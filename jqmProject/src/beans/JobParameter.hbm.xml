@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 8 sept. 2013 14:58:51 by Hibernate Tools 3.2.1.GA -->
+<hibernate-mapping>
+    <class name="beans.JobParameter" table="JOB_PARAMETER" schema="PUBLIC" catalog="PUBLIC">
+        <id name="idJp" type="int">
+            <column name="ID_JP" />
+            <generator class="assigned" />
+        </id>
+        <many-to-one name="job" class="beans.Job" fetch="select">
+            <column name="ID_JOB" not-null="true" />
+        </many-to-one>
+        <property name="key" type="string">
+            <column name="KEY" length="50" not-null="true" />
+        </property>
+        <property name="value" type="string">
+            <column name="VALUE" length="1000" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>
