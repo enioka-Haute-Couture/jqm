@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-reverse-engineering PUBLIC "-//Hibernate/Hibernate Reverse Engineering DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-reverse-engineering-3.0.dtd">
-<hibernate-reverse-engineering>
-  <schema-selection match-catalog="PUBLIC" match-schema="PUBLIC"/>
-  <table-filter match-name="APPLICATION"/>
-  <table-filter match-name="JOB"/>
-  <table-filter match-name="QUEUE"/>
-  <table-filter match-name="JOB_PARAMETER"/>
-</hibernate-reverse-engineering>
