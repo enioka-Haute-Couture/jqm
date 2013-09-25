@@ -2,29 +2,39 @@ package mcd;
 
 import java.util.Calendar;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
+@Entity
 public class History {
 
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
+	@Column(nullable=false)
 	private Integer returnedValue;
 	private Calendar jobDate;
+	@Column(length=1000)
 	private String msg;
-	private Integer msgId;
-	private Integer jobId;
-	/**
-	 * @return the id
-	 */
+	@ManyToOne(fetch=FetchType.EAGER, targetEntity=mcd.Message.class)
+	private Message message;
+	@OneToOne(fetch=FetchType.LAZY, targetEntity=mcd.JobInstance.class)
+	private JobInstance jobInstance;
+	private Calendar enqueueDate;
+	private Calendar executionDate;
+	private Calendar endDate;
+
+
 	public Integer getId()
 	{
 		return id;
 	}
-	/**
-	 * @param id the id to set
-	 */
+
 	public void setId(Integer id)
 	{
 		this.id = id;
@@ -71,32 +81,54 @@ public class History {
 	{
 		this.msg = msg;
 	}
-	/**
-	 * @return the msgId
-	 */
-	public Integer getMsgId()
+
+	public Message getMessage()
 	{
-		return msgId;
+		return message;
 	}
-	/**
-	 * @param msgId the msgId to set
-	 */
-	public void setMsgId(Integer msgId)
+
+	public void setMessage(Message message)
 	{
-		this.msgId = msgId;
+		this.message = message;
 	}
-	/**
-	 * @return the jobId
-	 */
-	public Integer getJobId()
+
+	public JobInstance getJobInstance()
 	{
-		return jobId;
+		return jobInstance;
 	}
-	/**
-	 * @param jobId the jobId to set
-	 */
-	public void setJobId(Integer jobId)
+
+	public void setJobInstance(JobInstance jobInstance)
 	{
-		this.jobId = jobId;
+		this.jobInstance = jobInstance;
+	}
+
+	public Calendar getEnqueueDate()
+	{
+		return enqueueDate;
+	}
+
+	public void setEnqueueDate(Calendar enqueueDate)
+	{
+		this.enqueueDate = enqueueDate;
+	}
+
+	public Calendar getExecutionDate()
+	{
+		return executionDate;
+	}
+
+	public void setExecutionDate(Calendar executionDate)
+	{
+		this.executionDate = executionDate;
+	}
+
+	public Calendar getEndDate()
+	{
+		return endDate;
+	}
+
+	public void setEndDate(Calendar endDate)
+	{
+		this.endDate = endDate;
 	}
 }

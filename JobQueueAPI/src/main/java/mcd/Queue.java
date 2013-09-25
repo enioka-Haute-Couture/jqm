@@ -1,15 +1,31 @@
 package mcd;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 
 /**
  *
  * @author pierre.coppee
  */
+
+@Entity
 public class Queue {
 
+	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	private int id;
+	@Column(nullable=false, length=50)
     private String name;
+	@Column(nullable=false, length=1000)
     private String description;
-    private Integer slot;
+	@Column(nullable=false)
+    private Integer maxTempInQueue;
+	@Column(nullable=false)
+    private Integer maxTempRunning;
+    private boolean defaultQueue;
 
 
     public String getName() {
@@ -19,11 +35,6 @@ public class Queue {
     public String getDescription() {
         return description;
     }
-
-    public int getSlot() {
-        return slot;
-    }
-
 	/**
 	 * @param name the name to set
 	 */
@@ -39,13 +50,43 @@ public class Queue {
 	{
 		this.description = description;
 	}
-
-	/**
-	 * @param slot the slot to set
-	 */
-	public void setSlot(int slot)
+	public int getId()
 	{
-		this.slot = slot;
+		return id;
 	}
 
+	public void setId(int id)
+	{
+		this.id = id;
+	}
+
+	public Integer getMaxTempInQueue()
+	{
+		return maxTempInQueue;
+	}
+
+	public void setMaxTempInQueue(Integer maxTempInQueue)
+	{
+		this.maxTempInQueue = maxTempInQueue;
+	}
+
+	public Integer getMaxTempRunning()
+	{
+		return maxTempRunning;
+	}
+
+	public void setMaxTempRunning(Integer maxTempRunning)
+	{
+		this.maxTempRunning = maxTempRunning;
+	}
+
+	public boolean isDefaultQueue()
+	{
+		return defaultQueue;
+	}
+
+	public void setDefaultQueue(boolean defaultQueue)
+	{
+		this.defaultQueue = defaultQueue;
+	}
 }

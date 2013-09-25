@@ -1,10 +1,24 @@
 package mcd;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
+@Entity
 public class ExecParameter {
 
+	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	private Integer id;
+	@Column(nullable=false, length=50)
 	private String key;
+	@Column(nullable=false, length=1000)
 	private String value;
-	private Integer submittedJobId;
+	@ManyToOne(fetch=FetchType.LAZY, targetEntity=mcd.JobInstance.class)
+	private JobInstance jobInstance;
 
 
 	public String getKey()
@@ -27,13 +41,23 @@ public class ExecParameter {
 		this.value = value;
 	}
 
-	public Integer getSubmittedJobId()
+	public Integer getId()
 	{
-		return submittedJobId;
+		return id;
 	}
 
-	public void setSubmittedJobId(Integer submittedJobId)
+	public void setId(Integer id)
 	{
-		this.submittedJobId = submittedJobId;
+		this.id = id;
+	}
+
+	public JobInstance getJobInstance()
+	{
+		return jobInstance;
+	}
+
+	public void setJobInstance(JobInstance jobInstance)
+	{
+		this.jobInstance = jobInstance;
 	}
 }

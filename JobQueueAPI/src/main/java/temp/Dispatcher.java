@@ -7,6 +7,7 @@ import mcd.Deliverable;
 import mcd.JobDefinition;
 import mcd.JobInstance;
 import mcd.Queue;
+import tools.CreationTools;
 
 /**
  *
@@ -16,7 +17,10 @@ public class Dispatcher {
 
 	public static int enQueue(JobDefinition job) {
 
-		return 0;
+		CreationTools c = new CreationTools();
+		JobInstance ji = c.initJobInstance(job, "SUBMITTED");
+		c.close();
+		return ji.getId();
 	}
 
 	public static void delJobInQueue(int idJob) {

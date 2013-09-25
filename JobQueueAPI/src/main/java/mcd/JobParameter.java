@@ -1,20 +1,24 @@
 package mcd;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.ManyToOne;
 
 @Entity
-@Table
 public class JobParameter
 {
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
-	private int id;
+	private Integer id;
+	@Column(nullable=false, length=50)
 	private String key;
+	@Column(nullable=false, length=1000)
 	private String value;
-	private Integer JobId;
+	@ManyToOne(fetch=FetchType.LAZY, targetEntity=mcd.JobDefinition.class)
+	private JobInstance jobInstance;
 
 
 	/**
@@ -45,18 +49,20 @@ public class JobParameter
 	{
 		this.value = value;
 	}
-	/**
-	 * @return the jobId
-	 */
-	public Integer getJobId()
+	public Integer getId()
 	{
-		return JobId;
+		return id;
 	}
-	/**
-	 * @param jobId the jobId to set
-	 */
-	public void setJobId(Integer jobId)
+	public void setId(Integer id)
 	{
-		JobId = jobId;
+		this.id = id;
+	}
+	public JobInstance getJobInstance()
+	{
+		return jobInstance;
+	}
+	public void setJobInstance(JobInstance jobInstance)
+	{
+		this.jobInstance = jobInstance;
 	}
 }

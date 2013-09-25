@@ -1,10 +1,12 @@
 package mcd;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.ManyToOne;
 
 
 /**
@@ -12,17 +14,20 @@ import javax.persistence.Table;
  * @author pierre.coppee
  */
 @Entity
-@Table
 public class JobInstance {
 
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
-    private int id;
+    private Integer id;
+	@ManyToOne(fetch=FetchType.LAZY)
+	private JobDefinition jd;
+	@ManyToOne(fetch=FetchType.LAZY)
+	public JobInstance parent;
+	@Column(length=50)
     private String user;
     private Integer sessionID;
-    private String jobClass;
-    private String filePath;
+    @Column(nullable=false, length=50)
     private String state;
-    private String position;
+    private Integer position;
 
     public int getId() {
         return id;
@@ -35,77 +40,53 @@ public class JobInstance {
     public int getSessionID() {
         return sessionID;
     }
-
-    public String getJobClass() {
-        return jobClass;
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public String getPosition() {
-        return position;
-    }
-
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(int id)
+    public JobDefinition getJd()
 	{
-		this.id = id;
+		return jd;
 	}
 
-	/**
-	 * @param user the user to set
-	 */
-	public void setUser(String user)
+	public void setJd(JobDefinition jd)
 	{
-		this.user = user;
+		this.jd = jd;
 	}
 
-	/**
-	 * @param sessionID the sessionID to set
-	 */
-	public void setSessionID(Integer sessionID)
+	public String getState()
 	{
-		this.sessionID = sessionID;
+		return state;
 	}
 
-	/**
-	 * @param jobClass the jobClass to set
-	 */
-	public void setJobClass(String jobClass)
-	{
-		this.jobClass = jobClass;
-	}
-
-	/**
-	 * @param filePath the filePath to set
-	 */
-	public void setFilePath(String filePath)
-	{
-		this.filePath = filePath;
-	}
-
-	/**
-	 * @param state the state to set
-	 */
 	public void setState(String state)
 	{
 		this.state = state;
 	}
 
-	/**
-	 * @param position the position to set
-	 */
-	public void setPosition(String position)
+	public Integer getPosition()
+	{
+		return position;
+	}
+
+	public void setPosition(Integer position)
 	{
 		this.position = position;
 	}
 
+	public void setUser(String user)
+	{
+		this.user = user;
+	}
+
+	public void setSessionID(Integer sessionID)
+	{
+		this.sessionID = sessionID;
+	}
+
+	public JobInstance getParent()
+	{
+		return parent;
+	}
+
+	public void setParent(JobInstance parent)
+	{
+		this.parent = parent;
+	}
 }

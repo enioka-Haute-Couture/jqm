@@ -1,15 +1,21 @@
 package mcd;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
+@Entity
 public class Message {
 
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
+	@Column(length=1000)
 	private String textMessage;
-	private Integer historyId;
+	@ManyToOne(optional=false)
+	private History history;
 
 
 	/**
@@ -40,18 +46,12 @@ public class Message {
 	{
 		this.textMessage = textMessage;
 	}
-	/**
-	 * @return the historyId
-	 */
-	public Integer getHistoryId()
+	public History getHistory()
 	{
-		return historyId;
+		return history;
 	}
-	/**
-	 * @param historyId the historyId to set
-	 */
-	public void setHistoryId(Integer historyId)
+	public void setHistory(History history)
 	{
-		this.historyId = historyId;
+		this.history = history;
 	}
 }
