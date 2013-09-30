@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2013 enioka. All rights reserved
+ * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
+ * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.enioka.jqm.tools;
 
 import java.io.File;
@@ -29,8 +47,8 @@ public class Main
 		{
 	    	Polling p = new Polling();
 	    	File local = new File(System.getProperty("user.home") + "/.m2/repository");
-	    	Dependencies dependencies = new Dependencies(p.getJob().getJd().getFilePath() + "pom.xml");
-	    	File jar = new File(p.getJob().getJd().getFilePath() + "target/testJobQueueAPI-0.0.1-SNAPSHOT.jar");
+	    	Dependencies dependencies = new Dependencies(p.getJob().get(0).getJd().getFilePath() + "pom.xml");
+	    	File jar = new File(p.getJob().get(0).getJd().getFilePath() + "target/DateTimeMaven-0.0.1-SNAPSHOT.jar");
 	    	dependencies.print();
 		    URL jars = jar.toURI().toURL();
 
@@ -69,6 +87,7 @@ public class Main
 			URL[] urls = tmp.toArray(new URL[tmp.size()]);
 
 			JarClassLoader jobClassLoader = new JarClassLoader(jars, urls);
+
 			// Change active class loader
 			Thread.currentThread().setContextClassLoader(jobClassLoader);
 
@@ -78,18 +97,6 @@ public class Main
 
 			// Restore class loader
 			Thread.currentThread().setContextClassLoader(contextClassLoader);
-//			urls.add(jars);
-//
-//
-//		    URLClassLoader depClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), null);
-//		    //URLClassLoader urlClassLoader = new URLClassLoader(jars, null);
-//		    Thread.currentThread().setContextClassLoader(depClassLoader);
-//		    Class<?> clazz = depClassLoader.loadClass("Main");
-//		    Method method = clazz.getDeclaredMethod("main", String[].class);
-//		    String[] mParams = null;
-//		    method.invoke(null, (Object) mParams);
-//
-//		    Thread.currentThread().setContextClassLoader(contextClassLoader);
 
 		} catch (DependencyResolutionException e)
 		{
