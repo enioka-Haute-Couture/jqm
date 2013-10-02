@@ -19,14 +19,19 @@
 package com.enioka.jqm.api;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
 import com.enioka.jqm.jpamodel.Deliverable;
+import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDefinition;
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.tools.CreationTools;
 
@@ -37,12 +42,45 @@ import com.enioka.jqm.tools.CreationTools;
 public class Dispatcher {
 
 	public static int enQueue(JobDefinition job) {
-//		"SELECT DISTINCT (j) FROM JobInstance j WHERE EXISTS (" +
-//				"SELECT MAX (j.position) FROM JobInstance j WHERE j.state = :state"
+
+		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
+		History h = null;
 		Integer p = CreationTools.em.createQuery("SELECT MAX (j.position) FROM JobInstance j, JobDefinition jd " +
 				"WHERE j.jd.queue.name = :queue", Integer.class).setParameter("queue", (job.getQueue().getName())).getSingleResult();
 		System.out.println("POSITION: " + p);
-		JobInstance ji = CreationTools.createJobInstance(job, "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1);
+		JobInstance ji = CreationTools.createJobInstance(job, "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue);
+
+		// Update status in the history table
+
+		Query q = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", ji.getId());
+
+		if (!q.equals(null)) {
+
+			Message m = null;
+
+			h = CreationTools.createhistory(1, null, "History of the Job --> ID = " + (ji.getId()),
+					m, ji, enqueueDate, null, null);
+
+			m = CreationTools.createMessage("Status updated: SUBMITTED", h);
+
+		}
+		else {
+			EntityTransaction transac = CreationTools.em.getTransaction();
+			transac.begin();
+
+			h = (History) q.getSingleResult();
+
+			Message m = CreationTools.em.createQuery("SELECT m FROM Message m WHERE m.id = :h",
+					Message.class).setParameter("h", h.getMessage().getId()).getSingleResult();
+
+			m.setTextMessage("Status updated: SUBMITTED");
+
+			CreationTools.em.createQuery("UPDATE Message m SET m.textMessage = :msg WHERE" +
+					"m.history.id = :h").setParameter("h", h.getId()).setParameter("msg", "Status updated: SUBMITTED").executeUpdate();
+
+			transac.commit();
+		}
+
 		return ji.getId();
 	}
 
@@ -95,6 +133,8 @@ public class Dispatcher {
 
 	public static void setPosition(int idJob, int position) {
 
+		if (position < 1)
+			position = 1;
 
 		List<JobInstance> q = CreationTools.em.createQuery("SELECT j FROM JobInstance j WHERE j.state = :s " +
 				"ORDER BY j.position", JobInstance.class).setParameter("s", "SUBMITTED").getResultList();
@@ -105,7 +145,8 @@ public class Dispatcher {
 		Query query = CreationTools.em.createQuery("UPDATE JobInstance j SET j.position = :pos WHERE " +
 				"j.id = (SELECT ji.id FROM JobInstance ji WHERE ji.id = :idJob)").setParameter("idJob", idJob).setParameter("pos", position);
 
-		int result = query.executeUpdate();
+		@SuppressWarnings("unused")
+        int result = query.executeUpdate();
 
 		for (int i = 0; i < q.size(); i++)
 		{
@@ -115,14 +156,16 @@ public class Dispatcher {
 			{
 				Query queryEg = CreationTools.em.createQuery("UPDATE JobInstance j SET j.position = :i WHERE j.id = :job").setParameter("i",
 						position + 2).setParameter("job", q.get(i).getId());
-				int res = queryEg.executeUpdate();
+				@SuppressWarnings("unused")
+                int res = queryEg.executeUpdate();
 				i++;
 			}
 			else
 			{
 				Query qq = CreationTools.em.createQuery("UPDATE JobInstance j SET j.position = :i WHERE j.id = :job").setParameter("i",
 						i + 1).setParameter("job", q.get(i).getId());
-				int res = qq.executeUpdate();
+				@SuppressWarnings("unused")
+                int res = qq.executeUpdate();
 
 			}
 		}
@@ -154,7 +197,7 @@ public class Dispatcher {
 		return null;
 	}
 
-	public static List<String> getMsg(int idJob) {
+	public static List<String> getMsg(int idJob) { // -------------TODO------------
 
 		ArrayList<String> msgs = new ArrayList<String>();
 
@@ -184,16 +227,14 @@ public class Dispatcher {
 
 	public static void changeQueue(int idJob, int idQueue) {
 
-		JobDefinition jd = CreationTools.em.createQuery("SELECT j.jd FROM JobInstance j, JobDefinition jd WHERE j.id = :idJob", JobDefinition.class).setParameter("idJob",
-						idJob).getSingleResult();
+		EntityTransaction transac = CreationTools.em.getTransaction();
+		transac.begin();
 
 		Queue q = CreationTools.em.createQuery("SELECT Queue FROM Queue queue " +
 				"WHERE queue.id = :q", Queue.class).setParameter("q", idQueue).getSingleResult();
 
-		EntityTransaction transac = CreationTools.em.getTransaction();
-		transac.begin();
 
-		Query query = CreationTools.em.createQuery("UPDATE JobDefinition j SET j.queue = :q WHERE j = :jd").setParameter("q", q).setParameter("jd", jd);
+		Query query = CreationTools.em.createQuery("UPDATE JobInstance j SET j.queue = :q WHERE j.id = :jd").setParameter("q", q).setParameter("jd", idJob);
 		int result = query.executeUpdate();
 
 		if (result != 1)
@@ -204,16 +245,10 @@ public class Dispatcher {
 
 	public static void changeQueue(int idJob, Queue queue) {
 
-		JobDefinition jd = CreationTools.em.createQuery("SELECT j.jd FROM JobInstance j, JobDefinition jd WHERE j.id = :idJob", JobDefinition.class).setParameter("idJob",
-				idJob).getSingleResult();
-
-		Queue q = CreationTools.em.createQuery("SELECT Queue FROM Queue queue " +
-				"WHERE queue.id = :q", Queue.class).setParameter("q", queue.getId()).getSingleResult();
-
 		EntityTransaction transac = CreationTools.em.getTransaction();
 		transac.begin();
 
-		Query query = CreationTools.em.createQuery("UPDATE JobDefinition j SET j.queue = :q WHERE j = :jd").setParameter("q", q).setParameter("jd", jd);
+		Query query = CreationTools.em.createQuery("UPDATE JobInstance j SET j.queue = :q WHERE j.id = :jd").setParameter("q", queue).setParameter("jd", idJob);
 		int result = query.executeUpdate();
 
 		if (result != 1)

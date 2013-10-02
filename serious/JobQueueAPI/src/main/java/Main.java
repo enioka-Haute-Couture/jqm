@@ -24,7 +24,6 @@ import com.enioka.jqm.tools.CreationTools;
 public class Main
 {
 
-
 	static Queue qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42 , 100);
 	static Queue qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
 	static Queue qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 0 , 100);
@@ -46,13 +45,14 @@ public class Main
 
 
 		//Dispatcher.enQueue(jd);
-		//Dispatcher.changeQueue(61, qSlow);
-		//Dispatcher.setPosition(69, 2);
+		Dispatcher.changeQueue(238, 347);
+		//Dispatcher.setPosition(88, 1);
 //		for (JobInstance i : Dispatcher.getUserJobs("MAG"))
 //		{
 //			System.out.println("Jobs " + i.getId());
 //		}
-		Dispatcher.delJobInQueue(70);
+		//Dispatcher.delJobInQueue(70);
+		//Dispatcher.enQueue(jd);
 		CreationTools.close();
 	}
 

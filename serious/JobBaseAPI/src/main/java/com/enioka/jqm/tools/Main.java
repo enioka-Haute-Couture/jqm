@@ -35,54 +35,54 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 import com.enioka.jqm.temp.Polling;
 import com.jcabi.aether.Aether;
 
-public class Main
-{
+public class Main {
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args)
-	{
-	    try
-		{
-	    	Polling p = new Polling();
-	    	File local = new File(System.getProperty("user.home") + "/.m2/repository");
-	    	Dependencies dependencies = new Dependencies(p.getJob().get(0).getJd().getFilePath() + "pom.xml");
-	    	File jar = new File(p.getJob().get(0).getJd().getFilePath() + "target/DateTimeMaven-0.0.1-SNAPSHOT.jar");
-	    	dependencies.print();
-		    URL jars = jar.toURI().toURL();
+	public static void main(String[] args) {
 
-		    Collection<RemoteRepository> remotes = Arrays.asList(
-		      new RemoteRepository(
-		        "maven-central",
-		        "default",
-		        "http://repo1.maven.org/maven2/"
-		      ),
-		      new RemoteRepository(
-				        "eclipselink",
-				        "default",
-				        "http://download.eclipse.org/rt/eclipselink/maven.repo/"
-				      )
+		try {
+			Polling p = new Polling();
+			File local = new File(System.getProperty("user.home")
+			        + "/.m2/repository");
+			Dependencies dependencies = new Dependencies(p.getJob().get(0)
+			        .getJd().getFilePath()
+			        + "pom.xml");
+			File jar = new File(p.getJob().get(0).getJd().getFilePath()
+			        + "target/DateTimeMaven-0.0.1-SNAPSHOT.jar");
+			dependencies.print();
+			URL jars = jar.toURI().toURL();
 
-		    );
-		    ArrayList<URL> tmp = new ArrayList<URL>();
-		    Collection<Artifact> deps = null;
-		    for (int i = 0; i < dependencies.getList().size(); i++)
-		    {
-		    	System.out.println("DEPENDENCIES" + i +": " + dependencies.getList().get(i));
-		    	deps = new Aether(remotes, local).resolve(
-		    			new DefaultArtifact(dependencies.getList().get(i)),
-		    			"compile"
-		    			);
-		    }
+			Collection<RemoteRepository> remotes = Arrays
+			        .asList(new RemoteRepository("maven-central", "default",
+			                "http://repo1.maven.org/maven2/"),
+			                new RemoteRepository("eclipselink", "default",
+			                        "http://download.eclipse.org/rt/eclipselink/maven.repo/")
 
-			for (Artifact artifact : deps)
-			{
+			        );
+			ArrayList<URL> tmp = new ArrayList<URL>();
+			Collection<Artifact> deps = null;
+			System.out.println("TESSSSSSST");
+
+			// Update of the job status --> RUNNING
+			p.executionStatus();
+
+			for (int i = 0; i < dependencies.getList().size(); i++) {
+				System.out.println("DEPENDENCIES" + i + ": "
+				        + dependencies.getList().get(i));
+				deps = new Aether(remotes, local).resolve(new DefaultArtifact(
+				        dependencies.getList().get(i)), "compile");
+			}
+
+			for (Artifact artifact : deps) {
 				tmp.add(artifact.getFile().toURI().toURL());
-				System.out.println("Artifact: " + artifact.getFile().toURI().toURL());
+				System.out.println("Artifact: "
+				        + artifact.getFile().toURI().toURL());
 
 			}
-			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+			ClassLoader contextClassLoader = Thread.currentThread()
+			        .getContextClassLoader();
 
 			URL[] urls = tmp.toArray(new URL[tmp.size()]);
 
@@ -91,43 +91,38 @@ public class Main
 			// Change active class loader
 			Thread.currentThread().setContextClassLoader(jobClassLoader);
 
-			// Go! (launches the main function in the startup class designated in
+			// Go! (launches the main function in the startup class designated
+			// in
 			// the manifest)
+			System.out.println("+++++++++++++++++++++++++++++++++++++++");
 			jobClassLoader.invokeMain();
+			System.out.println("+++++++++++++++++++++++++++++++++++++++");
 
 			// Restore class loader
 			Thread.currentThread().setContextClassLoader(contextClassLoader);
 
-		} catch (DependencyResolutionException e)
-		{
+		} catch (DependencyResolutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (MalformedURLException e)
-		{
+		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (ClassNotFoundException e)
-		{
+		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (SecurityException e)
-		{
+		} catch (SecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (NoSuchMethodException e)
-		{
+		} catch (NoSuchMethodException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (IllegalArgumentException e)
-		{
+		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (InvocationTargetException e)
-		{
+		} catch (InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (IOException e)
-		{
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

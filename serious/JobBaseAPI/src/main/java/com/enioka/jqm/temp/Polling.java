@@ -22,26 +22,74 @@ import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.tools.CreationTools;
 
-public class Polling
-{
-	ArrayList<JobInstance> job = null;
-	public Polling()
-	{
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+public class Polling {
+
+	private ArrayList<JobInstance> job = null;
+
+	public Polling() {
+
+		EntityManagerFactory emf = Persistence
+		        .createEntityManagerFactory("jobqueue-api-pu");
 		EntityManager em = emf.createEntityManager();
 
-		ArrayList<JobInstance> q = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j, JobDefinition jd" +
-				" WHERE j.jd.queue.name = :q ORDER BY j.position", JobInstance.class).setParameter("q", "VIPQueue").getResultList();
+		ArrayList<JobInstance> q = (ArrayList<JobInstance>) em
+		        .createQuery(
+		                "SELECT j FROM JobInstance j, JobDefinition jd"
+		                        + " WHERE j.jd.queue.name = :q ORDER BY j.position",
+		                JobInstance.class).setParameter("q", "VIPQueue")
+		        .getResultList();
 		job = q;
+
+		EntityTransaction transac = CreationTools.em.getTransaction();
+		transac.begin();
+
+		CreationTools.em
+		        .createQuery(
+		                "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
+		                        + "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)")
+		        .setParameter("j", job.get(0).getId())
+		        .setParameter("msg", "Status updated: ATTRIBUTED")
+		        .executeUpdate();
+
+		CreationTools.em
+		        .createQuery(
+		                "UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)")
+		        .setParameter("j", job.get(0).getId())
+		        .setParameter("msg", "ATTRIBUTED").executeUpdate();
+
+		transac.commit();
 	}
 
-	public ArrayList<JobInstance> getJob()
-	{
+	public ArrayList<JobInstance> getJob() {
+
 		return job;
+	}
+
+	public void executionStatus() {
+
+		EntityTransaction transac = CreationTools.em.getTransaction();
+		transac.begin();
+
+		CreationTools.em
+		        .createQuery(
+		                "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
+		                        + "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)")
+		        .setParameter("j", job.get(0).getId())
+		        .setParameter("msg", "Status updated: RUNNING").executeUpdate();
+
+		CreationTools.em
+		        .createQuery(
+		                "UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)")
+		        .setParameter("j", job.get(0).getId())
+		        .setParameter("msg", "RUNNING").executeUpdate();
+
+		transac.commit();
 	}
 
 }
