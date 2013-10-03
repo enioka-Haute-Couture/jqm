@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import javax.persistence.EntityTransaction;
+
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.jpamodel.JobDefinition;
 import com.enioka.jqm.jpamodel.Queue;
@@ -24,28 +26,77 @@ import com.enioka.jqm.tools.CreationTools;
 public class Main
 {
 
-	static Queue qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42 , 100);
-	static Queue qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
-	static Queue qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 0 , 100);
+	static Queue qVip = null;
+	static Queue qNormal = null;
+	static Queue qSlow = null;
 
-	static JobDefinition jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qVip,
-			42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+	static JobDefinition jd = null;
 
-	static JobDefinition jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
-			42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+	static JobDefinition jdDemoMaven = null;
 
-	static JobDefinition jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/Demo/", qSlow,
-			42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+	static JobDefinition jdDemo = null;
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 
+		EntityTransaction transac = CreationTools.em.getTransaction();
+		transac.begin();
 
+		CreationTools.em.createQuery("DELETE FROM Message").executeUpdate();
+		transac.commit();
 
-		//Dispatcher.enQueue(jd);
-		Dispatcher.changeQueue(238, 347);
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+
+		CreationTools.em.createQuery("DELETE FROM History").executeUpdate();
+		transac.commit();
+
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+
+		CreationTools.em.createQuery("DELETE FROM JobInstance").executeUpdate();
+		transac.commit();
+
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+
+		CreationTools.em.createQuery("DELETE FROM JobParameter").executeUpdate();
+		transac.commit();
+
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+
+		CreationTools.em.createQuery("DELETE FROM JobDefinition").executeUpdate();
+		transac.commit();
+
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+
+		CreationTools.em.createQuery("DELETE FROM Queue").executeUpdate();
+
+		transac.commit();
+
+		qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42 , 100);
+		qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
+		qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 0 , 100);
+
+		jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qVip,
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+
+		jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+
+		jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/Demo/", qSlow,
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+
+		Dispatcher.enQueue(jdDemoMaven);
+		Dispatcher.enQueue(jdDemo);
+		Dispatcher.enQueue(jd);
+		Dispatcher.enQueue(jd);
+		Dispatcher.enQueue(jd);
+		//Dispatcher.changeQueue(238, 347);
 		//Dispatcher.setPosition(88, 1);
 //		for (JobInstance i : Dispatcher.getUserJobs("MAG"))
 //		{

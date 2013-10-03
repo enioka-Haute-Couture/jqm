@@ -52,14 +52,14 @@ public class Dispatcher {
 
 		// Update status in the history table
 
-		Query q = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", ji.getId());
+		Query q = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobId = :j", History.class).setParameter("j", ji.getId());
 
 		if (!q.equals(null)) {
 
 			Message m = null;
 
 			h = CreationTools.createhistory(1, null, "History of the Job --> ID = " + (ji.getId()),
-					m, ji, enqueueDate, null, null);
+					m, ji.getId(), enqueueDate, null, null);
 
 			m = CreationTools.createMessage("Status updated: SUBMITTED", h);
 
