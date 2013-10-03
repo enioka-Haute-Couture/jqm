@@ -3,6 +3,7 @@ package com.enioka.jqm.test;
 import java.util.ArrayList;
 
 import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -129,19 +130,19 @@ public class TestSuite {
 
 	}
 
-//	@Test
-//	public void testDelJobInQueue() {
-//
-//		testInit();
-//
-//		JobInstance q = CreationTools.em.createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job", JobInstance.class).setParameter("job", jd.getId()).getSingleResult();
-//
-//		Dispatcher.delJobInQueue(q.getId());
-//
-//		JobInstance tmp = CreationTools.em.createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job", JobInstance.class).setParameter("job", jd.getId()).getSingleResult();
-//
-//		Assert.assertEquals(true, tmp.getJd().equals(null)); // UPDATE THE HISTORY
-//	}
+	@Test
+	public void testDelJobInQueue() {
+
+		testInit();
+
+		JobInstance q = CreationTools.em.createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job", JobInstance.class).setParameter("job", jd.getId()).getSingleResult();
+
+		Dispatcher.delJobInQueue(q.getId());
+
+		Query tmp = CreationTools.em.createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job", JobInstance.class).setParameter("job", jd.getId());
+
+		Assert.assertEquals(false, tmp.equals(q));
+	}
 
 	@Test
 	public void testCancelJobInQueue() {
