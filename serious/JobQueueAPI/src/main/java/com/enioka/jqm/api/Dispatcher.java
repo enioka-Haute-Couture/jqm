@@ -44,6 +44,7 @@ public class Dispatcher {
 	public static int enQueue(JobDefinition job) {
 
 		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
+
 		History h = null;
 		Integer p = CreationTools.em.createQuery("SELECT MAX (j.position) FROM JobInstance j, JobDefinition jd " +
 				"WHERE j.jd.queue.name = :queue", Integer.class).setParameter("queue", (job.getQueue().getName())).getSingleResult();
@@ -101,14 +102,24 @@ public class Dispatcher {
 
 	public static void cancelJobInQueue(int idJob) {
 
+		History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobId = :j", History.class).setParameter("j", idJob).getSingleResult();
+
 		EntityTransaction transac = CreationTools.em.getTransaction();
 		transac.begin();
 
 		Query q = CreationTools.em.createQuery("UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob").setParameter("idJob", idJob);
 		int res = q.executeUpdate();
 
+		CreationTools.em
+        .createQuery(
+                "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
+                        + "(SELECT h.id FROM History h WHERE h.jobId = :j)")
+        .setParameter("j", idJob)
+        .setParameter("msg", "Status updated: CANCELLED")
+        .executeUpdate();
+
 		if (res != 1)
-			System.err.println("delJobInQueueError: Job ID or Queue ID doesn't exists.");
+			System.err.println("CancelJobInQueueError: Job ID or Queue ID doesn't exists.");
 
 		transac.commit();
 

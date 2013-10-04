@@ -38,6 +38,18 @@ public class TestSuite {
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
 
+		CreationTools.em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
+		transac.commit();
+
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+
+		CreationTools.em.createQuery("DELETE FROM Node").executeUpdate();
+		transac.commit();
+
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+
 		CreationTools.em.createQuery("DELETE FROM History").executeUpdate();
 		transac.commit();
 
@@ -157,7 +169,7 @@ public class TestSuite {
 		JobInstance tmp = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", jd.getId()).getSingleResult();
 
-		Assert.assertEquals("CANCELLED", tmp.getState()); // UPDATE THE HISTORY
+		Assert.assertEquals("CANCELLED", tmp.getState());
 
 	}
 

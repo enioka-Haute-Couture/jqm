@@ -19,12 +19,18 @@
 import javax.persistence.EntityTransaction;
 
 import com.enioka.jqm.api.Dispatcher;
+import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.JobDefinition;
+import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.tools.CreationTools;
 
 public class Main
 {
+
+	static DeploymentParameter dp = null;
+	//static DeploymentParameter dpNormal = null;
+	static Node node = null;
 
 	static Queue qVip = null;
 	static Queue qNormal = null;
@@ -45,6 +51,18 @@ public class Main
 		transac.begin();
 
 		CreationTools.em.createQuery("DELETE FROM Message").executeUpdate();
+		transac.commit();
+
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+
+		CreationTools.em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
+		transac.commit();
+
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+
+		CreationTools.em.createQuery("DELETE FROM Node").executeUpdate();
 		transac.commit();
 
 		transac = CreationTools.em.getTransaction();
@@ -88,11 +106,16 @@ public class Main
 		jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/Demo/", qSlow,
+		jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		Dispatcher.enQueue(jdDemoMaven);
-		Dispatcher.enQueue(jdDemo);
+		node = CreationTools.createNode("Interface_42", 1234);
+
+		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip);
+		//dpNormal = CreationTools.createDeploymentParameter(1, node, 1, 500, qNormal);
+
+		//Dispatcher.enQueue(jdDemoMaven);
+		//Dispatcher.enQueue(jdDemo);
 		Dispatcher.enQueue(jd);
 		Dispatcher.enQueue(jd);
 		Dispatcher.enQueue(jd);

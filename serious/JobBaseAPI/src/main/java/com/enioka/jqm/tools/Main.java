@@ -18,155 +18,81 @@
 
 package com.enioka.jqm.tools;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.GregorianCalendar;
-import java.util.Locale;
 
-import javax.persistence.EntityTransaction;
-
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.resolution.DependencyResolutionException;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
-
-import com.enioka.jqm.jpamodel.History;
+import com.enioka.jqm.jpamodel.DeploymentParameter;
+import com.enioka.jqm.jpamodel.Node;
+import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.temp.Polling;
-import com.jcabi.aether.Aether;
 
 public class Main {
 
+	public static DeploymentParameter dp = null;
+	public static Node node = null;
+	public static Polling p = null;
+	public static ArrayList<Queue> queues = new ArrayList<Queue>();
+
 	/**
 	 * @param args
+	 * @throws InterruptedException
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 
-		try {
-			Polling p = new Polling();
-			Calendar executionDate = GregorianCalendar.getInstance(Locale
-			        .getDefault());
+		// Get the informations about the current node
+		// Add no node in base case
+		if (args.length == 1) {
 
-			if (p.getJob() != null) {
+			node = CreationTools.em
+			        .createQuery(
+			                "SELECT n FROM Node n WHERE n.listeningInterface = :li",
+			                Node.class).setParameter("li", args[0])
+			        .getSingleResult();
 
-				// Execution Date Updated
+			dp = CreationTools.em
+			        .createQuery(
+			                "SELECT dp FROM DeploymentParameter dp WHERE dp.node = :n",
+			                DeploymentParameter.class).setParameter("n", node)
+			        .getSingleResult();
+		}
 
-				History h = CreationTools.em
-				        .createQuery(
-				                "SELECT h FROM History h WHERE h.jobId = :j",
-				                History.class)
-				        .setParameter("j", p.getJob().get(0).getId())
-				        .getSingleResult();
+		// Get queues
 
-				System.out.println("history ID: " + h.getId());
+		ArrayList<DeploymentParameter> dps = (ArrayList<DeploymentParameter>) CreationTools.em
+		        .createQuery(
+		                "SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n",
+		                DeploymentParameter.class)
+		        .setParameter("n", node.getId()).getResultList();
 
-				EntityTransaction transac = CreationTools.em.getTransaction();
-				transac.begin();
+		for (int i = 0; i < dps.size(); i++) {
 
-				CreationTools.em
-				        .createQuery(
-				                "UPDATE History h SET h.executionDate = :date WHERE h.id = :h")
-				        .setParameter("h", h.getId())
-				        .setParameter("date", executionDate).executeUpdate();
+			queues.add(dps.get(i).getQueue());
+		}
 
-				transac.commit();
-				// Execution Date END
+		for (Queue q : queues) {
 
-				File local = new File(System.getProperty("user.home")
-				        + "/.m2/repository");
-				Dependencies dependencies = new Dependencies(p.getJob().get(0)
-				        .getJd().getFilePath()
-				        + "pom.xml");
-				File jar = new File(p.getJob().get(0).getJd().getFilePath()
-				        + "target/DateTimeMaven-0.0.1-SNAPSHOT.jar");
-				dependencies.print();
-				URL jars = jar.toURI().toURL();
+			System.out.println(q.getName());
+		}
 
-				Collection<RemoteRepository> remotes = Arrays
-				        .asList(new RemoteRepository("maven-central",
-				                "default", "http://repo1.maven.org/maven2/"),
-				                new RemoteRepository("eclipselink", "default",
-				                        "http://download.eclipse.org/rt/eclipselink/maven.repo/")
+		int j = 0;
 
-				        );
+		while (true) {
 
-				ArrayList<URL> tmp = new ArrayList<URL>();
-				Collection<Artifact> deps = null;
+			while (j < queues.size()) {
 
-				// Update of the job status --> RUNNING
-				p.executionStatus();
+				Thread.sleep(dp.getPollingInterval());
+				p = new Polling(queues.get(j));
 
-				// Clean the JobInstance list
-				p.clean();
+				if (p.getJob() != null) {
 
-				for (int i = 0; i < dependencies.getList().size(); i++) {
-					System.out.println("DEPENDENCIES" + i + ": "
-					        + dependencies.getList().get(i));
-					deps = new Aether(remotes, local).resolve(
-					        new DefaultArtifact(dependencies.getList().get(i)),
-					        "compile");
+					@SuppressWarnings("unused")
+					ThreadPool tp = new ThreadPool(p);
 				}
 
-				for (Artifact artifact : deps) {
-					tmp.add(artifact.getFile().toURI().toURL());
-					System.out.println("Artifact: "
-					        + artifact.getFile().toURI().toURL());
-
-				}
-				ClassLoader contextClassLoader = Thread.currentThread()
-				        .getContextClassLoader();
-
-				URL[] urls = tmp.toArray(new URL[tmp.size()]);
-
-				JarClassLoader jobClassLoader = new JarClassLoader(jars, urls);
-
-				// Change active class loader
-				Thread.currentThread().setContextClassLoader(jobClassLoader);
-
-				// Go! (launches the main function in the startup class
-				// designated
-				// in
-				// the manifest)
-				System.out.println("+++++++++++++++++++++++++++++++++++++++");
-				jobClassLoader.invokeMain();
-				System.out.println("+++++++++++++++++++++++++++++++++++++++");
-
-				// Restore class loader
-				Thread.currentThread()
-				        .setContextClassLoader(contextClassLoader);
+				if (j == queues.size() - 1)
+					j = 0;
+				else
+					j++;
 			}
-
-		} catch (DependencyResolutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
-
 }
