@@ -22,15 +22,13 @@ import java.util.ArrayList;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.temp.Polling;
 
 public class Main {
 
-	public static DeploymentParameter dp = null;
+	public static ArrayList<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
 	public static Node node = null;
 	public static Polling p = null;
-	public static ArrayList<Queue> queues = new ArrayList<Queue>();
 
 	/**
 	 * @param args
@@ -48,47 +46,45 @@ public class Main {
 			                Node.class).setParameter("li", args[0])
 			        .getSingleResult();
 
-			dp = CreationTools.em
+			// dp = (ArrayList<DeploymentParameter>) CreationTools.em
+			// .createQuery(
+			// "SELECT dp FROM DeploymentParameter dp WHERE dp.node = :n",
+			// DeploymentParameter.class).setParameter("n", node)
+			// .getResultList();
+
+			dps = (ArrayList<DeploymentParameter>) CreationTools.em
 			        .createQuery(
-			                "SELECT dp FROM DeploymentParameter dp WHERE dp.node = :n",
-			                DeploymentParameter.class).setParameter("n", node)
-			        .getSingleResult();
+			                "SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n",
+			                DeploymentParameter.class)
+			        .setParameter("n", node.getId()).getResultList();
 		}
 
-		// Get queues
+		// for (int i = 0; i < dps.size(); i++) {
+		//
+		// queues.add(dps.get(i).getQueue());
+		// }
+		//
+		for (DeploymentParameter q : dps) {
 
-		ArrayList<DeploymentParameter> dps = (ArrayList<DeploymentParameter>) CreationTools.em
-		        .createQuery(
-		                "SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n",
-		                DeploymentParameter.class)
-		        .setParameter("n", node.getId()).getResultList();
-
-		for (int i = 0; i < dps.size(); i++) {
-
-			queues.add(dps.get(i).getQueue());
-		}
-
-		for (Queue q : queues) {
-
-			System.out.println(q.getName());
+			System.out.println(q.getQueue().getName());
 		}
 
 		int j = 0;
 
 		while (true) {
 
-			while (j < queues.size()) {
+			while (j < dps.size()) {
 
-				Thread.sleep(dp.getPollingInterval());
-				p = new Polling(queues.get(j));
+				Thread.sleep(dps.get(j).getPollingInterval());
+				p = new Polling(dps.get(j).getQueue());
 
 				if (p.getJob() != null) {
 
 					@SuppressWarnings("unused")
-					ThreadPool tp = new ThreadPool(p);
+					ThreadPool tp = new ThreadPool(p, dps.get(j).getNbThread());
 				}
 
-				if (j == queues.size() - 1)
+				if (j == dps.size() - 1)
 					j = 0;
 				else
 					j++;

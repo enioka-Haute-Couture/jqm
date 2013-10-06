@@ -8,10 +8,9 @@ import com.enioka.jqm.temp.Polling;
 
 public class ThreadPool {
 
-	ExecutorService pool = Executors.newFixedThreadPool(Main.dp.getNbThread());
+	public ThreadPool(Polling p, int nbThread) {
 
-	public ThreadPool(Polling p) {
-
+		ExecutorService pool = Executors.newFixedThreadPool(nbThread);
 		// try {
 		pool.submit(new Loader(p.getJob().get(0)));
 		// pool.shutdown();

@@ -29,7 +29,7 @@ public class Main
 {
 
 	static DeploymentParameter dp = null;
-	//static DeploymentParameter dpNormal = null;
+	static DeploymentParameter dpNormal = null;
 	static Node node = null;
 
 	static Queue qVip = null;
@@ -112,10 +112,10 @@ public class Main
 		node = CreationTools.createNode("Interface_42", 1234);
 
 		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip);
-		//dpNormal = CreationTools.createDeploymentParameter(1, node, 1, 500, qNormal);
+		dpNormal = CreationTools.createDeploymentParameter(1, node, 1, 500, qNormal);
 
-		//Dispatcher.enQueue(jdDemoMaven);
-		//Dispatcher.enQueue(jdDemo);
+		Dispatcher.enQueue(jdDemoMaven);
+		Dispatcher.enQueue(jdDemo);
 		Dispatcher.enQueue(jd);
 		Dispatcher.enQueue(jd);
 		Dispatcher.enQueue(jd);
