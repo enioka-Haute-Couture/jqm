@@ -29,6 +29,7 @@ public class Main {
 	public static ArrayList<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
 	public static Node node = null;
 	public static Polling p = null;
+	public static ArrayList<ThreadPool> tps = new ArrayList<ThreadPool>();
 
 	/**
 	 * @param args
@@ -64,9 +65,11 @@ public class Main {
 		// queues.add(dps.get(i).getQueue());
 		// }
 		//
-		for (DeploymentParameter q : dps) {
 
-			System.out.println(q.getQueue().getName());
+		for (int i = 0; i < dps.size(); i++) {
+
+			tps.add(new ThreadPool(dps.get(i).getQueue(), dps.get(i)
+			        .getNbThread()));
 		}
 
 		int j = 0;
@@ -80,8 +83,12 @@ public class Main {
 
 				if (p.getJob() != null) {
 
-					@SuppressWarnings("unused")
-					ThreadPool tp = new ThreadPool(p, dps.get(j).getNbThread());
+					for (int i = 0; i < tps.size(); i++) {
+
+						if (p.getJob().get(0).getQueue().getId() == tps.get(i)
+						        .getQueue().getId())
+							tps.get(i).run(p);
+					}
 				}
 
 				if (j == dps.size() - 1)

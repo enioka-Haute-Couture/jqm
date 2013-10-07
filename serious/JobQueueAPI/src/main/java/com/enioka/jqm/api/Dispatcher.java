@@ -102,7 +102,8 @@ public class Dispatcher {
 
 	public static void cancelJobInQueue(int idJob) {
 
-		History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobId = :j", History.class).setParameter("j", idJob).getSingleResult();
+		@SuppressWarnings("unused")
+        History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobId = :j", History.class).setParameter("j", idJob).getSingleResult();
 
 		EntityTransaction transac = CreationTools.em.getTransaction();
 		transac.begin();

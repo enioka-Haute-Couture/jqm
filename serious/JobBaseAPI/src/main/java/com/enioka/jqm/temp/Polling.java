@@ -64,10 +64,6 @@ public class Polling {
 			job = new ArrayList<JobInstance>(newq);
 			Collections.sort(job);
 
-			for (JobInstance jobInstance : job) {
-
-				System.out.println(jobInstance.getPosition());
-			}
 			// System.exit(0);
 
 			// Higlander?
@@ -137,16 +133,13 @@ public class Polling {
 		        .setParameter("myjd", job.get(0).getJd()).getResultList();
 
 		System.out.println(jobs.size());
-		for (JobInstance jobInstance : jobs) {
-
-			System.out.println("HJOBS" + jobInstance.getId());
-		}
 
 		EntityTransaction transac = CreationTools.em.getTransaction();
 		transac.begin();
 
 		for (int i = 1; i < jobs.size(); i++) {
 
+			@SuppressWarnings("unused")
 			History h = CreationTools.em
 			        .createQuery("SELECT h FROM History h WHERE h.jobId = :j",
 			                History.class)
