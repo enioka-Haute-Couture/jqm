@@ -20,6 +20,10 @@ package com.enioka.jqm.tools;
 
 import java.util.ArrayList;
 
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.temp.Polling;
@@ -33,12 +37,25 @@ public class Main {
 
 	/**
 	 * @param args
-	 * @throws InterruptedException
+	 * @throws Exception
 	 */
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws Exception {
 
 		// Get the informations about the current node
 		// Add no node in base case
+
+		Server server = new Server(8081);
+
+		ServletContextHandler context = new ServletContextHandler(
+		        ServletContextHandler.SESSIONS);
+		context.setContextPath("/");
+		// context.setClassLoader(Thread.currentThread().getContextClassLoader());
+		server.setHandler(context);
+
+		context.addServlet(new ServletHolder(new Servlet()), "/getfile");
+
+		server.start();
+
 		if (args.length == 1) {
 
 			node = CreationTools.em

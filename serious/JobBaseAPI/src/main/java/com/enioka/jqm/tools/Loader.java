@@ -20,12 +20,14 @@ import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
+import com.enioka.jqm.api.JobBase;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.jcabi.aether.Aether;
 
 public class Loader implements Runnable {
 
 	JobInstance job = null;
+	JobBase jobBase = new JobBase();
 
 	public Loader(JobInstance job) {
 
@@ -60,6 +62,7 @@ public class Loader implements Runnable {
 		emf.close();
 	}
 
+	@Override
 	public void run() {
 
 		try {
@@ -157,11 +160,16 @@ public class Loader implements Runnable {
 			// Restore class loader
 			Thread.currentThread().setContextClassLoader(contextClassLoader);
 
-			// EntityManagerFactory emf = Persistence
-			// .createEntityManagerFactory("jobqueue-api-pu");
-			// EntityManager em = emf.createEntityManager();
-			// transac = em.getTransaction();
-			// transac.begin();
+			if (this.jobBase.getSha1s().size() != 0) {
+				for (int j = 0; j < this.jobBase.getSha1s().size(); j++) {
+
+					CreationTools.createDeliverable(this.jobBase.getSha1s()
+					        .get(j).getFilePath(),
+					        this.jobBase.getSha1s().get(j).getHashPath(),
+					        this.jobBase.getSha1s().get(j).getFileFamily(),
+					        this.job.getId());
+				}
+			}
 
 			// STATE UPDATED
 

@@ -93,7 +93,8 @@ public class JarClassLoader extends URLClassLoader {
 	public void invokeMain() throws ClassNotFoundException,
 	        NoSuchMethodException, InvocationTargetException, IOException {
 
-		this.invokeClass("Main", new String[]
-		{});
+		// this.invokeClass("Main", new String[]
+		// {});
+
 	}
 }

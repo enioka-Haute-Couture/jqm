@@ -17,6 +17,8 @@
  */
 
 package com.enioka.jqm.api;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -188,6 +190,25 @@ public class Dispatcher {
 	public static List<InputStream> getDeliverables(int idJob) {
 
 		ArrayList<InputStream> streams = new ArrayList<InputStream>();
+		List<Deliverable> tmp = new ArrayList<Deliverable>();
+
+			try {
+
+				tmp = CreationTools.em.createQuery(
+						"SELECT d FROM Deliverable d WHERE d.jobInstance = :idJob",
+						Deliverable.class)
+						.setParameter("idJob", idJob)
+						.getResultList();
+
+				for (int i = 0; i < tmp.size(); i++) {
+
+	            streams.add( new FileInputStream(tmp.get(i).getFilePath()));
+
+				}
+            } catch (FileNotFoundException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+            }
 
 		return streams;
 	}
@@ -196,17 +217,38 @@ public class Dispatcher {
 
 		ArrayList<Deliverable> deliverables = new ArrayList<Deliverable>();
 
+		deliverables = (ArrayList<Deliverable>) CreationTools.em.createQuery(
+				"SELECT d FROM Deliverable d WHERE d.jobInstance = :idJob",
+				Deliverable.class)
+				.setParameter("idJob", idJob)
+				.getResultList();
+
 		return deliverables;
 	}
 
-	public static InputStream getOneDeliverable(Deliverable deliverable) {
+	public static InputStream getOneDeliverable(Deliverable deliverable) throws FileNotFoundException {
 
-		return null;
+	        return new FileInputStream(deliverable.getFilePath());
+
 	}
 
 	public static List<Deliverable> getUserDeliverables(String user) {
 
-		return null;
+		ArrayList<Deliverable> d = new ArrayList<Deliverable>();
+
+		JobInstance j = CreationTools.em.createQuery(
+				"SELECT j FROM JobInstance j WHERE j.user = :u",
+				JobInstance.class)
+				.setParameter("u", user)
+				.getSingleResult();
+
+		d = (ArrayList<Deliverable>) CreationTools.em.createQuery(
+				"SELECT d FROM Deliverable WHERE d.jobInstance = :idJob",
+				Deliverable.class)
+				.setParameter("idJob", j.getId())
+				.getResultList();
+
+		return d;
 	}
 
 	public static List<String> getMsg(int idJob) { // -------------TODO------------
