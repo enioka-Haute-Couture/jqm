@@ -27,6 +27,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.jar.Attributes;
 
+import com.enioka.jqm.api.JobBase;
+import com.enioka.jqm.jpamodel.JobInstance;
+
 public class JarClassLoader extends URLClassLoader {
 
 	URL jarUrl;
@@ -90,11 +93,20 @@ public class JarClassLoader extends URLClassLoader {
 		}
 	}
 
-	public void invokeMain() throws ClassNotFoundException,
-	        NoSuchMethodException, InvocationTargetException, IOException {
+	public void invokeMain(JobInstance job) throws ClassNotFoundException,
+	        NoSuchMethodException, InvocationTargetException, IOException,
+	        InstantiationException, IllegalAccessException {
 
 		// this.invokeClass("Main", new String[]
 		// {});
+
+		Class c = loadClass(job.getJd().getJavaClassName());
+
+		Object o = c.newInstance();
+
+		JobBase t = (JobBase) o;
+
+		t.setParams(job);
 
 	}
 }

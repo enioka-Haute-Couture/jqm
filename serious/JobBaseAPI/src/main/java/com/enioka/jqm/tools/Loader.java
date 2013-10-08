@@ -154,7 +154,9 @@ public class Loader implements Runnable {
 			System.out.println("+++++++++++++++++++++++++++++++++++++++");
 			System.out.println("Je suis dans le thread "
 			        + Thread.currentThread().getName());
-			jobClassLoader.invokeMain();
+
+			jobClassLoader.invokeMain(job);
+
 			System.out.println("+++++++++++++++++++++++++++++++++++++++");
 
 			// Restore class loader
@@ -224,7 +226,36 @@ public class Loader implements Runnable {
 			crashedStatus();
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
+	}
+
+	public JobInstance getJob() {
+
+		return job;
+	}
+
+	public void setJob(JobInstance job) {
+
+		this.job = job;
+	}
+
+	public JobBase getJobBase() {
+
+		return jobBase;
+	}
+
+	public void setJobBase(JobBase jobBase) {
+
+		this.jobBase = jobBase;
 	}
 }
