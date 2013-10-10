@@ -22,12 +22,14 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 import com.enioka.jqm.api.JobBase;
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.temp.DeliverableStruct;
 import com.jcabi.aether.Aether;
 
 public class Loader implements Runnable {
 
 	JobInstance job = null;
 	JobBase jobBase = new JobBase();
+	ArrayList<DeliverableStruct> s1s = new ArrayList<DeliverableStruct>();
 
 	public Loader(JobInstance job) {
 
@@ -66,17 +68,8 @@ public class Loader implements Runnable {
 	public void run() {
 
 		try {
-
+			System.out.println("TOUT DEBUT LOADER");
 			Main.p.updateExecutionDate();
-
-			System.out
-			        .println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-			System.out
-			        .println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-			System.out
-			        .println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-			System.out
-			        .println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
 			// ---------------- BEGIN: MAVEN DEPENDENCIES ------------------
 
@@ -85,7 +78,7 @@ public class Loader implements Runnable {
 			Dependencies dependencies = new Dependencies(job.getJd()
 			        .getFilePath() + "pom.xml");
 			File jar = new File(job.getJd().getFilePath()
-			        + "target/DateTimeMaven-0.0.1-SNAPSHOT.jar");
+			        + "target/JobGenADeliverable-0.0.1-SNAPSHOT.jar");
 			dependencies.print();
 			URL jars = jar.toURI().toURL();
 
@@ -128,11 +121,12 @@ public class Loader implements Runnable {
 				        dependencies.getList().get(i)), "compile");
 			}
 
-			for (Artifact artifact : deps) {
-				tmp.add(artifact.getFile().toURI().toURL());
-				System.out.println("Artifact: "
-				        + artifact.getFile().toURI().toURL());
-
+			if (deps != null) {
+				for (Artifact artifact : deps) {
+					tmp.add(artifact.getFile().toURI().toURL());
+					System.out.println("Artifact: "
+					        + artifact.getFile().toURI().toURL());
+				}
 			}
 			// ------------------- END: MAVEN DEPENDENCIES ---------------
 
@@ -146,7 +140,8 @@ public class Loader implements Runnable {
 
 			// Change active class loader
 			Thread.currentThread().setContextClassLoader(jobClassLoader);
-
+			// System.out.println("STOP");
+			// System.exit(0);
 			// Go! (launches the main function in the startup class
 			// designated
 			// in
@@ -154,16 +149,28 @@ public class Loader implements Runnable {
 			System.out.println("+++++++++++++++++++++++++++++++++++++++");
 			System.out.println("Je suis dans le thread "
 			        + Thread.currentThread().getName());
-
-			jobClassLoader.invokeMain(job);
+			System.out.println("AVANT INVOKE MAIN");
+			jobBase = jobClassLoader.invokeMain(job);
 
 			System.out.println("+++++++++++++++++++++++++++++++++++++++");
 
 			// Restore class loader
 			Thread.currentThread().setContextClassLoader(contextClassLoader);
 
+			System.out
+			        .println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+			System.out
+			        .println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+
+			// for (DeliverableStruct d : job.) {
+			// System.out.println("DeliverableStruct: " + d.getFileFamily());
+			// }
+
 			if (this.jobBase.getSha1s().size() != 0) {
 				for (int j = 0; j < this.jobBase.getSha1s().size(); j++) {
+
+					System.out.println("SHA1: "
+					        + this.jobBase.getSha1s().get(j).getFilePath());
 
 					CreationTools.createDeliverable(this.jobBase.getSha1s()
 					        .get(j).getFilePath(),
@@ -172,6 +179,10 @@ public class Loader implements Runnable {
 					        this.job.getId());
 				}
 			}
+			System.out
+			        .println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+			System.out
+			        .println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
 			// STATE UPDATED
 

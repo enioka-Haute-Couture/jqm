@@ -1,5 +1,5 @@
 /**
- * Copyright © 2013 enioka. All rights reserved
+ * Copyright Â© 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
  * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
  *
@@ -17,9 +17,12 @@
  */
 
 package com.enioka.jqm.api;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -28,6 +31,8 @@ import java.util.Locale;
 
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
+
+import org.apache.commons.io.FileUtils;
 
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.History;
@@ -52,6 +57,8 @@ public class Dispatcher {
 				"WHERE j.jd.queue.name = :queue", Integer.class).setParameter("queue", (job.getQueue().getName())).getSingleResult();
 		System.out.println("POSITION: " + p);
 		JobInstance ji = CreationTools.createJobInstance(job, "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue);
+
+		//CreationTools.em.createQuery("UPDATE JobParameter jp SET jp.jobInstance = :j WHERE").executeUpdate();
 
 		// Update status in the history table
 
@@ -187,23 +194,25 @@ public class Dispatcher {
 		transac.commit();
 	}
 
-	public static List<InputStream> getDeliverables(int idJob) {
+	public static List<InputStream> getDeliverables(int idJob) throws IOException {
 
+		URL url = null;
 		ArrayList<InputStream> streams = new ArrayList<InputStream>();
 		List<Deliverable> tmp = new ArrayList<Deliverable>();
 
 			try {
 
 				tmp = CreationTools.em.createQuery(
-						"SELECT d FROM Deliverable d WHERE d.jobInstance = :idJob",
+						"SELECT d FROM Deliverable d WHERE d.jobId = :idJob",
 						Deliverable.class)
 						.setParameter("idJob", idJob)
 						.getResultList();
 
 				for (int i = 0; i < tmp.size(); i++) {
 
-	            streams.add( new FileInputStream(tmp.get(i).getFilePath()));
-
+					// Ajouter listeninginterface en guise d'adresse (localhost)
+					url = new URL("http://localhost:8081/getfile?file=" + tmp.get(i).getFilePath());
+					FileUtils.copyURLToFile(url, new File("/Users/pico/Downloads/tests/deliverable.txt"));
 				}
             } catch (FileNotFoundException e) {
 	            // TODO Auto-generated catch block

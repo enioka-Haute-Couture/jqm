@@ -93,20 +93,22 @@ public class JarClassLoader extends URLClassLoader {
 		}
 	}
 
-	public void invokeMain(JobInstance job) throws ClassNotFoundException,
+	public JobBase invokeMain(JobInstance job) throws ClassNotFoundException,
 	        NoSuchMethodException, InvocationTargetException, IOException,
 	        InstantiationException, IllegalAccessException {
 
 		// this.invokeClass("Main", new String[]
 		// {});
 
-		Class c = loadClass(job.getJd().getJavaClassName());
+		Class<? extends JobBase> c = loadClass(job.getJd().getJavaClassName())
+		        .asSubclass(JobBase.class);
 
 		Object o = c.newInstance();
 
 		JobBase t = (JobBase) o;
 
 		t.setParams(job);
+		return t;
 
 	}
 }

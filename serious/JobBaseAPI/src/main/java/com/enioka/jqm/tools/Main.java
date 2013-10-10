@@ -49,7 +49,6 @@ public class Main {
 		ServletContextHandler context = new ServletContextHandler(
 		        ServletContextHandler.SESSIONS);
 		context.setContextPath("/");
-		// context.setClassLoader(Thread.currentThread().getContextClassLoader());
 		server.setHandler(context);
 
 		context.addServlet(new ServletHolder(new Servlet()), "/getfile");
@@ -97,7 +96,7 @@ public class Main {
 
 				Thread.sleep(dps.get(j).getPollingInterval());
 				p = new Polling(dps.get(j).getQueue());
-
+				System.out.println("APRES POLLING");
 				if (p.getJob() != null) {
 
 					for (int i = 0; i < tps.size(); i++) {
@@ -105,6 +104,7 @@ public class Main {
 						if (p.getJob().get(0).getQueue().getId() == tps.get(i)
 						        .getQueue().getId())
 							tps.get(i).run(p);
+						System.out.println("APRES THREADPOOL RUN");
 					}
 				}
 

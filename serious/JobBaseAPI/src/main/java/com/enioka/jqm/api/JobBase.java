@@ -43,7 +43,7 @@ public class JobBase {
 	protected String other2;
 	protected String other3;
 	protected Map<String, String> parameters = new HashMap<String, String>();
-	private ArrayList<DeliverableStruct> sha1s = new ArrayList<DeliverableStruct>();
+	protected ArrayList<DeliverableStruct> sha1s = new ArrayList<DeliverableStruct>();
 
 	public void setParams(JobInstance j) {
 
@@ -62,13 +62,15 @@ public class JobBase {
 	public void addDeliverable(String path, String fileLabel) {
 
 		try {
-
-			sha1s.add(new DeliverableStruct(path, Cryptonite.sha1(path),
+			System.out.println("ajout du livrable dans la liste");
+			this.sha1s.add(new DeliverableStruct(path, Cryptonite.sha1(path),
 			        fileLabel));
 		} catch (NoSuchAlgorithmException e) {
 
 			e.printStackTrace();
 		}
+
+		System.out.println("size sha1s: " + this.sha1s.size());
 	}
 
 	public void sendMsg(String msg) {

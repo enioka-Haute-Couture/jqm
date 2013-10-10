@@ -132,7 +132,7 @@ public class Polling {
 		        .setParameter("refid", job.get(0).getId())
 		        .setParameter("myjd", job.get(0).getJd()).getResultList();
 
-		System.out.println(jobs.size());
+		System.out.println("JOBSSIZE" + jobs.size());
 
 		EntityTransaction transac = CreationTools.em.getTransaction();
 		transac.begin();

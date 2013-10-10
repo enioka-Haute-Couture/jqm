@@ -1,6 +1,8 @@
 package com.enioka.jqm.test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
@@ -26,6 +28,8 @@ public class TestSuite {
 	JobDefinition jdDemoMaven = null;
 
 	JobDefinition jdDemo = null;
+
+	Map<String, String> map = new HashMap<String, String>();
 
 	public void testInit() {
 
@@ -83,13 +87,13 @@ public class TestSuite {
 		this.qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 0 , 100);
 
 		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qVip,
-				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
 		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
-				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
 		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/Demo/", qSlow,
-				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
