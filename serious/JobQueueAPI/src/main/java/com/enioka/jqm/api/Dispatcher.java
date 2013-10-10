@@ -197,6 +197,7 @@ public class Dispatcher {
 	public static List<InputStream> getDeliverables(int idJob) throws IOException {
 
 		URL url = null;
+		File file = null;
 		ArrayList<InputStream> streams = new ArrayList<InputStream>();
 		List<Deliverable> tmp = new ArrayList<Deliverable>();
 
@@ -212,7 +213,8 @@ public class Dispatcher {
 
 					// Ajouter listeninginterface en guise d'adresse (localhost)
 					url = new URL("http://localhost:8081/getfile?file=" + tmp.get(i).getFilePath());
-					FileUtils.copyURLToFile(url, new File("/Users/pico/Downloads/tests/deliverable.txt"));
+					FileUtils.copyURLToFile(url, file = new File("/Users/pico/Downloads/tests/deliverable.txt"));
+					streams.add(new FileInputStream(file));
 				}
             } catch (FileNotFoundException e) {
 	            // TODO Auto-generated catch block
@@ -224,6 +226,7 @@ public class Dispatcher {
 
 	public static List<Deliverable> getAllDeliverables(int idJob) {
 
+		URL url = null;
 		ArrayList<Deliverable> deliverables = new ArrayList<Deliverable>();
 
 		deliverables = (ArrayList<Deliverable>) CreationTools.em.createQuery(
@@ -237,12 +240,14 @@ public class Dispatcher {
 
 	public static InputStream getOneDeliverable(Deliverable deliverable) throws FileNotFoundException {
 
+		URL url = null;
 	        return new FileInputStream(deliverable.getFilePath());
 
 	}
 
 	public static List<Deliverable> getUserDeliverables(String user) {
 
+		URL url = null;
 		ArrayList<Deliverable> d = new ArrayList<Deliverable>();
 
 		JobInstance j = CreationTools.em.createQuery(

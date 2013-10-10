@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.JobDefinition;
 import com.enioka.jqm.jpamodel.Node;
@@ -53,7 +52,7 @@ public class Main
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-//
+
 //		EntityTransaction transac = CreationTools.em.getTransaction();
 //		transac.begin();
 //		CreationTools.em.createQuery("DELETE FROM Message").executeUpdate();
@@ -97,7 +96,7 @@ public class Main
 //		qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42 , 100);
 //		qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
 //		qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 0 , 100);
-
+//
 //		jd = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Documents/workspace/JobGenADeliverable/", qVip,
 //				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
@@ -105,8 +104,8 @@ public class Main
 
 //		jdDemoMaven = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
 //				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
-
-
+//
+//
 //		jdDemo = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
 //				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
@@ -114,7 +113,7 @@ public class Main
 //		jpdm = CreationTools.createJobParameter("", "", jdDemoMaven);
 //		jpd = CreationTools.createJobParameter("", "", jdDemo);
 
-//		node = CreationTools.createNode("Interface_42", 1234);
+//		node = CreationTools.createNode("localhost:", 8081);
 
 //		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip);
 //		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal);
@@ -126,7 +125,7 @@ public class Main
 //		Dispatcher.enQueue(jd);
 		//Dispatcher.changeQueue(238, 347);
 		//Dispatcher.setPosition(88, 1);
-				Dispatcher.getDeliverables(22);
+//				Dispatcher.getDeliverables(22);
 //		for (JobInstance i : Dispatcher.getUserJobs("MAG"))
 //		{
 //			System.out.println("Jobs " + i.getId());
