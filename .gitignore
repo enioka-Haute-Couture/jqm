@@ -1,0 +1,7 @@
+.settings
+.class
+target/
+bin/
+.classpath
+*.launch
+
