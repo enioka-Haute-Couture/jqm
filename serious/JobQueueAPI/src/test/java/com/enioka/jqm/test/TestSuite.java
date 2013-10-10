@@ -1,5 +1,8 @@
 package com.enioka.jqm.test;
 
+import java.io.File;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,11 +89,6 @@ public class TestSuite {
 		this.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
 		this.qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 0 , 100);
 
-		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qVip,
-				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
-
-		Dispatcher.enQueue(jd);
-
 	}
 
 	@Test
@@ -98,12 +96,16 @@ public class TestSuite {
 
 		testInit();
 
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qVip,
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
+
 		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
 		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/Demo/", qSlow,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
+		Dispatcher.enQueue(jd);
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
 
@@ -121,6 +123,9 @@ public class TestSuite {
 
 		testInit();
 
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qVip,
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
+
 		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
@@ -129,6 +134,7 @@ public class TestSuite {
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
+		Dispatcher.enQueue(jd);
 
 		JobInstance j = CreationTools.em.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", jd.getId()).getSingleResult();
@@ -146,6 +152,9 @@ public class TestSuite {
 
 		testInit();
 
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qVip,
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
+
 		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
@@ -154,6 +163,7 @@ public class TestSuite {
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
+		Dispatcher.enQueue(jd);
 
 		JobInstance j = CreationTools.em.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", jd.getId()).getSingleResult();
@@ -170,6 +180,9 @@ public class TestSuite {
 
 		testInit();
 
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qVip,
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
+
 		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
@@ -178,6 +191,7 @@ public class TestSuite {
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
+		Dispatcher.enQueue(jd);
 
 		JobInstance q = CreationTools.em.createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job", JobInstance.class).setParameter("job", jd.getId()).getSingleResult();
 
@@ -193,6 +207,9 @@ public class TestSuite {
 
 		testInit();
 
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qVip,
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
+
 		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
@@ -201,6 +218,7 @@ public class TestSuite {
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
+		Dispatcher.enQueue(jd);
 
 		JobInstance q = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", jd.getId()).getSingleResult();
@@ -219,6 +237,9 @@ public class TestSuite {
 
 		testInit();
 
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qVip,
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
+
 		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
@@ -227,6 +248,7 @@ public class TestSuite {
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
+		Dispatcher.enQueue(jd);
 
 		JobInstance q = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", jd.getId()).getSingleResult();
@@ -245,6 +267,9 @@ public class TestSuite {
 
 		testInit();
 
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qVip,
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
+
 		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
@@ -253,6 +278,7 @@ public class TestSuite {
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
+		Dispatcher.enQueue(jd);
 
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) Dispatcher.getUserJobs("MAG");
 
@@ -272,6 +298,9 @@ public class TestSuite {
 
 		testInit();
 
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qVip,
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
+
 		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
@@ -280,6 +309,7 @@ public class TestSuite {
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
+		Dispatcher.enQueue(jd);
 
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) Dispatcher.getJobs();
 
@@ -296,6 +326,9 @@ public class TestSuite {
 
 		testInit();
 
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qVip,
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
+
 		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
@@ -304,6 +337,7 @@ public class TestSuite {
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
+		Dispatcher.enQueue(jd);
 
 		ArrayList<Queue> jobs = (ArrayList<Queue>) Dispatcher.getQueues();
 
@@ -313,6 +347,26 @@ public class TestSuite {
 		Assert.assertEquals(tmp.size(), jobs.size());
 		Assert.assertEquals(tmp, jobs);
 
+
+	}
+
+	public void testGetDeliverables() throws NoSuchAlgorithmException, IOException {
+
+		testInit();
+
+		JobInstance job = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job",
+				JobInstance.class).setParameter("job", jd.getId()).getSingleResult();
+
+		File file = new File("/Users/pico/Downloads/tests/deliverable" + job.getId());
+
+		this.jd = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Documents/workspace/JobGenADeliverable/", qVip,
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
+
+		Dispatcher.enQueue(jd);
+
+		Dispatcher.getDeliverables(job.getId());
+
+		Assert.assertEquals(file.exists(), true);
 
 	}
 

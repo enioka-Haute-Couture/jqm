@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.persistence.EntityTransaction;
+
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.JobDefinition;
 import com.enioka.jqm.jpamodel.Node;
@@ -53,85 +55,71 @@ public class Main
 	 */
 	public static void main(String[] args) throws IOException {
 
-//		EntityTransaction transac = CreationTools.em.getTransaction();
-//		transac.begin();
-//		CreationTools.em.createQuery("DELETE FROM Message").executeUpdate();
-//		transac.commit();
-//		transac = CreationTools.em.getTransaction();
-//		transac.begin();
-//		CreationTools.em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
-//		transac.commit();
-//		transac = CreationTools.em.getTransaction();
-//		transac.begin();
-//		CreationTools.em.createQuery("DELETE FROM Node").executeUpdate();
-//		transac.commit();
-//		transac = CreationTools.em.getTransaction();
-//		transac.begin();
-//		CreationTools.em.createQuery("DELETE FROM History").executeUpdate();
-//		transac.commit();
-//		transac = CreationTools.em.getTransaction();
-//		transac.begin();
-//		CreationTools.em.createQuery("DELETE FROM JobInstance").executeUpdate();
-//		transac.commit();
-//		transac = CreationTools.em.getTransaction();
-//		transac.begin();
-//		CreationTools.em.createQuery("DELETE FROM JobParameter").executeUpdate();
-//		transac.commit();
-//		transac = CreationTools.em.getTransaction();
-//		transac.begin();
-//		CreationTools.em.createQuery("DELETE FROM JobDefinition").executeUpdate();
-//		transac.commit();
-//		transac = CreationTools.em.getTransaction();
-//		transac.begin();
-//		CreationTools.em.createQuery("DELETE FROM Queue").executeUpdate();
-//		transac.commit();
-
-//		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-//		EntityManager em = emf.createEntityManager();
-//		EntityTransaction t = em.getTransaction();
-//		t.begin();
+		EntityTransaction transac = CreationTools.em.getTransaction();
+		transac.begin();
+		CreationTools.em.createQuery("DELETE FROM Message").executeUpdate();
+		transac.commit();
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+		CreationTools.em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
+		transac.commit();
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+		CreationTools.em.createQuery("DELETE FROM Node").executeUpdate();
+		transac.commit();
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+		CreationTools.em.createQuery("DELETE FROM History").executeUpdate();
+		transac.commit();
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+		CreationTools.em.createQuery("DELETE FROM JobInstance").executeUpdate();
+		transac.commit();
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+		CreationTools.em.createQuery("DELETE FROM JobParameter").executeUpdate();
+		transac.commit();
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+		CreationTools.em.createQuery("DELETE FROM JobDefinition").executeUpdate();
+		transac.commit();
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+		CreationTools.em.createQuery("DELETE FROM Queue").executeUpdate();
+		transac.commit();
 
 		Map<String, String> map = new HashMap<String, String>();
 
-//		qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42 , 100);
-//		qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
-//		qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 0 , 100);
-//
-//		jd = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Documents/workspace/JobGenADeliverable/", qVip,
-//				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
+		qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42 , 100);
+		qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
+		qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 0 , 100);
 
-//		t.commit();
+		jd = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Documents/workspace/JobGenADeliverable/", qVip,
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
-//		jdDemoMaven = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
-//				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
-//
-//
-//		jdDemo = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
-//				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
+
+		jdDemoMaven = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
+
+
+		jdDemo = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
 
 //		jp = CreationTools.createJobParameter("arg1", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", jd);
 //		jpdm = CreationTools.createJobParameter("", "", jdDemoMaven);
 //		jpd = CreationTools.createJobParameter("", "", jdDemo);
 
-//		node = CreationTools.createNode("localhost:", 8081);
+		node = CreationTools.createNode("localhost", 8081);
 
-//		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip);
-//		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal);
+		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip);
+		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal);
 
 //		Dispatcher.enQueue(jdDemoMaven);
 //		Dispatcher.enQueue(jdDemo);
 //		Dispatcher.enQueue(jd);
 //		Dispatcher.enQueue(jd);
 //		Dispatcher.enQueue(jd);
-		//Dispatcher.changeQueue(238, 347);
-		//Dispatcher.setPosition(88, 1);
-//				Dispatcher.getDeliverables(22);
-//		for (JobInstance i : Dispatcher.getUserJobs("MAG"))
-//		{
-//			System.out.println("Jobs " + i.getId());
-//		}
-		//Dispatcher.delJobInQueue(70);
-		//Dispatcher.enQueue(jd);
+//		Dispatcher.getDeliverables(22);
 		CreationTools.close();
 	}
 

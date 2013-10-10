@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -34,7 +35,9 @@ import javax.persistence.Query;
 
 import org.apache.commons.io.FileUtils;
 
+import com.enioka.jqm.hash.Cryptonite;
 import com.enioka.jqm.jpamodel.Deliverable;
+import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDefinition;
 import com.enioka.jqm.jpamodel.JobInstance;
@@ -194,39 +197,58 @@ public class Dispatcher {
 		transac.commit();
 	}
 
-	public static List<InputStream> getDeliverables(int idJob) throws IOException {
+	public static List<InputStream> getDeliverables(int idJob) throws IOException, NoSuchAlgorithmException {
 
 		URL url = null;
 		File file = null;
 		ArrayList<InputStream> streams = new ArrayList<InputStream>();
 		List<Deliverable> tmp = new ArrayList<Deliverable>();
 
-			try {
+		try {
 
-				tmp = CreationTools.em.createQuery(
-						"SELECT d FROM Deliverable d WHERE d.jobId = :idJob",
-						Deliverable.class)
-						.setParameter("idJob", idJob)
-						.getResultList();
+			tmp = CreationTools.em.createQuery(
+					"SELECT d FROM Deliverable d WHERE d.jobId = :idJob",
+					Deliverable.class)
+					.setParameter("idJob", idJob)
+					.getResultList();
 
-				for (int i = 0; i < tmp.size(); i++) {
+			JobInstance job = CreationTools.em.createQuery(
+					"SELECT j FROM JobInstance j WHERE j.id = :job",
+					JobInstance.class)
+					.setParameter("job", idJob)
+					.getSingleResult();
 
-					// Ajouter listeninginterface en guise d'adresse (localhost)
-					url = new URL("http://localhost:8081/getfile?file=" + tmp.get(i).getFilePath());
-					FileUtils.copyURLToFile(url, file = new File("/Users/pico/Downloads/tests/deliverable.txt"));
+			DeploymentParameter dp = CreationTools.em.createQuery(
+					"SELECT dp FROM DeploymentParamter dp WHERE dp.queue.id = :q", DeploymentParameter.class)
+					.setParameter("q", job.getQueue().getId())
+					.getSingleResult();
+
+			for (int i = 0; i < tmp.size(); i++) {
+
+				// Ajouter listeninginterface en guise d'adresse (localhost)
+				url = new URL(
+						"http://" +
+								dp.getNode().getListeningInterface() +
+								":" + dp.getNode().getPort() +
+								"/getfile?file=" +
+								tmp.get(i).getFilePath());
+
+				if (tmp.get(i).getHashPath().equals(Cryptonite.sha1(tmp.get(i).getFilePath()))) {
+
+					FileUtils.copyURLToFile(url, file = new File("/Users/pico/Downloads/tests/deliverable" + job.getId()));
 					streams.add(new FileInputStream(file));
 				}
-            } catch (FileNotFoundException e) {
-	            // TODO Auto-generated catch block
-	            e.printStackTrace();
-            }
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		return streams;
 	}
 
 	public static List<Deliverable> getAllDeliverables(int idJob) {
 
-		URL url = null;
 		ArrayList<Deliverable> deliverables = new ArrayList<Deliverable>();
 
 		deliverables = (ArrayList<Deliverable>) CreationTools.em.createQuery(
@@ -238,16 +260,38 @@ public class Dispatcher {
 		return deliverables;
 	}
 
-	public static InputStream getOneDeliverable(Deliverable deliverable) throws FileNotFoundException {
+	public static InputStream getOneDeliverable(Deliverable deliverable) throws NoSuchAlgorithmException, IOException {
 
 		URL url = null;
-	        return new FileInputStream(deliverable.getFilePath());
+		File file = null;
 
+		JobInstance job = CreationTools.em.createQuery(
+				"SELECT j FROM JobInstance j WHERE j.id = :job",
+				JobInstance.class)
+				.setParameter("job", deliverable.getJobId())
+				.getSingleResult();
+
+		DeploymentParameter dp = CreationTools.em.createQuery(
+				"SELECT dp FROM DeploymentParamter dp WHERE dp.queue.id = :q", DeploymentParameter.class)
+				.setParameter("q", job.getQueue().getId())
+				.getSingleResult();
+
+		url = new URL(
+				"http://" +
+						dp.getNode().getListeningInterface() +
+						":" + dp.getNode().getPort() +
+						"/getfile?file=" +
+						deliverable.getFilePath());
+
+		if (deliverable.getHashPath().equals(Cryptonite.sha1(deliverable.getFilePath()))) {
+
+			FileUtils.copyURLToFile(url, file = new File("/Users/pico/Downloads/tests/deliverable" + job.getId()));
+		}
+		return new FileInputStream(file);
 	}
 
 	public static List<Deliverable> getUserDeliverables(String user) {
 
-		URL url = null;
 		ArrayList<Deliverable> d = new ArrayList<Deliverable>();
 
 		JobInstance j = CreationTools.em.createQuery(
