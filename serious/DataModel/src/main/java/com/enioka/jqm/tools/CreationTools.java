@@ -97,7 +97,7 @@ public class CreationTools
 		return dp;
 	}
 
-	public static DeploymentParameter createDeploymentParameter(Integer classId, Node node, Integer nbThread, Integer pollingInterval)
+	public static DeploymentParameter createDeploymentParameter(Integer classId, Node node, Integer nbThread, Integer pollingInterval, Queue qVip)
 	{
 		DeploymentParameter dp = new DeploymentParameter();
 		EntityTransaction transac = em.getTransaction();
@@ -192,7 +192,7 @@ public class CreationTools
 		return j;
 	}
 
-	public static JobInstance createJobInstance(JobDefinition jd, String user, Integer sessionID, String state, Integer position)
+	public static JobInstance createJobInstance(JobDefinition jd, String user, Integer sessionID, String state, Integer position, Queue queue)
 	{
 		JobInstance j = new JobInstance();
 		EntityTransaction transac = em.getTransaction();

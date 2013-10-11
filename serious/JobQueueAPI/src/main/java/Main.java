@@ -18,8 +18,6 @@
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.persistence.EntityTransaction;
 
@@ -29,6 +27,8 @@ import com.enioka.jqm.jpamodel.JobDefinition;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.tools.CreationTools;
+
+
 
 public class Main
 {
@@ -91,38 +91,39 @@ public class Main
 		CreationTools.em.createQuery("DELETE FROM Queue").executeUpdate();
 		transac.commit();
 
-		Map<String, String> map = new HashMap<String, String>();
-
 		qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42 , 100);
 		qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
-		qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 0 , 100);
-
+		qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3 , 100);
+//
+////createJobDefinition(String;String;Queue;
+////		Integer;String;Integer;String;String;String;String;String;Map;)
+//
 		jd = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Documents/workspace/JobGenADeliverable/", qVip,
-				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
-
-
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+//
+//
 		jdDemoMaven = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
-				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 
 		jdDemo = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
-				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
-
-//		jp = CreationTools.createJobParameter("arg1", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", jd);
-//		jpdm = CreationTools.createJobParameter("", "", jdDemoMaven);
-//		jpd = CreationTools.createJobParameter("", "", jdDemo);
-
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+//
+////		jp = CreationTools.createJobParameter("arg1", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", jd);
+////		jpdm = CreationTools.createJobParameter("", "", jdDemoMaven);
+////		jpd = CreationTools.createJobParameter("", "", jdDemo);
+//
 		node = CreationTools.createNode("localhost", 8081);
-
+//
 		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip);
 		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal);
-
-//		Dispatcher.enQueue(jdDemoMaven);
-//		Dispatcher.enQueue(jdDemo);
+//
+		Dispatcher.enQueue(jdDemoMaven);
+		Dispatcher.enQueue(jdDemo);
 		Dispatcher.enQueue(jd);
-//		Dispatcher.enQueue(jd);
-//		Dispatcher.enQueue(jd);
-//		Dispatcher.getDeliverables(499);
+////		Dispatcher.enQueue(jd);
+////		Dispatcher.enQueue(jd);
+////		Dispatcher.getDeliverables(499);
 		CreationTools.close();
 	}
 

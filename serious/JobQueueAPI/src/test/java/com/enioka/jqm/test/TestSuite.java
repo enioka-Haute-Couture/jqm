@@ -1,101 +1,83 @@
 package com.enioka.jqm.test;
 
-import java.io.File;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.persistence.EntityTransaction;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.enioka.jqm.api.Dispatcher;
-import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.JobDefinition;
-import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.tools.CreationTools;
 
 
 public class TestSuite {
 
-	Queue qVip = null;
-	Queue qNormal = null;
-	Queue qSlow = null;
-
-	JobDefinition jd = null;
-	JobDefinition jdDemoMaven = null;
-	JobDefinition jdDemo = null;
-
-	Node node = null;
-
-	DeploymentParameter dp = null;
-
-	Map<String, String> map = new HashMap<String, String>();
-
-	public void testInit() {
-
-		EntityTransaction transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM Message").executeUpdate();
-		transac.commit();
-
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
-		transac.commit();
-
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM Node").executeUpdate();
-		transac.commit();
-
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM History").executeUpdate();
-		transac.commit();
-
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM JobInstance").executeUpdate();
-		transac.commit();
-
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM JobParameter").executeUpdate();
-		transac.commit();
-
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM JobDefinition").executeUpdate();
-		transac.commit();
-
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM Queue").executeUpdate();
-
-		transac.commit();
-
-		this.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42 , 100);
-		this.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
-		this.qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 0 , 100);
-
-		node = CreationTools.createNode("localhost", 8081);
-
-		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip);
-
-	}
+//	Queue qVip = null;
+//	Queue qNormal = null;
+//	Queue qSlow = null;
+//
+//	JobDefinition jd = null;
+//	JobDefinition jdDemoMaven = null;
+//	JobDefinition jdDemo = null;
+//
+//	Node node = null;
+//
+//	DeploymentParameter dp = null;
+//
+//	Map<String, String> map = new HashMap<String, String>();
+//
+//	public void testInit() {
+//
+//		EntityTransaction transac = CreationTools.em.getTransaction();
+//		transac.begin();
+//
+//		CreationTools.em.createQuery("DELETE FROM Message").executeUpdate();
+//		transac.commit();
+//
+//		transac = CreationTools.em.getTransaction();
+//		transac.begin();
+//
+//		CreationTools.em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
+//		transac.commit();
+//
+//		transac = CreationTools.em.getTransaction();
+//		transac.begin();
+//
+//		CreationTools.em.createQuery("DELETE FROM Node").executeUpdate();
+//		transac.commit();
+//
+//		transac = CreationTools.em.getTransaction();
+//		transac.begin();
+//
+//		CreationTools.em.createQuery("DELETE FROM History").executeUpdate();
+//		transac.commit();
+//
+//		transac = CreationTools.em.getTransaction();
+//		transac.begin();
+//
+//		CreationTools.em.createQuery("DELETE FROM JobInstance").executeUpdate();
+//		transac.commit();
+//
+//		transac = CreationTools.em.getTransaction();
+//		transac.begin();
+//
+//		CreationTools.em.createQuery("DELETE FROM JobParameter").executeUpdate();
+//		transac.commit();
+//
+//		transac = CreationTools.em.getTransaction();
+//		transac.begin();
+//
+//		CreationTools.em.createQuery("DELETE FROM JobDefinition").executeUpdate();
+//		transac.commit();
+//
+//		transac = CreationTools.em.getTransaction();
+//		transac.begin();
+//
+//		CreationTools.em.createQuery("DELETE FROM Queue").executeUpdate();
+//
+//		transac.commit();
+//
+//		this.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42 , 100);
+//		this.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
+//		this.qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 0 , 100);
+//
+//		node = CreationTools.createNode("localhost", 8081);
+//
+//		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip);
+//
+//	}
 
 //	@Test
 //	public void testEnQueue() {
@@ -356,39 +338,39 @@ public class TestSuite {
 //
 //	}
 
-	@Test
-	public void testGetDeliverables(){
-
-		testInit();
-
-		this.jd = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Documents/workspace/JobGenADeliverable/", qVip,
-				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
-
-		Dispatcher.enQueue(jd);
-
-		JobInstance job = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job",
-				JobInstance.class).setParameter("job", jd.getId()).getSingleResult();
-
-		File file = new File("/Users/pico/Downloads/tests/deliverable" + job.getId());
-
-		try {
-			System.out.println("TOTO");
-			Thread.sleep(2000);
-	        Dispatcher.getDeliverables(job.getId());
-        } catch (NoSuchAlgorithmException e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
-        } catch (IOException e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
-        } catch (InterruptedException e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
-        }
-
-		Assert.assertEquals(true, file.exists());
-
-	}
+//	@Test
+//	public void testGetDeliverables(){
+//
+//		testInit();
+//
+//		this.jd = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Documents/workspace/JobGenADeliverable/", qVip,
+//				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, map);
+//
+//		Dispatcher.enQueue(jd);
+//
+//		JobInstance job = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job",
+//				JobInstance.class).setParameter("job", jd.getId()).getSingleResult();
+//
+//		File file = new File("/Users/pico/Downloads/tests/deliverable" + job.getId());
+//
+//		try {
+//			System.out.println("TOTO");
+//			Thread.sleep(2000);
+//	        Dispatcher.getDeliverables(job.getId());
+//        } catch (NoSuchAlgorithmException e) {
+//	        // TODO Auto-generated catch block
+//	        e.printStackTrace();
+//        } catch (IOException e) {
+//	        // TODO Auto-generated catch block
+//	        e.printStackTrace();
+//        } catch (InterruptedException e) {
+//	        // TODO Auto-generated catch block
+//	        e.printStackTrace();
+//        }
+//
+//		Assert.assertEquals(true, file.exists());
+//
+//	}
 
 //	@Test
 //	public void testClose() {

@@ -71,8 +71,8 @@ public class Dispatcher {
 
 			Message m = null;
 
-			h = CreationTools.createhistory(1, null, "History of the Job --> ID = " + (ji.getId()),
-					m, ji.getId(), enqueueDate, null, null);
+			h = CreationTools.createhistory(1, (Calendar) null, "History of the Job --> ID = " + (ji.getId()),
+					m, ji, enqueueDate, (Calendar) null, (Calendar) null);
 
 			m = CreationTools.createMessage("Status updated: SUBMITTED", h);
 
@@ -220,7 +220,7 @@ public class Dispatcher {
 
 			DeploymentParameter dp = CreationTools.em.createQuery(
 					"SELECT dp FROM DeploymentParameter dp WHERE dp.queue.id = :q", DeploymentParameter.class)
-					.setParameter("q", job.getQueue().getId())
+					.setParameter("q", job.getJd().getQueue().getId())
 					.getSingleResult();
 
 			for (int i = 0; i < tmp.size(); i++) {
@@ -232,9 +232,9 @@ public class Dispatcher {
 								":" +
 								dp.getNode().getPort() +
 								"/getfile?file=" +
-								tmp.get(i).getFilePath());
+								tmp.get(i).getFileName());
 
-				if (tmp.get(i).getHashPath().equals(Cryptonite.sha1(tmp.get(i).getFilePath()))) {
+				if (tmp.get(i).getHashPath().equals(Cryptonite.sha1(tmp.get(i).getFileName()))) {
 
 					FileUtils.copyURLToFile(url, file = new File("/Users/pico/Downloads/tests/deliverable" + job.getId()));
 					streams.add(new FileInputStream(file));
