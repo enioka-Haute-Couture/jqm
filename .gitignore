@@ -5,3 +5,10 @@ bin/
 .classpath
 *.launch
 
+/jqmProject/nbproject/private/
+/jqmProject/dist/
+/jqmProject/build/
+/JobQueueAPI/nbproject/private/
+/JobBaseAPI/nbproject/private/
+/JobQueueAPI/build/
+/JobQueueAPI/dist/
