@@ -95,15 +95,19 @@ public class Main
 		qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
 		qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3 , 100);
 
-		jd = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qVip,
+		jd = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
+				"/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar",
+				qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 //
 //
-		jdDemoMaven = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
+		jdDemoMaven = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
+				"/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 
-		jdDemo = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qNormal,
+		jdDemo = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
+				"/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 //
 ////		jp = CreationTools.createJobParameter("arg1", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", jd);

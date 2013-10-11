@@ -1,18 +1,11 @@
 package com.enioka.jqm.jpamodel;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapKeyColumn;
 
 
 /**
@@ -45,13 +38,9 @@ public class JobDefinition {
 	@Column(length=50)
 	public String other3;
 	public boolean highlander = false;
+	@Column
+    private String jarPath;
 
-	@ElementCollection
-	@JoinTable(name="JobParameter",
-	joinColumns=@JoinColumn(name="id"))
-	@MapKeyColumn(name="key")
-	@Column(name="value")
-	public Map<String, String> parameters = new HashMap<String, String>();
 
 	public Integer getId()
 	{
@@ -158,16 +147,6 @@ public class JobDefinition {
 		this.other3 = other3;
 	}
 
-	public Map<String, String> getParameters()
-	{
-		return parameters;
-	}
-
-	public void setParameters(Map<String, String> parameters)
-	{
-		this.parameters = parameters;
-	}
-
 	public boolean isHighlander()
 	{
 		return highlander;
@@ -197,4 +176,16 @@ public class JobDefinition {
 	{
 		this.filePath = filePath;
 	}
+
+
+    public String getJarPath() {
+
+    	return jarPath;
+    }
+
+
+    public void setJarPath(String jarPath) {
+
+    	this.jarPath = jarPath;
+    }
 }

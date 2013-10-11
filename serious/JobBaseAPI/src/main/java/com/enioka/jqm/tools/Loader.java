@@ -69,7 +69,7 @@ public class Loader implements Runnable {
 
 			File local = new File(System.getProperty("user.home") + "/.m2/repository");
 			Dependencies dependencies = new Dependencies(job.getJd().getFilePath() + "pom.xml");
-			File jar = new File(job.getJd().getFilePath() + "target/DateTimeMaven-0.0.1-SNAPSHOT.jar");
+			File jar = new File(job.getJd().getJarPath());
 			dependencies.print();
 			URL jars = jar.toURI().toURL();
 
@@ -134,9 +134,6 @@ public class Loader implements Runnable {
 
 			// Restore class loader
 			Thread.currentThread().setContextClassLoader(contextClassLoader);
-
-			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
 			// for (DeliverableStruct d : job.) {
 			// System.out.println("DeliverableStruct: " + d.getFileFamily());

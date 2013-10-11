@@ -1,7 +1,6 @@
 package com.enioka.jqm.tools;
 
 import java.util.Calendar;
-import java.util.HashMap;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -66,7 +65,7 @@ public class CreationTools
 		return j;
 	}
 
-	public static JobDefinition createJobDefinition(boolean canBeRestarted, String javaClassName, String filePath,
+	public static JobDefinition createJobDefinition(boolean canBeRestarted, String javaClassName, String filePath, String jp,
 			 						Queue queue, Integer maxTimeRunning, String applicationName, Integer sessionID,
 			 						String application, String module, String other1, String other2, String other3,
 			 						boolean highlander)
@@ -75,9 +74,6 @@ public class CreationTools
 		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
-		// Default parameters
-		HashMap<String, String> p = new HashMap<String, String>();
-		p.put("MarsuKey", "MarsuValue");
 		// ------------------
 
 		j.setCanBeRestarted(canBeRestarted);
@@ -93,7 +89,7 @@ public class CreationTools
 		j.setOther2(other2);
 		j.setOther3(other3);
 		j.setHighlander(highlander);
-		j.setParameters(p);
+		j.setJarPath(jp);
 
 		em.persist(j);
 		transac.commit();

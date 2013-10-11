@@ -47,7 +47,7 @@ public class JobBase {
 
 	public void setParams(JobInstance j) {
 
-		this.parameters = j.getJd().getParameters();
+		// this.parameters = j.getJd().getParameters();
 		this.start();
 	}
 
@@ -63,8 +63,7 @@ public class JobBase {
 
 		try {
 			System.out.println("ajout du livrable dans la liste");
-			this.sha1s.add(new DeliverableStruct(path, Cryptonite.sha1(path),
-			        fileLabel));
+			this.sha1s.add(new DeliverableStruct(path, Cryptonite.sha1(path), fileLabel));
 		} catch (NoSuchAlgorithmException e) {
 
 			e.printStackTrace();
