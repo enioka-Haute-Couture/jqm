@@ -127,6 +127,7 @@ public class CreationTools
 		dp.setNode(node);
 		dp.setNbThread(nbThread);
 		dp.setPollingInterval(pollingInterval);
+		dp.setQueue(qVip);
 
 		em.persist(dp);
 		transac.commit();
@@ -223,6 +224,7 @@ public class CreationTools
 		j.setUser(user);
 		j.setState(state);
 		j.setPosition(position);
+		j.setQueue(queue);
 
 		em.persist(j);
 		transac.commit();

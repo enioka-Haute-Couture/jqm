@@ -38,26 +38,20 @@ public class Loader implements Runnable {
 
 	public void crashedStatus() {
 
-		EntityManagerFactory emf = Persistence
-		        .createEntityManagerFactory("jobqueue-api-pu");
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
 		// STATE UPDATED
 
-		em.createQuery(
-		        "UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j")
-		        .setParameter("j", job.getId()).setParameter("msg", "CRASHED")
+		em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId()).setParameter("msg", "CRASHED")
 		        .executeUpdate();
 
 		// MESSAGE HISTORY UPDATED
 
-		em.createQuery(
-		        "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
-		                + "(SELECT h.id FROM History h WHERE h.jobId = :j)")
-		        .setParameter("j", job.getId())
-		        .setParameter("msg", "Status updated: CRASHED").executeUpdate();
+		em.createQuery("UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = " + "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)")
+		        .setParameter("j", job.getId()).setParameter("msg", "Status updated: CRASHED").executeUpdate();
 
 		transac.commit();
 		em.close();
@@ -73,66 +67,51 @@ public class Loader implements Runnable {
 
 			// ---------------- BEGIN: MAVEN DEPENDENCIES ------------------
 
-			File local = new File(System.getProperty("user.home")
-			        + "/.m2/repository");
-			Dependencies dependencies = new Dependencies(job.getJd()
-			        .getFilePath() + "pom.xml");
-			File jar = new File(job.getJd().getFilePath()
-			        + "target/JobGenADeliverable-0.0.1-SNAPSHOT.jar");
+			File local = new File(System.getProperty("user.home") + "/.m2/repository");
+			Dependencies dependencies = new Dependencies(job.getJd().getFilePath() + "pom.xml");
+			File jar = new File(job.getJd().getFilePath() + "target/DateTimeMaven-0.0.1-SNAPSHOT.jar");
 			dependencies.print();
 			URL jars = jar.toURI().toURL();
 
-			Collection<RemoteRepository> remotes = Arrays
-			        .asList(new RemoteRepository("maven-central", "default",
-			                "http://repo1.maven.org/maven2/"),
-			                new RemoteRepository("eclipselink", "default",
-			                        "http://download.eclipse.org/rt/eclipselink/maven.repo/")
+			Collection<RemoteRepository> remotes = Arrays.asList(new RemoteRepository("maven-central", "default", "http://repo1.maven.org/maven2/"),
+			        new RemoteRepository("eclipselink", "default", "http://download.eclipse.org/rt/eclipselink/maven.repo/")
 
-			        );
+			);
 
 			ArrayList<URL> tmp = new ArrayList<URL>();
 			Collection<Artifact> deps = null;
 
 			// Update of the job status
-			EntityManagerFactory emf = Persistence
-			        .createEntityManagerFactory("jobqueue-api-pu");
+			EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
 			EntityManager em = emf.createEntityManager();
 			EntityTransaction transac = em.getTransaction();
 			transac.begin();
 
 			em.createQuery(
-			        "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
-			                + "(SELECT h.id FROM History h WHERE h.jobId = :j)")
-			        .setParameter("j", job.getId())
-			        .setParameter("msg", "Status updated: RUNNING")
-			        .executeUpdate();
+			        "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = " + "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)")
+			        .setParameter("j", job.getId()).setParameter("msg", "Status updated: RUNNING").executeUpdate();
 
-			em.createQuery(
-			        "UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)")
-			        .setParameter("j", job.getId())
-			        .setParameter("msg", "RUNNING").executeUpdate();
+			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", job.getId()).setParameter("msg", "RUNNING")
+			        .executeUpdate();
 			// transac.commit();
 
 			// Clean the JobInstance list
 			// Main.p.clean();
 
 			for (int i = 0; i < dependencies.getList().size(); i++) {
-				deps = new Aether(remotes, local).resolve(new DefaultArtifact(
-				        dependencies.getList().get(i)), "compile");
+				deps = new Aether(remotes, local).resolve(new DefaultArtifact(dependencies.getList().get(i)), "compile");
 			}
 
 			if (deps != null) {
 				for (Artifact artifact : deps) {
 					tmp.add(artifact.getFile().toURI().toURL());
-					System.out.println("Artifact: "
-					        + artifact.getFile().toURI().toURL());
+					System.out.println("Artifact: " + artifact.getFile().toURI().toURL());
 				}
 			}
 			// ------------------- END: MAVEN DEPENDENCIES ---------------
 
 			// We save the actual classloader
-			ClassLoader contextClassLoader = Thread.currentThread()
-			        .getContextClassLoader();
+			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
 			URL[] urls = tmp.toArray(new URL[tmp.size()]);
 
@@ -147,8 +126,7 @@ public class Loader implements Runnable {
 			// in
 			// the manifest)
 			System.out.println("+++++++++++++++++++++++++++++++++++++++");
-			System.out.println("Je suis dans le thread "
-			        + Thread.currentThread().getName());
+			System.out.println("Je suis dans le thread " + Thread.currentThread().getName());
 			System.out.println("AVANT INVOKE MAIN");
 			jobBase = jobClassLoader.invokeMain(job);
 
@@ -157,10 +135,8 @@ public class Loader implements Runnable {
 			// Restore class loader
 			Thread.currentThread().setContextClassLoader(contextClassLoader);
 
-			System.out
-			        .println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-			System.out
-			        .println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
 			// for (DeliverableStruct d : job.) {
 			// System.out.println("DeliverableStruct: " + d.getFileFamily());
@@ -169,36 +145,25 @@ public class Loader implements Runnable {
 			if (this.jobBase.getSha1s().size() != 0) {
 				for (int j = 0; j < this.jobBase.getSha1s().size(); j++) {
 
-					System.out.println("SHA1: "
-					        + this.jobBase.getSha1s().get(j).getFilePath());
+					System.out.println("SHA1: " + this.jobBase.getSha1s().get(j).getFilePath());
 
-					CreationTools.createDeliverable(this.jobBase.getSha1s()
-					        .get(j).getFilePath(),
-					        this.jobBase.getSha1s().get(j).getHashPath(),
-					        this.jobBase.getSha1s().get(j).getFileFamily(),
-					        this.job.getId());
+					CreationTools.createDeliverable(this.jobBase.getSha1s().get(j).getFilePath(), this.jobBase.getSha1s().get(j).getHashPath(),
+					        this.jobBase.getSha1s().get(j).getFileFamily(), this.job.getId());
 				}
 			}
-			System.out
-			        .println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-			System.out
-			        .println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
 			// STATE UPDATED
 
-			em.createQuery(
-			        "UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j")
-			        .setParameter("j", job.getId())
-			        .setParameter("msg", "ENDED").executeUpdate();
+			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId()).setParameter("msg", "ENDED")
+			        .executeUpdate();
 
 			// MESSAGE HISTORY UPDATED
 
 			em.createQuery(
-			        "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
-			                + "(SELECT h.id FROM History h WHERE h.jobId = :j)")
-			        .setParameter("j", job.getId())
-			        .setParameter("msg", "Status updated: ENDED")
-			        .executeUpdate();
+			        "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = " + "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)")
+			        .setParameter("j", job.getId()).setParameter("msg", "Status updated: ENDED").executeUpdate();
 
 			transac.commit();
 			em.close();

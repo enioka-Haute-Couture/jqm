@@ -20,6 +20,10 @@ import javax.persistence.OneToMany;
 @Entity
 public class JobInstance implements Comparable<JobInstance>, Serializable{
 
+	/**
+     *
+     */
+    private static final long serialVersionUID = -7710486847228806301L;
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer id;
 	@ManyToOne(fetch=FetchType.LAZY)
@@ -32,6 +36,8 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
     @Column(nullable=false, length=50)
     private String state;
     private Integer position;
+    @ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Queue.class)
+    private Queue queue;
     @OneToMany(mappedBy="jobInstance")
     private List<JobParameter> jps;
 
@@ -104,5 +110,29 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
 	      if (nb1 > nb2)  return -1;
 	      else if(nb1 == nb2) return 0;
 	      else return 1;
+    }
+
+
+    public Queue getQueue() {
+
+    	return queue;
+    }
+
+
+    public void setQueue(Queue queue) {
+
+    	this.queue = queue;
+    }
+
+
+    public List<JobParameter> getJps() {
+
+    	return jps;
+    }
+
+
+    public void setJps(List<JobParameter> jps) {
+
+    	this.jps = jps;
     }
 }

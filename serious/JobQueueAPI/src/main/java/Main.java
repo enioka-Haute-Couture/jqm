@@ -95,7 +95,7 @@ public class Main
 		qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
 		qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3 , 100);
 
-		jd = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Documents/workspace/JobGenADeliverable/", qVip,
+		jd = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 //
 //

@@ -93,13 +93,18 @@ public class Main {
 
 				p = new Polling(dps.get(j).getQueue());
 				System.out.println("APRES POLLING");
+				for (DeploymentParameter i : dps) {
+					System.out.println("DPS QUEUE: " + i.getQueue());
+				}
+
 				if (p.getJob() != null) {
 
 					for (int i = 0; i < tps.size(); i++) {
+
 						System.out.println("TPS QUEUE: " + tps.get(i).getQueue().getId());
 						System.out.println("POLLING QUEUE: " + p.getJob().get(0).getJd().getQueue().getId());
 
-						if (p.getJob().get(0).getJd().getQueue().getId() == tps.get(i).getQueue().getId())
+						if (p.getJob().get(0).getQueue().getId() == tps.get(i).getQueue().getId())
 							tps.get(i).run(p);
 						System.out.println("APRES THREADPOOL RUN");
 					}

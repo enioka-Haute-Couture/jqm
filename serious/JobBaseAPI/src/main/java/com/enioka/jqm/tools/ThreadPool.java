@@ -24,6 +24,7 @@ public class ThreadPool {
 		// try {
 		System.out.println("AVANT LOADER");
 		System.out.println("JOB WILL BE POOLED: " + p.getJob().get(0).getId());
+
 		pool.submit(new Loader(p.getJob().get(0)));
 		// pool.shutdown();
 
