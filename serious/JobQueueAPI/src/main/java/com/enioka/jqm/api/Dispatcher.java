@@ -219,7 +219,7 @@ public class Dispatcher {
 					.getSingleResult();
 
 			DeploymentParameter dp = CreationTools.em.createQuery(
-					"SELECT dp FROM DeploymentParamter dp WHERE dp.queue.id = :q", DeploymentParameter.class)
+					"SELECT dp FROM DeploymentParameter dp WHERE dp.queue.id = :q", DeploymentParameter.class)
 					.setParameter("q", job.getQueue().getId())
 					.getSingleResult();
 
@@ -229,7 +229,8 @@ public class Dispatcher {
 				url = new URL(
 						"http://" +
 								dp.getNode().getListeningInterface() +
-								":" + dp.getNode().getPort() +
+								":" +
+								dp.getNode().getPort() +
 								"/getfile?file=" +
 								tmp.get(i).getFilePath());
 
@@ -272,7 +273,7 @@ public class Dispatcher {
 				.getSingleResult();
 
 		DeploymentParameter dp = CreationTools.em.createQuery(
-				"SELECT dp FROM DeploymentParamter dp WHERE dp.queue.id = :q", DeploymentParameter.class)
+				"SELECT dp FROM DeploymentParameter dp WHERE dp.queue.id = :q", DeploymentParameter.class)
 				.setParameter("q", job.getQueue().getId())
 				.getSingleResult();
 

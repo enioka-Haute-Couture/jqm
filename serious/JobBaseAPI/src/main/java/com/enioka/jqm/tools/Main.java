@@ -46,8 +46,7 @@ public class Main {
 
 		Server server = new Server(8081);
 
-		ServletContextHandler context = new ServletContextHandler(
-		        ServletContextHandler.SESSIONS);
+		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setContextPath("/");
 		server.setHandler(context);
 
@@ -57,10 +56,7 @@ public class Main {
 
 		if (args.length == 1) {
 
-			node = CreationTools.em
-			        .createQuery(
-			                "SELECT n FROM Node n WHERE n.listeningInterface = :li",
-			                Node.class).setParameter("li", args[0])
+			node = CreationTools.em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :li", Node.class).setParameter("li", args[0])
 			        .getSingleResult();
 
 			// dp = (ArrayList<DeploymentParameter>) CreationTools.em
@@ -70,9 +66,7 @@ public class Main {
 			// .getResultList();
 
 			dps = (ArrayList<DeploymentParameter>) CreationTools.em
-			        .createQuery(
-			                "SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n",
-			                DeploymentParameter.class)
+			        .createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
 			        .setParameter("n", node.getId()).getResultList();
 		}
 
@@ -84,8 +78,7 @@ public class Main {
 
 		for (int i = 0; i < dps.size(); i++) {
 
-			tps.add(new ThreadPool(dps.get(i).getQueue(), dps.get(i)
-			        .getNbThread()));
+			tps.add(new ThreadPool(dps.get(i).getQueue(), dps.get(i).getNbThread()));
 		}
 
 		int j = 0;
@@ -100,9 +93,10 @@ public class Main {
 				if (p.getJob() != null) {
 
 					for (int i = 0; i < tps.size(); i++) {
+						System.out.println("TPS QUEUE: " + tps.get(i).getQueue().getId());
+						System.out.println("POLLING QUEUE: " + p.getJob().get(0).getQueue().getId());
 
-						if (p.getJob().get(0).getQueue().getId() == tps.get(i)
-						        .getQueue().getId())
+						if (p.getJob().get(0).getQueue().getId() == tps.get(i).getQueue().getId())
 							tps.get(i).run(p);
 						System.out.println("APRES THREADPOOL RUN");
 					}

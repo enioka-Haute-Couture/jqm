@@ -17,11 +17,13 @@
  */
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.EntityTransaction;
 
+import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.JobDefinition;
 import com.enioka.jqm.jpamodel.Node;
@@ -52,8 +54,9 @@ public class Main
 	/**
 	 * @param args
 	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
 
 		EntityTransaction transac = CreationTools.em.getTransaction();
 		transac.begin();
@@ -116,10 +119,10 @@ public class Main
 
 //		Dispatcher.enQueue(jdDemoMaven);
 //		Dispatcher.enQueue(jdDemo);
+		Dispatcher.enQueue(jd);
 //		Dispatcher.enQueue(jd);
 //		Dispatcher.enQueue(jd);
-//		Dispatcher.enQueue(jd);
-//		Dispatcher.getDeliverables(22);
+//		Dispatcher.getDeliverables(499);
 		CreationTools.close();
 	}
 
