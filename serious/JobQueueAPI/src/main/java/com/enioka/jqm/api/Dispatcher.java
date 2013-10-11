@@ -115,7 +115,7 @@ public class Dispatcher {
 	public static void cancelJobInQueue(int idJob) {
 
 		@SuppressWarnings("unused")
-        History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobId = :j", History.class).setParameter("j", idJob).getSingleResult();
+        History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", idJob).getSingleResult();
 
 		EntityTransaction transac = CreationTools.em.getTransaction();
 		transac.begin();
@@ -126,7 +126,7 @@ public class Dispatcher {
 		CreationTools.em
         .createQuery(
                 "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
-                        + "(SELECT h.id FROM History h WHERE h.jobId = :j)")
+                        + "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)")
         .setParameter("j", idJob)
         .setParameter("msg", "Status updated: CANCELLED")
         .executeUpdate();
