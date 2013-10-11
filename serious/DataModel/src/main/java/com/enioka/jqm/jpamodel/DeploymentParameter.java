@@ -20,6 +20,8 @@ public class DeploymentParameter
 	@Column(nullable=false)
 	private Integer nbThread;
 	private Integer pollingInterval;
+	@ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Queue.class)
+	private Queue queue;
 
 
 
@@ -63,4 +65,14 @@ public class DeploymentParameter
 	{
 		return nbThread;
 	}
+
+    public Queue getQueue() {
+
+    	return queue;
+    }
+
+    public void setQueue(Queue queue) {
+
+    	this.queue = queue;
+    }
 }

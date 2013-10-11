@@ -43,18 +43,15 @@ public class Polling {
 
 	public Polling(Queue queue) {
 
-		EntityManagerFactory emf = Persistence
-		        .createEntityManagerFactory("jobqueue-api-pu");
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
 		EntityManager em = emf.createEntityManager();
 
 		// Get the list of all jobInstance with the queue VIP ordered by
 		// position
+
 		ArrayList<JobInstance> q = (ArrayList<JobInstance>) em
-		        .createQuery(
-		                "SELECT j FROM JobInstance j, JobDefinition jd"
-		                        + " WHERE j.jd.queue.name = :q AND j.state = :s ORDER BY j.position",
-		                JobInstance.class).setParameter("q", queue.getName())
-		        .setParameter("s", "SUBMITTED").getResultList();
+		        .createQuery("SELECT j FROM JobInstance j, JobDefinition jd" + " WHERE j.jd.queue.name = :q AND j.state = :s ORDER BY j.position",
+		                JobInstance.class).setParameter("q", queue.getName()).setParameter("s", "SUBMITTED").getResultList();
 
 		Set<JobInstance> setq = new HashSet<JobInstance>(q);
 		List<JobInstance> newq = new ArrayList<JobInstance>(setq);
@@ -77,16 +74,10 @@ public class Polling {
 
 			CreationTools.em
 			        .createQuery(
-			                "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
-			                        + "(SELECT h.id FROM History h WHERE h.jobId = :j)")
-			        .setParameter("j", job.get(0).getId())
-			        .setParameter("msg", "Status updated: ATTRIBUTED")
-			        .executeUpdate();
+			                "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = " + "(SELECT h.id FROM History h WHERE h.jobId = :j)")
+			        .setParameter("j", job.get(0).getId()).setParameter("msg", "Status updated: ATTRIBUTED").executeUpdate();
 
-			CreationTools.em
-			        .createQuery(
-			                "UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)")
-			        .setParameter("j", job.get(0).getId())
+			CreationTools.em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", job.get(0).getId())
 			        .setParameter("msg", "ATTRIBUTED").executeUpdate();
 
 			transac.commit();
@@ -100,21 +91,15 @@ public class Polling {
 
 	public void executionStatus() {
 
-		EntityManagerFactory emf = Persistence
-		        .createEntityManagerFactory("jobqueue-api-pu");
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
-		em.createQuery(
-		        "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
-		                + "(SELECT h.id FROM History h WHERE h.jobId = :j)")
-		        .setParameter("j", job.get(0).getId())
-		        .setParameter("msg", "Status updated: RUNNING").executeUpdate();
+		em.createQuery("UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = " + "(SELECT h.id FROM History h WHERE h.jobId = :j)")
+		        .setParameter("j", job.get(0).getId()).setParameter("msg", "Status updated: RUNNING").executeUpdate();
 
-		em.createQuery(
-		        "UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)")
-		        .setParameter("j", job.get(0).getId())
+		em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", job.get(0).getId())
 		        .setParameter("msg", "RUNNING").executeUpdate();
 
 		transac.commit();
@@ -125,12 +110,8 @@ public class Polling {
 	public void HighlanderMode() {
 
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) CreationTools.em
-		        .createQuery(
-		                "SELECT j FROM JobInstance j, JobDefinition jd "
-		                        + "WHERE j.id IS NOT :refid AND j.jd = :myjd",
-		                JobInstance.class)
-		        .setParameter("refid", job.get(0).getId())
-		        .setParameter("myjd", job.get(0).getJd()).getResultList();
+		        .createQuery("SELECT j FROM JobInstance j, JobDefinition jd " + "WHERE j.id IS NOT :refid AND j.jd = :myjd", JobInstance.class)
+		        .setParameter("refid", job.get(0).getId()).setParameter("myjd", job.get(0).getJd()).getResultList();
 
 		System.out.println("JOBSSIZE" + jobs.size());
 
@@ -140,22 +121,15 @@ public class Polling {
 		for (int i = 1; i < jobs.size(); i++) {
 
 			@SuppressWarnings("unused")
-			History h = CreationTools.em
-			        .createQuery("SELECT h FROM History h WHERE h.jobId = :j",
-			                History.class)
+			History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobId = :j", History.class)
 			        .setParameter("j", jobs.get(i).getId()).getSingleResult();
 
 			CreationTools.em
 			        .createQuery(
-			                "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
-			                        + "(SELECT h.id FROM History h WHERE h.jobId = :j)")
-			        .setParameter("j", jobs.get(i).getId())
-			        .setParameter("msg", "Status updated: CANCELLED")
-			        .executeUpdate();
+			                "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = " + "(SELECT h.id FROM History h WHERE h.jobId = :j)")
+			        .setParameter("j", jobs.get(i).getId()).setParameter("msg", "Status updated: CANCELLED").executeUpdate();
 
-			CreationTools.em
-			        .createQuery(
-			                "UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob")
+			CreationTools.em.createQuery("UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob")
 			        .setParameter("idJob", jobs.get(i).getId()).executeUpdate();
 		}
 
@@ -165,21 +139,15 @@ public class Polling {
 
 	public void updateExecutionDate() {
 
-		Calendar executionDate = GregorianCalendar.getInstance(Locale
-		        .getDefault());
+		Calendar executionDate = GregorianCalendar.getInstance(Locale.getDefault());
 
-		History h = CreationTools.em
-		        .createQuery("SELECT h FROM History h WHERE h.jobId = :j",
-		                History.class).setParameter("j", job.get(0).getId())
+		History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobId = :j", History.class).setParameter("j", job.get(0).getId())
 		        .getSingleResult();
 
 		EntityTransaction transac = CreationTools.em.getTransaction();
 		transac.begin();
 
-		CreationTools.em
-		        .createQuery(
-		                "UPDATE History h SET h.executionDate = :date WHERE h.id = :h")
-		        .setParameter("h", h.getId())
+		CreationTools.em.createQuery("UPDATE History h SET h.executionDate = :date WHERE h.id = :h").setParameter("h", h.getId())
 		        .setParameter("date", executionDate).executeUpdate();
 
 		transac.commit();

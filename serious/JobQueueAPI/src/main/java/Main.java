@@ -94,10 +94,7 @@ public class Main
 		qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42 , 100);
 		qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
 		qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3 , 100);
-//
-////createJobDefinition(String;String;Queue;
-////		Integer;String;Integer;String;String;String;String;String;Map;)
-//
+
 		jd = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Documents/workspace/JobGenADeliverable/", qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 //

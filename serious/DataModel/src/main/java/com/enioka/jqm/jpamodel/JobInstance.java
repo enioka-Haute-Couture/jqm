@@ -1,5 +1,8 @@
 package com.enioka.jqm.jpamodel;
 
+import java.io.Serializable;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -7,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 
 /**
@@ -14,7 +18,7 @@ import javax.persistence.ManyToOne;
  * @author pierre.coppee
  */
 @Entity
-public class JobInstance {
+public class JobInstance implements Comparable<JobInstance>, Serializable{
 
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer id;
@@ -28,6 +32,8 @@ public class JobInstance {
     @Column(nullable=false, length=50)
     private String state;
     private Integer position;
+    @OneToMany(mappedBy="jobInstance")
+    private List<JobParameter> jps;
 
     public int getId() {
         return id;
@@ -89,4 +95,14 @@ public class JobInstance {
 	{
 		this.parent = parent;
 	}
+
+	@Override
+    public int compareTo(JobInstance arg0) {
+
+		int nb1 = arg0.getPosition();
+	      int nb2 = this.getPosition();
+	      if (nb1 > nb2)  return -1;
+	      else if(nb1 == nb2) return 0;
+	      else return 1;
+    }
 }

@@ -9,6 +9,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
+import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.ExecParameter;
 import com.enioka.jqm.jpamodel.History;
@@ -26,6 +27,25 @@ public class CreationTools
 
 	public CreationTools()
 	{
+	}
+
+	// ------------------ DELIVERABLES ------------------------
+
+	public static Deliverable createDeliverable(String fp, String hp, String ff, Integer jobId)
+	{
+		Deliverable j = new Deliverable();
+		EntityTransaction transac = em.getTransaction();
+		transac.begin();
+
+		j.setFilePath(fp);
+		j.setHashPath(hp);
+		j.setFileFamily(ff);
+		j.setJobId(jobId);
+
+		em.persist(j);
+		transac.commit();
+
+		return j;
 	}
 
 	// ------------------ JOBDEFINITION ------------------------

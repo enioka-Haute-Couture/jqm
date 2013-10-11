@@ -74,11 +74,11 @@ public class Main {
 		//
 		// queues.add(dps.get(i).getQueue());
 		// }
-		//
-
+		System.out.println("BIP: " + dps.size());
 		for (int i = 0; i < dps.size(); i++) {
 
 			tps.add(new ThreadPool(dps.get(i).getQueue(), dps.get(i).getNbThread()));
+			System.out.println("BIP: " + dps.get(i).getNbThread());
 		}
 
 		int j = 0;
@@ -86,17 +86,20 @@ public class Main {
 		while (true) {
 
 			while (j < dps.size()) {
+				System.out.println(dps.get(j).getPollingInterval());
 
 				Thread.sleep(dps.get(j).getPollingInterval());
+				System.out.println("TOTO");
+
 				p = new Polling(dps.get(j).getQueue());
 				System.out.println("APRES POLLING");
 				if (p.getJob() != null) {
 
 					for (int i = 0; i < tps.size(); i++) {
 						System.out.println("TPS QUEUE: " + tps.get(i).getQueue().getId());
-						System.out.println("POLLING QUEUE: " + p.getJob().get(0).getQueue().getId());
+						System.out.println("POLLING QUEUE: " + p.getJob().get(0).getJd().getQueue().getId());
 
-						if (p.getJob().get(0).getQueue().getId() == tps.get(i).getQueue().getId())
+						if (p.getJob().get(0).getJd().getQueue().getId() == tps.get(i).getQueue().getId())
 							tps.get(i).run(p);
 						System.out.println("APRES THREADPOOL RUN");
 					}

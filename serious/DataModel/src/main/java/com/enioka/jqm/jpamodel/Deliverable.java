@@ -17,26 +17,20 @@ public class Deliverable {
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	protected Integer id;
 	@Column(length=1000)
+    protected String filePath;
+	@Column(length=1000)
     protected String fileName;
 	@Column(length=1000)
     protected String fileFamily;
+	@Column
+	private Integer JobId;
+	private String HashPath;
 
 
-    public String getFileName() {
-        return fileName;
-    }
 
     public String getFileFamily() {
         return fileFamily;
     }
-
-	/**
-	 * @param fileName the fileName to set
-	 */
-	public void setFileName(String fileName)
-	{
-		this.fileName = fileName;
-	}
 
 	/**
 	 * @param fileFamily the fileFamily to set
@@ -45,5 +39,53 @@ public class Deliverable {
 	{
 		this.fileFamily = fileFamily;
 	}
+
+
+    public Integer getJobId() {
+
+    	return JobId;
+    }
+
+
+    public void setJobId(Integer jobId) {
+
+    	JobId = jobId;
+    }
+
+
+    public String getFilePath() {
+
+    	return filePath;
+    }
+
+
+    public void setFilePath(String filePath) {
+
+    	this.filePath = filePath;
+    }
+
+
+    public String getHashPath() {
+
+    	return HashPath;
+    }
+
+
+    public void setHashPath(String hashPath) {
+
+    	HashPath = hashPath;
+    }
+
+
+    public String getFileName() {
+
+    	return fileName;
+    }
+
+
+    public void setFileName(String fileName) {
+
+    	this.fileName = fileName;
+    }
 
 }

@@ -1,5 +1,7 @@
 package com.enioka.jqm.jpamodel;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -9,7 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class JobParameter
+public class JobParameter implements Serializable
 {
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;

@@ -65,7 +65,7 @@ public class Dispatcher {
 
 		// Update status in the history table
 
-		Query q = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobId = :j", History.class).setParameter("j", ji.getId());
+		Query q = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", ji.getId());
 
 		if (!q.equals(null)) {
 
@@ -274,7 +274,7 @@ public class Dispatcher {
 
 		DeploymentParameter dp = CreationTools.em.createQuery(
 				"SELECT dp FROM DeploymentParameter dp WHERE dp.queue.id = :q", DeploymentParameter.class)
-				.setParameter("q", job.getQueue().getId())
+				.setParameter("q", job.getJd().getQueue().getId())
 				.getSingleResult();
 
 		url = new URL(
