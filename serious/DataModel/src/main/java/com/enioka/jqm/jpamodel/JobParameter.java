@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 @Entity
 public class JobParameter implements Serializable
 {
+	private static final long serialVersionUID = -8894511645365690426L;
+	
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
 	@Column(nullable=false, length=50)
