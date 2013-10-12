@@ -13,6 +13,7 @@ import com.enioka.jqm.jpamodel.JobDefinition;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.tools.CreationTools;
+import com.enioka.jqm.api.Dispatcher;
 
 public class JobBaseTests {
 
@@ -81,13 +82,13 @@ public class JobBaseTests {
 		this.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, 100);
 		this.qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 0, 100);
 
-		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", qVip, 42,
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip, 42,
 		        "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
-		        qNormal, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+		        "", this.qNormal, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/Demo/", qSlow, 42,
+		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow, 42,
 		        "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 		Dispatcher.enQueue(jdDemoMaven);
