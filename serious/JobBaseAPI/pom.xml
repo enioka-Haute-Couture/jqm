@@ -28,11 +28,18 @@
 	</repositories>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<version>5.0.1.Final</version>
 		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>3.5.6-Final</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.jcabi</groupId>
 			<artifactId>jcabi-aether</artifactId>
@@ -53,26 +60,24 @@
 			<artifactId>maven-core</artifactId>
 			<version>3.1.0</version>
 		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-			<version>3.5.6-Final</version>
-		</dependency>
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.6.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.6.0</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>2.3.0</version>
+		</dependency>
+
 		<!-- JETTY -->
 		<dependency>
 			<groupId>jetty</groupId>
@@ -90,13 +95,25 @@
 			<version>7.6.13.v20130916</version>
 		</dependency>
 
-
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-model</artifactId>
 			<type>jar</type>
 			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-clientapi</artifactId>
+			<type>jar</type>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>
