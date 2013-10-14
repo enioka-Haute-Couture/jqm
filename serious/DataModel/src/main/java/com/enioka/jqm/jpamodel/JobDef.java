@@ -20,7 +20,7 @@ import javax.persistence.OneToMany;
  */
 @Entity
 @Embeddable
-public class JobDefinition implements Serializable{
+public class JobDef implements Serializable{
 
 	/**
      *

@@ -42,8 +42,8 @@ import com.enioka.jqm.hash.Cryptonite;
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.History;
+import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
-import com.enioka.jqm.jpamodel.JobDefinition;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
@@ -56,9 +56,20 @@ import com.enioka.jqm.tools.CreationTools;
  */
 public class Dispatcher {
 
-	public static int enQueue(JobDefinition job) {
+	private static JobDef jobDefinitionToJobDef(JobDefinition jd) {
+
+		 JobDef job = CreationTools.em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = :name", JobDef.class)
+		.setParameter("name", jd.getApplicationName())
+		.getSingleResult();
+
+		 return job;
+	}
+
+	public static int enQueue(JobDefinition jd) {
 
 		ArrayList<JobParameter> jps = new ArrayList<JobParameter>();
+
+		JobDef job = jobDefinitionToJobDef(jd);
 
 		if (job.getParameters() != null) {
 			for (JobDefParameter j : job.getParameters()) {
@@ -86,7 +97,7 @@ public class Dispatcher {
 		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
 
 		History h = null;
-		Integer p = CreationTools.em.createQuery("SELECT MAX (j.position) FROM JobInstance j, JobDefinition jd " +
+		Integer p = CreationTools.em.createQuery("SELECT MAX (j.position) FROM JobInstance j, JobDef jd " +
 				"WHERE j.jd.queue.name = :queue", Integer.class).setParameter("queue", (job.getQueue().getName())).getSingleResult();
 		System.out.println("POSITION: " + p);
 		JobInstance ji = CreationTools.createJobInstance(job, jps, "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue);
@@ -127,12 +138,14 @@ public class Dispatcher {
 		return ji.getId();
 	}
 
-	public static int enQueue(JobDefinition job, List<JobParameter> jps) {
+	public static int enQueue(JobDefinition jd, List<JobParameter> jps) {
 
 		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
 
+		JobDef job = jobDefinitionToJobDef(jd);
+
 		History h = null;
-		Integer p = CreationTools.em.createQuery("SELECT MAX (j.position) FROM JobInstance j, JobDefinition jd " +
+		Integer p = CreationTools.em.createQuery("SELECT MAX (j.position) FROM JobInstance j, JobDef jd " +
 				"WHERE j.jd.queue.name = :queue", Integer.class).setParameter("queue", (job.getQueue().getName())).getSingleResult();
 		System.out.println("POSITION: " + p);
 		JobInstance ji = CreationTools.createJobInstance(job, jps, "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue);

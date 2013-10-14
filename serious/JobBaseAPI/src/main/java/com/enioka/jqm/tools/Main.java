@@ -19,6 +19,7 @@
 package com.enioka.jqm.tools;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -34,12 +35,15 @@ public class Main {
 	public static Node node = null;
 	public static Polling p = null;
 	public static ArrayList<ThreadPool> tps = new ArrayList<ThreadPool>();
+	public static AtomicBoolean isRunning = new AtomicBoolean(true);
 
 	/**
 	 * @param args
 	 * @throws Exception
 	 */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception { // This code must
+															  // be excuted in a
+															  // new Thread
 
 		// Get the informations about the current node
 		// Add no node in base case
@@ -83,7 +87,7 @@ public class Main {
 
 		int j = 0;
 
-		while (true) {
+		while (isRunning.get()) {
 
 			while (j < dps.size()) {
 				System.out.println(dps.get(j).getPollingInterval());
@@ -110,11 +114,17 @@ public class Main {
 					}
 				}
 
+				if (!isRunning.get())
+					break;
+
 				if (j == dps.size() - 1)
 					j = 0;
 				else
 					j++;
 			}
+
+			if (!isRunning.get())
+				break;
 		}
 	}
 }

@@ -23,9 +23,10 @@ import java.util.ArrayList;
 import javax.persistence.EntityTransaction;
 
 import com.enioka.jqm.api.Dispatcher;
+import com.enioka.jqm.api.JobDefinition;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
+import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
-import com.enioka.jqm.jpamodel.JobDefinition;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.tools.CreationTools;
@@ -47,11 +48,11 @@ public class Main
 //	static JobParameter jpd = null;
 //	static JobParameter jpdm = null;
 
-	static JobDefinition jd = new JobDefinition();
+	static JobDef jd = new JobDef();
 
-	static JobDefinition jdDemoMaven = null;
+	static JobDef jdDemoMaven = null;
 
-	static JobDefinition jdDemo = null;
+	static JobDef jdDemo = null;
 
 	public static JobDefParameter jdp = null;
 	public static ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
@@ -93,7 +94,7 @@ public class Main
 		transac.commit();
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
-		CreationTools.em.createQuery("DELETE FROM JobDefinition").executeUpdate();
+		CreationTools.em.createQuery("DELETE FROM JobDef").executeUpdate();
 		transac.commit();
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
@@ -107,21 +108,21 @@ public class Main
 		qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
 		qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3 , 100);
 
-		jd = CreationTools.createJobDefinition(true, "App", jdargs, "/Users/pico/Dropbox/projets/enioka/jqm/tests/PrintArg/",
+		jd = CreationTools.createJobDef(true, "App", jdargs, "/Users/pico/Dropbox/projets/enioka/jqm/tests/PrintArg/",
 				"/Users/pico/Dropbox/projets/enioka/jqm/tests/PrintArg/target/PrintArg-0.0.1-SNAPSHOT.jar",
 				qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 //
 //
-		jdDemoMaven = CreationTools.createJobDefinition(true, "Main", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
+		jdDemoMaven = CreationTools.createJobDef(true, "Main", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
 				"/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", qNormal,
-				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+				42, "MarsuApplication2", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 
-		jdDemo = CreationTools.createJobDefinition(true, "Main", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
+		jdDemo = CreationTools.createJobDef(true, "Main", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
 				"/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", qNormal,
-				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+				42, "MarsuApplication3", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 //
 ////		jp = CreationTools.createJobParameter("arg1", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", jd);
 ////		jpdm = CreationTools.createJobParameter("", "", jdDemoMaven);
@@ -131,10 +132,13 @@ public class Main
 //
 		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip);
 		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal);
+
+		JobDefinition newJob = new JobDefinition("MarsuApplication");
+
 //
 //		Dispatcher.enQueue(jdDemoMaven);
 //		Dispatcher.enQueue(jdDemo);
-		Dispatcher.enQueue(jd);
+		Dispatcher.enQueue(newJob);
 ////		Dispatcher.enQueue(jd);
 ////		Dispatcher.enQueue(jd);
 ////		Dispatcher.getDeliverables(499);

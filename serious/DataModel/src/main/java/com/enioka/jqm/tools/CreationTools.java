@@ -13,7 +13,7 @@ import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.ExecParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDefParameter;
-import com.enioka.jqm.jpamodel.JobDefinition;
+import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
@@ -50,9 +50,9 @@ public class CreationTools
 
 	// ------------------ JOBDEFINITION ------------------------
 
-	public static JobDefinition initJobDefinition(String javaClassName, String filePath, Queue queue)
+	public static JobDef initJobDefinition(String javaClassName, String filePath, Queue queue)
 	{
-		JobDefinition j = new JobDefinition();
+		JobDef j = new JobDef();
 		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
@@ -66,12 +66,12 @@ public class CreationTools
 		return j;
 	}
 
-	public static JobDefinition createJobDefinition(boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String filePath, String jp,
+	public static JobDef createJobDef(boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String filePath, String jp,
 			 						Queue queue, Integer maxTimeRunning, String applicationName, Integer sessionID,
 			 						String application, String module, String other1, String other2, String other3,
 			 						boolean highlander)
 	{
-		JobDefinition j = new JobDefinition();
+		JobDef j = new JobDef();
 		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
@@ -192,7 +192,7 @@ public class CreationTools
 
 	// ------------------ JOBINSTANCE --------------------------
 
-	public static JobInstance createJobInstance(JobDefinition jd, List<JobParameter> jps, String user, Integer sessionID, String state, Integer position, Queue queue)
+	public static JobInstance createJobInstance(JobDef jd, List<JobParameter> jps, String user, Integer sessionID, String state, Integer position, Queue queue)
 	{
 		JobInstance j = new JobInstance();
 		EntityTransaction transac = em.getTransaction();

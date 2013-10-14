@@ -52,7 +52,7 @@ public class Polling {
 		// position
 
 		ArrayList<JobInstance> q = (ArrayList<JobInstance>) em
-		        .createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.queue.name = :q AND j.state = :s ORDER BY j.position",
+		        .createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.queue.name = :q AND j.state = :s ORDER BY j.position",
 		                JobInstance.class).setParameter("q", queue.getName()).setParameter("s", "SUBMITTED").getResultList();
 
 		Set<JobInstance> setq = new HashSet<JobInstance>(q);
@@ -118,7 +118,7 @@ public class Polling {
 	public void HighlanderMode() {
 
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) CreationTools.em
-		        .createQuery("SELECT j FROM JobInstance j, JobDefinition jd " + "WHERE j.id IS NOT :refid AND j.jd = :myjd", JobInstance.class)
+		        .createQuery("SELECT j FROM JobInstance j, JobDef jd " + "WHERE j.id IS NOT :refid AND j.jd = :myjd", JobInstance.class)
 		        .setParameter("refid", job.get(0).getId()).setParameter("myjd", job.get(0).getJd()).getResultList();
 
 		System.out.println("JOBSSIZE" + jobs.size());

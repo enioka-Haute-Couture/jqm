@@ -28,7 +28,7 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer id;
 	@ManyToOne(fetch=FetchType.LAZY)
-	private JobDefinition jd;
+	private JobDef jd;
 	@ManyToOne(fetch=FetchType.LAZY)
 	public JobInstance parent;
 	@Column(length=50)
@@ -54,12 +54,12 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
     public int getSessionID() {
         return sessionID;
     }
-    public JobDefinition getJd()
+    public JobDef getJd()
 	{
 		return jd;
 	}
 
-	public void setJd(JobDefinition jd)
+	public void setJd(JobDef jd)
 	{
 		this.jd = jd;
 	}
