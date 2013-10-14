@@ -1,17 +1,18 @@
 package com.enioka.jqm.tools;
 
 import java.util.Calendar;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
 
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.ExecParameter;
 import com.enioka.jqm.jpamodel.History;
+import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobDefinition;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
@@ -65,7 +66,7 @@ public class CreationTools
 		return j;
 	}
 
-	public static JobDefinition createJobDefinition(boolean canBeRestarted, String javaClassName, String filePath, String jp,
+	public static JobDefinition createJobDefinition(boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String filePath, String jp,
 			 						Queue queue, Integer maxTimeRunning, String applicationName, Integer sessionID,
 			 						String application, String module, String other1, String other2, String other3,
 			 						boolean highlander)
@@ -78,6 +79,7 @@ public class CreationTools
 
 		j.setCanBeRestarted(canBeRestarted);
 		j.setJavaClassName(javaClassName);
+		j.setParameters(jps);
 		j.setFilePath(filePath);
 		j.setQueue(queue);
 		j.setMaxTimeRunning(maxTimeRunning);
@@ -190,32 +192,14 @@ public class CreationTools
 
 	// ------------------ JOBINSTANCE --------------------------
 
-	public static JobInstance initJobInstance(JobDefinition jd, String state)
-	{
-		JobInstance j = new JobInstance();
-
-		Query q = em.createQuery("SELECT COUNT(t) from JobDefinition t");
-		System.out.println( q.getSingleResult());
-
-		EntityTransaction transac = em.getTransaction();
-		transac.begin();
-
-		j.setJd(jd);
-		j.setState(state);
-
-		em.persist(j);
-		transac.commit();
-
-		return j;
-	}
-
-	public static JobInstance createJobInstance(JobDefinition jd, String user, Integer sessionID, String state, Integer position, Queue queue)
+	public static JobInstance createJobInstance(JobDefinition jd, List<JobParameter> jps, String user, Integer sessionID, String state, Integer position, Queue queue)
 	{
 		JobInstance j = new JobInstance();
 		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
 		j.setJd(jd);
+		j.setParameters(jps);
 		j.setSessionID(sessionID);
 		j.setUser(user);
 		j.setState(state);
@@ -230,7 +214,7 @@ public class CreationTools
 
 	// ------------------ JOBPARAMETER -------------------------
 
-	public static JobParameter createJobParameter(String key, String value, JobInstance jobInstance)
+	public static JobParameter createJobParameter(String key, String value)
 	{
 		JobParameter j = new JobParameter();
 		EntityTransaction transac = em.getTransaction();
@@ -238,7 +222,20 @@ public class CreationTools
 
 		j.setKey(key);
 		j.setValue(value);
-		j.setJobInstance(jobInstance);
+
+		em.persist(j);
+		transac.commit();
+		return j;
+	}
+
+	public static JobDefParameter createJobDefParameter(String key, String value)
+	{
+		JobDefParameter j = new JobDefParameter();
+		EntityTransaction transac = em.getTransaction();
+		transac.begin();
+
+		j.setKey(key);
+		j.setValue(value);
 
 		em.persist(j);
 		transac.commit();

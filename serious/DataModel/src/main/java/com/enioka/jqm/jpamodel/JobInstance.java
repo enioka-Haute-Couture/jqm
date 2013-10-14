@@ -9,6 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -38,8 +39,9 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
     private Integer position;
     @ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Queue.class)
     private Queue queue;
-    @OneToMany(mappedBy="jobInstance")
-    private List<JobParameter> jps;
+    @OneToMany(orphanRemoval=true)
+	@JoinColumn(name="JOB_PARAMETERS")
+    private List<JobParameter> parameters;
 
     public int getId() {
         return id;
@@ -125,14 +127,15 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
     }
 
 
-    public List<JobParameter> getJps() {
+    public List<JobParameter> getParameters() {
 
-    	return jps;
+    	return parameters;
     }
 
 
-    public void setJps(List<JobParameter> jps) {
+    public void setParameters(List<JobParameter> parameters) {
 
-    	this.jps = jps;
+    	this.parameters = parameters;
     }
+
 }

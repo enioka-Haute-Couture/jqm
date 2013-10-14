@@ -1,11 +1,17 @@
 package com.enioka.jqm.jpamodel;
 
+import java.io.Serializable;
+import java.util.List;
+
 import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 
 /**
@@ -13,7 +19,13 @@ import javax.persistence.ManyToOne;
  * @author pierre.coppee
  */
 @Entity
-public class JobDefinition {
+@Embeddable
+public class JobDefinition implements Serializable{
+
+	/**
+     *
+     */
+    private static final long serialVersionUID = -3276834475433922990L;
 
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	public Integer id;
@@ -40,6 +52,9 @@ public class JobDefinition {
 	public boolean highlander = false;
 	@Column
     private String jarPath;
+	@OneToMany(orphanRemoval=true)
+	@JoinColumn(name="PARAMETERS")
+    private List<JobDefParameter> parameters;
 
 
 	public Integer getId()
@@ -183,9 +198,18 @@ public class JobDefinition {
     	return jarPath;
     }
 
-
     public void setJarPath(String jarPath) {
 
     	this.jarPath = jarPath;
+    }
+
+    public List<JobDefParameter> getParameters() {
+
+    	return parameters;
+    }
+
+    public void setParameters(List<JobDefParameter> parameters) {
+
+    	this.parameters = parameters;
     }
 }

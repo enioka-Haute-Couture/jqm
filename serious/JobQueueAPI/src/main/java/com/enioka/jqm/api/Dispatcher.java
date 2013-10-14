@@ -30,7 +30,10 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 import org.apache.commons.io.FileUtils;
@@ -39,8 +42,10 @@ import com.enioka.jqm.hash.Cryptonite;
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.History;
+import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobDefinition;
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.tools.CreationTools;
@@ -53,13 +58,80 @@ public class Dispatcher {
 
 	public static int enQueue(JobDefinition job) {
 
+		ArrayList<JobParameter> jps = new ArrayList<JobParameter>();
+
+		if (job.getParameters() != null) {
+			for (JobDefParameter j : job.getParameters()) {
+
+				EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+				EntityManager em = emf.createEntityManager();
+				JobParameter jp = new JobParameter();
+				EntityTransaction transac = em.getTransaction();
+				transac.begin();
+
+				jp.setKey(j.getKey());
+				jp.setValue(j.getValue());
+
+				em.persist(jp);
+				transac.commit();
+				em.close();
+				emf.close();
+			}
+	}
+
 		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
 
 		History h = null;
 		Integer p = CreationTools.em.createQuery("SELECT MAX (j.position) FROM JobInstance j, JobDefinition jd " +
 				"WHERE j.jd.queue.name = :queue", Integer.class).setParameter("queue", (job.getQueue().getName())).getSingleResult();
 		System.out.println("POSITION: " + p);
-		JobInstance ji = CreationTools.createJobInstance(job, "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue);
+		JobInstance ji = CreationTools.createJobInstance(job, jps, "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue);
+
+		//CreationTools.em.createQuery("UPDATE JobParameter jp SET jp.jobInstance = :j WHERE").executeUpdate();
+
+		// Update status in the history table
+
+		Query q = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", ji.getId());
+
+		if (!q.equals(null)) {
+
+			Message m = null;
+
+			h = CreationTools.createhistory(1, (Calendar) null, "History of the Job --> ID = " + (ji.getId()),
+					m, ji, enqueueDate, (Calendar) null, (Calendar) null);
+
+			m = CreationTools.createMessage("Status updated: SUBMITTED", h);
+
+		}
+		else {
+			EntityTransaction transac = CreationTools.em.getTransaction();
+			transac.begin();
+
+			h = (History) q.getSingleResult();
+
+			Message m = CreationTools.em.createQuery("SELECT m FROM Message m WHERE m.id = :h",
+					Message.class).setParameter("h", h.getMessage().getId()).getSingleResult();
+
+			m.setTextMessage("Status updated: SUBMITTED");
+
+			CreationTools.em.createQuery("UPDATE Message m SET m.textMessage = :msg WHERE" +
+					"m.history.id = :h").setParameter("h", h.getId()).setParameter("msg", "Status updated: SUBMITTED").executeUpdate();
+
+			transac.commit();
+		}
+
+		return ji.getId();
+	}
+
+	public static int enQueue(JobDefinition job, List<JobParameter> jps) {
+
+		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
+
+		History h = null;
+		Integer p = CreationTools.em.createQuery("SELECT MAX (j.position) FROM JobInstance j, JobDefinition jd " +
+				"WHERE j.jd.queue.name = :queue", Integer.class).setParameter("queue", (job.getQueue().getName())).getSingleResult();
+		System.out.println("POSITION: " + p);
+		JobInstance ji = CreationTools.createJobInstance(job, jps, "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue);
 
 		//CreationTools.em.createQuery("UPDATE JobParameter jp SET jp.jobInstance = :j WHERE").executeUpdate();
 

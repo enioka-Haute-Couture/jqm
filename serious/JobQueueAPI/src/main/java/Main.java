@@ -18,11 +18,13 @@
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 import javax.persistence.EntityTransaction;
 
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
+import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobDefinition;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
@@ -41,22 +43,25 @@ public class Main
 	static Queue qNormal = null;
 	static Queue qSlow = null;
 
-//	static JobParameter jp = null;
+	//static JobParameter jp = null;
 //	static JobParameter jpd = null;
 //	static JobParameter jpdm = null;
 
-	static JobDefinition jd = null;
+	static JobDefinition jd = new JobDefinition();
 
 	static JobDefinition jdDemoMaven = null;
 
 	static JobDefinition jdDemo = null;
+
+	public static JobDefParameter jdp = null;
+	public static ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 
 	/**
 	 * @param args
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 */
-	public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
 
 		EntityTransaction transac = CreationTools.em.getTransaction();
 		transac.begin();
@@ -80,6 +85,10 @@ public class Main
 		transac.commit();
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
+		CreationTools.em.createQuery("DELETE FROM JobDefParameter").executeUpdate();
+		transac.commit();
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
 		CreationTools.em.createQuery("DELETE FROM JobParameter").executeUpdate();
 		transac.commit();
 		transac = CreationTools.em.getTransaction();
@@ -91,22 +100,26 @@ public class Main
 		CreationTools.em.createQuery("DELETE FROM Queue").executeUpdate();
 		transac.commit();
 
+		jdp = CreationTools.createJobDefParameter("arg", "Hello World");
+		jdargs.add(jdp);
+
 		qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42 , 100);
 		qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
 		qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3 , 100);
 
-		jd = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
-				"/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar",
+		jd = CreationTools.createJobDefinition(true, "App", jdargs, "/Users/pico/Dropbox/projets/enioka/jqm/tests/PrintArg/",
+				"/Users/pico/Dropbox/projets/enioka/jqm/tests/PrintArg/target/PrintArg-0.0.1-SNAPSHOT.jar",
 				qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+
 //
 //
-		jdDemoMaven = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
+		jdDemoMaven = CreationTools.createJobDefinition(true, "Main", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
 				"/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 
-		jdDemo = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
+		jdDemo = CreationTools.createJobDefinition(true, "Main", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
 				"/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 //
@@ -119,8 +132,8 @@ public class Main
 		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip);
 		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal);
 //
-		Dispatcher.enQueue(jdDemoMaven);
-		Dispatcher.enQueue(jdDemo);
+//		Dispatcher.enQueue(jdDemoMaven);
+//		Dispatcher.enQueue(jdDemo);
 		Dispatcher.enQueue(jd);
 ////		Dispatcher.enQueue(jd);
 ////		Dispatcher.enQueue(jd);

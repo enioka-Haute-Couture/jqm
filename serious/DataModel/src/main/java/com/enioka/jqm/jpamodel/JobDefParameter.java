@@ -11,10 +11,12 @@ import javax.persistence.Id;
 
 @Entity
 @Embeddable
-public class JobParameter implements Serializable
-{
-	private static final long serialVersionUID = -8894511645365690426L;
+public class JobDefParameter implements Serializable{
 
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -5308516206913425230L;
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
 	@Column(nullable=false, length=50)
@@ -22,41 +24,35 @@ public class JobParameter implements Serializable
 	@Column(nullable=false, length=1000)
 	private String value;
 
-	/**
-	 * @return the key
-	 */
-	public String getKey()
-	{
+	public JobParameter jDPtoJP(JobDefParameter jdp) {
+
+		JobParameter jp = new JobParameter();
+
+		jp.setKey(jdp.getKey());
+		jp.setValue(jdp.getValue());
+
+		return jp;
+	}
+
+
+	public String getKey() {
+
 		return key;
 	}
-	/**
-	 * @param key the key to set
-	 */
-	public void setKey(String key)
-	{
+
+	public void setKey(String key) {
+
 		this.key = key;
 	}
-	/**
-	 * @return the value
-	 */
-	public String getValue()
-	{
+
+	public String getValue() {
+
 		return value;
 	}
-	/**
-	 * @param value the value to set
-	 */
-	public void setValue(String value)
-	{
+
+	public void setValue(String value) {
+
 		this.value = value;
-	}
-	public Integer getId()
-	{
-		return id;
-	}
-	public void setId(Integer id)
-	{
-		this.id = id;
 	}
 
 }

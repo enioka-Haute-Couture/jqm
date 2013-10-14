@@ -3,7 +3,6 @@
 	<name>jqm-clientapi</name>
 	<comment></comment>
 	<projects>
-		<project>jqm-model</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -13,11 +12,6 @@
 		</buildCommand>
 		<buildCommand>
 			<name>org.eclipse.jdt.core.javabuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>org.eclipse.wst.validation.validationbuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>

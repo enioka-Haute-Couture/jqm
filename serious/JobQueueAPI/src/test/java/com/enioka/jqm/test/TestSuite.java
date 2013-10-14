@@ -70,6 +70,12 @@ public class TestSuite {
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
 
+		CreationTools.em.createQuery("DELETE FROM JobDefParameter").executeUpdate();
+		transac.commit();
+
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+
 		CreationTools.em.createQuery("DELETE FROM JobParameter").executeUpdate();
 		transac.commit();
 
@@ -101,13 +107,13 @@ public class TestSuite {
 
 		testInit();
 
-		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
+		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
+		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 		Dispatcher.enQueue(jd);
@@ -128,13 +134,13 @@ public class TestSuite {
 
 		testInit();
 
-		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
+		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
+		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 		Dispatcher.enQueue(jdDemoMaven);
@@ -157,13 +163,13 @@ public class TestSuite {
 
 		testInit();
 
-		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
+		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
+		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 		Dispatcher.enQueue(jdDemoMaven);
@@ -185,13 +191,13 @@ public class TestSuite {
 
 		testInit();
 
-		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
+		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
+		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 		Dispatcher.enQueue(jdDemoMaven);
@@ -212,13 +218,13 @@ public class TestSuite {
 
 		testInit();
 
-		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
+		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
+		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 		Dispatcher.enQueue(jdDemoMaven);
@@ -242,13 +248,13 @@ public class TestSuite {
 
 		testInit();
 
-		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "",  qVip,
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "",  qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "",  qNormal,
+		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "",  qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "",  qSlow,
+		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "",  qSlow,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 		Dispatcher.enQueue(jdDemoMaven);
@@ -274,13 +280,13 @@ public class TestSuite {
 
 		testInit();
 
-		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
+		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
+		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 		Dispatcher.enQueue(jdDemoMaven);
@@ -305,13 +311,13 @@ public class TestSuite {
 
 		testInit();
 
-		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
+		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
+		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 		Dispatcher.enQueue(jdDemoMaven);
@@ -333,13 +339,13 @@ public class TestSuite {
 
 		testInit();
 
-		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
+		this.jd = CreationTools.createJobDefinition(true, "MarsuClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
+		this.jdDemoMaven = CreationTools.createJobDefinition(true, "DemoMavenClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
-		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
+		this.jdDemo = CreationTools.createJobDefinition(true, "DemoClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 		Dispatcher.enQueue(jdDemoMaven);
@@ -362,7 +368,7 @@ public class TestSuite {
 
 		testInit();
 
-		this.jd = CreationTools.createJobDefinition(true, "Main", "/Users/pico/Documents/workspace/JobGenADeliverable/", "", qVip,
+		this.jd = CreationTools.createJobDefinition(true, "Main", null, "/Users/pico/Documents/workspace/JobGenADeliverable/", "", qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 		Dispatcher.enQueue(jd);

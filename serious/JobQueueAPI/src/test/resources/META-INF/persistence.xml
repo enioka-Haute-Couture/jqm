@@ -17,6 +17,7 @@
 		<class>com.enioka.jqm.jpamodel.DeploymentParameter</class>
 		<class>com.enioka.jqm.jpamodel.Node</class>
 		<class>com.enioka.jqm.jpamodel.Queue</class>
+		<class>com.enioka.jqm.jpamodel.JobDefParameter</class>
 
 		<properties>
 			<property name="javax.persistence.validation.mode" value="none" />

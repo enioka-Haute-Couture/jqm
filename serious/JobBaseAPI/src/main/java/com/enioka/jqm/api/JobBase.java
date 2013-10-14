@@ -20,10 +20,9 @@ package com.enioka.jqm.api;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.temp.DeliverableStruct;
 import com.enioka.jqm.tools.Cryptonite;
 
@@ -42,12 +41,16 @@ public class JobBase {
 	protected String other1;
 	protected String other2;
 	protected String other3;
-	protected Map<String, String> parameters = new HashMap<String, String>();
+	protected ArrayList<JobParameter> parameters = new ArrayList<JobParameter>();
 	protected ArrayList<DeliverableStruct> sha1s = new ArrayList<DeliverableStruct>();
 
 	public void setParams(JobInstance j) {
 
-		// this.parameters = j.getJd().getParameters();
+		for (JobParameter i : j.getParameters()) {
+
+			this.parameters.add(i);
+		}
+
 		this.start();
 	}
 
@@ -168,16 +171,6 @@ public class JobBase {
 		this.other3 = other3;
 	}
 
-	public Map<String, String> getParameters() {
-
-		return parameters;
-	}
-
-	public void setParameters(Map<String, String> parameters) {
-
-		this.parameters = parameters;
-	}
-
 	public ArrayList<DeliverableStruct> getSha1s() {
 
 		return sha1s;
@@ -186,6 +179,16 @@ public class JobBase {
 	public void setSha1s(ArrayList<DeliverableStruct> sha1s) {
 
 		this.sha1s = sha1s;
+	}
+
+	public ArrayList<JobParameter> getParameters() {
+
+		return parameters;
+	}
+
+	public void setParameters(ArrayList<JobParameter> parameters) {
+
+		this.parameters = parameters;
 	}
 
 }
