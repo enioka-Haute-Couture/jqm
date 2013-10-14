@@ -381,6 +381,7 @@ public class TestSuite {
 				"SELECT j.parameters FROM JobInstance AS j WHERE j.id = :j")
 				.setParameter("j", job.getId());
 
+        @SuppressWarnings("unchecked")
         List<JobParameter> res = q.getResultList();
 
 		Assert.assertEquals("key", res.get(0).getKey());

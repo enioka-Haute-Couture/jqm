@@ -108,8 +108,8 @@ public class Main
 		qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
 		qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3 , 100);
 
-		jd = CreationTools.createJobDef(true, "App", jdargs, "/Users/pico/Dropbox/projets/enioka/jqm/tests/PrintArg/",
-				"/Users/pico/Dropbox/projets/enioka/jqm/tests/PrintArg/target/PrintArg-0.0.1-SNAPSHOT.jar",
+		jd = CreationTools.createJobDef(true, "Entry", jdargs, "/Users/pico/Dropbox/projets/enioka/jqm/tests/testJobCallAJob/",
+				"/Users/pico/Dropbox/projets/enioka/jqm/tests/testJobCallAJob/target/testJobCallAJob-0.0.1-SNAPSHOT.jar",
 				qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
@@ -134,7 +134,7 @@ public class Main
 		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal);
 
 		JobDefinition newJob = new JobDefinition("MarsuApplication");
-		newJob.addParameter("sry", "Gaston Lagaffe");
+		newJob.addParameter("sry", "/Users/pico/Dropbox/projets/enioka/jqm/tests/DemoMaven/target/DemoMaven-1.0-SNAPSHOT.jar");
 
 //
 //		Dispatcher.enQueue(jdDemoMaven);
