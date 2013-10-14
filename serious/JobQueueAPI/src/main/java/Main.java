@@ -134,11 +134,12 @@ public class Main
 		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal);
 
 		JobDefinition newJob = new JobDefinition("MarsuApplication");
+		newJob.addParameter("sry", "Gaston Lagaffe");
 
 //
 //		Dispatcher.enQueue(jdDemoMaven);
 //		Dispatcher.enQueue(jdDemo);
-		Dispatcher.enQueue(newJob);
+		Dispatcher.enQueue(newJob, newJob.parameters);
 ////		Dispatcher.enQueue(jd);
 ////		Dispatcher.enQueue(jd);
 ////		Dispatcher.getDeliverables(499);

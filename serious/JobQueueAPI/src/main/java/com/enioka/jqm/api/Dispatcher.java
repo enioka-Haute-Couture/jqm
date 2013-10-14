@@ -27,8 +27,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -138,16 +140,27 @@ public class Dispatcher {
 		return ji.getId();
 	}
 
-	public static int enQueue(JobDefinition jd, List<JobParameter> jps) {
+	public static int enQueue(JobDefinition jd, Map<String, String> parameters) {
 
 		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
-
+		ArrayList<JobParameter> jps = new ArrayList<JobParameter>();
 		JobDef job = jobDefinitionToJobDef(jd);
 
 		History h = null;
 		Integer p = CreationTools.em.createQuery("SELECT MAX (j.position) FROM JobInstance j, JobDef jd " +
 				"WHERE j.jd.queue.name = :queue", Integer.class).setParameter("queue", (job.getQueue().getName())).getSingleResult();
 		System.out.println("POSITION: " + p);
+
+		// Add values in a List to be persisted in the DataBase
+
+			for( Iterator<String> i = parameters.keySet().iterator(); i.hasNext();) {
+
+				String key = i.next();
+				String value = parameters.get(key);
+
+				jps.add(CreationTools.createJobParameter(key, value));
+			}
+
 		JobInstance ji = CreationTools.createJobInstance(job, jps, "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue);
 
 		//CreationTools.em.createQuery("UPDATE JobParameter jp SET jp.jobInstance = :j WHERE").executeUpdate();

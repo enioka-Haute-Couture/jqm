@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
@@ -16,6 +17,7 @@ import com.enioka.jqm.api.JobDefinition;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.tools.CreationTools;
@@ -97,7 +99,8 @@ public class TestSuite {
 		this.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
 		this.qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 0 , 100);
 
-		this.jd = CreationTools.createJobDef(true, "MarsuClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qVip,
+		this.jd = CreationTools.createJobDef(true, "App", null, "/Users/pico/Dropbox/projets/enioka/jqm/tests/PrintArg/",
+				"/Users/pico/Dropbox/projets/enioka/jqm/tests/PrintArg/target/PrintArg-0.0.1-SNAPSHOT.jar", qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
 
 		this.jdDemoMaven = CreationTools.createJobDef(true, "DemoMavenClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
@@ -337,7 +340,7 @@ public class TestSuite {
 
 		Dispatcher.enQueue(jd);
 
-		JobInstance job = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job",
+		JobInstance job = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
 		File file = new File("/Users/pico/Downloads/tests/deliverable" + job.getId());
@@ -359,6 +362,29 @@ public class TestSuite {
 
 		Assert.assertEquals(true, file.exists());
 
+	}
+
+	@Test
+	public void testOverloadArgument() {
+
+		testInit();
+
+		JobDefinition jd = new JobDefinition("MarsuApplication");
+		jd.addParameter("key", "value");
+
+		Dispatcher.enQueue(jd, jd.getParameters());
+
+		JobInstance job = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
+				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
+
+        Query q = CreationTools.emf.createEntityManager().createQuery(
+				"SELECT j.parameters FROM JobInstance AS j WHERE j.id = :j")
+				.setParameter("j", job.getId());
+
+        List<JobParameter> res = q.getResultList();
+
+		Assert.assertEquals("key", res.get(0).getKey());
+		Assert.assertEquals("value", res.get(0).getValue());
 	}
 
 //	@Test

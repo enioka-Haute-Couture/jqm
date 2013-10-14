@@ -40,7 +40,7 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
     @ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Queue.class)
     private Queue queue;
     @OneToMany(orphanRemoval=true)
-	@JoinColumn(name="JOB_PARAMETERS")
+	@JoinColumn(name="job_parameter")
     private List<JobParameter> parameters;
 
     public int getId() {
