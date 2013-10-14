@@ -64,12 +64,6 @@ public class TestSuite {
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
 
-		CreationTools.em.createQuery("DELETE FROM JobInstance").executeUpdate();
-		transac.commit();
-
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
-
 		CreationTools.em.createQuery("DELETE FROM JobDefParameter").executeUpdate();
 		transac.commit();
 
@@ -77,6 +71,12 @@ public class TestSuite {
 		transac.begin();
 
 		CreationTools.em.createQuery("DELETE FROM JobParameter").executeUpdate();
+		transac.commit();
+
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+
+		CreationTools.em.createQuery("DELETE FROM JobInstance").executeUpdate();
 		transac.commit();
 
 		transac = CreationTools.em.getTransaction();

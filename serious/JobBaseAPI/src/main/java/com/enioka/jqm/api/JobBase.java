@@ -51,6 +51,12 @@ public class JobBase {
 			this.parameters.add(i);
 		}
 
+		for (JobParameter i : parameters) {
+
+			System.out.println("PARAMETERS: " + i.getValue());
+		}
+
+		// System.exit(0);
 		this.start();
 	}
 

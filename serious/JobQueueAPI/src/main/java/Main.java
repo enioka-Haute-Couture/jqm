@@ -81,15 +81,15 @@ public class Main
 		transac.commit();
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
-		CreationTools.em.createQuery("DELETE FROM JobInstance").executeUpdate();
-		transac.commit();
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
 		CreationTools.em.createQuery("DELETE FROM JobDefParameter").executeUpdate();
 		transac.commit();
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
 		CreationTools.em.createQuery("DELETE FROM JobParameter").executeUpdate();
+		transac.commit();
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+		CreationTools.em.createQuery("DELETE FROM JobInstance").executeUpdate();
 		transac.commit();
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
@@ -100,7 +100,7 @@ public class Main
 		CreationTools.em.createQuery("DELETE FROM Queue").executeUpdate();
 		transac.commit();
 
-		jdp = CreationTools.createJobDefParameter("arg", "Hello World");
+		jdp = CreationTools.createJobDefParameter("arg", "POUPETTE");
 		jdargs.add(jdp);
 
 		qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42 , 100);

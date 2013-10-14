@@ -76,7 +76,11 @@ public class Dispatcher {
 				transac.commit();
 				em.close();
 				emf.close();
+
+				jps.add(jp);
 			}
+
+
 	}
 
 		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
