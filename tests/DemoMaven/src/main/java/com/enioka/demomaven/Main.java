@@ -7,8 +7,15 @@ package com.enioka.demomaven;
  */
 public class Main
 {
+    @SuppressWarnings("static-access")
     public static void main( String[] args )
     {
-       System.out.println("Hello World!");
+    	try {
+    		Thread.currentThread().sleep(3000);
+    		System.out.println("Hello World!");
+    	} catch (InterruptedException e) {
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
+    	}
     }
 }

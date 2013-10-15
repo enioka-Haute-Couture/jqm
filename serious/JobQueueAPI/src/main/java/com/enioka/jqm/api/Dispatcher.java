@@ -30,7 +30,6 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -70,103 +69,92 @@ public class Dispatcher {
 	public static int enQueue(JobDefinition jd) {
 
 		ArrayList<JobParameter> jps = new ArrayList<JobParameter>();
-
+		ArrayList<JobParameter> newJps = new ArrayList<JobParameter>();
+		boolean override = false;
 		JobDef job = jobDefinitionToJobDef(jd);
 
-		if (job.getParameters() != null) {
-			for (JobDefParameter j : job.getParameters()) {
+		if (job.getParameters() != null && job.getParameters() != null) {
 
-				EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-				EntityManager em = emf.createEntityManager();
-				JobParameter jp = new JobParameter();
-				EntityTransaction transac = em.getTransaction();
-				transac.begin();
+			for( Iterator<String> i = jd.getParameters().keySet().iterator(); i.hasNext();) {
 
-				jp.setKey(j.getKey());
-				jp.setValue(j.getValue());
+				boolean change = false;
+				String key = i.next();
+				String value = jd.getParameters().get(key);
 
-				em.persist(jp);
-				transac.commit();
-				em.close();
-				emf.close();
+				for (int j = 0; j < job.getParameters().size(); j++) {
 
-				jps.add(jp);
+					if (job.getParameters().get(j).getValue() == value)
+						break;
+					else if (j == job.getParameters().size() - 1 && job.getParameters().get(j).getValue() != value) {
+
+						change = true;
+						break;
+					}
+				}
+
+				if (change) {
+					override = true;
+					for( Iterator<String> k = jd.getParameters().keySet().iterator(); k.hasNext();) {
+
+						String keyk = k.next();
+						String valuev = jd.getParameters().get(keyk);
+
+						newJps.add(CreationTools.createJobParameter(keyk, valuev));
+					}
+					break;
+				}
 			}
-
-
-	}
-
-		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
-
-		History h = null;
-		Integer p = CreationTools.em.createQuery("SELECT MAX (j.position) FROM JobInstance j, JobDef jd " +
-				"WHERE j.jd.queue.name = :queue", Integer.class).setParameter("queue", (job.getQueue().getName())).getSingleResult();
-		System.out.println("POSITION: " + p);
-		JobInstance ji = CreationTools.createJobInstance(job, jps, "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue);
-
-		//CreationTools.em.createQuery("UPDATE JobParameter jp SET jp.jobInstance = :j WHERE").executeUpdate();
-
-		// Update status in the history table
-
-		Query q = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", ji.getId());
-
-		if (!q.equals(null)) {
-
-			Message m = null;
-
-			h = CreationTools.createhistory(1, (Calendar) null, "History of the Job --> ID = " + (ji.getId()),
-					m, ji, enqueueDate, (Calendar) null, (Calendar) null);
-
-			m = CreationTools.createMessage("Status updated: SUBMITTED", h);
-
 		}
 		else {
-			EntityTransaction transac = CreationTools.em.getTransaction();
-			transac.begin();
+			if (job.getParameters() != null) {
+				for (JobDefParameter j : job.getParameters()) {
 
-			h = (History) q.getSingleResult();
+					EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+					EntityManager em = emf.createEntityManager();
+					JobParameter jp = new JobParameter();
+					EntityTransaction transac = em.getTransaction();
+					transac.begin();
 
-			Message m = CreationTools.em.createQuery("SELECT m FROM Message m WHERE m.id = :h",
-					Message.class).setParameter("h", h.getMessage().getId()).getSingleResult();
+					jp.setKey(j.getKey());
+					jp.setValue(j.getValue());
 
-			m.setTextMessage("Status updated: SUBMITTED");
+					em.persist(jp);
+					transac.commit();
+					em.close();
+					emf.close();
 
-			CreationTools.em.createQuery("UPDATE Message m SET m.textMessage = :msg WHERE" +
-					"m.history.id = :h").setParameter("h", h.getId()).setParameter("msg", "Status updated: SUBMITTED").executeUpdate();
+					jps.add(jp);
+				}
+			}
+			else {
 
-			transac.commit();
+				for( Iterator<String> i = jd.getParameters().keySet().iterator(); i.hasNext();) {
+
+					String key = i.next();
+					String value = jd.getParameters().get(key);
+
+					jps.add(CreationTools.createJobParameter(key, value));
+				}
+			}
 		}
 
-		return ji.getId();
-	}
-
-	public static int enQueue(JobDefinition jd, Map<String, String> parameters) {
+		System.out.println("bool: " + override);
+		for (JobParameter jobParameter : newJps) {
+			System.out.println("newjps: " + jobParameter.getValue());
+		}
 
 		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
-		ArrayList<JobParameter> jps = new ArrayList<JobParameter>();
-		JobDef job = jobDefinitionToJobDef(jd);
 
 		History h = null;
 		Integer p = CreationTools.em.createQuery("SELECT MAX (j.position) FROM JobInstance j, JobDef jd " +
 				"WHERE j.jd.queue.name = :queue", Integer.class).setParameter("queue", (job.getQueue().getName())).getSingleResult();
 		System.out.println("POSITION: " + p);
-
-		// Add values in a List to be persisted in the DataBase
-
-			for( Iterator<String> i = parameters.keySet().iterator(); i.hasNext();) {
-
-				String key = i.next();
-				String value = parameters.get(key);
-
-				jps.add(CreationTools.createJobParameter(key, value));
-			}
-
-		JobInstance ji = CreationTools.createJobInstance(job, jps, "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue);
+		JobInstance ji = CreationTools.createJobInstance(job, (override == true) ? newJps : jps, "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue);
 
 		//CreationTools.em.createQuery("UPDATE JobParameter jp SET jp.jobInstance = :j WHERE").executeUpdate();
 
 		// Update status in the history table
-
+		//System.exit(0);
 		Query q = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", ji.getId());
 
 		if (!q.equals(null)) {

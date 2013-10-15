@@ -136,10 +136,12 @@ public class Main
 		JobDefinition newJob = new JobDefinition("MarsuApplication");
 		newJob.addParameter("sry", "/Users/pico/Dropbox/projets/enioka/jqm/tests/DemoMaven/target/DemoMaven-1.0-SNAPSHOT.jar");
 
+		JobDefinition newDemoMaven = new JobDefinition("MarsuApplication2");
+
 //
-//		Dispatcher.enQueue(jdDemoMaven);
+		Dispatcher.enQueue(newDemoMaven);
 //		Dispatcher.enQueue(jdDemo);
-		Dispatcher.enQueue(newJob, newJob.parameters);
+		Dispatcher.enQueue(newJob);
 ////		Dispatcher.enQueue(jd);
 ////		Dispatcher.enQueue(jd);
 ////		Dispatcher.getDeliverables(499);

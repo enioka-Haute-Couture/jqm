@@ -372,7 +372,7 @@ public class TestSuite {
 		JobDefinition jd = new JobDefinition("MarsuApplication");
 		jd.addParameter("key", "value");
 
-		Dispatcher.enQueue(jd, jd.getParameters());
+		Dispatcher.enQueue(jd);
 
 		JobInstance job = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
