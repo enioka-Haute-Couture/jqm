@@ -5,6 +5,7 @@ bin/
 .classpath
 *.launch
 *.project
+testprojects
 
 /jqmProject/nbproject/private/
 /jqmProject/dist/

@@ -112,8 +112,8 @@ public class JobBaseTests {
 						true,
 						"App",
 						jdargs,
-						"./testprojects/PrintArgs/",
-						"./testprojects/PrintArgs/PrintArg-0.0.1-SNAPSHOT.jar",
+						"./testprojects/PrintArg/",
+						"./testprojects/PrintArg/PrintArg.jar",
 						qVip, 42, "MarsuApplication", 42, "Franquin",
 						"ModuleMachin", "other", "other", "other", true);
 
