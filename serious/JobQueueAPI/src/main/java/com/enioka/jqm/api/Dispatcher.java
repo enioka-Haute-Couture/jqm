@@ -45,6 +45,7 @@ import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
+import com.enioka.jqm.jpamodel.JobHistoryParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
@@ -160,29 +161,51 @@ public class Dispatcher {
 		if (!q.equals(null)) {
 
 			Message m = null;
+			ArrayList<JobHistoryParameter> jhp = new ArrayList<JobHistoryParameter>();
+
+			for (JobParameter j : ji.getParameters()) {
+
+				EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+				EntityManager em = emf.createEntityManager();
+				JobHistoryParameter jp = new JobHistoryParameter();
+				EntityTransaction transac = em.getTransaction();
+				transac.begin();
+
+				jp.setKey(j.getKey());
+				jp.setValue(j.getValue());
+
+				em.persist(jp);
+				transac.commit();
+				em.close();
+				emf.close();
+
+				jhp.add(jp);
+			}
+
+			ArrayList<Message> msgs = new ArrayList<Message>();
 
 			h = CreationTools.createhistory(1, (Calendar) null, "History of the Job --> ID = " + (ji.getId()),
-					m, ji, enqueueDate, (Calendar) null, (Calendar) null);
+					msgs, ji, enqueueDate, (Calendar) null, (Calendar) null, jhp);
 
 			m = CreationTools.createMessage("Status updated: SUBMITTED", h);
-
+			msgs.add(m);
 		}
-		else {
-			EntityTransaction transac = CreationTools.em.getTransaction();
-			transac.begin();
-
-			h = (History) q.getSingleResult();
-
-			Message m = CreationTools.em.createQuery("SELECT m FROM Message m WHERE m.id = :h",
-					Message.class).setParameter("h", h.getMessage().getId()).getSingleResult();
-
-			m.setTextMessage("Status updated: SUBMITTED");
-
-			CreationTools.em.createQuery("UPDATE Message m SET m.textMessage = :msg WHERE" +
-					"m.history.id = :h").setParameter("h", h.getId()).setParameter("msg", "Status updated: SUBMITTED").executeUpdate();
-
-			transac.commit();
-		}
+//		else {
+//			EntityTransaction transac = CreationTools.em.getTransaction();
+//			transac.begin();
+//
+//			h = (History) q.getSingleResult();
+//
+//			Message m = CreationTools.em.createQuery("SELECT m FROM Message m WHERE m.id = :h",
+//					Message.class).setParameter("h", h.getMessage().getId()).getSingleResult();
+//
+//			m.setTextMessage("Status updated: SUBMITTED");
+//
+//			CreationTools.em.createQuery("UPDATE Message m SET m.textMessage = :msg WHERE" +
+//					"m.history.id = :h").setParameter("h", h.getId()).setParameter("msg", "Status updated: SUBMITTED").executeUpdate();
+//
+//			transac.commit();
+//		}
 
 		return ji.getId();
 	}

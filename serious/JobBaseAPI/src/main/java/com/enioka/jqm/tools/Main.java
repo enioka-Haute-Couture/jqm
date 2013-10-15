@@ -21,11 +21,18 @@ package com.enioka.jqm.tools;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
+import com.enioka.jqm.jpamodel.History;
+import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.temp.Polling;
 
@@ -36,14 +43,18 @@ public class Main {
 	public static Polling p = null;
 	public static ArrayList<ThreadPool> tps = new ArrayList<ThreadPool>();
 	public static AtomicBoolean isRunning = new AtomicBoolean(true);
+	public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+	public static EntityManager em = emf.createEntityManager();
+	public static EntityTransaction t = em.getTransaction();
 
 	/**
 	 * @param args
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception { // This code must
-															  // be excuted in a
-															  // new Thread
+
+		// be excuted in a
+		// new Thread
 
 		// Get the informations about the current node
 		// Add no node in base case
@@ -89,7 +100,6 @@ public class Main {
 
 		while (isRunning.get()) {
 
-
 			while (j < dps.size()) {
 				System.out.println(dps.get(j).getPollingInterval());
 
@@ -105,6 +115,22 @@ public class Main {
 				if (p.getJob() != null) {
 
 					for (int i = 0; i < tps.size(); i++) {
+
+						t.begin();
+
+						History h = em.createQuery("SELECT h FROM History h WHERE h.id = :j", History.class)
+						        .setParameter("j", p.getJob().get(0).getId()).getSingleResult();
+
+						Message m = new Message();
+
+						m.setTextMessage("Status updated: ATTRIBUTED");
+						m.setHistory(h);
+
+						em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", p.getJob().get(0).getId())
+						        .setParameter("msg", "ATTRIBUTED").executeUpdate();
+
+						em.persist(m);
+						t.commit();
 
 						System.out.println("TPS QUEUE: " + tps.get(i).getQueue().getId());
 						System.out.println("POLLING QUEUE: " + p.getJob().get(0).getJd().getQueue().getId());

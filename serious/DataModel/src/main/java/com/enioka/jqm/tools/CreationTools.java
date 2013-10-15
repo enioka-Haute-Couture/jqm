@@ -12,8 +12,9 @@ import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.ExecParameter;
 import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobDef;
+import com.enioka.jqm.jpamodel.JobDefParameter;
+import com.enioka.jqm.jpamodel.JobHistoryParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
@@ -151,26 +152,28 @@ public class CreationTools
 
 	// ------------------ HISTORY ------------------------------
 
-	public static History initHistory(Integer returnedValue, Message message, JobInstance jobInstance)
+	public static History initHistory(Integer returnedValue, List<Message> messages, JobInstance jobInstance, List<JobHistoryParameter> jhp)
 	{
 		History h = new History();
 		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
 		h.setReturnedValue(returnedValue);
-		h.setMessage(message);
+		h.setMessages(messages);
 		h.setJobInstance(jobInstance);
+		h.setParameters(jhp);
 
 		em.persist(h);
 		transac.commit();
 		return h;
 	}
 
-	public static History createhistory(Integer returnedValue, Calendar jobDate, String msg, Message message,
+	public static History createhistory(Integer returnedValue, Calendar jobDate, String msg, List<Message> messages,
 			JobInstance jobInstance,
 			Calendar enqueueDate,
 			Calendar executionDate,
-			Calendar endDate)
+			Calendar endDate,
+			List<JobHistoryParameter> jhp)
 	{
 		History h = new History();
 		EntityTransaction transac = em.getTransaction();
@@ -179,11 +182,12 @@ public class CreationTools
 		h.setReturnedValue(returnedValue);
 		h.setJobDate(jobDate);
 		h.setMsg(msg);
-		h.setMessage(message);
+		h.setMessages(messages);
 		h.setJobInstance(jobInstance);
 		h.setEnqueueDate(enqueueDate);
 		h.setExecutionDate(executionDate);
 		h.setEndDate(endDate);
+		h.setParameters(jhp);
 
 		em.persist(h);
 		transac.commit();

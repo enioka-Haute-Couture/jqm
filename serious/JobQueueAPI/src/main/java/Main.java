@@ -65,9 +65,6 @@ public class Main
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
 
 		EntityTransaction transac = CreationTools.em.getTransaction();
-		transac.begin();
-		CreationTools.em.createQuery("DELETE FROM Message").executeUpdate();
-		transac.commit();
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
 		CreationTools.em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
@@ -75,6 +72,14 @@ public class Main
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
 		CreationTools.em.createQuery("DELETE FROM Node").executeUpdate();
+		transac.commit();
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+		CreationTools.em.createQuery("DELETE FROM JobHistoryParameter").executeUpdate();
+		transac.commit();
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+		CreationTools.em.createQuery("DELETE FROM Message").executeUpdate();
 		transac.commit();
 		transac = CreationTools.em.getTransaction();
 		transac.begin();

@@ -41,58 +41,45 @@ public class TestSuite {
 	public void testInit() {
 
 		EntityTransaction transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM Message").executeUpdate();
-		transac.commit();
-
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
-
 		CreationTools.em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
 		transac.commit();
-
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
-
 		CreationTools.em.createQuery("DELETE FROM Node").executeUpdate();
 		transac.commit();
-
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
-
+		CreationTools.em.createQuery("DELETE FROM JobHistoryParameter").executeUpdate();
+		transac.commit();
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
+		CreationTools.em.createQuery("DELETE FROM Message").executeUpdate();
+		transac.commit();
+		transac = CreationTools.em.getTransaction();
+		transac.begin();
 		CreationTools.em.createQuery("DELETE FROM History").executeUpdate();
 		transac.commit();
-
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
-
 		CreationTools.em.createQuery("DELETE FROM JobDefParameter").executeUpdate();
 		transac.commit();
-
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
-
 		CreationTools.em.createQuery("DELETE FROM JobParameter").executeUpdate();
 		transac.commit();
-
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
-
 		CreationTools.em.createQuery("DELETE FROM JobInstance").executeUpdate();
 		transac.commit();
-
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
-
 		CreationTools.em.createQuery("DELETE FROM JobDef").executeUpdate();
 		transac.commit();
-
 		transac = CreationTools.em.getTransaction();
 		transac.begin();
-
 		CreationTools.em.createQuery("DELETE FROM Queue").executeUpdate();
-
 		transac.commit();
 
 		this.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42 , 100);

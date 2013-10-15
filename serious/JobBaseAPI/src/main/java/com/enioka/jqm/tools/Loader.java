@@ -21,6 +21,7 @@ import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 import com.enioka.jqm.api.JobBase;
+import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.temp.DeliverableStruct;
 import com.jcabi.aether.Aether;
@@ -50,8 +51,10 @@ public class Loader implements Runnable {
 
 		// MESSAGE HISTORY UPDATED
 
-		em.createQuery("UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = " + "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)")
-		        .setParameter("j", job.getId()).setParameter("msg", "Status updated: CRASHED").executeUpdate();
+		History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.id = :j", History.class).setParameter("j", job.getId())
+		        .getSingleResult();
+
+		CreationTools.createMessage("Status updated: ATTRIBUTED", h);
 
 		transac.commit();
 		em.close();
@@ -87,9 +90,10 @@ public class Loader implements Runnable {
 			EntityTransaction transac = em.getTransaction();
 			transac.begin();
 
-			em.createQuery(
-			        "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = " + "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)")
-			        .setParameter("j", job.getId()).setParameter("msg", "Status updated: RUNNING").executeUpdate();
+			History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.id = :j", History.class).setParameter("j", job.getId())
+			        .getSingleResult();
+
+			CreationTools.createMessage("Status updated: RUNNING", h);
 
 			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", job.getId()).setParameter("msg", "RUNNING")
 			        .executeUpdate();
@@ -158,9 +162,7 @@ public class Loader implements Runnable {
 
 			// MESSAGE HISTORY UPDATED
 
-			em.createQuery(
-			        "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = " + "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)")
-			        .setParameter("j", job.getId()).setParameter("msg", "Status updated: ENDED").executeUpdate();
+			CreationTools.createMessage("Status updated: ENDED", h);
 
 			transac.commit();
 			em.close();

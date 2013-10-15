@@ -1,19 +1,29 @@
 package com.enioka.jqm.jpamodel;
 
+import java.io.Serializable;
 import java.util.Calendar;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 @Entity
-public class History {
+@Embeddable
+public class History implements Serializable{
 
+	/**
+     *
+     */
+    private static final long serialVersionUID = -5249529794213078668L;
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
 	@Column(nullable=false)
@@ -21,13 +31,16 @@ public class History {
 	private Calendar jobDate;
 	@Column(length=1000)
 	private String msg;
-	@ManyToOne(fetch=FetchType.EAGER, targetEntity=com.enioka.jqm.jpamodel.Message.class)
-	private Message message;
+	@OneToMany(fetch=FetchType.EAGER, targetEntity=com.enioka.jqm.jpamodel.Message.class, cascade=CascadeType.ALL, mappedBy="history")
+	private List<Message> messages;
 	@OneToOne(fetch=FetchType.LAZY, targetEntity=com.enioka.jqm.jpamodel.JobInstance.class)
 	private JobInstance jobInstance;
 	private Calendar enqueueDate;
 	private Calendar executionDate;
 	private Calendar endDate;
+	@OneToMany(orphanRemoval=true)
+	@JoinColumn(name="history_parameter")
+    private List<JobHistoryParameter> parameters;
 
 
 	public Integer getId()
@@ -82,16 +95,6 @@ public class History {
 		this.msg = msg;
 	}
 
-	public Message getMessage()
-	{
-		return message;
-	}
-
-	public void setMessage(Message message)
-	{
-		this.message = message;
-	}
-
 	public JobInstance getJobInstance()
 	{
 		return jobInstance;
@@ -131,4 +134,28 @@ public class History {
 	{
 		this.endDate = endDate;
 	}
+
+
+    public List<JobHistoryParameter> getParameters() {
+
+    	return parameters;
+    }
+
+
+    public void setParameters(List<JobHistoryParameter> parameters) {
+
+    	this.parameters = parameters;
+    }
+
+
+    public List<Message> getMessages() {
+
+    	return messages;
+    }
+
+
+    public void setMessages(List<Message> messages) {
+
+    	this.messages = messages;
+    }
 }

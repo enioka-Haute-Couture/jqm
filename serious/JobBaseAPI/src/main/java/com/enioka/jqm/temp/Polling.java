@@ -79,16 +79,19 @@ public class Polling {
 			EntityTransaction transac = CreationTools.em.getTransaction();
 			transac.begin();
 
-			CreationTools.em
-			        .createQuery(
-			                "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
-			                        + "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)").setParameter("j", job.get(0).getId())
-			        .setParameter("msg", "Status updated: ATTRIBUTED").executeUpdate();
-
-			CreationTools.em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", job.get(0).getId())
-			        .setParameter("msg", "ATTRIBUTED").executeUpdate();
+			// CreationTools.em
+			// .createQuery(
+			// "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
+			// +
+			// "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)").setParameter("j",
+			// job.get(0).getId())
+			// .setParameter("msg",
+			// "Status updated: ATTRIBUTED").executeUpdate();
 
 			transac.commit();
+			// System.exit(0);
+			// em.close();
+			// emf.close();
 		}
 	}
 
@@ -104,8 +107,10 @@ public class Polling {
 		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
-		em.createQuery("UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = " + "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)")
-		        .setParameter("j", job.get(0).getId()).setParameter("msg", "Status updated: RUNNING").executeUpdate();
+		History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.id = :j", History.class).setParameter("j", job.get(0).getId())
+		        .getSingleResult();
+
+		CreationTools.createMessage("Status updated: RUNNING", h);
 
 		em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", job.get(0).getId())
 		        .setParameter("msg", "RUNNING").executeUpdate();
@@ -128,15 +133,10 @@ public class Polling {
 
 		for (int i = 1; i < jobs.size(); i++) {
 
-			@SuppressWarnings("unused")
 			History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class)
 			        .setParameter("j", jobs.get(i).getId()).getSingleResult();
 
-			CreationTools.em
-			        .createQuery(
-			                "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
-			                        + "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)").setParameter("j", jobs.get(i).getId())
-			        .setParameter("msg", "Status updated: CANCELLED").executeUpdate();
+			CreationTools.createMessage("Status updated: CANCELLED", h);
 
 			CreationTools.em.createQuery("UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob")
 			        .setParameter("idJob", jobs.get(i).getId()).executeUpdate();
