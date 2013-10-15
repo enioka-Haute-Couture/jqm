@@ -27,9 +27,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -58,6 +60,8 @@ import com.enioka.jqm.tools.CreationTools;
  */
 public class Dispatcher {
 
+	//----------------------------- JOBDEFINITIONTOJOBDEF --------------------------------------
+
 	private static JobDef jobDefinitionToJobDef(JobDefinition jd) {
 
 		 JobDef job = CreationTools.em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = :name", JobDef.class)
@@ -66,6 +70,68 @@ public class Dispatcher {
 
 		 return job;
 	}
+
+	private static com.enioka.jqm.api.JobDefinition jobDefToJobDefinition(JobDef jd) {
+
+		com.enioka.jqm.api.JobDefinition job = new com.enioka.jqm.api.JobDefinition();
+		 Map<String, String> h = new HashMap<String, String>();
+
+		 if(jd.getParameters() != null) {
+			 for (JobDefParameter i : jd.getParameters()) {
+
+				 h.put(i.getKey(), i.getValue());
+			 }
+		 }
+
+		 job.setParameters(h);
+		 job.setApplicationName(jd.getApplicationName());
+		 job.setSessionID(jd.getSessionID());
+		 job.setApplication(jd.getApplication());
+		 job.setModule(jd.getModule());
+		 job.setOther1(jd.getOther1());
+		 job.setOther2(jd.getOther2());
+		 job.setOther3(jd.getOther3());
+
+		 return job;
+	}
+
+	private static com.enioka.jqm.api.Queue getQueue(Queue queue) {
+
+		com.enioka.jqm.api.Queue q = new com.enioka.jqm.api.Queue();
+
+		q.setDefaultQueue(queue.isDefaultQueue());
+		q.setDescription(queue.getDescription());
+		q.setId(queue.getId());
+		q.setMaxTempInQueue(queue.getMaxTempInQueue());
+		q.setMaxTempRunning(queue.getMaxTempRunning());
+		q.setName(queue.getName());
+
+		return q;
+	}
+
+    private static com.enioka.jqm.api.JobInstance getJobInstance(JobInstance job) {
+
+		Map<String, String> parameters = new HashMap<String, String>();
+		com.enioka.jqm.api.JobInstance j = new com.enioka.jqm.api.JobInstance();
+
+		for (JobParameter i : job.getParameters()) {
+
+			parameters.put(i.getKey(), i.getValue());
+        }
+
+		j.setId(job.getId());
+		j.setJd(jobDefToJobDefinition(job.getJd()));
+		j.setParameters(parameters);
+		j.setParent(job.getParent().getId());
+		j.setPosition(job.getPosition());
+		j.setQueue(getQueue(job.getQueue()));
+		j.setSessionID(job.getSessionID());
+		j.setState(job.getState());
+		j.setUser(job.getUser());
+
+		return j;
+	}
+	// ----------------------------- ENQUEUE --------------------------------------
 
 	public static int enQueue(JobDefinition jd) {
 
@@ -190,25 +256,21 @@ public class Dispatcher {
 			m = CreationTools.createMessage("Status updated: SUBMITTED", h);
 			msgs.add(m);
 		}
-//		else {
-//			EntityTransaction transac = CreationTools.em.getTransaction();
-//			transac.begin();
-//
-//			h = (History) q.getSingleResult();
-//
-//			Message m = CreationTools.em.createQuery("SELECT m FROM Message m WHERE m.id = :h",
-//					Message.class).setParameter("h", h.getMessage().getId()).getSingleResult();
-//
-//			m.setTextMessage("Status updated: SUBMITTED");
-//
-//			CreationTools.em.createQuery("UPDATE Message m SET m.textMessage = :msg WHERE" +
-//					"m.history.id = :h").setParameter("h", h.getId()).setParameter("msg", "Status updated: SUBMITTED").executeUpdate();
-//
-//			transac.commit();
-//		}
-
 		return ji.getId();
 	}
+
+	//----------------------------- GETJOB --------------------------------------
+
+	public static com.enioka.jqm.api.JobInstance getJob(int idJob) {
+
+		return getJobInstance(CreationTools.em.createQuery(
+				"SELECT j FROM JobInstance j WHERE j.id = :job",
+				JobInstance.class)
+				.setParameter("job", idJob)
+				.getSingleResult());
+	}
+
+	//----------------------------- DELJOBINQUEUE --------------------------------------
 
 	public static void delJobInQueue(int idJob) {
 
@@ -224,6 +286,8 @@ public class Dispatcher {
 		transac.commit();
 
 	}
+
+	//----------------------------- CANCELJOBINQUEUE --------------------------------------
 
 	public static void cancelJobInQueue(int idJob) {
 
@@ -251,9 +315,13 @@ public class Dispatcher {
 
 	}
 
+	//----------------------------- STOPJOB --------------------------------------
+
 	public static void stopJob(int idJob) {
 
 	}
+
+	//----------------------------- KILLJOB --------------------------------------
 
 	public static void killJob(int idJob) {
 
@@ -267,6 +335,8 @@ public class Dispatcher {
 
 		return 0;
 	}
+
+	//----------------------------- SETPOSITION --------------------------------------
 
 	public static void setPosition(int idJob, int position) {
 
@@ -309,6 +379,8 @@ public class Dispatcher {
 
 		transac.commit();
 	}
+
+	//----------------------------- GETDELIVERABLES --------------------------------------
 
 	public static List<InputStream> getDeliverables(int idJob) throws IOException, NoSuchAlgorithmException {
 
@@ -361,6 +433,8 @@ public class Dispatcher {
 		return streams;
 	}
 
+	//----------------------------- GETALLDELIVERABLES --------------------------------------
+
 	public static List<Deliverable> getAllDeliverables(int idJob) {
 
 		ArrayList<Deliverable> deliverables = new ArrayList<Deliverable>();
@@ -373,6 +447,8 @@ public class Dispatcher {
 
 		return deliverables;
 	}
+
+	//----------------------------- GETONEDELIVERABLE --------------------------------------
 
 	public static InputStream getOneDeliverable(Deliverable deliverable) throws NoSuchAlgorithmException, IOException {
 
@@ -404,6 +480,8 @@ public class Dispatcher {
 		return new FileInputStream(file);
 	}
 
+	//----------------------------- GETUSERDELIVERABLES --------------------------------------
+
 	public static List<Deliverable> getUserDeliverables(String user) {
 
 		ArrayList<Deliverable> d = new ArrayList<Deliverable>();
@@ -423,12 +501,16 @@ public class Dispatcher {
 		return d;
 	}
 
+	//----------------------------- GETMSG --------------------------------------
+
 	public static List<String> getMsg(int idJob) { // -------------TODO------------
 
 		ArrayList<String> msgs = new ArrayList<String>();
 
 		return msgs;
 	}
+
+	//----------------------------- GETUSERJOBS --------------------------------------
 
 	public static List<JobInstance> getUserJobs(String user) {
 
@@ -437,19 +519,49 @@ public class Dispatcher {
 		return jobs;
 	}
 
-	public static List<JobInstance> getJobs() {
+	//----------------------------- GETJOBS --------------------------------------
 
+	public static List<com.enioka.jqm.api.JobInstance> getJobs() {
+
+		ArrayList<com.enioka.jqm.api.JobInstance> res = new ArrayList<com.enioka.jqm.api.JobInstance>();
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) CreationTools.em.createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList();
 
-		return jobs;
+		for (JobInstance j : jobs) {
+	        com.enioka.jqm.api.JobInstance tmp = new com.enioka.jqm.api.JobInstance();
+
+	        tmp.setId(j.getId());
+	        tmp.setJd(jobDefToJobDefinition(j.getJd()));
+	        if (j.getParent() != null)
+	        	tmp.setParent(j.getParent().getId());
+	        else
+	        	tmp.setParent(null);
+
+	        res.add(tmp);
+        }
+
+		return res;
 	}
 
-	public static List<Queue> getQueues() {
+	//----------------------------- GETQUEUES --------------------------------------
 
+	public static List<com.enioka.jqm.api.Queue> getQueues() {
+
+		List<com.enioka.jqm.api.Queue> res = new ArrayList<com.enioka.jqm.api.Queue>();
 		ArrayList<Queue> queues = (ArrayList<Queue>) CreationTools.em.createQuery("SELECT j FROM Queue j", Queue.class).getResultList();
 
-		return queues;
+		for (Queue queue : queues) {
+
+			com.enioka.jqm.api.Queue q = new com.enioka.jqm.api.Queue();
+
+			q = getQueue(queue);
+
+			res.add(q);
+        }
+
+		return res;
 	}
+
+	//----------------------------- CHANGEQUEUE --------------------------------------
 
 	public static void changeQueue(int idJob, int idQueue) {
 
@@ -468,6 +580,8 @@ public class Dispatcher {
 
 		transac.commit();
 	}
+
+	//----------------------------- CHANGEQUEUE --------------------------------------
 
 	public static void changeQueue(int idJob, Queue queue) {
 

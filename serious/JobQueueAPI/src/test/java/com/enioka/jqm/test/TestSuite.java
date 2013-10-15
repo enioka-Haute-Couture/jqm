@@ -37,6 +37,7 @@ public class TestSuite {
 	Node node = null;
 
 	DeploymentParameter dp = null;
+	DeploymentParameter dpNormal = null;
 
 	public void testInit() {
 
@@ -99,6 +100,7 @@ public class TestSuite {
 		node = CreationTools.createNode("localhost", 8081);
 
 		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip);
+		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal);
 
 	}
 
@@ -284,14 +286,27 @@ public class TestSuite {
 		Dispatcher.enQueue(jdDemo);
 		Dispatcher.enQueue(jd);
 
-		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) Dispatcher.getJobs();
+		ArrayList<com.enioka.jqm.api.JobInstance> jobs = (ArrayList<com.enioka.jqm.api.JobInstance>) Dispatcher.getJobs();
+
+		for (com.enioka.jqm.api.JobInstance jobInstance : jobs) {
+
+			System.out.println("job: " + jobInstance.getId());
+        }
 
 		ArrayList<JobInstance> tmp = (ArrayList<JobInstance>) CreationTools.em.createQuery("SELECT j FROM JobInstance j",
 				JobInstance.class).getResultList();
 
-		Assert.assertEquals(tmp.size(), jobs.size());
-		Assert.assertEquals(tmp, jobs);
+		for (JobInstance j : tmp) {
 
+			System.out.println("jobInstance: " + j.getId());
+        }
+
+		Assert.assertEquals(tmp.size(), jobs.size());
+
+		for (int i = 0; i < jobs.size(); i++) {
+
+			Assert.assertEquals(tmp.get(i).getId(), (int)jobs.get(i).getId());
+		}
 	}
 
 	@Test
@@ -307,15 +322,17 @@ public class TestSuite {
 		Dispatcher.enQueue(jdDemo);
 		Dispatcher.enQueue(jd);
 
-		ArrayList<Queue> jobs = (ArrayList<Queue>) Dispatcher.getQueues();
+		ArrayList<com.enioka.jqm.api.Queue> jobs = (ArrayList<com.enioka.jqm.api.Queue>) Dispatcher.getQueues();
 
 		ArrayList<Queue> tmp = (ArrayList<Queue>) CreationTools.em.createQuery("SELECT j FROM Queue j",
 				Queue.class).getResultList();
 
 		Assert.assertEquals(tmp.size(), jobs.size());
-		Assert.assertEquals(tmp, jobs);
 
+		for (int i = 0; i < jobs.size(); i++) {
 
+			Assert.assertEquals(tmp.get(i).getId(), jobs.get(i).getId());
+		}
 	}
 
 	//@Test
