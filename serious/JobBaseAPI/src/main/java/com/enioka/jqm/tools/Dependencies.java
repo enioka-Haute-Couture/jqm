@@ -32,76 +32,82 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class Dependencies
-{
+public class Dependencies {
 	private ArrayList<String> list = new ArrayList<String>();
 
 	public Dependencies(String path) {
 
-	File fXmlFile = new File(path);
-	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-	DocumentBuilder dBuilder;
-	String dep = "";
-	try
-	{
-		if (fXmlFile == null || !fXmlFile.isFile())
-			throw new Throwable("Dependencies: ");
+		File fXmlFile = new File(path);
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder;
+		String dep = "";
+		try {
+			System.out.println(fXmlFile.getPath());
+			System.out.println("Working Directory = "
+					+ System.getProperty("user.dir"));
+			if (fXmlFile == null || !fXmlFile.isFile())
+				throw new Throwable("Dependencies: ");
 
-		dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(fXmlFile);
+			dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(fXmlFile);
 
-		//optional, but recommended
-		//read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
-		doc.getDocumentElement().normalize();
+			// optional, but recommended
+			// read this -
+			// http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
+			doc.getDocumentElement().normalize();
 
-		//System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+			// System.out.println("Root element :" +
+			// doc.getDocumentElement().getNodeName());
 
-		NodeList nList = doc.getElementsByTagName("dependency");
+			NodeList nList = doc.getElementsByTagName("dependency");
 
-		//System.out.println("----------------------------");
+			// System.out.println("----------------------------");
 
-		for (int temp = 0; temp < nList.getLength(); temp++) {
+			for (int temp = 0; temp < nList.getLength(); temp++) {
 
-			Node nNode = nList.item(temp);
+				Node nNode = nList.item(temp);
 
-			//System.out.println("\nCurrent Element :" + nNode.getNodeName());
+				// System.out.println("\nCurrent Element :" +
+				// nNode.getNodeName());
 
-			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-				Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode;
 
-				dep += eElement.getElementsByTagName("groupId").item(0).getTextContent().toString() + ":";
-				dep += eElement.getElementsByTagName("artifactId").item(0).getTextContent().toString() + ":";
-				dep += eElement.getElementsByTagName("version").item(0).getTextContent().toString();
+					dep += eElement.getElementsByTagName("groupId").item(0)
+							.getTextContent().toString()
+							+ ":";
+					dep += eElement.getElementsByTagName("artifactId").item(0)
+							.getTextContent().toString()
+							+ ":";
+					dep += eElement.getElementsByTagName("version").item(0)
+							.getTextContent().toString();
 
-				list.add(dep);
-				dep = "";
+					list.add(dep);
+					dep = "";
+				}
 			}
+
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			System.err
+					.println("Invalid XML architecture. Please, fix correctly the dependencies");
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.err
+					.println("Invalid pom.xml. Thanks to verify the pom.xml filepath");
+			e.printStackTrace();
+		} catch (Throwable e) {
+			System.err
+					.println("Invalid pom.xml. Thanks to verify the pom.xml filepath");
+			e.printStackTrace();
 		}
-
-	} catch (ParserConfigurationException e)
-	{
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (SAXException e)
-	{
-		System.err.println("Invalid XML architecture. Please, fix correctly the dependencies");
-		e.printStackTrace();
-	} catch (IOException e)
-	{
-		System.err.println("Invalid pom.xml. Thanks to verify the pom.xml filepath");
-		e.printStackTrace();
-	} catch (Throwable e)
-	{
-		System.err.println("Invalid pom.xml. Thanks to verify the pom.xml filepath");
-		e.printStackTrace();
-	}
 	}
 
-	public void print()
-	{
-		for (int i = 0; i < list.size(); i++)
-		{
+	public void print() {
+		for (int i = 0; i < list.size(); i++) {
 			System.out.println("Dependency " + i + ": " + list.get(i));
 		}
 	}
@@ -109,16 +115,15 @@ public class Dependencies
 	/**
 	 * @return the list
 	 */
-	public ArrayList<String> getList()
-	{
+	public ArrayList<String> getList() {
 		return list;
 	}
 
 	/**
-	 * @param list the list to set
+	 * @param list
+	 *            the list to set
 	 */
-	public void setList(ArrayList<String> list)
-	{
+	public void setList(ArrayList<String> list) {
 		this.list = list;
 	}
 }

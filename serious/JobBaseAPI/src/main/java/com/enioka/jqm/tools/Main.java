@@ -89,6 +89,7 @@ public class Main {
 
 		while (isRunning.get()) {
 
+
 			while (j < dps.size()) {
 				System.out.println(dps.get(j).getPollingInterval());
 
