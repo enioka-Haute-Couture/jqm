@@ -7,9 +7,6 @@ public class Queue {
 	private int id;
     private String name;
     private String description;
-    private Integer maxTempInQueue;
-    private Integer maxTempRunning;
-    private boolean defaultQueue;
 
     public int getId() {
 
@@ -39,35 +36,5 @@ public class Queue {
     public void setDescription(String description) {
 
     	this.description = description;
-    }
-
-    public Integer getMaxTempInQueue() {
-
-    	return maxTempInQueue;
-    }
-
-    public void setMaxTempInQueue(Integer maxTempInQueue) {
-
-    	this.maxTempInQueue = maxTempInQueue;
-    }
-
-    public Integer getMaxTempRunning() {
-
-    	return maxTempRunning;
-    }
-
-    public void setMaxTempRunning(Integer maxTempRunning) {
-
-    	this.maxTempRunning = maxTempRunning;
-    }
-
-    public boolean isDefaultQueue() {
-
-    	return defaultQueue;
-    }
-
-    public void setDefaultQueue(boolean defaultQueue) {
-
-    	this.defaultQueue = defaultQueue;
     }
 }

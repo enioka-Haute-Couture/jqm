@@ -66,7 +66,7 @@ public class Loader implements Runnable {
 
 		try {
 			System.out.println("TOUT DEBUT LOADER");
-			Main.p.updateExecutionDate();
+			// Main.p.updateExecutionDate();
 
 			// ---------------- BEGIN: MAVEN DEPENDENCIES ------------------
 
@@ -90,14 +90,14 @@ public class Loader implements Runnable {
 			EntityTransaction transac = em.getTransaction();
 			transac.begin();
 
-			History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.id = :j", History.class).setParameter("j", job.getId())
+			History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", job)
 			        .getSingleResult();
 
 			CreationTools.createMessage("Status updated: RUNNING", h);
 
 			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", job.getId()).setParameter("msg", "RUNNING")
 			        .executeUpdate();
-			// transac.commit();
+			transac.commit();
 
 			// Clean the JobInstance list
 			// Main.p.clean();
@@ -157,11 +157,13 @@ public class Loader implements Runnable {
 
 			// STATE UPDATED
 
+			em.getTransaction().begin();
+
 			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId()).setParameter("msg", "ENDED")
 			        .executeUpdate();
 
 			// MESSAGE HISTORY UPDATED
-
+			em.getTransaction().commit();
 			CreationTools.createMessage("Status updated: ENDED", h);
 
 			transac.commit();

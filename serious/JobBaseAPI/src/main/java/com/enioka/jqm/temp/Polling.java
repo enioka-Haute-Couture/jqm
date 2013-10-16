@@ -31,9 +31,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.tools.CreationTools;
 
@@ -41,7 +43,11 @@ public class Polling {
 
 	private ArrayList<JobInstance> job = null;
 
-	public Polling(Queue queue) {
+	public Polling() {
+
+	}
+
+	public JobInstance dequeue(Queue queue) {
 
 		System.out.println("Queue: " + queue.getName());
 
@@ -50,10 +56,14 @@ public class Polling {
 
 		// Get the list of all jobInstance with the queue VIP ordered by
 		// position
+		// ArrayList<JobInstance> q = (ArrayList<JobInstance>) em.createQuery(;
 
-		ArrayList<JobInstance> q = (ArrayList<JobInstance>) em
-		        .createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.queue.name = :q AND j.state = :s ORDER BY j.position",
-		                JobInstance.class).setParameter("q", queue.getName()).setParameter("s", "SUBMITTED").getResultList();
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j WHERE j.queue.name = :q AND j.state = :s ORDER BY j.position",
+		        JobInstance.class);
+		query.setParameter("q", queue.getName()).setParameter("s", "SUBMITTED");
+		List<JobInstance> q = query.getResultList();
+		@SuppressWarnings("unused")
+		Object o = query.getLockMode();
 
 		Set<JobInstance> setq = new HashSet<JobInstance>(q);
 		List<JobInstance> newq = new ArrayList<JobInstance>(setq);
@@ -90,9 +100,10 @@ public class Polling {
 
 			transac.commit();
 			// System.exit(0);
-			// em.close();
-			// emf.close();
+			em.close();
+			emf.close();
 		}
+		return (!job.isEmpty()) ? job.get(0) : null;
 	}
 
 	public ArrayList<JobInstance> getJob() {
@@ -133,10 +144,23 @@ public class Polling {
 
 		for (int i = 1; i < jobs.size(); i++) {
 
-			History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class)
-			        .setParameter("j", jobs.get(i).getId()).getSingleResult();
+			EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+			EntityManager em = emf.createEntityManager();
+			EntityTransaction t = em.getTransaction();
+			t.begin();
 
-			CreationTools.createMessage("Status updated: CANCELLED", h);
+			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", jobs.get(i).getId())
+			        .getSingleResult();
+
+			Message m = new Message();
+
+			m.setTextMessage("Status updated: CANCELLED");
+			m.setHistory(h);
+
+			em.persist(m);
+			t.commit();
+
+			// CreationTools.createMessage("Status updated: CANCELLED", h);
 
 			CreationTools.em.createQuery("UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob")
 			        .setParameter("idJob", jobs.get(i).getId()).executeUpdate();

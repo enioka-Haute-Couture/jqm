@@ -99,11 +99,8 @@ public class Dispatcher {
 
 		com.enioka.jqm.api.Queue q = new com.enioka.jqm.api.Queue();
 
-		q.setDefaultQueue(queue.isDefaultQueue());
 		q.setDescription(queue.getDescription());
 		q.setId(queue.getId());
-		q.setMaxTempInQueue(queue.getMaxTempInQueue());
-		q.setMaxTempRunning(queue.getMaxTempRunning());
 		q.setName(queue.getName());
 
 		return q;
@@ -131,92 +128,54 @@ public class Dispatcher {
 
 		return j;
 	}
+
+    public static List<JobParameter> overrideParameter(JobDef jdef, JobDefinition jdefinition) {
+
+    	Map<String, String> m = jdefinition.getParameters();
+    	List<JobParameter> res = new ArrayList<JobParameter>();
+
+    	if (m.isEmpty()) {
+
+    		if (jdef.getParameters() == null)
+    			return res;
+
+    		for (JobDefParameter i : jdef.getParameters()) {
+
+    			res.add(CreationTools.createJobParameter(i.getKey(), i.getValue()));
+            }
+
+    		return res;
+    	}
+    	else {
+
+    		for( Iterator<String> i = m.keySet().iterator(); i.hasNext();) {
+
+    			String key = i.next();
+    			String value = m.get(key);
+
+    			res.add(CreationTools.createJobParameter(key, value));
+    		}
+
+    		return res;
+    	}
+    }
 	// ----------------------------- ENQUEUE --------------------------------------
 
 	public static int enQueue(JobDefinition jd) {
 
-		ArrayList<JobParameter> jps = new ArrayList<JobParameter>();
-		ArrayList<JobParameter> newJps = new ArrayList<JobParameter>();
-		boolean override = false;
+		// On a exactement la classe qui est en base
+		System.out.println("DEBUT ENQUEUE");
 		JobDef job = jobDefinitionToJobDef(jd);
-
-		if (job.getParameters() != null && job.getParameters() != null) {
-
-			for( Iterator<String> i = jd.getParameters().keySet().iterator(); i.hasNext();) {
-
-				boolean change = false;
-				String key = i.next();
-				String value = jd.getParameters().get(key);
-
-				for (int j = 0; j < job.getParameters().size(); j++) {
-
-					if (job.getParameters().get(j).getValue() == value)
-						break;
-					else if (j == job.getParameters().size() - 1 && job.getParameters().get(j).getValue() != value) {
-
-						change = true;
-						break;
-					}
-				}
-
-				if (change) {
-					override = true;
-					for( Iterator<String> k = jd.getParameters().keySet().iterator(); k.hasNext();) {
-
-						String keyk = k.next();
-						String valuev = jd.getParameters().get(keyk);
-
-						newJps.add(CreationTools.createJobParameter(keyk, valuev));
-					}
-					break;
-				}
-			}
-		}
-		else {
-			if (job.getParameters() != null) {
-				for (JobDefParameter j : job.getParameters()) {
-
-					EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-					EntityManager em = emf.createEntityManager();
-					JobParameter jp = new JobParameter();
-					EntityTransaction transac = em.getTransaction();
-					transac.begin();
-
-					jp.setKey(j.getKey());
-					jp.setValue(j.getValue());
-
-					em.persist(jp);
-					transac.commit();
-					em.close();
-					emf.close();
-
-					jps.add(jp);
-				}
-			}
-			else {
-
-				for( Iterator<String> i = jd.getParameters().keySet().iterator(); i.hasNext();) {
-
-					String key = i.next();
-					String value = jd.getParameters().get(key);
-
-					jps.add(CreationTools.createJobParameter(key, value));
-				}
-			}
-		}
-
-		System.out.println("bool: " + override);
-		for (JobParameter jobParameter : newJps) {
-			System.out.println("newjps: " + jobParameter.getValue());
-		}
 
 		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
 
 		History h = null;
-		Integer p = CreationTools.em.createQuery("SELECT MAX (j.position) FROM JobInstance j, JobDef jd " +
+
+		Integer p = CreationTools.em.createQuery("SELECT MAX (j.position) FROM JobInstance j " +
 				"WHERE j.jd.queue.name = :queue", Integer.class).setParameter("queue", (job.getQueue().getName())).getSingleResult();
+
 		System.out.println("POSITION: " + p);
-		JobInstance ji = CreationTools.createJobInstance(job, (override == true) ? newJps : jps, "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue);
+		JobInstance ji = CreationTools.createJobInstance(job, overrideParameter(job, jd), "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue);
 
 		//CreationTools.em.createQuery("UPDATE JobParameter jp SET jp.jobInstance = :j WHERE").executeUpdate();
 

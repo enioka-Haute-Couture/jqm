@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -52,7 +53,7 @@ public class JobDef implements Serializable{
 	public boolean highlander = false;
 	@Column
     private String jarPath;
-	@OneToMany(orphanRemoval=true)
+	@OneToMany(orphanRemoval=true, fetch=FetchType.EAGER)
 	@JoinColumn(name="PARAMETERS")
     private List<JobDefParameter> parameters;
 

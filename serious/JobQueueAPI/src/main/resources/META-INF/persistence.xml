@@ -27,7 +27,7 @@
       <!--<property name="eclipselink.classloader" value="MyClassLoader" />-->
       <!--<property name="hibernate.archive.autodetection" value="class" />-->
       <!--<property name="hibernate.show_sql" value="true" />
-      <property name="hibernate.format_sql" value="true" /> -->
+      <property name="hibernate.format_sql" value="true" />-->
 
       <!-- Configuration de la  BDD -->
       <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />

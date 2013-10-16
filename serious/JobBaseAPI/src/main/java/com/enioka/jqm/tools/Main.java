@@ -40,7 +40,7 @@ public class Main {
 
 	public static ArrayList<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
 	public static Node node = null;
-	public static Polling p = null;
+	public static Polling p = new Polling();
 	public static ArrayList<ThreadPool> tps = new ArrayList<ThreadPool>();
 	public static AtomicBoolean isRunning = new AtomicBoolean(true);
 	public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
@@ -106,37 +106,38 @@ public class Main {
 				Thread.sleep(dps.get(j).getPollingInterval());
 				System.out.println("TOTO");
 
-				p = new Polling(dps.get(j).getQueue());
 				System.out.println("APRES POLLING");
 				for (DeploymentParameter i : dps) {
 					System.out.println("DPS QUEUE: " + i.getQueue());
 				}
 
-				if (p.getJob() != null) {
+				com.enioka.jqm.jpamodel.JobInstance ji = p.dequeue(dps.get(j).getQueue());
+				if (ji != null) {
 
 					for (int i = 0; i < tps.size(); i++) {
 
 						t.begin();
 
-						History h = em.createQuery("SELECT h FROM History h WHERE h.id = :j", History.class)
-						        .setParameter("j", p.getJob().get(0).getId()).getSingleResult();
+						History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", ji)
+						        .getSingleResult();
 
 						Message m = new Message();
 
 						m.setTextMessage("Status updated: ATTRIBUTED");
 						m.setHistory(h);
 
-						em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", p.getJob().get(0).getId())
+						em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", ji.getId())
 						        .setParameter("msg", "ATTRIBUTED").executeUpdate();
 
 						em.persist(m);
 						t.commit();
 
 						System.out.println("TPS QUEUE: " + tps.get(i).getQueue().getId());
-						System.out.println("POLLING QUEUE: " + p.getJob().get(0).getJd().getQueue().getId());
+						System.out.println("POLLING QUEUE: " + ji.getQueue().getId());
 
-						if (p.getJob().get(0).getQueue().getId() == tps.get(i).getQueue().getId())
-							tps.get(i).run(p);
+						// if (p.getJob().get(0).getQueue().getId() ==
+						// tps.get(i).getQueue().getId())
+						tps.get(i).run(ji);
 						System.out.println("APRES THREADPOOL RUN");
 					}
 				}
