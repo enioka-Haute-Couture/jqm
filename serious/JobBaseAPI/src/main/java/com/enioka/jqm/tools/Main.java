@@ -39,6 +39,7 @@ import com.enioka.jqm.temp.Polling;
 public class Main {
 
 	public static ArrayList<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
+	public static ArrayList<Polling> pollers = new ArrayList<Polling>();
 	public static Node node = null;
 	public static ArrayList<ThreadPool> tps = new ArrayList<ThreadPool>();
 	public static AtomicBoolean isRunning = new AtomicBoolean(true);
@@ -72,15 +73,22 @@ public class Main {
 			        .setParameter("n", node.getId()).getResultList();
 		}
 
-		int j = 0;
+		for (DeploymentParameter i : dps) {
 
-		while (j < dps.size()) {
-
-			for (DeploymentParameter i : dps) {
-
-				Polling p = new Polling(i, cache);
-				p.run();
-			}
+			Polling p = new Polling(i, cache);
+			pollers.add(p);
+			Thread t = new Thread(p);
+			t.start();
 		}
+		System.out.println("End of main");
+	}
+	
+	public static void stop()
+	{
+		for (Polling p : pollers)
+		{
+			p.stop();
+		}
+		
 	}
 }

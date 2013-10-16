@@ -46,7 +46,13 @@ public class Polling implements Runnable {
 	private EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
 	private EntityManager em = emf.createEntityManager();
 	private ThreadPool tp = null;
-
+	private boolean run = true;
+	
+	public void stop()
+	{
+		run = false;
+	}
+	
 	public Polling(DeploymentParameter dp, Map<String, ClassLoader> cache) {
 
 		this.dp = dp;
@@ -180,8 +186,12 @@ public class Polling implements Runnable {
 		while (true) {
 
 			try {
+				if (!run)
+					break;
 				Thread.sleep(dp.getPollingInterval());
-
+				if (!run)
+					break;
+				
 				JobInstance ji = dequeue();
 
 				if (ji == null)
@@ -212,10 +222,4 @@ public class Polling implements Runnable {
 			}
 		}
 	}
-
-	// public void clean() {
-	//
-	// this.job.clear();
-	// }
-
 }
