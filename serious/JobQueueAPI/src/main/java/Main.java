@@ -121,8 +121,8 @@ public class Main
 		qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100, em);
 		qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3 , 100, em);
 
-		jd = CreationTools.createJobDef(true, "App", jdargs, "/Users/pico/Dropbox/projets/enioka/jqm/tests/Fibo/",
-				"/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/Fibo/Fibo.jar",
+		jd = CreationTools.createJobDef(true, "App", jdargs, "../JobBaseAPI/testprojects/Fibo/",
+				"../JobBaseAPI/testprojects/Fibo/Fibo.jar",
 				qVip,
 				42, "Fibo", 42, "Franquin", "ModuleMachin", "other", "other", "other", false, em);
 
