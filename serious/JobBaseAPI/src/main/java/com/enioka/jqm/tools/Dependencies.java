@@ -97,11 +97,11 @@ public class Dependencies {
 			e.printStackTrace();
 		} catch (IOException e) {
 			System.err
-					.println("Invalid pom.xml. Thanks to verify the pom.xml filepath");
+					.println("Invalid pom.xml. Please check the pom.xml & its filepath " + path);
 			e.printStackTrace();
 		} catch (Throwable e) {
 			System.err
-					.println("Invalid pom.xml. Thanks to verify the pom.xml filepath");
+					.println("Invalid pom.xml. Please check the pom.xml & its filepath " + path);
 			e.printStackTrace();
 		}
 	}
