@@ -16,6 +16,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
+import org.apache.log4j.Logger;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.DependencyResolutionException;
@@ -36,6 +37,7 @@ public class Loader implements Runnable {
 	EntityManager em = emf.createEntityManager();
 	Map<String, ClassLoader> cache = null;
 	boolean isInCache = true;
+	Logger jqmlogger = Logger.getLogger(this.getClass());
 
 	public Loader(JobInstance job, Map<String, ClassLoader> cache) {
 
@@ -167,24 +169,34 @@ public class Loader implements Runnable {
 
 		} catch (DependencyResolutionException e) {
 			crashedStatus();
+			jqmlogger.info(e);
 		} catch (MalformedURLException e) {
 			crashedStatus();
+			jqmlogger.info(e);
 		} catch (ClassNotFoundException e) {
 			crashedStatus();
+			jqmlogger.info(e);
 		} catch (SecurityException e) {
 			crashedStatus();
+			jqmlogger.info(e);
 		} catch (NoSuchMethodException e) {
 			crashedStatus();
+			jqmlogger.info(e);
 		} catch (IllegalArgumentException e) {
 			crashedStatus();
+			jqmlogger.info(e);
 		} catch (InvocationTargetException e) {
 			crashedStatus();
+			jqmlogger.info(e);
 		} catch (IOException e) {
 			crashedStatus();
+			jqmlogger.info(e);
 		} catch (InstantiationException e) {
 			crashedStatus();
+			jqmlogger.info(e);
 		} catch (IllegalAccessException e) {
 			crashedStatus();
+			jqmlogger.info(e);
 		} catch (Exception e) {
 		} finally {
 			try {

@@ -26,6 +26,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -33,7 +34,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class Dependencies {
+
 	private ArrayList<String> list = new ArrayList<String>();
+	Logger jqmlogger = Logger.getLogger(this.getClass());
 
 	public Dependencies(String path) {
 
@@ -41,10 +44,10 @@ public class Dependencies {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		String dep = "";
+
 		try {
 			System.out.println(fXmlFile.getPath());
-			System.out.println("Working Directory = "
-					+ System.getProperty("user.dir"));
+			System.out.println("Working Directory = " + System.getProperty("user.dir"));
 			if (fXmlFile == null || !fXmlFile.isFile())
 				throw new Throwable("Dependencies: ");
 
@@ -74,14 +77,9 @@ public class Dependencies {
 
 					Element eElement = (Element) nNode;
 
-					dep += eElement.getElementsByTagName("groupId").item(0)
-							.getTextContent().toString()
-							+ ":";
-					dep += eElement.getElementsByTagName("artifactId").item(0)
-							.getTextContent().toString()
-							+ ":";
-					dep += eElement.getElementsByTagName("version").item(0)
-							.getTextContent().toString();
+					dep += eElement.getElementsByTagName("groupId").item(0).getTextContent().toString() + ":";
+					dep += eElement.getElementsByTagName("artifactId").item(0).getTextContent().toString() + ":";
+					dep += eElement.getElementsByTagName("version").item(0).getTextContent().toString();
 
 					list.add(dep);
 					dep = "";
@@ -89,24 +87,18 @@ public class Dependencies {
 			}
 
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SAXException e) {
-			System.err
-					.println("Invalid XML architecture. Please, fix correctly the dependencies");
-			e.printStackTrace();
+			jqmlogger.error(e + "Invalid XML architecture. Please, fix correctly the dependencies");
 		} catch (IOException e) {
-			System.err
-					.println("Invalid pom.xml. Please check the pom.xml & its filepath " + path);
-			e.printStackTrace();
+			jqmlogger.error(e + "Invalid pom.xml. Please check the pom.xml & its filepath " + path);
 		} catch (Throwable e) {
-			System.err
-					.println("Invalid pom.xml. Please check the pom.xml & its filepath " + path);
-			e.printStackTrace();
+			jqmlogger.error(e + "Invalid pom.xml. Please check the pom.xml & its filepath " + path);
 		}
 	}
 
 	public void print() {
+
 		for (int i = 0; i < list.size(); i++) {
 			System.out.println("Dependency " + i + ": " + list.get(i));
 		}
@@ -116,6 +108,7 @@ public class Dependencies {
 	 * @return the list
 	 */
 	public ArrayList<String> getList() {
+
 		return list;
 	}
 
@@ -124,6 +117,7 @@ public class Dependencies {
 	 *            the list to set
 	 */
 	public void setList(ArrayList<String> list) {
+
 		this.list = list;
 	}
 }
