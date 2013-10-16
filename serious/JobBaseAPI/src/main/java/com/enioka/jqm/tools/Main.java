@@ -31,8 +31,6 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.temp.Polling;
 
@@ -40,7 +38,6 @@ public class Main {
 
 	public static ArrayList<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
 	public static Node node = null;
-	public static Polling p = new Polling();
 	public static ArrayList<ThreadPool> tps = new ArrayList<ThreadPool>();
 	public static AtomicBoolean isRunning = new AtomicBoolean(true);
 	public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
@@ -52,12 +49,6 @@ public class Main {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception { // This code must
-
-		// be excuted in a
-		// new Thread
-
-		// Get the informations about the current node
-		// Add no node in base case
 
 		Server server = new Server(8081);
 
@@ -71,88 +62,22 @@ public class Main {
 
 		if (args.length == 1) {
 
-			node = CreationTools.em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :li", Node.class).setParameter("li", args[0])
-			        .getSingleResult();
+			node = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :li", Node.class).setParameter("li", args[0]).getSingleResult();
 
-			// dp = (ArrayList<DeploymentParameter>) CreationTools.em
-			// .createQuery(
-			// "SELECT dp FROM DeploymentParameter dp WHERE dp.node = :n",
-			// DeploymentParameter.class).setParameter("n", node)
-			// .getResultList();
-
-			dps = (ArrayList<DeploymentParameter>) CreationTools.em
+			dps = (ArrayList<DeploymentParameter>) em
 			        .createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
 			        .setParameter("n", node.getId()).getResultList();
 		}
 
-		// for (int i = 0; i < dps.size(); i++) {
-		//
-		// queues.add(dps.get(i).getQueue());
-		// }
-		System.out.println("BIP: " + dps.size());
-		for (int i = 0; i < dps.size(); i++) {
-
-			tps.add(new ThreadPool(dps.get(i).getQueue(), dps.get(i).getNbThread()));
-			System.out.println("BIP: " + dps.get(i).getNbThread());
-		}
-
 		int j = 0;
 
-		while (isRunning.get()) {
+		while (j < dps.size()) {
 
-			while (j < dps.size()) {
-				System.out.println(dps.get(j).getPollingInterval());
+			for (DeploymentParameter i : dps) {
 
-				Thread.sleep(dps.get(j).getPollingInterval());
-				System.out.println("TOTO");
-
-				System.out.println("APRES POLLING");
-				for (DeploymentParameter i : dps) {
-					System.out.println("DPS QUEUE: " + i.getQueue());
-				}
-
-				com.enioka.jqm.jpamodel.JobInstance ji = p.dequeue(dps.get(j).getQueue());
-				if (ji != null) {
-
-					for (int i = 0; i < tps.size(); i++) {
-
-						t.begin();
-
-						History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", ji)
-						        .getSingleResult();
-
-						Message m = new Message();
-
-						m.setTextMessage("Status updated: ATTRIBUTED");
-						m.setHistory(h);
-
-						em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", ji.getId())
-						        .setParameter("msg", "ATTRIBUTED").executeUpdate();
-
-						em.persist(m);
-						t.commit();
-
-						System.out.println("TPS QUEUE: " + tps.get(i).getQueue().getId());
-						System.out.println("POLLING QUEUE: " + ji.getQueue().getId());
-
-						// if (p.getJob().get(0).getQueue().getId() ==
-						// tps.get(i).getQueue().getId())
-						tps.get(i).run(ji);
-						System.out.println("APRES THREADPOOL RUN");
-					}
-				}
-
-				if (!isRunning.get())
-					break;
-
-				if (j == dps.size() - 1)
-					j = 0;
-				else
-					j++;
+				Polling p = new Polling(i);
+				p.run();
 			}
-
-			if (!isRunning.get())
-				break;
 		}
 	}
 }

@@ -6,7 +6,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 import org.junit.Assert;
@@ -26,6 +29,9 @@ import com.enioka.jqm.tools.CreationTools;
 
 public class TestSuite {
 
+	EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+	EntityManager em = emf.createEntityManager();
+
 	Queue qVip = null;
 	Queue qNormal = null;
 	Queue qSlow = null;
@@ -41,66 +47,66 @@ public class TestSuite {
 
 	public void testInit() {
 
-		EntityTransaction transac = CreationTools.em.getTransaction();
-		transac = CreationTools.em.getTransaction();
+		EntityTransaction transac = em.getTransaction();
+		transac = em.getTransaction();
 		transac.begin();
-		CreationTools.em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
+		em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
 		transac.commit();
-		transac = CreationTools.em.getTransaction();
+		transac = em.getTransaction();
 		transac.begin();
-		CreationTools.em.createQuery("DELETE FROM Node").executeUpdate();
+		em.createQuery("DELETE FROM Node").executeUpdate();
 		transac.commit();
-		transac = CreationTools.em.getTransaction();
+		transac = em.getTransaction();
 		transac.begin();
-		CreationTools.em.createQuery("DELETE FROM JobHistoryParameter").executeUpdate();
+		em.createQuery("DELETE FROM JobHistoryParameter").executeUpdate();
 		transac.commit();
-		transac = CreationTools.em.getTransaction();
+		transac = em.getTransaction();
 		transac.begin();
-		CreationTools.em.createQuery("DELETE FROM Message").executeUpdate();
+		em.createQuery("DELETE FROM Message").executeUpdate();
 		transac.commit();
-		transac = CreationTools.em.getTransaction();
+		transac = em.getTransaction();
 		transac.begin();
-		CreationTools.em.createQuery("DELETE FROM History").executeUpdate();
+		em.createQuery("DELETE FROM History").executeUpdate();
 		transac.commit();
-		transac = CreationTools.em.getTransaction();
+		transac = em.getTransaction();
 		transac.begin();
-		CreationTools.em.createQuery("DELETE FROM JobDefParameter").executeUpdate();
+		em.createQuery("DELETE FROM JobDefParameter").executeUpdate();
 		transac.commit();
-		transac = CreationTools.em.getTransaction();
+		transac = em.getTransaction();
 		transac.begin();
-		CreationTools.em.createQuery("DELETE FROM JobParameter").executeUpdate();
+		em.createQuery("DELETE FROM JobParameter").executeUpdate();
 		transac.commit();
-		transac = CreationTools.em.getTransaction();
+		transac = em.getTransaction();
 		transac.begin();
-		CreationTools.em.createQuery("DELETE FROM JobInstance").executeUpdate();
+		em.createQuery("DELETE FROM JobInstance").executeUpdate();
 		transac.commit();
-		transac = CreationTools.em.getTransaction();
+		transac = em.getTransaction();
 		transac.begin();
-		CreationTools.em.createQuery("DELETE FROM JobDef").executeUpdate();
+		em.createQuery("DELETE FROM JobDef").executeUpdate();
 		transac.commit();
-		transac = CreationTools.em.getTransaction();
+		transac = em.getTransaction();
 		transac.begin();
-		CreationTools.em.createQuery("DELETE FROM Queue").executeUpdate();
+		em.createQuery("DELETE FROM Queue").executeUpdate();
 		transac.commit();
 
-		this.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42 , 100);
-		this.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100);
-		this.qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 0 , 100);
+		this.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42 , 100, em);
+		this.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100, em);
+		this.qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 0 , 100, em);
 
 		this.jd = CreationTools.createJobDef(true, "App", null, "/Users/pico/Dropbox/projets/enioka/jqm/tests/PrintArg/",
 				"/Users/pico/Dropbox/projets/enioka/jqm/tests/PrintArg/target/PrintArg-0.0.1-SNAPSHOT.jar", qVip,
-				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
 		this.jdDemoMaven = CreationTools.createJobDef(true, "DemoMavenClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/", "", qNormal,
-				42, "MarsuApplication2", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+				42, "MarsuApplication2", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
 		this.jdDemo = CreationTools.createJobDef(true, "DemoClassName", null, "/Users/pico/Dropbox/projets/enioka/tests/Demo/", "", qSlow,
-				42, "MarsuApplication3", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+				42, "MarsuApplication3", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
-		node = CreationTools.createNode("localhost", 8081);
+		node = CreationTools.createNode("localhost", 8081, em);
 
-		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip);
-		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal);
+		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip, em);
+		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal, em);
 
 	}
 
@@ -117,7 +123,7 @@ public class TestSuite {
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
 
-		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) CreationTools.em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position",
+		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position",
 				JobInstance.class).getResultList();
 
 		Assert.assertEquals(jobs.size(), 3);
@@ -139,12 +145,12 @@ public class TestSuite {
 		Dispatcher.enQueue(jdDemo);
 		Dispatcher.enQueue(jd);
 
-		JobInstance j = CreationTools.em.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :job",
+		JobInstance j = em.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
 		Dispatcher.changeQueue(j.getId(), qSlow.getId());
 
-		j = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :job",
+		j = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
 		Assert.assertEquals(qSlow.getId(), j.getQueue().getId());
@@ -163,12 +169,12 @@ public class TestSuite {
 		Dispatcher.enQueue(jdDemo);
 		Dispatcher.enQueue(jd);
 
-		JobInstance j = CreationTools.em.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :job",
+		JobInstance j = em.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
 		Dispatcher.changeQueue(j.getId(), qSlow.getId());
 
-		j = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :job",
+		j = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
 	}
@@ -186,11 +192,11 @@ public class TestSuite {
 		Dispatcher.enQueue(jdDemo);
 		Dispatcher.enQueue(jd);
 
-		JobInstance q = CreationTools.em.createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job", JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
+		JobInstance q = em.createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job", JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
 		Dispatcher.delJobInQueue(this.jd.getId() + 3);
 
-		Query tmp = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job", JobInstance.class).setParameter("job", this.jd.getId());
+		Query tmp = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job", JobInstance.class).setParameter("job", this.jd.getId());
 
 		Assert.assertEquals(false, tmp.equals(q));
 	}
@@ -208,12 +214,12 @@ public class TestSuite {
 		Dispatcher.enQueue(jdDemo);
 		Dispatcher.enQueue(jd);
 
-		JobInstance q = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
+		JobInstance q = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
 		Dispatcher.cancelJobInQueue(q.getId());
 
-		JobInstance tmp = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
+		JobInstance tmp = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
 		Assert.assertEquals("CANCELLED", tmp.getState());
@@ -235,12 +241,12 @@ public class TestSuite {
 		Dispatcher.enQueue(jd);
 		Dispatcher.enQueue(jd);
 
-		JobInstance q = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
+		JobInstance q = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
 		Dispatcher.setPosition(q.getId(), 1);
 
-		JobInstance tmp = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
+		JobInstance tmp = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
 		Assert.assertEquals(1, (int)tmp.getPosition());
@@ -262,14 +268,14 @@ public class TestSuite {
 
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) Dispatcher.getUserJobs("MAG");
 
-		ArrayList<JobInstance> tmp = (ArrayList<JobInstance>) CreationTools.em.createQuery("SELECT j FROM JobInstance j WHERE j.user = :u",
+		ArrayList<JobInstance> tmp = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j WHERE j.user = :u",
 				JobInstance.class).setParameter("u", "MAG").getResultList();
 
 		Assert.assertEquals(tmp.size(), jobs.size());
 
 		for (int i = 0; i < jobs.size(); i++) {
 
-			Assert.assertEquals(tmp.get(i), jobs.get(i));
+			Assert.assertEquals(tmp.get(i).getId(), jobs.get(i).getId());
         }
 	}
 
@@ -293,7 +299,7 @@ public class TestSuite {
 			System.out.println("job: " + jobInstance.getId());
         }
 
-		ArrayList<JobInstance> tmp = (ArrayList<JobInstance>) CreationTools.em.createQuery("SELECT j FROM JobInstance j",
+		ArrayList<JobInstance> tmp = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j",
 				JobInstance.class).getResultList();
 
 		for (JobInstance j : tmp) {
@@ -324,7 +330,7 @@ public class TestSuite {
 
 		ArrayList<com.enioka.jqm.api.Queue> jobs = (ArrayList<com.enioka.jqm.api.Queue>) Dispatcher.getQueues();
 
-		ArrayList<Queue> tmp = (ArrayList<Queue>) CreationTools.em.createQuery("SELECT j FROM Queue j",
+		ArrayList<Queue> tmp = (ArrayList<Queue>) em.createQuery("SELECT j FROM Queue j",
 				Queue.class).getResultList();
 
 		Assert.assertEquals(tmp.size(), jobs.size());
@@ -344,7 +350,7 @@ public class TestSuite {
 
 		Dispatcher.enQueue(jd);
 
-		JobInstance job = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
+		JobInstance job = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
 		File file = new File("/Users/pico/Downloads/tests/deliverable" + job.getId());
@@ -378,10 +384,10 @@ public class TestSuite {
 
 		Dispatcher.enQueue(jd);
 
-		JobInstance job = CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
+		JobInstance job = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
-        Query q = CreationTools.emf.createEntityManager().createQuery(
+        Query q = emf.createEntityManager().createQuery(
 				"SELECT j.parameters FROM JobInstance AS j WHERE j.id = :j")
 				.setParameter("j", job.getId());
 

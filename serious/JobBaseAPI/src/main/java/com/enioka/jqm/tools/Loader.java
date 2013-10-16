@@ -31,6 +31,8 @@ public class Loader implements Runnable {
 	JobInstance job = null;
 	JobBase jobBase = new JobBase();
 	ArrayList<DeliverableStruct> s1s = new ArrayList<DeliverableStruct>();
+	EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+	EntityManager em = emf.createEntityManager();
 
 	public Loader(JobInstance job) {
 
@@ -39,8 +41,6 @@ public class Loader implements Runnable {
 
 	public void crashedStatus() {
 
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-		EntityManager em = emf.createEntityManager();
 		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
@@ -51,14 +51,11 @@ public class Loader implements Runnable {
 
 		// MESSAGE HISTORY UPDATED
 
-		History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.id = :j", History.class).setParameter("j", job.getId())
-		        .getSingleResult();
+		History h = em.createQuery("SELECT h FROM History h WHERE h.id = :j", History.class).setParameter("j", job.getId()).getSingleResult();
 
-		CreationTools.createMessage("Status updated: ATTRIBUTED", h);
+		CreationTools.createMessage("Status updated: ATTRIBUTED", h, em);
 
 		transac.commit();
-		em.close();
-		emf.close();
 	}
 
 	@Override
@@ -85,15 +82,13 @@ public class Loader implements Runnable {
 			Collection<Artifact> deps = null;
 
 			// Update of the job status
-			EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-			EntityManager em = emf.createEntityManager();
+
+			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", job).getSingleResult();
+
+			CreationTools.createMessage("Status updated: RUNNING", h, em);
+
 			EntityTransaction transac = em.getTransaction();
 			transac.begin();
-
-			History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", job)
-			        .getSingleResult();
-
-			CreationTools.createMessage("Status updated: RUNNING", h);
 
 			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", job.getId()).setParameter("msg", "RUNNING")
 			        .executeUpdate();
@@ -149,7 +144,7 @@ public class Loader implements Runnable {
 					System.out.println("SHA1: " + this.jobBase.getSha1s().get(j).getFilePath());
 
 					CreationTools.createDeliverable(this.jobBase.getSha1s().get(j).getFilePath(), this.jobBase.getSha1s().get(j).getHashPath(),
-					        this.jobBase.getSha1s().get(j).getFileFamily(), this.job.getId());
+					        this.jobBase.getSha1s().get(j).getFileFamily(), this.job.getId(), em);
 				}
 			}
 			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
@@ -164,11 +159,7 @@ public class Loader implements Runnable {
 
 			// MESSAGE HISTORY UPDATED
 			em.getTransaction().commit();
-			CreationTools.createMessage("Status updated: ENDED", h);
-
-			transac.commit();
-			em.close();
-			emf.close();
+			CreationTools.createMessage("Status updated: ENDED", h, em);
 
 		} catch (DependencyResolutionException e) {
 
@@ -212,6 +203,12 @@ public class Loader implements Runnable {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			try {
+				em.close();
+				emf.close();
+			} catch (Exception e) {
+			}
 		}
 
 	}

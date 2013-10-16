@@ -20,6 +20,8 @@ package com.enioka.jqm.api;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
@@ -41,19 +43,14 @@ public class JobBase {
 	protected String other1;
 	protected String other2;
 	protected String other3;
-	protected ArrayList<JobParameter> parameters = new ArrayList<JobParameter>();
+	protected Map<String, String> parameters = new HashMap<String, String>();
 	protected ArrayList<DeliverableStruct> sha1s = new ArrayList<DeliverableStruct>();
 
 	public void setParams(JobInstance j) {
 
 		for (JobParameter i : j.getParameters()) {
 
-			this.parameters.add(i);
-		}
-
-		for (JobParameter i : parameters) {
-
-			System.out.println("PARAMETERS: " + i.getValue());
+			this.parameters.put(i.getKey(), i.getValue());
 		}
 
 		// System.exit(0);
@@ -187,12 +184,12 @@ public class JobBase {
 		this.sha1s = sha1s;
 	}
 
-	public ArrayList<JobParameter> getParameters() {
+	public Map<String, String> getParameters() {
 
 		return parameters;
 	}
 
-	public void setParameters(ArrayList<JobParameter> parameters) {
+	public void setParameters(Map<String, String> parameters) {
 
 		this.parameters = parameters;
 	}

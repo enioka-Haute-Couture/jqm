@@ -60,11 +60,14 @@ import com.enioka.jqm.tools.CreationTools;
  */
 public class Dispatcher {
 
+	public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+	public static EntityManager em = emf.createEntityManager();
+
 	//----------------------------- JOBDEFINITIONTOJOBDEF --------------------------------------
 
 	private static JobDef jobDefinitionToJobDef(JobDefinition jd) {
 
-		 JobDef job = CreationTools.em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = :name", JobDef.class)
+		 JobDef job = em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = :name", JobDef.class)
 		.setParameter("name", jd.getApplicationName())
 		.getSingleResult();
 
@@ -141,7 +144,7 @@ public class Dispatcher {
 
     		for (JobDefParameter i : jdef.getParameters()) {
 
-    			res.add(CreationTools.createJobParameter(i.getKey(), i.getValue()));
+    			res.add(CreationTools.createJobParameter(i.getKey(), i.getValue(), em));
             }
 
     		return res;
@@ -153,7 +156,7 @@ public class Dispatcher {
     			String key = i.next();
     			String value = m.get(key);
 
-    			res.add(CreationTools.createJobParameter(key, value));
+    			res.add(CreationTools.createJobParameter(key, value, em));
     		}
 
     		return res;
@@ -171,17 +174,20 @@ public class Dispatcher {
 
 		History h = null;
 
-		Integer p = CreationTools.em.createQuery("SELECT MAX (j.position) FROM JobInstance j " +
+		Integer p = em.createQuery("SELECT MAX (j.position) FROM JobInstance j " +
 				"WHERE j.jd.queue.name = :queue", Integer.class).setParameter("queue", (job.getQueue().getName())).getSingleResult();
 
 		System.out.println("POSITION: " + p);
-		JobInstance ji = CreationTools.createJobInstance(job, overrideParameter(job, jd), "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue);
+
+		em.getTransaction().begin();
+
+		JobInstance ji = CreationTools.createJobInstance(job, overrideParameter(job, jd), "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue, em);
 
 		//CreationTools.em.createQuery("UPDATE JobParameter jp SET jp.jobInstance = :j WHERE").executeUpdate();
 
 		// Update status in the history table
 		//System.exit(0);
-		Query q = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", ji.getId());
+		Query q = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", ji.getId());
 
 		if (!q.equals(null)) {
 
@@ -190,19 +196,12 @@ public class Dispatcher {
 
 			for (JobParameter j : ji.getParameters()) {
 
-				EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-				EntityManager em = emf.createEntityManager();
 				JobHistoryParameter jp = new JobHistoryParameter();
-				EntityTransaction transac = em.getTransaction();
-				transac.begin();
 
 				jp.setKey(j.getKey());
 				jp.setValue(j.getValue());
 
 				em.persist(jp);
-				transac.commit();
-				em.close();
-				emf.close();
 
 				jhp.add(jp);
 			}
@@ -210,9 +209,11 @@ public class Dispatcher {
 			ArrayList<Message> msgs = new ArrayList<Message>();
 
 			h = CreationTools.createhistory(1, (Calendar) null, "History of the Job --> ID = " + (ji.getId()),
-					msgs, ji, enqueueDate, (Calendar) null, (Calendar) null, jhp);
+					msgs, ji, enqueueDate, (Calendar) null, (Calendar) null, jhp, em);
 
-			m = CreationTools.createMessage("Status updated: SUBMITTED", h);
+			em.getTransaction().commit();
+
+			m = CreationTools.createMessage("Status updated: SUBMITTED", h, em);
 			msgs.add(m);
 		}
 		return ji.getId();
@@ -222,7 +223,7 @@ public class Dispatcher {
 
 	public static com.enioka.jqm.api.JobInstance getJob(int idJob) {
 
-		return getJobInstance(CreationTools.em.createQuery(
+		return getJobInstance(em.createQuery(
 				"SELECT j FROM JobInstance j WHERE j.id = :job",
 				JobInstance.class)
 				.setParameter("job", idJob)
@@ -233,10 +234,10 @@ public class Dispatcher {
 
 	public static void delJobInQueue(int idJob) {
 
-		EntityTransaction transac = CreationTools.em.getTransaction();
+		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
-		Query q = CreationTools.em.createQuery("DELETE FROM JobInstance j WHERE j.id = :idJob").setParameter("idJob", idJob);
+		Query q = em.createQuery("DELETE FROM JobInstance j WHERE j.id = :idJob").setParameter("idJob", idJob);
 		int res = q.executeUpdate();
 
 		if (res != 1)
@@ -251,15 +252,15 @@ public class Dispatcher {
 	public static void cancelJobInQueue(int idJob) {
 
 		@SuppressWarnings("unused")
-        History h = CreationTools.em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", idJob).getSingleResult();
+        History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", idJob).getSingleResult();
 
-		EntityTransaction transac = CreationTools.em.getTransaction();
+		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
-		Query q = CreationTools.em.createQuery("UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob").setParameter("idJob", idJob);
+		Query q = em.createQuery("UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob").setParameter("idJob", idJob);
 		int res = q.executeUpdate();
 
-		CreationTools.em
+		em
         .createQuery(
                 "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
                         + "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)")
@@ -302,13 +303,13 @@ public class Dispatcher {
 		if (position < 1)
 			position = 1;
 
-		List<JobInstance> q = CreationTools.em.createQuery("SELECT j FROM JobInstance j WHERE j.state = :s " +
+		List<JobInstance> q = em.createQuery("SELECT j FROM JobInstance j WHERE j.state = :s " +
 				"ORDER BY j.position", JobInstance.class).setParameter("s", "SUBMITTED").getResultList();
 
-		EntityTransaction transac = CreationTools.em.getTransaction();
+		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
-		Query query = CreationTools.em.createQuery("UPDATE JobInstance j SET j.position = :pos WHERE " +
+		Query query = em.createQuery("UPDATE JobInstance j SET j.position = :pos WHERE " +
 				"j.id = (SELECT ji.id FROM JobInstance ji WHERE ji.id = :idJob)").setParameter("idJob", idJob).setParameter("pos", position);
 
 		@SuppressWarnings("unused")
@@ -320,7 +321,7 @@ public class Dispatcher {
 				continue;
 			else if (i + 1 == position)
 			{
-				Query queryEg = CreationTools.em.createQuery("UPDATE JobInstance j SET j.position = :i WHERE j.id = :job").setParameter("i",
+				Query queryEg = em.createQuery("UPDATE JobInstance j SET j.position = :i WHERE j.id = :job").setParameter("i",
 						position + 2).setParameter("job", q.get(i).getId());
 				@SuppressWarnings("unused")
                 int res = queryEg.executeUpdate();
@@ -328,7 +329,7 @@ public class Dispatcher {
 			}
 			else
 			{
-				Query qq = CreationTools.em.createQuery("UPDATE JobInstance j SET j.position = :i WHERE j.id = :job").setParameter("i",
+				Query qq = em.createQuery("UPDATE JobInstance j SET j.position = :i WHERE j.id = :job").setParameter("i",
 						i + 1).setParameter("job", q.get(i).getId());
 				@SuppressWarnings("unused")
                 int res = qq.executeUpdate();
@@ -350,19 +351,19 @@ public class Dispatcher {
 
 		try {
 
-			tmp = CreationTools.em.createQuery(
+			tmp = em.createQuery(
 					"SELECT d FROM Deliverable d WHERE d.jobId = :idJob",
 					Deliverable.class)
 					.setParameter("idJob", idJob)
 					.getResultList();
 
-			JobInstance job = CreationTools.em.createQuery(
+			JobInstance job = em.createQuery(
 					"SELECT j FROM JobInstance j WHERE j.id = :job",
 					JobInstance.class)
 					.setParameter("job", idJob)
 					.getSingleResult();
 
-			DeploymentParameter dp = CreationTools.em.createQuery(
+			DeploymentParameter dp = em.createQuery(
 					"SELECT dp FROM DeploymentParameter dp WHERE dp.queue.id = :q", DeploymentParameter.class)
 					.setParameter("q", job.getJd().getQueue().getId())
 					.getSingleResult();
@@ -398,7 +399,7 @@ public class Dispatcher {
 
 		ArrayList<Deliverable> deliverables = new ArrayList<Deliverable>();
 
-		deliverables = (ArrayList<Deliverable>) CreationTools.em.createQuery(
+		deliverables = (ArrayList<Deliverable>) em.createQuery(
 				"SELECT d FROM Deliverable d WHERE d.jobInstance = :idJob",
 				Deliverable.class)
 				.setParameter("idJob", idJob)
@@ -414,13 +415,13 @@ public class Dispatcher {
 		URL url = null;
 		File file = null;
 
-		JobInstance job = CreationTools.em.createQuery(
+		JobInstance job = em.createQuery(
 				"SELECT j FROM JobInstance j WHERE j.id = :job",
 				JobInstance.class)
 				.setParameter("job", deliverable.getJobId())
 				.getSingleResult();
 
-		DeploymentParameter dp = CreationTools.em.createQuery(
+		DeploymentParameter dp = em.createQuery(
 				"SELECT dp FROM DeploymentParameter dp WHERE dp.queue.id = :q", DeploymentParameter.class)
 				.setParameter("q", job.getJd().getQueue().getId())
 				.getSingleResult();
@@ -445,13 +446,13 @@ public class Dispatcher {
 
 		ArrayList<Deliverable> d = new ArrayList<Deliverable>();
 
-		JobInstance j = CreationTools.em.createQuery(
+		JobInstance j = em.createQuery(
 				"SELECT j FROM JobInstance j WHERE j.user = :u",
 				JobInstance.class)
 				.setParameter("u", user)
 				.getSingleResult();
 
-		d = (ArrayList<Deliverable>) CreationTools.em.createQuery(
+		d = (ArrayList<Deliverable>) em.createQuery(
 				"SELECT d FROM Deliverable WHERE d.jobInstance = :idJob",
 				Deliverable.class)
 				.setParameter("idJob", j.getId())
@@ -473,7 +474,7 @@ public class Dispatcher {
 
 	public static List<JobInstance> getUserJobs(String user) {
 
-		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) CreationTools.em.createQuery("SELECT j FROM JobInstance j WHERE j.user = :u", JobInstance.class).setParameter("u", user).getResultList();
+		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j WHERE j.user = :u", JobInstance.class).setParameter("u", user).getResultList();
 
 		return jobs;
 	}
@@ -483,7 +484,7 @@ public class Dispatcher {
 	public static List<com.enioka.jqm.api.JobInstance> getJobs() {
 
 		ArrayList<com.enioka.jqm.api.JobInstance> res = new ArrayList<com.enioka.jqm.api.JobInstance>();
-		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) CreationTools.em.createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList();
+		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList();
 
 		for (JobInstance j : jobs) {
 	        com.enioka.jqm.api.JobInstance tmp = new com.enioka.jqm.api.JobInstance();
@@ -506,7 +507,7 @@ public class Dispatcher {
 	public static List<com.enioka.jqm.api.Queue> getQueues() {
 
 		List<com.enioka.jqm.api.Queue> res = new ArrayList<com.enioka.jqm.api.Queue>();
-		ArrayList<Queue> queues = (ArrayList<Queue>) CreationTools.em.createQuery("SELECT j FROM Queue j", Queue.class).getResultList();
+		ArrayList<Queue> queues = (ArrayList<Queue>) em.createQuery("SELECT j FROM Queue j", Queue.class).getResultList();
 
 		for (Queue queue : queues) {
 
@@ -524,14 +525,14 @@ public class Dispatcher {
 
 	public static void changeQueue(int idJob, int idQueue) {
 
-		EntityTransaction transac = CreationTools.em.getTransaction();
+		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
-		Queue q = CreationTools.em.createQuery("SELECT Queue FROM Queue queue " +
+		Queue q = em.createQuery("SELECT Queue FROM Queue queue " +
 				"WHERE queue.id = :q", Queue.class).setParameter("q", idQueue).getSingleResult();
 
 
-		Query query = CreationTools.em.createQuery("UPDATE JobInstance j SET j.queue = :q WHERE j.id = :jd").setParameter("q", q).setParameter("jd", idJob);
+		Query query = em.createQuery("UPDATE JobInstance j SET j.queue = :q WHERE j.id = :jd").setParameter("q", q).setParameter("jd", idJob);
 		int result = query.executeUpdate();
 
 		if (result != 1)
@@ -544,10 +545,10 @@ public class Dispatcher {
 
 	public static void changeQueue(int idJob, Queue queue) {
 
-		EntityTransaction transac = CreationTools.em.getTransaction();
+		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
-		Query query = CreationTools.em.createQuery("UPDATE JobInstance j SET j.queue = :q WHERE j.id = :jd").setParameter("q", queue).setParameter("jd", idJob);
+		Query query = em.createQuery("UPDATE JobInstance j SET j.queue = :q WHERE j.id = :jd").setParameter("q", queue).setParameter("jd", idJob);
 		int result = query.executeUpdate();
 
 		if (result != 1)

@@ -24,7 +24,6 @@ import com.enioka.jqm.jpamodel.Queue;
 public class CreationTools
 {
 	public static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-	public static final EntityManager em = emf.createEntityManager();
 
 	public CreationTools()
 	{
@@ -32,7 +31,7 @@ public class CreationTools
 
 	// ------------------ DELIVERABLES ------------------------
 
-	public static Deliverable createDeliverable(String fp, String hp, String ff, Integer jobId)
+	public static Deliverable createDeliverable(String fp, String hp, String ff, Integer jobId, EntityManager em)
 	{
 		Deliverable j = new Deliverable();
 		EntityTransaction transac = em.getTransaction();
@@ -51,7 +50,7 @@ public class CreationTools
 
 	// ------------------ JOBDEFINITION ------------------------
 
-	public static JobDef initJobDefinition(String javaClassName, String filePath, Queue queue)
+	public static JobDef initJobDefinition(String javaClassName, String filePath, Queue queue, EntityManager em)
 	{
 		JobDef j = new JobDef();
 		EntityTransaction transac = em.getTransaction();
@@ -70,7 +69,7 @@ public class CreationTools
 	public static JobDef createJobDef(boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String filePath, String jp,
 			 						Queue queue, Integer maxTimeRunning, String applicationName, Integer sessionID,
 			 						String application, String module, String other1, String other2, String other3,
-			 						boolean highlander)
+			 						boolean highlander, EntityManager em)
 	{
 		JobDef j = new JobDef();
 		EntityTransaction transac = em.getTransaction();
@@ -102,7 +101,7 @@ public class CreationTools
 
 	// ------------------ DEPLOYMENTPARAMETER ------------------
 
-	public static DeploymentParameter initDeploymentParameter(Node node, Integer nbThread)
+	public static DeploymentParameter initDeploymentParameter(Node node, Integer nbThread, EntityManager em)
 	{
 		DeploymentParameter dp = new DeploymentParameter();
 		EntityTransaction transac = em.getTransaction();
@@ -116,7 +115,7 @@ public class CreationTools
 		return dp;
 	}
 
-	public static DeploymentParameter createDeploymentParameter(Integer classId, Node node, Integer nbThread, Integer pollingInterval, Queue qVip)
+	public static DeploymentParameter createDeploymentParameter(Integer classId, Node node, Integer nbThread, Integer pollingInterval, Queue qVip, EntityManager em)
 	{
 		DeploymentParameter dp = new DeploymentParameter();
 		EntityTransaction transac = em.getTransaction();
@@ -135,7 +134,7 @@ public class CreationTools
 
 	// ------------------ EXECPARAMETER ------------------------
 
-	public static ExecParameter createExecParameter(String key, String value, JobInstance jobInstance)
+	public static ExecParameter createExecParameter(String key, String value, JobInstance jobInstance, EntityManager em)
 	{
 		ExecParameter e = new ExecParameter();
 		EntityTransaction transac = em.getTransaction();
@@ -152,11 +151,9 @@ public class CreationTools
 
 	// ------------------ HISTORY ------------------------------
 
-	public static History initHistory(Integer returnedValue, List<Message> messages, JobInstance jobInstance, List<JobHistoryParameter> jhp)
+	public static History initHistory(Integer returnedValue, List<Message> messages, JobInstance jobInstance, List<JobHistoryParameter> jhp, EntityManager em)
 	{
 		History h = new History();
-		EntityTransaction transac = em.getTransaction();
-		transac.begin();
 
 		h.setReturnedValue(returnedValue);
 		h.setMessages(messages);
@@ -164,7 +161,6 @@ public class CreationTools
 		h.setParameters(jhp);
 
 		em.persist(h);
-		transac.commit();
 		return h;
 	}
 
@@ -173,11 +169,9 @@ public class CreationTools
 			Calendar enqueueDate,
 			Calendar executionDate,
 			Calendar endDate,
-			List<JobHistoryParameter> jhp)
+			List<JobHistoryParameter> jhp, EntityManager em)
 	{
 		History h = new History();
-		EntityTransaction transac = em.getTransaction();
-		transac.begin();
 
 		h.setReturnedValue(returnedValue);
 		h.setJobDate(jobDate);
@@ -190,17 +184,14 @@ public class CreationTools
 		h.setParameters(jhp);
 
 		em.persist(h);
-		transac.commit();
 		return h;
 	}
 
 	// ------------------ JOBINSTANCE --------------------------
 
-	public static JobInstance createJobInstance(JobDef jd, List<JobParameter> jps, String user, Integer sessionID, String state, Integer position, Queue queue)
+	public static JobInstance createJobInstance(JobDef jd, List<JobParameter> jps, String user, Integer sessionID, String state, Integer position, Queue queue, EntityManager em)
 	{
 		JobInstance j = new JobInstance();
-		EntityTransaction transac = em.getTransaction();
-		transac.begin();
 
 		j.setJd(jd);
 		j.setParameters(jps);
@@ -211,28 +202,24 @@ public class CreationTools
 		j.setQueue(queue);
 
 		em.persist(j);
-		transac.commit();
 
 		return j;
 	}
 
 	// ------------------ JOBPARAMETER -------------------------
 
-	public static JobParameter createJobParameter(String key, String value)
+	public static JobParameter createJobParameter(String key, String value, EntityManager em)
 	{
 		JobParameter j = new JobParameter();
-		EntityTransaction transac = em.getTransaction();
-		transac.begin();
 
 		j.setKey(key);
 		j.setValue(value);
 
 		em.persist(j);
-		transac.commit();
 		return j;
 	}
 
-	public static JobDefParameter createJobDefParameter(String key, String value)
+	public static JobDefParameter createJobDefParameter(String key, String value, EntityManager em)
 	{
 		JobDefParameter j = new JobDefParameter();
 		EntityTransaction transac = em.getTransaction();
@@ -248,7 +235,7 @@ public class CreationTools
 
 	// ------------------ MESSAGE ------------------------------
 
-	public static Message createMessage(String textMessage, History history)
+	public static Message createMessage(String textMessage, History history, EntityManager em)
 	{
 		Message m = new Message();
 		EntityTransaction transac = em.getTransaction();
@@ -264,7 +251,7 @@ public class CreationTools
 
 	// ------------------ NODE ---------------------------------
 
-	public static Node createNode(String listeningInterface, Integer port)
+	public static Node createNode(String listeningInterface, Integer port, EntityManager em)
 	{
 		Node n = new Node();
 		EntityTransaction transac = em.getTransaction();
@@ -280,7 +267,7 @@ public class CreationTools
 
 	// ------------------ QUEUE --------------------------------
 
-	public static Queue initQueue(String name, String description, Integer maxTempInQueue, Integer maxTempRunning)
+	public static Queue initQueue(String name, String description, Integer maxTempInQueue, Integer maxTempRunning, EntityManager em)
 	{
 		Queue q = new Queue();
 		EntityTransaction transac = em.getTransaction();
@@ -298,7 +285,7 @@ public class CreationTools
 	}
 
 	public static Queue createQueue(String name, String description, Integer maxTempInQueue, Integer maxTempRunning,
-			boolean defaultQueue)
+			boolean defaultQueue, EntityManager em)
 	{
 		Queue q = new Queue();
 		EntityTransaction transac = em.getTransaction();
@@ -317,7 +304,7 @@ public class CreationTools
 
 	// ------------------ CLOSE ENTITYs ------------------------
 
-	public static void close()
+	public static void close(EntityManager em)
 	{
 		em.close();
 		emf.close();

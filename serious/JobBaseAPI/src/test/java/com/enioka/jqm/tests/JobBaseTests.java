@@ -3,7 +3,10 @@ package com.enioka.jqm.tests;
 
 import java.util.ArrayList;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 
 import org.junit.Test;
 
@@ -18,6 +21,9 @@ import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.tools.CreationTools;
 
 public class JobBaseTests {
+
+	EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+	EntityManager em = emf.createEntityManager();
 
 	Queue qVip = null;
 	Queue qNormal = null;
@@ -38,82 +44,69 @@ public class JobBaseTests {
 
 	public void testInit() {
 
-		EntityTransaction transac = CreationTools.em.getTransaction();
+		EntityTransaction transac = em.getTransaction();
+		transac = em.getTransaction();
 		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM Message").executeUpdate();
+		em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
+		transac.commit();
+		transac = em.getTransaction();
+		transac.begin();
+		em.createQuery("DELETE FROM Node").executeUpdate();
+		transac.commit();
+		transac = em.getTransaction();
+		transac.begin();
+		em.createQuery("DELETE FROM JobHistoryParameter").executeUpdate();
+		transac.commit();
+		transac = em.getTransaction();
+		transac.begin();
+		em.createQuery("DELETE FROM Message").executeUpdate();
+		transac.commit();
+		transac = em.getTransaction();
+		transac.begin();
+		em.createQuery("DELETE FROM History").executeUpdate();
+		transac.commit();
+		transac = em.getTransaction();
+		transac.begin();
+		em.createQuery("DELETE FROM JobDefParameter").executeUpdate();
+		transac.commit();
+		transac = em.getTransaction();
+		transac.begin();
+		em.createQuery("DELETE FROM JobParameter").executeUpdate();
+		transac.commit();
+		transac = em.getTransaction();
+		transac.begin();
+		em.createQuery("DELETE FROM JobInstance").executeUpdate();
+		transac.commit();
+		transac = em.getTransaction();
+		transac.begin();
+		em.createQuery("DELETE FROM JobDef").executeUpdate();
+		transac.commit();
+		transac = em.getTransaction();
+		transac.begin();
+		em.createQuery("DELETE FROM Queue").executeUpdate();
 		transac.commit();
 
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
-		transac.commit();
-
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM Node").executeUpdate();
-		transac.commit();
-
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM History").executeUpdate();
-		transac.commit();
-
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM JobDefParameter").executeUpdate();
-		transac.commit();
-
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM JobParameter").executeUpdate();
-		transac.commit();
-
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM JobInstance").executeUpdate();
-		transac.commit();
-
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM JobDef").executeUpdate();
-		transac.commit();
-
-		transac = CreationTools.em.getTransaction();
-		transac.begin();
-
-		CreationTools.em.createQuery("DELETE FROM Queue").executeUpdate();
-
-		transac.commit();
-
-		jdp = CreationTools.createJobDefParameter("arg", "POUPETTE");
+		jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
-		this.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42, 100);
-		this.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, 100);
-		this.qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3, 100);
+		this.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42, 100, em);
+		this.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, 100, em);
+		this.qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3, 100, em);
 
 		jd = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/PrintArg/", "./testprojects/PrintArg/PrintArg.jar", qVip, 42,
-		        "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+		        "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
 		jdDemoMaven = CreationTools.createJobDef(true, "Main", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
 		        "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", qNormal, 42, "MarsuApplication1",
-		        42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+		        42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
 		jdDemo = CreationTools.createJobDef(true, "Main", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
 		        "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", qNormal, 42, "MarsuApplication2",
-		        42, "Franquin", "ModuleMachin", "other", "other", "other", true);
+		        42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
-		node = CreationTools.createNode("localhost", 8081);
-		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip);
-		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal);
+		node = CreationTools.createNode("localhost", 8081, em);
+		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip, em);
+		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal, em);
 
 	}
 
@@ -122,12 +115,13 @@ public class JobBaseTests {
 
 		testInit();
 
+		@SuppressWarnings("unused")
 		String[] arg =
 		{ "localhost" };
 
 		@SuppressWarnings("unused")
-		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) CreationTools.em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position",
-		        JobInstance.class).getResultList();
+		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position", JobInstance.class)
+		        .getResultList();
 
 		// try {
 		JobDefinition pouet = new JobDefinition("MarsuApplication");
