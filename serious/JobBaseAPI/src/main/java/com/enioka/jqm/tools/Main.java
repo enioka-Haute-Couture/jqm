@@ -19,6 +19,8 @@
 package com.enioka.jqm.tools;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.persistence.EntityManager;
@@ -43,12 +45,13 @@ public class Main {
 	public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
 	public static EntityManager em = emf.createEntityManager();
 	public static EntityTransaction t = em.getTransaction();
+	public static Map<String, ClassLoader> cache = new HashMap<String, ClassLoader>();
 
 	/**
 	 * @param args
 	 * @throws Exception
 	 */
-	public static void main(String[] args) throws Exception { // This code must
+	public static void main(String[] args) throws Exception {
 
 		Server server = new Server(8081);
 
@@ -75,7 +78,7 @@ public class Main {
 
 			for (DeploymentParameter i : dps) {
 
-				Polling p = new Polling(i);
+				Polling p = new Polling(i, cache);
 				p.run();
 			}
 		}

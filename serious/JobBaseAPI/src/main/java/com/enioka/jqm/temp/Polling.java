@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -46,12 +47,12 @@ public class Polling implements Runnable {
 	private EntityManager em = emf.createEntityManager();
 	private ThreadPool tp = null;
 
-	public Polling(DeploymentParameter dp) {
+	public Polling(DeploymentParameter dp, Map<String, ClassLoader> cache) {
 
 		this.dp = dp;
 		this.queue = dp.getQueue();
 
-		this.tp = new ThreadPool(queue, dp.getNbThread());
+		this.tp = new ThreadPool(queue, dp.getNbThread(), cache);
 	}
 
 	public JobInstance dequeue() {

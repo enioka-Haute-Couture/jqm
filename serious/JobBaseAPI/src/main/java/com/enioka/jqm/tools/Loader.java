@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -33,10 +34,13 @@ public class Loader implements Runnable {
 	ArrayList<DeliverableStruct> s1s = new ArrayList<DeliverableStruct>();
 	EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
 	EntityManager em = emf.createEntityManager();
+	Map<String, ClassLoader> cache = null;
+	boolean isInCache = true;
 
-	public Loader(JobInstance job) {
+	public Loader(JobInstance job, Map<String, ClassLoader> cache) {
 
 		this.job = job;
+		this.cache = cache;
 	}
 
 	public void crashedStatus() {
@@ -62,27 +66,19 @@ public class Loader implements Runnable {
 	public void run() {
 
 		try {
+
 			System.out.println("TOUT DEBUT LOADER");
 			// Main.p.updateExecutionDate();
 
 			// ---------------- BEGIN: MAVEN DEPENDENCIES ------------------
 
 			File local = new File(System.getProperty("user.home") + "/.m2/repository");
-			Dependencies dependencies = new Dependencies(job.getJd().getFilePath() + "pom.xml");
 			File jar = new File(job.getJd().getJarPath());
-			dependencies.print();
 			URL jars = jar.toURI().toURL();
-
-			Collection<RemoteRepository> remotes = Arrays.asList(new RemoteRepository("maven-central", "default", "http://repo1.maven.org/maven2/"),
-			        new RemoteRepository("eclipselink", "default", "http://download.eclipse.org/rt/eclipselink/maven.repo/")
-
-			);
-
 			ArrayList<URL> tmp = new ArrayList<URL>();
 			Collection<Artifact> deps = null;
 
 			// Update of the job status
-
 			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", job).getSingleResult();
 
 			CreationTools.createMessage("Status updated: RUNNING", h, em);
@@ -94,32 +90,44 @@ public class Loader implements Runnable {
 			        .executeUpdate();
 			transac.commit();
 
-			// Clean the JobInstance list
-			// Main.p.clean();
+			if (!cache.containsKey(job.getJd().getApplicationName())) {
 
-			for (int i = 0; i < dependencies.getList().size(); i++) {
-				deps = new Aether(remotes, local).resolve(new DefaultArtifact(dependencies.getList().get(i)), "compile");
-			}
+				Dependencies dependencies = new Dependencies(job.getJd().getFilePath() + "pom.xml");
 
-			if (deps != null) {
-				for (Artifact artifact : deps) {
-					tmp.add(artifact.getFile().toURI().toURL());
-					System.out.println("Artifact: " + artifact.getFile().toURI().toURL());
+				isInCache = false;
+				Collection<RemoteRepository> remotes = Arrays.asList(new RemoteRepository("maven-central", "default",
+				        "http://repo1.maven.org/maven2/"), new RemoteRepository("eclipselink", "default",
+				        "http://download.eclipse.org/rt/eclipselink/maven.repo/")
+
+				);
+
+				for (int i = 0; i < dependencies.getList().size(); i++) {
+					deps = new Aether(remotes, local).resolve(new DefaultArtifact(dependencies.getList().get(i)), "compile");
+				}
+
+				if (deps != null) {
+					for (Artifact artifact : deps) {
+						tmp.add(artifact.getFile().toURI().toURL());
+						System.out.println("Artifact: " + artifact.getFile().toURI().toURL());
+					}
 				}
 			}
 			// ------------------- END: MAVEN DEPENDENCIES ---------------
 
 			// We save the actual classloader
 			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-
+			JarClassLoader jobClassLoader = null;
 			URL[] urls = tmp.toArray(new URL[tmp.size()]);
 
-			JarClassLoader jobClassLoader = new JarClassLoader(jars, urls);
+			if (!isInCache) {
+				jobClassLoader = new JarClassLoader(jars, urls);
+				cache.put(job.getJd().getApplicationName(), jobClassLoader);
+			} else
+				jobClassLoader = (JarClassLoader) cache.get(job.getJd().getApplicationName());
 
 			// Change active class loader
 			Thread.currentThread().setContextClassLoader(jobClassLoader);
-			// System.out.println("STOP");
-			// System.exit(0);
+
 			// Go! (launches the main function in the startup class
 			// designated
 			// in
@@ -133,10 +141,6 @@ public class Loader implements Runnable {
 
 			// Restore class loader
 			Thread.currentThread().setContextClassLoader(contextClassLoader);
-
-			// for (DeliverableStruct d : job.) {
-			// System.out.println("DeliverableStruct: " + d.getFileFamily());
-			// }
 
 			if (this.jobBase.getSha1s().size() != 0) {
 				for (int j = 0; j < this.jobBase.getSha1s().size(); j++) {
@@ -162,47 +166,26 @@ public class Loader implements Runnable {
 			CreationTools.createMessage("Status updated: ENDED", h, em);
 
 		} catch (DependencyResolutionException e) {
-
 			crashedStatus();
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (MalformedURLException e) {
 			crashedStatus();
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			crashedStatus();
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (SecurityException e) {
 			crashedStatus();
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (NoSuchMethodException e) {
 			crashedStatus();
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
 			crashedStatus();
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (InvocationTargetException e) {
 			crashedStatus();
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			crashedStatus();
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			crashedStatus();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			crashedStatus();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} finally {
 			try {
 				em.close();

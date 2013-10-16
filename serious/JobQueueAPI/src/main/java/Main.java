@@ -147,8 +147,8 @@ public class Main
 //
 		node = CreationTools.createNode("localhost", 8081, em);
 //
-		dp = CreationTools.createDeploymentParameter(1, node, 3, 5, qVip, em);
-		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal, em);
+		dp = CreationTools.createDeploymentParameter(1, node, 3, 1000, qVip, em);
+		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 5000, qNormal, em);
 
 		JobDefinition newJob = new JobDefinition("Fibo");
 		newJob.addParameter("p1", "1");

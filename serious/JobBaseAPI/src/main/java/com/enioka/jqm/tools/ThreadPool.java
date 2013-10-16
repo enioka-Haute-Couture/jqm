@@ -1,6 +1,7 @@
 
 package com.enioka.jqm.tools;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -11,10 +12,12 @@ public class ThreadPool {
 	private Queue queue = null;
 	private int nbThread = 0;
 	ExecutorService pool = null;
+	Map<String, ClassLoader> cache = null;
 
-	public ThreadPool(Queue queue, int n) {
+	public ThreadPool(Queue queue, int n, Map<String, ClassLoader> cache) {
 
 		this.queue = queue;
+		this.cache = cache;
 		nbThread = n;
 		pool = Executors.newFixedThreadPool(nbThread);
 	}
@@ -24,7 +27,7 @@ public class ThreadPool {
 		System.out.println("AVANT LOADER");
 		System.out.println("JOB WILL BE POOLED: " + ji.getId());
 
-		pool.submit(new Loader(ji));
+		pool.submit(new Loader(ji, cache));
 
 	}
 
