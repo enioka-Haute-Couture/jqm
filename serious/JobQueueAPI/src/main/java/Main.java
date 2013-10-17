@@ -7,9 +7,11 @@ import javax.persistence.Persistence;
 
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
+import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.tools.CreationTools;
@@ -34,6 +36,7 @@ import com.enioka.jqm.tools.CreationTools;
 
 public class Main
 {
+	static DatabaseProp db = null;
 
 	static DeploymentParameter dp = null;
 	static DeploymentParameter dpNormal = null;
@@ -67,6 +70,10 @@ public class Main
     	EntityManager em = emf.createEntityManager();
 
 		EntityTransaction transac = em.getTransaction();
+		transac = em.getTransaction();
+		transac.begin();
+		em.createQuery("DELETE FROM DatabaseProp").executeUpdate();
+		transac.commit();
 		transac = em.getTransaction();
 		transac.begin();
 		em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
@@ -113,6 +120,8 @@ public class Main
 		jdargs.add(jdp);
 //		jdargs.add(jdp2);
 
+		db = CreationTools.createDatabaseProp("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb", "SA", "", em);
+
 		qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42 , 100, em);
 		qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100, em);
 		qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3 , 100, em);
@@ -150,6 +159,7 @@ public class Main
 //		newJob.addParameter("p1", "1");
 //		newJob.addParameter("p2", "2");
 
+        @SuppressWarnings("unused")
         JobDefinition newDemoMaven = new JobDefinition("MarsuApplication2");
 
 //
@@ -162,6 +172,16 @@ public class Main
 		Dispatcher.enQueue(newJob);
 		Dispatcher.enQueue(newJob);
 		Dispatcher.enQueue(newJob);
+
+		transac = em.getTransaction();
+		transac.begin();
+
+		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
+		        .setParameter("myId", 2).setParameter("i", jd.getId()).getSingleResult();
+
+		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId()).executeUpdate();
+
+		transac.commit();
 ////		Dispatcher.enQueue(jd);
 ////		Dispatcher.enQueue(jd);
 ////		Dispatcher.getDeliverables(499);

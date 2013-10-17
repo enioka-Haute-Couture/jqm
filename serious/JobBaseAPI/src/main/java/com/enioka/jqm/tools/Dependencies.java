@@ -1,5 +1,5 @@
 /**
- * Copyright © 2013 enioka. All rights reserved
+ * Copyright ï¿½ 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
  * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
  *
@@ -87,7 +87,7 @@ public class Dependencies {
 			}
 
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			jqmlogger.error(e);
 		} catch (SAXException e) {
 			jqmlogger.error(e + "Invalid XML architecture. Please, fix correctly the dependencies");
 		} catch (IOException e) {

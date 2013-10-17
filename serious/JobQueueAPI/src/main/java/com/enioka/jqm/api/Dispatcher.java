@@ -382,7 +382,7 @@ public class Dispatcher {
 
 				if (tmp.get(i).getHashPath().equals(Cryptonite.sha1(tmp.get(i).getFileName()))) {
 
-					FileUtils.copyURLToFile(url, file = new File("/Users/pico/Downloads/tests/deliverable" + job.getId()));
+					FileUtils.copyURLToFile(url, file = new File("./testprojects/JobGenADeliverable/deliverable" + job.getId()));
 					streams.add(new FileInputStream(file));
 				}
 			}

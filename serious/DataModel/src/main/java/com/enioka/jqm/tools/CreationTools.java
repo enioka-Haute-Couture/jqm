@@ -8,6 +8,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
+import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.ExecParameter;
@@ -294,6 +295,21 @@ public class CreationTools
 		em.persist(q);
 		transac.commit();
 		return q;
+	}
+
+	// ------------------ DATABASEPROP --------------------------------
+
+	public static DatabaseProp createDatabaseProp(String driver, String url, String user, String pwd, EntityManager em)
+	{
+		DatabaseProp h = new DatabaseProp();
+
+		h.setDriver(driver);
+		h.setUrl(url);
+		h.setUser(user);
+		h.setPwd(pwd);
+
+		em.persist(h);
+		return h;
 	}
 
 	// ------------------ CLOSE ENTITYs ------------------------

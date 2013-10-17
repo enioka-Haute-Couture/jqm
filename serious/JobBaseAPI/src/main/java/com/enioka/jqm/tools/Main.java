@@ -32,8 +32,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
-import com.enioka.jqm.jndi.JndiContext;
-import com.enioka.jqm.jndi.JndiContextFactory;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.temp.Polling;
@@ -45,9 +43,9 @@ public class Main {
 	public static Node node = null;
 	public static ArrayList<ThreadPool> tps = new ArrayList<ThreadPool>();
 	public static AtomicBoolean isRunning = new AtomicBoolean(true);
-	public static EntityManagerFactory emf = null;
-	public static EntityManager em = null;
-	public static EntityTransaction t = null;
+	public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+	public static EntityManager em = emf.createEntityManager();
+	public static EntityTransaction t = em.getTransaction();
 	public static Map<String, ClassLoader> cache = new HashMap<String, ClassLoader>();
 
 	/**
@@ -56,12 +54,8 @@ public class Main {
 	 */
 	public static void main(String[] args) throws Exception {
 
-		@SuppressWarnings("unused")
-		JndiContext ctx = JndiContextFactory.createJndiContext("org.hsqldb.jdbcDriver");
-
-		emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-		em = emf.createEntityManager();
-		t = em.getTransaction();
+		// @SuppressWarnings("unused")
+		// JndiContext ctx = JndiContextFactory.createJndiContext(db);
 
 		Server server = new Server(8081);
 

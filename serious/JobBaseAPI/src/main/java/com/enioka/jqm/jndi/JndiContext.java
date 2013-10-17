@@ -1,3 +1,4 @@
+
 package com.enioka.jqm.jndi;
 
 import java.util.Hashtable;
@@ -9,20 +10,25 @@ import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 import javax.naming.spi.InitialContextFactoryBuilder;
 
+import com.enioka.jqm.jpamodel.DatabaseProp;
 
-public class JndiContext extends InitialContext implements
-InitialContextFactoryBuilder, InitialContextFactory {
+public class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory {
 
-	public JndiContext() throws NamingException {
+	DatabaseProp db = null;
+
+	public JndiContext(DatabaseProp db) throws NamingException {
+
 		super();
+		this.db = db;
 	}
 
 	@Override
 	public Object lookup(String name) throws NamingException {
+
 		if (name.equals("jdbc/marsu"))
-			return new DbDataSource("jdbc:hsqldb:mem:testdb", "", "");
+			return new DbDataSource(db.getUrl(), db.getUser(), db.getPwd());
 		if (name.equals("jdbc/pico"))
-			return new DbDataSource("jdbc:hsqldb:hsql://localhost/testdb", "SA", "");
+			return new DbDataSource(db.getUrl(), db.getUser(), db.getPwd());
 		if (name.equals("dialect/pico"))
 			return null;
 
@@ -30,14 +36,14 @@ InitialContextFactoryBuilder, InitialContextFactory {
 	}
 
 	@Override
-	public Context getInitialContext(Hashtable<?, ?> environment)
-			throws NamingException {
+	public Context getInitialContext(Hashtable<?, ?> environment) throws NamingException {
+
 		return this;
 	}
 
 	@Override
-	public InitialContextFactory createInitialContextFactory(
-			Hashtable<?, ?> environment) throws NamingException {
+	public InitialContextFactory createInitialContextFactory(Hashtable<?, ?> environment) throws NamingException {
+
 		return this;
 	}
 }
