@@ -222,14 +222,11 @@ public class CreationTools
 	public static JobDefParameter createJobDefParameter(String key, String value, EntityManager em)
 	{
 		JobDefParameter j = new JobDefParameter();
-		EntityTransaction transac = em.getTransaction();
-		transac.begin();
 
 		j.setKey(key);
 		j.setValue(value);
 
 		em.persist(j);
-		transac.commit();
 		return j;
 	}
 
@@ -238,14 +235,11 @@ public class CreationTools
 	public static Message createMessage(String textMessage, History history, EntityManager em)
 	{
 		Message m = new Message();
-		EntityTransaction transac = em.getTransaction();
-		transac.begin();
 
 		m.setTextMessage(textMessage);
 		m.setHistory(history);
 
 		em.persist(m);
-		transac.commit();
 		return m;
 	}
 

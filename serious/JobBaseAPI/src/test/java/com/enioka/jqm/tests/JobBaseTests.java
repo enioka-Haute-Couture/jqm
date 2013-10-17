@@ -4,9 +4,6 @@ package com.enioka.jqm.tests;
 import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 
 import org.junit.Test;
 
@@ -19,11 +16,9 @@ import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.tools.CreationTools;
+import com.enioka.jqm.tools.Main;
 
 public class JobBaseTests {
-
-	EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-	EntityManager em = emf.createEntityManager();
 
 	Queue qVip = null;
 	Queue qNormal = null;
@@ -42,263 +37,151 @@ public class JobBaseTests {
 
 	ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 
-	public void testInit() {
+	// public void testInit() {
+	//
+	// EntityTransaction transac = em.getTransaction();
+	// transac = em.getTransaction();
+	// transac.begin();
+	// em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
+	// transac.commit();
+	// transac = em.getTransaction();
+	// transac.begin();
+	// em.createQuery("DELETE FROM Node").executeUpdate();
+	// transac.commit();
+	// transac = em.getTransaction();
+	// transac.begin();
+	// em.createQuery("DELETE FROM JobHistoryParameter").executeUpdate();
+	// transac.commit();
+	// transac = em.getTransaction();
+	// transac.begin();
+	// em.createQuery("DELETE FROM Message").executeUpdate();
+	// transac.commit();
+	// transac = em.getTransaction();
+	// transac.begin();
+	// em.createQuery("DELETE FROM History").executeUpdate();
+	// transac.commit();
+	// transac = em.getTransaction();
+	// transac.begin();
+	// em.createQuery("DELETE FROM JobDefParameter").executeUpdate();
+	// transac.commit();
+	// transac = em.getTransaction();
+	// transac.begin();
+	// em.createQuery("DELETE FROM JobParameter").executeUpdate();
+	// transac.commit();
+	// transac = em.getTransaction();
+	// transac.begin();
+	// em.createQuery("DELETE FROM JobInstance").executeUpdate();
+	// transac.commit();
+	// transac = em.getTransaction();
+	// transac.begin();
+	// em.createQuery("DELETE FROM JobDef").executeUpdate();
+	// transac.commit();
+	// transac = em.getTransaction();
+	// transac.begin();
+	// em.createQuery("DELETE FROM Queue").executeUpdate();
+	// transac.commit();
+	//
+	// jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+	// jdargs.add(jdp);
+	//
+	// this.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners",
+	// 42, 100, em);
+	// this.qNormal = CreationTools.initQueue("NormalQueue",
+	// "Queue for the ordinary job", 7, 100, em);
+	// this.qSlow = CreationTools.initQueue("SlowQueue",
+	// "Queue for the bad guys", 3, 100, em);
+	//
+	// jd = CreationTools.createJobDef(true, "App", jdargs,
+	// "./testprojects/PrintArg/", "./testprojects/PrintArg/PrintArg.jar", qVip,
+	// 42,
+	// "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other",
+	// "other", false, em);
+	//
+	// jdDemoMaven = CreationTools.createJobDef(true, "Main", null,
+	// "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
+	// "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar",
+	// qNormal, 42, "Highlander", 42,
+	// "Franquin", "ModuleBidule", "other", "other", "other", true, em);
+	//
+	// jdDemo = CreationTools.createJobDef(true, "Main", null,
+	// "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
+	// "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar",
+	// qNormal, 42, "MarsuApplication2",
+	// 42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
+	//
+	// node = CreationTools.createNode("localhost", 8081, em);
+	// dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip, em);
+	// dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500,
+	// qNormal, em);
+	//
+	// }
 
-		EntityTransaction transac = em.getTransaction();
-		transac = em.getTransaction();
-		transac.begin();
-		em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
-		transac.commit();
-		transac = em.getTransaction();
-		transac.begin();
-		em.createQuery("DELETE FROM Node").executeUpdate();
-		transac.commit();
-		transac = em.getTransaction();
-		transac.begin();
-		em.createQuery("DELETE FROM JobHistoryParameter").executeUpdate();
-		transac.commit();
-		transac = em.getTransaction();
-		transac.begin();
-		em.createQuery("DELETE FROM Message").executeUpdate();
-		transac.commit();
-		transac = em.getTransaction();
-		transac.begin();
-		em.createQuery("DELETE FROM History").executeUpdate();
-		transac.commit();
-		transac = em.getTransaction();
-		transac.begin();
-		em.createQuery("DELETE FROM JobDefParameter").executeUpdate();
-		transac.commit();
-		transac = em.getTransaction();
-		transac.begin();
-		em.createQuery("DELETE FROM JobParameter").executeUpdate();
-		transac.commit();
-		transac = em.getTransaction();
-		transac.begin();
-		em.createQuery("DELETE FROM JobInstance").executeUpdate();
-		transac.commit();
-		transac = em.getTransaction();
-		transac.begin();
-		em.createQuery("DELETE FROM JobDef").executeUpdate();
-		transac.commit();
-		transac = em.getTransaction();
-		transac.begin();
-		em.createQuery("DELETE FROM Queue").executeUpdate();
-		transac.commit();
+	public void printJobInstanceTable() {
 
-		jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-		jdargs.add(jdp);
+		EntityManager em = Helpers.getNewEm();
 
-		this.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42, 100, em);
-		this.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, 100, em);
-		this.qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3, 100, em);
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList();
 
-		jd = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/PrintArg/", "./testprojects/PrintArg/PrintArg.jar", qVip, 42,
-		        "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
+		for (JobInstance jobInstance : res) {
 
-		jdDemoMaven = CreationTools.createJobDef(true, "Main", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
-		        "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", qNormal, 42, "MarsuApplication1",
-		        42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
-
-		jdDemo = CreationTools.createJobDef(true, "Main", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
-		        "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", qNormal, 42, "MarsuApplication2",
-		        42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
-
-		node = CreationTools.createNode("localhost", 8081, em);
-		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip, em);
-		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal, em);
-
+			System.out.println("==========================================================================================");
+			System.out.println("JobInstance Id: " + jobInstance.getId() + " ---> " + jobInstance.getPosition() + " | " + jobInstance.getState()
+			        + " | " + jobInstance.getJd().getId() + " | " + jobInstance.getQueue().getName());
+			System.out.println("==========================================================================================");
+		}
 	}
 
 	@Test
-	public void testEnQueue() {
+	public void testHighlanderMode() throws Exception {
 
-		testInit();
+		EntityManager em = Helpers.getNewEm();
+		Helpers.createLocalNode(em);
 
-		@SuppressWarnings("unused")
-		String[] arg =
-		{ "localhost" };
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
 
-		@SuppressWarnings("unused")
-		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position", JobInstance.class)
-		        .getResultList();
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "Main", jdargs, "./testprojects/DateTimeMaven/",
+		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other",
+		        "other", "other", true, em);
 
-		// try {
-		JobDefinition pouet = new JobDefinition("MarsuApplication");
-		pouet.addParameter("ratonlaveur", "patapouf");
-		Dispatcher.enQueue(pouet);
+		JobDefinition j = new JobDefinition("MarsuApplication");
 
-		// Main.main(arg);
-		// Main.isRunning.set(false);
-		// } catch (Exception e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		//
-		// Assert.assertEquals("ENDED", jobs.get(0).getState());
-		// Assert.assertEquals(jobs.get(0).getJd(), jdDemoMaven);
-		// Assert.assertEquals(jobs.get(1).getJd(), jdDemo);
-		// Assert.assertEquals(jobs.get(2).getJd(), jd);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		// Dispatcher.enQueue(tmp);
+		// Dispatcher.enQueue(tmp);
+
+		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
+		        .setParameter("myId", 2).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+
+		em.getTransaction().begin();
+
+		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId()).executeUpdate();
+
+		em.getTransaction().commit();
+
+		em.getTransaction().begin();
+
+		printJobInstanceTable();
+
+		Main.main(new String[]
+		{ "localhost" });
+
+		Thread.sleep(5000);
+		Main.stop();
+
+		em.getTransaction().commit();
+		printJobInstanceTable();
+
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) em
+		        .createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class).getResultList();
+
+		// Assert.assertEquals("ENDED", res.get(0).getState());
+		// // Assert.assertEquals("ENDED", res.get(1).getState());
+		// Assert.assertEquals("CANCELLED", res.get(1).getState());
+		// Assert.assertEquals("CANCELLED", res.get(2).getState());
+		// Assert.assertEquals("CANCELLED", res.get(4).getState());
 	}
-
-	// @Test
-	// public void testChangeQueueIntVersion() {
-	//
-	// testInit();
-	//
-	// JobInstance j =
-	// CreationTools.em.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :job",
-	// JobInstance.class)
-	// .setParameter("job", jd.getId()).getSingleResult();
-	//
-	// Dispatcher.changeQueue(j.getId(), qSlow.getId());
-	//
-	// j =
-	// CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :job",
-	// JobInstance.class)
-	// .setParameter("job", jd.getId()).getSingleResult();
-	//
-	// Assert.assertEquals(qSlow.getId(), j.getQueue().getId());
-	// }
-	//
-	// @Test
-	// public void testChangeQueueQVersion() {
-	//
-	// testInit();
-	//
-	// JobInstance j =
-	// CreationTools.em.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :job",
-	// JobInstance.class)
-	// .setParameter("job", jd.getId()).getSingleResult();
-	//
-	// Dispatcher.changeQueue(j.getId(), qSlow.getId());
-	//
-	// j =
-	// CreationTools.emf.createEntityManager().createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :job",
-	// JobInstance.class)
-	// .setParameter("job", jd.getId()).getSingleResult();
-	//
-	// }
-	//
-	// @Test
-	// public void testDelJobInQueue() {
-	//
-	// testInit();
-	//
-	// JobInstance q =
-	// CreationTools.em.createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job",
-	// JobInstance.class)
-	// .setParameter("job", jd.getId()).getSingleResult();
-	//
-	// Dispatcher.delJobInQueue(q.getId());
-	//
-	// Query tmp =
-	// CreationTools.em.createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job",
-	// JobInstance.class)
-	// .setParameter("job", jd.getId());
-	//
-	// Assert.assertEquals(false, tmp.equals(q));
-	// }
-	//
-	// @Test
-	// public void testCancelJobInQueue() {
-	//
-	// testInit();
-	//
-	// JobInstance q = CreationTools.emf.createEntityManager()
-	// .createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job",
-	// JobInstance.class).setParameter("job", jd.getId())
-	// .getSingleResult();
-	//
-	// Dispatcher.cancelJobInQueue(q.getId());
-	//
-	// JobInstance tmp = CreationTools.emf.createEntityManager()
-	// .createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job",
-	// JobInstance.class).setParameter("job", jd.getId())
-	// .getSingleResult();
-	//
-	// Assert.assertEquals("CANCELLED", tmp.getState());
-	//
-	// }
-	//
-	// @Test
-	// public void testSetPosition() {
-	//
-	// testInit();
-	//
-	// JobInstance q = CreationTools.emf.createEntityManager()
-	// .createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job",
-	// JobInstance.class).setParameter("job", jd.getId())
-	// .getSingleResult();
-	//
-	// Dispatcher.setPosition(q.getId(), 1);
-	//
-	// JobInstance tmp = CreationTools.emf.createEntityManager()
-	// .createQuery("SELECT j FROM JobInstance j, JobDefinition jd WHERE j.jd.id = :job",
-	// JobInstance.class).setParameter("job", jd.getId())
-	// .getSingleResult();
-	//
-	// Assert.assertEquals(1, (int) tmp.getPosition());
-	//
-	// }
-	//
-	// @Test
-	// public void testGetUserJobs() {
-	//
-	// testInit();
-	//
-	// ArrayList<JobInstance> jobs = (ArrayList<JobInstance>)
-	// Dispatcher.getUserJobs("MAG");
-	//
-	// ArrayList<JobInstance> tmp = (ArrayList<JobInstance>) CreationTools.em
-	// .createQuery("SELECT j FROM JobInstance j WHERE j.user = :u",
-	// JobInstance.class).setParameter("u", "MAG").getResultList();
-	//
-	// Assert.assertEquals(tmp.size(), jobs.size());
-	//
-	// for (int i = 0; i < jobs.size(); i++) {
-	//
-	// Assert.assertEquals(tmp.get(i), jobs.get(i));
-	// }
-	// }
-	//
-	// @Test
-	// public void testGetJobs() {
-	//
-	// testInit();
-	//
-	// ArrayList<JobInstance> jobs = (ArrayList<JobInstance>)
-	// Dispatcher.getJobs();
-	//
-	// ArrayList<JobInstance> tmp = (ArrayList<JobInstance>)
-	// CreationTools.em.createQuery("SELECT j FROM JobInstance j",
-	// JobInstance.class)
-	// .getResultList();
-	//
-	// Assert.assertEquals(tmp.size(), jobs.size());
-	// Assert.assertEquals(tmp, jobs);
-	//
-	// }
-	//
-	// @Test
-	// public void testGetQueues() {
-	//
-	// testInit();
-	//
-	// ArrayList<Queue> jobs = (ArrayList<Queue>) Dispatcher.getQueues();
-	//
-	// ArrayList<Queue> tmp = (ArrayList<Queue>)
-	// CreationTools.em.createQuery("SELECT j FROM Queue j",
-	// Queue.class).getResultList();
-	//
-	// Assert.assertEquals(tmp.size(), jobs.size());
-	// Assert.assertEquals(tmp, jobs);
-	//
-	// }
-
-	// @Test
-	// public void testClose() {
-	//
-	// CreationTools.close();
-	// }
 }

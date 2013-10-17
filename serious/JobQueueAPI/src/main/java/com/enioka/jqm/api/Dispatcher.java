@@ -168,7 +168,7 @@ public class Dispatcher {
 
 		// On a exactement la classe qui est en base
 		System.out.println("DEBUT ENQUEUE");
-		JobDef job = jobDefinitionToJobDef(jd);
+		JobDef job = jobDefinitionToJobDef(jd); // Catch l'erreur si le nom de l'appli est mauvais
 
 		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
 
@@ -211,10 +211,11 @@ public class Dispatcher {
 			h = CreationTools.createhistory(1, (Calendar) null, "History of the Job --> ID = " + (ji.getId()),
 					msgs, ji, enqueueDate, (Calendar) null, (Calendar) null, jhp, em);
 
-			em.getTransaction().commit();
-
 			m = CreationTools.createMessage("Status updated: SUBMITTED", h, em);
 			msgs.add(m);
+
+			em.getTransaction().commit();
+
 		}
 		return ji.getId();
 	}

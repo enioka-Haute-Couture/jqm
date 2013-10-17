@@ -1,3 +1,19 @@
+import java.util.ArrayList;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+
+import com.enioka.jqm.api.Dispatcher;
+import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.jpamodel.DeploymentParameter;
+import com.enioka.jqm.jpamodel.JobDef;
+import com.enioka.jqm.jpamodel.JobDefParameter;
+import com.enioka.jqm.jpamodel.Node;
+import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.tools.CreationTools;
+
 /**
  * Copyright � 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
@@ -15,26 +31,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-
-import com.enioka.jqm.api.Dispatcher;
-import com.enioka.jqm.api.JobDefinition;
-import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobDefParameter;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.tools.CreationTools;
-
-
 
 public class Main
 {
@@ -60,15 +56,15 @@ public class Main
 	public static JobDefParameter jdp = null;
 	public static JobDefParameter jdp2 = null;
 	public static ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-	public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-	public static EntityManager em = emf.createEntityManager();
 
 	/**
 	 * @param args
-	 * @throws IOException
-	 * @throws NoSuchAlgorithmException
+	 * @throws Exception
 	 */
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+    public static void main(String[] args) throws Exception {
+
+    	EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+    	EntityManager em = emf.createEntityManager();
 
 		EntityTransaction transac = em.getTransaction();
 		transac = em.getTransaction();
@@ -121,14 +117,14 @@ public class Main
 		qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100, em);
 		qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3 , 100, em);
 
-		jd = CreationTools.createJobDef(true, "App", jdargs, "../JobBaseAPI/testprojects/Fibo/",
-				"../JobBaseAPI/testprojects/Fibo/Fibo.jar",
-				qVip,
-				42, "Fibo", 42, "Franquin", "ModuleMachin", "other", "other", "other", false, em);
+//		jd = CreationTools.createJobDef(true, "App", jdargs, "../JobBaseAPI/testprojects/Fibo/",
+//				"../JobBaseAPI/testprojects/Fibo/Fibo.jar",
+//				qVip,
+//				42, "Fibo", 42, "Franquin", "ModuleMachin", "other", "other", "other", false, em);
 
-//		jd = CreationTools.createJobDef(true, "App", jdargs, "/Users/pico/Dropbox/projets/enioka/jqm/tests/PrintArg/",
-//				"/Users/pico/Dropbox/projets/enioka/jqm/tests/PrintArg/target/PrintArg-0.0.1-SNAPSHOT.jar", qVip, 42,
-//		        "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
+		jd = CreationTools.createJobDef(true, "Main", jdargs, "./testprojects/DateTimeMaven/",
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", qVip, 42,
+		        "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
 //
 //
@@ -150,16 +146,21 @@ public class Main
 		dp = CreationTools.createDeploymentParameter(1, node, 3, 1000, qVip, em);
 		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 5000, qNormal, em);
 
-		JobDefinition newJob = new JobDefinition("Fibo");
-		newJob.addParameter("p1", "1");
-		newJob.addParameter("p2", "2");
+		JobDefinition newJob = new JobDefinition("MarsuApplication");
+//		newJob.addParameter("p1", "1");
+//		newJob.addParameter("p2", "2");
 
-		@SuppressWarnings("unused")
         JobDefinition newDemoMaven = new JobDefinition("MarsuApplication2");
 
 //
 //		Dispatcher.enQueue(newDemoMaven);
 //		Dispatcher.enQueue(newDemoMaven);
+//		Dispatcher.enQueue(newDemoMaven);
+//		Dispatcher.enQueue(newDemoMaven);
+//		Dispatcher.enQueue(newDemoMaven);
+//		Dispatcher.enQueue(newDemoMaven);
+		Dispatcher.enQueue(newJob);
+		Dispatcher.enQueue(newJob);
 		Dispatcher.enQueue(newJob);
 ////		Dispatcher.enQueue(jd);
 ////		Dispatcher.enQueue(jd);

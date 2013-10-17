@@ -1,5 +1,5 @@
 /**
- * Copyright © 2013 enioka. All rights reserved
+ * Copyright ï¿½ 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
  * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
  *
@@ -47,12 +47,12 @@ public class Polling implements Runnable {
 	private EntityManager em = emf.createEntityManager();
 	private ThreadPool tp = null;
 	private boolean run = true;
-	
-	public void stop()
-	{
+
+	public void stop() {
+
 		run = false;
 	}
-	
+
 	public Polling(DeploymentParameter dp, Map<String, ClassLoader> cache) {
 
 		this.dp = dp;
@@ -88,7 +88,7 @@ public class Polling implements Runnable {
 		// Higlander?
 		if (job.size() > 0 && job.get(0).getJd().isHighlander() == true) {
 
-			HighlanderMode(em);
+			HighlanderMode(job.get(0), em);
 		}
 
 		// em
@@ -127,21 +127,65 @@ public class Polling implements Runnable {
 		emf.close();
 	}
 
-	public void HighlanderMode(EntityManager em) {
+	public void HighlanderMode(JobInstance currentJob, EntityManager em) {
 
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
-		        .createQuery("SELECT j FROM JobInstance j, JobDef jd " + "WHERE j.id IS NOT :refid AND j.jd = :myjd", JobInstance.class)
-		        .setParameter("refid", job.get(0).getId()).setParameter("myjd", job.get(0).getJd()).getResultList();
+		        .createQuery("SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd = :myjd AND j.position >= :currentPos", JobInstance.class)
+		        .setParameter("refid", currentJob.getId()).setParameter("currentPos", currentJob.getPosition())
+		        .setParameter("myjd", job.get(0).getJd()).getResultList();
 
-		System.out.println("JOBSSIZE" + jobs.size());
+		for (int i = 0; i < jobs.size(); i++) {
 
-		EntityTransaction transac = em.getTransaction();
-		transac.begin();
+			if (jobs.get(i).getState().equals("ATTRIBUTED") || jobs.get(i).getState().equals("RUNNING")) {
+
+				EntityTransaction t = em.getTransaction();
+				t.begin();
+
+				em.createQuery("UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob").setParameter("idJob", currentJob.getId())
+				        .executeUpdate();
+
+				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class)
+				        .setParameter("j", currentJob.getId()).getSingleResult();
+
+				CreationTools.createMessage("Status updated: CANCELLED", h, em);
+
+				t.commit();
+			}
+		}
+
+		if (!currentJob.getState().equals("CANCELLED")) {
+
+			for (JobInstance j : jobs) {
+
+				EntityTransaction t = em.getTransaction();
+				t.begin();
+
+				em.createQuery("UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob").setParameter("idJob", j.getId()).executeUpdate();
+
+				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", j.getId())
+				        .getSingleResult();
+
+				CreationTools.createMessage("Status updated: CANCELLED", h, em);
+
+				t.commit();
+			}
+		}
+
+		// --------------------------- OLD -----------------------------
+
+		// ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
+		// .createQuery("SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd = :myjd",
+		// JobInstance.class)
+		// .setParameter("refid", job.get(0).getId()).setParameter("myjd",
+		// job.get(0).getJd()).getResultList();
 
 		for (int i = 1; i < jobs.size(); i++) {
 
 			EntityTransaction t = em.getTransaction();
 			t.begin();
+
+			em.createQuery("UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob AND j.state IS NOT :endState")
+			        .setParameter("idJob", jobs.get(i).getId()).setParameter("endState", "ENDED").executeUpdate();
 
 			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", jobs.get(i).getId())
 			        .getSingleResult();
@@ -151,16 +195,11 @@ public class Polling implements Runnable {
 			m.setTextMessage("Status updated: CANCELLED");
 			m.setHistory(h);
 
-			em.persist(m);
-			t.commit();
-
 			// CreationTools.createMessage("Status updated: CANCELLED", h);
 
-			em.createQuery("UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob").setParameter("idJob", jobs.get(i).getId())
-			        .executeUpdate();
+			em.persist(m);
+			t.commit();
 		}
-
-		transac.commit();
 
 	}
 
@@ -191,7 +230,7 @@ public class Polling implements Runnable {
 				Thread.sleep(dp.getPollingInterval());
 				if (!run)
 					break;
-				
+
 				JobInstance ji = dequeue();
 
 				if (ji == null)

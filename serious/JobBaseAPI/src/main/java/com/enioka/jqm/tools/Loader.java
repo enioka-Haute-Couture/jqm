@@ -144,6 +144,17 @@ public class Loader implements Runnable {
 			// Restore class loader
 			Thread.currentThread().setContextClassLoader(contextClassLoader);
 
+			// STATE UPDATED
+
+			em.getTransaction().begin();
+
+			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId()).setParameter("msg", "ENDED")
+			        .executeUpdate();
+
+			// MESSAGE HISTORY UPDATED
+			em.getTransaction().commit();
+			CreationTools.createMessage("Status updated: ENDED", h, em);
+
 			if (this.jobBase.getSha1s().size() != 0) {
 				for (int j = 0; j < this.jobBase.getSha1s().size(); j++) {
 
@@ -155,17 +166,6 @@ public class Loader implements Runnable {
 			}
 			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-
-			// STATE UPDATED
-
-			em.getTransaction().begin();
-
-			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId()).setParameter("msg", "ENDED")
-			        .executeUpdate();
-
-			// MESSAGE HISTORY UPDATED
-			em.getTransaction().commit();
-			CreationTools.createMessage("Status updated: ENDED", h, em);
 
 		} catch (DependencyResolutionException e) {
 			crashedStatus();
