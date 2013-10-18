@@ -2,8 +2,9 @@
 package com.enioka.jqm.jndi;
 
 import javax.naming.spi.NamingManager;
+import javax.persistence.EntityManager;
 
-import com.enioka.jqm.jpamodel.DatabaseProp;
+import com.enioka.jqm.api.DatabaseProp;
 
 public class JndiContextFactory {
 
@@ -11,10 +12,14 @@ public class JndiContextFactory {
 
 	}
 
-	public static JndiContext createJndiContext(DatabaseProp db) throws Exception {
+	public static JndiContext createJndiContext(DatabaseProp db, EntityManager em) throws Exception {
+
+		com.enioka.jqm.jpamodel.DatabaseProp tmp = em
+		        .createQuery("SELECT d FROM DatabaseProp d WHERE d.url = :url AND d.user = :user", com.enioka.jqm.jpamodel.DatabaseProp.class)
+		        .setParameter("url", db.getUrl()).setParameter("usr", db.getUser()).getSingleResult();
 
 		try {
-			JndiContext ctx = new JndiContext(db);
+			JndiContext ctx = new JndiContext(tmp);
 			Class.forName(db.getDriver());
 			NamingManager.setInitialContextFactoryBuilder(ctx);
 			return ctx;
