@@ -1,3 +1,5 @@
+package com.enioka.jqm.api;
+
 /**
  * Copyright © 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
@@ -16,20 +18,18 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.api;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.enioka.jqm.deliverabletools.Cryptonite;
+import com.enioka.jqm.deliverabletools.DeliverableStruct;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
-import com.enioka.jqm.temp.DeliverableStruct;
-import com.enioka.jqm.tools.Cryptonite;
 
 /**
- * 
+ *
  * @author Pierre COPPEE <pierre.coppee@enioka.com>
  */
 public class JobBase {

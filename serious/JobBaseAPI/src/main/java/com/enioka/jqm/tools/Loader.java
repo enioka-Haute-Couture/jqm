@@ -23,9 +23,9 @@ import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 import com.enioka.jqm.api.JobBase;
+import com.enioka.jqm.deliverabletools.DeliverableStruct;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.temp.DeliverableStruct;
 import com.jcabi.aether.Aether;
 
 public class Loader implements Runnable {

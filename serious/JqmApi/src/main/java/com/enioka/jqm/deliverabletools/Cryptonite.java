@@ -1,5 +1,5 @@
 
-package com.enioka.jqm.tools;
+package com.enioka.jqm.deliverabletools;
 
 import java.io.FileInputStream;
 import java.io.IOException;

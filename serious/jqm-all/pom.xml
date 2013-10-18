@@ -17,6 +17,7 @@
 	<modules>
 		<module>../DataModel</module>
 		<module>../JobQueueAPI</module>
+        <module>../JqmApi</module>
 		<module>../JobBaseAPI</module>
 	</modules>
 

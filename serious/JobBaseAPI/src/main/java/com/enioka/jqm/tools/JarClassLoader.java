@@ -1,3 +1,6 @@
+
+package com.enioka.jqm.tools;
+
 /**
  * Copyright © 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
@@ -15,8 +18,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.enioka.jqm.tools;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

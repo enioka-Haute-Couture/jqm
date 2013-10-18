@@ -1,5 +1,5 @@
 
-package com.enioka.jqm.temp;
+package com.enioka.jqm.deliverabletools;
 
 public class DeliverableStruct {
 
