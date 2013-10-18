@@ -23,7 +23,7 @@ public class Deliverable {
 	@Column(length=1000)
     protected String fileFamily;
 	@Column
-	private Integer JobId;
+	private Integer jobId;
 	private String HashPath;
 
 
@@ -43,13 +43,13 @@ public class Deliverable {
 
     public Integer getJobId() {
 
-    	return JobId;
+    	return jobId;
     }
 
 
     public void setJobId(Integer jobId) {
 
-    	JobId = jobId;
+    	this.jobId = jobId;
     }
 
 

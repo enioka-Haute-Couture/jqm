@@ -153,15 +153,21 @@ public class Loader implements Runnable {
 
 			// MESSAGE HISTORY UPDATED
 			em.getTransaction().commit();
+
+			em.getTransaction().begin();
 			CreationTools.createMessage("Status updated: ENDED", h, em);
+			em.getTransaction().commit();
 
 			if (this.jobBase.getSha1s().size() != 0) {
 				for (int j = 0; j < this.jobBase.getSha1s().size(); j++) {
+					em.getTransaction().begin();
 
 					System.out.println("SHA1: " + this.jobBase.getSha1s().get(j).getFilePath());
-
+					System.out.println("FILEPATH ADDED: " + this.jobBase.getSha1s().get(j).getFilePath());
 					CreationTools.createDeliverable(this.jobBase.getSha1s().get(j).getFilePath(), this.jobBase.getSha1s().get(j).getHashPath(),
 					        this.jobBase.getSha1s().get(j).getFileFamily(), this.job.getId(), em);
+					System.out.println("JOBID: " + this.job.getId());
+					em.getTransaction().commit();
 				}
 			}
 			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");

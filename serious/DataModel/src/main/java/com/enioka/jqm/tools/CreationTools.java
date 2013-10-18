@@ -35,17 +35,14 @@ public class CreationTools
 	public static Deliverable createDeliverable(String fp, String hp, String ff, Integer jobId, EntityManager em)
 	{
 		Deliverable j = new Deliverable();
-		EntityTransaction transac = em.getTransaction();
-		transac.begin();
 
+		System.out.println("CREATING DELIVERABLE");
 		j.setFilePath(fp);
 		j.setHashPath(hp);
 		j.setFileFamily(ff);
 		j.setJobId(jobId);
 
 		em.persist(j);
-		transac.commit();
-
 		return j;
 	}
 

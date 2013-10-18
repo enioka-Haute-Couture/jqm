@@ -69,6 +69,7 @@ public class JobBase {
 
 		try {
 			System.out.println("ajout du livrable dans la liste");
+			System.out.println("Path: " + path);
 			this.sha1s.add(new DeliverableStruct(path, Cryptonite.sha1(path), fileLabel));
 		} catch (NoSuchAlgorithmException e) {
 

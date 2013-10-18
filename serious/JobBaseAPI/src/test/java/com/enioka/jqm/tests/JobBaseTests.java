@@ -96,11 +96,12 @@ public class JobBaseTests {
 		Helpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", "./testprojects/JobGenADeliverable/", em);
+		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath",
+		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt", em);
 		jdargs.add(jdp);
 
 		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(true, "Main", jdargs, "./testprojects/JobGenADeliverable/",
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
 		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
 		        "other", "other", "other", false, em);
 
@@ -112,21 +113,19 @@ public class JobBaseTests {
 		{ "localhost" });
 
 		Thread.sleep(10000);
+		Main.stop();
 
-		File f = new File("./testprojects/JobGenADeliverable/JobGenADeliverable.txt");
+		File f = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt");
 
 		Assert.assertEquals(true, f.exists());
 
-		@SuppressWarnings("unused")
+		printJobInstanceTable();
+
 		List<InputStream> tmp = Dispatcher.getDeliverables(1);
 
-		Thread.sleep(3000);
-
-		File res = new File("./testprojects/JobGenADeliverable/deliverable1");
+		File res = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/deliverable1");
 
 		Assert.assertEquals(true, res.exists());
-
-		Main.stop();
-
+		Assert.assertEquals(res, tmp.get(0));
 	}
 }

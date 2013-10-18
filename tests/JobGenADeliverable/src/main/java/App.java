@@ -3,7 +3,7 @@ import java.io.PrintWriter;
 
 import com.enioka.jqm.api.JobBase;
 
-public class Main extends JobBase{
+public class App extends JobBase{
 
 	@Override
 	public void start() {

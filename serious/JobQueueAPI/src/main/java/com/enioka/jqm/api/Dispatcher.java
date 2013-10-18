@@ -358,6 +358,9 @@ public class Dispatcher {
 					.setParameter("idJob", idJob)
 					.getResultList();
 
+			System.out.println("idJob: " + idJob);
+			System.out.println("sizeTMP: " + tmp.size());
+
 			JobInstance job = em.createQuery(
 					"SELECT j FROM JobInstance j WHERE j.id = :job",
 					JobInstance.class)
@@ -369,9 +372,13 @@ public class Dispatcher {
 					.setParameter("q", job.getJd().getQueue().getId())
 					.getSingleResult();
 
+			for (Deliverable d : tmp) {
+	            System.out.println(d.getHashPath());
+            }
+
+
 			for (int i = 0; i < tmp.size(); i++) {
 
-				// Ajouter listeninginterface en guise d'adresse (localhost)
 				url = new URL(
 						"http://" +
 								dp.getNode().getListeningInterface() +
@@ -380,9 +387,11 @@ public class Dispatcher {
 								"/getfile?file=" +
 								tmp.get(i).getFileName());
 
+				System.out.println(tmp.get(i).getHashPath());
+				System.out.println(Cryptonite.sha1(tmp.get(i).getFileName()));
 				if (tmp.get(i).getHashPath().equals(Cryptonite.sha1(tmp.get(i).getFileName()))) {
-
-					FileUtils.copyURLToFile(url, file = new File("./testprojects/JobGenADeliverable/deliverable" + job.getId()));
+					System.out.println("YO");
+					FileUtils.copyURLToFile(url, file = new File("./deliverable" + job.getId()));
 					streams.add(new FileInputStream(file));
 				}
 			}
