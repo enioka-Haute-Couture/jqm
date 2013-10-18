@@ -2,8 +2,7 @@ import org.joda.time.DateTime;
 
 import com.enioka.jqm.api.JobBase;
 
-
-public class Main extends JobBase {
+public class App extends JobBase{
 
 	@Override
     public void start()

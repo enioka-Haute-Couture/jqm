@@ -1,5 +1,5 @@
 /**
- * Copyright © 2013 enioka. All rights reserved
+ * Copyright Â© 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
  * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
  *
@@ -70,9 +70,7 @@ public class JarClassLoader extends URLClassLoader {
 		return attr != null ? attr.getValue(Attributes.Name.MAIN_CLASS) : null;
 	}
 
-	public void invokeClass(String name, String[] args)
-	        throws ClassNotFoundException, NoSuchMethodException,
-	        InvocationTargetException {
+	public void invokeClass(String name, String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
 
 		@SuppressWarnings("rawtypes")
 		Class c = loadClass(name);
@@ -81,8 +79,7 @@ public class JarClassLoader extends URLClassLoader {
 		{ args.getClass() });
 		m.setAccessible(true);
 		int mods = m.getModifiers();
-		if (m.getReturnType() != void.class || !Modifier.isStatic(mods)
-		        || !Modifier.isPublic(mods)) {
+		if (m.getReturnType() != void.class || !Modifier.isStatic(mods) || !Modifier.isPublic(mods)) {
 			throw new NoSuchMethodException("main");
 		}
 		try {
@@ -93,16 +90,14 @@ public class JarClassLoader extends URLClassLoader {
 		}
 	}
 
-	public JobBase invokeMain(JobInstance job) throws ClassNotFoundException,
-	        NoSuchMethodException, InvocationTargetException, IOException,
+	public JobBase invokeMain(JobInstance job) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IOException,
 	        InstantiationException, IllegalAccessException {
 
 		// this.invokeClass("Main", new String[]
 		// {});
-
-		Class<? extends JobBase> c = loadClass(job.getJd().getJavaClassName())
-		        .asSubclass(JobBase.class);
-
+		System.out.println("HHHHHHHHHHHHHHH: " + job.getJd().getJavaClassName());
+		Class<? extends JobBase> c = loadClass(job.getJd().getJavaClassName()).asSubclass(JobBase.class);
+		System.out.println("IIIIIIIIIIII");
 		Object o = c.newInstance();
 
 		JobBase t = (JobBase) o;

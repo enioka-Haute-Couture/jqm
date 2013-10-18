@@ -7,7 +7,7 @@ public class Main extends JobBase{
 
 	@Override
 	public void start() {
-		String file = "./testprojects/JobGenADeliverable/JobGenADeliverable.txt";
+		String file = this.getParameters().get("filepath");
 		try{
 			PrintWriter out  = new PrintWriter(new FileWriter(file));
 			out.println("Hello World!");

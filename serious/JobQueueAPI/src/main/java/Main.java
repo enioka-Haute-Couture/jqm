@@ -11,7 +11,6 @@ import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
-import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.tools.CreationTools;
@@ -131,11 +130,9 @@ public class Main
 //				qVip,
 //				42, "Fibo", 42, "Franquin", "ModuleMachin", "other", "other", "other", false, em);
 
-		jd = CreationTools.createJobDef(true, "Main", jdargs, "./testprojects/DateTimeMaven/",
-				"./testprojects/DateTimeMaven/DateTimeMaven.jar", qVip, 42,
-		        "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
-
-//
+		jd = CreationTools.createJobDef(true, "App", jdargs, "../JobBaseAPI/testprojects/DateTimeMaven/",
+				"../JobBaseAPI/testprojects/DateTimeMaven/DateTimeMaven.jar", qVip, 42,
+		        "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", false, em);
 //
 		jdDemoMaven = CreationTools.createJobDef(true, "Main", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
 				"/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", qNormal,
@@ -156,8 +153,8 @@ public class Main
 		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 5000, qNormal, em);
 
 		JobDefinition newJob = new JobDefinition("MarsuApplication");
-//		newJob.addParameter("p1", "1");
-//		newJob.addParameter("p2", "2");
+		newJob.addParameter("p1", "1");
+		newJob.addParameter("p2", "2");
 
         @SuppressWarnings("unused")
         JobDefinition newDemoMaven = new JobDefinition("MarsuApplication2");
@@ -170,18 +167,18 @@ public class Main
 //		Dispatcher.enQueue(newDemoMaven);
 //		Dispatcher.enQueue(newDemoMaven);
 		Dispatcher.enQueue(newJob);
-		Dispatcher.enQueue(newJob);
-		Dispatcher.enQueue(newJob);
+//		Dispatcher.enQueue(newJob);
+//		Dispatcher.enQueue(newJob);
 
-		transac = em.getTransaction();
-		transac.begin();
-
-		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
-		        .setParameter("myId", 2).setParameter("i", jd.getId()).getSingleResult();
-
-		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId()).executeUpdate();
-
-		transac.commit();
+//		transac = em.getTransaction();
+//		transac.begin();
+//
+//		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
+//		        .setParameter("myId", 2).setParameter("i", jd.getId()).getSingleResult();
+//
+//		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId()).executeUpdate();
+//
+//		transac.commit();
 ////		Dispatcher.enQueue(jd);
 ////		Dispatcher.enQueue(jd);
 ////		Dispatcher.getDeliverables(499);
