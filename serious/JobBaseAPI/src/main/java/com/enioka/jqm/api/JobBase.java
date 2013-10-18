@@ -65,12 +65,12 @@ public class JobBase {
 
 	}
 
-	public void addDeliverable(String path, String fileLabel) {
+	public void addDeliverable(String path, String fileName, String fileLabel) {
 
 		try {
 			System.out.println("ajout du livrable dans la liste");
 			System.out.println("Path: " + path);
-			this.sha1s.add(new DeliverableStruct(path, Cryptonite.sha1(path), fileLabel));
+			this.sha1s.add(new DeliverableStruct(path, fileName, Cryptonite.sha1(path), fileLabel));
 		} catch (NoSuchAlgorithmException e) {
 
 			e.printStackTrace();

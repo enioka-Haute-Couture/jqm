@@ -372,10 +372,6 @@ public class Dispatcher {
 					.setParameter("q", job.getJd().getQueue().getId())
 					.getSingleResult();
 
-			for (Deliverable d : tmp) {
-	            System.out.println(d.getHashPath());
-            }
-
 
 			for (int i = 0; i < tmp.size(); i++) {
 
@@ -385,13 +381,11 @@ public class Dispatcher {
 								":" +
 								dp.getNode().getPort() +
 								"/getfile?file=" +
-								tmp.get(i).getFileName());
+								tmp.get(i).getFilePath());
 
-				System.out.println(tmp.get(i).getHashPath());
-				System.out.println(Cryptonite.sha1(tmp.get(i).getFileName()));
-				if (tmp.get(i).getHashPath().equals(Cryptonite.sha1(tmp.get(i).getFileName()))) {
-					System.out.println("YO");
-					FileUtils.copyURLToFile(url, file = new File("./deliverable" + job.getId()));
+				if (tmp.get(i).getHashPath().equals(Cryptonite.sha1(tmp.get(i).getFilePath()))) {
+					// mettre en base le repertoire de dl
+					FileUtils.copyURLToFile(url, file = new File("./testprojects/JobGenADeliverable/deliverable" + job.getId()));
 					streams.add(new FileInputStream(file));
 				}
 			}
@@ -420,10 +414,15 @@ public class Dispatcher {
 
 	//----------------------------- GETONEDELIVERABLE --------------------------------------
 
-	public static InputStream getOneDeliverable(Deliverable deliverable) throws NoSuchAlgorithmException, IOException {
+	public static InputStream getOneDeliverable(com.enioka.jqm.api.Deliverable d) throws NoSuchAlgorithmException, IOException {
 
 		URL url = null;
 		File file = null;
+
+		Deliverable deliverable = em.createQuery("SELECT d FROM Deliverable d WHERE d.filePath = :f AND d.fileName = :fn", Deliverable.class)
+				.setParameter("f", d.getFilePath())
+				.setParameter("fn", d.getFileName())
+				.getSingleResult();
 
 		JobInstance job = em.createQuery(
 				"SELECT j FROM JobInstance j WHERE j.id = :job",
@@ -445,7 +444,7 @@ public class Dispatcher {
 
 		if (deliverable.getHashPath().equals(Cryptonite.sha1(deliverable.getFilePath()))) {
 
-			FileUtils.copyURLToFile(url, file = new File("/Users/pico/Downloads/tests/deliverable" + job.getId()));
+			FileUtils.copyURLToFile(url, file = new File("./testprojects/JobGenADeliverable/deliverable" + job.getId()));
 		}
 		return new FileInputStream(file);
 	}

@@ -13,7 +13,7 @@ public class App extends JobBase{
 			out.println("Hello World!");
 			out.close();
 
-			addDeliverable(file, "JobGenADeliverable");
+			addDeliverable(file, "deliverable.txt", "JobGenADeliverable");
 		}
 		catch(Exception e){
 			e.printStackTrace();

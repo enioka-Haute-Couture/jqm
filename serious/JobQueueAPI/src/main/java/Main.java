@@ -139,9 +139,9 @@ public class Main
 				42, "MarsuApplication2", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
 
-		jdDemo = CreationTools.createJobDef(true, "Main", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
-				"/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", qNormal,
-				42, "MarsuApplication3", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
+		jdDemo = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
+		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", qVip, 42, "deliverable", 42, "Franquin", "ModuleMachin",
+		        "other", "other", "other", false, em);
 //
 ////		jp = CreationTools.createJobParameter("arg1", "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", jd);
 ////		jpdm = CreationTools.createJobParameter("", "", jdDemoMaven);
@@ -152,9 +152,10 @@ public class Main
 		dp = CreationTools.createDeploymentParameter(1, node, 3, 1000, qVip, em);
 		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 5000, qNormal, em);
 
-		JobDefinition newJob = new JobDefinition("MarsuApplication");
-		newJob.addParameter("p1", "1");
-		newJob.addParameter("p2", "2");
+		JobDefinition newJob = new JobDefinition("deliverable");
+		newJob.addParameter("filepath",
+		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt");
+		//newJob.addParameter("p2", "2");
 
         @SuppressWarnings("unused")
         JobDefinition newDemoMaven = new JobDefinition("MarsuApplication2");

@@ -9,7 +9,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import org.junit.Assert;
+import org.junit.Test;
 
+import com.enioka.jqm.api.Deliverable;
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
 import com.enioka.jqm.jpamodel.JobDef;
@@ -35,6 +37,7 @@ public class JobBaseTests {
 		}
 	}
 
+	@Test
 	public void testHighlanderMode() throws Exception {
 
 		EntityManager em = Helpers.getNewEm();
@@ -44,7 +47,7 @@ public class JobBaseTests {
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
-		JobDef jdDemoMaven = CreationTools.createJobDef(true, "Main", jdargs, "./testprojects/DateTimeMaven/",
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
 		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other",
 		        "other", "other", true, em);
 
@@ -65,31 +68,26 @@ public class JobBaseTests {
 
 		em.getTransaction().begin();
 
-		printJobInstanceTable();
-
 		Main.main(new String[]
 		{ "localhost" });
 
-		Thread.sleep(3000);
+		Thread.sleep(8000);
 		Main.stop();
 
 		em.getTransaction().commit();
 
-		printJobInstanceTable();
+		EntityManager emm = Helpers.getNewEm();
 
-		@SuppressWarnings("unused")
-		ArrayList<JobInstance> res = (ArrayList<JobInstance>) em
-		        .createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class).getResultList();
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
+		        JobInstance.class).getResultList();
 
-		// Assert.assertEquals("ENDED", res.get(0).getState());
-		// // Assert.assertEquals("ENDED", res.get(1).getState());
-		// Assert.assertEquals("CANCELLED", res.get(1).getState());
-		// Assert.assertEquals("CANCELLED", res.get(2).getState());
-		// Assert.assertEquals("CANCELLED", res.get(4).getState());
+		Assert.assertEquals("ENDED", res.get(0).getState());
+		Assert.assertEquals("CANCELLED", res.get(1).getState());
+		Assert.assertEquals("CANCELLED", res.get(2).getState());
 	}
 
 	// @Test
-	public void testGetDeliverable() throws Exception {
+	public void testGetDeliverables() throws Exception {
 
 		EntityManager em = Helpers.getNewEm();
 		Helpers.cleanup(em);
@@ -126,6 +124,48 @@ public class JobBaseTests {
 		File res = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/deliverable1");
 
 		Assert.assertEquals(true, res.exists());
-		Assert.assertEquals(res, tmp.get(0));
+	}
+
+	public void testGetOneDeliverable() throws Exception {
+
+		EntityManager em = Helpers.getNewEm();
+		Helpers.cleanup(em);
+		Helpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath",
+		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt", em);
+		jdargs.add(jdp);
+
+		@SuppressWarnings("unused")
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
+		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+		        "other", "other", "other", false, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication");
+
+		Dispatcher.enQueue(j);
+
+		Main.main(new String[]
+		{ "localhost" });
+
+		Thread.sleep(10000);
+		Main.stop();
+
+		File f = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt");
+
+		Assert.assertEquals(true, f.exists());
+
+		printJobInstanceTable();
+
+		com.enioka.jqm.api.Deliverable d = new Deliverable(
+		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt", "deliverable.txt");
+
+		@SuppressWarnings("unused")
+		InputStream tmp = Dispatcher.getOneDeliverable(d);
+
+		File res = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/deliverable1");
+
+		Assert.assertEquals(true, res.exists());
 	}
 }

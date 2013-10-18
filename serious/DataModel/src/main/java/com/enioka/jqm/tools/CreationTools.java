@@ -32,15 +32,15 @@ public class CreationTools
 
 	// ------------------ DELIVERABLES ------------------------
 
-	public static Deliverable createDeliverable(String fp, String hp, String ff, Integer jobId, EntityManager em)
+	public static Deliverable createDeliverable(String fp, String fn, String hp, String ff, Integer jobId, EntityManager em)
 	{
 		Deliverable j = new Deliverable();
 
-		System.out.println("CREATING DELIVERABLE");
 		j.setFilePath(fp);
 		j.setHashPath(hp);
 		j.setFileFamily(ff);
 		j.setJobId(jobId);
+		j.setFileName(fn);
 
 		em.persist(j);
 		return j;

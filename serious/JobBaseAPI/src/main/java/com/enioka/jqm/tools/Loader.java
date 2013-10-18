@@ -164,8 +164,8 @@ public class Loader implements Runnable {
 
 					System.out.println("SHA1: " + this.jobBase.getSha1s().get(j).getFilePath());
 					System.out.println("FILEPATH ADDED: " + this.jobBase.getSha1s().get(j).getFilePath());
-					CreationTools.createDeliverable(this.jobBase.getSha1s().get(j).getFilePath(), this.jobBase.getSha1s().get(j).getHashPath(),
-					        this.jobBase.getSha1s().get(j).getFileFamily(), this.job.getId(), em);
+					CreationTools.createDeliverable(this.jobBase.getSha1s().get(j).getFilePath(), this.jobBase.getSha1s().get(j).getFileName(),
+					        this.jobBase.getSha1s().get(j).getHashPath(), this.jobBase.getSha1s().get(j).getFileFamily(), this.job.getId(), em);
 					System.out.println("JOBID: " + this.job.getId());
 					em.getTransaction().commit();
 				}

@@ -27,7 +27,7 @@ public class Servlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 
 		String fileName = request.getParameter("file");
-		File realFileName = new File("/Users/pico/Downloads/tests", fileName);
+		File realFileName = new File("", fileName);
 		FileInputStream fis = null;
 		OutputStream out;
 

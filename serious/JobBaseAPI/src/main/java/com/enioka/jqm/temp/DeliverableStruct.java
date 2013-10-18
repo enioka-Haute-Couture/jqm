@@ -6,12 +6,14 @@ public class DeliverableStruct {
 	public String filePath;
 	public String hashPath;
 	public String fileFamily;
+	public String fileName;
 
-	public DeliverableStruct(String fp, String hp, String ff) {
+	public DeliverableStruct(String fp, String fileName, String hp, String ff) {
 
 		filePath = fp;
 		hashPath = hp;
 		fileFamily = ff;
+		this.fileName = fileName;
 	}
 
 	public String getFilePath() {
@@ -42,6 +44,16 @@ public class DeliverableStruct {
 	public void setFileFamily(String fileFamily) {
 
 		this.fileFamily = fileFamily;
+	}
+
+	public String getFileName() {
+
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+
+		this.fileName = fileName;
 	}
 
 }
