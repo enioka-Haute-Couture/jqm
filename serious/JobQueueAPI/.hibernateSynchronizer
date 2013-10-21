@@ -1,0 +1,15 @@
+DAOEnabled=true
+GenerationEnabled=true
+DAOPackageName=dao
+BaseDAOPackageName=base
+BasePackageName=base
+UseCustomRootDAO=false
+ContextObject=
+BasePackageStyle=Relative
+BOEnabled=true
+BaseDAOPackageStyle=Same
+CustomRootDAOClass=
+SourceLocation=/jqm-clientapi/src/main/java
+DAOPackageStyle=Relative
+BaseDAOUseBasePackage=true
+BaseDAOException=net.sf.hibernate.HibernateException
