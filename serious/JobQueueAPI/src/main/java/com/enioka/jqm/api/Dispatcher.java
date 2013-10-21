@@ -448,15 +448,21 @@ public class Dispatcher {
 		url = new URL(
 				"http://" +
 						dp.getNode().getListeningInterface() +
-						":" + dp.getNode().getPort() +
+						":" +
+						dp.getNode().getPort() +
 						"/getfile?file=" +
-						deliverable.getFilePath());
+						deliverable.getFilePath() + deliverable.getFileName());
 
-		if (deliverable.getHashPath().equals(Cryptonite.sha1(deliverable.getFilePath()))) {
+		System.out.println("URLtmp: " + deliverable.getFilePath() + deliverable.getFileName());
 
-			FileUtils.copyURLToFile(url, file = new File("./testprojects/JobGenADeliverable/deliverable" + job.getId()));
+		if (deliverable.getHashPath().equals(Cryptonite.sha1(deliverable.getFilePath() + deliverable.getFileName()))) {
+			System.out.println("dlRepo: " + dp.getNode().getDlRepo() + deliverable.getFileFamily() + "/" + job.getId() + "/");
+			File dlRepo = new File(dp.getNode().getDlRepo() + deliverable.getFileFamily() + "/" + job.getId() + "/");
+			dlRepo.mkdirs();
+			file = new File(dp.getNode().getDlRepo() + deliverable.getFileFamily() + "/" + job.getId() + "/" + deliverable.getFileName());
+			FileUtils.copyURLToFile(url, file);
 		}
-		return new FileInputStream(file);
+		return (new FileInputStream(file));
 	}
 
 	//----------------------------- GETUSERDELIVERABLES --------------------------------------
