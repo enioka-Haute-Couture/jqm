@@ -11,9 +11,9 @@ import javax.persistence.EntityManager;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.enioka.jqm.api.Deliverable;
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
@@ -71,7 +71,7 @@ public class JobBaseTests {
 		Main.main(new String[]
 		{ "localhost" });
 
-		Thread.sleep(8000);
+		Thread.sleep(6000);
 		Main.stop();
 
 		em.getTransaction().commit();
@@ -86,47 +86,105 @@ public class JobBaseTests {
 		Assert.assertEquals("CANCELLED", res.get(2).getState());
 	}
 
-	// @Test
+	@Test
 	public void testGetDeliverables() throws Exception {
 
 		EntityManager em = Helpers.getNewEm();
 		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
+		EntityManager emm = Helpers.getNewEm();
+		Helpers.createLocalNode(emm);
+		EntityManager emmm = Helpers.getNewEm();
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath",
-		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt", em);
+		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", "./testprojects/JobGenADeliverable/", em);
 		jdargs.add(jdp);
 
-		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
-		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "getDeliverables", 42, "Franquin", "ModuleMachin",
 		        "other", "other", "other", false, em);
 
-		JobDefinition j = new JobDefinition("MarsuApplication");
+		JobDefinition j = new JobDefinition("getDeliverables");
+
+		printJobInstanceTable();
 
 		Dispatcher.enQueue(j);
+
+		printJobInstanceTable();
+
+		JobInstance ji = emmm.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :myId", JobInstance.class)
+		        .setParameter("myId", jdDemoMaven.getId()).getSingleResult();
 
 		Main.main(new String[]
 		{ "localhost" });
 
-		Thread.sleep(10000);
-		Main.stop();
+		Thread.sleep(1000);
 
-		File f = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt");
+		File f = new File("./testprojects/JobGenADeliverable/JobGenADeliverable.txt");
 
 		Assert.assertEquals(true, f.exists());
 
 		printJobInstanceTable();
 
-		List<InputStream> tmp = Dispatcher.getDeliverables(1);
+		@SuppressWarnings("unused")
+		List<InputStream> tmp = Dispatcher.getDeliverables(ji.getId());
+		Main.stop();
 
-		File res = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/deliverable1");
+		File res = new File("./testprojects/JobGenADeliverable/JobGenADeliverableFamily/" + ji.getId() + "/JobGenADeliverable.txt");
 
 		Assert.assertEquals(true, res.exists());
 	}
 
-	public void testGetOneDeliverable() throws Exception {
+	// public void testGetOneDeliverable() throws Exception {
+	//
+	// EntityManager em = Helpers.getNewEm();
+	// Helpers.cleanup(em);
+	// Helpers.createLocalNode(em);
+	//
+	// ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+	// JobDefParameter jdp = CreationTools.createJobDefParameter("filepath",
+	// "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt",
+	// em);
+	// jdargs.add(jdp);
+	//
+	// @SuppressWarnings("unused")
+	// JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs,
+	// "./testprojects/JobGenADeliverable/",
+	// "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip,
+	// 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+	// "other", "other", "other", false, em);
+	//
+	// JobDefinition j = new JobDefinition("MarsuApplication");
+	//
+	// Dispatcher.enQueue(j);
+	//
+	// Main.main(new String[]
+	// { "localhost" });
+	//
+	// Thread.sleep(10000);
+	// Main.stop();
+	//
+	// File f = new
+	// File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt");
+	//
+	// Assert.assertEquals(true, f.exists());
+	//
+	// printJobInstanceTable();
+	//
+	// com.enioka.jqm.api.Deliverable d = new Deliverable(
+	// "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt",
+	// "deliverable.txt");
+	//
+	// @SuppressWarnings("unused")
+	// InputStream tmp = Dispatcher.getOneDeliverable(d);
+	//
+	// File res = new
+	// File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/deliverable1");
+	//
+	// Assert.assertEquals(true, res.exists());
+	// }
+
+	// @Test
+	public void testGetUserDeliverables() throws Exception {
 
 		EntityManager em = Helpers.getNewEm();
 		Helpers.cleanup(em);
@@ -134,38 +192,61 @@ public class JobBaseTests {
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath",
-		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt", em);
+		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable1.txt", em);
 		jdargs.add(jdp);
+
+		ArrayList<JobDefParameter> jdargs2 = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp2 = CreationTools.createJobDefParameter("filepath",
+		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable2.txt", em);
+		jdargs2.add(jdp2);
+
+		ArrayList<JobDefParameter> jdargs3 = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp3 = CreationTools.createJobDefParameter("filepath",
+		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable3.txt", em);
+		jdargs3.add(jdp3);
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
-		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication1", 42, "Franquin", "ModuleMachin",
 		        "other", "other", "other", false, em);
 
-		JobDefinition j = new JobDefinition("MarsuApplication");
+		@SuppressWarnings("unused")
+		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs2, "./testprojects/JobGenADeliverable/",
+		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication2", 42, "Franquin", "ModuleMachin",
+		        "other", "other", "other", false, em);
 
-		Dispatcher.enQueue(j);
+		@SuppressWarnings("unused")
+		JobDef jdDemoMaven3 = CreationTools.createJobDef(true, "App", jdargs3, "./testprojects/JobGenADeliverable/",
+		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication3", 42, "Franquin", "ModuleMachin",
+		        "other", "other", "other", false, em);
+
+		JobDefinition j1 = new JobDefinition("MarsuApplication1");
+		JobDefinition j2 = new JobDefinition("MarsuApplication2");
+		JobDefinition j3 = new JobDefinition("MarsuApplication3");
+
+		Dispatcher.enQueue(j1);
+		Dispatcher.enQueue(j2);
+		Dispatcher.enQueue(j3);
 
 		Main.main(new String[]
 		{ "localhost" });
 
-		Thread.sleep(10000);
+		Thread.sleep(20000);
 		Main.stop();
 
-		File f = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt");
+		File f1 = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable1.txt");
+		File f2 = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable2.txt");
+		File f3 = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable3.txt");
 
-		Assert.assertEquals(true, f.exists());
+		Assert.assertEquals(true, f1.exists());
+		Assert.assertEquals(true, f2.exists());
+		Assert.assertEquals(true, f3.exists());
 
 		printJobInstanceTable();
 
-		com.enioka.jqm.api.Deliverable d = new Deliverable(
-		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt", "deliverable.txt");
+		List<Deliverable> tmp = Dispatcher.getUserDeliverables("Franquin");
 
-		@SuppressWarnings("unused")
-		InputStream tmp = Dispatcher.getOneDeliverable(d);
-
-		File res = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/deliverable1");
-
-		Assert.assertEquals(true, res.exists());
+		Assert.assertEquals(3, tmp.size());
+		// Assert.assertEquals(, tmp.get(0).getFilePath());
 	}
 }

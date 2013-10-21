@@ -9,11 +9,11 @@ public class App extends JobBase{
 	public void start() {
 		String file = this.getParameters().get("filepath");
 		try{
-			PrintWriter out  = new PrintWriter(new FileWriter(file));
+			PrintWriter out  = new PrintWriter(new FileWriter(file + "JobGenADeliverable.txt"));
 			out.println("Hello World!");
 			out.close();
 
-			addDeliverable(file, "deliverable.txt", "JobGenADeliverable");
+			addDeliverable(file, "JobGenADeliverable.txt", "JobGenADeliverableFamily");
 		}
 		catch(Exception e){
 			e.printStackTrace();

@@ -33,7 +33,7 @@ public class Helpers {
 		Helpers.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, 100, em);
 		Helpers.qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3, 100, em);
 
-		Helpers.node = CreationTools.createNode("localhost", 8081, em);
+		Helpers.node = CreationTools.createNode("localhost", 8081, "./testprojects/JobGenADeliverable/", em);
 
 		Helpers.dpVip = CreationTools.createDeploymentParameter(1, node, 1, 1, qVip, em);
 		Helpers.dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal, em);

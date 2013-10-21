@@ -125,14 +125,14 @@ public class Main
 		qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7 , 100, em);
 		qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3 , 100, em);
 
-//		jd = CreationTools.createJobDef(true, "App", jdargs, "../JobBaseAPI/testprojects/Fibo/",
-//				"../JobBaseAPI/testprojects/Fibo/Fibo.jar",
-//				qVip,
-//				42, "Fibo", 42, "Franquin", "ModuleMachin", "other", "other", "other", false, em);
-
-		jd = CreationTools.createJobDef(true, "App", jdargs, "../JobBaseAPI/testprojects/DateTimeMaven/",
-				"../JobBaseAPI/testprojects/DateTimeMaven/DateTimeMaven.jar", qVip, 42,
-		        "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", false, em);
+		jd = CreationTools.createJobDef(true, "App", jdargs, "../JobBaseAPI/testprojects/Fibo/",
+				"../JobBaseAPI/testprojects/Fibo/Fibo.jar",
+				qVip,
+				42, "Fibo", 42, "Franquin", "ModuleMachin", "other", "other", "other", false, em);
+//
+//		jd = CreationTools.createJobDef(true, "App", jdargs, "../JobBaseAPI/testprojects/DateTimeMaven/",
+//				"../JobBaseAPI/testprojects/DateTimeMaven/DateTimeMaven.jar", qVip, 42,
+//		        "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", false, em);
 //
 		jdDemoMaven = CreationTools.createJobDef(true, "Main", null, "/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/",
 				"/Users/pico/Dropbox/projets/enioka/tests/DateTimeMaven/target/DateTimeMaven-0.0.1-SNAPSHOT.jar", qNormal,
@@ -147,7 +147,7 @@ public class Main
 ////		jpdm = CreationTools.createJobParameter("", "", jdDemoMaven);
 ////		jpd = CreationTools.createJobParameter("", "", jdDemo);
 //
-		node = CreationTools.createNode("localhost", 8081, em);
+		node = CreationTools.createNode("localhost", 8081, "../JobBaseAPI/dlRepository/", em);
 //
 		dp = CreationTools.createDeploymentParameter(1, node, 3, 1000, qVip, em);
 		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 5000, qNormal, em);
@@ -155,7 +155,8 @@ public class Main
 		JobDefinition newJob = new JobDefinition("deliverable");
 		newJob.addParameter("filepath",
 		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt");
-		//newJob.addParameter("p2", "2");
+//		newJob.addParameter("p1", "1");
+//		newJob.addParameter("p2", "2");
 
         @SuppressWarnings("unused")
         JobDefinition newDemoMaven = new JobDefinition("MarsuApplication2");

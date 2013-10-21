@@ -40,6 +40,7 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 
 import com.enioka.jqm.hash.Cryptonite;
 import com.enioka.jqm.jpamodel.Deliverable;
@@ -349,6 +350,7 @@ public class Dispatcher {
 		File file = null;
 		ArrayList<InputStream> streams = new ArrayList<InputStream>();
 		List<Deliverable> tmp = new ArrayList<Deliverable>();
+		Logger jqmlogger = Logger.getLogger(Dispatcher.class);
 
 		try {
 
@@ -372,7 +374,6 @@ public class Dispatcher {
 					.setParameter("q", job.getJd().getQueue().getId())
 					.getSingleResult();
 
-
 			for (int i = 0; i < tmp.size(); i++) {
 
 				url = new URL(
@@ -381,17 +382,26 @@ public class Dispatcher {
 								":" +
 								dp.getNode().getPort() +
 								"/getfile?file=" +
-								tmp.get(i).getFilePath());
+								tmp.get(i).getFilePath() + tmp.get(i).getFileName());
 
-				if (tmp.get(i).getHashPath().equals(Cryptonite.sha1(tmp.get(i).getFilePath()))) {
+				if (tmp.get(i).getHashPath().equals(Cryptonite.sha1(tmp.get(i).getFilePath() + tmp.get(i).getFileName()))) {
 					// mettre en base le repertoire de dl
-					FileUtils.copyURLToFile(url, file = new File("./testprojects/JobGenADeliverable/deliverable" + job.getId()));
+					System.out.println("dlRepo: " + dp.getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + job.getId() + "/");
+					File dlRepo = new File(dp.getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + job.getId() + "/");
+					dlRepo.mkdirs();
+					file = new File(dp.getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + job.getId() + "/" + tmp.get(i).getFileName());
+
+
+					FileUtils.copyURLToFile(url, file);
 					streams.add(new FileInputStream(file));
 				}
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+			jqmlogger.info(e);
+		} catch (Exception e) {
+
+			jqmlogger.info("No deliverable available", e);
 		}
 
 		return streams;

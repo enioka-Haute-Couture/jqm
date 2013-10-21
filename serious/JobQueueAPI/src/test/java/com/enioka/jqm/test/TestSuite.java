@@ -103,7 +103,7 @@ public class TestSuite {
 		this.jdDemo = CreationTools.createJobDef(true, "DemoClassName", null, "./testprojects/DateTimeMaven/", "", qSlow,
 				42, "MarsuApplication3", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
-		node = CreationTools.createNode("localhost", 8081, em);
+		node = CreationTools.createNode("localhost", 8081, "../JobBaseAPI/testprojects/JobGenADeliverable/", em);
 
 		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip, em);
 		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal, em);

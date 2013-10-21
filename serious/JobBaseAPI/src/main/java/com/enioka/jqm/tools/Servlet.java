@@ -27,7 +27,7 @@ public class Servlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 
 		String fileName = request.getParameter("file");
-		File realFileName = new File("", fileName);
+		File realFileName = new File(fileName);
 		FileInputStream fis = null;
 		OutputStream out;
 
@@ -44,7 +44,7 @@ public class Servlet extends HttpServlet {
 
 		} catch (FileNotFoundException e) {
 
-			jqmlogger.info(e + "No file named: " + fileName + "found");
+			jqmlogger.info(e);
 		} catch (IOException e) {
 
 			jqmlogger.info(e);

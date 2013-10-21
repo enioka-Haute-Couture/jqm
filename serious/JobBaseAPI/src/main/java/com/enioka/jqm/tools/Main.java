@@ -47,6 +47,7 @@ public class Main {
 	public static EntityManager em = emf.createEntityManager();
 	public static EntityTransaction t = em.getTransaction();
 	public static Map<String, ClassLoader> cache = new HashMap<String, ClassLoader>();
+	public static Server server = null;
 
 	/**
 	 * @param args
@@ -56,9 +57,7 @@ public class Main {
 
 		// @SuppressWarnings("unused")
 		// JndiContext ctx = JndiContextFactory.createJndiContext(db);
-
-		Server server = new Server(8081);
-
+		server = new Server(8081);
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setContextPath("/");
 		server.setHandler(context);
@@ -91,6 +90,18 @@ public class Main {
 		for (Polling p : pollers) {
 			p.stop();
 		}
+		try {
+			server.stop();
+		} catch (Exception e) {
 
+		}
+	}
+
+	public static void run() {
+
+		for (Polling p : pollers) {
+			Thread t = new Thread(p);
+			t.start();
+		}
 	}
 }

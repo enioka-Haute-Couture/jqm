@@ -15,6 +15,8 @@ public class Node
 	private String listeningInterface;
 	@Column(nullable=false)
 	private Integer port;
+	@Column(nullable=false)
+	private String dlRepo;
 
 	public Integer getId()
 	{
@@ -40,4 +42,14 @@ public class Node
 	{
 		this.port = port;
 	}
+
+    public String getDlRepo() {
+
+    	return dlRepo;
+    }
+
+    public void setDlRepo(String dlRepo) {
+
+    	this.dlRepo = dlRepo;
+    }
 }
