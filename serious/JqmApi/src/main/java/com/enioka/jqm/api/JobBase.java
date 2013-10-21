@@ -25,8 +25,6 @@ import java.util.Map;
 
 import com.enioka.jqm.deliverabletools.Cryptonite;
 import com.enioka.jqm.deliverabletools.DeliverableStruct;
-import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.JobParameter;
 
 /**
  *
@@ -46,17 +44,6 @@ public class JobBase {
 	protected Map<String, String> parameters = new HashMap<String, String>();
 	protected ArrayList<DeliverableStruct> sha1s = new ArrayList<DeliverableStruct>();
 
-	public void setParams(JobInstance j) {
-
-		for (JobParameter i : j.getParameters()) {
-
-			this.parameters.put(i.getKey(), i.getValue());
-		}
-
-		// System.exit(0);
-		this.start();
-	}
-
 	public void start() {
 
 	}
@@ -70,7 +57,7 @@ public class JobBase {
 		try {
 			System.out.println("ajout du livrable dans la liste");
 			System.out.println("Path: " + path);
-			this.sha1s.add(new DeliverableStruct(path, fileName, Cryptonite.sha1(path), fileLabel));
+			this.sha1s.add(new DeliverableStruct(path, fileName, Cryptonite.sha1(path + fileName), fileLabel));
 		} catch (NoSuchAlgorithmException e) {
 
 			e.printStackTrace();

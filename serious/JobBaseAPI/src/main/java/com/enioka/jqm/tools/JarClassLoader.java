@@ -30,6 +30,7 @@ import java.util.jar.Attributes;
 
 import com.enioka.jqm.api.JobBase;
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.JobParameter;
 
 public class JarClassLoader extends URLClassLoader {
 
@@ -103,7 +104,11 @@ public class JarClassLoader extends URLClassLoader {
 
 		JobBase t = (JobBase) o;
 
-		t.setParams(job);
+		for (JobParameter i : job.getParameters()) {
+
+			t.getParameters().put(i.getKey(), i.getValue());
+		}
+		t.start();
 		return t;
 
 	}
