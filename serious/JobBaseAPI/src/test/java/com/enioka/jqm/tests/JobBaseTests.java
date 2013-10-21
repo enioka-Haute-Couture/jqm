@@ -403,7 +403,8 @@ public class JobBaseTests {
 		Assert.assertEquals(3, qs.size());
 	}
 
-	public void testChangeQueue() throws Exception {
+	@Test
+	public void testGoodOrder() throws Exception {
 
 		EntityManager em = Helpers.getNewEm();
 		Helpers.cleanup(em);
@@ -461,17 +462,17 @@ public class JobBaseTests {
 		query3.setParameter("q", Helpers.qSlow);
 		ArrayList<JobInstance> resSlow = (ArrayList<JobInstance>) query.getResultList();
 
-		for (int i = 0; i < resVIP.size(); i++) {
+		for (int i = 0; i < resVIP.size() - 1; i++) {
 
 			Assert.assertNotEquals(resVIP.get(i).getPosition(), resVIP.get(i + 1).getPosition());
 		}
 
-		for (int i = 0; i < resNormal.size(); i++) {
+		for (int i = 0; i < resNormal.size() - 1; i++) {
 
 			Assert.assertNotEquals(resNormal.get(i).getPosition(), resNormal.get(i + 1).getPosition());
 		}
 
-		for (int i = 0; i < resSlow.size(); i++) {
+		for (int i = 0; i < resSlow.size() - 1; i++) {
 
 			Assert.assertNotEquals(resSlow.get(i).getPosition(), resSlow.get(i + 1).getPosition());
 		}
