@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.tools.CreationTools;
 import com.enioka.jqm.tools.Main;
 
@@ -256,5 +258,223 @@ public class JobBaseTests {
 
 		Assert.assertEquals(3, tmp.size());
 		// Assert.assertEquals(, tmp.get(0).getFilePath());
+	}
+
+	@Test
+	public void testGetUserJobs() throws Exception {
+
+		EntityManager em = Helpers.getNewEm();
+		Helpers.cleanup(em);
+		Helpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other",
+		        "other", "other", true, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+
+		em.getTransaction().begin();
+
+		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
+		        .setParameter("myId", 2).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+
+		JobInstance ji2 = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
+		        .setParameter("myId", 3).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+
+		JobInstance ji3 = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
+		        .setParameter("myId", 1).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+
+		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId()).executeUpdate();
+		em.createQuery("UPDATE JobInstance j SET j.state = 'ENDED' WHERE j.id = :idJob").setParameter("idJob", ji2.getId()).executeUpdate();
+		em.createQuery("UPDATE JobInstance j SET j.state = 'RUNNING' WHERE j.id = :idJob").setParameter("idJob", ji3.getId()).executeUpdate();
+
+		em.getTransaction().commit();
+
+		em.getTransaction().begin();
+
+		Main.main(new String[]
+		{ "localhost" });
+
+		Thread.sleep(10000);
+		Main.stop();
+
+		em.getTransaction().commit();
+
+		EntityManager emm = Helpers.getNewEm();
+
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
+		        JobInstance.class).getResultList();
+
+		Assert.assertEquals(3, res.size());
+	}
+
+	@Test
+	public void testGetJobs() throws Exception {
+
+		EntityManager em = Helpers.getNewEm();
+		Helpers.cleanup(em);
+		Helpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other",
+		        "other", "other", true, em);
+
+		ArrayList<JobDefParameter> jdargs2 = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp2 = CreationTools.createJobDefParameter("filepath", "./testprojects/JobGenADeliverable/", em);
+		JobDefParameter jdp3 = CreationTools.createJobDefParameter("fileName", "JobGenADeliverable42.txt", em);
+		jdargs2.add(jdp2);
+		jdargs2.add(jdp3);
+
+		@SuppressWarnings("unused")
+		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
+		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "test", 42, "Franquin", "ModuleMachin", "other",
+		        "other", "other", false, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+		JobDefinition j2 = new JobDefinition("test", "Toto");
+
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j2);
+
+		em.getTransaction().begin();
+
+		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
+		        .setParameter("myId", 2).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+
+		JobInstance ji2 = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
+		        .setParameter("myId", 3).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+
+		JobInstance ji3 = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
+		        .setParameter("myId", 1).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+
+		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId()).executeUpdate();
+		em.createQuery("UPDATE JobInstance j SET j.state = 'ENDED' WHERE j.id = :idJob").setParameter("idJob", ji2.getId()).executeUpdate();
+		em.createQuery("UPDATE JobInstance j SET j.state = 'RUNNING' WHERE j.id = :idJob").setParameter("idJob", ji3.getId()).executeUpdate();
+
+		em.getTransaction().commit();
+
+		em.getTransaction().begin();
+
+		Main.main(new String[]
+		{ "localhost" });
+
+		Thread.sleep(10000);
+		Main.stop();
+
+		em.getTransaction().commit();
+
+		EntityManager emm = Helpers.getNewEm();
+
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
+		        JobInstance.class).getResultList();
+
+		Assert.assertEquals(4, res.size());
+	}
+
+	@Test
+	public void testGetQueues() throws Exception {
+
+		EntityManager em = Helpers.getNewEm();
+		Helpers.cleanup(em);
+		Helpers.createLocalNode(em);
+
+		Main.main(new String[]
+		{ "localhost" });
+
+		Thread.sleep(10000);
+		Main.stop();
+
+		ArrayList<Queue> qs = (ArrayList<Queue>) em.createQuery("SELECT q FROM Queue q", Queue.class).getResultList();
+
+		Assert.assertEquals(3, qs.size());
+	}
+
+	public void testChangeQueue() throws Exception {
+
+		EntityManager em = Helpers.getNewEm();
+		Helpers.cleanup(em);
+		Helpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other",
+		        "other", "other", true, em);
+
+		JobDef jd = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qNormal, 42, "MarsuApplication2", 42, "Franquin", "ModuleMachin", "other",
+		        "other", "other", true, em);
+
+		JobDef jd2 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qSlow, 42, "MarsuApplication3", 42, "Franquin", "ModuleMachin", "other",
+		        "other", "other", true, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+		JobDefinition jj = new JobDefinition("MarsuApplication2", "Franquin");
+		JobDefinition jjj = new JobDefinition("MarsuApplication3", "Franquin");
+
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(jj);
+		Dispatcher.enQueue(jj);
+		Dispatcher.enQueue(jjj);
+
+		Main.main(new String[]
+		{ "localhost" });
+
+		Thread.sleep(10);
+
+		Dispatcher.enQueue(jjj);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(jj);
+		Dispatcher.enQueue(j);
+
+		Thread.sleep(1000);
+		Main.stop();
+
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j WHERE j.queue = :q ORDER BY j.position ASC", JobInstance.class);
+		query.setParameter("q", Helpers.qVip);
+		ArrayList<JobInstance> resVIP = (ArrayList<JobInstance>) query.getResultList();
+
+		TypedQuery<JobInstance> query2 = em.createQuery("SELECT j FROM JobInstance j WHERE j.queue = :q ORDER BY j.position ASC", JobInstance.class);
+		query2.setParameter("q", Helpers.qNormal);
+		ArrayList<JobInstance> resNormal = (ArrayList<JobInstance>) query.getResultList();
+
+		TypedQuery<JobInstance> query3 = em.createQuery("SELECT j FROM JobInstance j WHERE j.queue = :q ORDER BY j.position ASC", JobInstance.class);
+		query3.setParameter("q", Helpers.qSlow);
+		ArrayList<JobInstance> resSlow = (ArrayList<JobInstance>) query.getResultList();
+
+		for (int i = 0; i < resVIP.size(); i++) {
+
+			Assert.assertNotEquals(resVIP.get(i).getPosition(), resVIP.get(i + 1).getPosition());
+		}
+
+		for (int i = 0; i < resNormal.size(); i++) {
+
+			Assert.assertNotEquals(resNormal.get(i).getPosition(), resNormal.get(i + 1).getPosition());
+		}
+
+		for (int i = 0; i < resSlow.size(); i++) {
+
+			Assert.assertNotEquals(resSlow.get(i).getPosition(), resSlow.get(i + 1).getPosition());
+		}
+
 	}
 }
