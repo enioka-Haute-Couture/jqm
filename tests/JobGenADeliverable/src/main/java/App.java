@@ -8,6 +8,8 @@ public class App extends JobBase{
 	@Override
 	public void start() {
 		String file = this.getParameters().get("filepath");
+//		String fileName = this.getParameters().get("fileName");
+//		System.out.println("jobGEN: " + fileName);
 		try{
 			PrintWriter out  = new PrintWriter(new FileWriter(file + "JobGenADeliverable.txt"));
 			out.println("Hello World!");

@@ -10,6 +10,7 @@ public class JobDefinition {
 	public String applicationName;
 	public Integer sessionID;
 	public String application;
+	public String user;
 	public String module;
 	public String other1;
 	public String other2;
@@ -20,9 +21,10 @@ public class JobDefinition {
 
     }
 
-    public JobDefinition(String applicationName) {
+    public JobDefinition(String applicationName, String user) {
 
     	this.applicationName = applicationName;
+    	this.user = user;
     }
 
 	public void addParameter(String key, String value) {
@@ -141,6 +143,18 @@ public class JobDefinition {
     public void setParameters(Map<String, String> parameters) {
 
     	this.parameters = parameters;
+    }
+
+
+    public String getUser() {
+
+    	return user;
+    }
+
+
+    public void setUser(String user) {
+
+    	this.user = user;
     }
 
 

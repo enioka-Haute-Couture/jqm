@@ -115,9 +115,9 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3");
+		JobDefinition jd = new JobDefinition("MarsuApplication","MAG");
+		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jd);
 		Dispatcher.enQueue(jdDemoMaven);
@@ -137,9 +137,9 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3");
+		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
@@ -161,9 +161,9 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3");
+		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
@@ -184,9 +184,9 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3");
+		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
@@ -206,9 +206,9 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3");
+		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
@@ -231,9 +231,9 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3");
+		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
@@ -258,9 +258,9 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3");
+		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
@@ -284,9 +284,9 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3");
+		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
@@ -320,9 +320,9 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3");
+		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
@@ -346,7 +346,7 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication");
+		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
 
 		Dispatcher.enQueue(jd);
 
@@ -379,7 +379,7 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication");
+		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
 		jd.addParameter("key", "value");
 
 		Dispatcher.enQueue(jd);

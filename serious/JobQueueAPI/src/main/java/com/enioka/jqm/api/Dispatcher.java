@@ -182,7 +182,7 @@ public class Dispatcher {
 
 		em.getTransaction().begin();
 
-		JobInstance ji = CreationTools.createJobInstance(job, overrideParameter(job, jd), "MAG", 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue, em);
+		JobInstance ji = CreationTools.createJobInstance(job, overrideParameter(job, jd), jd.getUser(), 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue, em);
 
 		//CreationTools.em.createQuery("UPDATE JobParameter jp SET jp.jobInstance = :j WHERE").executeUpdate();
 
@@ -464,20 +464,25 @@ public class Dispatcher {
 	public static List<Deliverable> getUserDeliverables(String user) {
 
 		ArrayList<Deliverable> d = new ArrayList<Deliverable>();
+		ArrayList<Deliverable> res = new ArrayList<Deliverable>();
 
-		JobInstance j = em.createQuery(
+		ArrayList<JobInstance> j = (ArrayList<JobInstance>) em.createQuery(
 				"SELECT j FROM JobInstance j WHERE j.user = :u",
 				JobInstance.class)
 				.setParameter("u", user)
-				.getSingleResult();
-
-		d = (ArrayList<Deliverable>) em.createQuery(
-				"SELECT d FROM Deliverable WHERE d.jobInstance = :idJob",
-				Deliverable.class)
-				.setParameter("idJob", j.getId())
 				.getResultList();
 
-		return d;
+		for (int i = 0; i < j.size(); i++) {
+
+			d = (ArrayList<Deliverable>) em.createQuery(
+					"SELECT d FROM Deliverable d WHERE d.jobId = :idJob",
+					Deliverable.class)
+					.setParameter("idJob", j.get(i).getId())
+					.getResultList();
+
+			res.addAll(d);
+		}
+		return res;
 	}
 
 	//----------------------------- GETMSG --------------------------------------

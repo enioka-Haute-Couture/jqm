@@ -51,7 +51,7 @@ public class JobBaseTests {
 		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other",
 		        "other", "other", true, em);
 
-		JobDefinition j = new JobDefinition("MarsuApplication");
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
 		Dispatcher.enQueue(j);
 		Dispatcher.enQueue(j);
@@ -71,7 +71,7 @@ public class JobBaseTests {
 		Main.main(new String[]
 		{ "localhost" });
 
-		Thread.sleep(6000);
+		Thread.sleep(10000);
 		Main.stop();
 
 		em.getTransaction().commit();
@@ -103,7 +103,7 @@ public class JobBaseTests {
 		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "getDeliverables", 42, "Franquin", "ModuleMachin",
 		        "other", "other", "other", false, em);
 
-		JobDefinition j = new JobDefinition("getDeliverables");
+		JobDefinition j = new JobDefinition("getDeliverables", "MAG");
 
 		printJobInstanceTable();
 
@@ -117,7 +117,7 @@ public class JobBaseTests {
 		Main.main(new String[]
 		{ "localhost" });
 
-		Thread.sleep(1000);
+		Thread.sleep(10000);
 
 		File f = new File("./testprojects/JobGenADeliverable/JobGenADeliverable.txt");
 
@@ -183,7 +183,7 @@ public class JobBaseTests {
 	// Assert.assertEquals(true, res.exists());
 	// }
 
-	// @Test
+	@Test
 	public void testGetUserDeliverables() throws Exception {
 
 		EntityManager em = Helpers.getNewEm();
@@ -192,17 +192,17 @@ public class JobBaseTests {
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath",
-		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable1.txt", em);
+		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/", em);
 		jdargs.add(jdp);
 
 		ArrayList<JobDefParameter> jdargs2 = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp2 = CreationTools.createJobDefParameter("filepath",
-		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable2.txt", em);
+		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/", em);
 		jdargs2.add(jdp2);
 
 		ArrayList<JobDefParameter> jdargs3 = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp3 = CreationTools.createJobDefParameter("filepath",
-		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable3.txt", em);
+		        "/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/", em);
 		jdargs3.add(jdp3);
 
 		@SuppressWarnings("unused")
@@ -220,9 +220,9 @@ public class JobBaseTests {
 		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication3", 42, "Franquin", "ModuleMachin",
 		        "other", "other", "other", false, em);
 
-		JobDefinition j1 = new JobDefinition("MarsuApplication1");
-		JobDefinition j2 = new JobDefinition("MarsuApplication2");
-		JobDefinition j3 = new JobDefinition("MarsuApplication3");
+		JobDefinition j1 = new JobDefinition("MarsuApplication1", "Franquin");
+		JobDefinition j2 = new JobDefinition("MarsuApplication2", "Franquin");
+		JobDefinition j3 = new JobDefinition("MarsuApplication3", "Franquin");
 
 		Dispatcher.enQueue(j1);
 		Dispatcher.enQueue(j2);
@@ -234,9 +234,9 @@ public class JobBaseTests {
 		Thread.sleep(20000);
 		Main.stop();
 
-		File f1 = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable1.txt");
-		File f2 = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable2.txt");
-		File f3 = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable3.txt");
+		File f1 = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt");
+		File f2 = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt");
+		File f3 = new File("/Users/pico/Dropbox/projets/enioka/jqm/serious/JobBaseAPI/testprojects/JobGenADeliverable/JobGenADeliverable.txt");
 
 		Assert.assertEquals(true, f1.exists());
 		Assert.assertEquals(true, f2.exists());

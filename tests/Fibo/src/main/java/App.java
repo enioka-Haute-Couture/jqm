@@ -11,7 +11,7 @@ public class App extends JobBase{
 
 		System.out.println("PARAMETRE FIBO 2: " + this.parameters.get("p2"));
 
-        JobDefinition j = new JobDefinition("Fibo");
+        JobDefinition j = new JobDefinition("Fibo", "MAG");
 
         j.addParameter("p1", this.parameters.get("p2"));
 		j.addParameter("p2", (Integer.parseInt(this.parameters.get("p1"))

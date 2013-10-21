@@ -31,7 +31,7 @@ public class FiboTest {
 		JobDef jd = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/Fibo/", "./testprojects/Fibo/Fibo.jar", Helpers.qVip, 42, "Fibo",
 		        42, "Franquin", "ModuleMachin", "other1", "other2", "other3", false, em);
 
-		JobDefinition form = new JobDefinition("Fibo");
+		JobDefinition form = new JobDefinition("Fibo", "MAG");
 		form.addParameter("p1", "1");
 		form.addParameter("p2", "2");
 		Dispatcher.enQueue(form);
