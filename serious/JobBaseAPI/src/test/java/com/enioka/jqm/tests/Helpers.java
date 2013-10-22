@@ -48,6 +48,7 @@ public class Helpers
 	{
 
 		em.getTransaction().begin();
+		em.createQuery("DELETE FROM Deliverable").executeUpdate();
 		em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
 		em.createQuery("DELETE FROM Node").executeUpdate();
 		em.createQuery("DELETE FROM JobHistoryParameter").executeUpdate();
