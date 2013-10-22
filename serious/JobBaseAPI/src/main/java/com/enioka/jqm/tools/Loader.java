@@ -147,7 +147,7 @@ public class Loader implements Runnable
 			Thread.currentThread().setContextClassLoader(jobClassLoader);
 
 			// Add JNDI context
-			JndiContextFactory.createJndiContext();
+			JndiContextFactory.createJndiContext(contextClassLoader);
 
 			// Go! (launches the main function in the startup class designated in the manifest)
 			System.out.println("+++++++++++++++++++++++++++++++++++++++");

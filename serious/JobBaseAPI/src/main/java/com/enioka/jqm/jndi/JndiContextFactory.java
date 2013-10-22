@@ -10,11 +10,11 @@ public class JndiContextFactory
 
 	}
 
-	public static JndiContext createJndiContext() throws Exception
+	public static JndiContext createJndiContext(ClassLoader cl) throws Exception
 	{
 		try
 		{
-			JndiContext ctx = new JndiContext();
+			JndiContext ctx = new JndiContext(cl);
 
 			NamingManager.setInitialContextFactoryBuilder(ctx);
 			return ctx;

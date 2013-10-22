@@ -8,6 +8,8 @@ import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 import javax.naming.spi.InitialContextFactoryBuilder;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 
 import org.apache.log4j.Logger;
 
@@ -17,32 +19,51 @@ import com.enioka.jqm.tools.Main;
 public class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory
 {
 	Logger jqmlogger = Logger.getLogger(this.getClass());
+	ClassLoader cl = null;
 
-	public JndiContext() throws NamingException
+	public JndiContext(ClassLoader cl) throws NamingException
 	{
 		super();
+		this.cl = cl;
 	}
 
 	@Override
 	public Object lookup(String name) throws NamingException
 	{
 		jqmlogger.info("Looking up a JNDI element named " + name);
-		DatabaseProp db = Main.em.createNamedQuery("SELECT d FROM DatabaseProp d WHERE d.name = :n", DatabaseProp.class)
-				.setParameter("n", name).getSingleResult();
 
-		if (name.equals(db.getName()))
+		// Base class loader only
+		ClassLoader tmp = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(this.cl);
+
+		DatabaseProp db = null;
+		try
 		{
-			try
-			{
-				Class.forName(db.getDriver());
-			} catch (ClassNotFoundException e)
-			{
-			}
-			jqmlogger.info("JNDI element named " + name + " was found.");
-			return new DbDataSource(db.getUrl(), db.getUser(), db.getPwd());
+			db = Main.em.createQuery("SELECT d FROM DatabaseProp d WHERE d.name = :n", DatabaseProp.class).setParameter("n", name)
+					.getSingleResult();
+		} catch (NonUniqueResultException e)
+		{
+			Thread.currentThread().setContextClassLoader(tmp);
+			throw new NameNotFoundException("JNDI name " + name + " cannot be found");
+		} catch (NoResultException e)
+		{
+			Thread.currentThread().setContextClassLoader(tmp);
+			throw new NameNotFoundException("JNDI name " + name + " cannot be found");
 		}
 
-		throw new NameNotFoundException("name " + name + " cannot be found");
+		try
+		{
+			Class.forName(db.getDriver());
+		} catch (ClassNotFoundException e)
+		{
+			Thread.currentThread().setContextClassLoader(tmp);
+			throw new NameNotFoundException("JDBC driver for JNDI name " + name + " cannot be loaded");
+		}
+
+		jqmlogger.info("JNDI element named " + name + " was found.");
+		DbDataSource ds = new DbDataSource(db.getUrl(), db.getUser(), db.getPwd());
+		Thread.currentThread().setContextClassLoader(tmp);
+		return ds;
 	}
 
 	@Override
