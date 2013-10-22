@@ -28,7 +28,7 @@
 
 			<!-- Configuration de la BDD -->
 			<property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:testdb" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:testdbengine" />
 			<property name="javax.persistence.jdbc.user" value="SA" />
 			<property name="javax.persistence.jdbc.password" value="" />
 			<property name="hibernate.hbm2ddl.auto" value="update" />

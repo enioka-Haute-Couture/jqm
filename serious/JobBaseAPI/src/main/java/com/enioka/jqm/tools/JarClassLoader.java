@@ -25,6 +25,8 @@ import java.lang.reflect.Modifier;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.acl.Owner;
+import java.util.Map;
 import java.util.jar.Attributes;
 
 import com.enioka.jqm.api.JobBase;
@@ -56,7 +58,7 @@ public class JarClassLoader extends URLClassLoader
 	public JarClassLoader(URL url, URL[] libs)
 	{
 
-		super(addUrls(url, libs));
+		super(addUrls(url, libs), null);
 		this.jarUrl = url;
 	}
 
@@ -98,27 +100,31 @@ public class JarClassLoader extends URLClassLoader
 		}
 	}
 
-	public JobBase invokeMain(JobInstance job) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException,
-			IOException, InstantiationException, IllegalAccessException
+	public JobBase invokeMain(JobInstance job) throws Exception
 	{
-
-		// this.invokeClass("Main", new String[]
-		// {});
 		System.out.println("HHHHHHHHHHHHHHH: " + job.getJd().getJavaClassName());
-		Class<? extends JobBase> c = loadClass(job.getJd().getJavaClassName()).asSubclass(JobBase.class);
+		String classQualifiedName = job.getJd().getJavaClassName();
+		Class c = loadClass(classQualifiedName);
 		System.out.println("IIIIIIIIIIII");
 
 		Object o = c.newInstance();
 
-		JobBase t = (JobBase) o;
-
-		for (JobParameter i : job.getParameters())
+		try
 		{
+			Method start = c.getMethod("start", null);
+			Method getParameters = c.getMethod("getParameters", null);
 
-			t.getParameters().put(i.getKey(), i.getValue());
+			Map<String, String> params = (Map<String, String>) getParameters.invoke(o, null);
+			for (JobParameter i : job.getParameters())
+			{
+				params.put(i.getKey(), i.getValue());
+			}
+			start.invoke(o, null);
+		} catch (Exception e)
+		{
+			System.out.println("Dynamic code error: " + e.getMessage());
+			throw e;
 		}
-		t.start();
-		return t;
-
+		return null;
 	}
 }

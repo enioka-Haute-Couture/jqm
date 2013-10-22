@@ -23,6 +23,7 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 import com.enioka.jqm.api.JobBase;
 import com.enioka.jqm.deliverabletools.DeliverableStruct;
+import com.enioka.jqm.jndi.JndiContextFactory;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.temp.Polling;
@@ -113,19 +114,19 @@ public class Loader implements Runnable
 
 				);
 
+				deps = new ArrayList<Artifact>();
 				for (int i = 0; i < dependencies.getList().size(); i++)
 				{
-					deps = new Aether(remotes, local).resolve(new DefaultArtifact(dependencies.getList().get(i)), "compile");
+					jqmlogger.info("Resolving Maven dep " + dependencies.getList().get(i));
+					deps.addAll(new Aether(remotes, local).resolve(new DefaultArtifact(dependencies.getList().get(i)), "compile"));
 				}
 
-				if (deps != null)
+				for (Artifact artifact : deps)
 				{
-					for (Artifact artifact : deps)
-					{
-						tmp.add(artifact.getFile().toURI().toURL());
-						System.out.println("Artifact: " + artifact.getFile().toURI().toURL());
-					}
+					tmp.add(artifact.getFile().toURI().toURL());
+					System.out.println("Artifact: " + artifact.getFile().toURI().toURL());
 				}
+
 			}
 			// ------------------- END: MAVEN DEPENDENCIES ---------------
 
@@ -145,10 +146,10 @@ public class Loader implements Runnable
 			// Change active class loader
 			Thread.currentThread().setContextClassLoader(jobClassLoader);
 
-			// Go! (launches the main function in the startup class
-			// designated
-			// in
-			// the manifest)
+			// Add JNDI context
+			JndiContextFactory.createJndiContext();
+
+			// Go! (launches the main function in the startup class designated in the manifest)
 			System.out.println("+++++++++++++++++++++++++++++++++++++++");
 			System.out.println("Je suis dans le thread " + Thread.currentThread().getName());
 			System.out.println("AVANT INVOKE MAIN");
@@ -161,7 +162,6 @@ public class Loader implements Runnable
 			Thread.currentThread().setContextClassLoader(contextClassLoader);
 
 			// STATE UPDATED
-
 			em.getTransaction().begin();
 
 			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())

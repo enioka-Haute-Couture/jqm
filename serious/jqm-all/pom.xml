@@ -17,8 +17,9 @@
 	<modules>
 		<module>../DataModel</module>
 		<module>../JobQueueAPI</module>
-        <module>../JqmApi</module>
+		<module>../JqmApi</module>
 		<module>../JobBaseAPI</module>
+		<module>../../tests/Fibo</module>
 	</modules>
 
 	<build>
@@ -36,12 +37,6 @@
 	</build>
 
 	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 </project>
