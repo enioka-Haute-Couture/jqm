@@ -1,5 +1,6 @@
-
 package com.enioka.jqm.tests;
+
+import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -7,10 +8,12 @@ import javax.persistence.Persistence;
 
 import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
+import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.tools.CreationTools;
 
-public class Helpers {
+public class Helpers
+{
 
 	public static DatabaseProp db = null;
 
@@ -20,12 +23,14 @@ public class Helpers {
 
 	public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
 
-	public static EntityManager getNewEm() {
+	public static EntityManager getNewEm()
+	{
 
 		return emf.createEntityManager();
 	}
 
-	public static void createLocalNode(EntityManager em) {
+	public static void createLocalNode(EntityManager em)
+	{
 
 		db = CreationTools.createDatabaseProp("jdbc/marsu", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb", "SA", "", em);
 
@@ -39,7 +44,8 @@ public class Helpers {
 		Helpers.dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal, em);
 	}
 
-	public static void cleanup(EntityManager em) {
+	public static void cleanup(EntityManager em)
+	{
 
 		em.getTransaction().begin();
 		em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
@@ -55,4 +61,21 @@ public class Helpers {
 		em.getTransaction().commit();
 	}
 
+	public static void printJobInstanceTable()
+	{
+
+		EntityManager em = getNewEm();
+
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j", JobInstance.class)
+				.getResultList();
+
+		for (JobInstance jobInstance : res)
+		{
+
+			System.out.println("==========================================================================================");
+			System.out.println("JobInstance Id: " + jobInstance.getId() + " ---> " + jobInstance.getPosition() + " | "
+					+ jobInstance.getState() + " | " + jobInstance.getJd().getId() + " | " + jobInstance.getQueue().getName());
+			System.out.println("==========================================================================================");
+		}
+	}
 }

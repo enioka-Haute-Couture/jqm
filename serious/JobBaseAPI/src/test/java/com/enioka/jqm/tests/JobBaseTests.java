@@ -23,25 +23,6 @@ import com.enioka.jqm.tools.Main;
 
 public class JobBaseTests
 {
-
-	public void printJobInstanceTable()
-	{
-
-		EntityManager em = Helpers.getNewEm();
-
-		ArrayList<JobInstance> res = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j", JobInstance.class)
-				.getResultList();
-
-		for (JobInstance jobInstance : res)
-		{
-
-			System.out.println("==========================================================================================");
-			System.out.println("JobInstance Id: " + jobInstance.getId() + " ---> " + jobInstance.getPosition() + " | "
-					+ jobInstance.getState() + " | " + jobInstance.getJd().getId() + " | " + jobInstance.getQueue().getName());
-			System.out.println("==========================================================================================");
-		}
-	}
-
 	@Test
 	public void testHighlanderMode() throws Exception
 	{
@@ -115,11 +96,11 @@ public class JobBaseTests
 
 		JobDefinition j = new JobDefinition("getDeliverables", "MAG");
 
-		printJobInstanceTable();
+		Helpers.printJobInstanceTable();
 
 		Dispatcher.enQueue(j);
 
-		printJobInstanceTable();
+		Helpers.printJobInstanceTable();
 
 		JobInstance ji = emmm.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :myId", JobInstance.class)
 				.setParameter("myId", jdDemoMaven.getId()).getSingleResult();
@@ -132,7 +113,7 @@ public class JobBaseTests
 
 		Assert.assertEquals(true, f.exists());
 
-		printJobInstanceTable();
+		Helpers.printJobInstanceTable();
 
 		@SuppressWarnings("unused")
 		List<InputStream> tmp = Dispatcher.getDeliverables(ji.getId());
@@ -173,13 +154,13 @@ public class JobBaseTests
 
 		Thread.sleep(10000);
 
-		printJobInstanceTable();
+		Helpers.printJobInstanceTable();
 
 		File f = new File("./testprojects/JobGenADeliverable/JobGenADeliverable42.txt");
 
 		Assert.assertEquals(true, f.exists());
 
-		printJobInstanceTable();
+		Helpers.printJobInstanceTable();
 
 		com.enioka.jqm.api.Deliverable d = new com.enioka.jqm.api.Deliverable("./testprojects/JobGenADeliverable/",
 				"JobGenADeliverable42.txt");
@@ -242,7 +223,7 @@ public class JobBaseTests
 		Dispatcher.enQueue(j2);
 		Dispatcher.enQueue(j3);
 
-		printJobInstanceTable();
+		Helpers.printJobInstanceTable();
 
 		Main.main(new String[] { "localhost" });
 
@@ -257,7 +238,7 @@ public class JobBaseTests
 		Assert.assertEquals(true, f2.exists());
 		Assert.assertEquals(true, f3.exists());
 
-		printJobInstanceTable();
+		Helpers.printJobInstanceTable();
 
 		List<Deliverable> tmp = Dispatcher.getUserDeliverables("Franquin");
 
