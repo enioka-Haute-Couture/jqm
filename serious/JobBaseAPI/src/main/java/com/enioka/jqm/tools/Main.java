@@ -33,6 +33,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
+import com.enioka.jqm.jndi.JndiContextFactory;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.temp.Polling;
@@ -58,6 +59,9 @@ public class Main
 	{
 		java.lang.System.setProperty("log4j.debug", "true");
 	
+		// JNDI
+		JndiContextFactory.createJndiContext(Thread.currentThread().getContextClassLoader());
+		
 		// Jetty
 		server = new Server(8081);
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);

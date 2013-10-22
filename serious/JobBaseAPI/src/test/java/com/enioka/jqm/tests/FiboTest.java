@@ -4,7 +4,12 @@ import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.hsqldb.Server;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.enioka.jqm.api.Dispatcher;
@@ -16,11 +21,29 @@ import com.enioka.jqm.tools.Main;
 
 public class FiboTest
 {
+	public static Server s;
+	
+	@BeforeClass
+	public static void testInit()
+	{
+		s = new Server();
+		s.setDatabaseName(0, "testdbengine");
+		s.setDatabasePath(0, "mem:testdbengine");
+		s.setLogWriter(null);
+		s.setSilent(true);
+		s.start();
+		
+	}
+
+	@AfterClass
+	public static void end()
+	{
+		s.stop();
+	}
 
 	@Test
 	public void testFibo() throws Exception
 	{
-
 		EntityManager em = Helpers.getNewEm();
 		Helpers.createLocalNode(em);
 
@@ -40,13 +63,13 @@ public class FiboTest
 
 		// Create JNDI connection to write inside the engine database
 		em.getTransaction().begin();
-		CreationTools.createDatabaseProp("jdbc/jqm", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:testdbengine", "SA", "", em);
+		CreationTools.createDatabaseProp("jdbc/jqm", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em);
 		em.getTransaction().commit();
 
 		// Start the engine
 		Main.main(new String[] { "localhost" });
 
-		Thread.sleep(1000000);
+		Thread.sleep(10000);
 		Main.stop();
 
 		long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();

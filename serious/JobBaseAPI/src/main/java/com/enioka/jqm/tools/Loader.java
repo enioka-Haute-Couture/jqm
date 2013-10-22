@@ -3,6 +3,7 @@ package com.enioka.jqm.tools;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -77,12 +78,9 @@ public class Loader implements Runnable
 
 		try
 		{
-
-			System.out.println("TOUT DEBUT LOADER");
-			// Main.p.updateExecutionDate();
+			jqmlogger.debug("TOUT DEBUT LOADER");
 
 			// ---------------- BEGIN: MAVEN DEPENDENCIES ------------------
-
 			File local = new File(System.getProperty("user.home") + "/.m2/repository");
 			File jar = new File(job.getJd().getJarPath());
 			URL jars = jar.toURI().toURL();
@@ -92,6 +90,7 @@ public class Loader implements Runnable
 			// Update of the job status
 			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", job)
 					.getSingleResult();
+			jqmlogger.debug("History was updated");
 
 			CreationTools.createMessage("Status updated: RUNNING", h, em);
 
@@ -101,10 +100,10 @@ public class Loader implements Runnable
 			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", job.getId())
 					.setParameter("msg", "RUNNING").executeUpdate();
 			transac.commit();
+			jqmlogger.debug("JobInstance was updated");
 
 			if (!cache.containsKey(job.getJd().getApplicationName()))
 			{
-
 				Dependencies dependencies = new Dependencies(job.getJd().getFilePath() + "pom.xml");
 
 				isInCache = false;
@@ -124,9 +123,8 @@ public class Loader implements Runnable
 				for (Artifact artifact : deps)
 				{
 					tmp.add(artifact.getFile().toURI().toURL());
-					System.out.println("Artifact: " + artifact.getFile().toURI().toURL());
+					jqmlogger.info("Artifact: " + artifact.getFile().toURI().toURL());
 				}
-
 			}
 			// ------------------- END: MAVEN DEPENDENCIES ---------------
 
@@ -144,19 +142,17 @@ public class Loader implements Runnable
 				jobClassLoader = (JarClassLoader) cache.get(job.getJd().getApplicationName());
 
 			// Change active class loader
+			jqmlogger.debug("Setting class loader");
 			Thread.currentThread().setContextClassLoader(jobClassLoader);
-
-			// Add JNDI context
-			JndiContextFactory.createJndiContext(contextClassLoader);
+			jqmlogger.info("Class Loader was set correctly");
 
 			// Go! (launches the main function in the startup class designated in the manifest)
-			System.out.println("+++++++++++++++++++++++++++++++++++++++");
-			System.out.println("Je suis dans le thread " + Thread.currentThread().getName());
-			System.out.println("AVANT INVOKE MAIN");
+			jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
+			jqmlogger.debug("Je suis dans le thread " + Thread.currentThread().getName());
+			jqmlogger.debug("AVANT INVOKE MAIN");
 			jobBase = jobClassLoader.invokeMain(job);
 			p.setActualNbThread(p.getActualNbThread() - 1);
-
-			System.out.println("+++++++++++++++++++++++++++++++++++++++");
+			jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
 
 			// Restore class loader
 			Thread.currentThread().setContextClassLoader(contextClassLoader);
@@ -174,23 +170,20 @@ public class Loader implements Runnable
 			CreationTools.createMessage("Status updated: ENDED", h, em);
 			em.getTransaction().commit();
 
-			if (this.jobBase.getSha1s().size() != 0)
-			{
-				for (int j = 0; j < this.jobBase.getSha1s().size(); j++)
-				{
-					em.getTransaction().begin();
+			/*
+			 * if (this.jobBase.getSha1s().size() != 0) { for (int j = 0; j < this.jobBase.getSha1s().size(); j++) {
+			 * em.getTransaction().begin();
+			 * 
+			 * System.out.println("SHA1: " + this.jobBase.getSha1s().get(j).getFilePath()); System.out.println("FILEPATH ADDED: " +
+			 * this.jobBase.getSha1s().get(j).getFilePath()); CreationTools.createDeliverable(this.jobBase.getSha1s().get(j).getFilePath(),
+			 * this.jobBase.getSha1s().get(j) .getFileName(), this.jobBase.getSha1s().get(j).getHashPath(),
+			 * this.jobBase.getSha1s().get(j).getFileFamily(), this.job.getId(), em); System.out.println("JOBID: " + this.job.getId());
+			 * em.getTransaction().commit(); } }
+			 */
 
-					System.out.println("SHA1: " + this.jobBase.getSha1s().get(j).getFilePath());
-					System.out.println("FILEPATH ADDED: " + this.jobBase.getSha1s().get(j).getFilePath());
-					CreationTools.createDeliverable(this.jobBase.getSha1s().get(j).getFilePath(), this.jobBase.getSha1s().get(j)
-							.getFileName(), this.jobBase.getSha1s().get(j).getHashPath(), this.jobBase.getSha1s().get(j).getFileFamily(),
-							this.job.getId(), em);
-					System.out.println("JOBID: " + this.job.getId());
-					em.getTransaction().commit();
-				}
-			}
-			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+			jqmlogger.debug("End of loader. Thread will now end");
+			jqmlogger.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+			jqmlogger.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
 		} catch (DependencyResolutionException e)
 		{
@@ -234,6 +227,7 @@ public class Loader implements Runnable
 			jqmlogger.info(e);
 		} catch (Exception e)
 		{
+			jqmlogger.error("An error occured during job execution or preparation: " + e.getMessage(), e);
 		} finally
 		{
 			try
