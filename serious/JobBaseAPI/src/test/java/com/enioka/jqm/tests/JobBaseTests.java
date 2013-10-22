@@ -1,4 +1,3 @@
-
 package com.enioka.jqm.tests;
 
 import java.io.File;
@@ -22,25 +21,30 @@ import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.tools.CreationTools;
 import com.enioka.jqm.tools.Main;
 
-public class JobBaseTests {
+public class JobBaseTests
+{
 
-	public void printJobInstanceTable() {
+	public void printJobInstanceTable()
+	{
 
 		EntityManager em = Helpers.getNewEm();
 
-		ArrayList<JobInstance> res = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList();
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j", JobInstance.class)
+				.getResultList();
 
-		for (JobInstance jobInstance : res) {
+		for (JobInstance jobInstance : res)
+		{
 
 			System.out.println("==========================================================================================");
-			System.out.println("JobInstance Id: " + jobInstance.getId() + " ---> " + jobInstance.getPosition() + " | " + jobInstance.getState()
-			        + " | " + jobInstance.getJd().getId() + " | " + jobInstance.getQueue().getName());
+			System.out.println("JobInstance Id: " + jobInstance.getId() + " ---> " + jobInstance.getPosition() + " | "
+					+ jobInstance.getState() + " | " + jobInstance.getJd().getId() + " | " + jobInstance.getQueue().getName());
 			System.out.println("==========================================================================================");
 		}
 	}
 
 	@Test
-	public void testHighlanderMode() throws Exception {
+	public void testHighlanderMode() throws Exception
+	{
 
 		EntityManager em = Helpers.getNewEm();
 		Helpers.cleanup(em);
@@ -51,8 +55,8 @@ public class JobBaseTests {
 		jdargs.add(jdp);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
-		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other",
-		        "other", "other", true, em);
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
@@ -63,16 +67,16 @@ public class JobBaseTests {
 		em.getTransaction().begin();
 
 		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
-		        .setParameter("myId", 2).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+				.setParameter("myId", 2).setParameter("i", jdDemoMaven.getId()).getSingleResult();
 
-		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId()).executeUpdate();
+		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId())
+				.executeUpdate();
 
 		em.getTransaction().commit();
 
 		em.getTransaction().begin();
 
-		Main.main(new String[]
-		{ "localhost" });
+		Main.main(new String[] { "localhost" });
 
 		Thread.sleep(10000);
 		Main.stop();
@@ -82,7 +86,7 @@ public class JobBaseTests {
 		EntityManager emm = Helpers.getNewEm();
 
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
-		        JobInstance.class).getResultList();
+				JobInstance.class).getResultList();
 
 		Assert.assertEquals("ENDED", res.get(0).getState());
 		Assert.assertEquals("CANCELLED", res.get(1).getState());
@@ -90,7 +94,8 @@ public class JobBaseTests {
 	}
 
 	@Test
-	public void testGetDeliverables() throws Exception {
+	public void testGetDeliverables() throws Exception
+	{
 
 		EntityManager em = Helpers.getNewEm();
 		Helpers.cleanup(em);
@@ -105,8 +110,8 @@ public class JobBaseTests {
 		jdargs.add(jdp2);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
-		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "getDeliverables", 42, "Franquin", "ModuleMachin",
-		        "other", "other", "other", false, em);
+				"./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "getDeliverables", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("getDeliverables", "MAG");
 
@@ -117,10 +122,9 @@ public class JobBaseTests {
 		printJobInstanceTable();
 
 		JobInstance ji = emmm.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :myId", JobInstance.class)
-		        .setParameter("myId", jdDemoMaven.getId()).getSingleResult();
+				.setParameter("myId", jdDemoMaven.getId()).getSingleResult();
 
-		Main.main(new String[]
-		{ "localhost" });
+		Main.main(new String[] { "localhost" });
 
 		Thread.sleep(10000);
 
@@ -140,7 +144,8 @@ public class JobBaseTests {
 	}
 
 	@Test
-	public void testGetOneDeliverable() throws Exception {
+	public void testGetOneDeliverable() throws Exception
+	{
 
 		EntityManager em = Helpers.getNewEm();
 		Helpers.cleanup(em);
@@ -154,18 +159,17 @@ public class JobBaseTests {
 		jdargs.add(jdp2);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
-		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
-		        "other", "other", "other", false, em);
+				"./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "Franquin");
 
 		Dispatcher.enQueue(j);
 
 		JobInstance ji = emm.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :myId", JobInstance.class)
-		        .setParameter("myId", jdDemoMaven.getId()).getSingleResult();
+				.setParameter("myId", jdDemoMaven.getId()).getSingleResult();
 
-		Main.main(new String[]
-		{ "localhost" });
+		Main.main(new String[] { "localhost" });
 
 		Thread.sleep(10000);
 
@@ -177,7 +181,8 @@ public class JobBaseTests {
 
 		printJobInstanceTable();
 
-		com.enioka.jqm.api.Deliverable d = new com.enioka.jqm.api.Deliverable("./testprojects/JobGenADeliverable/", "JobGenADeliverable42.txt");
+		com.enioka.jqm.api.Deliverable d = new com.enioka.jqm.api.Deliverable("./testprojects/JobGenADeliverable/",
+				"JobGenADeliverable42.txt");
 
 		@SuppressWarnings("unused")
 		InputStream tmp = Dispatcher.getOneDeliverable(d);
@@ -189,7 +194,8 @@ public class JobBaseTests {
 	}
 
 	@Test
-	public void testGetUserDeliverables() throws Exception {
+	public void testGetUserDeliverables() throws Exception
+	{
 
 		EntityManager em = Helpers.getNewEm();
 		Helpers.cleanup(em);
@@ -215,18 +221,18 @@ public class JobBaseTests {
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
-		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication1", 42, "Franquin", "ModuleMachin",
-		        "other", "other", "other", false, em);
+				"./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication1", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs2, "./testprojects/JobGenADeliverable/",
-		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication2", 42, "Franquin", "ModuleMachin",
-		        "other", "other", "other", false, em);
+				"./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication2", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven3 = CreationTools.createJobDef(true, "App", jdargs3, "./testprojects/JobGenADeliverable/",
-		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication3", 42, "Franquin", "ModuleMachin",
-		        "other", "other", "other", false, em);
+				"./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication3", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j1 = new JobDefinition("MarsuApplication1", "Franquin");
 		JobDefinition j2 = new JobDefinition("MarsuApplication2", "Franquin");
@@ -238,8 +244,7 @@ public class JobBaseTests {
 
 		printJobInstanceTable();
 
-		Main.main(new String[]
-		{ "localhost" });
+		Main.main(new String[] { "localhost" });
 
 		Thread.sleep(20000);
 		Main.stop();
@@ -261,7 +266,8 @@ public class JobBaseTests {
 	}
 
 	@Test
-	public void testGetUserJobs() throws Exception {
+	public void testGetUserJobs() throws Exception
+	{
 
 		EntityManager em = Helpers.getNewEm();
 		Helpers.cleanup(em);
@@ -272,8 +278,8 @@ public class JobBaseTests {
 		jdargs.add(jdp);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
-		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other",
-		        "other", "other", true, em);
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
@@ -284,24 +290,25 @@ public class JobBaseTests {
 		em.getTransaction().begin();
 
 		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
-		        .setParameter("myId", 2).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+				.setParameter("myId", 2).setParameter("i", jdDemoMaven.getId()).getSingleResult();
 
 		JobInstance ji2 = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
-		        .setParameter("myId", 3).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+				.setParameter("myId", 3).setParameter("i", jdDemoMaven.getId()).getSingleResult();
 
 		JobInstance ji3 = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
-		        .setParameter("myId", 1).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+				.setParameter("myId", 1).setParameter("i", jdDemoMaven.getId()).getSingleResult();
 
-		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId()).executeUpdate();
+		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId())
+				.executeUpdate();
 		em.createQuery("UPDATE JobInstance j SET j.state = 'ENDED' WHERE j.id = :idJob").setParameter("idJob", ji2.getId()).executeUpdate();
-		em.createQuery("UPDATE JobInstance j SET j.state = 'RUNNING' WHERE j.id = :idJob").setParameter("idJob", ji3.getId()).executeUpdate();
+		em.createQuery("UPDATE JobInstance j SET j.state = 'RUNNING' WHERE j.id = :idJob").setParameter("idJob", ji3.getId())
+				.executeUpdate();
 
 		em.getTransaction().commit();
 
 		em.getTransaction().begin();
 
-		Main.main(new String[]
-		{ "localhost" });
+		Main.main(new String[] { "localhost" });
 
 		Thread.sleep(10000);
 		Main.stop();
@@ -311,13 +318,14 @@ public class JobBaseTests {
 		EntityManager emm = Helpers.getNewEm();
 
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
-		        JobInstance.class).getResultList();
+				JobInstance.class).getResultList();
 
 		Assert.assertEquals(3, res.size());
 	}
 
 	@Test
-	public void testGetJobs() throws Exception {
+	public void testGetJobs() throws Exception
+	{
 
 		EntityManager em = Helpers.getNewEm();
 		Helpers.cleanup(em);
@@ -328,8 +336,8 @@ public class JobBaseTests {
 		jdargs.add(jdp);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
-		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other",
-		        "other", "other", true, em);
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
 
 		ArrayList<JobDefParameter> jdargs2 = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp2 = CreationTools.createJobDefParameter("filepath", "./testprojects/JobGenADeliverable/", em);
@@ -339,8 +347,8 @@ public class JobBaseTests {
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
-		        "./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "test", 42, "Franquin", "ModuleMachin", "other",
-		        "other", "other", false, em);
+				"./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "test", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 		JobDefinition j2 = new JobDefinition("test", "Toto");
@@ -353,24 +361,25 @@ public class JobBaseTests {
 		em.getTransaction().begin();
 
 		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
-		        .setParameter("myId", 2).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+				.setParameter("myId", 2).setParameter("i", jdDemoMaven.getId()).getSingleResult();
 
 		JobInstance ji2 = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
-		        .setParameter("myId", 3).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+				.setParameter("myId", 3).setParameter("i", jdDemoMaven.getId()).getSingleResult();
 
 		JobInstance ji3 = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
-		        .setParameter("myId", 1).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+				.setParameter("myId", 1).setParameter("i", jdDemoMaven.getId()).getSingleResult();
 
-		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId()).executeUpdate();
+		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId())
+				.executeUpdate();
 		em.createQuery("UPDATE JobInstance j SET j.state = 'ENDED' WHERE j.id = :idJob").setParameter("idJob", ji2.getId()).executeUpdate();
-		em.createQuery("UPDATE JobInstance j SET j.state = 'RUNNING' WHERE j.id = :idJob").setParameter("idJob", ji3.getId()).executeUpdate();
+		em.createQuery("UPDATE JobInstance j SET j.state = 'RUNNING' WHERE j.id = :idJob").setParameter("idJob", ji3.getId())
+				.executeUpdate();
 
 		em.getTransaction().commit();
 
 		em.getTransaction().begin();
 
-		Main.main(new String[]
-		{ "localhost" });
+		Main.main(new String[] { "localhost" });
 
 		Thread.sleep(10000);
 		Main.stop();
@@ -380,20 +389,20 @@ public class JobBaseTests {
 		EntityManager emm = Helpers.getNewEm();
 
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
-		        JobInstance.class).getResultList();
+				JobInstance.class).getResultList();
 
 		Assert.assertEquals(4, res.size());
 	}
 
 	@Test
-	public void testGetQueues() throws Exception {
+	public void testGetQueues() throws Exception
+	{
 
 		EntityManager em = Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
-		Main.main(new String[]
-		{ "localhost" });
+		Main.main(new String[] { "localhost" });
 
 		Thread.sleep(10000);
 		Main.stop();
@@ -404,7 +413,8 @@ public class JobBaseTests {
 	}
 
 	@Test
-	public void testGoodOrder() throws Exception {
+	public void testGoodOrder() throws Exception
+	{
 
 		EntityManager em = Helpers.getNewEm();
 		Helpers.cleanup(em);
@@ -416,18 +426,18 @@ public class JobBaseTests {
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
-		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other",
-		        "other", "other", true, em);
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
-		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qNormal, 42, "MarsuApplication2", 42, "Franquin", "ModuleMachin", "other",
-		        "other", "other", true, em);
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qNormal, 42, "MarsuApplication2", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd2 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
-		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qSlow, 42, "MarsuApplication3", 42, "Franquin", "ModuleMachin", "other",
-		        "other", "other", true, em);
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qSlow, 42, "MarsuApplication3", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 		JobDefinition jj = new JobDefinition("MarsuApplication2", "Franquin");
@@ -440,8 +450,7 @@ public class JobBaseTests {
 		Dispatcher.enQueue(jj);
 		Dispatcher.enQueue(jjj);
 
-		Main.main(new String[]
-		{ "localhost" });
+		Main.main(new String[] { "localhost" });
 
 		Thread.sleep(10);
 
@@ -453,29 +462,35 @@ public class JobBaseTests {
 		Thread.sleep(1000);
 		Main.stop();
 
-		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j WHERE j.queue = :q ORDER BY j.position ASC", JobInstance.class);
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j WHERE j.queue = :q ORDER BY j.position ASC",
+				JobInstance.class);
 		query.setParameter("q", Helpers.qVip);
 		ArrayList<JobInstance> resVIP = (ArrayList<JobInstance>) query.getResultList();
 
-		TypedQuery<JobInstance> query2 = em.createQuery("SELECT j FROM JobInstance j WHERE j.queue = :q ORDER BY j.position ASC", JobInstance.class);
+		TypedQuery<JobInstance> query2 = em.createQuery("SELECT j FROM JobInstance j WHERE j.queue = :q ORDER BY j.position ASC",
+				JobInstance.class);
 		query2.setParameter("q", Helpers.qNormal);
 		ArrayList<JobInstance> resNormal = (ArrayList<JobInstance>) query.getResultList();
 
-		TypedQuery<JobInstance> query3 = em.createQuery("SELECT j FROM JobInstance j WHERE j.queue = :q ORDER BY j.position ASC", JobInstance.class);
+		TypedQuery<JobInstance> query3 = em.createQuery("SELECT j FROM JobInstance j WHERE j.queue = :q ORDER BY j.position ASC",
+				JobInstance.class);
 		query3.setParameter("q", Helpers.qSlow);
 		ArrayList<JobInstance> resSlow = (ArrayList<JobInstance>) query.getResultList();
 
-		for (int i = 0; i < resVIP.size() - 1; i++) {
+		for (int i = 0; i < resVIP.size() - 1; i++)
+		{
 
 			Assert.assertNotEquals(resVIP.get(i).getPosition(), resVIP.get(i + 1).getPosition());
 		}
 
-		for (int i = 0; i < resNormal.size() - 1; i++) {
+		for (int i = 0; i < resNormal.size() - 1; i++)
+		{
 
 			Assert.assertNotEquals(resNormal.get(i).getPosition(), resNormal.get(i + 1).getPosition());
 		}
 
-		for (int i = 0; i < resSlow.size() - 1; i++) {
+		for (int i = 0; i < resSlow.size() - 1; i++)
+		{
 
 			Assert.assertNotEquals(resSlow.get(i).getPosition(), resSlow.get(i + 1).getPosition());
 		}

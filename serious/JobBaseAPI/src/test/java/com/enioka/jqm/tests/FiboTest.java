@@ -1,4 +1,3 @@
-
 package com.enioka.jqm.tests;
 
 import java.util.ArrayList;
@@ -15,10 +14,12 @@ import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.tools.CreationTools;
 import com.enioka.jqm.tools.Main;
 
-public class FiboTest {
+public class FiboTest
+{
 
 	@Test
-	public void testFibo() throws Exception {
+	public void testFibo() throws Exception
+	{
 
 		EntityManager em = Helpers.getNewEm();
 		Helpers.createLocalNode(em);
@@ -28,8 +29,8 @@ public class FiboTest {
 		jdargs.add(jdp);
 
 		@SuppressWarnings("unused")
-		JobDef jd = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/Fibo/", "./testprojects/Fibo/Fibo.jar", Helpers.qVip, 42, "Fibo",
-		        42, "Franquin", "ModuleMachin", "other1", "other2", "other3", false, em);
+		JobDef jd = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/Fibo/", "./testprojects/Fibo/Fibo.jar", Helpers.qVip,
+				42, "Fibo", 42, "Franquin", "ModuleMachin", "other1", "other2", "other3", false, em);
 
 		JobDefinition form = new JobDefinition("Fibo", "MAG");
 		form.addParameter("p1", "1");
@@ -37,8 +38,7 @@ public class FiboTest {
 		Dispatcher.enQueue(form);
 
 		// Start the engine
-		Main.main(new String[]
-		{ "localhost" });
+		Main.main(new String[] { "localhost" });
 
 		Thread.sleep(10000);
 		Main.stop();

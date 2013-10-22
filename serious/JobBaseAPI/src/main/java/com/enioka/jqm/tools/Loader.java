@@ -1,4 +1,3 @@
-
 package com.enioka.jqm.tools;
 
 import java.io.File;
@@ -28,7 +27,8 @@ import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.jcabi.aether.Aether;
 
-public class Loader implements Runnable {
+public class Loader implements Runnable
+{
 
 	JobInstance job = null;
 	JobBase jobBase = new JobBase();
@@ -39,25 +39,28 @@ public class Loader implements Runnable {
 	boolean isInCache = true;
 	Logger jqmlogger = Logger.getLogger(this.getClass());
 
-	public Loader(JobInstance job, Map<String, ClassLoader> cache) {
+	public Loader(JobInstance job, Map<String, ClassLoader> cache)
+	{
 
 		this.job = job;
 		this.cache = cache;
 	}
 
-	public void crashedStatus() {
+	public void crashedStatus()
+	{
 
 		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
 		// STATE UPDATED
 
-		em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId()).setParameter("msg", "CRASHED")
-		        .executeUpdate();
+		em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
+				.setParameter("msg", "CRASHED").executeUpdate();
 
 		// MESSAGE HISTORY UPDATED
 
-		History h = em.createQuery("SELECT h FROM History h WHERE h.id = :j", History.class).setParameter("j", job.getId()).getSingleResult();
+		History h = em.createQuery("SELECT h FROM History h WHERE h.id = :j", History.class).setParameter("j", job.getId())
+				.getSingleResult();
 
 		CreationTools.createMessage("Status updated: ATTRIBUTED", h, em);
 
@@ -65,9 +68,11 @@ public class Loader implements Runnable {
 	}
 
 	@Override
-	public void run() {
+	public void run()
+	{
 
-		try {
+		try
+		{
 
 			System.out.println("TOUT DEBUT LOADER");
 			// Main.p.updateExecutionDate();
@@ -81,34 +86,39 @@ public class Loader implements Runnable {
 			Collection<Artifact> deps = null;
 
 			// Update of the job status
-			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", job).getSingleResult();
+			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", job)
+					.getSingleResult();
 
 			CreationTools.createMessage("Status updated: RUNNING", h, em);
 
 			EntityTransaction transac = em.getTransaction();
 			transac.begin();
 
-			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", job.getId()).setParameter("msg", "RUNNING")
-			        .executeUpdate();
+			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", job.getId())
+					.setParameter("msg", "RUNNING").executeUpdate();
 			transac.commit();
 
-			if (!cache.containsKey(job.getJd().getApplicationName())) {
+			if (!cache.containsKey(job.getJd().getApplicationName()))
+			{
 
 				Dependencies dependencies = new Dependencies(job.getJd().getFilePath() + "pom.xml");
 
 				isInCache = false;
 				Collection<RemoteRepository> remotes = Arrays.asList(new RemoteRepository("maven-central", "default",
-				        "http://repo1.maven.org/maven2/"), new RemoteRepository("eclipselink", "default",
-				        "http://download.eclipse.org/rt/eclipselink/maven.repo/")
+						"http://repo1.maven.org/maven2/"), new RemoteRepository("eclipselink", "default",
+						"http://download.eclipse.org/rt/eclipselink/maven.repo/")
 
 				);
 
-				for (int i = 0; i < dependencies.getList().size(); i++) {
+				for (int i = 0; i < dependencies.getList().size(); i++)
+				{
 					deps = new Aether(remotes, local).resolve(new DefaultArtifact(dependencies.getList().get(i)), "compile");
 				}
 
-				if (deps != null) {
-					for (Artifact artifact : deps) {
+				if (deps != null)
+				{
+					for (Artifact artifact : deps)
+					{
 						tmp.add(artifact.getFile().toURI().toURL());
 						System.out.println("Artifact: " + artifact.getFile().toURI().toURL());
 					}
@@ -121,10 +131,12 @@ public class Loader implements Runnable {
 			JarClassLoader jobClassLoader = null;
 			URL[] urls = tmp.toArray(new URL[tmp.size()]);
 
-			if (!isInCache) {
+			if (!isInCache)
+			{
 				jobClassLoader = new JarClassLoader(jars, urls);
 				cache.put(job.getJd().getApplicationName(), jobClassLoader);
-			} else
+			}
+			else
 				jobClassLoader = (JarClassLoader) cache.get(job.getJd().getApplicationName());
 
 			// Change active class loader
@@ -148,8 +160,8 @@ public class Loader implements Runnable {
 
 			em.getTransaction().begin();
 
-			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId()).setParameter("msg", "ENDED")
-			        .executeUpdate();
+			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
+					.setParameter("msg", "ENDED").executeUpdate();
 
 			// MESSAGE HISTORY UPDATED
 			em.getTransaction().commit();
@@ -158,14 +170,17 @@ public class Loader implements Runnable {
 			CreationTools.createMessage("Status updated: ENDED", h, em);
 			em.getTransaction().commit();
 
-			if (this.jobBase.getSha1s().size() != 0) {
-				for (int j = 0; j < this.jobBase.getSha1s().size(); j++) {
+			if (this.jobBase.getSha1s().size() != 0)
+			{
+				for (int j = 0; j < this.jobBase.getSha1s().size(); j++)
+				{
 					em.getTransaction().begin();
 
 					System.out.println("SHA1: " + this.jobBase.getSha1s().get(j).getFilePath());
 					System.out.println("FILEPATH ADDED: " + this.jobBase.getSha1s().get(j).getFilePath());
-					CreationTools.createDeliverable(this.jobBase.getSha1s().get(j).getFilePath(), this.jobBase.getSha1s().get(j).getFileName(),
-					        this.jobBase.getSha1s().get(j).getHashPath(), this.jobBase.getSha1s().get(j).getFileFamily(), this.job.getId(), em);
+					CreationTools.createDeliverable(this.jobBase.getSha1s().get(j).getFilePath(), this.jobBase.getSha1s().get(j)
+							.getFileName(), this.jobBase.getSha1s().get(j).getHashPath(), this.jobBase.getSha1s().get(j).getFileFamily(),
+							this.job.getId(), em);
 					System.out.println("JOBID: " + this.job.getId());
 					em.getTransaction().commit();
 				}
@@ -173,63 +188,81 @@ public class Loader implements Runnable {
 			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
-		} catch (DependencyResolutionException e) {
+		} catch (DependencyResolutionException e)
+		{
 			crashedStatus();
 			jqmlogger.info(e);
-		} catch (MalformedURLException e) {
+		} catch (MalformedURLException e)
+		{
 			crashedStatus();
 			jqmlogger.info(e);
-		} catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException e)
+		{
 			crashedStatus();
 			jqmlogger.info(e);
-		} catch (SecurityException e) {
+		} catch (SecurityException e)
+		{
 			crashedStatus();
 			jqmlogger.info(e);
-		} catch (NoSuchMethodException e) {
+		} catch (NoSuchMethodException e)
+		{
 			crashedStatus();
 			jqmlogger.info(e);
-		} catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e)
+		{
 			crashedStatus();
 			jqmlogger.info(e);
-		} catch (InvocationTargetException e) {
+		} catch (InvocationTargetException e)
+		{
 			crashedStatus();
 			jqmlogger.info(e);
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			crashedStatus();
 			jqmlogger.info(e);
-		} catch (InstantiationException e) {
+		} catch (InstantiationException e)
+		{
 			crashedStatus();
 			jqmlogger.info(e);
-		} catch (IllegalAccessException e) {
+		} catch (IllegalAccessException e)
+		{
 			crashedStatus();
 			jqmlogger.info(e);
-		} catch (Exception e) {
-		} finally {
-			try {
+		} catch (Exception e)
+		{
+		} finally
+		{
+			try
+			{
 				em.close();
 				emf.close();
-			} catch (Exception e) {
+			} catch (Exception e)
+			{
 			}
 		}
 
 	}
 
-	public JobInstance getJob() {
+	public JobInstance getJob()
+	{
 
 		return job;
 	}
 
-	public void setJob(JobInstance job) {
+	public void setJob(JobInstance job)
+	{
 
 		this.job = job;
 	}
 
-	public JobBase getJobBase() {
+	public JobBase getJobBase()
+	{
 
 		return jobBase;
 	}
 
-	public void setJobBase(JobBase jobBase) {
+	public void setJobBase(JobBase jobBase)
+	{
 
 		this.jobBase = jobBase;
 	}

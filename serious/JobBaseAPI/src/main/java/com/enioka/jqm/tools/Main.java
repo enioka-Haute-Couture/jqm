@@ -36,7 +36,8 @@ import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.temp.Polling;
 
-public class Main {
+public class Main
+{
 
 	public static ArrayList<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
 	public static ArrayList<Polling> pollers = new ArrayList<Polling>();
@@ -53,7 +54,8 @@ public class Main {
 	 * @param args
 	 * @throws Exception
 	 */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception
+	{
 
 		// @SuppressWarnings("unused")
 		// JndiContext ctx = JndiContextFactory.createJndiContext(db);
@@ -66,16 +68,19 @@ public class Main {
 
 		server.start();
 
-		if (args.length == 1) {
+		if (args.length == 1)
+		{
 
-			node = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :li", Node.class).setParameter("li", args[0]).getSingleResult();
+			node = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :li", Node.class).setParameter("li", args[0])
+					.getSingleResult();
 
 			dps = (ArrayList<DeploymentParameter>) em
-			        .createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
-			        .setParameter("n", node.getId()).getResultList();
+					.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
+					.setParameter("n", node.getId()).getResultList();
 		}
 
-		for (DeploymentParameter i : dps) {
+		for (DeploymentParameter i : dps)
+		{
 
 			Polling p = new Polling(i, cache);
 			pollers.add(p);
@@ -85,21 +90,27 @@ public class Main {
 		System.out.println("End of main");
 	}
 
-	public static void stop() {
+	public static void stop()
+	{
 
-		for (Polling p : pollers) {
+		for (Polling p : pollers)
+		{
 			p.stop();
 		}
-		try {
+		try
+		{
 			server.stop();
-		} catch (Exception e) {
+		} catch (Exception e)
+		{
 
 		}
 	}
 
-	public static void run() {
+	public static void run()
+	{
 
-		for (Polling p : pollers) {
+		for (Polling p : pollers)
+		{
 			Thread t = new Thread(p);
 			t.start();
 		}
