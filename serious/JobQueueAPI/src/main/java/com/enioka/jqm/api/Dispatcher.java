@@ -146,7 +146,6 @@ public class Dispatcher {
 
     		for (JobDefParameter i : jdef.getParameters())
     		{
-
     			res.add(CreationTools.createJobParameter(i.getKey(), i.getValue(), em));
             }
 
@@ -156,7 +155,6 @@ public class Dispatcher {
     	{
     		for (JobDefParameter i : jdef.getParameters())
     		{
-
     			res.add(CreationTools.createJobParameter(i.getKey(), i.getValue(), em));
     		}
 
@@ -192,7 +190,9 @@ public class Dispatcher {
 						present = true;
 
 					if (j == res.size() - 1 && !present)
+					{
 						res.add(CreationTools.createJobParameter(key, value, em));
+					}
 				}
 			}
 
@@ -234,6 +234,7 @@ public class Dispatcher {
 
 		JobInstance ji = CreationTools.createJobInstance(job, overrideParameter(job, jd), jd.getUser(), 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue, em);
 
+		em.getTransaction().commit();
 		//CreationTools.em.createQuery("UPDATE JobParameter jp SET jp.jobInstance = :j WHERE").executeUpdate();
 
 		// Update status in the history table
@@ -257,6 +258,7 @@ public class Dispatcher {
 				jhp.add(jp);
 			}
 
+			em.getTransaction().begin();
 			ArrayList<Message> msgs = new ArrayList<Message>();
 
 			h = CreationTools.createhistory(1, (Calendar) null, "History of the Job --> ID = " + (ji.getId()),
