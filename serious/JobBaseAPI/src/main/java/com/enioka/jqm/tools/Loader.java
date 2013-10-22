@@ -34,7 +34,7 @@ public class Loader implements Runnable
 {
 
 	JobInstance job = null;
-	JobBase jobBase = new JobBase();
+	Object jobBase = new JobBase();
 	ArrayList<DeliverableStruct> s1s = new ArrayList<DeliverableStruct>();
 	EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
 	EntityManager em = emf.createEntityManager();
@@ -170,16 +170,32 @@ public class Loader implements Runnable
 			CreationTools.createMessage("Status updated: ENDED", h, em);
 			em.getTransaction().commit();
 
-			/*
-			 * if (this.jobBase.getSha1s().size() != 0) { for (int j = 0; j < this.jobBase.getSha1s().size(); j++) {
-			 * em.getTransaction().begin();
-			 * 
-			 * System.out.println("SHA1: " + this.jobBase.getSha1s().get(j).getFilePath()); System.out.println("FILEPATH ADDED: " +
-			 * this.jobBase.getSha1s().get(j).getFilePath()); CreationTools.createDeliverable(this.jobBase.getSha1s().get(j).getFilePath(),
-			 * this.jobBase.getSha1s().get(j) .getFileName(), this.jobBase.getSha1s().get(j).getHashPath(),
-			 * this.jobBase.getSha1s().get(j).getFileFamily(), this.job.getId(), em); System.out.println("JOBID: " + this.job.getId());
-			 * em.getTransaction().commit(); } }
-			 */
+			// Retrieve files created by the job
+			Method m = this.jobBase.getClass().getMethod("getSha1s");
+			ArrayList<Object> dss = (ArrayList<Object>) m.invoke(jobBase, null);
+			for (Object ds : dss)
+			{
+				try
+				{
+					em.getTransaction().begin();
+					String filePath = (String) ds.getClass().getMethod("getFilePath", null).invoke(ds, null);
+					String fileName = (String) ds.getClass().getMethod("getFileName", null).invoke(ds, null);
+					String hashPath = (String) ds.getClass().getMethod("getHashPath", null).invoke(ds, null);
+					String fileFamily = (String) ds.getClass().getMethod("getFileFamily", null).invoke(ds, null);
+
+					jqmlogger.debug("Job " + job.getId() + " has created a file: " + fileName + " - " + hashPath + " - " + fileFamily);
+					CreationTools.createDeliverable(filePath, fileName, hashPath, fileFamily, this.job.getId(), em);
+					jqmlogger.debug("Job " + job.getId() + " has finished registering file " + fileName);
+				} catch (Exception e)
+				{
+					jqmlogger
+							.error("Could not analyse a deliverbale - it may be of an incorrect Java class. Job has run correctly - it's only missing its produce.",
+									e);
+				} finally
+				{
+					em.getTransaction().commit();
+				}
+			}
 
 			jqmlogger.debug("End of loader. Thread will now end");
 			jqmlogger.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
@@ -253,7 +269,7 @@ public class Loader implements Runnable
 		this.job = job;
 	}
 
-	public JobBase getJobBase()
+	public Object getJobBase()
 	{
 
 		return jobBase;

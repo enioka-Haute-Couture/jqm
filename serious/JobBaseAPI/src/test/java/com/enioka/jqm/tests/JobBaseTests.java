@@ -8,7 +8,10 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import org.hsqldb.Server;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.enioka.jqm.api.Dispatcher;
@@ -23,6 +26,25 @@ import com.enioka.jqm.tools.Main;
 
 public class JobBaseTests
 {
+	public static Server s;
+
+	@BeforeClass
+	public static void testInit()
+	{
+		s = new Server();
+		s.setDatabaseName(0, "testdbengine");
+		s.setDatabasePath(0, "mem:testdbengine");
+		s.setLogWriter(null);
+		s.setSilent(true);
+		s.start();
+	}
+
+	@AfterClass
+	public static void stop()
+	{
+		s.stop();
+	}
+
 	// @Test
 	public void testHighlanderMode() throws Exception
 	{
@@ -74,7 +96,7 @@ public class JobBaseTests
 		Assert.assertEquals("CANCELLED", res.get(2).getState());
 	}
 
-	// @Test
+	@Test
 	public void testGetDeliverables() throws Exception
 	{
 
@@ -170,7 +192,7 @@ public class JobBaseTests
 		Assert.assertEquals(true, res.exists());
 	}
 
-	// @Test
+	@Test
 	public void testGetUserDeliverables() throws Exception
 	{
 
@@ -242,7 +264,7 @@ public class JobBaseTests
 		// Assert.assertEquals(, tmp.get(0).getFilePath());
 	}
 
-	// @Test
+	@Test
 	public void testGetUserJobs() throws Exception
 	{
 
@@ -366,7 +388,7 @@ public class JobBaseTests
 		Assert.assertEquals(4, res.size());
 	}
 
-	// @Test
+	@Test
 	public void testGetQueues() throws Exception
 	{
 
@@ -384,7 +406,7 @@ public class JobBaseTests
 		Assert.assertEquals(3, qs.size());
 	}
 
-	// @Test
+	@Test
 	public void testGoodOrder() throws Exception
 	{
 

@@ -25,7 +25,6 @@ public class Helpers
 
 	public static EntityManager getNewEm()
 	{
-
 		return emf.createEntityManager();
 	}
 
@@ -46,19 +45,18 @@ public class Helpers
 
 	public static void cleanup(EntityManager em)
 	{
-
 		em.getTransaction().begin();
-		em.createQuery("DELETE FROM Deliverable").executeUpdate();
-		em.createQuery("DELETE FROM DeploymentParameter").executeUpdate();
-		em.createQuery("DELETE FROM Node").executeUpdate();
-		em.createQuery("DELETE FROM JobHistoryParameter").executeUpdate();
-		em.createQuery("DELETE FROM Message").executeUpdate();
-		em.createQuery("DELETE FROM History").executeUpdate();
-		em.createQuery("DELETE FROM JobDefParameter").executeUpdate();
-		em.createQuery("DELETE FROM JobParameter").executeUpdate();
-		em.createQuery("DELETE FROM JobInstance").executeUpdate();
-		em.createQuery("DELETE FROM JobDef").executeUpdate();
-		em.createQuery("DELETE FROM Queue").executeUpdate();
+		em.createQuery("DELETE Deliverable WHERE 1=1").executeUpdate();
+		em.createQuery("DELETE DeploymentParameter WHERE 1=1").executeUpdate();
+		em.createQuery("DELETE Node WHERE 1=1").executeUpdate();
+		em.createQuery("DELETE JobHistoryParameter WHERE 1=1").executeUpdate();
+		em.createQuery("DELETE Message WHERE 1=1").executeUpdate();
+		em.createQuery("DELETE History WHERE 1=1").executeUpdate();
+		em.createQuery("DELETE JobDefParameter WHERE 1=1").executeUpdate();
+		em.createQuery("DELETE JobParameter WHERE 1=1").executeUpdate();
+		em.createQuery("DELETE JobInstance WHERE 1=1").executeUpdate();
+		em.createQuery("DELETE JobDef WHERE 1=1").executeUpdate();
+		em.createQuery("DELETE Queue WHERE 1=1").executeUpdate();
 		em.getTransaction().commit();
 	}
 

@@ -100,7 +100,7 @@ public class JarClassLoader extends URLClassLoader
 		}
 	}
 
-	public JobBase invokeMain(JobInstance job) throws Exception
+	public Object invokeMain(JobInstance job) throws Exception
 	{
 		System.out.println("HHHHHHHHHHHHHHH: " + job.getJd().getJavaClassName());
 		String classQualifiedName = job.getJd().getJavaClassName();
@@ -125,6 +125,6 @@ public class JarClassLoader extends URLClassLoader
 			System.out.println("Dynamic code error: " + e.getMessage());
 			throw e;
 		}
-		return null;
+		return o;
 	}
 }
