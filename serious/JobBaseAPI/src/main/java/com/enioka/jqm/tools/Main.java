@@ -21,7 +21,6 @@ package com.enioka.jqm.tools;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.persistence.EntityManager;
@@ -33,6 +32,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
+import com.enioka.jqm.jndi.JndiContext;
 import com.enioka.jqm.jndi.JndiContextFactory;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.Node;
@@ -50,6 +50,7 @@ public class Main
 	public static EntityTransaction t = em.getTransaction();
 	public static Map<String, ClassLoader> cache = new HashMap<String, ClassLoader>();
 	public static Server server = null;
+	public static JndiContext jndiCtx = null;
 
 	/**
 	 * @param args
@@ -58,10 +59,11 @@ public class Main
 	public static void main(String[] args) throws Exception
 	{
 		java.lang.System.setProperty("log4j.debug", "true");
-	
+
 		// JNDI
-		JndiContextFactory.createJndiContext(Thread.currentThread().getContextClassLoader());
-		
+		if (jndiCtx == null)
+			jndiCtx = JndiContextFactory.createJndiContext(Thread.currentThread().getContextClassLoader());
+
 		// Jetty
 		server = new Server(8081);
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
