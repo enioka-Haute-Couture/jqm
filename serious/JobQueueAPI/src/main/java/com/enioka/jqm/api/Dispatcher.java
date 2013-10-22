@@ -138,21 +138,71 @@ public class Dispatcher {
     	Map<String, String> m = jdefinition.getParameters();
     	List<JobParameter> res = new ArrayList<JobParameter>();
 
-    	if (m.isEmpty()) {
+    	if (m.isEmpty())
+    	{
 
     		if (jdef.getParameters() == null)
     			return res;
 
-    		for (JobDefParameter i : jdef.getParameters()) {
+    		for (JobDefParameter i : jdef.getParameters())
+    		{
 
     			res.add(CreationTools.createJobParameter(i.getKey(), i.getValue(), em));
             }
 
     		return res;
     	}
-    	else {
+    	else if (!m.isEmpty())
+    	{
+    		for (JobDefParameter i : jdef.getParameters())
+    		{
 
-    		for( Iterator<String> i = m.keySet().iterator(); i.hasNext();) {
+    			res.add(CreationTools.createJobParameter(i.getKey(), i.getValue(), em));
+    		}
+
+    		for (int j = 0; j < res.size(); j++)
+    		{
+    			if (m.containsKey(res.get(j).getKey()))
+    			{
+    				for( Iterator<String> i = m.keySet().iterator(); i.hasNext();)
+    				{
+    					String key = i.next();
+    					String value = m.get(key);
+
+    					if (res.get(j).getKey().equals(key))
+    					{
+    						res.remove(j);
+    						res.add(CreationTools.createJobParameter(key, value, em));
+    						break;
+    					}
+    				}
+    			}
+    		}
+
+    		for( Iterator<String> i = m.keySet().iterator(); i.hasNext();)
+			{
+				String key = i.next();
+				String value = m.get(key);
+
+				for (int j = 0; j < res.size(); j++)
+				{
+					boolean present = false;
+
+					if (res.get(j).getKey().equals(key))
+						present = true;
+
+					if (j == res.size() - 1 && !present)
+						res.add(CreationTools.createJobParameter(key, value, em));
+				}
+			}
+
+    		return res;
+    	}
+    	else
+    	{
+
+    		for( Iterator<String> i = m.keySet().iterator(); i.hasNext();)
+    		{
 
     			String key = i.next();
     			String value = m.get(key);

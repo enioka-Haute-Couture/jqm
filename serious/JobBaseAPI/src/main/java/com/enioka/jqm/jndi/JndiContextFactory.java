@@ -12,7 +12,6 @@ public class JndiContextFactory
 
 	public static JndiContext createJndiContext() throws Exception
 	{
-
 		try
 		{
 			JndiContext ctx = new JndiContext();

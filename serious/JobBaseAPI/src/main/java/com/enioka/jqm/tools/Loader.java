@@ -25,6 +25,7 @@ import com.enioka.jqm.api.JobBase;
 import com.enioka.jqm.deliverabletools.DeliverableStruct;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.temp.Polling;
 import com.jcabi.aether.Aether;
 
 public class Loader implements Runnable
@@ -38,12 +39,14 @@ public class Loader implements Runnable
 	Map<String, ClassLoader> cache = null;
 	boolean isInCache = true;
 	Logger jqmlogger = Logger.getLogger(this.getClass());
+	Polling p = null;
 
-	public Loader(JobInstance job, Map<String, ClassLoader> cache)
+	public Loader(JobInstance job, Map<String, ClassLoader> cache, Polling p)
 	{
 
 		this.job = job;
 		this.cache = cache;
+		this.p = p;
 	}
 
 	public void crashedStatus()
@@ -150,6 +153,7 @@ public class Loader implements Runnable
 			System.out.println("Je suis dans le thread " + Thread.currentThread().getName());
 			System.out.println("AVANT INVOKE MAIN");
 			jobBase = jobClassLoader.invokeMain(job);
+			p.setActualNbThread(p.getActualNbThread() - 1);
 
 			System.out.println("+++++++++++++++++++++++++++++++++++++++");
 

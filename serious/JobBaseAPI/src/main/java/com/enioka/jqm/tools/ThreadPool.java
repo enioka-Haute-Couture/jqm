@@ -1,4 +1,3 @@
-
 package com.enioka.jqm.tools;
 
 import java.util.Map;
@@ -6,15 +5,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.temp.Polling;
 
-public class ThreadPool {
+public class ThreadPool
+{
 
 	private Queue queue = null;
 	private int nbThread = 0;
 	ExecutorService pool = null;
 	Map<String, ClassLoader> cache = null;
 
-	public ThreadPool(Queue queue, int n, Map<String, ClassLoader> cache) {
+	public ThreadPool(Queue queue, int n, Map<String, ClassLoader> cache)
+	{
 
 		this.queue = queue;
 		this.cache = cache;
@@ -22,31 +24,36 @@ public class ThreadPool {
 		pool = Executors.newFixedThreadPool(nbThread);
 	}
 
-	public void run(com.enioka.jqm.jpamodel.JobInstance ji) {
+	public void run(com.enioka.jqm.jpamodel.JobInstance ji, Polling p)
+	{
 
 		System.out.println("AVANT LOADER");
 		System.out.println("JOB WILL BE POOLED: " + ji.getId());
 
-		pool.submit(new Loader(ji, cache));
+		pool.submit(new Loader(ji, cache, p));
 
 	}
 
-	public Queue getQueue() {
+	public Queue getQueue()
+	{
 
 		return queue;
 	}
 
-	public void setQueue(Queue queue) {
+	public void setQueue(Queue queue)
+	{
 
 		this.queue = queue;
 	}
 
-	public int getNbThread() {
+	public int getNbThread()
+	{
 
 		return nbThread;
 	}
 
-	public void setNbThread(int nbThread) {
+	public void setNbThread(int nbThread)
+	{
 
 		this.nbThread = nbThread;
 	}
