@@ -25,11 +25,11 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 	@Override
 	public Object lookup(String name) throws NamingException {
 
-		if (name.equals("jdbc/marsu"))
+		if (name.equals(db.getName()))
 			return new DbDataSource(db.getUrl(), db.getUser(), db.getPwd());
-		if (name.equals("jdbc/pico"))
+		if (name.equals(db.getName()))
 			return new DbDataSource(db.getUrl(), db.getUser(), db.getPwd());
-		if (name.equals("dialect/pico"))
+		if (name.equals(db.getName()))
 			return null;
 
 		throw new NameNotFoundException("name " + name + " cannot be found");

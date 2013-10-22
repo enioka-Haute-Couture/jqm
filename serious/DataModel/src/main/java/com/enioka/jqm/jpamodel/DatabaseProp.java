@@ -20,6 +20,8 @@ public class DatabaseProp implements Serializable{
     @Column(nullable=false)
     private String driver;
     @Column(nullable=false)
+    private String name;
+    @Column(nullable=false)
     private String url;
     @Column(nullable=false)
     private String user;
@@ -70,5 +72,17 @@ public class DatabaseProp implements Serializable{
     public Integer getId() {
 
     	return id;
+    }
+
+
+    public String getName() {
+
+    	return name;
+    }
+
+
+    public void setName(String name) {
+
+    	this.name = name;
     }
 }
