@@ -414,14 +414,17 @@ public class JobBaseTests {
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
+		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
 		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other",
 		        "other", "other", true, em);
 
+		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
 		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qNormal, 42, "MarsuApplication2", 42, "Franquin", "ModuleMachin", "other",
 		        "other", "other", true, em);
 
+		@SuppressWarnings("unused")
 		JobDef jd2 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
 		        "./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qSlow, 42, "MarsuApplication3", 42, "Franquin", "ModuleMachin", "other",
 		        "other", "other", true, em);

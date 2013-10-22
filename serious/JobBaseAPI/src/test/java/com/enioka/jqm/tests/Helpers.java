@@ -27,7 +27,7 @@ public class Helpers {
 
 	public static void createLocalNode(EntityManager em) {
 
-		db = CreationTools.createDatabaseProp("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb", "SA", "", em);
+		db = CreationTools.createDatabaseProp("jdbc/marsu", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb", "SA", "", em);
 
 		Helpers.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42, 100, em);
 		Helpers.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, 100, em);

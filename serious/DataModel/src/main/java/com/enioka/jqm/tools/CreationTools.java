@@ -297,10 +297,11 @@ public class CreationTools
 
 	// ------------------ DATABASEPROP --------------------------------
 
-	public static DatabaseProp createDatabaseProp(String driver, String url, String user, String pwd, EntityManager em)
+	public static DatabaseProp createDatabaseProp(String name, String driver, String url, String user, String pwd, EntityManager em)
 	{
 		DatabaseProp h = new DatabaseProp();
 
+		h.setName(name);
 		h.setDriver(driver);
 		h.setUrl(url);
 		h.setUser(user);

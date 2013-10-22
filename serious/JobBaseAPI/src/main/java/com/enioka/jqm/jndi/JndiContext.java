@@ -27,10 +27,6 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 
 		if (name.equals(db.getName()))
 			return new DbDataSource(db.getUrl(), db.getUser(), db.getPwd());
-		if (name.equals(db.getName()))
-			return new DbDataSource(db.getUrl(), db.getUser(), db.getPwd());
-		if (name.equals(db.getName()))
-			return null;
 
 		throw new NameNotFoundException("name " + name + " cannot be found");
 	}
