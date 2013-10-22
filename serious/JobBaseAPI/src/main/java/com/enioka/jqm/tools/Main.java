@@ -21,6 +21,7 @@ package com.enioka.jqm.tools;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.persistence.EntityManager;
@@ -38,7 +39,6 @@ import com.enioka.jqm.temp.Polling;
 
 public class Main
 {
-
 	public static ArrayList<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
 	public static ArrayList<Polling> pollers = new ArrayList<Polling>();
 	public static Node node = null;
@@ -56,9 +56,9 @@ public class Main
 	 */
 	public static void main(String[] args) throws Exception
 	{
-
-		// @SuppressWarnings("unused")
-		// JndiContext ctx = JndiContextFactory.createJndiContext(db);
+		java.lang.System.setProperty("log4j.debug", "true");
+	
+		// Jetty
 		server = new Server(8081);
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setContextPath("/");
