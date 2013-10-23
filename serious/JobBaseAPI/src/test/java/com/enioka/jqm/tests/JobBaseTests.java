@@ -97,6 +97,73 @@ public class JobBaseTests
 	}
 
 	@Test
+	public void testHighlanderModeMultiQueue() throws Exception
+	{
+		EntityManager em = Helpers.getNewEm();
+		Helpers.cleanup(em);
+		Helpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
+
+		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qNormal, 42, "MarsuApplication2", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+		JobDefinition jj = new JobDefinition("MarsuApplication2", "MAG");
+
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(jj);
+		Dispatcher.enQueue(jj);
+
+		em.getTransaction().begin();
+
+		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
+				.setParameter("myId", 2).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+
+		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId())
+				.executeUpdate();
+
+		em.getTransaction().commit();
+
+		em.getTransaction().begin();
+
+		Main.main(new String[] { "localhost" });
+
+		Thread.sleep(10000);
+		Main.stop();
+
+		em.getTransaction().commit();
+
+		EntityManager emm = Helpers.getNewEm();
+
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm
+				.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :j ORDER BY j.position ASC", JobInstance.class)
+				.setParameter("j", jdDemoMaven.getId()).getResultList();
+
+		ArrayList<JobInstance> res2 = (ArrayList<JobInstance>) emm
+				.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :j ORDER BY j.position ASC", JobInstance.class)
+				.setParameter("j", jdDemoMaven2.getId()).getResultList();
+
+		Assert.assertEquals(3, res.size());
+		Assert.assertEquals("ENDED", res.get(0).getState());
+		Assert.assertEquals("CANCELLED", res.get(1).getState());
+		Assert.assertEquals("CANCELLED", res.get(2).getState());
+
+		Assert.assertEquals(2, res2.size());
+		Assert.assertEquals("ENDED", res2.get(0).getState());
+		Assert.assertEquals("ENDED", res2.get(1).getState());
+	}
+
+	@Test
 	public void testGetDeliverables() throws Exception
 	{
 
