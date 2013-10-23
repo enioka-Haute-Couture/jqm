@@ -168,6 +168,8 @@ public class Loader implements Runnable
 			// MESSAGE HISTORY UPDATED
 			em.getTransaction().commit();
 
+			System.out.println("LOADER HISTORY: " + h.getId());
+
 			em.getTransaction().begin();
 			CreationTools.createMessage("Status updated: ENDED", h, em);
 			em.getTransaction().commit();

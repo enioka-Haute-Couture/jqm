@@ -261,6 +261,8 @@ public class Polling implements Runnable
 
 				System.out.println("((((((((((((((((((()))))))))))))))))");
 				System.out.println("ACTUAL DEPLOYMENT PARAMETER: " + dp.getNode().getId());
+				System.out.println("ACTUAL nbThread: " + actualNbThread);
+				System.out.println("JI: " + ji.getId());
 				System.out.println("((((((((((((((((((()))))))))))))))))");
 
 				em.getTransaction().begin();

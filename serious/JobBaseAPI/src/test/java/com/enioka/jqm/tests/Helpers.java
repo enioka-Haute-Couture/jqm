@@ -51,7 +51,7 @@ public class Helpers
 		Helpers.node3 = CreationTools.createNode("localhost3", 8083, "./testprojects/JobGenADeliverable/", em);
 		// Helpers.nodeMix = CreationTools.createNode("localhost4", 8084, "./testprojects/JobGenADeliverable/", em);
 
-		Helpers.dpVip = CreationTools.createDeploymentParameter(1, node, 1, 100, qVip, em);
+		Helpers.dpVip = CreationTools.createDeploymentParameter(1, node, 3, 100, qVip, em);
 		// Helpers.dpVipMix = CreationTools.createDeploymentParameter(2, nodeMix, 3, 100, qVip, em);
 		Helpers.dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 300, qNormal, em);
 		Helpers.dpSlow = CreationTools.createDeploymentParameter(1, node, 1, 1000, qSlow, em);

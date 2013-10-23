@@ -19,7 +19,6 @@ public class MultiNodeTests
 {
 
 	public static Server s;
-	public static Server s2;
 
 	@BeforeClass
 	public static void testInit()

@@ -207,10 +207,11 @@ public class Dispatcher {
 				}
 			}
 
-    		for (JobParameter j : res)
-			{
-				System.out.println("CONTENU PARAMETERS: " + j.getKey() + ", " + j.getValue());
-			}
+//    		for (JobParameter j : res)
+//			{
+//				System.out.println("CONTENU PARAMETERS: " + j.getKey() + ", " + j.getValue());
+//			}
+    		System.out.println("YES");
     		return res;
     	}
     	else
@@ -248,8 +249,21 @@ public class Dispatcher {
 		em.getTransaction().begin();
 
 		JobInstance ji = CreationTools.createJobInstance(job, overrideParameter(job, jd), jd.getUser(), 42, "SUBMITTED", (p == null) ? 1 : p + 1, job.queue, em);
+		System.out.println("JI QUI VIENT D'ETRE CREE: " + ji.getId());
+		//em.getTransaction().commit();
 
-		em.getTransaction().commit();
+		//em.getTransaction().begin();
+		Message m = null;
+		ArrayList<JobHistoryParameter> jhp = new ArrayList<JobHistoryParameter>();
+
+		ArrayList<Message> msgs = new ArrayList<Message>();
+
+		h = CreationTools.createhistory(1, (Calendar) null, "History of the Job --> ID = " + (ji.getId()),
+				msgs, ji, enqueueDate, (Calendar) null, (Calendar) null, jhp, em);
+
+		m = CreationTools.createMessage("Status updated: SUBMITTED", h, em);
+		msgs.add(m);
+		System.out.println("HISTORY QUI VIENT D'ETRE CREE: " + h.getId());
 		//CreationTools.em.createQuery("UPDATE JobParameter jp SET jp.jobInstance = :j WHERE").executeUpdate();
 
 		// Update status in the history table
@@ -258,9 +272,6 @@ public class Dispatcher {
 
 		if (!q.equals(null))
 		{
-			Message m = null;
-			ArrayList<JobHistoryParameter> jhp = new ArrayList<JobHistoryParameter>();
-
 			for (JobParameter j : ji.getParameters())
 			{
 
@@ -274,18 +285,8 @@ public class Dispatcher {
 				jhp.add(jp);
 			}
 
-			em.getTransaction().begin();
-			ArrayList<Message> msgs = new ArrayList<Message>();
-
-			h = CreationTools.createhistory(1, (Calendar) null, "History of the Job --> ID = " + (ji.getId()),
-					msgs, ji, enqueueDate, (Calendar) null, (Calendar) null, jhp, em);
-
-			m = CreationTools.createMessage("Status updated: SUBMITTED", h, em);
-			msgs.add(m);
-
-			em.getTransaction().commit();
-
 		}
+		em.getTransaction().commit();
 		return ji.getId();
 	}
 
