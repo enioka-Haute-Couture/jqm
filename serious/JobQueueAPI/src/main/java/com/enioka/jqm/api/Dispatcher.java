@@ -256,12 +256,13 @@ public class Dispatcher {
 		//System.exit(0);
 		Query q = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", ji.getId());
 
-		if (!q.equals(null)) {
-
+		if (!q.equals(null))
+		{
 			Message m = null;
 			ArrayList<JobHistoryParameter> jhp = new ArrayList<JobHistoryParameter>();
 
-			for (JobParameter j : ji.getParameters()) {
+			for (JobParameter j : ji.getParameters())
+			{
 
 				JobHistoryParameter jp = new JobHistoryParameter();
 

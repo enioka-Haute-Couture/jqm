@@ -105,7 +105,7 @@ public class QueueTests
 			query.setParameter("s", "SUBMITTED").setParameter("ss", "ENDED");
 			job = (ArrayList<JobInstance>) query.getResultList();
 
-			if (job.size() > 2)
+			if (job.size() > 3)
 				Assert.assertEquals(false, true);
 			i++;
 		}

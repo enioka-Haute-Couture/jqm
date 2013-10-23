@@ -236,7 +236,6 @@ public class Polling implements Runnable
 		transac.commit();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void run()
 	{
