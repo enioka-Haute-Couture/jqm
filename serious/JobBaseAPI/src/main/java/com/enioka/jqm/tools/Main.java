@@ -60,12 +60,15 @@ public class Main
 	{
 		java.lang.System.setProperty("log4j.debug", "true");
 
+		Node node = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :l", Node.class).setParameter("l", args[0])
+				.getSingleResult();
+
 		// JNDI
 		if (jndiCtx == null)
 			jndiCtx = JndiContextFactory.createJndiContext(Thread.currentThread().getContextClassLoader());
 
 		// Jetty
-		server = new Server(8081);
+		server = new Server(node.getPort());
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setContextPath("/");
 		server.setHandler(context);
