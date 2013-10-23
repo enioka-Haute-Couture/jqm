@@ -465,7 +465,7 @@ public class JobBaseTests
 
 		ArrayList<Queue> qs = (ArrayList<Queue>) em.createQuery("SELECT q FROM Queue q", Queue.class).getResultList();
 
-		Assert.assertEquals(3, qs.size());
+		Assert.assertEquals(9, qs.size());
 	}
 
 	@Test

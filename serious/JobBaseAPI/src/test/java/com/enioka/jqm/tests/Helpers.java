@@ -17,9 +17,10 @@ public class Helpers
 
 	public static DatabaseProp db = null;
 
-	public static com.enioka.jqm.jpamodel.Queue qVip, qNormal, qSlow;
-	public static Node node;
-	public static DeploymentParameter dpVip, dpNormal, dpSlow;
+	public static com.enioka.jqm.jpamodel.Queue qVip, qNormal, qSlow, qVip2, qNormal2, qSlow2, qVip3, qNormal3, qSlow3;
+	public static Node node, node2, node3, nodeMix;
+
+	public static DeploymentParameter dpVip, dpNormal, dpSlow, dpVip2, dpNormal2, dpSlow2, dpVip3, dpNormal3, dpSlow3, dpVipMix;
 
 	public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
 
@@ -37,10 +38,31 @@ public class Helpers
 		Helpers.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, 100, em);
 		Helpers.qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3, 100, em);
 
-		Helpers.node = CreationTools.createNode("localhost", 8081, "./testprojects/JobGenADeliverable/", em);
+		Helpers.qVip2 = CreationTools.initQueue("VIPQueue2", "Queue for the winners2", 42, 100, em);
+		Helpers.qNormal2 = CreationTools.initQueue("NormalQueue2", "Queue for the ordinary job2", 7, 100, em);
+		Helpers.qSlow2 = CreationTools.initQueue("SlowQueue2", "Queue for the bad guys2", 3, 100, em);
 
-		Helpers.dpVip = CreationTools.createDeploymentParameter(1, node, 1, 1, qVip, em);
-		Helpers.dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal, em);
+		Helpers.qVip3 = CreationTools.initQueue("VIPQueue3", "Queue for the winners3", 42, 100, em);
+		Helpers.qNormal3 = CreationTools.initQueue("NormalQueue3", "Queue for the ordinary job3", 7, 100, em);
+		Helpers.qSlow3 = CreationTools.initQueue("SlowQueue3", "Queue for the bad guys3", 3, 100, em);
+
+		Helpers.node = CreationTools.createNode("localhost", 8081, "./testprojects/JobGenADeliverable/", em);
+		Helpers.node2 = CreationTools.createNode("localhost2", 8082, "./testprojects/JobGenADeliverable/", em);
+		Helpers.node3 = CreationTools.createNode("localhost3", 8083, "./testprojects/JobGenADeliverable/", em);
+		// Helpers.nodeMix = CreationTools.createNode("localhost4", 8084, "./testprojects/JobGenADeliverable/", em);
+
+		Helpers.dpVip = CreationTools.createDeploymentParameter(1, node, 3, 100, qVip, em);
+		// Helpers.dpVipMix = CreationTools.createDeploymentParameter(2, nodeMix, 3, 100, qVip, em);
+		Helpers.dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 300, qNormal, em);
+		Helpers.dpSlow = CreationTools.createDeploymentParameter(1, node, 1, 1000, qSlow, em);
+
+		Helpers.dpVip2 = CreationTools.createDeploymentParameter(1, node2, 3, 100, qVip2, em);
+		Helpers.dpNormal2 = CreationTools.createDeploymentParameter(1, node2, 2, 300, qNormal2, em);
+		Helpers.dpSlow2 = CreationTools.createDeploymentParameter(1, node2, 1, 1000, qSlow2, em);
+
+		Helpers.dpVip3 = CreationTools.createDeploymentParameter(1, node3, 3, 100, qVip3, em);
+		Helpers.dpNormal3 = CreationTools.createDeploymentParameter(1, node3, 2, 300, qNormal3, em);
+		Helpers.dpSlow3 = CreationTools.createDeploymentParameter(1, node3, 1, 1000, qSlow3, em);
 	}
 
 	public static void cleanup(EntityManager em)

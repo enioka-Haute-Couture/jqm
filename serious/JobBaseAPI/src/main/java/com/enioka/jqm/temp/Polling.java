@@ -260,6 +260,10 @@ public class Polling implements Runnable
 				if (actualNbThread == tp.getNbThread())
 					continue;
 
+				System.out.println("((((((((((((((((((()))))))))))))))))");
+				System.out.println("ACTUAL DEPLOYMENT PARAMETER: " + dp.getNode().getId());
+				System.out.println("((((((((((((((((((()))))))))))))))))");
+
 				em.getTransaction().begin();
 
 				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", ji)

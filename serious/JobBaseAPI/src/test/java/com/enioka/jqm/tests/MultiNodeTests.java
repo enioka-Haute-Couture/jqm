@@ -7,7 +7,6 @@ import javax.persistence.EntityManager;
 import org.hsqldb.Server;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
@@ -39,8 +38,8 @@ public class MultiNodeTests
 		s.stop();
 	}
 
-	@Test
-	public void testTwoNodesOneQueue() throws Exception
+	// @Test
+	public void testOneQueueTwoNodes() throws Exception
 	{
 		EntityManager em = Helpers.getNewEm();
 		Helpers.cleanup(em);
@@ -51,30 +50,43 @@ public class MultiNodeTests
 		jdargs.add(jdp);
 
 		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
-				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+		JobDef jd11 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "AppliNode1-1", 42, "Franquin", "ModuleMachin",
 				"other", "other", "other", false, em);
 
-		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+		JobDefinition j11 = new JobDefinition("AppliNode1-1", "MAG");
 
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
 
 		Main.main(new String[] { "localhost" });
+		Main.main(new String[] { "localhost4" });
 
 		int i = 0;
 		while (i < 5)
 		{
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
+			Helpers.printJobInstanceTable();
+
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+
 			Thread.sleep(5000);
 
 			Helpers.printJobInstanceTable();
@@ -82,11 +94,217 @@ public class MultiNodeTests
 		}
 
 		Main.stop();
+		Main.stop();
 	}
 
-	public void testTwoNodesTwoQueues()
+	// @Test
+	public void testTwoNodesTwoQueues() throws Exception
 	{
+		EntityManager em = Helpers.getNewEm();
+		Helpers.cleanup(em);
+		Helpers.createLocalNode(em);
 
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		@SuppressWarnings("unused")
+		JobDef jd11 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "AppliNode1-1", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
+
+		@SuppressWarnings("unused")
+		JobDef jd21 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip2, 42, "AppliNode2-1", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
+
+		JobDefinition j11 = new JobDefinition("AppliNode1-1", "MAG");
+		JobDefinition j21 = new JobDefinition("AppliNode2-1", "MAG");
+
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j21);
+		Dispatcher.enQueue(j21);
+		Dispatcher.enQueue(j21);
+
+		Main.main(new String[] { "localhost" });
+		Main.main(new String[] { "localhost2" });
+
+		int i = 0;
+		while (i < 5)
+		{
+			Helpers.printJobInstanceTable();
+
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j21);
+			Dispatcher.enQueue(j21);
+			Dispatcher.enQueue(j21);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j21);
+			Dispatcher.enQueue(j21);
+			Dispatcher.enQueue(j21);
+
+			Thread.sleep(5000);
+
+			Helpers.printJobInstanceTable();
+			i++;
+		}
+
+		Main.stop();
+		Main.stop();
+	}
+
+	// @Test
+	public void testThreeNodesThreeQueues() throws Exception
+	{
+		EntityManager em = Helpers.getNewEm();
+		Helpers.cleanup(em);
+		Helpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		@SuppressWarnings("unused")
+		JobDef jd11 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip, 42, "AppliNode1-1", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
+
+		@SuppressWarnings("unused")
+		JobDef jd12 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qNormal, 42, "AppliNode1-2", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
+
+		@SuppressWarnings("unused")
+		JobDef jd13 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qSlow, 42, "AppliNode1-3", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
+
+		@SuppressWarnings("unused")
+		JobDef jd21 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip2, 42, "AppliNode2-1", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
+
+		@SuppressWarnings("unused")
+		JobDef jd22 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qNormal2, 42, "AppliNode2-2", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
+
+		@SuppressWarnings("unused")
+		JobDef jd23 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qSlow2, 42, "AppliNode2-3", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
+
+		@SuppressWarnings("unused")
+		JobDef jd31 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qVip3, 42, "AppliNode3-1", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
+
+		@SuppressWarnings("unused")
+		JobDef jd32 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qNormal3, 42, "AppliNode3-2", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
+
+		@SuppressWarnings("unused")
+		JobDef jd33 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
+				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qSlow3, 42, "AppliNode3-3", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
+
+		JobDefinition j11 = new JobDefinition("AppliNode1-1", "MAG");
+		JobDefinition j12 = new JobDefinition("AppliNode1-2", "MAG");
+		JobDefinition j13 = new JobDefinition("AppliNode1-3", "MAG");
+
+		JobDefinition j21 = new JobDefinition("AppliNode2-1", "MAG");
+		JobDefinition j22 = new JobDefinition("AppliNode2-2", "MAG");
+		JobDefinition j23 = new JobDefinition("AppliNode2-3", "MAG");
+
+		JobDefinition j31 = new JobDefinition("AppliNode3-1", "MAG");
+		JobDefinition j32 = new JobDefinition("AppliNode3-2", "MAG");
+		JobDefinition j33 = new JobDefinition("AppliNode3-3", "MAG");
+
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j12);
+		Dispatcher.enQueue(j12);
+		Dispatcher.enQueue(j12);
+		Dispatcher.enQueue(j13);
+		Dispatcher.enQueue(j13);
+		Dispatcher.enQueue(j13);
+
+		Dispatcher.enQueue(j21);
+		Dispatcher.enQueue(j21);
+		Dispatcher.enQueue(j21);
+		Dispatcher.enQueue(j22);
+		Dispatcher.enQueue(j22);
+		Dispatcher.enQueue(j22);
+		Dispatcher.enQueue(j23);
+		Dispatcher.enQueue(j23);
+		Dispatcher.enQueue(j23);
+
+		Dispatcher.enQueue(j31);
+		Dispatcher.enQueue(j31);
+		Dispatcher.enQueue(j31);
+		Dispatcher.enQueue(j32);
+		Dispatcher.enQueue(j32);
+		Dispatcher.enQueue(j32);
+		Dispatcher.enQueue(j33);
+		Dispatcher.enQueue(j33);
+		Dispatcher.enQueue(j33);
+
+		Main.main(new String[] { "localhost" });
+		Main.main(new String[] { "localhost2" });
+		Main.main(new String[] { "localhost3" });
+
+		int i = 0;
+		while (i < 5)
+		{
+			Helpers.printJobInstanceTable();
+
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j12);
+			Dispatcher.enQueue(j12);
+			Dispatcher.enQueue(j12);
+			Dispatcher.enQueue(j13);
+			Dispatcher.enQueue(j13);
+			Dispatcher.enQueue(j13);
+
+			Dispatcher.enQueue(j21);
+			Dispatcher.enQueue(j21);
+			Dispatcher.enQueue(j21);
+			Dispatcher.enQueue(j22);
+			Dispatcher.enQueue(j22);
+			Dispatcher.enQueue(j22);
+			Dispatcher.enQueue(j23);
+			Dispatcher.enQueue(j23);
+			Dispatcher.enQueue(j23);
+
+			Dispatcher.enQueue(j31);
+			Dispatcher.enQueue(j31);
+			Dispatcher.enQueue(j31);
+			Dispatcher.enQueue(j32);
+			Dispatcher.enQueue(j32);
+			Dispatcher.enQueue(j32);
+			Dispatcher.enQueue(j33);
+			Dispatcher.enQueue(j33);
+			Dispatcher.enQueue(j33);
+
+			Thread.sleep(5000);
+
+			Helpers.printJobInstanceTable();
+			i++;
+		}
+
+		Main.stop();
+		Main.stop();
+		Main.stop();
 	}
 
 	public void testMultiNode()
