@@ -20,6 +20,7 @@
 		<module>../JqmApi</module>
 		<module>../JobBaseAPI</module>
 		<module>../../tests/Fibo</module>
+		<module>../../tests/jqm-test-datetimemaven</module>
 	</modules>
 
 	<build>

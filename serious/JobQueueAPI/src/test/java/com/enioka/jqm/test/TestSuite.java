@@ -97,10 +97,10 @@ public class TestSuite {
 				"/Users/pico/Dropbox/projets/enioka/jqm/tests/PrintArg/target/PrintArg-0.0.1-SNAPSHOT.jar", qVip,
 				42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
-		this.jdDemoMaven = CreationTools.createJobDef(true, "DemoMavenClassName", null, "./testprojects/DateTimeMaven/", "", qNormal,
+		this.jdDemoMaven = CreationTools.createJobDef(true, "DemoMavenClassName", null, "./testprojects/jqm-test-datetimemaven/", "", qNormal,
 				42, "MarsuApplication2", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
-		this.jdDemo = CreationTools.createJobDef(true, "DemoClassName", null, "./testprojects/DateTimeMaven/", "", qSlow,
+		this.jdDemo = CreationTools.createJobDef(true, "DemoClassName", null, "./testprojects/jqm-test-datetimemaven/", "", qSlow,
 				42, "MarsuApplication3", 42, "Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
 		node = CreationTools.createNode("localhost", 8081, "../JobBaseAPI/testprojects/JobGenADeliverable/", em);

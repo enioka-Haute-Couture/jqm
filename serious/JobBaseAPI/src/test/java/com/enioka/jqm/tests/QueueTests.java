@@ -17,7 +17,7 @@ import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.tools.CreationTools;
-import com.enioka.jqm.tools.Main;
+import com.enioka.jqm.tools.JqmEngine;
 
 public class QueueTests
 {
@@ -71,8 +71,8 @@ public class QueueTests
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
-		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
-				"./testprojects/DateTimeMaven/DateTimeMaven.jar", Helpers.qNormal, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qNormal, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
 				"other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
@@ -83,7 +83,8 @@ public class QueueTests
 
 		int i = 0;
 
-		Main.main(new String[] { "localhost" });
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
 
 		while (i < 5)
 		{
@@ -109,7 +110,7 @@ public class QueueTests
 				Assert.assertEquals(false, true);
 			i++;
 		}
-		Main.stop();
+		engine1.stop();
 
 		Assert.assertEquals(true, true);
 	}

@@ -15,7 +15,7 @@ import com.enioka.jqm.api.JobDefinition;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.tools.CreationTools;
-import com.enioka.jqm.tools.Main;
+import com.enioka.jqm.tools.JqmEngine;
 
 public class ParameterTests
 {
@@ -60,9 +60,10 @@ public class ParameterTests
 
 		Dispatcher.enQueue(j);
 
-		Main.main(new String[] { "localhost" });
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
 		Thread.sleep(5000);
-		Main.stop();
+		engine1.stop();
 
 		Assert.assertEquals(true, true);
 	}
@@ -88,9 +89,10 @@ public class ParameterTests
 
 		Dispatcher.enQueue(j);
 
-		Main.main(new String[] { "localhost" });
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
 		Thread.sleep(5000);
-		Main.stop();
+		engine1.stop();
 
 		Assert.assertEquals(true, true);
 	}
@@ -118,9 +120,10 @@ public class ParameterTests
 
 		Dispatcher.enQueue(j);
 
-		Main.main(new String[] { "localhost" });
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
 		Thread.sleep(5000);
-		Main.stop();
+		engine1.stop();
 
 		Assert.assertEquals(true, true);
 	}

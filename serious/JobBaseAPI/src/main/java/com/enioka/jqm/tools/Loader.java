@@ -83,6 +83,7 @@ public class Loader implements Runnable
 			File local = new File(System.getProperty("user.home") + "/.m2/repository");
 			File jar = new File(job.getJd().getJarPath());
 			URL jars = jar.toURI().toURL();
+			jqmlogger.debug("Loader will try to launch jar " + job.getJd().getJarPath() + " - " + job.getJd().getJavaClassName());
 			ArrayList<URL> tmp = new ArrayList<URL>();
 			Collection<Artifact> deps = null;
 
@@ -161,14 +162,10 @@ public class Loader implements Runnable
 
 			// STATE UPDATED
 			em.getTransaction().begin();
-
 			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
 					.setParameter("msg", "ENDED").executeUpdate();
-
-			// MESSAGE HISTORY UPDATED
 			em.getTransaction().commit();
-
-			System.out.println("LOADER HISTORY: " + h.getId());
+			jqmlogger.debug("LOADER HISTORY: " + h.getId());
 
 			em.getTransaction().begin();
 			CreationTools.createMessage("Status updated: ENDED", h, em);

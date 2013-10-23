@@ -17,14 +17,14 @@ import com.enioka.jqm.api.JobDefinition;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.tools.CreationTools;
-import com.enioka.jqm.tools.Main;
+import com.enioka.jqm.tools.JqmEngine;
 
 public class FiboTest
 {
 	public static Server s;
-	
+
 	@BeforeClass
-	public static void testInit()
+	public static void testInit() throws InterruptedException
 	{
 		s = new Server();
 		s.setDatabaseName(0, "testdbengine");
@@ -32,12 +32,15 @@ public class FiboTest
 		s.setLogWriter(null);
 		s.setSilent(true);
 		s.start();
-		
+
+		Thread.sleep(1000);
 	}
 
 	@AfterClass
 	public static void end()
 	{
+		Dispatcher.resetEM();
+		s.shutdown();
 		s.stop();
 	}
 
@@ -67,10 +70,11 @@ public class FiboTest
 		em.getTransaction().commit();
 
 		// Start the engine
-		Main.main(new String[] { "localhost" });
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
 
 		Thread.sleep(10000);
-		Main.stop();
+		engine1.stop();
 
 		long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
 		Assert.assertTrue(i > 2);

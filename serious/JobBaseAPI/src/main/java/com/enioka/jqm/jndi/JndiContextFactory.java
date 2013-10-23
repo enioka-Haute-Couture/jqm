@@ -18,8 +18,8 @@ public class JndiContextFactory
 		try
 		{
 			JndiContext ctx = new JndiContext(cl);
-
-			NamingManager.setInitialContextFactoryBuilder(ctx);
+			if (!NamingManager.hasInitialContextFactoryBuilder())
+				NamingManager.setInitialContextFactoryBuilder(ctx);
 			return ctx;
 		} catch (Exception e)
 		{

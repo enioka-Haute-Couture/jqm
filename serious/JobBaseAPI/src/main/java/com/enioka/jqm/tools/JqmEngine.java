@@ -38,25 +38,25 @@ import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.temp.Polling;
 
-public class Main
+public class JqmEngine
 {
-	public static ArrayList<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
-	public static ArrayList<Polling> pollers = new ArrayList<Polling>();
-	public static Node node = null;
-	public static ArrayList<ThreadPool> tps = new ArrayList<ThreadPool>();
-	public static AtomicBoolean isRunning = new AtomicBoolean(true);
-	public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-	public static EntityManager em = emf.createEntityManager();
-	public static EntityTransaction t = em.getTransaction();
-	public static Map<String, ClassLoader> cache = new HashMap<String, ClassLoader>();
-	public static Server server = null;
-	public static JndiContext jndiCtx = null;
+	public ArrayList<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
+	public ArrayList<Polling> pollers = new ArrayList<Polling>();
+	public Node node = null;
+	public ArrayList<ThreadPool> tps = new ArrayList<ThreadPool>();
+	public AtomicBoolean isRunning = new AtomicBoolean(true);
+	public EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+	public EntityManager em = emf.createEntityManager();
+	public EntityTransaction t = em.getTransaction();
+	public Map<String, ClassLoader> cache = new HashMap<String, ClassLoader>();
+	public Server server = null;
+	public JndiContext jndiCtx = null;
 
 	/**
 	 * @param args
 	 * @throws Exception
 	 */
-	public static void main(String[] args) throws Exception
+	public void start(String[] args) throws Exception
 	{
 		java.lang.System.setProperty("log4j.debug", "true");
 
@@ -99,7 +99,7 @@ public class Main
 		System.out.println("End of main");
 	}
 
-	public static void stop()
+	public void stop()
 	{
 
 		for (Polling p : pollers)
@@ -115,7 +115,7 @@ public class Main
 		}
 	}
 
-	public static void run()
+	public void run()
 	{
 
 		for (Polling p : pollers)

@@ -8,23 +8,26 @@ import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 import javax.naming.spi.InitialContextFactoryBuilder;
+import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
+import javax.persistence.Persistence;
 
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.DatabaseProp;
-import com.enioka.jqm.tools.Main;
 
 public class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory
 {
 	Logger jqmlogger = Logger.getLogger(this.getClass());
 	ClassLoader cl = null;
+	EntityManager em = null;
 
 	public JndiContext(ClassLoader cl) throws NamingException
 	{
 		super();
 		this.cl = cl;
+		this.em = Persistence.createEntityManagerFactory("jobqueue-api-pu").createEntityManager();
 	}
 
 	@Override
@@ -39,7 +42,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 		DatabaseProp db = null;
 		try
 		{
-			db = Main.em.createQuery("SELECT d FROM DatabaseProp d WHERE d.name = :n", DatabaseProp.class).setParameter("n", name)
+			db = this.em.createQuery("SELECT d FROM DatabaseProp d WHERE d.name = :n", DatabaseProp.class).setParameter("n", name)
 					.getSingleResult();
 		} catch (NonUniqueResultException e)
 		{
