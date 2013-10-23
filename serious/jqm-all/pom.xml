@@ -21,6 +21,7 @@
 		<module>../JobBaseAPI</module>
 		<module>../../tests/Fibo</module>
 		<module>../../tests/jqm-test-datetimemaven</module>
+		<module>../../tests/jqm-test-deliverable</module>
 	</modules>
 
 	<build>

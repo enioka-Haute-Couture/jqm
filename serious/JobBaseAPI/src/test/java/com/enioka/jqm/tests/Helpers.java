@@ -39,10 +39,10 @@ public class Helpers
 		Helpers.qNormal3 = CreationTools.initQueue("NormalQueue3", "Queue for the ordinary job3", 7, 100, em);
 		Helpers.qSlow3 = CreationTools.initQueue("SlowQueue3", "Queue for the bad guys3", 3, 100, em);
 
-		Helpers.node = CreationTools.createNode("localhost", 8081, "./testprojects/JobGenADeliverable/", em);
-		Helpers.node2 = CreationTools.createNode("localhost2", 8082, "./testprojects/JobGenADeliverable/", em);
-		Helpers.node3 = CreationTools.createNode("localhost3", 8083, "./testprojects/JobGenADeliverable/", em);
-		// Helpers.nodeMix = CreationTools.createNode("localhost4", 8084, "./testprojects/JobGenADeliverable/", em);
+		Helpers.node = CreationTools.createNode("localhost", 8081, "./testprojects/jqm-test-deliverable/", em);
+		Helpers.node2 = CreationTools.createNode("localhost2", 8082, "./testprojects/jqm-test-deliverable/", em);
+		Helpers.node3 = CreationTools.createNode("localhost3", 8083, "./testprojects/jqm-test-deliverable/", em);
+		// Helpers.nodeMix = CreationTools.createNode("localhost4", 8084, "./testprojects/jqm-test-deliverable/", em);
 
 		Helpers.dpVip = CreationTools.createDeploymentParameter(1, node, 3, 100, qVip, em);
 		// Helpers.dpVipMix = CreationTools.createDeploymentParameter(2, nodeMix, 3, 100, qVip, em);

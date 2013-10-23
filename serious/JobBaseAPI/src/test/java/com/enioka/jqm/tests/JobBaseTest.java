@@ -183,13 +183,13 @@ public class JobBaseTest
 		EntityManager emmm = com.enioka.jqm.tools.Helpers.getNewEm();
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", "./testprojects/JobGenADeliverable/", em);
-		JobDefParameter jdp2 = CreationTools.createJobDefParameter("fileName", "JobGenADeliverable.txt", em);
+		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", "./testprojects/jqm-test-deliverable/", em);
+		JobDefParameter jdp2 = CreationTools.createJobDefParameter("fileName", "jqm-test-deliverable.txt", em);
 		jdargs.add(jdp);
 		jdargs.add(jdp2);
 
-		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
-				"./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "getDeliverables", 42, "Franquin",
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
+				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", Helpers.qVip, 42, "getDeliverables", 42, "Franquin",
 				"ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("getDeliverables", "MAG");
@@ -208,7 +208,7 @@ public class JobBaseTest
 
 		Thread.sleep(10000);
 
-		File f = new File("./testprojects/JobGenADeliverable/JobGenADeliverable.txt");
+		File f = new File("./testprojects/jqm-test-deliverable/jqm-test-deliverable.txt");
 
 		Assert.assertEquals(true, f.exists());
 
@@ -218,7 +218,7 @@ public class JobBaseTest
 		List<InputStream> tmp = Dispatcher.getDeliverables(ji.getId());
 		engine1.stop();
 
-		File res = new File("./testprojects/JobGenADeliverable/JobGenADeliverableFamily/" + ji.getId() + "/JobGenADeliverable.txt");
+		File res = new File("./testprojects/jqm-test-deliverable/JobGenADeliverableFamily/" + ji.getId() + "/jqm-test-deliverable.txt");
 
 		Assert.assertEquals(true, res.exists());
 	}
@@ -233,13 +233,13 @@ public class JobBaseTest
 		EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", "./testprojects/JobGenADeliverable/", em);
+		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", "./testprojects/jqm-test-deliverable/", em);
 		JobDefParameter jdp2 = CreationTools.createJobDefParameter("fileName", "JobGenADeliverable42.txt", em);
 		jdargs.add(jdp);
 		jdargs.add(jdp2);
 
-		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
-				"./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin",
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
+				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin",
 				"ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "Franquin");
@@ -254,18 +254,18 @@ public class JobBaseTest
 
 		Thread.sleep(10000);
 
-		File f = new File("./testprojects/JobGenADeliverable/JobGenADeliverable42.txt");
+		File f = new File("./testprojects/jqm-test-deliverable/JobGenADeliverable42.txt");
 
 		Assert.assertEquals(true, f.exists());
 
-		com.enioka.jqm.api.Deliverable d = new com.enioka.jqm.api.Deliverable("./testprojects/JobGenADeliverable/",
+		com.enioka.jqm.api.Deliverable d = new com.enioka.jqm.api.Deliverable("./testprojects/jqm-test-deliverable/",
 				"JobGenADeliverable42.txt");
 
 		@SuppressWarnings("unused")
 		InputStream tmp = Dispatcher.getOneDeliverable(d);
 		engine1.stop();
 
-		File res = new File("./testprojects/JobGenADeliverable/JobGenADeliverableFamily/" + ji.getId() + "/JobGenADeliverable42.txt");
+		File res = new File("./testprojects/jqm-test-deliverable/JobGenADeliverableFamily/" + ji.getId() + "/JobGenADeliverable42.txt");
 
 		Assert.assertEquals(true, res.exists());
 	}
@@ -279,36 +279,36 @@ public class JobBaseTest
 		Helpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", "./testprojects/JobGenADeliverable/", em);
+		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", "./testprojects/jqm-test-deliverable/", em);
 		JobDefParameter jdpp = CreationTools.createJobDefParameter("fileName", "JobGenADeliverable.txt", em);
 		jdargs.add(jdp);
 		jdargs.add(jdpp);
 
 		ArrayList<JobDefParameter> jdargs2 = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp2 = CreationTools.createJobDefParameter("filepath", "./testprojects/JobGenADeliverable/", em);
+		JobDefParameter jdp2 = CreationTools.createJobDefParameter("filepath", "./testprojects/jqm-test-deliverable/", em);
 		JobDefParameter jdpp2 = CreationTools.createJobDefParameter("fileName", "JobGenADeliverable2.txt", em);
 		jdargs2.add(jdp2);
 		jdargs2.add(jdpp2);
 
 		ArrayList<JobDefParameter> jdargs3 = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp3 = CreationTools.createJobDefParameter("filepath", "./testprojects/JobGenADeliverable/", em);
+		JobDefParameter jdp3 = CreationTools.createJobDefParameter("filepath", "./testprojects/jqm-test-deliverable/", em);
 		JobDefParameter jdpp3 = CreationTools.createJobDefParameter("fileName", "JobGenADeliverable3.txt", em);
 		jdargs3.add(jdp3);
 		jdargs3.add(jdpp3);
 
 		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
-				"./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication1", 42, "Franquin",
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
+				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", Helpers.qVip, 42, "MarsuApplication1", 42, "Franquin",
 				"ModuleMachin", "other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
-		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs2, "./testprojects/JobGenADeliverable/",
-				"./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication2", 42, "Franquin",
+		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs2, "./testprojects/jqm-test-deliverable/",
+				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", Helpers.qVip, 42, "MarsuApplication2", 42, "Franquin",
 				"ModuleMachin", "other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
-		JobDef jdDemoMaven3 = CreationTools.createJobDef(true, "App", jdargs3, "./testprojects/JobGenADeliverable/",
-				"./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication3", 42, "Franquin",
+		JobDef jdDemoMaven3 = CreationTools.createJobDef(true, "App", jdargs3, "./testprojects/jqm-test-deliverable/",
+				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", Helpers.qVip, 42, "MarsuApplication3", 42, "Franquin",
 				"ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j1 = new JobDefinition("MarsuApplication1", "Franquin");
@@ -327,9 +327,9 @@ public class JobBaseTest
 		Thread.sleep(20000);
 		engine1.stop();
 
-		File f1 = new File("./testprojects/JobGenADeliverable/JobGenADeliverable.txt");
-		File f2 = new File("./testprojects/JobGenADeliverable/JobGenADeliverable2.txt");
-		File f3 = new File("./testprojects/JobGenADeliverable/JobGenADeliverable3.txt");
+		File f1 = new File("./testprojects/jqm-test-deliverable/JobGenADeliverable.txt");
+		File f2 = new File("./testprojects/jqm-test-deliverable/JobGenADeliverable2.txt");
+		File f3 = new File("./testprojects/jqm-test-deliverable/JobGenADeliverable3.txt");
 
 		Assert.assertEquals(true, f1.exists());
 		Assert.assertEquals(true, f2.exists());
@@ -420,14 +420,14 @@ public class JobBaseTest
 				"ModuleMachin", "other", "other", "other", true, em);
 
 		ArrayList<JobDefParameter> jdargs2 = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp2 = CreationTools.createJobDefParameter("filepath", "./testprojects/JobGenADeliverable/", em);
+		JobDefParameter jdp2 = CreationTools.createJobDefParameter("filepath", "./testprojects/jqm-test-deliverable/", em);
 		JobDefParameter jdp3 = CreationTools.createJobDefParameter("fileName", "JobGenADeliverable42.txt", em);
 		jdargs2.add(jdp2);
 		jdargs2.add(jdp3);
 
 		@SuppressWarnings("unused")
-		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
-				"./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "test", 42, "Franquin", "ModuleMachin",
+		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
+				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", Helpers.qVip, 42, "test", 42, "Franquin", "ModuleMachin",
 				"other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
@@ -577,21 +577,21 @@ public class JobBaseTest
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
-		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
-				"./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin",
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
+				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin",
 				"ModuleMachin", "other", "other", "other", true, em);
 
 		@SuppressWarnings("unused")
-		JobDef jd = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
-				"./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qNormal, 42, "MarsuApplication2", 42, "Franquin",
+		JobDef jd = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
+				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", Helpers.qNormal, 42, "MarsuApplication2", 42, "Franquin",
 				"ModuleMachin", "other", "other", "other", true, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
-		j.addParameter("filepath", "./testprojects/JobGenADeliverable/");
+		j.addParameter("filepath", "./testprojects/jqm-test-deliverable/");
 		j.addParameter("fileName", "JobGenADeliverableSecurity1.txt");
 
 		JobDefinition jj = new JobDefinition("MarsuApplication2", "Franquin");
-		jj.addParameter("filepath", "./testprojects/JobGenADeliverable/");
+		jj.addParameter("filepath", "./testprojects/jqm-test-deliverable/");
 		jj.addParameter("fileName", "JobGenADeliverableSecurity2.txt");
 
 		Dispatcher.enQueue(j);
@@ -610,7 +610,7 @@ public class JobBaseTest
 
 		Helpers.printJobInstanceTable();
 
-		File f = new File("./testprojects/JobGenADeliverable/JobGenADeliverableSecurity1.txt");
+		File f = new File("./testprojects/jqm-test-deliverable/JobGenADeliverableSecurity1.txt");
 
 		Assert.assertEquals(true, f.exists());
 
