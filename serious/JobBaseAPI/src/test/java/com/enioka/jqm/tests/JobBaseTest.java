@@ -39,8 +39,6 @@ public class JobBaseTest
 		s.setLogWriter(null);
 		s.setSilent(true);
 		s.start();
-
-		Thread.sleep(5000);
 	}
 
 	@AfterClass
@@ -406,7 +404,6 @@ public class JobBaseTest
 	public void testGetJobs() throws Exception
 	{
 		jqmlogger.debug("Starting test testGetJobs");
-		Dispatcher.resetEM();
 		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);

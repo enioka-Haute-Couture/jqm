@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -32,8 +30,6 @@ public class FiboTest
 		s.setLogWriter(null);
 		s.setSilent(true);
 		s.start();
-
-		Thread.sleep(1000);
 	}
 
 	@AfterClass
