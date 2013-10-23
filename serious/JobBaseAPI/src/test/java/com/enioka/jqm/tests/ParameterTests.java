@@ -41,7 +41,7 @@ public class ParameterTests
 	@Test
 	public void testMixParameters() throws Exception
 	{
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
@@ -71,7 +71,7 @@ public class ParameterTests
 	@Test
 	public void testDefaultParameters() throws Exception
 	{
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
@@ -100,7 +100,7 @@ public class ParameterTests
 	@Test
 	public void testOverrideParmeters() throws Exception
 	{
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 

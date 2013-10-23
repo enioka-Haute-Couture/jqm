@@ -66,7 +66,7 @@ public class Loader implements Runnable
 		History h = em.createQuery("SELECT h FROM History h WHERE h.id = :j", History.class).setParameter("j", job.getId())
 				.getSingleResult();
 
-		CreationTools.createMessage("Status updated: ATTRIBUTED", h, em);
+		Helpers.createMessage("Status updated: ATTRIBUTED", h, em);
 
 		transac.commit();
 	}
@@ -94,7 +94,7 @@ public class Loader implements Runnable
 
 			jqmlogger.debug("History was updated");
 
-			CreationTools.createMessage("Status updated: RUNNING", h, em);
+			Helpers.createMessage("Status updated: RUNNING", h, em);
 			em.getTransaction().commit();
 
 			EntityTransaction transac = em.getTransaction();
@@ -168,7 +168,7 @@ public class Loader implements Runnable
 			jqmlogger.debug("LOADER HISTORY: " + h.getId());
 
 			em.getTransaction().begin();
-			CreationTools.createMessage("Status updated: ENDED", h, em);
+			Helpers.createMessage("Status updated: ENDED", h, em);
 			em.getTransaction().commit();
 
 			// Retrieve files created by the job
@@ -185,7 +185,7 @@ public class Loader implements Runnable
 					String fileFamily = (String) ds.getClass().getMethod("getFileFamily", null).invoke(ds, null);
 
 					jqmlogger.debug("Job " + job.getId() + " has created a file: " + fileName + " - " + hashPath + " - " + fileFamily);
-					CreationTools.createDeliverable(filePath, fileName, hashPath, fileFamily, this.job.getId(), em);
+					Helpers.createDeliverable(filePath, fileName, hashPath, fileFamily, this.job.getId(), em);
 					jqmlogger.debug("Job " + job.getId() + " has finished registering file " + fileName);
 				} catch (Exception e)
 				{

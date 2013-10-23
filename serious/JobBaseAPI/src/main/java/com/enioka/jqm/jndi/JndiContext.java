@@ -11,11 +11,11 @@ import javax.naming.spi.InitialContextFactoryBuilder;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
-import javax.persistence.Persistence;
 
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.DatabaseProp;
+import com.enioka.jqm.tools.Helpers;
 
 public class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory
 {
@@ -27,7 +27,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 	{
 		super();
 		this.cl = cl;
-		this.em = Persistence.createEntityManagerFactory("jobqueue-api-pu").createEntityManager();
+		this.em = Helpers.getNewEm();
 	}
 
 	@Override

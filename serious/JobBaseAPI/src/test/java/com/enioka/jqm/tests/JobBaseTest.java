@@ -55,7 +55,7 @@ public class JobBaseTest
 	public void testHighlanderMode() throws Exception
 	{
 		jqmlogger.debug("Starting test testHighlanderMode");
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
@@ -93,7 +93,7 @@ public class JobBaseTest
 
 		em.getTransaction().commit();
 
-		EntityManager emm = Helpers.getNewEm();
+		EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
 
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
 				JobInstance.class).getResultList();
@@ -107,7 +107,7 @@ public class JobBaseTest
 	public void testHighlanderModeMultiQueue() throws Exception
 	{
 		jqmlogger.debug("Starting test testHighlanderModeMultiQueue");
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
@@ -152,7 +152,7 @@ public class JobBaseTest
 
 		em.getTransaction().commit();
 
-		EntityManager emm = Helpers.getNewEm();
+		EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
 
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm
 				.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :j ORDER BY j.position ASC", JobInstance.class)
@@ -176,11 +176,11 @@ public class JobBaseTest
 	public void testGetDeliverables() throws Exception
 	{
 		jqmlogger.debug("Starting test testGetDeliverables");
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
-		EntityManager emm = Helpers.getNewEm();
+		EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.createLocalNode(emm);
-		EntityManager emmm = Helpers.getNewEm();
+		EntityManager emmm = com.enioka.jqm.tools.Helpers.getNewEm();
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", "./testprojects/JobGenADeliverable/", em);
@@ -227,10 +227,10 @@ public class JobBaseTest
 	public void testGetOneDeliverable() throws Exception
 	{
 		jqmlogger.debug("Starting test testGetOneDeliverable");
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
-		EntityManager emm = Helpers.getNewEm();
+		EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", "./testprojects/JobGenADeliverable/", em);
@@ -274,7 +274,7 @@ public class JobBaseTest
 	public void testGetUserDeliverables() throws Exception
 	{
 		jqmlogger.debug("Starting test testGetUserDeliverables");
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
@@ -347,7 +347,7 @@ public class JobBaseTest
 	public void testGetUserJobs() throws Exception
 	{
 		jqmlogger.debug("Starting test testGetUserJobs");
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
@@ -394,7 +394,7 @@ public class JobBaseTest
 
 		em.getTransaction().commit();
 
-		EntityManager emm = Helpers.getNewEm();
+		EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
 
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
 				JobInstance.class).getResultList();
@@ -407,7 +407,7 @@ public class JobBaseTest
 	{
 		jqmlogger.debug("Starting test testGetJobs");
 		Dispatcher.resetEM();
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
@@ -433,7 +433,7 @@ public class JobBaseTest
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 		JobDefinition j2 = new JobDefinition("test", "Toto");
 		Dispatcher.resetEM();
-		
+
 		Dispatcher.enQueue(j);
 		Dispatcher.enQueue(j);
 		Dispatcher.enQueue(j);
@@ -462,7 +462,7 @@ public class JobBaseTest
 
 		em.getTransaction().commit();
 
-		EntityManager emm = Helpers.getNewEm();
+		EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
 
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
 				JobInstance.class).getResultList();
@@ -474,7 +474,7 @@ public class JobBaseTest
 	public void testGetQueues() throws Exception
 	{
 		jqmlogger.debug("Starting test testGetQueues");
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
@@ -487,7 +487,7 @@ public class JobBaseTest
 	public void testGoodOrder() throws Exception
 	{
 		jqmlogger.debug("Starting test testGoodOrder");
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
@@ -569,7 +569,7 @@ public class JobBaseTest
 	public void testSecurityDeliverable() throws Exception
 	{
 		jqmlogger.debug("Starting test testSecurityDeliverable");
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
@@ -599,7 +599,7 @@ public class JobBaseTest
 
 		Helpers.printJobInstanceTable();
 
-		EntityManager emm = Helpers.getNewEm();
+		EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
 		JobInstance ji = emm.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :myId", JobInstance.class)
 				.setParameter("myId", jdDemoMaven.getId()).getSingleResult();
 

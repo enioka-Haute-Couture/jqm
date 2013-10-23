@@ -3,8 +3,6 @@ package com.enioka.jqm.tests;
 import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 
 import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
@@ -22,12 +20,7 @@ public class Helpers
 
 	public static DeploymentParameter dpVip, dpNormal, dpSlow, dpVip2, dpNormal2, dpSlow2, dpVip3, dpNormal3, dpSlow3, dpVipMix;
 
-	public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-
-	public static EntityManager getNewEm()
-	{
-		return emf.createEntityManager();
-	}
+	
 
 	public static void createLocalNode(EntityManager em)
 	{
@@ -84,8 +77,7 @@ public class Helpers
 
 	public static void printJobInstanceTable()
 	{
-
-		EntityManager em = getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j", JobInstance.class)
 				.getResultList();

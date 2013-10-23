@@ -40,7 +40,7 @@ public class MultiNodeTests
 	// @Test
 	public void testOneQueueTwoNodes() throws Exception
 	{
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
@@ -50,8 +50,8 @@ public class MultiNodeTests
 
 		@SuppressWarnings("unused")
 		JobDef jd11 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip, 42, "AppliNode1-1", 42, "Franquin", "ModuleMachin",
-				"other", "other", "other", false, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip, 42, "AppliNode1-1", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j11 = new JobDefinition("AppliNode1-1", "MAG");
 
@@ -101,7 +101,7 @@ public class MultiNodeTests
 	// @Test
 	public void testTwoNodesTwoQueues() throws Exception
 	{
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
@@ -111,13 +111,13 @@ public class MultiNodeTests
 
 		@SuppressWarnings("unused")
 		JobDef jd11 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip, 42, "AppliNode1-1", 42, "Franquin", "ModuleMachin",
-				"other", "other", "other", false, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip, 42, "AppliNode1-1", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd21 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip2, 42, "AppliNode2-1", 42, "Franquin", "ModuleMachin",
-				"other", "other", "other", false, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip2, 42, "AppliNode2-1", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j11 = new JobDefinition("AppliNode1-1", "MAG");
 		JobDefinition j21 = new JobDefinition("AppliNode2-1", "MAG");
@@ -165,7 +165,7 @@ public class MultiNodeTests
 	// @Test
 	public void testThreeNodesThreeQueues() throws Exception
 	{
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
@@ -175,48 +175,48 @@ public class MultiNodeTests
 
 		@SuppressWarnings("unused")
 		JobDef jd11 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip, 42, "AppliNode1-1", 42, "Franquin", "ModuleMachin",
-				"other", "other", "other", false, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip, 42, "AppliNode1-1", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd12 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/DateTimeMaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qNormal, 42, "AppliNode1-2", 42, "Franquin", "ModuleMachin",
-				"other", "other", "other", false, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qNormal, 42, "AppliNode1-2", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd13 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qSlow, 42, "AppliNode1-3", 42, "Franquin", "ModuleMachin",
-				"other", "other", "other", false, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qSlow, 42, "AppliNode1-3", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd21 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip2, 42, "AppliNode2-1", 42, "Franquin", "ModuleMachin",
-				"other", "other", "other", false, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip2, 42, "AppliNode2-1", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd22 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qNormal2, 42, "AppliNode2-2", 42, "Franquin", "ModuleMachin",
-				"other", "other", "other", false, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qNormal2, 42, "AppliNode2-2", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd23 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qSlow2, 42, "AppliNode2-3", 42, "Franquin", "ModuleMachin",
-				"other", "other", "other", false, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qSlow2, 42, "AppliNode2-3", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd31 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip3, 42, "AppliNode3-1", 42, "Franquin", "ModuleMachin",
-				"other", "other", "other", false, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip3, 42, "AppliNode3-1", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd32 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qNormal3, 42, "AppliNode3-2", 42, "Franquin", "ModuleMachin",
-				"other", "other", "other", false, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qNormal3, 42, "AppliNode3-2", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd33 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qSlow3, 42, "AppliNode3-3", 42, "Franquin", "ModuleMachin",
-				"other", "other", "other", false, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qSlow3, 42, "AppliNode3-3", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j11 = new JobDefinition("AppliNode1-1", "MAG");
 		JobDefinition j12 = new JobDefinition("AppliNode1-2", "MAG");
@@ -266,7 +266,6 @@ public class MultiNodeTests
 		engine1.start(new String[] { "localhost" });
 		engine2.start(new String[] { "localhost2" });
 		engine3.start(new String[] { "localhost3" });
-		
 
 		int i = 0;
 		while (i < 5)

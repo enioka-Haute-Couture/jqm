@@ -30,22 +30,7 @@ public class CreationTools
 	{
 	}
 
-	// ------------------ DELIVERABLES ------------------------
-
-	public static Deliverable createDeliverable(String fp, String fn, String hp, String ff, Integer jobId, EntityManager em)
-	{
-		Deliverable j = new Deliverable();
-
-		j.setFilePath(fp);
-		j.setHashPath(hp);
-		j.setFileFamily(ff);
-		j.setJobId(jobId);
-		j.setFileName(fn);
-
-		em.persist(j);
-		return j;
-	}
-
+	
 	// ------------------ JOBDEFINITION ------------------------
 
 	public static JobDef initJobDefinition(String javaClassName, String filePath, Queue queue, EntityManager em)
@@ -228,19 +213,7 @@ public class CreationTools
 		return j;
 	}
 
-	// ------------------ MESSAGE ------------------------------
-
-	public static Message createMessage(String textMessage, History history, EntityManager em)
-	{
-		Message m = new Message();
-
-		m.setTextMessage(textMessage);
-		m.setHistory(history);
-
-		em.persist(m);
-		return m;
-	}
-
+	
 	// ------------------ NODE ---------------------------------
 
 	public static Node createNode(String listeningInterface, Integer port, String dlRepo, EntityManager em)

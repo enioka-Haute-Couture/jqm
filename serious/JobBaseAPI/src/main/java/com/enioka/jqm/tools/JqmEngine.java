@@ -24,9 +24,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -45,8 +43,7 @@ public class JqmEngine
 	public Node node = null;
 	public ArrayList<ThreadPool> tps = new ArrayList<ThreadPool>();
 	public AtomicBoolean isRunning = new AtomicBoolean(true);
-	public EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-	public EntityManager em = emf.createEntityManager();
+	public EntityManager em = Helpers.getNewEm();
 	public EntityTransaction t = em.getTransaction();
 	public Map<String, ClassLoader> cache = new HashMap<String, ClassLoader>();
 	public Server server = null;

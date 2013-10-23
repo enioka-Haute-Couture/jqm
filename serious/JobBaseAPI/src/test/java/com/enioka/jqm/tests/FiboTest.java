@@ -47,7 +47,7 @@ public class FiboTest
 	@Test
 	public void testFibo() throws Exception
 	{
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();

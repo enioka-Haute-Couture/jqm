@@ -30,22 +30,23 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
+import org.apache.log4j.Logger;
+
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.tools.CreationTools;
+import com.enioka.jqm.tools.Helpers;
 import com.enioka.jqm.tools.ThreadPool;
 
 public class Polling implements Runnable
 {
-
+	Logger jqmlogger = Logger.getLogger(Polling.class);
 	private ArrayList<JobInstance> job = new ArrayList<JobInstance>();
 	private DeploymentParameter dp = null;
 	private Queue queue = null;
-	private EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-	private EntityManager em = emf.createEntityManager();
+	private EntityManager em = Helpers.getNewEm();
 	private ThreadPool tp = null;
 	private boolean run = true;
 	private Integer actualNbThread = 0;
@@ -117,7 +118,6 @@ public class Polling implements Runnable
 
 	public void executionStatus()
 	{
-
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction transac = em.getTransaction();
@@ -126,7 +126,7 @@ public class Polling implements Runnable
 		History h = em.createQuery("SELECT h FROM History h WHERE h.id = :j", History.class).setParameter("j", job.get(0).getId())
 				.getSingleResult();
 
-		CreationTools.createMessage("Status updated: RUNNING", h, em);
+		Helpers.createMessage("Status updated: RUNNING", h, em);
 
 		em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", job.get(0).getId())
 				.setParameter("msg", "RUNNING").executeUpdate();
@@ -159,7 +159,7 @@ public class Polling implements Runnable
 				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class)
 						.setParameter("j", currentJob.getId()).getSingleResult();
 
-				CreationTools.createMessage("Status updated: CANCELLED", h, em);
+				Helpers.createMessage("Status updated: CANCELLED", h, em);
 
 				t.commit();
 			}
@@ -180,7 +180,7 @@ public class Polling implements Runnable
 				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class)
 						.setParameter("j", j.getId()).getSingleResult();
 
-				CreationTools.createMessage("Status updated: CANCELLED", h, em);
+				Helpers.createMessage("Status updated: CANCELLED", h, em);
 
 				t.commit();
 			}
@@ -259,11 +259,12 @@ public class Polling implements Runnable
 				if (actualNbThread == tp.getNbThread())
 					continue;
 
-				System.out.println("((((((((((((((((((()))))))))))))))))");
-				System.out.println("ACTUAL DEPLOYMENT PARAMETER: " + dp.getNode().getId());
-				System.out.println("ACTUAL nbThread: " + actualNbThread);
-				System.out.println("JI: " + ji.getId());
-				System.out.println("((((((((((((((((((()))))))))))))))))");
+				jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
+				jqmlogger.debug("ACTUAL DEPLOYMENT PARAMETER: " + dp.getNode().getId());
+				jqmlogger.debug("THEORETICAL MAX nbThread: " + dp.getNbThread());
+				jqmlogger.debug("ACTUAL nbThread: " + actualNbThread);
+				jqmlogger.debug("JI: " + ji.getId());
+				jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
 
 				em.getTransaction().begin();
 
@@ -283,12 +284,12 @@ public class Polling implements Runnable
 
 				actualNbThread++;
 
-				System.out.println("TPS QUEUE: " + tp.getQueue().getId());
-				System.out.println("POLLING QUEUE: " + ji.getQueue().getId());
+				jqmlogger.debug("TPS QUEUE: " + tp.getQueue().getId());
+				jqmlogger.debug("POLLING QUEUE: " + ji.getQueue().getId());
 
 				tp.run(ji, this);
 
-				System.out.println("APRES THREADPOOL RUN");
+				jqmlogger.debug("End of poller loop  on queue " + this.queue.getName());
 
 			} catch (InterruptedException e)
 			{

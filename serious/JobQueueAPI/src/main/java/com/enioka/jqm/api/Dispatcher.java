@@ -270,19 +270,12 @@ public class Dispatcher
 		JobInstance ji = CreationTools.createJobInstance(job, overrideParameter(job, jd), jd.getUser(), 42, "SUBMITTED", (p == null) ? 1
 				: p + 1, job.queue, em);
 		jqmlogger.debug("JI QUI VIENT D'ETRE CREE: " + ji.getId());
-		// em.getTransaction().commit();
 
-		// em.getTransaction().begin();
-		Message m = null;
 		ArrayList<JobHistoryParameter> jhp = new ArrayList<JobHistoryParameter>();
-
 		ArrayList<Message> msgs = new ArrayList<Message>();
 
 		h = CreationTools.createhistory(1, (Calendar) null, "History of the Job --> ID = " + (ji.getId()), msgs, ji, enqueueDate,
 				(Calendar) null, (Calendar) null, jhp, em);
-
-		m = CreationTools.createMessage("Status updated: SUBMITTED", h, em);
-		msgs.add(m);
 		jqmlogger.debug("HISTORY QUI VIENT D'ETRE CREE: " + h.getId());
 		// CreationTools.em.createQuery("UPDATE JobParameter jp SET jp.jobInstance = :j WHERE").executeUpdate();
 
@@ -661,7 +654,6 @@ public class Dispatcher
 
 	public static List<com.enioka.jqm.api.JobInstance> getJobs()
 	{
-		Logger jqmlogger = Logger.getLogger(Dispatcher.class);
 		ArrayList<com.enioka.jqm.api.JobInstance> res = new ArrayList<com.enioka.jqm.api.JobInstance>();
 
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j", JobInstance.class)

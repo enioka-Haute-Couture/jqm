@@ -44,7 +44,7 @@ public class QueueTests
 	public void printJobInstanceTable()
 	{
 
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j", JobInstance.class)
 				.getResultList();
@@ -62,7 +62,7 @@ public class QueueTests
 	@Test
 	public void testMaxThread() throws Exception
 	{
-		EntityManager em = Helpers.getNewEm();
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 		ArrayList<JobInstance> job = null;
@@ -72,8 +72,8 @@ public class QueueTests
 		jdargs.add(jdp);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qNormal, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
-				"other", "other", "other", false, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qNormal, 42, "MarsuApplication", 42,
+				"Franquin", "ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
@@ -88,7 +88,7 @@ public class QueueTests
 
 		while (i < 5)
 		{
-			EntityManager emm = Helpers.getNewEm();
+			EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
 			Dispatcher.enQueue(j);
 			Dispatcher.enQueue(j);
 			Dispatcher.enQueue(j);

@@ -25,17 +25,17 @@ import java.lang.reflect.Modifier;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.acl.Owner;
 import java.util.Map;
 import java.util.jar.Attributes;
 
-import com.enioka.jqm.api.JobBase;
+import org.apache.log4j.Logger;
+
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
 
 public class JarClassLoader extends URLClassLoader
 {
-
+	Logger jqmlogger = Logger.getLogger(JarClassLoader.class);
 	URL jarUrl;
 
 	public JarClassLoader(URL url)
@@ -80,7 +80,6 @@ public class JarClassLoader extends URLClassLoader
 
 	public void invokeClass(String name, String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException
 	{
-
 		@SuppressWarnings("rawtypes")
 		Class c = loadClass(name);
 		@SuppressWarnings("unchecked")
@@ -102,10 +101,9 @@ public class JarClassLoader extends URLClassLoader
 
 	public Object invokeMain(JobInstance job) throws Exception
 	{
-		System.out.println("HHHHHHHHHHHHHHH: " + job.getJd().getJavaClassName());
 		String classQualifiedName = job.getJd().getJavaClassName();
 		Class c = loadClass(classQualifiedName);
-		System.out.println("IIIIIIIIIIII");
+		jqmlogger.debug("Class " + classQualifiedName + " was correctly loaded");
 
 		Object o = c.newInstance();
 
