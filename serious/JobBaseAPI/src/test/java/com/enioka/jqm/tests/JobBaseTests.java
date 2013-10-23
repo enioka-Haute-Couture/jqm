@@ -45,7 +45,7 @@ public class JobBaseTests
 		s.stop();
 	}
 
-	// @Test
+	@Test
 	public void testHighlanderMode() throws Exception
 	{
 
@@ -174,7 +174,7 @@ public class JobBaseTests
 
 		Main.main(new String[] { "localhost" });
 
-		Thread.sleep(16000);
+		Thread.sleep(10000);
 
 		File f = new File("./testprojects/JobGenADeliverable/JobGenADeliverable42.txt");
 
@@ -396,11 +396,6 @@ public class JobBaseTests
 		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
-		Main.main(new String[] { "localhost" });
-
-		Thread.sleep(10000);
-		Main.stop();
-
 		ArrayList<Queue> qs = (ArrayList<Queue>) em.createQuery("SELECT q FROM Queue q", Queue.class).getResultList();
 
 		Assert.assertEquals(3, qs.size());
@@ -488,6 +483,63 @@ public class JobBaseTests
 
 			Assert.assertNotEquals(resSlow.get(i).getPosition(), resSlow.get(i + 1).getPosition());
 		}
+	}
 
+	@Test
+	public void testSecurityDeliverable() throws Exception
+	{
+		EntityManager em = Helpers.getNewEm();
+		Helpers.cleanup(em);
+		Helpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
+				"./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", true, em);
+
+		@SuppressWarnings("unused")
+		JobDef jd = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/JobGenADeliverable/",
+				"./testprojects/JobGenADeliverable/JobGenADeliverable.jar", Helpers.qNormal, 42, "MarsuApplication2", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", true, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+		j.addParameter("filepath", "./testprojects/JobGenADeliverable/");
+		j.addParameter("fileName", "JobGenADeliverableSecurity1.txt");
+
+		JobDefinition jj = new JobDefinition("MarsuApplication2", "Franquin");
+		jj.addParameter("filepath", "./testprojects/JobGenADeliverable/");
+		jj.addParameter("fileName", "JobGenADeliverableSecurity2.txt");
+
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(jj);
+
+		Helpers.printJobInstanceTable();
+
+		EntityManager emm = Helpers.getNewEm();
+		JobInstance ji = emm.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :myId", JobInstance.class)
+				.setParameter("myId", jdDemoMaven.getId()).getSingleResult();
+
+		Main.main(new String[] { "localhost" });
+
+		Thread.sleep(12000);
+
+		Helpers.printJobInstanceTable();
+
+		File f = new File("./testprojects/JobGenADeliverable/JobGenADeliverableSecurity1.txt");
+
+		Assert.assertEquals(true, f.exists());
+
+		List<Deliverable> tmp = Dispatcher.getUserDeliverables("MAG");
+		Main.stop();
+
+		Assert.assertEquals(1, tmp.size());
+
+		for (Deliverable dd : tmp)
+		{
+			Assert.assertEquals(ji.getId(), (int) dd.getJobId());
+		}
 	}
 }

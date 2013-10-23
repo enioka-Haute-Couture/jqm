@@ -24,7 +24,6 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 import com.enioka.jqm.api.JobBase;
 import com.enioka.jqm.deliverabletools.DeliverableStruct;
-import com.enioka.jqm.jndi.JndiContextFactory;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.temp.Polling;
@@ -88,11 +87,14 @@ public class Loader implements Runnable
 			Collection<Artifact> deps = null;
 
 			// Update of the job status
+			em.getTransaction().begin();
 			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", job)
 					.getSingleResult();
+
 			jqmlogger.debug("History was updated");
 
 			CreationTools.createMessage("Status updated: RUNNING", h, em);
+			em.getTransaction().commit();
 
 			EntityTransaction transac = em.getTransaction();
 			transac.begin();

@@ -140,7 +140,7 @@ public class Dispatcher {
 
     	if (m.isEmpty())
     	{
-
+    		System.out.println("NOT OVERRIDE");
     		if (jdef.getParameters() == null)
     			return res;
 
@@ -151,8 +151,9 @@ public class Dispatcher {
 
     		return res;
     	}
-    	else if (!m.isEmpty())
+    	else if (!m.isEmpty() && !jdef.getParameters().isEmpty())
     	{
+    		System.out.println("OVERRIDE");
     		for (JobDefParameter i : jdef.getParameters())
     		{
     			res.add(CreationTools.createJobParameter(i.getKey(), i.getValue(), em));
@@ -196,11 +197,15 @@ public class Dispatcher {
 				}
 			}
 
+    		for (JobParameter j : res)
+			{
+				System.out.println("CONTENU PARAMETERS: " + j.getKey() + ", " + j.getValue());
+			}
     		return res;
     	}
     	else
     	{
-
+    		System.out.println("SUPER OVERRIDE");
     		for( Iterator<String> i = m.keySet().iterator(); i.hasNext();)
     		{
 
@@ -447,6 +452,11 @@ public class Dispatcher {
 					FileUtils.copyURLToFile(url, file);
 					streams.add(new FileInputStream(file));
 				}
+				else
+				{
+					jqmlogger.info("GetDeliverables: You are not the owner of this document.");
+					return null;
+				}
 			}
 		} catch (FileNotFoundException e) {
 
@@ -480,17 +490,27 @@ public class Dispatcher {
 
 		URL url = null;
 		File file = null;
+		JobInstance job = null;
+		Logger jqmlogger = Logger.getLogger(Dispatcher.class);
 
 		Deliverable deliverable = em.createQuery("SELECT d FROM Deliverable d WHERE d.filePath = :f AND d.fileName = :fn", Deliverable.class)
 				.setParameter("f", d.getFilePath())
 				.setParameter("fn", d.getFileName())
 				.getSingleResult();
 
-		JobInstance job = em.createQuery(
-				"SELECT j FROM JobInstance j WHERE j.id = :job",
-				JobInstance.class)
-				.setParameter("job", deliverable.getJobId())
-				.getSingleResult();
+		try
+		{
+			job = em.createQuery(
+					"SELECT j FROM JobInstance j WHERE j.id = :job",
+					JobInstance.class)
+					.setParameter("job", deliverable.getJobId())
+					.getSingleResult();
+		}
+		catch(Exception e)
+		{
+			job = null;
+			jqmlogger.info("GetOneDeliverable: No job found with the deliverable ID");
+		}
 
 		DeploymentParameter dp = em.createQuery(
 				"SELECT dp FROM DeploymentParameter dp WHERE dp.queue.id = :q", DeploymentParameter.class)
@@ -507,12 +527,18 @@ public class Dispatcher {
 
 		System.out.println("URLtmp: " + deliverable.getFilePath() + deliverable.getFileName());
 
-		if (deliverable.getHashPath().equals(Cryptonite.sha1(deliverable.getFilePath() + deliverable.getFileName()))) {
+		if (deliverable.getHashPath().equals(Cryptonite.sha1(deliverable.getFilePath() + deliverable.getFileName())) &&
+				job != null) {
 			System.out.println("dlRepo: " + dp.getNode().getDlRepo() + deliverable.getFileFamily() + "/" + job.getId() + "/");
 			File dlRepo = new File(dp.getNode().getDlRepo() + deliverable.getFileFamily() + "/" + job.getId() + "/");
 			dlRepo.mkdirs();
 			file = new File(dp.getNode().getDlRepo() + deliverable.getFileFamily() + "/" + job.getId() + "/" + deliverable.getFileName());
 			FileUtils.copyURLToFile(url, file);
+		}
+		else
+		{
+			jqmlogger.info("GetOneDeliverable: You are not the owner of this document.");
+			return null;
 		}
 		return (new FileInputStream(file));
 	}
