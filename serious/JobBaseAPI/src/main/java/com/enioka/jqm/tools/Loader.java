@@ -99,12 +99,8 @@ public class Loader implements Runnable
 
 			Calendar executionDate = GregorianCalendar.getInstance(Locale.getDefault());
 
-			em.getTransaction().begin();
-
 			em.createQuery("UPDATE History h SET h.executionDate = :date WHERE h.id = :h").setParameter("h", h.getId())
 					.setParameter("date", executionDate).executeUpdate();
-
-			em.getTransaction().commit();
 
 			// End of the execution date
 
@@ -184,7 +180,7 @@ public class Loader implements Runnable
 			em.getTransaction().begin();
 
 			em.createQuery("UPDATE History h SET h.executionDate = :date WHERE h.id = :h").setParameter("h", h.getId())
-					.setParameter("date", executionDate).executeUpdate();
+					.setParameter("date", endDate).executeUpdate();
 
 			em.getTransaction().commit();
 
