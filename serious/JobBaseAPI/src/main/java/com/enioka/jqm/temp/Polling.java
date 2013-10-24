@@ -19,9 +19,6 @@
 package com.enioka.jqm.temp;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
@@ -219,22 +216,22 @@ public class Polling implements Runnable
 
 	}
 
-	public void updateExecutionDate(EntityManager em)
-	{
-
-		Calendar executionDate = GregorianCalendar.getInstance(Locale.getDefault());
-
-		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class)
-				.setParameter("j", job.get(0).getId()).getSingleResult();
-
-		EntityTransaction transac = em.getTransaction();
-		transac.begin();
-
-		em.createQuery("UPDATE History h SET h.executionDate = :date WHERE h.id = :h").setParameter("h", h.getId())
-				.setParameter("date", executionDate).executeUpdate();
-
-		transac.commit();
-	}
+	// public void updateExecutionDate(EntityManager em)
+	// {
+	//
+	// Calendar executionDate = GregorianCalendar.getInstance(Locale.getDefault());
+	//
+	// History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class)
+	// .setParameter("j", job.get(0).getId()).getSingleResult();
+	//
+	// EntityTransaction transac = em.getTransaction();
+	// transac.begin();
+	//
+	// em.createQuery("UPDATE History h SET h.executionDate = :date WHERE h.id = :h").setParameter("h", h.getId())
+	// .setParameter("date", executionDate).executeUpdate();
+	//
+	// transac.commit();
+	// }
 
 	@Override
 	public void run()

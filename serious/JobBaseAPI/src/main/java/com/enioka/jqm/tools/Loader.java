@@ -8,7 +8,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
@@ -92,6 +95,19 @@ public class Loader implements Runnable
 			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", job)
 					.getSingleResult();
 
+			// Update of the execution date
+
+			Calendar executionDate = GregorianCalendar.getInstance(Locale.getDefault());
+
+			em.getTransaction().begin();
+
+			em.createQuery("UPDATE History h SET h.executionDate = :date WHERE h.id = :h").setParameter("h", h.getId())
+					.setParameter("date", executionDate).executeUpdate();
+
+			em.getTransaction().commit();
+
+			// End of the execution date
+
 			jqmlogger.debug("History was updated");
 
 			Helpers.createMessage("Status updated: RUNNING", h, em);
@@ -161,6 +177,19 @@ public class Loader implements Runnable
 			// Restore class loader
 			Thread.currentThread().setContextClassLoader(contextClassLoader);
 
+			// Update end date
+
+			Calendar endDate = GregorianCalendar.getInstance(Locale.getDefault());
+
+			em.getTransaction().begin();
+
+			em.createQuery("UPDATE History h SET h.executionDate = :date WHERE h.id = :h").setParameter("h", h.getId())
+					.setParameter("date", executionDate).executeUpdate();
+
+			em.getTransaction().commit();
+
+			// End end date
+
 			// STATE UPDATED
 			em.getTransaction().begin();
 			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
@@ -175,6 +204,7 @@ public class Loader implements Runnable
 			// Retrieve files created by the job
 			Method m = this.jobBase.getClass().getMethod("getSha1s");
 			ArrayList<Object> dss = (ArrayList<Object>) m.invoke(jobBase, null);
+
 			for (Object ds : dss)
 			{
 				try
