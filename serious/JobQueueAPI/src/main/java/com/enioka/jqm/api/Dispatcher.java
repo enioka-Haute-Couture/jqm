@@ -57,7 +57,7 @@ import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.tools.CreationTools;
 
 /**
- * 
+ *
  * @author pierre.coppee
  */
 public class Dispatcher
@@ -166,9 +166,13 @@ public class Dispatcher
 		Map<String, String> m = jdefinition.getParameters();
 		List<JobParameter> res = new ArrayList<JobParameter>();
 
-		if (m.isEmpty())
+		if (m == null)
 		{
-			System.out.println("NOT OVERRIDE");
+			return res;
+		}
+		else if (m.isEmpty())
+		{
+			jqmlogger.debug("Parameters no overriding");
 			if (jdef.getParameters() == null)
 				return res;
 
@@ -181,7 +185,7 @@ public class Dispatcher
 		}
 		else if (!m.isEmpty() && !jdef.getParameters().isEmpty())
 		{
-			System.out.println("OVERRIDE");
+			System.out.println("Parameters overriding");
 			for (JobDefParameter i : jdef.getParameters())
 			{
 				res.add(CreationTools.createJobParameter(i.getKey(), i.getValue(), em));
@@ -229,12 +233,12 @@ public class Dispatcher
 			// {
 			// System.out.println("CONTENU PARAMETERS: " + j.getKey() + ", " + j.getValue());
 			// }
-			System.out.println("YES");
+			System.out.println("Parameters overrided will be returned");
 			return res;
 		}
 		else
 		{
-			System.out.println("SUPER OVERRIDE");
+			jqmlogger.debug("Parameters will be SUPER overriding");
 			for (Iterator<String> i = m.keySet().iterator(); i.hasNext();)
 			{
 
@@ -333,7 +337,7 @@ public class Dispatcher
 		int res = q.executeUpdate();
 
 		if (res != 1)
-			System.err.println("delJobInQueueError: Job ID or Queue ID doesn't exists.");
+			jqmlogger.info("delJobInQueueError: Job ID or Queue ID doesn't exists.");
 
 		transac.commit();
 
@@ -362,7 +366,7 @@ public class Dispatcher
 					.setParameter("msg", "Status updated: CANCELLED").executeUpdate();
 
 			if (res != 1)
-				System.err.println("CancelJobInQueueError: Job ID or Queue ID doesn't exists.");
+				jqmlogger.info("CancelJobInQueueError: Job ID or Queue ID doesn't exists.");
 
 			transac.commit();
 		} catch (Exception e)
@@ -471,8 +475,8 @@ public class Dispatcher
 			tmp = em.createQuery("SELECT d FROM Deliverable d WHERE d.jobId = :idJob", Deliverable.class).setParameter("idJob", idJob)
 					.getResultList();
 
-			System.out.println("idJob: " + idJob);
-			System.out.println("sizeTMP: " + tmp.size());
+			jqmlogger.debug("idJob of the deliverable: " + idJob);
+			jqmlogger.debug("size of the deliverable list: " + tmp.size());
 
 			JobInstance job = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :job", JobInstance.class).setParameter("job", idJob)
 					.getSingleResult();
@@ -490,7 +494,7 @@ public class Dispatcher
 				if (tmp.get(i).getHashPath().equals(Cryptonite.sha1(tmp.get(i).getFilePath() + tmp.get(i).getFileName())))
 				{
 					// mettre en base le repertoire de dl
-					System.out.println("dlRepo: " + dp.getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + job.getId() + "/");
+					jqmlogger.debug("dlRepository: " + dp.getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + job.getId() + "/");
 					File dlRepo = new File(dp.getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + job.getId() + "/");
 					dlRepo.mkdirs();
 					file = new File(dp.getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + job.getId() + "/"
@@ -574,7 +578,7 @@ public class Dispatcher
 		url = new URL("http://" + dp.getNode().getListeningInterface() + ":" + dp.getNode().getPort() + "/getfile?file="
 				+ deliverable.getFilePath() + deliverable.getFileName());
 
-		System.out.println("URLtmp: " + deliverable.getFilePath() + deliverable.getFileName());
+		jqmlogger.debug("URL: " + deliverable.getFilePath() + deliverable.getFileName());
 
 		if (deliverable.getHashPath().equals(Cryptonite.sha1(deliverable.getFilePath() + deliverable.getFileName())) && job != null)
 		{
@@ -715,7 +719,7 @@ public class Dispatcher
 			int result = query.executeUpdate();
 
 			if (result != 1)
-				System.err.println("changeQueueError: Job ID or Queue ID doesn't exists.");
+				jqmlogger.info("changeQueueError: Job ID or Queue ID doesn't exists.");
 		} catch (Exception e)
 		{
 			jqmlogger.info(e);
@@ -739,7 +743,7 @@ public class Dispatcher
 			int result = query.executeUpdate();
 
 			if (result != 1)
-				System.err.println("changeQueueError: Job ID or Queue ID doesn't exists.");
+				jqmlogger.info("changeQueueError: Job ID or Queue ID doesn't exists.");
 		} catch (Exception e)
 		{
 			jqmlogger.info(e);

@@ -105,30 +105,30 @@ public class Loader implements Runnable
 			transac.commit();
 			jqmlogger.debug("JobInstance was updated");
 
-			if (!cache.containsKey(job.getJd().getApplicationName()))
+			// if (!cache.containsKey(job.getJd().getApplicationName()))
+			// {
+			Dependencies dependencies = new Dependencies(job.getJd().getFilePath() + "pom.xml");
+
+			isInCache = false;
+			Collection<RemoteRepository> remotes = Arrays.asList(new RemoteRepository("maven-central", "default",
+					"http://repo1.maven.org/maven2/"), new RemoteRepository("eclipselink", "default",
+					"http://download.eclipse.org/rt/eclipselink/maven.repo/")
+
+			);
+
+			deps = new ArrayList<Artifact>();
+			for (int i = 0; i < dependencies.getList().size(); i++)
 			{
-				Dependencies dependencies = new Dependencies(job.getJd().getFilePath() + "pom.xml");
-
-				isInCache = false;
-				Collection<RemoteRepository> remotes = Arrays.asList(new RemoteRepository("maven-central", "default",
-						"http://repo1.maven.org/maven2/"), new RemoteRepository("eclipselink", "default",
-						"http://download.eclipse.org/rt/eclipselink/maven.repo/")
-
-				);
-
-				deps = new ArrayList<Artifact>();
-				for (int i = 0; i < dependencies.getList().size(); i++)
-				{
-					jqmlogger.info("Resolving Maven dep " + dependencies.getList().get(i));
-					deps.addAll(new Aether(remotes, local).resolve(new DefaultArtifact(dependencies.getList().get(i)), "compile"));
-				}
-
-				for (Artifact artifact : deps)
-				{
-					tmp.add(artifact.getFile().toURI().toURL());
-					jqmlogger.info("Artifact: " + artifact.getFile().toURI().toURL());
-				}
+				jqmlogger.info("Resolving Maven dep " + dependencies.getList().get(i));
+				deps.addAll(new Aether(remotes, local).resolve(new DefaultArtifact(dependencies.getList().get(i)), "compile"));
 			}
+
+			for (Artifact artifact : deps)
+			{
+				tmp.add(artifact.getFile().toURI().toURL());
+				jqmlogger.info("Artifact: " + artifact.getFile().toURI().toURL());
+			}
+			// }
 			// ------------------- END: MAVEN DEPENDENCIES ---------------
 
 			// We save the actual classloader
@@ -151,9 +151,10 @@ public class Loader implements Runnable
 
 			// Go! (launches the main function in the startup class designated in the manifest)
 			jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
-			jqmlogger.debug("Je suis dans le thread " + Thread.currentThread().getName());
+			jqmlogger.debug("Job is running in the thread: " + Thread.currentThread().getName());
 			jqmlogger.debug("AVANT INVOKE MAIN");
 			jobBase = jobClassLoader.invokeMain(job);
+			jqmlogger.debug("ActualNbThread after execution: " + p.getActualNbThread());
 			p.setActualNbThread(p.getActualNbThread() - 1);
 			jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
 

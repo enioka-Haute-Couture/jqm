@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import org.hsqldb.Server;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
@@ -69,6 +70,69 @@ public class MultiNodeTests
 		JqmEngine engine2 = new JqmEngine();
 		engine1.start(new String[] { "localhost" });
 		engine2.start(new String[] { "localhost4" });
+
+		int i = 0;
+		while (i < 5)
+		{
+			Helpers.printJobInstanceTable();
+
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+
+			Thread.sleep(5000);
+
+			Helpers.printJobInstanceTable();
+			i++;
+		}
+
+		engine1.stop();
+		engine2.stop();
+	}
+
+	@Test
+	public void testOneQueueThreeNodes() throws Exception
+	{
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
+		Helpers.cleanup(em);
+		Helpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		@SuppressWarnings("unused")
+		JobDef jd11 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip, 42, "AppliNode1-1", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
+
+		JobDefinition j11 = new JobDefinition("AppliNode1-1", "MAG");
+
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+
+		JqmEngine engine1 = new JqmEngine();
+		JqmEngine engine2 = new JqmEngine();
+		JqmEngine engine3 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+		engine2.start(new String[] { "localhost4" });
+		engine3.start(new String[] { "localhost5" });
 
 		int i = 0;
 		while (i < 5)

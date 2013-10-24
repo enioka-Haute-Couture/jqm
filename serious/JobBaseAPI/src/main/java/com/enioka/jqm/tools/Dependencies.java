@@ -33,21 +33,24 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class Dependencies {
+public class Dependencies
+{
 
 	private ArrayList<String> list = new ArrayList<String>();
 	Logger jqmlogger = Logger.getLogger(this.getClass());
 
-	public Dependencies(String path) {
+	public Dependencies(String path)
+	{
 
 		File fXmlFile = new File(path);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		String dep = "";
 
-		try {
-			System.out.println(fXmlFile.getPath());
-			System.out.println("Working Directory = " + System.getProperty("user.dir"));
+		try
+		{
+			jqmlogger.debug(fXmlFile.getPath());
+			jqmlogger.debug("Working Directory = " + System.getProperty("user.dir"));
 			if (fXmlFile == null || !fXmlFile.isFile())
 				throw new Throwable("Dependencies: ");
 
@@ -66,14 +69,16 @@ public class Dependencies {
 
 			// System.out.println("----------------------------");
 
-			for (int temp = 0; temp < nList.getLength(); temp++) {
+			for (int temp = 0; temp < nList.getLength(); temp++)
+			{
 
 				Node nNode = nList.item(temp);
 
 				// System.out.println("\nCurrent Element :" +
 				// nNode.getNodeName());
 
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+				if (nNode.getNodeType() == Node.ELEMENT_NODE)
+				{
 
 					Element eElement = (Element) nNode;
 
@@ -86,28 +91,35 @@ public class Dependencies {
 				}
 			}
 
-		} catch (ParserConfigurationException e) {
+		} catch (ParserConfigurationException e)
+		{
 			jqmlogger.error(e);
-		} catch (SAXException e) {
+		} catch (SAXException e)
+		{
 			jqmlogger.error(e + "Invalid XML architecture. Please, fix correctly the dependencies");
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			jqmlogger.error(e + "Invalid pom.xml. Please check the pom.xml & its filepath " + path);
-		} catch (Throwable e) {
+		} catch (Throwable e)
+		{
 			jqmlogger.error(e + "Invalid pom.xml. Please check the pom.xml & its filepath " + path);
 		}
 	}
 
-	public void print() {
+	public void print()
+	{
 
-		for (int i = 0; i < list.size(); i++) {
-			System.out.println("Dependency " + i + ": " + list.get(i));
+		for (int i = 0; i < list.size(); i++)
+		{
+			jqmlogger.debug("Dependency " + i + ": " + list.get(i));
 		}
 	}
 
 	/**
 	 * @return the list
 	 */
-	public ArrayList<String> getList() {
+	public ArrayList<String> getList()
+	{
 
 		return list;
 	}
@@ -116,7 +128,8 @@ public class Dependencies {
 	 * @param list
 	 *            the list to set
 	 */
-	public void setList(ArrayList<String> list) {
+	public void setList(ArrayList<String> list)
+	{
 
 		this.list = list;
 	}

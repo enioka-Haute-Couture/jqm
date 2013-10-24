@@ -49,7 +49,7 @@ public class Polling implements Runnable
 	private EntityManager em = Helpers.getNewEm();
 	private ThreadPool tp = null;
 	private boolean run = true;
-	private Integer actualNbThread = 0;
+	private Integer actualNbThread;
 
 	public void stop()
 	{
@@ -59,10 +59,10 @@ public class Polling implements Runnable
 
 	public Polling(DeploymentParameter dp, Map<String, ClassLoader> cache)
 	{
-
+		jqmlogger.debug("Polling instanciation with the Deployment Parameter: " + dp.getClassId());
 		this.dp = dp;
 		this.queue = dp.getQueue();
-
+		this.actualNbThread = 0;
 		this.tp = new ThreadPool(queue, dp.getNbThread(), cache);
 	}
 
@@ -260,10 +260,10 @@ public class Polling implements Runnable
 					continue;
 
 				jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
-				jqmlogger.debug("ACTUAL DEPLOYMENT PARAMETER: " + dp.getNode().getId());
+				jqmlogger.debug("Actual deploymentParameter: " + dp.getNode().getId());
 				jqmlogger.debug("THEORETICAL MAX nbThread: " + dp.getNbThread());
-				jqmlogger.debug("ACTUAL nbThread: " + actualNbThread);
-				jqmlogger.debug("JI: " + ji.getId());
+				jqmlogger.debug("Actual nbThread: " + actualNbThread);
+				jqmlogger.debug("JI that will be attributed: " + ji.getId());
 				jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
 
 				em.getTransaction().begin();
@@ -285,6 +285,7 @@ public class Polling implements Runnable
 				actualNbThread++;
 
 				jqmlogger.debug("TPS QUEUE: " + tp.getQueue().getId());
+				jqmlogger.debug("INCREMENTATION NBTHREAD: " + actualNbThread);
 				jqmlogger.debug("POLLING QUEUE: " + ji.getQueue().getId());
 
 				tp.run(ji, this);

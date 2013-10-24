@@ -16,11 +16,9 @@ public class Helpers
 	public static DatabaseProp db = null;
 
 	public static com.enioka.jqm.jpamodel.Queue qVip, qNormal, qSlow, qVip2, qNormal2, qSlow2, qVip3, qNormal3, qSlow3;
-	public static Node node, node2, node3, nodeMix;
+	public static Node node, node2, node3, nodeMix, nodeMix2;
 
-	public static DeploymentParameter dpVip, dpNormal, dpSlow, dpVip2, dpNormal2, dpSlow2, dpVip3, dpNormal3, dpSlow3, dpVipMix;
-
-	
+	public static DeploymentParameter dpVip, dpNormal, dpSlow, dpVip2, dpNormal2, dpSlow2, dpVip3, dpNormal3, dpSlow3, dpVipMix, dpVipMix2;
 
 	public static void createLocalNode(EntityManager em)
 	{
@@ -42,10 +40,12 @@ public class Helpers
 		Helpers.node = CreationTools.createNode("localhost", 8081, "./testprojects/jqm-test-deliverable/", em);
 		Helpers.node2 = CreationTools.createNode("localhost2", 8082, "./testprojects/jqm-test-deliverable/", em);
 		Helpers.node3 = CreationTools.createNode("localhost3", 8083, "./testprojects/jqm-test-deliverable/", em);
-		// Helpers.nodeMix = CreationTools.createNode("localhost4", 8084, "./testprojects/jqm-test-deliverable/", em);
+		Helpers.nodeMix = CreationTools.createNode("localhost4", 8084, "./testprojects/jqm-test-deliverable/", em);
+		Helpers.nodeMix2 = CreationTools.createNode("localhost5", 8085, "./testprojects/jqm-test-deliverable/", em);
 
-		Helpers.dpVip = CreationTools.createDeploymentParameter(1, node, 3, 100, qVip, em);
-		// Helpers.dpVipMix = CreationTools.createDeploymentParameter(2, nodeMix, 3, 100, qVip, em);
+		Helpers.dpVip = CreationTools.createDeploymentParameter(1, node, 3, 1, qVip, em);
+		Helpers.dpVipMix = CreationTools.createDeploymentParameter(2, nodeMix, 3, 1, qVip, em);
+		Helpers.dpVipMix2 = CreationTools.createDeploymentParameter(2, nodeMix2, 3, 1, qVip, em);
 		Helpers.dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 300, qNormal, em);
 		Helpers.dpSlow = CreationTools.createDeploymentParameter(1, node, 1, 1000, qSlow, em);
 

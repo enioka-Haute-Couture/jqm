@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -48,6 +49,7 @@ public class JqmEngine
 	public Map<String, ClassLoader> cache = new HashMap<String, ClassLoader>();
 	public Server server = null;
 	public JndiContext jndiCtx = null;
+	Logger jqmlogger = Logger.getLogger(JarClassLoader.class);
 
 	/**
 	 * @param args
@@ -93,7 +95,7 @@ public class JqmEngine
 			Thread t = new Thread(p);
 			t.start();
 		}
-		System.out.println("End of main");
+		jqmlogger.debug("End of main");
 	}
 
 	public void stop()
