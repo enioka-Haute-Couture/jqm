@@ -4,8 +4,10 @@ import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
 
+import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -13,12 +15,13 @@ import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
+import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.tools.CreationTools;
 import com.enioka.jqm.tools.JqmEngine;
 
 public class MultiNodeTests
 {
-
+	public static Logger jqmlogger = Logger.getLogger(JobBaseTests.class);
 	public static Server s;
 
 	@BeforeClass
@@ -99,7 +102,7 @@ public class MultiNodeTests
 		engine2.stop();
 	}
 
-	@Test
+	// @Test
 	public void testOneQueueThreeNodes() throws Exception
 	{
 		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
@@ -377,18 +380,81 @@ public class MultiNodeTests
 		engine3.stop();
 	}
 
-	public void testMultiNode()
+	@Test
+	public void testHighlanderMode() throws Exception
 	{
+		jqmlogger.debug("Starting test testHighlanderMode");
+		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
+		Helpers.cleanup(em);
+		Helpers.createLocalNode(em);
 
-	}
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
 
-	public void testHighlander()
-	{
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", true, em);
 
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+
+		em.getTransaction().begin();
+
+		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
+				.setParameter("myId", 2).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+
+		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId())
+				.executeUpdate();
+
+		em.getTransaction().commit();
+
+		em.getTransaction().begin();
+
+		JqmEngine engine1 = new JqmEngine();
+		JqmEngine engine2 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+		engine2.start(new String[] { "localhost4" });
+
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+
+		Thread.sleep(10000);
+		engine1.stop();
+		engine2.stop();
+
+		em.getTransaction().commit();
+
+		EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
+
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
+				JobInstance.class).getResultList();
+
+		Helpers.printJobInstanceTable();
+
+		Assert.assertEquals(11, res.size());
+		Assert.assertEquals("ENDED", res.get(0).getState());
+		Assert.assertEquals("CANCELLED", res.get(1).getState());
+		Assert.assertEquals("CANCELLED", res.get(2).getState());
 	}
 
 	public void testTwoFiboMultiNode()
 	{
 
 	}
+
+	public void testMultiNode()
+	{
+
+	}
+
 }
