@@ -120,7 +120,7 @@ public class JarClassLoader extends URLClassLoader
 			start.invoke(o, null);
 		} catch (Exception e)
 		{
-			jqmlogger.debug("Dynamic code error: " + e.getMessage());
+			jqmlogger.error("Dynamic code error: ", e);
 			throw e;
 		}
 		return o;

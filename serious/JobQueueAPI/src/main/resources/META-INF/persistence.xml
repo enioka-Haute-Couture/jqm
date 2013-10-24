@@ -20,6 +20,8 @@
 		<class>com.enioka.jqm.jpamodel.JobDefParameter</class>
 		<class>com.enioka.jqm.jpamodel.JobHistoryParameter</class>
 		<class>com.enioka.jqm.jpamodel.DatabaseProp</class>
+		<class>com.enioka.jqm.jpamodel.JndiObjectResource</class>
+		<class>com.enioka.jqm.jpamodel.JndiObjectResourceParameter</class>
 
 		<properties>
 			<property name="javax.persistence.validation.mode" value="none" />

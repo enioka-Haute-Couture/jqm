@@ -22,7 +22,8 @@
 		<module>../../tests/Fibo</module>
 		<module>../../tests/jqm-test-datetimemaven</module>
 		<module>../../tests/jqm-test-deliverable</module>
-    <module>../../tests/Geo</module>
+		<module>../../tests/Geo</module>
+		<module>../../tests/jqm-test-jndijms-amq</module>
 	</modules>
 
 	<build>

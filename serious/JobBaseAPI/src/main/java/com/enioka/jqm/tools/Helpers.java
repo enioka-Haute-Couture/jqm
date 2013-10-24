@@ -18,6 +18,13 @@ public class Helpers
 		return emf.createEntityManager();
 	}
 
+	public static void resetEmf()
+	{
+		if (emf != null)
+			emf.close();
+		emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+	}
+
 	public static Message createMessage(String textMessage, History history, EntityManager em)
 	{
 		Message m = new Message();
