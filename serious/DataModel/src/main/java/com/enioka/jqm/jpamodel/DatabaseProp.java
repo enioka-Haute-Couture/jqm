@@ -9,80 +9,83 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class DatabaseProp implements Serializable{
+public class DatabaseProp implements Serializable
+{
 
 	/**
      *
      */
-    private static final long serialVersionUID = 5286608402747360301L;
-    @Id @GeneratedValue(strategy=GenerationType.AUTO)
+	private static final long serialVersionUID = 5286608402747360301L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	protected Integer id;
-    @Column(nullable=false)
-    private String driver;
-    @Column(nullable=false)
-    private String name;
-    @Column(nullable=false)
-    private String url;
-    @Column(nullable=false)
-    private String user;
-    @Column(nullable=false)
-    private String pwd;
+	@Column(nullable = false)
+	private String driver;
+	@Column(nullable = false)
+	private String name;
+	@Column(nullable = false)
+	private String url;
+	@Column(nullable = false, name = "username")
+	private String userName;
+	@Column(nullable = false)
+	private String pwd;
 
-    public String getDriver() {
+	public String getDriver()
+	{
+		return driver;
+	}
 
-    	return driver;
-    }
+	public void setDriver(String driver)
+	{
+		this.driver = driver;
+	}
 
-    public void setDriver(String driver) {
+	public String getUrl()
+	{
+		return url;
+	}
 
-    	this.driver = driver;
-    }
+	public void setUrl(String url)
+	{
+		this.url = url;
+	}
 
-    public String getUrl() {
+	public String getUserName()
+	{
+		return userName;
+	}
 
-    	return url;
-    }
+	public void setUserName(String user)
+	{
+		this.userName = user;
+	}
 
-    public void setUrl(String url) {
+	public String getPwd()
+	{
+		return pwd;
+	}
 
-    	this.url = url;
-    }
+	public void setPwd(String pwd)
+	{
 
-    public String getUser() {
+		this.pwd = pwd;
+	}
 
-    	return user;
-    }
+	public Integer getId()
+	{
 
-    public void setUser(String user) {
+		return id;
+	}
 
-    	this.user = user;
-    }
+	public String getName()
+	{
 
-    public String getPwd() {
+		return name;
+	}
 
-    	return pwd;
-    }
+	public void setName(String name)
+	{
 
-    public void setPwd(String pwd) {
-
-    	this.pwd = pwd;
-    }
-
-
-    public Integer getId() {
-
-    	return id;
-    }
-
-
-    public String getName() {
-
-    	return name;
-    }
-
-
-    public void setName(String name) {
-
-    	this.name = name;
-    }
+		this.name = name;
+	}
 }

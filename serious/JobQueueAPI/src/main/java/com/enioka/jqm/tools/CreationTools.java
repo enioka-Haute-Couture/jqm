@@ -179,7 +179,7 @@ public class CreationTools
 		j.setJd(jd);
 		j.setParameters(jps);
 		j.setSessionID(sessionID);
-		j.setUser(user);
+		j.setUserName(user);
 		j.setState(state);
 		j.setPosition(position);
 		j.setQueue(queue);
@@ -277,7 +277,7 @@ public class CreationTools
 		h.setName(name);
 		h.setDriver(driver);
 		h.setUrl(url);
-		h.setUser(user);
+		h.setUserName(user);
 		h.setPwd(pwd);
 
 		em.persist(h);

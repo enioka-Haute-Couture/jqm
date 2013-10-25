@@ -154,7 +154,7 @@ public class Dispatcher
 		j.setQueue(getQueue(job.getQueue()));
 		j.setSessionID(job.getSessionID());
 		j.setState(job.getState());
-		j.setUser(job.getUser());
+		j.setUser(job.getUserName());
 
 		return j;
 	}
@@ -601,7 +601,7 @@ public class Dispatcher
 
 		try
 		{
-			j = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j WHERE j.user = :u", JobInstance.class)
+			j = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j WHERE j.userName = :u", JobInstance.class)
 					.setParameter("u", user).getResultList();
 		} catch (Exception e)
 		{
@@ -638,7 +638,7 @@ public class Dispatcher
 
 		try
 		{
-			jobs = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j WHERE j.user = :u", JobInstance.class)
+			jobs = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j WHERE j.userName = :u", JobInstance.class)
 					.setParameter("u", user).getResultList();
 		} catch (Exception e)
 		{

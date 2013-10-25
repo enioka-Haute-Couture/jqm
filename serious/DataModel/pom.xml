@@ -6,6 +6,7 @@
 	<groupId>com.enioka.jqm</groupId>
 	<artifactId>jqm-model</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -31,6 +32,21 @@
 
 		</plugins>
 	</build>
+	
+	<profiles>
+		<profile>
+			<id>internal</id>
+			<distributionManagement>
+				<snapshotRepository>
+					<id>snapshot-nexus</id>
+					<name>repository for daily snaps</name>
+					<layout>default</layout>
+					<uniqueVersion>false</uniqueVersion>
+					<url>http://10.0.3.128/nexus/content/repositories/snapshots/</url>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
+	</profiles>
 
 	<dependencies>
 		<dependency>
@@ -56,7 +72,7 @@
 			<version>4.2.6.Final</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>

@@ -74,7 +74,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 			}
 
 			jqmlogger.info("JNDI element named " + name + " was found.");
-			DbDataSource ds = new DbDataSource(db.getUrl(), db.getUser(), db.getPwd());
+			DbDataSource ds = new DbDataSource(db.getUrl(), db.getUserName(), db.getPwd());
 			Thread.currentThread().setContextClassLoader(tmp);
 			return ds;
 		}

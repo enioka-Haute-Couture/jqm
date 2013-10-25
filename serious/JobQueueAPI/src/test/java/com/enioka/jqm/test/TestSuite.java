@@ -268,7 +268,7 @@ public class TestSuite {
 
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) Dispatcher.getUserJobs("MAG");
 
-		ArrayList<JobInstance> tmp = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j WHERE j.user = :u",
+		ArrayList<JobInstance> tmp = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j WHERE j.userName = :u",
 				JobInstance.class).setParameter("u", "MAG").getResultList();
 
 		Assert.assertEquals(tmp.size(), jobs.size());

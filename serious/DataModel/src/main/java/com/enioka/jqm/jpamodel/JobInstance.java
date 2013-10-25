@@ -31,8 +31,8 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
 	private JobDef jd;
 	@ManyToOne(fetch=FetchType.LAZY)
 	public JobInstance parent;
-	@Column(length=50)
-    private String user;
+	@Column(length = 50, name = "username")
+    private String userName;
     private Integer sessionID;
     @Column(nullable=false, length=50)
     private String state;
@@ -49,8 +49,8 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
         return id;
     }
 
-    public String getUser() {
-        return user;
+    public String getUserName() {
+        return userName;
     }
 
     public int getSessionID() {
@@ -86,9 +86,9 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
 		this.position = position;
 	}
 
-	public void setUser(String user)
+	public void setUserName(String user)
 	{
-		this.user = user;
+		this.userName = user;
 	}
 
 	public void setSessionID(Integer sessionID)

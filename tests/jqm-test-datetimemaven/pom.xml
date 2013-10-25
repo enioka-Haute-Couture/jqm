@@ -55,6 +55,22 @@
 		</plugins>
 	</build>
 
+			<profiles>
+		<profile>
+			<id>internal</id>
+			<distributionManagement>
+				<snapshotRepository>
+					<id>snapshot-nexus</id>
+					<name>repository for daily snaps</name>
+					<layout>default</layout>
+					<uniqueVersion>false</uniqueVersion>
+					<url>http://10.0.3.128/nexus/content/repositories/snapshots/</url>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
+	</profiles>
+
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.hibernate</groupId>
