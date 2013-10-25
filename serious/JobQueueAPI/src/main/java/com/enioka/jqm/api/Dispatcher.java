@@ -539,7 +539,7 @@ public class Dispatcher
 
 	// ----------------------------- GETONEDELIVERABLE --------------------------------------
 
-	public static InputStream getOneDeliverable(com.enioka.jqm.api.Deliverable d) throws NoSuchAlgorithmException, IOException
+	public static InputStream getOneDeliverable(com.enioka.jqm.api.Deliverable d) throws Exception
 	{
 
 		URL url = null;
@@ -555,6 +555,7 @@ public class Dispatcher
 		} catch (Exception e)
 		{
 			jqmlogger.info(e);
+			throw e;
 		}
 
 		try
@@ -565,6 +566,7 @@ public class Dispatcher
 		{
 			h = null;
 			jqmlogger.info("GetOneDeliverable: No job found with the deliverable ID");
+			throw e;
 		}
 
 		url = new URL("http://" + h.getJobInstance().getNode().getListeningInterface() + ":" + h.getJobInstance().getNode().getPort() + "/getfile?file="

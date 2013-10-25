@@ -20,7 +20,7 @@ import com.enioka.jqm.tools.JqmEngine;
 
 public class GeoTests
 {
-	public static Logger jqmlogger = Logger.getLogger(JobBaseTests.class);
+	public static Logger jqmlogger = Logger.getLogger(JobBaseTest.class);
 	public static Server s;
 
 	@BeforeClass
@@ -32,6 +32,9 @@ public class GeoTests
 		s.setLogWriter(null);
 		s.setSilent(true);
 		s.start();
+
+		Dispatcher.resetEM();
+		com.enioka.jqm.tools.Helpers.resetEmf();
 	}
 
 	@AfterClass
@@ -74,7 +77,7 @@ public class GeoTests
 		engine2.start(new String[] { "localhost4" });
 		engine3.start(new String[] { "localhost5" });
 
-		Thread.sleep(10000);
+		Thread.sleep(30000);
 		jqmlogger.debug("###############################################################");
 		jqmlogger.debug("SHUTDOWN");
 		jqmlogger.debug("###############################################################");

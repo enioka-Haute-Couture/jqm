@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
 
+import org.apache.log4j.Logger;
+
 import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
@@ -12,7 +14,7 @@ import com.enioka.jqm.tools.CreationTools;
 
 public class Helpers
 {
-
+	public static Logger jqmlogger = Logger.getLogger(Helpers.class);
 	public static DatabaseProp db = null;
 
 	public static com.enioka.jqm.jpamodel.Queue qVip, qNormal, qSlow, qVip2, qNormal2, qSlow2, qVip3, qNormal3, qSlow3;
@@ -40,12 +42,12 @@ public class Helpers
 		Helpers.node = CreationTools.createNode("localhost", 8081, "./testprojects/jqm-test-deliverable/", em);
 		Helpers.node2 = CreationTools.createNode("localhost2", 8082, "./testprojects/jqm-test-deliverable/", em);
 		Helpers.node3 = CreationTools.createNode("localhost3", 8083, "./testprojects/jqm-test-deliverable/", em);
-		// Helpers.nodeMix = CreationTools.createNode("localhost4", 8084, "./testprojects/jqm-test-deliverable/", em);
-		// Helpers.nodeMix2 = CreationTools.createNode("localhost5", 8085, "./testprojects/jqm-test-deliverable/", em);
+		Helpers.nodeMix = CreationTools.createNode("localhost4", 8084, "./testprojects/jqm-test-deliverable/", em);
+		Helpers.nodeMix2 = CreationTools.createNode("localhost5", 8085, "./testprojects/jqm-test-deliverable/", em);
 
 		Helpers.dpVip = CreationTools.createDeploymentParameter(1, node, 3, 1, qVip, em);
-		// Helpers.dpVipMix = CreationTools.createDeploymentParameter(2, nodeMix, 3, 1, qVip, em);
-		// Helpers.dpVipMix2 = CreationTools.createDeploymentParameter(2, nodeMix2, 3, 1, qVip, em);
+		Helpers.dpVipMix = CreationTools.createDeploymentParameter(2, nodeMix, 3, 1, qVip, em);
+		Helpers.dpVipMix2 = CreationTools.createDeploymentParameter(2, nodeMix2, 3, 1, qVip, em);
 		Helpers.dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 300, qNormal, em);
 		Helpers.dpSlow = CreationTools.createDeploymentParameter(1, node, 1, 1000, qSlow, em);
 
@@ -63,13 +65,13 @@ public class Helpers
 		em.getTransaction().begin();
 		em.createQuery("DELETE Deliverable WHERE 1=1").executeUpdate();
 		em.createQuery("DELETE DeploymentParameter WHERE 1=1").executeUpdate();
-		em.createQuery("DELETE Node WHERE 1=1").executeUpdate();
 		em.createQuery("DELETE JobHistoryParameter WHERE 1=1").executeUpdate();
 		em.createQuery("DELETE Message WHERE 1=1").executeUpdate();
 		em.createQuery("DELETE History WHERE 1=1").executeUpdate();
 		em.createQuery("DELETE JobDefParameter WHERE 1=1").executeUpdate();
 		em.createQuery("DELETE JobParameter WHERE 1=1").executeUpdate();
 		em.createQuery("DELETE JobInstance WHERE 1=1").executeUpdate();
+		em.createQuery("DELETE Node WHERE 1=1").executeUpdate();
 		em.createQuery("DELETE JobDef WHERE 1=1").executeUpdate();
 		em.createQuery("DELETE Queue WHERE 1=1").executeUpdate();
 		em.createQuery("DELETE JndiObjectResourceParameter WHERE 1=1").executeUpdate();
@@ -87,10 +89,10 @@ public class Helpers
 		for (JobInstance jobInstance : res)
 		{
 
-			System.out.println("==========================================================================================");
-			System.out.println("JobInstance Id: " + jobInstance.getId() + " ---> " + jobInstance.getPosition() + " | "
+			jqmlogger.debug("==========================================================================================");
+			jqmlogger.debug("JobInstance Id: " + jobInstance.getId() + " ---> " + jobInstance.getPosition() + " | "
 					+ jobInstance.getState() + " | " + jobInstance.getJd().getId() + " | " + jobInstance.getQueue().getName());
-			System.out.println("==========================================================================================");
+			jqmlogger.debug("==========================================================================================");
 		}
 	}
 }

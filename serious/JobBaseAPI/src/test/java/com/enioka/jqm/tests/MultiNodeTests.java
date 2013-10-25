@@ -21,7 +21,7 @@ import com.enioka.jqm.tools.JqmEngine;
 
 public class MultiNodeTests
 {
-	public static Logger jqmlogger = Logger.getLogger(JobBaseTests.class);
+	public static Logger jqmlogger = Logger.getLogger(JobBaseTest.class);
 	public static Server s;
 
 	@BeforeClass
