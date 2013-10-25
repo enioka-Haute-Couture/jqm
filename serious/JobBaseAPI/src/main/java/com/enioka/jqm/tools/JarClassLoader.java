@@ -102,7 +102,16 @@ public class JarClassLoader extends URLClassLoader
 	public Object invokeMain(JobInstance job) throws Exception
 	{
 		String classQualifiedName = job.getJd().getJavaClassName();
-		Class c = loadClass(classQualifiedName);
+		jqmlogger.debug("Trying to load class " + classQualifiedName);
+		Class c = null;
+		try
+		{
+			c = loadClass(classQualifiedName);
+		} catch (Exception e)
+		{
+			jqmlogger.error("Could not load class", e);
+			throw e;
+		}
 		jqmlogger.debug("Class " + classQualifiedName + " was correctly loaded");
 
 		Object o = c.newInstance();
