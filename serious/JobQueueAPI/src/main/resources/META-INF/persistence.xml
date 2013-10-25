@@ -5,8 +5,7 @@
 	version="2.0">
 
 	<persistence-unit name="jobqueue-api-pu">
-		<jta-data-source>jdbc/jqm3</jta-data-source>
-		<non-jta-data-source>jdbc/jqm4</non-jta-data-source>
+		<non-jta-data-source>jdbc/jqm</non-jta-data-source>
 
 		<class>com.enioka.jqm.jpamodel.JobInstance</class>
 		<class>com.enioka.jqm.jpamodel.Deliverable</class>
