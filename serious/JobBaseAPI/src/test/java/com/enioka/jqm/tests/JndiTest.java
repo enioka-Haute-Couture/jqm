@@ -33,13 +33,14 @@ public class JndiTest
 		s.setLogWriter(null);
 		s.setSilent(true);
 		s.start();
+
+		Dispatcher.resetEM();
+		com.enioka.jqm.tools.Helpers.resetEmf();
 	}
 
 	@AfterClass
 	public static void end()
 	{
-		Dispatcher.resetEM();
-		com.enioka.jqm.tools.Helpers.resetEmf();
 		s.shutdown();
 		s.stop();
 	}

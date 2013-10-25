@@ -25,14 +25,12 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 {
 	Logger jqmlogger = Logger.getLogger(this.getClass());
 	ClassLoader cl = null;
-	EntityManager em = null;
 	ResourceFactory rf = new ResourceFactory();
 
 	public JndiContext(ClassLoader cl) throws NamingException
 	{
 		super();
 		this.cl = cl;
-		this.em = Helpers.getNewEm();
 	}
 
 	@Override
@@ -41,19 +39,20 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 		jqmlogger.info("Looking up a JNDI element named " + name);
 		String baseCtx = name.split("/")[0];
 		// String objName = name.split("/")[1];
+		ClassLoader tmp = Thread.currentThread().getContextClassLoader();
 
 		if (baseCtx.equals("jdbc"))
 		{
 			jqmlogger.debug("JNDI context is database");
 
 			// Base class loader only
-			ClassLoader tmp = Thread.currentThread().getContextClassLoader();
 			Thread.currentThread().setContextClassLoader(this.cl);
 
 			DatabaseProp db = null;
 			try
 			{
-				db = this.em.createQuery("SELECT d FROM DatabaseProp d WHERE d.name = :n", DatabaseProp.class).setParameter("n", name)
+				EntityManager em = Helpers.getNewEm();
+				db = em.createQuery("SELECT d FROM DatabaseProp d WHERE d.name = :n", DatabaseProp.class).setParameter("n", name)
 						.getSingleResult();
 			} catch (NonUniqueResultException e)
 			{
@@ -86,13 +85,17 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 			try
 			{
 				jqmlogger.debug("Looking for a JNDI object resource in the database of name " + name);
+				Thread.currentThread().setContextClassLoader(this.cl);
+				EntityManager em = Helpers.getNewEm();
 				resource = em.createQuery("SELECT t FROM JndiObjectResource t WHERE t.name = :name", JndiObjectResource.class)
 						.setParameter("name", name).getSingleResult();
+				Thread.currentThread().setContextClassLoader(tmp);
 			} catch (Exception e)
 			{
 				jqmlogger.error("Could not find a JNDI object resource of name " + name, e);
 				NamingException ex = new NamingException("Could not find a JNDI object resource of name " + name);
 				ex.setRootCause(e);
+				Thread.currentThread().setContextClassLoader(tmp);
 				throw ex;
 			}
 

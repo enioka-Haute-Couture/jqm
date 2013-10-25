@@ -38,8 +38,7 @@ public class Loader implements Runnable
 	JobInstance job = null;
 	Object jobBase = new JobBase();
 	ArrayList<DeliverableStruct> s1s = new ArrayList<DeliverableStruct>();
-	EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-	EntityManager em = emf.createEntityManager();
+	EntityManager em = Helpers.getNewEm();
 	Map<String, ClassLoader> cache = null;
 	boolean isInCache = true;
 	Logger jqmlogger = Logger.getLogger(this.getClass());
@@ -277,7 +276,6 @@ public class Loader implements Runnable
 			try
 			{
 				em.close();
-				emf.close();
 			} catch (Exception e)
 			{
 			}

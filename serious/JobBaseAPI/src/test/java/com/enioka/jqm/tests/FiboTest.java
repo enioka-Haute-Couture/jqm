@@ -30,12 +30,14 @@ public class FiboTest
 		s.setLogWriter(null);
 		s.setSilent(true);
 		s.start();
+
+		Dispatcher.resetEM();
+		com.enioka.jqm.tools.Helpers.resetEmf();
 	}
 
 	@AfterClass
 	public static void end()
 	{
-		Dispatcher.resetEM();
 		s.shutdown();
 		s.stop();
 	}
@@ -69,7 +71,7 @@ public class FiboTest
 		JqmEngine engine1 = new JqmEngine();
 		engine1.start(new String[] { "localhost" });
 
-		Thread.sleep(10000);
+		Thread.sleep(40000);
 		engine1.stop();
 
 		long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();

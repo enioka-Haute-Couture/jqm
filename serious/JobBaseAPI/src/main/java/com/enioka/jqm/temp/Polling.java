@@ -22,9 +22,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
 import org.apache.log4j.Logger;
@@ -115,8 +113,7 @@ public class Polling implements Runnable
 
 	public void executionStatus()
 	{
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-		EntityManager em = emf.createEntityManager();
+		EntityManager em = Helpers.getNewEm();
 		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
@@ -130,7 +127,6 @@ public class Polling implements Runnable
 
 		transac.commit();
 		em.close();
-		emf.close();
 	}
 
 	public void HighlanderMode(JobInstance currentJob, EntityManager em)
