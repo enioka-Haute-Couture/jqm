@@ -18,6 +18,7 @@
 
 package com.enioka.jqm.temp;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -52,7 +53,7 @@ public class Polling implements Runnable
 		run = false;
 	}
 
-	public Polling(DeploymentParameter dp, Map<String, ClassLoader> cache)
+	public Polling(DeploymentParameter dp, Map<String, URL[]> cache)
 	{
 		jqmlogger.debug("Polling instanciation with the Deployment Parameter: " + dp.getClassId());
 		this.dp = dp;
@@ -261,6 +262,9 @@ public class Polling implements Runnable
 
 				em.getTransaction().begin();
 
+				em.createQuery("UPDATE JobInstance j SET j.node = :n WHERE j.id = :j").setParameter("j", ji.getId())
+						.setParameter("n", ji.getNode()).executeUpdate();
+
 				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", ji)
 						.getSingleResult();
 
@@ -269,7 +273,7 @@ public class Polling implements Runnable
 				m.setTextMessage("Status updated: ATTRIBUTED");
 				m.setHistory(h);
 
-				em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", ji.getId())
+				em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", ji.getId())
 						.setParameter("msg", "ATTRIBUTED").executeUpdate();
 
 				em.persist(m);

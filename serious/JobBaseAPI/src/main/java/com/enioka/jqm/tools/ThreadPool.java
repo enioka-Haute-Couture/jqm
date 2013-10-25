@@ -1,5 +1,6 @@
 package com.enioka.jqm.tools;
 
+import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,9 +16,9 @@ public class ThreadPool
 	private Queue queue = null;
 	private int nbThread = 0;
 	ExecutorService pool = null;
-	Map<String, ClassLoader> cache = null;
+	Map<String, URL[]> cache = null;
 
-	public ThreadPool(Queue queue, int n, Map<String, ClassLoader> cache)
+	public ThreadPool(Queue queue, int n, Map<String, URL[]> cache)
 	{
 		this.queue = queue;
 		this.cache = cache;

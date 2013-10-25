@@ -172,7 +172,7 @@ public class CreationTools
 	// ------------------ JOBINSTANCE --------------------------
 
 	public static JobInstance createJobInstance(JobDef jd, List<JobParameter> jps, String user, Integer sessionID, String state,
-			Integer position, Queue queue, EntityManager em)
+			Integer position, Queue queue, Node node, EntityManager em)
 	{
 		JobInstance j = new JobInstance();
 
@@ -183,6 +183,7 @@ public class CreationTools
 		j.setState(state);
 		j.setPosition(position);
 		j.setQueue(queue);
+		j.setNode(node);
 
 		em.persist(j);
 

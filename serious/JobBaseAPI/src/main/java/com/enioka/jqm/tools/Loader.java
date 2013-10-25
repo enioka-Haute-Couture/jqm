@@ -39,12 +39,12 @@ public class Loader implements Runnable
 	Object jobBase = new JobBase();
 	ArrayList<DeliverableStruct> s1s = new ArrayList<DeliverableStruct>();
 	EntityManager em = Helpers.getNewEm();
-	Map<String, ClassLoader> cache = null;
+	Map<String, URL[]> cache = null;
 	boolean isInCache = true;
 	Logger jqmlogger = Logger.getLogger(this.getClass());
 	Polling p = null;
 
-	public Loader(JobInstance job, Map<String, ClassLoader> cache, Polling p)
+	public Loader(JobInstance job, Map<String, URL[]> cache, Polling p)
 	{
 
 		this.job = job;
@@ -116,30 +116,30 @@ public class Loader implements Runnable
 			transac.commit();
 			jqmlogger.debug("JobInstance was updated");
 
-			// if (!cache.containsKey(job.getJd().getApplicationName()))
-			// {
-			Dependencies dependencies = new Dependencies(job.getJd().getFilePath() + "pom.xml");
-
-			isInCache = false;
-			Collection<RemoteRepository> remotes = Arrays.asList(new RemoteRepository("maven-central", "default",
-					"http://repo1.maven.org/maven2/"), new RemoteRepository("eclipselink", "default",
-					"http://download.eclipse.org/rt/eclipselink/maven.repo/")
-
-			);
-
-			deps = new ArrayList<Artifact>();
-			for (int i = 0; i < dependencies.getList().size(); i++)
+			if (!cache.containsKey(job.getJd().getApplicationName()))
 			{
-				jqmlogger.info("Resolving Maven dep " + dependencies.getList().get(i));
-				deps.addAll(new Aether(remotes, local).resolve(new DefaultArtifact(dependencies.getList().get(i)), "compile"));
-			}
+				Dependencies dependencies = new Dependencies(job.getJd().getFilePath() + "pom.xml");
 
-			for (Artifact artifact : deps)
-			{
-				tmp.add(artifact.getFile().toURI().toURL());
-				jqmlogger.info("Artifact: " + artifact.getFile().toURI().toURL());
+				isInCache = false;
+				Collection<RemoteRepository> remotes = Arrays.asList(new RemoteRepository("maven-central", "default",
+						"http://repo1.maven.org/maven2/"), new RemoteRepository("eclipselink", "default",
+						"http://download.eclipse.org/rt/eclipselink/maven.repo/")
+
+				);
+
+				deps = new ArrayList<Artifact>();
+				for (int i = 0; i < dependencies.getList().size(); i++)
+				{
+					jqmlogger.info("Resolving Maven dep " + dependencies.getList().get(i));
+					deps.addAll(new Aether(remotes, local).resolve(new DefaultArtifact(dependencies.getList().get(i)), "compile"));
+				}
+
+				for (Artifact artifact : deps)
+				{
+					tmp.add(artifact.getFile().toURI().toURL());
+					jqmlogger.info("Artifact: " + artifact.getFile().toURI().toURL());
+				}
 			}
-			// }
 			// ------------------- END: MAVEN DEPENDENCIES ---------------
 
 			// We save the actual classloader
@@ -150,10 +150,10 @@ public class Loader implements Runnable
 			if (!isInCache)
 			{
 				jobClassLoader = new JarClassLoader(jars, urls);
-				cache.put(job.getJd().getApplicationName(), jobClassLoader);
+				cache.put(job.getJd().getApplicationName(), urls);
 			}
 			else
-				jobClassLoader = (JarClassLoader) cache.get(job.getJd().getApplicationName());
+				jobClassLoader = new JarClassLoader(jars, cache.get(job.getJd().getApplicationName()));
 
 			// Change active class loader
 			jqmlogger.debug("Setting class loader");
@@ -178,7 +178,7 @@ public class Loader implements Runnable
 
 			em.getTransaction().begin();
 
-			em.createQuery("UPDATE History h SET h.executionDate = :date WHERE h.id = :h").setParameter("h", h.getId())
+			em.createQuery("UPDATE History h SET h.endDate = :date WHERE h.id = :h").setParameter("h", h.getId())
 					.setParameter("date", endDate).executeUpdate();
 
 			em.getTransaction().commit();

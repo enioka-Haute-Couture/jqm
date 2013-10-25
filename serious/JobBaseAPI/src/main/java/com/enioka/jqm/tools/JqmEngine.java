@@ -18,6 +18,7 @@
 
 package com.enioka.jqm.tools;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +47,7 @@ public class JqmEngine
 	public AtomicBoolean isRunning = new AtomicBoolean(true);
 	public EntityManager em = Helpers.getNewEm();
 	public EntityTransaction t = em.getTransaction();
-	public Map<String, ClassLoader> cache = new HashMap<String, ClassLoader>();
+	public Map<String, URL[]> cache = new HashMap<String, URL[]>();
 	public Server server = null;
 	public JndiContext jndiCtx = null;
 	Logger jqmlogger = Logger.getLogger(JarClassLoader.class);

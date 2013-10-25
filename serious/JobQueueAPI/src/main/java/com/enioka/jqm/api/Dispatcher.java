@@ -45,7 +45,6 @@ import org.apache.log4j.Logger;
 
 import com.enioka.jqm.hash.Cryptonite;
 import com.enioka.jqm.jpamodel.Deliverable;
-import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
@@ -272,7 +271,7 @@ public class Dispatcher
 		em.getTransaction().begin();
 
 		JobInstance ji = CreationTools.createJobInstance(job, overrideParameter(job, jd), jd.getUser(), 42, "SUBMITTED", (p == null) ? 1
-				: p + 1, job.queue, em);
+				: p + 1, job.queue, null, em);
 		jqmlogger.debug("JI QUI VIENT D'ETRE CREE: " + ji.getId());
 
 		ArrayList<JobHistoryParameter> jhp = new ArrayList<JobHistoryParameter>();
@@ -478,26 +477,22 @@ public class Dispatcher
 			jqmlogger.debug("idJob of the deliverable: " + idJob);
 			jqmlogger.debug("size of the deliverable list: " + tmp.size());
 
-			JobInstance job = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :job", JobInstance.class).setParameter("job", idJob)
+			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :job", History.class).setParameter("job", idJob)
 					.getSingleResult();
-
-			DeploymentParameter dp = em
-					.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.queue.id = :q", DeploymentParameter.class)
-					.setParameter("q", job.getJd().getQueue().getId()).getSingleResult();
 
 			for (int i = 0; i < tmp.size(); i++)
 			{
 
-				url = new URL("http://" + dp.getNode().getListeningInterface() + ":" + dp.getNode().getPort() + "/getfile?file="
+				url = new URL("http://" + h.getJobInstance().getNode().getListeningInterface() + ":" + h.getJobInstance().getNode().getPort() + "/getfile?file="
 						+ tmp.get(i).getFilePath() + tmp.get(i).getFileName());
 
 				if (tmp.get(i).getHashPath().equals(Cryptonite.sha1(tmp.get(i).getFilePath() + tmp.get(i).getFileName())))
 				{
 					// mettre en base le repertoire de dl
-					jqmlogger.debug("dlRepository: " + dp.getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + job.getId() + "/");
-					File dlRepo = new File(dp.getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + job.getId() + "/");
+					jqmlogger.debug("dlRepository: " + h.getJobInstance().getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + h.getJobInstance().getId() + "/");
+					File dlRepo = new File(h.getJobInstance().getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + h.getJobInstance().getId() + "/");
 					dlRepo.mkdirs();
-					file = new File(dp.getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + job.getId() + "/"
+					file = new File(h.getJobInstance().getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + h.getJobInstance().getId() + "/"
 							+ tmp.get(i).getFileName());
 
 					FileUtils.copyURLToFile(url, file);
@@ -549,7 +544,7 @@ public class Dispatcher
 
 		URL url = null;
 		File file = null;
-		JobInstance job = null;
+		History h = null;
 		Deliverable deliverable = null;
 		Logger jqmlogger = Logger.getLogger(Dispatcher.class);
 
@@ -564,28 +559,25 @@ public class Dispatcher
 
 		try
 		{
-			job = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :job", JobInstance.class)
+			h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :job", History.class)
 					.setParameter("job", deliverable.getJobId()).getSingleResult();
 		} catch (Exception e)
 		{
-			job = null;
+			h = null;
 			jqmlogger.info("GetOneDeliverable: No job found with the deliverable ID");
 		}
 
-		DeploymentParameter dp = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.queue.id = :q", DeploymentParameter.class)
-				.setParameter("q", job.getJd().getQueue().getId()).getSingleResult();
-
-		url = new URL("http://" + dp.getNode().getListeningInterface() + ":" + dp.getNode().getPort() + "/getfile?file="
+		url = new URL("http://" + h.getJobInstance().getNode().getListeningInterface() + ":" + h.getJobInstance().getNode().getPort() + "/getfile?file="
 				+ deliverable.getFilePath() + deliverable.getFileName());
 
 		jqmlogger.debug("URL: " + deliverable.getFilePath() + deliverable.getFileName());
 
-		if (deliverable.getHashPath().equals(Cryptonite.sha1(deliverable.getFilePath() + deliverable.getFileName())) && job != null)
+		if (deliverable.getHashPath().equals(Cryptonite.sha1(deliverable.getFilePath() + deliverable.getFileName())) && h.getJobInstance() != null)
 		{
-			System.out.println("dlRepo: " + dp.getNode().getDlRepo() + deliverable.getFileFamily() + "/" + job.getId() + "/");
-			File dlRepo = new File(dp.getNode().getDlRepo() + deliverable.getFileFamily() + "/" + job.getId() + "/");
+			System.out.println("dlRepo: " + h.getJobInstance().getNode().getDlRepo() + deliverable.getFileFamily() + "/" + h.getJobInstance().getId() + "/");
+			File dlRepo = new File(h.getJobInstance().getNode().getDlRepo() + deliverable.getFileFamily() + "/" + h.getJobInstance().getId() + "/");
 			dlRepo.mkdirs();
-			file = new File(dp.getNode().getDlRepo() + deliverable.getFileFamily() + "/" + job.getId() + "/" + deliverable.getFileName());
+			file = new File(h.getJobInstance().getNode().getDlRepo() + deliverable.getFileFamily() + "/" + h.getJobInstance().getId() + "/" + deliverable.getFileName());
 			FileUtils.copyURLToFile(url, file);
 		}
 		else

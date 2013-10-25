@@ -39,6 +39,8 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
     private Integer position;
     @ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Queue.class, fetch=FetchType.EAGER)
     private Queue queue;
+    @ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Node.class, fetch=FetchType.EAGER)
+    private Node node;
     @OneToMany(orphanRemoval=true, fetch=FetchType.EAGER)
 	@JoinColumn(name="job_parameter")
     private List<JobParameter> parameters;
@@ -137,5 +139,15 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
 
     	this.parameters = parameters;
     }
+
+	public Node getNode()
+	{
+		return node;
+	}
+
+	public void setNode(Node node)
+	{
+		this.node = node;
+	}
 
 }
