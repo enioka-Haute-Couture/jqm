@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
 
+import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -20,6 +21,7 @@ import com.enioka.jqm.tools.JqmEngine;
 
 public class JndiTest
 {
+	public static Logger jqmlogger = Logger.getLogger(JndiTest.class);
 	public static Server s;
 
 	@BeforeClass
@@ -70,7 +72,9 @@ public class JndiTest
 	@Test
 	public void testJmsAmq() throws Exception
 	{
+		jqmlogger.debug("AMQ: Starting");
 		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
+		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
@@ -114,7 +118,9 @@ public class JndiTest
 	@Test
 	public void testJmsAmqWrongAlias() throws Exception
 	{
+		jqmlogger.debug("WRONG ALIAS: Starting");
 		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
+		Helpers.cleanup(em);
 		Helpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();

@@ -72,6 +72,8 @@ public class Helpers
 		em.createQuery("DELETE JobInstance WHERE 1=1").executeUpdate();
 		em.createQuery("DELETE JobDef WHERE 1=1").executeUpdate();
 		em.createQuery("DELETE Queue WHERE 1=1").executeUpdate();
+		em.createQuery("DELETE JndiObjectResourceParameter WHERE 1=1").executeUpdate();
+		em.createQuery("DELETE JndiObjectResource WHERE 1=1").executeUpdate();
 		em.getTransaction().commit();
 	}
 
