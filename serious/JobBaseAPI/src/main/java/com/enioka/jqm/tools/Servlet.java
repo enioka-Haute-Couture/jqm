@@ -42,11 +42,11 @@ public class Servlet extends HttpServlet
 		} catch (FileNotFoundException e)
 		{
 			jqmlogger.warn(e);
-			response.setStatus(500);
+			response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 		} catch (IOException e)
 		{
 			jqmlogger.warn(e);
-			response.setStatus(500);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally
 		{
 			IOUtils.closeQuietly(out); // Good practice
