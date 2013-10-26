@@ -20,7 +20,7 @@ public class JndiObjectResourceParameter implements Serializable
 	private int id;
 
 	// Name of the parameter. E.g.: QMGR for the queue manager name with MQSeries.
-	@Column(nullable = false, length = 50)
+	@Column(nullable = false, length = 50, name = "KEYNAME")
 	private String key;
 
 	// Value. E.g.: QM.POUET

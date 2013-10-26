@@ -20,7 +20,7 @@ public class JobHistoryParameter implements Serializable{
 
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
-	@Column(nullable=false, length=50)
+	@Column(nullable=false, length=50, name="KEYNAME")
 	private String key;
 	@Column(nullable=false, length=1000)
 	private String value;
