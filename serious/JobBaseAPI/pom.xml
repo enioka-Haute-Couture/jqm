@@ -30,6 +30,9 @@
 							<classpathPrefix>lib/</classpathPrefix>
 							<mainClass>com.enioka.jqm.tools.Main</mainClass>
 						</manifest>
+						<manifestEntries>
+							<Class-Path>lib/jdbcdriver.jar</Class-Path>
+						</manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>
@@ -44,7 +47,7 @@
 		</repository>
 	</repositories>
 
-		<profiles>
+	<profiles>
 		<profile>
 			<id>internal</id>
 			<distributionManagement>
@@ -58,13 +61,13 @@
 			</distributionManagement>
 		</profile>
 	</profiles>
-	
+
 	<dependencies>
 		<!-- We need an actual JAP2 implementation here. JAP-API is implied -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
-			<version>4.2.6.Final</version>
+			<version>4.2.7.Final</version>
 		</dependency>
 
 		<!-- JCABI-AETHER & MAVEN -->
