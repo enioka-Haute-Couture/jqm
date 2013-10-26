@@ -4,10 +4,8 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
 	version="2.0">
 
-	<persistence-unit name="jobqueue-api-pu"
-		transaction-type="RESOURCE_LOCAL">
-
-		<!-- Définit Hibernate comme fournisseur de persistence -->
+	<persistence-unit name="jobqueue-api-pu">
+		<!-- Hibernate is our only persistence provider in the engine -->
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 
 		<class>com.enioka.jqm.jpamodel.JobInstance</class>
@@ -28,8 +26,6 @@
 
 		<properties>
 			<property name="javax.persistence.validation.mode" value="none" />
-			<!--<property name="eclipselink.classloader" value="MyClassLoader" /> -->
-			<!--<property name="hibernate.archive.autodetection" value="class" /> -->
 			<!--<property name="hibernate.show_sql" value="true" /> <property name="hibernate.format_sql" 
 				value="true" /> -->
 
@@ -38,13 +34,7 @@
 			<property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:hsql://localhost/testdb" />
 			<property name="javax.persistence.jdbc.user" value="SA" />
 			<property name="javax.persistence.jdbc.password" value="" />
-			<property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect" />
 			<property name="hibernate.hbm2ddl.auto" value="update" />
-
-			<!-- <property name="eclipselink.ddl-generation" value="create-tables" 
-				/> <property name="eclipselink.ddl-generation.output-mode" value="database" 
-				/> -->
-
 		</properties>
 	</persistence-unit>
 </persistence>
