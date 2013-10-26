@@ -28,7 +28,7 @@ import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.jcabi.aether.Aether;
 
-public class Loader implements Runnable
+class Loader implements Runnable
 {
 	private JobInstance job = null;
 	private Object jobBase = null;
@@ -37,7 +37,7 @@ public class Loader implements Runnable
 	private Logger jqmlogger = Logger.getLogger(this.getClass());
 	private Polling p = null;
 
-	public Loader(JobInstance job, Map<String, URL[]> cache, Polling p)
+	Loader(JobInstance job, Map<String, URL[]> cache, Polling p)
 	{
 
 		this.job = job;
@@ -45,7 +45,7 @@ public class Loader implements Runnable
 		this.p = p;
 	}
 
-	public void crashedStatus()
+	protected void crashedStatus()
 	{
 
 		EntityTransaction transac = em.getTransaction();
@@ -277,29 +277,5 @@ public class Loader implements Runnable
 			}
 		}
 
-	}
-
-	public JobInstance getJob()
-	{
-
-		return job;
-	}
-
-	public void setJob(JobInstance job)
-	{
-
-		this.job = job;
-	}
-
-	public Object getJobBase()
-	{
-
-		return jobBase;
-	}
-
-	public void setJobBase(JobBase jobBase)
-	{
-
-		this.jobBase = jobBase;
 	}
 }

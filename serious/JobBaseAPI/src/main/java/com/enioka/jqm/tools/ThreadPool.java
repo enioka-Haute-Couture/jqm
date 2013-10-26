@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.Queue;
 
-public class ThreadPool
+class ThreadPool
 {
 	private static Logger jqmlogger = Logger.getLogger(ThreadPool.class);
 	private Queue queue = null;
@@ -17,7 +17,7 @@ public class ThreadPool
 	private ExecutorService pool = null;
 	private Map<String, URL[]> cache = null;
 
-	public ThreadPool(Queue queue, int n, Map<String, URL[]> cache)
+	ThreadPool(Queue queue, int n, Map<String, URL[]> cache)
 	{
 		this.queue = queue;
 		this.cache = cache;
@@ -25,30 +25,19 @@ public class ThreadPool
 		pool = Executors.newFixedThreadPool(nbThread);
 	}
 
-	public void run(com.enioka.jqm.jpamodel.JobInstance ji, Polling p)
+	void run(com.enioka.jqm.jpamodel.JobInstance ji, Polling p)
 	{
 		jqmlogger.info("Job instance will be inserted inside a thread pool: " + ji.getId());
 		pool.submit(new Loader(ji, cache, p));
 	}
 
-	public Queue getQueue()
+	Queue getQueue()
 	{
 		return queue;
 	}
 
-	public void setQueue(Queue queue)
-	{
-		this.queue = queue;
-	}
-
-	public int getNbThread()
+	int getNbThread()
 	{
 		return nbThread;
 	}
-
-	public void setNbThread(int nbThread)
-	{
-		this.nbThread = nbThread;
-	}
-
 }

@@ -13,6 +13,14 @@ public class JndiContextFactory
 
 	}
 
+	/**
+	 * Will create a JNDI Context and register it as the initial context factory builder
+	 * 
+	 * @param cl
+	 *            a classloader with visibility on the JPA files
+	 * @return the context
+	 * @throws Exception
+	 */
 	public static JndiContext createJndiContext(ClassLoader cl) throws Exception
 	{
 		try

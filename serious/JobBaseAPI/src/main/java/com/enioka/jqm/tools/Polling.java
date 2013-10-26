@@ -34,7 +34,7 @@ import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Queue;
 
-public class Polling implements Runnable
+class Polling implements Runnable
 {
 	private static Logger jqmlogger = Logger.getLogger(Polling.class);
 	private ArrayList<JobInstance> job = new ArrayList<JobInstance>();
@@ -45,13 +45,13 @@ public class Polling implements Runnable
 	private boolean run = true;
 	private Integer actualNbThread;
 
-	public void stop()
+	void stop()
 	{
 
 		run = false;
 	}
 
-	public Polling(DeploymentParameter dp, Map<String, URL[]> cache)
+	Polling(DeploymentParameter dp, Map<String, URL[]> cache)
 	{
 		jqmlogger.debug("Polling instanciation with the Deployment Parameter: " + dp.getClassId());
 		this.dp = dp;
@@ -60,7 +60,7 @@ public class Polling implements Runnable
 		this.tp = new ThreadPool(queue, dp.getNbThread(), cache);
 	}
 
-	public JobInstance dequeue()
+	protected JobInstance dequeue()
 	{
 		// Get the list of all jobInstance with the queue VIP ordered by position
 		TypedQuery<JobInstance> query = em.createQuery(
@@ -78,13 +78,13 @@ public class Polling implements Runnable
 		return (!job.isEmpty()) ? job.get(0) : null;
 	}
 
-	public ArrayList<JobInstance> getJob()
+	ArrayList<JobInstance> getJob()
 	{
 
 		return job;
 	}
 
-	public void executionStatus()
+	void executionStatus()
 	{
 		EntityManager em = Helpers.getNewEm();
 		EntityTransaction transac = em.getTransaction();
@@ -102,7 +102,7 @@ public class Polling implements Runnable
 		em.close();
 	}
 
-	public void HighlanderMode(JobInstance currentJob, EntityManager em)
+	protected void HighlanderMode(JobInstance currentJob, EntityManager em)
 	{
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
 				.createQuery("SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd = :myjd AND j.position >= :currentPos",
@@ -246,22 +246,12 @@ public class Polling implements Runnable
 		}
 	}
 
-	public EntityManager getEm()
-	{
-		return em;
-	}
-
-	public void setEm(EntityManager em)
-	{
-		this.em = em;
-	}
-
-	public Integer getActualNbThread()
+	Integer getActualNbThread()
 	{
 		return actualNbThread;
 	}
 
-	public void setActualNbThread(Integer actualNbThread)
+	void setActualNbThread(Integer actualNbThread)
 	{
 		this.actualNbThread = actualNbThread;
 	}

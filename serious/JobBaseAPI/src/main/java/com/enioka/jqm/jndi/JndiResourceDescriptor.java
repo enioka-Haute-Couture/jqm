@@ -3,11 +3,11 @@ package com.enioka.jqm.jndi;
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
 
-public class JndiResourceDescriptor extends Reference
+class JndiResourceDescriptor extends Reference
 {
 	private static final long serialVersionUID = 3348684996519775949L;
 
-	public JndiResourceDescriptor(String resourceClass, String description, String scope, String auth, boolean singleton, String factory,
+	JndiResourceDescriptor(String resourceClass, String description, String scope, String auth, boolean singleton, String factory,
 			String factoryLocation)
 	{
 		super(resourceClass, factory, factoryLocation);

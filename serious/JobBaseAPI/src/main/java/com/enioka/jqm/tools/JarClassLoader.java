@@ -33,12 +33,12 @@ import org.apache.log4j.Logger;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
 
-public class JarClassLoader extends URLClassLoader
+class JarClassLoader extends URLClassLoader
 {
 	private static Logger jqmlogger = Logger.getLogger(JarClassLoader.class);
 	private URL jarUrl;
 
-	public JarClassLoader(URL url)
+	JarClassLoader(URL url)
 	{
 
 		super(new URL[] { url });
@@ -57,21 +57,21 @@ public class JarClassLoader extends URLClassLoader
 		return urls;
 	}
 
-	public JarClassLoader(URL url, URL[] libs)
+	JarClassLoader(URL url, URL[] libs)
 	{
 
 		super(addUrls(url, libs), null);
 		this.jarUrl = url;
 	}
 
-	public JarClassLoader(URL url, URL[] libs, ClassLoader parent)
+	JarClassLoader(URL url, URL[] libs, ClassLoader parent)
 	{
 
 		super(addUrls(url, libs), parent);
 		this.jarUrl = url;
 	}
 
-	public String getMainClassName() throws IOException
+	String getMainClassName() throws IOException
 	{
 
 		URL u = new URL("jar", "", jarUrl + "!/");
@@ -80,7 +80,7 @@ public class JarClassLoader extends URLClassLoader
 		return attr != null ? attr.getValue(Attributes.Name.MAIN_CLASS) : null;
 	}
 
-	public void invokeClass(String name, String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException
+	void invokeClass(String name, String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException
 	{
 		@SuppressWarnings("rawtypes")
 		Class c = loadClass(name);
@@ -101,7 +101,7 @@ public class JarClassLoader extends URLClassLoader
 		}
 	}
 
-	public Object invokeMain(JobInstance job) throws Exception
+	Object invokeMain(JobInstance job) throws Exception
 	{
 		String classQualifiedName = job.getJd().getJavaClassName();
 		jqmlogger.debug("Trying to load class " + classQualifiedName);

@@ -2,7 +2,12 @@ package com.enioka.jqm.tools;
 
 public class Main
 {
-
+	/**
+	 * Startup method for the packaged JAR
+	 * 
+	 * @param args
+	 *            0 is node name
+	 */
 	public static void main(String[] args)
 	{
 		JqmEngine engine = new JqmEngine();

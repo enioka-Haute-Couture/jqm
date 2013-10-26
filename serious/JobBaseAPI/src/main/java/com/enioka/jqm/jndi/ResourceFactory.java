@@ -11,7 +11,7 @@ import javax.naming.spi.ObjectFactory;
 
 import org.apache.log4j.Logger;
 
-public class ResourceFactory implements ObjectFactory
+class ResourceFactory implements ObjectFactory
 {
 	private static Logger jqmlogger = Logger.getLogger(ResourceFactory.class);
 

@@ -35,7 +35,7 @@ import com.enioka.jqm.jndi.JndiContextFactory;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.Node;
 
-public class JqmEngine
+class JqmEngine
 {
 	private ArrayList<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
 	private ArrayList<Polling> pollers = new ArrayList<Polling>();
@@ -47,7 +47,10 @@ public class JqmEngine
 	private static Logger jqmlogger = Logger.getLogger(JarClassLoader.class);
 
 	/**
+	 * Starts the engine
+	 * 
 	 * @param args
+	 *            - [0] = nodename
 	 * @throws Exception
 	 */
 	public void start(String[] args) throws Exception
@@ -94,6 +97,9 @@ public class JqmEngine
 		jqmlogger.debug("End of main");
 	}
 
+	/**
+	 * Nicely stops the engine
+	 */
 	public void stop()
 	{
 
@@ -107,16 +113,6 @@ public class JqmEngine
 		} catch (Exception e)
 		{
 
-		}
-	}
-
-	public void run()
-	{
-
-		for (Polling p : pollers)
-		{
-			Thread t = new Thread(p);
-			t.start();
 		}
 	}
 }

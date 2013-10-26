@@ -14,7 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 @SuppressWarnings("serial")
-public class Servlet extends HttpServlet
+class Servlet extends HttpServlet
 {
 	private static Logger jqmlogger = Logger.getLogger(Servlet.class);
 

@@ -34,12 +34,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class Dependencies
+class Dependencies
 {
 	private ArrayList<String> list = new ArrayList<String>();
 	private static Logger jqmlogger = Logger.getLogger(Dependencies.class);
 
-	public Dependencies(String path)
+	Dependencies(String path)
 	{
 		File fXmlFile = new File(path);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -94,7 +94,10 @@ public class Dependencies
 		}
 	}
 
-	public void print()
+	/**
+	 * debug method
+	 */
+	void print()
 	{
 		for (int i = 0; i < list.size(); i++)
 		{
@@ -105,17 +108,8 @@ public class Dependencies
 	/**
 	 * @return the list
 	 */
-	public ArrayList<String> getList()
+	ArrayList<String> getList()
 	{
 		return list;
-	}
-
-	/**
-	 * @param list
-	 *            the list to set
-	 */
-	public void setList(ArrayList<String> list)
-	{
-		this.list = list;
 	}
 }
