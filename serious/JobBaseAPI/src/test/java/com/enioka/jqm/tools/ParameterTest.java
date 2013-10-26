@@ -55,8 +55,8 @@ public class ParameterTest
 		jdargs.add(jdp2);
 
 		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/CheckArgs/",
-				"./testprojects/CheckArgs/CheckArgs.jar", TestHelpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-checkargs/",
+				"./testprojects/jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
 				"other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
@@ -86,8 +86,8 @@ public class ParameterTest
 		jdargs.add(jdp2);
 
 		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/CheckArgs/",
-				"./testprojects/CheckArgs/CheckArgs.jar", TestHelpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-checkargs/",
+				"./testprojects/jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
 				"other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
@@ -116,8 +116,8 @@ public class ParameterTest
 		jdargs.add(jdp2);
 
 		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/CheckArgs/",
-				"./testprojects/CheckArgs/CheckArgs.jar", TestHelpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-checkargs/",
+				"./testprojects/jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
 				"other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");

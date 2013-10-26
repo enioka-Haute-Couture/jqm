@@ -24,6 +24,7 @@
 		<module>../../tests/jqm-test-deliverable</module>
 		<module>../../tests/Geo</module>
 		<module>../../tests/jqm-test-jndijms-amq</module>
+		<module>../../tests/jqm-test-checkargs</module>
 	</modules>
 
 	<profiles>
