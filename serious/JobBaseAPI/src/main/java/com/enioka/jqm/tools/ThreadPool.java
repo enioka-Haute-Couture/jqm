@@ -8,7 +8,6 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.temp.Polling;
 
 public class ThreadPool
 {

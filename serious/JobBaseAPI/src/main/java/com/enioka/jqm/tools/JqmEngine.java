@@ -34,7 +34,6 @@ import com.enioka.jqm.jndi.JndiContext;
 import com.enioka.jqm.jndi.JndiContextFactory;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.temp.Polling;
 
 public class JqmEngine
 {

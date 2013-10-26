@@ -26,7 +26,6 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 import com.enioka.jqm.api.JobBase;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.temp.Polling;
 import com.jcabi.aether.Aether;
 
 public class Loader implements Runnable

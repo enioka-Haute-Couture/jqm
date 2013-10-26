@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.temp;
+package com.enioka.jqm.tools;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -33,8 +33,6 @@ import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.tools.Helpers;
-import com.enioka.jqm.tools.ThreadPool;
 
 public class Polling implements Runnable
 {
