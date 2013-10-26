@@ -22,10 +22,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Server;
@@ -40,17 +38,14 @@ import com.enioka.jqm.temp.Polling;
 
 public class JqmEngine
 {
-	public ArrayList<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
-	public ArrayList<Polling> pollers = new ArrayList<Polling>();
-	public Node node = null;
-	public ArrayList<ThreadPool> tps = new ArrayList<ThreadPool>();
-	public AtomicBoolean isRunning = new AtomicBoolean(true);
-	public EntityManager em = Helpers.getNewEm();
-	public EntityTransaction t = em.getTransaction();
-	public Map<String, URL[]> cache = new HashMap<String, URL[]>();
-	public Server server = null;
-	public JndiContext jndiCtx = null;
-	Logger jqmlogger = Logger.getLogger(JarClassLoader.class);
+	private ArrayList<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
+	private ArrayList<Polling> pollers = new ArrayList<Polling>();
+	private Node node = null;
+	private EntityManager em = Helpers.getNewEm();
+	private Map<String, URL[]> cache = new HashMap<String, URL[]>();
+	private Server server = null;
+	private JndiContext jndiCtx = null;
+	private static Logger jqmlogger = Logger.getLogger(JarClassLoader.class);
 
 	/**
 	 * @param args
@@ -60,7 +55,7 @@ public class JqmEngine
 	{
 		java.lang.System.setProperty("log4j.debug", "true");
 
-		Node node = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :l", Node.class).setParameter("l", args[0])
+		node = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :l", Node.class).setParameter("l", args[0])
 				.getSingleResult();
 
 		// JNDI
@@ -79,7 +74,6 @@ public class JqmEngine
 
 		if (args.length == 1)
 		{
-
 			node = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :li", Node.class).setParameter("li", args[0])
 					.getSingleResult();
 

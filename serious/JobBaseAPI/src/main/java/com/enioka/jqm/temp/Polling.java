@@ -38,7 +38,7 @@ import com.enioka.jqm.tools.ThreadPool;
 
 public class Polling implements Runnable
 {
-	Logger jqmlogger = Logger.getLogger(Polling.class);
+	private static Logger jqmlogger = Logger.getLogger(Polling.class);
 	private ArrayList<JobInstance> job = new ArrayList<JobInstance>();
 	private DeploymentParameter dp = null;
 	private Queue queue = null;

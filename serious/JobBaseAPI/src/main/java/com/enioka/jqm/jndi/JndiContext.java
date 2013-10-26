@@ -23,10 +23,10 @@ import com.enioka.jqm.tools.Helpers;
 
 public class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory
 {
-	Logger jqmlogger = Logger.getLogger(this.getClass());
-	ClassLoader cl = null;
-	ResourceFactory rf = new ResourceFactory();
-
+	private static Logger jqmlogger = Logger.getLogger(JndiContext.class);
+	private ClassLoader cl = null;
+	private ResourceFactory rf = new ResourceFactory();
+ 
 	public JndiContext(ClassLoader cl) throws NamingException
 	{
 		super();

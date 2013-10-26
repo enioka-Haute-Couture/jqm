@@ -35,8 +35,8 @@ import com.enioka.jqm.jpamodel.JobParameter;
 
 public class JarClassLoader extends URLClassLoader
 {
-	Logger jqmlogger = Logger.getLogger(JarClassLoader.class);
-	URL jarUrl;
+	private static Logger jqmlogger = Logger.getLogger(JarClassLoader.class);
+	private URL jarUrl;
 
 	public JarClassLoader(URL url)
 	{

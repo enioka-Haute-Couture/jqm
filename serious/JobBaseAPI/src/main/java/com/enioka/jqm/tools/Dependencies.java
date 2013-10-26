@@ -36,13 +36,11 @@ import org.xml.sax.SAXException;
 
 public class Dependencies
 {
-
 	private ArrayList<String> list = new ArrayList<String>();
-	Logger jqmlogger = Logger.getLogger(this.getClass());
+	private static Logger jqmlogger = Logger.getLogger(Dependencies.class);
 
 	public Dependencies(String path)
 	{
-
 		File fXmlFile = new File(path);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;

@@ -11,7 +11,7 @@ import com.enioka.jqm.jpamodel.Message;
 public class Helpers
 {
 	// The one and only EMF in the engine.
-	public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+	private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
 
 	public static EntityManager getNewEm()
 	{

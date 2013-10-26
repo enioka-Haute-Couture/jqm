@@ -12,11 +12,11 @@ import com.enioka.jqm.temp.Polling;
 
 public class ThreadPool
 {
-	Logger jqmlogger = Logger.getLogger(ThreadPool.class);
+	private static Logger jqmlogger = Logger.getLogger(ThreadPool.class);
 	private Queue queue = null;
 	private int nbThread = 0;
-	ExecutorService pool = null;
-	Map<String, URL[]> cache = null;
+	private ExecutorService pool = null;
+	private Map<String, URL[]> cache = null;
 
 	public ThreadPool(Queue queue, int n, Map<String, URL[]> cache)
 	{

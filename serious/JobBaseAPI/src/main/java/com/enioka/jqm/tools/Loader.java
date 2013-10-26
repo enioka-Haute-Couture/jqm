@@ -15,9 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 
 import org.apache.log4j.Logger;
 import org.sonatype.aether.artifact.Artifact;
@@ -26,7 +24,6 @@ import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 import com.enioka.jqm.api.JobBase;
-import com.enioka.jqm.deliverabletools.DeliverableStruct;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.temp.Polling;
@@ -34,15 +31,12 @@ import com.jcabi.aether.Aether;
 
 public class Loader implements Runnable
 {
-
-	JobInstance job = null;
-	Object jobBase = new JobBase();
-	ArrayList<DeliverableStruct> s1s = new ArrayList<DeliverableStruct>();
-	EntityManager em = Helpers.getNewEm();
-	Map<String, URL[]> cache = null;
-	boolean isInCache = true;
-	Logger jqmlogger = Logger.getLogger(this.getClass());
-	Polling p = null;
+	private JobInstance job = null;
+	private Object jobBase = null;
+	private EntityManager em = Helpers.getNewEm();
+	private Map<String, URL[]> cache = null;
+	private Logger jqmlogger = Logger.getLogger(this.getClass());
+	private Polling p = null;
 
 	public Loader(JobInstance job, Map<String, URL[]> cache, Polling p)
 	{
@@ -116,6 +110,7 @@ public class Loader implements Runnable
 			transac.commit();
 			jqmlogger.debug("JobInstance was updated");
 
+			boolean isInCache = true;
 			if (!cache.containsKey(job.getJd().getApplicationName()))
 			{
 				Dependencies dependencies = new Dependencies(job.getJd().getFilePath() + "pom.xml");
