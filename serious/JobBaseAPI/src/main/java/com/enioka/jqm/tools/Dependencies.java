@@ -19,6 +19,7 @@
 package com.enioka.jqm.tools;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -52,7 +53,7 @@ public class Dependencies
 			jqmlogger.debug(fXmlFile.getPath());
 			jqmlogger.debug("Working Directory = " + System.getProperty("user.dir"));
 			if (fXmlFile == null || !fXmlFile.isFile())
-				throw new Throwable("Dependencies: ");
+				throw new FileNotFoundException("The XML file " + fXmlFile + " was not found");
 
 			dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(fXmlFile);
@@ -96,13 +97,13 @@ public class Dependencies
 			jqmlogger.error(e);
 		} catch (SAXException e)
 		{
-			jqmlogger.error(e + "Invalid XML architecture. Please, fix correctly the dependencies");
+			jqmlogger.error("Invalid XML architecture. Please, fix correctly the dependencies", e);
 		} catch (IOException e)
 		{
-			jqmlogger.error(e + "Invalid pom.xml. Please check the pom.xml & its filepath " + path);
-		} catch (Throwable e)
+			jqmlogger.error("Invalid pom.xml. Please check the pom.xml & its filepath " + path, e);
+		} catch (Exception e)
 		{
-			jqmlogger.error(e + "Invalid pom.xml. Please check the pom.xml & its filepath " + path);
+			jqmlogger.error("Invalid pom.xml. Please check the pom.xml & its filepath " + path, e);
 		}
 	}
 
