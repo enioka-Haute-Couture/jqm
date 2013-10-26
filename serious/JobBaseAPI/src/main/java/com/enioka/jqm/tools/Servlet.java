@@ -27,7 +27,6 @@ public class Servlet extends HttpServlet
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 	{
-
 		String fileName = request.getParameter("file");
 		File realFileName = new File(fileName);
 		FileInputStream fis = null;
@@ -39,30 +38,20 @@ public class Servlet extends HttpServlet
 			fis = new FileInputStream(realFileName);
 			response.setContentType("application/octet-stream");
 
-			IOUtils.copy(fis, out); // Copy bytes from an InputStream to an
-									// OutputStream.
-
-			IOUtils.closeQuietly(out); // Good practice
-			IOUtils.closeQuietly(fis);
+			IOUtils.copy(fis, out); // Copy bytes from an InputStream to an OutputStream.
 
 		} catch (FileNotFoundException e)
 		{
-
-			jqmlogger.info(e);
+			jqmlogger.warn(e);
+			response.setStatus(500);
 		} catch (IOException e)
 		{
-
-			jqmlogger.info(e);
-		}
-		try
+			jqmlogger.warn(e);
+			response.setStatus(500);
+		} finally
 		{
-			fis.close();
-			out.close();
-		} catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			IOUtils.closeQuietly(out); // Good practice
+			IOUtils.closeQuietly(fis);
 		}
-
 	}
 }
