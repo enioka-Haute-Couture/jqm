@@ -1,4 +1,4 @@
-package com.enioka.jqm.tests;
+package com.enioka.jqm.tools;
 
 import java.io.File;
 import java.io.InputStream;
@@ -41,7 +41,7 @@ public class JobBaseTest
 		s.start();
 
 		Dispatcher.resetEM();
-		com.enioka.jqm.tools.Helpers.resetEmf();
+		Helpers.resetEmf();
 	}
 
 	@AfterClass
@@ -56,17 +56,17 @@ public class JobBaseTest
 	public void testHighlanderMode() throws Exception
 	{
 		jqmlogger.debug("Starting test testHighlanderMode");
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin",
-				"ModuleMachin", "other", "other", "other", true, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", 42,
+				"Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
@@ -94,7 +94,7 @@ public class JobBaseTest
 
 		em.getTransaction().commit();
 
-		EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
+		EntityManager emm = Helpers.getNewEm();
 
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
 				JobInstance.class).getResultList();
@@ -108,20 +108,20 @@ public class JobBaseTest
 	public void testHighlanderModeMultiQueue() throws Exception
 	{
 		jqmlogger.debug("Starting test testHighlanderModeMultiQueue");
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin",
-				"ModuleMachin", "other", "other", "other", true, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", 42,
+				"Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
 		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qNormal, 42, "MarsuApplication2", 42,
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "MarsuApplication2", 42,
 				"Franquin", "ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
@@ -153,7 +153,7 @@ public class JobBaseTest
 
 		em.getTransaction().commit();
 
-		EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
+		EntityManager emm = Helpers.getNewEm();
 
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm
 				.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :j ORDER BY j.position ASC", JobInstance.class)
@@ -177,11 +177,11 @@ public class JobBaseTest
 	public void testGetDeliverables() throws Exception
 	{
 		jqmlogger.debug("Starting test testGetDeliverables");
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.createLocalNode(emm);
-		EntityManager emmm = com.enioka.jqm.tools.Helpers.getNewEm();
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		EntityManager emm = Helpers.getNewEm();
+		TestHelpers.createLocalNode(emm);
+		EntityManager emmm = Helpers.getNewEm();
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", "./testprojects/jqm-test-deliverable/", em);
@@ -190,16 +190,16 @@ public class JobBaseTest
 		jdargs.add(jdp2);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
-				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", Helpers.qVip, 42, "getDeliverables", 42, "Franquin",
+				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "getDeliverables", 42, "Franquin",
 				"ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("getDeliverables", "MAG");
 
-		Helpers.printJobInstanceTable();
+		TestHelpers.printJobInstanceTable();
 
 		Dispatcher.enQueue(j);
 
-		Helpers.printJobInstanceTable();
+		TestHelpers.printJobInstanceTable();
 
 		JobInstance ji = emmm.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :myId", JobInstance.class)
 				.setParameter("myId", jdDemoMaven.getId()).getSingleResult();
@@ -213,14 +213,14 @@ public class JobBaseTest
 
 		Assert.assertEquals(true, f.exists());
 
-		Helpers.printJobInstanceTable();
+		TestHelpers.printJobInstanceTable();
 
 		Dispatcher.resetEM();
 		List<InputStream> tmp = Dispatcher.getDeliverables(ji.getId());
 		engine1.stop();
-
+		Assert.assertEquals(1, tmp.size());
+		
 		File res = new File("./testprojects/jqm-test-deliverable/JobGenADeliverableFamily/" + ji.getId() + "/jqm-test-deliverable.txt");
-
 		Assert.assertEquals(true, res.exists());
 		f.delete();
 		res.delete();
@@ -234,10 +234,10 @@ public class JobBaseTest
 	public void testGetOneDeliverable() throws Exception
 	{
 		jqmlogger.debug("Starting test testGetOneDeliverable");
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
-		EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+		EntityManager emm = Helpers.getNewEm();
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", "./testprojects/jqm-test-deliverable/", em);
@@ -246,7 +246,7 @@ public class JobBaseTest
 		jdargs.add(jdp2);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
-				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin",
+				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication", 42, "Franquin",
 				"ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "Franquin");
@@ -271,7 +271,8 @@ public class JobBaseTest
 		Dispatcher.resetEM();
 		InputStream tmp = Dispatcher.getOneDeliverable(d);
 		engine1.stop();
-
+		Assert.assertTrue(tmp.available() >0);
+		
 		File res = new File("./testprojects/jqm-test-deliverable/JobGenADeliverableFamily/" + ji.getId() + "/JobGenADeliverable42.txt");
 
 		Assert.assertEquals(true, res.exists());
@@ -287,9 +288,9 @@ public class JobBaseTest
 	public void testGetUserDeliverables() throws Exception
 	{
 		jqmlogger.debug("Starting test testGetUserDeliverables");
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", "./testprojects/jqm-test-deliverable/", em);
@@ -311,17 +312,17 @@ public class JobBaseTest
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
-				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", Helpers.qVip, 42, "MarsuApplication1", 42, "Franquin",
+				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication1", 42, "Franquin",
 				"ModuleMachin", "other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs2, "./testprojects/jqm-test-deliverable/",
-				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", Helpers.qVip, 42, "MarsuApplication2", 42, "Franquin",
+				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication2", 42, "Franquin",
 				"ModuleMachin", "other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven3 = CreationTools.createJobDef(true, "App", jdargs3, "./testprojects/jqm-test-deliverable/",
-				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", Helpers.qVip, 42, "MarsuApplication3", 42, "Franquin",
+				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication3", 42, "Franquin",
 				"ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j1 = new JobDefinition("MarsuApplication1", "Franquin");
@@ -332,7 +333,7 @@ public class JobBaseTest
 		Dispatcher.enQueue(j2);
 		Dispatcher.enQueue(j3);
 
-		Helpers.printJobInstanceTable();
+		TestHelpers.printJobInstanceTable();
 
 		JqmEngine engine1 = new JqmEngine();
 		engine1.start(new String[] { "localhost" });
@@ -348,7 +349,7 @@ public class JobBaseTest
 		Assert.assertEquals(true, f2.exists());
 		Assert.assertEquals(true, f3.exists());
 
-		Helpers.printJobInstanceTable();
+		TestHelpers.printJobInstanceTable();
 
 		List<Deliverable> tmp = Dispatcher.getUserDeliverables("Franquin");
 
@@ -363,17 +364,17 @@ public class JobBaseTest
 	public void testGetUserJobs() throws Exception
 	{
 		jqmlogger.debug("Starting test testGetUserJobs");
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin",
-				"ModuleMachin", "other", "other", "other", true, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", 42,
+				"Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
@@ -410,7 +411,7 @@ public class JobBaseTest
 
 		em.getTransaction().commit();
 
-		EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
+		EntityManager emm = Helpers.getNewEm();
 
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
 				JobInstance.class).getResultList();
@@ -422,17 +423,17 @@ public class JobBaseTest
 	public void testGetJobs() throws Exception
 	{
 		jqmlogger.debug("Starting test testGetJobs");
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin",
-				"ModuleMachin", "other", "other", "other", true, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", 42,
+				"Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
 		ArrayList<JobDefParameter> jdargs2 = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp2 = CreationTools.createJobDefParameter("filepath", "./testprojects/jqm-test-deliverable/", em);
@@ -442,8 +443,8 @@ public class JobBaseTest
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
-				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", Helpers.qVip, 42, "test", 42, "Franquin", "ModuleMachin",
-				"other", "other", "other", false, em);
+				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "test", 42, "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 		JobDefinition j2 = new JobDefinition("test", "Toto");
@@ -477,7 +478,7 @@ public class JobBaseTest
 
 		em.getTransaction().commit();
 
-		EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
+		EntityManager emm = Helpers.getNewEm();
 
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
 				JobInstance.class).getResultList();
@@ -489,9 +490,9 @@ public class JobBaseTest
 	public void testGetQueues() throws Exception
 	{
 		jqmlogger.debug("Starting test testGetQueues");
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
 
 		ArrayList<Queue> qs = (ArrayList<Queue>) em.createQuery("SELECT q FROM Queue q", Queue.class).getResultList();
 
@@ -502,9 +503,9 @@ public class JobBaseTest
 	public void testGoodOrder() throws Exception
 	{
 		jqmlogger.debug("Starting test testGoodOrder");
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
@@ -512,18 +513,18 @@ public class JobBaseTest
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin",
-				"ModuleMachin", "other", "other", "other", true, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", 42,
+				"Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qNormal, 42, "MarsuApplication2", 42,
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "MarsuApplication2", 42,
 				"Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd2 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qSlow, 42, "MarsuApplication3", 42, "Franquin",
-				"ModuleMachin", "other", "other", "other", true, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qSlow, 42, "MarsuApplication3", 42,
+				"Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 		JobDefinition jj = new JobDefinition("MarsuApplication2", "Franquin");
@@ -551,17 +552,17 @@ public class JobBaseTest
 
 		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j WHERE j.queue = :q ORDER BY j.position ASC",
 				JobInstance.class);
-		query.setParameter("q", Helpers.qVip);
+		query.setParameter("q", TestHelpers.qVip);
 		ArrayList<JobInstance> resVIP = (ArrayList<JobInstance>) query.getResultList();
 
 		TypedQuery<JobInstance> query2 = em.createQuery("SELECT j FROM JobInstance j WHERE j.queue = :q ORDER BY j.position ASC",
 				JobInstance.class);
-		query2.setParameter("q", Helpers.qNormal);
+		query2.setParameter("q", TestHelpers.qNormal);
 		ArrayList<JobInstance> resNormal = (ArrayList<JobInstance>) query.getResultList();
 
 		TypedQuery<JobInstance> query3 = em.createQuery("SELECT j FROM JobInstance j WHERE j.queue = :q ORDER BY j.position ASC",
 				JobInstance.class);
-		query3.setParameter("q", Helpers.qSlow);
+		query3.setParameter("q", TestHelpers.qSlow);
 		ArrayList<JobInstance> resSlow = (ArrayList<JobInstance>) query.getResultList();
 
 		for (int i = 0; i < resVIP.size() - 1; i++)
@@ -584,22 +585,22 @@ public class JobBaseTest
 	public void testSecurityDeliverable() throws Exception
 	{
 		jqmlogger.debug("Starting test testSecurityDeliverable");
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
-				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin",
+				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication", 42, "Franquin",
 				"ModuleMachin", "other", "other", "other", true, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
-				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", Helpers.qNormal, 42, "MarsuApplication2", 42, "Franquin",
-				"ModuleMachin", "other", "other", "other", true, em);
+				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qNormal, 42, "MarsuApplication2", 42,
+				"Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 		j.addParameter("filepath", "./testprojects/jqm-test-deliverable/");
@@ -612,9 +613,9 @@ public class JobBaseTest
 		Dispatcher.enQueue(j);
 		Dispatcher.enQueue(jj);
 
-		Helpers.printJobInstanceTable();
+		TestHelpers.printJobInstanceTable();
 
-		EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
+		EntityManager emm = Helpers.getNewEm();
 		JobInstance ji = emm.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :myId", JobInstance.class)
 				.setParameter("myId", jdDemoMaven.getId()).getSingleResult();
 
@@ -623,7 +624,7 @@ public class JobBaseTest
 
 		Thread.sleep(12000);
 
-		Helpers.printJobInstanceTable();
+		TestHelpers.printJobInstanceTable();
 
 		File f = new File("./testprojects/jqm-test-deliverable/JobGenADeliverableSecurity1.txt");
 		File ff = new File("./testprojects/jqm-test-deliverable/JobGenADeliverableSecurity2.txt");

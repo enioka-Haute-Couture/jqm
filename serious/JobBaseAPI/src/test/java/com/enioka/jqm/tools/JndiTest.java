@@ -1,4 +1,4 @@
-package com.enioka.jqm.tests;
+package com.enioka.jqm.tools;
 
 import java.util.ArrayList;
 
@@ -35,7 +35,7 @@ public class JndiTest
 		s.start();
 
 		Dispatcher.resetEM();
-		com.enioka.jqm.tools.Helpers.resetEmf();
+		Helpers.resetEmf();
 	}
 
 	@AfterClass
@@ -74,15 +74,15 @@ public class JndiTest
 	public void testJmsAmq() throws Exception
 	{
 		jqmlogger.debug("AMQ: Starting");
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs,
-				"./testprojects/jqm-test-jndijms-amq/", "./testprojects/jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", Helpers.qVip, 42,
+				"./testprojects/jqm-test-jndijms-amq/", "./testprojects/jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42,
 				"Jms", 42, "Franquin", "ModuleMachin", "other1", "other2", "other3", false, em);
 
 		JobDefinition form = new JobDefinition("Jms", "MAG");
@@ -120,15 +120,15 @@ public class JndiTest
 	public void testJmsAmqWrongAlias() throws Exception
 	{
 		jqmlogger.debug("WRONG ALIAS: Starting");
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs,
-				"./testprojects/jqm-test-jndijms-amq/", "./testprojects/jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", Helpers.qVip, 42,
+				"./testprojects/jqm-test-jndijms-amq/", "./testprojects/jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42,
 				"Jms", 42, "Franquin", "ModuleMachin", "other1", "other2", "other3", false, em);
 
 		JobDefinition form = new JobDefinition("Jms", "MAG");

@@ -1,4 +1,4 @@
-package com.enioka.jqm.tests;
+package com.enioka.jqm.tools;
 
 import java.util.ArrayList;
 
@@ -35,7 +35,7 @@ public class QueueTest
 		s.start();
 
 		Dispatcher.resetEM();
-		com.enioka.jqm.tools.Helpers.resetEmf();
+		Helpers.resetEmf();
 	}
 
 	@AfterClass
@@ -47,17 +47,18 @@ public class QueueTest
 	@Test
 	public void testMaxThreadNormal() throws Exception
 	{
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
 		ArrayList<JobInstance> job = null;
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
+		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qNormal, 42, "MarsuApplication", 42,
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "MarsuApplication", 42,
 				"Franquin", "ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
@@ -73,7 +74,7 @@ public class QueueTest
 
 		while (i < 5)
 		{
-			EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
+			EntityManager emm = Helpers.getNewEm();
 			Dispatcher.enQueue(j);
 			Dispatcher.enQueue(j);
 			Dispatcher.enQueue(j);
@@ -90,7 +91,7 @@ public class QueueTest
 			Dispatcher.enQueue(j);
 			Dispatcher.enQueue(j);
 			Thread.sleep(3000);
-			Helpers.printJobInstanceTable();
+			TestHelpers.printJobInstanceTable();
 			TypedQuery<JobInstance> query = emm
 					.createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
 							JobInstance.class);
@@ -109,18 +110,19 @@ public class QueueTest
 	@Test
 	public void testMaxThreadVip() throws Exception
 	{
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
 		ArrayList<JobInstance> job = null;
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
+		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin",
-				"ModuleMachin", "other", "other", "other", false, em);
+				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", 42,
+				"Franquin", "ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
@@ -141,7 +143,7 @@ public class QueueTest
 
 		while (i < 5)
 		{
-			EntityManager emm = com.enioka.jqm.tools.Helpers.getNewEm();
+			EntityManager emm = Helpers.getNewEm();
 			Dispatcher.enQueue(j);
 			Dispatcher.enQueue(j);
 			Dispatcher.enQueue(j);
@@ -158,7 +160,7 @@ public class QueueTest
 			Dispatcher.enQueue(j);
 			Dispatcher.enQueue(j);
 			Thread.sleep(3000);
-			Helpers.printJobInstanceTable();
+			TestHelpers.printJobInstanceTable();
 			TypedQuery<JobInstance> query = emm
 					.createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
 							JobInstance.class);

@@ -1,9 +1,10 @@
-package com.enioka.jqm.tests;
+package com.enioka.jqm.tools;
 
 import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
 
+import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -17,8 +18,9 @@ import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.tools.CreationTools;
 import com.enioka.jqm.tools.JqmEngine;
 
-public class FiboTest
+public class GeoTests
 {
+	public static Logger jqmlogger = Logger.getLogger(JobBaseTest.class);
 	public static Server s;
 
 	@BeforeClass
@@ -32,34 +34,34 @@ public class FiboTest
 		s.start();
 
 		Dispatcher.resetEM();
-		com.enioka.jqm.tools.Helpers.resetEmf();
+		Helpers.resetEmf();
 	}
 
 	@AfterClass
-	public static void end()
+	public static void stop()
 	{
+		Dispatcher.resetEM();
 		s.shutdown();
 		s.stop();
 	}
 
 	@Test
-	public void testFibo() throws Exception
+	public void testGeo() throws Exception
 	{
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.createLocalNode(em);
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
 		@SuppressWarnings("unused")
-		JobDef jd = CreationTools.createJobDef(true, "com.enioka.jqm.tests.App", jdargs, "./testprojects/jqm-test-fibo/",
-				"./testprojects/jqm-test-fibo/jqm-test-fibo.jar", Helpers.qVip, 42, "Fibo", 42, "Franquin", "ModuleMachin", "other1",
+		JobDef jd = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-geo/",
+				"./testprojects/jqm-test-geo/jqm-test-geo.jar", TestHelpers.qVip, 42, "Geo", 42, "Franquin", "ModuleMachin", "other1",
 				"other2", "other3", false, em);
 
-		JobDefinition form = new JobDefinition("Fibo", "MAG");
-		form.addParameter("p1", "1");
-		form.addParameter("p2", "2");
+		JobDefinition form = new JobDefinition("Geo", "MAG");
+		form.addParameter("nbJob", "1");
 		Dispatcher.enQueue(form);
 
 		// Create JNDI connection to write inside the engine database
@@ -69,12 +71,23 @@ public class FiboTest
 
 		// Start the engine
 		JqmEngine engine1 = new JqmEngine();
+		JqmEngine engine2 = new JqmEngine();
+		JqmEngine engine3 = new JqmEngine();
 		engine1.start(new String[] { "localhost" });
+		engine2.start(new String[] { "localhost4" });
+		engine3.start(new String[] { "localhost5" });
 
-		Thread.sleep(40000);
+		Thread.sleep(30000);
+		jqmlogger.debug("###############################################################");
+		jqmlogger.debug("SHUTDOWN");
+		jqmlogger.debug("###############################################################");
 		engine1.stop();
+		engine2.stop();
+		engine3.stop();
+
+		TestHelpers.printJobInstanceTable();
 
 		long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
-		Assert.assertTrue(i > 2);
+		Assert.assertTrue(i > 3);
 	}
 }

@@ -1,4 +1,4 @@
-package com.enioka.jqm.tests;
+package com.enioka.jqm.tools;
 
 import java.util.ArrayList;
 
@@ -32,7 +32,7 @@ public class ParameterTest
 		s.start();
 
 		Dispatcher.resetEM();
-		com.enioka.jqm.tools.Helpers.resetEmf();
+		Helpers.resetEmf();
 	}
 
 	@AfterClass
@@ -44,9 +44,9 @@ public class ParameterTest
 	@Test
 	public void testMixParameters() throws Exception
 	{
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg1", "argument1", em);
@@ -54,9 +54,10 @@ public class ParameterTest
 		jdargs.add(jdp);
 		jdargs.add(jdp2);
 
+		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/CheckArgs/",
-				"./testprojects/CheckArgs/CheckArgs.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other",
-				"other", "other", false, em);
+				"./testprojects/CheckArgs/CheckArgs.jar", TestHelpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 		j.addParameter("arg2", "argument2");
@@ -74,9 +75,9 @@ public class ParameterTest
 	@Test
 	public void testDefaultParameters() throws Exception
 	{
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg1", "argument1", em);
@@ -84,9 +85,10 @@ public class ParameterTest
 		jdargs.add(jdp);
 		jdargs.add(jdp2);
 
+		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/CheckArgs/",
-				"./testprojects/CheckArgs/CheckArgs.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other",
-				"other", "other", false, em);
+				"./testprojects/CheckArgs/CheckArgs.jar", TestHelpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
@@ -103,9 +105,9 @@ public class ParameterTest
 	@Test
 	public void testOverrideParmeters() throws Exception
 	{
-		EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
-		Helpers.cleanup(em);
-		Helpers.createLocalNode(em);
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg1", "Gaston Lagaffe", em);
@@ -113,9 +115,10 @@ public class ParameterTest
 		jdargs.add(jdp);
 		jdargs.add(jdp2);
 
+		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/CheckArgs/",
-				"./testprojects/CheckArgs/CheckArgs.jar", Helpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin", "other",
-				"other", "other", false, em);
+				"./testprojects/CheckArgs/CheckArgs.jar", TestHelpers.qVip, 42, "MarsuApplication", 42, "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 		j.addParameter("arg1", "argument1");
