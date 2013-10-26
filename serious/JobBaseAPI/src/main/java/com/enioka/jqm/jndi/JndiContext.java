@@ -26,7 +26,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 	private static Logger jqmlogger = Logger.getLogger(JndiContext.class);
 	private ClassLoader cl = null;
 	private ResourceFactory rf = new ResourceFactory();
- 
+
 	public JndiContext(ClassLoader cl) throws NamingException
 	{
 		super();
@@ -38,7 +38,6 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 	{
 		jqmlogger.info("Looking up a JNDI element named " + name);
 		String baseCtx = name.split("/")[0];
-		// String objName = name.split("/")[1];
 		ClassLoader tmp = Thread.currentThread().getContextClassLoader();
 
 		if (baseCtx.equals("jdbc"))

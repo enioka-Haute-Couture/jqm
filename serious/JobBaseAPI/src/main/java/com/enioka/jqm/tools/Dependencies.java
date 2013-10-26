@@ -56,29 +56,16 @@ public class Dependencies
 			dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(fXmlFile);
 
-			// optional, but recommended
-			// read this -
+			// optional, but recommended read this -
 			// http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
 			doc.getDocumentElement().normalize();
-
-			// System.out.println("Root element :" +
-			// doc.getDocumentElement().getNodeName());
-
 			NodeList nList = doc.getElementsByTagName("dependency");
-
-			// System.out.println("----------------------------");
 
 			for (int temp = 0; temp < nList.getLength(); temp++)
 			{
-
 				Node nNode = nList.item(temp);
-
-				// System.out.println("\nCurrent Element :" +
-				// nNode.getNodeName());
-
 				if (nNode.getNodeType() == Node.ELEMENT_NODE)
 				{
-
 					Element eElement = (Element) nNode;
 
 					dep += eElement.getElementsByTagName("groupId").item(0).getTextContent().toString() + ":";
@@ -107,7 +94,6 @@ public class Dependencies
 
 	public void print()
 	{
-
 		for (int i = 0; i < list.size(); i++)
 		{
 			jqmlogger.debug("Dependency " + i + ": " + list.get(i));
@@ -119,7 +105,6 @@ public class Dependencies
 	 */
 	public ArrayList<String> getList()
 	{
-
 		return list;
 	}
 
@@ -129,7 +114,6 @@ public class Dependencies
 	 */
 	public void setList(ArrayList<String> list)
 	{
-
 		this.list = list;
 	}
 }
