@@ -21,7 +21,9 @@ public class Helpers
 	public static void resetEmf()
 	{
 		if (emf != null)
+		{
 			emf.close();
+		}
 		emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
 	}
 

@@ -185,18 +185,26 @@ public class Polling implements Runnable
 			try
 			{
 				if (!run)
+				{
 					break;
+				}
 				Thread.sleep(dp.getPollingInterval());
 				if (!run)
+				{
 					break;
+				}
 
 				JobInstance ji = dequeue();
 
 				if (ji == null)
+				{
 					continue;
+				}
 
 				if (actualNbThread == tp.getNbThread())
+				{
 					continue;
+				}
 
 				jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
 				jqmlogger.debug("Actual deploymentParameter: " + dp.getNode().getId());

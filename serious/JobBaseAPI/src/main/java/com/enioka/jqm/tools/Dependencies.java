@@ -51,7 +51,9 @@ public class Dependencies
 			jqmlogger.debug(fXmlFile.getPath());
 			jqmlogger.debug("Working Directory = " + System.getProperty("user.dir"));
 			if (fXmlFile == null || !fXmlFile.isFile())
+			{
 				throw new FileNotFoundException("The XML file " + fXmlFile + " was not found");
+			}
 
 			dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(fXmlFile);

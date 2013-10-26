@@ -148,7 +148,9 @@ public class Loader implements Runnable
 				cache.put(job.getJd().getApplicationName(), urls);
 			}
 			else
+			{
 				jobClassLoader = new JarClassLoader(jars, cache.get(job.getJd().getApplicationName()));
+			}
 
 			// Change active class loader
 			jqmlogger.debug("Setting class loader");

@@ -51,7 +51,9 @@ public class ResourceFactory implements ObjectFactory
 		} catch (Exception e)
 		{
 			if (e instanceof NamingException)
+			{
 				throw (NamingException) e;
+			}
 			NamingException ex = new NamingException("Could not create resource factory instance");
 			ex.initCause(e);
 			throw ex;

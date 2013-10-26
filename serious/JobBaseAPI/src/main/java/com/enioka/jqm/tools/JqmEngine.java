@@ -60,7 +60,9 @@ public class JqmEngine
 
 		// JNDI
 		if (jndiCtx == null)
+		{
 			jndiCtx = JndiContextFactory.createJndiContext(Thread.currentThread().getContextClassLoader());
+		}
 
 		// Jetty
 		server = new Server(node.getPort());

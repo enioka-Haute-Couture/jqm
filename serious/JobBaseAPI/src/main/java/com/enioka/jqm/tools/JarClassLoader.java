@@ -51,7 +51,9 @@ public class JarClassLoader extends URLClassLoader
 		URL[] urls = new URL[libs.length + 1];
 		urls[0] = url;
 		for (int i = 0; i < libs.length; i++)
+		{
 			urls[i + 1] = libs[i];
+		}
 		return urls;
 	}
 
