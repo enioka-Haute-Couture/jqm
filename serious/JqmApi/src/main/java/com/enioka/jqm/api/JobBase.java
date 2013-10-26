@@ -53,17 +53,13 @@ public class JobBase {
 	}
 
 	public void addDeliverable(String path, String fileName, String fileLabel) {
-
-		try {
-			System.out.println("ajout du livrable dans la liste");
-			System.out.println("Path: " + path);
+		try
+		{
 			this.sha1s.add(new DeliverableStruct(path, fileName, Cryptonite.sha1(path + fileName), fileLabel));
 		} catch (NoSuchAlgorithmException e) {
 
 			e.printStackTrace();
 		}
-
-		System.out.println("size sha1s: " + this.sha1s.size());
 	}
 
 	public void sendMsg(String msg) {

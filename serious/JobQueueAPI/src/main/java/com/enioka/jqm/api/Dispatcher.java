@@ -112,7 +112,6 @@ public class Dispatcher
 
 		job.setParameters(h);
 		job.setApplicationName(jd.getApplicationName());
-		job.setSessionID(jd.getSessionID());
 		job.setApplication(jd.getApplication());
 		job.setModule(jd.getModule());
 		job.setOther1(jd.getOther1());
@@ -277,8 +276,8 @@ public class Dispatcher
 		ArrayList<JobHistoryParameter> jhp = new ArrayList<JobHistoryParameter>();
 		ArrayList<Message> msgs = new ArrayList<Message>();
 
-		h = CreationTools.createhistory(1, (Calendar) null, "History of the Job --> ID = " + (ji.getId()), msgs, ji, enqueueDate,
-				(Calendar) null, (Calendar) null, jhp, em);
+		h = CreationTools.createhistory(1, (Calendar) null, job.getId(), 42, job.getQueue(), "History of the Job --> ID = " + (ji.getId()), msgs, ji, enqueueDate,
+				(Calendar) null, (Calendar) null, jd.getUser(), null, jhp, em);
 		jqmlogger.debug("HISTORY QUI VIENT D'ETRE CREE: " + h.getId());
 		// CreationTools.em.createQuery("UPDATE JobParameter jp SET jp.jobInstance = :j WHERE").executeUpdate();
 
@@ -597,22 +596,22 @@ public class Dispatcher
 		Logger jqmlogger = Logger.getLogger(Dispatcher.class);
 		ArrayList<Deliverable> d = new ArrayList<Deliverable>();
 		ArrayList<Deliverable> res = new ArrayList<Deliverable>();
-		ArrayList<JobInstance> j = null;
+		ArrayList<History> h = null;
 
 		try
 		{
-			j = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j WHERE j.userName = :u", JobInstance.class)
+			h = (ArrayList<History>) em.createQuery("SELECT h FROM History h WHERE h.userName = :u", History.class)
 					.setParameter("u", user).getResultList();
 		} catch (Exception e)
 		{
 			jqmlogger.info(e);
 		}
 
-		for (int i = 0; i < j.size(); i++)
+		for (int i = 0; i < h.size(); i++)
 		{
 
 			d = (ArrayList<Deliverable>) em.createQuery("SELECT d FROM Deliverable d WHERE d.jobId = :idJob", Deliverable.class)
-					.setParameter("idJob", j.get(i).getId()).getResultList();
+					.setParameter("idJob", h.get(i).getJobInstance().getId()).getResultList();
 
 			res.addAll(d);
 		}

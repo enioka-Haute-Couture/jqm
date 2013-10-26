@@ -75,10 +75,12 @@ class Loader implements Runnable
 			jqmlogger.debug("TOUT DEBUT LOADER");
 
 			// ---------------- BEGIN: MAVEN DEPENDENCIES ------------------
+			CheckFilePath cfp = new CheckFilePath();
 			File local = new File(System.getProperty("user.home") + "/.m2/repository");
-			File jar = new File(job.getJd().getJarPath());
+			File jar = new File(cfp.FixFilePath(job.getJd().getJarPath()));
 			URL jars = jar.toURI().toURL();
-			jqmlogger.debug("Loader will try to launch jar " + job.getJd().getJarPath() + " - " + job.getJd().getJavaClassName());
+			jqmlogger.debug("Loader will try to launch jar " + cfp.FixFilePath(job.getJd().getJarPath()) + " - "
+					+ cfp.FixFilePath(job.getJd().getJavaClassName()));
 			ArrayList<URL> tmp = new ArrayList<URL>();
 			Collection<Artifact> deps = null;
 

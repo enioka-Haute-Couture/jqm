@@ -216,6 +216,9 @@ class Polling implements Runnable
 				em.createQuery("UPDATE JobInstance j SET j.node = :n WHERE j.id = :j").setParameter("j", ji.getId())
 						.setParameter("n", dp.getNode()).executeUpdate();
 
+				em.createQuery("UPDATE History h SET h.node = :n WHERE h.jobInstance.id = :j").setParameter("j", ji.getId())
+						.setParameter("n", dp.getNode()).executeUpdate();
+
 				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", ji)
 						.getSingleResult();
 

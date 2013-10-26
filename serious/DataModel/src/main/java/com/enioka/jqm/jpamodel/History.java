@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -26,9 +27,13 @@ public class History implements Serializable{
     private static final long serialVersionUID = -5249529794213078668L;
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
-	@Column(nullable=false)
+	@Column(nullable=true)
 	private Integer returnedValue;
 	private Calendar jobDate;
+	private Integer jobDefId;
+	private Integer sessionId;
+	@ManyToOne(fetch=FetchType.EAGER, targetEntity=com.enioka.jqm.jpamodel.Queue.class)
+	private Queue queue;
 	@Column(length=1000)
 	private String msg;
 	@OneToMany(fetch=FetchType.EAGER, targetEntity=com.enioka.jqm.jpamodel.Message.class, cascade=CascadeType.ALL, mappedBy="history")
@@ -38,6 +43,9 @@ public class History implements Serializable{
 	private Calendar enqueueDate;
 	private Calendar executionDate;
 	private Calendar endDate;
+	private String userName;
+	@ManyToOne(fetch=FetchType.EAGER, targetEntity=com.enioka.jqm.jpamodel.Node.class)
+	private Node node;
 	@OneToMany(orphanRemoval=true)
 	@JoinColumn(name="history_parameter")
     private List<JobHistoryParameter> parameters;
@@ -158,4 +166,54 @@ public class History implements Serializable{
 
     	this.messages = messages;
     }
+
+	public Integer getJobDefId()
+	{
+		return jobDefId;
+	}
+
+	public void setJobDefId(Integer jobDefId)
+	{
+		this.jobDefId = jobDefId;
+	}
+
+	public Queue getQueue()
+	{
+		return queue;
+	}
+
+	public void setQueue(Queue queue)
+	{
+		this.queue = queue;
+	}
+
+	public String getUserName()
+	{
+		return userName;
+	}
+
+	public void setUserName(String userName)
+	{
+		this.userName = userName;
+	}
+
+	public Node getNode()
+	{
+		return node;
+	}
+
+	public void setNode(Node node)
+	{
+		this.node = node;
+	}
+
+	public Integer getSessionId()
+	{
+		return sessionId;
+	}
+
+	public void setSessionId(Integer sessionId)
+	{
+		this.sessionId = sessionId;
+	}
 }

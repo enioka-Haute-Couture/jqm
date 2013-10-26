@@ -216,6 +216,7 @@ public class JobBaseTest
 		TestHelpers.printJobInstanceTable();
 
 		Dispatcher.resetEM();
+		@SuppressWarnings("unused")
 		List<InputStream> tmp = Dispatcher.getDeliverables(ji.getId());
 		engine1.stop();
 		Assert.assertEquals(1, tmp.size());
@@ -269,6 +270,7 @@ public class JobBaseTest
 				"JobGenADeliverable42.txt");
 
 		Dispatcher.resetEM();
+		@SuppressWarnings("unused")
 		InputStream tmp = Dispatcher.getOneDeliverable(d);
 		engine1.stop();
 		Assert.assertTrue(tmp.available() >0);

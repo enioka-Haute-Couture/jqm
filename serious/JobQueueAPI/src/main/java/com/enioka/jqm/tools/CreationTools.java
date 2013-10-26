@@ -51,7 +51,7 @@ public class CreationTools
 	}
 
 	public static JobDef createJobDef(boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String filePath, String jp,
-			Queue queue, Integer maxTimeRunning, String applicationName, Integer sessionID, String application, String module,
+			Queue queue, Integer maxTimeRunning, String applicationName, String application, String module,
 			String other1, String other2, String other3, boolean highlander, EntityManager em)
 	{
 		JobDef j = new JobDef();
@@ -67,7 +67,6 @@ public class CreationTools
 		j.setQueue(queue);
 		j.setMaxTimeRunning(maxTimeRunning);
 		j.setApplicationName(applicationName);
-		j.setSessionID(sessionID);
 		j.setApplication(application);
 		j.setModule(module);
 		j.setOther1(other1);
@@ -149,20 +148,25 @@ public class CreationTools
 		return h;
 	}
 
-	public static History createhistory(Integer returnedValue, Calendar jobDate, String msg, List<Message> messages,
-			JobInstance jobInstance, Calendar enqueueDate, Calendar executionDate, Calendar endDate, List<JobHistoryParameter> jhp,
+	public static History createhistory(Integer returnedValue, Calendar jobDate, Integer JobDefId, Integer sessionId, Queue queue, String msg, List<Message> messages,
+			JobInstance jobInstance, Calendar enqueueDate, Calendar executionDate, Calendar endDate, String userName, Node node, List<JobHistoryParameter> jhp,
 			EntityManager em)
 	{
 		History h = new History();
 
 		h.setReturnedValue(returnedValue);
 		h.setJobDate(jobDate);
+		h.setJobDefId(JobDefId);
+		h.setSessionId(sessionId);
+		h.setQueue(queue);
 		h.setMsg(msg);
 		h.setMessages(messages);
 		h.setJobInstance(jobInstance);
 		h.setEnqueueDate(enqueueDate);
 		h.setExecutionDate(executionDate);
 		h.setEndDate(endDate);
+		h.setUserName(userName);
+		h.setNode(node);
 		h.setParameters(jhp);
 
 		em.persist(h);

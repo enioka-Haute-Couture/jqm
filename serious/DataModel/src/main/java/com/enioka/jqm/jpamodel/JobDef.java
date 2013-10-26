@@ -39,7 +39,6 @@ public class JobDef implements Serializable{
 	public Queue queue;
 	public Integer maxTimeRunning;
 	public String applicationName;
-	public Integer sessionID;
 	@Column(length=50)
 	public String application;
 	@Column(length=50)
@@ -101,16 +100,6 @@ public class JobDef implements Serializable{
 	public void setApplicationName(String applicationName)
 	{
 		this.applicationName = applicationName;
-	}
-
-	public Integer getSessionID()
-	{
-		return sessionID;
-	}
-
-	public void setSessionID(Integer sessionID)
-	{
-		this.sessionID = sessionID;
 	}
 
 	public String getApplication()

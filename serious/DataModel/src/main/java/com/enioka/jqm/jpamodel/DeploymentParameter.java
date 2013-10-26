@@ -13,7 +13,7 @@ public class DeploymentParameter
 {
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
-	@Column(nullable=false)
+	@Column(nullable=true)
 	private Integer classId;
 	@ManyToOne(fetch=FetchType.LAZY, targetEntity=com.enioka.jqm.jpamodel.Node.class)
 	private Node node;
