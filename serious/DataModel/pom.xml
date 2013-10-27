@@ -30,9 +30,22 @@
 				<version>2.1</version>
 			</plugin>
 
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<failIfNoTests>false</failIfNoTests>
+					<trimStackTrace>false</trimStackTrace>
+				</configuration>
+			</plugin>
+
+			<!-- <plugin> <artifactId>eclipselink-staticweave-maven-plugin</artifactId> 
+				<groupId>au.com.alderaan</groupId> <version>1.0.4</version> <executions> 
+				<execution> <goals> <goal>weave</goal> </goals> <phase>process-classes</phase> 
+				</execution> </executions> </plugin> -->
+
 		</plugins>
 	</build>
-	
+
 	<profiles>
 		<profile>
 			<id>internal</id>
@@ -50,13 +63,11 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.hibernate.javax.persistence</groupId>
-			<artifactId>hibernate-jpa-2.0-api</artifactId>
-			<version>1.0.1.Final</version>
-			<type>jar</type>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>6.0</version>
 			<scope>provided</scope>
 		</dependency>
-
 
 		<!-- FOR TESTS -->
 		<dependency>
@@ -66,12 +77,11 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-			<version>4.2.6.Final</version>
-			<scope>test</scope>
-		</dependency>
+		<!-- <dependency> <groupId>org.hibernate</groupId> <artifactId>hibernate-entitymanager</artifactId> 
+			<version>4.2.6.Final</version> <scope>test</scope> </dependency> -->
+
+		<!-- <dependency> <groupId>org.eclipse.persistence</groupId> <artifactId>eclipselink</artifactId> 
+			<version>2.5.1</version> <scope>compile</scope> </dependency> -->
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
