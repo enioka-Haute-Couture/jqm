@@ -258,7 +258,6 @@ public class TestSuite
 	@Test
 	public void testSetPosition()
 	{
-
 		testInit();
 
 		final JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
@@ -266,23 +265,17 @@ public class TestSuite
 		final JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
-		Dispatcher.enQueue(jdDemo);
+		int i = Dispatcher.enQueue(jdDemo);
 		Dispatcher.enQueue(jd);
 		Dispatcher.enQueue(jd);
 		Dispatcher.enQueue(jd);
 
-		final JobInstance q = emf.createEntityManager()
-		        .createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job", JobInstance.class)
-		        .setParameter("job", this.jd.getId()).getSingleResult();
+		//final JobInstance q = Dispatcher.getEm().find(JobInstance.class, i);
+ 
+		Dispatcher.setPosition(i, 1);
 
-		Dispatcher.setPosition(q.getId(), 1);
-
-		final JobInstance tmp = emf.createEntityManager()
-		        .createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job", JobInstance.class)
-		        .setParameter("job", this.jd.getId()).getSingleResult();
-
+		final JobInstance tmp = Dispatcher.getEm().find(JobInstance.class, i);
 		Assert.assertEquals(1, (int) tmp.getPosition());
-
 	}
 
 	@Test

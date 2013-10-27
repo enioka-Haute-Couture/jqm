@@ -27,6 +27,7 @@ public class TestPersistence
 		n.setListeningInterface("localhost");
 		n.setPort(1234);
 		n.setDlRepo("/Temp/");
+		n.setRepo("/tmp");
 
 		em.persist(n);
 
