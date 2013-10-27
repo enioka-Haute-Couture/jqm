@@ -27,8 +27,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Entity
+@Table(name="JndiObjectResourceParameter")
 public class JndiObjectResourceParameter implements Serializable
 {
 	private static final long serialVersionUID = -8023896508793524111L;

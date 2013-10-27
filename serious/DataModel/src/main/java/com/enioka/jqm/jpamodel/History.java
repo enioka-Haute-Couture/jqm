@@ -24,7 +24,6 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -34,40 +33,44 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
-@Embeddable
-public class History implements Serializable{
-
-	/**
-	 *
-	 */
+@Table(name = "History")
+public class History implements Serializable
+{
 	private static final long serialVersionUID = -5249529794213078668L;
-	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-	@Column(nullable=true)
+	@Column(nullable = false)
 	private Integer returnedValue;
+	@Temporal(TemporalType.DATE)
 	private Calendar jobDate;
 	private Integer jobDefId;
 	private Integer sessionId;
-	@ManyToOne(fetch=FetchType.EAGER, targetEntity=com.enioka.jqm.jpamodel.Queue.class)
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Queue.class)
 	private Queue queue;
-	@Column(length=1000)
+	@Column(length = 1000)
 	private String msg;
-	@OneToMany(fetch=FetchType.EAGER, targetEntity=com.enioka.jqm.jpamodel.Message.class, cascade=CascadeType.ALL, mappedBy="history")
+	@OneToMany(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Message.class, cascade = CascadeType.ALL, mappedBy = "history")
 	private List<Message> messages;
-	@OneToOne(fetch=FetchType.LAZY, targetEntity=com.enioka.jqm.jpamodel.JobInstance.class)
+	@OneToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.JobInstance.class)
 	private JobInstance jobInstance;
+	@Temporal(TemporalType.DATE)
 	private Calendar enqueueDate;
+	@Temporal(TemporalType.DATE)
 	private Calendar executionDate;
+	@Temporal(TemporalType.DATE)
 	private Calendar endDate;
 	private String userName;
-	@ManyToOne(fetch=FetchType.EAGER, targetEntity=com.enioka.jqm.jpamodel.Node.class)
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Node.class)
 	private Node node;
-	@OneToMany(orphanRemoval=true)
-	@JoinColumn(name="history_parameter")
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)
+	@JoinColumn(name = "history_id")
 	private List<JobHistoryParameter> parameters;
-
 
 	public Integer getId()
 	{
@@ -78,6 +81,7 @@ public class History implements Serializable{
 	{
 		this.id = id;
 	}
+
 	/**
 	 * @return the returnedValue
 	 */
@@ -85,13 +89,16 @@ public class History implements Serializable{
 	{
 		return returnedValue;
 	}
+
 	/**
-	 * @param returnedValue the returnedValue to set
+	 * @param returnedValue
+	 *            the returnedValue to set
 	 */
 	public void setReturnedValue(final Integer returnedValue)
 	{
 		this.returnedValue = returnedValue;
 	}
+
 	/**
 	 * @return the jobDate
 	 */
@@ -99,13 +106,16 @@ public class History implements Serializable{
 	{
 		return jobDate;
 	}
+
 	/**
-	 * @param jobDate the jobDate to set
+	 * @param jobDate
+	 *            the jobDate to set
 	 */
 	public void setJobDate(final Calendar jobDate)
 	{
 		this.jobDate = jobDate;
 	}
+
 	/**
 	 * @return the msg
 	 */
@@ -113,8 +123,10 @@ public class History implements Serializable{
 	{
 		return msg;
 	}
+
 	/**
-	 * @param msg the msg to set
+	 * @param msg
+	 *            the msg to set
 	 */
 	public void setMsg(final String msg)
 	{
@@ -161,26 +173,20 @@ public class History implements Serializable{
 		this.endDate = endDate;
 	}
 
-
-	public List<JobHistoryParameter> getParameters() {
+	public List<JobHistoryParameter> getParameters()
+	{
 
 		return parameters;
 	}
 
-
-	public void setParameters(final List<JobHistoryParameter> parameters) {
-
-		this.parameters = parameters;
-	}
-
-
-	public List<Message> getMessages() {
+	public List<Message> getMessages()
+	{
 
 		return messages;
 	}
 
-
-	public void setMessages(final List<Message> messages) {
+	public void setMessages(final List<Message> messages)
+	{
 
 		this.messages = messages;
 	}
@@ -233,5 +239,12 @@ public class History implements Serializable{
 	public void setSessionId(final Integer sessionId)
 	{
 		this.sessionId = sessionId;
+
+	}
+
+	public void setParameters(List<JobHistoryParameter> parameters)
+	{
+
+		this.parameters = parameters;
 	}
 }

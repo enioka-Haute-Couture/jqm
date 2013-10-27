@@ -19,48 +19,58 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 /**
- *
+ * 
  * @author pierre.coppee
  */
 
 @Entity
-public class Queue implements Serializable{
-
-	/**
-	 *
-	 */
+@Table(name = "Queue")
+public class Queue implements Serializable
+{
 	private static final long serialVersionUID = 4677042929807285233L;
-	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
-	@Column(nullable=false, length=50)
+	@Column(nullable = false, length = 50)
 	private String name;
-	@Column(nullable=false, length=1000)
+	@Column(nullable = false, length = 1000)
 	private String description;
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private Integer maxTempInQueue;
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private Integer maxTempRunning;
 	private boolean defaultQueue;
 
+	@OneToMany(mappedBy="queue", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<JobDef> jobdefs = new ArrayList<JobDef>();
 
-	public String getName() {
+	public String getName()
+	{
 		return name;
 	}
 
-	public String getDescription() {
+	public String getDescription()
+	{
 		return description;
 	}
+
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
 	public void setName(final String name)
 	{
@@ -68,12 +78,14 @@ public class Queue implements Serializable{
 	}
 
 	/**
-	 * @param description the description to set
+	 * @param description
+	 *            the description to set
 	 */
 	public void setDescription(final String description)
 	{
 		this.description = description;
 	}
+
 	public int getId()
 	{
 		return id;

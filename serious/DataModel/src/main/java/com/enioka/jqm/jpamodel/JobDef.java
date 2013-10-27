@@ -19,10 +19,11 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -31,50 +32,50 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-
+import javax.persistence.Table;
 
 /**
- *
+ * 
  * @author pierre.coppee
  */
 @Entity
-@Embeddable
-public class JobDef implements Serializable{
-
-	/**
-	 *
-	 */
+@Table(name = "JobDef")
+public class JobDef implements Serializable
+{
 	private static final long serialVersionUID = -3276834475433922990L;
 
-	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	public Integer id;
 	public boolean canBeRestarted = true;
-	@Column(nullable=false, length=100)
+	@Column(nullable = false, length = 100)
 	public String javaClassName;
-	@Column(length=1000)
+	@Column(length = 1000)
 	public String filePath;
-	@ManyToOne(optional=false)
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "queue_id", nullable = false)
 	public Queue queue;
 	public Integer maxTimeRunning;
-	@Column(nullable=false, unique=true)
+	@Column(nullable = false, unique = true)
 	public String applicationName;
-	@Column(length=50)
+	@Column(length = 50)
+	public Integer sessionID;
+	@Column(length = 50)
 	public String application;
-	@Column(length=50)
+	@Column(length = 50)
 	public String module;
-	@Column(length=50)
+	@Column(length = 50)
 	public String other1;
-	@Column(length=50)
+	@Column(length = 50)
 	public String other2;
-	@Column(length=50)
+	@Column(length = 50)
 	public String other3;
 	public boolean highlander = false;
 	@Column
 	private String jarPath;
-	@OneToMany(orphanRemoval=true, fetch=FetchType.EAGER)
-	@JoinColumn(name="PARAMETERS")
-	private List<JobDefParameter> parameters;
-
+	@OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "JobDefId")
+	private List<JobDefParameter> parameters = new ArrayList<JobDefParameter>();
 
 	public Integer getId()
 	{
@@ -201,24 +202,24 @@ public class JobDef implements Serializable{
 		this.filePath = filePath;
 	}
 
-
-	public String getJarPath() {
+	public String getJarPath()
+	{
 
 		return jarPath;
 	}
 
-	public void setJarPath(final String jarPath) {
-
+	public void setJarPath(final String jarPath)
+	{
 		this.jarPath = jarPath;
 	}
 
-	public List<JobDefParameter> getParameters() {
-
+	public List<JobDefParameter> getParameters()
+	{
 		return parameters;
 	}
 
-	public void setParameters(final List<JobDefParameter> parameters) {
-
+	public void setParameters(final List<JobDefParameter> parameters)
+	{
 		this.parameters = parameters;
 	}
 }

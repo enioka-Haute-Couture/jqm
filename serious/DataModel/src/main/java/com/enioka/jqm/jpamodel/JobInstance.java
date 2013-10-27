@@ -21,6 +21,7 @@ package com.enioka.jqm.jpamodel;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -30,6 +31,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 
 /**
@@ -37,6 +39,7 @@ import javax.persistence.OneToMany;
  * @author pierre.coppee
  */
 @Entity
+@Table(name="JobInstance")
 public class JobInstance implements Comparable<JobInstance>, Serializable{
 
 	/**
@@ -50,16 +53,16 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
 	@ManyToOne(fetch=FetchType.LAZY)
 	public JobInstance parent;
 	@Column(length = 50, name = "username")
-	private String userName;
-	private Integer sessionID;
-	@Column(nullable=false, length=50)
-	private String state;
-	private Integer position;
-	@ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Queue.class, fetch=FetchType.EAGER)
-	private Queue queue;
-	@ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Node.class, fetch=FetchType.EAGER)
-	private Node node;
-	@OneToMany(orphanRemoval=true, fetch=FetchType.EAGER)
+    private String userName;
+    private Integer sessionID;
+    @Column(nullable=false, length=50)
+    private String state;
+    private Integer position;
+    @ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Queue.class, fetch=FetchType.EAGER)
+    private Queue queue;
+    @ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Node.class, fetch=FetchType.EAGER)
+    private Node node;
+    @OneToMany(orphanRemoval=true, fetch=FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name="job_parameter")
 	private List<JobParameter> parameters;
 
