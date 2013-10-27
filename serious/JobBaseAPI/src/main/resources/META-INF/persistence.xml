@@ -8,28 +8,15 @@
 		<!-- Hibernate is our only persistence provider in the engine -->
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 
-		<class>com.enioka.jqm.jpamodel.JobInstance</class>
-		<class>com.enioka.jqm.jpamodel.Deliverable</class>
-		<class>com.enioka.jqm.jpamodel.ExecParameter</class>
-		<class>com.enioka.jqm.jpamodel.History</class>
-		<class>com.enioka.jqm.jpamodel.JobDef</class>
-		<class>com.enioka.jqm.jpamodel.JobParameter</class>
-		<class>com.enioka.jqm.jpamodel.Message</class>
-		<class>com.enioka.jqm.jpamodel.DeploymentParameter</class>
-		<class>com.enioka.jqm.jpamodel.Node</class>
-		<class>com.enioka.jqm.jpamodel.Queue</class>
-		<class>com.enioka.jqm.jpamodel.JobDefParameter</class>
-		<class>com.enioka.jqm.jpamodel.JobHistoryParameter</class>
-		<class>com.enioka.jqm.jpamodel.DatabaseProp</class>
-		<class>com.enioka.jqm.jpamodel.JndiObjectResource</class>
-		<class>com.enioka.jqm.jpamodel.JndiObjectResourceParameter</class>
+		<jar-file>./lib/jqm-model-0.0.1-SNAPSHOT.jar</jar-file>
 
 		<properties>
 			<property name="javax.persistence.validation.mode" value="none" />
 			<!--<property name="hibernate.show_sql" value="true" /> <property name="hibernate.format_sql" 
 				value="true" /> -->
 
-			<!-- Configuration de la BDD -->
+			<!-- Database default configuration (see db.properties for overriding 
+				these values) -->
 			<property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />
 			<property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:hsql://localhost/testdb" />
 			<property name="javax.persistence.jdbc.user" value="SA" />

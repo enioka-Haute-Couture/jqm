@@ -24,17 +24,15 @@
 		<class>com.enioka.jqm.jpamodel.JndiObjectResourceParameter</class>
 
 		<properties>
-			<property name="javax.persistence.validation.mode" value="none" />
 			<!--<property name="hibernate.show_sql" value="true" /> <property name="hibernate.format_sql" 
 				value="true" /> -->
 
-			<!-- Configuration de la BDD -->
+			<!-- Configuration de la BDD de test -->
 			<property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />
 			<property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:testdb" />
 			<property name="javax.persistence.jdbc.user" value="SA" />
 			<property name="javax.persistence.jdbc.password" value="" />
 			<property name="hibernate.hbm2ddl.auto" value="update" />
-
 		</properties>
 	</persistence-unit>
 </persistence>
