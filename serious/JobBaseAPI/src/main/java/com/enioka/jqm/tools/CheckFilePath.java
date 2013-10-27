@@ -9,7 +9,8 @@ public class CheckFilePath
 
 	public boolean IsValidFilePath(String fp)
 	{
-		return (fp.endsWith("/"));
+		Integer length = fp.length();
+		return (fp.charAt(length - 1) == '/');
 
 	}
 

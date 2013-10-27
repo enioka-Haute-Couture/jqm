@@ -77,10 +77,9 @@ class Loader implements Runnable
 			// ---------------- BEGIN: MAVEN DEPENDENCIES ------------------
 			CheckFilePath cfp = new CheckFilePath();
 			File local = new File(System.getProperty("user.home") + "/.m2/repository");
-			File jar = new File(cfp.FixFilePath(job.getJd().getJarPath()));
+			File jar = new File(job.getJd().getJarPath());
 			URL jars = jar.toURI().toURL();
-			jqmlogger.debug("Loader will try to launch jar " + cfp.FixFilePath(job.getJd().getJarPath()) + " - "
-					+ cfp.FixFilePath(job.getJd().getJavaClassName()));
+			jqmlogger.debug("Loader will try to launch jar " + job.getJd().getJarPath() + " - " + job.getJd().getJavaClassName());
 			ArrayList<URL> tmp = new ArrayList<URL>();
 			Collection<Artifact> deps = null;
 
@@ -114,7 +113,7 @@ class Loader implements Runnable
 			boolean isInCache = true;
 			if (!cache.containsKey(job.getJd().getApplicationName()))
 			{
-				Dependencies dependencies = new Dependencies(job.getJd().getFilePath() + "pom.xml");
+				Dependencies dependencies = new Dependencies(cfp.FixFilePath(job.getJd().getFilePath()) + "pom.xml");
 
 				isInCache = false;
 				Collection<RemoteRepository> remotes = Arrays.asList(new RemoteRepository("maven-central", "default",
