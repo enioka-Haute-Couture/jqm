@@ -1,3 +1,20 @@
+/**
+ * Copyright © 2013 enioka. All rights reserved
+ * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
+ * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.enioka.jqm.deliverabletools;
 
@@ -8,15 +25,14 @@ import java.security.NoSuchAlgorithmException;
 
 public class Cryptonite {
 
-	public static String sha1(String input) throws NoSuchAlgorithmException {
+	public static String sha1(final String input) throws NoSuchAlgorithmException {
 
-		MessageDigest mDigest = MessageDigest.getInstance("SHA1");
-		byte[] result = mDigest.digest(input.getBytes());
-		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < result.length; i++) {
+		final MessageDigest mDigest = MessageDigest.getInstance("SHA1");
+		final byte[] result = mDigest.digest(input.getBytes());
+		final StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < result.length; i++)
 			sb.append(Integer.toString((result[i] & 0xff) + 0x100, 16)
-			        .substring(1));
-		}
+					.substring(1));
 
 		return sb.toString();
 	}
@@ -33,28 +49,27 @@ public class Cryptonite {
 	 * @throws NoSuchAlgorithmException
 	 * @throws IOException
 	 */
-	public static boolean verifyChecksum(String file, String testChecksum)
-	        throws NoSuchAlgorithmException, IOException {
+	public static boolean verifyChecksum(final String file, final String testChecksum)
+			throws NoSuchAlgorithmException, IOException {
 
-		MessageDigest sha1 = MessageDigest.getInstance("SHA1");
+		final MessageDigest sha1 = MessageDigest.getInstance("SHA1");
 		@SuppressWarnings("resource")
+		final
 		FileInputStream fis = new FileInputStream(file);
 
-		byte[] data = new byte[1024];
+		final byte[] data = new byte[1024];
 		int read = 0;
-		while ((read = fis.read(data)) != -1) {
+		while ((read = fis.read(data)) != -1)
 			sha1.update(data, 0, read);
-		}
 		;
-		byte[] hashBytes = sha1.digest();
+		final byte[] hashBytes = sha1.digest();
 
-		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < hashBytes.length; i++) {
+		final StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < hashBytes.length; i++)
 			sb.append(Integer.toString((hashBytes[i] & 0xff) + 0x100, 16)
-			        .substring(1));
-		}
+					.substring(1));
 
-		String fileHash = sb.toString();
+		final String fileHash = sb.toString();
 
 		return fileHash.equals(testChecksum);
 	}

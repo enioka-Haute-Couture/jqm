@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2013 enioka. All rights reserved
+ * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
+ * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.enioka.jqm.tools;
 
 import java.util.ArrayList;
@@ -10,7 +28,6 @@ import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.tools.CreationTools;
 
 public class TestHelpers
 {
@@ -39,11 +56,11 @@ public class TestHelpers
 		TestHelpers.qNormal3 = CreationTools.initQueue("NormalQueue3", "Queue for the ordinary job3", 7, 100, em);
 		TestHelpers.qSlow3 = CreationTools.initQueue("SlowQueue3", "Queue for the bad guys3", 3, 100, em);
 
-		TestHelpers.node = CreationTools.createNode("localhost", 8081, "./testprojects/jqm-test-deliverable/", em);
-		TestHelpers.node2 = CreationTools.createNode("localhost2", 8082, "./testprojects/jqm-test-deliverable/", em);
-		TestHelpers.node3 = CreationTools.createNode("localhost3", 8083, "./testprojects/jqm-test-deliverable/", em);
-		TestHelpers.nodeMix = CreationTools.createNode("localhost4", 8084, "./testprojects/jqm-test-deliverable/", em);
-		TestHelpers.nodeMix2 = CreationTools.createNode("localhost5", 8085, "./testprojects/jqm-test-deliverable/", em);
+		TestHelpers.node = CreationTools.createNode("localhost", 8081, "./testprojects/jqm-test-deliverable/", "./testprojects", em);
+		TestHelpers.node2 = CreationTools.createNode("localhost2", 8082, "./testprojects/jqm-test-deliverable/", "./testprojects", em);
+		TestHelpers.node3 = CreationTools.createNode("localhost3", 8083, "./testprojects/jqm-test-deliverable/", "./testprojects", em);
+		TestHelpers.nodeMix = CreationTools.createNode("localhost4", 8084, "./testprojects/jqm-test-deliverable/", "./testprojects", em);
+		TestHelpers.nodeMix2 = CreationTools.createNode("localhost5", 8085, "./testprojects/jqm-test-deliverable/", "./testprojects", em);
 
 		TestHelpers.dpVip = CreationTools.createDeploymentParameter(1, node, 3, 1, qVip, em);
 		TestHelpers.dpVipMix = CreationTools.createDeploymentParameter(2, nodeMix, 3, 1, qVip, em);

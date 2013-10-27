@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2013 enioka. All rights reserved
+ * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
+ * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.enioka.jqm.jpamodel;
 
 import javax.persistence.Column;
@@ -17,75 +35,75 @@ public class Deliverable {
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	protected Integer id;
 	@Column(length=1000)
-    protected String filePath;
+	protected String filePath;
 	@Column(length=1000)
-    protected String fileName;
+	protected String fileName;
 	@Column(length=1000)
-    protected String fileFamily;
+	protected String fileFamily;
 	@Column
 	private Integer jobId;
 	private String HashPath;
 
 
 
-    public String getFileFamily() {
-        return fileFamily;
-    }
+	public String getFileFamily() {
+		return fileFamily;
+	}
 
 	/**
 	 * @param fileFamily the fileFamily to set
 	 */
-	public void setFileFamily(String fileFamily)
+	public void setFileFamily(final String fileFamily)
 	{
 		this.fileFamily = fileFamily;
 	}
 
 
-    public Integer getJobId() {
+	public Integer getJobId() {
 
-    	return jobId;
-    }
-
-
-    public void setJobId(Integer jobId) {
-
-    	this.jobId = jobId;
-    }
+		return jobId;
+	}
 
 
-    public String getFilePath() {
+	public void setJobId(final Integer jobId) {
 
-    	return filePath;
-    }
-
-
-    public void setFilePath(String filePath) {
-
-    	this.filePath = filePath;
-    }
+		this.jobId = jobId;
+	}
 
 
-    public String getHashPath() {
+	public String getFilePath() {
 
-    	return HashPath;
-    }
-
-
-    public void setHashPath(String hashPath) {
-
-    	HashPath = hashPath;
-    }
+		return filePath;
+	}
 
 
-    public String getFileName() {
+	public void setFilePath(final String filePath) {
 
-    	return fileName;
-    }
+		this.filePath = filePath;
+	}
 
 
-    public void setFileName(String fileName) {
+	public String getHashPath() {
 
-    	this.fileName = fileName;
-    }
+		return HashPath;
+	}
+
+
+	public void setHashPath(final String hashPath) {
+
+		HashPath = hashPath;
+	}
+
+
+	public String getFileName() {
+
+		return fileName;
+	}
+
+
+	public void setFileName(final String fileName) {
+
+		this.fileName = fileName;
+	}
 
 }

@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2013 enioka. All rights reserved
+ * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
+ * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
@@ -22,46 +40,46 @@ import javax.persistence.OneToMany;
 public class JobInstance implements Comparable<JobInstance>, Serializable{
 
 	/**
-     *
-     */
-    private static final long serialVersionUID = -7710486847228806301L;
+	 *
+	 */
+	private static final long serialVersionUID = -7710486847228806301L;
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
-    private Integer id;
+	private Integer id;
 	@ManyToOne(fetch=FetchType.LAZY)
 	private JobDef jd;
 	@ManyToOne(fetch=FetchType.LAZY)
 	public JobInstance parent;
 	@Column(length = 50, name = "username")
-    private String userName;
-    private Integer sessionID;
-    @Column(nullable=false, length=50)
-    private String state;
-    private Integer position;
-    @ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Queue.class, fetch=FetchType.EAGER)
-    private Queue queue;
-    @ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Node.class, fetch=FetchType.EAGER)
-    private Node node;
-    @OneToMany(orphanRemoval=true, fetch=FetchType.EAGER)
+	private String userName;
+	private Integer sessionID;
+	@Column(nullable=false, length=50)
+	private String state;
+	private Integer position;
+	@ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Queue.class, fetch=FetchType.EAGER)
+	private Queue queue;
+	@ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Node.class, fetch=FetchType.EAGER)
+	private Node node;
+	@OneToMany(orphanRemoval=true, fetch=FetchType.EAGER)
 	@JoinColumn(name="job_parameter")
-    private List<JobParameter> parameters;
+	private List<JobParameter> parameters;
 
-    public int getId() {
-        return id;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public String getUserName() {
-        return userName;
-    }
+	public String getUserName() {
+		return userName;
+	}
 
-    public int getSessionID() {
-        return sessionID;
-    }
-    public JobDef getJd()
+	public int getSessionID() {
+		return sessionID;
+	}
+	public JobDef getJd()
 	{
 		return jd;
 	}
 
-	public void setJd(JobDef jd)
+	public void setJd(final JobDef jd)
 	{
 		this.jd = jd;
 	}
@@ -71,7 +89,7 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
 		return state;
 	}
 
-	public void setState(String state)
+	public void setState(final String state)
 	{
 		this.state = state;
 	}
@@ -81,17 +99,17 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
 		return position;
 	}
 
-	public void setPosition(Integer position)
+	public void setPosition(final Integer position)
 	{
 		this.position = position;
 	}
 
-	public void setUserName(String user)
+	public void setUserName(final String user)
 	{
 		this.userName = user;
 	}
 
-	public void setSessionID(Integer sessionID)
+	public void setSessionID(final Integer sessionID)
 	{
 		this.sessionID = sessionID;
 	}
@@ -101,51 +119,51 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
 		return parent;
 	}
 
-	public void setParent(JobInstance parent)
+	public void setParent(final JobInstance parent)
 	{
 		this.parent = parent;
 	}
 
 	@Override
-    public int compareTo(JobInstance arg0) {
+	public int compareTo(final JobInstance arg0) {
 
-		int nb1 = arg0.getPosition();
-	      int nb2 = this.getPosition();
-	      if (nb1 > nb2)  return -1;
-	      else if(nb1 == nb2) return 0;
-	      else return 1;
-    }
-
-
-    public Queue getQueue() {
-
-    	return queue;
-    }
+		final int nb1 = arg0.getPosition();
+		final int nb2 = this.getPosition();
+		if (nb1 > nb2)  return -1;
+		else if(nb1 == nb2) return 0;
+		else return 1;
+	}
 
 
-    public void setQueue(Queue queue) {
+	public Queue getQueue() {
 
-    	this.queue = queue;
-    }
-
-
-    public List<JobParameter> getParameters() {
-
-    	return parameters;
-    }
+		return queue;
+	}
 
 
-    public void setParameters(List<JobParameter> parameters) {
+	public void setQueue(final Queue queue) {
 
-    	this.parameters = parameters;
-    }
+		this.queue = queue;
+	}
+
+
+	public List<JobParameter> getParameters() {
+
+		return parameters;
+	}
+
+
+	public void setParameters(final List<JobParameter> parameters) {
+
+		this.parameters = parameters;
+	}
 
 	public Node getNode()
 	{
 		return node;
 	}
 
-	public void setNode(Node node)
+	public void setNode(final Node node)
 	{
 		this.node = node;
 	}

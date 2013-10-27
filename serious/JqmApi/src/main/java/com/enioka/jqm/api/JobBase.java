@@ -1,5 +1,3 @@
-package com.enioka.jqm.api;
-
 /**
  * Copyright © 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
@@ -17,6 +15,9 @@ package com.enioka.jqm.api;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package com.enioka.jqm.api;
+
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -52,17 +53,17 @@ public class JobBase {
 
 	}
 
-	public void addDeliverable(String path, String fileName, String fileLabel) {
+	public void addDeliverable(final String path, final String fileName, final String fileLabel) {
 		try
 		{
 			this.sha1s.add(new DeliverableStruct(path, fileName, Cryptonite.sha1(path + fileName), fileLabel));
-		} catch (NoSuchAlgorithmException e) {
+		} catch (final NoSuchAlgorithmException e) {
 
 			e.printStackTrace();
 		}
 	}
 
-	public void sendMsg(String msg) {
+	public void sendMsg(final String msg) {
 
 	}
 
@@ -73,7 +74,7 @@ public class JobBase {
 		return parentID;
 	}
 
-	public void setParentID(int parentID) {
+	public void setParentID(final int parentID) {
 
 		this.parentID = parentID;
 	}
@@ -83,7 +84,7 @@ public class JobBase {
 		return canBeRestart;
 	}
 
-	public void setCanBeRestart(int canBeRestart) {
+	public void setCanBeRestart(final int canBeRestart) {
 
 		this.canBeRestart = canBeRestart;
 	}
@@ -93,7 +94,7 @@ public class JobBase {
 		return applicationName;
 	}
 
-	public void setApplicationName(String applicationName) {
+	public void setApplicationName(final String applicationName) {
 
 		this.applicationName = applicationName;
 	}
@@ -103,7 +104,7 @@ public class JobBase {
 		return sessionID;
 	}
 
-	public void setSessionID(String sessionID) {
+	public void setSessionID(final String sessionID) {
 
 		this.sessionID = sessionID;
 	}
@@ -113,7 +114,7 @@ public class JobBase {
 		return application;
 	}
 
-	public void setApplication(String application) {
+	public void setApplication(final String application) {
 
 		this.application = application;
 	}
@@ -123,7 +124,7 @@ public class JobBase {
 		return module;
 	}
 
-	public void setModule(String module) {
+	public void setModule(final String module) {
 
 		this.module = module;
 	}
@@ -133,7 +134,7 @@ public class JobBase {
 		return other1;
 	}
 
-	public void setOther1(String other1) {
+	public void setOther1(final String other1) {
 
 		this.other1 = other1;
 	}
@@ -143,7 +144,7 @@ public class JobBase {
 		return other2;
 	}
 
-	public void setOther2(String other2) {
+	public void setOther2(final String other2) {
 
 		this.other2 = other2;
 	}
@@ -153,7 +154,7 @@ public class JobBase {
 		return other3;
 	}
 
-	public void setOther3(String other3) {
+	public void setOther3(final String other3) {
 
 		this.other3 = other3;
 	}
@@ -163,7 +164,7 @@ public class JobBase {
 		return sha1s;
 	}
 
-	public void setSha1s(ArrayList<DeliverableStruct> sha1s) {
+	public void setSha1s(final ArrayList<DeliverableStruct> sha1s) {
 
 		this.sha1s = sha1s;
 	}
@@ -173,7 +174,7 @@ public class JobBase {
 		return parameters;
 	}
 
-	public void setParameters(Map<String, String> parameters) {
+	public void setParameters(final Map<String, String> parameters) {
 
 		this.parameters = parameters;
 	}

@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2013 enioka. All rights reserved
+ * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
+ * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.enioka.jqm.tools;
 
 import java.io.File;
@@ -22,8 +40,6 @@ import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.tools.CreationTools;
-import com.enioka.jqm.tools.JqmEngine;
 
 public class JobBaseTest
 {
@@ -65,8 +81,8 @@ public class JobBaseTest
 		jdargs.add(jdp);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", 42,
-				"Franquin", "ModuleMachin", "other", "other", "other", true, em);
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
@@ -117,12 +133,12 @@ public class JobBaseTest
 		jdargs.add(jdp);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", 42,
-				"Franquin", "ModuleMachin", "other", "other", "other", true, em);
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
 
 		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "MarsuApplication2", 42,
-				"Franquin", "ModuleMachin", "other", "other", "other", false, em);
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "MarsuApplication2", "Franquin",
+				"ModuleMachin", "other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 		JobDefinition jj = new JobDefinition("MarsuApplication2", "MAG");
@@ -190,8 +206,8 @@ public class JobBaseTest
 		jdargs.add(jdp2);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
-				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "getDeliverables", 42, "Franquin",
-				"ModuleMachin", "other", "other", "other", false, em);
+				"jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "getDeliverables", "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("getDeliverables", "MAG");
 
@@ -216,11 +232,10 @@ public class JobBaseTest
 		TestHelpers.printJobInstanceTable();
 
 		Dispatcher.resetEM();
-		@SuppressWarnings("unused")
 		List<InputStream> tmp = Dispatcher.getDeliverables(ji.getId());
 		engine1.stop();
 		Assert.assertEquals(1, tmp.size());
-		
+
 		File res = new File("./testprojects/jqm-test-deliverable/JobGenADeliverableFamily/" + ji.getId() + "/jqm-test-deliverable.txt");
 		Assert.assertEquals(true, res.exists());
 		f.delete();
@@ -247,8 +262,8 @@ public class JobBaseTest
 		jdargs.add(jdp2);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
-				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication", 42, "Franquin",
-				"ModuleMachin", "other", "other", "other", false, em);
+				"jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication", "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "Franquin");
 
@@ -270,11 +285,10 @@ public class JobBaseTest
 				"JobGenADeliverable42.txt");
 
 		Dispatcher.resetEM();
-		@SuppressWarnings("unused")
 		InputStream tmp = Dispatcher.getOneDeliverable(d);
 		engine1.stop();
-		Assert.assertTrue(tmp.available() >0);
-		
+		Assert.assertTrue(tmp.available() > 0);
+
 		File res = new File("./testprojects/jqm-test-deliverable/JobGenADeliverableFamily/" + ji.getId() + "/JobGenADeliverable42.txt");
 
 		Assert.assertEquals(true, res.exists());
@@ -314,18 +328,18 @@ public class JobBaseTest
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
-				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication1", 42, "Franquin",
-				"ModuleMachin", "other", "other", "other", false, em);
+				"jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication1", "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs2, "./testprojects/jqm-test-deliverable/",
-				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication2", 42, "Franquin",
-				"ModuleMachin", "other", "other", "other", false, em);
+				"jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication2", "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven3 = CreationTools.createJobDef(true, "App", jdargs3, "./testprojects/jqm-test-deliverable/",
-				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication3", 42, "Franquin",
-				"ModuleMachin", "other", "other", "other", false, em);
+				"jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication3", "Franquin", "ModuleMachin",
+				"other", "other", "other", false, em);
 
 		JobDefinition j1 = new JobDefinition("MarsuApplication1", "Franquin");
 		JobDefinition j2 = new JobDefinition("MarsuApplication2", "Franquin");
@@ -375,8 +389,8 @@ public class JobBaseTest
 		jdargs.add(jdp);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", 42,
-				"Franquin", "ModuleMachin", "other", "other", "other", true, em);
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
@@ -434,8 +448,8 @@ public class JobBaseTest
 		jdargs.add(jdp);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", 42,
-				"Franquin", "ModuleMachin", "other", "other", "other", true, em);
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
 
 		ArrayList<JobDefParameter> jdargs2 = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp2 = CreationTools.createJobDefParameter("filepath", "./testprojects/jqm-test-deliverable/", em);
@@ -445,8 +459,8 @@ public class JobBaseTest
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
-				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "test", 42, "Franquin",
-				"ModuleMachin", "other", "other", "other", false, em);
+				"jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "test", "Franquin", "ModuleMachin", "other",
+				"other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 		JobDefinition j2 = new JobDefinition("test", "Toto");
@@ -515,18 +529,18 @@ public class JobBaseTest
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", 42,
-				"Franquin", "ModuleMachin", "other", "other", "other", true, em);
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "MarsuApplication2", 42,
-				"Franquin", "ModuleMachin", "other", "other", "other", true, em);
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "MarsuApplication2", "Franquin",
+				"ModuleMachin", "other", "other", "other", true, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd2 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
-				"./testprojects/jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qSlow, 42, "MarsuApplication3", 42,
-				"Franquin", "ModuleMachin", "other", "other", "other", true, em);
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qSlow, 42, "MarsuApplication3", "Franquin",
+				"ModuleMachin", "other", "other", "other", true, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 		JobDefinition jj = new JobDefinition("MarsuApplication2", "Franquin");
@@ -596,13 +610,13 @@ public class JobBaseTest
 		jdargs.add(jdp);
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
-				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication", 42, "Franquin",
-				"ModuleMachin", "other", "other", "other", true, em);
+				"jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication", "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-deliverable/",
-				"./testprojects/jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qNormal, 42, "MarsuApplication2", 42,
-				"Franquin", "ModuleMachin", "other", "other", "other", true, em);
+				"jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qNormal, 42, "MarsuApplication2", "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 		j.addParameter("filepath", "./testprojects/jqm-test-deliverable/");
@@ -644,5 +658,47 @@ public class JobBaseTest
 		}
 		f.delete();
 		ff.delete();
+	}
+
+	@Test
+	public void testPomError() throws Exception
+	{
+		jqmlogger.debug("Starting test testPomError");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/",
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
+
+		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven",
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication2", "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+		JobDefinition jj = new JobDefinition("MarsuApplication2", "MAG");
+
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(jj);
+
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+
+		Thread.sleep(3000);
+		engine1.stop();
+
+		JobInstance ji1 = Helpers.getNewEm().createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :myId", JobInstance.class)
+				.setParameter("myId", jdDemoMaven.getId()).getSingleResult();
+
+		JobInstance ji2 = Helpers.getNewEm().createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :myId", JobInstance.class)
+				.setParameter("myId", jdDemoMaven2.getId()).getSingleResult();
+
+		Assert.assertEquals("CRASHED", ji1.getState());
+		Assert.assertEquals("ENDED", ji2.getState());
 	}
 }

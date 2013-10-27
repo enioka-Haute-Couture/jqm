@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2013 enioka. All rights reserved
+ * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
+ * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.enioka.jqm.api;
 
 import java.util.HashMap;
@@ -15,147 +33,147 @@ public class JobDefinition {
 	public String other1;
 	public String other2;
 	public String other3;
-    public Map<String, String> parameters = new HashMap<String, String>();
+	public Map<String, String> parameters = new HashMap<String, String>();
 
-    public JobDefinition() {
+	public JobDefinition() {
 
-    }
+	}
 
-    public JobDefinition(String applicationName, String user) {
+	public JobDefinition(final String applicationName, final String user) {
 
-    	this.applicationName = applicationName;
-    	this.user = user;
-    }
+		this.applicationName = applicationName;
+		this.user = user;
+	}
 
-	public void addParameter(String key, String value) {
+	public void addParameter(final String key, final String value) {
 
 		parameters.put(key, value);
 	}
 
-	public void delParameter(String key) {
+	public void delParameter(final String key) {
 
 		parameters.remove(key);
 	}
 
 
-    public int getParentID() {
+	public int getParentID() {
 
-    	return parentID;
-    }
-
-
-    public void setParentID(int parentID) {
-
-    	this.parentID = parentID;
-    }
+		return parentID;
+	}
 
 
-    public String getApplicationName() {
+	public void setParentID(final int parentID) {
 
-    	return applicationName;
-    }
-
-
-    public void setApplicationName(String applicationName) {
-
-    	this.applicationName = applicationName;
-    }
+		this.parentID = parentID;
+	}
 
 
-    public Integer getSessionID() {
+	public String getApplicationName() {
 
-    	return sessionID;
-    }
-
-
-    public void setSessionID(Integer sessionID) {
-
-    	this.sessionID = sessionID;
-    }
+		return applicationName;
+	}
 
 
-    public String getApplication() {
+	public void setApplicationName(final String applicationName) {
 
-    	return application;
-    }
-
-
-    public void setApplication(String application) {
-
-    	this.application = application;
-    }
+		this.applicationName = applicationName;
+	}
 
 
-    public String getModule() {
+	public Integer getSessionID() {
 
-    	return module;
-    }
-
-
-    public void setModule(String module) {
-
-    	this.module = module;
-    }
+		return sessionID;
+	}
 
 
-    public String getOther1() {
+	public void setSessionID(final Integer sessionID) {
 
-    	return other1;
-    }
-
-
-    public void setOther1(String other1) {
-
-    	this.other1 = other1;
-    }
+		this.sessionID = sessionID;
+	}
 
 
-    public String getOther2() {
+	public String getApplication() {
 
-    	return other2;
-    }
-
-
-    public void setOther2(String other2) {
-
-    	this.other2 = other2;
-    }
+		return application;
+	}
 
 
-    public String getOther3() {
+	public void setApplication(final String application) {
 
-    	return other3;
-    }
-
-
-    public void setOther3(String other3) {
-
-    	this.other3 = other3;
-    }
+		this.application = application;
+	}
 
 
-    public Map<String, String> getParameters() {
+	public String getModule() {
 
-    	return parameters;
-    }
-
-
-    public void setParameters(Map<String, String> parameters) {
-
-    	this.parameters = parameters;
-    }
+		return module;
+	}
 
 
-    public String getUser() {
+	public void setModule(final String module) {
 
-    	return user;
-    }
+		this.module = module;
+	}
 
 
-    public void setUser(String user) {
+	public String getOther1() {
 
-    	this.user = user;
-    }
+		return other1;
+	}
+
+
+	public void setOther1(final String other1) {
+
+		this.other1 = other1;
+	}
+
+
+	public String getOther2() {
+
+		return other2;
+	}
+
+
+	public void setOther2(final String other2) {
+
+		this.other2 = other2;
+	}
+
+
+	public String getOther3() {
+
+		return other3;
+	}
+
+
+	public void setOther3(final String other3) {
+
+		this.other3 = other3;
+	}
+
+
+	public Map<String, String> getParameters() {
+
+		return parameters;
+	}
+
+
+	public void setParameters(final Map<String, String> parameters) {
+
+		this.parameters = parameters;
+	}
+
+
+	public String getUser() {
+
+		return user;
+	}
+
+
+	public void setUser(final String user) {
+
+		this.user = user;
+	}
 
 
 }

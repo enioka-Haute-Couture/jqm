@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2013 enioka. All rights reserved
+ * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
+ * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
@@ -52,7 +70,7 @@ public class JndiObjectResource implements Serializable
 		return id;
 	}
 
-	public void setId(int id)
+	public void setId(final int id)
 	{
 		this.id = id;
 	}
@@ -62,7 +80,7 @@ public class JndiObjectResource implements Serializable
 		return name;
 	}
 
-	public void setName(String name)
+	public void setName(final String name)
 	{
 		this.name = name;
 	}
@@ -72,7 +90,7 @@ public class JndiObjectResource implements Serializable
 		return auth;
 	}
 
-	public void setAuth(String auth)
+	public void setAuth(final String auth)
 	{
 		this.auth = auth;
 	}
@@ -82,7 +100,7 @@ public class JndiObjectResource implements Serializable
 		return type;
 	}
 
-	public void setType(String type)
+	public void setType(final String type)
 	{
 		this.type = type;
 	}
@@ -92,7 +110,7 @@ public class JndiObjectResource implements Serializable
 		return factory;
 	}
 
-	public void setFactory(String factory)
+	public void setFactory(final String factory)
 	{
 		this.factory = factory;
 	}
@@ -102,7 +120,7 @@ public class JndiObjectResource implements Serializable
 		return description;
 	}
 
-	public void setDescription(String description)
+	public void setDescription(final String description)
 	{
 		this.description = description;
 	}
@@ -112,7 +130,7 @@ public class JndiObjectResource implements Serializable
 		return parameters;
 	}
 
-	public void setParameters(Collection<JndiObjectResourceParameter> parameters)
+	public void setParameters(final Collection<JndiObjectResourceParameter> parameters)
 	{
 		this.parameters = parameters;
 	}

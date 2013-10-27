@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2013 enioka. All rights reserved
+ * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
+ * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.enioka.jqm.test;
 
 import java.io.File;
@@ -97,13 +115,13 @@ public class TestSuite {
 				"/Users/pico/Dropbox/projets/enioka/jqm/tests/PrintArg/target/PrintArg-0.0.1-SNAPSHOT.jar", qVip,
 				42, "MarsuApplication", "Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
-		this.jdDemoMaven = CreationTools.createJobDef(true, "DemoMavenClassName", null, "./testprojects/jqm-test-datetimemaven/", "", qNormal,
+		this.jdDemoMaven = CreationTools.createJobDef(true, "DemoMavenClassName", null, "jqm-test-datetimemaven/pom.xml", "", qNormal,
 				42, "MarsuApplication2", "Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
 		this.jdDemo = CreationTools.createJobDef(true, "DemoClassName", null, "./testprojects/jqm-test-datetimemaven/", "", qSlow,
 				42, "MarsuApplication3", "Franquin", "ModuleMachin", "other", "other", "other", true, em);
 
-		node = CreationTools.createNode("localhost", 8081, "../JobBaseAPI/testprojects/jqm-test-deliverable/", em);
+		node = CreationTools.createNode("localhost", 8081, "../JobBaseAPI/testprojects/jqm-test-deliverable/", "./testprojects/", em);
 
 		dp = CreationTools.createDeploymentParameter(1, node, 1, 5, qVip, em);
 		dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 500, qNormal, em);
@@ -115,15 +133,15 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication","MAG");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
+		final JobDefinition jd = new JobDefinition("MarsuApplication","MAG");
+		final JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		final JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jd);
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
 
-		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position",
+		final ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position",
 				JobInstance.class).getResultList();
 
 		Assert.assertEquals(jobs.size(), 3);
@@ -137,9 +155,9 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
+		final JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		final JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		final JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
@@ -161,9 +179,9 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
+		final JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		final JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		final JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
@@ -184,19 +202,19 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
+		final JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		final JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		final JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
 		Dispatcher.enQueue(jd);
 
-		JobInstance q = em.createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job", JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
+		final JobInstance q = em.createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job", JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
 		Dispatcher.delJobInQueue(this.jd.getId() + 3);
 
-		Query tmp = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job", JobInstance.class).setParameter("job", this.jd.getId());
+		final Query tmp = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job", JobInstance.class).setParameter("job", this.jd.getId());
 
 		Assert.assertEquals(false, tmp.equals(q));
 	}
@@ -206,20 +224,20 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
+		final JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		final JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		final JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
 		Dispatcher.enQueue(jd);
 
-		JobInstance q = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
+		final JobInstance q = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
 		Dispatcher.cancelJobInQueue(q.getId());
 
-		JobInstance tmp = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
+		final JobInstance tmp = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
 		Assert.assertEquals("CANCELLED", tmp.getState());
@@ -231,9 +249,9 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
+		final JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		final JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		final JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
@@ -241,12 +259,12 @@ public class TestSuite {
 		Dispatcher.enQueue(jd);
 		Dispatcher.enQueue(jd);
 
-		JobInstance q = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
+		final JobInstance q = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
 		Dispatcher.setPosition(q.getId(), 1);
 
-		JobInstance tmp = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
+		final JobInstance tmp = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
 		Assert.assertEquals(1, (int)tmp.getPosition());
@@ -258,25 +276,23 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
+		final JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		final JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		final JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
 		Dispatcher.enQueue(jd);
 
-		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) Dispatcher.getUserJobs("MAG");
+		final ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) Dispatcher.getUserJobs("MAG");
 
-		ArrayList<JobInstance> tmp = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j WHERE j.userName = :u",
+		final ArrayList<JobInstance> tmp = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j WHERE j.userName = :u",
 				JobInstance.class).setParameter("u", "MAG").getResultList();
 
 		Assert.assertEquals(tmp.size(), jobs.size());
 
-		for (int i = 0; i < jobs.size(); i++) {
-
+		for (int i = 0; i < jobs.size(); i++)
 			Assert.assertEquals(tmp.get(i).getId(), jobs.get(i).getId());
-        }
 	}
 
 	@Test
@@ -284,35 +300,29 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
+		final JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		final JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		final JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
 		Dispatcher.enQueue(jd);
 
-		ArrayList<com.enioka.jqm.api.JobInstance> jobs = (ArrayList<com.enioka.jqm.api.JobInstance>) Dispatcher.getJobs();
+		final ArrayList<com.enioka.jqm.api.JobInstance> jobs = (ArrayList<com.enioka.jqm.api.JobInstance>) Dispatcher.getJobs();
 
-		for (com.enioka.jqm.api.JobInstance jobInstance : jobs) {
-
+		for (final com.enioka.jqm.api.JobInstance jobInstance : jobs)
 			System.out.println("job: " + jobInstance.getId());
-        }
 
-		ArrayList<JobInstance> tmp = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j",
+		final ArrayList<JobInstance> tmp = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j",
 				JobInstance.class).getResultList();
 
-		for (JobInstance j : tmp) {
-
+		for (final JobInstance j : tmp)
 			System.out.println("jobInstance: " + j.getId());
-        }
 
 		Assert.assertEquals(tmp.size(), jobs.size());
 
-		for (int i = 0; i < jobs.size(); i++) {
-
+		for (int i = 0; i < jobs.size(); i++)
 			Assert.assertEquals(tmp.get(i).getId(), (int)jobs.get(i).getId());
-		}
 	}
 
 	@Test
@@ -320,25 +330,23 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
-		JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
-		JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
+		final JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		final JobDefinition jdDemoMaven = new JobDefinition("MarsuApplication2", "MAG");
+		final JobDefinition jdDemo = new JobDefinition("MarsuApplication3", "MAG");
 
 		Dispatcher.enQueue(jdDemoMaven);
 		Dispatcher.enQueue(jdDemo);
 		Dispatcher.enQueue(jd);
 
-		ArrayList<com.enioka.jqm.api.Queue> jobs = (ArrayList<com.enioka.jqm.api.Queue>) Dispatcher.getQueues();
+		final ArrayList<com.enioka.jqm.api.Queue> jobs = (ArrayList<com.enioka.jqm.api.Queue>) Dispatcher.getQueues();
 
-		ArrayList<Queue> tmp = (ArrayList<Queue>) em.createQuery("SELECT j FROM Queue j",
+		final ArrayList<Queue> tmp = (ArrayList<Queue>) em.createQuery("SELECT j FROM Queue j",
 				Queue.class).getResultList();
 
 		Assert.assertEquals(tmp.size(), jobs.size());
 
-		for (int i = 0; i < jobs.size(); i++) {
-
+		for (int i = 0; i < jobs.size(); i++)
 			Assert.assertEquals(tmp.get(i).getId(), jobs.get(i).getId());
-		}
 	}
 
 	//@Test
@@ -346,61 +354,62 @@ public class TestSuite {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		final JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
 
 		Dispatcher.enQueue(jd);
 
-		JobInstance job = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
+		final JobInstance job = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
-		File file = new File("/Users/pico/Downloads/tests/deliverable" + job.getId());
+		final File file = new File("/Users/pico/Downloads/tests/deliverable" + job.getId());
 
 		try {
 			System.out.println("TOTO");
 			Thread.sleep(2000);
-	        Dispatcher.getDeliverables(job.getId());
-        } catch (NoSuchAlgorithmException e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
-        } catch (IOException e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
-        } catch (InterruptedException e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
-        }
+			Dispatcher.getDeliverables(job.getId());
+		} catch (final NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (final InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		Assert.assertEquals(true, file.exists());
 
 	}
 
-//	@Test
+	//	@Test
 	public void testOverloadArgument() {
 
 		testInit();
 
-		JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
+		final JobDefinition jd = new JobDefinition("MarsuApplication", "MAG");
 		jd.addParameter("key", "value");
 
 		Dispatcher.enQueue(jd);
 
-		JobInstance job = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
+		final JobInstance job = emf.createEntityManager().createQuery("SELECT j FROM JobInstance j, JobDef jd WHERE j.jd.id = :job",
 				JobInstance.class).setParameter("job", this.jd.getId()).getSingleResult();
 
-        Query q = emf.createEntityManager().createQuery(
+		final Query q = emf.createEntityManager().createQuery(
 				"SELECT j.parameters FROM JobInstance AS j WHERE j.id = :j")
 				.setParameter("j", job.getId());
 
-        @SuppressWarnings("unchecked")
-        List<JobParameter> res = q.getResultList();
+		@SuppressWarnings("unchecked")
+		final
+		List<JobParameter> res = q.getResultList();
 
 		Assert.assertEquals("key", res.get(0).getKey());
 		Assert.assertEquals("value", res.get(0).getValue());
 	}
 
-//	@Test
-//	public void testClose() {
-//
-//		CreationTools.close();
-//	}
+	//	@Test
+	//	public void testClose() {
+	//
+	//		CreationTools.close();
+	//	}
 }

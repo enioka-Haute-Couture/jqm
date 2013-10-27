@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2013 enioka. All rights reserved
+ * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
+ * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
@@ -22,9 +40,9 @@ import javax.persistence.OneToOne;
 public class History implements Serializable{
 
 	/**
-     *
-     */
-    private static final long serialVersionUID = -5249529794213078668L;
+	 *
+	 */
+	private static final long serialVersionUID = -5249529794213078668L;
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
 	@Column(nullable=true)
@@ -48,7 +66,7 @@ public class History implements Serializable{
 	private Node node;
 	@OneToMany(orphanRemoval=true)
 	@JoinColumn(name="history_parameter")
-    private List<JobHistoryParameter> parameters;
+	private List<JobHistoryParameter> parameters;
 
 
 	public Integer getId()
@@ -56,7 +74,7 @@ public class History implements Serializable{
 		return id;
 	}
 
-	public void setId(Integer id)
+	public void setId(final Integer id)
 	{
 		this.id = id;
 	}
@@ -70,7 +88,7 @@ public class History implements Serializable{
 	/**
 	 * @param returnedValue the returnedValue to set
 	 */
-	public void setReturnedValue(Integer returnedValue)
+	public void setReturnedValue(final Integer returnedValue)
 	{
 		this.returnedValue = returnedValue;
 	}
@@ -84,7 +102,7 @@ public class History implements Serializable{
 	/**
 	 * @param jobDate the jobDate to set
 	 */
-	public void setJobDate(Calendar jobDate)
+	public void setJobDate(final Calendar jobDate)
 	{
 		this.jobDate = jobDate;
 	}
@@ -98,7 +116,7 @@ public class History implements Serializable{
 	/**
 	 * @param msg the msg to set
 	 */
-	public void setMsg(String msg)
+	public void setMsg(final String msg)
 	{
 		this.msg = msg;
 	}
@@ -108,7 +126,7 @@ public class History implements Serializable{
 		return jobInstance;
 	}
 
-	public void setJobInstance(JobInstance jobInstance)
+	public void setJobInstance(final JobInstance jobInstance)
 	{
 		this.jobInstance = jobInstance;
 	}
@@ -118,7 +136,7 @@ public class History implements Serializable{
 		return enqueueDate;
 	}
 
-	public void setEnqueueDate(Calendar enqueueDate)
+	public void setEnqueueDate(final Calendar enqueueDate)
 	{
 		this.enqueueDate = enqueueDate;
 	}
@@ -128,7 +146,7 @@ public class History implements Serializable{
 		return executionDate;
 	}
 
-	public void setExecutionDate(Calendar executionDate)
+	public void setExecutionDate(final Calendar executionDate)
 	{
 		this.executionDate = executionDate;
 	}
@@ -138,41 +156,41 @@ public class History implements Serializable{
 		return endDate;
 	}
 
-	public void setEndDate(Calendar endDate)
+	public void setEndDate(final Calendar endDate)
 	{
 		this.endDate = endDate;
 	}
 
 
-    public List<JobHistoryParameter> getParameters() {
+	public List<JobHistoryParameter> getParameters() {
 
-    	return parameters;
-    }
-
-
-    public void setParameters(List<JobHistoryParameter> parameters) {
-
-    	this.parameters = parameters;
-    }
+		return parameters;
+	}
 
 
-    public List<Message> getMessages() {
+	public void setParameters(final List<JobHistoryParameter> parameters) {
 
-    	return messages;
-    }
+		this.parameters = parameters;
+	}
 
 
-    public void setMessages(List<Message> messages) {
+	public List<Message> getMessages() {
 
-    	this.messages = messages;
-    }
+		return messages;
+	}
+
+
+	public void setMessages(final List<Message> messages) {
+
+		this.messages = messages;
+	}
 
 	public Integer getJobDefId()
 	{
 		return jobDefId;
 	}
 
-	public void setJobDefId(Integer jobDefId)
+	public void setJobDefId(final Integer jobDefId)
 	{
 		this.jobDefId = jobDefId;
 	}
@@ -182,7 +200,7 @@ public class History implements Serializable{
 		return queue;
 	}
 
-	public void setQueue(Queue queue)
+	public void setQueue(final Queue queue)
 	{
 		this.queue = queue;
 	}
@@ -192,7 +210,7 @@ public class History implements Serializable{
 		return userName;
 	}
 
-	public void setUserName(String userName)
+	public void setUserName(final String userName)
 	{
 		this.userName = userName;
 	}
@@ -202,7 +220,7 @@ public class History implements Serializable{
 		return node;
 	}
 
-	public void setNode(Node node)
+	public void setNode(final Node node)
 	{
 		this.node = node;
 	}
@@ -212,7 +230,7 @@ public class History implements Serializable{
 		return sessionId;
 	}
 
-	public void setSessionId(Integer sessionId)
+	public void setSessionId(final Integer sessionId)
 	{
 		this.sessionId = sessionId;
 	}
