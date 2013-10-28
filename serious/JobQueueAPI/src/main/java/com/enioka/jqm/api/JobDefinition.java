@@ -39,18 +39,18 @@ public class JobDefinition {
 
 	}
 
-	public JobDefinition(final String applicationName, final String user) {
+	public JobDefinition(String applicationName, String user) {
 
 		this.applicationName = applicationName;
 		this.user = user;
 	}
 
-	public void addParameter(final String key, final String value) {
+	public void addParameter(String key, String value) {
 
 		parameters.put(key, value);
 	}
 
-	public void delParameter(final String key) {
+	public void delParameter(String key) {
 
 		parameters.remove(key);
 	}
@@ -62,7 +62,7 @@ public class JobDefinition {
 	}
 
 
-	public void setParentID(final int parentID) {
+	public void setParentID(int parentID) {
 
 		this.parentID = parentID;
 	}
@@ -74,7 +74,7 @@ public class JobDefinition {
 	}
 
 
-	public void setApplicationName(final String applicationName) {
+	public void setApplicationName(String applicationName) {
 
 		this.applicationName = applicationName;
 	}
@@ -86,7 +86,7 @@ public class JobDefinition {
 	}
 
 
-	public void setSessionID(final Integer sessionID) {
+	public void setSessionID(Integer sessionID) {
 
 		this.sessionID = sessionID;
 	}
@@ -98,7 +98,7 @@ public class JobDefinition {
 	}
 
 
-	public void setApplication(final String application) {
+	public void setApplication(String application) {
 
 		this.application = application;
 	}
@@ -110,7 +110,7 @@ public class JobDefinition {
 	}
 
 
-	public void setModule(final String module) {
+	public void setModule(String module) {
 
 		this.module = module;
 	}
@@ -122,7 +122,7 @@ public class JobDefinition {
 	}
 
 
-	public void setOther1(final String other1) {
+	public void setOther1(String other1) {
 
 		this.other1 = other1;
 	}
@@ -134,7 +134,7 @@ public class JobDefinition {
 	}
 
 
-	public void setOther2(final String other2) {
+	public void setOther2(String other2) {
 
 		this.other2 = other2;
 	}
@@ -146,7 +146,7 @@ public class JobDefinition {
 	}
 
 
-	public void setOther3(final String other3) {
+	public void setOther3(String other3) {
 
 		this.other3 = other3;
 	}
@@ -158,7 +158,7 @@ public class JobDefinition {
 	}
 
 
-	public void setParameters(final Map<String, String> parameters) {
+	public void setParameters(Map<String, String> parameters) {
 
 		this.parameters = parameters;
 	}
@@ -170,7 +170,7 @@ public class JobDefinition {
 	}
 
 
-	public void setUser(final String user) {
+	public void setUser(String user) {
 
 		this.user = user;
 	}

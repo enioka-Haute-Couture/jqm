@@ -40,7 +40,7 @@ public class JobInstance {
 		return id;
 	}
 
-	public void setId(final Integer id) {
+	public void setId(Integer id) {
 
 		this.id = id;
 	}
@@ -50,7 +50,7 @@ public class JobInstance {
 		return jd;
 	}
 
-	public void setJd(final JobDefinition jd) {
+	public void setJd(JobDefinition jd) {
 
 		this.jd = jd;
 	}
@@ -60,7 +60,7 @@ public class JobInstance {
 		return parent;
 	}
 
-	public void setParent(final Integer parent) {
+	public void setParent(Integer parent) {
 
 		this.parent = parent;
 	}
@@ -70,7 +70,7 @@ public class JobInstance {
 		return user;
 	}
 
-	public void setUser(final String user) {
+	public void setUser(String user) {
 
 		this.user = user;
 	}
@@ -80,7 +80,7 @@ public class JobInstance {
 		return sessionID;
 	}
 
-	public void setSessionID(final Integer sessionID) {
+	public void setSessionID(Integer sessionID) {
 
 		this.sessionID = sessionID;
 	}
@@ -90,7 +90,7 @@ public class JobInstance {
 		return state;
 	}
 
-	public void setState(final String state) {
+	public void setState(String state) {
 
 		this.state = state;
 	}
@@ -100,7 +100,7 @@ public class JobInstance {
 		return position;
 	}
 
-	public void setPosition(final Integer position) {
+	public void setPosition(Integer position) {
 
 		this.position = position;
 	}
@@ -110,7 +110,7 @@ public class JobInstance {
 		return queue;
 	}
 
-	public void setQueue(final Queue queue) {
+	public void setQueue(Queue queue) {
 
 		this.queue = queue;
 	}
@@ -120,7 +120,7 @@ public class JobInstance {
 		return parameters;
 	}
 
-	public void setParameters(final Map<String, String> parameters) {
+	public void setParameters(Map<String, String> parameters) {
 
 		this.parameters = parameters;
 	}

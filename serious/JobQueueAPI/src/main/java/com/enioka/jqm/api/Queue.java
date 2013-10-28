@@ -31,7 +31,7 @@ public class Queue {
 		return id;
 	}
 
-	public void setId(final int id) {
+	public void setId(int id) {
 
 		this.id = id;
 	}
@@ -41,7 +41,7 @@ public class Queue {
 		return name;
 	}
 
-	public void setName(final String name) {
+	public void setName(String name) {
 
 		this.name = name;
 	}
@@ -51,7 +51,7 @@ public class Queue {
 		return description;
 	}
 
-	public void setDescription(final String description) {
+	public void setDescription(String description) {
 
 		this.description = description;
 	}

@@ -25,7 +25,7 @@ public class DatabaseProp {
 	private String user;
 	private String pwd;
 
-	public DatabaseProp(final String url, final String user) {
+	public DatabaseProp(String url, String user) {
 
 		this.url = url;
 		this.user = user;
@@ -36,7 +36,7 @@ public class DatabaseProp {
 		return driver;
 	}
 
-	public void setDriver(final String driver) {
+	public void setDriver(String driver) {
 
 		this.driver = driver;
 	}
@@ -46,7 +46,7 @@ public class DatabaseProp {
 		return url;
 	}
 
-	public void setUrl(final String url) {
+	public void setUrl(String url) {
 
 		this.url = url;
 	}
@@ -56,7 +56,7 @@ public class DatabaseProp {
 		return user;
 	}
 
-	public void setUser(final String user) {
+	public void setUser(String user) {
 
 		this.user = user;
 	}
@@ -66,7 +66,7 @@ public class DatabaseProp {
 		return pwd;
 	}
 
-	public void setPwd(final String pwd) {
+	public void setPwd(String pwd) {
 
 		this.pwd = pwd;
 	}
