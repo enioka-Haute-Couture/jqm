@@ -63,7 +63,7 @@ import com.enioka.jqm.tools.CreationTools;
 public class Dispatcher
 {
 	private static Logger jqmlogger = Logger.getLogger(Dispatcher.class);
-	private static final String PERSISTENCE_UNIT = "jobqueue-api-pu";
+	private static String PERSISTENCE_UNIT = "jobqueue-api-pu";
 
 	private static EntityManagerFactory emf = null;
 
@@ -72,6 +72,7 @@ public class Dispatcher
 		if (emf != null)
 		{
 			emf.close();
+		}
 		emf = createFactory();
 	}
 
@@ -124,7 +125,7 @@ public class Dispatcher
 
 	// ----------------------------- JOBDEFINITIONTOJOBDEF --------------------------------------
 
-	private static JobDef jobDefinitionToJobDef(JobDefinition jd)
+	private static JobDef jobDefinitionToJobDef(JobDefinition jd, EntityManager em)
 	{
 		JobDef job = null;
 
@@ -223,17 +224,17 @@ public class Dispatcher
 
 			for (JobDefParameter i : jdef.getParameters())
 			{
-				res.add(CreationTools.createJobParameter(i.getKey(), i.getValue(), em));
+				res.add(CreationTools.createJobParameter(i.getKey(), i.getValue(), getEm()));
 			}
-
 			return res;
 		}
 		else if (!m.isEmpty() && !jdef.getParameters().isEmpty())
 		{
 			System.out.println("Parameters overriding");
+
 			for (JobDefParameter i : jdef.getParameters())
 			{
-				res.add(CreationTools.createJobParameter(i.getKey(), i.getValue(), em));
+				res.add(CreationTools.createJobParameter(i.getKey(), i.getValue(), getEm()));
 			}
 
 			for (int j = 0; j < res.size(); j++)
@@ -271,7 +272,7 @@ public class Dispatcher
 
 					if (j == res.size() - 1 && !present)
 					{
-						res.add(CreationTools.createJobParameter(key, value, em));
+						res.add(CreationTools.createJobParameter(key, value, getEm()));
 					}
 				}
 			}
@@ -304,7 +305,8 @@ public class Dispatcher
 	public static int enQueue(JobDefinition jd)
 	{
 		jqmlogger.debug("BEGINING ENQUEUE");
-		JobDef job = jobDefinitionToJobDef(jd);
+		EntityManager em = getEm();
+		JobDef job = jobDefinitionToJobDef(jd, em);
 		jqmlogger.debug("Job to enqueue is from JobDef " + job.getId());
 
 		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
@@ -313,33 +315,28 @@ public class Dispatcher
 
 		Integer p = em.createQuery("SELECT MAX (j.position) FROM JobInstance j " + "WHERE j.jd.queue.name = :queue", Integer.class)
 				.setParameter("queue", (job.getQueue().getName())).getSingleResult();
-
 		jqmlogger.debug("POSITION: " + p);
 
 		em.getTransaction().begin();
 
-		JobInstance ji = CreationTools.createJobInstance(job, overrideParameter(job, jd), jd.getUser(), 42, "SUBMITTED", (p == null) ? 1
-				: p + 1, job.queue, null, em);
+		JobInstance ji = CreationTools.createJobInstance(job, overrideParameter(job, jd), jd.getUser(), 42, "SUBMITTED",
+				(p == null) ? 1 : p + 1, job.queue, null, em);
 		jqmlogger.debug("JI recently created: " + ji.getId());
 
 		ArrayList<JobHistoryParameter> jhp = new ArrayList<JobHistoryParameter>();
 		ArrayList<Message> msgs = new ArrayList<Message>();
 
 		h = CreationTools.createhistory(1, (Calendar) null, job.getId(), 42, job.getQueue(), "History of the Job --> ID = " + (ji.getId()),
-		        msgs, ji, enqueueDate, (Calendar) null, (Calendar) null, jd.getUser(), null, jhp, em);
+				msgs, ji, enqueueDate, (Calendar) null, (Calendar) null, jd.getUser(), null, jhp, em);
 		jqmlogger.debug("History recently created: " + h.getId());
 
-		// Update status in the history table
-		// System.exit(0);
 		Query q = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", ji.getId());
 
 		if (!q.equals(null))
 		{
 			for (JobParameter j : ji.getParameters())
 			{
-
 				JobHistoryParameter jp = new JobHistoryParameter();
-
 				jp.setKey(j.getKey());
 				jp.setValue(j.getValue());
 
@@ -358,16 +355,15 @@ public class Dispatcher
 	{
 
 		return getJobInstance(getEm().createQuery("SELECT j FROM JobInstance j WHERE j.id = :job", JobInstance.class)
-		        .setParameter("job", idJob).getSingleResult());
+				.setParameter("job", idJob).getSingleResult());
 	}
 
 	// ----------------------------- DELJOBINQUEUE --------------------------------------
 
 	public static void delJobInQueue(int idJob)
 	{
-
+		EntityManager em = getEm();
 		EntityTransaction transac = em.getTransaction();
-		Logger jqmlogger = Logger.getLogger(Dispatcher.class);
 		Query q = null;
 
 		transac.begin();
@@ -394,28 +390,28 @@ public class Dispatcher
 
 	public static void cancelJobInQueue(int idJob)
 	{
-		Logger jqmlogger = Logger.getLogger(Dispatcher.class);
+		EntityManager em = getEm();
 		try
 		{
 			@SuppressWarnings("unused")
-
 			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", idJob)
 			.getSingleResult();
 
 			EntityTransaction transac = em.getTransaction();
 			transac.begin();
 
-			Query q = em.createQuery("UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob").setParameter("idJob", idJob);
+			Query q = em.createQuery("UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob").setParameter("idJob",
+					idJob);
 			int res = q.executeUpdate();
 
 			em.createQuery(
-			        "UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
-			                + "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)").setParameter("j", idJob)
-			        .setParameter("msg", "Status updated: CANCELLED").executeUpdate();
+					"UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
+							+ "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)").setParameter("j", idJob)
+							.setParameter("msg", "Status updated: CANCELLED").executeUpdate();
 
 			if (res != 1)
 			{
-				jqmlogger.info("CancelJobInQueueError: Job ID or Queue ID doesn't exists.");
+				jqmlogger.error("CancelJobInQueueError: Job ID or Queue ID doesn't exists.");
 			}
 
 			transac.commit();
@@ -458,8 +454,8 @@ public class Dispatcher
 
 	public static void setPosition(int idJob, int position)
 	{
-		Logger jqmlogger = Logger.getLogger(Dispatcher.class);
 		List<JobInstance> q = null;
+		EntityManager em = getEm();
 		EntityTransaction transac = em.getTransaction();
 		Query query = null;
 
@@ -471,18 +467,17 @@ public class Dispatcher
 		try
 		{
 			q = em.createQuery("SELECT j FROM JobInstance j WHERE j.state = :s " + "ORDER BY j.position", JobInstance.class)
-			        .setParameter("s", "SUBMITTED").getResultList();
+					.setParameter("s", "SUBMITTED").getResultList();
 
 			transac.begin();
 
 			query = em
-			        .createQuery(
-			                "UPDATE JobInstance j SET j.position = :pos WHERE "
-			                        + "j.id = (SELECT ji.id FROM JobInstance ji WHERE ji.id = :idJob)").setParameter("idJob", idJob)
-			        .setParameter("pos", position);
+					.createQuery(
+							"UPDATE JobInstance j SET j.position = :pos WHERE "
+									+ "j.id = (SELECT ji.id FROM JobInstance ji WHERE ji.id = :idJob)").setParameter("idJob", idJob)
+									.setParameter("pos", position);
 
 			@SuppressWarnings("unused")
-
 			int result = query.executeUpdate();
 
 			for (int i = 0; i < q.size(); i++)
@@ -496,7 +491,6 @@ public class Dispatcher
 					Query queryEg = em.createQuery("UPDATE JobInstance j SET j.position = :i WHERE j.id = :job")
 							.setParameter("i", position + 2).setParameter("job", q.get(i).getId());
 					@SuppressWarnings("unused")
-
 					int res = queryEg.executeUpdate();
 					i++;
 				}
@@ -505,7 +499,6 @@ public class Dispatcher
 					Query qq = em.createQuery("UPDATE JobInstance j SET j.position = :i WHERE j.id = :job").setParameter("i", i + 1)
 							.setParameter("job", q.get(i).getId());
 					@SuppressWarnings("unused")
-
 					int res = qq.executeUpdate();
 
 				}
@@ -530,34 +523,35 @@ public class Dispatcher
 		File file = null;
 		ArrayList<InputStream> streams = new ArrayList<InputStream>();
 		List<Deliverable> tmp = new ArrayList<Deliverable>();
-		Logger jqmlogger = Logger.getLogger(Dispatcher.class);
 
 		try
 		{
 
 			tmp = em.createQuery("SELECT d FROM Deliverable d WHERE d.jobId = :idJob", Deliverable.class).setParameter("idJob", idJob)
-			        .getResultList();
+					.getResultList();
 
 			jqmlogger.debug("idJob of the deliverable: " + idJob);
 			jqmlogger.debug("size of the deliverable list: " + tmp.size());
 
-			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :job", History.class).setParameter("job", idJob)
-					.getSingleResult();
+			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :job", History.class)
+					.setParameter("job", idJob).getSingleResult();
 
 			for (int i = 0; i < tmp.size(); i++)
 			{
 
 				url = new URL("http://" + h.getJobInstance().getNode().getListeningInterface() + ":"
-				        + h.getJobInstance().getNode().getPort() + "/getfile?file=" + tmp.get(i).getFilePath() + tmp.get(i).getFileName());
+						+ h.getJobInstance().getNode().getPort() + "/getfile?file=" + tmp.get(i).getFilePath() + tmp.get(i).getFileName());
 
 				if (tmp.get(i).getHashPath().equals(Cryptonite.sha1(tmp.get(i).getFilePath() + tmp.get(i).getFileName())))
 				{
 					// mettre en base le repertoire de dl
-					jqmlogger.debug("dlRepository: " + h.getJobInstance().getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + h.getJobInstance().getId() + "/");
-					File dlRepo = new File(h.getJobInstance().getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + h.getJobInstance().getId() + "/");
+					jqmlogger.debug("dlRepository: " + h.getJobInstance().getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/"
+							+ h.getJobInstance().getId() + "/");
+					File dlRepo = new File(h.getJobInstance().getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/"
+							+ h.getJobInstance().getId() + "/");
 					dlRepo.mkdirs();
 					file = new File(h.getJobInstance().getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/"
-					        + h.getJobInstance().getId() + "/" + tmp.get(i).getFileName());
+							+ h.getJobInstance().getId() + "/" + tmp.get(i).getFileName());
 
 					FileUtils.copyURLToFile(url, file);
 					streams.add(new FileInputStream(file));
@@ -592,7 +586,7 @@ public class Dispatcher
 
 		try
 		{
-			deliverables = (ArrayList<Deliverable>) em
+			deliverables = (ArrayList<Deliverable>) getEm()
 					.createQuery("SELECT d FROM Deliverable d WHERE d.jobInstance = :idJob", Deliverable.class)
 					.setParameter("idJob", idJob).getResultList();
 		} catch (Exception e)
@@ -638,18 +632,20 @@ public class Dispatcher
 		}
 
 		url = new URL("http://" + h.getJobInstance().getNode().getListeningInterface() + ":" + h.getJobInstance().getNode().getPort()
-		        + "/getfile?file=" + deliverable.getFilePath() + deliverable.getFileName());
+				+ "/getfile?file=" + deliverable.getFilePath() + deliverable.getFileName());
 
 		jqmlogger.debug("URL: " + deliverable.getFilePath() + deliverable.getFileName());
 
 		if (deliverable.getHashPath().equals(Cryptonite.sha1(deliverable.getFilePath() + deliverable.getFileName()))
-		        && h.getJobInstance() != null)
+				&& h.getJobInstance() != null)
 		{
-			System.out.println("dlRepo: " + h.getJobInstance().getNode().getDlRepo() + deliverable.getFileFamily() + "/" + h.getJobInstance().getId() + "/");
-			File dlRepo = new File(h.getJobInstance().getNode().getDlRepo() + deliverable.getFileFamily() + "/" + h.getJobInstance().getId() + "/");
+			System.out.println("dlRepo: " + h.getJobInstance().getNode().getDlRepo() + deliverable.getFileFamily() + "/"
+					+ h.getJobInstance().getId() + "/");
+			File dlRepo = new File(h.getJobInstance().getNode().getDlRepo() + deliverable.getFileFamily() + "/"
+					+ h.getJobInstance().getId() + "/");
 			dlRepo.mkdirs();
 			file = new File(h.getJobInstance().getNode().getDlRepo() + deliverable.getFileFamily() + "/" + h.getJobInstance().getId() + "/"
-			        + deliverable.getFileName());
+					+ deliverable.getFileName());
 			FileUtils.copyURLToFile(url, file);
 		}
 		else
@@ -665,15 +661,15 @@ public class Dispatcher
 
 	public static List<Deliverable> getUserDeliverables(String user)
 	{
-		Logger jqmlogger = Logger.getLogger(Dispatcher.class);
+		EntityManager em = getEm();
 		ArrayList<Deliverable> d = new ArrayList<Deliverable>();
 		ArrayList<Deliverable> res = new ArrayList<Deliverable>();
 		ArrayList<History> h = null;
 
 		try
 		{
-			h = (ArrayList<History>) em.createQuery("SELECT h FROM History h WHERE h.userName = :u", History.class)
-					.setParameter("u", user).getResultList();
+			h = (ArrayList<History>) em.createQuery("SELECT h FROM History h WHERE h.userName = :u", History.class).setParameter("u", user)
+					.getResultList();
 		} catch (Exception e)
 		{
 			jqmlogger.info(e);
@@ -683,7 +679,7 @@ public class Dispatcher
 		{
 
 			d = (ArrayList<Deliverable>) em.createQuery("SELECT d FROM Deliverable d WHERE d.jobId = :idJob", Deliverable.class)
-			        .setParameter("idJob", h.get(i).getJobInstance().getId()).getResultList();
+					.setParameter("idJob", h.get(i).getJobInstance().getId()).getResultList();
 
 			res.addAll(d);
 		}
@@ -710,9 +706,9 @@ public class Dispatcher
 
 		try
 		{
-			jobs = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j WHERE j.userName = :u", JobInstance.class)
+			jobs = (ArrayList<JobInstance>) getEm().createQuery("SELECT j FROM JobInstance j WHERE j.userName = :u", JobInstance.class)
 					.setParameter("u", user).getResultList();
-		} catch ( Exception e)
+		} catch (Exception e)
 		{
 			jqmlogger.info(e);
 		}
@@ -725,8 +721,7 @@ public class Dispatcher
 	public static List<com.enioka.jqm.api.JobInstance> getJobs()
 	{
 		ArrayList<com.enioka.jqm.api.JobInstance> res = new ArrayList<com.enioka.jqm.api.JobInstance>();
-
-		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j", JobInstance.class)
+		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) getEm().createQuery("SELECT j FROM JobInstance j", JobInstance.class)
 				.getResultList();
 
 		for (JobInstance j : jobs)
@@ -754,9 +749,8 @@ public class Dispatcher
 
 	public static List<com.enioka.jqm.api.Queue> getQueues()
 	{
-
 		List<com.enioka.jqm.api.Queue> res = new ArrayList<com.enioka.jqm.api.Queue>();
-		ArrayList<Queue> queues = (ArrayList<Queue>) em.createQuery("SELECT j FROM Queue j", Queue.class).getResultList();
+		ArrayList<Queue> queues = (ArrayList<Queue>) getEm().createQuery("SELECT j FROM Queue j", Queue.class).getResultList();
 
 		for (Queue queue : queues)
 		{
@@ -775,14 +769,14 @@ public class Dispatcher
 
 	public static void changeQueue(int idJob, int idQueue)
 	{
-		Logger jqmlogger = Logger.getLogger(Dispatcher.class);
+		EntityManager em = getEm();
 		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
 		try
 		{
-			Queue q = em.createQuery("SELECT Queue FROM Queue queue " + "WHERE queue.id = :q", Queue.class).setParameter("q", idQueue)
-					.getSingleResult();
+			Queue q = em.createQuery("SELECT Queue FROM Queue queue " + "WHERE queue.id = :q", Queue.class)
+					.setParameter("q", idQueue).getSingleResult();
 
 			Query query = em.createQuery("UPDATE JobInstance j SET j.queue = :q WHERE j.id = :jd").setParameter("q", q)
 					.setParameter("jd", idJob);
