@@ -31,17 +31,17 @@ public class Node
 {
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
-	@Column(nullable=false, length=1000)
+	@Column(nullable=false, length=1000, name="listeningInterface")
 	private String listeningInterface;
-	@Column(nullable=false)
+	@Column(nullable=false, name="port")
 	private Integer port;
 
 	// Repo where the deliverables must be downloaded
-	@Column(nullable=false)
+	@Column(nullable=false, name="dlRepo")
 	private String dlRepo;
 
 	// Repo where the jar repository and the pom repository must be relative
-	@Column(nullable=false)
+	@Column(nullable=false, name="repo")
 	private String repo;
 
 	public Integer getId()

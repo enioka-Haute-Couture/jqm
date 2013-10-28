@@ -45,17 +45,19 @@ public class Queue implements Serializable
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
-	@Column(nullable = false, length = 50)
+	@Column(nullable = false, length = 50, name="name")
 	private String name;
-	@Column(nullable = false, length = 1000)
+	@Column(nullable = false, length = 1000, name="description")
 	private String description;
-	@Column(nullable = false)
+	@Column(nullable = false, name="maxTempInQueue")
 	private Integer maxTempInQueue;
-	@Column(nullable = false)
+	@Column(nullable = false, name="maxTempRunning")
 	private Integer maxTempRunning;
+	@Column(name="defaultQueue")
 	private boolean defaultQueue;
 
 	@OneToMany(mappedBy="queue", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@Column(name="jobdefs")
 	private List<JobDef> jobdefs = new ArrayList<JobDef>();
 
 	public String getName()

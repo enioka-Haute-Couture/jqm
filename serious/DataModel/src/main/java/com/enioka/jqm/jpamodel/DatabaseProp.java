@@ -39,15 +39,15 @@ public class DatabaseProp implements Serializable
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	protected Integer id;
-	@Column(nullable = false)
+	@Column(nullable = false, name="driver")
 	private String driver;
-	@Column(nullable = false)
+	@Column(nullable = false, name="name")
 	private String name;
-	@Column(nullable = false)
+	@Column(nullable = false, name="url")
 	private String url;
 	@Column(nullable = false, name = "username")
 	private String userName;
-	@Column(nullable = false)
+	@Column(nullable = false, name="pwd")
 	private String pwd;
 
 	public String getDriver()

@@ -44,7 +44,7 @@ public class JndiObjectResourceParameter implements Serializable
 	private String key;
 
 	// Value. E.g.: QM.POUET
-	@Column(nullable = false, length = 250)
+	@Column(nullable = false, length = 250, name="VALUE")
 	private String value;
 
 	// Field for the reverse relationship towards the ObjectResource holding the parameter.

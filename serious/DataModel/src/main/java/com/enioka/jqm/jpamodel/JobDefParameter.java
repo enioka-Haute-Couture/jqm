@@ -39,10 +39,10 @@ public class JobDefParameter implements Serializable{
 	private Integer id;
 	@Column(nullable=false, length=50, name="KEYNAME")
 	private String key;
-	@Column(nullable=false, length=1000)
+	@Column(nullable=false, length=1000, name="VALUE")
 	private String value;
 
-	public JobParameter jDPtoJP(final JobDefParameter jdp) {
+	public JobParameter jDPtoJP(JobDefParameter jdp) {
 
 		final JobParameter jp = new JobParameter();
 

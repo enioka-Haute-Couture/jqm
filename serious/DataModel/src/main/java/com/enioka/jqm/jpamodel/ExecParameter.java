@@ -24,6 +24,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -35,9 +36,10 @@ public class ExecParameter {
 	private Integer id;
 	@Column(nullable=false, length=50, name="KEYNAME")
 	private String key;
-	@Column(nullable=false, length=1000)
+	@Column(nullable=false, length=1000, name="VALUE")
 	private String value;
 	@ManyToOne(fetch=FetchType.LAZY, targetEntity=com.enioka.jqm.jpamodel.JobInstance.class)
+	@JoinColumn(nullable=false, name="jobInstance")
 	private JobInstance jobInstance;
 
 

@@ -43,28 +43,29 @@ public class JndiObjectResource implements Serializable
 	private int id;
 
 	// JNDI alias. JQM only allows "context/resource" aliases. E.g.: jms/myqueueconnectionfactory.
-	@Column(nullable = false, length = 100)
+	@Column(nullable = false, length = 100, name="name")
 	private String name;
 
 	// Not used in JQM. Here for completion sake. (Possible values: Container, ?)
-	@Column(nullable = true, length = 20)
+	@Column(nullable = true, length = 20, name="auth")
 	private String auth = null;
 
 	// Class name of the requested resource. E.g.: com.ibm.mq.jms.MQQueueConnectionFactory
-	@Column(nullable = false, length = 100)
+	@Column(nullable = false, length = 100, name="type")
 	private String type;
 
 	// Class name of the factory which will create the resource. JQM only allows resources with a factory implementing ObjectFactory. (no
 	// singleton and other resources). E.g.: com.ibm.mq.jms.MQQueueConnectionFactoryFactory
-	@Column(nullable = false, length = 100)
+	@Column(nullable = false, length = 100, name="factory")
 	private String factory;
 
 	// A free text description
-	@Column(nullable = true, length = 250)
+	@Column(nullable = true, length = 250, name="description")
 	private String description;
 
 	// The parameters. These are specific to each Object type. (e.g. for MQSeries: HOST, PORT, CHAN, TRAN, QMGR, ...)
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "resource")
+	@Column(name="parameters")
 	private Collection<JndiObjectResourceParameter> parameters = new ArrayList<JndiObjectResourceParameter>();
 
 	public int getId()

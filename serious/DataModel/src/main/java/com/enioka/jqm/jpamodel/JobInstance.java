@@ -49,20 +49,26 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
 	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="jd_id")
 	private JobDef jd;
 	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="parent_id")
 	public JobInstance parent;
 	@Column(length = 50, name = "username")
-    private String userName;
-    private Integer sessionID;
-    @Column(nullable=false, length=50)
-    private String state;
-    private Integer position;
-    @ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Queue.class, fetch=FetchType.EAGER)
-    private Queue queue;
-    @ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Node.class, fetch=FetchType.EAGER)
-    private Node node;
-    @OneToMany(orphanRemoval=true, fetch=FetchType.EAGER, cascade = CascadeType.ALL)
+	private String userName;
+	@Column(name="sessionId")
+	private Integer sessionID;
+	@Column(length=50, name="state")
+	private String state;
+	@Column(name="position")
+	private Integer position;
+	@ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Queue.class, fetch=FetchType.EAGER)
+	@JoinColumn(name="queue_id")
+	private Queue queue;
+	@ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Node.class, fetch=FetchType.EAGER)
+	@JoinColumn(name="node_id")
+	private Node node;
+	@OneToMany(orphanRemoval=true, fetch=FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name="job_parameter")
 	private List<JobParameter> parameters;
 
@@ -132,9 +138,18 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
 
 		final int nb1 = arg0.getPosition();
 		final int nb2 = this.getPosition();
-		if (nb1 > nb2)  return -1;
-		else if(nb1 == nb2) return 0;
-		else return 1;
+		if (nb1 > nb2)
+		{
+			return -1;
+		}
+		else if(nb1 == nb2)
+		{
+			return 0;
+		}
+		else
+		{
+			return 1;
+		}
 	}
 
 

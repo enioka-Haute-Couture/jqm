@@ -40,7 +40,7 @@ public class JobHistoryParameter implements Serializable{
 	private Integer id;
 	@Column(nullable=false, length=50, name="KEYNAME")
 	private String key;
-	@Column(nullable=false, length=1000)
+	@Column(nullable=false, length=1000, name="VALUE")
 	private String value;
 
 	public Integer getId() {

@@ -36,15 +36,16 @@ public class Deliverable {
 
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	protected Integer id;
-	@Column(length=1000)
+	@Column(length=1000, name="filePath")
 	protected String filePath;
-	@Column(length=1000)
+	@Column(length=1000, name="fileName")
 	protected String fileName;
-	@Column(length=1000)
+	@Column(length=1000, name="fileFamily")
 	protected String fileFamily;
-	@Column
+	@Column(nullable=false, name="jobId")
 	private Integer jobId;
-	private String HashPath;
+	@Column(name="hashPath")
+	private String hashPath;
 
 
 
@@ -84,19 +85,6 @@ public class Deliverable {
 		this.filePath = filePath;
 	}
 
-
-	public String getHashPath() {
-
-		return HashPath;
-	}
-
-
-	public void setHashPath(final String hashPath) {
-
-		HashPath = hashPath;
-	}
-
-
 	public String getFileName() {
 
 		return fileName;
@@ -106,6 +94,16 @@ public class Deliverable {
 	public void setFileName(final String fileName) {
 
 		this.fileName = fileName;
+	}
+
+	public String getHashPath()
+	{
+		return hashPath;
+	}
+
+	public void setHashPath(String hashPath)
+	{
+		this.hashPath = hashPath;
 	}
 
 }

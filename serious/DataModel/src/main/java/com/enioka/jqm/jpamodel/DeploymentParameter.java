@@ -24,6 +24,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -33,14 +34,17 @@ public class DeploymentParameter
 {
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
-	@Column(nullable=true)
+	@Column(nullable=true, name="classId")
 	private Integer classId;
 	@ManyToOne(fetch=FetchType.LAZY, targetEntity=com.enioka.jqm.jpamodel.Node.class)
+	@JoinColumn(name="node", nullable=false)
 	private Node node;
-	@Column(nullable=false)
+	@Column(nullable=false, name="nbThread")
 	private Integer nbThread;
+	@Column(name="pollingInterval", nullable=false)
 	private Integer pollingInterval;
 	@ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Queue.class)
+	@JoinColumn(name="queue", nullable=false)
 	private Queue queue;
 
 

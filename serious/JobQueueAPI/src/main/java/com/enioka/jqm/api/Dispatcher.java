@@ -230,7 +230,7 @@ public class Dispatcher
 		}
 		else if (!m.isEmpty() && !jdef.getParameters().isEmpty())
 		{
-			System.out.println("Parameters overriding");
+			jqmlogger.debug("Parameters overriding");
 
 			for (JobDefParameter i : jdef.getParameters())
 			{
@@ -281,7 +281,7 @@ public class Dispatcher
 			// {
 			// System.out.println("CONTENU PARAMETERS: " + j.getKey() + ", " + j.getValue());
 			// }
-			System.out.println("Parameters overrided will be returned");
+			jqmlogger.debug("Parameters overrided will be returned: " + res.size());
 			return res;
 		}
 		else

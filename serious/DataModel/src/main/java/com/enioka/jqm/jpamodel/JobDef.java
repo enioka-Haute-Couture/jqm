@@ -47,31 +47,34 @@ public class JobDef implements Serializable
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	public Integer id;
+	@Column(name="canBeRestarted")
 	public boolean canBeRestarted = true;
-	@Column(nullable = false, length = 100)
+	@Column(nullable = false, length = 100, name="javaClassName")
 	public String javaClassName;
-	@Column(length = 1000)
+	@Column(length = 1000, name="filePath")
 	public String filePath;
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "queue_id", nullable = false)
+	@JoinColumn(name = "queue_id")
 	public Queue queue;
+	@Column(name="maxTimeRunning")
 	public Integer maxTimeRunning;
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false, name="applicationName")
 	public String applicationName;
-	@Column(length = 50)
+	@Column(length = 50, name="sessionId")
 	public Integer sessionID;
-	@Column(length = 50)
+	@Column(length = 50, name="application")
 	public String application;
-	@Column(length = 50)
+	@Column(length = 50, name="module")
 	public String module;
-	@Column(length = 50)
+	@Column(length = 50, name="other1")
 	public String other1;
-	@Column(length = 50)
+	@Column(length = 50, name="other2")
 	public String other2;
-	@Column(length = 50)
+	@Column(length = 50, name="other3")
 	public String other3;
+	@Column(name="highlander", nullable=false)
 	public boolean highlander = false;
-	@Column
+	@Column(name="jarPath")
 	private String jarPath;
 	@OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "JobDefId")

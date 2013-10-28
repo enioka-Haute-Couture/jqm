@@ -62,7 +62,7 @@ class Polling implements Runnable
 
 	protected JobInstance dequeue()
 	{
-		// Get the list of all jobInstance with the queue VIP ordered by position
+		// Get the list of all jobInstance with the queue definded ordered by position
 		TypedQuery<JobInstance> query = em.createQuery(
 				"SELECT j FROM JobInstance j WHERE j.queue.name = :q AND j.state = :s ORDER BY j.position ASC", JobInstance.class);
 		query.setParameter("q", queue.getName()).setParameter("s", "SUBMITTED");

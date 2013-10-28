@@ -45,28 +45,38 @@ public class History implements Serializable
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-	@Column(nullable = false)
+	@Column(name="returnedValue")
 	private Integer returnedValue;
 	@Temporal(TemporalType.DATE)
+	@Column(name="jobDate")
 	private Calendar jobDate;
+	@Column(name="jobDefId")
 	private Integer jobDefId;
+	@Column(name="sessionId")
 	private Integer sessionId;
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Queue.class)
+	@JoinColumn(name="queue")
 	private Queue queue;
-	@Column(length = 1000)
+	@Column(length = 1000, name="msg")
 	private String msg;
 	@OneToMany(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Message.class, cascade = CascadeType.ALL, mappedBy = "history")
 	private List<Message> messages;
 	@OneToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.JobInstance.class)
+	@JoinColumn(name="jobInstance")
 	private JobInstance jobInstance;
 	@Temporal(TemporalType.DATE)
+	@Column(name="enqueueDate")
 	private Calendar enqueueDate;
 	@Temporal(TemporalType.DATE)
+	@Column(name="executionDate")
 	private Calendar executionDate;
 	@Temporal(TemporalType.DATE)
+	@Column(name="endDate")
 	private Calendar endDate;
+	@Column(name="userName")
 	private String userName;
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Node.class)
+	@JoinColumn(name="node")
 	private Node node;
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)
 	@JoinColumn(name = "history_id")
