@@ -71,7 +71,7 @@ public class ParameterTest
 		jdargs.add(jdp2);
 
 		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-checkargs/",
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "jqm-test-checkargs/",
 				"jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", "Franquin", "ModuleMachin", "other",
 				"other", "other", false, em);
 
@@ -102,7 +102,7 @@ public class ParameterTest
 		jdargs.add(jdp2);
 
 		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-checkargs/",
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "jqm-test-checkargs/",
 				"jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", "Franquin", "ModuleMachin", "other",
 				"other", "other", false, em);
 
@@ -132,7 +132,7 @@ public class ParameterTest
 		jdargs.add(jdp2);
 
 		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-checkargs/",
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "jqm-test-checkargs/",
 				"jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", "Franquin", "ModuleMachin", "other",
 				"other", "other", false, em);
 

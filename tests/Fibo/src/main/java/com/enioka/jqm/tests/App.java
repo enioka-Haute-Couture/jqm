@@ -16,10 +16,11 @@ public class App extends JobBase
 
 		j.addParameter("p1", this.parameters.get("p2"));
 		j.addParameter("p2", (Integer.parseInt(this.parameters.get("p1")) + Integer.parseInt(this.parameters.get("p2")) + ""));
-		System.out.println("AVANT ENQUEUE");
+		System.out.println("BEFORE ENQUEUE");
 
-		if (Integer.parseInt(this.parameters.get("p1")) <= 100)
+		if (Integer.parseInt(this.parameters.get("p1")) <= 100) {
 			Dispatcher.enQueue(j);
+		}
 		System.out.println("QUIT FIBO");
 	}
 }

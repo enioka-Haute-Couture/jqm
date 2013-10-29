@@ -56,11 +56,11 @@ public class TestHelpers
 		TestHelpers.qNormal3 = CreationTools.initQueue("NormalQueue3", "Queue for the ordinary job3", 7, 100, em);
 		TestHelpers.qSlow3 = CreationTools.initQueue("SlowQueue3", "Queue for the bad guys3", 3, 100, em);
 
-		TestHelpers.node = CreationTools.createNode("localhost", 8081, "./testprojects/jqm-test-deliverable/", "testprojects/", em);
-		TestHelpers.node2 = CreationTools.createNode("localhost2", 8082, "./testprojects/jqm-test-deliverable/", "testprojects/", em);
-		TestHelpers.node3 = CreationTools.createNode("localhost3", 8083, "./testprojects/jqm-test-deliverable/", "testprojects/", em);
-		TestHelpers.nodeMix = CreationTools.createNode("localhost4", 8084, "./testprojects/jqm-test-deliverable/", "testprojects/", em);
-		TestHelpers.nodeMix2 = CreationTools.createNode("localhost5", 8085, "./testprojects/jqm-test-deliverable/", "testprojects/", em);
+		TestHelpers.node = CreationTools.createNode("localhost", 8081, "./testprojects/jqm-test-deliverable/", "./testprojects/", em);
+		TestHelpers.node2 = CreationTools.createNode("localhost2", 8082, "./testprojects/jqm-test-deliverable/", "./testprojects/", em);
+		TestHelpers.node3 = CreationTools.createNode("localhost3", 8083, "./testprojects/jqm-test-deliverable/", "./testprojects/", em);
+		TestHelpers.nodeMix = CreationTools.createNode("localhost4", 8084, "./testprojects/jqm-test-deliverable/", "./testprojects/", em);
+		TestHelpers.nodeMix2 = CreationTools.createNode("localhost5", 8085, "./testprojects/jqm-test-deliverable/", "./testprojects/", em);
 
 		TestHelpers.dpVip = CreationTools.createDeploymentParameter(1, node, 3, 1, qVip, em);
 		TestHelpers.dpVipMix = CreationTools.createDeploymentParameter(2, nodeMix, 3, 1, qVip, em);

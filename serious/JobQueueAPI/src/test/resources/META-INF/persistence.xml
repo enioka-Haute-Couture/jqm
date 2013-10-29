@@ -9,7 +9,6 @@
 
 		<class>com.enioka.jqm.jpamodel.JobInstance</class>
 		<class>com.enioka.jqm.jpamodel.Deliverable</class>
-		<class>com.enioka.jqm.jpamodel.ExecParameter</class>
 		<class>com.enioka.jqm.jpamodel.History</class>
 		<class>com.enioka.jqm.jpamodel.JobDef</class>
 		<class>com.enioka.jqm.jpamodel.JobParameter</class>
