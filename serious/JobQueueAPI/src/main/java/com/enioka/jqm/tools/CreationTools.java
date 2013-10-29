@@ -27,9 +27,10 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
+import org.apache.log4j.Logger;
+
 import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.ExecParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JndiObjectResource;
 import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
@@ -44,6 +45,7 @@ import com.enioka.jqm.jpamodel.Queue;
 
 public class CreationTools
 {
+	private static Logger jqmlogger = Logger.getLogger(CreationTools.class);
 	public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
 
 	public CreationTools()
@@ -52,7 +54,7 @@ public class CreationTools
 
 	// ------------------ JOBDEFINITION ------------------------
 
-	public static JobDef initJobDefinition(String javaClassName,  String filePath,  Queue queue,  EntityManager em)
+	public static JobDef initJobDefinition(String javaClassName, String filePath, Queue queue, EntityManager em)
 	{
 		JobDef j = new JobDef();
 		EntityTransaction transac = em.getTransaction();
@@ -69,8 +71,8 @@ public class CreationTools
 	}
 
 	public static JobDef createJobDef(boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String filePath, String jp,
-			Queue queue,  Integer maxTimeRunning,  String applicationName,  String application,  String module,
-			String other1,  String other2,  String other3,  boolean highlander,  EntityManager em)
+	        Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String other1, String other2,
+	        String other3, boolean highlander, EntityManager em)
 	{
 		JobDef j = new JobDef();
 		EntityTransaction transac = em.getTransaction();
@@ -101,7 +103,7 @@ public class CreationTools
 
 	// ------------------ DEPLOYMENTPARAMETER ------------------
 
-	public static DeploymentParameter initDeploymentParameter( Node node,  Integer nbThread,  EntityManager em)
+	public static DeploymentParameter initDeploymentParameter(Node node, Integer nbThread, EntityManager em)
 	{
 		DeploymentParameter dp = new DeploymentParameter();
 		EntityTransaction transac = em.getTransaction();
@@ -115,8 +117,8 @@ public class CreationTools
 		return dp;
 	}
 
-	public static DeploymentParameter createDeploymentParameter( Integer classId,  Node node,  Integer nbThread,  Integer pollingInterval,
-			Queue qVip,  EntityManager em)
+	public static DeploymentParameter createDeploymentParameter(Integer classId, Node node, Integer nbThread, Integer pollingInterval,
+	        Queue qVip, EntityManager em)
 	{
 		DeploymentParameter dp = new DeploymentParameter();
 		EntityTransaction transac = em.getTransaction();
@@ -133,27 +135,10 @@ public class CreationTools
 		return dp;
 	}
 
-	// ------------------ EXECPARAMETER ------------------------
-
-	public static ExecParameter createExecParameter( String key,  String value,  JobInstance jobInstance,  EntityManager em)
-	{
-		ExecParameter e = new ExecParameter();
-		EntityTransaction transac = em.getTransaction();
-		transac.begin();
-
-		e.setKey(key);
-		e.setValue(value);
-		e.setJobInstance(jobInstance);
-
-		em.persist(e);
-		transac.commit();
-		return e;
-	}
-
 	// ------------------ HISTORY ------------------------------
 
-	public static History initHistory( Integer returnedValue,  List<Message> messages,  JobInstance jobInstance,
-			List<JobHistoryParameter> jhp,  EntityManager em)
+	public static History initHistory(Integer returnedValue, List<Message> messages, JobInstance jobInstance,
+	        List<JobHistoryParameter> jhp, EntityManager em)
 	{
 		History h = new History();
 
@@ -166,9 +151,9 @@ public class CreationTools
 		return h;
 	}
 
-	public static History createhistory( Integer returnedValue,  Calendar jobDate,  Integer JobDefId,  Integer sessionId,  Queue queue,  String msg,  List<Message> messages,
-			JobInstance jobInstance,  Calendar enqueueDate,  Calendar executionDate,  Calendar endDate,  String userName,  Node node,  List<JobHistoryParameter> jhp,
-			EntityManager em)
+	public static History createhistory(Integer returnedValue, Calendar jobDate, Integer JobDefId, Integer sessionId, Queue queue,
+	        String msg, List<Message> messages, JobInstance jobInstance, Calendar enqueueDate, Calendar executionDate, Calendar endDate,
+	        String userName, Node node, List<JobHistoryParameter> jhp, EntityManager em)
 	{
 		History h = new History();
 
@@ -193,13 +178,16 @@ public class CreationTools
 
 	// ------------------ JOBINSTANCE --------------------------
 
-	public static JobInstance createJobInstance( JobDef jd,  List<JobParameter> jps,  String user,  Integer sessionID,  String state,
-			Integer position,  Queue queue,  Node node,  EntityManager em)
+	public static JobInstance createJobInstance(JobDef jd, List<JobParameter> jps, String user, Integer sessionID, String state,
+	        Integer position, Queue queue, Node node, EntityManager em)
 	{
 		JobInstance j = new JobInstance();
-
+		jqmlogger.debug("Creating JobInstance with " + jps.size() + " parameters");
+		for (JobParameter jp : jps)
+		{
+			jqmlogger.debug("Parameter: " + jp.getKey() + " - " + jp.getValue());
+		}
 		j.setJd(jd);
-		j.setParameters(jps);
 		j.setSessionID(sessionID);
 		j.setUserName(user);
 		j.setState(state);
@@ -208,13 +196,14 @@ public class CreationTools
 		j.setNode(node);
 
 		em.persist(j);
+		j.setParameters(jps);
 
 		return j;
 	}
 
 	// ------------------ JOBPARAMETER -------------------------
 
-	public static JobParameter createJobParameter( String key,  String value,  EntityManager em)
+	public static JobParameter createJobParameter(String key, String value, EntityManager em)
 	{
 		JobParameter j = new JobParameter();
 
@@ -225,7 +214,7 @@ public class CreationTools
 		return j;
 	}
 
-	public static JobDefParameter createJobDefParameter( String key,  String value,  EntityManager em)
+	public static JobDefParameter createJobDefParameter(String key, String value, EntityManager em)
 	{
 		JobDefParameter j = new JobDefParameter();
 
@@ -238,7 +227,7 @@ public class CreationTools
 
 	// ------------------ NODE ---------------------------------
 
-	public static Node createNode( String listeningInterface,  Integer port,  String dlRepo,  String repo,  EntityManager em)
+	public static Node createNode(String listeningInterface, Integer port, String dlRepo, String repo, EntityManager em)
 	{
 		Node n = new Node();
 		EntityTransaction transac = em.getTransaction();
@@ -256,7 +245,7 @@ public class CreationTools
 
 	// ------------------ QUEUE --------------------------------
 
-	public static Queue initQueue( String name,  String description,  Integer maxTempInQueue,  Integer maxTempRunning,  EntityManager em)
+	public static Queue initQueue(String name, String description, Integer maxTempInQueue, Integer maxTempRunning, EntityManager em)
 	{
 		Queue q = new Queue();
 		EntityTransaction transac = em.getTransaction();
@@ -273,8 +262,8 @@ public class CreationTools
 		return q;
 	}
 
-	public static Queue createQueue( String name,  String description,  Integer maxTempInQueue,  Integer maxTempRunning,  boolean defaultQueue,
-			EntityManager em)
+	public static Queue createQueue(String name, String description, Integer maxTempInQueue, Integer maxTempRunning, boolean defaultQueue,
+	        EntityManager em)
 	{
 		Queue q = new Queue();
 		EntityTransaction transac = em.getTransaction();
@@ -293,7 +282,7 @@ public class CreationTools
 
 	// ------------------ DATABASEPROP --------------------------------
 
-	public static DatabaseProp createDatabaseProp( String name,  String driver,  String url,  String user,  String pwd,  EntityManager em)
+	public static DatabaseProp createDatabaseProp(String name, String driver, String url, String user, String pwd, EntityManager em)
 	{
 		DatabaseProp h = new DatabaseProp();
 
@@ -308,8 +297,8 @@ public class CreationTools
 	}
 
 	// ------------------ JNDI FOR JMS & co --------------------------------
-	public static JndiObjectResource createJndiObjectResource( EntityManager em,  String jndiAlias,  String className,  String factoryClass,
-			String description,  HashMap<String, String> parameters)
+	public static JndiObjectResource createJndiObjectResource(EntityManager em, String jndiAlias, String className, String factoryClass,
+	        String description, HashMap<String, String> parameters)
 	{
 		JndiObjectResource res = new JndiObjectResource();
 		res.setAuth(null);
@@ -319,7 +308,7 @@ public class CreationTools
 		res.setType(className);
 		em.persist(res);
 
-		for ( String parameterName : parameters.keySet())
+		for (String parameterName : parameters.keySet())
 		{
 			JndiObjectResourceParameter prm = new JndiObjectResourceParameter();
 			prm.setKey(parameterName);
@@ -332,14 +321,14 @@ public class CreationTools
 		return res;
 	}
 
-	public static JndiObjectResource createJndiQcfMQSeries( EntityManager em,  String jndiAlias,  String description,  String hostname,
-			String queueManagerName,  Integer port,  String channel)
+	public static JndiObjectResource createJndiQcfMQSeries(EntityManager em, String jndiAlias, String description, String hostname,
+	        String queueManagerName, Integer port, String channel)
 	{
 		return createJndiQcfMQSeries(em, jndiAlias, description, hostname, queueManagerName, port, channel, null);
 	}
 
-	public static JndiObjectResource createJndiQcfMQSeries( EntityManager em,  String jndiAlias,  String description,  String hostname,
-			String queueManagerName,  Integer port,  String channel,  HashMap<String, String> optionalParameters)
+	public static JndiObjectResource createJndiQcfMQSeries(EntityManager em, String jndiAlias, String description, String hostname,
+	        String queueManagerName, Integer port, String channel, HashMap<String, String> optionalParameters)
 	{
 		HashMap<String, String> prms = new HashMap<String, String>();
 		prms.put("HOST", hostname);
@@ -352,11 +341,11 @@ public class CreationTools
 		}
 
 		return createJndiObjectResource(em, jndiAlias, "com.ibm.mq.jms.MQQueueConnectionFactory",
-				"com.ibm.mq.jms.MQQueueConnectionFactoryFactory", description, prms);
+		        "com.ibm.mq.jms.MQQueueConnectionFactoryFactory", description, prms);
 	}
 
-	public static JndiObjectResource createJndiQueueMQSeries( EntityManager em,  String jndiAlias,  String description,  String queueName,
-			HashMap<String, String> optionalParameters)
+	public static JndiObjectResource createJndiQueueMQSeries(EntityManager em, String jndiAlias, String description, String queueName,
+	        HashMap<String, String> optionalParameters)
 	{
 		HashMap<String, String> prms = new HashMap<String, String>();
 		prms.put("QU", queueName);
@@ -368,8 +357,8 @@ public class CreationTools
 		return createJndiObjectResource(em, jndiAlias, "com.ibm.mq.jms.MQQueue", "com.ibm.mq.jms.MQQueueFactory", description, prms);
 	}
 
-	public static JndiObjectResource createJndiQcfActiveMQ( EntityManager em,  String jndiAlias,  String description,  String Url,
-			HashMap<String, String> optionalParameters)
+	public static JndiObjectResource createJndiQcfActiveMQ(EntityManager em, String jndiAlias, String description, String Url,
+	        HashMap<String, String> optionalParameters)
 	{
 		HashMap<String, String> prms = new HashMap<String, String>();
 		prms.put("brokerURL", Url);
@@ -379,11 +368,11 @@ public class CreationTools
 		}
 
 		return createJndiObjectResource(em, jndiAlias, "org.apache.activemq.ActiveMQConnectionFactory",
-				"org.apache.activemq.jndi.JNDIReferenceFactory", description, prms);
+		        "org.apache.activemq.jndi.JNDIReferenceFactory", description, prms);
 	}
 
-	public static JndiObjectResource createJndiQueueActiveMQ( EntityManager em,  String jndiAlias,  String description,  String queueName,
-			HashMap<String, String> optionalParameters)
+	public static JndiObjectResource createJndiQueueActiveMQ(EntityManager em, String jndiAlias, String description, String queueName,
+	        HashMap<String, String> optionalParameters)
 	{
 		HashMap<String, String> prms = new HashMap<String, String>();
 		prms.put("physicalName", queueName);
@@ -393,12 +382,12 @@ public class CreationTools
 		}
 
 		return createJndiObjectResource(em, jndiAlias, "org.apache.activemq.command.ActiveMQQueue",
-				"org.apache.activemq.jndi.JNDIReferenceFactory", description, prms);
+		        "org.apache.activemq.jndi.JNDIReferenceFactory", description, prms);
 	}
 
 	// ------------------ CLOSE ENTITYs ------------------------
 
-	public static void close( EntityManager em)
+	public static void close(EntityManager em)
 	{
 		em.close();
 		emf.close();

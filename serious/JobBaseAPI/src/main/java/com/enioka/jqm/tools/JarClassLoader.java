@@ -144,6 +144,7 @@ class JarClassLoader extends URLClassLoader
 			Map<String, String> params = (Map<String, String>) getParameters.invoke(o, null);
 			for (JobParameter i : job.getParameters())
 			{
+				jqmlogger.debug("Job has parameter " + i.getKey() + " - " + i.getValue());
 				params.put(i.getKey(), i.getValue());
 			}
 			start.invoke(o, null);

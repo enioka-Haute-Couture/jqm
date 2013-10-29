@@ -19,7 +19,11 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -33,56 +37,61 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-
 /**
- *
+ * 
  * @author pierre.coppee
  */
 @Entity
-@Table(name="JobInstance")
-public class JobInstance implements Comparable<JobInstance>, Serializable{
+@Table(name = "JobInstance")
+public class JobInstance implements Comparable<JobInstance>, Serializable
+{
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = -7710486847228806301L;
-	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="jd_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "jd_id")
 	private JobDef jd;
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="parent_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "parent_id")
 	public JobInstance parent;
 	@Column(length = 50, name = "username")
 	private String userName;
-	@Column(name="sessionId")
+	@Column(name = "sessionId")
 	private Integer sessionID;
-	@Column(length=50, name="state")
+	@Column(length = 50, name = "state")
 	private String state;
-	@Column(name="position")
+	@Column(name = "position")
 	private Integer position;
-	@ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Queue.class, fetch=FetchType.EAGER)
-	@JoinColumn(name="queue_id")
+	@ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Queue.class, fetch = FetchType.EAGER)
+	@JoinColumn(name = "queue_id")
 	private Queue queue;
-	@ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Node.class, fetch=FetchType.EAGER)
-	@JoinColumn(name="node_id")
+	@ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Node.class, fetch = FetchType.EAGER)
+	@JoinColumn(name = "node_id")
 	private Node node;
-	@OneToMany(orphanRemoval=true, fetch=FetchType.EAGER, cascade = CascadeType.ALL)
-	@JoinColumn(name="job_parameter")
+
+	@OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "jobinstance")
 	private List<JobParameter> parameters;
 
-	public int getId() {
+	public int getId()
+	{
 		return id;
 	}
 
-	public String getUserName() {
+	public String getUserName()
+	{
 		return userName;
 	}
 
-	public int getSessionID() {
+	public int getSessionID()
+	{
 		return sessionID;
 	}
+
 	public JobDef getJd()
 	{
 		return jd;
@@ -134,7 +143,8 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
 	}
 
 	@Override
-	public int compareTo(final JobInstance arg0) {
+	public int compareTo(final JobInstance arg0)
+	{
 
 		final int nb1 = arg0.getPosition();
 		final int nb2 = this.getPosition();
@@ -142,7 +152,7 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
 		{
 			return -1;
 		}
-		else if(nb1 == nb2)
+		else if (nb1 == nb2)
 		{
 			return 0;
 		}
@@ -152,26 +162,26 @@ public class JobInstance implements Comparable<JobInstance>, Serializable{
 		}
 	}
 
-
-	public Queue getQueue() {
+	public Queue getQueue()
+	{
 
 		return queue;
 	}
 
-
-	public void setQueue(final Queue queue) {
+	public void setQueue(final Queue queue)
+	{
 
 		this.queue = queue;
 	}
 
-
-	public List<JobParameter> getParameters() {
+	public List<JobParameter> getParameters()
+	{
 
 		return parameters;
 	}
 
-
-	public void setParameters(final List<JobParameter> parameters) {
+	public void setParameters(final List<JobParameter> parameters)
+	{
 
 		this.parameters = parameters;
 	}

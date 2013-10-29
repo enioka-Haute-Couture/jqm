@@ -38,7 +38,7 @@ class Polling implements Runnable
 {
 	private static Logger jqmlogger = Logger.getLogger(Polling.class);
 	private ArrayList<JobInstance> job = new ArrayList<JobInstance>();
-	private DeploymentParameter dp = null;
+	DeploymentParameter dp = null;
 	private Queue queue = null;
 	private EntityManager em = Helpers.getNewEm();
 	private ThreadPool tp = null;

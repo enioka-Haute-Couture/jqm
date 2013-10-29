@@ -25,6 +25,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -40,6 +42,10 @@ public class JobParameter implements Serializable
 	@Column(nullable=false, length=1000, name="VALUE")
 	private String value;
 
+	@ManyToOne
+	@JoinColumn(name="jobinstance_id")
+	private JobInstance jobinstance;
+	
 	/**
 	 * @return the key
 	 */
@@ -75,6 +81,14 @@ public class JobParameter implements Serializable
 	public void setId(final Integer id)
 	{
 		this.id = id;
+	}
+	public JobInstance getJobinstance()
+	{
+		return jobinstance;
+	}
+	public void setJobinstance(JobInstance jobinstance)
+	{
+		this.jobinstance = jobinstance;
 	}
 
 }

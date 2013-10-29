@@ -135,9 +135,10 @@ class JqmEngine
 		{
 			jqmlogger.info("Node " + nodeName + " does not exist in the configuration and will be created with default values");
 			n = new Node();
-			n.setDlRepo(System.getProperty("user.dir") + "/outputfiles");
+			n.setDlRepo(System.getProperty("user.dir") + "/outputfiles/");
 			n.setListeningInterface(nodeName);
 			n.setPort(1789);
+			n.setRepo(System.getProperty("user.dir") + "/jobs/");
 			em.persist(n);
 		}
 

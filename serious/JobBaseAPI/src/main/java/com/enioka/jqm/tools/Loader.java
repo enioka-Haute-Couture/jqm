@@ -72,12 +72,12 @@ class Loader implements Runnable
 		// STATE UPDATED
 
 		em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
-				.setParameter("msg", "CRASHED").executeUpdate();
+		        .setParameter("msg", "CRASHED").executeUpdate();
 
 		// MESSAGE HISTORY UPDATED
 
 		History h = em.createQuery("SELECT h FROM History h WHERE h.id = :j", History.class).setParameter("j", job.getId())
-				.getSingleResult();
+		        .getSingleResult();
 
 		Helpers.createMessage("Status updated: ATTRIBUTED", h, em);
 
@@ -91,19 +91,18 @@ class Loader implements Runnable
 		try
 		{
 			jqmlogger.debug("TOUT DEBUT LOADER");
-
-			Node node = em.createQuery("SELECT n FROM Node n, History h WHERE n.id = h.node.id AND h.id = :job", Node.class)
-					.setParameter("job", job.getId()).getSingleResult();
-
+			Node node = this.p.dp.getNode();
+			
 			// ---------------- BEGIN: MAVEN DEPENDENCIES ------------------
 			CheckFilePath cfp = new CheckFilePath();
 			File local = new File(System.getProperty("user.home") + "/.m2/repository");
 			File jar = new File(cfp.FixFilePath(node.getRepo()) + job.getJd().getJarPath());
 			URL jars = jar.toURI().toURL();
-			jqmlogger.debug("Loader will try to launch jar " + job.getJd().getJarPath() + " - " + job.getJd().getJavaClassName());
+			jqmlogger.debug("Loader will try to launch jar " + jar.getAbsolutePath() + " - " + job.getJd().getJavaClassName());
 			ArrayList<URL> tmp = new ArrayList<URL>();
 			Collection<Artifact> deps = null;
-			File pomFile = new File(cfp.FixFilePath(job.getJd().getFilePath()) + "pom.xml");
+			File pomFile = new File(cfp.FixFilePath(node.getRepo() + job.getJd().getFilePath()) + "pom.xml");
+			jqmlogger.debug("Loader will try to load POM " + pomFile.getAbsolutePath());
 
 			if (!pomFile.exists())
 				throw new IOException();
@@ -111,14 +110,13 @@ class Loader implements Runnable
 			// Update of the job status
 			em.getTransaction().begin();
 			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", job)
-					.getSingleResult();
+			        .getSingleResult();
 
 			// Update of the execution date
-
 			Calendar executionDate = GregorianCalendar.getInstance(Locale.getDefault());
 
 			em.createQuery("UPDATE History h SET h.executionDate = :date WHERE h.id = :h").setParameter("h", h.getId())
-					.setParameter("date", executionDate).executeUpdate();
+			        .setParameter("date", executionDate).executeUpdate();
 
 			// End of the execution date
 
@@ -131,21 +129,18 @@ class Loader implements Runnable
 			transac.begin();
 
 			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", job.getId())
-					.setParameter("msg", "RUNNING").executeUpdate();
+			        .setParameter("msg", "RUNNING").executeUpdate();
 			transac.commit();
 			jqmlogger.debug("JobInstance was updated");
 
 			boolean isInCache = true;
 			if (!cache.containsKey(job.getJd().getApplicationName()))
 			{
-				Dependencies dependencies = new Dependencies(cfp.FixFilePath(job.getJd().getFilePath()) + "pom.xml");
+				Dependencies dependencies = new Dependencies(pomFile.getAbsolutePath());
 
 				isInCache = false;
-				Collection<RemoteRepository> remotes = Arrays.asList(new RemoteRepository("maven-central", "default",
-						"http://repo1.maven.org/maven2/"), new RemoteRepository("eclipselink", "default",
-						"http://download.eclipse.org/rt/eclipselink/maven.repo/")
-
-				);
+				Collection<RemoteRepository> remotes = Arrays.asList(new RemoteRepository("nexus", "default",
+				        "http://10.0.3.128/nexus/content/groups/public/"));
 
 				deps = new ArrayList<Artifact>();
 				for (int i = 0; i < dependencies.getList().size(); i++)
@@ -201,7 +196,7 @@ class Loader implements Runnable
 			em.getTransaction().begin();
 
 			em.createQuery("UPDATE History h SET h.endDate = :date WHERE h.id = :h").setParameter("h", h.getId())
-					.setParameter("date", endDate).executeUpdate();
+			        .setParameter("date", endDate).executeUpdate();
 
 			em.getTransaction().commit();
 
@@ -210,7 +205,7 @@ class Loader implements Runnable
 			// STATE UPDATED
 			em.getTransaction().begin();
 			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
-					.setParameter("msg", "ENDED").executeUpdate();
+			        .setParameter("msg", "ENDED").executeUpdate();
 			em.getTransaction().commit();
 			jqmlogger.debug("LOADER HISTORY: " + h.getId());
 
@@ -238,8 +233,8 @@ class Loader implements Runnable
 				} catch (Exception e)
 				{
 					jqmlogger
-							.error("Could not analyse a deliverbale - it may be of an incorrect Java class. Job has run correctly - it's only missing its produce.",
-									e);
+					        .error("Could not analyse a deliverbale - it may be of an incorrect Java class. Job has run correctly - it's only missing its produce.",
+					                e);
 				} finally
 				{
 					em.getTransaction().commit();

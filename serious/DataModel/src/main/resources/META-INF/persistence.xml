@@ -9,7 +9,6 @@
 
 		<class>com.enioka.jqm.jpamodel.JobInstance</class>
 		<class>com.enioka.jqm.jpamodel.Deliverable</class>
-		<class>com.enioka.jqm.jpamodel.ExecParameter</class>
 		<class>com.enioka.jqm.jpamodel.History</class>
 		<class>com.enioka.jqm.jpamodel.JobDefParameter</class>
 		<class>com.enioka.jqm.jpamodel.JobDef</class>
@@ -25,18 +24,6 @@
 
 		<properties>
 			<property name="javax.persistence.validation.mode" value="NONE" />
-			
-			<!-- for Hibernate (ignored of other JPA provider) -->
-			<property name="hibernate.hbm2ddl.auto" value="update" />
-			<!--<property name="hibernate.show_sql" value="true" /> <property name="hibernate.format_sql" 
-				value="true" /> -->
-
-			<!-- for EclipseLink (ignored of other JPA provider) -->
-			<property name="eclipselink.ddl-generation" value="create-or-extend-tables" />
-			<property name="eclipselink.ddl-generation.output-mode"
-				value="database" />
-			<!-- <property name="eclipselink.logging.level" value="FINE" /> -->
-
 		</properties>
 	</persistence-unit>
 </persistence>
