@@ -336,6 +336,7 @@ public class CreationTools
 		prms.put("PORT", port.toString());
 		prms.put("CHAN", channel);
 		prms.put("QMGR", queueManagerName);
+		prms.put("TRAN", "1"); // 0 = bindings, 1 = CLIENT, 2 = DIRECT, 4 = DIRECTHTTP
 		if (optionalParameters != null)
 		{
 			prms.putAll(optionalParameters);
