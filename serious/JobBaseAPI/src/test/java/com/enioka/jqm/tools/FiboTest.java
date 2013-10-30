@@ -70,8 +70,8 @@ public class FiboTest
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/",
-				"jqm-test-fibo/jqm-test-fibo.jar", TestHelpers.qVip, 42, "Fibo", "Franquin", "ModuleMachin", "other1", "other2", "other3",
-				false, em);
+				"jqm-test-fibo/jqm-test-fibo.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2",
+				"other3", false, em);
 
 		JobDefinition form = new JobDefinition("Fibo", "MAG");
 		form.addParameter("p1", "1");

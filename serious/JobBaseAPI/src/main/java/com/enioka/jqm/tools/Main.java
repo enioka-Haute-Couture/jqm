@@ -28,16 +28,34 @@ public class Main
 	 */
 	public static void main(String[] args)
 	{
+		if (args.length >= 3)
+		{
+			if (args[1].equals("xmlEngine"))
+			{
+				if (!args[2].isEmpty())
+				{
+					XmlParser parser = new XmlParser(args[2]);
+					parser.parse();
+				}
+			}
+		}
+
 		JqmEngine engine = new JqmEngine();
 		try
 		{
 			engine.start(args);
-			Thread.sleep(Long.MAX_VALUE);
+
+			if (args.length > 3)
+			{
+				Thread.sleep(Integer.parseInt(args[3]));
+				engine.stop();
+			}
+			else
+				Thread.sleep(Long.MAX_VALUE);
 		} catch (Exception e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 }

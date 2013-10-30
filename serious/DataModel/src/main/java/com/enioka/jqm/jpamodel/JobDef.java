@@ -225,4 +225,14 @@ public class JobDef implements Serializable
 	{
 		this.parameters = parameters;
 	}
+
+	public Integer getSessionID()
+	{
+		return sessionID;
+	}
+
+	public void setSessionID(Integer sessionID)
+	{
+		this.sessionID = sessionID;
+	}
 }

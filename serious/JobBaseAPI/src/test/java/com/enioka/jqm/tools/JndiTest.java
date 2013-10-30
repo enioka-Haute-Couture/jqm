@@ -98,7 +98,7 @@ public class JndiTest
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-amq/",
-				"jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", "Franquin", "ModuleMachin", "other1",
+				"jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
 				"other2", "other3", false, em);
 
 		JobDefinition form = new JobDefinition("Jms", "MAG");
@@ -144,7 +144,7 @@ public class JndiTest
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-amq/",
-				"jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", "Franquin", "ModuleMachin", "other1",
+				"jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
 				"other2", "other3", false, em);
 
 		JobDefinition form = new JobDefinition("Jms", "MAG");
