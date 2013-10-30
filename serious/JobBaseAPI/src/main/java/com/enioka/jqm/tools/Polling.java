@@ -71,8 +71,7 @@ class Polling implements Runnable
 		// Higlander?
 		if (job.size() > 0 && job.get(0).getJd().isHighlander() == true)
 		{
-
-			HighlanderMode(job.get(0), em);
+			HighlanderPollingMode(job.get(0), em);
 		}
 
 		return (!job.isEmpty()) ? job.get(0) : null;
@@ -102,77 +101,17 @@ class Polling implements Runnable
 		em.close();
 	}
 
-	protected void HighlanderMode(JobInstance currentJob, EntityManager em)
+	protected void HighlanderPollingMode(JobInstance currentJob, EntityManager em)
 	{
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
-				.createQuery("SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd = :myjd AND j.position >= :currentPos",
-						JobInstance.class).setParameter("refid", currentJob.getId()).setParameter("currentPos", currentJob.getPosition())
-				.setParameter("myjd", job.get(0).getJd()).getResultList();
+				.createQuery("SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.applicationName = :n", JobInstance.class)
+				.setParameter("refid", currentJob.getId()).setParameter("n", currentJob.getJd().getApplicationName()).getResultList();
 
-		for (int i = 0; i < jobs.size(); i++)
+		for (JobInstance j : jobs)
 		{
-
-			if (jobs.get(i).getState().equals("ATTRIBUTED") || jobs.get(i).getState().equals("RUNNING"))
-			{
-				EntityTransaction t = em.getTransaction();
-				t.begin();
-
-				em.createQuery("UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob")
-						.setParameter("idJob", currentJob.getId()).executeUpdate();
-
-				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class)
-						.setParameter("j", currentJob.getId()).getSingleResult();
-
-				Helpers.createMessage("Status updated: CANCELLED", h, em);
-
-				t.commit();
-			}
+			if (j.getState().equals("ATTRIBUTED") || j.getState().equals("RUNNING"))
+				job = new ArrayList<JobInstance>();
 		}
-
-		if (!currentJob.getState().equals("CANCELLED"))
-		{
-
-			for (JobInstance j : jobs)
-			{
-
-				EntityTransaction t = em.getTransaction();
-				t.begin();
-
-				em.createQuery("UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob").setParameter("idJob", j.getId())
-						.executeUpdate();
-
-				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class)
-						.setParameter("j", j.getId()).getSingleResult();
-
-				Helpers.createMessage("Status updated: CANCELLED", h, em);
-
-				t.commit();
-			}
-		}
-
-		for (int i = 1; i < jobs.size(); i++)
-		{
-
-			EntityTransaction t = em.getTransaction();
-			t.begin();
-
-			em.createQuery("UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob AND j.state IS NOT :endState")
-					.setParameter("idJob", jobs.get(i).getId()).setParameter("endState", "ENDED").executeUpdate();
-
-			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class)
-					.setParameter("j", jobs.get(i).getId()).getSingleResult();
-
-			Message m = new Message();
-
-			m.setTextMessage("Status updated: CANCELLED");
-			m.setHistory(h);
-
-			// CreationTools.createMessage("Status updated: CANCELLED", h);
-
-			em.persist(m);
-			t.commit();
-		}
-
 	}
 
 	@Override

@@ -36,9 +36,11 @@ import org.junit.Test;
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
 import com.enioka.jqm.jpamodel.Deliverable;
+import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Queue;
 
 public class JobBaseTest
@@ -88,19 +90,16 @@ public class JobBaseTest
 
 		Dispatcher.enQueue(j);
 		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
 
-		em.getTransaction().begin();
-
-		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
-				.setParameter("myId", 2).setParameter("i", jdDemoMaven.getId()).getSingleResult();
-
-		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId())
-				.executeUpdate();
-
-		em.getTransaction().commit();
-
-		em.getTransaction().begin();
+		// em.getTransaction().begin();
+		//
+		// JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
+		// .setParameter("myId", 2).setParameter("i", jdDemoMaven.getId()).getSingleResult();
+		//
+		// em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId())
+		// .executeUpdate();
+		//
+		// em.getTransaction().commit();
 
 		JqmEngine engine1 = new JqmEngine();
 		engine1.start(new String[] { "localhost" });
@@ -108,16 +107,58 @@ public class JobBaseTest
 		Thread.sleep(5000);
 		engine1.stop();
 
+		EntityManager emm = Helpers.getNewEm();
+
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
+				JobInstance.class).getResultList();
+
+		Assert.assertEquals(1, res.size());
+		Assert.assertEquals("ENDED", res.get(0).getState());
+	}
+
+	@Test
+	public void testHighlanderMode2() throws Exception
+	{
+		jqmlogger.debug("Starting test testHighlanderMode");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+		List<JobParameter> jps = new ArrayList<JobParameter>();
+
+		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "jqm-test-datetimemaven/",
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", "Franquin", "ModuleMachin",
+				"other", "other", "other", true, em);
+
+		em.getTransaction().begin();
+
+		JobInstance j = CreationTools.createJobInstance(jdDemoMaven, jps, "MAG", null, "SUBMITTED", 2, TestHelpers.qVip, null, em);
+		JobInstance jj = CreationTools.createJobInstance(jdDemoMaven, jps, "MAG", null, "RUNNING", 1, TestHelpers.qVip, null, em);
+
+		History h = CreationTools.createhistory(null, null, jdDemoMaven.getId(), null, TestHelpers.qVip, null, null, j, null, null, null,
+				null, TestHelpers.node, null, em);
+		History hh = CreationTools.createhistory(null, null, jdDemoMaven.getId(), null, TestHelpers.qVip, null, null, jj, null, null, null,
+				null, TestHelpers.node, null, em);
+
 		em.getTransaction().commit();
+
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+
+		Thread.sleep(2000);
+		engine1.stop();
 
 		EntityManager emm = Helpers.getNewEm();
 
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
 				JobInstance.class).getResultList();
 
-		Assert.assertEquals("ENDED", res.get(0).getState());
-		Assert.assertEquals("CANCELLED", res.get(1).getState());
-		Assert.assertEquals("CANCELLED", res.get(2).getState());
+		Assert.assertEquals(2, res.size());
+		Assert.assertEquals("RUNNING", res.get(0).getState());
+		Assert.assertEquals("SUBMITTED", res.get(1).getState());
 	}
 
 	@Test
@@ -136,38 +177,16 @@ public class JobBaseTest
 				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", "Franquin", "ModuleMachin",
 				"other", "other", "other", true, em);
 
-		JobDef jdDemoMaven2 = CreationTools.createJobDef(true, "App", jdargs, "jqm-test-datetimemaven/",
-				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "MarsuApplication2", "Franquin",
-				"ModuleMachin", "other", "other", "other", false, em);
-
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
-		JobDefinition jj = new JobDefinition("MarsuApplication2", "MAG");
 
 		Dispatcher.enQueue(j);
 		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(jj);
-		Dispatcher.enQueue(jj);
-
-		em.getTransaction().begin();
-
-		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
-				.setParameter("myId", 2).setParameter("i", jdDemoMaven.getId()).getSingleResult();
-
-		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId())
-				.executeUpdate();
-
-		em.getTransaction().commit();
-
-		em.getTransaction().begin();
 
 		JqmEngine engine1 = new JqmEngine();
 		engine1.start(new String[] { "localhost" });
 
-		Thread.sleep(10000);
+		Thread.sleep(2000);
 		engine1.stop();
-
-		em.getTransaction().commit();
 
 		EntityManager emm = Helpers.getNewEm();
 
@@ -175,18 +194,8 @@ public class JobBaseTest
 				.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :j ORDER BY j.position ASC", JobInstance.class)
 				.setParameter("j", jdDemoMaven.getId()).getResultList();
 
-		ArrayList<JobInstance> res2 = (ArrayList<JobInstance>) emm
-				.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :j ORDER BY j.position ASC", JobInstance.class)
-				.setParameter("j", jdDemoMaven2.getId()).getResultList();
-
-		Assert.assertEquals(3, res.size());
+		Assert.assertEquals(1, res.size());
 		Assert.assertEquals("ENDED", res.get(0).getState());
-		Assert.assertEquals("CANCELLED", res.get(1).getState());
-		Assert.assertEquals("CANCELLED", res.get(2).getState());
-
-		Assert.assertEquals(2, res2.size());
-		Assert.assertEquals("ENDED", res2.get(0).getState());
-		Assert.assertEquals("ENDED", res2.get(1).getState());
 	}
 
 	@Test
@@ -390,7 +399,7 @@ public class JobBaseTest
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "./testprojects/jqm-test-datetimemaven/",
 				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", "Franquin", "ModuleMachin",
-				"other", "other", "other", true, em);
+				"other", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
@@ -449,7 +458,7 @@ public class JobBaseTest
 
 		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "jqm-test-datetimemaven/",
 				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", "Franquin", "ModuleMachin",
-				"other", "other", "other", true, em);
+				"other", "other", "other", false, em);
 
 		ArrayList<JobDefParameter> jdargs2 = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp2 = CreationTools.createJobDefParameter("filepath", "jqm-test-deliverable/", em);
