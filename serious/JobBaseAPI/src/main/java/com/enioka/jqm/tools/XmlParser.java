@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -44,7 +45,6 @@ public class XmlParser
 		Queue queue = null;
 		Integer maxTimeRunning = null;
 		String applicationName = null;
-		Integer sessionID = null;
 		String application = null;
 		String module = null;
 		String other1 = null;
@@ -77,69 +77,76 @@ public class XmlParser
 				{
 					Element e = (Element) nNode;
 
-					if (e.getNodeName().equals("parameters"))
+					NodeList nl = e.getElementsByTagName("jobDefinition");
+
+					for (int i = 0; i < nl.getLength(); i++)
 					{
-						jqmlogger.debug("TOTOPROUT");
-						NodeList nl = doc.getElementsByTagName("parameter");
-						for (int i = 0; i < nl.getLength(); i++)
+						em.getTransaction().begin();
+						Element ee = (Element) nl.item(i);
+
+						canBeRestarted = (ee.getElementsByTagName("canBeRestarted").item(0).getTextContent().equals("true")) ? true : false;
+						javaClassName = ee.getElementsByTagName("javaClassName").item(0).getTextContent();
+						filePath = ee.getElementsByTagName("filePath").item(0).getTextContent();
+						queue = em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true", Queue.class).getSingleResult();
+						maxTimeRunning = Integer.parseInt(ee.getElementsByTagName("maxTimeRunning").item(0).getTextContent());
+
+						JobDef jd;
+
+						TypedQuery<JobDef> q = em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = :n", JobDef.class);
+						q.setParameter("n", ee.getElementsByTagName("name").item(0).getTextContent());
+
+						try
 						{
-
-							Node n = nl.item(i);
-							Element el = (Element) n;
-							JobDefParameter jdp = new JobDefParameter();
-							jdp.setKey(el.getTextContent());
-							jdp.setValue(el.getTextContent());
-							parameters.add(jdp);
+							jd = q.getSingleResult();
+							jd.getParameters().clear();
+						} catch (NoResultException x)
+						{
+							jd = new JobDef();
 						}
+
+						applicationName = ee.getElementsByTagName("name").item(0).getTextContent();
+						application = ee.getElementsByTagName("application").item(0).getTextContent();
+						module = ee.getElementsByTagName("module").item(0).getTextContent();
+						other1 = ee.getElementsByTagName("other1").item(0).getTextContent();
+						other2 = ee.getElementsByTagName("other2").item(0).getTextContent();
+						other3 = ee.getElementsByTagName("other3").item(0).getTextContent();
+						highlander = (ee.getElementsByTagName("highlander").item(0).getTextContent().equals("true")) ? true : false;
+						jarPath = e.getElementsByTagName("path").item(0).getTextContent();
+
+						NodeList l = ee.getElementsByTagName("parameter");
+
+						for (int j = 0; j < l.getLength(); j++)
+						{
+							Element t = (Element) l.item(j);
+
+							JobDefParameter jdp = new JobDefParameter();
+							jdp.setKey(t.getElementsByTagName("key").item(0).getTextContent());
+							jdp.setValue(t.getElementsByTagName("value").item(0).getTextContent());
+							jd.getParameters().add(jdp);
+						}
+
+						jd.setCanBeRestarted(canBeRestarted);
+						jd.setJavaClassName(javaClassName);
+						// jd.setParameters(parameters);
+						jd.setFilePath(filePath);
+						jd.setQueue(queue);
+						jd.setMaxTimeRunning(maxTimeRunning);
+						jd.setApplicationName(applicationName);
+						jd.setApplication(application);
+						jd.setModule(module);
+						jd.setOther1(other1);
+						jd.setOther2(other2);
+						jd.setOther3(other3);
+						jd.setHighlander(highlander);
+						jd.setJarPath(jarPath);
+
+						em.persist(jd);
+						em.getTransaction().commit();
+
+						jqmlogger.debug("XML parsed");
 					}
-
-					canBeRestarted = (e.getElementsByTagName("canBeRestarted").item(0).getTextContent().equals("true")) ? true : false;
-					javaClassName = e.getElementsByTagName("javaClassName").item(0).getTextContent();
-					filePath = e.getElementsByTagName("filePath").item(0).getTextContent();
-					queue = em.createQuery("SELECT q FROM Queue q WHERE q.name = :n", Queue.class)
-							.setParameter("n", e.getElementsByTagName("queue").item(0).getTextContent()).getSingleResult();
-					maxTimeRunning = Integer.parseInt(e.getElementsByTagName("maxTimeRunning").item(0).getTextContent());
-					applicationName = e.getElementsByTagName("name").item(0).getTextContent();
-					sessionID = Integer.parseInt(e.getElementsByTagName("sessionId").item(0).getTextContent());
-					application = e.getElementsByTagName("application").item(0).getTextContent();
-					module = e.getElementsByTagName("module").item(0).getTextContent();
-					other1 = e.getElementsByTagName("other1").item(0).getTextContent();
-					other2 = e.getElementsByTagName("other2").item(0).getTextContent();
-					other3 = e.getElementsByTagName("other3").item(0).getTextContent();
-					highlander = (e.getElementsByTagName("highlander").item(0).getTextContent().equals("true")) ? true : false;
-					jarPath = e.getElementsByTagName("path").item(0).getTextContent();
-					JobDefParameter jdp = new JobDefParameter();
-					jdp.setKey(e.getElementsByTagName("key").item(0).getTextContent());
-					jdp.setValue(e.getElementsByTagName("value").item(0).getTextContent());
-					parameters.add(jdp);
-
-					JobDef j = new JobDef();
-					EntityTransaction transac = em.getTransaction();
-					transac.begin();
-
-					j.setCanBeRestarted(canBeRestarted);
-					j.setJavaClassName(javaClassName);
-					j.setParameters(parameters);
-					j.setFilePath(filePath);
-					j.setQueue(queue);
-					j.setMaxTimeRunning(maxTimeRunning);
-					j.setApplicationName(applicationName);
-					j.setSessionID(sessionID);
-					j.setApplication(application);
-					j.setModule(module);
-					j.setOther1(other1);
-					j.setOther2(other2);
-					j.setOther3(other3);
-					j.setHighlander(highlander);
-					j.setJarPath(jarPath);
-
-					em.persist(j);
-					transac.commit();
-
-					jqmlogger.debug("XML parsed");
 				}
 			}
-
 		} catch (ParserConfigurationException e)
 		{
 			jqmlogger.error(e);

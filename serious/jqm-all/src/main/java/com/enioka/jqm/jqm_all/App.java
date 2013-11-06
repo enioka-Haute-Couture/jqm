@@ -1,4 +1,4 @@
-package src.main.java.com.enioka.jqm.jqm_all;
+package com.enioka.jqm.jqm_all;
 
 
 /**

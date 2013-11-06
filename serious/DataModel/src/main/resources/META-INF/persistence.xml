@@ -21,6 +21,7 @@
 		<class>com.enioka.jqm.jpamodel.DatabaseProp</class>
 		<class>com.enioka.jqm.jpamodel.JndiObjectResource</class>
 		<class>com.enioka.jqm.jpamodel.JndiObjectResourceParameter</class>
+		<class>com.enioka.jqm.jpamodel.GlobalParameter</class>
 
 		<properties>
 			<property name="javax.persistence.validation.mode" value="NONE" />

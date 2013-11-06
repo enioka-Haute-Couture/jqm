@@ -46,34 +46,34 @@ public class JobDef implements Serializable
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	public Integer id;
+	private Integer id;
+	@Column(name="description")
+	private String description;
 	@Column(name="canBeRestarted")
-	public boolean canBeRestarted = true;
+	private boolean canBeRestarted = true;
 	@Column(nullable = false, length = 100, name="javaClassName")
-	public String javaClassName;
+	private String javaClassName;
 	@Column(length = 1000, name="filePath")
-	public String filePath;
+	private String filePath;
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "queue_id")
-	public Queue queue;
+	private Queue queue;
 	@Column(name="maxTimeRunning")
-	public Integer maxTimeRunning;
+	private Integer maxTimeRunning;
 	@Column(nullable = false, name="applicationName")
-	public String applicationName;
-	@Column(length = 50, name="sessionId")
-	public Integer sessionID;
+	private String applicationName;
 	@Column(length = 50, name="application")
-	public String application;
+	private String application;
 	@Column(length = 50, name="module")
-	public String module;
+	private String module;
 	@Column(length = 50, name="other1")
-	public String other1;
+	private String other1;
 	@Column(length = 50, name="other2")
-	public String other2;
+	private String other2;
 	@Column(length = 50, name="other3")
-	public String other3;
+	private String other3;
 	@Column(name="highlander", nullable=false)
-	public boolean highlander = false;
+	private boolean highlander = false;
 	@Column(name="jarPath")
 	private String jarPath;
 	@OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -224,15 +224,5 @@ public class JobDef implements Serializable
 	public void setParameters(final List<JobDefParameter> parameters)
 	{
 		this.parameters = parameters;
-	}
-
-	public Integer getSessionID()
-	{
-		return sessionID;
-	}
-
-	public void setSessionID(Integer sessionID)
-	{
-		this.sessionID = sessionID;
 	}
 }

@@ -5,22 +5,18 @@
 	version="2.0">
 
 	<persistence-unit name="jobqueue-api-pu">
-		<!-- Hibernate is our only persistence provider in the engine -->
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<non-jta-data-source>jdbc/jqm</non-jta-data-source>
+		<jar-file>/Users/pico/Dropbox/projets/enioka/jqm/serious/DataModel/target/jqm-model-0.0.1-SNAPSHOT.jar</jar-file>
 
-		<jar-file>./lib/jqm-model-0.0.1-SNAPSHOT.jar</jar-file>
 		<properties>
 			<property name="javax.persistence.validation.mode" value="none" />
 			<!--<property name="hibernate.show_sql" value="true" /> <property name="hibernate.format_sql" 
 				value="true" /> -->
 
-			<!-- Database default configuration (see db.properties for overriding 
-				these values) -->
-			<property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:hsql://localhost/testdb" />
-			<property name="javax.persistence.jdbc.user" value="SA" />
-			<property name="javax.persistence.jdbc.password" value="" />
+			<!-- We use a test db started during the jUnit tests -->
 			<property name="hibernate.hbm2ddl.auto" value="update" />
+
 		</properties>
 	</persistence-unit>
 </persistence>

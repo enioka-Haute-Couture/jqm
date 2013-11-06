@@ -65,7 +65,7 @@ public class JndiObjectResource implements Serializable
 
 	// The parameters. These are specific to each Object type. (e.g. for MQSeries: HOST, PORT, CHAN, TRAN, QMGR, ...)
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "resource")
-	@Column(name="parameters")
+	//	@Column(name="parameters")
 	private Collection<JndiObjectResourceParameter> parameters = new ArrayList<JndiObjectResourceParameter>();
 
 	public int getId()

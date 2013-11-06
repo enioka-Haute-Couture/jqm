@@ -57,7 +57,7 @@ public class Queue implements Serializable
 	private boolean defaultQueue;
 
 	@OneToMany(mappedBy="queue", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Column(name="jobdefs")
+	//	@Column(name="jobdefs")
 	private List<JobDef> jobdefs = new ArrayList<JobDef>();
 
 	public String getName()

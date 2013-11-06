@@ -1,5 +1,5 @@
 /**
- * Copyright © 2013 enioka. All rights reserved
+ * Copyright �� 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
  * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
  *
@@ -248,6 +248,13 @@ class Loader implements Runnable
 			jqmlogger.debug("End of loader. Thread will now end");
 			jqmlogger.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 			jqmlogger.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+
+			// SEND EMAIL
+
+			// Mail mail = new Mail(node, job);
+			// mail.send();
+
+			// END SEND EMAIL
 
 		} catch (DependencyResolutionException e)
 		{

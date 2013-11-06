@@ -71,7 +71,7 @@ public class CreationTools
 	}
 
 	public static JobDef createJobDef(boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String filePath, String jp,
-			Queue queue, Integer maxTimeRunning, String applicationName, Integer sessionId, String application, String module, String other1, String other2,
+			Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String other1, String other2,
 			String other3, boolean highlander, EntityManager em)
 	{
 		JobDef j = new JobDef();
@@ -87,7 +87,6 @@ public class CreationTools
 		j.setQueue(queue);
 		j.setMaxTimeRunning(maxTimeRunning);
 		j.setApplicationName(applicationName);
-		j.setSessionID(sessionId);
 		j.setApplication(application);
 		j.setModule(module);
 		j.setOther1(other1);

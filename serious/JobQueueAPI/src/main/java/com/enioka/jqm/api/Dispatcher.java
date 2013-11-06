@@ -332,7 +332,7 @@ public class Dispatcher
 
 		jqmlogger.debug("Value of the highlander return: " + hl);
 		JobInstance ji = CreationTools.createJobInstance(job, overrideParameter(job, jd, em), jd.getUser(), 42, "SUBMITTED",
-				(p == null) ? 1 : p + 1, job.queue, null, em);
+				(p == null) ? 1 : p + 1, job.getQueue(), null, em);
 		jqmlogger.debug("JI recently created: " + ji.getId());
 
 		ArrayList<JobHistoryParameter> jhp = new ArrayList<JobHistoryParameter>();

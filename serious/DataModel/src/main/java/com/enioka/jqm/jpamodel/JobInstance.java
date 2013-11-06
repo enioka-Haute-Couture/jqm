@@ -19,11 +19,7 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -58,7 +54,7 @@ public class JobInstance implements Comparable<JobInstance>, Serializable
 	private JobDef jd;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_id")
-	public JobInstance parent;
+	private JobInstance parent;
 	@Column(length = 50, name = "username")
 	private String userName;
 	@Column(name = "sessionId")

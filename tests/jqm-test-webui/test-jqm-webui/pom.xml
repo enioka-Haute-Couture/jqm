@@ -1,0 +1,182 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.enioka.jqm</groupId>
+  <artifactId>test-jqm-webui</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>war</packaging>
+
+  <name>test-jqm-webui</name>
+
+  <properties>
+    <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <repositories>
+
+    <repository>
+      <id>repository.jboss.org</id>
+      <name>JBoss Repository</name>
+      <url>http://repository.jboss.org/maven2</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+  </repositories>
+
+  <dependencies>
+  
+  	<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-model</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+    <dependency>
+      <groupId>javax</groupId>
+      <artifactId>javaee-web-api</artifactId>
+      <version>6.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.faces</groupId>
+      <artifactId>jsf-api</artifactId>
+      <version>2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>jsr250-api</artifactId>
+      <version>1.0</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>javax.enterprise</groupId>
+      <artifactId>cdi-api</artifactId>
+      <version>1.1-20130918</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>javax.faces</groupId>
+      <artifactId>jsf-impl</artifactId>
+      <version>1.2-NIGHTLY_20060227</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>jspapi</groupId>
+      <artifactId>jsp-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+
+<dependency>
+    <groupId>com.sun.faces</groupId>
+    <artifactId>mojarra-jsf-impl</artifactId>
+    <version>2.0.0-b04</version>
+</dependency>
+
+<dependency>
+    <groupId>com.sun.faces</groupId>
+    <artifactId>jsf-impl</artifactId>
+    <version>2.2.4</version>
+</dependency>
+    
+    <dependency>
+    <groupId>tomcat</groupId>
+    <artifactId>servlet-api</artifactId>
+    <version>5.5.23</version>
+</dependency>
+
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!--This plugin's configuration is used to store Eclipse m2e settings 
+                                                   only. It has no influence on the Maven build itself. -->
+                                                               <plugin>
+                                                                 <groupId>org.eclipse.m2e</groupId>
+                                                                 <artifactId>lifecycle-mapping</artifactId>
+                                                                 <version>1.0.0</version>
+                                                                 <configuration>
+                                                                   <lifecycleMappingMetadata>
+                                                                     <pluginExecutions>
+                                                                       <pluginExecution>
+                                                                         <pluginExecutionFilter>
+                                                                           <groupId>
+                                                                             org.appfuse.plugins
+                                                                           </groupId>
+                                                                           <artifactId>
+                                                                             maven-warpath-plugin
+                                                                           </artifactId>
+                                                                           <versionRange>
+                                                                             [2.1.0,)
+                                                                           </versionRange>
+                                                                           <goals>
+                                                                             <goal>add-classes</goal>
+                                                                           </goals>
+                                                                         </pluginExecutionFilter>
+                                                                         <action>
+                                                                           <ignore></ignore>
+                                                                         </action>
+                                                                       </pluginExecution>
+                                                                     </pluginExecutions>
+                                                                   </lifecycleMappingMetadata>
+                                                                 </configuration>
+                                                               </plugin>
+
+                                                               <plugin>
+                                                                 <groupId>org.apache.maven.plugins</groupId>
+                                                                 <artifactId>maven-compiler-plugin</artifactId>
+                                                                 <version>2.3.2</version>
+                                                                 <configuration>
+                                                                   <source>1.6</source>
+                                                                   <target>1.6</target>
+                                                                   <compilerArguments>
+                                                                     <endorseddirs>${endorsed.dir}</endorseddirs>
+                                                                   </compilerArguments>
+                                                                 </configuration>
+                                                               </plugin>
+                                                               <plugin>
+                                                                 <groupId>org.apache.maven.plugins</groupId>
+                                                                 <artifactId>maven-war-plugin</artifactId>
+                                                                 <version>2.1.1</version>
+                                                                 <configuration>
+                                                                   <failOnMissingWebXml>false</failOnMissingWebXml>
+                                                                 </configuration>
+                                                               </plugin>
+                                                               <plugin>
+                                                                 <groupId>org.apache.maven.plugins</groupId>
+                                                                 <artifactId>maven-dependency-plugin</artifactId>
+                                                                 <version>2.1</version>
+                                                                 <executions>
+                                                                   <execution>
+                                                                     <phase>validate</phase>
+                                                                     <goals>
+                                                                       <goal>copy</goal>
+                                                                     </goals>
+                                                                     <configuration>
+                                                                       <outputDirectory>${endorsed.dir}</outputDirectory>
+                                                                       <silent>true</silent>
+                                                                       <artifactItems>
+                                                                         <artifactItem>
+                                                                           <groupId>javax</groupId>
+                                                                           <artifactId>javaee-endorsed-api</artifactId>
+                                                                           <version>6.0</version>
+                                                                           <type>jar</type>
+                                                                         </artifactItem>
+                                                                       </artifactItems>
+                                                                     </configuration>
+                                                                   </execution>
+                                                                 </executions>
+                                                               </plugin>
+                                                             </plugins>
+                                                           </pluginManagement>
+                                                         </build>
+                                                       </project>
