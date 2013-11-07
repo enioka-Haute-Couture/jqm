@@ -180,6 +180,30 @@ class JqmEngine
 			}
 		}
 
+		// GlobalParameter
+		GlobalParameter gp = null;
+		i = (Long) em.createQuery("SELECT COUNT(gp) FROM GlobalParameter gp WHERE gp.key = :key").setParameter("key", "mavenRepo")
+				.getSingleResult();
+		if (i == 0)
+		{
+			gp = new GlobalParameter();
+
+			gp.setKey("mavenRepo");
+			gp.setValue("http://repo1.maven.org/maven2/");
+			em.persist(gp);
+
+			gp = new GlobalParameter();
+			gp.setKey("mavenRepo");
+			gp.setValue("http://download.eclipse.org/rt/eclipselink/maven.repo/");
+			em.persist(gp);
+
+			jqmlogger.info("This GlobalParameter will allow to download maven resources");
+		}
+		else
+		{
+			jqmlogger.info("This GlobalParameter is already exists");
+		}
+
 		// Deployment parameter
 		DeploymentParameter dp = null;
 		i = (Long) em.createQuery("SELECT COUNT(dp) FROM DeploymentParameter dp WHERE dp.node = :localnode").setParameter("localnode", n)
@@ -218,30 +242,6 @@ class JqmEngine
 			em.persist(localDb);
 
 			jqmlogger.info("A  JNDI alias towards the JQM db has been created. It references: " + localDb.getUrl());
-		}
-
-		// GlobalParameter
-		GlobalParameter gp = null;
-		i = (Long) em.createQuery("SELECT COUNT(gp) FROM GlobalParameter gp WHERE gp.key = :key").setParameter("key", "mavenRepo")
-				.getSingleResult();
-		if (i == 0)
-		{
-			gp = new GlobalParameter();
-
-			gp.setKey("mavenRepo");
-			gp.setValue("http://repo1.maven.org/maven2/");
-			em.persist(gp);
-
-			gp = new GlobalParameter();
-			gp.setKey("mavenRepo");
-			gp.setValue("http://download.eclipse.org/rt/eclipselink/maven.repo/");
-			em.persist(gp);
-
-			jqmlogger.info("This globalParameter will allow to download maven resources");
-		}
-		else
-		{
-			jqmlogger.info("This GlobalParameter is already configured");
 		}
 
 		// Done

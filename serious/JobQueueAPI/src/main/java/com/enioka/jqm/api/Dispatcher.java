@@ -482,13 +482,46 @@ public class Dispatcher
 
 	public static void restartCrashedJob(int idJob)
 	{
+		EntityManager em = getEm();
 
+		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", idJob)
+				.getSingleResult();
+
+		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :id", JobInstance.class).setParameter("id", idJob).getSingleResult();
+
+		if (!ji.getJd().isCanBeRestarted())
+		{
+			return;
+		}
+
+		JobDefinition j = new JobDefinition(ji.getJd().getApplicationName(), h.getUserName());
+
+		for (JobHistoryParameter i : h.getParameters())
+		{
+			j.addParameter(i.getKey(), i.getValue());
+		}
+
+		Dispatcher.enQueue(j);
 	}
 
 	public static int restartJob(int idJob)
 	{
+		EntityManager em = getEm();
 
-		return 0;
+		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", idJob)
+				.getSingleResult();
+
+		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :id", JobInstance.class).setParameter("id", idJob).getSingleResult();
+
+		JobDefinition j = new JobDefinition(ji.getJd().getApplicationName(), h.getUserName());
+
+		for (JobHistoryParameter i : h.getParameters())
+		{
+			j.addParameter(i.getKey(), i.getValue());
+		}
+
+		return Dispatcher.enQueue(j);
+
 	}
 
 	// ----------------------------- SETPOSITION --------------------------------------
@@ -731,7 +764,8 @@ public class Dispatcher
 	// ----------------------------- GETMSG --------------------------------------
 
 	public static List<String> getMsg(int idJob)
-	{ // -------------TODO------------
+	{
+		// -------------TODO------------
 
 		ArrayList<String> msgs = new ArrayList<String>();
 
