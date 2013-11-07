@@ -10,6 +10,8 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 import org.apache.log4j.Logger;
 
@@ -22,18 +24,26 @@ public class Mail
 	private String to = null;
 	private String from = null;
 	private String host = null;
-	private Node node = null;
 	private JobInstance ji = null;
-	private String username = "pico.2607@gmail.com";
-	private String pwd = "toto";
+	private String port = null;
+	private String pwd = "marsu1952";
 
-	public Mail(Node node, JobInstance ji)
+	public Mail(Node node, JobInstance ji, EntityManager em)
 	{
-		this.to = "pico.2607@gmail.com";
-		this.from = "pico.2607@gmail.com";
-		this.host = node.getListeningInterface();
-		this.node = node;
-		this.ji = ji;
+		try
+		{
+			this.host = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
+					.setParameter("k", "mailSmtp").getSingleResult();
+			this.to = "jqm.noreply@gmail.com";
+			this.from = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
+					.setParameter("k", "mailFrom").getSingleResult();
+			this.ji = ji;
+			this.port = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
+					.setParameter("k", "mailPort").getSingleResult();
+		} catch (NoResultException e)
+		{
+			jqmlogger.debug("Some information have been forgotten. JQM can't send emails", e);
+		}
 	}
 
 	public void send()
@@ -42,28 +52,28 @@ public class Mail
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");
 		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.smtp.host", "smtp.gmail.com");
-		props.put("mail.smtp.port", "587");
+		props.put("mail.smtp.host", host);
+		props.put("mail.smtp.port", port);
 
 		Session session = Session.getInstance(props, new javax.mail.Authenticator()
 		{
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication()
 			{
-				return new PasswordAuthentication(username, pwd);
+				return new PasswordAuthentication(to, pwd);
 			}
 		});
 
 		MimeMessage msg = new MimeMessage(session);
 		try
 		{
-			msg.setFrom(new InternetAddress(username));
-			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(username));
+			msg.setFrom(new InternetAddress(from));
+			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
 			msg.setSubject("[JQM] Job: " + ji.getId() + " ENDED");
 			msg.setText("The Job number: " + ji.getId() + " finished correctly\n" + "Description of the job:\n" + "- Job definition: "
 					+ ji.getJd().getApplicationName() + "\n" + "- Parent: " + ji.getParent() + "\n" + "- User name: " + ji.getUserName()
-					+ "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "- Queue: " + ji.getQueue() + "\n" + "- Node: " + ji.getNode()
-					+ "\n" + "Best regards,\n");
+					+ "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "- Queue: " + ji.getQueue().getName() + "\n" + "- Node: "
+					+ ji.getNode().getListeningInterface() + "\n" + "Best regards,\n");
 
 			Transport.send(msg);
 			jqmlogger.debug("Email sent successfully...");

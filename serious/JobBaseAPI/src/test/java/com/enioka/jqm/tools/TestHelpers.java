@@ -50,6 +50,9 @@ public class TestHelpers
 		TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenRepo", "http://repo1.maven.org/maven2/", em);
 		TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenRepo", "http://download.eclipse.org/rt/eclipselink/maven.repo/",
 				em);
+		TestHelpers.gpCentral = CreationTools.createGlobalParameter("mailSmtp", "smtp.gmail.com", em);
+		TestHelpers.gpCentral = CreationTools.createGlobalParameter("mailFrom", "jqm-noreply@gmail.com", em);
+		TestHelpers.gpCentral = CreationTools.createGlobalParameter("mailPort", "587", em);
 
 		TestHelpers.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42, 100, em);
 		TestHelpers.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, 100, em);

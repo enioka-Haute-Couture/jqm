@@ -145,15 +145,20 @@ class Polling implements Runnable
 
 				jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
 				jqmlogger.debug("Actual deploymentParameter: " + dp.getNode().getId());
-				jqmlogger.debug("THEORETICAL MAX nbThread: " + dp.getNbThread());
+				jqmlogger.debug("Theorical max nbThread: " + dp.getNbThread());
 				jqmlogger.debug("Actual nbThread: " + actualNbThread);
 				jqmlogger.debug("JI that will be attributed: " + ji.getId());
 				jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
 
 				em.getTransaction().begin();
 
-				em.createQuery("UPDATE JobInstance j SET j.node = :n WHERE j.id = :j").setParameter("j", ji.getId())
-						.setParameter("n", dp.getNode()).executeUpdate();
+				JobInstance tt = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :j", JobInstance.class)
+						.setParameter("j", ji.getId()).getSingleResult();
+
+				tt.setNode(dp.getNode());
+
+				// em.createQuery("UPDATE JobInstance j SET j.node = :n WHERE j.id = :j").setParameter("j", ji.getId())
+				// .setParameter("n", dp.getNode()).executeUpdate();
 
 				em.createQuery("UPDATE History h SET h.node = :n WHERE h.jobInstance.id = :j").setParameter("j", ji.getId())
 						.setParameter("n", dp.getNode()).executeUpdate();
@@ -171,6 +176,16 @@ class Polling implements Runnable
 
 				em.persist(m);
 				em.getTransaction().commit();
+
+				JobInstance t = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :j", JobInstance.class)
+						.setParameter("j", ji.getId()).getSingleResult();
+
+				History th = em.createQuery("SELECT j FROM History j WHERE j.jobInstance.id = :j", History.class)
+						.setParameter("j", ji.getId()).getSingleResult();
+
+				jqmlogger.debug("The job " + t.getId() + " have been updated with the node: " + t.getNode().getListeningInterface());
+				jqmlogger.debug("The job history " + th.getId() + " have been updated with the node: "
+						+ th.getNode().getListeningInterface());
 
 				actualNbThread++;
 
