@@ -719,21 +719,22 @@ public class JobBaseTest
 		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);
 
-		Main.main(new String[] { "-xml", "./testprojects/xmltest.xml" });
+		Main.main(new String[] { "-xml", "testprojects/jqm-test-xml/xmltest.xml" });
 
-		// JobDef jd = em.createQuery("SELECT j FROM JobDef j", JobDef.class).getSingleResult();
-		//
-		// Assert.assertEquals("xmlJobDef", jd.getApplicationName());
-		// Assert.assertEquals(true, jd.isCanBeRestarted());
-		// Assert.assertEquals("App", jd.getJavaClassName());
-		// Assert.assertEquals("jqm-test-datetimemaven", jd.getFilePath());
-		// Assert.assertEquals(TestHelpers.qVip, jd.getQueue());
-		// Assert.assertEquals((Integer) 42, jd.getMaxTimeRunning());
-		// Assert.assertEquals((Integer) 1234, jd.getSessionID());
-		// Assert.assertEquals("ApplicationTest", jd.getApplication());
-		// Assert.assertEquals("TestModule", jd.getModule());
-		// Assert.assertEquals(true, jd.isHighlander());
-		// Assert.assertEquals("parameter1", jd.getParameters().get(0).getValue());
+		List<JobDef> jd = em.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
+
+		Assert.assertEquals(2, jd.size());
+		Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
+		Assert.assertEquals(true, jd.get(0).isCanBeRestarted());
+		Assert.assertEquals("com.enioka.jqm.tests.App", jd.get(0).getJavaClassName());
+		Assert.assertEquals("jqm-test-fibo/", jd.get(0).getFilePath());
+		Assert.assertEquals(TestHelpers.qVip, jd.get(0).getQueue());
+		Assert.assertEquals((Integer) 42, jd.get(0).getMaxTimeRunning());
+		Assert.assertEquals("ApplicationTest", jd.get(0).getApplication());
+		Assert.assertEquals("TestModuleRATONLAVEUR", jd.get(0).getModule());
+		Assert.assertEquals(false, jd.get(0).isHighlander());
+		Assert.assertEquals("1", jd.get(0).getParameters().get(0).getValue());
+		Assert.assertEquals("2", jd.get(0).getParameters().get(1).getValue());
 
 	}
 }

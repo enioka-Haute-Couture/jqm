@@ -34,9 +34,23 @@ public class Main
 			{
 				if (!args[1].isEmpty())
 				{
-					XmlParser parser = new XmlParser(args[1]);
-					parser.parse();
-					return;
+					try
+					{
+						JqmEngine engine = new JqmEngine();
+						engine.start(args);
+						Thread.sleep(2000);
+						engine.stop();
+						XmlParser parser = new XmlParser(args[1]);
+						parser.parse();
+						return;
+					} catch (InterruptedException e)
+					{
+						e.printStackTrace();
+					} catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+
 				}
 			}
 		}
