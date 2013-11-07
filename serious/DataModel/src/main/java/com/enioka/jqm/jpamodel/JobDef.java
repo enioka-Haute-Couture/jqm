@@ -225,4 +225,14 @@ public class JobDef implements Serializable
 	{
 		this.parameters = parameters;
 	}
+
+	public String getDescription()
+	{
+		return description;
+	}
+
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
 }

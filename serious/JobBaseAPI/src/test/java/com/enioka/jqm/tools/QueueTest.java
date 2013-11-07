@@ -73,7 +73,7 @@ public class QueueTest
 		jdargs.add(jdp);
 
 		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "jqm-test-datetimemaven/",
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
 				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "MarsuApplication", null, "Franquin",
 				"ModuleMachin", "other", "other", false, em);
 
@@ -136,7 +136,7 @@ public class QueueTest
 		jdargs.add(jdp);
 
 		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(true, "App", jdargs, "jqm-test-datetimemaven/",
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
 				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
 				"ModuleMachin", "other", "other", false, em);
 

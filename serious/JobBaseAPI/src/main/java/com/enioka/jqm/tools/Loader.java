@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -41,6 +42,7 @@ import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
+import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Node;
@@ -138,13 +140,20 @@ class Loader implements Runnable
 			{
 				Dependencies dependencies = new Dependencies(pomFile.getAbsolutePath());
 
+				List<GlobalParameter> repolist = em
+						.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
+						.setParameter("repo", "mavenRepo").getResultList();
+
+				RemoteRepository[] rr = new RemoteRepository[repolist.size()];
+				int ii = 0;
+				for (GlobalParameter g : repolist)
+				{
+					rr[ii] = new RemoteRepository(g.getKey(), "default", g.getValue());
+					ii++;
+				}
+
 				isInCache = false;
-				Collection<RemoteRepository> remotes = Arrays.asList(new RemoteRepository("maven-central", "default",
-						"http://repo1.maven.org/maven2/"), new RemoteRepository("eclipselink", "default",
-						"http://download.eclipse.org/rt/eclipselink/maven.repo/")/*
-																				 * , new RemoteRepository("nexus", "default",
-																				 * "http://10.0.3.128/nexus/content/groups/public/")
-																				 */);
+				Collection<RemoteRepository> remotes = Arrays.asList(rr);
 
 				deps = new ArrayList<Artifact>();
 				for (int i = 0; i < dependencies.getList().size(); i++)

@@ -69,7 +69,7 @@ public class FiboTest
 		jdargs.add(jdp);
 
 		@SuppressWarnings("unused")
-		JobDef jd = CreationTools.createJobDef(true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/",
+		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/",
 				"jqm-test-fibo/jqm-test-fibo.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2",
 				false, em);
 

@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
+import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Node;
 
@@ -39,10 +40,16 @@ public class TestHelpers
 
 	public static DeploymentParameter dpVip, dpNormal, dpSlow, dpVip2, dpNormal2, dpSlow2, dpVip3, dpNormal3, dpSlow3, dpVipMix, dpVipMix2;
 
+	public static GlobalParameter gpCentral, gpEclipse;
+
 	public static void createLocalNode(EntityManager em)
 	{
 
 		db = CreationTools.createDatabaseProp("jdbc/marsu", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb", "SA", "", em);
+
+		TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenRepo", "http://repo1.maven.org/maven2/", em);
+		TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenRepo", "http://download.eclipse.org/rt/eclipselink/maven.repo/",
+				em);
 
 		TestHelpers.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42, 100, em);
 		TestHelpers.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, 100, em);
@@ -80,6 +87,7 @@ public class TestHelpers
 	public static void cleanup(EntityManager em)
 	{
 		em.getTransaction().begin();
+		em.createQuery("DELETE GlobalParameter WHERE 1=1").executeUpdate();
 		em.createQuery("DELETE Deliverable WHERE 1=1").executeUpdate();
 		em.createQuery("DELETE DeploymentParameter WHERE 1=1").executeUpdate();
 		em.createQuery("DELETE JobHistoryParameter WHERE 1=1").executeUpdate();

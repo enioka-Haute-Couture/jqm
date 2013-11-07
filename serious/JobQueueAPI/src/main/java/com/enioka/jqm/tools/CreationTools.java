@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
+import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JndiObjectResource;
 import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
@@ -52,6 +53,22 @@ public class CreationTools
 	{
 	}
 
+	// ------------------ GLOBALPARAMETER ------------------------
+
+	public static GlobalParameter createGlobalParameter(String key, String value, EntityManager em)
+	{
+		GlobalParameter gp = new GlobalParameter();
+		EntityTransaction transac = em.getTransaction();
+		transac.begin();
+
+		gp.setKey(key);
+		gp.setValue(value);
+
+		em.persist(gp);
+		transac.commit();
+		return gp;
+	}
+
 	// ------------------ JOBDEFINITION ------------------------
 
 	public static JobDef initJobDefinition(String javaClassName, String filePath, Queue queue, EntityManager em)
@@ -70,7 +87,7 @@ public class CreationTools
 		return j;
 	}
 
-	public static JobDef createJobDef(boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String filePath, String jp,
+	public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String filePath, String jp,
 			Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String other1, String other2,
 			String other3, boolean highlander, EntityManager em)
 	{
@@ -80,6 +97,7 @@ public class CreationTools
 
 		// ------------------
 
+		j.setDescription(descripton);
 		j.setCanBeRestarted(canBeRestarted);
 		j.setJavaClassName(javaClassName);
 		j.setParameters(jps);

@@ -36,6 +36,7 @@ import com.enioka.jqm.jndi.JndiContext;
 import com.enioka.jqm.jndi.JndiContextFactory;
 import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
+import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 
@@ -217,6 +218,30 @@ class JqmEngine
 			em.persist(localDb);
 
 			jqmlogger.info("A  JNDI alias towards the JQM db has been created. It references: " + localDb.getUrl());
+		}
+
+		// GlobalParameter
+		GlobalParameter gp = null;
+		i = (Long) em.createQuery("SELECT COUNT(gp) FROM GlobalParameter gp WHERE gp.key = :key").setParameter("key", "mavenRepo")
+				.getSingleResult();
+		if (i == 0)
+		{
+			gp = new GlobalParameter();
+
+			gp.setKey("mavenRepo");
+			gp.setValue("http://repo1.maven.org/maven2/");
+			em.persist(gp);
+
+			gp = new GlobalParameter();
+			gp.setKey("mavenRepo");
+			gp.setValue("http://download.eclipse.org/rt/eclipselink/maven.repo/");
+			em.persist(gp);
+
+			jqmlogger.info("This globalParameter will allow to download maven resources");
+		}
+		else
+		{
+			jqmlogger.info("This GlobalParameter is already configured");
 		}
 
 		// Done
