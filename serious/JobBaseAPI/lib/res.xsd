@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="jqm">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="jar"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="jar">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="path"/>
+        <xs:element ref="jobdefinitions"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="path" type="xs:string"/>
+  <xs:element name="jobdefinitions">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="jobDefinition"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="jobDefinition">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="name"/>
+        <xs:element ref="description"/>
+        <xs:element ref="canBeRestarted"/>
+        <xs:element ref="javaClassName"/>
+        <xs:element ref="filePath"/>
+        <xs:element ref="queue"/>
+        <xs:element ref="maxTimeRunning"/>
+        <xs:element ref="application"/>
+        <xs:element ref="module"/>
+        <xs:element ref="other1"/>
+        <xs:element ref="other2"/>
+        <xs:element ref="other3"/>
+        <xs:element ref="highlander"/>
+        <xs:element ref="parameters"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="name" type="xs:NCName"/>
+  <xs:element name="description" type="xs:string"/>
+  <xs:element name="canBeRestarted" type="xs:boolean"/>
+  <xs:element name="javaClassName" type="xs:NCName"/>
+  <xs:element name="filePath" type="xs:string"/>
+  <xs:element name="queue" type="xs:NCName"/>
+  <xs:element name="maxTimeRunning" type="xs:integer"/>
+  <xs:element name="application" type="xs:NCName"/>
+  <xs:element name="module" type="xs:NCName"/>
+  <xs:element name="other1" type="xs:NCName"/>
+  <xs:element name="other2" type="xs:NCName"/>
+  <xs:element name="other3" type="xs:NCName"/>
+  <xs:element name="highlander" type="xs:boolean"/>
+  <xs:element name="parameters">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="parameter"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="parameter">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="key"/>
+        <xs:element ref="value"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="key" type="xs:NCName"/>
+  <xs:element name="value" type="xs:integer"/>
+</xs:schema>

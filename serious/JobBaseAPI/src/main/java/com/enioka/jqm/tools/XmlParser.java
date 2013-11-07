@@ -9,9 +9,14 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -53,6 +58,27 @@ public class XmlParser
 		boolean highlander = false;
 		String jarPath = null;
 		List<JobDefParameter> parameters = new ArrayList<JobDefParameter>();
+
+		SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		Schema schema = null;
+		try
+		{
+			schema = factory.newSchema(new File("./lib/res.xsd"));
+			Validator validator = schema.newValidator();
+			DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			Document document = parser.parse(f);
+			validator.validate(new DOMSource(document));
+		} catch (SAXException e1)
+		{
+			jqmlogger.debug(e1);
+		} catch (ParserConfigurationException e)
+		{
+			jqmlogger.debug(e);
+
+		} catch (IOException e)
+		{
+			jqmlogger.debug(e);
+		}
 
 		try
 		{
