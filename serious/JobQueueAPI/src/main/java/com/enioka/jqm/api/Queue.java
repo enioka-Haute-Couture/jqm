@@ -18,41 +18,56 @@
 
 package com.enioka.jqm.api;
 
-
-
-public class Queue {
-
+/**
+ * A job instance queue. Job request (i.e. job instances) are put inside queues. There are different queues for different uses depending on
+ * the environment.
+ * 
+ */
+public class Queue
+{
 	private int id;
 	private String name;
 	private String description;
 
-	public int getId() {
-
+	/**
+	 * Each queue has a unique ID
+	 * @return
+	 */
+	public int getId()
+	{
 		return id;
 	}
 
-	public void setId(int id) {
-
+	void setId(int id)
+	{
 		this.id = id;
 	}
 
-	public String getName() {
-
+	/**
+	 * Name of the queue, usually descriptive.
+	 * @return
+	 */
+	public String getName()
+	{
 		return name;
 	}
 
-	public void setName(String name) {
-
+	void setName(String name)
+	{
 		this.name = name;
 	}
 
-	public String getDescription() {
-
+	/**
+	 * Queue description.
+	 * @return
+	 */
+	public String getDescription()
+	{
 		return description;
 	}
 
-	public void setDescription(String description) {
-
+	void setDescription(String description)
+	{
 		this.description = description;
 	}
 }

@@ -11,6 +11,7 @@ public class Deliverable
 
 	/**
 	 * Construction. This will not create a new file on the file system!
+	 * 
 	 * @param filePath
 	 * @param fileName
 	 */
@@ -22,6 +23,7 @@ public class Deliverable
 
 	/**
 	 * File Path
+	 * 
 	 * @return
 	 */
 	public String getFilePath()
@@ -29,18 +31,13 @@ public class Deliverable
 		return filePath;
 	}
 
-	public void setFilePath(String filePath)
-	{
-		this.filePath = filePath;
-	}
-
+	/**
+	 * The family name
+	 * 
+	 * @return
+	 */
 	public String getFileName()
 	{
 		return fileName;
-	}
-
-	public void setFileName(String fileName)
-	{
-		this.fileName = fileName;
 	}
 }

@@ -21,159 +21,279 @@ package com.enioka.jqm.api;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Job execution request. It contains all the data needed to enqueue a request, as well as non-mandatory data.
+ * 
+ */
+public class JobDefinition
+{
+	private int parentID;
+	private String applicationName;
+	private Integer sessionID;
+	private String application;
+	private String user;
+	private String module;
+	private String other1;
+	private String other2;
+	private String other3;
+	private Map<String, String> parameters = new HashMap<String, String>();
 
-public class JobDefinition {
-
-	public int parentID;
-	public String applicationName;
-	public Integer sessionID;
-	public String application;
-	public String user;
-	public String module;
-	public String other1;
-	public String other2;
-	public String other3;
-	public Map<String, String> parameters = new HashMap<String, String>();
-
-	public JobDefinition() {
+	JobDefinition()
+	{
 
 	}
 
-	public JobDefinition(String applicationName, String user) {
-
+	/**
+	 * Public constructor
+	 * 
+	 * @param applicationName
+	 *            name (key) of the job to launch
+	 * @param user
+	 *            name of the human user that is at the origin of the request. If no user, use the application module name.
+	 */
+	public JobDefinition(String applicationName, String user)
+	{
 		this.applicationName = applicationName;
 		this.user = user;
 	}
 
-	public void addParameter(String key, String value) {
-
+	/**
+	 * Parameters are <key,value> pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
+	 * job itself.
+	 * 
+	 * @param key
+	 * @param value
+	 */
+	public void addParameter(String key, String value)
+	{
 		parameters.put(key, value);
 	}
 
-	public void delParameter(String key) {
-
+	/**
+	 * Parameters are <key,value> pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
+	 * job itself. If there is no parameter named key, no error is thrown.
+	 * 
+	 * @param key
+	 */
+	public void delParameter(String key)
+	{
 		parameters.remove(key);
 	}
 
-
-	public int getParentID() {
-
+	/**
+	 * <strong>Optional</strong><br>
+	 * A job instance can be the child of another job instance. This allows you to retrieve the ID of that parent. It is null if there is no
+	 * parent.
+	 * 
+	 * @return
+	 */
+	public int getParentID()
+	{
 		return parentID;
 	}
 
-
-	public void setParentID(int parentID) {
-
+	/**
+	 * <strong>Optional</strong><br>
+	 * A job instance can be the child of another job instance. This allows you to retrieve the ID of that parent. It is null if there is no
+	 * parent.
+	 * 
+	 * @param parentID
+	 */
+	public void setParentID(int parentID)
+	{
 		this.parentID = parentID;
 	}
 
-
-	public String getApplicationName() {
-
+	/**
+	 * <strong>Compulsory</strong><br>
+	 * The name of the batch job to launch. It is the "Job Definition" name, and the most important parameter in this form.
+	 * 
+	 * @return
+	 */
+	public String getApplicationName()
+	{
 		return applicationName;
 	}
 
-
-	public void setApplicationName(String applicationName) {
-
+	/**
+	 * <strong>Compulsory</strong><br>
+	 * The name of the batch job to launch. It is the "Job Definition" name, and the most important parameter in this form.
+	 * 
+	 * @param applicationName
+	 */
+	public void setApplicationName(String applicationName)
+	{
 		this.applicationName = applicationName;
 	}
 
-
-	public Integer getSessionID() {
-
+	/**
+	 * <strong>Optional</strong><br>
+	 * It is possible to link a job instance to an arbitrary ID, such as a session ID and later query result by this ID.<br>
+	 * Default is null.
+	 * 
+	 * @return
+	 */
+	public Integer getSessionID()
+	{
 		return sessionID;
 	}
 
-
-	public void setSessionID(Integer sessionID) {
-
+	/**
+	 * <strong>Optional</strong><br>
+	 * It is possible to link a job instance to an arbitrary ID, such as a session ID and later query result by this ID.<br>
+	 * Default is null.
+	 * 
+	 * @param sessionID
+	 */
+	public void setSessionID(Integer sessionID)
+	{
 		this.sessionID = sessionID;
 	}
 
-
-	public String getApplication() {
-
+	/**
+	 * <strong>Optional</strong><br>
+	 * The application making the query. E.g.: Accounting, Interfaces, ...
+	 * 
+	 * @return
+	 */
+	public String getApplication()
+	{
 		return application;
 	}
 
-
-	public void setApplication(String application) {
-
+	/**
+	 * <strong>Optional</strong><br>
+	 * The application making the query. E.g.: Accounting, Interfaces, ...
+	 * 
+	 * @param application
+	 */
+	public void setApplication(String application)
+	{
 		this.application = application;
 	}
 
-
-	public String getModule() {
-
+	/**
+	 * <strong>Optional</strong><br>
+	 * An optional classification axis (and therefore query criterion)
+	 * 
+	 * @return
+	 */
+	public String getModule()
+	{
 		return module;
 	}
 
-
-	public void setModule(String module) {
-
+	/**
+	 * <strong>Optional</strong><br>
+	 * An optional classification axis (and therefore query criterion)
+	 * 
+	 * @param module
+	 */
+	public void setModule(String module)
+	{
 		this.module = module;
 	}
 
-
-	public String getOther1() {
-
+	/**
+	 * <strong>Optional</strong><br>
+	 * An optional classification axis (and therefore query criterion)
+	 * 
+	 * @return
+	 */
+	public String getOther1()
+	{
 		return other1;
 	}
 
-
-	public void setOther1(String other1) {
-
+	/**
+	 * <strong>Optional</strong><br>
+	 * An optional classification axis (and therefore query criterion)
+	 * 
+	 * @param other1
+	 */
+	public void setOther1(String other1)
+	{
 		this.other1 = other1;
 	}
 
-
-	public String getOther2() {
-
+	/**
+	 * <strong>Optional</strong><br>
+	 * An optional classification axis (and therefore query criterion)
+	 * 
+	 * @return
+	 */
+	public String getOther2()
+	{
 		return other2;
 	}
 
-
-	public void setOther2(String other2) {
-
+	/**
+	 * <strong>Optional</strong><br>
+	 * An optional classification axis (and therefore query criterion)
+	 * 
+	 * @param other2
+	 */
+	public void setOther2(String other2)
+	{
 		this.other2 = other2;
 	}
 
-
-	public String getOther3() {
-
+	/**
+	 * <strong>Optional</strong><br>
+	 * An optional classification axis (and therefore query criterion)
+	 * 
+	 * @return
+	 */
+	public String getOther3()
+	{
 		return other3;
 	}
 
-
-	public void setOther3(String other3) {
-
+	/**
+	 * <strong>Optional</strong><br>
+	 * An optional classification axis (and therefore query criterion)
+	 * 
+	 * @param other3
+	 */
+	public void setOther3(String other3)
+	{
 		this.other3 = other3;
 	}
 
-
-	public Map<String, String> getParameters() {
-
+	/**
+	 * Get the Map of all parameters
+	 * 
+	 * @return
+	 */
+	public Map<String, String> getParameters()
+	{
 		return parameters;
 	}
 
-
-	public void setParameters(Map<String, String> parameters) {
-
+	void setParameters(Map<String, String> parameters)
+	{
 		this.parameters = parameters;
 	}
 
-
-	public String getUser() {
-
+	/**
+	 * <strong>Optional</strong><br>
+	 * It is possible to associate a user to a job execution request, and later query job execution by user.
+	 * 
+	 * @return
+	 */
+	public String getUser()
+	{
 		return user;
 	}
 
-
-	public void setUser(String user) {
-
+	/**
+	 * <strong>Optional</strong><br>
+	 * It is possible to associate a user to a job execution request, and later query job execution by user.
+	 * 
+	 * @param user
+	 */
+	public void setUser(String user)
+	{
 		this.user = user;
 	}
-
-
 }

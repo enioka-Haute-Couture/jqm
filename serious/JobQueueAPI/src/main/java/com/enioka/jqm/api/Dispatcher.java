@@ -55,8 +55,7 @@ import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Queue;
 
 /**
- * 
- * @author pierre.coppee
+ * Main JQM client API entry point.
  */
 public class Dispatcher
 {
@@ -439,7 +438,8 @@ public class Dispatcher
 	// ----------------------------- DELJOBINQUEUE --------------------------------------
 
 	/**
-	 * Remove an enqueud job from the queue. Cannot be called of the job is already running, but will not throw any exceptions in that case.
+	 * Remove an enqueued job from the queue. Should not be called of the job is already running, but will not throw any exceptions in that
+	 * case.
 	 * 
 	 * @param idJob
 	 */
@@ -471,6 +471,11 @@ public class Dispatcher
 
 	// ----------------------------- CANCELJOBINQUEUE --------------------------------------
 
+	/**
+	 * Cancel a job without removing it from the queue.
+	 * 
+	 * @param idJob
+	 */
 	public static void cancelJobInQueue(int idJob)
 	{
 		EntityManager em = getEm();
@@ -537,7 +542,8 @@ public class Dispatcher
 	}
 
 	/**
-	 * Will enqueue (copy) a job once again with the same parameters and environment.
+	 * Will restart a crashed job. This will eventually update the history and make the error disappear from the logs should the job end OK
+	 * this time.
 	 * 
 	 * @param idJob
 	 */
@@ -566,6 +572,12 @@ public class Dispatcher
 		Dispatcher.enQueue(j);
 	}
 
+	/**
+	 * Will enqueue (copy) a job once again with the same parameters and environment. This will not destroy
+	 * the log of the original job instance.
+	 * @param idJob
+	 * @return
+	 */
 	public static int restartJob(int idJob)
 	{
 		EntityManager em = getEm();
@@ -1014,8 +1026,7 @@ public class Dispatcher
 		transac.commit();
 		em.close();
 	}
-	
-	
+
 	private static JobParameter createJobParameter(String key, String value, EntityManager em)
 	{
 		JobParameter j = new JobParameter();
@@ -1026,6 +1037,5 @@ public class Dispatcher
 		em.persist(j);
 		return j;
 	}
-
 
 }

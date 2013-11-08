@@ -21,13 +21,15 @@ package com.enioka.jqm.api;
 import java.util.HashMap;
 import java.util.Map;
 
-
-
-public class JobInstance {
-
+/**
+ * Represents the result of a job execution request - either a queued request, or a running job, or the result of said execution.
+ * 
+ */
+public class JobInstance
+{
 	private Integer id;
 	private JobDefinition jd;
-	public Integer parent;
+	private Integer parent;
 	private String user;
 	private Integer sessionID;
 	private String state;
@@ -35,93 +37,139 @@ public class JobInstance {
 	private Queue queue;
 	private Map<String, String> parameters = new HashMap<String, String>();
 
-	public Integer getId() {
-
+	/**
+	 * The Job instance ID. This is a key for numerous Dispatcher functions.
+	 * 
+	 * @return
+	 */
+	public Integer getId()
+	{
 		return id;
 	}
 
-	public void setId(Integer id) {
-
+	void setId(Integer id)
+	{
 		this.id = id;
 	}
 
-	public JobDefinition getJd() {
-
+	/**
+	 * A JobDefinition that contains all the data that was used to create the job request.
+	 * 
+	 * @return
+	 */
+	public JobDefinition getJd()
+	{
 		return jd;
 	}
 
-	public void setJd(JobDefinition jd) {
-
+	void setJd(JobDefinition jd)
+	{
 		this.jd = jd;
 	}
 
-	public Integer getParent() {
-
+	/**
+	 * The ID of the parent job that has enqueued this job instance. Optionnal.
+	 * 
+	 * @return
+	 */
+	public Integer getParent()
+	{
 		return parent;
 	}
 
-	public void setParent(Integer parent) {
-
+	void setParent(Integer parent)
+	{
 		this.parent = parent;
 	}
 
-	public String getUser() {
-
+	/**
+	 * The user that was given at enqueue time.
+	 * 
+	 * @return
+	 */
+	public String getUser()
+	{
 		return user;
 	}
 
-	public void setUser(String user) {
-
+	void setUser(String user)
+	{
 		this.user = user;
 	}
 
-	public Integer getSessionID() {
-
+	/**
+	 * The session ID that was given at enqueue time. Optional.
+	 * 
+	 * @return
+	 */
+	public Integer getSessionID()
+	{
 		return sessionID;
 	}
 
-	public void setSessionID(Integer sessionID) {
-
+	void setSessionID(Integer sessionID)
+	{
 		this.sessionID = sessionID;
 	}
 
-	public String getState() {
-
+	/**
+	 * Status of the job. usual values: SUBMITTED, ATTRIBUTED, RUNNING, DONE, CRASHED.
+	 * 
+	 * @return
+	 */
+	public String getState()
+	{
 		return state;
 	}
 
-	public void setState(String state) {
-
+	void setState(String state)
+	{
 		this.state = state;
 	}
 
-	public Integer getPosition() {
-
+	/**
+	 * Position in the queue. 0 if running.
+	 * 
+	 * @return
+	 */
+	public Integer getPosition()
+	{
 		return position;
 	}
 
-	public void setPosition(Integer position) {
-
+	void setPosition(Integer position)
+	{
 		this.position = position;
 	}
 
-	public Queue getQueue() {
-
+	/**
+	 * The queue in which the job was enqueued.
+	 * 
+	 * @return
+	 */
+	public Queue getQueue()
+	{
 		return queue;
 	}
 
-	public void setQueue(Queue queue) {
-
+	void setQueue(Queue queue)
+	{
 		this.queue = queue;
 	}
 
-	public Map<String, String> getParameters() {
-
+	/**
+	 * A list of all the parameters used by this job (both those passed at enqueue time and those defined as default parameters fot this
+	 * kind of jobs)
+	 * 
+	 * @return
+	 */
+	public Map<String, String> getParameters()
+	{
 		return parameters;
 	}
 
-	public void setParameters(Map<String, String> parameters) {
-
+	void setParameters(Map<String, String> parameters)
+	{
 		this.parameters = parameters;
 	}
 }
