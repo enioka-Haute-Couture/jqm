@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.persistence.EntityManager;
@@ -42,6 +43,7 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.Deliverable;
@@ -79,13 +81,17 @@ public class Dispatcher
 	private static EntityManagerFactory createFactory()
 	{
 		Properties p = new Properties();
+		FileInputStream fis = null;
 		try
 		{
-			p.load(new FileInputStream("conf/db.properties"));
+			fis = new FileInputStream("conf/db.properties");
+			p.load(fis);
+			IOUtils.closeQuietly(fis);
 			return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, p);
 		} catch (FileNotFoundException e)
 		{
 			// No properties file means we use the test HSQLDB (file, not in-memory) as specified in the persistence.xml
+			IOUtils.closeQuietly(fis);
 			try
 			{
 				jqmlogger.info("New EMF will be created");
@@ -98,6 +104,7 @@ public class Dispatcher
 		} catch (IOException e)
 		{
 			jqmlogger.fatal("conf/db.properties file is invalid", e);
+			IOUtils.closeQuietly(fis);
 			System.exit(1);
 			// Stupid, just for Eclipse's parser and therefore avoid red lines...
 			return null;
@@ -239,10 +246,10 @@ public class Dispatcher
 			{
 				if (m.containsKey(res.get(j).getKey()))
 				{
-					for (Iterator<String> i = m.keySet().iterator(); i.hasNext();)
+					for (Entry<String, String> e : m.entrySet())
 					{
-						String key = i.next();
-						String value = m.get(key);
+						String key = e.getKey();
+						String value = e.getValue();
 
 						if (res.get(j).getKey().equals(key))
 						{
@@ -254,10 +261,10 @@ public class Dispatcher
 				}
 			}
 
-			for (Iterator<String> i = m.keySet().iterator(); i.hasNext();)
+			for (Entry<String, String> e : m.entrySet())
 			{
-				String key = i.next();
-				String value = m.get(key);
+				String key = e.getKey();
+				String value = e.getValue();
 
 				for (int j = 0; j < res.size(); j++)
 				{
@@ -285,11 +292,10 @@ public class Dispatcher
 		else
 		{
 			jqmlogger.debug("Parameters will be SUPER overriding");
-			for (Iterator<String> i = m.keySet().iterator(); i.hasNext();)
+			for (Entry<String, String> e : m.entrySet())
 			{
-
-				String key = i.next();
-				String value = m.get(key);
+				String key = e.getKey();
+				String value = e.getValue();
 
 				res.add(createJobParameter(key, value, em));
 			}
@@ -333,10 +339,9 @@ public class Dispatcher
 			jqmlogger.debug("JI can't be enqueue because a job in the highlander mode is currently submitted: " + hl);
 			return hl;
 		}
+		jqmlogger.debug("Not in highlander mode");
 
 		em.getTransaction().begin();
-
-		jqmlogger.debug("Value of the highlander return: " + hl);
 
 		JobInstance ji = new JobInstance();
 		List<JobParameter> jps = overrideParameter(job, jd, em);
@@ -375,21 +380,17 @@ public class Dispatcher
 
 		jqmlogger.debug("History recently created: " + h.getId());
 
-		Query q = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", ji.getId());
-
-		if (!q.equals(null))
+		for (JobParameter j : ji.getParameters())
 		{
-			for (JobParameter j : ji.getParameters())
-			{
-				JobHistoryParameter jp = new JobHistoryParameter();
-				jp.setKey(j.getKey());
-				jp.setValue(j.getValue());
-				j.setJobinstance(ji);
+			JobHistoryParameter jp = new JobHistoryParameter();
+			jp.setKey(j.getKey());
+			jp.setValue(j.getValue());
+			j.setJobinstance(ji);
 
-				em.persist(jp);
-				h.getParameters().add(jp);
-			}
+			em.persist(jp);
+			h.getParameters().add(jp);
 		}
+
 		em.getTransaction().commit();
 		em.close();
 		return ji.getId();
@@ -457,6 +458,7 @@ public class Dispatcher
 		} catch (Exception e)
 		{
 			jqmlogger.info("delJobInQueue: " + e);
+			throw new JqmException("Could not create a query on JobInstance", e);
 		}
 		int res = q.executeUpdate();
 
@@ -573,8 +575,9 @@ public class Dispatcher
 	}
 
 	/**
-	 * Will enqueue (copy) a job once again with the same parameters and environment. This will not destroy
-	 * the log of the original job instance.
+	 * Will enqueue (copy) a job once again with the same parameters and environment. This will not destroy the log of the original job
+	 * instance.
+	 * 
 	 * @param idJob
 	 * @return
 	 */
@@ -685,11 +688,10 @@ public class Dispatcher
 		URL url = null;
 		File file = null;
 		ArrayList<InputStream> streams = new ArrayList<InputStream>();
-		List<Deliverable> tmp = new ArrayList<Deliverable>();
+		List<Deliverable> tmp = null;
 
 		try
 		{
-
 			tmp = em.createQuery("SELECT d FROM Deliverable d WHERE d.jobId = :idJob", Deliverable.class).setParameter("idJob", idJob)
 			        .getResultList();
 
@@ -727,11 +729,9 @@ public class Dispatcher
 			}
 		} catch (FileNotFoundException e)
 		{
-
 			jqmlogger.info(e);
 		} catch (Exception e)
 		{
-
 			jqmlogger.info("No deliverable available", e);
 		} finally
 		{
@@ -838,7 +838,7 @@ public class Dispatcher
 	public static List<Deliverable> getUserDeliverables(String user)
 	{
 		EntityManager em = getEm();
-		ArrayList<Deliverable> d = new ArrayList<Deliverable>();
+		ArrayList<Deliverable> d = null;
 		ArrayList<Deliverable> res = new ArrayList<Deliverable>();
 		ArrayList<History> h = null;
 
@@ -848,15 +848,13 @@ public class Dispatcher
 			        .getResultList();
 		} catch (Exception e)
 		{
-			jqmlogger.info(e);
+			throw new JqmException("Could not find history inside the database", e);
 		}
 
 		for (int i = 0; i < h.size(); i++)
 		{
-
 			d = (ArrayList<Deliverable>) em.createQuery("SELECT d FROM Deliverable d WHERE d.jobId = :idJob", Deliverable.class)
 			        .setParameter("idJob", h.get(i).getJobInstance().getId()).getResultList();
-
 			res.addAll(d);
 		}
 		em.close();
@@ -947,11 +945,7 @@ public class Dispatcher
 
 		for (Queue queue : queues)
 		{
-
-			com.enioka.jqm.api.Queue q = new com.enioka.jqm.api.Queue();
-
-			q = getQueue(queue);
-
+			com.enioka.jqm.api.Queue q = getQueue(queue);
 			res.add(q);
 		}
 
