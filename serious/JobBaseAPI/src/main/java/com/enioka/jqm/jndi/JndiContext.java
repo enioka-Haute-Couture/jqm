@@ -56,11 +56,15 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 			} catch (NonUniqueResultException e)
 			{
 				Thread.currentThread().setContextClassLoader(tmp);
-				throw new NameNotFoundException("JNDI name " + name + " cannot be found");
+				NameNotFoundException ex = new NameNotFoundException("JNDI name " + name + " cannot be found");
+				ex.setRootCause(e);
+				throw ex;
 			} catch (NoResultException e)
 			{
 				Thread.currentThread().setContextClassLoader(tmp);
-				throw new NameNotFoundException("JNDI name " + name + " cannot be found");
+				NameNotFoundException ex = new NameNotFoundException("JNDI name " + name + " cannot be found");
+				ex.setRootCause(e);
+				throw ex;
 			}
 
 			try
@@ -69,7 +73,9 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 			} catch (ClassNotFoundException e)
 			{
 				Thread.currentThread().setContextClassLoader(tmp);
-				throw new NameNotFoundException("JDBC driver for JNDI name " + name + " cannot be loaded");
+				NameNotFoundException ex = new NameNotFoundException("JDBC driver for JNDI name " + name + " cannot be loaded");
+				ex.setRootCause(e);
+				throw ex;
 			}
 
 			jqmlogger.info("JNDI element named " + name + " was found.");
