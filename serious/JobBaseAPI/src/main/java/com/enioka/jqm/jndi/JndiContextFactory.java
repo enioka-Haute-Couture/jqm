@@ -22,7 +22,7 @@ import javax.naming.spi.NamingManager;
 
 import org.apache.log4j.Logger;
 
-public class JndiContextFactory
+public final class JndiContextFactory
 {
 	private static Logger jqmlogger = Logger.getLogger(JndiContextFactory.class);
 

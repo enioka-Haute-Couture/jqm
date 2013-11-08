@@ -71,13 +71,13 @@ class Polling implements Runnable
 		// Higlander?
 		if (job.size() > 0 && job.get(0).getJd().isHighlander() == true)
 		{
-			HighlanderPollingMode(job.get(0), em);
+			highlanderPollingMode(job.get(0), em);
 		}
 
 		return (!job.isEmpty()) ? job.get(0) : null;
 	}
 
-	protected void HighlanderPollingMode(JobInstance currentJob, EntityManager em)
+	protected void highlanderPollingMode(JobInstance currentJob, EntityManager em)
 	{
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
 		        .createQuery("SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.applicationName = :n", JobInstance.class)
