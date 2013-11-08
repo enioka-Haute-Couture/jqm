@@ -202,4 +202,44 @@ public class JndiTest
 
 		Assert.assertEquals("CRASHED", h.getJobInstance().getState()); // Exception in jar => CRASHED
 	}
+	
+	@Test
+	public void testDefCon() throws Exception
+	{
+		jqmlogger.debug("Default connection: Starting");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+
+		@SuppressWarnings("unused")
+		JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-defcon/",
+				"jqm-test-defcon/jqm-test-defcon.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
+				"other2", false, em);
+
+		JobDefinition form = new JobDefinition("Jms", "MAG");
+		Dispatcher.enQueue(form);
+
+		// Start the engine
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+
+		Thread.sleep(3000);
+		engine1.stop();
+
+		History h = null;
+		try
+		{
+			h = (History) em.createQuery("SELECT h FROM History h").getSingleResult();
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+			Assert.fail("History object was not created");
+			throw e;
+		}
+
+		Assert.assertEquals("ENDED", h.getJobInstance().getState()); // Exception in jar => CRASHED
+	}
+
 }
