@@ -54,9 +54,11 @@ public final class Helpers
 	private static EntityManagerFactory createFactory()
 	{
 		Properties p = new Properties();
+		FileInputStream fis = null;
 		try
 		{
-			p.load(new FileInputStream("conf/db.properties"));
+			fis = new FileInputStream("conf/db.properties");
+			p.load(fis);
 			return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, p);
 		} catch (FileNotFoundException e)
 		{
@@ -68,6 +70,14 @@ public final class Helpers
 			System.exit(1);
 			// Stupid, just for Eclipse's parser and therefore avoid red lines...
 			return null;
+		} finally
+		{
+			try
+			{
+				fis.close();
+			} catch (Exception e)
+			{
+			}
 		}
 	}
 
