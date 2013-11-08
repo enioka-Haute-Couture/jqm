@@ -44,7 +44,6 @@ import javax.persistence.Query;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
-import com.enioka.jqm.hash.Cryptonite;
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
@@ -67,6 +66,9 @@ public class Dispatcher
 
 	private static EntityManagerFactory emf = null;
 
+	/**
+	 * For tests only. Never use in production code.
+	 */
 	public static void resetEM()
 	{
 		if (emf != null)
@@ -170,7 +172,6 @@ public class Dispatcher
 
 	private static com.enioka.jqm.api.Queue getQueue(Queue queue)
 	{
-
 		com.enioka.jqm.api.Queue q = new com.enioka.jqm.api.Queue();
 
 		q.setDescription(queue.getDescription());
@@ -204,7 +205,7 @@ public class Dispatcher
 		return j;
 	}
 
-	public static List<JobParameter> overrideParameter(JobDef jdef, JobDefinition jdefinition, EntityManager em)
+	private static List<JobParameter> overrideParameter(JobDef jdef, JobDefinition jdefinition, EntityManager em)
 	{
 		Map<String, String> m = jdefinition.getParameters();
 		List<JobParameter> res = new ArrayList<JobParameter>();
@@ -301,6 +302,11 @@ public class Dispatcher
 
 	// ----------------------------- ENQUEUE --------------------------------------
 
+	/**
+	 * Ask for a new job instance, as described in the parameter object
+	 * @param jd the description of the desired job instance
+	 * @return
+	 */
 	public static int enQueue(JobDefinition jd)
 	{
 		jqmlogger.debug("BEGINING ENQUEUE");
@@ -364,7 +370,7 @@ public class Dispatcher
 
 	// ----------------------------- HIGHLANDER --------------------------------------
 
-	public static Integer highlanderMode(JobDef jd, EntityManager em)
+	private static Integer highlanderMode(JobDef jd, EntityManager em)
 	{
 		Integer res = null;
 
@@ -391,6 +397,12 @@ public class Dispatcher
 
 	// ----------------------------- GETJOB --------------------------------------
 
+	/**
+	 * Retrieve a job instance. The returned object will contain all relevant data on that job instance
+	 * such as its status.
+	 * @param idJob
+	 * @return
+	 */
 	public static com.enioka.jqm.api.JobInstance getJob(int idJob)
 	{
 
@@ -400,6 +412,11 @@ public class Dispatcher
 
 	// ----------------------------- DELJOBINQUEUE --------------------------------------
 
+	/**
+	 * Remove an enqueud job from the queue. Cannot be called of the job is already running, but will
+	 * not throw any exceptions in that case.
+	 * @param idJob
+	 */
 	public static void delJobInQueue(int idJob)
 	{
 		EntityManager em = getEm();
@@ -468,6 +485,12 @@ public class Dispatcher
 
 	// ----------------------------- STOPJOB --------------------------------------
 
+	/** 
+	 * Nicely stop a running job (asks the job to stop itself - this will usually not do anything
+	 * as most jobs do not implement this function)
+	 * 
+	 * @param idJob
+	 */
 	public static void stopJob(int idJob)
 	{
 
@@ -475,11 +498,20 @@ public class Dispatcher
 
 	// ----------------------------- KILLJOB --------------------------------------
 
+	/** 
+	 * Kill a running job. Kill is not immediate, and is only possible when a job calls some
+	 * JQM APIs. If none are called, the job cannot be killed.
+	 * @param idJob
+	 */
 	public static void killJob(int idJob)
 	{
 
 	}
 
+	/**
+	 * Will enqueue (copy) a job once again with the same parameters and environment.
+	 * @param idJob
+	 */
 	public static void restartCrashedJob(int idJob)
 	{
 		EntityManager em = getEm();
@@ -526,6 +558,11 @@ public class Dispatcher
 
 	// ----------------------------- SETPOSITION --------------------------------------
 
+	/**
+	 * Change the position of a job instance inside a queue.
+	 * @param idJob
+	 * @param position
+	 */
 	public static void setPosition(int idJob, int position)
 	{
 		List<JobInstance> q = null;
@@ -590,6 +627,13 @@ public class Dispatcher
 
 	// ----------------------------- GETDELIVERABLES --------------------------------------
 
+	/**
+	 * Retrieve a list of all deliverables produced by a job instance as OutputStreams.
+	 * @param idJob
+	 * @return
+	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
+	 */
 	public static List<InputStream> getDeliverables(int idJob) throws IOException, NoSuchAlgorithmException
 	{
 		EntityManager em = getEm();
@@ -654,6 +698,11 @@ public class Dispatcher
 
 	// ----------------------------- GETALLDELIVERABLES --------------------------------------
 
+	/**
+	 * Get a list of deliverables description produced by a job instance.
+	 * @param idJob
+	 * @return
+	 */
 	public static List<Deliverable> getAllDeliverables(int idJob)
 	{
 		ArrayList<Deliverable> deliverables = new ArrayList<Deliverable>();
@@ -673,6 +722,12 @@ public class Dispatcher
 
 	// ----------------------------- GETONEDELIVERABLE --------------------------------------
 
+	/**
+	 * Retrieve one deliverable from JQM as a Stream.
+	 * @param d
+	 * @return
+	 * @throws Exception
+	 */
 	public static InputStream getOneDeliverable(com.enioka.jqm.api.Deliverable d) throws Exception
 	{
 		EntityManager em = getEm();
@@ -774,6 +829,11 @@ public class Dispatcher
 
 	// ----------------------------- GETUSERJOBS --------------------------------------
 
+	/**
+	 * List all active job instances created by a given user
+	 * @param user
+	 * @return
+	 */
 	public static List<JobInstance> getUserJobs(String user)
 	{
 		Logger jqmlogger = Logger.getLogger(Dispatcher.class);
@@ -793,6 +853,10 @@ public class Dispatcher
 
 	// ----------------------------- GETJOBS --------------------------------------
 
+	/**
+	 * List all active job instances
+	 * @return
+	 */
 	public static List<com.enioka.jqm.api.JobInstance> getJobs()
 	{
 		ArrayList<com.enioka.jqm.api.JobInstance> res = new ArrayList<com.enioka.jqm.api.JobInstance>();
@@ -822,6 +886,10 @@ public class Dispatcher
 
 	// ----------------------------- GETQUEUES --------------------------------------
 
+	/**
+	 * List all the available queues.
+	 * @return
+	 */
 	public static List<com.enioka.jqm.api.Queue> getQueues()
 	{
 		List<com.enioka.jqm.api.Queue> res = new ArrayList<com.enioka.jqm.api.Queue>();
@@ -842,6 +910,11 @@ public class Dispatcher
 
 	// ----------------------------- CHANGEQUEUE --------------------------------------
 
+	/**
+	 * Move a job instance from a queue to another.
+	 * @param idJob
+	 * @param idQueue
+	 */
 	public static void changeQueue(int idJob, int idQueue)
 	{
 		EntityManager em = getEm();
@@ -872,6 +945,11 @@ public class Dispatcher
 
 	// ----------------------------- CHANGEQUEUE --------------------------------------
 
+	/**
+	 * Move a job instance from a queue to another queue
+	 * @param idJob
+	 * @param queue
+	 */
 	public static void changeQueue(int idJob, Queue queue)
 	{
 		EntityManager em = getEm();

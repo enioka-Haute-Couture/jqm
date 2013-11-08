@@ -16,16 +16,16 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.hash;
+package com.enioka.jqm.api;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class Cryptonite {
+class Cryptonite {
 
-	public static String sha1(String input) throws NoSuchAlgorithmException {
+	static String sha1(String input) throws NoSuchAlgorithmException {
 
 		MessageDigest mDigest = MessageDigest.getInstance("SHA1");
 		byte[] result = mDigest.digest(input.getBytes());
@@ -51,7 +51,7 @@ public class Cryptonite {
 	 * @throws NoSuchAlgorithmException
 	 * @throws IOException
 	 */
-	public static boolean verifyChecksum(String file, String testChecksum)
+	static boolean verifyChecksum(String file, String testChecksum)
 			throws NoSuchAlgorithmException, IOException {
 
 		MessageDigest sha1 = MessageDigest.getInstance("SHA1");

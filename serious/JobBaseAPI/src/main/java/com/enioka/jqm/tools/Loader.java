@@ -97,7 +97,7 @@ class Loader implements Runnable
 	}
 
 	// ExtractJar
-	public void extractJar(String jarFile, String destDir)
+	void extractJar(String jarFile, String destDir)
 	{
 		try
 		{
@@ -133,7 +133,7 @@ class Loader implements Runnable
 	}
 
 	// FindFile
-	public void findFile(String path, File f)
+	void findFile(String path, File f)
 	{
 		File[] list = f.listFiles();
 		if (list != null)
@@ -155,7 +155,6 @@ class Loader implements Runnable
 	@Override
 	public void run()
 	{
-
 		try
 		{
 			jqmlogger.debug("TOUT DEBUT LOADER");

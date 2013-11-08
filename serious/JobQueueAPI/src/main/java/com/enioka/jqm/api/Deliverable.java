@@ -1,35 +1,46 @@
 package com.enioka.jqm.api;
 
-
-
-public class Deliverable {
-
+/**
+ * Represents a file created by a job instance
+ * 
+ */
+public class Deliverable
+{
 	private String filePath;
-    private String fileName;
+	private String fileName;
 
-    public Deliverable(String filePath, String fileName) {
+	/**
+	 * Construction. This will not create a new file on the file system!
+	 * @param filePath
+	 * @param fileName
+	 */
+	public Deliverable(String filePath, String fileName)
+	{
+		this.filePath = filePath;
+		this.fileName = fileName;
+	}
 
-    	this.filePath = filePath;
-    	this.fileName = fileName;
-    }
+	/**
+	 * File Path
+	 * @return
+	 */
+	public String getFilePath()
+	{
+		return filePath;
+	}
 
-    public String getFilePath() {
+	public void setFilePath(String filePath)
+	{
+		this.filePath = filePath;
+	}
 
-    	return filePath;
-    }
+	public String getFileName()
+	{
+		return fileName;
+	}
 
-    public void setFilePath(String filePath) {
-
-    	this.filePath = filePath;
-    }
-
-    public String getFileName() {
-
-    	return fileName;
-    }
-
-    public void setFileName(String fileName) {
-
-    	this.fileName = fileName;
-    }
+	public void setFileName(String fileName)
+	{
+		this.fileName = fileName;
+	}
 }

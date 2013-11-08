@@ -27,16 +27,16 @@ import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.Queue;
 
-public class XmlParser
+class XmlParser
 {
 	private static Logger jqmlogger = Logger.getLogger(XmlParser.class);
 	private EntityManager em = Helpers.getNewEm();
 
-	public XmlParser()
+	XmlParser()
 	{
 	}
 
-	public void parse(String path)
+	void parse(String path)
 	{
 		File f = new File(path);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();

@@ -20,6 +20,10 @@ package com.enioka.jqm.tools;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Starter class & parameter parsing
+ *
+ */
 public class Main
 {
 	private static Logger jqmlogger = Logger.getLogger(Main.class);

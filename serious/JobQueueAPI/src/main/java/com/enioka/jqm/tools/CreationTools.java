@@ -44,12 +44,17 @@ import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 
+/**
+ * This class will soon become private. It is not part of the API.
+ * @author Marc-Antoine
+ *
+ */
 public class CreationTools
 {
 	private static Logger jqmlogger = Logger.getLogger(CreationTools.class);
 	public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
 
-	public CreationTools()
+	private CreationTools()
 	{
 	}
 
