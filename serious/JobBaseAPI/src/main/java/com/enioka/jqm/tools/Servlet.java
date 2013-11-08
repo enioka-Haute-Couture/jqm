@@ -55,8 +55,8 @@ class Servlet extends HttpServlet
 			fis = new FileInputStream(realFileName);
 			response.setContentType("application/octet-stream");
 
-			IOUtils.copy(fis, out); // Copy bytes from an InputStream to an OutputStream.
-
+			// Copy bytes from an InputStream to an OutputStream.
+			IOUtils.copy(fis, out); 
 		} catch (FileNotFoundException e)
 		{
 			jqmlogger.warn(e);
@@ -67,7 +67,8 @@ class Servlet extends HttpServlet
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally
 		{
-			IOUtils.closeQuietly(out); // Good practice
+			// Good practice
+			IOUtils.closeQuietly(out); 
 			IOUtils.closeQuietly(fis);
 		}
 	}
