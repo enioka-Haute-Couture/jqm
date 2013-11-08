@@ -87,8 +87,7 @@ class JqmEngine
 			node = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :li", Node.class).setParameter("li", args[0])
 					.getSingleResult();
 
-			dps = (ArrayList<DeploymentParameter>) em
-					.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
+			dps = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
 					.setParameter("n", node.getId()).getResultList();
 		}
 
@@ -196,6 +195,11 @@ class JqmEngine
 			gp = new GlobalParameter();
 			gp.setKey("mavenRepo");
 			gp.setValue("http://download.eclipse.org/rt/eclipselink/maven.repo/");
+			em.persist(gp);
+
+			gp = new GlobalParameter();
+			gp.setKey("defaultConnection");
+			gp.setValue("jdbc/jqm");
 			em.persist(gp);
 
 			jqmlogger.info("This GlobalParameter will allow to download maven resources");

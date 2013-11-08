@@ -119,7 +119,7 @@ class JarClassLoader extends URLClassLoader
 		}
 	}
 
-	Object invokeMain(JobInstance job) throws Exception
+	Object invokeMain(JobInstance job, String defaultConnection) throws Exception
 	{
 		String classQualifiedName = job.getJd().getJavaClassName();
 		jqmlogger.debug("Trying to load class " + classQualifiedName);
@@ -140,6 +140,8 @@ class JarClassLoader extends URLClassLoader
 		{
 			Method start = c.getMethod("start", null);
 			Method getParameters = c.getMethod("getParameters", null);
+			Method getdefaultConnect = c.getMethod("setDefaultConnect", String.class);
+			getdefaultConnect.invoke(o, defaultConnection);
 
 			Map<String, String> params = (Map<String, String>) getParameters.invoke(o, null);
 			for (JobParameter i : job.getParameters())
@@ -147,6 +149,7 @@ class JarClassLoader extends URLClassLoader
 				jqmlogger.debug("Job has parameter " + i.getKey() + " - " + i.getValue());
 				params.put(i.getKey(), i.getValue());
 			}
+
 			start.invoke(o, null);
 		} catch (Exception e)
 		{

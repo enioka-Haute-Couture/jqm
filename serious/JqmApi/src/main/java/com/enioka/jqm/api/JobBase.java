@@ -24,6 +24,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.naming.NamingException;
+import javax.naming.spi.NamingManager;
+import javax.sql.DataSource;
+
 import com.enioka.jqm.deliverabletools.Cryptonite;
 import com.enioka.jqm.deliverabletools.DeliverableStruct;
 
@@ -44,6 +48,7 @@ public class JobBase {
 	protected String other3;
 	protected Map<String, String> parameters = new HashMap<String, String>();
 	protected ArrayList<DeliverableStruct> sha1s = new ArrayList<DeliverableStruct>();
+	protected String defaultConnect;
 
 	public void start() {
 
@@ -51,6 +56,14 @@ public class JobBase {
 
 	public void stop() {
 
+	}
+
+	public DataSource getDefaultConnection() throws NamingException
+	{
+		Object p = NamingManager.getInitialContext(null).lookup(defaultConnect);
+		DataSource q = (DataSource) p;
+
+		return q;
 	}
 
 	public void addDeliverable(final String path, final String fileName, final String fileLabel) {
@@ -179,4 +192,13 @@ public class JobBase {
 		this.parameters = parameters;
 	}
 
+	public String getDefaultConnect()
+	{
+		return defaultConnect;
+	}
+
+	public void setDefaultConnect(String defaultConnect)
+	{
+		this.defaultConnect = defaultConnect;
+	}
 }

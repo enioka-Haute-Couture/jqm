@@ -84,12 +84,12 @@ class Loader implements Runnable
 		// STATE UPDATED
 
 		em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
-		        .setParameter("msg", "CRASHED").executeUpdate();
+				.setParameter("msg", "CRASHED").executeUpdate();
 
 		// MESSAGE HISTORY UPDATED
 
 		History h = em.createQuery("SELECT h FROM History h WHERE h.id = :j", History.class).setParameter("j", job.getId())
-		        .getSingleResult();
+				.getSingleResult();
 
 		Helpers.createMessage("Status updated: ATTRIBUTED", h, em);
 
@@ -169,7 +169,7 @@ class Loader implements Runnable
 			ArrayList<URL> tmp = new ArrayList<URL>();
 			Collection<Artifact> deps = null;
 			File pomFile = new File(CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-			        + "pom.xml");
+					+ "pom.xml");
 			jqmlogger.debug("Loader will try to load POM " + pomFile.getAbsolutePath());
 			boolean pomCustom = false;
 
@@ -186,8 +186,8 @@ class Loader implements Runnable
 
 				InputStream is = new FileInputStream(res + "/pom.xml");
 				OutputStream os = new FileOutputStream(CheckFilePath.fixFilePath(node.getRepo()
-				        + CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-				        + "pom.xml");
+						+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
+						+ "pom.xml");
 
 				int r = 0;
 				byte[] bytes = new byte[1024];
@@ -201,11 +201,11 @@ class Loader implements Runnable
 				os.close();
 
 				pomFile = new File(CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-				        + "pom.xml");
+						+ "pom.xml");
 
 				FileUtils.deleteDirectory(new File(CheckFilePath.fixFilePath(node.getRepo()
-				        + CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-				        + "tmp"));
+						+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
+						+ "tmp"));
 			}
 			if (!pomFile.exists())
 			{
@@ -216,13 +216,13 @@ class Loader implements Runnable
 			// Update of the job status
 			em.getTransaction().begin();
 			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", job)
-			        .getSingleResult();
+					.getSingleResult();
 
 			// Update of the execution date
 			Calendar executionDate = GregorianCalendar.getInstance(Locale.getDefault());
 
 			em.createQuery("UPDATE History h SET h.executionDate = :date WHERE h.id = :h").setParameter("h", h.getId())
-			        .setParameter("date", executionDate).executeUpdate();
+					.setParameter("date", executionDate).executeUpdate();
 
 			// End of the execution date
 
@@ -235,7 +235,7 @@ class Loader implements Runnable
 			transac.begin();
 
 			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", job.getId())
-			        .setParameter("msg", "RUNNING").executeUpdate();
+					.setParameter("msg", "RUNNING").executeUpdate();
 			transac.commit();
 			jqmlogger.debug("JobInstance was updated");
 
@@ -248,8 +248,8 @@ class Loader implements Runnable
 					pomFile.delete();
 
 				List<GlobalParameter> repolist = em
-				        .createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
-				        .setParameter("repo", "mavenRepo").getResultList();
+						.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
+						.setParameter("repo", "mavenRepo").getResultList();
 
 				RemoteRepository[] rr = new RemoteRepository[repolist.size()];
 				int ii = 0;
@@ -297,11 +297,16 @@ class Loader implements Runnable
 			Thread.currentThread().setContextClassLoader(jobClassLoader);
 			jqmlogger.info("Class Loader was set correctly");
 
+			// Get the default connection
+
+			String defaultconnection = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = 'defaultConnection'",
+					String.class).getSingleResult();
+
 			// Go! (launches the main function in the startup class designated in the manifest)
 			jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
 			jqmlogger.debug("Job is running in the thread: " + Thread.currentThread().getName());
 			jqmlogger.debug("AVANT INVOKE MAIN");
-			jobBase = jobClassLoader.invokeMain(job);
+			jobBase = jobClassLoader.invokeMain(job, defaultconnection);
 			jqmlogger.debug("ActualNbThread after execution: " + p.getActualNbThread());
 			p.setActualNbThread(p.getActualNbThread() - 1);
 			jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
@@ -316,7 +321,7 @@ class Loader implements Runnable
 			em.getTransaction().begin();
 
 			em.createQuery("UPDATE History h SET h.endDate = :date WHERE h.id = :h").setParameter("h", h.getId())
-			        .setParameter("date", endDate).executeUpdate();
+					.setParameter("date", endDate).executeUpdate();
 
 			em.getTransaction().commit();
 
@@ -325,7 +330,7 @@ class Loader implements Runnable
 			// STATE UPDATED
 			em.getTransaction().begin();
 			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
-			        .setParameter("msg", "ENDED").executeUpdate();
+					.setParameter("msg", "ENDED").executeUpdate();
 			em.getTransaction().commit();
 			jqmlogger.debug("LOADER HISTORY: " + h.getId());
 
@@ -353,8 +358,8 @@ class Loader implements Runnable
 				} catch (Exception e)
 				{
 					jqmlogger
-					        .error("Could not analyse a deliverbale - it may be of an incorrect Java class. Job has run correctly - it's only missing its produce.",
-					                e);
+							.error("Could not analyse a deliverbale - it may be of an incorrect Java class. Job has run correctly - it's only missing its produce.",
+									e);
 				} finally
 				{
 					em.getTransaction().commit();

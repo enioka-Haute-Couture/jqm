@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 public class Main
 {
 	private static Logger jqmlogger = Logger.getLogger(Main.class);
-			
+
 	/**
 	 * Startup method for the packaged JAR
 	 * 
@@ -43,8 +43,8 @@ public class Main
 					try
 					{
 						engine.checkAndUpdateNode(args[0]);
-						XmlParser parser = new XmlParser(args[2]);
-						parser.parse();
+						XmlParser parser = new XmlParser();
+						parser.parse(args[2]);
 						return;
 					} catch (Exception e)
 					{
