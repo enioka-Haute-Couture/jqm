@@ -96,14 +96,13 @@ class Loader implements Runnable
 			Node node = this.p.dp.getNode();
 
 			// ---------------- BEGIN: MAVEN DEPENDENCIES ------------------
-			CheckFilePath cfp = new CheckFilePath();
 			File local = new File(System.getProperty("user.home") + "/.m2/repository");
-			File jar = new File(cfp.FixFilePath(node.getRepo()) + job.getJd().getJarPath());
+			File jar = new File(CheckFilePath.FixFilePath(node.getRepo()) + job.getJd().getJarPath());
 			URL jars = jar.toURI().toURL();
 			jqmlogger.debug("Loader will try to launch jar " + jar.getAbsolutePath() + " - " + job.getJd().getJavaClassName());
 			ArrayList<URL> tmp = new ArrayList<URL>();
 			Collection<Artifact> deps = null;
-			File pomFile = new File(cfp.FixFilePath(node.getRepo() + cfp.FixFilePath(job.getJd().getFilePath())) + "pom.xml");
+			File pomFile = new File(CheckFilePath.FixFilePath(node.getRepo() + CheckFilePath.FixFilePath(job.getJd().getFilePath())) + "pom.xml");
 			jqmlogger.debug("Loader will try to load POM " + pomFile.getAbsolutePath());
 
 			if (!pomFile.exists())
