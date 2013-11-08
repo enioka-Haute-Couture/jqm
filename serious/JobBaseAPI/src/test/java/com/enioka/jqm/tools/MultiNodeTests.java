@@ -424,15 +424,7 @@ public class MultiNodeTests
 		Dispatcher.enQueue(j);
 		Dispatcher.enQueue(j);
 
-		em.getTransaction().begin();
-
-		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
-				.setParameter("myId", 2).setParameter("i", jdDemoMaven.getId()).getSingleResult();
-
-		em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId())
-				.executeUpdate();
-
-		em.getTransaction().commit();
+		TestHelpers.printJobInstanceTable();
 
 		em.getTransaction().begin();
 
@@ -457,10 +449,9 @@ public class MultiNodeTests
 
 		TestHelpers.printJobInstanceTable();
 
-		Assert.assertEquals(11, res.size());
+		Assert.assertEquals(2, res.size());
 		Assert.assertEquals("ENDED", res.get(0).getState());
-		Assert.assertEquals("CANCELLED", res.get(1).getState());
-		Assert.assertEquals("CANCELLED", res.get(2).getState());
+		Assert.assertEquals("ENDED", res.get(1).getState());
 	}
 
 	public void testTwoFiboMultiNode()

@@ -122,7 +122,7 @@ class JqmEngine
 		}
 	}
 
-	private Node checkAndUpdateNode(String nodeName)
+	Node checkAndUpdateNode(String nodeName)
 	{
 		em.getTransaction().begin();
 

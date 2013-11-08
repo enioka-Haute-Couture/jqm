@@ -681,7 +681,7 @@ public class JobBaseTest
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
-		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "../testprojects/",
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/pom_error.xml",
 				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
 				"ModuleMachin", "other", "other", true, em);
 
@@ -719,7 +719,7 @@ public class JobBaseTest
 		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);
 
-		Main.main(new String[] { "-xml", "testprojects/jqm-test-xml/xmltest.xml" });
+		Main.main(new String[] { "localhost", "-xml", "testprojects/jqm-test-xml/xmltest.xml" });
 
 		List<JobDef> jd = em.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
 
@@ -775,5 +775,39 @@ public class JobBaseTest
 		Assert.assertEquals(jdDemoMaven.getId(), res.get(0).getJd().getId());
 		Assert.assertEquals(jdDemoMaven.getId(), res.get(1).getJd().getId());
 
+	}
+
+	@Test
+	public void testPomOnlyInJar() throws Exception
+	{
+		jqmlogger.debug("Starting test testGoodOrder");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemavennopom/",
+				"jqm-test-datetimemavennopom/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+				"ModuleMachin", "other", "other", true, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+
+		int i = Dispatcher.enQueue(j);
+
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+
+		Thread.sleep(3000);
+
+		engine1.stop();
+
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+
+		Assert.assertEquals(1, res.size());
+		Assert.assertEquals("ENDED", res.get(0).getState());
 	}
 }

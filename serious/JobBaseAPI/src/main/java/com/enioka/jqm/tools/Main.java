@@ -32,24 +32,20 @@ public class Main
 	 */
 	public static void main(String[] args)
 	{
-		if (args.length >= 2)
+		JqmEngine engine = new JqmEngine();
+
+		if (args.length >= 3)
 		{
-			if (args[0].equals("-xml"))
+			if (args[1].equals("-xml"))
 			{
-				if (!args[1].isEmpty())
+				if (!args[2].isEmpty())
 				{
 					try
 					{
-						JqmEngine engine = new JqmEngine();
-						engine.start(args);
-						Thread.sleep(2000);
-						engine.stop();
-						XmlParser parser = new XmlParser();
-						parser.parse(args[1]);
+						engine.checkAndUpdateNode(args[0]);
+						XmlParser parser = new XmlParser(args[2]);
+						parser.parse();
 						return;
-					} catch (InterruptedException e)
-					{
-						e.printStackTrace();
 					} catch (Exception e)
 					{
 						e.printStackTrace();
@@ -59,7 +55,6 @@ public class Main
 			}
 		}
 
-		JqmEngine engine = new JqmEngine();
 		try
 		{
 			jqmlogger.info("Starting engine node " + args[0]);

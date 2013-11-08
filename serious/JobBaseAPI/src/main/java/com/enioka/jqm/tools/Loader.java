@@ -19,7 +19,11 @@
 package com.enioka.jqm.tools;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -28,14 +32,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.repository.RemoteRepository;
@@ -56,6 +64,7 @@ class Loader implements Runnable
 	private Map<String, URL[]> cache = null;
 	private Logger jqmlogger = Logger.getLogger(this.getClass());
 	private Polling p = null;
+	String res = null;
 
 	Loader(JobInstance job, Map<String, URL[]> cache, Polling p)
 	{
@@ -65,6 +74,7 @@ class Loader implements Runnable
 		this.p = p;
 	}
 
+	// CrashedStatus
 	protected void crashedStatus()
 	{
 
@@ -86,6 +96,62 @@ class Loader implements Runnable
 		transac.commit();
 	}
 
+	// ExtractJar
+	public void extractJar(String jarFile, String destDir)
+	{
+		try
+		{
+			JarFile jar = new JarFile(jarFile);
+			File tmp = new File(destDir + "tmp/");
+			tmp.mkdir();
+			destDir += "tmp/";
+			Enumeration<JarEntry> enumm = jar.entries();
+			while (enumm.hasMoreElements())
+			{
+				JarEntry file = enumm.nextElement();
+				File f = new File(destDir + File.separator + file.getName());
+				if (file.isDirectory())
+				{ // if its a directory, create it
+					f.mkdir();
+					continue;
+				}
+				InputStream is = jar.getInputStream(file); // get the input stream
+				FileOutputStream fos = new FileOutputStream(f);
+				while (is.available() > 0)
+				{ // write contents of 'is' to 'fos'
+					fos.write(is.read());
+				}
+				fos.close();
+				is.close();
+			}
+		} catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	// FindFile
+	public void findFile(String path, File f)
+	{
+		File[] list = f.listFiles();
+		if (list != null)
+			for (File ff : list)
+			{
+				if (ff.isDirectory())
+				{
+					findFile(path, ff);
+				}
+				else if (path.equalsIgnoreCase(ff.getName()))
+				{
+					jqmlogger.debug("findFile returning " + ff.getPath());
+					res = ff.getParentFile().getAbsolutePath();
+				}
+			}
+	}
+
+	// Run
 	@Override
 	public void run()
 	{
@@ -104,9 +170,43 @@ class Loader implements Runnable
 			Collection<Artifact> deps = null;
 			File pomFile = new File(CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath())) + "pom.xml");
 			jqmlogger.debug("Loader will try to load POM " + pomFile.getAbsolutePath());
+			boolean pomCustom = false;
 
 			if (!pomFile.exists())
+			{
+				pomCustom = true;
+				jqmlogger.debug("POM doesn't exist, it will be get in the META-INF/pom.xml of the Jar file");
+				String env = cfp.FixFilePath(node.getRepo() + cfp.FixFilePath(job.getJd().getFilePath()));
+
+				extractJar(jar.getAbsolutePath(), env);
+				findFile("pom.xml", new File(env + "tmp/"));
+
+				jqmlogger.debug("pomdebug: " + res);
+
+				InputStream is = new FileInputStream(res + "/pom.xml");
+				OutputStream os = new FileOutputStream(cfp.FixFilePath(node.getRepo() + cfp.FixFilePath(job.getJd().getFilePath()))
+						+ "pom.xml");
+
+				int r = 0;
+				byte[] bytes = new byte[1024];
+
+				while ((r = is.read(bytes)) != -1)
+				{
+					os.write(bytes, 0, r);
+				}
+
+				is.close();
+				os.close();
+
+				pomFile = new File(cfp.FixFilePath(node.getRepo() + cfp.FixFilePath(job.getJd().getFilePath())) + "pom.xml");
+
+				FileUtils.deleteDirectory(new File(cfp.FixFilePath(node.getRepo() + cfp.FixFilePath(job.getJd().getFilePath())) + "tmp"));
+			}
+			if (!pomFile.exists())
+			{
+				jqmlogger.debug("POM doesn't exist in the Jar");
 				throw new IOException();
+			}
 
 			// Update of the job status
 			em.getTransaction().begin();
@@ -138,6 +238,9 @@ class Loader implements Runnable
 			if (!cache.containsKey(job.getJd().getApplicationName()))
 			{
 				Dependencies dependencies = new Dependencies(pomFile.getAbsolutePath());
+
+				if (pomCustom)
+					pomFile.delete();
 
 				List<GlobalParameter> repolist = em
 						.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
