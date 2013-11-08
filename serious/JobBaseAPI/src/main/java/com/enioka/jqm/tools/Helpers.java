@@ -34,6 +34,10 @@ import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.Message;
 
+/** 
+ * This is a helper class for internal use only.
+ *
+ */
 public final class Helpers
 {
 	private static final String PERSISTENCE_UNIT = "jobqueue-api-pu";
@@ -101,7 +105,7 @@ public final class Helpers
 	 * @param em
 	 * @return the JPA message created
 	 */
-	public static Message createMessage(String textMessage, History history, EntityManager em)
+	static Message createMessage(String textMessage, History history, EntityManager em)
 	{
 		Message m = new Message();
 
@@ -129,7 +133,7 @@ public final class Helpers
 	 *            the EM to use.
 	 * @return
 	 */
-	public static Deliverable createDeliverable(String fp, String fn, String hp, String ff, Integer jobId, EntityManager em)
+	static Deliverable createDeliverable(String fp, String fn, String hp, String ff, Integer jobId, EntityManager em)
 	{
 		Deliverable j = new Deliverable();
 

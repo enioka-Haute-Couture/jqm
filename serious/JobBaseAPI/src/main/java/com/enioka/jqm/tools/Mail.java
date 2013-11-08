@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Node;
 
-public class Mail
+class Mail
 {
 	private Logger jqmlogger = Logger.getLogger(Mail.class);
 	private String to = null;
@@ -28,7 +28,7 @@ public class Mail
 	private String port = null;
 	private String pwd = "marsu1952";
 
-	public Mail(Node node, JobInstance ji, EntityManager em)
+	Mail(Node node, JobInstance ji, EntityManager em)
 	{
 		try
 		{
@@ -46,7 +46,7 @@ public class Mail
 		}
 	}
 
-	public void send()
+	void send()
 	{
 		jqmlogger.debug("Preparation of the email");
 		Properties props = new Properties();

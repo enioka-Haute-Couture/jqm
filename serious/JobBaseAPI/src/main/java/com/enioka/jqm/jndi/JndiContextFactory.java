@@ -22,13 +22,17 @@ import javax.naming.spi.NamingManager;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Helper class to register the JNDI context
+ * @author Marc-Antoine
+ *
+ */
 public final class JndiContextFactory
 {
 	private static Logger jqmlogger = Logger.getLogger(JndiContextFactory.class);
 
 	private JndiContextFactory()
 	{
-
 	}
 
 	/**

@@ -21,12 +21,21 @@ import com.enioka.jqm.jpamodel.JndiObjectResource;
 import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
 import com.enioka.jqm.tools.Helpers;
 
+/**
+ * This class implements a basic JNDI context
+ *
+ */
 public class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory
 {
 	private static Logger jqmlogger = Logger.getLogger(JndiContext.class);
 	private ClassLoader cl = null;
 	private ResourceFactory rf = new ResourceFactory();
 
+	/** 
+	 * Create a new Context
+	 * @param cl the classloader with access to Hibernate & JQM persistence.xml
+	 * @throws NamingException
+	 */
 	public JndiContext(ClassLoader cl) throws NamingException
 	{
 		super();

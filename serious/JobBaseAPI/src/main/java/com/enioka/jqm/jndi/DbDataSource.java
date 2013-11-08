@@ -28,15 +28,22 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+/**
+ * A JDBC Datasource
+ * 
+ */
 public class DbDataSource implements DataSource, Serializable
 {
-
-	/**
-     *
-     */
 	private static final long serialVersionUID = -7943086055863888338L;
 	private String connectionString, userName, password;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param connStr
+	 * @param username
+	 * @param password
+	 */
 	public DbDataSource(String connStr, String username, String password)
 	{
 		this.connectionString = connStr;
@@ -53,7 +60,6 @@ public class DbDataSource implements DataSource, Serializable
 	@Override
 	public int getLoginTimeout() throws SQLException
 	{
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -65,38 +71,37 @@ public class DbDataSource implements DataSource, Serializable
 	@Override
 	public PrintWriter getLogWriter() throws SQLException
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void setLogWriter(PrintWriter out) throws SQLException
 	{
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException
 	{
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public Connection getConnection(String username, String password) throws SQLException
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/** 
+	 * Not supported.
+	 * @return an exception
+	 * @throws SQLFeatureNotSupportedException
+	 */
 	public Logger getParentLogger() throws SQLFeatureNotSupportedException
 	{
 		return null;
