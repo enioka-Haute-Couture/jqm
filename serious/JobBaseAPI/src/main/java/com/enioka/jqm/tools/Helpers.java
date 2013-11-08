@@ -27,6 +27,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.Deliverable;
@@ -59,25 +60,23 @@ public final class Helpers
 		{
 			fis = new FileInputStream("conf/db.properties");
 			p.load(fis);
+			IOUtils.closeQuietly(fis);
 			return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, p);
 		} catch (FileNotFoundException e)
 		{
 			// No properties file means we use the test HSQLDB (file, not in-memory) as specified in the persistence.xml
+			IOUtils.closeQuietly(fis);
 			return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
 		} catch (IOException e)
 		{
 			jqmlogger.fatal("conf/db.properties file is invalid", e);
+			IOUtils.closeQuietly(fis);
 			System.exit(1);
 			// Stupid, just for Eclipse's parser and therefore avoid red lines...
 			return null;
 		} finally
 		{
-			try
-			{
-				fis.close();
-			} catch (Exception e)
-			{
-			}
+			IOUtils.closeQuietly(fis);
 		}
 	}
 
