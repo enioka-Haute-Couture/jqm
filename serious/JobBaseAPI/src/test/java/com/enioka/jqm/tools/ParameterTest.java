@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
 
+import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -36,6 +37,7 @@ import com.enioka.jqm.jpamodel.JobDefParameter;
 public class ParameterTest
 {
 	public static Server s;
+	public static Logger jqmlogger = Logger.getLogger(ParameterTest.class);
 
 	@BeforeClass
 	public static void testInit()
@@ -60,6 +62,9 @@ public class ParameterTest
 	@Test
 	public void testMixParameters() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testMixParameters");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);
@@ -91,6 +96,9 @@ public class ParameterTest
 	@Test
 	public void testDefaultParameters() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testDefaultParameters");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);
@@ -121,6 +129,9 @@ public class ParameterTest
 	@Test
 	public void testOverrideParmeters() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testOverrideParameters");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);

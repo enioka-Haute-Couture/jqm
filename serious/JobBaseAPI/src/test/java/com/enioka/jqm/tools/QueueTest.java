@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -39,6 +40,7 @@ public class QueueTest
 {
 
 	public static Server s;
+	public static Logger jqmlogger = Logger.getLogger(QueueTest.class);
 
 	@BeforeClass
 	public static void testInit()
@@ -63,6 +65,9 @@ public class QueueTest
 	@Test
 	public void testMaxThreadNormal() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testMaxThreadNormal");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);
@@ -126,6 +131,9 @@ public class QueueTest
 	@Test
 	public void testMaxThreadVip() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testMaxThreadVip");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);

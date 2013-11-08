@@ -60,6 +60,9 @@ public class MultiNodeTests
 	// @Test
 	public void testOneQueueTwoNodes() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testOneQueueTwoNodes");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);
@@ -121,6 +124,9 @@ public class MultiNodeTests
 	// @Test
 	public void testOneQueueThreeNodes() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testOneQueueThreeNodes");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);
@@ -184,6 +190,9 @@ public class MultiNodeTests
 	// @Test
 	public void testTwoNodesTwoQueues() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testTwoNodesTwoQueues");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);
@@ -248,6 +257,9 @@ public class MultiNodeTests
 	// @Test
 	public void testThreeNodesThreeQueues() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testThreeNodesThreeQueues");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);
@@ -399,6 +411,8 @@ public class MultiNodeTests
 	@Test
 	public void testHighlanderMode() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("Starting test testHighlanderMode");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);

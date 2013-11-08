@@ -36,7 +36,7 @@ import com.enioka.jqm.jpamodel.JobDefParameter;
 
 public class GeoTests
 {
-	public static Logger jqmlogger = Logger.getLogger(JobBaseTest.class);
+	public static Logger jqmlogger = Logger.getLogger(GeoTests.class);
 	public static Server s;
 
 	@BeforeClass
@@ -64,6 +64,9 @@ public class GeoTests
 	@Test
 	public void testGeo() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testGeo");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.createLocalNode(em);
 

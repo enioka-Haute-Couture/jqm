@@ -73,6 +73,8 @@ public class JobBaseTest
 	@Test
 	public void testHighlanderMode() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("Starting test testHighlanderMode");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
@@ -119,6 +121,8 @@ public class JobBaseTest
 	@Test
 	public void testHighlanderMode2() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("Starting test testHighlanderMode2");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
@@ -164,6 +168,8 @@ public class JobBaseTest
 	@Test
 	public void testHighlanderModeMultiQueue() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("Starting test testHighlanderModeMultiQueue");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
@@ -201,6 +207,8 @@ public class JobBaseTest
 	@Test
 	public void testGetDeliverables() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("Starting test testGetDeliverables");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
@@ -258,6 +266,8 @@ public class JobBaseTest
 	@Test
 	public void testGetOneDeliverable() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("Starting test testGetOneDeliverable");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
@@ -312,6 +322,8 @@ public class JobBaseTest
 	@Test
 	public void testGetUserDeliverables() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("Starting test testGetUserDeliverables");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
@@ -388,6 +400,8 @@ public class JobBaseTest
 	@Test
 	public void testGetUserJobs() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("Starting test testGetUserJobs");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
@@ -447,6 +461,8 @@ public class JobBaseTest
 	@Test
 	public void testGetJobs() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("Starting test testGetJobs");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
@@ -514,6 +530,8 @@ public class JobBaseTest
 	@Test
 	public void testGetQueues() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("Starting test testGetQueues");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
@@ -527,6 +545,8 @@ public class JobBaseTest
 	@Test
 	public void testGoodOrder() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("Starting test testGoodOrder");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
@@ -609,6 +629,8 @@ public class JobBaseTest
 	@Test
 	public void testSecurityDeliverable() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("Starting test testSecurityDeliverable");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
@@ -672,6 +694,8 @@ public class JobBaseTest
 	@Test
 	public void testPomError() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("Starting test testPomError");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
@@ -714,6 +738,8 @@ public class JobBaseTest
 	@Test
 	public void testXmlParser()
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("Starting test testXmlParser");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
@@ -741,7 +767,9 @@ public class JobBaseTest
 	@Test
 	public void testRestartJob() throws Exception
 	{
-		jqmlogger.debug("Starting test testGoodOrder");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testRestartJob");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);
@@ -780,7 +808,9 @@ public class JobBaseTest
 	@Test
 	public void testPomOnlyInJar() throws Exception
 	{
-		jqmlogger.debug("Starting test testGoodOrder");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testPomOnlyInJar");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);

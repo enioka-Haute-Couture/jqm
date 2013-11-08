@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
 
+import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -36,6 +37,7 @@ import com.enioka.jqm.jpamodel.JobDefParameter;
 public class FiboTest
 {
 	public static Server s;
+	public static Logger jqmlogger = Logger.getLogger(FiboTest.class);
 
 	@BeforeClass
 	public static void testInit() throws InterruptedException
@@ -61,6 +63,9 @@ public class FiboTest
 	@Test
 	public void testFibo() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testFibo");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.createLocalNode(em);
 
