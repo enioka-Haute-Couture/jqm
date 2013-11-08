@@ -23,13 +23,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -59,10 +59,14 @@ import com.enioka.jqm.jpamodel.Queue;
 /**
  * Main JQM client API entry point.
  */
-public class Dispatcher
+public final class Dispatcher
 {
 	private static Logger jqmlogger = Logger.getLogger(Dispatcher.class);
-	private static String PERSISTENCE_UNIT = "jobqueue-api-pu";
+	private static final String PERSISTENCE_UNIT = "jobqueue-api-pu";
+
+	private Dispatcher()
+	{
+	}
 
 	private static EntityManagerFactory emf = null;
 
@@ -616,10 +620,11 @@ public class Dispatcher
 		EntityManager em = getEm();
 		EntityTransaction transac = em.getTransaction();
 		Query query = null;
+		int newPos = position;
 
-		if (position < 1)
+		if (newPos < 1)
 		{
-			position = 1;
+			newPos = 1;
 		}
 
 		try
@@ -633,7 +638,7 @@ public class Dispatcher
 			        .createQuery(
 			                "UPDATE JobInstance j SET j.position = :pos WHERE "
 			                        + "j.id = (SELECT ji.id FROM JobInstance ji WHERE ji.id = :idJob)").setParameter("idJob", idJob)
-			        .setParameter("pos", position);
+			        .setParameter("pos", newPos);
 
 			@SuppressWarnings("unused")
 			int result = query.executeUpdate();
@@ -644,10 +649,10 @@ public class Dispatcher
 				{
 					continue;
 				}
-				else if (i + 1 == position)
+				else if (i + 1 == newPos)
 				{
 					Query queryEg = em.createQuery("UPDATE JobInstance j SET j.position = :i WHERE j.id = :job")
-					        .setParameter("i", position + 2).setParameter("job", q.get(i).getId());
+					        .setParameter("i", newPos + 2).setParameter("job", q.get(i).getId());
 					@SuppressWarnings("unused")
 					int res = queryEg.executeUpdate();
 					i++;
@@ -775,14 +780,13 @@ public class Dispatcher
 	 * @return
 	 * @throws Exception
 	 */
-	public static InputStream getOneDeliverable(com.enioka.jqm.api.Deliverable d) throws Exception
+	public static InputStream getOneDeliverable(com.enioka.jqm.api.Deliverable d) throws JqmException
 	{
 		EntityManager em = getEm();
 		URL url = null;
 		File file = null;
 		History h = null;
 		Deliverable deliverable = null;
-		Logger jqmlogger = Logger.getLogger(Dispatcher.class);
 
 		try
 		{
@@ -792,7 +796,7 @@ public class Dispatcher
 		{
 			jqmlogger.info(e);
 			em.close();
-			throw e;
+			throw new JqmException("Could not get find deliverable description inside DB", e);
 		}
 
 		try
@@ -804,25 +808,36 @@ public class Dispatcher
 			h = null;
 			jqmlogger.info("GetOneDeliverable: No job found with the deliverable ID");
 			em.close();
-			throw e;
+			throw new JqmException("No job found with the deliverable ID", e);
 		}
 
-		url = new URL("http://" + h.getJobInstance().getNode().getListeningInterface() + ":" + h.getJobInstance().getNode().getPort()
-		        + "/getfile?file=" + deliverable.getFilePath() + deliverable.getFileName());
-
-		jqmlogger.debug("URL: " + deliverable.getFilePath() + deliverable.getFileName());
+		try
+		{
+			url = new URL("http://" + h.getJobInstance().getNode().getListeningInterface() + ":" + h.getJobInstance().getNode().getPort()
+			        + "/getfile?file=" + deliverable.getFilePath() + deliverable.getFileName());
+			jqmlogger.debug("URL: " + deliverable.getFilePath() + deliverable.getFileName());
+		} catch (MalformedURLException e)
+		{
+			throw new JqmException("URL is not valid " + url, e);
+		}
 
 		if (deliverable.getHashPath().equals(Cryptonite.sha1(deliverable.getFilePath() + deliverable.getFileName()))
 		        && h.getJobInstance() != null)
 		{
-			System.out.println("dlRepo: " + h.getJobInstance().getNode().getDlRepo() + deliverable.getFileFamily() + "/"
+			jqmlogger.debug("dlRepo: " + h.getJobInstance().getNode().getDlRepo() + deliverable.getFileFamily() + "/"
 			        + h.getJobInstance().getId() + "/");
 			File dlRepo = new File(h.getJobInstance().getNode().getDlRepo() + deliverable.getFileFamily() + "/"
 			        + h.getJobInstance().getId() + "/");
 			dlRepo.mkdirs();
-			file = new File(h.getJobInstance().getNode().getDlRepo() + deliverable.getFileFamily() + "/" + h.getJobInstance().getId() + "/"
-			        + deliverable.getFileName());
-			FileUtils.copyURLToFile(url, file);
+			try
+			{
+				file = new File(h.getJobInstance().getNode().getDlRepo() + deliverable.getFileFamily() + "/" + h.getJobInstance().getId()
+				        + "/" + deliverable.getFileName());
+				FileUtils.copyURLToFile(url, file);
+			} catch (IOException e)
+			{
+				throw new JqmException("Could not copy the downloaded file", e);
+			}
 		}
 		else
 		{
@@ -830,7 +845,16 @@ public class Dispatcher
 			return null;
 		}
 		em.close();
-		return (new FileInputStream(file));
+
+		FileInputStream res = null;
+		try
+		{
+			res = new FileInputStream(file);
+		} catch (IOException e)
+		{
+			throw new JqmException("Could not copy the downloaded file", e);
+		}
+		return res;
 	}
 
 	// ----------------------------- GETUSERDELIVERABLES --------------------------------------
@@ -882,7 +906,6 @@ public class Dispatcher
 	 */
 	public static List<JobInstance> getUserJobs(String user)
 	{
-		Logger jqmlogger = Logger.getLogger(Dispatcher.class);
 		ArrayList<JobInstance> jobs = null;
 
 		try

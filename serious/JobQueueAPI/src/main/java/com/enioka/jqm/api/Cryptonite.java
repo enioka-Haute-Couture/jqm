@@ -25,13 +25,22 @@ import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.io.IOUtils;
 
-class Cryptonite
+final class Cryptonite
 {
-
-	static String sha1(String input) throws NoSuchAlgorithmException
+	private Cryptonite()
 	{
+	}
 
-		MessageDigest mDigest = MessageDigest.getInstance("SHA1");
+	static String sha1(String input) throws JqmException
+	{
+		MessageDigest mDigest = null;
+		try
+		{
+			mDigest = MessageDigest.getInstance("SHA1");
+		} catch (NoSuchAlgorithmException e)
+		{
+			throw new JqmException("Invalid hashing algorythm SHA1 on this system", e);
+		}
 		byte[] result = mDigest.digest(input.getBytes());
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < result.length; i++)
