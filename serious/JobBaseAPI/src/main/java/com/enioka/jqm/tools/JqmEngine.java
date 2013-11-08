@@ -21,6 +21,7 @@ package com.enioka.jqm.tools;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
@@ -42,8 +43,8 @@ import com.enioka.jqm.jpamodel.Queue;
 
 class JqmEngine
 {
-	private ArrayList<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
-	private ArrayList<Polling> pollers = new ArrayList<Polling>();
+	private List<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
+	private List<Polling> pollers = new ArrayList<Polling>();
 	private Node node = null;
 	private EntityManager em = Helpers.getNewEm();
 	private Map<String, URL[]> cache = new HashMap<String, URL[]>();

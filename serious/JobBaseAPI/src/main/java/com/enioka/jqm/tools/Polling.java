@@ -20,6 +20,7 @@ package com.enioka.jqm.tools;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
@@ -36,7 +37,7 @@ import com.enioka.jqm.jpamodel.Queue;
 class Polling implements Runnable
 {
 	private static Logger jqmlogger = Logger.getLogger(Polling.class);
-	private ArrayList<JobInstance> job = new ArrayList<JobInstance>();
+	private List<JobInstance> job = new ArrayList<JobInstance>();
 	DeploymentParameter dp = null;
 	private Queue queue = null;
 	private EntityManager em = Helpers.getNewEm();
@@ -74,12 +75,6 @@ class Polling implements Runnable
 		}
 
 		return (!job.isEmpty()) ? job.get(0) : null;
-	}
-
-	ArrayList<JobInstance> getJob()
-	{
-
-		return job;
 	}
 
 	protected void HighlanderPollingMode(JobInstance currentJob, EntityManager em)

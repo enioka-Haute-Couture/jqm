@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,7 +37,7 @@ import org.xml.sax.SAXException;
 
 class Dependencies
 {
-	private ArrayList<String> list = new ArrayList<String>();
+	private List<String> list = new ArrayList<String>();
 	private static Logger jqmlogger = Logger.getLogger(Dependencies.class);
 
 	Dependencies(String path)
@@ -106,7 +107,7 @@ class Dependencies
 	/**
 	 * @return the list
 	 */
-	ArrayList<String> getList()
+	List<String> getList()
 	{
 		return list;
 	}
