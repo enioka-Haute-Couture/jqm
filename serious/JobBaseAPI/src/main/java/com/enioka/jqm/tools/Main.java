@@ -18,8 +18,12 @@
 
 package com.enioka.jqm.tools;
 
+import org.apache.log4j.Logger;
+
 public class Main
 {
+	private static Logger jqmlogger = Logger.getLogger(Main.class);
+			
 	/**
 	 * Startup method for the packaged JAR
 	 * 
@@ -58,13 +62,13 @@ public class Main
 		JqmEngine engine = new JqmEngine();
 		try
 		{
+			jqmlogger.info("Starting engine node " + args[0]);
 			engine.start(args);
 			Thread.sleep(Long.MAX_VALUE);
 
 		} catch (Exception e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			jqmlogger.fatal("Could not launch the engine", e);
 		}
 	}
 }

@@ -33,13 +33,13 @@ public class Mail
 		try
 		{
 			this.host = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-					.setParameter("k", "mailSmtp").getSingleResult();
+			        .setParameter("k", "mailSmtp").getSingleResult();
 			this.to = "jqm.noreply@gmail.com";
 			this.from = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-					.setParameter("k", "mailFrom").getSingleResult();
+			        .setParameter("k", "mailFrom").getSingleResult();
 			this.ji = ji;
 			this.port = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-					.setParameter("k", "mailPort").getSingleResult();
+			        .setParameter("k", "mailPort").getSingleResult();
 		} catch (NoResultException e)
 		{
 			jqmlogger.debug("Some information have been forgotten. JQM can't send emails", e);
@@ -71,20 +71,18 @@ public class Mail
 			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
 			msg.setSubject("[JQM] Job: " + ji.getId() + " ENDED");
 			msg.setText("The Job number: " + ji.getId() + " finished correctly\n" + "Description of the job:\n" + "- Job definition: "
-					+ ji.getJd().getApplicationName() + "\n" + "- Parent: " + ji.getParent() + "\n" + "- User name: " + ji.getUserName()
-					+ "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "- Queue: " + ji.getQueue().getName() + "\n" + "- Node: "
-					+ ji.getNode().getListeningInterface() + "\n" + "Best regards,\n");
+			        + ji.getJd().getApplicationName() + "\n" + "- Parent: " + ji.getParent() + "\n" + "- User name: " + ji.getUserName()
+			        + "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "- Queue: " + ji.getQueue().getName() + "\n" + "- Node: "
+			        + ji.getNode().getListeningInterface() + "\n" + "Best regards,\n");
 
 			Transport.send(msg);
 			jqmlogger.debug("Email sent successfully...");
 		} catch (AddressException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			jqmlogger.warn("Could not send email. Job has nevertheless run correctly", e);
 		} catch (MessagingException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			jqmlogger.warn("Could not send email. Job has nevertheless run correctly", e);
 		}
 	}
 }
