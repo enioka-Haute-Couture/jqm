@@ -13,7 +13,7 @@ public class App extends JobBase
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			throw new RuntimeException("arg");
+			throw new RuntimeException("arg", e);
 		}
 	}
 }
