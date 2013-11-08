@@ -3,8 +3,6 @@ package com.enioka.jqm.tools;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -33,15 +31,14 @@ public class XmlParser
 {
 	private static Logger jqmlogger = Logger.getLogger(XmlParser.class);
 	private EntityManager em = Helpers.getNewEm();
-	File f = null;
 
-	public XmlParser(String path)
+	public XmlParser()
 	{
-		this.f = new File(path);
 	}
 
-	public void parse()
+	public void parse(String path)
 	{
+		File f = new File(path);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		boolean canBeRestarted = true;
@@ -57,7 +54,6 @@ public class XmlParser
 		String other3 = null;
 		boolean highlander = false;
 		String jarPath = null;
-		List<JobDefParameter> parameters = new ArrayList<JobDefParameter>();
 
 		SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		Schema schema = null;

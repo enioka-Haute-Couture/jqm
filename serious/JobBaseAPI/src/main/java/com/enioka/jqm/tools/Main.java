@@ -40,8 +40,8 @@ public class Main
 						engine.start(args);
 						Thread.sleep(2000);
 						engine.stop();
-						XmlParser parser = new XmlParser(args[1]);
-						parser.parse();
+						XmlParser parser = new XmlParser();
+						parser.parse(args[1]);
 						return;
 					} catch (InterruptedException e)
 					{
