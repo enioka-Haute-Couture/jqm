@@ -840,4 +840,40 @@ public class JobBaseTest
 		Assert.assertEquals(1, res.size());
 		Assert.assertEquals("ENDED", res.get(0).getState());
 	}
+
+	@Test
+	public void testEmail() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testSendEmail");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+				"ModuleMachin", "other", "other", true, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG", "jqm.noreply@gmail.com");
+
+		int i = Dispatcher.enQueue(j);
+
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+
+		Thread.sleep(6000);
+
+		engine1.stop();
+
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+
+		Assert.assertEquals(1, res.size());
+		Assert.assertEquals("ENDED", res.get(0).getState());
+	}
 }

@@ -371,8 +371,11 @@ class Loader implements Runnable
 
 			// SEND EMAIL
 
-			Mail mail = new Mail(node, job, em);
-			mail.send();
+			if (job.getEmail() != null)
+			{
+				Mail mail = new Mail(node, job, em);
+				mail.send();
+			}
 
 			// END SEND EMAIL
 

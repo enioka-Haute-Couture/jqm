@@ -33,13 +33,13 @@ class Mail
 		try
 		{
 			this.host = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-			        .setParameter("k", "mailSmtp").getSingleResult();
-			this.to = "jqm.noreply@gmail.com";
+					.setParameter("k", "mailSmtp").getSingleResult();
 			this.from = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-			        .setParameter("k", "mailFrom").getSingleResult();
+					.setParameter("k", "mailFrom").getSingleResult();
 			this.ji = ji;
 			this.port = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-			        .setParameter("k", "mailPort").getSingleResult();
+					.setParameter("k", "mailPort").getSingleResult();
+			this.to = ji.getEmail();
 		} catch (NoResultException e)
 		{
 			jqmlogger.debug("Some information have been forgotten. JQM can't send emails", e);
@@ -49,6 +49,7 @@ class Mail
 	void send()
 	{
 		jqmlogger.debug("Preparation of the email");
+		jqmlogger.debug("The email will be sent to: " + to);
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");
 		props.put("mail.smtp.starttls.enable", "true");
@@ -70,10 +71,10 @@ class Mail
 			msg.setFrom(new InternetAddress(from));
 			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
 			msg.setSubject("[JQM] Job: " + ji.getId() + " ENDED");
-			msg.setText("The Job number: " + ji.getId() + " finished correctly\n" + "Description of the job:\n" + "- Job definition: "
-			        + ji.getJd().getApplicationName() + "\n" + "- Parent: " + ji.getParent() + "\n" + "- User name: " + ji.getUserName()
-			        + "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "- Queue: " + ji.getQueue().getName() + "\n" + "- Node: "
-			        + ji.getNode().getListeningInterface() + "\n" + "Best regards,\n");
+			msg.setText("The Job number: " + ji.getId() + " finished correctly\n\n" + "Description of the job:\n" + "- Job definition: "
+					+ ji.getJd().getApplicationName() + "\n" + "- Parent: " + ji.getParent() + "\n" + "- User name: " + ji.getUserName()
+					+ "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "- Queue: " + ji.getQueue().getName() + "\n" + "- Node: "
+					+ ji.getNode().getListeningInterface() + "\n" + "Best regards,\n");
 
 			Transport.send(msg);
 			jqmlogger.debug("Email sent successfully...");

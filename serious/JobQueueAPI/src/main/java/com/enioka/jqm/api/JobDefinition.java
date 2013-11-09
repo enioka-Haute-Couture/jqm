@@ -36,6 +36,7 @@ public class JobDefinition
 	private String other1;
 	private String other2;
 	private String other3;
+	private String email = null;
 	private Map<String, String> parameters = new HashMap<String, String>();
 
 	JobDefinition()
@@ -55,6 +56,23 @@ public class JobDefinition
 	{
 		this.applicationName = applicationName;
 		this.user = user;
+	}
+
+	/**
+	 * Public constructor
+	 * 
+	 * @param applicationName
+	 *            name (key) of the job to launch
+	 * @param user
+	 *            name of the human user that is at the origin of the request. If no user, use the application module name.
+	 * @param email
+	 * 			  email of the human user that to want to receive it when the job will ended.
+	 */
+	public JobDefinition(String applicationName, String user, String email)
+	{
+		this.applicationName = applicationName;
+		this.user = user;
+		this.email = email;
 	}
 
 	/**
@@ -295,5 +313,27 @@ public class JobDefinition
 	public void setUser(String user)
 	{
 		this.user = user;
+	}
+
+	/**
+	 * <strong>Compulsory</strong><br>
+	 * The email of the user that want to received it.
+	 * 
+	 * @return
+	 */
+	public String getEmail()
+	{
+		return email;
+	}
+
+	/**
+	 * <strong>Compulsory</strong><br>
+	 * The user can enter an email to receive an email when the job is ended.
+	 * 
+	 * @param email
+	 */
+	public void setEmail(String email)
+	{
+		this.email = email;
 	}
 }

@@ -69,6 +69,8 @@ public class JobInstance implements Comparable<JobInstance>, Serializable
 	@ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Node.class, fetch = FetchType.EAGER)
 	@JoinColumn(name = "node_id")
 	private Node node;
+	@Column(name = "sendEmail")
+	private String email;
 
 	@OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "jobinstance")
 	private List<JobParameter> parameters;
@@ -192,4 +194,13 @@ public class JobInstance implements Comparable<JobInstance>, Serializable
 		this.node = node;
 	}
 
+	public String getEmail()
+	{
+		return email;
+	}
+
+	public void setEmail(String email)
+	{
+		this.email = email;
+	}
 }
