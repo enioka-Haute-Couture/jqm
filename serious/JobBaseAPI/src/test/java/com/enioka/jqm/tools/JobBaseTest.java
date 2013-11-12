@@ -876,4 +876,100 @@ public class JobBaseTest
 		Assert.assertEquals(1, res.size());
 		Assert.assertEquals("ENDED", res.get(0).getState());
 	}
+
+	@Test
+	public void testRestartCrashedJob() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testRestartCrashedJob");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+				"ModuleMachin", "other", "other", true, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+
+		int i = Dispatcher.enQueue(j);
+
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+
+		Thread.sleep(5000);
+
+		Dispatcher.restartCrashedJob(i);
+
+		Thread.sleep(5000);
+		engine1.stop();
+
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+
+		Assert.assertEquals(2, res.size());
+		Assert.assertEquals(jdDemoMaven.getId(), res.get(0).getJd().getId());
+		Assert.assertEquals(jdDemoMaven.getId(), res.get(1).getJd().getId());
+	}
+
+	@Test
+	public void testGetAllDeliverables() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testGetAllDeliverables");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+		EntityManager emm = Helpers.getNewEm();
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", "./testprojects/jqm-test-deliverable/", em);
+		JobDefParameter jdp2 = CreationTools.createJobDefParameter("fileName", "JobGenADeliverable42.txt", em);
+		jdargs.add(jdp);
+		jdargs.add(jdp2);
+
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-deliverable/",
+				"jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+				"ModuleMachin", "other", "other", false, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "Franquin");
+
+		Dispatcher.enQueue(j);
+
+		JobInstance ji = emm.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :myId", JobInstance.class)
+				.setParameter("myId", jdDemoMaven.getId()).getSingleResult();
+
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+
+		Thread.sleep(10000);
+
+		File f = new File("./testprojects/jqm-test-deliverable/JobGenADeliverable42.txt");
+
+		Assert.assertEquals(true, f.exists());
+
+		com.enioka.jqm.api.Deliverable d = new com.enioka.jqm.api.Deliverable("./testprojects/jqm-test-deliverable/",
+				"JobGenADeliverable42.txt");
+
+		Dispatcher.resetEM();
+		List<com.enioka.jqm.api.Deliverable> tmp = Dispatcher.getAllDeliverables(ji.getId());
+		engine1.stop();
+
+		File res = new File("./testprojects/jqm-test-deliverable/JobGenADeliverableFamily/" + ji.getId() + "/JobGenADeliverable42.txt");
+
+		Assert.assertEquals(1, tmp.size());
+		Assert.assertEquals(tmp.get(0).getFilePath(), d.getFilePath());
+		f.delete();
+		res.delete();
+		File sRep = new File("./testprojects/jqm-test-deliverable/JobGenADeliverableFamily/" + ji.getId());
+		sRep.delete();
+		File rep = new File("./testprojects/jqm-test-deliverable/JobGenADeliverableFamily/");
+		rep.delete();
+	}
 }

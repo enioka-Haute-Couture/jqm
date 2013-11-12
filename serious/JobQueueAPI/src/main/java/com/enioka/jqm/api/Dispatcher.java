@@ -771,11 +771,11 @@ public final class Dispatcher
 		try
 		{
 			deliverables = (ArrayList<Deliverable>) getEm()
-					.createQuery("SELECT d FROM Deliverable d WHERE d.jobInstance = :idJob", Deliverable.class)
+					.createQuery("SELECT d FROM Deliverable d WHERE d.jobId = :idJob", Deliverable.class)
 					.setParameter("idJob", idJob).getResultList();
 		} catch (Exception e)
 		{
-			jqmlogger.info(e);
+			throw new JqmException("Deliverables cannot be found", e);
 		}
 
 		List<com.enioka.jqm.api.Deliverable> res = new ArrayList<com.enioka.jqm.api.Deliverable>();
