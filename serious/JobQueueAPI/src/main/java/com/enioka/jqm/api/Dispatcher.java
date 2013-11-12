@@ -523,7 +523,7 @@ public final class Dispatcher
 			transac.commit();
 		} catch (Exception e)
 		{
-			jqmlogger.error("cancelJobInQueue", e);
+			throw new JqmException("cancelJobInQueue", e);
 		} finally
 		{
 			em.close();
@@ -678,7 +678,7 @@ public final class Dispatcher
 			}
 		} catch (Exception e)
 		{
-			jqmlogger.info("setPosition: " + e);
+			throw new JqmException("Position can't be setted", e);
 		} finally
 		{
 			em.close();
@@ -744,10 +744,10 @@ public final class Dispatcher
 			}
 		} catch (FileNotFoundException e)
 		{
-			jqmlogger.info(e);
+			throw new JqmException("The deliverable can't be found", e);
 		} catch (Exception e)
 		{
-			jqmlogger.info("No deliverable available", e);
+			throw new JqmException("The deliverable is not availble", e);
 		} finally
 		{
 			em.close();
@@ -931,7 +931,7 @@ public final class Dispatcher
 					.setParameter("u", user).getResultList();
 		} catch (Exception e)
 		{
-			jqmlogger.info(e);
+			throw new JqmException("The user cannot be found", e);
 		}
 
 		return jobs;
@@ -1021,7 +1021,7 @@ public final class Dispatcher
 			}
 		} catch (Exception e)
 		{
-			jqmlogger.info(e);
+			throw new JqmException("The queue cannot be changed", e);
 		}
 
 		transac.commit();
@@ -1054,7 +1054,7 @@ public final class Dispatcher
 			}
 		} catch (Exception e)
 		{
-			jqmlogger.info(e);
+			throw new JqmException("The queue cannot be changed", e);
 		}
 
 		transac.commit();
