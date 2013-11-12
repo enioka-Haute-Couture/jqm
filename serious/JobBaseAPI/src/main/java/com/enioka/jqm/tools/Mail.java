@@ -71,7 +71,7 @@ class Mail
 			msg.setFrom(new InternetAddress(from));
 			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
 			msg.setSubject("[JQM] Job: " + ji.getId() + " ENDED");
-			msg.setText("The Job number: " + ji.getId() + " finished correctly\n\n" + "Description of the job:\n" + "- Job definition: "
+			msg.setText("The Job number: " + ji.getId() + " finished correctly\n\no" + "Description of the job:\n" + "- Job definition: "
 					+ ji.getJd().getApplicationName() + "\n" + "- Parent: " + ji.getParent() + "\n" + "- User name: " + ji.getUserName()
 					+ "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "- Queue: " + ji.getQueue().getName() + "\n" + "- Node: "
 					+ ji.getNode().getListeningInterface() + "\n" + "Best regards,\n");

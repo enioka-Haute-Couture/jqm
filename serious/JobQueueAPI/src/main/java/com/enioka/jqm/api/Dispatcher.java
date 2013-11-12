@@ -376,7 +376,7 @@ public final class Dispatcher
 		h = new History();
 		// h.setReturnedValue(null);
 		// h.setJobDate(jobDate);
-		h.setJobDefId(job.getId());
+		h.setJd(job);
 		h.setSessionId(42);
 		h.setQueue(job.getQueue());
 		h.setMsg("History of the Job --> ID = " + (ji.getId()));
@@ -386,6 +386,8 @@ public final class Dispatcher
 		// h.setExecutionDate(executionDate);
 		// h.setEndDate(endDate);
 		h.setUserName(jd.getUser());
+		h.setEmail(ji.getEmail());
+		h.setPosition(ji.getPosition());
 		// h.setNode(null);
 		h.setParameters(new ArrayList<JobHistoryParameter>());
 		em.persist(h);
@@ -762,7 +764,7 @@ public final class Dispatcher
 	 * @param idJob
 	 * @return
 	 */
-	public static List<Deliverable> getAllDeliverables(int idJob)
+	public static List<com.enioka.jqm.api.Deliverable> getAllDeliverables(int idJob)
 	{
 		ArrayList<Deliverable> deliverables = new ArrayList<Deliverable>();
 
@@ -776,7 +778,14 @@ public final class Dispatcher
 			jqmlogger.info(e);
 		}
 
-		return deliverables;
+		List<com.enioka.jqm.api.Deliverable> res = new ArrayList<com.enioka.jqm.api.Deliverable>();
+
+		for (Deliverable d : deliverables)
+		{
+			res.add(new com.enioka.jqm.api.Deliverable(d.getFilePath(), d.getFileName()));
+		}
+
+		return res;
 	}
 
 	// ----------------------------- GETONEDELIVERABLE --------------------------------------

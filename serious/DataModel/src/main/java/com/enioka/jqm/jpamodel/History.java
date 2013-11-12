@@ -45,42 +45,50 @@ public class History implements Serializable
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-	@Column(name="returnedValue")
+	@Column(name = "returnedValue")
 	private Integer returnedValue;
 	@Temporal(TemporalType.DATE)
-	@Column(name="jobDate")
+	@Column(name = "jobDate")
 	private Calendar jobDate;
-	@Column(name="jobDefId")
-	private Integer jobDefId;
-	@Column(name="sessionId")
+	@JoinColumn(name = "jd")
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.JobDef.class)
+	private JobDef jd;
+	@Column(name = "sessionId")
 	private Integer sessionId;
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Queue.class)
-	@JoinColumn(name="queue")
+	@JoinColumn(name = "queue")
 	private Queue queue;
 	@Column(length = 1000, name="msg")
 	private String msg;
 	@OneToMany(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Message.class, cascade = CascadeType.ALL, mappedBy = "history")
 	private List<Message> messages;
 	@OneToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.JobInstance.class)
-	@JoinColumn(name="jobInstance")
+	@JoinColumn(name = "jobInstance")
 	private JobInstance jobInstance;
 	@Temporal(TemporalType.DATE)
-	@Column(name="enqueueDate")
+	@Column(name = "enqueueDate")
 	private Calendar enqueueDate;
 	@Temporal(TemporalType.DATE)
-	@Column(name="executionDate")
+	@Column(name = "executionDate")
 	private Calendar executionDate;
 	@Temporal(TemporalType.DATE)
-	@Column(name="endDate")
+	@Column(name = "endDate")
 	private Calendar endDate;
-	@Column(name="userName")
+	@Column(name = "userName")
 	private String userName;
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Node.class)
-	@JoinColumn(name="node")
+	@JoinColumn(name = "node")
 	private Node node;
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)
 	@JoinColumn(name = "history_id")
 	private List<JobHistoryParameter> parameters;
+	@Column(name = "position")
+	private Integer position;
+	@Column(name = "email")
+	private String email;
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.JobDef.class)
+	@JoinColumn(name = "parent")
+	private JobDef parent;
 
 	public Integer getId()
 	{
@@ -201,16 +209,6 @@ public class History implements Serializable
 		this.messages = messages;
 	}
 
-	public Integer getJobDefId()
-	{
-		return jobDefId;
-	}
-
-	public void setJobDefId(final Integer jobDefId)
-	{
-		this.jobDefId = jobDefId;
-	}
-
 	public Queue getQueue()
 	{
 		return queue;
@@ -256,5 +254,45 @@ public class History implements Serializable
 	{
 
 		this.parameters = parameters;
+	}
+
+	public JobDef getJd()
+	{
+		return jd;
+	}
+
+	public void setJd(JobDef jd)
+	{
+		this.jd = jd;
+	}
+
+	public Integer getPosition()
+	{
+		return position;
+	}
+
+	public void setPosition(Integer position)
+	{
+		this.position = position;
+	}
+
+	public String getEmail()
+	{
+		return email;
+	}
+
+	public void setEmail(String email)
+	{
+		this.email = email;
+	}
+
+	public JobDef getParent()
+	{
+		return parent;
+	}
+
+	public void setParent(JobDef parent)
+	{
+		this.parent = parent;
 	}
 }

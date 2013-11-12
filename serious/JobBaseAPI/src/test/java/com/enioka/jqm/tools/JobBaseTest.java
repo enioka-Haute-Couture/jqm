@@ -142,10 +142,10 @@ public class JobBaseTest
 		JobInstance j = CreationTools.createJobInstance(jdDemoMaven, jps, "MAG", null, "SUBMITTED", 2, TestHelpers.qVip, null, em);
 		JobInstance jj = CreationTools.createJobInstance(jdDemoMaven, jps, "MAG", null, "RUNNING", 1, TestHelpers.qVip, null, em);
 
-		History h = CreationTools.createhistory(null, null, jdDemoMaven.getId(), null, TestHelpers.qVip, null, null, j, null, null, null,
-				null, TestHelpers.node, null, em);
-		History hh = CreationTools.createhistory(null, null, jdDemoMaven.getId(), null, TestHelpers.qVip, null, null, jj, null, null, null,
-				null, TestHelpers.node, null, em);
+		History h = CreationTools.createhistory(null, null, jdDemoMaven, null, TestHelpers.qVip, null, null, j, null, null, null, null,
+				TestHelpers.node, null, em);
+		History hh = CreationTools.createhistory(null, null, jdDemoMaven, null, TestHelpers.qVip, null, null, jj, null, null, null, null,
+				TestHelpers.node, null, em);
 
 		em.getTransaction().commit();
 

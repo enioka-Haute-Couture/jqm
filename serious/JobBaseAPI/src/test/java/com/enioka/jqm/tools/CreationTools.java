@@ -1,5 +1,5 @@
 /**
- * Copyright © 2013 enioka. All rights reserved
+ * Copyright �� 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
  * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
  *
@@ -46,8 +46,9 @@ import com.enioka.jqm.jpamodel.Queue;
 
 /**
  * This class will soon become private. It is not part of the API.
+ * 
  * @author Marc-Antoine
- *
+ * 
  */
 public class CreationTools
 {
@@ -92,9 +93,9 @@ public class CreationTools
 		return j;
 	}
 
-	public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String filePath, String jp,
-			Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String other1, String other2,
-			String other3, boolean highlander, EntityManager em)
+	public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps,
+			String filePath, String jp, Queue queue, Integer maxTimeRunning, String applicationName, String application, String module,
+			String other1, String other2, String other3, boolean highlander, EntityManager em)
 	{
 		JobDef j = new JobDef();
 		EntityTransaction transac = em.getTransaction();
@@ -174,7 +175,7 @@ public class CreationTools
 		return h;
 	}
 
-	public static History createhistory(Integer returnedValue, Calendar jobDate, Integer JobDefId, Integer sessionId, Queue queue,
+	public static History createhistory(Integer returnedValue, Calendar jobDate, JobDef JobDefId, Integer sessionId, Queue queue,
 			String msg, List<Message> messages, JobInstance jobInstance, Calendar enqueueDate, Calendar executionDate, Calendar endDate,
 			String userName, Node node, List<JobHistoryParameter> jhp, EntityManager em)
 	{
@@ -182,7 +183,7 @@ public class CreationTools
 
 		h.setReturnedValue(returnedValue);
 		h.setJobDate(jobDate);
-		h.setJobDefId(JobDefId);
+		h.setJd(JobDefId);
 		h.setSessionId(sessionId);
 		h.setQueue(queue);
 		h.setMsg(msg);
