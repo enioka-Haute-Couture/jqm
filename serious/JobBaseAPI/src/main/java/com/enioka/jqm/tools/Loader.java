@@ -305,7 +305,7 @@ class Loader implements Runnable
 			jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
 			jqmlogger.debug("Job is running in the thread: " + Thread.currentThread().getName());
 			jqmlogger.debug("AVANT INVOKE MAIN");
-			jobBase = jobClassLoader.invokeMain(job, defaultconnection);
+			jobBase = jobClassLoader.invokeMain(job, defaultconnection, contextClassLoader, em);
 			jqmlogger.debug("ActualNbThread after execution: " + p.getActualNbThread());
 			p.setActualNbThread(p.getActualNbThread() - 1);
 			jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");

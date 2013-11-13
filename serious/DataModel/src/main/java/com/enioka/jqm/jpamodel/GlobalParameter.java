@@ -20,7 +20,7 @@ public class GlobalParameter implements Serializable
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-	@Column(length=50, name="key")
+	@Column(length=50, name="KEYNAME")
 	private String key;
 	@Column(length=1000, name="value")
 	private String value;

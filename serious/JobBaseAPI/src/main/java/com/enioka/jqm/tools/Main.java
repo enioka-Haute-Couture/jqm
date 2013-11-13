@@ -1,5 +1,5 @@
 /**
- * Copyright © 2013 enioka. All rights reserved
+ * Copyright �� 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
  * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
  *
@@ -20,9 +20,12 @@ package com.enioka.jqm.tools;
 
 import org.apache.log4j.Logger;
 
+import com.enioka.jqm.api.Dispatcher;
+import com.enioka.jqm.api.JobDefinition;
+
 /**
  * Starter class & parameter parsing
- *
+ * 
  */
 public class Main
 {
@@ -37,6 +40,12 @@ public class Main
 	public static void main(String[] args)
 	{
 		JqmEngine engine = new JqmEngine();
+
+		if (args.length != 1 && args.length != 3)
+		{
+			jqmlogger.fatal("The command line is incorrect");
+			return;
+		}
 
 		if (args.length >= 3)
 		{
@@ -55,6 +64,15 @@ public class Main
 						e.printStackTrace();
 					}
 
+				}
+			}
+			else if (args[1].equals("-enqueue"))
+			{
+				if (!args[2].isEmpty())
+				{
+					JobDefinition job = new JobDefinition(args[2], "TestUser");
+					Dispatcher.enQueue(job);
+					return;
 				}
 			}
 		}

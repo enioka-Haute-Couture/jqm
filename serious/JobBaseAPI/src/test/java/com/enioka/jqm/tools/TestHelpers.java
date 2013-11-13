@@ -44,7 +44,6 @@ public class TestHelpers
 
 	public static void createLocalNode(EntityManager em)
 	{
-
 		db = CreationTools.createDatabaseProp("jdbc/marsu", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb", "SA", "", em);
 
 		TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenRepo", "http://repo1.maven.org/maven2/", em);

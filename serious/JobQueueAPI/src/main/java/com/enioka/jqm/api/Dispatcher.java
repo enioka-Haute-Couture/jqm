@@ -747,7 +747,7 @@ public final class Dispatcher
 			throw new JqmException("The deliverable can't be found", e);
 		} catch (Exception e)
 		{
-			throw new JqmException("The deliverable is not availble", e);
+			throw new JqmException("The deliverable is not available", e);
 		} finally
 		{
 			em.close();

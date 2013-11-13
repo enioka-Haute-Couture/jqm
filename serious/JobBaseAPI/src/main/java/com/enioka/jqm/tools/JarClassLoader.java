@@ -46,6 +46,8 @@ import java.net.URLClassLoader;
 import java.util.Map;
 import java.util.jar.Attributes;
 
+import javax.persistence.EntityManager;
+
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.JobInstance;
@@ -119,7 +121,7 @@ class JarClassLoader extends URLClassLoader
 		}
 	}
 
-	Object invokeMain(JobInstance job, String defaultConnection) throws Exception
+	Object invokeMain(JobInstance job, String defaultConnection, ClassLoader old, EntityManager em) throws Exception
 	{
 		String classQualifiedName = job.getJd().getJavaClassName();
 		jqmlogger.debug("Trying to load class " + classQualifiedName);
@@ -141,7 +143,10 @@ class JarClassLoader extends URLClassLoader
 			Method start = c.getMethod("start", null);
 			Method getParameters = c.getMethod("getParameters", null);
 			Method getdefaultConnect = c.getMethod("setDefaultConnect", String.class);
+			Link l = new Link(old, em);
+			Method getMyEngine = c.getMethod("setMyEngine", Object.class);
 			getdefaultConnect.invoke(o, defaultConnection);
+			getMyEngine.invoke(o, l);
 
 			Map<String, String> params = (Map<String, String>) getParameters.invoke(o, null);
 			for (JobParameter i : job.getParameters())

@@ -19,6 +19,7 @@
 package com.enioka.jqm.api;
 
 
+import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,6 +38,8 @@ import com.enioka.jqm.deliverabletools.DeliverableStruct;
  */
 public class JobBase {
 
+	private Integer jobId;
+	private Object myEngine = null;
 	protected int parentID;
 	protected int canBeRestart;
 	protected String applicationName;
@@ -48,7 +51,7 @@ public class JobBase {
 	protected String other3;
 	protected Map<String, String> parameters = new HashMap<String, String>();
 	protected ArrayList<DeliverableStruct> sha1s = new ArrayList<DeliverableStruct>();
-	protected String defaultConnect;
+	private String defaultConnect;
 
 	public void start() {
 
@@ -66,7 +69,8 @@ public class JobBase {
 		return q;
 	}
 
-	public void addDeliverable(final String path, final String fileName, final String fileLabel) {
+	public void addDeliverable(final String path, final String fileName, final String fileLabel)
+	{
 		try
 		{
 			this.sha1s.add(new DeliverableStruct(path, fileName, Cryptonite.sha1(path + fileName), fileLabel));
@@ -76,8 +80,18 @@ public class JobBase {
 		}
 	}
 
-	public void sendMsg(final String msg) {
+	public void sendMsg(final String msg)
+	{
+		try
+		{
+			Class c = myEngine.getClass();
+			Method getMyEngine = c.getMethod("getMyEngine", null);
+			getMyEngine.invoke(c, msg, jobId);
 
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	// ---------
@@ -200,5 +214,25 @@ public class JobBase {
 	public void setDefaultConnect(String defaultConnect)
 	{
 		this.defaultConnect = defaultConnect;
+	}
+
+	public Integer getJobId()
+	{
+		return jobId;
+	}
+
+	public void setJobId(Integer jobId)
+	{
+		this.jobId = jobId;
+	}
+
+	public Object getMyEngine()
+	{
+		return myEngine;
+	}
+
+	public void setMyEngine(Object myEngine)
+	{
+		this.myEngine = myEngine;
 	}
 }
