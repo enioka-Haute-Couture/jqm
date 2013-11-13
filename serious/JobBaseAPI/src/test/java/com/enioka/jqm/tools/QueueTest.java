@@ -1,5 +1,5 @@
 /**
- * Copyright © 2013 enioka. All rights reserved
+ * Copyright �� 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
  * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
  *
@@ -111,7 +111,7 @@ public class QueueTest
 			Dispatcher.enQueue(j);
 			Dispatcher.enQueue(j);
 			Dispatcher.enQueue(j);
-			Thread.sleep(3000);
+			Thread.sleep(5000);
 			TestHelpers.printJobInstanceTable();
 			TypedQuery<JobInstance> query = emm
 					.createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
@@ -183,7 +183,7 @@ public class QueueTest
 			Dispatcher.enQueue(j);
 			Dispatcher.enQueue(j);
 			Dispatcher.enQueue(j);
-			Thread.sleep(3000);
+			Thread.sleep(5000);
 			TestHelpers.printJobInstanceTable();
 			TypedQuery<JobInstance> query = emm
 					.createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",

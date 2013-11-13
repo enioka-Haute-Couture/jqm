@@ -38,7 +38,6 @@ import com.enioka.jqm.deliverabletools.DeliverableStruct;
  */
 public class JobBase {
 
-	private Integer jobId;
 	private Object myEngine = null;
 	protected int parentID;
 	protected int canBeRestart;
@@ -85,8 +84,8 @@ public class JobBase {
 		try
 		{
 			Class c = myEngine.getClass();
-			Method getMyEngine = c.getMethod("getMyEngine", null);
-			getMyEngine.invoke(c, msg, jobId);
+			Method getMyEngine = c.getMethod("sendMsg", String.class);
+			getMyEngine.invoke(myEngine, msg);
 
 		} catch (Exception e)
 		{
@@ -214,16 +213,6 @@ public class JobBase {
 	public void setDefaultConnect(String defaultConnect)
 	{
 		this.defaultConnect = defaultConnect;
-	}
-
-	public Integer getJobId()
-	{
-		return jobId;
-	}
-
-	public void setJobId(Integer jobId)
-	{
-		this.jobId = jobId;
 	}
 
 	public Object getMyEngine()

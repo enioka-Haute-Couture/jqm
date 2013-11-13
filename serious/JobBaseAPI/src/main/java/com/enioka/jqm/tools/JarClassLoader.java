@@ -143,7 +143,7 @@ class JarClassLoader extends URLClassLoader
 			Method start = c.getMethod("start", null);
 			Method getParameters = c.getMethod("getParameters", null);
 			Method getdefaultConnect = c.getMethod("setDefaultConnect", String.class);
-			Link l = new Link(old, em);
+			Link l = new Link(old, job.getId(), em);
 			Method getMyEngine = c.getMethod("setMyEngine", Object.class);
 			getdefaultConnect.invoke(o, defaultConnection);
 			getMyEngine.invoke(o, l);

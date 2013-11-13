@@ -9,14 +9,16 @@ public class Link
 {
 	private ClassLoader old = null;
 	private EntityManager em = null;
+	private Integer id = null;
 
-	public Link(ClassLoader old, EntityManager em)
+	public Link(ClassLoader old, Integer id, EntityManager em)
 	{
 		this.old = old;
 		this.em = em;
+		this.id = id;
 	};
 
-	public void sendMsg(String msg, Integer id)
+	public void sendMsg(String msg)
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(old);

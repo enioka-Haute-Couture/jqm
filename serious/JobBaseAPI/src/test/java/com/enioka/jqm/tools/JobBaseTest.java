@@ -41,6 +41,7 @@ import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
+import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Queue;
 
 public class JobBaseTest
@@ -971,5 +972,61 @@ public class JobBaseTest
 		sRep.delete();
 		File rep = new File("./testprojects/jqm-test-deliverable/JobGenADeliverableFamily/");
 		rep.delete();
+	}
+
+	@Test
+	public void testSendMsg() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testSendMsg");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+		boolean success = false;
+		boolean success2 = false;
+		boolean success3 = false;
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-sendmsg/",
+				"jqm-test-sendmsg/jqm-test-sendmsg.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
+				"other", "other", true, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+
+		int i = Dispatcher.enQueue(j);
+
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+		Thread.sleep(5000);
+
+		engine1.stop();
+
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+
+		ArrayList<Message> m = (ArrayList<Message>) em
+				.createQuery("SELECT m FROM Message m WHERE m.history.jobInstance.id = :i", Message.class)
+				.setParameter("i", res.get(0).getId()).getResultList();
+
+		Assert.assertEquals(1, res.size());
+		Assert.assertEquals("ENDED", res.get(0).getState());
+
+		for (Message msg : m)
+		{
+			if (msg.getTextMessage().equals("Les marsus sont nos amis, il faut les aimer aussi!"))
+				success = true;
+			if (msg.getTextMessage().equals("Les marsus sont nos amis, il faut les aimer aussi!2"))
+				success2 = true;
+			if (msg.getTextMessage().equals("Les marsus sont nos amis, il faut les aimer aussi!3"))
+				success3 = true;
+		}
+
+		Assert.assertEquals(true, success);
+		Assert.assertEquals(true, success2);
+		Assert.assertEquals(true, success3);
 	}
 }

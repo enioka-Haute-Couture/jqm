@@ -25,6 +25,7 @@
 		<module>../../tests/jqm-test-jndijms-amq</module>
 		<module>../../tests/jqm-test-checkargs</module>
 		<module>../../tests/jqm-test-defcon</module>
+    <module>../../tests/jqm-test-sendmsg</module>
 	</modules>
 
 	<profiles>
