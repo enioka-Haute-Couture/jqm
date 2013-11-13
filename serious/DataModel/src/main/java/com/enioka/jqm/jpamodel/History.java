@@ -47,9 +47,6 @@ public class History implements Serializable
 	private Integer id;
 	@Column(name = "returnedValue")
 	private Integer returnedValue;
-	@Temporal(TemporalType.DATE)
-	@Column(name = "jobDate")
-	private Calendar jobDate;
 	@JoinColumn(name = "jd")
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.JobDef.class)
 	private JobDef jd;
@@ -58,20 +55,18 @@ public class History implements Serializable
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Queue.class)
 	@JoinColumn(name = "queue")
 	private Queue queue;
-	@Column(length = 1000, name="msg")
-	private String msg;
 	@OneToMany(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Message.class, cascade = CascadeType.ALL, mappedBy = "history")
 	private List<Message> messages;
 	@OneToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.JobInstance.class)
 	@JoinColumn(name = "jobInstance")
 	private JobInstance jobInstance;
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "enqueueDate")
 	private Calendar enqueueDate;
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "executionDate")
 	private Calendar executionDate;
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "endDate")
 	private Calendar endDate;
 	@Column(name = "userName")
@@ -115,40 +110,6 @@ public class History implements Serializable
 	public void setReturnedValue(final Integer returnedValue)
 	{
 		this.returnedValue = returnedValue;
-	}
-
-	/**
-	 * @return the jobDate
-	 */
-	public Calendar getJobDate()
-	{
-		return jobDate;
-	}
-
-	/**
-	 * @param jobDate
-	 *            the jobDate to set
-	 */
-	public void setJobDate(final Calendar jobDate)
-	{
-		this.jobDate = jobDate;
-	}
-
-	/**
-	 * @return the msg
-	 */
-	public String getMsg()
-	{
-		return msg;
-	}
-
-	/**
-	 * @param msg
-	 *            the msg to set
-	 */
-	public void setMsg(final String msg)
-	{
-		this.msg = msg;
 	}
 
 	public JobInstance getJobInstance()

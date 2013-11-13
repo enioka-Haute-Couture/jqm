@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -92,6 +93,8 @@ class Loader implements Runnable
 				.getSingleResult();
 
 		Helpers.createMessage("Status updated: ATTRIBUTED", h, em);
+
+		h.setReturnedValue(1);
 
 		transac.commit();
 	}
@@ -218,10 +221,11 @@ class Loader implements Runnable
 					.getSingleResult();
 
 			// Update of the execution date
+			Date date = new Date();
 			Calendar executionDate = GregorianCalendar.getInstance(Locale.getDefault());
+			executionDate.setTime(date);
 
-			em.createQuery("UPDATE History h SET h.executionDate = :date WHERE h.id = :h").setParameter("h", h.getId())
-					.setParameter("date", executionDate).executeUpdate();
+			h.setExecutionDate(executionDate);
 
 			// End of the execution date
 
@@ -315,13 +319,12 @@ class Loader implements Runnable
 
 			// Update end date
 
+			Date datee = new Date();
 			Calendar endDate = GregorianCalendar.getInstance(Locale.getDefault());
+			endDate.setTime(datee);
 
 			em.getTransaction().begin();
-
-			em.createQuery("UPDATE History h SET h.endDate = :date WHERE h.id = :h").setParameter("h", h.getId())
-					.setParameter("date", endDate).executeUpdate();
-
+			h.setEndDate(endDate);
 			em.getTransaction().commit();
 
 			// End end date
@@ -335,6 +338,10 @@ class Loader implements Runnable
 
 			em.getTransaction().begin();
 			Helpers.createMessage("Status updated: ENDED", h, em);
+			em.getTransaction().commit();
+
+			em.getTransaction().begin();
+			h.setReturnedValue(0);
 			em.getTransaction().commit();
 
 			// Retrieve files created by the job

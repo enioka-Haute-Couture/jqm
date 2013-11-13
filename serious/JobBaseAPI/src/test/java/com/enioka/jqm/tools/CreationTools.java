@@ -182,11 +182,9 @@ public class CreationTools
 		History h = new History();
 
 		h.setReturnedValue(returnedValue);
-		h.setJobDate(jobDate);
 		h.setJd(JobDefId);
 		h.setSessionId(sessionId);
 		h.setQueue(queue);
-		h.setMsg(msg);
 		h.setMessages(messages);
 		h.setJobInstance(jobInstance);
 		h.setEnqueueDate(enqueueDate);

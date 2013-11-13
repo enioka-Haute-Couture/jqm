@@ -28,6 +28,7 @@ import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -326,6 +327,7 @@ public final class Dispatcher
 		Integer hl = null;
 
 		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
+		Date date = enqueueDate.getTime();
 
 		History h = null;
 
@@ -377,9 +379,8 @@ public final class Dispatcher
 		// h.setReturnedValue(null);
 		// h.setJobDate(jobDate);
 		h.setJd(job);
-		h.setSessionId(42);
+		h.setSessionId(ji.getSessionID());
 		h.setQueue(job.getQueue());
-		h.setMsg("History of the Job --> ID = " + (ji.getId()));
 		h.setMessages(new ArrayList<Message>());
 		h.setJobInstance(ji);
 		h.setEnqueueDate(enqueueDate);

@@ -20,6 +20,7 @@ package com.enioka.jqm.tools;
 
 import java.io.File;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -1028,5 +1029,55 @@ public class JobBaseTest
 		Assert.assertEquals(true, success);
 		Assert.assertEquals(true, success2);
 		Assert.assertEquals(true, success3);
+	}
+
+	@Test
+	public void testHistoryFields() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testHistoryFields");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+				"ModuleMachin", "other", "other", true, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+
+		int i = Dispatcher.enQueue(j);
+
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+		Thread.sleep(2000);
+		engine1.stop();
+
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+
+		TestHelpers.printJobInstanceTable();
+
+		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :i", History.class)
+				.setParameter("i", res.get(0).getId()).getSingleResult();
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+		jqmlogger.debug("EnqueueDate: " + df.format(h.getEnqueueDate().getTime()));
+		jqmlogger.debug("ReturnedValue: " + h.getReturnedValue());
+		jqmlogger.debug("ExecutionDate: " + df.format(h.getExecutionDate().getTime()));
+		jqmlogger.debug("EndDate: " + df.format(h.getEndDate().getTime()));
+
+		Assert.assertEquals(1, res.size());
+		Assert.assertTrue(h.getEnqueueDate() != null);
+		Assert.assertTrue(h.getReturnedValue() != null);
+		Assert.assertTrue(h.getUserName() != null);
+		Assert.assertTrue(h.getEndDate() != null);
+		Assert.assertTrue(h.getExecutionDate() != null);
+		Assert.assertTrue(h.getSessionId() != null);
 	}
 }
