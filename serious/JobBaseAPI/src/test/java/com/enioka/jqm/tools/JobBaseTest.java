@@ -904,11 +904,11 @@ public class JobBaseTest
 		JqmEngine engine1 = new JqmEngine();
 		engine1.start(new String[] { "localhost" });
 
-		Thread.sleep(5000);
+		Thread.sleep(2000);
 
 		Dispatcher.restartCrashedJob(i);
 
-		Thread.sleep(5000);
+		Thread.sleep(2000);
 		engine1.stop();
 
 		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
@@ -1002,7 +1002,7 @@ public class JobBaseTest
 
 		JqmEngine engine1 = new JqmEngine();
 		engine1.start(new String[] { "localhost" });
-		Thread.sleep(5000);
+		Thread.sleep(2000);
 
 		engine1.stop();
 
@@ -1079,5 +1079,41 @@ public class JobBaseTest
 		Assert.assertTrue(h.getEndDate() != null);
 		Assert.assertTrue(h.getExecutionDate() != null);
 		Assert.assertTrue(h.getSessionId() != null);
+	}
+
+	@Test
+	public void testSendProgress() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testSendMsg");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-sendprogress/",
+				"jqm-test-sendprogress/jqm-test-sendprogress.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+				"ModuleMachin", "other", "other", true, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+
+		int i = Dispatcher.enQueue(j);
+
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+		Thread.sleep(5000);
+
+		engine1.stop();
+
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+
+		Assert.assertEquals(1, res.size());
+		Assert.assertEquals("ENDED", res.get(0).getState());
+		Assert.assertEquals((Integer) 100, res.get(0).getProgress());
 	}
 }

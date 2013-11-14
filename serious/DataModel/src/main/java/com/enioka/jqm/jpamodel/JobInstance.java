@@ -71,6 +71,8 @@ public class JobInstance implements Comparable<JobInstance>, Serializable
 	private Node node;
 	@Column(name = "sendEmail")
 	private String email;
+	@Column(name = "progress")
+	private Integer progress;
 
 	@OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "jobinstance")
 	private List<JobParameter> parameters;
@@ -202,5 +204,15 @@ public class JobInstance implements Comparable<JobInstance>, Serializable
 	public void setEmail(String email)
 	{
 		this.email = email;
+	}
+
+	public Integer getProgress()
+	{
+		return progress;
+	}
+
+	public void setProgress(Integer progress)
+	{
+		this.progress = progress;
 	}
 }

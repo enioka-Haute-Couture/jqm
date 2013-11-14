@@ -192,26 +192,32 @@
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-test-geo</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-test-checkargs</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-        <dependency>
-            <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-test-defcon</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-		<dependency>
-            <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-test-sendmsg</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-	</dependencies>
+      <version>0.0.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.enioka.jqm</groupId>
+      <artifactId>jqm-test-checkargs</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.enioka.jqm</groupId>
+      <artifactId>jqm-test-defcon</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.enioka.jqm</groupId>
+      <artifactId>jqm-test-sendmsg</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.enioka.jqm</groupId>
+      <artifactId>jqm-test-sendprogress</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <scope>test</scope>
+  </dependency>
+  </dependencies>
 </project>

@@ -93,6 +93,20 @@ public class JobBase {
 		}
 	}
 
+	public void sendProgress(final Integer msg)
+	{
+		try
+		{
+			Class c = myEngine.getClass();
+			Method getMyEngine = c.getMethod("sendProgress", Integer.class);
+			getMyEngine.invoke(myEngine, msg);
+
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	// ---------
 
 	public int getParentID() {
