@@ -7,18 +7,12 @@ public class App extends JobBase
 	@Override
 	public void start()
 	{
-		try {
-			sendProgress(10);
-			Thread.sleep(1000);
-			sendProgress(30);
-			Thread.sleep(1000);
-			sendProgress(60);
-			Thread.sleep(1000);
-			sendProgress(100);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		for (int i = 0; i <= 1500; i++)
+		{
+			if (i == 500 || i == 1000 || i == 1500) {
+				System.out.println("Progress: " + i);
+				sendProgress(i);
+			}
 		}
-
 	}
 }

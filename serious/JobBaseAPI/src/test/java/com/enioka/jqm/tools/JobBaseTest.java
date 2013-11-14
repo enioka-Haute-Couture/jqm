@@ -1086,7 +1086,7 @@ public class JobBaseTest
 	{
 		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("Starting test testSendMsg");
+		jqmlogger.debug("Starting test testSendProgress");
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);
@@ -1114,6 +1114,52 @@ public class JobBaseTest
 
 		Assert.assertEquals(1, res.size());
 		Assert.assertEquals("ENDED", res.get(0).getState());
-		Assert.assertEquals((Integer) 100, res.get(0).getProgress());
+		Assert.assertEquals((Integer) 1500, res.get(0).getProgress());
 	}
+
+	// @Test
+	// public void testKillJob() throws Exception
+	// {
+	// jqmlogger.debug("**********************************************************");
+	// jqmlogger.debug("**********************************************************");
+	// jqmlogger.debug("Starting test testKillJob");
+	// EntityManager em = Helpers.getNewEm();
+	// TestHelpers.cleanup(em);
+	// TestHelpers.createLocalNode(em);
+	//
+	// ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+	// JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+	// jdargs.add(jdp);
+	//
+	// JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-sendprogress/",
+	// "jqm-test-sendprogress/jqm-test-sendprogress.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+	// "ModuleMachin", "other", "other", false, em);
+	//
+	// JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+	//
+	// int i = Dispatcher.enQueue(j);
+	// Dispatcher.enQueue(j);
+	//
+	// TestHelpers.printJobInstanceTable();
+	//
+	// JqmEngine engine1 = new JqmEngine();
+	// engine1.start(new String[] { "localhost" });
+	// Thread.sleep(1000);
+	//
+	// Dispatcher.killJob(i);
+	// TestHelpers.printJobInstanceTable();
+	//
+	// Thread.sleep(5000);
+	//
+	// engine1.stop();
+	//
+	// TestHelpers.printJobInstanceTable();
+	//
+	// TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+	// ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+	//
+	// Assert.assertEquals(2, res.size());
+	// Assert.assertEquals("KILLED", res.get(0).getState());
+	// Assert.assertEquals("ENDED", res.get(1).getState());
+	// }
 }

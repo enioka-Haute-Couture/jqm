@@ -27,16 +27,22 @@ public class Link
 		JobInstance j = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class).setParameter("i", id)
 				.getSingleResult();
 
-		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :i", History.class).setParameter("i", id)
-				.getSingleResult();
+		if (j.getState().equals("KILLED"))
+			throw new JqmKillException("This job" + "(ID: " + j.getId() + ")" + " has been killed by a user");
+		else
+		{
 
-		em.getTransaction().begin();
-		Message mssg = new Message();
+			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :i", History.class).setParameter("i", id)
+					.getSingleResult();
 
-		mssg.setHistory(h);
-		mssg.setTextMessage(msg);
-		em.persist(mssg);
-		em.getTransaction().commit();
+			em.getTransaction().begin();
+			Message mssg = new Message();
+
+			mssg.setHistory(h);
+			mssg.setTextMessage(msg);
+			em.persist(mssg);
+			em.getTransaction().commit();
+		}
 
 		Thread.currentThread().setContextClassLoader(cl);
 	}
@@ -49,9 +55,15 @@ public class Link
 		JobInstance j = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class).setParameter("i", id)
 				.getSingleResult();
 
-		em.getTransaction().begin();
-		j.setProgress(msg);
-		em.getTransaction().commit();
+		if (j.getState().equals("KILLED"))
+			throw new JqmKillException("This job" + "(ID: " + j.getId() + ")" + " has been killed by a user");
+		else
+		{
+
+			em.getTransaction().begin();
+			j.setProgress(msg);
+			em.getTransaction().commit();
+		}
 
 		Thread.currentThread().setContextClassLoader(cl);
 	}

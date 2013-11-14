@@ -237,10 +237,9 @@ class Loader implements Runnable
 			EntityTransaction transac = em.getTransaction();
 			transac.begin();
 
-			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j)").setParameter("j", job.getId())
-					.setParameter("msg", "RUNNING").executeUpdate();
+			job.setState("RUNNING");
 			transac.commit();
-			jqmlogger.debug("JobInstance was updated");
+			jqmlogger.debug("JobInstance was updated: " + job.getState());
 
 			boolean isInCache = true;
 			if (!cache.containsKey(job.getJd().getApplicationName()))
@@ -314,6 +313,8 @@ class Loader implements Runnable
 			p.setActualNbThread(p.getActualNbThread() - 1);
 			jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
 
+			jqmlogger.debug("Job status after execution before contextClassLoader: " + job.getState());
+
 			// Restore class loader
 			Thread.currentThread().setContextClassLoader(contextClassLoader);
 
@@ -327,22 +328,27 @@ class Loader implements Runnable
 			h.setEndDate(endDate);
 			em.getTransaction().commit();
 
+			jqmlogger.debug("Job status after execution: " + job.getState());
+
 			// End end date
 
 			// STATE UPDATED
-			em.getTransaction().begin();
-			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
-					.setParameter("msg", "ENDED").executeUpdate();
-			em.getTransaction().commit();
-			jqmlogger.debug("LOADER HISTORY: " + h.getId());
+			if (!job.getState().equals("KILLED"))
+			{
+				em.getTransaction().begin();
+				em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
+						.setParameter("msg", "ENDED").executeUpdate();
+				em.getTransaction().commit();
+				jqmlogger.debug("In the Loader --> ENDED: HISTORY: " + h.getId());
 
-			em.getTransaction().begin();
-			Helpers.createMessage("Status updated: ENDED", h, em);
-			em.getTransaction().commit();
+				em.getTransaction().begin();
+				Helpers.createMessage("Status updated: ENDED", h, em);
+				em.getTransaction().commit();
 
-			em.getTransaction().begin();
-			h.setReturnedValue(0);
-			em.getTransaction().commit();
+				em.getTransaction().begin();
+				h.setReturnedValue(0);
+				em.getTransaction().commit();
+			}
 
 			// Retrieve files created by the job
 			Method m = this.jobBase.getClass().getMethod("getSha1s");
@@ -426,6 +432,23 @@ class Loader implements Runnable
 		{
 			crashedStatus();
 			jqmlogger.info(e);
+		} catch (JqmKillException e)
+		{
+			em.getTransaction().begin();
+			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", job)
+					.getSingleResult();
+			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
+					.setParameter("msg", "KILLED").executeUpdate();
+			em.getTransaction().commit();
+			jqmlogger.debug("In the Loader --> KILLED: HISTORY: " + h.getId());
+
+			em.getTransaction().begin();
+			Helpers.createMessage("Status updated: KILLED", h, em);
+			em.getTransaction().commit();
+
+			em.getTransaction().begin();
+			h.setReturnedValue(0);
+			em.getTransaction().commit();
 		} catch (Exception e)
 		{
 			jqmlogger.error("An error occured during job execution or preparation: " + e.getMessage(), e);

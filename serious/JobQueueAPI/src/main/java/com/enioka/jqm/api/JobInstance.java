@@ -36,6 +36,7 @@ public class JobInstance
 	private Integer position;
 	private Queue queue;
 	private Map<String, String> parameters = new HashMap<String, String>();
+	private Integer progress;
 
 	/**
 	 * The Job instance ID. This is a key for numerous Dispatcher functions.
@@ -171,5 +172,15 @@ public class JobInstance
 	void setParameters(Map<String, String> parameters)
 	{
 		this.parameters = parameters;
+	}
+
+	public Integer getProgress()
+	{
+		return progress;
+	}
+
+	public void setProgress(Integer progress)
+	{
+		this.progress = progress;
 	}
 }
