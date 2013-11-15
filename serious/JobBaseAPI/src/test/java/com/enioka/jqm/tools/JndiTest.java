@@ -1,5 +1,5 @@
 /**
- * Copyright © 2013 enioka. All rights reserved
+ * Copyright �� 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
  * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
  *
@@ -202,7 +202,7 @@ public class JndiTest
 
 		Assert.assertEquals("CRASHED", h.getJobInstance().getState()); // Exception in jar => CRASHED
 	}
-	
+
 	@Test
 	public void testDefCon() throws Exception
 	{
@@ -214,9 +214,8 @@ public class JndiTest
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 
 		@SuppressWarnings("unused")
-		JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-defcon/",
-				"jqm-test-defcon/jqm-test-defcon.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
-				"other2", false, em);
+		JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-defcon/", "jqm-test-defcon/jqm-test-defcon.jar",
+				TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
 
 		JobDefinition form = new JobDefinition("Jms", "MAG");
 		Dispatcher.enQueue(form);
@@ -228,10 +227,12 @@ public class JndiTest
 		Thread.sleep(3000);
 		engine1.stop();
 
+		TestHelpers.printJobInstanceTable();
+
 		History h = null;
 		try
 		{
-			h = (History) em.createQuery("SELECT h FROM History h").getSingleResult();
+			h = (History) Helpers.getNewEm().createQuery("SELECT h FROM History h").getSingleResult();
 		} catch (Exception e)
 		{
 			e.printStackTrace();

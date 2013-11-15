@@ -2,12 +2,15 @@ package com.enioka.jqm.tools;
 
 import javax.persistence.EntityManager;
 
+import org.apache.log4j.Logger;
+
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
 
 public class Link
 {
+	private Logger jqmlogger = Logger.getLogger(Polling.class);
 	private ClassLoader old = null;
 	private EntityManager em = null;
 	private Integer id = null;
@@ -28,10 +31,12 @@ public class Link
 				.getSingleResult();
 
 		if (j.getState().equals("KILLED"))
-			throw new JqmKillException("This job" + "(ID: " + j.getId() + ")" + " has been killed by a user");
+		{
+			Thread.currentThread().setContextClassLoader(cl);
+			throw new JqmKillException("This job" + "(ID: " + id + ")" + " has been killed by a user");
+		}
 		else
 		{
-
 			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :i", History.class).setParameter("i", id)
 					.getSingleResult();
 
@@ -49,6 +54,7 @@ public class Link
 
 	public void sendProgress(Integer msg)
 	{
+		jqmlogger.debug("Begining SendProgress");
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(old);
 
@@ -56,13 +62,22 @@ public class Link
 				.getSingleResult();
 
 		if (j.getState().equals("KILLED"))
+		{
+			jqmlogger.debug("Link: Job will be KILLED");
 			throw new JqmKillException("This job" + "(ID: " + j.getId() + ")" + " has been killed by a user");
+		}
 		else
 		{
-
+			jqmlogger.debug("Progress of the job: " + j.getId() + " will be updated");
 			em.getTransaction().begin();
+			// em.createQuery("UPDATE JobInstance j SET j.progress = :msg WHERE j.id = :j").setParameter("msg", msg)
+			// .setParameter("j", j.getId()).executeUpdate();
 			j.setProgress(msg);
+			em.merge(j);
 			em.getTransaction().commit();
+			em.refresh(j);
+
+			jqmlogger.debug("Actual progression: " + j.getProgress());
 		}
 
 		Thread.currentThread().setContextClassLoader(cl);

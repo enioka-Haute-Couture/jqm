@@ -555,19 +555,21 @@ public final class Dispatcher
 	 */
 	public static void killJob(int idJob)
 	{
-		jqmlogger.debug("The job (ID: " + idJob + ")" + " will be killed");
 		EntityManager em = getEm();
 		JobInstance j = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class).setParameter("i", idJob)
 				.getSingleResult();
+		jqmlogger.debug("The " + j.getState() + " job (ID: " + idJob + ")" + " will be killed");
 		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", idJob)
 				.getSingleResult();
 		em.getTransaction().begin();
-		j.setState("KILLED");
+		em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", idJob)
+		.setParameter("msg", "KILLED").executeUpdate();
 		Message m = new Message();
 		m.setHistory(h);
 		m.setTextMessage("Status updated: ENDED");
 		em.persist(m);
 		em.getTransaction().commit();
+		em.refresh(j);
 		JobInstance jj = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class).setParameter("i", idJob)
 				.getSingleResult();
 		jqmlogger.debug("Job status after killJob: " + jj.getState());

@@ -1,5 +1,5 @@
 /**
- * Copyright © 2013 enioka. All rights reserved
+ * Copyright �� 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
  * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
  *
@@ -117,7 +117,6 @@ public class TestHelpers
 
 		for (JobInstance jobInstance : res)
 		{
-
 			jqmlogger.debug("==========================================================================================");
 			jqmlogger.debug("JobInstance Id: " + jobInstance.getId() + " ---> " + jobInstance.getPosition() + " | "
 					+ jobInstance.getState() + " | " + jobInstance.getJd().getId() + " | " + jobInstance.getQueue().getName());

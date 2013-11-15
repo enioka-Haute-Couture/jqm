@@ -111,7 +111,7 @@ public class QueueTest
 			Dispatcher.enQueue(j);
 			Dispatcher.enQueue(j);
 			Dispatcher.enQueue(j);
-			Thread.sleep(5000);
+			Thread.sleep(8000);
 			TestHelpers.printJobInstanceTable();
 			TypedQuery<JobInstance> query = emm
 					.createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
@@ -183,7 +183,7 @@ public class QueueTest
 			Dispatcher.enQueue(j);
 			Dispatcher.enQueue(j);
 			Dispatcher.enQueue(j);
-			Thread.sleep(5000);
+			Thread.sleep(8000);
 			TestHelpers.printJobInstanceTable();
 			TypedQuery<JobInstance> query = emm
 					.createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",

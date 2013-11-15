@@ -175,6 +175,8 @@ class Loader implements Runnable
 			jqmlogger.debug("Loader will try to load POM " + pomFile.getAbsolutePath());
 			boolean pomCustom = false;
 
+			jqmlogger.debug("Loader actualNbThread: " + p.getActualNbThread());
+
 			if (!pomFile.exists())
 			{
 				pomCustom = true;
@@ -228,8 +230,6 @@ class Loader implements Runnable
 			h.setExecutionDate(executionDate);
 
 			// End of the execution date
-
-			jqmlogger.debug("History was updated");
 
 			Helpers.createMessage("Status updated: RUNNING", h, em);
 			em.getTransaction().commit();
@@ -294,29 +294,34 @@ class Loader implements Runnable
 				jobClassLoader = new JarClassLoader(jars, cache.get(job.getJd().getApplicationName()));
 			}
 
-			// Change active class loader
-			jqmlogger.debug("Setting class loader");
-			Thread.currentThread().setContextClassLoader(jobClassLoader);
-			jqmlogger.info("Class Loader was set correctly");
-
 			// Get the default connection
 
 			String defaultconnection = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = 'defaultConnection'",
 					String.class).getSingleResult();
+
+			// Change active class loader
+			jqmlogger.debug("Setting class loader");
+			Thread.currentThread().setContextClassLoader(jobClassLoader);
+			jqmlogger.info("Class Loader was set correctly");
 
 			// Go! (launches the main function in the startup class designated in the manifest)
 			jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
 			jqmlogger.debug("Job is running in the thread: " + Thread.currentThread().getName());
 			jqmlogger.debug("AVANT INVOKE MAIN");
 			jobBase = jobClassLoader.invokeMain(job, defaultconnection, contextClassLoader, em);
-			jqmlogger.debug("ActualNbThread after execution: " + p.getActualNbThread());
-			p.setActualNbThread(p.getActualNbThread() - 1);
 			jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
 
 			jqmlogger.debug("Job status after execution before contextClassLoader: " + job.getState());
+			jqmlogger.debug("Progression after execution: " + job.getProgress());
 
 			// Restore class loader
 			Thread.currentThread().setContextClassLoader(contextClassLoader);
+
+			jqmlogger.debug("ActualNbThread after execution: " + p.getActualNbThread());
+			p.setActualNbThread(p.getActualNbThread() - 1);
+
+			// em.getEntityManagerFactory().getCache().evictAll();
+			// em.refresh(em.merge(job));
 
 			// Update end date
 
@@ -333,11 +338,13 @@ class Loader implements Runnable
 			// End end date
 
 			// STATE UPDATED
-			if (!job.getState().equals("KILLED"))
+			if (job.getState().equals("RUNNING"))
 			{
 				em.getTransaction().begin();
-				em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
-						.setParameter("msg", "ENDED").executeUpdate();
+				// em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
+				// .setParameter("msg", "KILLED").executeUpdate();
+				job.setState("ENDED");
+				em.merge(job);
 				em.getTransaction().commit();
 				jqmlogger.debug("In the Loader --> ENDED: HISTORY: " + h.getId());
 
@@ -347,8 +354,14 @@ class Loader implements Runnable
 
 				em.getTransaction().begin();
 				h.setReturnedValue(0);
+				em.persist(h);
 				em.getTransaction().commit();
 			}
+
+			em.refresh(em.merge(job));
+
+			jqmlogger.debug("Final status: " + job.getState());
+			jqmlogger.debug("Final progression: " + job.getProgress());
 
 			// Retrieve files created by the job
 			Method m = this.jobBase.getClass().getMethod("getSha1s");

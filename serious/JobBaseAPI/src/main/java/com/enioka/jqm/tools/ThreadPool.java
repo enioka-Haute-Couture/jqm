@@ -1,5 +1,5 @@
 /**
- * Copyright © 2013 enioka. All rights reserved
+ * Copyright �� 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
  * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
  *
@@ -46,6 +46,7 @@ class ThreadPool
 	void run(com.enioka.jqm.jpamodel.JobInstance ji, Polling p)
 	{
 		jqmlogger.info("Job instance will be inserted inside a thread pool: " + ji.getId());
+		jqmlogger.debug("ThreadPool ActualNbThread: " + p.getActualNbThread());
 		pool.submit(new Loader(ji, cache, p));
 	}
 

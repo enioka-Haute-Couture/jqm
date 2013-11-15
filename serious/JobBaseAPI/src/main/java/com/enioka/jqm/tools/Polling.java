@@ -1,5 +1,5 @@
 /**
- * Copyright © 2013 enioka. All rights reserved
+ * Copyright �� 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
  * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
  *
@@ -64,9 +64,9 @@ class Polling implements Runnable
 	{
 		// Get the list of all jobInstance with the queue definded ordered by position
 		TypedQuery<JobInstance> query = em.createQuery(
-		        "SELECT j FROM JobInstance j WHERE j.queue.name = :q AND j.state = :s ORDER BY j.position ASC", JobInstance.class);
+				"SELECT j FROM JobInstance j WHERE j.queue.name = :q AND j.state = :s ORDER BY j.position ASC", JobInstance.class);
 		query.setParameter("q", queue.getName()).setParameter("s", "SUBMITTED");
-		job = (ArrayList<JobInstance>) query.getResultList();
+		job = query.getResultList();
 
 		// Higlander?
 		if (job.size() > 0 && job.get(0).getJd().isHighlander() == true)
@@ -80,8 +80,8 @@ class Polling implements Runnable
 	protected void highlanderPollingMode(JobInstance currentJob, EntityManager em)
 	{
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
-		        .createQuery("SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.applicationName = :n", JobInstance.class)
-		        .setParameter("refid", currentJob.getId()).setParameter("n", currentJob.getJd().getApplicationName()).getResultList();
+				.createQuery("SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.applicationName = :n", JobInstance.class)
+				.setParameter("refid", currentJob.getId()).setParameter("n", currentJob.getJd().getApplicationName()).getResultList();
 
 		for (JobInstance j : jobs)
 		{
@@ -114,7 +114,7 @@ class Polling implements Runnable
 					continue;
 				}
 
-				if (actualNbThread == tp.getNbThread())
+				if (actualNbThread >= tp.getNbThread())
 				{
 					continue;
 				}
@@ -126,42 +126,39 @@ class Polling implements Runnable
 				jqmlogger.debug("JI that will be attributed: " + ji.getId());
 				jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
 
+				em.refresh(ji);
+
 				em.getTransaction().begin();
 
 				JobInstance tt = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :j", JobInstance.class)
-				        .setParameter("j", ji.getId()).getSingleResult();
+						.setParameter("j", ji.getId()).getSingleResult();
 
 				tt.setNode(dp.getNode());
 
 				// em.createQuery("UPDATE JobInstance j SET j.node = :n WHERE j.id = :j").setParameter("j", ji.getId())
 				// .setParameter("n", dp.getNode()).executeUpdate();
 
-				em.createQuery("UPDATE History h SET h.node = :n WHERE h.jobInstance.id = :j").setParameter("j", ji.getId())
-				        .setParameter("n", dp.getNode()).executeUpdate();
-
 				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", ji)
-				        .getSingleResult();
+						.getSingleResult();
 
+				h.setNode(dp.getNode());
 				Message m = new Message();
 
 				m.setTextMessage("Status updated: ATTRIBUTED");
 				m.setHistory(h);
 
-				em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", ji.getId())
-				        .setParameter("msg", "ATTRIBUTED").executeUpdate();
+				ji.setState("ATTRIBUTED");
 
 				em.persist(m);
 				em.getTransaction().commit();
+				em.refresh(h);
 
 				JobInstance t = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :j", JobInstance.class)
-				        .setParameter("j", ji.getId()).getSingleResult();
-
-				History th = em.createQuery("SELECT j FROM History j WHERE j.jobInstance.id = :j", History.class)
-				        .setParameter("j", ji.getId()).getSingleResult();
+						.setParameter("j", ji.getId()).getSingleResult();
 
 				jqmlogger.debug("The job " + t.getId() + " have been updated with the node: " + t.getNode().getListeningInterface());
-				jqmlogger.debug("The job history " + th.getId() + " have been updated with the node: "
-				        + th.getNode().getListeningInterface());
+				jqmlogger
+						.debug("The job history " + h.getId() + " have been updated with the node: " + h.getNode().getListeningInterface());
 
 				actualNbThread++;
 
