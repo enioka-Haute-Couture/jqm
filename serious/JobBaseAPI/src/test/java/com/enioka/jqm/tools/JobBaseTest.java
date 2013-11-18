@@ -1081,7 +1081,7 @@ public class JobBaseTest
 		Assert.assertTrue(h.getSessionId() != null);
 	}
 
-	// @Test
+	@Test
 	public void testSendProgress() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");

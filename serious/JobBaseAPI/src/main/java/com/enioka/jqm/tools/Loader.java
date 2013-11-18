@@ -96,7 +96,7 @@ class Loader implements Runnable
 		History h = em.createQuery("SELECT h FROM History h WHERE h.id = :j", History.class).setParameter("j", job.getId())
 				.getSingleResult();
 
-		Helpers.createMessage("Status updated: ATTRIBUTED", h, em);
+		Helpers.createMessage("Status updated: CRASHED", h, em);
 
 		h.setReturnedValue(1);
 
@@ -263,6 +263,7 @@ class Loader implements Runnable
 			transac.begin();
 
 			job.setState("RUNNING");
+			job = em.merge(job);
 			transac.commit();
 			jqmlogger.debug("JobInstance was updated: " + job.getState());
 
@@ -344,6 +345,9 @@ class Loader implements Runnable
 			jobBase = jobClassLoader.invokeMain(job, defaultconnection, contextClassLoader, em);
 			jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
 
+			job = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class)
+					.setParameter("i", h.getJobInstance().getId()).getSingleResult();
+
 			jqmlogger.debug("Job status after execution before contextClassLoader: " + job.getState());
 			jqmlogger.debug("Progression after execution: " + job.getProgress());
 
@@ -352,9 +356,6 @@ class Loader implements Runnable
 
 			jqmlogger.debug("ActualNbThread after execution: " + p.getActualNbThread());
 			p.setActualNbThread(p.getActualNbThread() - 1);
-
-			// em.getEntityManagerFactory().getCache().evictAll();
-			// em.refresh(em.merge(job));
 
 			// Update end date
 
@@ -371,28 +372,29 @@ class Loader implements Runnable
 			// End end date
 
 			// STATE UPDATED
-			if (job.getState().equals("RUNNING"))
-			{
-				em.getTransaction().begin();
-				// em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
-				// .setParameter("msg", "KILLED").executeUpdate();
-				job.setState("ENDED");
-				em.merge(job);
-				em.getTransaction().commit();
-				jqmlogger.debug("In the Loader --> ENDED: HISTORY: " + h.getId());
+			// if (job.getState().equals("RUNNING"))
+			// {
+			em.getTransaction().begin();
+			// em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
+			// .setParameter("msg", "KILLED").executeUpdate();
+			job.setState("ENDED");
+			job = em.merge(job);
+			em.getTransaction().commit();
+			jqmlogger.debug("In the Loader --> ENDED: HISTORY: " + h.getId());
 
-				em.getTransaction().begin();
-				Helpers.createMessage("Status updated: ENDED", h, em);
-				em.getTransaction().commit();
+			em.getTransaction().begin();
+			Helpers.createMessage("Status updated: ENDED", h, em);
+			em.getTransaction().commit();
 
-				em.getTransaction().begin();
-				h.setReturnedValue(0);
-				em.persist(h);
-				em.getTransaction().commit();
-			}
+			em.getTransaction().begin();
+			h.setReturnedValue(0);
+			h = em.merge(h);
+			em.getTransaction().commit();
+			// }
 
 			em.refresh(em.merge(job));
-
+			job = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class)
+					.setParameter("i", h.getJobInstance().getId()).getSingleResult();
 			jqmlogger.debug("Final status: " + job.getState());
 			jqmlogger.debug("Final progression: " + job.getProgress());
 
@@ -435,7 +437,7 @@ class Loader implements Runnable
 				Mail mail = new Mail(node, job, em);
 				mail.send();
 			}
-
+			job = em.merge(job);
 			// END SEND EMAIL
 
 		} catch (DependencyResolutionException e)

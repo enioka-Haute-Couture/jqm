@@ -95,6 +95,7 @@ class Polling implements Runnable
 	{
 		while (true)
 		{
+			// em.getEntityManagerFactory().getCache().evictAll();
 			try
 			{
 				if (!run)
@@ -126,8 +127,6 @@ class Polling implements Runnable
 				jqmlogger.debug("JI that will be attributed: " + ji.getId());
 				jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
 
-				em.refresh(ji);
-
 				em.getTransaction().begin();
 
 				JobInstance tt = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :j", JobInstance.class)
@@ -148,10 +147,9 @@ class Polling implements Runnable
 				m.setHistory(h);
 
 				ji.setState("ATTRIBUTED");
-
+				ji = em.merge(ji);
 				em.persist(m);
 				em.getTransaction().commit();
-				em.refresh(h);
 
 				JobInstance t = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :j", JobInstance.class)
 						.setParameter("j", ji.getId()).getSingleResult();

@@ -45,7 +45,7 @@ public class JobParameter implements Serializable
 	@ManyToOne
 	@JoinColumn(name="jobinstance_id")
 	private JobInstance jobinstance;
-	
+
 	/**
 	 * @return the key
 	 */

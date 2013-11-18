@@ -54,7 +54,6 @@ public class Link
 
 	public void sendProgress(Integer msg)
 	{
-		jqmlogger.debug("Begining SendProgress");
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(old);
 
@@ -68,18 +67,20 @@ public class Link
 		}
 		else
 		{
-			jqmlogger.debug("Progress of the job: " + j.getId() + " will be updated");
+
+			j = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class).setParameter("i", id).getSingleResult();
+			// jqmlogger.debug("Progress of the job: " + j.getId() + " will be updated");
 			em.getTransaction().begin();
 			// em.createQuery("UPDATE JobInstance j SET j.progress = :msg WHERE j.id = :j").setParameter("msg", msg)
 			// .setParameter("j", j.getId()).executeUpdate();
 			j.setProgress(msg);
-			em.merge(j);
+			j = em.merge(j);
 			em.getTransaction().commit();
-			em.refresh(j);
 
 			jqmlogger.debug("Actual progression: " + j.getProgress());
 		}
 
 		Thread.currentThread().setContextClassLoader(cl);
+		jqmlogger.debug("Actual progression: " + j.getProgress());
 	}
 }
