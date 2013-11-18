@@ -50,5 +50,4 @@ public class JobInstanceBeans implements Serializable {
 		return jobs;
 	}
 
-
 }

@@ -42,9 +42,6 @@ import javax.persistence.Table;
 public class JobInstance implements Comparable<JobInstance>, Serializable
 {
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = -7710486847228806301L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

@@ -16,7 +16,6 @@
 
 			<!-- We use a test db started during the jUnit tests -->
 			<property name="hibernate.hbm2ddl.auto" value="update" />
-
 		</properties>
 	</persistence-unit>
 </persistence>

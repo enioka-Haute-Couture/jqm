@@ -19,6 +19,7 @@
 package com.enioka.jqm.tools;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -45,6 +46,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.log4j.Logger;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.repository.RemoteRepository;
@@ -66,6 +68,8 @@ class Loader implements Runnable
 	private Logger jqmlogger = Logger.getLogger(this.getClass());
 	private Polling p = null;
 	String res = null;
+	String lib = null;
+	URL[] libUrls = null;
 
 	Loader(JobInstance job, Map<String, URL[]> cache, Polling p)
 	{
@@ -142,6 +146,11 @@ class Loader implements Runnable
 		if (list != null)
 			for (File ff : list)
 			{
+				if (ff.isDirectory() && path.equalsIgnoreCase(ff.getName()))
+				{
+					jqmlogger.debug("findFile lib " + ff.getPath());
+					lib = ff.getAbsolutePath();
+				}
 				if (ff.isDirectory())
 				{
 					findFile(path, ff);
@@ -184,7 +193,7 @@ class Loader implements Runnable
 				String env = CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()));
 
 				extractJar(jar.getAbsolutePath(), env);
-				findFile("pom.xml", new File(env + "tmp/"));
+				findFile("pom.xml", new File(env + "tmp/META-INF/maven/"));
 
 				jqmlogger.debug("pomdebug: " + res);
 
@@ -206,16 +215,32 @@ class Loader implements Runnable
 
 				pomFile = new File(CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()))
 						+ "pom.xml");
-
-				FileUtils.deleteDirectory(new File(CheckFilePath.fixFilePath(node.getRepo()
-						+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-						+ "tmp"));
 			}
 			if (!pomFile.exists())
 			{
-				jqmlogger.debug("POM doesn't exist in the Jar");
-				throw new IOException();
+				String env = CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()));
+				findFile("lib", new File(env + "tmp/META-INF/maven/"));
+
+				File dir = new File(res);
+
+				if (!dir.exists())
+				{
+					throw new IOException();
+				}
+
+				FileFilter fileFilter = new WildcardFileFilter("*.jar");
+				File[] files = dir.listFiles(fileFilter);
+				libUrls = new URL[files.length];
+				for (int i = 0; i < files.length; i++)
+				{
+					libUrls[i] = files[i].toURI().toURL();
+				}
 			}
+
+			// The temporary file containing the extract jar must be deleted
+			FileUtils.deleteDirectory(new File(CheckFilePath.fixFilePath(node.getRepo()
+					+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
+					+ "tmp"));
 
 			// Update of the job status
 			em.getTransaction().begin();
@@ -244,37 +269,40 @@ class Loader implements Runnable
 			boolean isInCache = true;
 			if (!cache.containsKey(job.getJd().getApplicationName()))
 			{
-				Dependencies dependencies = new Dependencies(pomFile.getAbsolutePath());
-
-				if (pomCustom)
-					pomFile.delete();
-
-				List<GlobalParameter> repolist = em
-						.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
-						.setParameter("repo", "mavenRepo").getResultList();
-
-				RemoteRepository[] rr = new RemoteRepository[repolist.size()];
-				int ii = 0;
-				for (GlobalParameter g : repolist)
+				if (libUrls == null)
 				{
-					rr[ii] = new RemoteRepository(g.getKey(), "default", g.getValue());
-					ii++;
-				}
+					Dependencies dependencies = new Dependencies(pomFile.getAbsolutePath());
 
-				isInCache = false;
-				Collection<RemoteRepository> remotes = Arrays.asList(rr);
+					if (pomCustom)
+						pomFile.delete();
 
-				deps = new ArrayList<Artifact>();
-				for (int i = 0; i < dependencies.getList().size(); i++)
-				{
-					jqmlogger.info("Resolving Maven dep " + dependencies.getList().get(i));
-					deps.addAll(new Aether(remotes, local).resolve(new DefaultArtifact(dependencies.getList().get(i)), "compile"));
-				}
+					List<GlobalParameter> repolist = em
+							.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
+							.setParameter("repo", "mavenRepo").getResultList();
 
-				for (Artifact artifact : deps)
-				{
-					tmp.add(artifact.getFile().toURI().toURL());
-					jqmlogger.info("Artifact: " + artifact.getFile().toURI().toURL());
+					RemoteRepository[] rr = new RemoteRepository[repolist.size()];
+					int ii = 0;
+					for (GlobalParameter g : repolist)
+					{
+						rr[ii] = new RemoteRepository(g.getKey(), "default", g.getValue());
+						ii++;
+					}
+
+					isInCache = false;
+					Collection<RemoteRepository> remotes = Arrays.asList(rr);
+
+					deps = new ArrayList<Artifact>();
+					for (int i = 0; i < dependencies.getList().size(); i++)
+					{
+						jqmlogger.info("Resolving Maven dep " + dependencies.getList().get(i));
+						deps.addAll(new Aether(remotes, local).resolve(new DefaultArtifact(dependencies.getList().get(i)), "compile"));
+					}
+
+					for (Artifact artifact : deps)
+					{
+						tmp.add(artifact.getFile().toURI().toURL());
+						jqmlogger.info("Artifact: " + artifact.getFile().toURI().toURL());
+					}
 				}
 			}
 			// ------------------- END: MAVEN DEPENDENCIES ---------------
@@ -282,7 +310,12 @@ class Loader implements Runnable
 			// We save the actual classloader
 			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 			JarClassLoader jobClassLoader = null;
-			URL[] urls = tmp.toArray(new URL[tmp.size()]);
+			URL[] urls = null;
+
+			if (libUrls == null)
+				urls = tmp.toArray(new URL[tmp.size()]);
+			else
+				urls = libUrls;
 
 			if (!isInCache)
 			{
