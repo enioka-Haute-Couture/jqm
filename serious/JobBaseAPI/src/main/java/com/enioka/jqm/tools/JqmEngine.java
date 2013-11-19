@@ -182,7 +182,7 @@ class JqmEngine
 
 		// GlobalParameter
 		GlobalParameter gp = null;
-		i = (Long) em.createQuery("SELECT COUNT(gp) FROM GlobalParameter gp WHERE gp.key = :key").setParameter("key", "mavenRepo")
+		i = (Long) em.createQuery("SELECT COUNT(gp) FROM GlobalParameter gp WHERE gp.key = :k").setParameter("k", "defaultConnection")
 				.getSingleResult();
 		if (i == 0)
 		{

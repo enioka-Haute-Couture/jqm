@@ -41,6 +41,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.zip.ZipException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -468,6 +469,10 @@ class Loader implements Runnable
 			job = em.merge(job);
 			// END SEND EMAIL
 
+		} catch (ZipException e)
+		{
+			crashedStatus();
+			jqmlogger.info(e);
 		} catch (DependencyResolutionException e)
 		{
 			crashedStatus();
