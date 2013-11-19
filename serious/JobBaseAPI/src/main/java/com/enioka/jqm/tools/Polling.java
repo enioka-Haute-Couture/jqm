@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 
 import org.apache.log4j.Logger;
@@ -63,10 +64,12 @@ class Polling implements Runnable
 	protected JobInstance dequeue()
 	{
 		// Get the list of all jobInstance with the queue definded ordered by position
+		em.getTransaction().begin();
 		TypedQuery<JobInstance> query = em.createQuery(
 				"SELECT j FROM JobInstance j WHERE j.queue.name = :q AND j.state = :s ORDER BY j.position ASC", JobInstance.class);
-		query.setParameter("q", queue.getName()).setParameter("s", "SUBMITTED");
+		query.setParameter("q", queue.getName()).setParameter("s", "SUBMITTED").setLockMode(LockModeType.PESSIMISTIC_WRITE);
 		job = query.getResultList();
+		em.getTransaction().commit();
 
 		// Higlander?
 		if (job.size() > 0 && job.get(0).getJd().isHighlander() == true)
@@ -79,15 +82,18 @@ class Polling implements Runnable
 
 	protected void highlanderPollingMode(JobInstance currentJob, EntityManager em)
 	{
+		em.getTransaction().begin();
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
 				.createQuery("SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.applicationName = :n", JobInstance.class)
-				.setParameter("refid", currentJob.getId()).setParameter("n", currentJob.getJd().getApplicationName()).getResultList();
+				.setParameter("refid", currentJob.getId()).setParameter("n", currentJob.getJd().getApplicationName())
+				.setLockMode(LockModeType.PESSIMISTIC_READ).getResultList();
 
 		for (JobInstance j : jobs)
 		{
 			if (j.getState().equals("ATTRIBUTED") || j.getState().equals("RUNNING"))
 				job = new ArrayList<JobInstance>();
 		}
+		em.getTransaction().commit();
 	}
 
 	@Override
@@ -131,7 +137,7 @@ class Polling implements Runnable
 				em.getTransaction().begin();
 
 				JobInstance tt = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :j", JobInstance.class)
-						.setParameter("j", ji.getId()).getSingleResult();
+						.setParameter("j", ji.getId()).setLockMode(LockModeType.PESSIMISTIC_READ).getSingleResult();
 
 				tt.setNode(dp.getNode());
 
@@ -139,7 +145,7 @@ class Polling implements Runnable
 				// .setParameter("n", dp.getNode()).executeUpdate();
 
 				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", ji)
-						.getSingleResult();
+						.setLockMode(LockModeType.PESSIMISTIC_READ).getSingleResult();
 
 				h.setNode(dp.getNode());
 				Message m = new Message();
@@ -147,13 +153,16 @@ class Polling implements Runnable
 				m.setTextMessage("Status updated: ATTRIBUTED");
 				m.setHistory(h);
 
+				em.lock(ji, LockModeType.PESSIMISTIC_WRITE);
 				ji.setState("ATTRIBUTED");
 				ji = em.merge(ji);
 				em.persist(m);
 				em.getTransaction().commit();
 
+				em.getTransaction().begin();
 				JobInstance t = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :j", JobInstance.class)
-						.setParameter("j", ji.getId()).getSingleResult();
+						.setParameter("j", ji.getId()).setLockMode(LockModeType.PESSIMISTIC_READ).getSingleResult();
+				em.getTransaction().commit();
 
 				jqmlogger.debug("The job " + t.getId() + " have been updated with the node: " + t.getNode().getListeningInterface());
 				jqmlogger

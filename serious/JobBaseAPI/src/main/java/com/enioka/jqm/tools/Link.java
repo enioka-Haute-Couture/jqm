@@ -14,6 +14,7 @@ public class Link
 	private ClassLoader old = null;
 	private EntityManager em = null;
 	private Integer id = null;
+	private volatile boolean running = true;
 
 	public Link(ClassLoader old, Integer id, EntityManager em)
 	{
@@ -22,7 +23,7 @@ public class Link
 		this.id = id;
 	};
 
-	public void sendMsg(String msg)
+	public void sendMsg(String msg) throws JqmKillException
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(old);
@@ -52,7 +53,7 @@ public class Link
 		Thread.currentThread().setContextClassLoader(cl);
 	}
 
-	public void sendProgress(Integer msg)
+	public void sendProgress(Integer msg) throws InterruptedException
 	{
 		// ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		// Thread.currentThread().setContextClassLoader(old);
@@ -64,6 +65,7 @@ public class Link
 		if (j.getState().equals("KILLED"))
 		{
 			jqmlogger.debug("Link: Job will be KILLED");
+			Thread.currentThread().interrupt();
 			throw new JqmKillException("This job" + "(ID: " + j.getId() + ")" + " has been killed by a user");
 		}
 		else
@@ -83,5 +85,15 @@ public class Link
 
 		// Thread.currentThread().setContextClassLoader(cl);
 		jqmlogger.debug("Actual progression: " + j.getProgress());
+	}
+
+	public boolean isRunning()
+	{
+		return running;
+	}
+
+	public void setRunning(boolean running)
+	{
+		this.running = running;
 	}
 }

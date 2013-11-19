@@ -35,6 +35,7 @@ import com.enioka.jqm.api.JobDefinition;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.Message;
 
 public class QueueTest
 {
@@ -199,6 +200,96 @@ public class QueueTest
 		}
 		engine1.stop();
 
+		Assert.assertEquals(true, true);
+	}
+
+	@Test
+	public void testMaxThreadVipLock() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testMaxThreadVipLock");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+		ArrayList<JobInstance> job = null;
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		@SuppressWarnings("unused")
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
+				"jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+				"ModuleMachin", "other", "other", false, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+		Dispatcher.enQueue(j);
+
+		int i = 0;
+
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+
+		while (i < 5)
+		{
+			EntityManager emm = Helpers.getNewEm();
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Dispatcher.enQueue(j);
+			Thread.sleep(12000);
+			TestHelpers.printJobInstanceTable();
+			em.clear();
+			TypedQuery<JobInstance> query = emm
+					.createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
+							JobInstance.class);
+			// 134 messages must be printed
+
+			query.setParameter("s", "SUBMITTED").setParameter("ss", "ENDED");
+			job = (ArrayList<JobInstance>) query.getResultList();
+
+			if (job.size() > 3)
+				Assert.assertEquals(false, true);
+			i++;
+		}
+		engine1.stop();
+
+		ArrayList<Message> msgs = (ArrayList<Message>) em.createQuery("SELECT m FROM Message m WHERE m.textMessage = :m", Message.class)
+				.setParameter("m", "DateTime will be printed").getResultList();
+
+		Assert.assertEquals(139, msgs.size());
 		Assert.assertEquals(true, true);
 	}
 }

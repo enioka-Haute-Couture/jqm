@@ -40,6 +40,7 @@ import java.util.Properties;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.LockModeType;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
@@ -331,8 +332,10 @@ public final class Dispatcher
 
 		History h = null;
 
+		em.getTransaction().begin();
 		Integer p = em.createQuery("SELECT MAX (j.position) FROM JobInstance j " + "WHERE j.jd.queue.name = :queue", Integer.class)
-				.setParameter("queue", (job.getQueue().getName())).getSingleResult();
+				.setParameter("queue", (job.getQueue().getName())).setLockMode(LockModeType.PESSIMISTIC_READ).getSingleResult();
+		em.getTransaction().commit();
 		jqmlogger.debug("POSITION: " + p);
 
 		if (job.isHighlander())

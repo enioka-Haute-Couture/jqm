@@ -99,6 +99,8 @@ public class JobBase {
 		{
 			Class c = myEngine.getClass();
 			Method getMyEngine = c.getMethod("sendProgress", Integer.class);
+			Method setRunning = c.getMethod("setRunning", boolean.class);
+			setRunning.invoke(myEngine, true);
 			getMyEngine.invoke(myEngine, msg);
 
 		} catch (Exception e)
@@ -238,4 +240,5 @@ public class JobBase {
 	{
 		this.myEngine = myEngine;
 	}
+
 }

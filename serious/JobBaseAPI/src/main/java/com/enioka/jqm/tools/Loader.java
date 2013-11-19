@@ -45,6 +45,7 @@ import java.util.zip.ZipException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.LockModeType;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -91,12 +92,12 @@ class Loader implements Runnable
 		// STATE UPDATED
 
 		em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
-				.setParameter("msg", "CRASHED").executeUpdate();
+				.setParameter("msg", "CRASHED").setLockMode(LockModeType.PESSIMISTIC_WRITE).executeUpdate();
 
 		// MESSAGE HISTORY UPDATED
 
 		History h = em.createQuery("SELECT h FROM History h WHERE h.id = :j", History.class).setParameter("j", job.getId())
-				.getSingleResult();
+				.setLockMode(LockModeType.PESSIMISTIC_READ).getSingleResult();
 
 		Helpers.createMessage("Status updated: CRASHED", h, em);
 
@@ -247,7 +248,7 @@ class Loader implements Runnable
 			// Update of the job status
 			em.getTransaction().begin();
 			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", job)
-					.getSingleResult();
+					.setLockMode(LockModeType.PESSIMISTIC_READ).getSingleResult();
 
 			// Update of the execution date
 			Date date = new Date();
@@ -513,23 +514,6 @@ class Loader implements Runnable
 		{
 			crashedStatus();
 			jqmlogger.info(e);
-		} catch (JqmKillException e)
-		{
-			em.getTransaction().begin();
-			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", job)
-					.getSingleResult();
-			em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
-					.setParameter("msg", "KILLED").executeUpdate();
-			em.getTransaction().commit();
-			jqmlogger.debug("In the Loader --> KILLED: HISTORY: " + h.getId());
-
-			em.getTransaction().begin();
-			Helpers.createMessage("Status updated: KILLED", h, em);
-			em.getTransaction().commit();
-
-			em.getTransaction().begin();
-			h.setReturnedValue(0);
-			em.getTransaction().commit();
 		} catch (Exception e)
 		{
 			jqmlogger.error("An error occured during job execution or preparation: " + e.getMessage(), e);

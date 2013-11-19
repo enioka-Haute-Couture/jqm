@@ -1114,7 +1114,7 @@ public class JobBaseTest
 
 		Assert.assertEquals(1, res.size());
 		Assert.assertEquals("ENDED", res.get(0).getState());
-		Assert.assertEquals((Integer) 1500, res.get(0).getProgress());
+		Assert.assertEquals((Integer) 3500, res.get(0).getProgress());
 	}
 
 	@Test
