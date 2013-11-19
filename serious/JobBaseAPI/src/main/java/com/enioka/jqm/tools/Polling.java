@@ -95,7 +95,8 @@ class Polling implements Runnable
 	{
 		while (true)
 		{
-			// em.getEntityManagerFactory().getCache().evictAll();
+			em.getEntityManagerFactory().getCache().evictAll();
+			em.clear();
 			try
 			{
 				if (!run)

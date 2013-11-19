@@ -54,11 +54,12 @@ public class Link
 
 	public void sendProgress(Integer msg)
 	{
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		Thread.currentThread().setContextClassLoader(old);
-
+		// ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		// Thread.currentThread().setContextClassLoader(old);
+		em.clear();
 		JobInstance j = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class).setParameter("i", id)
 				.getSingleResult();
+		jqmlogger.debug("Job status before Kill: " + j.getState());
 
 		if (j.getState().equals("KILLED"))
 		{
@@ -80,7 +81,7 @@ public class Link
 			jqmlogger.debug("Actual progression: " + j.getProgress());
 		}
 
-		Thread.currentThread().setContextClassLoader(cl);
+		// Thread.currentThread().setContextClassLoader(cl);
 		jqmlogger.debug("Actual progression: " + j.getProgress());
 	}
 }

@@ -56,6 +56,7 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 import com.jcabi.aether.Aether;
 
@@ -171,7 +172,7 @@ class Loader implements Runnable
 		{
 			jqmlogger.debug("TOUT DEBUT LOADER");
 			Node node = this.p.dp.getNode();
-
+			em.refresh(em.merge(node));
 			// ---------------- BEGIN: MAVEN DEPENDENCIES ------------------
 			File local = new File(System.getProperty("user.home") + "/.m2/repository");
 			File jar = new File(CheckFilePath.fixFilePath(node.getRepo()) + job.getJd().getJarPath());
@@ -345,8 +346,11 @@ class Loader implements Runnable
 			jobBase = jobClassLoader.invokeMain(job, defaultconnection, contextClassLoader, em);
 			jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
 
+			em.clear();
+
 			job = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class)
 					.setParameter("i", h.getJobInstance().getId()).getSingleResult();
+			h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", job).getSingleResult();
 
 			jqmlogger.debug("Job status after execution before contextClassLoader: " + job.getState());
 			jqmlogger.debug("Progression after execution: " + job.getProgress());
@@ -372,26 +376,50 @@ class Loader implements Runnable
 			// End end date
 
 			// STATE UPDATED
-			// if (job.getState().equals("RUNNING"))
-			// {
-			em.getTransaction().begin();
-			// em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
-			// .setParameter("msg", "KILLED").executeUpdate();
-			job.setState("ENDED");
-			job = em.merge(job);
-			em.getTransaction().commit();
-			jqmlogger.debug("In the Loader --> ENDED: HISTORY: " + h.getId());
+			if (!job.getState().equals("KILLED"))
+			{
+				em.getTransaction().begin();
+				// em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
+				// .setParameter("msg", "KILLED").executeUpdate();
+				job.setState("ENDED");
+				job = em.merge(job);
+				em.getTransaction().commit();
+				jqmlogger.debug("In the Loader --> ENDED: HISTORY: " + h.getId());
+				em.refresh(em.merge(h));
 
-			em.getTransaction().begin();
-			Helpers.createMessage("Status updated: ENDED", h, em);
-			em.getTransaction().commit();
+				em.getTransaction().begin();
+				Helpers.createMessage("Status updated: ENDED", h, em);
+				em.getTransaction().commit();
 
-			em.getTransaction().begin();
-			h.setReturnedValue(0);
-			h = em.merge(h);
-			em.getTransaction().commit();
-			// }
+				em.getTransaction().begin();
+				h.setReturnedValue(0);
+				h = em.merge(h);
+				em.getTransaction().commit();
+			}
+			else
+			{
+				em.getTransaction().begin();
+				// em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
+				// .setParameter("msg", "KILLED").executeUpdate();
+				job.setState("KILLED");
+				job = em.merge(job);
+				em.getTransaction().commit();
+				jqmlogger.debug("In the Loader --> KILLED: HISTORY: " + h.getId());
+				em.refresh(em.merge(h));
 
+				em.getTransaction().begin();
+				Message m = new Message();
+				m.setHistory(h);
+				m.setTextMessage("Status updated: RUNNING");
+				em.persist(m);
+				em.getTransaction().commit();
+
+				em.getTransaction().begin();
+				h.setReturnedValue(0);
+				em.getTransaction().commit();
+			}
+			em.getEntityManagerFactory().getCache().evictAll();
+			em.clear();
 			em.refresh(em.merge(job));
 			job = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class)
 					.setParameter("i", h.getJobInstance().getId()).getSingleResult();

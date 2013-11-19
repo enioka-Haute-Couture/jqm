@@ -562,14 +562,18 @@ public final class Dispatcher
 		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", idJob)
 				.getSingleResult();
 		em.getTransaction().begin();
-		em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", idJob)
-		.setParameter("msg", "KILLED").executeUpdate();
+		//		em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", idJob)
+		//		.setParameter("msg", "KILLED").executeUpdate();
+		j.setState("KILLED");
+		j = em.merge(j);
 		Message m = new Message();
 		m.setHistory(h);
 		m.setTextMessage("Status updated: ENDED");
 		em.persist(m);
+		h = em.merge(h);
 		em.getTransaction().commit();
 		em.refresh(j);
+		em.refresh(h);
 		JobInstance jj = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class).setParameter("i", idJob)
 				.getSingleResult();
 		jqmlogger.debug("Job status after killJob: " + jj.getState());

@@ -28,6 +28,7 @@ import org.hsqldb.Server;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
@@ -61,7 +62,7 @@ public class QueueTest
 		s.shutdown();
 	}
 
-	// @Test
+	@Test
 	public void testMaxThreadNormal() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");
@@ -128,7 +129,7 @@ public class QueueTest
 		Assert.assertEquals(true, true);
 	}
 
-	// @Test
+	@Test
 	public void testMaxThreadVip() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");
@@ -185,7 +186,7 @@ public class QueueTest
 			Dispatcher.enQueue(j);
 			Thread.sleep(10000);
 			TestHelpers.printJobInstanceTable();
-
+			em.clear();
 			TypedQuery<JobInstance> query = emm
 					.createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
 							JobInstance.class);

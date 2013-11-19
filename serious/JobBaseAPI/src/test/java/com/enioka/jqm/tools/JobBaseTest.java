@@ -1117,7 +1117,7 @@ public class JobBaseTest
 		Assert.assertEquals((Integer) 1500, res.get(0).getProgress());
 	}
 
-	// @Test
+	@Test
 	public void testKillJob() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");
@@ -1155,13 +1155,11 @@ public class JobBaseTest
 
 		TestHelpers.printJobInstanceTable();
 
-		TypedQuery<JobInstance> query = Helpers.getNewEm().createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
-				JobInstance.class);
+		TypedQuery<JobInstance> query = Helpers.getNewEm().createQuery("SELECT j FROM JobInstance j", JobInstance.class);
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
 
 		Assert.assertEquals(1, res.size());
 		Assert.assertEquals("KILLED", res.get(0).getState());
-		Assert.assertEquals("ENDED", res.get(1).getState());
 	}
 
 	@Test
