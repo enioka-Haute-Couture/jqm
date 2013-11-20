@@ -7,6 +7,7 @@ bin/
 *.project
 testprojects
 test.txt
+*.log
 
 /jqmProject/nbproject/private/
 /jqmProject/dist/
