@@ -51,11 +51,16 @@ public class MultiNodeTest
 		s.setLogWriter(null);
 		s.setSilent(true);
 		s.start();
+
+		Dispatcher.resetEM();
+		Helpers.resetEmf();
 	}
 
 	@AfterClass
 	public static void stop()
 	{
+		Dispatcher.resetEM();
+		s.shutdown();
 		s.stop();
 	}
 
@@ -96,7 +101,7 @@ public class MultiNodeTest
 		engine2.start(new String[] { "localhost4" });
 
 		int i = 0;
-		while (i < 5)
+		while (i < 3)
 		{
 			TestHelpers.printJobInstanceTable();
 
@@ -121,6 +126,8 @@ public class MultiNodeTest
 
 		engine1.stop();
 		engine2.stop();
+
+		Assert.assertEquals(true, true);
 	}
 
 	@Test
@@ -162,7 +169,7 @@ public class MultiNodeTest
 		engine3.start(new String[] { "localhost5" });
 
 		int i = 0;
-		while (i < 5)
+		while (i < 3)
 		{
 			TestHelpers.printJobInstanceTable();
 
@@ -187,6 +194,7 @@ public class MultiNodeTest
 
 		engine1.stop();
 		engine2.stop();
+		Assert.assertEquals(true, true);
 	}
 
 	@Test
@@ -229,7 +237,7 @@ public class MultiNodeTest
 		engine2.start(new String[] { "localhost2" });
 
 		int i = 0;
-		while (i < 5)
+		while (i < 3)
 		{
 			TestHelpers.printJobInstanceTable();
 
@@ -254,6 +262,7 @@ public class MultiNodeTest
 
 		engine1.stop();
 		engine2.stop();
+		Assert.assertEquals(true, true);
 	}
 
 	@Test
@@ -365,7 +374,7 @@ public class MultiNodeTest
 		engine3.start(new String[] { "localhost3" });
 
 		int i = 0;
-		while (i < 5)
+		while (i < 3)
 		{
 			TestHelpers.printJobInstanceTable();
 
@@ -408,6 +417,7 @@ public class MultiNodeTest
 		engine1.stop();
 		engine2.stop();
 		engine3.stop();
+		Assert.assertEquals(true, true);
 	}
 
 	@Test
@@ -468,6 +478,7 @@ public class MultiNodeTest
 		Assert.assertEquals(2, res.size());
 		Assert.assertEquals("ENDED", res.get(0).getState());
 		Assert.assertEquals("ENDED", res.get(1).getState());
+		Assert.assertEquals(true, true);
 	}
 
 	@Test
@@ -580,7 +591,7 @@ public class MultiNodeTest
 		engine3.start(new String[] { "localhost3" });
 
 		int i = 0;
-		while (i < 5)
+		while (i < 3)
 		{
 			TestHelpers.printJobInstanceTable();
 

@@ -20,7 +20,6 @@ package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -40,7 +39,7 @@ public class Message implements Serializable{
 	private Integer id;
 	@Column(length=1000, name="textMessage")
 	private String textMessage;
-	@ManyToOne(optional=false, cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+	@ManyToOne(optional=false, fetch=FetchType.EAGER)
 	@JoinColumn(name="message_history", nullable=false)
 	private History history;
 

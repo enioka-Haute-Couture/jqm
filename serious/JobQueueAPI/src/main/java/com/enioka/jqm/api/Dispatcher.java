@@ -582,6 +582,8 @@ public final class Dispatcher
 		jqmlogger.debug("Job status after killJob: " + jj.getState());
 	}
 
+
+	// ----------------------------- RESTARTCRASHEDJOB --------------------------------------
 	/**
 	 * Will restart a crashed job. This will eventually update the history and make the error disappear from the logs should the job end OK
 	 * this time.
@@ -603,16 +605,23 @@ public final class Dispatcher
 			return;
 		}
 
-		JobDefinition j = new JobDefinition(ji.getJd().getApplicationName(), h.getUserName());
+		Message m = em.createQuery("SELECT m FROM Message m WHERE m.history.id = :h AND m.textMessage = :msg", Message.class)
+				.setParameter("h", h.getId()).setParameter("msg", "Status updated: CRASHED").getSingleResult();
 
-		for (JobHistoryParameter i : h.getParameters())
-		{
-			j.addParameter(i.getKey(), i.getValue());
-		}
+		em.getTransaction().begin();
+		em.remove(m);
+		em.getTransaction().commit();
 
-		Dispatcher.enQueue(j);
+		em.getTransaction().begin();
+		ji.setState("SUBMITTED");
+		ji = em.merge(ji);
+		em.getTransaction().commit();
+
+		em.clear();
+
 	}
 
+	// ----------------------------- RESTARTJOB --------------------------------------
 	/**
 	 * Will enqueue (copy) a job once again with the same parameters and environment. This will not destroy the log of the original job
 	 * instance.
@@ -629,6 +638,11 @@ public final class Dispatcher
 
 		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :id", JobInstance.class).setParameter("id", idJob)
 				.getSingleResult();
+
+		if (!ji.getJd().isCanBeRestarted())
+		{
+			return 0;
+		}
 
 		JobDefinition j = new JobDefinition(ji.getJd().getApplicationName(), h.getUserName());
 

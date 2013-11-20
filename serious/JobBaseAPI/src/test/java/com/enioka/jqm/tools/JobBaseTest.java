@@ -901,22 +901,45 @@ public class JobBaseTest
 
 		int i = Dispatcher.enQueue(j);
 
+		em.getTransaction().begin();
+		JobInstance ji = em.find(JobInstance.class, i);
+		ji.setState("CRASHED");
+		em.getTransaction().commit();
+
+		TestHelpers.printJobInstanceTable();
+
+		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", ji)
+				.getSingleResult();
+
+		em.getTransaction().begin();
+		Message m = new Message();
+		m.setHistory(h);
+		m.setTextMessage("Status updated: CRASHED");
+		em.persist(m);
+		em.getTransaction().commit();
+		em.clear();
+
+		TestHelpers.printJobInstanceTable();
+
+		Message mm = em.createQuery("SELECT m FROM Message m WHERE m.history = :h", Message.class).setParameter("h", h).getSingleResult();
+
 		JqmEngine engine1 = new JqmEngine();
 		engine1.start(new String[] { "localhost" });
 
-		Thread.sleep(2000);
+		Thread.sleep(4000);
 
 		Dispatcher.restartCrashedJob(i);
+		TestHelpers.printJobInstanceTable();
 
-		Thread.sleep(2000);
+		Thread.sleep(4000);
 		engine1.stop();
 
 		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
-
-		Assert.assertEquals(2, res.size());
+		TestHelpers.printJobInstanceTable();
+		Assert.assertEquals(1, res.size());
+		Assert.assertEquals("ENDED", res.get(0).getState());
 		Assert.assertEquals(jdDemoMaven.getId(), res.get(0).getJd().getId());
-		Assert.assertEquals(jdDemoMaven.getId(), res.get(1).getJd().getId());
 	}
 
 	@Test

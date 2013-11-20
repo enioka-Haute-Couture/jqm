@@ -27,7 +27,7 @@
 		<module>../../tests/jqm-test-defcon</module>
     <module>../../tests/jqm-test-sendmsg</module>
     <module>../../tests/jqm-test-sendprogress</module>
-	<module>../../tests/jqm-test-datetimesendmsg</module>
+    <module>../../tests/jqm-test-datetimesendmsg</module>
 	</modules>
 
 	<profiles>

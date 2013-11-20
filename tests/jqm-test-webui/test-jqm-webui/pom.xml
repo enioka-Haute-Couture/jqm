@@ -32,6 +32,12 @@
 
   <dependencies>
   
+  <dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>4.2.7.Final</version>
+		</dependency>
+  
   	<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-model</artifactId>
