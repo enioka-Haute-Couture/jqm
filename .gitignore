@@ -6,6 +6,7 @@ bin/
 *.launch
 *.project
 testprojects
+test.txt
 
 /jqmProject/nbproject/private/
 /jqmProject/dist/
