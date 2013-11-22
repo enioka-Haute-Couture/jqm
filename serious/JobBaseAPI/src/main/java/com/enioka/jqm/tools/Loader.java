@@ -70,9 +70,9 @@ class Loader implements Runnable
 	private Map<String, URL[]> cache = null;
 	private Logger jqmlogger = Logger.getLogger(this.getClass());
 	private Polling p = null;
-	String res = null;
-	String lib = null;
-	URL[] libUrls = null;
+	private String res = null;
+	private String lib = null;
+	private URL[] libUrls = null;
 
 	Loader(JobInstance job, Map<String, URL[]> cache, Polling p)
 	{
@@ -133,6 +133,7 @@ class Loader implements Runnable
 				}
 				fos.close();
 				is.close();
+				jar.close();
 			}
 		} catch (IOException e)
 		{
@@ -147,6 +148,7 @@ class Loader implements Runnable
 	{
 		File[] list = f.listFiles();
 		if (list != null)
+		{
 			for (File ff : list)
 			{
 				if (ff.isDirectory() && path.equalsIgnoreCase(ff.getName()))
@@ -164,6 +166,7 @@ class Loader implements Runnable
 					res = ff.getParentFile().getAbsolutePath();
 				}
 			}
+		}
 	}
 
 	// Run
@@ -173,7 +176,7 @@ class Loader implements Runnable
 		try
 		{
 			jqmlogger.debug("TOUT DEBUT LOADER");
-			Node node = this.p.dp.getNode();
+			Node node = this.p.getDp().getNode();
 			em.refresh(em.merge(node));
 			// ---------------- BEGIN: MAVEN DEPENDENCIES ------------------
 			File local = new File(System.getProperty("user.home") + "/.m2/repository");
@@ -278,7 +281,9 @@ class Loader implements Runnable
 					Dependencies dependencies = new Dependencies(pomFile.getAbsolutePath());
 
 					if (pomCustom)
+					{
 						pomFile.delete();
+					}
 
 					List<GlobalParameter> repolist = em
 							.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
@@ -317,9 +322,13 @@ class Loader implements Runnable
 			URL[] urls = null;
 
 			if (libUrls == null)
+			{
 				urls = tmp.toArray(new URL[tmp.size()]);
+			}
 			else
+			{
 				urls = libUrls;
+			}
 
 			if (!isInCache)
 			{
@@ -381,8 +390,6 @@ class Loader implements Runnable
 			if (!job.getState().equals("KILLED"))
 			{
 				em.getTransaction().begin();
-				// em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
-				// .setParameter("msg", "KILLED").executeUpdate();
 				job.setState("ENDED");
 				job = em.merge(job);
 				em.getTransaction().commit();
@@ -401,8 +408,6 @@ class Loader implements Runnable
 			else
 			{
 				em.getTransaction().begin();
-				// em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", job.getId())
-				// .setParameter("msg", "KILLED").executeUpdate();
 				job.setState("KILLED");
 				job = em.merge(job);
 				em.getTransaction().commit();
@@ -464,7 +469,7 @@ class Loader implements Runnable
 
 			if (job.getEmail() != null)
 			{
-				Mail mail = new Mail(node, job, em);
+				Mail mail = new Mail(job, em);
 				mail.send();
 			}
 			job = em.merge(job);
@@ -479,10 +484,6 @@ class Loader implements Runnable
 			crashedStatus();
 			jqmlogger.info(e);
 		} catch (MalformedURLException e)
-		{
-			crashedStatus();
-			jqmlogger.info(e);
-		} catch (ClassNotFoundException e)
 		{
 			crashedStatus();
 			jqmlogger.info(e);
@@ -506,16 +507,13 @@ class Loader implements Runnable
 		{
 			crashedStatus();
 			jqmlogger.info(e);
-		} catch (InstantiationException e)
-		{
-			crashedStatus();
-			jqmlogger.info(e);
 		} catch (IllegalAccessException e)
 		{
 			crashedStatus();
 			jqmlogger.info(e);
 		} catch (Exception e)
 		{
+			crashedStatus();
 			jqmlogger.error("An error occured during job execution or preparation: " + e.getMessage(), e);
 		} finally
 		{
@@ -527,5 +525,15 @@ class Loader implements Runnable
 			}
 		}
 
+	}
+
+	public String getLib()
+	{
+		return lib;
+	}
+
+	public void setLib(String lib)
+	{
+		this.lib = lib;
 	}
 }

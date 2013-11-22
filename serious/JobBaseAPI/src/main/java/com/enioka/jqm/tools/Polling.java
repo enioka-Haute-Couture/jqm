@@ -39,7 +39,7 @@ class Polling implements Runnable
 {
 	private static Logger jqmlogger = Logger.getLogger(Polling.class);
 	private List<JobInstance> job = new ArrayList<JobInstance>();
-	DeploymentParameter dp = null;
+	private DeploymentParameter dp = null;
 	private Queue queue = null;
 	private EntityManager em = Helpers.getNewEm();
 	private ThreadPool tp = null;
@@ -91,7 +91,9 @@ class Polling implements Runnable
 		for (JobInstance j : jobs)
 		{
 			if (j.getState().equals("ATTRIBUTED") || j.getState().equals("RUNNING"))
+			{
 				job = new ArrayList<JobInstance>();
+			}
 		}
 		em.getTransaction().commit();
 	}
@@ -141,9 +143,6 @@ class Polling implements Runnable
 
 				tt.setNode(dp.getNode());
 
-				// em.createQuery("UPDATE JobInstance j SET j.node = :n WHERE j.id = :j").setParameter("j", ji.getId())
-				// .setParameter("n", dp.getNode()).executeUpdate();
-
 				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", ji)
 						.setLockMode(LockModeType.PESSIMISTIC_READ).getSingleResult();
 
@@ -192,5 +191,15 @@ class Polling implements Runnable
 	void setActualNbThread(Integer actualNbThread)
 	{
 		this.actualNbThread = actualNbThread;
+	}
+
+	public DeploymentParameter getDp()
+	{
+		return dp;
+	}
+
+	public void setDp(DeploymentParameter dp)
+	{
+		this.dp = dp;
 	}
 }

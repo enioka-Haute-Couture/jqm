@@ -16,7 +16,6 @@ import javax.persistence.NoResultException;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Node;
 
 class Mail
 {
@@ -28,7 +27,7 @@ class Mail
 	private String port = null;
 	private String pwd = "marsu1952";
 
-	Mail(Node node, JobInstance ji, EntityManager em)
+	Mail(JobInstance ji, EntityManager em)
 	{
 		try
 		{

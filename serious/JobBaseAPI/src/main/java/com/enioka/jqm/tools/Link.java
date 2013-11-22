@@ -55,8 +55,6 @@ public class Link
 
 	public void sendProgress(Integer msg) throws InterruptedException
 	{
-		// ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		// Thread.currentThread().setContextClassLoader(old);
 		em.clear();
 		JobInstance j = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class).setParameter("i", id)
 				.getSingleResult();
@@ -72,10 +70,7 @@ public class Link
 		{
 
 			j = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class).setParameter("i", id).getSingleResult();
-			// jqmlogger.debug("Progress of the job: " + j.getId() + " will be updated");
 			em.getTransaction().begin();
-			// em.createQuery("UPDATE JobInstance j SET j.progress = :msg WHERE j.id = :j").setParameter("msg", msg)
-			// .setParameter("j", j.getId()).executeUpdate();
 			j.setProgress(msg);
 			j = em.merge(j);
 			em.getTransaction().commit();
@@ -83,7 +78,6 @@ public class Link
 			jqmlogger.debug("Actual progression: " + j.getProgress());
 		}
 
-		// Thread.currentThread().setContextClassLoader(cl);
 		jqmlogger.debug("Actual progression: " + j.getProgress());
 	}
 

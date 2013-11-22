@@ -149,7 +149,6 @@ class XmlParser
 
 						jd.setCanBeRestarted(canBeRestarted);
 						jd.setJavaClassName(javaClassName);
-						// jd.setParameters(parameters);
 						jd.setFilePath(filePath);
 						jd.setQueue(queue);
 						jd.setMaxTimeRunning(maxTimeRunning);

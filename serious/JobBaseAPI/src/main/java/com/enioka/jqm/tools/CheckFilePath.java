@@ -1,5 +1,5 @@
 /**
- * Copyright © 2013 enioka. All rights reserved
+ * Copyright �� 2013 enioka. All rights reserved
  * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
  * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
  *
@@ -34,8 +34,12 @@ final class CheckFilePath
 	static String fixFilePath(String fp)
 	{
 		if (isValidFilePath(fp))
+		{
 			return fp;
+		}
 		else
+		{
 			return fp + "/";
+		}
 	}
 }

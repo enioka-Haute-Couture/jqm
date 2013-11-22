@@ -117,7 +117,7 @@ class JqmEngine
 			server.stop();
 		} catch (Exception e)
 		{
-
+			jqmlogger.error(e);
 		}
 	}
 
