@@ -34,7 +34,8 @@ import javax.persistence.Table;
 @Table(name="Deliverable")
 public class Deliverable {
 
-	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	protected Integer id;
 	@Column(length=1000, name="filePath")
 	protected String filePath;

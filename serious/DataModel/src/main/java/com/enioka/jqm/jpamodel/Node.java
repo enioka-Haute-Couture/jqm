@@ -29,7 +29,8 @@ import javax.persistence.Table;
 @Table(name="Node")
 public class Node
 {
-	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
 	@Column(nullable=false, length=1000, name="listeningInterface")
 	private String listeningInterface;

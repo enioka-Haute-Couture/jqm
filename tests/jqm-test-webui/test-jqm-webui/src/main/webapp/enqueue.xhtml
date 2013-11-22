@@ -27,59 +27,63 @@
 
 <h:form>
 	<h1>Enqueue screen</h1>
-	        <h:form>
-	           <h:inputText value="#{jobDefBeans.cl}" />
-	           <h:commandButton value="Enqueue" action="enqueue" />
-	        </h:form>
-	         <h:form>
-	           <h:inputText value="#{jobDefCustom.cl}" />
-	           <h:commandButton value="Enqueue" action="enqueue" />
-	        </h:form>
-<!-- 	<h:dataTable value="#{jobDefBeans.jobs}" var="job" cellspacing="4" -->
-<!-- 		width="60%" rowClasses="eager,odd" headerClass="title"> -->
-<!-- 		<h:column> -->
-<!-- 			<f:facet name="header"> -->
-<!-- 				<h:outputText value="ID" /> -->
-<!-- 			</f:facet> -->
-<!-- 			<h:outputText value="#{job.j.id}" /> -->
-<!-- 		</h:column> -->
+<!-- 	        <h:form> -->
+<!-- 	           <h:inputText value="#{jobDefBeans.cl}" /> -->
+<!-- 	           <h:commandButton value="Enqueue" action="enqueue" /> -->
+<!-- 	        </h:form> -->
+<!-- 	         <h:form> -->
+<!-- 	           <h:inputText value="#{jobDefCustom.cl}" /> -->
+<!-- 	           <h:commandButton value="Enqueue" action="enqueue" /> -->
+<!-- 	        </h:form> -->
+<!-- <f:push> -->
+<!--         <f:ajax event="onPushUpdate" update="widgetID" listener="#{jobDefBeans.initJobInstanceBeans}" />  -->
+<!-- </f:push> -->
+	<h:dataTable value="#{jobDefBeans.jobs}" var="job" cellspacing="4"
+		width="60%" rowClasses="eager,odd" headerClass="title">
+		<h:column>
+			<f:facet name="header">
+				<h:outputText value="ID" />
+			</f:facet>
+			<h:outputText value="#{job.j.id}" />
+		</h:column>
 
-<!-- 		<h:column> -->
-<!-- 			<f:facet name="header"> -->
-<!-- 				<h:outputText value="Name" /> -->
-<!-- 			</f:facet> -->
-<!-- 			<h:outputText value="job.getJ().getApplicationName()" /> -->
-<!-- 		</h:column> -->
+		<h:column>
+			<f:facet name="header">
+				<h:outputText value="Name" />
+			</f:facet>
+			<h:outputText value="#{job.j.applicationName}" />
+		</h:column>
 
-<!-- 		<h:column> -->
-<!-- 			<f:facet name="header"> -->
-<!-- 				<h:outputText value="Description" /> -->
-<!-- 			</f:facet> -->
-<!-- 			<h:outputText value="#{job.j.description}" /> -->
-<!-- 		</h:column> -->
+		<h:column>
+			<f:facet name="header">
+				<h:outputText value="Description" />
+			</f:facet>
+<!-- 			<h:commandLink value="#{job.j.description}" action="#{jobDefBeans.update}" rendered="#{job.j.description}"/> -->
+			<h:outputText value="#{job.j.description}" />
+		</h:column>
 
-<!-- 		<h:column> -->
-<!-- 			<f:facet name="header"> -->
-<!-- 				<h:outputText value="FilePath" /> -->
-<!-- 			</f:facet> -->
-<!-- 			<h:outputText value="#{job.j.filePath}" /> -->
-<!-- 		</h:column> -->
+		<h:column>
+			<f:facet name="header">
+				<h:outputText value="FilePath" />
+			</f:facet>
+			<h:outputText value="#{job.j.filePath}" />
+		</h:column>
 
-<!-- 		<h:column> -->
-<!-- 			<f:facet name="header"> -->
-<!-- 				<h:outputText value="Queue" /> -->
-<!-- 			</f:facet> -->
-<!-- 			<h:outputText value="#{job.j.queue.name}" /> -->
-<!-- 		</h:column> -->
+		<h:column>
+			<f:facet name="header">
+				<h:outputText value="Queue" />
+			</f:facet>
+			<h:outputText value="#{job.j.queue.name}" />
+		</h:column>
 
-<!-- 		<h:column> -->
-<!-- 			<f:facet name="header"> -->
-<!-- 				<h:outputText value="Enqueue" /> -->
-<!-- 			</f:facet> -->
-<!-- 			<h:selectBooleanCheckbox value="#{job.enqueue}" /> -->
-<!-- 		</h:column> -->
+		<h:column>
+			<f:facet name="header">
+				<h:outputText value="Enqueue" />
+			</f:facet>
+			<h:selectBooleanCheckbox value="#{job.enqueue}" />
+		</h:column>
 
-<!-- 	</h:dataTable> -->
+	</h:dataTable>
 	
 	<p>
 		<h:commandButton value="Enqueue selected items"

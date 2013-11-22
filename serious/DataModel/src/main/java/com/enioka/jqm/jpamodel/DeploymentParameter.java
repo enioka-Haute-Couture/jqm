@@ -32,7 +32,8 @@ import javax.persistence.Table;
 @Table(name="DeploymentParameter")
 public class DeploymentParameter
 {
-	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
 	@Column(nullable=true, name="classId")
 	private Integer classId;

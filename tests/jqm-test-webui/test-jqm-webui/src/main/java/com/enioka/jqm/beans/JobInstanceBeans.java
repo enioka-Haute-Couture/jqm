@@ -4,15 +4,17 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.RequestScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import com.enioka.jqm.jpamodel.JobInstance;
+
 @ManagedBean
-@ApplicationScoped
-public class JobInstanceBeans implements Serializable {
+@RequestScoped
+public class JobInstanceBeans extends JobInstance implements Serializable {
 
 	/**
 	 * 
@@ -47,6 +49,14 @@ public class JobInstanceBeans implements Serializable {
 
 	public List<com.enioka.jqm.jpamodel.JobInstance> getJobs() {
 
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+		EntityManager em = emf.createEntityManager();
+
+		jobs = em.createQuery("SELECT j FROM JobInstance j",
+				com.enioka.jqm.jpamodel.JobInstance.class).getResultList();
+
+		em.close();
+		emf.close();
 		return jobs;
 	}
 

@@ -35,7 +35,8 @@ import javax.persistence.Table;
 public class Message implements Serializable{
 
 	private static final long serialVersionUID = 1234354709423602792L;
-	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
 	@Column(length=1000, name="textMessage")
 	private String textMessage;

@@ -36,7 +36,8 @@ public class JobHistoryParameter implements Serializable{
 	 */
 	private static final long serialVersionUID = -667768580903076029L;
 
-	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
 	@Column(nullable=false, length=50, name="KEYNAME")
 	private String key;

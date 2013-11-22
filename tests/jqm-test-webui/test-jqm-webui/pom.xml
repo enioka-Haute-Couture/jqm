@@ -1,11 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>com.enioka.jqm</groupId>
   <artifactId>test-jqm-webui</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <packaging>war</packaging>
+  <packaging>ear</packaging>
 
   <name>test-jqm-webui</name>
 
@@ -27,15 +26,27 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
+    
+   <repository>
+    <id>central</id>
+    <url>http://repo1.maven.org/maven2/</url>
+  </repository>
 
   </repositories>
 
   <dependencies>
   
+   <dependency>
+    <groupId>com.enioka.jqm</groupId>
+    <artifactId>test-jqm-webui</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <type>war</type>
+  </dependency>
+  
   <dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
-			<version>4.2.7.Final</version>
+			<version>4.3.0.Beta5</version>
 		</dependency>
   
   	<dependency>
@@ -51,60 +62,11 @@
 		</dependency>
 
     <dependency>
-      <groupId>javax</groupId>
-      <artifactId>javaee-web-api</artifactId>
-      <version>6.0</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>javax.faces</groupId>
       <artifactId>jsf-api</artifactId>
       <version>2.1</version>
     </dependency>
-
-    <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>jsr250-api</artifactId>
-      <version>1.0</version>
-    </dependency>
     
-    <dependency>
-      <groupId>javax.enterprise</groupId>
-      <artifactId>cdi-api</artifactId>
-      <version>1.1-20130918</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>javax.faces</groupId>
-      <artifactId>jsf-impl</artifactId>
-      <version>1.2-NIGHTLY_20060227</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>jspapi</groupId>
-      <artifactId>jsp-api</artifactId>
-      <version>2.0</version>
-    </dependency>
-
-<dependency>
-    <groupId>com.sun.faces</groupId>
-    <artifactId>mojarra-jsf-impl</artifactId>
-    <version>2.0.0-b04</version>
-</dependency>
-
-<dependency>
-    <groupId>com.sun.faces</groupId>
-    <artifactId>jsf-impl</artifactId>
-    <version>2.2.4</version>
-</dependency>
-    
-    <dependency>
-    <groupId>tomcat</groupId>
-    <artifactId>servlet-api</artifactId>
-    <version>5.5.23</version>
-</dependency>
-
   </dependencies>
 
   <build>
@@ -155,6 +117,7 @@
                                                                    </compilerArguments>
                                                                  </configuration>
                                                                </plugin>
+                                                               
                                                                <plugin>
                                                                  <groupId>org.apache.maven.plugins</groupId>
                                                                  <artifactId>maven-war-plugin</artifactId>
@@ -163,6 +126,7 @@
                                                                    <failOnMissingWebXml>false</failOnMissingWebXml>
                                                                  </configuration>
                                                                </plugin>
+                                                               
                                                                <plugin>
                                                                  <groupId>org.apache.maven.plugins</groupId>
                                                                  <artifactId>maven-dependency-plugin</artifactId>
@@ -188,6 +152,23 @@
                                                                    </execution>
                                                                  </executions>
                                                                </plugin>
+                                                               
+                                                               <plugin>
+ 
+ <groupId>org.apache.maven.plugins</groupId>
+ <artifactId>maven-ear-plugin</artifactId>
+ <version>2.4.2</version>
+ <configuration>
+ <webModule>
+ <groupId>com.enioka.jqm</groupId>
+ <artifactId>test-jqm-webui</artifactId>
+ <version>0.0.1-SNAPSHOT</version>
+    <type>ejb</type>
+ </webModule>
+ <defaultLibBundleDir>lib</defaultLibBundleDir>
+ </configuration>
+ </plugin>
+                                                               
                                                              </plugins>
                                                            </pluginManagement>
                                                          </build>
