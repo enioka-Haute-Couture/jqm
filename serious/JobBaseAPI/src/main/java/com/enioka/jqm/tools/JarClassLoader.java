@@ -121,53 +121,48 @@ class JarClassLoader extends URLClassLoader
 		}
 	}
 
-	Object invokeMain(JobInstance job, String defaultConnection, ClassLoader old, EntityManager em)
+	Object invokeMain(JobInstance job, String defaultConnection, ClassLoader old, EntityManager em) throws Exception
 	{
+		String classQualifiedName = job.getJd().getJavaClassName();
+		jqmlogger.debug("Trying to load class " + classQualifiedName);
+		@SuppressWarnings("rawtypes")
+		Class c = null;
 		try
 		{
-			String classQualifiedName = job.getJd().getJavaClassName();
-			jqmlogger.debug("Trying to load class " + classQualifiedName);
-			Class c = null;
-			try
-			{
-				c = loadClass(classQualifiedName);
-			} catch (Exception e)
-			{
-				jqmlogger.error("Could not load class", e);
-				throw e;
-			}
-			jqmlogger.debug("Class " + classQualifiedName + " was correctly loaded");
-
-			Object o = c.newInstance();
-
-			try
-			{
-				Method start = c.getMethod("start", null);
-				Method getParameters = c.getMethod("getParameters", null);
-				Method getdefaultConnect = c.getMethod("setDefaultConnect", String.class);
-				Link l = new Link(old, job.getId(), em);
-				Method getMyEngine = c.getMethod("setMyEngine", Object.class);
-				getdefaultConnect.invoke(o, defaultConnection);
-				getMyEngine.invoke(o, l);
-
-				Map<String, String> params = (Map<String, String>) getParameters.invoke(o, null);
-				for (JobParameter i : job.getParameters())
-				{
-					jqmlogger.debug("Job has parameter " + i.getKey() + " - " + i.getValue());
-					params.put(i.getKey(), i.getValue());
-				}
-
-				start.invoke(o, null);
-			} catch (Exception e)
-			{
-				jqmlogger.error("Dynamic code error: ", e);
-				throw e;
-			}
-			return o;
+			c = loadClass(classQualifiedName);
+			jqmlogger.debug("toto");
 		} catch (Exception e)
 		{
-			e.printStackTrace();
+			jqmlogger.error("Could not load class", e);
+			throw e;
 		}
-		return null;
+		jqmlogger.debug("Class " + classQualifiedName + " was correctly loaded");
+
+		Object o = c.newInstance();
+
+		try
+		{
+			Method start = c.getMethod("start", null);
+			Method getParameters = c.getMethod("getParameters", null);
+			Method getdefaultConnect = c.getMethod("setDefaultConnect", String.class);
+			Link l = new Link(old, job.getId(), em);
+			Method getMyEngine = c.getMethod("setMyEngine", Object.class);
+			getdefaultConnect.invoke(o, defaultConnection);
+			getMyEngine.invoke(o, l);
+
+			Map<String, String> params = (Map<String, String>) getParameters.invoke(o, null);
+			for (JobParameter i : job.getParameters())
+			{
+				jqmlogger.debug("Job has parameter " + i.getKey() + " - " + i.getValue());
+				params.put(i.getKey(), i.getValue());
+			}
+
+			start.invoke(o, null);
+		} catch (Exception e)
+		{
+			jqmlogger.error("Dynamic code error: ", e);
+			throw e;
+		}
+		return o;
 	}
 }

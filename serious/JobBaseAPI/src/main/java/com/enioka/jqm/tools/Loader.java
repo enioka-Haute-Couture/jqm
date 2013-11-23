@@ -58,7 +58,6 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 import com.jcabi.aether.Aether;
 
@@ -109,6 +108,7 @@ class Loader implements Runnable
 	// ExtractJar
 	void extractJar(String jarFile, String destDir)
 	{
+		jqmlogger.debug("jar: " + jarFile);
 		try
 		{
 			JarFile jar = new JarFile(jarFile);
@@ -119,9 +119,11 @@ class Loader implements Runnable
 			while (enumm.hasMoreElements())
 			{
 				JarEntry file = enumm.nextElement();
+				jqmlogger.debug("file: " + file.getName());
 				File f = new File(destDir + File.separator + file.getName());
 				if (file.isDirectory())
 				{ // if its a directory, create it
+					jqmlogger.debug("The actual file is a directory");
 					f.mkdir();
 					continue;
 				}
@@ -133,11 +135,9 @@ class Loader implements Runnable
 				}
 				fos.close();
 				is.close();
-				jar.close();
 			}
 		} catch (IOException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -203,31 +203,35 @@ class Loader implements Runnable
 
 				jqmlogger.debug("pomdebug: " + res);
 
-				InputStream is = new FileInputStream(res + "/pom.xml");
-				OutputStream os = new FileOutputStream(CheckFilePath.fixFilePath(node.getRepo()
-						+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-						+ "pom.xml");
-
-				int r = 0;
-				byte[] bytes = new byte[1024];
-
-				while ((r = is.read(bytes)) != -1)
+				if (res != null)
 				{
-					os.write(bytes, 0, r);
+					InputStream is = new FileInputStream(res + "/pom.xml");
+					OutputStream os = new FileOutputStream(CheckFilePath.fixFilePath(node.getRepo()
+							+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
+							+ "pom.xml");
+
+					int r = 0;
+					byte[] bytes = new byte[1024];
+
+					while ((r = is.read(bytes)) != -1)
+					{
+						os.write(bytes, 0, r);
+					}
+
+					is.close();
+					os.close();
+
+					pomFile = new File(CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()))
+							+ "pom.xml");
 				}
-
-				is.close();
-				os.close();
-
-				pomFile = new File(CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-						+ "pom.xml");
 			}
 			if (!pomFile.exists())
 			{
+				jqmlogger.debug("POM doesn't exist, checking a lib directory in the Jar file");
 				String env = CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()));
-				findFile("lib", new File(env + "tmp/META-INF/maven/"));
+				findFile("lib", new File(env + "tmp/"));
 
-				File dir = new File(res);
+				File dir = new File(lib);
 
 				if (!dir.exists())
 				{
@@ -239,14 +243,10 @@ class Loader implements Runnable
 				libUrls = new URL[files.length];
 				for (int i = 0; i < files.length; i++)
 				{
+					jqmlogger.debug("Jars in lib/ : " + files[i].toURI().toURL());
 					libUrls[i] = files[i].toURI().toURL();
 				}
 			}
-
-			// The temporary file containing the extract jar must be deleted
-			FileUtils.deleteDirectory(new File(CheckFilePath.fixFilePath(node.getRepo()
-					+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-					+ "tmp"));
 
 			// Update of the job status
 			em.getTransaction().begin();
@@ -276,6 +276,7 @@ class Loader implements Runnable
 			boolean isInCache = true;
 			if (!cache.containsKey(job.getJd().getApplicationName()))
 			{
+				isInCache = false;
 				if (libUrls == null)
 				{
 					Dependencies dependencies = new Dependencies(pomFile.getAbsolutePath());
@@ -297,20 +298,19 @@ class Loader implements Runnable
 						ii++;
 					}
 
-					isInCache = false;
 					Collection<RemoteRepository> remotes = Arrays.asList(rr);
 
 					deps = new ArrayList<Artifact>();
 					for (int i = 0; i < dependencies.getList().size(); i++)
 					{
-						jqmlogger.info("Resolving Maven dep " + dependencies.getList().get(i));
+						jqmlogger.debug("Resolving Maven dep " + dependencies.getList().get(i));
 						deps.addAll(new Aether(remotes, local).resolve(new DefaultArtifact(dependencies.getList().get(i)), "compile"));
 					}
 
 					for (Artifact artifact : deps)
 					{
 						tmp.add(artifact.getFile().toURI().toURL());
-						jqmlogger.info("Artifact: " + artifact.getFile().toURI().toURL());
+						jqmlogger.debug("Artifact: " + artifact.getFile().toURI().toURL());
 					}
 				}
 			}
@@ -330,8 +330,13 @@ class Loader implements Runnable
 				urls = libUrls;
 			}
 
+			jqmlogger.info("isInCache " + isInCache);
 			if (!isInCache)
 			{
+				for (URL url : urls)
+				{
+					jqmlogger.debug("Urls: " + url.getPath());
+				}
 				jobClassLoader = new JarClassLoader(jars, urls);
 				cache.put(job.getJd().getApplicationName(), urls);
 			}
@@ -405,26 +410,7 @@ class Loader implements Runnable
 				h = em.merge(h);
 				em.getTransaction().commit();
 			}
-			else
-			{
-				em.getTransaction().begin();
-				job.setState("KILLED");
-				job = em.merge(job);
-				em.getTransaction().commit();
-				jqmlogger.debug("In the Loader --> KILLED: HISTORY: " + h.getId());
-				em.refresh(em.merge(h));
 
-				em.getTransaction().begin();
-				Message m = new Message();
-				m.setHistory(h);
-				m.setTextMessage("Status updated: RUNNING");
-				em.persist(m);
-				em.getTransaction().commit();
-
-				em.getTransaction().begin();
-				h.setReturnedValue(0);
-				em.getTransaction().commit();
-			}
 			em.getEntityManagerFactory().getCache().evictAll();
 			em.clear();
 			em.refresh(em.merge(job));
@@ -460,6 +446,11 @@ class Loader implements Runnable
 					em.getTransaction().commit();
 				}
 			}
+
+			// The temporary file containing the extract jar must be deleted
+			FileUtils.deleteDirectory(new File(CheckFilePath.fixFilePath(node.getRepo()
+					+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
+					+ "tmp"));
 
 			jqmlogger.debug("End of loader. Thread will now end");
 			jqmlogger.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
