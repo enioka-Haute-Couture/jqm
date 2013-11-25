@@ -38,13 +38,13 @@
 									<overWrite>true</overWrite>
 									<destFileName>${project.artifactId}.jar</destFileName>
 								</artifactItem>
-								<artifactItem>
+                                <artifactItem>
 									<groupId>${project.groupId}</groupId>
 									<artifactId>${project.artifactId}</artifactId>
 									<version>${project.version}</version>
-									<type>pom</type>
+									<type>${project.packaging}</type>
 									<overWrite>true</overWrite>
-									<destFileName>pom.xml</destFileName>
+									<destFileName>pom</destFileName>
 								</artifactItem>
 							</artifactItems>
 							<outputDirectory>../../serious/JobBaseAPI/testprojects/${project.artifactId}</outputDirectory>

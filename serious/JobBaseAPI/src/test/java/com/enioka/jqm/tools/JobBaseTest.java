@@ -399,6 +399,15 @@ public class JobBaseTest
 		f1.delete();
 		f2.delete();
 		f3.delete();
+
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+
+		Assert.assertEquals(3, res.size());
+		for (JobInstance jobInstance : res)
+		{
+			Assert.assertEquals("ENDED", jobInstance.getState());
+		}
 		// Assert.assertEquals(, tmp.get(0).getFilePath());
 	}
 
@@ -1228,6 +1237,44 @@ public class JobBaseTest
 		engine1.start(new String[] { "localhost" });
 
 		Thread.sleep(6000);
+
+		engine1.stop();
+
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+
+		Assert.assertEquals(1, res.size());
+		Assert.assertEquals("ENDED", res.get(0).getState());
+	}
+
+	@Test
+	public void testPomOnlyInJar2() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testPomOnlyInJar2");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		@SuppressWarnings("unused")
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemavennopom/",
+				"jqm-test-datetimemavennopom/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+				"ModuleMachin", "other", "other", true, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+
+		@SuppressWarnings("unused")
+		int i = Dispatcher.enQueue(j);
+
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+
+		Thread.sleep(4000);
 
 		engine1.stop();
 

@@ -94,17 +94,6 @@ class Dependencies
 	}
 
 	/**
-	 * debug method
-	 */
-	void print()
-	{
-		for (int i = 0; i < list.size(); i++)
-		{
-			jqmlogger.debug("Dependency " + i + ": " + list.get(i));
-		}
-	}
-
-	/**
 	 * @return the list
 	 */
 	List<String> getList()

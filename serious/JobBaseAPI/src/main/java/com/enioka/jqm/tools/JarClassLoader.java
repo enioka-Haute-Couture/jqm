@@ -36,15 +36,10 @@ package com.enioka.jqm.tools;
  * limitations under the License.
  */
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Map;
-import java.util.jar.Attributes;
 
 import javax.persistence.EntityManager;
 
@@ -57,13 +52,6 @@ class JarClassLoader extends URLClassLoader
 {
 	private static Logger jqmlogger = Logger.getLogger(JarClassLoader.class);
 	private URL jarUrl;
-
-	JarClassLoader(URL url)
-	{
-
-		super(new URL[] { url });
-		this.jarUrl = url;
-	}
 
 	private static URL[] addUrls(URL url, URL[] libs)
 	{
@@ -82,43 +70,6 @@ class JarClassLoader extends URLClassLoader
 
 		super(addUrls(url, libs), null);
 		this.jarUrl = url;
-	}
-
-	JarClassLoader(URL url, URL[] libs, ClassLoader parent)
-	{
-
-		super(addUrls(url, libs), parent);
-		this.jarUrl = url;
-	}
-
-	String getMainClassName() throws IOException
-	{
-
-		URL u = new URL("jar", "", jarUrl + "!/");
-		JarURLConnection uc = (JarURLConnection) u.openConnection();
-		Attributes attr = uc.getMainAttributes();
-		return attr != null ? attr.getValue(Attributes.Name.MAIN_CLASS) : null;
-	}
-
-	void invokeClass(String name, String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException
-	{
-		@SuppressWarnings("rawtypes")
-		Class c = loadClass(name);
-		@SuppressWarnings("unchecked")
-		Method m = c.getMethod("main", new Class[] { args.getClass() });
-		m.setAccessible(true);
-		int mods = m.getModifiers();
-		if (m.getReturnType() != void.class || !Modifier.isStatic(mods) || !Modifier.isPublic(mods))
-		{
-			throw new NoSuchMethodException("main");
-		}
-		try
-		{
-			m.invoke(null, new Object[] { args });
-		} catch (IllegalAccessException e)
-		{
-			// This should not happen, as we have disabled access checks
-		}
 	}
 
 	Object invokeMain(JobInstance job, String defaultConnection, ClassLoader old, EntityManager em) throws Exception

@@ -179,6 +179,7 @@ class Polling implements Runnable
 
 			} catch (InterruptedException e)
 			{
+				jqmlogger.debug(e);
 			}
 		}
 	}
@@ -196,10 +197,5 @@ class Polling implements Runnable
 	public DeploymentParameter getDp()
 	{
 		return dp;
-	}
-
-	public void setDp(DeploymentParameter dp)
-	{
-		this.dp = dp;
 	}
 }

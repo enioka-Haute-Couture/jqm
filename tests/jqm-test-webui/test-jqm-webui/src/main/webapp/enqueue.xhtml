@@ -89,6 +89,10 @@
 		<h:commandButton value="Enqueue selected items"
 			action="#{jobDefBeans.enqueue}" />
 	</p>
-	
+
+	<h:commandButton action="#{jobDefBeans.update}">
+		<f:ajax render="job.j.description" />
+	</h:commandButton>
+
 </h:form>
 </html>

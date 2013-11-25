@@ -109,9 +109,12 @@ class Loader implements Runnable
 	void extractJar(String jarFile, String destDir)
 	{
 		jqmlogger.debug("jar: " + jarFile);
+		JarFile jar = null;
+		InputStream is = null;
+		FileOutputStream fos = null;
 		try
 		{
-			JarFile jar = new JarFile(jarFile);
+			jar = new JarFile(jarFile);
 			File tmp = new File(destDir + "tmp/");
 			tmp.mkdir();
 			destDir += "tmp/";
@@ -127,8 +130,8 @@ class Loader implements Runnable
 					f.mkdir();
 					continue;
 				}
-				InputStream is = jar.getInputStream(file); // get the input stream
-				FileOutputStream fos = new FileOutputStream(f);
+				is = jar.getInputStream(file); // get the input stream
+				fos = new FileOutputStream(f);
 				while (is.available() > 0)
 				{ // write contents of 'is' to 'fos'
 					fos.write(is.read());
@@ -138,7 +141,21 @@ class Loader implements Runnable
 			}
 		} catch (IOException e)
 		{
-			e.printStackTrace();
+			try
+			{
+				if (fos != null)
+				{
+					fos.close();
+				}
+				if (is != null)
+				{
+					is.close();
+				}
+
+			} catch (IOException e1)
+			{
+				e1.printStackTrace();
+			}
 		}
 
 	}
@@ -277,7 +294,7 @@ class Loader implements Runnable
 			if (!cache.containsKey(job.getJd().getApplicationName()))
 			{
 				isInCache = false;
-				if (libUrls == null)
+				if (libUrls == null && pomFile.exists())
 				{
 					Dependencies dependencies = new Dependencies(pomFile.getAbsolutePath());
 
@@ -447,10 +464,16 @@ class Loader implements Runnable
 				}
 			}
 
+			Long k = (Long) em
+					.createQuery("SELECT COUNT(j) FROM JobInstance j WHERE j.jd = :jd AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
+					.setParameter("jd", job.getJd()).getSingleResult();
 			// The temporary file containing the extract jar must be deleted
-			FileUtils.deleteDirectory(new File(CheckFilePath.fixFilePath(node.getRepo()
-					+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-					+ "tmp"));
+			if (k == 0)
+			{
+				FileUtils.deleteDirectory(new File(CheckFilePath.fixFilePath(node.getRepo()
+						+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
+						+ "tmp"));
+			}
 
 			jqmlogger.debug("End of loader. Thread will now end");
 			jqmlogger.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
@@ -513,6 +536,7 @@ class Loader implements Runnable
 				em.close();
 			} catch (Exception e)
 			{
+				jqmlogger.debug("");
 			}
 		}
 
