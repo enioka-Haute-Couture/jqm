@@ -112,7 +112,7 @@ class Polling implements Runnable
 				{
 					break;
 				}
-				dp = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.id = :l ", DeploymentParameter.class)
+				dp = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.id = :l", DeploymentParameter.class)
 						.setParameter("l", dp.getId()).getSingleResult();
 				Thread.sleep(dp.getPollingInterval());
 				if (!run)
@@ -179,41 +179,32 @@ class Polling implements Runnable
 				{
 					jqmlogger.debug("Current node must be stop: " + dp.getNode().isStop());
 
-					if (n > 0)
+					if (n == 0)
 					{
-						continue;
-					}
-					else if (n == 0)
-					{
-						em.getTransaction().begin();
-						Message m = new Message();
-
-						m.setTextMessage("Status updated: ATTRIBUTED");
-						m.setHistory(h);
-
-						em.lock(ji, LockModeType.PESSIMISTIC_WRITE);
-						ji.setState("ATTRIBUTED");
-						ji = em.merge(ji);
-						em.persist(m);
-						em.getTransaction().commit();
-
 						tp.run(ji, this, true);
 					}
+					else if (n > 0)
+					{
+						jqmlogger.debug("Waiting the end of " + n + " job(s)");
+						continue;
+					}
 				}
+				else
+				{
+					em.getTransaction().begin();
+					Message m = new Message();
 
-				em.getTransaction().begin();
-				Message m = new Message();
+					m.setTextMessage("Status updated: ATTRIBUTED");
+					m.setHistory(h);
 
-				m.setTextMessage("Status updated: ATTRIBUTED");
-				m.setHistory(h);
+					em.lock(ji, LockModeType.PESSIMISTIC_WRITE);
+					ji.setState("ATTRIBUTED");
+					ji = em.merge(ji);
+					em.persist(m);
+					em.getTransaction().commit();
 
-				em.lock(ji, LockModeType.PESSIMISTIC_WRITE);
-				ji.setState("ATTRIBUTED");
-				ji = em.merge(ji);
-				em.persist(m);
-				em.getTransaction().commit();
-
-				tp.run(ji, this, false);
+					tp.run(ji, this, false);
+				}
 
 				jqmlogger.debug("End of poller loop  on queue " + this.queue.getName());
 

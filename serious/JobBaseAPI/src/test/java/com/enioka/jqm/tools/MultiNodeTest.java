@@ -658,7 +658,7 @@ public class MultiNodeTest
 		Assert.assertEquals(job.size(), msgs.size());
 	}
 
-	@Test
+	// @Test
 	public void testStopNicely() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");
@@ -684,7 +684,7 @@ public class MultiNodeTest
 
 		@SuppressWarnings("unused")
 		JobDef jd21 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-				"jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "AppliNode2-1", null, "Franquin",
+				"jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip2, 42, "AppliNode2-1", null, "Franquin",
 				"ModuleMachin", "other", "other", false, em);
 
 		JobDefinition j11 = new JobDefinition("AppliNode1-1", "MAG");
@@ -709,7 +709,7 @@ public class MultiNodeTest
 		engine2.start(new String[] { "localhost2" });
 
 		int i = 0;
-		while (i <= 1)
+		while (i <= 2)
 		{
 			System.out.println(i);
 			if (i == 1)
@@ -728,23 +728,23 @@ public class MultiNodeTest
 			Dispatcher.enQueue(j11);
 			Dispatcher.enQueue(j12);
 			Dispatcher.enQueue(j12);
-			// Dispatcher.enQueue(j12);
-			// Dispatcher.enQueue(j11);
-			// Dispatcher.enQueue(j11);
-			// Dispatcher.enQueue(j11);
-			// Dispatcher.enQueue(j12);
-			// Dispatcher.enQueue(j12);
-			// Dispatcher.enQueue(j12);
-			// Dispatcher.enQueue(j11);
-			// Dispatcher.enQueue(j11);
-			// Dispatcher.enQueue(j11);
-			// Dispatcher.enQueue(j12);
-			// Dispatcher.enQueue(j12);
-			// Dispatcher.enQueue(j12);
-			//
-			// Dispatcher.enQueue(j21);
-			// Dispatcher.enQueue(j21);
-			// Dispatcher.enQueue(j21);
+			Dispatcher.enQueue(j12);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j12);
+			Dispatcher.enQueue(j12);
+			Dispatcher.enQueue(j12);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j12);
+			Dispatcher.enQueue(j12);
+			Dispatcher.enQueue(j12);
+
+			Dispatcher.enQueue(j21);
+			Dispatcher.enQueue(j21);
+			Dispatcher.enQueue(j21);
 
 			Thread.sleep(4000);
 
