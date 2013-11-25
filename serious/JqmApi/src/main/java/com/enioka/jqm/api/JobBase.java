@@ -19,6 +19,7 @@
 package com.enioka.jqm.api;
 
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -99,14 +100,43 @@ public class JobBase {
 		{
 			Class c = myEngine.getClass();
 			Method getMyEngine = c.getMethod("sendProgress", Integer.class);
-			Method setRunning = c.getMethod("setRunning", boolean.class);
-			setRunning.invoke(myEngine, true);
 			getMyEngine.invoke(myEngine, msg);
 
 		} catch (Exception e)
 		{
 			e.printStackTrace();
 		}
+	}
+
+	public int enQueue(JobDefinition jd)
+	{
+		try
+		{
+			Class c = myEngine.getClass();
+			Method getMyEngine = c.getMethod("enQueue", JobDefinition.class);
+			return (Integer) getMyEngine.invoke(myEngine, jd);
+		} catch (SecurityException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return 0;
 	}
 
 	// ---------

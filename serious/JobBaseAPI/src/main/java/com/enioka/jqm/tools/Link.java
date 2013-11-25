@@ -4,6 +4,8 @@ import javax.persistence.EntityManager;
 
 import org.apache.log4j.Logger;
 
+import com.enioka.jqm.api.Dispatcher;
+import com.enioka.jqm.api.JobDefinition;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
@@ -14,7 +16,6 @@ public class Link
 	private ClassLoader old = null;
 	private EntityManager em = null;
 	private Integer id = null;
-	private volatile boolean running = true;
 
 	public Link(ClassLoader old, Integer id, EntityManager em)
 	{
@@ -81,13 +82,8 @@ public class Link
 		jqmlogger.debug("Actual progression: " + j.getProgress());
 	}
 
-	public boolean isRunning()
+	public int enQueue(JobDefinition jd)
 	{
-		return running;
-	}
-
-	public void setRunning(boolean running)
-	{
-		this.running = running;
+		return Dispatcher.enQueue(jd);
 	}
 }

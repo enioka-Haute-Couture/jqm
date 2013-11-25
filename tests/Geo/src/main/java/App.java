@@ -1,4 +1,3 @@
-import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobBase;
 import com.enioka.jqm.api.JobDefinition;
 
@@ -15,10 +14,10 @@ public class App extends JobBase{
 
 		sendMsg("launching first job");
 		System.out.println("LAUNCHING FIRST JOB");
-		Dispatcher.enQueue(jd);
+		enQueue(jd);
 		sendMsg("launching second job");
 		System.out.println("LAUNCHING SECOND JOB");
-		Dispatcher.enQueue(jd);
+		enQueue(jd);
 		System.out.println("ENDING GEOJOB");
 	}
 }
