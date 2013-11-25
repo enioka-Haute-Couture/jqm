@@ -380,8 +380,10 @@ public class JobBaseTest
 		JqmEngine engine1 = new JqmEngine();
 		engine1.start(new String[] { "localhost" });
 
-		Thread.sleep(20000);
+		Thread.sleep(10000);
 		engine1.stop();
+
+		TestHelpers.printJobInstanceTable();
 
 		File f1 = new File("./testprojects/jqm-test-deliverable/JobGenADeliverable.txt");
 		File f2 = new File("./testprojects/jqm-test-deliverable/JobGenADeliverable2.txt");

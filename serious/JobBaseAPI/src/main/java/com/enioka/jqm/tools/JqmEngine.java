@@ -253,4 +253,19 @@ class JqmEngine
 		em.getTransaction().commit();
 		return n;
 	}
+
+	public void removeNode(Node n)
+	{
+		dps.remove(n);
+	}
+
+	public List<DeploymentParameter> getDps()
+	{
+		return dps;
+	}
+
+	public void setDps(List<DeploymentParameter> dps)
+	{
+		this.dps = dps;
+	}
 }

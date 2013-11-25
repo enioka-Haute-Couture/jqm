@@ -45,6 +45,10 @@ public class Node
 	@Column(nullable=false, name="repo")
 	private String repo;
 
+	// To stop nicely the current node
+	@Column(nullable=false, name="stop")
+	private boolean stop = false;
+
 	public Integer getId()
 	{
 		return id;
@@ -86,5 +90,13 @@ public class Node
 	public void setRepo(final String repo)
 	{
 		this.repo = repo;
+	}
+	public boolean isStop()
+	{
+		return stop;
+	}
+	public void setStop(boolean stop)
+	{
+		this.stop = stop;
 	}
 }

@@ -298,11 +298,6 @@ class Loader implements Runnable
 				{
 					Dependencies dependencies = new Dependencies(pomFile.getAbsolutePath());
 
-					if (pomCustom)
-					{
-						pomFile.delete();
-					}
-
 					List<GlobalParameter> repolist = em
 							.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
 							.setParameter("repo", "mavenRepo").getResultList();
@@ -470,9 +465,15 @@ class Loader implements Runnable
 			// The temporary file containing the extract jar must be deleted
 			if (k == 0)
 			{
+				jqmlogger.debug("The tmp directory will be removed");
 				FileUtils.deleteDirectory(new File(CheckFilePath.fixFilePath(node.getRepo()
 						+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
 						+ "tmp"));
+			}
+
+			if (pomCustom)
+			{
+				pomFile.delete();
 			}
 
 			jqmlogger.debug("End of loader. Thread will now end");

@@ -105,12 +105,15 @@ class Polling implements Runnable
 		{
 			em.getEntityManagerFactory().getCache().evictAll();
 			em.clear();
+			em.refresh(em.merge(dp.getNode()));
 			try
 			{
 				if (!run)
 				{
 					break;
 				}
+				dp = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.id = :l ", DeploymentParameter.class)
+						.setParameter("l", dp.getId()).getSingleResult();
 				Thread.sleep(dp.getPollingInterval());
 				if (!run)
 				{
@@ -147,15 +150,7 @@ class Polling implements Runnable
 						.setLockMode(LockModeType.PESSIMISTIC_READ).getSingleResult();
 
 				h.setNode(dp.getNode());
-				Message m = new Message();
 
-				m.setTextMessage("Status updated: ATTRIBUTED");
-				m.setHistory(h);
-
-				em.lock(ji, LockModeType.PESSIMISTIC_WRITE);
-				ji.setState("ATTRIBUTED");
-				ji = em.merge(ji);
-				em.persist(m);
 				em.getTransaction().commit();
 
 				em.getTransaction().begin();
@@ -173,7 +168,52 @@ class Polling implements Runnable
 				jqmlogger.debug("INCREMENTATION NBTHREAD: " + actualNbThread);
 				jqmlogger.debug("POLLING QUEUE: " + ji.getQueue().getId());
 
-				tp.run(ji, this);
+				jqmlogger.debug("Node corresponding to the current job must be stopped: " + t.getNode().isStop());
+
+				Long n = (Long) em
+						.createQuery(
+								"SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
+						.setParameter("node", t.getNode()).getSingleResult();
+
+				if (dp.getNode().isStop())
+				{
+					jqmlogger.debug("Current node must be stop: " + dp.getNode().isStop());
+
+					if (n > 0)
+					{
+						continue;
+					}
+					else if (n == 0)
+					{
+						em.getTransaction().begin();
+						Message m = new Message();
+
+						m.setTextMessage("Status updated: ATTRIBUTED");
+						m.setHistory(h);
+
+						em.lock(ji, LockModeType.PESSIMISTIC_WRITE);
+						ji.setState("ATTRIBUTED");
+						ji = em.merge(ji);
+						em.persist(m);
+						em.getTransaction().commit();
+
+						tp.run(ji, this, true);
+					}
+				}
+
+				em.getTransaction().begin();
+				Message m = new Message();
+
+				m.setTextMessage("Status updated: ATTRIBUTED");
+				m.setHistory(h);
+
+				em.lock(ji, LockModeType.PESSIMISTIC_WRITE);
+				ji.setState("ATTRIBUTED");
+				ji = em.merge(ji);
+				em.persist(m);
+				em.getTransaction().commit();
+
+				tp.run(ji, this, false);
 
 				jqmlogger.debug("End of poller loop  on queue " + this.queue.getName());
 

@@ -34,6 +34,7 @@ class ThreadPool
 	private int nbThread = 0;
 	private ExecutorService pool = null;
 	private Map<String, URL[]> cache = null;
+	private JqmEngine engine;
 
 	ThreadPool(Queue queue, int n, Map<String, URL[]> cache)
 	{
@@ -43,11 +44,19 @@ class ThreadPool
 		pool = Executors.newFixedThreadPool(nbThread);
 	}
 
-	void run(com.enioka.jqm.jpamodel.JobInstance ji, Polling p)
+	void run(com.enioka.jqm.jpamodel.JobInstance ji, Polling p, boolean stop)
 	{
 		jqmlogger.info("Job instance will be inserted inside a thread pool: " + ji.getId());
 		jqmlogger.debug("ThreadPool ActualNbThread: " + p.getActualNbThread());
-		pool.submit(new Loader(ji, cache, p));
+
+		if (stop)
+		{
+			System.exit(0);
+		}
+		else
+		{
+			pool.submit(new Loader(ji, cache, p));
+		}
 	}
 
 	Queue getQueue()

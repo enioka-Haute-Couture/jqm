@@ -36,6 +36,7 @@ import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
+import com.enioka.jqm.jpamodel.Node;
 
 public class MultiNodeTest
 {
@@ -285,7 +286,7 @@ public class MultiNodeTest
 				"ModuleMachin", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
-		JobDef jd12 = CreationTools.createJobDef(null, true, "App", jdargs, "DateTimeMaven/",
+		JobDef jd12 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
 				"jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qNormal, 42, "AppliNode1-2", null, "Franquin",
 				"ModuleMachin", "other", "other", false, em);
 
@@ -502,7 +503,7 @@ public class MultiNodeTest
 				"ModuleMachin", "other", "other", false, em);
 
 		@SuppressWarnings("unused")
-		JobDef jd12 = CreationTools.createJobDef(null, true, "App", jdargs, "DateTimeMaven/",
+		JobDef jd12 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
 				"jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qNormal, 42, "AppliNode1-2", null, "Franquin",
 				"ModuleMachin", "other", "other", false, em);
 
@@ -657,14 +658,104 @@ public class MultiNodeTest
 		Assert.assertEquals(job.size(), msgs.size());
 	}
 
-	public void testTwoFiboMultiNode()
+	@Test
+	public void testStopNicely() throws Exception
 	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testStopNicely");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
 
-	}
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
 
-	public void testMultiNode()
-	{
+		@SuppressWarnings("unused")
+		JobDef jd11 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
+				"jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "AppliNode1-1", null, "Franquin",
+				"ModuleMachin", "other", "other", false, em);
 
+		@SuppressWarnings("unused")
+		JobDef jd12 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
+				"jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qNormal, 42, "AppliNode1-2", null, "Franquin",
+				"ModuleMachin", "other", "other", false, em);
+
+		@SuppressWarnings("unused")
+		JobDef jd21 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
+				"jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "AppliNode2-1", null, "Franquin",
+				"ModuleMachin", "other", "other", false, em);
+
+		JobDefinition j11 = new JobDefinition("AppliNode1-1", "MAG");
+		JobDefinition j12 = new JobDefinition("AppliNode1-2", "MAG");
+
+		JobDefinition j21 = new JobDefinition("AppliNode2-1", "MAG");
+
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j11);
+		Dispatcher.enQueue(j12);
+		Dispatcher.enQueue(j12);
+		Dispatcher.enQueue(j12);
+
+		Dispatcher.enQueue(j21);
+		Dispatcher.enQueue(j21);
+		Dispatcher.enQueue(j21);
+
+		JqmEngine engine1 = new JqmEngine();
+		JqmEngine engine2 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+		engine2.start(new String[] { "localhost2" });
+
+		int i = 0;
+		while (i <= 1)
+		{
+			System.out.println(i);
+			if (i == 1)
+			{
+				em.getTransaction().begin();
+				em.createQuery("UPDATE Node n SET n.stop = 'true' WHERE n.listeningInterface = 'localhost'").executeUpdate();
+				em.getTransaction().commit();
+				em.clear();
+				Node n = (Node) em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = 'localhost'").getSingleResult();
+				jqmlogger.debug("Node stop updated: " + n.isStop());
+			}
+			TestHelpers.printJobInstanceTable();
+
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j11);
+			Dispatcher.enQueue(j12);
+			Dispatcher.enQueue(j12);
+			// Dispatcher.enQueue(j12);
+			// Dispatcher.enQueue(j11);
+			// Dispatcher.enQueue(j11);
+			// Dispatcher.enQueue(j11);
+			// Dispatcher.enQueue(j12);
+			// Dispatcher.enQueue(j12);
+			// Dispatcher.enQueue(j12);
+			// Dispatcher.enQueue(j11);
+			// Dispatcher.enQueue(j11);
+			// Dispatcher.enQueue(j11);
+			// Dispatcher.enQueue(j12);
+			// Dispatcher.enQueue(j12);
+			// Dispatcher.enQueue(j12);
+			//
+			// Dispatcher.enQueue(j21);
+			// Dispatcher.enQueue(j21);
+			// Dispatcher.enQueue(j21);
+
+			Thread.sleep(4000);
+
+			TestHelpers.printJobInstanceTable();
+			i++;
+		}
+
+		engine1.stop();
+		engine2.stop();
+		TestHelpers.printJobInstanceTable();
+		Assert.assertEquals(true, true);
 	}
 
 }
