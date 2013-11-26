@@ -113,8 +113,16 @@ public class JobBase {
 		try
 		{
 			Class c = myEngine.getClass();
-			Method getMyEngine = c.getMethod("enQueue", JobDefinition.class);
-			return (Integer) getMyEngine.invoke(myEngine, jd);
+			if (jd.getEmail() != null && jd.getEmail() != "")
+			{
+				Method getMyEngine = c.getMethod("enQueue", String.class, String.class, String.class, Map.class);
+				return (Integer) getMyEngine.invoke(myEngine, jd.getApplicationName(), jd.getUser(), jd.getEmail(), jd.getParameters());
+			}
+			else
+			{
+				Method getMyEngine = c.getMethod("enQueue", String.class, String.class, Map.class);
+				return (Integer) getMyEngine.invoke(myEngine, jd.getApplicationName(), jd.getUser(), jd.getParameters());
+			}
 		} catch (SecurityException e)
 		{
 			// TODO Auto-generated catch block

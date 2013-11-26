@@ -1,5 +1,7 @@
 package com.enioka.jqm.tools;
 
+import java.util.Map;
+
 import javax.persistence.EntityManager;
 
 import org.apache.log4j.Logger;
@@ -82,8 +84,19 @@ public class Link
 		jqmlogger.debug("Actual progression: " + j.getProgress());
 	}
 
-	public int enQueue(JobDefinition jd)
+	public int enQueue(String applicationName, String user, Map<String, String> p)
 	{
+		Thread.currentThread().setContextClassLoader(old);
+		JobDefinition jd = new JobDefinition(applicationName, user);
+		jd.setParameters(p);
+		return Dispatcher.enQueue(jd);
+	}
+
+	public int enQueue(String applicationName, String user, String email, Map<String, String> p)
+	{
+		Thread.currentThread().setContextClassLoader(old);
+		JobDefinition jd = new JobDefinition(applicationName, user, email);
+		jd.setParameters(p);
 		return Dispatcher.enQueue(jd);
 	}
 }
