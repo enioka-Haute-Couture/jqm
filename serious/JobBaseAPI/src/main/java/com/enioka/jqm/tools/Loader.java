@@ -115,9 +115,9 @@ class Loader implements Runnable
 		try
 		{
 			jar = new JarFile(jarFile);
-			File tmp = new File(destDir + "tmp/");
+			File tmp = new File(destDir + "tmp" + job.getId() + "/");
 			tmp.mkdir();
-			destDir += "tmp/";
+			destDir += "tmp" + job.getId() + "/";
 			Enumeration<JarEntry> enumm = jar.entries();
 			while (enumm.hasMoreElements())
 			{
@@ -163,6 +163,7 @@ class Loader implements Runnable
 	// FindFile
 	void findFile(String path, File f)
 	{
+		jqmlogger.debug("Trying to find the job in the directory: " + f);
 		File[] list = f.listFiles();
 		if (list != null)
 		{
@@ -216,7 +217,7 @@ class Loader implements Runnable
 				String env = CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()));
 
 				extractJar(jar.getAbsolutePath(), env);
-				findFile("pom.xml", new File(env + "tmp/META-INF/maven/"));
+				findFile("pom.xml", new File(env + "tmp" + job.getId() + "/" + "META-INF/maven/"));
 
 				jqmlogger.debug("pomdebug: " + res);
 
@@ -246,7 +247,7 @@ class Loader implements Runnable
 			{
 				jqmlogger.debug("POM doesn't exist, checking a lib directory in the Jar file");
 				String env = CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()));
-				findFile("lib", new File(env + "tmp/"));
+				findFile("lib", new File(env + "tmp" + job.getId() + "/"));
 
 				File dir = new File(lib);
 
@@ -459,17 +460,11 @@ class Loader implements Runnable
 				}
 			}
 
-			Long k = (Long) em
-					.createQuery("SELECT COUNT(j) FROM JobInstance j WHERE j.jd = :jd AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
-					.setParameter("jd", job.getJd()).getSingleResult();
 			// The temporary file containing the extract jar must be deleted
-			if (k == 0)
-			{
-				jqmlogger.debug("The tmp directory will be removed");
-				FileUtils.deleteDirectory(new File(CheckFilePath.fixFilePath(node.getRepo()
-						+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-						+ "tmp"));
-			}
+			jqmlogger.debug("The tmp directory will be removed");
+			FileUtils.deleteDirectory(new File(CheckFilePath.fixFilePath(node.getRepo()
+					+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
+					+ "tmp" + job.getId() + "/"));
 
 			if (pomCustom)
 			{
