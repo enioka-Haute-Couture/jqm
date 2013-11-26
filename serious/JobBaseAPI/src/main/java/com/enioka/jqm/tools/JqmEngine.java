@@ -254,11 +254,6 @@ class JqmEngine
 		return n;
 	}
 
-	public void removeNode(Node n)
-	{
-		dps.remove(n);
-	}
-
 	public List<DeploymentParameter> getDps()
 	{
 		return dps;
