@@ -33,12 +33,12 @@ import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
+import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 
 class Polling implements Runnable
 {
 	private static Logger jqmlogger = Logger.getLogger(Polling.class);
-	private List<JobInstance> job = new ArrayList<JobInstance>();
 	private DeploymentParameter dp = null;
 	private Queue queue = null;
 	private EntityManager em = Helpers.getNewEm();
@@ -48,7 +48,6 @@ class Polling implements Runnable
 
 	void stop()
 	{
-
 		run = false;
 	}
 
@@ -63,44 +62,56 @@ class Polling implements Runnable
 
 	protected JobInstance dequeue()
 	{
-		// Get the list of all jobInstance with the queue definded ordered by position
+		// Free room?
+		if (actualNbThread >= tp.getNbThread())
+		{
+			return null;
+		}
+
+		// Get the list of all jobInstance within the defined queue, ordered by position
 		em.getTransaction().begin();
-		TypedQuery<JobInstance> query = em.createQuery(
-		        "SELECT j FROM JobInstance j WHERE j.queue.name = :q AND j.state = :s ORDER BY j.position ASC", JobInstance.class);
-		query.setParameter("q", queue.getName()).setParameter("s", "SUBMITTED").setLockMode(LockModeType.PESSIMISTIC_WRITE);
-		job = query.getResultList();
+		TypedQuery<JobInstance> query = em
+		        .createQuery("SELECT j FROM JobInstance j WHERE j.queue = :q AND j.state = 'SUBMITTED' ORDER BY j.position ASC",
+		                JobInstance.class).setLockMode(LockModeType.PESSIMISTIC_WRITE).setParameter("q", queue);
+		List<JobInstance> availableJobs = query.getResultList();
 
-		if (!job.isEmpty())
+		for (JobInstance res : availableJobs)
 		{
-			job.get(0).setState("ATTRIBUTED");
+			// Highlander?
+			if (res.getJd().isHighlander() && !highlanderPollingMode(res, em))
+			{
+				continue;
+			}
+
+			// Reserve the JI for this engine
+			res.setState("ATTRIBUTED");
+			res.setNode(dp.getNode());
+
+			// Stop at the first suitable JI. Release the lock & update the JI which has been attributed to us.
+			em.getTransaction().commit();
+			return res;
 		}
+
+		// If here, no suitable JI is available
 		em.getTransaction().commit();
-
-		// Higlander?
-		if (job.size() > 0 && job.get(0).getJd().isHighlander() == true)
-		{
-			highlanderPollingMode(job.get(0), em);
-		}
-
-		return (!job.isEmpty()) ? job.get(0) : null;
+		return null;
 	}
 
-	protected void highlanderPollingMode(JobInstance currentJob, EntityManager em)
+	/**
+	 * 
+	 * @param jobToTest
+	 * @param em
+	 * @return true if job can be launched even if it is in highlander mode
+	 */
+	protected boolean highlanderPollingMode(JobInstance jobToTest, EntityManager em)
 	{
 		em.getTransaction().begin();
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
-		        .createQuery("SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.applicationName = :n", JobInstance.class)
-		        .setParameter("refid", currentJob.getId()).setParameter("n", currentJob.getJd().getApplicationName())
+		        .createQuery(
+		                "SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.id = :n AND (j.state = 'RUNNING' OR j.state = 'ATTRIBUTED')",
+		                JobInstance.class).setParameter("refid", jobToTest.getId()).setParameter("n", jobToTest.getJd().getId())
 		        .setLockMode(LockModeType.PESSIMISTIC_WRITE).getResultList();
-
-		for (JobInstance j : jobs)
-		{
-			if (j.getState().equals("ATTRIBUTED") || j.getState().equals("RUNNING"))
-			{
-				job = new ArrayList<JobInstance>();
-			}
-		}
-		em.getTransaction().commit();
+		return jobs.isEmpty();
 	}
 
 	@Override
@@ -108,11 +119,10 @@ class Polling implements Runnable
 	{
 		while (true)
 		{
-			em.getEntityManagerFactory().getCache().evictAll();
-			em.clear();
-			em.refresh(em.merge(dp.getNode()));
+			em = Helpers.getNewEm();
 			try
 			{
+				// Sleep for the required time (& exit if asked to)
 				if (!run)
 				{
 					break;
@@ -125,14 +135,28 @@ class Polling implements Runnable
 					break;
 				}
 
-				JobInstance ji = dequeue();
-
-				if (ji == null)
+				// Check if a stop order has been given
+				Node n = em.createQuery("SELECT n FROM Node n WHERE n.id = :l", Node.class).setParameter("l", dp.getNode().getId())
+				        .getSingleResult();
+				if (n.isStop())
 				{
+					jqmlogger.debug("Current node must be stopped: " + dp.getNode().isStop());
+
+					Long nbRunning = (Long) em
+					        .createQuery(
+					                "SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
+					        .setParameter("node", n).getSingleResult();
+					jqmlogger.debug("Waiting the end of " + nbRunning + " job(s)");
+					if (nbRunning == 0)
+					{
+						run = false;
+					}
 					continue;
 				}
 
-				if (actualNbThread >= tp.getNbThread())
+				// Get a JI to run
+				JobInstance ji = dequeue();
+				if (ji == null)
 				{
 					continue;
 				}
@@ -144,78 +168,41 @@ class Polling implements Runnable
 				jqmlogger.debug("JI that will be attributed: " + ji.getId());
 				jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
 
+				// Update the history object: the JI has been attributed
 				em.getTransaction().begin();
-
-				JobInstance tt = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :j", JobInstance.class)
-				        .setParameter("j", ji.getId()).getSingleResult();
-
-				tt.setNode(dp.getNode());
-
 				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", ji)
 				        .getSingleResult();
-
 				h.setNode(dp.getNode());
-
 				em.getTransaction().commit();
 
-				em.getTransaction().begin();
-				JobInstance t = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :j", JobInstance.class)
-				        .setParameter("j", ji.getId()).getSingleResult();
-				em.getTransaction().commit();
-
-				jqmlogger.debug("The job " + t.getId() + " have been updated with the node: " + t.getNode().getListeningInterface());
+				jqmlogger.debug("The job " + ji.getId() + " have been updated with the node: " + ji.getNode().getListeningInterface());
 				jqmlogger
 				        .debug("The job history " + h.getId() + " have been updated with the node: " + h.getNode().getListeningInterface());
 
+				// We will run this JI!
 				actualNbThread++;
 
 				jqmlogger.debug("TPS QUEUE: " + tp.getQueue().getId());
 				jqmlogger.debug("INCREMENTATION NBTHREAD: " + actualNbThread);
 				jqmlogger.debug("POLLING QUEUE: " + ji.getQueue().getId());
+				jqmlogger.debug("Should the node corresponding to the current job be stopped: " + ji.getNode().isStop());
 
-				jqmlogger.debug("Node corresponding to the current job must be stopped: " + t.getNode().isStop());
+				em.getTransaction().begin();
+				Message m = new Message();
+				m.setTextMessage("Status updated: ATTRIBUTED");
+				m.setHistory(h);
+				em.persist(m);
+				em.getTransaction().commit();
 
-				Long n = (Long) em
-				        .createQuery(
-				                "SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
-				        .setParameter("node", t.getNode()).getSingleResult();
+				// Run it
+				tp.run(ji, this, false);
 
-				if (dp.getNode().isStop())
-				{
-					jqmlogger.debug("Current node must be stop: " + dp.getNode().isStop());
-
-					if (n == 0)
-					{
-						tp.run(ji, this, true);
-					}
-					else if (n > 0)
-					{
-						jqmlogger.debug("Waiting the end of " + n + " job(s)");
-						continue;
-					}
-				}
-				else
-				{
-					em.getTransaction().begin();
-					Message m = new Message();
-
-					m.setTextMessage("Status updated: ATTRIBUTED");
-					m.setHistory(h);
-
-					// em.lock(ji, LockModeType.PESSIMISTIC_WRITE);
-					// ji.setState("ATTRIBUTED");
-					ji = em.merge(ji);
-					em.persist(m);
-					em.getTransaction().commit();
-
-					tp.run(ji, this, false);
-				}
-
+				// Done for this loop
 				jqmlogger.debug("End of poller loop  on queue " + this.queue.getName());
 
 			} catch (InterruptedException e)
 			{
-				jqmlogger.debug(e);
+				jqmlogger.warn(e);
 			}
 		}
 	}
@@ -225,9 +212,9 @@ class Polling implements Runnable
 		return actualNbThread;
 	}
 
-	void setActualNbThread(Integer actualNbThread)
+	synchronized void decreaseNbThread()
 	{
-		this.actualNbThread = actualNbThread;
+		this.actualNbThread--;
 	}
 
 	public DeploymentParameter getDp()

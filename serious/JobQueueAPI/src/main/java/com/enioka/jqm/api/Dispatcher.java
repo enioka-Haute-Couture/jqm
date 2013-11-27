@@ -217,96 +217,26 @@ public final class Dispatcher
 
 	private static List<JobParameter> overrideParameter(JobDef jdef, JobDefinition jdefinition, EntityManager em)
 	{
-		Map<String, String> m = jdefinition.getParameters();
 		List<JobParameter> res = new ArrayList<JobParameter>();
+		Map<String, String> resm = new HashMap<String, String>();
 
-		if (m == null)
+		// 1st: default parameters
+		for (JobDefParameter jp : jdef.getParameters())
 		{
-			m = new HashMap<String, String>();
+			resm.put(jp.getKey(), jp.getValue());
 		}
-		if (m.isEmpty())
+
+		// 2nd: overloads inside the user enqueue form.
+		resm.putAll(jdefinition.getParameters());
+
+		// 3rd: create the JobParameter objects
+		for (Entry<String, String> e : resm.entrySet())
 		{
-			jqmlogger.debug("Parameters no overriding");
-			if (jdef.getParameters() == null)
-			{
-				return res;
-			}
-
-			for (JobDefParameter i : jdef.getParameters())
-			{
-				res.add(createJobParameter(i.getKey(), i.getValue(), em));
-			}
-			return res;
+			res.add(createJobParameter(e.getKey(), e.getValue(), em));
 		}
-		else if (!m.isEmpty() && !jdef.getParameters().isEmpty())
-		{
-			jqmlogger.debug("Parameters overriding");
 
-			for (JobDefParameter i : jdef.getParameters())
-			{
-				res.add(createJobParameter(i.getKey(), i.getValue(), em));
-			}
-
-			for (int j = 0; j < res.size(); j++)
-			{
-				if (m.containsKey(res.get(j).getKey()))
-				{
-					for (Entry<String, String> e : m.entrySet())
-					{
-						String key = e.getKey();
-						String value = e.getValue();
-
-						if (res.get(j).getKey().equals(key))
-						{
-							res.remove(j);
-							res.add(createJobParameter(key, value, em));
-							break;
-						}
-					}
-				}
-			}
-
-			for (Entry<String, String> e : m.entrySet())
-			{
-				String key = e.getKey();
-				String value = e.getValue();
-
-				for (int j = 0; j < res.size(); j++)
-				{
-					boolean present = false;
-
-					if (res.get(j).getKey().equals(key))
-					{
-						present = true;
-					}
-
-					if (j == res.size() - 1 && !present)
-					{
-						res.add(createJobParameter(key, value, em));
-					}
-				}
-			}
-
-			// for (JobParameter j : res)
-			// {
-			// System.out.println("CONTENU PARAMETERS: " + j.getKey() + ", " + j.getValue());
-			// }
-			jqmlogger.debug("Parameters overrided will be returned: " + res.size());
-			return res;
-		}
-		else
-		{
-			jqmlogger.debug("Parameters will be SUPER overriding");
-			for (Entry<String, String> e : m.entrySet())
-			{
-				String key = e.getKey();
-				String value = e.getValue();
-
-				res.add(createJobParameter(key, value, em));
-			}
-
-			return res;
-		}
+		// Done
+		return res;
 	}
 
 	// ----------------------------- ENQUEUE --------------------------------------
@@ -341,10 +271,10 @@ public final class Dispatcher
 
 		if (hl != null)
 		{
-			jqmlogger.debug("JI can't be enqueue because a job in the highlander mode is currently submitted: " + hl);
+			jqmlogger.debug("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + hl);
 			return hl;
 		}
-		jqmlogger.debug("Not in highlander mode");
+		jqmlogger.debug("Not in highlander mode or no currently enqued instance");
 
 		JobInstance ji = new JobInstance();
 		List<JobParameter> jps = overrideParameter(job, jd, em);
@@ -359,14 +289,8 @@ public final class Dispatcher
 		ji.setPosition((p == null) ? 1 : p + 1);
 		ji.setQueue(job.getQueue());
 		ji.setNode(null);
-		if (jd.getEmail() == null)
-		{
-			ji.setEmail(null);
-		}
-		else
-		{
-			ji.setEmail(jd.getEmail());
-		}
+		// Can be null (if no email is asked for)
+		ji.setEmail(jd.getEmail());
 
 		em.persist(ji);
 		ji.setParameters(jps);
@@ -414,22 +338,23 @@ public final class Dispatcher
 	{
 		Integer res = null;
 
-		jqmlogger.debug("Highlander mode is begining");
+		jqmlogger.debug("Highlander mode analysis is begining");
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
 		        .createQuery("SELECT j FROM JobInstance j WHERE j.jd.applicationName = :j", JobInstance.class)
-		        .setParameter("j", jd.getApplicationName()).getResultList();
+		        .setLockMode(LockModeType.PESSIMISTIC_WRITE).setParameter("j", jd.getApplicationName()).getResultList();
 
 		for (JobInstance j : jobs)
 		{
 			jqmlogger.debug("JI seeing by highlander: " + j.getId() + j.getState());
 			if (j.getState().equals("SUBMITTED"))
 			{
-				// must be canceld and enqueue must returned the id of the submitted JI
+				// HIGLANDER: only one enqueued job can survive!
+				// current request must be cancelled and enqueue must returned the id of the existing submitted JI
 				jqmlogger.debug("In the highlander if");
 				res = j.getId();
 			}
 		}
-		jqmlogger.debug("Highlander mode will returned: " + res);
+		jqmlogger.debug("Highlander mode will return: " + res);
 		return res;
 	}
 

@@ -401,7 +401,7 @@ class Loader implements Runnable
 			Thread.currentThread().setContextClassLoader(contextClassLoader);
 
 			jqmlogger.debug("ActualNbThread after execution: " + p.getActualNbThread());
-			p.setActualNbThread(p.getActualNbThread() - 1);
+			p.decreaseNbThread();
 
 			// Update end date
 
