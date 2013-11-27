@@ -1,8 +1,9 @@
 package com.enioka.jqm.tests;
 
-import com.enioka.jqm.api.Dispatcher;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.enioka.jqm.api.JobBase;
-import com.enioka.jqm.api.JobDefinition;
 
 public class App extends JobBase
 {
@@ -12,14 +13,14 @@ public class App extends JobBase
 	{
 		System.out.println("PARAMETRE FIBO 2: " + this.parameters.get("p2"));
 
-		JobDefinition j = new JobDefinition("Fibo", "MAG");
+		Map<String, String> p = new HashMap<String, String>();
 
-		j.addParameter("p1", this.parameters.get("p2"));
-		j.addParameter("p2", (Integer.parseInt(this.parameters.get("p1")) + Integer.parseInt(this.parameters.get("p2")) + ""));
+		p.put("p1", this.parameters.get("p2"));
+		p.put("p2", (Integer.parseInt(this.parameters.get("p1")) + Integer.parseInt(this.parameters.get("p2")) + ""));
 		System.out.println("BEFORE ENQUEUE");
 
 		if (Integer.parseInt(this.parameters.get("p1")) <= 100) {
-			Dispatcher.enQueue(j);
+			enQueue("Fibo", "Dark Vador", null, null, null, null, null, null, null, null, null, p);
 		}
 		System.out.println("QUIT FIBO");
 	}

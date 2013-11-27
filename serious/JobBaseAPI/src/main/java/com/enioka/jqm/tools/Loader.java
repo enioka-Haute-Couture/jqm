@@ -45,6 +45,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.LockModeType;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.log4j.Logger;
 import org.sonatype.aether.artifact.Artifact;
@@ -131,21 +132,17 @@ class Loader implements Runnable
 				{ // write contents of 'is' to 'fos'
 					fos.write(is.read());
 				}
-				fos.close();
-				is.close();
 			}
+
+			IOUtils.closeQuietly(fos);
+			IOUtils.closeQuietly(is);
+			jar.close();
 		} catch (IOException e)
 		{
+			IOUtils.closeQuietly(fos);
+			IOUtils.closeQuietly(is);
 			try
 			{
-				if (fos != null)
-				{
-					fos.close();
-				}
-				if (is != null)
-				{
-					is.close();
-				}
 				if (jar != null)
 				{
 					jar.close();
@@ -153,7 +150,7 @@ class Loader implements Runnable
 
 			} catch (IOException e1)
 			{
-				e1.printStackTrace();
+				jqmlogger.debug(e);
 			}
 		}
 
@@ -188,7 +185,6 @@ class Loader implements Runnable
 			}
 		} catch (Exception e)
 		{
-			crashedStatus();
 			jqmlogger.debug(e);
 		}
 	}
@@ -218,37 +214,48 @@ class Loader implements Runnable
 
 			if (!pomFile.exists())
 			{
-				pomCustom = true;
-				jqmlogger.debug("POM doesn't exist, it will be get in the META-INF/pom.xml of the Jar file");
-				String env = CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()));
-
-				extractJar(jar.getAbsolutePath(), env);
-				findFile("pom.xml", new File(env + "tmp" + job.getId() + "/" + "META-INF/maven/"));
-
-				jqmlogger.debug("pomdebug: " + res);
-
-				if (res != null)
+				InputStream is = null;
+				OutputStream os = null;
+				try
 				{
-					InputStream is = new FileInputStream(res + "/pom.xml");
-					OutputStream os = new FileOutputStream(CheckFilePath.fixFilePath(node.getRepo()
-							+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-							+ "pom.xml");
+					pomCustom = true;
+					jqmlogger.debug("POM doesn't exist, it will be get in the META-INF/pom.xml of the Jar file");
+					String env = CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()));
 
-					int r = 0;
-					byte[] bytes = new byte[1024];
+					extractJar(jar.getAbsolutePath(), env);
+					findFile("pom.xml", new File(env + "tmp" + job.getId() + "/" + "META-INF/maven/"));
 
-					while ((r = is.read(bytes)) != -1)
+					jqmlogger.debug("pomdebug: " + res);
+
+					if (res != null
+							&& (CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()))) != null)
 					{
-						os.write(bytes, 0, r);
+						is = new FileInputStream(res + "/pom.xml");
+						os = new FileOutputStream(CheckFilePath.fixFilePath(node.getRepo()
+								+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
+								+ "pom.xml");
+
+						int r = 0;
+						byte[] bytes = new byte[1024];
+
+						while ((r = is.read(bytes)) != -1)
+						{
+							os.write(bytes, 0, r);
+						}
+
+						IOUtils.closeQuietly(is);
+						IOUtils.closeQuietly(os);
+
 					}
-
-					is.close();
-					os.close();
-
-					pomFile = new File(CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-							+ "pom.xml");
+				} catch (Exception e)
+				{
+					IOUtils.closeQuietly(is);
+					IOUtils.closeQuietly(os);
 				}
+				pomFile = new File(CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()))
+						+ "pom.xml");
 			}
+
 			if (!pomFile.exists())
 			{
 				jqmlogger.debug("POM doesn't exist, checking a lib directory in the Jar file");
