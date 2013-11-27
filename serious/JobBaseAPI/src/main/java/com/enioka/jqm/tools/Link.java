@@ -32,7 +32,7 @@ public class Link
 		Thread.currentThread().setContextClassLoader(old);
 
 		JobInstance j = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class).setParameter("i", id)
-				.getSingleResult();
+		        .getSingleResult();
 
 		if (j.getState().equals("KILLED"))
 		{
@@ -42,7 +42,7 @@ public class Link
 		else
 		{
 			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :i", History.class).setParameter("i", id)
-					.getSingleResult();
+			        .getSingleResult();
 
 			em.getTransaction().begin();
 			Message mssg = new Message();
@@ -58,9 +58,12 @@ public class Link
 
 	public void sendProgress(Integer msg) throws InterruptedException
 	{
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(old);
+
 		em.clear();
 		JobInstance j = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class).setParameter("i", id)
-				.getSingleResult();
+		        .getSingleResult();
 		jqmlogger.debug("Job status before Kill: " + j.getState());
 
 		if (j.getState().equals("KILLED"))
@@ -81,12 +84,16 @@ public class Link
 			jqmlogger.debug("Actual progression: " + j.getProgress());
 		}
 
+		Thread.currentThread().setContextClassLoader(cl);
 		jqmlogger.debug("Actual progression: " + j.getProgress());
 	}
 
 	public int enQueue(String applicationName, String user, String mail, Integer sessionId, String application, String module,
-			String other1, String other2, String other3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
+	        String other1, String other2, String other3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
 	{
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(old);
+
 		JobDefinition jd = new JobDefinition(applicationName, user, mail);
 		jd.setApplicationName(applicationName);
 		jd.setUser(user);
@@ -99,6 +106,10 @@ public class Link
 		jd.setOther3(other3);
 		jd.setParentID(parentId);
 		jd.setParameters(parameters);
-		return Dispatcher.enQueue(jd);
+
+		int id = Dispatcher.enQueue(jd);
+
+		Thread.currentThread().setContextClassLoader(cl);
+		return id;
 	}
 }
