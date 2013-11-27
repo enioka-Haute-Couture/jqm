@@ -51,11 +51,9 @@ import com.enioka.jqm.jpamodel.JobParameter;
 class JarClassLoader extends URLClassLoader
 {
 	private static Logger jqmlogger = Logger.getLogger(JarClassLoader.class);
-	private URL jarUrl;
 
 	private static URL[] addUrls(URL url, URL[] libs)
 	{
-
 		URL[] urls = new URL[libs.length + 1];
 		urls[0] = url;
 		for (int i = 0; i < libs.length; i++)
@@ -67,9 +65,7 @@ class JarClassLoader extends URLClassLoader
 
 	JarClassLoader(URL url, URL[] libs)
 	{
-
 		super(addUrls(url, libs), null);
-		this.jarUrl = url;
 	}
 
 	Object invokeMain(JobInstance job, String defaultConnection, ClassLoader old, EntityManager em) throws Exception
