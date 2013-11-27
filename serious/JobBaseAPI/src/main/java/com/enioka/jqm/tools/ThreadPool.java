@@ -34,7 +34,6 @@ class ThreadPool
 	private int nbThread = 0;
 	private ExecutorService pool = null;
 	private Map<String, URL[]> cache = null;
-	private JqmEngine engine;
 
 	ThreadPool(Queue queue, int n, Map<String, URL[]> cache)
 	{
