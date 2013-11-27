@@ -84,19 +84,21 @@ public class Link
 		jqmlogger.debug("Actual progression: " + j.getProgress());
 	}
 
-	public int enQueue(String applicationName, String user, Map<String, String> p)
+	public int enQueue(String applicationName, String user, String mail, Integer sessionId, String application, String module,
+			String other1, String other2, String other3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
 	{
-		Thread.currentThread().setContextClassLoader(old);
-		JobDefinition jd = new JobDefinition(applicationName, user);
-		jd.setParameters(p);
-		return Dispatcher.enQueue(jd);
-	}
-
-	public int enQueue(String applicationName, String user, String email, Map<String, String> p)
-	{
-		Thread.currentThread().setContextClassLoader(old);
-		JobDefinition jd = new JobDefinition(applicationName, user, email);
-		jd.setParameters(p);
+		JobDefinition jd = new JobDefinition(applicationName, user, mail);
+		jd.setApplicationName(applicationName);
+		jd.setUser(user);
+		jd.setEmail(mail);
+		jd.setSessionID(sessionId);
+		jd.setApplication(application);
+		jd.setModule(module);
+		jd.setOther1(other1);
+		jd.setOther2(other2);
+		jd.setOther3(other3);
+		jd.setParentID(parentId);
+		jd.setParameters(parameters);
 		return Dispatcher.enQueue(jd);
 	}
 }

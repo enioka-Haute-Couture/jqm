@@ -19,7 +19,6 @@
 package com.enioka.jqm.api;
 
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -40,10 +39,10 @@ import com.enioka.jqm.deliverabletools.DeliverableStruct;
 public class JobBase {
 
 	private Object myEngine = null;
-	protected int parentID;
-	protected int canBeRestart;
+	protected Integer parentID;
+	protected Integer canBeRestart;
 	protected String applicationName;
-	protected String sessionID;
+	protected Integer sessionID;
 	protected String application;
 	protected String module;
 	protected String other1;
@@ -108,40 +107,22 @@ public class JobBase {
 		}
 	}
 
-	public int enQueue(JobDefinition jd)
+	public int enQueue(String applicationName, String user, String mail, Integer sessionId, String application, String module,
+			String other1, String other2, String other3, Integer parentId, Integer canBeRestart,
+			Map<String, String> parameters)
 	{
 		try
 		{
 			Class c = myEngine.getClass();
-			if (jd.getEmail() != null && jd.getEmail() != "")
-			{
-				Method getMyEngine = c.getMethod("enQueue", String.class, String.class, String.class, Map.class);
-				return (Integer) getMyEngine.invoke(myEngine, jd.getApplicationName(), jd.getUser(), jd.getEmail(), jd.getParameters());
-			}
-			else
-			{
-				Method getMyEngine = c.getMethod("enQueue", String.class, String.class, Map.class);
-				return (Integer) getMyEngine.invoke(myEngine, jd.getApplicationName(), jd.getUser(), jd.getParameters());
-			}
-		} catch (SecurityException e)
+
+			Method getMyEngine = c.getMethod("enQueue", String.class, String.class, String.class, Integer.class, String.class,
+					String.class, String.class, String.class, String.class, Integer.class, Integer.class,
+					Map.class);
+			return (Integer) getMyEngine.invoke(myEngine, applicationName, user, mail, sessionId, application, module,
+					other1, other2, other3, parentId, canBeRestart,
+					parameters);
+		} catch (Exception e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e)
-		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return 0;
@@ -149,12 +130,12 @@ public class JobBase {
 
 	// ---------
 
-	public int getParentID() {
+	public Integer getParentID() {
 
 		return parentID;
 	}
 
-	public void setParentID(final int parentID) {
+	public void setParentID(final Integer parentID) {
 
 		this.parentID = parentID;
 	}
@@ -179,12 +160,12 @@ public class JobBase {
 		this.applicationName = applicationName;
 	}
 
-	public String getSessionID() {
+	public Integer getSessionID() {
 
 		return sessionID;
 	}
 
-	public void setSessionID(final String sessionID) {
+	public void setSessionID(final Integer sessionID) {
 
 		this.sessionID = sessionID;
 	}

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:f="http://java.sun.com/jsf/core">
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <STYLE type="text/css">
 <!--
@@ -20,25 +21,30 @@
 -->
 </STYLE>
 
-<meta http-equiv="cache-control" content="no-cache"/>
+<meta http-equiv="cache-control" content="no-cache" />
 
 <h:head>
 	<title>JQM ENQUEUE</title>
 </h:head>
 
 <h:form>
+
+<f:metadata>
+   <f:event type="preRenderView" listener="#{jobDefBeans.initJobInstanceBeans()}" />
+</f:metadata>
+
 	<h1>Enqueue screen</h1>
-<!-- 	        <h:form> -->
-<!-- 	           <h:inputText value="#{jobDefBeans.cl}" /> -->
-<!-- 	           <h:commandButton value="Enqueue" action="enqueue" /> -->
-<!-- 	        </h:form> -->
-<!-- 	         <h:form> -->
-<!-- 	           <h:inputText value="#{jobDefCustom.cl}" /> -->
-<!-- 	           <h:commandButton value="Enqueue" action="enqueue" /> -->
-<!-- 	        </h:form> -->
-<!-- <f:push> -->
-<!--         <f:ajax event="onPushUpdate" update="widgetID" listener="#{jobDefBeans.initJobInstanceBeans}" />  -->
-<!-- </f:push> -->
+	<!-- 	        <h:form> -->
+	<!-- 	           <h:inputText value="#{jobDefBeans.cl}" /> -->
+	<!-- 	           <h:commandButton value="Enqueue" action="enqueue" /> -->
+	<!-- 	        </h:form> -->
+	<!-- 	         <h:form> -->
+	<!-- 	           <h:inputText value="#{jobDefCustom.cl}" /> -->
+	<!-- 	           <h:commandButton value="Enqueue" action="enqueue" /> -->
+	<!-- 	        </h:form> -->
+	<!-- <f:push> -->
+	<!--         <f:ajax event="onPushUpdate" update="widgetID" listener="#{jobDefBeans.initJobInstanceBeans}" />  -->
+	<!-- </f:push> -->
 	<h:dataTable value="#{jobDefBeans.jobs}" var="job" cellspacing="4"
 		width="60%" rowClasses="eager,odd" headerClass="title">
 		<h:column>
@@ -59,8 +65,8 @@
 			<f:facet name="header">
 				<h:outputText value="Description" />
 			</f:facet>
-<!-- 			<h:commandLink value="#{job.j.description}" action="#{jobDefBeans.update}" rendered="#{job.j.description}"/> -->
-			<h:outputText value="#{job.j.description}" />
+						<h:commandLink value="#{job.j.description}" action="#{jobDefBeans.update}" />
+<!-- 			<h:outputText value="#{job.j.description}" /> -->
 		</h:column>
 
 		<h:column>
@@ -85,15 +91,11 @@
 		</h:column>
 
 	</h:dataTable>
-	
+
 	<p>
 		<h:commandButton value="Enqueue selected items"
 			action="#{jobDefBeans.enqueue}" />
 	</p>
-
-	<h:commandButton action="#{jobDefBeans.update}">
-		<f:ajax render="job.j.description" />
-	</h:commandButton>
 
 </h:form>
 </html>

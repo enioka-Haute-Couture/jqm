@@ -25,6 +25,7 @@
 
 		<properties>
 			<property name="javax.persistence.validation.mode" value="NONE" />
+			<property name="javax.persistence.lock.timeout" value="1000"/>
 		</properties>
 	</persistence-unit>
 </persistence>

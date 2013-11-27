@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class JobDefinition
 {
-	private int parentID;
+	private Integer parentID;
 	private String applicationName;
 	private Integer sessionID;
 	private String application;
@@ -105,7 +105,7 @@ public class JobDefinition
 	 * 
 	 * @return
 	 */
-	public int getParentID()
+	public Integer getParentID()
 	{
 		return parentID;
 	}
@@ -117,7 +117,7 @@ public class JobDefinition
 	 * 
 	 * @param parentID
 	 */
-	public void setParentID(int parentID)
+	public void setParentID(Integer parentID)
 	{
 		this.parentID = parentID;
 	}

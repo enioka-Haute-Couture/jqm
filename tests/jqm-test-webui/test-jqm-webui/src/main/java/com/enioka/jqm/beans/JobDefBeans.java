@@ -4,12 +4,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
-import javax.faces.view.ViewScoped;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceUnit;
 
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
@@ -17,13 +18,17 @@ import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.webui.JobDefCustom;
 
 @ManagedBean
-@ViewScoped
+@SessionScoped
 public class JobDefBeans implements Serializable
 {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2144227424128605638L;
+
+	@PersistenceUnit
+	EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+	EntityManager em = emf.createEntityManager();
 
 	private ArrayList<JobDefCustom> jobs = new ArrayList<JobDefCustom>();
 	//@ManagedProperty(value="#{jobDefBeans}")
@@ -37,13 +42,8 @@ public class JobDefBeans implements Serializable
 		getJobs();
 	}
 
-	@PostConstruct
 	public void initJobInstanceBeans()
 	{
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-		EntityManager em = emf.createEntityManager();
-
-		System.out.println("ClassLoader Beans: " + JobDef.class.getClassLoader().hashCode());
 
 		this.tmp = em.createQuery("SELECT j FROM JobDef j",
 				com.enioka.jqm.jpamodel.JobDef.class).getResultList();
@@ -58,21 +58,12 @@ public class JobDefBeans implements Serializable
 
 	public String update()
 	{
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-		EntityManager em = emf.createEntityManager();
 
-		System.out.println("ClassLoader Beans: " + JobDef.class.getClassLoader().hashCode());
-
-		this.tmp = em.createQuery("SELECT j FROM JobDef j",
-				com.enioka.jqm.jpamodel.JobDef.class).getResultList();
-
-		em.clear();
-
-		for (int i = 0; i < tmp.size(); i++)
+		for (int i = 0; i < jobs.size(); i++)
 		{
-			jobs.add(new JobDefCustom(tmp.get(i), false));
+			em.refresh(em.merge(jobs.get(i)));
 		}
-
+		em.clear();
 		return null;
 	}
 
@@ -119,20 +110,23 @@ public class JobDefBeans implements Serializable
 
 
 	public List<JobDefCustom> getJobs() {
+		if (FacesContext.getCurrentInstance().getRenderResponse()) {
 
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
-		EntityManager em = emf.createEntityManager();
 
-		System.out.println("ClassLoader Beans: " + JobDef.class.getClassLoader().hashCode());
+			EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+			EntityManager em = emf.createEntityManager();
 
-		this.tmp = em.createQuery("SELECT j FROM JobDef j",
-				com.enioka.jqm.jpamodel.JobDef.class).getResultList();
+			System.out.println("ClassLoader Beans: " + JobDef.class.getClassLoader().hashCode());
 
-		em.clear();
+			this.tmp = em.createQuery("SELECT j FROM JobDef j",
+					com.enioka.jqm.jpamodel.JobDef.class).getResultList();
 
-		for (int i = 0; i < tmp.size(); i++)
-		{
-			jobs.add(new JobDefCustom(tmp.get(i), false));
+			em.clear();
+
+			for (int i = 0; i < tmp.size(); i++)
+			{
+				jobs.add(new JobDefCustom(tmp.get(i), false));
+			}
 		}
 
 		return jobs;

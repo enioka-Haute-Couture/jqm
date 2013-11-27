@@ -1,5 +1,7 @@
+import java.util.HashMap;
+import java.util.Map;
+
 import com.enioka.jqm.api.JobBase;
-import com.enioka.jqm.api.JobDefinition;
 
 
 
@@ -9,15 +11,15 @@ public class App extends JobBase{
 	public void start()
 	{
 		System.out.println("BEGINING GEOJOB: " + this.parameters.get("nbJob"));
-		JobDefinition jd = new JobDefinition("Geo", "MAG");
-		jd.addParameter("nbJob", (Integer.parseInt(this.parameters.get("nbJob") + 1) + ""));
+		Map<String, String> p = new HashMap<String, String>();
+		p.put("nbJob", (Integer.parseInt(this.parameters.get("nbJob") + 1) + ""));
 
 		sendMsg("launching first job");
 		System.out.println("LAUNCHING FIRST JOB");
-		enQueue(jd);
+		enQueue("Geo", "Franquin", null, sessionID, application, module, other1, other2, other3, parentID, canBeRestart, p);
 		sendMsg("launching second job");
 		System.out.println("LAUNCHING SECOND JOB");
-		enQueue(jd);
+		enQueue("Geo", "Franquin", null, sessionID, application, module, other1, other2, other3, parentID, canBeRestart, p);
 		System.out.println("ENDING GEOJOB");
 	}
 }

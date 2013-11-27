@@ -343,7 +343,7 @@ class Loader implements Runnable
 				urls = libUrls;
 			}
 
-			jqmlogger.info("isInCache " + isInCache);
+			jqmlogger.debug("isInCache " + isInCache);
 			if (!isInCache)
 			{
 				for (URL url : urls)
@@ -366,7 +366,7 @@ class Loader implements Runnable
 			// Change active class loader
 			jqmlogger.debug("Setting class loader");
 			Thread.currentThread().setContextClassLoader(jobClassLoader);
-			jqmlogger.info("Class Loader was set correctly");
+			jqmlogger.debug("Class Loader was set correctly");
 
 			// Go! (launches the main function in the startup class designated in the manifest)
 			jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
