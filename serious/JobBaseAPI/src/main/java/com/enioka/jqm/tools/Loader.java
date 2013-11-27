@@ -25,9 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,7 +39,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.zip.ZipException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -52,7 +49,6 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.log4j.Logger;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 import com.enioka.jqm.jpamodel.GlobalParameter;
@@ -84,7 +80,6 @@ class Loader implements Runnable
 	// CrashedStatus
 	protected void crashedStatus()
 	{
-
 		EntityTransaction transac = em.getTransaction();
 		transac.begin();
 
@@ -167,27 +162,34 @@ class Loader implements Runnable
 	// FindFile
 	void findFile(String path, File f)
 	{
-		jqmlogger.debug("Trying to find the job in the directory: " + f);
-		File[] list = f.listFiles();
-		if (list != null)
+		try
 		{
-			for (File ff : list)
+			jqmlogger.debug("Trying to find the job in the directory: " + f);
+			File[] list = f.listFiles();
+			if (list != null)
 			{
-				if (ff.isDirectory() && path.equalsIgnoreCase(ff.getName()))
+				for (File ff : list)
 				{
-					jqmlogger.debug("findFile lib " + ff.getPath());
-					lib = ff.getAbsolutePath();
-				}
-				if (ff.isDirectory())
-				{
-					findFile(path, ff);
-				}
-				else if (path.equalsIgnoreCase(ff.getName()))
-				{
-					jqmlogger.debug("findFile returning " + ff.getPath());
-					res = ff.getParentFile().getAbsolutePath();
+					if (ff.isDirectory() && path.equalsIgnoreCase(ff.getName()))
+					{
+						jqmlogger.debug("findFile lib " + ff.getPath());
+						lib = ff.getAbsolutePath();
+					}
+					if (ff.isDirectory())
+					{
+						findFile(path, ff);
+					}
+					else if (path.equalsIgnoreCase(ff.getName()))
+					{
+						jqmlogger.debug("findFile returning " + ff.getPath());
+						res = ff.getParentFile().getAbsolutePath();
+					}
 				}
 			}
+		} catch (Exception e)
+		{
+			crashedStatus();
+			jqmlogger.debug(e);
 		}
 	}
 
@@ -488,43 +490,6 @@ class Loader implements Runnable
 			}
 			job = em.merge(job);
 			// END SEND EMAIL
-
-		} catch (ZipException e)
-		{
-			crashedStatus();
-			jqmlogger.info(e);
-		} catch (DependencyResolutionException e)
-		{
-			crashedStatus();
-			jqmlogger.info(e);
-		} catch (MalformedURLException e)
-		{
-			crashedStatus();
-			jqmlogger.info(e);
-		} catch (SecurityException e)
-		{
-			crashedStatus();
-			jqmlogger.info(e);
-		} catch (NoSuchMethodException e)
-		{
-			crashedStatus();
-			jqmlogger.info(e);
-		} catch (IllegalArgumentException e)
-		{
-			crashedStatus();
-			jqmlogger.info(e);
-		} catch (InvocationTargetException e)
-		{
-			crashedStatus();
-			jqmlogger.info(e);
-		} catch (IOException e)
-		{
-			crashedStatus();
-			jqmlogger.info(e);
-		} catch (IllegalAccessException e)
-		{
-			crashedStatus();
-			jqmlogger.info(e);
 		} catch (Exception e)
 		{
 			crashedStatus();
@@ -536,6 +501,7 @@ class Loader implements Runnable
 				em.close();
 			} catch (Exception e)
 			{
+				crashedStatus();
 				jqmlogger.debug("");
 			}
 		}
