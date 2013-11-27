@@ -151,6 +151,10 @@ class Loader implements Runnable
 				{
 					is.close();
 				}
+				if (jar != null)
+				{
+					jar.close();
+				}
 
 			} catch (IOException e1)
 			{
