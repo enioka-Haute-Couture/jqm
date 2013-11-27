@@ -66,9 +66,14 @@ class Polling implements Runnable
 		// Get the list of all jobInstance with the queue definded ordered by position
 		em.getTransaction().begin();
 		TypedQuery<JobInstance> query = em.createQuery(
-				"SELECT j FROM JobInstance j WHERE j.queue.name = :q AND j.state = :s ORDER BY j.position ASC", JobInstance.class);
+		        "SELECT j FROM JobInstance j WHERE j.queue.name = :q AND j.state = :s ORDER BY j.position ASC", JobInstance.class);
 		query.setParameter("q", queue.getName()).setParameter("s", "SUBMITTED").setLockMode(LockModeType.PESSIMISTIC_WRITE);
 		job = query.getResultList();
+
+		if (!job.isEmpty())
+		{
+			job.get(0).setState("ATTRIBUTED");
+		}
 		em.getTransaction().commit();
 
 		// Higlander?
@@ -84,9 +89,9 @@ class Polling implements Runnable
 	{
 		em.getTransaction().begin();
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
-				.createQuery("SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.applicationName = :n", JobInstance.class)
-				.setParameter("refid", currentJob.getId()).setParameter("n", currentJob.getJd().getApplicationName())
-				.setLockMode(LockModeType.PESSIMISTIC_READ).getResultList();
+		        .createQuery("SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.applicationName = :n", JobInstance.class)
+		        .setParameter("refid", currentJob.getId()).setParameter("n", currentJob.getJd().getApplicationName())
+		        .setLockMode(LockModeType.PESSIMISTIC_WRITE).getResultList();
 
 		for (JobInstance j : jobs)
 		{
@@ -113,7 +118,7 @@ class Polling implements Runnable
 					break;
 				}
 				dp = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.id = :l", DeploymentParameter.class)
-						.setParameter("l", dp.getId()).getSingleResult();
+				        .setParameter("l", dp.getId()).getSingleResult();
 				Thread.sleep(dp.getPollingInterval());
 				if (!run)
 				{
@@ -142,12 +147,12 @@ class Polling implements Runnable
 				em.getTransaction().begin();
 
 				JobInstance tt = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :j", JobInstance.class)
-						.setParameter("j", ji.getId()).setLockMode(LockModeType.PESSIMISTIC_READ).getSingleResult();
+				        .setParameter("j", ji.getId()).getSingleResult();
 
 				tt.setNode(dp.getNode());
 
 				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", ji)
-						.setLockMode(LockModeType.PESSIMISTIC_READ).getSingleResult();
+				        .getSingleResult();
 
 				h.setNode(dp.getNode());
 
@@ -155,12 +160,12 @@ class Polling implements Runnable
 
 				em.getTransaction().begin();
 				JobInstance t = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :j", JobInstance.class)
-						.setParameter("j", ji.getId()).setLockMode(LockModeType.PESSIMISTIC_READ).getSingleResult();
+				        .setParameter("j", ji.getId()).getSingleResult();
 				em.getTransaction().commit();
 
 				jqmlogger.debug("The job " + t.getId() + " have been updated with the node: " + t.getNode().getListeningInterface());
 				jqmlogger
-						.debug("The job history " + h.getId() + " have been updated with the node: " + h.getNode().getListeningInterface());
+				        .debug("The job history " + h.getId() + " have been updated with the node: " + h.getNode().getListeningInterface());
 
 				actualNbThread++;
 
@@ -171,9 +176,9 @@ class Polling implements Runnable
 				jqmlogger.debug("Node corresponding to the current job must be stopped: " + t.getNode().isStop());
 
 				Long n = (Long) em
-						.createQuery(
-								"SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
-						.setParameter("node", t.getNode()).getSingleResult();
+				        .createQuery(
+				                "SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
+				        .setParameter("node", t.getNode()).getSingleResult();
 
 				if (dp.getNode().isStop())
 				{
@@ -197,8 +202,8 @@ class Polling implements Runnable
 					m.setTextMessage("Status updated: ATTRIBUTED");
 					m.setHistory(h);
 
-					em.lock(ji, LockModeType.PESSIMISTIC_WRITE);
-					ji.setState("ATTRIBUTED");
+					// em.lock(ji, LockModeType.PESSIMISTIC_WRITE);
+					// ji.setState("ATTRIBUTED");
 					ji = em.merge(ji);
 					em.persist(m);
 					em.getTransaction().commit();
