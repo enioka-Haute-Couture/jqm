@@ -72,7 +72,6 @@ class Loader implements Runnable
 
 	Loader(JobInstance job, Map<String, URL[]> cache, Polling p)
 	{
-
 		this.job = job;
 		this.cache = cache;
 		this.p = p;

@@ -4,6 +4,7 @@
         <groupId>com.enioka.jqm</groupId>
         <artifactId>jqm-test-datetimemaven2</artifactId>
         <version>0.0.1-SNAPSHOT</version>
+		<relativePath>../jqm-test-datetimemaven2</relativePath>
     </parent>
     <groupId>com.enioka.jqm</groupId>
     <artifactId>jqm-test-datetimemavenparent</artifactId>

@@ -25,7 +25,6 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
-import javax.persistence.TypedQuery;
 
 import org.apache.log4j.Logger;
 
@@ -70,12 +69,10 @@ class Polling implements Runnable
 
 		// Get the list of all jobInstance within the defined queue, ordered by position
 		em.getTransaction().begin();
-		TypedQuery<JobInstance> query = em
-				.createQuery("SELECT j FROM JobInstance j WHERE j.queue = :q AND j.state = 'SUBMITTED' ORDER BY j.position ASC",
-						JobInstance.class).setLockMode(LockModeType.PESSIMISTIC_WRITE).setParameter("q", queue);
-		List<JobInstance> availableJobs = query.getResultList();
-		// recently add
-		em.getTransaction().commit();
+		List<JobInstance> availableJobs = em
+		        .createQuery(
+		                "SELECT j FROM JobInstance j LEFT JOIN FETCH j.jd LEFT JOIN FETCH j.queue WHERE j.queue = :q AND j.state = 'SUBMITTED' ORDER BY j.position ASC",
+		                JobInstance.class).setLockMode(LockModeType.PESSIMISTIC_WRITE).setParameter("q", queue).getResultList();
 
 		for (JobInstance res : availableJobs)
 		{
@@ -90,12 +87,13 @@ class Polling implements Runnable
 			res.setNode(dp.getNode());
 
 			// Stop at the first suitable JI. Release the lock & update the JI which has been attributed to us.
-			// em.getTransaction().commit();
+			jqmlogger.debug("JI number " + res.getId() + " will be selected by this poller loop");
+			em.getTransaction().commit();
 			return res;
 		}
 
 		// If here, no suitable JI is available
-		// em.getTransaction().commit();
+		em.getTransaction().commit();
 		return null;
 	}
 
@@ -107,14 +105,11 @@ class Polling implements Runnable
 	 */
 	protected boolean highlanderPollingMode(JobInstance jobToTest, EntityManager em)
 	{
-		em.getTransaction().begin();
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
-				.createQuery(
-						"SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.id = :n AND (j.state = 'RUNNING' OR j.state = 'ATTRIBUTED')",
-						JobInstance.class).setParameter("refid", jobToTest.getId()).setParameter("n", jobToTest.getJd().getId())
-				.setLockMode(LockModeType.PESSIMISTIC_WRITE).getResultList();
-		// recently add
-		em.getTransaction().commit();
+		        .createQuery(
+		                "SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.id = :n AND (j.state = 'RUNNING' OR j.state = 'ATTRIBUTED')",
+		                JobInstance.class).setParameter("refid", jobToTest.getId()).setParameter("n", jobToTest.getJd().getId())
+		        .setLockMode(LockModeType.PESSIMISTIC_WRITE).getResultList();
 		return jobs.isEmpty();
 	}
 
@@ -123,6 +118,10 @@ class Polling implements Runnable
 	{
 		while (true)
 		{
+			if (em != null)
+			{
+				em.close();
+			}
 			em = Helpers.getNewEm();
 			try
 			{
@@ -133,8 +132,9 @@ class Polling implements Runnable
 				}
 
 				// Updating the deploymentParameter
-				dp = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.id = :l", DeploymentParameter.class)
-						.setParameter("l", dp.getId()).getSingleResult();
+				dp = em.createQuery(
+				        "SELECT dp FROM DeploymentParameter dp LEFT JOIN FETCH dp.queue LEFT JOIN FETCH dp.node WHERE dp.id = :l",
+				        DeploymentParameter.class).setParameter("l", dp.getId()).getSingleResult();
 				Thread.sleep(dp.getPollingInterval());
 
 				if (!run)
@@ -144,23 +144,22 @@ class Polling implements Runnable
 
 				// Check if a stop order has been given
 				Node n = em.createQuery("SELECT n FROM Node n WHERE n.id = :l", Node.class).setParameter("l", dp.getNode().getId())
-						.getSingleResult();
+				        .getSingleResult();
 
 				if (n.isStop())
 				{
 					jqmlogger.debug("Current node must be stopped: " + dp.getNode().isStop());
 
 					Long nbRunning = (Long) em
-							.createQuery(
-									"SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
-							.setParameter("node", n).getSingleResult();
+					        .createQuery(
+					                "SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
+					        .setParameter("node", n).getSingleResult();
 					jqmlogger.debug("Waiting the end of " + nbRunning + " job(s)");
 
 					if (nbRunning == 0)
 					{
 						run = false;
 					}
-
 					continue;
 				}
 
@@ -181,13 +180,12 @@ class Polling implements Runnable
 				// Update the history object: the JI has been attributed
 				em.getTransaction().begin();
 				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", ji)
-						.getSingleResult();
+				        .getSingleResult();
 				h.setNode(dp.getNode());
 				em.getTransaction().commit();
 
-				jqmlogger.debug("The job " + ji.getId() + " have been updated with the node: " + ji.getNode().getListeningInterface());
-				jqmlogger
-						.debug("The job history " + h.getId() + " have been updated with the node: " + h.getNode().getListeningInterface());
+				jqmlogger.debug("The job " + ji.getId() + " has been updated with the node: " + ji.getNode().getListeningInterface());
+				jqmlogger.debug("The job history " + h.getId() + " has been updated with the node: " + h.getNode().getListeningInterface());
 
 				// We will run this JI!
 				actualNbThread++;
