@@ -128,7 +128,13 @@ public class MultiNodeTest
 		engine1.stop();
 		engine2.stop();
 
-		Assert.assertEquals(true, true);
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+
+		for (JobInstance jobInstance : res)
+		{
+			Assert.assertEquals("ENDED", jobInstance.getState());
+		}
 	}
 
 	@Test
@@ -195,7 +201,14 @@ public class MultiNodeTest
 
 		engine1.stop();
 		engine2.stop();
-		Assert.assertEquals(true, true);
+
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+
+		for (JobInstance jobInstance : res)
+		{
+			Assert.assertEquals("ENDED", jobInstance.getState());
+		}
 	}
 
 	@Test
@@ -263,7 +276,14 @@ public class MultiNodeTest
 
 		engine1.stop();
 		engine2.stop();
-		Assert.assertEquals(true, true);
+
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+
+		for (JobInstance jobInstance : res)
+		{
+			Assert.assertEquals("ENDED", jobInstance.getState());
+		}
 	}
 
 	@Test
@@ -418,7 +438,14 @@ public class MultiNodeTest
 		engine1.stop();
 		engine2.stop();
 		engine3.stop();
-		Assert.assertEquals(true, true);
+
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+
+		for (JobInstance jobInstance : res)
+		{
+			Assert.assertEquals("ENDED", jobInstance.getState());
+		}
 	}
 
 	@Test
@@ -435,6 +462,7 @@ public class MultiNodeTest
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
+		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
 				"jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
 				"ModuleMachin", "other", "other", true, em);
@@ -754,6 +782,18 @@ public class MultiNodeTest
 
 		engine1.stop();
 		engine2.stop();
+
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+
+		for (JobInstance jobInstance : res)
+		{
+			if (jobInstance.getState().equals("ATTRIBUTED") || jobInstance.getState().equals("RUNNING"))
+			{
+				Assert.assertEquals(true, false);
+			}
+		}
+
 		TestHelpers.printJobInstanceTable();
 		Assert.assertEquals(true, true);
 	}

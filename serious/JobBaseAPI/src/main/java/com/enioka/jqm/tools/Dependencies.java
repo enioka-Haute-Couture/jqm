@@ -60,7 +60,26 @@ class Dependencies
 			Document doc = dBuilder.parse(fXmlFile);
 
 			doc.getDocumentElement().normalize();
-			NodeList nList = doc.getElementsByTagName("dependency");
+
+			NodeList nList = doc.getElementsByTagName("parent");
+
+			for (int temp = 0; temp < nList.getLength(); temp++)
+			{
+				Node nNode = nList.item(temp);
+				if (nNode.getNodeType() == Node.ELEMENT_NODE)
+				{
+					Element eElement = (Element) nNode;
+
+					dep += eElement.getElementsByTagName("groupId").item(0).getTextContent().toString() + ":";
+					dep += eElement.getElementsByTagName("artifactId").item(0).getTextContent().toString() + ":pom:";
+					dep += eElement.getElementsByTagName("version").item(0).getTextContent().toString();
+
+					list.add(dep);
+					dep = "";
+				}
+			}
+
+			nList = doc.getElementsByTagName("dependency");
 
 			for (int temp = 0; temp < nList.getLength(); temp++)
 			{

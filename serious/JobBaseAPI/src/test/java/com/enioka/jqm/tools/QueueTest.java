@@ -127,7 +127,13 @@ public class QueueTest
 		}
 		engine1.stop();
 
-		Assert.assertEquals(true, true);
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+
+		for (JobInstance jobInstance : res)
+		{
+			Assert.assertEquals("ENDED", jobInstance.getState());
+		}
 	}
 
 	@Test
@@ -200,7 +206,13 @@ public class QueueTest
 		}
 		engine1.stop();
 
-		Assert.assertEquals(true, true);
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+
+		for (JobInstance jobInstance : res)
+		{
+			Assert.assertEquals("ENDED", jobInstance.getState());
+		}
 	}
 
 	@Test

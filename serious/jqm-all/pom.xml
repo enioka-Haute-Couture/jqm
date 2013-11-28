@@ -5,31 +5,33 @@
 	<artifactId>jqm-all</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-
+    
 	<name>jqm-all</name>
 	<url>http://maven.apache.org</url>
-
+    
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-
+    
 	<modules>
 		<module>../DataModel</module>
 		<module>../JobQueueAPI</module>
 		<module>../JqmApi</module>
 		<module>../JobBaseAPI</module>
+        <module>../../tests/jqm-test-datetimemaven2</module>
+         <module>../../tests/jqm-test-datetimemavenparent</module>
 		<module>../../tests/Fibo</module>
 		<module>../../tests/jqm-test-datetimemaven</module>
 		<module>../../tests/jqm-test-deliverable</module>
 		<module>../../tests/Geo</module>
 		<module>../../tests/jqm-test-jndijms-amq</module>
-		<module>../../tests/jqm-test-checkargs</module>
-		<module>../../tests/jqm-test-defcon</module>
+    <module>../../tests/jqm-test-checkargs</module>
+    <module>../../tests/jqm-test-defcon</module>
     <module>../../tests/jqm-test-sendmsg</module>
     <module>../../tests/jqm-test-sendprogress</module>
     <module>../../tests/jqm-test-datetimesendmsg</module>
 	</modules>
-
+    
 	<profiles>
 		<profile>
 			<id>internal</id>

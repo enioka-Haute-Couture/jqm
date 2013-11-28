@@ -32,7 +32,7 @@ public class Link
 		Thread.currentThread().setContextClassLoader(old);
 
 		JobInstance j = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class).setParameter("i", id)
-		        .getSingleResult();
+				.getSingleResult();
 
 		if (j.getState().equals("KILLED"))
 		{
@@ -42,7 +42,7 @@ public class Link
 		else
 		{
 			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :i", History.class).setParameter("i", id)
-			        .getSingleResult();
+					.getSingleResult();
 
 			em.getTransaction().begin();
 			Message mssg = new Message();
@@ -63,7 +63,7 @@ public class Link
 
 		em.clear();
 		JobInstance j = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class).setParameter("i", id)
-		        .getSingleResult();
+				.getSingleResult();
 		jqmlogger.debug("Job status before Kill: " + j.getState());
 
 		if (j.getState().equals("KILLED"))
@@ -89,7 +89,7 @@ public class Link
 	}
 
 	public int enQueue(String applicationName, String user, String mail, Integer sessionId, String application, String module,
-	        String other1, String other2, String other3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
+			String other1, String other2, String other3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(old);
