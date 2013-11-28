@@ -56,7 +56,7 @@ public class Link
 		Thread.currentThread().setContextClassLoader(cl);
 	}
 
-	public void sendProgress(Integer msg) throws InterruptedException
+	public void sendProgress(Integer msg) throws InterruptedException, JqmKillException
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(old);

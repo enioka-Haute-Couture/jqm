@@ -141,6 +141,7 @@ class Loader implements Runnable
 		{
 			IOUtils.closeQuietly(fos);
 			IOUtils.closeQuietly(is);
+			crashedStatus();
 			try
 			{
 				if (jar != null)
@@ -150,6 +151,7 @@ class Loader implements Runnable
 
 			} catch (IOException e1)
 			{
+				crashedStatus();
 				jqmlogger.debug(e);
 			}
 		}
@@ -262,11 +264,16 @@ class Loader implements Runnable
 				String env = CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()));
 				findFile("lib", new File(env + "tmp" + job.getId() + "/"));
 
+				if (lib == null)
+				{
+					throw new NullPointerException();
+				}
+
 				File dir = new File(lib);
 
 				if (!dir.exists())
 				{
-					throw new IOException();
+					throw new NullPointerException();
 				}
 
 				FileFilter fileFilter = new WildcardFileFilter("*.jar");

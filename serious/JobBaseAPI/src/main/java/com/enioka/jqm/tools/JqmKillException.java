@@ -4,7 +4,7 @@ package com.enioka.jqm.tools;
  * The generic JQM exception class.
  * 
  */
-public class JqmKillException extends RuntimeException
+public class JqmKillException extends Exception
 {
 	private static final long serialVersionUID = -2937310125732117976L;
 
