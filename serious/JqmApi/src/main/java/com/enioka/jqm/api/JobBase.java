@@ -18,7 +18,6 @@
 
 package com.enioka.jqm.api;
 
-
 import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -33,13 +32,14 @@ import com.enioka.jqm.deliverabletools.Cryptonite;
 import com.enioka.jqm.deliverabletools.DeliverableStruct;
 
 /**
- *
+ * 
  * @author Pierre COPPEE <pierre.coppee@enioka.com>
  */
-public class JobBase {
-
+public class JobBase
+{
 	private Object myEngine = null;
 	protected Integer parentID;
+	protected Integer jobInstanceID;
 	protected Integer canBeRestart;
 	protected String applicationName;
 	protected Integer sessionID;
@@ -52,11 +52,13 @@ public class JobBase {
 	protected ArrayList<DeliverableStruct> sha1s = new ArrayList<DeliverableStruct>();
 	private String defaultConnect;
 
-	public void start() {
+	public void start()
+	{
 
 	}
 
-	public void stop() {
+	public void stop()
+	{
 
 	}
 
@@ -73,7 +75,8 @@ public class JobBase {
 		try
 		{
 			this.sha1s.add(new DeliverableStruct(path, fileName, Cryptonite.sha1(path + fileName), fileLabel));
-		} catch (final NoSuchAlgorithmException e) {
+		} catch (final NoSuchAlgorithmException e)
+		{
 
 			e.printStackTrace();
 		}
@@ -108,19 +111,16 @@ public class JobBase {
 	}
 
 	public int enQueue(String applicationName, String user, String mail, Integer sessionId, String application, String module,
-			String other1, String other2, String other3, Integer parentId, Integer canBeRestart,
-			Map<String, String> parameters)
+	        String other1, String other2, String other3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
 	{
 		try
 		{
 			Class c = myEngine.getClass();
 
 			Method getMyEngine = c.getMethod("enQueue", String.class, String.class, String.class, Integer.class, String.class,
-					String.class, String.class, String.class, String.class, Integer.class, Integer.class,
-					Map.class);
-			return (Integer) getMyEngine.invoke(myEngine, applicationName, user, mail, sessionId, application, module,
-					other1, other2, other3, parentId, canBeRestart,
-					parameters);
+			        String.class, String.class, String.class, String.class, Integer.class, Integer.class, Map.class);
+			return (Integer) getMyEngine.invoke(myEngine, applicationName, user, mail, sessionId, application, module, other1, other2,
+			        other3, parentId, canBeRestart, parameters);
 		} catch (Exception e)
 		{
 			e.printStackTrace();
@@ -130,112 +130,134 @@ public class JobBase {
 
 	// ---------
 
-	public Integer getParentID() {
+	public Integer getParentID()
+	{
 
 		return parentID;
 	}
 
-	public void setParentID(final Integer parentID) {
+	public void setParentID(final Integer parentID)
+	{
 
 		this.parentID = parentID;
 	}
 
-	public int getCanBeRestart() {
+	public int getCanBeRestart()
+	{
 
 		return canBeRestart;
 	}
 
-	public void setCanBeRestart(final int canBeRestart) {
+	public void setCanBeRestart(final int canBeRestart)
+	{
 
 		this.canBeRestart = canBeRestart;
 	}
 
-	public String getApplicationName() {
+	public String getApplicationName()
+	{
 
 		return applicationName;
 	}
 
-	public void setApplicationName(final String applicationName) {
+	public void setApplicationName(final String applicationName)
+	{
 
 		this.applicationName = applicationName;
 	}
 
-	public Integer getSessionID() {
+	public Integer getSessionID()
+	{
 
 		return sessionID;
 	}
 
-	public void setSessionID(final Integer sessionID) {
+	public void setSessionID(final Integer sessionID)
+	{
 
 		this.sessionID = sessionID;
 	}
 
-	public String getApplication() {
+	public String getApplication()
+	{
 
 		return application;
 	}
 
-	public void setApplication(final String application) {
+	public void setApplication(final String application)
+	{
 
 		this.application = application;
 	}
 
-	public String getModule() {
+	public String getModule()
+	{
 
 		return module;
 	}
 
-	public void setModule(final String module) {
+	public void setModule(final String module)
+	{
 
 		this.module = module;
 	}
 
-	public String getOther1() {
+	public String getOther1()
+	{
 
 		return other1;
 	}
 
-	public void setOther1(final String other1) {
+	public void setOther1(final String other1)
+	{
 
 		this.other1 = other1;
 	}
 
-	public String getOther2() {
+	public String getOther2()
+	{
 
 		return other2;
 	}
 
-	public void setOther2(final String other2) {
+	public void setOther2(final String other2)
+	{
 
 		this.other2 = other2;
 	}
 
-	public String getOther3() {
+	public String getOther3()
+	{
 
 		return other3;
 	}
 
-	public void setOther3(final String other3) {
+	public void setOther3(final String other3)
+	{
 
 		this.other3 = other3;
 	}
 
-	public ArrayList<DeliverableStruct> getSha1s() {
+	public ArrayList<DeliverableStruct> getSha1s()
+	{
 
 		return sha1s;
 	}
 
-	public void setSha1s(final ArrayList<DeliverableStruct> sha1s) {
+	public void setSha1s(final ArrayList<DeliverableStruct> sha1s)
+	{
 
 		this.sha1s = sha1s;
 	}
 
-	public Map<String, String> getParameters() {
+	public Map<String, String> getParameters()
+	{
 
 		return parameters;
 	}
 
-	public void setParameters(final Map<String, String> parameters) {
+	public void setParameters(final Map<String, String> parameters)
+	{
 
 		this.parameters = parameters;
 	}
@@ -258,6 +280,11 @@ public class JobBase {
 	public void setMyEngine(Object myEngine)
 	{
 		this.myEngine = myEngine;
+	}
+
+	public void setJobInstanceID(Integer jobInstanceID)
+	{
+		this.jobInstanceID = jobInstanceID;
 	}
 
 }

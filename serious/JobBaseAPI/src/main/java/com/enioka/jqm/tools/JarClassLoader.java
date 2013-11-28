@@ -36,6 +36,7 @@ package com.enioka.jqm.tools;
  * limitations under the License.
  */
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -88,9 +89,18 @@ class JarClassLoader extends URLClassLoader
 
 		try
 		{
+			// Job ID
+			Method m = c.getMethod("setJobInstanceID", Integer.class);
+			m.invoke(o, job.getId());
+
+			// Start method that we will have to call
 			Method start = c.getMethod("start", null);
+
+			// Set parameters
 			Method getParameters = c.getMethod("getParameters", null);
 			Method getdefaultConnect = c.getMethod("setDefaultConnect", String.class);
+
+			// Injection
 			Link l = new Link(old, job.getId(), em);
 			Method getMyEngine = c.getMethod("setMyEngine", Object.class);
 			getdefaultConnect.invoke(o, defaultConnection);

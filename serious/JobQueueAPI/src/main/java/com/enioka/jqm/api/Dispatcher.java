@@ -291,6 +291,10 @@ public final class Dispatcher
 		ji.setNode(null);
 		// Can be null (if no email is asked for)
 		ji.setEmail(jd.getEmail());
+		if (jd.getParentID() != null)
+		{
+			ji.setParent(em.find(JobInstance.class, jd.getParentID()));
+		}
 
 		em.persist(ji);
 		ji.setParameters(jps);
@@ -310,6 +314,7 @@ public final class Dispatcher
 		h.setUserName(jd.getUser());
 		h.setEmail(ji.getEmail());
 		h.setPosition(ji.getPosition());
+
 		// h.setNode(null);
 		h.setParameters(new ArrayList<JobHistoryParameter>());
 		em.persist(h);
