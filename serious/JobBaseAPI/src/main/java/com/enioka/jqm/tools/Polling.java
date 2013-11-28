@@ -52,7 +52,7 @@ class Polling implements Runnable
 
 	Polling(DeploymentParameter dp, Map<String, URL[]> cache)
 	{
-		jqmlogger.debug("Polling instanciation with the Deployment Parameter: " + dp.getClassId());
+		jqmlogger.debug("Polling JobInstances with the Deployment Parameter: " + dp.getClassId());
 		this.dp = dp;
 		this.queue = dp.getQueue();
 		this.actualNbThread = 0;
@@ -71,11 +71,20 @@ class Polling implements Runnable
 		em.getTransaction().begin();
 		List<JobInstance> availableJobs = em
 		        .createQuery(
-		                "SELECT j FROM JobInstance j LEFT JOIN FETCH j.jd LEFT JOIN FETCH j.queue WHERE j.queue = :q AND j.state = 'SUBMITTED' ORDER BY j.position ASC",
-		                JobInstance.class).setLockMode(LockModeType.PESSIMISTIC_WRITE).setParameter("q", queue).getResultList();
+		                "SELECT j FROM JobInstance j LEFT JOIN FETCH j.jd LEFT JOIN FETCH j.queue "
+		                        + "WHERE j.queue = :q AND j.state = 'SUBMITTED' ORDER BY j.id ASC", JobInstance.class)
+		        .setParameter("q", queue).getResultList();
 
 		for (JobInstance res : availableJobs)
 		{
+			// Lock is given when object is read, not during select... stupid.
+			// So we must check if the object is still SUBMITTED.
+			em.refresh(res, LockModeType.PESSIMISTIC_WRITE);
+			if (!res.getState().equals("SUBMITTED"))
+			{
+				continue;
+			}
+
 			// Highlander?
 			if (res.getJd().isHighlander() && !highlanderPollingMode(res, em))
 			{
@@ -109,7 +118,7 @@ class Polling implements Runnable
 		        .createQuery(
 		                "SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.id = :n AND (j.state = 'RUNNING' OR j.state = 'ATTRIBUTED')",
 		                JobInstance.class).setParameter("refid", jobToTest.getId()).setParameter("n", jobToTest.getJd().getId())
-		        .setLockMode(LockModeType.PESSIMISTIC_WRITE).getResultList();
+		        .getResultList();
 		return jobs.isEmpty();
 	}
 
@@ -143,9 +152,7 @@ class Polling implements Runnable
 				}
 
 				// Check if a stop order has been given
-				Node n = em.createQuery("SELECT n FROM Node n WHERE n.id = :l", Node.class).setParameter("l", dp.getNode().getId())
-				        .getSingleResult();
-
+				Node n = dp.getNode();
 				if (n.isStop())
 				{
 					jqmlogger.debug("Current node must be stopped: " + dp.getNode().isStop());
