@@ -19,8 +19,9 @@ public class App extends JobBase
 		p.put("p2", (Integer.parseInt(this.parameters.get("p1")) + Integer.parseInt(this.parameters.get("p2")) + ""));
 		System.out.println("BEFORE ENQUEUE");
 
-		if (Integer.parseInt(this.parameters.get("p1")) <= 100) {
-			enQueue("Fibo", "Dark Vador", null, null, null, null, null, null, null, null, null, p);
+		if (Integer.parseInt(this.parameters.get("p1")) <= 100)
+		{
+			enQueue("Fibo", "Dark Vador", null, null, null, null, null, null, null, this.jobInstanceID, null, p);
 		}
 		System.out.println("QUIT FIBO");
 	}
