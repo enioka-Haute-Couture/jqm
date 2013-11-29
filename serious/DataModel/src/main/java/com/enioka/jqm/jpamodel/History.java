@@ -200,7 +200,6 @@ public class History implements Serializable
 
 	public void setParameters(List<JobHistoryParameter> parameters)
 	{
-
 		this.parameters = parameters;
 	}
 

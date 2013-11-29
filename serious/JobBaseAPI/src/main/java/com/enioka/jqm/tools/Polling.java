@@ -45,6 +45,7 @@ class Polling implements Runnable
 	private boolean run = true;
 	private Integer actualNbThread;
 	private JqmEngine engine;
+	private boolean hasStopped = false;
 
 	void stop()
 	{
@@ -225,6 +226,7 @@ class Polling implements Runnable
 			}
 		}
 		this.tp.stop();
+		this.hasStopped = true;
 		jqmlogger.info("Poller on queue " + dp.getQueue().getName() + " has ended");
 		// Let the engine decide if it should stop completely
 		this.engine.checkEngineEnd();
@@ -247,6 +249,6 @@ class Polling implements Runnable
 
 	boolean isRunning()
 	{
-		return this.run;
+		return !this.hasStopped;
 	}
 }

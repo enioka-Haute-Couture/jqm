@@ -261,7 +261,7 @@ public final class Dispatcher
 
 		em.getTransaction().begin();
 		Integer p = em.createQuery("SELECT MAX (j.position) FROM JobInstance j " + "WHERE j.jd.queue.name = :queue", Integer.class)
-		        .setParameter("queue", (job.getQueue().getName())).setLockMode(LockModeType.PESSIMISTIC_WRITE).getSingleResult();
+		        .setParameter("queue", (job.getQueue().getName())).getSingleResult();
 		jqmlogger.debug("POSITION: " + p);
 
 		if (job.isHighlander())
@@ -272,6 +272,7 @@ public final class Dispatcher
 		if (hl != null)
 		{
 			jqmlogger.debug("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + hl);
+			em.getTransaction().commit();
 			return hl;
 		}
 		jqmlogger.debug("Not in highlander mode or no currently enqued instance");
@@ -301,27 +302,20 @@ public final class Dispatcher
 		jqmlogger.debug("JI recently created: " + ji.getId());
 
 		h = new History();
-		// h.setReturnedValue(null);
-		// h.setJobDate(jobDate);
 		h.setJd(job);
 		h.setSessionId(ji.getSessionID());
 		h.setQueue(job.getQueue());
 		h.setMessages(new ArrayList<Message>());
 		h.setJobInstanceId(ji.getId());
 		h.setEnqueueDate(enqueueDate);
-		// h.setExecutionDate(executionDate);
-		// h.setEndDate(endDate);
 		h.setUserName(jd.getUser());
 		h.setEmail(ji.getEmail());
 		if (ji.getParent() != null)
 		{
 			h.setParentJobId(ji.getParent().getId());
 		}
-
-		// h.setNode(null);
 		h.setParameters(new ArrayList<JobHistoryParameter>());
 		em.persist(h);
-
 		jqmlogger.debug("History recently created: " + h.getId());
 
 		for (JobParameter j : ji.getParameters())
@@ -349,7 +343,7 @@ public final class Dispatcher
 		jqmlogger.debug("Highlander mode analysis is begining");
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
 		        .createQuery("SELECT j FROM JobInstance j WHERE j.jd.applicationName = :j", JobInstance.class)
-		        .setLockMode(LockModeType.PESSIMISTIC_WRITE).setParameter("j", jd.getApplicationName()).getResultList();
+		        .setParameter("j", jd.getApplicationName()).getResultList();
 
 		for (JobInstance j : jobs)
 		{

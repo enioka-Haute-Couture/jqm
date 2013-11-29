@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -52,6 +53,7 @@ class JqmEngine
 	private Server server = null;
 	private JndiContext jndiCtx = null;
 	private static Logger jqmlogger = Logger.getLogger(JqmEngine.class);
+	private Semaphore ended = new Semaphore(0);
 
 	/**
 	 * Starts the engine
@@ -103,21 +105,28 @@ class JqmEngine
 	}
 
 	/**
-	 * Nicely stops the engine
+	 * Nicely stop the engine
 	 */
 	public void stop()
 	{
+		jqmlogger.debug("JQM engine has received a stop order");
+		// Stop pollers
 		for (Polling p : pollers)
 		{
 			p.stop();
 		}
+
+		// Jetty is closed automatically when all pollers are down
+
+		// Wait for the end of the world
 		try
 		{
-			server.stop();
-		} catch (Exception e)
+			this.ended.acquire();
+		} catch (InterruptedException e)
 		{
 			jqmlogger.error(e);
 		}
+		jqmlogger.debug("Stop order was correctly handled");
 	}
 
 	Node checkAndUpdateNode(String nodeName)
@@ -276,6 +285,7 @@ class JqmEngine
 		// If here, all pollers are down. Stop Jetty too
 		try
 		{
+			jqmlogger.debug("Jetty will be stopped");
 			this.server.stop();
 		} catch (Exception e)
 		{
@@ -296,6 +306,7 @@ class JqmEngine
 		}
 
 		// Done
+		this.ended.release();
 		jqmlogger.info("JQM engine has stopped");
 	}
 }
