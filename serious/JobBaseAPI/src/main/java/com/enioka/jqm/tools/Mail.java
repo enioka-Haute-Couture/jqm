@@ -32,12 +32,12 @@ class Mail
 		try
 		{
 			this.host = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-					.setParameter("k", "mailSmtp").getSingleResult();
+			        .setParameter("k", "mailSmtp").getSingleResult();
 			this.from = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-					.setParameter("k", "mailFrom").getSingleResult();
+			        .setParameter("k", "mailFrom").getSingleResult();
 			this.ji = ji;
 			this.port = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-					.setParameter("k", "mailPort").getSingleResult();
+			        .setParameter("k", "mailPort").getSingleResult();
 			this.to = ji.getEmail();
 		} catch (NoResultException e)
 		{
@@ -54,6 +54,9 @@ class Mail
 		props.put("mail.smtp.starttls.enable", "true");
 		props.put("mail.smtp.host", host);
 		props.put("mail.smtp.port", port);
+		props.put("mail.smtp.connectiontimeout", 5000);
+		props.put("mail.smtp.timeout", 5000);
+		props.put("mail.smtp.writetimeout", 5000);
 
 		Session session = Session.getInstance(props, new javax.mail.Authenticator()
 		{
@@ -71,9 +74,9 @@ class Mail
 			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
 			msg.setSubject("[JQM] Job: " + ji.getId() + " ENDED");
 			msg.setText("The Job number: " + ji.getId() + " finished correctly\n\no" + "Description of the job:\n" + "- Job definition: "
-					+ ji.getJd().getApplicationName() + "\n" + "- Parent: " + ji.getParent() + "\n" + "- User name: " + ji.getUserName()
-					+ "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "- Queue: " + ji.getQueue().getName() + "\n" + "- Node: "
-					+ ji.getNode().getListeningInterface() + "\n" + "Best regards,\n");
+			        + ji.getJd().getApplicationName() + "\n" + "- Parent: " + ji.getParent() + "\n" + "- User name: " + ji.getUserName()
+			        + "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "- Queue: " + ji.getQueue().getName() + "\n" + "- Node: "
+			        + ji.getNode().getListeningInterface() + "\n" + "Best regards,\n");
 
 			Transport.send(msg);
 			jqmlogger.debug("Email sent successfully...");

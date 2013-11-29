@@ -470,8 +470,14 @@ class Loader implements Runnable
 		// Send e-mail
 		if (job.getEmail() != null)
 		{
-			Mail mail = new Mail(job, em);
-			mail.send();
+			try
+			{
+				Mail mail = new Mail(job, em);
+				mail.send();
+			} catch (Exception e)
+			{
+				jqmlogger.warn("An e-mail could not be sent. No impact on the engine.", e);
+			}
 		}
 
 		// Done

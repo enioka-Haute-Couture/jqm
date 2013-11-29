@@ -886,7 +886,7 @@ public class JobBaseTest
 		JqmEngine engine1 = new JqmEngine();
 		engine1.start(new String[] { "localhost" });
 
-		Thread.sleep(6000);
+		Thread.sleep(10000);
 
 		engine1.stop();
 
