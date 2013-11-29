@@ -104,20 +104,24 @@ class Loader implements Runnable
 				File f = new File(destDir + File.separator + file.getName());
 				if (file.isDirectory())
 				{ // if its a directory, create it
-					jqmlogger.debug("The actual file is a directory");
+					jqmlogger.debug("The file is actually a directory");
 					f.mkdir();
 					continue;
 				}
-				is = jar.getInputStream(file); // get the input stream
+
+				is = jar.getInputStream(file);
 				fos = new FileOutputStream(f);
 				while (is.available() > 0)
-				{ // write contents of 'is' to 'fos'
+				{
+					// write contents of 'is' to 'fos'
 					fos.write(is.read());
 				}
+
+				IOUtils.closeQuietly(fos);
+				IOUtils.closeQuietly(is);
 			}
 
-			IOUtils.closeQuietly(fos);
-			IOUtils.closeQuietly(is);
+			// Done with the jar
 			jar.close();
 		} catch (IOException e)
 		{
@@ -496,7 +500,6 @@ class Loader implements Runnable
 		{
 			try
 			{
-				em.getTransaction().begin();
 				String filePath = (String) ds.getClass().getMethod("getFilePath", null).invoke(ds, null);
 				String fileName = (String) ds.getClass().getMethod("getFileName", null).invoke(ds, null);
 				String hashPath = (String) ds.getClass().getMethod("getHashPath", null).invoke(ds, null);
