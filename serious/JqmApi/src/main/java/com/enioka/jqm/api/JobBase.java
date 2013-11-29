@@ -18,6 +18,7 @@
 
 package com.enioka.jqm.api;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -84,30 +85,85 @@ public class JobBase
 
 	public void sendMsg(final String msg)
 	{
+		// 1: get the method
+		Method getMyEngine = null;
+		Class c = null;
 		try
 		{
-			Class c = myEngine.getClass();
-			Method getMyEngine = c.getMethod("sendMsg", String.class);
-			getMyEngine.invoke(myEngine, msg);
-
-		} catch (Exception e)
+			c = myEngine.getClass();
+			getMyEngine = c.getMethod("sendMsg", String.class);
+		} catch (SecurityException e)
 		{
-			e.printStackTrace();
+			throw new JqmApiException("Could not access the injected sendMsg method", e);
+		} catch (NoSuchMethodException e)
+		{
+			throw new JqmApiException("There was no sendMsg method in the injected object", e);
+		}
+
+		// 2: run the method
+		try
+		{
+			getMyEngine.invoke(myEngine, msg);
+		} catch (IllegalArgumentException e)
+		{
+			throw new JqmApiException("Inccorect parameters for sendMsg method", e);
+		} catch (IllegalAccessException e)
+		{
+			throw new JqmApiException("Could not execute the injected sendMsg method for security reasons", e);
+		} catch (InvocationTargetException e)
+		{
+			if (e.getCause() instanceof RuntimeException)
+			{
+				// it may be a Kill order, or whatever exception...
+				throw (RuntimeException) e.getCause();
+			}
+			else
+			{
+				throw new JqmApiException("An unexpected issue occured during sendMsg", e);
+			}
 		}
 	}
 
 	public void sendProgress(final Integer msg)
 	{
+		// 1: get the method
+		Method getMyEngine = null;
+		Class c = null;
 		try
 		{
-			Class c = myEngine.getClass();
-			Method getMyEngine = c.getMethod("sendProgress", Integer.class);
-			getMyEngine.invoke(myEngine, msg);
-
-		} catch (Exception e)
+			c = myEngine.getClass();
+			getMyEngine = c.getMethod("sendProgress", Integer.class);
+		} catch (SecurityException e)
 		{
-			e.printStackTrace();
+			throw new JqmApiException("Could not access the injected sendProgress method", e);
+		} catch (NoSuchMethodException e)
+		{
+			throw new JqmApiException("There was no sendProgress method in the injected object", e);
 		}
+
+		// 2: run the method
+		try
+		{
+			getMyEngine.invoke(myEngine, msg);
+		} catch (IllegalArgumentException e)
+		{
+			throw new JqmApiException("Incorrect parameters for sendProgress method", e);
+		} catch (IllegalAccessException e)
+		{
+			throw new JqmApiException("Could not execute the injected sendProgress method for security reasons", e);
+		} catch (InvocationTargetException e)
+		{
+			if (e.getCause() instanceof RuntimeException)
+			{
+				// it may be a Kill order, or whatever exception...
+				throw (RuntimeException) e.getCause();
+			}
+			else
+			{
+				throw new JqmApiException("An unexpected issue occured during sendMsg", e);
+			}
+		}
+
 	}
 
 	public int enQueue(String applicationName, String user, String mail, Integer sessionId, String application, String module,

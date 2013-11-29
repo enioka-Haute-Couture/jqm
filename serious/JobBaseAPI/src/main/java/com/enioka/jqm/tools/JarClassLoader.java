@@ -37,6 +37,7 @@ package com.enioka.jqm.tools;
  */
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -46,6 +47,7 @@ import javax.persistence.EntityManager;
 
 import org.apache.log4j.Logger;
 
+import com.enioka.jqm.api.JqmApiException;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
 
@@ -114,10 +116,17 @@ class JarClassLoader extends URLClassLoader
 			}
 
 			start.invoke(o, null);
-		} catch (Exception e)
+		} catch (InvocationTargetException e)
 		{
-			jqmlogger.error("Dynamic code error: ", e);
-			throw e;
+			if (e.getCause() instanceof RuntimeException)
+			{
+				// it may be a Kill order, or whatever exception...
+				throw (RuntimeException) e.getCause();
+			}
+			else
+			{
+				throw e;
+			}
 		}
 		return o;
 	}

@@ -480,27 +480,22 @@ public final class Dispatcher
 	public static void killJob(int idJob)
 	{
 		EntityManager em = getEm();
-		JobInstance j = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class).setParameter("i", idJob)
-		        .getSingleResult();
-		jqmlogger.debug("The " + j.getState() + " job (ID: " + idJob + ")" + " will be killed");
-		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", idJob)
-		        .getSingleResult();
 		em.getTransaction().begin();
-		// em.createQuery("UPDATE JobInstance j SET j.state = :msg WHERE j.id = :j").setParameter("j", idJob)
-		// .setParameter("msg", "KILLED").executeUpdate();
+		JobInstance j = em.find(JobInstance.class, idJob, LockModeType.PESSIMISTIC_READ);
+		jqmlogger.debug("The " + j.getState() + " job (ID: " + idJob + ")" + " will be killed");
+		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class).setParameter("j", idJob)
+		        .getSingleResult();
+
 		j.setState("KILLED");
-		j = em.merge(j);
+
 		Message m = new Message();
 		m.setHistory(h);
-		m.setTextMessage("Status updated: ENDED");
+		m.setTextMessage("Status updated: KILLED");
 		em.persist(m);
-		h = em.merge(h);
+
 		em.getTransaction().commit();
-		em.refresh(j);
-		em.refresh(h);
-		JobInstance jj = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :i", JobInstance.class).setParameter("i", idJob)
-		        .getSingleResult();
-		jqmlogger.debug("Job status after killJob: " + jj.getState());
+		em.close();
+		jqmlogger.debug("Job status after killJob: " + j.getState());
 	}
 
 	// ----------------------------- RESTARTCRASHEDJOB --------------------------------------

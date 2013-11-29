@@ -339,7 +339,10 @@ class Loader implements Runnable
 
 			// Add a message
 			Helpers.createMessage("Status updated: RUNNING", h, em);
-			job.setState("RUNNING");
+			if (job.getState() != "KILLED")
+			{
+				job.setState("RUNNING");
+			}
 			h.setStatus("RUNNING");
 			em.getTransaction().commit();
 			jqmlogger.debug("JobInstance was updated: " + job.getState());
