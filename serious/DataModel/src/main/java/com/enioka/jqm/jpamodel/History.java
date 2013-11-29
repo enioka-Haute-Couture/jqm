@@ -32,7 +32,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -52,14 +51,13 @@ public class History implements Serializable
 	private JobDef jd;
 	@Column(name = "sessionId")
 	private Integer sessionId;
-	@ManyToOne(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Queue.class)
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.Queue.class)
 	@JoinColumn(name = "queue")
 	private Queue queue;
 	@OneToMany(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Message.class, cascade = CascadeType.ALL, mappedBy = "history")
 	private List<Message> messages;
-	@OneToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.JobInstance.class)
-	@JoinColumn(name = "jobInstance")
-	private JobInstance jobInstance;
+	@Column(nullable = true)
+	private Integer jobInstanceId;
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "enqueueDate")
 	private Calendar enqueueDate;
@@ -67,9 +65,9 @@ public class History implements Serializable
 	@Column(name = "executionDate")
 	private Calendar executionDate;
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "endDate")
+	@Column(name = "endDate", nullable = true)
 	private Calendar endDate;
-	@Column(name = "userName")
+	@Column(name = "userName", nullable = true)
 	private String userName;
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Node.class)
 	@JoinColumn(name = "node")
@@ -77,13 +75,12 @@ public class History implements Serializable
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)
 	@JoinColumn(name = "history_id")
 	private List<JobHistoryParameter> parameters;
-	@Column(name = "position")
-	private Integer position;
 	@Column(name = "email")
 	private String email;
-	@ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.JobDef.class)
-	@JoinColumn(name = "parent")
-	private JobDef parent;
+	@Column(name = "parentJobId")
+	private int parentJobId;
+	@Column(length = 20, name = "status")
+	private String status = "SUBMITTED";
 
 	public Integer getId()
 	{
@@ -110,16 +107,6 @@ public class History implements Serializable
 	public void setReturnedValue(final Integer returnedValue)
 	{
 		this.returnedValue = returnedValue;
-	}
-
-	public JobInstance getJobInstance()
-	{
-		return jobInstance;
-	}
-
-	public void setJobInstance(final JobInstance jobInstance)
-	{
-		this.jobInstance = jobInstance;
 	}
 
 	public Calendar getEnqueueDate()
@@ -227,16 +214,6 @@ public class History implements Serializable
 		this.jd = jd;
 	}
 
-	public Integer getPosition()
-	{
-		return position;
-	}
-
-	public void setPosition(Integer position)
-	{
-		this.position = position;
-	}
-
 	public String getEmail()
 	{
 		return email;
@@ -247,13 +224,33 @@ public class History implements Serializable
 		this.email = email;
 	}
 
-	public JobDef getParent()
+	public Integer getJobInstanceId()
 	{
-		return parent;
+		return jobInstanceId;
 	}
 
-	public void setParent(JobDef parent)
+	public void setJobInstanceId(Integer jobInstanceId)
 	{
-		this.parent = parent;
+		this.jobInstanceId = jobInstanceId;
+	}
+
+	public int getParentJobId()
+	{
+		return parentJobId;
+	}
+
+	public void setParentJobId(int parentJobId)
+	{
+		this.parentJobId = parentJobId;
+	}
+
+	public String getStatus()
+	{
+		return status;
+	}
+
+	public void setStatus(String status)
+	{
+		this.status = status;
 	}
 }

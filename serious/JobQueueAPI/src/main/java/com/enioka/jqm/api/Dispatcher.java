@@ -307,13 +307,16 @@ public final class Dispatcher
 		h.setSessionId(ji.getSessionID());
 		h.setQueue(job.getQueue());
 		h.setMessages(new ArrayList<Message>());
-		h.setJobInstance(ji);
+		h.setJobInstanceId(ji.getId());
 		h.setEnqueueDate(enqueueDate);
 		// h.setExecutionDate(executionDate);
 		// h.setEndDate(endDate);
 		h.setUserName(jd.getUser());
 		h.setEmail(ji.getEmail());
-		h.setPosition(ji.getPosition());
+		if (ji.getParent() != null)
+		{
+			h.setParentJobId(ji.getParent().getId());
+		}
 
 		// h.setNode(null);
 		h.setParameters(new ArrayList<JobHistoryParameter>());
@@ -681,19 +684,18 @@ public final class Dispatcher
 			for (int i = 0; i < tmp.size(); i++)
 			{
 
-				url = new URL("http://" + h.getJobInstance().getNode().getListeningInterface() + ":"
-				        + h.getJobInstance().getNode().getPort() + "/getfile?file=" + tmp.get(i).getFilePath() + tmp.get(i).getFileName());
+				url = new URL("http://" + h.getNode().getListeningInterface() + ":" + h.getNode().getPort() + "/getfile?file="
+				        + tmp.get(i).getFilePath() + tmp.get(i).getFileName());
 
 				if (tmp.get(i).getHashPath().equals(Cryptonite.sha1(tmp.get(i).getFilePath() + tmp.get(i).getFileName())))
 				{
 					// mettre en base le repertoire de dl
-					jqmlogger.debug("dlRepository: " + h.getJobInstance().getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/"
-					        + h.getJobInstance().getId() + "/");
-					File dlRepo = new File(h.getJobInstance().getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/"
-					        + h.getJobInstance().getId() + "/");
+					jqmlogger.debug("dlRepository: " + h.getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + h.getJobInstanceId()
+					        + "/");
+					File dlRepo = new File(h.getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + h.getJobInstanceId() + "/");
 					dlRepo.mkdirs();
-					file = new File(h.getJobInstance().getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/"
-					        + h.getJobInstance().getId() + "/" + tmp.get(i).getFileName());
+					file = new File(h.getNode().getDlRepo() + tmp.get(i).getFileFamily() + "/" + h.getJobInstanceId() + "/"
+					        + tmp.get(i).getFileName());
 
 					FileUtils.copyURLToFile(url, file);
 					streams.add(new FileInputStream(file));
@@ -792,26 +794,23 @@ public final class Dispatcher
 
 		try
 		{
-			url = new URL("http://" + h.getJobInstance().getNode().getListeningInterface() + ":" + h.getJobInstance().getNode().getPort()
-			        + "/getfile?file=" + deliverable.getFilePath() + deliverable.getFileName());
+			url = new URL("http://" + h.getNode().getListeningInterface() + ":" + h.getNode().getPort() + "/getfile?file="
+			        + deliverable.getFilePath() + deliverable.getFileName());
 			jqmlogger.debug("URL: " + deliverable.getFilePath() + deliverable.getFileName());
 		} catch (MalformedURLException e)
 		{
 			throw new JqmException("URL is not valid " + url, e);
 		}
 
-		if (deliverable.getHashPath().equals(Cryptonite.sha1(deliverable.getFilePath() + deliverable.getFileName()))
-		        && h.getJobInstance() != null)
+		if (deliverable.getHashPath().equals(Cryptonite.sha1(deliverable.getFilePath() + deliverable.getFileName())) && h.getNode() != null)
 		{
-			jqmlogger.debug("dlRepo: " + h.getJobInstance().getNode().getDlRepo() + deliverable.getFileFamily() + "/"
-			        + h.getJobInstance().getId() + "/");
-			File dlRepo = new File(h.getJobInstance().getNode().getDlRepo() + deliverable.getFileFamily() + "/"
-			        + h.getJobInstance().getId() + "/");
+			jqmlogger.debug("dlRepo: " + h.getNode().getDlRepo() + deliverable.getFileFamily() + "/" + h.getJobInstanceId() + "/");
+			File dlRepo = new File(h.getNode().getDlRepo() + deliverable.getFileFamily() + "/" + h.getJobInstanceId() + "/");
 			dlRepo.mkdirs();
 			try
 			{
-				file = new File(h.getJobInstance().getNode().getDlRepo() + deliverable.getFileFamily() + "/" + h.getJobInstance().getId()
-				        + "/" + deliverable.getFileName());
+				file = new File(h.getNode().getDlRepo() + deliverable.getFileFamily() + "/" + h.getJobInstanceId() + "/"
+				        + deliverable.getFileName());
 				FileUtils.copyURLToFile(url, file);
 			} catch (IOException e)
 			{
@@ -857,7 +856,7 @@ public final class Dispatcher
 		for (int i = 0; i < h.size(); i++)
 		{
 			d = (ArrayList<Deliverable>) em.createQuery("SELECT d FROM Deliverable d WHERE d.jobId = :idJob", Deliverable.class)
-			        .setParameter("idJob", h.get(i).getJobInstance().getId()).getResultList();
+			        .setParameter("idJob", h.get(i).getJobInstanceId()).getResultList();
 			res.addAll(d);
 		}
 		em.close();

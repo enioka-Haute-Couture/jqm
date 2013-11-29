@@ -107,7 +107,6 @@ class JqmEngine
 	 */
 	public void stop()
 	{
-
 		for (Polling p : pollers)
 		{
 			p.stop();
@@ -264,7 +263,7 @@ class JqmEngine
 		this.dps = dps;
 	}
 
-	void checkEngineEnd()
+	synchronized void checkEngineEnd()
 	{
 		for (Polling poller : pollers)
 		{
@@ -285,9 +284,16 @@ class JqmEngine
 
 		// Reset the stop counter - we may want to restart one day
 		this.em.getTransaction().begin();
-		this.em.refresh(this.node, LockModeType.PESSIMISTIC_WRITE);
-		this.node.setStop(false);
-		this.em.getTransaction().commit();
+		try
+		{
+			this.em.refresh(this.node, LockModeType.PESSIMISTIC_WRITE);
+			this.node.setStop(false);
+			this.em.getTransaction().commit();
+		} catch (Exception e)
+		{
+			// Shutdown exception is ignored (happens during tests)
+			this.em.getTransaction().rollback();
+		}
 
 		// Done
 		jqmlogger.info("JQM engine has stopped");

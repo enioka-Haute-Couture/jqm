@@ -190,8 +190,8 @@ class Polling implements Runnable
 
 				// Update the history object: the JI has been attributed
 				em.getTransaction().begin();
-				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance = :j", History.class).setParameter("j", ji)
-				        .getSingleResult();
+				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class)
+				        .setParameter("j", ji.getId()).getSingleResult();
 				h.setNode(dp.getNode());
 				em.getTransaction().commit();
 

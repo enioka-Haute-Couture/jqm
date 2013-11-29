@@ -73,8 +73,8 @@ public class JndiTest
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-wmq/",
-				"jqm-test-jndijms-wmq/jqm-test-jndijms-wmq.jar", TestHelpers.qVip, 42, "Jms", "Franquin", "ModuleMachin", "other1",
-				"other2", "other3", false, em);
+		        "jqm-test-jndijms-wmq/jqm-test-jndijms-wmq.jar", TestHelpers.qVip, 42, "Jms", "Franquin", "ModuleMachin", "other1",
+		        "other2", "other3", false, em);
 
 		JobDefinition form = new JobDefinition("Jms", "MAG");
 		form.addParameter("p1", "1");
@@ -108,7 +108,7 @@ public class JndiTest
 			throw e;
 		}
 
-		Assert.assertEquals("ENDED", h.getJobInstance().getState()); // Exception in jar => CRASHED
+		Assert.assertEquals("ENDED", h.getStatus()); // Exception in jar => CRASHED
 	}
 
 	@Test
@@ -123,8 +123,8 @@ public class JndiTest
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-amq/",
-				"jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
-				"other2", false, em);
+		        "jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
+		        "other2", false, em);
 
 		JobDefinition form = new JobDefinition("Jms", "MAG");
 		Dispatcher.enQueue(form);
@@ -133,7 +133,7 @@ public class JndiTest
 		em.getTransaction().begin();
 		CreationTools.createJndiQueueActiveMQ(em, "jms/testqueue", "test queue", "Q.TEST", null);
 		CreationTools.createJndiQcfActiveMQ(em, "jms/qcf", "test QCF", "vm:broker:(tcp://localhost:1234)?persistent=false&useJmx=false",
-				null);
+		        null);
 		em.getTransaction().commit();
 
 		// Start the engine
@@ -154,7 +154,7 @@ public class JndiTest
 			throw e;
 		}
 
-		Assert.assertEquals("ENDED", h.getJobInstance().getState()); // Exception in jar => CRASHED
+		Assert.assertEquals("ENDED", h.getStatus()); // Exception in jar => CRASHED
 	}
 
 	@Test
@@ -169,8 +169,8 @@ public class JndiTest
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-amq/",
-				"jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
-				"other2", false, em);
+		        "jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
+		        "other2", false, em);
 
 		JobDefinition form = new JobDefinition("Jms", "MAG");
 		Dispatcher.enQueue(form);
@@ -179,7 +179,7 @@ public class JndiTest
 		em.getTransaction().begin();
 		CreationTools.createJndiQueueActiveMQ(em, "jms/testqueue", "test queue", "Q.TEST", null);
 		CreationTools.createJndiQcfActiveMQ(em, "jms/qcf2", "test QCF", "vm:broker:(tcp://localhost:1234)?persistent=false&useJmx=false",
-				null);
+		        null);
 		em.getTransaction().commit();
 
 		// Start the engine
@@ -200,7 +200,7 @@ public class JndiTest
 			throw e;
 		}
 
-		Assert.assertEquals("CRASHED", h.getJobInstance().getState()); // Exception in jar => CRASHED
+		Assert.assertEquals("CRASHED", h.getStatus()); // Exception in jar => CRASHED
 	}
 
 	@Test
@@ -215,7 +215,7 @@ public class JndiTest
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-defcon/", "jqm-test-defcon/jqm-test-defcon.jar",
-				TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+		        TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
 
 		JobDefinition form = new JobDefinition("Jms", "MAG");
 		Dispatcher.enQueue(form);
@@ -240,7 +240,7 @@ public class JndiTest
 			throw e;
 		}
 
-		Assert.assertEquals("ENDED", h.getJobInstance().getState()); // Exception in jar => CRASHED
+		Assert.assertEquals("ENDED", h.getStatus()); // Exception in jar => CRASHED
 	}
 
 }
