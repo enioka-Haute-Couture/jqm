@@ -771,7 +771,7 @@ public final class Dispatcher
 
 		try
 		{
-			h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :job", History.class)
+			h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :job", History.class)
 			        .setParameter("job", deliverable.getJobId()).getSingleResult();
 		} catch (Exception e)
 		{
