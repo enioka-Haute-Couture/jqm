@@ -508,32 +508,24 @@ public final class Dispatcher
 	public static void restartCrashedJob(int idJob)
 	{
 		EntityManager em = getEm();
+		em.getTransaction().begin();
 
-		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", idJob)
+		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class).setParameter("j", idJob)
 		        .getSingleResult();
 
-		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :id", JobInstance.class).setParameter("id", idJob)
-		        .getSingleResult();
+		JobInstance ji = em.find(JobInstance.class, idJob, LockModeType.PESSIMISTIC_READ);
 
 		if (!ji.getJd().isCanBeRestarted())
 		{
-			return;
+			em.getTransaction().commit();
+			throw new JqmException("This type of job was configured to prevent being restarded");
 		}
 
 		Message m = em.createQuery("SELECT m FROM Message m WHERE m.history.id = :h AND m.textMessage = :msg", Message.class)
 		        .setParameter("h", h.getId()).setParameter("msg", "Status updated: CRASHED").getSingleResult();
-
-		em.getTransaction().begin();
 		em.remove(m);
-		em.getTransaction().commit();
-
-		em.getTransaction().begin();
 		ji.setState("SUBMITTED");
-		ji = em.merge(ji);
 		em.getTransaction().commit();
-
-		em.clear();
-
 	}
 
 	// ----------------------------- RESTARTJOB --------------------------------------
@@ -548,11 +540,9 @@ public final class Dispatcher
 	{
 		EntityManager em = getEm();
 
-		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", idJob)
+		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class).setParameter("j", idJob)
 		        .getSingleResult();
-
-		JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :id", JobInstance.class).setParameter("id", idJob)
-		        .getSingleResult();
+		JobInstance ji = em.find(JobInstance.class, idJob);
 
 		if (!ji.getJd().isCanBeRestarted())
 		{
@@ -667,7 +657,7 @@ public final class Dispatcher
 			jqmlogger.debug("idJob of the deliverable: " + idJob);
 			jqmlogger.debug("size of the deliverable list: " + tmp.size());
 
-			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :job", History.class).setParameter("job", idJob)
+			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :job", History.class).setParameter("job", idJob)
 			        .getSingleResult();
 
 			for (int i = 0; i < tmp.size(); i++)

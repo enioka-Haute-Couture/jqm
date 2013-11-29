@@ -78,9 +78,12 @@ class Loader implements Runnable
 
 	Loader(JobInstance job, Map<String, URL[]> cache, Polling p)
 	{
-		this.job = job;
+		this.job = em.find(JobInstance.class, job.getId());
+		this.node = em.find(Node.class, p.getDp().getNode().getId());
 		this.cache = cache;
 		this.p = p;
+		this.h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class).setParameter("j", job.getId())
+		        .getSingleResult();
 	}
 
 	// ExtractJar
@@ -309,9 +312,7 @@ class Loader implements Runnable
 	public void run()
 	{
 		String resultStatus = "";
-
 		jqmlogger.debug("LOADER HAS JUST STARTED UP");
-		node = this.p.getDp().getNode();
 
 		// Create the CLASSPATH for our classloader (if not already in cache)
 		try
