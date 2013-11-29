@@ -171,6 +171,12 @@ public class JobBase
 	{
 		try
 		{
+			// If not given, consider this is a child/parent launch.
+			if (parentId == null)
+			{
+				parentId = this.jobInstanceID;
+			}
+
 			Class c = myEngine.getClass();
 
 			Method getMyEngine = c.getMethod("enQueue", String.class, String.class, String.class, Integer.class, String.class,
