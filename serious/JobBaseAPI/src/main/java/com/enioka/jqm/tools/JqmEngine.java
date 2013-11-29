@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 
@@ -85,21 +86,20 @@ class JqmEngine
 		if (args.length == 1)
 		{
 			node = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :li", Node.class).setParameter("li", args[0])
-					.getSingleResult();
+			        .getSingleResult();
 
 			dps = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
-					.setParameter("n", node.getId()).getResultList();
+			        .setParameter("n", node.getId()).getResultList();
 		}
 
 		for (DeploymentParameter i : dps)
 		{
-
-			Polling p = new Polling(i, cache);
+			Polling p = new Polling(i, cache, this);
 			pollers.add(p);
 			Thread t = new Thread(p);
 			t.start();
 		}
-		jqmlogger.debug("End of main");
+		jqmlogger.info("End of JQM engine initialization");
 	}
 
 	/**
@@ -130,7 +130,7 @@ class JqmEngine
 		try
 		{
 			n = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :l", Node.class).setParameter("l", nodeName)
-					.getSingleResult();
+			        .getSingleResult();
 			jqmlogger.info("Node " + nodeName + " was found in the configuration");
 		} catch (NoResultException e)
 		{
@@ -183,7 +183,7 @@ class JqmEngine
 		// GlobalParameter
 		GlobalParameter gp = null;
 		i = (Long) em.createQuery("SELECT COUNT(gp) FROM GlobalParameter gp WHERE gp.key = :k").setParameter("k", "defaultConnection")
-				.getSingleResult();
+		        .getSingleResult();
 		if (i == 0)
 		{
 			gp = new GlobalParameter();
@@ -212,7 +212,7 @@ class JqmEngine
 		// Deployment parameter
 		DeploymentParameter dp = null;
 		i = (Long) em.createQuery("SELECT COUNT(dp) FROM DeploymentParameter dp WHERE dp.node = :localnode").setParameter("localnode", n)
-				.getSingleResult();
+		        .getSingleResult();
 		if (i == 0)
 		{
 			dp = new DeploymentParameter();
@@ -262,5 +262,34 @@ class JqmEngine
 	public void setDps(List<DeploymentParameter> dps)
 	{
 		this.dps = dps;
+	}
+
+	void checkEngineEnd()
+	{
+		for (Polling poller : pollers)
+		{
+			if (poller.isRunning())
+			{
+				return;
+			}
+		}
+
+		// If here, all pollers are down. Stop Jetty too
+		try
+		{
+			this.server.stop();
+		} catch (Exception e)
+		{
+			// Who cares, we are dying.
+		}
+
+		// Reset the stop counter - we may want to restart one day
+		this.em.getTransaction().begin();
+		this.em.refresh(this.node, LockModeType.PESSIMISTIC_WRITE);
+		this.node.setStop(false);
+		this.em.getTransaction().commit();
+
+		// Done
+		jqmlogger.info("JQM engine has stopped");
 	}
 }

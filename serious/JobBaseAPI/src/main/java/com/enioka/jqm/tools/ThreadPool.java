@@ -58,6 +58,13 @@ class ThreadPool
 		}
 	}
 
+	void stop()
+	{
+		jqmlogger.debug("A thread pool will now try to stop");
+		this.pool.shutdown();
+		jqmlogger.debug("A thread pool has stopped properly");
+	}
+
 	Queue getQueue()
 	{
 		return queue;

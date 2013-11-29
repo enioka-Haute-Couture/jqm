@@ -44,19 +44,21 @@ class Polling implements Runnable
 	private ThreadPool tp = null;
 	private boolean run = true;
 	private Integer actualNbThread;
+	private JqmEngine engine;
 
 	void stop()
 	{
 		run = false;
 	}
 
-	Polling(DeploymentParameter dp, Map<String, URL[]> cache)
+	Polling(DeploymentParameter dp, Map<String, URL[]> cache, JqmEngine engine)
 	{
 		jqmlogger.debug("Polling JobInstances with the Deployment Parameter: " + dp.getClassId());
 		this.dp = dp;
 		this.queue = dp.getQueue();
 		this.actualNbThread = 0;
 		this.tp = new ThreadPool(queue, dp.getNbThread(), cache);
+		this.engine = engine;
 	}
 
 	protected JobInstance dequeue()
@@ -167,6 +169,8 @@ class Polling implements Runnable
 					{
 						run = false;
 					}
+
+					// Whatever happens, do not not take new jobs during shutdown
 					continue;
 				}
 
@@ -220,6 +224,10 @@ class Polling implements Runnable
 				jqmlogger.warn(e);
 			}
 		}
+		this.tp.stop();
+		jqmlogger.info("Poller on queue " + dp.getQueue().getName() + " has ended");
+		// Let the engine decide if it should stop completely
+		this.engine.checkEngineEnd();
 	}
 
 	Integer getActualNbThread()
@@ -235,5 +243,10 @@ class Polling implements Runnable
 	public DeploymentParameter getDp()
 	{
 		return dp;
+	}
+
+	boolean isRunning()
+	{
+		return this.run;
 	}
 }

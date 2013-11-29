@@ -81,8 +81,6 @@ public class Main
 		{
 			jqmlogger.info("Starting engine node " + args[0]);
 			engine.start(args);
-			Thread.sleep(Long.MAX_VALUE);
-
 		} catch (Exception e)
 		{
 			jqmlogger.fatal("Could not launch the engine", e);
