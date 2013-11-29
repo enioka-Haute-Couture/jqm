@@ -77,8 +77,8 @@ public class History implements Serializable
 	private List<JobHistoryParameter> parameters;
 	@Column(name = "email")
 	private String email;
-	@Column(name = "parentJobId")
-	private int parentJobId;
+	@Column(name = "parentJobId", nullable = true)
+	private Integer parentJobId;
 	@Column(length = 20, name = "status")
 	private String status = "SUBMITTED";
 
@@ -233,12 +233,12 @@ public class History implements Serializable
 		this.jobInstanceId = jobInstanceId;
 	}
 
-	public int getParentJobId()
+	public Integer getParentJobId()
 	{
 		return parentJobId;
 	}
 
-	public void setParentJobId(int parentJobId)
+	public void setParentJobId(Integer parentJobId)
 	{
 		this.parentJobId = parentJobId;
 	}

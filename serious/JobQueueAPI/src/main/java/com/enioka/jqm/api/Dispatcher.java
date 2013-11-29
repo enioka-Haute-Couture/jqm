@@ -135,26 +135,6 @@ public final class Dispatcher
 		}
 	}
 
-	// ----------------------------- JOBDEFINITIONTOJOBDEF --------------------------------------
-
-	private static JobDef jobDefinitionToJobDef(JobDefinition jd, EntityManager em)
-	{
-		JobDef job = null;
-
-		try
-		{
-			jqmlogger.debug("Retrieving JobDef for Application named " + jd.getApplicationName());
-			job = em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = :name", JobDef.class)
-			        .setParameter("name", jd.getApplicationName()).getSingleResult();
-		} catch (Exception e)
-		{
-			jqmlogger.error("Could not retrieve JobDef from job instance request", e);
-			return null;
-		}
-
-		return job;
-	}
-
 	private static com.enioka.jqm.api.JobDefinition jobDefToJobDefinition(JobDef jd)
 	{
 
@@ -252,7 +232,8 @@ public final class Dispatcher
 	{
 		jqmlogger.debug("BEGINING ENQUEUE");
 		EntityManager em = getEm();
-		JobDef job = jobDefinitionToJobDef(jd, em);
+		JobDef job = em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = :name", JobDef.class)
+		        .setParameter("name", jd.getApplicationName()).getSingleResult();
 		jqmlogger.debug("Job to enqueue is from JobDef " + job.getId());
 		Integer hl = null;
 		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
@@ -310,10 +291,8 @@ public final class Dispatcher
 		h.setEnqueueDate(enqueueDate);
 		h.setUserName(jd.getUser());
 		h.setEmail(ji.getEmail());
-		if (ji.getParent() != null)
-		{
-			h.setParentJobId(ji.getParent().getId());
-		}
+		h.setParentJobId(jd.getParentID());
+
 		h.setParameters(new ArrayList<JobHistoryParameter>());
 		em.persist(h);
 		jqmlogger.debug("History recently created: " + h.getId());
