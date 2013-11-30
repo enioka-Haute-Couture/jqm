@@ -30,6 +30,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -68,6 +69,18 @@ class JqmEngine
 
 		// Node configuration is in the database
 		node = checkAndUpdateNode(args[0]);
+
+		// Log level
+		try
+		{
+			Logger.getRootLogger().setLevel(Level.toLevel(node.getRootLogLevel()));
+			Logger.getLogger("com.enioka").setLevel(Level.toLevel(node.getRootLogLevel()));
+			jqmlogger.info("Log level is set at " + node.getRootLogLevel() + " which translates as log4j level "
+			        + Level.toLevel(node.getRootLogLevel()));
+		} catch (Exception e)
+		{
+			jqmlogger.warn("Log level could not be set", e);
+		}
 
 		// JNDI
 		if (jndiCtx == null)

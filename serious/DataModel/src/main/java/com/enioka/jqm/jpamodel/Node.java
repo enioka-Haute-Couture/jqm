@@ -26,77 +26,102 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="Node")
+@Table(name = "Node")
 public class Node
 {
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-	@Column(nullable=false, length=1000, name="listeningInterface")
+	@Column(nullable = false, length = 1000, name = "listeningInterface")
 	private String listeningInterface;
-	@Column(nullable=false, name="port")
+	@Column(nullable = false, name = "port")
 	private Integer port;
 
 	// Repo where the deliverables must be downloaded
-	@Column(nullable=false, name="dlRepo")
+	@Column(nullable = false, name = "dlRepo")
 	private String dlRepo;
 
 	// Repo where the jar repository and the pom repository must be relative
-	@Column(nullable=false, name="repo")
+	@Column(nullable = false, name = "repo")
 	private String repo;
 
 	// To stop nicely the current node
-	@Column(nullable=false, name="stop")
+	@Column(nullable = false, name = "stop")
 	private boolean stop = false;
+
+	// To set the log level
+	@Column(name = "rootLogLevel")
+	private String rootLogLevel = "DEBUG";
 
 	public Integer getId()
 	{
 		return id;
 	}
+
 	public void setId(final Integer id)
 	{
 		this.id = id;
 	}
+
 	public String getListeningInterface()
 	{
 		return listeningInterface;
 	}
+
 	public void setListeningInterface(final String listeningInterface)
 	{
 		this.listeningInterface = listeningInterface;
 	}
+
 	public Integer getPort()
 	{
 		return port;
 	}
+
 	public void setPort(final Integer port)
 	{
 		this.port = port;
 	}
 
-	public String getDlRepo() {
+	public String getDlRepo()
+	{
 
 		return dlRepo;
 	}
 
-	public void setDlRepo(final String dlRepo) {
+	public void setDlRepo(final String dlRepo)
+	{
 
 		this.dlRepo = dlRepo;
 	}
+
 	public String getRepo()
 	{
 		return repo;
 	}
+
 	public void setRepo(final String repo)
 	{
 		this.repo = repo;
 	}
+
 	public boolean isStop()
 	{
 		return stop;
 	}
+
 	public void setStop(boolean stop)
 	{
 		this.stop = stop;
+	}
+
+	public String getRootLogLevel()
+	{
+		return rootLogLevel;
+	}
+
+	public void setRootLogLevel(String rootLogLevel)
+	{
+		this.rootLogLevel = rootLogLevel;
 	}
 }
