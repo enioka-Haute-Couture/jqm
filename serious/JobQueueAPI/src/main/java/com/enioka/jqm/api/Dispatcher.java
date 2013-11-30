@@ -518,14 +518,13 @@ public final class Dispatcher
 	public static int restartJob(int idJob)
 	{
 		EntityManager em = getEm();
-
 		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class).setParameter("j", idJob)
 		        .getSingleResult();
 		JobInstance ji = em.find(JobInstance.class, idJob);
 
 		if (!ji.getJd().isCanBeRestarted())
 		{
-			return 0;
+			throw new JqmException("This type of job was configured to prevent being restarded");
 		}
 
 		JobDefinition j = new JobDefinition(ji.getJd().getApplicationName(), h.getUserName());
@@ -534,9 +533,12 @@ public final class Dispatcher
 		{
 			j.addParameter(i.getKey(), i.getValue());
 		}
+		j.setEmail(h.getEmail());
+		j.setParentID(h.getParentJobId());
+		j.setSessionID(h.getSessionId());
 
+		em.close();
 		return Dispatcher.enQueue(j);
-
 	}
 
 	// ----------------------------- SETPOSITION --------------------------------------
