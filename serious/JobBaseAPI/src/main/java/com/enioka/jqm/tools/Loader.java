@@ -485,6 +485,10 @@ class Loader implements Runnable
 		}
 
 		// Done
+		if (job.getState() == "ENDED")
+		{
+			em.remove(job);
+		}
 		em.getTransaction().commit();
 	}
 

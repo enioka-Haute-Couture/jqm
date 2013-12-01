@@ -32,6 +32,7 @@ import org.junit.Test;
 
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
@@ -499,8 +500,8 @@ public class MultiNodeTest
 
 		EntityManager emm = Helpers.getNewEm();
 
-		ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC",
-				JobInstance.class).getResultList();
+		ArrayList<History> res = (ArrayList<History>) emm.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC",
+				History.class).getResultList();
 
 		TestHelpers.printJobInstanceTable();
 
@@ -519,7 +520,7 @@ public class MultiNodeTest
 		EntityManager em = Helpers.getNewEm();
 		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);
-		ArrayList<JobInstance> job = new ArrayList<JobInstance>();
+		ArrayList<History> job = new ArrayList<History>();
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
@@ -673,11 +674,11 @@ public class MultiNodeTest
 		engine2.stop();
 		engine3.stop();
 
-		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j WHERE j.state = :ss", JobInstance.class);
+		TypedQuery<History> query = em.createQuery("SELECT j FROM History j WHERE j.status = :ss", History.class);
 		// 134 messages must be printed
 
 		query.setParameter("ss", "ENDED");
-		job = (ArrayList<JobInstance>) query.getResultList();
+		job = (ArrayList<History>) query.getResultList();
 
 		// 171
 		ArrayList<Message> msgs = (ArrayList<Message>) em.createQuery("SELECT m FROM Message m WHERE m.textMessage = :m", Message.class)

@@ -247,6 +247,11 @@ public class History implements Serializable
 	{
 		return status;
 	}
+	
+	public String getState()
+	{
+		return status;
+	}
 
 	public void setStatus(String status)
 	{

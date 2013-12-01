@@ -160,6 +160,25 @@ public final class Dispatcher
 		return job;
 	}
 
+	private static com.enioka.jqm.api.JobInstance getJobInstance(History h)
+	{
+		com.enioka.jqm.api.JobInstance ji = new com.enioka.jqm.api.JobInstance();
+		ji.setId(h.getJobInstanceId());
+		ji.setParameters(new HashMap<String, String>());
+		ji.setParent(h.getParentJobId());
+		ji.setQueue(getQueue(h.getQueue()));
+		ji.setSessionID(h.getSessionId());
+		ji.setState(h.getStatus());
+		ji.setUser(h.getUserName());
+
+		for (JobHistoryParameter p : h.getParameters())
+		{
+			ji.getParameters().put(p.getKey(), p.getValue());
+		}
+
+		return ji;
+	}
+
 	private static com.enioka.jqm.api.Queue getQueue(Queue queue)
 	{
 		com.enioka.jqm.api.Queue q = new com.enioka.jqm.api.Queue();
@@ -350,7 +369,7 @@ public final class Dispatcher
 	public static com.enioka.jqm.api.JobInstance getJob(int idJob)
 	{
 
-		return getJobInstance(getEm().createQuery("SELECT j FROM JobInstance j WHERE j.id = :job", JobInstance.class)
+		return getJobInstance(getEm().createQuery("SELECT j FROM History j WHERE j.jobInstanceId = :job", History.class)
 		        .setParameter("job", idJob).getSingleResult());
 	}
 
@@ -520,14 +539,13 @@ public final class Dispatcher
 		EntityManager em = getEm();
 		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class).setParameter("j", idJob)
 		        .getSingleResult();
-		JobInstance ji = em.find(JobInstance.class, idJob);
 
-		if (!ji.getJd().isCanBeRestarted())
+		if (!h.getJd().isCanBeRestarted())
 		{
 			throw new JqmException("This type of job was configured to prevent being restarded");
 		}
 
-		JobDefinition j = new JobDefinition(ji.getJd().getApplicationName(), h.getUserName());
+		JobDefinition j = new JobDefinition(h.getJd().getApplicationName(), h.getUserName());
 
 		for (JobHistoryParameter i : h.getParameters())
 		{
@@ -842,19 +860,24 @@ public final class Dispatcher
 	 * @param user
 	 * @return
 	 */
-	public static List<JobInstance> getUserJobs(String user)
+	public static List<com.enioka.jqm.api.JobInstance> getUserJobs(String user)
 	{
-		ArrayList<JobInstance> jobs = null;
+		ArrayList<com.enioka.jqm.api.JobInstance> jobs = new ArrayList<com.enioka.jqm.api.JobInstance>();
+		EntityManager em = getEm();
 
 		try
 		{
-			jobs = (ArrayList<JobInstance>) getEm().createQuery("SELECT j FROM JobInstance j WHERE j.userName = :u", JobInstance.class)
-			        .setParameter("u", user).getResultList();
+			for (History h : em.createQuery("SELECT j FROM History j WHERE j.userName = :u", History.class).setParameter("u", user)
+			        .getResultList())
+			{
+				jobs.add(getJobInstance(h));
+			}
 		} catch (Exception e)
 		{
-			throw new JqmException("The user cannot be found", e);
+			throw new JqmException("The user cannot be found or an error occured getting his jobs", e);
 		}
 
+		em.close();
 		return jobs;
 	}
 
