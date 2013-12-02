@@ -108,7 +108,6 @@ class XmlParser
 
 						canBeRestarted = (ee.getElementsByTagName("canBeRestarted").item(0).getTextContent().equals("true")) ? true : false;
 						javaClassName = ee.getElementsByTagName("javaClassName").item(0).getTextContent();
-						filePath = ee.getElementsByTagName("filePath").item(0).getTextContent();
 						queue = em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true", Queue.class).getSingleResult();
 						maxTimeRunning = Integer.parseInt(ee.getElementsByTagName("maxTimeRunning").item(0).getTextContent());
 
@@ -133,6 +132,7 @@ class XmlParser
 						other2 = ee.getElementsByTagName("other2").item(0).getTextContent();
 						other3 = ee.getElementsByTagName("other3").item(0).getTextContent();
 						highlander = (ee.getElementsByTagName("highlander").item(0).getTextContent().equals("true")) ? true : false;
+						filePath = e.getElementsByTagName("filePath").item(0).getTextContent();
 						jarPath = e.getElementsByTagName("path").item(0).getTextContent();
 
 						NodeList l = ee.getElementsByTagName("parameter");

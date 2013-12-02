@@ -81,6 +81,16 @@ public class History implements Serializable
 	private Integer parentJobId;
 	@Column(length = 20, name = "status")
 	private String status = "SUBMITTED";
+	@Column
+	private String other1;
+	@Column
+	private String other2;
+	@Column
+	private String other3;
+	@Column
+	private String application;
+	@Column
+	private String module;
 
 	public Integer getId()
 	{
@@ -247,7 +257,7 @@ public class History implements Serializable
 	{
 		return status;
 	}
-	
+
 	public String getState()
 	{
 		return status;
@@ -256,5 +266,65 @@ public class History implements Serializable
 	public void setStatus(String status)
 	{
 		this.status = status;
+	}
+
+
+	public String getOther1() {
+
+		return other1;
+	}
+
+
+	public void setOther1(String other1) {
+
+		this.other1 = other1;
+	}
+
+
+	public String getOther2() {
+
+		return other2;
+	}
+
+
+	public void setOther2(String other2) {
+
+		this.other2 = other2;
+	}
+
+
+	public String getOther3() {
+
+		return other3;
+	}
+
+
+	public void setOther3(String other3) {
+
+		this.other3 = other3;
+	}
+
+
+	public String getApplication() {
+
+		return application;
+	}
+
+
+	public void setApplication(String application) {
+
+		this.application = application;
+	}
+
+
+	public String getModule() {
+
+		return module;
+	}
+
+
+	public void setModule(String module) {
+
+		this.module = module;
 	}
 }

@@ -1,14 +1,13 @@
 <jqm>
   <jar>
     <path>jqm-test-fibo/jqm-test-fibo.jar</path>
+    <filePath>jqm-test-fibo/</filePath>
     <jobdefinitions>
       <jobDefinition>
         <name>Fibo</name>
         <description>Test based on the Fibonachi suite</description>
         <canBeRestarted>true</canBeRestarted>
         <javaClassName>com.enioka.jqm.tests.App</javaClassName>
-        <filePath>jqm-test-fibo/</filePath>
-        <queue>VIPQueue</queue>
         <maxTimeRunning>42</maxTimeRunning>
         <application>ApplicationTest</application>
         <module>TestModuleRATONLAVEUR</module>
@@ -32,8 +31,6 @@
         <description>Test to check the xml implementation</description>
         <canBeRestarted>true</canBeRestarted>
         <javaClassName>com.enioka.jqm.tests.App</javaClassName>
-        <filePath>jqm-test-fibo/</filePath>
-        <queue>VIPQueue</queue>
         <maxTimeRunning>42</maxTimeRunning>
         <application>ApplicationTest</application>
         <module>TestModule</module>

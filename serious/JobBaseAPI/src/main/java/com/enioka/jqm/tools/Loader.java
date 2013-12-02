@@ -83,7 +83,7 @@ class Loader implements Runnable
 		this.cache = cache;
 		this.p = p;
 		this.h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class).setParameter("j", job.getId())
-		        .getSingleResult();
+				.getSingleResult();
 	}
 
 	// ExtractJar
@@ -179,7 +179,7 @@ class Loader implements Runnable
 		}
 	}
 
-	void classpathResolution(Node node) throws MalformedURLException, DependencyResolutionException
+	void classpathResolution(Node node) throws MalformedURLException, DependencyResolutionException, NoPomException
 	{
 		File local = new File(System.getProperty("user.home") + "/.m2/repository");
 		File jar = new File(CheckFilePath.fixFilePath(node.getRepo()) + job.getJd().getJarPath());
@@ -207,12 +207,12 @@ class Loader implements Runnable
 				jqmlogger.debug("pomdebug: " + res);
 
 				if (res != null
-				        && (CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()))) != null)
+						&& (CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()))) != null)
 				{
 					is = new FileInputStream(res + "/pom.xml");
 					os = new FileOutputStream(CheckFilePath.fixFilePath(node.getRepo()
-					        + CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-					        + "pom.xml");
+							+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
+							+ "pom.xml");
 
 					int r = 0;
 					byte[] bytes = new byte[1024];
@@ -244,14 +244,14 @@ class Loader implements Runnable
 
 			if (lib == null)
 			{
-				throw new NullPointerException();
+				throw new NoPomException("No pom.xml in the current jar or in the job directory. No lib/ directory in the current jar file.");
 			}
 
 			File dir = new File(lib);
 
 			if (!dir.exists())
 			{
-				throw new NullPointerException();
+				throw new NoPomException("No pom.xml in the current jar or in the job directory. No lib/ directory in the current jar file.");
 			}
 
 			FileFilter fileFilter = new WildcardFileFilter("*.jar");
@@ -273,8 +273,8 @@ class Loader implements Runnable
 			Dependencies dependencies = new Dependencies(pomFile.getAbsolutePath());
 
 			List<GlobalParameter> repolist = em
-			        .createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
-			        .setParameter("repo", "mavenRepo").getResultList();
+					.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
+					.setParameter("repo", "mavenRepo").getResultList();
 
 			RemoteRepository[] rr = new RemoteRepository[repolist.size()];
 			int ii = 0;
@@ -330,7 +330,7 @@ class Loader implements Runnable
 		{
 			em.getTransaction().begin();
 			h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class)
-			        .setLockMode(LockModeType.PESSIMISTIC_READ).setParameter("j", job.getId()).getSingleResult();
+					.setLockMode(LockModeType.PESSIMISTIC_READ).setParameter("j", job.getId()).getSingleResult();
 			job = em.find(JobInstance.class, job.getId(), LockModeType.PESSIMISTIC_READ);
 
 			Date date = new Date();
@@ -357,7 +357,7 @@ class Loader implements Runnable
 
 		// Get the default connection
 		String defaultconnection = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = 'defaultConnection'",
-		        String.class).getSingleResult();
+				String.class).getSingleResult();
 
 		// Class loader switch
 		JarClassLoader jobClassLoader = null;
@@ -459,8 +459,8 @@ class Loader implements Runnable
 		try
 		{
 			FileUtils.deleteDirectory(new File(CheckFilePath.fixFilePath(node.getRepo()
-			        + CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-			        + "tmp" + job.getId() + "/"));
+					+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
+					+ "tmp" + job.getId() + "/"));
 		} catch (IOException e)
 		{
 			jqmlogger.warn("Could not delete a temp file. It may result in filling up the file system", e);
@@ -496,8 +496,9 @@ class Loader implements Runnable
 	@SuppressWarnings("unchecked")
 	private void processDeliverables() throws JqmEngineException
 	{
-		if (this.jobBase == null)
+		if (this.jobBase == null) {
 			return;
+		}
 
 		Method m;
 		ArrayList<Object> dss;
@@ -525,8 +526,8 @@ class Loader implements Runnable
 			} catch (Exception e)
 			{
 				jqmlogger
-				        .error("Could not analyse a deliverbale - it may be of an incorrect Java class. Job has run correctly - it's only missing its produce.",
-				                e);
+				.error("Could not analyse a deliverbale - it may be of an incorrect Java class. Job has run correctly - it's only missing its produce.",
+						e);
 			}
 		}
 	}

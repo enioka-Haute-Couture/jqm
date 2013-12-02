@@ -36,7 +36,6 @@ package com.enioka.jqm.tools;
  * limitations under the License.
  */
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -47,7 +46,6 @@ import javax.persistence.EntityManager;
 
 import org.apache.log4j.Logger;
 
-import com.enioka.jqm.api.JqmApiException;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
 
@@ -101,11 +99,23 @@ class JarClassLoader extends URLClassLoader
 			// Set parameters
 			Method getParameters = c.getMethod("getParameters", null);
 			Method getdefaultConnect = c.getMethod("setDefaultConnect", String.class);
+			Method setOther1 = c.getMethod("setOther1", String.class);
+			Method setOther2 = c.getMethod("setOther2", String.class);
+			Method setOther3 = c.getMethod("setOther3", String.class);
+			Method setSessionID = c.getMethod("setSessionID", Integer.class);
+			Method setApplication= c.getMethod("setApplication", String.class);
+			Method setModule = c.getMethod("setModule", String.class);
 
 			// Injection
 			Link l = new Link(old, job.getId(), em);
 			Method getMyEngine = c.getMethod("setMyEngine", Object.class);
 			getdefaultConnect.invoke(o, defaultConnection);
+			setOther1.invoke(o, job.getJd().getOther1());
+			setOther2.invoke(o, job.getJd().getOther2());
+			setOther3.invoke(o, job.getJd().getOther3());
+			setSessionID.invoke(o, job.getSessionID());
+			setApplication.invoke(o, job.getJd().getApplication());
+			setModule.invoke(o, job.getJd().getModule());
 			getMyEngine.invoke(o, l);
 
 			Map<String, String> params = (Map<String, String>) getParameters.invoke(o, null);

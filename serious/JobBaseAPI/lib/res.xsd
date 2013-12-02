@@ -11,11 +11,13 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element ref="path"/>
+        <xs:element ref="filePath"/>
         <xs:element ref="jobdefinitions"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="path" type="xs:string"/>
+  <xs:element name="filePath" type="xs:string"/>
   <xs:element name="jobdefinitions">
     <xs:complexType>
       <xs:sequence>
@@ -30,8 +32,6 @@
         <xs:element ref="description"/>
         <xs:element ref="canBeRestarted"/>
         <xs:element ref="javaClassName"/>
-        <xs:element ref="filePath"/>
-        <xs:element ref="queue"/>
         <xs:element ref="maxTimeRunning"/>
         <xs:element ref="application"/>
         <xs:element ref="module"/>
@@ -47,8 +47,6 @@
   <xs:element name="description" type="xs:string"/>
   <xs:element name="canBeRestarted" type="xs:boolean"/>
   <xs:element name="javaClassName" type="xs:NCName"/>
-  <xs:element name="filePath" type="xs:string"/>
-  <xs:element name="queue" type="xs:NCName"/>
   <xs:element name="maxTimeRunning" type="xs:integer"/>
   <xs:element name="application" type="xs:NCName"/>
   <xs:element name="module" type="xs:NCName"/>
