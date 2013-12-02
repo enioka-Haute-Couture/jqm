@@ -201,7 +201,7 @@ public class QueueTest
 			job = (ArrayList<JobInstance>) query.getResultList();
 
 			if (job.size() > 3)
-				Assert.assertEquals(false, true);
+				Assert.fail();
 			i++;
 		}
 		engine1.stop();

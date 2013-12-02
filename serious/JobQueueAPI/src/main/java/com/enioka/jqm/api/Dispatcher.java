@@ -244,7 +244,7 @@ public final class Dispatcher
 	 * Ask for a new job instance, as described in the parameter object
 	 * 
 	 * @param jd
-	 *            the description of the desired job instance
+	 *            the definition of the desired job instance
 	 * @return
 	 */
 	public static int enQueue(JobDefinition jd)
@@ -270,6 +270,7 @@ public final class Dispatcher
 		{
 			jqmlogger.debug("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + hl);
 			em.getTransaction().commit();
+			em.close();
 			return hl;
 		}
 		jqmlogger.debug("Not in highlander mode or no currently enqued instance");
@@ -336,10 +337,14 @@ public final class Dispatcher
 
 	// ----------------------------- HIGHLANDER --------------------------------------
 
+	// Must be called within an active JPA transaction
 	private static Integer highlanderMode(JobDef jd, EntityManager em)
 	{
-		Integer res = null;
+		// Synchronization is done through locking the JobDef
+		em.lock(jd, LockModeType.WRITE);
 
+		// Do the analysis
+		Integer res = null;
 		jqmlogger.debug("Highlander mode analysis is begining");
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
 		        .createQuery("SELECT j FROM JobInstance j WHERE j.jd.applicationName = :j", JobInstance.class)
