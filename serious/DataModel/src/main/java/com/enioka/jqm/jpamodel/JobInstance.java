@@ -55,7 +55,7 @@ public class JobInstance implements Comparable<JobInstance>, Serializable
 	@Column(length = 50, name = "username")
 	private String userName;
 	@Column(name = "sessionId")
-	private Integer sessionID;
+	private String sessionID;
 	@Column(length = 50, name = "state")
 	private String state;
 	@Column(name = "position")
@@ -84,7 +84,7 @@ public class JobInstance implements Comparable<JobInstance>, Serializable
 		return userName;
 	}
 
-	public int getSessionID()
+	public String getSessionID()
 	{
 		return sessionID;
 	}
@@ -124,7 +124,7 @@ public class JobInstance implements Comparable<JobInstance>, Serializable
 		this.userName = user;
 	}
 
-	public void setSessionID(final Integer sessionID)
+	public void setSessionID(final String sessionID)
 	{
 		this.sessionID = sessionID;
 	}

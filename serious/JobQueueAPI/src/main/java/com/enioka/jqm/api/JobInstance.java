@@ -31,7 +31,7 @@ public class JobInstance
 	private JobDefinition jd;
 	private Integer parent;
 	private String user;
-	private Integer sessionID;
+	private String sessionID;
 	private String state;
 	private Integer position;
 	private Queue queue;
@@ -103,12 +103,12 @@ public class JobInstance
 	 * 
 	 * @return
 	 */
-	public Integer getSessionID()
+	public String getSessionID()
 	{
 		return sessionID;
 	}
 
-	void setSessionID(Integer sessionID)
+	void setSessionID(String sessionID)
 	{
 		this.sessionID = sessionID;
 	}

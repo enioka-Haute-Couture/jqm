@@ -50,7 +50,7 @@ public class History implements Serializable
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.JobDef.class)
 	private JobDef jd;
 	@Column(name = "sessionId")
-	private Integer sessionId;
+	private String sessionId;
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.Queue.class)
 	@JoinColumn(name = "queue")
 	private Queue queue;
@@ -197,12 +197,12 @@ public class History implements Serializable
 		this.node = node;
 	}
 
-	public Integer getSessionId()
+	public String getSessionId()
 	{
 		return sessionId;
 	}
 
-	public void setSessionId(final Integer sessionId)
+	public void setSessionId(final String sessionId)
 	{
 		this.sessionId = sessionId;
 

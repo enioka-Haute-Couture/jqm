@@ -303,7 +303,7 @@ public final class Dispatcher
 
 		h = new History();
 		h.setJd(job);
-		h.setSessionId(ji.getSessionID());
+		h.setSessionId(jd.getSessionID());
 		h.setQueue(job.getQueue());
 		h.setMessages(new ArrayList<Message>());
 		h.setJobInstanceId(ji.getId());
@@ -316,7 +316,6 @@ public final class Dispatcher
 		h.setOther1(ji.getJd().getOther1());
 		h.setOther2(ji.getJd().getOther2());
 		h.setOther3(ji.getJd().getOther3());
-		h.setSessionId(ji.getSessionID());
 
 		h.setParameters(new ArrayList<JobHistoryParameter>());
 		em.persist(h);

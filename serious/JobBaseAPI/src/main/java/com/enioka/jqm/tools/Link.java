@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
-import com.enioka.jqm.api.JqmException;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
@@ -30,7 +29,7 @@ public class Link
 		this.id = id;
 		ji = em.find(JobInstance.class, id);
 		h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :i", History.class).setParameter("i", this.id)
-		        .getSingleResult();
+				.getSingleResult();
 		// Load the libs if not done already
 		em.refresh(ji);
 	};
@@ -78,8 +77,8 @@ public class Link
 		}
 	}
 
-	public int enQueue(String applicationName, String user, String mail, Integer sessionId, String application, String module,
-	        String other1, String other2, String other3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
+	public int enQueue(String applicationName, String user, String mail, String sessionId, String application, String module,
+			String other1, String other2, String other3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(old);

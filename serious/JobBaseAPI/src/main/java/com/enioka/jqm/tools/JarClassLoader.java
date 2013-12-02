@@ -102,7 +102,7 @@ class JarClassLoader extends URLClassLoader
 			Method setOther1 = c.getMethod("setOther1", String.class);
 			Method setOther2 = c.getMethod("setOther2", String.class);
 			Method setOther3 = c.getMethod("setOther3", String.class);
-			Method setSessionID = c.getMethod("setSessionID", Integer.class);
+			Method setSessionID = c.getMethod("setSessionID", String.class);
 			Method setApplication= c.getMethod("setApplication", String.class);
 			Method setModule = c.getMethod("setModule", String.class);
 

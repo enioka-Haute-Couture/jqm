@@ -29,7 +29,7 @@ public class JobDefinition
 {
 	private Integer parentID;
 	private String applicationName;
-	private Integer sessionID;
+	private String sessionID;
 	private String application;
 	private String user;
 	private String module;
@@ -151,7 +151,7 @@ public class JobDefinition
 	 * 
 	 * @return
 	 */
-	public Integer getSessionID()
+	public String getSessionID()
 	{
 		return sessionID;
 	}
@@ -163,7 +163,7 @@ public class JobDefinition
 	 * 
 	 * @param sessionID
 	 */
-	public void setSessionID(Integer sessionID)
+	public void setSessionID(String sessionID)
 	{
 		this.sessionID = sessionID;
 	}
