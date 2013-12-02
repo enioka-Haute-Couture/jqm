@@ -47,34 +47,34 @@ public class JobDef implements Serializable
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-	@Column(name="description")
+	@Column(name = "description")
 	private String description;
-	@Column(name="canBeRestarted")
+	@Column(name = "canBeRestarted")
 	private boolean canBeRestarted = true;
-	@Column(nullable = false, length = 100, name="javaClassName")
+	@Column(nullable = false, length = 100, name = "javaClassName")
 	private String javaClassName;
-	@Column(length = 1000, name="filePath")
+	@Column(length = 1000, name = "filePath")
 	private String filePath;
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "queue_id")
 	private Queue queue;
-	@Column(name="maxTimeRunning")
+	@Column(name = "maxTimeRunning")
 	private Integer maxTimeRunning;
-	@Column(nullable = false, name="applicationName")
+	@Column(nullable = false, name = "applicationName", unique = true)
 	private String applicationName;
-	@Column(length = 50, name="application")
+	@Column(length = 50, name = "application")
 	private String application;
-	@Column(length = 50, name="module")
+	@Column(length = 50, name = "module")
 	private String module;
-	@Column(length = 50, name="other1")
+	@Column(length = 50, name = "other1")
 	private String other1;
-	@Column(length = 50, name="other2")
+	@Column(length = 50, name = "other2")
 	private String other2;
-	@Column(length = 50, name="other3")
+	@Column(length = 50, name = "other3")
 	private String other3;
-	@Column(name="highlander", nullable=false)
+	@Column(name = "highlander", nullable = false)
 	private boolean highlander = false;
-	@Column(name="jarPath")
+	@Column(name = "jarPath")
 	private String jarPath;
 	@OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "JobDefId")

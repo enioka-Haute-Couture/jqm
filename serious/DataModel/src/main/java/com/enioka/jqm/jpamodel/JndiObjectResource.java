@@ -43,7 +43,7 @@ public class JndiObjectResource implements Serializable
 	private int id;
 
 	// JNDI alias. JQM only allows "context/resource" aliases. E.g.: jms/myqueueconnectionfactory.
-	@Column(nullable = false, length = 100, name="name")
+	@Column(nullable = false, length = 100, name="name", unique = true)
 	private String name;
 
 	// Not used in JQM. Here for completion sake. (Possible values: Container, ?)

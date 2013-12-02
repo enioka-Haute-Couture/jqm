@@ -41,7 +41,7 @@ public class DatabaseProp implements Serializable
 	protected Integer id;
 	@Column(nullable = false, name="driver")
 	private String driver;
-	@Column(nullable = false, name="name")
+	@Column(nullable = false, name="name", unique = true)
 	private String name;
 	@Column(nullable = false, name="url")
 	private String url;

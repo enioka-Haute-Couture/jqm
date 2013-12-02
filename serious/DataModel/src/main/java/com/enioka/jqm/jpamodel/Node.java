@@ -32,7 +32,7 @@ public class Node
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-	@Column(nullable = false, length = 1000, name = "listeningInterface")
+	@Column(nullable = false, length = 1000, name = "nodeName", unique = true)
 	private String listeningInterface;
 	@Column(nullable = false, name = "port")
 	private Integer port;

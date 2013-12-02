@@ -45,7 +45,7 @@ public class Queue implements Serializable
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
-	@Column(nullable = false, length = 50, name="name")
+	@Column(nullable = false, length = 50, name="name", unique = true)
 	private String name;
 	@Column(nullable = false, length = 1000, name="description")
 	private String description;
