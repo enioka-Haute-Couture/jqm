@@ -24,6 +24,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -39,7 +40,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "JobInstance")
-public class JobInstance implements Comparable<JobInstance>, Serializable
+public class JobInstance implements Serializable
 {
 
 	private static final long serialVersionUID = -7710486847228806301L;
@@ -58,8 +59,6 @@ public class JobInstance implements Comparable<JobInstance>, Serializable
 	private String sessionID;
 	@Column(length = 50, name = "state")
 	private String state;
-	@Column(name = "position")
-	private Integer position;
 	@ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Queue.class, fetch = FetchType.EAGER)
 	@JoinColumn(name = "queue_id")
 	private Queue queue;
@@ -70,9 +69,25 @@ public class JobInstance implements Comparable<JobInstance>, Serializable
 	private String email;
 	@Column(name = "progress")
 	private Integer progress;
+	@Column(name = "internalPosition", nullable = false)
+	private double internalPosition;
 
 	@OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "jobinstance")
 	private List<JobParameter> parameters;
+
+	public int getCurrentPosition(EntityManager em)
+	{
+		if (this.state.equals("SUBMITTED"))
+		{
+			return em
+			        .createQuery("SELECT COUNT(ji) FROM JobInstance ji WHERE ji.internalPosition < :p AND ji.state = 'SUBMITTED'",
+			                Long.class).setParameter("p", this.internalPosition).getSingleResult().intValue() + 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
 
 	public int getId()
 	{
@@ -109,16 +124,6 @@ public class JobInstance implements Comparable<JobInstance>, Serializable
 		this.state = state;
 	}
 
-	public Integer getPosition()
-	{
-		return position;
-	}
-
-	public void setPosition(final Integer position)
-	{
-		this.position = position;
-	}
-
 	public void setUserName(final String user)
 	{
 		this.userName = user;
@@ -137,26 +142,6 @@ public class JobInstance implements Comparable<JobInstance>, Serializable
 	public void setParent(final JobInstance parent)
 	{
 		this.parent = parent;
-	}
-
-	@Override
-	public int compareTo(final JobInstance arg0)
-	{
-
-		final int nb1 = arg0.getPosition();
-		final int nb2 = this.getPosition();
-		if (nb1 > nb2)
-		{
-			return -1;
-		}
-		else if (nb1 == nb2)
-		{
-			return 0;
-		}
-		else
-		{
-			return 1;
-		}
 	}
 
 	public Queue getQueue()
@@ -211,5 +196,15 @@ public class JobInstance implements Comparable<JobInstance>, Serializable
 	public void setProgress(Integer progress)
 	{
 		this.progress = progress;
+	}
+
+	public double getInternalPosition()
+	{
+		return internalPosition;
+	}
+
+	public void setInternalPosition(double internalPosition)
+	{
+		this.internalPosition = internalPosition;
 	}
 }

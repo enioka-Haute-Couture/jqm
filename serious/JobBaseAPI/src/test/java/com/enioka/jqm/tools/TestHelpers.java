@@ -118,7 +118,7 @@ public class TestHelpers
 		for (JobInstance jobInstance : res)
 		{
 			jqmlogger.debug("==========================================================================================");
-			jqmlogger.debug("JobInstance Id: " + jobInstance.getId() + " ---> " + jobInstance.getPosition() + " | "
+			jqmlogger.debug("JobInstance Id: " + jobInstance.getId() + " ---> " + jobInstance.getCurrentPosition(em) + " | "
 					+ jobInstance.getState() + " | " + jobInstance.getJd().getId() + " | " + jobInstance.getQueue().getName());
 			jqmlogger.debug("==========================================================================================");
 		}

@@ -75,7 +75,7 @@ class Polling implements Runnable
 		List<JobInstance> availableJobs = em
 		        .createQuery(
 		                "SELECT j FROM JobInstance j LEFT JOIN FETCH j.jd LEFT JOIN FETCH j.queue "
-		                        + "WHERE j.queue = :q AND j.state = 'SUBMITTED' ORDER BY j.id ASC", JobInstance.class)
+		                        + "WHERE j.queue = :q AND j.state = 'SUBMITTED' ORDER BY j.internalPosition ASC", JobInstance.class)
 		        .setParameter("q", queue).getResultList();
 
 		for (JobInstance res : availableJobs)

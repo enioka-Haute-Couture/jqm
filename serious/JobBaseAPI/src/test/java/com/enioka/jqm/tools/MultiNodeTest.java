@@ -129,10 +129,10 @@ public class MultiNodeTest
 		engine1.stop();
 		engine2.stop();
 
-		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
-		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+		TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.executionDate ASC", History.class);
+		ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
-		for (JobInstance jobInstance : res)
+		for (History jobInstance : res)
 		{
 			Assert.assertEquals("ENDED", jobInstance.getState());
 		}
@@ -203,10 +203,10 @@ public class MultiNodeTest
 		engine1.stop();
 		engine2.stop();
 
-		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
-		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+		TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.executionDate ASC", History.class);
+		ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
-		for (JobInstance jobInstance : res)
+		for (History jobInstance : res)
 		{
 			Assert.assertEquals("ENDED", jobInstance.getState());
 		}
@@ -278,10 +278,10 @@ public class MultiNodeTest
 		engine1.stop();
 		engine2.stop();
 
-		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
-		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+		TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.executionDate ASC", History.class);
+		ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
-		for (JobInstance jobInstance : res)
+		for (History jobInstance : res)
 		{
 			Assert.assertEquals("ENDED", jobInstance.getState());
 		}
@@ -440,10 +440,10 @@ public class MultiNodeTest
 		engine2.stop();
 		engine3.stop();
 
-		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
-		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+		TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.executionDate ASC", History.class);
+		ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
-		for (JobInstance jobInstance : res)
+		for (History jobInstance : res)
 		{
 			Assert.assertEquals("ENDED", jobInstance.getState());
 		}
