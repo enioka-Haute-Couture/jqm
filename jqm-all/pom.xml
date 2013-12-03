@@ -23,6 +23,12 @@
        
 	</modules>
     
+	<scm>
+		<developerConnection>scm:git:ssh://git@git.enioka.com/jqm.git</developerConnection>
+		<connection>scm:git:ssh://git@git.enioka.com/jqm.git</connection>
+		<url>https://git.enioka.com/?p=jqm.git;a=summary</url>
+	</scm>
+	
 	<profiles>
 		<profile>
 			<id>internal</id>
