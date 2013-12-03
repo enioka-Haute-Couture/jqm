@@ -293,6 +293,7 @@ public final class Dispatcher
 		{
 			ji.setParent(em.find(JobInstance.class, jd.getParentID()));
 		}
+		ji.setProgress(0);
 
 		em.persist(ji);
 		ji.setInternalPosition(ji.getId());
@@ -314,6 +315,7 @@ public final class Dispatcher
 		h.setOther1(ji.getJd().getOther1());
 		h.setOther2(ji.getJd().getOther2());
 		h.setOther3(ji.getJd().getOther3());
+		h.setProgress(0);
 
 		h.setParameters(new ArrayList<JobHistoryParameter>());
 		em.persist(h);
