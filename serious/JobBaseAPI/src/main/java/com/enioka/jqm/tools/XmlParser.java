@@ -36,7 +36,7 @@ class XmlParser
 	{
 	}
 
-	void parse(String path)
+	void parse(String path) throws SAXException, ParserConfigurationException, IOException
 	{
 		File f = new File(path);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -57,24 +57,13 @@ class XmlParser
 
 		SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		Schema schema = null;
-		try
-		{
-			schema = factory.newSchema(new File("./lib/res.xsd"));
-			Validator validator = schema.newValidator();
-			DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			Document document = parser.parse(f);
-			validator.validate(new DOMSource(document));
-		} catch (SAXException e1)
-		{
-			jqmlogger.debug(e1);
-		} catch (ParserConfigurationException e)
-		{
-			jqmlogger.debug(e);
 
-		} catch (IOException e)
-		{
-			jqmlogger.debug(e);
-		}
+		schema = factory.newSchema(new File("./lib/res.xsd"));
+		Validator validator = schema.newValidator();
+		DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		Document document = parser.parse(f);
+		validator.validate(new DOMSource(document));
+
 
 		try
 		{
