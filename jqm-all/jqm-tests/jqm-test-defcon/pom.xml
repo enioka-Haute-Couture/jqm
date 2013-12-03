@@ -3,7 +3,7 @@
   <parent>
       <groupId>com.enioka.jqm</groupId>
       <artifactId>jqm-tests</artifactId>
-      <version>1.1.1</version>
+      <version>1.1.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>jqm-test-defcon</artifactId>
@@ -13,7 +13,7 @@
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-api</artifactId>
 			<type>jar</type>
-			<version>1.1.1</version>
+			<version>1.1.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
