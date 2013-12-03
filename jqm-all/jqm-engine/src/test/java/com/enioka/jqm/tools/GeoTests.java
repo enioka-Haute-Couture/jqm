@@ -21,6 +21,7 @@ package com.enioka.jqm.tools;
 import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
@@ -31,6 +32,7 @@ import org.junit.Test;
 
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 
@@ -107,5 +109,12 @@ public class GeoTests
 
 		long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
 		Assert.assertTrue(i > 3);
+		TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
+		ArrayList<History> res = (ArrayList<History>) query.getResultList();
+
+		for (History history : res) {
+			Assert.assertEquals("ENDED", history.getState());
+
+		}
 	}
 }

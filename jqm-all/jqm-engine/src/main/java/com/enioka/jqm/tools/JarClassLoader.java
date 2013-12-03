@@ -108,7 +108,7 @@ class JarClassLoader extends URLClassLoader
 
 			// Injection
 			Link l = new Link(old, job.getId(), em);
-			Method getMyEngine = c.getMethod("setMyEngine", Object.class);
+			Method setMyEngine = c.getMethod("setMyEngine", Object.class);
 			getdefaultConnect.invoke(o, defaultConnection);
 			setOther1.invoke(o, job.getJd().getOther1());
 			setOther2.invoke(o, job.getJd().getOther2());
@@ -116,7 +116,7 @@ class JarClassLoader extends URLClassLoader
 			setSessionID.invoke(o, job.getSessionID());
 			setApplication.invoke(o, job.getJd().getApplication());
 			setModule.invoke(o, job.getJd().getModule());
-			getMyEngine.invoke(o, l);
+			setMyEngine.invoke(o, l);
 
 			Map<String, String> params = (Map<String, String>) getParameters.invoke(o, null);
 			for (JobParameter i : job.getParameters())
