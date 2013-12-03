@@ -97,15 +97,13 @@ public class GeoTests
 		engine2.start(new String[] { "localhost4" });
 		engine3.start(new String[] { "localhost5" });
 
-		Thread.sleep(30000);
+		Thread.sleep(15000);
 		jqmlogger.debug("###############################################################");
 		jqmlogger.debug("SHUTDOWN");
 		jqmlogger.debug("###############################################################");
 		engine1.stop();
 		engine2.stop();
 		engine3.stop();
-
-		// TestHelpers.printJobInstanceTable();
 
 		long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
 		Assert.assertTrue(i > 3);
@@ -118,7 +116,6 @@ public class GeoTests
 			{
 				Assert.fail("No job should be crashed");
 			}
-
 		}
 
 		Assert.assertEquals(31, res.size());
