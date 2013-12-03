@@ -10,6 +10,9 @@
 	<artifactId>jqm-test-datetimemaven2</artifactId>
     <packaging>pom</packaging>
 
+	<modules>
+		<module>jqm-test-datetimemavenparent</module>
+	</modules>
 	
 	<dependencies>
 				<dependency>
