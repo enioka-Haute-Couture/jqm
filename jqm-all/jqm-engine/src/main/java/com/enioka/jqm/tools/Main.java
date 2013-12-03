@@ -62,6 +62,7 @@ public class Main
 					} catch (Exception e)
 					{
 						jqmlogger.fatal(e);
+						return;
 					}
 
 				}
@@ -84,6 +85,7 @@ public class Main
 		} catch (Exception e)
 		{
 			jqmlogger.fatal("Could not launch the engine", e);
+			return;
 		}
 	}
 }
