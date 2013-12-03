@@ -19,17 +19,24 @@
 package com.enioka.jqm.tools;
 
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.LockModeType;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
+import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
@@ -74,10 +81,10 @@ class Polling implements Runnable
 		// Get the list of all jobInstance within the defined queue, ordered by position
 		em.getTransaction().begin();
 		List<JobInstance> availableJobs = em
-		        .createQuery(
-		                "SELECT j FROM JobInstance j LEFT JOIN FETCH j.jd LEFT JOIN FETCH j.queue "
-		                        + "WHERE j.queue = :q AND j.state = 'SUBMITTED' ORDER BY j.internalPosition ASC", JobInstance.class)
-		        .setParameter("q", queue).getResultList();
+				.createQuery(
+						"SELECT j FROM JobInstance j LEFT JOIN FETCH j.jd LEFT JOIN FETCH j.queue "
+								+ "WHERE j.queue = :q AND j.state = 'SUBMITTED' ORDER BY j.internalPosition ASC", JobInstance.class)
+								.setParameter("q", queue).getResultList();
 
 		for (JobInstance res : availableJobs)
 		{
@@ -128,18 +135,20 @@ class Polling implements Runnable
 	protected boolean highlanderPollingMode(JobInstance jobToTest, EntityManager em)
 	{
 		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
-		        .createQuery(
-		                "SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.id = :n AND (j.state = 'RUNNING' OR j.state = 'ATTRIBUTED')",
-		                JobInstance.class).setParameter("refid", jobToTest.getId()).setParameter("n", jobToTest.getJd().getId())
-		        .getResultList();
+				.createQuery(
+						"SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.id = :n AND (j.state = 'RUNNING' OR j.state = 'ATTRIBUTED')",
+						JobInstance.class).setParameter("refid", jobToTest.getId()).setParameter("n", jobToTest.getJd().getId())
+						.getResultList();
 		return jobs.isEmpty();
 	}
 
 	@Override
 	public void run()
 	{
+		Calendar date = GregorianCalendar.getInstance(Locale.getDefault());
 		while (true)
 		{
+			Calendar today = GregorianCalendar.getInstance(Locale.getDefault());
 			if (em != null)
 			{
 				em.close();
@@ -153,10 +162,27 @@ class Polling implements Runnable
 					break;
 				}
 
+				// if true, CRASHED jobs are removed
+				if (today.DATE != date.DATE)
+				{
+					GlobalParameter gp = em.createQuery("SELECT g FROM GlobalParameter g WHERE g.key = 'deadline'", GlobalParameter.class).getSingleResult();
+					String[] format = {"yyyy", "MM", "dd"};
+					Date tmp = null;
+					try {
+						tmp = DateUtils.addDays(DateUtils.parseDate(gp.getValue(), format), +10);
+					} catch (ParseException e) {
+						jqmlogger.debug(e);
+					}
+					em.createQuery("DELETE FROM JobInstance j WHERE j.endDate.date > :ddline AND j.state = 'CRASHED'")
+					.setParameter("ddline", tmp)
+					.executeUpdate();
+				}
+
+
 				// Updating the deploymentParameter
 				dp = em.createQuery(
-				        "SELECT dp FROM DeploymentParameter dp LEFT JOIN FETCH dp.queue LEFT JOIN FETCH dp.node WHERE dp.id = :l",
-				        DeploymentParameter.class).setParameter("l", dp.getId()).getSingleResult();
+						"SELECT dp FROM DeploymentParameter dp LEFT JOIN FETCH dp.queue LEFT JOIN FETCH dp.node WHERE dp.id = :l",
+						DeploymentParameter.class).setParameter("l", dp.getId()).getSingleResult();
 				Thread.sleep(dp.getPollingInterval());
 
 				if (!run)
@@ -171,9 +197,9 @@ class Polling implements Runnable
 					jqmlogger.debug("Current node must be stopped: " + dp.getNode().isStop());
 
 					Long nbRunning = (Long) em
-					        .createQuery(
-					                "SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
-					        .setParameter("node", n).getSingleResult();
+							.createQuery(
+									"SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
+									.setParameter("node", n).getSingleResult();
 					jqmlogger.debug("Waiting the end of " + nbRunning + " job(s)");
 
 					if (nbRunning == 0)
@@ -202,7 +228,7 @@ class Polling implements Runnable
 				// Update the history object: the JI has been attributed
 				em.getTransaction().begin();
 				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class)
-				        .setParameter("j", ji.getId()).getSingleResult();
+						.setParameter("j", ji.getId()).getSingleResult();
 				h.setNode(dp.getNode());
 				em.getTransaction().commit();
 

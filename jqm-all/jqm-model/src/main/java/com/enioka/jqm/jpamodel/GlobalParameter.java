@@ -17,6 +17,7 @@ public class GlobalParameter implements Serializable
 	 * 
 	 */
 	private static final long serialVersionUID = 2619971486012565203L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;

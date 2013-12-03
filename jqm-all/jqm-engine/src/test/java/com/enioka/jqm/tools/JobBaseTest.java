@@ -967,6 +967,7 @@ public class JobBaseTest
 				"ModuleMachin", "other", "other", true, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+		j.setSessionID("session42");
 
 		int i = Dispatcher.enQueue(j);
 
@@ -989,7 +990,7 @@ public class JobBaseTest
 		Assert.assertTrue(h.getUserName() != null);
 		Assert.assertTrue(h.getEndDate() != null);
 		Assert.assertTrue(h.getExecutionDate() != null);
-		// Assert.assertTrue(h.getSessionId() != null);
+		Assert.assertTrue(h.getSessionId() != null);
 	}
 
 	@Test
@@ -1332,4 +1333,45 @@ public class JobBaseTest
 		Assert.assertEquals("ENDED", res.get(0).getState());
 		Assert.assertEquals((Integer) 5000, k);
 	}
+
+	//	@Test
+	//	public void testCrashPurge() throws Exception
+	//	{
+	//		jqmlogger.debug("**********************************************************");
+	//		jqmlogger.debug("**********************************************************");
+	//		jqmlogger.debug("Starting test testCrashPurge");
+	//		EntityManager em = Helpers.getNewEm();
+	//		TestHelpers.cleanup(em);
+	//		TestHelpers.createLocalNode(em);
+	//
+	//		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+	//		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+	//		jdargs.add(jdp);
+	//
+	//		@SuppressWarnings("unused")
+	//		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
+	//				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+	//				"ModuleMachin", "other", "other", true, em);
+	//
+	//		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+	//
+	//		int i = Dispatcher.enQueue(j);
+	//
+	//		em.getTransaction().begin();
+	//		JobInstance t = em.find(JobInstance.class, i);
+	//		t.setState("CRASHED");
+	//
+	//		History h = em.createQuery("SELECT j FROM History j WHERE j.id = 1", History.class).getSingleResult();
+	//
+	//		Calendar tmp = GregorianCalendar.getInstance(Locale.getDefault());
+	//		DateUtils.addDays(tmp.getTime(), +10);
+	//		em.getTransaction().commit();
+	//		em.refresh(h);
+	//
+	//		h.setEndDate(tmp);
+	//
+	//		ArrayList<JobInstance> r = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList();
+	//
+	//		Assert.assertEquals(0, r.size());
+	//	}
 }

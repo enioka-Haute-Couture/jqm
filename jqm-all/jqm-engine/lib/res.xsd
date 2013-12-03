@@ -70,5 +70,5 @@
     </xs:complexType>
   </xs:element>
   <xs:element name="key" type="xs:NCName"/>
-  <xs:element name="value" type="xs:integer"/>
+  <xs:element name="value" type="xs:string"/>
 </xs:schema>

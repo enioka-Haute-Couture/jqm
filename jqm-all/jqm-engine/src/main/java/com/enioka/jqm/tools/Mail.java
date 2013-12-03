@@ -32,12 +32,12 @@ class Mail
 		try
 		{
 			this.host = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-			        .setParameter("k", "mailSmtp").getSingleResult();
+					.setParameter("k", "mailSmtp").getSingleResult();
 			this.from = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-			        .setParameter("k", "mailFrom").getSingleResult();
+					.setParameter("k", "mailFrom").getSingleResult();
 			this.ji = ji;
 			this.port = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-			        .setParameter("k", "mailPort").getSingleResult();
+					.setParameter("k", "mailPort").getSingleResult();
 			this.to = ji.getEmail();
 		} catch (NoResultException e)
 		{
@@ -73,10 +73,10 @@ class Mail
 			msg.setFrom(new InternetAddress(from));
 			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
 			msg.setSubject("[JQM] Job: " + ji.getId() + " ENDED");
-			msg.setText("The Job number: " + ji.getId() + " finished correctly\n\no" + "Description of the job:\n" + "- Job definition: "
-			        + ji.getJd().getApplicationName() + "\n" + "- Parent: " + ji.getParentId() + "\n" + "- User name: " + ji.getUserName()
-			        + "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "- Queue: " + ji.getQueue().getName() + "\n" + "- Node: "
-			        + ji.getNode().getListeningInterface() + "\n" + "Best regards,\n");
+			msg.setText("The Job number: " + ji.getId() + " finished correctly\n\n" + "Job description:\n" + "- Job definition: "
+					+ ji.getJd().getApplicationName() + "\n" + "- Parent: " + ji.getParent() + "\n" + "- User name: " + ji.getUserName()
+					+ "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "- Queue: " + ji.getQueue().getName() + "\n" + "- Node: "
+					+ ji.getNode().getListeningInterface() + "\n" + "Best regards,\n");
 
 			Transport.send(msg);
 			jqmlogger.debug("Email sent successfully...");

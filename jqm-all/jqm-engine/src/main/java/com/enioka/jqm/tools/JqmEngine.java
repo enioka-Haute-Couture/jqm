@@ -20,8 +20,11 @@ package com.enioka.jqm.tools;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 
@@ -76,7 +79,7 @@ class JqmEngine
 			Logger.getRootLogger().setLevel(Level.toLevel(node.getRootLogLevel()));
 			Logger.getLogger("com.enioka").setLevel(Level.toLevel(node.getRootLogLevel()));
 			jqmlogger.info("Log level is set at " + node.getRootLogLevel() + " which translates as log4j level "
-			        + Level.toLevel(node.getRootLogLevel()));
+					+ Level.toLevel(node.getRootLogLevel()));
 		} catch (Exception e)
 		{
 			jqmlogger.warn("Log level could not be set", e);
@@ -101,10 +104,10 @@ class JqmEngine
 		if (args.length == 1)
 		{
 			node = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :li", Node.class).setParameter("li", args[0])
-			        .getSingleResult();
+					.getSingleResult();
 
 			dps = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
-			        .setParameter("n", node.getId()).getResultList();
+					.setParameter("n", node.getId()).getResultList();
 		}
 
 		for (DeploymentParameter i : dps)
@@ -151,7 +154,7 @@ class JqmEngine
 		try
 		{
 			n = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :l", Node.class).setParameter("l", nodeName)
-			        .getSingleResult();
+					.getSingleResult();
 			jqmlogger.info("Node " + nodeName + " was found in the configuration");
 		} catch (NoResultException e)
 		{
@@ -204,9 +207,10 @@ class JqmEngine
 		// GlobalParameter
 		GlobalParameter gp = null;
 		i = (Long) em.createQuery("SELECT COUNT(gp) FROM GlobalParameter gp WHERE gp.key = :k").setParameter("k", "defaultConnection")
-		        .getSingleResult();
+				.getSingleResult();
 		if (i == 0)
 		{
+			Calendar deadlineDate = GregorianCalendar.getInstance(Locale.getDefault());
 			gp = new GlobalParameter();
 
 			gp.setKey("mavenRepo");
@@ -223,6 +227,11 @@ class JqmEngine
 			gp.setValue("jdbc/jqm");
 			em.persist(gp);
 
+			gp = new GlobalParameter();
+			gp.setKey("deadline");
+			gp.setValue(deadlineDate.getTime() + "");
+			em.persist(gp);
+
 			jqmlogger.info("This GlobalParameter will allow to download maven resources");
 		}
 		else
@@ -233,7 +242,7 @@ class JqmEngine
 		// Deployment parameter
 		DeploymentParameter dp = null;
 		i = (Long) em.createQuery("SELECT COUNT(dp) FROM DeploymentParameter dp WHERE dp.node = :localnode").setParameter("localnode", n)
-		        .getSingleResult();
+				.getSingleResult();
 		if (i == 0)
 		{
 			dp = new DeploymentParameter();
