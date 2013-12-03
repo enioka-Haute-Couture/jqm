@@ -59,6 +59,7 @@ public class Link
 		em.getTransaction().begin();
 		em.refresh(ji, LockModeType.PESSIMISTIC_WRITE);
 		ji.setProgress(msg);
+		h.setProgress(msg);
 		em.getTransaction().commit();
 
 		jqmlogger.debug("Actual progression: " + ji.getProgress());

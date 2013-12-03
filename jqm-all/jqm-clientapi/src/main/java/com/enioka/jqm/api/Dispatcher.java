@@ -864,11 +864,26 @@ public final class Dispatcher
 
 	public static List<String> getMsg(int idJob)
 	{
-		// -------------TODO------------
-
+		EntityManager em = getEm();
 		ArrayList<String> msgs = new ArrayList<String>();
 
+		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :id", History.class).setParameter("id", idJob).getSingleResult();
+		List<Message> m = h.getMessages();
+
+		for (Message message : m) {
+			msgs.add(message.getTextMessage());
+		}
+
 		return msgs;
+	}
+
+	// ----------------------------- GETPROGRESS --------------------------------------
+	public static Integer getProgress(int idJob)
+	{
+		EntityManager em = getEm();
+
+		History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :id", History.class).setParameter("id", idJob).getSingleResult();
+		return h.getProgress();
 	}
 
 	// ----------------------------- GETUSERJOBS --------------------------------------

@@ -91,6 +91,8 @@ public class History implements Serializable
 	private String application;
 	@Column
 	private String module;
+	@Column
+	private Integer progress;
 
 	public Integer getId()
 	{
@@ -326,5 +328,17 @@ public class History implements Serializable
 	public void setModule(String module) {
 
 		this.module = module;
+	}
+
+
+	public Integer getProgress() {
+
+		return progress;
+	}
+
+
+	public void setProgress(Integer progress) {
+
+		this.progress = progress;
 	}
 }
