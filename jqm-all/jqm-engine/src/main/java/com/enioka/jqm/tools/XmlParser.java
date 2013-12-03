@@ -62,7 +62,7 @@ class XmlParser
 		Validator validator = schema.newValidator();
 		DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document document = parser.parse(f);
-		validator.validate(new DOMSource(document));
+		//validator.validate(new DOMSource(document));
 
 
 		try
