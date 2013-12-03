@@ -105,7 +105,7 @@ public class GeoTests
 		engine2.stop();
 		engine3.stop();
 
-		//TestHelpers.printJobInstanceTable();
+		// TestHelpers.printJobInstanceTable();
 
 		long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
 		Assert.assertTrue(i > 3);
@@ -120,5 +120,7 @@ public class GeoTests
 			}
 
 		}
+
+		Assert.assertEquals(31, res.size());
 	}
 }
