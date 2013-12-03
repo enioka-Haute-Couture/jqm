@@ -50,9 +50,8 @@ public class JobInstance implements Serializable
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "jd_id")
 	private JobDef jd;
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "parent_id")
-	private JobInstance parent;
+	@Column(name = "parentId")
+	private Integer parentId;
 	@Column(length = 50, name = "username")
 	private String userName;
 	@Column(name = "sessionId")
@@ -134,16 +133,6 @@ public class JobInstance implements Serializable
 		this.sessionID = sessionID;
 	}
 
-	public JobInstance getParent()
-	{
-		return parent;
-	}
-
-	public void setParent(final JobInstance parent)
-	{
-		this.parent = parent;
-	}
-
 	public Queue getQueue()
 	{
 
@@ -206,5 +195,15 @@ public class JobInstance implements Serializable
 	public void setInternalPosition(double internalPosition)
 	{
 		this.internalPosition = internalPosition;
+	}
+
+	public Integer getParentId()
+	{
+		return parentId;
+	}
+
+	public void setParentId(Integer parentId)
+	{
+		this.parentId = parentId;
 	}
 }

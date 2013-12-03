@@ -78,7 +78,7 @@ public class GeoTests
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar",
-				TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+		        TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
 
 		JobDefinition form = new JobDefinition("Geo", "MAG");
 		form.addParameter("nbJob", "1");
@@ -105,15 +105,19 @@ public class GeoTests
 		engine2.stop();
 		engine3.stop();
 
-		TestHelpers.printJobInstanceTable();
+		//TestHelpers.printJobInstanceTable();
 
 		long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
 		Assert.assertTrue(i > 3);
 		TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
 		ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
-		for (History history : res) {
-			Assert.assertEquals("ENDED", history.getState());
+		for (History history : res)
+		{
+			if (history.getState() == "CRASHED")
+			{
+				Assert.fail("No job should be crashed");
+			}
 
 		}
 	}
