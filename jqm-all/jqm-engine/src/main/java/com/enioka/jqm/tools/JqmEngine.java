@@ -229,7 +229,7 @@ class JqmEngine
 
 			gp = new GlobalParameter();
 			gp.setKey("deadline");
-			gp.setValue(deadlineDate.getTime().toString());
+			gp.setValue("10");
 			em.persist(gp);
 
 			jqmlogger.info("This GlobalParameter will allow to download maven resources");
