@@ -22,11 +22,15 @@ import java.io.File;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 import org.junit.AfterClass;
@@ -1248,10 +1252,10 @@ public class JobBaseTest
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-sendmsg/",
-				"jqm-test-sendmsg/jqm-test-sendmsg.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
+				"jqm-test-sendmsg/jqm-test-sendmsg.jar", TestHelpers.qVip, 42, "Marsu-Application", null, "Franquin", "ModuleMachin",
 				"other", "other", true, em);
 
-		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+		JobDefinition j = new JobDefinition("Marsu-Application", "MAG");
 
 		int i = Dispatcher.enQueue(j);
 
@@ -1315,7 +1319,6 @@ public class JobBaseTest
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
-		@SuppressWarnings("unused")
 		int i = Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
@@ -1334,44 +1337,52 @@ public class JobBaseTest
 		Assert.assertEquals((Integer) 5000, k);
 	}
 
-	//	@Test
-	//	public void testCrashPurge() throws Exception
-	//	{
-	//		jqmlogger.debug("**********************************************************");
-	//		jqmlogger.debug("**********************************************************");
-	//		jqmlogger.debug("Starting test testCrashPurge");
-	//		EntityManager em = Helpers.getNewEm();
-	//		TestHelpers.cleanup(em);
-	//		TestHelpers.createLocalNode(em);
-	//
-	//		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-	//		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-	//		jdargs.add(jdp);
-	//
-	//		@SuppressWarnings("unused")
-	//		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
-	//				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-	//				"ModuleMachin", "other", "other", true, em);
-	//
-	//		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
-	//
-	//		int i = Dispatcher.enQueue(j);
-	//
-	//		em.getTransaction().begin();
-	//		JobInstance t = em.find(JobInstance.class, i);
-	//		t.setState("CRASHED");
-	//
-	//		History h = em.createQuery("SELECT j FROM History j WHERE j.id = 1", History.class).getSingleResult();
-	//
-	//		Calendar tmp = GregorianCalendar.getInstance(Locale.getDefault());
-	//		DateUtils.addDays(tmp.getTime(), +10);
-	//		em.getTransaction().commit();
-	//		em.refresh(h);
-	//
-	//		h.setEndDate(tmp);
-	//
-	//		ArrayList<JobInstance> r = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList();
-	//
-	//		Assert.assertEquals(0, r.size());
-	//	}
+	// @Test
+	public void testCrashPurge() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testCrashPurge");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		@SuppressWarnings("unused")
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+				"ModuleMachin", "other", "other", true, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+
+		int i = Dispatcher.enQueue(j);
+
+		em.getTransaction().begin();
+		JobInstance t = em.find(JobInstance.class, i);
+		t.setState("CRASHED");
+
+		History h = em.createQuery("SELECT j FROM History j WHERE j.id = 1", History.class).getSingleResult();
+
+		Calendar tmp = GregorianCalendar.getInstance(Locale.getDefault());
+		h.setEndDate(DateUtils.toCalendar(DateUtils.addDays(tmp.getTime(), -11)));
+		em.getTransaction().commit();
+		em.refresh(em.merge(h));
+		em.clear();
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+		jqmlogger.debug("EndDate: " + df.format(h.getEndDate().getTime()));
+
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+		Thread.sleep(3000);
+
+		engine1.stop();
+
+		ArrayList<JobInstance> r = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList();
+
+		Assert.assertEquals(0, r.size());
+	}
 }

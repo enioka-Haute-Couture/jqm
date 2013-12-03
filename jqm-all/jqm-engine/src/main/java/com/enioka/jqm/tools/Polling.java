@@ -19,10 +19,8 @@
 package com.enioka.jqm.tools;
 
 import java.net.URL;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
@@ -142,6 +140,7 @@ class Polling implements Runnable
 		return jobs.isEmpty();
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void run()
 	{
@@ -163,21 +162,30 @@ class Polling implements Runnable
 				}
 
 				// if true, CRASHED jobs are removed
-				if (today.DATE != date.DATE)
+				if (date.DATE != today.DATE)
 				{
+					date = today;
+					Calendar ttt = GregorianCalendar.getInstance(Locale.getDefault());
 					GlobalParameter gp = em.createQuery("SELECT g FROM GlobalParameter g WHERE g.key = 'deadline'", GlobalParameter.class).getSingleResult();
-					String[] format = {"yyyy", "MM", "dd"};
-					Date tmp = null;
-					try {
-						tmp = DateUtils.addDays(DateUtils.parseDate(gp.getValue(), format), +10);
-					} catch (ParseException e) {
-						jqmlogger.debug(e);
-					}
-					em.createQuery("DELETE FROM JobInstance j WHERE j.endDate.date > :ddline AND j.state = 'CRASHED'")
-					.setParameter("ddline", tmp)
-					.executeUpdate();
-				}
+					jqmlogger.debug("DEADLINE: " + gp.getValue());
+					Integer d = Integer.valueOf(gp.getValue());
 
+					ArrayList<History> hs = (ArrayList<History>) em.createQuery("SELECT h FROM JobInstance j, History h WHERE " +
+							"j.state = 'CRASHED' AND h.jobInstanceId = j.id", History.class).getResultList();
+
+					for(History h : hs)
+					{
+						Calendar tt = h.getEndDate();
+						tt.setTime(DateUtils.addDays(h.getEndDate().getTime(), d));
+						em.getTransaction().begin();
+						if (tt.getTime().compareTo(ttt.getTime()) > 0)
+						{
+							jqmlogger.debug("Purging the CRASHED jobs" + h.getJobInstanceId());
+							em.remove(em.find(JobInstance.class, h.getJobInstanceId()));
+						}
+						em.getTransaction().commit();
+					}
+				}
 
 				// Updating the deploymentParameter
 				dp = em.createQuery(
