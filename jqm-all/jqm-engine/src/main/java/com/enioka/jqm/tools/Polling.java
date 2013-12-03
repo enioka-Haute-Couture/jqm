@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.LockModeType;
 
 import org.apache.log4j.Logger;
@@ -82,15 +83,24 @@ class Polling implements Runnable
 		{
 			// Lock is given when object is read, not during select... stupid.
 			// So we must check if the object is still SUBMITTED.
-			em.refresh(res, LockModeType.PESSIMISTIC_WRITE);
+			try
+			{
+				em.refresh(res, LockModeType.PESSIMISTIC_WRITE);
+			} catch (EntityNotFoundException e)
+			{
+				// It has already been eaten and finished by another engine
+				continue;
+			}
 			if (!res.getState().equals("SUBMITTED"))
 			{
+				em.lock(res, LockModeType.NONE);
 				continue;
 			}
 
 			// Highlander?
 			if (res.getJd().isHighlander() && !highlanderPollingMode(res, em))
 			{
+				em.lock(res, LockModeType.NONE);
 				continue;
 			}
 
