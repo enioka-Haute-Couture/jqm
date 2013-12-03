@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.enioka.jqm</groupId>
-        <artifactId>jqm-all</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
+	<parent>
+		<groupId>com.enioka.jqm</groupId>
+		<artifactId>jqm-all</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
 	<artifactId>jqm-engine</artifactId>
-    
-    
+
+
 	<build>
 		<plugins>
 			<plugin>
@@ -29,17 +29,17 @@
 					</archive>
 				</configuration>
 			</plugin>
-            
+
 		</plugins>
 	</build>
-    
+
 	<repositories>
 		<repository>
 			<id>oss.sonatype.org</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 		</repository>
 	</repositories>
-    
+
 	<dependencies>
 		<!-- We need an actual JAP2 implementation here. JAP-API is implied -->
 		<dependency>
@@ -47,19 +47,19 @@
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>4.2.7.Final</version>
 		</dependency>
-        
-        <!-- MAIL -->
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mailapi</artifactId>
-            <version>1.4.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>smtp</artifactId>
-            <version>1.4.5</version>
-        </dependency>
-        
+
+		<!-- MAIL -->
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mailapi</artifactId>
+			<version>1.4.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>smtp</artifactId>
+			<version>1.4.5</version>
+		</dependency>
+
 		<!-- JCABI-AETHER & MAVEN -->
 		<dependency>
 			<groupId>com.jcabi</groupId>
@@ -81,14 +81,14 @@
 			<artifactId>maven-core</artifactId>
 			<version>3.1.0</version>
 		</dependency>
-        
+
 		<!-- LOGGING (Log4J & slf4j-api are from Hibernate) -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.5</version>
 		</dependency>
-        
+
 		<!-- JETTY -->
 		<dependency>
 			<groupId>jetty</groupId>
@@ -105,7 +105,7 @@
 			<artifactId>jetty-servlet</artifactId>
 			<version>7.6.13.v20130916</version>
 		</dependency>
-        
+
 		<!-- JQM APIs -->
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
@@ -119,7 +119,7 @@
 			<type>jar</type>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-        
+
 		<!-- TEST DEPENDENCIES -->
 		<dependency>
 			<groupId>org.hsqldb</groupId>
@@ -127,88 +127,29 @@
 			<version>2.3.1</version>
 			<scope>test</scope>
 		</dependency>
-        
+
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-clientapi</artifactId>
 			<type>jar</type>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-        
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
 			<scope>test</scope>
 		</dependency>
-        
+
 		<!-- TEST JARS (PAYLOADS) -->
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-test-fibo</artifactId>
+			<artifactId>jqm-tests</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>test</scope>
+			<type>pom</type>
 		</dependency>
-        <dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-test-datetimemavenparent</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-test-datetimemaven</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-test-deliverable</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-test-jndijms-amq</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-test-geo</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-test-checkargs</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-test-defcon</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-test-sendmsg</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-test-sendprogress</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-test-datetimesendmsg</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        
-    </dependencies>
+
+	</dependencies>
 </project>
