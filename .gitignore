@@ -9,6 +9,8 @@ testprojects
 test.txt
 *.log
 *.log.*
+*.releaseBackup
+release.properties
 
 /jqmProject/nbproject/private/
 /jqmProject/dist/

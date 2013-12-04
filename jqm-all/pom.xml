@@ -40,6 +40,12 @@
 					<uniqueVersion>false</uniqueVersion>
 					<url>http://10.0.3.128/nexus/content/repositories/snapshots/</url>
 				</snapshotRepository>
+				
+				<repository>
+					<id>nexus</id>
+					<name>internal publication Nexus repository</name>
+					<url>http://10.0.3.128/nexus/content/repositories/releases/</url>
+				</repository>
 			</distributionManagement>
 		</profile>
 	</profiles>
