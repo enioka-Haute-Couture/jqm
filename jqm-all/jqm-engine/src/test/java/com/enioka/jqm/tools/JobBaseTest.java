@@ -725,7 +725,7 @@ public class JobBaseTest
 		JqmEngine engine1 = new JqmEngine();
 		engine1.start(new String[] { "localhost" });
 
-		Thread.sleep(4000);
+		Thread.sleep(8000);
 
 		engine1.stop();
 
@@ -763,7 +763,7 @@ public class JobBaseTest
 		JqmEngine engine1 = new JqmEngine();
 		engine1.start(new String[] { "localhost" });
 
-		Thread.sleep(10000);
+		Thread.sleep(12000);
 
 		engine1.stop();
 
@@ -1146,7 +1146,7 @@ public class JobBaseTest
 		JqmEngine engine1 = new JqmEngine();
 		engine1.start(new String[] { "localhost" });
 
-		Thread.sleep(4000);
+		Thread.sleep(8000);
 
 		engine1.stop();
 
