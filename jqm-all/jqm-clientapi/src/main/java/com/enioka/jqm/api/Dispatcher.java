@@ -131,8 +131,8 @@ public final class Dispatcher
 		} catch (Exception e)
 		{
 			jqmlogger.fatal("Could not create EM. Exiting.", e);
-			System.exit(2);
-			return null;
+			throw new RuntimeException();
+			//return null;
 		}
 	}
 
