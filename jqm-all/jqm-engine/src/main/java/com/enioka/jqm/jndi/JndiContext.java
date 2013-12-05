@@ -1,3 +1,21 @@
+/**
+ * Copyright © 2013 enioka. All rights reserved
+ * Authors: Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *          Pierre COPPEE (pierre.coppee@enioka.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.enioka.jqm.jndi;
 
 import java.util.Hashtable;
@@ -63,7 +81,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 			{
 				EntityManager em = Helpers.getNewEm();
 				db = em.createQuery("SELECT d FROM DatabaseProp d WHERE d.name = :n", DatabaseProp.class).setParameter("n", name)
-				        .getSingleResult();
+						.getSingleResult();
 				em.close();
 			} catch (NonUniqueResultException e)
 			{
@@ -105,7 +123,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 				Thread.currentThread().setContextClassLoader(this.cl);
 				EntityManager em = Helpers.getNewEm();
 				resource = em.createQuery("SELECT t FROM JndiObjectResource t WHERE t.name = :name", JndiObjectResource.class)
-				        .setParameter("name", name).getSingleResult();
+						.setParameter("name", name).getSingleResult();
 				em.close();
 				Thread.currentThread().setContextClassLoader(tmp);
 			} catch (Exception e)
@@ -119,7 +137,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 
 			// Create the ResourceDescriptor from the JPA object
 			JndiResourceDescriptor d = new JndiResourceDescriptor(resource.getType(), resource.getDescription(), null, resource.getAuth(),
-			        false, resource.getFactory(), null);
+					false, resource.getFactory(), null);
 			for (JndiObjectResourceParameter prm : resource.getParameters())
 			{
 				jqmlogger.debug("Setting property " + prm.getKey() + " - " + prm.getValue());

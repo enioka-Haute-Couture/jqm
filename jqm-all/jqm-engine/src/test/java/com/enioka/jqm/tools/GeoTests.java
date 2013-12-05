@@ -1,7 +1,7 @@
 /**
  * Copyright © 2013 enioka. All rights reserved
- * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
- * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ * Authors: Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *          Pierre COPPEE (pierre.coppee@enioka.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@ public class GeoTests
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar",
-		        TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+				TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
 
 		JobDefinition form = new JobDefinition("Geo", "MAG");
 		form.addParameter("nbJob", "1");

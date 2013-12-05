@@ -1,7 +1,7 @@
 /**
  * Copyright © 2013 enioka. All rights reserved
- * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
- * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ * Authors: Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *          Pierre COPPEE (pierre.coppee@enioka.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ class JndiResourceDescriptor extends Reference
 
 	JndiResourceDescriptor(String resourceClass, String description, String scope, String auth, boolean singleton, String factory,
 			String factoryLocation)
-	{
+			{
 		super(resourceClass, factory, factoryLocation);
 		StringRefAddr refAddr = null;
 		if (description != null)
@@ -48,5 +48,5 @@ class JndiResourceDescriptor extends Reference
 		// singleton is a boolean so slightly different handling
 		refAddr = new StringRefAddr("singleton", Boolean.toString(singleton));
 		add(refAddr);
-	}
+			}
 }

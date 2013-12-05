@@ -1,7 +1,7 @@
 /**
  * Copyright © 2013 enioka. All rights reserved
- * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
- * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ * Authors: Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *          Pierre COPPEE (pierre.coppee@enioka.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,10 @@ public class Cryptonite {
 		final MessageDigest mDigest = MessageDigest.getInstance("SHA1");
 		final byte[] result = mDigest.digest(input.getBytes());
 		final StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < result.length; i++)
+		for (int i = 0; i < result.length; i++) {
 			sb.append(Integer.toString((result[i] & 0xff) + 0x100, 16)
 					.substring(1));
+		}
 
 		return sb.toString();
 	}
@@ -59,15 +60,17 @@ public class Cryptonite {
 
 		final byte[] data = new byte[1024];
 		int read = 0;
-		while ((read = fis.read(data)) != -1)
+		while ((read = fis.read(data)) != -1) {
 			sha1.update(data, 0, read);
+		}
 		;
 		final byte[] hashBytes = sha1.digest();
 
 		final StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < hashBytes.length; i++)
+		for (int i = 0; i < hashBytes.length; i++) {
 			sb.append(Integer.toString((hashBytes[i] & 0xff) + 0x100, 16)
 					.substring(1));
+		}
 
 		final String fileHash = sb.toString();
 

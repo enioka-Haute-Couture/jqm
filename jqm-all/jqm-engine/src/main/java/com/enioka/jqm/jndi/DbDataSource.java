@@ -1,7 +1,7 @@
 /**
  * Copyright © 2013 enioka. All rights reserved
- * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
- * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ * Authors: Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *          Pierre COPPEE (pierre.coppee@enioka.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ public class DbDataSource implements DataSource, Serializable
 		return null;
 	}
 
-	/** 
+	/**
 	 * Not supported.
 	 * @return an exception
 	 * @throws SQLFeatureNotSupportedException

@@ -1,7 +1,7 @@
 /**
  * Copyright © 2013 enioka. All rights reserved
- * Authors: Pierre COPPEE (pierre.coppee@enioka.com)
- * Contributors : Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ * Authors: Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *          Pierre COPPEE (pierre.coppee@enioka.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ class Servlet extends HttpServlet
 			response.setContentType("application/octet-stream");
 
 			// Copy bytes from an InputStream to an OutputStream.
-			IOUtils.copy(fis, out); 
+			IOUtils.copy(fis, out);
 		} catch (FileNotFoundException e)
 		{
 			jqmlogger.warn(e);
@@ -68,7 +68,7 @@ class Servlet extends HttpServlet
 		} finally
 		{
 			// Good practice
-			IOUtils.closeQuietly(out); 
+			IOUtils.closeQuietly(out);
 			IOUtils.closeQuietly(fis);
 		}
 	}
