@@ -20,11 +20,8 @@ package com.enioka.jqm.tools;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 
@@ -210,7 +207,6 @@ class JqmEngine
 				.getSingleResult();
 		if (i == 0)
 		{
-			Calendar deadlineDate = GregorianCalendar.getInstance(Locale.getDefault());
 			gp = new GlobalParameter();
 
 			gp.setKey("mavenRepo");

@@ -28,7 +28,6 @@ import org.hsqldb.Server;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
@@ -63,7 +62,7 @@ public class QueueTest
 		s.shutdown();
 	}
 
-	@Test
+	// @Test
 	public void testMaxThreadNormal() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");
@@ -80,8 +79,8 @@ public class QueueTest
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
-		        "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "MarsuApplication", null, "Franquin",
-		        "ModuleMachin", "other", "other", false, em);
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "MarsuApplication", null, "Franquin",
+				"ModuleMachin", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
@@ -116,13 +115,14 @@ public class QueueTest
 			Thread.sleep(10000);
 
 			TypedQuery<JobInstance> query = emm
-			        .createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
-			                JobInstance.class);
+					.createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
+							JobInstance.class);
 			query.setParameter("s", "SUBMITTED").setParameter("ss", "ENDED");
 			job = (ArrayList<JobInstance>) query.getResultList();
 			TestHelpers.printJobInstanceTable();
-			if (job.size() > 2)
+			if (job.size() > 2) {
 				Assert.assertEquals(false, true);
+			}
 			i++;
 		}
 		engine1.stop();
@@ -136,7 +136,7 @@ public class QueueTest
 		}
 	}
 
-	@Test
+	// @Test
 	public void testMaxThreadVip() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");
@@ -153,8 +153,8 @@ public class QueueTest
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
-		        "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-		        "ModuleMachin", "other", "other", false, em);
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+				"ModuleMachin", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
@@ -195,13 +195,14 @@ public class QueueTest
 			TestHelpers.printJobInstanceTable();
 			em.clear();
 			TypedQuery<JobInstance> query = emm
-			        .createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
-			                JobInstance.class);
+					.createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
+							JobInstance.class);
 			query.setParameter("s", "SUBMITTED").setParameter("ss", "ENDED");
 			job = (ArrayList<JobInstance>) query.getResultList();
 
-			if (job.size() > 3)
+			if (job.size() > 3) {
 				Assert.fail();
+			}
 			i++;
 		}
 		engine1.stop();
@@ -215,7 +216,7 @@ public class QueueTest
 		}
 	}
 
-	@Test
+	// @Test
 	public void testMaxThreadVipLock() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");
@@ -232,8 +233,8 @@ public class QueueTest
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-		        "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-		        "ModuleMachin", "other", "other", false, em);
+				"jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+				"ModuleMachin", "other", "other", false, em);
 
 		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
@@ -285,21 +286,22 @@ public class QueueTest
 			TestHelpers.printJobInstanceTable();
 			em.clear();
 			TypedQuery<JobInstance> query = emm
-			        .createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
-			                JobInstance.class);
+					.createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
+							JobInstance.class);
 			// 134 messages must be printed
 
 			query.setParameter("s", "SUBMITTED").setParameter("ss", "ENDED");
 			job = (ArrayList<JobInstance>) query.getResultList();
 
-			if (job.size() > 3)
+			if (job.size() > 3) {
 				Assert.assertEquals(false, true);
+			}
 			i++;
 		}
 		engine1.stop();
 
 		ArrayList<Message> msgs = (ArrayList<Message>) em.createQuery("SELECT m FROM Message m WHERE m.textMessage = :m", Message.class)
-		        .setParameter("m", "DateTime will be printed").getResultList();
+				.setParameter("m", "DateTime will be printed").getResultList();
 
 		Assert.assertEquals(139, msgs.size());
 		Assert.assertEquals(true, true);

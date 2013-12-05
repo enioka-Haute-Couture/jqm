@@ -18,11 +18,7 @@
 
 package com.enioka.jqm.tools;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Locale;
 
 import javax.persistence.EntityManager;
 
@@ -48,8 +44,6 @@ public class TestHelpers
 
 	public static void createLocalNode(EntityManager em)
 	{
-		Calendar deadline = GregorianCalendar.getInstance(Locale.getDefault());
-		SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 		db = CreationTools.createDatabaseProp("jdbc/marsu", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb", "SA", "", em);
 
 		TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenRepo", "http://repo1.maven.org/maven2/", em);
