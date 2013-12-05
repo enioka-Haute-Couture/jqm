@@ -18,7 +18,7 @@
 		<module>jqm-clientapi</module>
 		<module>jqm-api</module>
 		<module>jqm-engine</module>
-        <module>jqm-tests</module>
+    <module>jqm-tests</module>
        
 	</modules>
     
