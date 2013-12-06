@@ -40,6 +40,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.LockModeType;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
@@ -314,10 +315,40 @@ public final class Dispatcher
 		return ji.getId();
 	}
 
-	// ----------------------------- HIGHLANDER --------------------------------------
+	// ----------------------------- HOLDED ------------------------------------------
+	/**
+	 * Set the job status to HOLDED.
+	 * 
+	 * @param idJob
+	 * @return void
+	 */
+	public static void jobBreak(int idJob)
+	{
+		jqmlogger.debug("Job status number " + idJob + " will be set to HOLDED");
+		EntityManager em = getEm();
 
+		em.getTransaction().begin();
+
+		try
+		{
+			@SuppressWarnings("unused")
+			int q = em.createQuery("UPDATE JobInstance j SET j.state = 'HOLDED' WHERE j.id = :idJob").setParameter("idJob", idJob).executeUpdate();
+			@SuppressWarnings("unused")
+			int qq = em.createQuery("UPDATE History j SET j.status = 'HOLDED' WHERE j.jobInstanceId = :idJob").setParameter("idJob", idJob).executeUpdate();
+
+		} catch (Exception e)
+		{
+			jqmlogger.debug(e);
+		}
+
+		em.getTransaction().commit();
+
+		em.close();
+	}
+
+	// ----------------------------- HIGHLANDER --------------------------------------
 	// Must be called within an active JPA transaction
-	private static Integer highlanderMode(JobDef jd, EntityManager em)
+	public static Integer highlanderMode(JobDef jd, EntityManager em)
 	{
 		// Synchronization is done through locking the JobDef
 		em.lock(jd, LockModeType.PESSIMISTIC_WRITE);
@@ -407,11 +438,20 @@ public final class Dispatcher
 		try
 		{
 			@SuppressWarnings("unused")
-			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstance.id = :j", History.class).setParameter("j", idJob)
+			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class).setParameter("j", idJob)
 			.getSingleResult();
 
-			JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :id", JobInstance.class).setParameter("id", idJob)
-					.getSingleResult();
+			@SuppressWarnings("unused")
+			JobInstance ji = null;
+
+			try
+			{
+				ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.id = :id AND j.state = 'SUBMITTED'", JobInstance.class).setParameter("id", idJob)
+						.getSingleResult();
+			} catch (NoResultException e)
+			{
+				jqmlogger.debug("This job cannot be CANCELLED");
+			}
 
 			EntityTransaction transac = em.getTransaction();
 			transac.begin();
@@ -419,14 +459,12 @@ public final class Dispatcher
 			Query q = em.createQuery("UPDATE JobInstance j SET j.state = 'CANCELLED' WHERE j.id = :idJob").setParameter("idJob", idJob);
 			int res = q.executeUpdate();
 
-			em.createQuery(
-					"UPDATE Message m SET m.textMessage = :msg WHERE m.history.id = "
-							+ "(SELECT h.id FROM History h WHERE h.jobInstance.id = :j)").setParameter("j", idJob)
-							.setParameter("msg", "Status updated: CANCELLED by the user: " + ji.getUserName()).executeUpdate();
+			@SuppressWarnings("unused")
+			int qq = em.createQuery("UPDATE History j SET j.status = 'CANCELLED' WHERE j.jobInstanceId = :idJob").setParameter("idJob", idJob).executeUpdate();
 
 			if (res != 1)
 			{
-				jqmlogger.error("CancelJobInQueueError: Job ID or Queue ID doesn't exists.");
+				jqmlogger.error("Job ID can't be cancelled");
 			}
 
 			transac.commit();
@@ -995,27 +1033,7 @@ public final class Dispatcher
 	 */
 	public static void changeQueue(int idJob, Queue queue)
 	{
-		EntityManager em = getEm();
-		EntityTransaction transac = em.getTransaction();
-		transac.begin();
-
-		try
-		{
-			Query query = em.createQuery("UPDATE JobInstance j SET j.queue = :q WHERE j.id = :jd").setParameter("q", queue)
-					.setParameter("jd", idJob);
-			int result = query.executeUpdate();
-
-			if (result != 1)
-			{
-				jqmlogger.info("changeQueueError: Job ID or Queue ID doesn't exists.");
-			}
-		} catch (Exception e)
-		{
-			throw new JqmException("The queue cannot be changed", e);
-		}
-
-		transac.commit();
-		em.close();
+		changeQueue(idJob, queue.getId());
 	}
 
 	private static JobParameter createJobParameter(String key, String value, EntityManager em)
