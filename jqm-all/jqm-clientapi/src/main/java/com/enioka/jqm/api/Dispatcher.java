@@ -400,29 +400,26 @@ public final class Dispatcher
 	 */
 	public static void delJobInQueue(int idJob)
 	{
+		jqmlogger.debug("Job status number " + idJob + " will be deleted");
 		EntityManager em = getEm();
 		EntityTransaction transac = em.getTransaction();
 		Query q = null;
 
-		transac.begin();
-
 		try
 		{
-			q = em.createQuery("DELETE FROM JobInstance j WHERE j.id = :idJob").setParameter("idJob", idJob);
+			transac.begin();
+			em.remove(em.find(JobInstance.class, idJob));
+			History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :i", History.class).setParameter("i", idJob).getSingleResult();
+			em.remove(h);
 		} catch (Exception e)
 		{
-			jqmlogger.info("delJobInQueue: " + e);
-			throw new JqmException("Could not create a query on JobInstance", e);
+			jqmlogger.info(e);
 		}
-		int res = q.executeUpdate();
-
-		if (res != 1)
+		finally
 		{
-			jqmlogger.info("delJobInQueueError: Job ID or Queue ID doesn't exists.");
+			transac.commit();
+			em.close();
 		}
-
-		transac.commit();
-		em.close();
 	}
 
 	// ----------------------------- CANCELJOBINQUEUE --------------------------------------
@@ -1009,6 +1006,10 @@ public final class Dispatcher
 			Query query = em.createQuery("UPDATE JobInstance j SET j.queue = :q WHERE j.id = :jd").setParameter("q", q)
 					.setParameter("jd", idJob);
 			int result = query.executeUpdate();
+
+			@SuppressWarnings("unused")
+			int i = em.createQuery("UPDATE History h SET h.queue = :q WHERE h.jobInstanceId = :jd").setParameter("q", q)
+			.setParameter("jd", idJob).executeUpdate();
 
 			if (result != 1)
 			{

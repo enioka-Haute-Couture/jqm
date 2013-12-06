@@ -1505,4 +1505,83 @@ public class JobBaseTest
 		Assert.assertEquals("CANCELLED", res.get(0).getState());
 		Assert.assertEquals("ENDED", res.get(1).getState());
 	}
+
+	@Test
+	public void testChangeQueue() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testChanegQueue");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		@SuppressWarnings("unused")
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+				"ModuleMachin", "other", "other", false, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+
+		int i = Dispatcher.enQueue(j);
+
+		JqmEngine engine1 = new JqmEngine();
+		Dispatcher.changeQueue(i, TestHelpers.qSlow);
+		TestHelpers.printJobInstanceTable();
+		engine1.start(new String[] { "localhost" });
+		Thread.sleep(5000);
+
+		engine1.stop();
+
+		TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
+		ArrayList<History> res = (ArrayList<History>) query.getResultList();
+
+		Assert.assertEquals(1, res.size());
+		Assert.assertEquals("ENDED", res.get(0).getState());
+		Assert.assertEquals(TestHelpers.qSlow.getName(), res.get(0).getQueue().getName());
+	}
+
+	@Test
+	public void testDelJobInQueue() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testDelJobInQueue");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		@SuppressWarnings("unused")
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+				"ModuleMachin", "other", "other", false, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+
+		int i = Dispatcher.enQueue(j);
+
+		JqmEngine engine1 = new JqmEngine();
+		Dispatcher.delJobInQueue(i);
+		TestHelpers.printJobInstanceTable();
+		engine1.start(new String[] { "localhost" });
+		Thread.sleep(1000);
+
+		engine1.stop();
+
+		TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
+		ArrayList<History> res = (ArrayList<History>) query.getResultList();
+
+		ArrayList<JobInstance> js = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList();
+
+		Assert.assertEquals(0, res.size());
+		Assert.assertEquals(0, js.size());
+	}
 }
