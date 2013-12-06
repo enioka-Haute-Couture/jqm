@@ -191,30 +191,6 @@ public final class Dispatcher
 		return q;
 	}
 
-	private static com.enioka.jqm.api.JobInstance getJobInstance(JobInstance job, EntityManager em)
-	{
-
-		Map<String, String> parameters = new HashMap<String, String>();
-		com.enioka.jqm.api.JobInstance j = new com.enioka.jqm.api.JobInstance();
-
-		for (JobParameter i : job.getParameters())
-		{
-			parameters.put(i.getKey(), i.getValue());
-		}
-
-		j.setId(job.getId());
-		j.setJd(jobDefToJobDefinition(job.getJd()));
-		j.setParameters(parameters);
-		j.setParent(job.getParentId());
-		j.setPosition(job.getCurrentPosition(em));
-		j.setQueue(getQueue(job.getQueue()));
-		j.setSessionID(job.getSessionID());
-		j.setState(job.getState());
-		j.setUser(job.getUserName());
-
-		return j;
-	}
-
 	private static List<JobParameter> overrideParameter(JobDef jdef, JobDefinition jdefinition, EntityManager em)
 	{
 		List<JobParameter> res = new ArrayList<JobParameter>();
@@ -730,7 +706,7 @@ public final class Dispatcher
 	 */
 	public static List<com.enioka.jqm.api.Deliverable> getAllDeliverables(int idJob)
 	{
-		ArrayList<Deliverable> deliverables = new ArrayList<Deliverable>();
+		ArrayList<Deliverable> deliverables = null;
 
 		try
 		{

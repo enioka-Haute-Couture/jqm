@@ -30,7 +30,9 @@ public class Cryptonite {
 		final MessageDigest mDigest = MessageDigest.getInstance("SHA1");
 		final byte[] result = mDigest.digest(input.getBytes());
 		final StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < result.length; i++) {
+
+		for (int i = 0; i < result.length; i++)
+		{
 			sb.append(Integer.toString((result[i] & 0xff) + 0x100, 16)
 					.substring(1));
 		}
@@ -48,32 +50,63 @@ public class Cryptonite {
 	 * @return true if the expeceted SHA1 checksum matches the file's SHA1
 	 *         checksum; false otherwise.
 	 * @throws NoSuchAlgorithmException
-	 * @throws IOException
 	 */
-	public static boolean verifyChecksum(final String file, final String testChecksum)
-			throws NoSuchAlgorithmException, IOException {
-
+	public static boolean verifyChecksum(final String file, final String testChecksum) throws NoSuchAlgorithmException
+	{
 		final MessageDigest sha1 = MessageDigest.getInstance("SHA1");
-		@SuppressWarnings("resource")
-		final
-		FileInputStream fis = new FileInputStream(file);
+		FileInputStream fis = null;
 
-		final byte[] data = new byte[1024];
-		int read = 0;
-		while ((read = fis.read(data)) != -1) {
-			sha1.update(data, 0, read);
+		try
+		{
+			fis = new FileInputStream(file);
+			final byte[] data = new byte[1024];
+			int read = 0;
+
+			while ((read = fis.read(data)) != -1)
+			{
+				sha1.update(data, 0, read);
+			};
+
+			final byte[] hashBytes = sha1.digest();
+			final StringBuffer sb = new StringBuffer();
+
+			for (int i = 0; i < hashBytes.length; i++)
+			{
+				sb.append(Integer.toString((hashBytes[i] & 0xff) + 0x100, 16)
+						.substring(1));
+			}
+
+			final String fileHash = sb.toString();
+
+			if (fis != null)
+			{
+				fis.close();
+			}
+
+			return fileHash.equals(testChecksum);
+		} catch (IOException e)
+		{
+			try {
+				if (fis != null)
+				{
+					fis.close();
+				}
+			} catch (IOException e1) {
+
+			}
+			e.printStackTrace();
+			return false;
 		}
-		;
-		final byte[] hashBytes = sha1.digest();
+		finally
+		{
+			try {
+				if (fis != null)
+				{
+					fis.close();
+				}
+			} catch (IOException e) {
 
-		final StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < hashBytes.length; i++) {
-			sb.append(Integer.toString((hashBytes[i] & 0xff) + 0x100, 16)
-					.substring(1));
+			}
 		}
-
-		final String fileHash = sb.toString();
-
-		return fileHash.equals(testChecksum);
 	}
 }

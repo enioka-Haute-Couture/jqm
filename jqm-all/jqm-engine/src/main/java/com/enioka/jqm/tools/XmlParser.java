@@ -25,13 +25,9 @@ import java.io.IOException;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -72,13 +68,13 @@ class XmlParser
 		boolean highlander = false;
 		String jarPath = null;
 
-		SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		Schema schema = null;
+		// SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		// Schema schema = null;
 
-		schema = factory.newSchema(new File("./lib/res.xsd"));
-		Validator validator = schema.newValidator();
-		DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		Document document = parser.parse(f);
+		// schema = factory.newSchema(new File("./lib/res.xsd"));
+		// Validator validator = schema.newValidator();
+		//DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		// Document document = parser.parse(f);
 		//validator.validate(new DOMSource(document));
 
 
