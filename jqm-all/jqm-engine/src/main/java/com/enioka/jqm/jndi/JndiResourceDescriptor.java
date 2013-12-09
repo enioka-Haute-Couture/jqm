@@ -26,8 +26,8 @@ class JndiResourceDescriptor extends Reference
 	private static final long serialVersionUID = 3348684996519775949L;
 
 	JndiResourceDescriptor(String resourceClass, String description, String scope, String auth, boolean singleton, String factory,
-			String factoryLocation)
-			{
+	        String factoryLocation)
+	{
 		super(resourceClass, factory, factoryLocation);
 		StringRefAddr refAddr = null;
 		if (description != null)
@@ -48,5 +48,5 @@ class JndiResourceDescriptor extends Reference
 		// singleton is a boolean so slightly different handling
 		refAddr = new StringRefAddr("singleton", Boolean.toString(singleton));
 		add(refAddr);
-			}
+	}
 }

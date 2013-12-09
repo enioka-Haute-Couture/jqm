@@ -81,7 +81,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 			{
 				EntityManager em = Helpers.getNewEm();
 				db = em.createQuery("SELECT d FROM DatabaseProp d WHERE d.name = :n", DatabaseProp.class).setParameter("n", name)
-						.getSingleResult();
+				        .getSingleResult();
 				em.close();
 			} catch (NonUniqueResultException e)
 			{
@@ -113,7 +113,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 			Thread.currentThread().setContextClassLoader(tmp);
 			return ds;
 		}
-		else if (baseCtx.equals("jms"))
+		else if (baseCtx.equals("jms") || baseCtx.equals("fs"))
 		{
 			// Retrieve the resource description from the database
 			JndiObjectResource resource = null;
@@ -123,7 +123,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 				Thread.currentThread().setContextClassLoader(this.cl);
 				EntityManager em = Helpers.getNewEm();
 				resource = em.createQuery("SELECT t FROM JndiObjectResource t WHERE t.name = :name", JndiObjectResource.class)
-						.setParameter("name", name).getSingleResult();
+				        .setParameter("name", name).getSingleResult();
 				em.close();
 				Thread.currentThread().setContextClassLoader(tmp);
 			} catch (Exception e)
@@ -137,7 +137,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 
 			// Create the ResourceDescriptor from the JPA object
 			JndiResourceDescriptor d = new JndiResourceDescriptor(resource.getType(), resource.getDescription(), null, resource.getAuth(),
-					false, resource.getFactory(), null);
+			        false, resource.getFactory(), null);
 			for (JndiObjectResourceParameter prm : resource.getParameters())
 			{
 				jqmlogger.debug("Setting property " + prm.getKey() + " - " + prm.getValue());
@@ -151,7 +151,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 				return o;
 			} catch (Exception e)
 			{
-				jqmlogger.error("Could not instanciate QCF: ", e);
+				jqmlogger.error("Could not instanciate JNDI object resource " + name, e);
 				NamingException ex = new NamingException(e.getMessage());
 				ex.initCause(e);
 				throw ex;

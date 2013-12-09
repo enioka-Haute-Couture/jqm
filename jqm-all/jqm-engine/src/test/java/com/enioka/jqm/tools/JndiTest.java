@@ -18,8 +18,10 @@
 
 package com.enioka.jqm.tools;
 
+import java.io.File;
 import java.util.ArrayList;
 
+import javax.naming.spi.NamingManager;
 import javax.persistence.EntityManager;
 
 import org.apache.log4j.Logger;
@@ -73,8 +75,8 @@ public class JndiTest
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-wmq/",
-				"jqm-test-jndijms-wmq/jqm-test-jndijms-wmq.jar", TestHelpers.qVip, 42, "Jms", "Franquin", "ModuleMachin", "other1",
-				"other2", "other3", false, em);
+		        "jqm-test-jndijms-wmq/jqm-test-jndijms-wmq.jar", TestHelpers.qVip, 42, "Jms", "Franquin", "ModuleMachin", "other1",
+		        "other2", "other3", false, em);
 
 		JobDefinition form = new JobDefinition("Jms", "MAG");
 		form.addParameter("p1", "1");
@@ -123,8 +125,8 @@ public class JndiTest
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-amq/",
-				"jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
-				"other2", false, em);
+		        "jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
+		        "other2", false, em);
 
 		JobDefinition form = new JobDefinition("Jms", "MAG");
 		Dispatcher.enQueue(form);
@@ -133,7 +135,7 @@ public class JndiTest
 		em.getTransaction().begin();
 		CreationTools.createJndiQueueActiveMQ(em, "jms/testqueue", "test queue", "Q.TEST", null);
 		CreationTools.createJndiQcfActiveMQ(em, "jms/qcf", "test QCF", "vm:broker:(tcp://localhost:1234)?persistent=false&useJmx=false",
-				null);
+		        null);
 		em.getTransaction().commit();
 
 		// Start the engine
@@ -169,8 +171,8 @@ public class JndiTest
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-amq/",
-				"jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
-				"other2", false, em);
+		        "jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
+		        "other2", false, em);
 
 		JobDefinition form = new JobDefinition("Jms", "MAG");
 		Dispatcher.enQueue(form);
@@ -179,7 +181,7 @@ public class JndiTest
 		em.getTransaction().begin();
 		CreationTools.createJndiQueueActiveMQ(em, "jms/testqueue", "test queue", "Q.TEST", null);
 		CreationTools.createJndiQcfActiveMQ(em, "jms/qcf2", "test QCF", "vm:broker:(tcp://localhost:1234)?persistent=false&useJmx=false",
-				null);
+		        null);
 		em.getTransaction().commit();
 
 		// Start the engine
@@ -215,7 +217,7 @@ public class JndiTest
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-defcon/", "jqm-test-defcon/jqm-test-defcon.jar",
-				TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+		        TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
 
 		JobDefinition form = new JobDefinition("Jms", "MAG");
 		Dispatcher.enQueue(form);
@@ -241,6 +243,39 @@ public class JndiTest
 		}
 
 		Assert.assertEquals("ENDED", h.getStatus()); // Exception in jar => CRASHED
+	}
+
+	@Test
+	public void testFileJndi() throws Exception
+	{
+		jqmlogger.debug("FILE JNDI: Starting");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		// Create JMS JNDI references for use by the test jar
+		String path = "./testdir";
+		em.getTransaction().begin();
+		CreationTools.createJndiFile(em, "fs/testdirectory", "test directory", path);
+		em.getTransaction().commit();
+
+		// Create the directory...
+		(new File(path)).mkdir();
+
+		// Start the engine to init the JNDI context
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+		engine1.stop();
+
+		try
+		{
+			File f = (File) NamingManager.getInitialContext(null).lookup("fs/testdirectory");
+			Assert.assertTrue(f.isDirectory());
+			f.delete();
+		} catch (Exception e)
+		{
+			Assert.fail(e.getMessage());
+		}
 	}
 
 }
