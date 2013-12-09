@@ -1,0 +1,27 @@
+﻿<jqm>
+  <jar>
+    <path>jqm-test-geo/jqm-test-geo.jar</path>
+	<filePath>jqm-test-geo/</filePath>
+    <jobdefinitions>
+      <jobDefinition>
+        <name>Geo</name>
+        <description>Test based on a geometric suite</description>
+        <canBeRestarted>true</canBeRestarted>
+        <javaClassName>App</javaClassName>
+        <maxTimeRunning>42</maxTimeRunning>
+        <application>ApplicationTest</application>
+        <module>TestModuleRATONLAVEUR</module>
+        <other1>vdjvkdv</other1>
+        <other2>sgfbgg</other2>
+        <other3>jvhkdfl</other3>
+        <highlander>false</highlander>
+        <parameters>
+          <parameter>
+            <key>nbJob</key>
+            <value>1</value>
+          </parameter>
+        </parameters>
+      </jobDefinition>
+    </jobdefinitions>
+  </jar>
+</jqm>
