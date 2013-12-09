@@ -8,8 +8,18 @@
 	</parent>
 	<artifactId>jqm-engine</artifactId>
 
+	<properties>
+		<modelJarName>./lib/jqm-model-${project.version}.jar</modelJarName>
+	</properties>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
 		<plugins>
 			<plugin>
 				<!-- Build an executable JAR -->
