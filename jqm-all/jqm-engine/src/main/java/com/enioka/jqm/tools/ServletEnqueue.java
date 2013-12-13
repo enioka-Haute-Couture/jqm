@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.http.HttpStatus;
+import org.eclipse.jetty.http.HttpStatus;
 
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
@@ -19,7 +19,7 @@ public class ServletEnqueue extends HttpServlet
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
 	{
-		resp.setStatus(HttpStatus.SC_BAD_REQUEST);
+		resp.setStatus(HttpStatus.BAD_REQUEST_400);
 	}
 
 	@Override

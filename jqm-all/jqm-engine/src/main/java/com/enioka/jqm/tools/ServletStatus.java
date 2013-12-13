@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.http.HttpStatus;
+import org.eclipse.jetty.http.HttpStatus;
 
 import com.enioka.jqm.api.Dispatcher;
 
@@ -21,7 +21,7 @@ public class ServletStatus extends HttpServlet
 		String sid = req.getParameter("id");
 		if (sid == null)
 		{
-			resp.setStatus(HttpStatus.SC_BAD_REQUEST);
+			resp.setStatus(HttpStatus.BAD_REQUEST_400);
 			return;
 		}
 
@@ -31,7 +31,7 @@ public class ServletStatus extends HttpServlet
 			id = Integer.parseInt(sid);
 		} catch (Exception e)
 		{
-			resp.setStatus(HttpStatus.SC_BAD_REQUEST);
+			resp.setStatus(HttpStatus.BAD_REQUEST_400);
 			return;
 		}
 
