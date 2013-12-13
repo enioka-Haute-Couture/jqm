@@ -76,7 +76,7 @@ class JqmEngine
 			Logger.getRootLogger().setLevel(Level.toLevel(node.getRootLogLevel()));
 			Logger.getLogger("com.enioka").setLevel(Level.toLevel(node.getRootLogLevel()));
 			jqmlogger.info("Log level is set at " + node.getRootLogLevel() + " which translates as log4j level "
-					+ Level.toLevel(node.getRootLogLevel()));
+			        + Level.toLevel(node.getRootLogLevel()));
 		} catch (Exception e)
 		{
 			jqmlogger.warn("Log level could not be set", e);
@@ -93,18 +93,17 @@ class JqmEngine
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setContextPath("/");
 		server.setHandler(context);
-
 		context.addServlet(new ServletHolder(new Servlet()), "/getfile");
-
+		context.addServlet(new ServletHolder(new ServletEnqueue()), "/enqueue");
 		server.start();
 
 		if (args.length == 1)
 		{
 			node = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :li", Node.class).setParameter("li", args[0])
-					.getSingleResult();
+			        .getSingleResult();
 
 			dps = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
-					.setParameter("n", node.getId()).getResultList();
+			        .setParameter("n", node.getId()).getResultList();
 		}
 
 		for (DeploymentParameter i : dps)
@@ -151,7 +150,7 @@ class JqmEngine
 		try
 		{
 			n = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :l", Node.class).setParameter("l", nodeName)
-					.getSingleResult();
+			        .getSingleResult();
 			jqmlogger.info("Node " + nodeName + " was found in the configuration");
 		} catch (NoResultException e)
 		{
@@ -204,7 +203,7 @@ class JqmEngine
 		// GlobalParameter
 		GlobalParameter gp = null;
 		i = (Long) em.createQuery("SELECT COUNT(gp) FROM GlobalParameter gp WHERE gp.key = :k").setParameter("k", "defaultConnection")
-				.getSingleResult();
+		        .getSingleResult();
 		if (i == 0)
 		{
 			gp = new GlobalParameter();
@@ -238,7 +237,7 @@ class JqmEngine
 		// Deployment parameter
 		DeploymentParameter dp = null;
 		i = (Long) em.createQuery("SELECT COUNT(dp) FROM DeploymentParameter dp WHERE dp.node = :localnode").setParameter("localnode", n)
-				.getSingleResult();
+		        .getSingleResult();
 		if (i == 0)
 		{
 			dp = new DeploymentParameter();
