@@ -95,6 +95,7 @@ class JqmEngine
 		server.setHandler(context);
 		context.addServlet(new ServletHolder(new Servlet()), "/getfile");
 		context.addServlet(new ServletHolder(new ServletEnqueue()), "/enqueue");
+		context.addServlet(new ServletHolder(new ServletStatus()), "/status");
 		server.start();
 
 		if (args.length == 1)

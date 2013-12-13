@@ -38,6 +38,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -1659,5 +1660,75 @@ public class JobBaseTest
 		History h = em.createQuery("SELECT j FROM History j", History.class).getSingleResult();
 		Assert.assertEquals("ENDED", h.getStatus());
 		Assert.assertEquals(jid, h.getJobInstanceId());
+	}
+
+	@Test
+	public void testHttpStatus() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testHttpEnqueue");
+
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		@SuppressWarnings("unused")
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-sendmsg/",
+		        "jqm-test-sendmsg/jqm-test-sendmsg.jar", TestHelpers.qVip, 42, "Marsu-Application", null, "Franquin", "ModuleMachin",
+		        "other", "other", true, em);
+
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+
+		HttpPost post = new HttpPost("http://localhost:8081/enqueue");
+		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+		nvps.add(new BasicNameValuePair("applicationname", "Marsu-Application"));
+		nvps.add(new BasicNameValuePair("user", "testuser"));
+		nvps.add(new BasicNameValuePair("module", "testuser"));
+		nvps.add(new BasicNameValuePair("param_1", "arg"));
+		nvps.add(new BasicNameValuePair("paramvalue_1", "newvalue"));
+		post.setEntity(new UrlEncodedFormEntity(nvps));
+
+		HttpClient client = HttpClients.createDefault();
+		HttpResponse res = client.execute(post);
+
+		Assert.assertEquals(200, res.getStatusLine().getStatusCode());
+
+		HttpEntity entity = res.getEntity();
+		InputStream in = entity.getContent();
+		StringWriter writer = new StringWriter();
+		IOUtils.copy(in, writer);
+		String result = writer.toString();
+		IOUtils.closeQuietly(in);
+
+		Integer jid = 0;
+		try
+		{
+			jid = Integer.parseInt(result);
+		} catch (Exception e)
+		{
+			Assert.fail("result was not an integer " + e.getMessage());
+		}
+
+		Thread.sleep(3000);
+
+		HttpGet rq = new HttpGet("http://localhost:8081/status?id=" + jid);
+		res = client.execute(rq);
+		Assert.assertEquals(200, res.getStatusLine().getStatusCode());
+
+		entity = res.getEntity();
+		in = entity.getContent();
+		writer = new StringWriter();
+		IOUtils.copy(in, writer);
+		result = writer.toString();
+		IOUtils.closeQuietly(in);
+		engine1.stop();
+
+		Assert.assertEquals("ENDED", result);
 	}
 }
