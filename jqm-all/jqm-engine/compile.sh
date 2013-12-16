@@ -1,3 +1,3 @@
 #!/bin/sh
 
-mvn3 clean install -DskipTests dependency:copy-dependencies && cp target/jqm-engine-0.0.1-SNAPSHOT.jar ~/jqm/ && cp target/dependency/* ~/jqm/lib
+mvn3 clean install -DskipTests dependency:copy-dependencies && cp target/jqm-engine-1.1.4-SNAPSHOT.jar ~/jqm/ && cp target/dependency/* ~/jqm/lib/

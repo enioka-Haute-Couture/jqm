@@ -7,7 +7,7 @@ import javax.faces.bean.SessionScoped;
 
 import com.enioka.jqm.jpamodel.JobDef;
 
-@ManagedBean(name="jobDefCustom")
+@ManagedBean(eager = true)
 @SessionScoped
 public class JobDefCustom extends JobDef implements Serializable{
 
@@ -17,13 +17,11 @@ public class JobDefCustom extends JobDef implements Serializable{
 	private static final long serialVersionUID = 1076548059466510604L;
 	private com.enioka.jqm.jpamodel.JobDef j = null;
 	private boolean enqueue = false;
-	private int cl;
 
 	public JobDefCustom() {}
 
 	public JobDefCustom(com.enioka.jqm.jpamodel.JobDef j, boolean isEnqueue)
 	{
-		System.out.println("ClassLoader Custom: " + JobDef.class.getClassLoader().hashCode());
 		this.j = j;
 		this.enqueue = isEnqueue;
 	}
@@ -51,17 +49,4 @@ public class JobDefCustom extends JobDef implements Serializable{
 
 		this.enqueue = isEnqueue;
 	}
-
-
-	public int getCl() {
-		this.cl = JobDef.class.getClassLoader().hashCode();
-		return cl;
-	}
-
-
-	public void setCl(int cl) {
-
-		this.cl = cl;
-	}
-
 }

@@ -27,6 +27,7 @@ import org.hsqldb.Server;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
@@ -59,7 +60,7 @@ public class FiboTest
 		s.stop();
 	}
 
-	// @Test
+	@Test
 	public void testFibo() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");

@@ -39,10 +39,10 @@ public class App extends JobBase
 
 		sendMsg("launching first job");
 		System.out.println("LAUNCHING FIRST JOB");
-		enQueue("Geo", "Franquin", null, sessionID, application, module, other1, other2, other3, parentID, canBeRestart, p);
+		enQueue("Geo", "Dark Vador", null, null, null, null, null, null, null, null, null, p);
 		sendMsg("launching second job");
 		System.out.println("LAUNCHING SECOND JOB");
-		enQueue("Geo", "Franquin", null, sessionID, application, module, other1, other2, other3, parentID, canBeRestart, p);
+		enQueue("Geo", "Dark Vador", null, null, null, null, null, null, null, null, null, p);
 		System.out.println("ENDING GEOJOB");
 	}
 }
