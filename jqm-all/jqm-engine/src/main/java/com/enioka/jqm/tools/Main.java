@@ -77,15 +77,17 @@ public class Main
 				}
 			}
 		}
-
-		try
+		else if (args.length == 1)
 		{
-			jqmlogger.info("Starting engine node " + args[0]);
-			engine.start(args);
-		} catch (Exception e)
-		{
-			jqmlogger.fatal("Could not launch the engine", e);
-			return;
+			try
+			{
+				jqmlogger.info("Starting engine node " + args[0]);
+				engine.start(args);
+			} catch (Exception e)
+			{
+				jqmlogger.fatal("Could not launch the engine", e);
+				return;
+			}
 		}
 	}
 }
