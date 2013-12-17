@@ -18,12 +18,15 @@
 
 package com.enioka.jqm.jndi;
 
+import java.util.Collections;
 import java.util.Hashtable;
 
 import javax.naming.CompositeName;
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.Name;
 import javax.naming.NameNotFoundException;
+import javax.naming.NameParser;
 import javax.naming.NamingException;
 import javax.naming.StringRefAddr;
 import javax.naming.spi.InitialContextFactory;
@@ -32,6 +35,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.DatabaseProp;
@@ -43,7 +47,7 @@ import com.enioka.jqm.tools.Helpers;
  * This class implements a basic JNDI context
  * 
  */
-public class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory
+public class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory, NameParser
 {
 	private static Logger jqmlogger = Logger.getLogger(JndiContext.class);
 	private ClassLoader cl = null;
@@ -162,6 +166,12 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 	}
 
 	@Override
+	public Object lookup(Name name) throws NamingException
+	{
+		return this.lookup(StringUtils.join(Collections.list(name.getAll()), "/"));
+	}
+
+	@Override
 	public Context getInitialContext(Hashtable<?, ?> environment) throws NamingException
 	{
 		return this;
@@ -171,5 +181,23 @@ public class JndiContext extends InitialContext implements InitialContextFactory
 	public InitialContextFactory createInitialContextFactory(Hashtable<?, ?> environment) throws NamingException
 	{
 		return this;
+	}
+
+	@Override
+	public NameParser getNameParser(String name) throws NamingException
+	{
+		return this;
+	}
+
+	@Override
+	public Name parse(String name) throws NamingException
+	{
+		return new CompositeName(name);
+	}
+
+	@Override
+	public void close() throws NamingException
+	{
+		// Nothing to do.
 	}
 }
