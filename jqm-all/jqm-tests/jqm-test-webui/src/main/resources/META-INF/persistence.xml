@@ -11,10 +11,6 @@
 
 		<properties>
 			<property name="javax.persistence.validation.mode" value="none" />
-			<!--<property name="hibernate.show_sql" value="true" /> <property name="hibernate.format_sql" 
-				value="true" /> -->
-
-			<!-- We use a test db started during the jUnit tests -->
 			<property name="hibernate.hbm2ddl.auto" value="update" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
 			<property name="hibernate.transaction.manager_lookup_class" value="org.hibernate.transaction.SunONETransactionManagerLookup"/>
