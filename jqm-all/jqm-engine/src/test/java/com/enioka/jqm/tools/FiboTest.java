@@ -67,6 +67,7 @@ public class FiboTest
 		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("Starting test testFibo");
 		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();

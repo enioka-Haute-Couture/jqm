@@ -70,6 +70,7 @@ public class GeoTests
 		jqmlogger.debug("**********************************************************");
 		jqmlogger.debug("Starting test testGeo");
 		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);
 
 		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
