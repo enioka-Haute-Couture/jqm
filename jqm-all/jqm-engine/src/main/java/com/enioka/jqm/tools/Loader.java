@@ -53,6 +53,7 @@ import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
+import com.enioka.jqm.jndi.JndiContextFactory;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
@@ -379,6 +380,13 @@ class Loader implements Runnable
 			jqmlogger.error("Could not switch classloaders", e);
 			endOfRun("CRASHED");
 			return;
+		}
+
+		try {
+			JndiContextFactory.createJndiContext(contextClassLoader);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 
 		// Go! (launches the main function in the startup class designated in the manifest)

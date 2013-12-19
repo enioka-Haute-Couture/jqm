@@ -85,9 +85,9 @@ public class FiboHibTest
 		Dispatcher.enQueue(form);
 
 		// Create JNDI connection to write inside the engine database
-		em.getTransaction().begin();
-		CreationTools.createDatabaseProp("jdbc/jqm", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em);
-		em.getTransaction().commit();
+		//		em.getTransaction().begin();
+		//		CreationTools.createDatabaseProp("jdbc/jqm", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em);
+		//		em.getTransaction().commit();
 
 		// Start the engine
 		JqmEngine engine1 = new JqmEngine();
