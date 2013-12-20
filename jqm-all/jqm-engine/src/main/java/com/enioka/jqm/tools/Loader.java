@@ -382,13 +382,6 @@ class Loader implements Runnable
 			return;
 		}
 
-		try {
-			JndiContextFactory.createJndiContext(contextClassLoader);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
 		// Go! (launches the main function in the startup class designated in the manifest)
 		jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
 		jqmlogger.debug("Job is running in the thread: " + Thread.currentThread().getName());

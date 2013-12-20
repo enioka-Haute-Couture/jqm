@@ -76,8 +76,8 @@ public class FiboHibTest
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibohib/",
-				"jqm-test-fibohib/jqm-test-fibohib.jar", TestHelpers.qVip, 42, "FiboHib", null, "Franquin", "ModuleMachin", "other1", "other2",
-				false, em);
+		        "jqm-test-fibohib/jqm-test-fibohib.jar", TestHelpers.qVip, 42, "FiboHib", null, "Franquin", "ModuleMachin", "other1",
+		        "other2", false, em);
 
 		JobDefinition form = new JobDefinition("FiboHib", "MAG");
 		form.addParameter("p1", "1");
@@ -85,9 +85,10 @@ public class FiboHibTest
 		Dispatcher.enQueue(form);
 
 		// Create JNDI connection to write inside the engine database
-		//		em.getTransaction().begin();
-		//		CreationTools.createDatabaseProp("jdbc/jqm", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em);
-		//		em.getTransaction().commit();
+		em.getTransaction().begin();
+		em.createQuery("DELETE FROM DatabaseProp");
+		CreationTools.createDatabaseProp("jdbc/jqm", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em);
+		em.getTransaction().commit();
 
 		// Start the engine
 		JqmEngine engine1 = new JqmEngine();
