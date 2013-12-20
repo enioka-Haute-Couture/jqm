@@ -346,6 +346,37 @@ public final class Dispatcher
 		em.close();
 	}
 
+	// ----------------------------- RESUME ------------------------------------------
+	/**
+	 * Resume the holded job.
+	 * 
+	 * @param idJob
+	 * @return void
+	 */
+	public static void resumeJob(int idJob)
+	{
+		jqmlogger.debug("Job status number " + idJob + " will be resumed");
+		EntityManager em = getEm();
+
+		em.getTransaction().begin();
+
+		try
+		{
+			@SuppressWarnings("unused")
+			int q = em.createQuery("UPDATE JobInstance j SET j.state = 'SUBMITTED' WHERE j.id = :idJob").setParameter("idJob", idJob).executeUpdate();
+			@SuppressWarnings("unused")
+			int qq = em.createQuery("UPDATE History j SET j.status = 'SUBMITTED' WHERE j.jobInstanceId = :idJob").setParameter("idJob", idJob).executeUpdate();
+
+		} catch (Exception e)
+		{
+			jqmlogger.debug(e);
+		}
+
+		em.getTransaction().commit();
+
+		em.close();
+	}
+
 	// ----------------------------- HIGHLANDER --------------------------------------
 	// Must be called within an active JPA transaction
 	public static Integer highlanderMode(JobDef jd, EntityManager em)

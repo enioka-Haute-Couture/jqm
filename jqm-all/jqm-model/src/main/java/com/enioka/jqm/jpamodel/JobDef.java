@@ -160,9 +160,9 @@ public class JobDef implements Serializable
 		return keyword2;
 	}
 
-	public void setKeyword2(final String other2)
+	public void setKeyword2(final String keyword2)
 	{
-		this.keyword2 = other2;
+		this.keyword2 = keyword2;
 	}
 
 	public String getKeyword3()

@@ -11,9 +11,9 @@
         <maxTimeRunning>42</maxTimeRunning>
         <application>ApplicationTest</application>
         <module>Tests</module>
-        <other1>AMQ</other1>
-        <other2>JNDI</other2>
-        <other3></other3>
+        <keyword1>AMQ</keyword1>
+        <keyword2>JNDI</keyword2>
+        <keyword3></keyword3>
         <highlander>false</highlander>
         <parameters>
         </parameters>

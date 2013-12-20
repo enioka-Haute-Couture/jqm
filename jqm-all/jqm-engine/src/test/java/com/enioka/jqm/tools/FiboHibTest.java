@@ -37,7 +37,7 @@ import com.enioka.jqm.jpamodel.JobDefParameter;
 public class FiboHibTest
 {
 	public static Server s;
-	public static Logger jqmlogger = Logger.getLogger(FiboTest.class);
+	public static Logger jqmlogger = Logger.getLogger(FiboHibTest.class);
 
 	@BeforeClass
 	public static void testInit() throws InterruptedException

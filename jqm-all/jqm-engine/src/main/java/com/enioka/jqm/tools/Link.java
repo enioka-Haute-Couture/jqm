@@ -97,7 +97,7 @@ public class Link
 	}
 
 	public int enQueue(String applicationName, String user, String mail, String sessionId, String application, String module,
-			String other1, String other2, String other3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
+			String keyword1, String keyword2, String keyword3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(old);
@@ -109,9 +109,9 @@ public class Link
 		jd.setSessionID(sessionId);
 		jd.setApplication(application);
 		jd.setModule(module);
-		jd.setKeyword1(other1);
-		jd.setKeyword2(other2);
-		jd.setKeyword3(other3);
+		jd.setKeyword1(keyword1);
+		jd.setKeyword2(keyword2);
+		jd.setKeyword3(keyword3);
 		jd.setParentID(parentId);
 		jd.setParameters(parameters);
 

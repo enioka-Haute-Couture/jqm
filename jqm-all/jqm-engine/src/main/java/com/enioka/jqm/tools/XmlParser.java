@@ -62,9 +62,9 @@ class XmlParser
 		String applicationName = null;
 		String application = null;
 		String module = null;
-		String other1 = null;
-		String other2 = null;
-		String other3 = null;
+		String keyword1 = null;
+		String keyword2 = null;
+		String keyword3 = null;
 		boolean highlander = false;
 		String jarPath = null;
 
@@ -130,9 +130,9 @@ class XmlParser
 						applicationName = ee.getElementsByTagName("name").item(0).getTextContent();
 						application = ee.getElementsByTagName("application").item(0).getTextContent();
 						module = ee.getElementsByTagName("module").item(0).getTextContent();
-						other1 = ee.getElementsByTagName("other1").item(0).getTextContent();
-						other2 = ee.getElementsByTagName("other2").item(0).getTextContent();
-						other3 = ee.getElementsByTagName("other3").item(0).getTextContent();
+						keyword1 = ee.getElementsByTagName("keyword1").item(0).getTextContent();
+						keyword2 = ee.getElementsByTagName("keyword2").item(0).getTextContent();
+						keyword3 = ee.getElementsByTagName("keyword3").item(0).getTextContent();
 						highlander = (ee.getElementsByTagName("highlander").item(0).getTextContent().equals("true")) ? true : false;
 						filePath = e.getElementsByTagName("filePath").item(0).getTextContent();
 						jarPath = e.getElementsByTagName("path").item(0).getTextContent();
@@ -157,9 +157,9 @@ class XmlParser
 						jd.setApplicationName(applicationName);
 						jd.setApplication(application);
 						jd.setModule(module);
-						jd.setKeyword1(other1);
-						jd.setKeyword2(other2);
-						jd.setKeyword3(other3);
+						jd.setKeyword1(keyword1);
+						jd.setKeyword2(keyword2);
+						jd.setKeyword3(keyword3);
 						jd.setHighlander(highlander);
 						jd.setJarPath(jarPath);
 

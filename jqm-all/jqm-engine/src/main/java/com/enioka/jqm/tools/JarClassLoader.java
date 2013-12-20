@@ -81,9 +81,9 @@ class JarClassLoader extends URLClassLoader
 			// Set parameters
 			Method getParameters = c.getMethod("getParameters", null);
 			Method getdefaultConnect = c.getMethod("setDefaultConnect", String.class);
-			Method setOther1 = c.getMethod("setOther1", String.class);
-			Method setOther2 = c.getMethod("setOther2", String.class);
-			Method setOther3 = c.getMethod("setOther3", String.class);
+			Method setOther1 = c.getMethod("setKeyword1", String.class);
+			Method setOther2 = c.getMethod("setKeyword2", String.class);
+			Method setOther3 = c.getMethod("setKeyword3", String.class);
 			Method setSessionID = c.getMethod("setSessionID", String.class);
 			Method setApplication= c.getMethod("setApplication", String.class);
 			Method setModule = c.getMethod("setModule", String.class);

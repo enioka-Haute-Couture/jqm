@@ -95,7 +95,7 @@ public class CreationTools
 
 	public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps,
 			String filePath, String jp, Queue queue, Integer maxTimeRunning, String applicationName, String application, String module,
-			String other1, String other2, String other3, boolean highlander, EntityManager em)
+			String keyword1, String keyword2, String keyword3, boolean highlander, EntityManager em)
 	{
 		JobDef j = new JobDef();
 		EntityTransaction transac = em.getTransaction();
@@ -113,9 +113,9 @@ public class CreationTools
 		j.setApplicationName(applicationName);
 		j.setApplication(application);
 		j.setModule(module);
-		j.setKeyword1(other1);
-		j.setKeyword2(other2);
-		j.setKeyword3(other3);
+		j.setKeyword1(keyword1);
+		j.setKeyword2(keyword2);
+		j.setKeyword3(keyword3);
 		j.setHighlander(highlander);
 		j.setJarPath(jp);
 

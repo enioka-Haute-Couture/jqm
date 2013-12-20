@@ -35,9 +35,9 @@
         <xs:element ref="maxTimeRunning"/>
         <xs:element ref="application"/>
         <xs:element ref="module"/>
-        <xs:element ref="other1"/>
-        <xs:element ref="other2"/>
-        <xs:element ref="other3"/>
+        <xs:element ref="keyword1"/>
+        <xs:element ref="keyword2"/>
+        <xs:element ref="keyword3"/>
         <xs:element ref="highlander"/>
         <xs:element ref="parameters"/>
       </xs:sequence>
@@ -50,9 +50,9 @@
   <xs:element name="maxTimeRunning" type="xs:integer"/>
   <xs:element name="application" type="xs:string"/>
   <xs:element name="module" type="xs:string"/>
-  <xs:element name="other1" type="xs:string"/>
-  <xs:element name="other2" type="xs:string"/>
-  <xs:element name="other3" type="xs:string"/>
+  <xs:element name="keyword1" type="xs:string"/>
+  <xs:element name="keyword2" type="xs:string"/>
+  <xs:element name="keyword3" type="xs:string"/>
   <xs:element name="highlander" type="xs:boolean"/>
   <xs:element name="parameters">
     <xs:complexType>

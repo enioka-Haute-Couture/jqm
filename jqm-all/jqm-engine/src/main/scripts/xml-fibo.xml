@@ -12,9 +12,9 @@
         <maxTimeRunning>42</maxTimeRunning>
         <application>ApplicationTest</application>
         <module>TestModuleRATONLAVEUR</module>
-        <other1>vdjvkdv</other1>
-        <other2>sgfbgg</other2>
-        <other3>jvhkdfl</other3>
+        <keyword1>vdjvkdv</keyword1>
+        <keyword2>sgfbgg</keyword2>
+        <keyword3>jvhkdfl</keyword3>
         <highlander>false</highlander>
         <parameters>
           <parameter>
@@ -35,9 +35,9 @@
         <maxTimeRunning>42</maxTimeRunning>
         <application>ApplicationTest</application>
         <module>TestModule</module>
-        <other1>vdjvkdv</other1>
-        <other2>sgfbgg</other2>
-        <other3>jvhkdfl</other3>
+        <keyword1>vdjvkdv</keyword1>
+        <keyword2>sgfbgg</keyword2>
+        <keyword3>jvhkdfl</keyword3>
         <highlander>false</highlander>
         <parameters>
           <parameter>

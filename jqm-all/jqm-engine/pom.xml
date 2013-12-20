@@ -240,5 +240,11 @@
 			<version>1.1.4-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-test-fibohib</artifactId>
+			<version>1.1.4-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>
