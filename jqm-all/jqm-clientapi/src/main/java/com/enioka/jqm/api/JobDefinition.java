@@ -33,9 +33,9 @@ public class JobDefinition
 	private String application;
 	private String user;
 	private String module;
-	private String other1;
-	private String other2;
-	private String other3;
+	private String keyword1;
+	private String keyword2;
+	private String keyword3;
 	private String email = null;
 	private Map<String, String> parameters = new HashMap<String, String>();
 
@@ -218,42 +218,20 @@ public class JobDefinition
 	 * 
 	 * @return
 	 */
-	public String getOther1()
+	public String getKeyword1()
 	{
-		return other1;
+		return keyword1;
 	}
 
 	/**
 	 * <strong>Optional</strong><br>
 	 * An optional classification axis (and therefore query criterion)
 	 * 
-	 * @param other1
+	 * @param keyword1
 	 */
-	public void setOther1(String other1)
+	public void setKeyword1(String keyword1)
 	{
-		this.other1 = other1;
-	}
-
-	/**
-	 * <strong>Optional</strong><br>
-	 * An optional classification axis (and therefore query criterion)
-	 * 
-	 * @return
-	 */
-	public String getOther2()
-	{
-		return other2;
-	}
-
-	/**
-	 * <strong>Optional</strong><br>
-	 * An optional classification axis (and therefore query criterion)
-	 * 
-	 * @param other2
-	 */
-	public void setOther2(String other2)
-	{
-		this.other2 = other2;
+		this.keyword1 = keyword1;
 	}
 
 	/**
@@ -262,20 +240,42 @@ public class JobDefinition
 	 * 
 	 * @return
 	 */
-	public String getOther3()
+	public String getKeyword2()
 	{
-		return other3;
+		return keyword2;
 	}
 
 	/**
 	 * <strong>Optional</strong><br>
 	 * An optional classification axis (and therefore query criterion)
 	 * 
-	 * @param other3
+	 * @param keyword2
 	 */
-	public void setOther3(String other3)
+	public void setKeyword2(String keyword2)
 	{
-		this.other3 = other3;
+		this.keyword2 = keyword2;
+	}
+
+	/**
+	 * <strong>Optional</strong><br>
+	 * An optional classification axis (and therefore query criterion)
+	 * 
+	 * @return
+	 */
+	public String getKeyword3()
+	{
+		return keyword3;
+	}
+
+	/**
+	 * <strong>Optional</strong><br>
+	 * An optional classification axis (and therefore query criterion)
+	 * 
+	 * @param keyword3
+	 */
+	public void setKeyword3(String keyword3)
+	{
+		this.keyword3 = keyword3;
 	}
 
 	/**

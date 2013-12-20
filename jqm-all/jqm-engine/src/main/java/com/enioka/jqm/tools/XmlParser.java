@@ -157,9 +157,9 @@ class XmlParser
 						jd.setApplicationName(applicationName);
 						jd.setApplication(application);
 						jd.setModule(module);
-						jd.setOther1(other1);
-						jd.setOther2(other2);
-						jd.setOther3(other3);
+						jd.setKeyword1(other1);
+						jd.setKeyword2(other2);
+						jd.setKeyword3(other3);
 						jd.setHighlander(highlander);
 						jd.setJarPath(jarPath);
 

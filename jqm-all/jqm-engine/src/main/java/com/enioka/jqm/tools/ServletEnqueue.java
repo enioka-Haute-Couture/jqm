@@ -34,9 +34,9 @@ public class ServletEnqueue extends HttpServlet
 		jd.setModule(req.getParameter("module"));
 		jd.setEmail(req.getParameter("mail"));
 		jd.setModule(req.getParameter("module"));
-		jd.setOther1(req.getParameter("other1"));
-		jd.setOther2(req.getParameter("other2"));
-		jd.setOther3(req.getParameter("other3"));
+		jd.setKeyword1(req.getParameter("other1"));
+		jd.setKeyword2(req.getParameter("other2"));
+		jd.setKeyword3(req.getParameter("other3"));
 		if (req.getParameter("parentid") != null)
 		{
 			jd.setParentID(Integer.parseInt(req.getParameter("parentid")));

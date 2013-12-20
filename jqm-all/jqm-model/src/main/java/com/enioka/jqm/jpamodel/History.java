@@ -82,11 +82,11 @@ public class History implements Serializable
 	@Column(length = 20, name = "status")
 	private String status = "SUBMITTED";
 	@Column
-	private String other1;
+	private String keyword1;
 	@Column
-	private String other2;
+	private String keyword2;
 	@Column
-	private String other3;
+	private String keyword3;
 	@Column
 	private String application;
 	@Column
@@ -271,39 +271,39 @@ public class History implements Serializable
 	}
 
 
-	public String getOther1() {
+	public String getKeyword1() {
 
-		return other1;
+		return keyword1;
 	}
 
 
-	public void setOther1(String other1) {
+	public void setKeyword1(String keyword1) {
 
-		this.other1 = other1;
+		this.keyword1 = keyword1;
 	}
 
 
-	public String getOther2() {
+	public String getKeyword2() {
 
-		return other2;
+		return keyword2;
 	}
 
 
-	public void setOther2(String other2) {
+	public void setKeyword2(String keyword2) {
 
-		this.other2 = other2;
+		this.keyword2 = keyword2;
 	}
 
 
-	public String getOther3() {
+	public String getKeyword3() {
 
-		return other3;
+		return keyword3;
 	}
 
 
-	public void setOther3(String other3) {
+	public void setKeyword3(String keyword3) {
 
-		this.other3 = other3;
+		this.keyword3 = keyword3;
 	}
 
 

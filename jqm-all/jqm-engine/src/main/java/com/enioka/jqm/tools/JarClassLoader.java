@@ -92,9 +92,9 @@ class JarClassLoader extends URLClassLoader
 			Link l = new Link(old, job.getId(), em);
 			Method setMyEngine = c.getMethod("setMyEngine", Object.class);
 			getdefaultConnect.invoke(o, defaultConnection);
-			setOther1.invoke(o, job.getJd().getOther1());
-			setOther2.invoke(o, job.getJd().getOther2());
-			setOther3.invoke(o, job.getJd().getOther3());
+			setOther1.invoke(o, job.getJd().getKeyword1());
+			setOther2.invoke(o, job.getJd().getKeyword2());
+			setOther3.invoke(o, job.getJd().getKeyword3());
 			setSessionID.invoke(o, job.getSessionID());
 			setApplication.invoke(o, job.getJd().getApplication());
 			setModule.invoke(o, job.getJd().getModule());

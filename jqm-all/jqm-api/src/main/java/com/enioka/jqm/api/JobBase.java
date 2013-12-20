@@ -46,9 +46,9 @@ public class JobBase
 	protected String sessionID;
 	protected String application;
 	protected String module;
-	protected String other1;
-	protected String other2;
-	protected String other3;
+	protected String keyword1;
+	protected String keyword2;
+	protected String keyword3;
 	protected Map<String, String> parameters = new HashMap<String, String>();
 	protected ArrayList<DeliverableStruct> sha1s = new ArrayList<DeliverableStruct>();
 	private String defaultConnect;
@@ -167,7 +167,7 @@ public class JobBase
 	}
 
 	public int enQueue(String applicationName, String user, String mail, String sessionID, String application, String module,
-			String other1, String other2, String other3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
+			String keyword1, String keyword2, String keyword3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
 	{
 		try
 		{
@@ -181,8 +181,8 @@ public class JobBase
 
 			Method getMyEngine = c.getMethod("enQueue", String.class, String.class, String.class, String.class, String.class, String.class,
 					String.class, String.class, String.class, Integer.class, Integer.class, Map.class);
-			return (Integer) getMyEngine.invoke(myEngine, applicationName, user, mail, sessionID, application, module, other1, other2,
-					other3, parentId, canBeRestart, parameters);
+			return (Integer) getMyEngine.invoke(myEngine, applicationName, user, mail, sessionID, application, module, keyword1, keyword2,
+					keyword3, parentId, canBeRestart, parameters);
 		} catch (Exception e)
 		{
 			e.printStackTrace();
@@ -264,40 +264,40 @@ public class JobBase
 		this.module = module;
 	}
 
-	public String getOther1()
+	public String getkeyword1()
 	{
 
-		return other1;
+		return keyword1;
 	}
 
-	public void setOther1(final String other1)
+	public void setKeyword1(final String keyword1)
 	{
 
-		this.other1 = other1;
+		this.keyword1 = keyword1;
 	}
 
-	public String getOther2()
+	public String getKeyword2()
 	{
 
-		return other2;
+		return keyword2;
 	}
 
-	public void setOther2(final String other2)
+	public void setKeyword2(final String keyword2)
 	{
 
-		this.other2 = other2;
+		this.keyword2 = keyword2;
 	}
 
-	public String getOther3()
+	public String getKeyword3()
 	{
 
-		return other3;
+		return keyword3;
 	}
 
-	public void setOther3(final String other3)
+	public void setKeyword3(final String keyword3)
 	{
 
-		this.other3 = other3;
+		this.keyword3 = keyword3;
 	}
 
 	public ArrayList<DeliverableStruct> getSha1s()

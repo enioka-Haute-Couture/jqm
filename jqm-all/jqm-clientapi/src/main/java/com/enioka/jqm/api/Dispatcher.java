@@ -155,9 +155,9 @@ public final class Dispatcher
 		job.setApplicationName(jd.getApplicationName());
 		job.setApplication(jd.getApplication());
 		job.setModule(jd.getModule());
-		job.setOther1(jd.getOther1());
-		job.setOther2(jd.getOther2());
-		job.setOther3(jd.getOther3());
+		job.setKeyword1(jd.getKeyword1());
+		job.setKeyword2(jd.getKeyword2());
+		job.setKeyword3(jd.getKeyword3());
 
 		return job;
 	}
@@ -290,9 +290,9 @@ public final class Dispatcher
 		h.setParentJobId(jd.getParentID());
 		h.setApplication(ji.getJd().getApplication());
 		h.setModule(ji.getJd().getModule());
-		h.setOther1(ji.getJd().getOther1());
-		h.setOther2(ji.getJd().getOther2());
-		h.setOther3(ji.getJd().getOther3());
+		h.setKeyword1(ji.getJd().getKeyword1());
+		h.setKeyword2(ji.getJd().getKeyword2());
+		h.setKeyword3(ji.getJd().getKeyword3());
 		h.setProgress(0);
 
 		h.setParameters(new ArrayList<JobHistoryParameter>());

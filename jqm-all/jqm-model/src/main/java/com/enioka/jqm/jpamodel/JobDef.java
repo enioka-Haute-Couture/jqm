@@ -66,12 +66,12 @@ public class JobDef implements Serializable
 	private String application;
 	@Column(length = 50, name = "module")
 	private String module;
-	@Column(length = 50, name = "other1")
-	private String other1;
-	@Column(length = 50, name = "other2")
-	private String other2;
-	@Column(length = 50, name = "other3")
-	private String other3;
+	@Column(length = 50, name = "keyword1")
+	private String keyword1;
+	@Column(length = 50, name = "keyword2")
+	private String keyword2;
+	@Column(length = 50, name = "keyword3")
+	private String keyword3;
 	@Column(name = "highlander", nullable = false)
 	private boolean highlander = false;
 	@Column(name = "jarPath")
@@ -145,34 +145,34 @@ public class JobDef implements Serializable
 		this.module = module;
 	}
 
-	public String getOther1()
+	public String getKeyword1()
 	{
-		return other1;
+		return keyword1;
 	}
 
-	public void setOther1(final String other1)
+	public void setKeyword1(final String keyword1)
 	{
-		this.other1 = other1;
+		this.keyword1 = keyword1;
 	}
 
-	public String getOther2()
+	public String getKeyword2()
 	{
-		return other2;
+		return keyword2;
 	}
 
-	public void setOther2(final String other2)
+	public void setKeyword2(final String other2)
 	{
-		this.other2 = other2;
+		this.keyword2 = other2;
 	}
 
-	public String getOther3()
+	public String getKeyword3()
 	{
-		return other3;
+		return keyword3;
 	}
 
-	public void setOther3(final String other3)
+	public void setKeyword3(final String keyword3)
 	{
-		this.other3 = other3;
+		this.keyword3 = keyword3;
 	}
 
 	public boolean isHighlander()
