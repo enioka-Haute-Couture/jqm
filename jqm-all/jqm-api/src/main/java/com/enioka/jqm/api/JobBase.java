@@ -190,6 +190,30 @@ public class JobBase
 		return 0;
 	}
 
+	public int enQueueSynchronously(String applicationName, String user, String mail, String sessionID, String application, String module,
+			String keyword1, String keyword2, String keyword3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
+	{
+		try
+		{
+			// If not given, consider this is a child/parent launch.
+			if (parentId == null)
+			{
+				parentId = this.jobInstanceID;
+			}
+
+			Class c = myEngine.getClass();
+
+			Method getMyEngine = c.getMethod("enQueueSynchronously", String.class, String.class, String.class, String.class, String.class, String.class,
+					String.class, String.class, String.class, Integer.class, Integer.class, Map.class);
+			return (Integer) getMyEngine.invoke(myEngine, applicationName, user, mail, sessionID, application, module, keyword1, keyword2,
+					keyword3, parentId, canBeRestart, parameters);
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
 	// ---------
 
 	public Integer getParentID()

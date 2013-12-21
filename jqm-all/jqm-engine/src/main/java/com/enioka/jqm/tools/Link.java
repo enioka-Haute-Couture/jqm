@@ -120,4 +120,24 @@ public class Link
 		Thread.currentThread().setContextClassLoader(cl);
 		return id;
 	}
+
+	public int enQueueSynchronously(String applicationName, String user, String mail, String sessionId, String application, String module,
+			String keyword1, String keyword2, String keyword3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
+	{
+		int i = enQueue(applicationName, user, mail, sessionId, application, module, keyword1, keyword2, keyword3, parentId, canBeRestart, parameters);
+
+		while (true)
+		{
+			String status = em.createQuery("SELECT h.status FROM History h WHERE h.jobInstanceId = :id", String.class).setParameter("id", i).getSingleResult();
+
+			jqmlogger.debug("Status of the synchronous job: " + status);
+
+			if (status.equals("ENDED") || status.equals("CRASHED"))
+			{
+				break;
+			}
+		}
+
+		return i;
+	}
 }
