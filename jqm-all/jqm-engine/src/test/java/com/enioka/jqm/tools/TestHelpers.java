@@ -73,7 +73,7 @@ public class TestHelpers
 		TestHelpers.nodeMix = CreationTools.createNode("localhost4", 8084, "./testprojects/jqm-test-deliverable/", "./testprojects/", em);
 		TestHelpers.nodeMix2 = CreationTools.createNode("localhost5", 8085, "./testprojects/jqm-test-deliverable/", "./testprojects/", em);
 
-		TestHelpers.dpVip = CreationTools.createDeploymentParameter(1, node, 3, 1, qVip, em);
+		TestHelpers.dpVip = CreationTools.createDeploymentParameter(1, node, 20, 1, qVip, em);
 		TestHelpers.dpVipMix = CreationTools.createDeploymentParameter(2, nodeMix, 3, 1, qVip, em);
 		TestHelpers.dpVipMix2 = CreationTools.createDeploymentParameter(2, nodeMix2, 3, 1, qVip, em);
 		TestHelpers.dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 300, qNormal, em);

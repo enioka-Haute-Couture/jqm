@@ -14,13 +14,15 @@ public class App extends JobBase
 		System.out.println("PARAMETRE FIBO 2: " + this.parameters.get("p2"));
 
 		Map<String, String> p = new HashMap<String, String>();
-		p.put("p1", "1");
-		p.put("p2", "2");
+		p.put("p1", this.parameters.get("p2"));
+		p.put("p2", (Integer.parseInt(this.parameters.get("p1")) + Integer.parseInt(this.parameters.get("p2")) + ""));
 
-		int ii = enQueueSynchronously("Fibo", "Luke", null, null, null, null, null, null, null, null, null, p);
+		if (Integer.parseInt(this.parameters.get("p1")) <= 100)
+		{
+			int i = enQueueSynchronously("FiboSync", "Luke", null, null, null, null, null, null, null, null, null, p);
+			System.out.println("Synchronous job finished: " + i);
+		}
 
-		System.out.println("FIBO FINISHED. ID of the job: " + ii);
-
-		System.out.println("666");
+		System.out.println("FIBO FINISHED");
 	}
 }

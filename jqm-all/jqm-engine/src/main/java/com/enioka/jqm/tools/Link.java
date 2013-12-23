@@ -130,7 +130,7 @@ public class Link
 		{
 			String status = em.createQuery("SELECT h.status FROM History h WHERE h.jobInstanceId = :id", String.class).setParameter("id", i).getSingleResult();
 
-			jqmlogger.debug("Status of the synchronous job: " + status);
+			//jqmlogger.debug("Status of the synchronous job: " + status);
 
 			if (status.equals("ENDED") || status.equals("CRASHED"))
 			{

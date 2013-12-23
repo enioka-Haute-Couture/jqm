@@ -1791,15 +1791,12 @@ public class JobBaseTest
 
 		@SuppressWarnings("unused")
 		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibosync/",
-				"jqm-test-fibosync/jqm-test-fibosync.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+				"jqm-test-fibosync/jqm-test-fibosync.jar", TestHelpers.qVip, 42, "FiboSync", null, "Franquin",
 				"ModuleMachin", "other", "other", false, em);
-		JobDef jdd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/",
-				"jqm-test-fibo/jqm-test-fibo.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2",
-				false, em);
 
-
-		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
-
+		JobDefinition j = new JobDefinition("FiboSync", "MAG");
+		j.addParameter("p1", "1");
+		j.addParameter("p2", "2");
 		int i = Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
@@ -1807,8 +1804,13 @@ public class JobBaseTest
 		Thread.sleep(10000);
 
 		engine1.stop();
-
 		long ii = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
 		Assert.assertTrue(ii > 2);
+		TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.endDate ASC", History.class);
+		ArrayList<History> res = (ArrayList<History>) query.getResultList();
+		for (History history : res) {
+			Assert.assertEquals("ENDED", history.getState());
+		}
+		Assert.assertEquals(1, (int)res.get(res.size()- 1).getId());
 	}
 }
