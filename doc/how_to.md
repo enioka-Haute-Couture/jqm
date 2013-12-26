@@ -36,7 +36,6 @@ To easily include JQM in your dependencies, add this dependency:
       <version>1.1.2</version>
     </dependency>
 
-
 This dependency is THE necessary dependency to use JQM.
 
 This dependency includes:
@@ -76,10 +75,7 @@ Example:
 
 * Parent job
 
-    import java.util.HashMap;
-    import java.util.Map;
-    import com.enioka.jqm.api.JobBase;
-
+```java
     public class Caller extends JobBase
     {
         @Override
@@ -88,7 +84,7 @@ Example:
             Map<String, String> params = new HashMap<String, String>();
             params.put("myParam1", "parameter1");
             params.put("myParam2", "parameter2");
-         
+            
             // enQueue is a JobBase method.
             // It is used to enqueue a Job, here “Called”.
             enQueue("Called", "Steve", null, null, null, null, null,          
@@ -99,10 +95,12 @@ Example:
                                + params.get("myParam1") + " & " 
                                + params.get("myParam2") + "!");
         }
-    }
+    }    
+```
 
 * Child job
 
+```java
     import com.enioka.jqm.api.JobBase;
 
     public class Called extends JobBase
@@ -113,6 +111,7 @@ Example:
             System.out.println(“Called: Called job launched by Steve!”);
         }
     }
+```
 
 Here, the Caller job, will enqueue the Called job. You will see appear in the logs:
 
