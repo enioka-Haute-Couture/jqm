@@ -1,8 +1,24 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:p="http://primefaces.org/ui" >
+	xmlns:f="http://java.sun.com/jsf/core">
+
+<STYLE type="text/css">
+<!--
+.title {
+	background-color: #000000;
+	color: #FFFFFF;
+}
+
+.eager {
+	background-color: #EFEFEF;
+}
+
+.odd {
+	background-color: #CECECE;
+}
+-->
+</STYLE>
 
 <h:outputLink value="jobdef.xhtml">
 	<h:outputText value="Job definition" />
@@ -16,7 +32,7 @@
 
 <h:outputText value="   --   " />
 
-<h:outputLink value="faces/history.xhtml">
+<h:outputLink value="history.xhtml">
 	<h:outputText value="History" />
 </h:outputLink>
 
@@ -28,78 +44,78 @@
 
 <h:form>
 	<h1>JobInstance screen</h1>
-	<p:dataTable value="#{jobInstance.jobs}" var="job" cellspacing="4"
-		width="100%" paginator="true" rows="25" rowsPerPageTemplate="5,10,15,20,25,30,40,50,60">
-		<p:column>
+	<h:dataTable value="#{jobInstance.jobs}" var="job" cellspacing="4"
+		width="100%" rowClasses="eager,odd" headerClass="title">
+		<h:column>
 			<f:facet name="header">
 				<h:outputText value="Stop" />
 			</f:facet>
 			<h:selectBooleanCheckbox value="#{job.stop}" />
-		</p:column>
-		<p:column>
+		</h:column>
+		<h:column>
 			<f:facet name="header">
 				<h:outputText value="ID" />
 			</f:facet>
 			<h:outputText value="#{job.ji.id}" />
-		</p:column>
-		<p:column>
+		</h:column>
+		<h:column>
 			<f:facet name="header">
 				<h:outputText value="JobDefinition" />
 			</f:facet>
 			<h:outputText value="#{job.ji.jd.applicationName}" />
-		</p:column>
-		<p:column>
+		</h:column>
+		<h:column>
 			<f:facet name="header">
 				<h:outputText value="Parent ID" />
 			</f:facet>
 			<h:outputText value="#{job.ji.parentId}" />
-		</p:column>
-		<p:column>
+		</h:column>
+		<h:column>
 			<f:facet name="header">
 				<h:outputText value="Position" />
 			</f:facet>
 			<h:outputText value="#{job.ji.internalPosition}" />
-		</p:column>
-		<p:column>
+		</h:column>
+		<h:column>
 			<f:facet name="header">
 				<h:outputText value="Progression" />
 			</f:facet>
 			<h:outputText value="#{job.ji.progress}" />
-		</p:column>
-		<p:column>
+		</h:column>
+		<h:column>
 			<f:facet name="header">
 				<h:outputText value="User name" />
 			</f:facet>
 			<h:outputText value="#{job.ji.userName}" />
-		</p:column>
-		<p:column>
+		</h:column>
+		<h:column>
 			<f:facet name="header">
 				<h:outputText value="Status" />
 			</f:facet>
 			<h:outputText value="#{job.ji.state}" />
-		</p:column>
-		<p:column>
+		</h:column>
+		<h:column>
 			<f:facet name="header">
 				<h:outputText value="Queue" />
 			</f:facet>
 			<h:outputText value="#{job.ji.queue.name}" />
-		</p:column>
-		<p:column>
+		</h:column>
+		<h:column>
 			<f:facet name="header">
 				<h:outputText value="Node" />
 			</f:facet>
 			<h:outputText value="#{job.ji.node.listeningInterface}" />
-		</p:column>
-		<p:column>
+		</h:column>
+		<h:column>
 			<f:facet name="header">
 				<h:outputText value="Email" />
 			</f:facet>
 			<h:outputText value="#{job.ji.email}" />
-		</p:column>
-	</p:dataTable>
+		</h:column>
+	</h:dataTable>
 
 	<p>
-		<h:commandButton value="Stop"
+		<h:commandButton value="Stop selected items"
 			action="#{jobInstance.stop}" />
 	</p>		
 </h:form>

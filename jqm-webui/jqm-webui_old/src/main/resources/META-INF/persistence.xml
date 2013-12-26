@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+	version="2.0">
+
+	<persistence-unit name="jobqueue-api-pu">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<non-jta-data-source>jdbc/jqm</non-jta-data-source>
+		<jar-file>/Users/pico/Dropbox/projets/enioka/jqm/jqm-all/jqm-model/target/jqm-model-1.1.4-SNAPSHOT.jar</jar-file>
+
+		<properties>
+			<property name="javax.persistence.validation.mode" value="none" />
+			<property name="hibernate.hbm2ddl.auto" value="update" />
+			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
+			<property name="hibernate.transaction.manager_lookup_class" value="org.hibernate.transaction.SunONETransactionManagerLookup"/>
+		</properties>
+	</persistence-unit>
+</persistence>

@@ -4,15 +4,17 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
+import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-@ManagedBean(eager = true)
+@ManagedBean(eager = false)
 @RequestScoped
-public class History implements Serializable{
+public class History implements Serializable {
 
 	/**
 	 * 
@@ -22,12 +24,24 @@ public class History implements Serializable{
 	EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
 	EntityManager em = emf.createEntityManager();
 
-	private ArrayList<com.enioka.jqm.jpamodel.History> hs = null;
+	private List<com.enioka.jqm.jpamodel.History> hs = null;
+	private List<com.enioka.jqm.jpamodel.History> hss = null;
+	private List<com.enioka.jqm.jpamodel.History> filteredhs;
 
-	public History() {
+	@PostConstruct
+	public void init()
+	{
+		FacesContext.getCurrentInstance().getExternalContext().getSession(true);
+		em.clear();
+		getHs();
 	}
 
-	public ArrayList<com.enioka.jqm.jpamodel.History> getHs() {
+	public String reload()
+	{
+		return "null";
+	}
+
+	public List<com.enioka.jqm.jpamodel.History> getHs() {
 
 		em.clear();
 
@@ -46,5 +60,28 @@ public class History implements Serializable{
 
 	public void setHs(ArrayList<com.enioka.jqm.jpamodel.History> hs) {
 		this.hs = hs;
+	}
+
+
+	public List<com.enioka.jqm.jpamodel.History> getHss() {
+		hss = hs;
+		return hss;
+	}
+
+
+	public void setHss(List<com.enioka.jqm.jpamodel.History> hss) {
+
+		this.hss = hss;
+	}
+
+
+	public List<com.enioka.jqm.jpamodel.History> getFilteredhs() {
+		return filteredhs;
+	}
+
+
+	public void setFilteredhs(List<com.enioka.jqm.jpamodel.History> filteredhs) {
+
+		this.filteredhs = filteredhs;
 	}
 }

@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
 import javax.faces.context.FacesContext;
@@ -18,7 +17,7 @@ import com.enioka.jqm.api.JobDefinition;
 
 @ManagedBean(eager = true)
 @RequestScoped
-public class JobDef implements Serializable {
+public class JobDef implements Serializable{
 
 	/**
 	 * 
@@ -30,10 +29,8 @@ public class JobDef implements Serializable {
 	private ArrayList<utils.JobDefCustom> jobs = new ArrayList<utils.JobDefCustom>();
 	private String userName;
 
-	@PostConstruct
-	public void init()
+	public JobDef()
 	{
-		FacesContext.getCurrentInstance().getExternalContext().getSession(true);
 		getJobs();
 	}
 

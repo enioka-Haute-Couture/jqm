@@ -2,150 +2,134 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:ui="http://java.sun.com/jsf/facelets">
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
 
-<STYLE type="text/css">
-<!--
-.title {
-	background-color: #000000;
-	color: #FFFFFF;
-}
-
-.eager {
-	background-color: #EFEFEF;
-}
-
-.odd {
-	background-color: #CECECE;
-}
--->
-</STYLE>
-
-<h:outputLink value="jobdef.xhtml">
+<h:outputLink value="faces/jobdef.xhtml">
 	<h:outputText value="Job definition" />
 </h:outputLink>
 
 <h:outputText value="   --   " />
 
-<h:outputLink value="queue.xhtml">
+<h:outputLink value="faces/queue.xhtml">
 	<h:outputText value="Queue" />
 </h:outputLink>
 
 <h:outputText value="   --   " />
 
-<h:outputLink value="history.xhtml">
+<h:outputLink value="faces/history.xhtml">
 	<h:outputText value="History" />
 </h:outputLink>
 
 <meta http-equiv="cache-control" content="no-cache" />
 
 <h:head>
-	<title>JQM ENQUEUE</title>
+	<title>JQM enqueue</title>
 </h:head>
 
 <h:form>
 
 	<h1>Jobs actually registered</h1>
-	<h:dataTable value="#{jobDef.jobs}" var="job" cellspacing="4"
-		width="100%" rowClasses="eager,odd" headerClass="title">
-		<h:column>
+	<p:dataTable value="#{jobDef.jobs}" var="job" paginator="true" rows="25" rowsPerPageTemplate="5,10,15,20,25,30,40,50,60"
+		width="100%" >
+		 <p:column>
 			<f:facet name="header">
 				<h:outputText value="Enqueue" />
 			</f:facet>
 			<h:selectBooleanCheckbox value="#{job.enqueue}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="ID" />
-			</f:facet>
-			<h:outputText value="#{job.j.id}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Name" />
-			</f:facet>
-			<h:outputText value="#{job.j.applicationName}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Description" />
-			</f:facet>
-			<h:outputText value="#{job.j.description}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="FilePath" />
-			</f:facet>
-			<h:outputText value="#{job.j.filePath}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Queue" />
-			</f:facet>
-			<h:outputText value="#{job.j.queue.name}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Can be restarted?" />
-			</f:facet>
-			<h:outputText value="#{job.j.canBeRestarted}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Main Class" />
-			</f:facet>
-			<h:outputText value="#{job.j.javaClassName}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Application" />
-			</f:facet>
-			<h:outputText value="#{job.j.application}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Module" />
-			</f:facet>
-			<h:outputText value="#{job.j.module}" />
-		</h:column>
-		
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Other 1" />
-			</f:facet>
-			<h:outputText value="#{job.j.other1}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Other 2" />
-			</f:facet>
-			<h:outputText value="#{job.j.other2}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Other 3" />
-			</f:facet>
-			<h:outputText value="#{job.j.other3}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Highlander" />
-			</f:facet>
-			<h:outputText value="#{job.j.highlander}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Jar filepath" />
-			</f:facet>
-			<h:outputText value="#{job.j.jarPath}" />
-		</h:column>
-	</h:dataTable>
-
+		</p:column>
+		  <p:column>  
+            <f:facet name="header">  
+                <h:outputText value="ID" />  
+            </f:facet>  
+            <h:outputText value="#{job.j.id}" />  
+        </p:column>  
+		  <p:column>  
+            <f:facet name="header">  
+                <h:outputText value="Name" />  
+            </f:facet>  
+            <h:outputText value="#{job.j.applicationName}" />  
+        </p:column>  
+		  <p:column>  
+            <f:facet name="header">  
+                <h:outputText value="Description" />  
+            </f:facet>  
+            <h:outputText value="#{job.j.description}" />  
+        </p:column>  
+		  <p:column>  
+            <f:facet name="header">  
+                <h:outputText value="FilePath" />  
+            </f:facet>  
+            <h:outputText value="#{job.j.filePath}" />  
+        </p:column>  
+		  <p:column>  
+            <f:facet name="header">  
+                <h:outputText value="Queue" />  
+            </f:facet>  
+            <h:outputText value="#{job.j.queue.name}" />  
+        </p:column>  
+		  <p:column>  
+            <f:facet name="header">  
+                <h:outputText value="Can be restarted?" />  
+            </f:facet>  
+            <h:outputText value="#{job.j.canBeRestarted}" />  
+        </p:column>  
+		  <p:column>  
+            <f:facet name="header">  
+                <h:outputText value="Main Class" />  
+            </f:facet>  
+            <h:outputText value="#{job.j.javaClassName}" />  
+        </p:column>  
+		  <p:column>  
+            <f:facet name="header">  
+                <h:outputText value="Application" />  
+            </f:facet>  
+            <h:outputText value="#{job.j.application}" />  
+        </p:column>  
+		  <p:column>  
+            <f:facet name="header">  
+                <h:outputText value="Module" />  
+            </f:facet>  
+            <h:outputText value="#{job.j.module}" />  
+        </p:column>  
+		  <p:column>  
+            <f:facet name="header">  
+                <h:outputText value="Other 1" />  
+            </f:facet>  
+            <h:outputText value="#{job.j.other1}" />  
+        </p:column>  
+		  <p:column>  
+            <f:facet name="header">  
+                <h:outputText value="Other 2" />  
+            </f:facet>  
+            <h:outputText value="#{job.j.other2}" />  
+        </p:column>  
+		  <p:column>  
+            <f:facet name="header">  
+                <h:outputText value="Other 3" />  
+            </f:facet>  
+            <h:outputText value="#{job.j.other3}" />  
+        </p:column>  
+	  <p:column>  
+            <f:facet name="header">  
+                <h:outputText value="Highlander" />  
+            </f:facet>  
+            <h:outputText value="#{job.j.highlander}" />  
+        </p:column>  
+		  <p:column>  
+            <f:facet name="header">  
+                <h:outputText value="Jar filepath" />  
+            </f:facet>  
+            <h:outputText value="#{job.j.jarPath}" />  
+        </p:column>  
+	</p:dataTable>
+	
 	<p>
 		<h:inputText value="#{jobDef.userName}" />
 		<h:commandButton value="Enqueue selected items"
 			action="#{jobDef.enqueue}" />
 	</p>
+	
 
 </h:form>
 </html>

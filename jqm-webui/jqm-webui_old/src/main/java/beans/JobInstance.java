@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
 import javax.faces.context.FacesContext;
@@ -28,10 +27,8 @@ public class JobInstance implements Serializable {
 
 	private ArrayList<utils.JobInstanceCustom> jobs;
 
-	@PostConstruct
-	public void init()
-	{
-		FacesContext.getCurrentInstance().getExternalContext().getSession(true);
+	public JobInstance() {
+
 		getJobs();
 	}
 

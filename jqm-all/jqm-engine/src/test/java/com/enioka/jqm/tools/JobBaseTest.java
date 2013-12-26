@@ -1801,7 +1801,7 @@ public class JobBaseTest
 
 		JqmEngine engine1 = new JqmEngine();
 		engine1.start(new String[] { "localhost" });
-		Thread.sleep(10000);
+		Thread.sleep(20000);
 
 		engine1.stop();
 		long ii = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();

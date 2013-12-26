@@ -2,179 +2,110 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:ui="http://java.sun.com/jsf/facelets">
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
 
-<STYLE type="text/css">
-<!--
-.title {
-	background-color: #000000;
-	color: #FFFFFF;
-}
-
-.eager {
-	background-color: #EFEFEF;
-}
-
-.odd {
-	background-color: #CECECE;
-}
--->
-</STYLE>
-
-<h:outputLink value="jobdef.xhtml">
+<h:outputLink value="faces/jobdef.xhtml">
 	<h:outputText value="Job definition" />
 </h:outputLink>
 
 <h:outputText value="   --   " />
 
-<h:outputLink value="queue.xhtml">
+<h:outputLink value="faces/queue.xhtml">
 	<h:outputText value="Queue" />
 </h:outputLink>
 
 <h:outputText value="   --   " />
 
-<h:outputLink value="history.xhtml">
+<h:outputLink value="faces/history.xhtml">
 	<h:outputText value="History" />
 </h:outputLink>
 
-<meta http-equiv="cache-control" content="no-cache" />
-
 <h:head>
-	<title>History</title>
+<title>History</title>
 </h:head>
+
+<meta http-equiv="cache-control" content="no-cache" />
 
 <h:form>
 
-	<h1>History</h1>
+	<p:dataTable id="dataTable" var="h" value="#{history.hs}"  
+		sortMode="multiple" rows="25" paginator="true" filteredValue="#{history.filteredhs}" 
+		rowsPerPageTemplate="5,10,15,20,25,30,40,50,60" >
 
-	<h:dataTable value="#{history.hs}" var="h" cellspacing="4" width="100%"
-		cellpadding="4" rowClasses="eager,odd" headerClass="title">
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="ID" />
-			</f:facet>
+		<p:column id="idColumn" headerText="ID" filterBy="id" >
 			<h:outputText value="#{h.id}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Returned Value" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="Returned Value" filterBy="returnedValue">
 			<h:outputText value="#{h.returnedValue}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Job Definition" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="Job Definition" filterBy="jd.applicationName">
 			<h:outputText value="#{h.jd.applicationName}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Session ID" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="Session ID" filterBy="sessionId">
 			<h:outputText value="#{h.sessionId}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Queue" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="Queue" filterBy="queue.name">
 			<h:outputText value="#{h.queue.name}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="JobInstance ID" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="JobInstance ID" filterBy="jobInstanceId">
 			<h:outputText value="#{h.jobInstanceId}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Enqueue Date" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="Enqueue Date" filterBy="enqueueDate.time">
 			<h:outputText value="#{h.enqueueDate.time}">
-				<f:convertDateTime type="date" pattern="yyyy.MM.dd 'at' HH:mm:ss"/>
+			<f:convertDateTime type="date" pattern="yyyy.MM.dd 'at' HH:mm:ss"/>
 			</h:outputText>
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Execution Date" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="Execution Date" filterBy="executionDate.time">
 			<h:outputText value="#{h.executionDate.time}">
 			<f:convertDateTime type="date" pattern="yyyy.MM.dd 'at' HH:mm:ss"/>
 			</h:outputText>
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="End Date" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="End Date" filterBy="endDate.time">
 			<h:outputText value="#{h.endDate.time}">
 			<f:convertDateTime type="date" pattern="yyyy.MM.dd 'at' HH:mm:ss"/>
 			</h:outputText>
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="User Name" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="User Name" filterBy="userName">
 			<h:outputText value="#{h.userName}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Node" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="Node" filterBy="node.listeningInterface">
 			<h:outputText value="#{h.node.listeningInterface}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Email" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="Email" filterBy="email">
 			<h:outputText value="#{h.email}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Parent Job ID" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="Parent Job ID" filterBy="parentJobId">
 			<h:outputText value="#{h.parentJobId}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Status" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="Status" filterBy="status">
 			<h:outputText value="#{h.status}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Other 1" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="Other 1" filterBy="other1">
 			<h:outputText value="#{h.other1}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Other 2" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="Other 2" filterBy="other2">
 			<h:outputText value="#{h.other2}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Other 3" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="Other 3" filterBy="other3">
 			<h:outputText value="#{h.other3}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Application" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="Application" filterBy="application">
 			<h:outputText value="#{h.application}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Module" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="Module" filterBy="module">
 			<h:outputText value="#{h.module}" />
-		</h:column>
-		<h:column>
-			<f:facet name="header">
-				<h:outputText value="Progression" />
-			</f:facet>
+		</p:column>
+		<p:column headerText="Progression" filterBy="progress">
 			<h:outputText value="#{h.progress}" />
-		</h:column>
-	</h:dataTable>
+		</p:column>
+
+	</p:dataTable>
+	
+	<p>
+		<h:commandButton value="Actualize"
+			action="#{history.reload}" />
+	</p>	
+
 </h:form>
 </html>
