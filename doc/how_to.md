@@ -108,7 +108,7 @@ Example:
         @Override
         public void start()
         {
-            System.out.println(“Called: Called job launched by Steve!”);
+            System.out.println("Called: Called job launched by Steve!");
         }
     }
 ```
