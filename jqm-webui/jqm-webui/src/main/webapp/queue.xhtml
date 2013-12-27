@@ -2,34 +2,36 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:p="http://primefaces.org/ui" >
-
-<h:outputLink value="jobdef.xhtml">
-	<h:outputText value="Job definition" />
-</h:outputLink>
-
-<h:outputText value="   --   " />
-
-<h:outputLink value="queue.xhtml">
-	<h:outputText value="Queue" />
-</h:outputLink>
-
-<h:outputText value="   --   " />
-
-<h:outputLink value="faces/history.xhtml">
-	<h:outputText value="History" />
-</h:outputLink>
+	xmlns:p="http://primefaces.org/ui">
 
 <meta http-equiv="cache-control" content="no-cache" />
 
 <h:head>
-	<title>JQM VIEW</title>
+	<title>JQM queue</title>
 </h:head>
 
 <h:form>
-	<h1>JobInstance screen</h1>
+
+	<h:outputLink value="jobdef.xhtml">
+		<h:outputText value="Job definition" />
+	</h:outputLink>
+
+	<h:outputText value="   --   " />
+
+	<h:outputLink value="queue.xhtml">
+		<h:outputText value="Queue" />
+	</h:outputLink>
+
+	<h:outputText value="   --   " />
+
+	<h:outputLink value="history.xhtml">
+		<h:outputText value="History" />
+	</h:outputLink>
+
+	<h1>Jobs in the queue</h1>
 	<p:dataTable value="#{jobInstance.jobs}" var="job" cellspacing="4"
-		width="100%" paginator="true" rows="25" rowsPerPageTemplate="5,10,15,20,25,30,40,50,60">
+		width="100%" paginator="true" rows="25"
+		rowsPerPageTemplate="5,10,15,20,25,30,40,50,60">
 		<p:column>
 			<f:facet name="header">
 				<h:outputText value="Stop" />
@@ -99,8 +101,7 @@
 	</p:dataTable>
 
 	<p>
-		<h:commandButton value="Stop"
-			action="#{jobInstance.stop}" />
-	</p>		
+		<h:commandButton value="Stop" action="#{jobInstance.stop}" />
+	</p>
 </h:form>
 </html>
