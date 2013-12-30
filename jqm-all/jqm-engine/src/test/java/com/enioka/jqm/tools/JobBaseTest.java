@@ -1813,4 +1813,72 @@ public class JobBaseTest
 		}
 		Assert.assertEquals(1, (int)res.get(res.size()- 1).getId());
 	}
+
+	@Test
+	public void testImportQueue() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testImportQueue");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/",
+				"jqm-test-fibo/jqm-test-fibo.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2",
+				false, em);
+		JobDef jdd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar",
+				TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "DateTime", null, "Franquin",
+				"ModuleMachin", "other", "other", false, em);
+
+		QueueXmlParser qxp = new QueueXmlParser();
+		qxp.parse("testprojects/jqm-test-xml/xmlqueuetest.xml");
+
+		long ii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'XmlQueue'").getSingleResult();
+		long iii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'XmlQueue2'").getSingleResult();
+		Assert.assertEquals(2, ii + iii);
+		Assert.assertEquals("XmlQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Fibo' ", String.class).getSingleResult());
+		Assert.assertEquals("XmlQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Geo' ", String.class).getSingleResult());
+		Assert.assertEquals("XmlQueue2", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
+	}
+
+	//	@Test
+	//	public void testExportQueue() throws Exception
+	//	{
+	//		jqmlogger.debug("**********************************************************");
+	//		jqmlogger.debug("**********************************************************");
+	//		jqmlogger.debug("Starting test testExportQueue");
+	//		EntityManager em = Helpers.getNewEm();
+	//		TestHelpers.cleanup(em);
+	//		TestHelpers.createLocalNode(em);
+	//
+	//		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+	//		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+	//		jdargs.add(jdp);
+	//
+	//		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/",
+	//				"jqm-test-fibo/jqm-test-fibo.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2",
+	//				false, em);
+	//		JobDef jdd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar",
+	//				TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+	//		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
+	//				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "DateTime", null, "Franquin",
+	//				"ModuleMachin", "other", "other", false, em);
+	//
+	//		QueueXmlParser qxp = new QueueXmlParser();
+	//		qxp.export("testprojects/jqm-test-xml/xmlexportqueuetest.xml");
+	//
+	//		long ii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'XmlQueue'").getSingleResult();
+	//		long iii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'XmlQueue2'").getSingleResult();
+	//		Assert.assertEquals(2, ii + iii);
+	//		Assert.assertEquals("XmlQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Fibo' ", String.class).getSingleResult());
+	//		Assert.assertEquals("XmlQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Geo' ", String.class).getSingleResult());
+	//		Assert.assertEquals("XmlQueue2", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
+	//	}
 }
