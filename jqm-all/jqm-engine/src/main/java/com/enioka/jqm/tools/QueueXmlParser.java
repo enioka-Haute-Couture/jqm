@@ -156,6 +156,8 @@ public class QueueXmlParser
 							{
 								jqmlogger.warn("Queue " + name + " or the JobDef "+ n + " is non unique. " +
 										"The admin must change the queue or the JobDef configurations");
+								jqmlogger.warn("This job will be ignored");
+
 							}
 							catch (NoResultException ss)
 							{
