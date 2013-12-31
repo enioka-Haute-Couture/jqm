@@ -1776,45 +1776,6 @@ public class JobBaseTest
 	}
 
 	@Test
-	public void testEnqueueSynchronously() throws Exception
-	{
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("Starting test testEnqueueSynchronously");
-		EntityManager em = Helpers.getNewEm();
-		TestHelpers.cleanup(em);
-		TestHelpers.createLocalNode(em);
-
-		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-		jdargs.add(jdp);
-
-		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibosync/",
-				"jqm-test-fibosync/jqm-test-fibosync.jar", TestHelpers.qVip, 42, "FiboSync", null, "Franquin",
-				"ModuleMachin", "other", "other", false, em);
-
-		JobDefinition j = new JobDefinition("FiboSync", "MAG");
-		j.addParameter("p1", "1");
-		j.addParameter("p2", "2");
-		int i = Dispatcher.enQueue(j);
-
-		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
-		Thread.sleep(20000);
-
-		engine1.stop();
-		long ii = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
-		Assert.assertTrue(ii > 2);
-		TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.endDate ASC", History.class);
-		ArrayList<History> res = (ArrayList<History>) query.getResultList();
-		for (History history : res) {
-			Assert.assertEquals("ENDED", history.getState());
-		}
-		Assert.assertEquals(1, (int)res.get(res.size()- 1).getId());
-	}
-
-	@Test
 	public void testImportQueue() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");
@@ -1848,37 +1809,93 @@ public class JobBaseTest
 		Assert.assertEquals("XmlQueue2", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
 	}
 
-	//	@Test
-	//	public void testExportQueue() throws Exception
-	//	{
-	//		jqmlogger.debug("**********************************************************");
-	//		jqmlogger.debug("**********************************************************");
-	//		jqmlogger.debug("Starting test testExportQueue");
-	//		EntityManager em = Helpers.getNewEm();
-	//		TestHelpers.cleanup(em);
-	//		TestHelpers.createLocalNode(em);
-	//
-	//		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-	//		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-	//		jdargs.add(jdp);
-	//
-	//		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/",
-	//				"jqm-test-fibo/jqm-test-fibo.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2",
-	//				false, em);
-	//		JobDef jdd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar",
-	//				TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
-	//		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
-	//				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "DateTime", null, "Franquin",
-	//				"ModuleMachin", "other", "other", false, em);
-	//
-	//		QueueXmlParser qxp = new QueueXmlParser();
-	//		qxp.export("testprojects/jqm-test-xml/xmlexportqueuetest.xml");
-	//
-	//		long ii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'XmlQueue'").getSingleResult();
-	//		long iii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'XmlQueue2'").getSingleResult();
-	//		Assert.assertEquals(2, ii + iii);
-	//		Assert.assertEquals("XmlQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Fibo' ", String.class).getSingleResult());
-	//		Assert.assertEquals("XmlQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Geo' ", String.class).getSingleResult());
-	//		Assert.assertEquals("XmlQueue2", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
-	//	}
+	@Test
+	public void testExportQueue() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testExportQueue");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/",
+				"jqm-test-fibo/jqm-test-fibo.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2",
+				false, em);
+		JobDef jdd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar",
+				TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "DateTime", null, "Franquin",
+				"ModuleMachin", "other", "other", false, em);
+
+		ArrayList<String> tmp = new ArrayList<String>();
+		tmp.add("VIPQueue");
+		tmp.add("NormalQueue");
+
+		QueueXmlExporter qxe = new QueueXmlExporter("localhost");
+		qxe.exportSeveral("xmlexportqueuetest.xml", tmp);
+
+		File t = new File("./testprojects/jqm-test-xml/xmlexportqueuetest.xml");
+		Assert.assertEquals(true, t.exists());
+
+		// --> Test Import
+
+		QueueXmlParser qxp = new QueueXmlParser();
+		qxp.parse("testprojects/jqm-test-xml/xmlexportqueuetest.xml");
+
+		long ii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'VIPQueue'").getSingleResult();
+		long iii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'NormalQueue'").getSingleResult();
+		Assert.assertEquals(2, ii + iii);
+		Assert.assertEquals("VIPQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Fibo' ", String.class).getSingleResult());
+		Assert.assertEquals("VIPQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Geo' ", String.class).getSingleResult());
+		Assert.assertEquals("NormalQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
+		t.delete();
+	}
+
+	@Test
+	public void testExportQueueAll() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testExportQueueAll");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/",
+				"jqm-test-fibo/jqm-test-fibo.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2",
+				false, em);
+		JobDef jdd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar",
+				TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
+				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "DateTime", null, "Franquin",
+				"ModuleMachin", "other", "other", false, em);
+
+		QueueXmlExporter qxe = new QueueXmlExporter("localhost");
+		qxe.exportAll("xmlexportqueuetest.xml");
+
+		File t = new File("./testprojects/jqm-test-xml/xmlexportqueuetest.xml");
+		Assert.assertEquals(true, t.exists());
+
+		// --> Test Import
+
+		QueueXmlParser qxp = new QueueXmlParser();
+		qxp.parse("testprojects/jqm-test-xml/xmlexportqueuetest.xml");
+
+		long ii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'VIPQueue'").getSingleResult();
+		long iii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'NormalQueue'").getSingleResult();
+		Assert.assertEquals(2, ii + iii);
+		Assert.assertEquals("VIPQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Fibo' ", String.class).getSingleResult());
+		Assert.assertEquals("VIPQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Geo' ", String.class).getSingleResult());
+		Assert.assertEquals("NormalQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
+		t.delete();
+	}
 }

@@ -28,6 +28,7 @@ import org.hsqldb.Server;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
@@ -38,7 +39,7 @@ import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 
-public class MultiNodeTest
+public class MultiNodeTests
 {
 	public static Logger jqmlogger = Logger.getLogger(JobBaseTest.class);
 	public static Server s;
@@ -65,7 +66,7 @@ public class MultiNodeTest
 		s.stop();
 	}
 
-	// @Test
+	@Test
 	public void testOneQueueTwoNodes() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");
@@ -137,7 +138,7 @@ public class MultiNodeTest
 		}
 	}
 
-	// @Test
+	@Test
 	public void testOneQueueThreeNodes() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");
@@ -211,7 +212,7 @@ public class MultiNodeTest
 		}
 	}
 
-	// @Test
+	@Test
 	public void testTwoNodesTwoQueues() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");
@@ -510,7 +511,7 @@ public class MultiNodeTest
 		Assert.assertEquals(true, true);
 	}
 
-	// @Test
+	@Test
 	public void testThreeNodesThreeQueuesLock() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");
@@ -686,7 +687,7 @@ public class MultiNodeTest
 		Assert.assertEquals(job.size(), msgs.size());
 	}
 
-	// @Test
+	@Test
 	public void testStopNicely() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");
@@ -783,7 +784,7 @@ public class MultiNodeTest
 		engine1.stop();
 		engine2.stop();
 
-		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.internalPosition ASC", JobInstance.class);
 		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
 
 		for (JobInstance jobInstance : res)

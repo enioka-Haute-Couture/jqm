@@ -28,6 +28,7 @@ import org.hsqldb.Server;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
@@ -36,11 +37,11 @@ import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
 
-public class QueueTest
+public class QueueTests
 {
 
 	public static Server s;
-	public static Logger jqmlogger = Logger.getLogger(QueueTest.class);
+	public static Logger jqmlogger = Logger.getLogger(QueueTests.class);
 
 	@BeforeClass
 	public static void testInit()
@@ -62,7 +63,7 @@ public class QueueTest
 		s.shutdown();
 	}
 
-	// @Test
+	@Test
 	public void testMaxThreadNormal() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");
@@ -136,7 +137,7 @@ public class QueueTest
 		}
 	}
 
-	// @Test
+	@Test
 	public void testMaxThreadVip() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");
@@ -216,7 +217,7 @@ public class QueueTest
 		}
 	}
 
-	// @Test
+	@Test
 	public void testMaxThreadVipLock() throws Exception
 	{
 		jqmlogger.debug("**********************************************************");

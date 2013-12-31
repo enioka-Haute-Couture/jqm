@@ -12,6 +12,7 @@ test.txt
 *.releaseBackup
 release.properties
 
+/jqm-all/jqm-engine/compile.sh
 /jqmProject/nbproject/private/
 /jqmProject/dist/
 /jqmProject/build/

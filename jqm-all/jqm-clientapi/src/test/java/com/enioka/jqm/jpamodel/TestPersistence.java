@@ -41,6 +41,7 @@ public class TestPersistence
 		n.setPort(1234);
 		n.setDlRepo("/Temp/");
 		n.setRepo("/tmp");
+		n.setExportRepo("/exportTmp/");
 
 		em.persist(n);
 

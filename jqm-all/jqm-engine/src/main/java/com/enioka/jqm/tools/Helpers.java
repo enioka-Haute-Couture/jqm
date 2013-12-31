@@ -78,6 +78,12 @@ public final class Helpers
 			System.exit(1);
 			// Stupid, just for Eclipse's parser and therefore avoid red lines...
 			return null;
+		} catch (Exception e)
+		{
+			jqmlogger.fatal("Unable to connect with the database. Maybe your configuration file is wrong. " +
+					"Please check the password or the url in the $JQM_DIR/conf/db.properties");
+			System.exit(1);
+			return null;
 		} finally
 		{
 			IOUtils.closeQuietly(fis);

@@ -249,7 +249,7 @@ public class CreationTools
 
 	// ------------------ NODE ---------------------------------
 
-	public static Node createNode(String listeningInterface, Integer port, String dlRepo, String repo, EntityManager em)
+	public static Node createNode(String listeningInterface, Integer port, String dlRepo, String repo, String exportRepo, EntityManager em)
 	{
 		Node n = new Node();
 		EntityTransaction transac = em.getTransaction();
@@ -259,6 +259,7 @@ public class CreationTools
 		n.setPort(port);
 		n.setDlRepo(dlRepo);
 		n.setRepo(repo);
+		n.setExportRepo(exportRepo);
 
 		em.persist(n);
 		transac.commit();

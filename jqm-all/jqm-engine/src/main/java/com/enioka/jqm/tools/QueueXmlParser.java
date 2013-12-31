@@ -35,7 +35,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.Queue;
@@ -43,7 +42,7 @@ import com.enioka.jqm.jpamodel.Queue;
 
 public class QueueXmlParser
 {
-	private static Logger jqmlogger = Logger.getLogger(XmlParser.class);
+	private static Logger jqmlogger = Logger.getLogger(QueueXmlParser.class);
 	private EntityManager em = Helpers.getNewEm();
 
 	private String name = null;
@@ -55,7 +54,7 @@ public class QueueXmlParser
 	{
 	}
 
-	void parse(String path) throws SAXException, ParserConfigurationException, IOException
+	void parse(String path) throws ParserConfigurationException, IOException
 	{
 		File f = new File(path);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -170,10 +169,6 @@ public class QueueXmlParser
 		catch (ParserConfigurationException e)
 		{
 			jqmlogger.error(e);
-		}
-		catch (SAXException e)
-		{
-			jqmlogger.error("Invalid XML architecture. Please, fix correctly the dependencies", e);
 		}
 		catch (IOException e)
 		{

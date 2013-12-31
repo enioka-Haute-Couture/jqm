@@ -21,6 +21,7 @@ package com.enioka.jqm.tools;
 import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
@@ -31,6 +32,7 @@ import org.junit.Test;
 
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 
@@ -98,5 +100,45 @@ public class FiboTest
 
 		long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
 		Assert.assertTrue(i > 2);
+	}
+
+	@Test
+	public void testEnqueueSynchronously() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testEnqueueSynchronously");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+		jdargs.add(jdp);
+
+		@SuppressWarnings("unused")
+		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibosync/",
+				"jqm-test-fibosync/jqm-test-fibosync.jar", TestHelpers.qVip, 42, "FiboSync", null, "Franquin",
+				"ModuleMachin", "other", "other", false, em);
+
+		JobDefinition j = new JobDefinition("FiboSync", "MAG");
+		j.addParameter("p1", "1");
+		j.addParameter("p2", "2");
+		int i = Dispatcher.enQueue(j);
+
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+		Thread.sleep(25000);
+
+		engine1.stop();
+		long ii = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
+		Assert.assertTrue(ii > 2);
+		TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.endDate ASC", History.class);
+		ArrayList<History> res = (ArrayList<History>) query.getResultList();
+		for (History history : res) {
+			Assert.assertEquals("ENDED", history.getState());
+		}
+		TestHelpers.printJobInstanceTable();
+		Assert.assertEquals(i, (int)res.get(res.size()- 1).getId());
 	}
 }

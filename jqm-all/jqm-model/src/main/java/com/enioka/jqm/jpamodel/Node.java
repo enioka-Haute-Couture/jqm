@@ -53,6 +53,10 @@ public class Node
 	@Column(name = "rootLogLevel")
 	private String rootLogLevel = "DEBUG";
 
+	// Repo where the export repository must be relative
+	@Column(nullable = false, name = "exportRepo")
+	private String exportRepo;
+
 	public Integer getId()
 	{
 		return id;
@@ -123,5 +127,17 @@ public class Node
 	public void setRootLogLevel(String rootLogLevel)
 	{
 		this.rootLogLevel = rootLogLevel;
+	}
+
+
+	public String getExportRepo() {
+
+		return exportRepo;
+	}
+
+
+	public void setExportRepo(String exportRepo) {
+
+		this.exportRepo = exportRepo;
 	}
 }

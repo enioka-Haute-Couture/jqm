@@ -84,6 +84,13 @@
 			<version>1.4.5</version>
 		</dependency>
 
+		<!-- XML -->
+		<dependency>
+			<groupId>jdom</groupId>
+			<artifactId>jdom</artifactId>
+			<version>1.1</version>
+		</dependency>
+
 		<!-- JCABI-AETHER & MAVEN -->
 		<dependency>
 			<groupId>com.jcabi</groupId>
