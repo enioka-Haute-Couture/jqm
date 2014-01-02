@@ -261,4 +261,4 @@ Here :
 
 ## Bug report
 
-Marc-Antoine Gouillart: [marc-antoine.gouillart@enioka.com](marc-antoine.gouillart@enioka.com)
+Reports bugs or features requests on [github](https://github.com/enioka/jqm/issues)
