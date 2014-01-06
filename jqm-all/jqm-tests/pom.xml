@@ -12,7 +12,8 @@
     
 	<modules>
 		<module>jqm-test-fibo</module>
-    <module>jqm-test-fibosync</module>
+		<module>jqm-test-fibohib</module>
+		<module>jqm-test-fibosync</module>
 		<module>jqm-test-datetimemaven</module>
 		<module>jqm-test-datetimemaven2</module>
 		<module>jqm-test-deliverable</module>
