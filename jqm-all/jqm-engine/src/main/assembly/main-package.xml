@@ -28,6 +28,7 @@
 				<include>*.ps1</include>
 				<include>*.bat</include>
 			</includes>
+			<fileMode>0755</fileMode>
 		</fileSet>
 		<fileSet>
 			<directory>${project.basedir}/src/main/scripts</directory>
