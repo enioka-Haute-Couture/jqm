@@ -67,7 +67,15 @@ class JarClassLoader extends URLClassLoader
 		}
 		jqmlogger.debug("Class " + classQualifiedName + " was correctly loaded");
 
-		Object o = c.newInstance();
+		Object o = null;
+		try
+		{
+			o = c.newInstance();
+		} catch (Exception e)
+		{
+			jqmlogger.error("Cannot create an instance of class " + classQualifiedName + ". Does it have an argumentless constructor?");
+			throw e;
+		}
 
 		try
 		{
@@ -85,7 +93,7 @@ class JarClassLoader extends URLClassLoader
 			Method setOther2 = c.getMethod("setKeyword2", String.class);
 			Method setOther3 = c.getMethod("setKeyword3", String.class);
 			Method setSessionID = c.getMethod("setSessionID", String.class);
-			Method setApplication= c.getMethod("setApplication", String.class);
+			Method setApplication = c.getMethod("setApplication", String.class);
 			Method setModule = c.getMethod("setModule", String.class);
 
 			// Injection
