@@ -1898,4 +1898,36 @@ public class JobBaseTest
 		Assert.assertEquals("NormalQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
 		t.delete();
 	}
+	
+	@Test
+	public void testThrowable() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testThrowable");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-throwable",
+				"jqm-test-throwable/jqm-test-throwable.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+				"ModuleMachin", "other", "other", false, em);
+
+		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+		Dispatcher.enQueue(j);
+
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+
+		Thread.sleep(3000);
+		engine1.stop();
+
+		History ji1 = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId", History.class)
+				.setParameter("myId", jd.getId()).getSingleResult();
+
+		Assert.assertEquals("CRASHED", ji1.getState());
+	}
+
+
 }

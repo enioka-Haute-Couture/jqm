@@ -53,7 +53,6 @@ import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
-import com.enioka.jqm.jndi.JndiContextFactory;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
