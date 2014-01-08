@@ -229,8 +229,18 @@ public final class Dispatcher
 	{
 		jqmlogger.debug("BEGINING ENQUEUE");
 		EntityManager em = getEm();
-		JobDef job = em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = :name", JobDef.class)
+		JobDef job = null;
+		try {
+			job = em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = :name", JobDef.class)
 				.setParameter("name", jd.getApplicationName()).getSingleResult();
+		}
+		catch(NoResultException ex)
+		{
+			jqmlogger.error("Job definition named " + jd.getApplicationName() + " does not exist");
+			em.close();
+			throw new JqmException("no such job definition");
+		}
+		
 		jqmlogger.debug("Job to enqueue is from JobDef " + job.getId());
 		Integer hl = null;
 		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
@@ -434,7 +444,6 @@ public final class Dispatcher
 		jqmlogger.debug("Job status number " + idJob + " will be deleted");
 		EntityManager em = getEm();
 		EntityTransaction transac = em.getTransaction();
-		Query q = null;
 
 		try
 		{
