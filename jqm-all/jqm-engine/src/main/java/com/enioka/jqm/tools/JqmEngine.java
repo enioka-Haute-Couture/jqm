@@ -18,6 +18,7 @@
 
 package com.enioka.jqm.tools;
 
+import java.net.BindException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,8 +97,19 @@ class JqmEngine
 		context.addServlet(new ServletHolder(new Servlet()), "/getfile");
 		context.addServlet(new ServletHolder(new ServletEnqueue()), "/enqueue");
 		context.addServlet(new ServletHolder(new ServletStatus()), "/status");
-		server.start();
-
+		jqmlogger.info("Starting Jetty (port " + node.getPort() + ")");
+		try
+		{
+			server.start();
+		}
+		catch(BindException e)
+		{
+			// JETTY-839: threadpool not daemon nor close on exception
+			server.stop();
+			throw e;
+		}
+		jqmlogger.info("Jetty has started");
+		
 		if (args.length == 1)
 		{
 			node = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :li", Node.class).setParameter("li", args[0])
