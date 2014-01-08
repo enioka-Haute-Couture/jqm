@@ -26,6 +26,7 @@
 		<module>jqm-test-sendprogress</module>
 		<module>jqm-test-datetimesendmsg</module>
 		<module>jqm-test-throwable</module>
+		<module>jqm-test-em</module>
 	</modules>
 
 	<build>
