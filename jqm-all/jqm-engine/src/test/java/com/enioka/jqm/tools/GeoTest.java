@@ -19,7 +19,6 @@
 package com.enioka.jqm.tools;
 
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
@@ -38,9 +37,9 @@ import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 
-public class GeoTests
+public class GeoTest
 {
-	public static Logger jqmlogger = Logger.getLogger(GeoTests.class);
+	public static Logger jqmlogger = Logger.getLogger(GeoTest.class);
 	public static Server s;
 
 	@BeforeClass
@@ -49,8 +48,8 @@ public class GeoTests
 		s = new Server();
 		s.setDatabaseName(0, "testdbengine");
 		s.setDatabasePath(0, "mem:testdbengine");
-		s.setLogWriter(new PrintWriter("C:\\TEMP\\hsql.log"));
-		s.setSilent(false);
+		s.setLogWriter(null);
+		s.setSilent(true);
 		s.start();
 
 		Dispatcher.resetEM();
