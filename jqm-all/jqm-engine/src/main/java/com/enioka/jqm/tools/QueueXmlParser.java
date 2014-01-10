@@ -40,7 +40,7 @@ import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.Queue;
 
 
-public class QueueXmlParser
+class QueueXmlParser
 {
 	private static Logger jqmlogger = Logger.getLogger(QueueXmlParser.class);
 	private EntityManager em = Helpers.getNewEm();
@@ -50,7 +50,7 @@ public class QueueXmlParser
 	private String maxTempInQueue = null;
 	private ArrayList<String> jobs = new ArrayList<String>();
 
-	public QueueXmlParser()
+	QueueXmlParser()
 	{
 	}
 

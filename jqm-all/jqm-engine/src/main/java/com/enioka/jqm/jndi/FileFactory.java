@@ -8,9 +8,9 @@ import javax.naming.Name;
 import javax.naming.NamingException;
 import javax.naming.spi.ObjectFactory;
 
-public class FileFactory implements ObjectFactory
+class FileFactory implements ObjectFactory
 {
-	public FileFactory()
+	FileFactory()
 	{
 
 	}

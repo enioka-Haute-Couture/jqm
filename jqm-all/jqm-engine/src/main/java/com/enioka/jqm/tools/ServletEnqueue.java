@@ -12,7 +12,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
 
-public class ServletEnqueue extends HttpServlet
+class ServletEnqueue extends HttpServlet
 {
 	private static final long serialVersionUID = 5632427472597258194L;
 

@@ -31,6 +31,15 @@ import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
 
+/**
+ * The object that gets injected into payloads, enabling communications from
+ * payload to JQM engine.
+ * 
+ * It is mostly used through reflection from an independent class loader. 
+ * Therefore, all parameters and return types are of basic data types
+ * shared between all class loaders (loaded by the boostrap).
+ *
+ */
 public class Link
 {
 	private Logger jqmlogger = Logger.getLogger(Link.class);
@@ -40,7 +49,7 @@ public class Link
 	private JobInstance ji;
 	private History h;
 
-	public Link(ClassLoader old, Integer id, EntityManager em)
+	Link(ClassLoader old, Integer id, EntityManager em)
 	{
 		this.old = old;
 		this.em = em;
@@ -52,6 +61,12 @@ public class Link
 		em.refresh(ji);
 	};
 
+	/**
+	 * Create a {@link com.enioka.jqm.jpamodel.Message} with the given message.
+	 * The {@link com.enioka.jqm.jpamodel.History} to link to is deduced from the context.
+	 * @param msg
+	 * @throws JqmKillException
+	 */
 	public void sendMsg(String msg) throws JqmKillException
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -68,6 +83,11 @@ public class Link
 		Thread.currentThread().setContextClassLoader(cl);
 	}
 
+	/**
+	 * Update the {@link com.enioka.jqm.jpamodel.History} with the given progress data.
+	 * @param msg
+	 * @throws JqmKillException
+	 */
 	public void sendProgress(Integer msg) throws JqmKillException
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -96,6 +116,12 @@ public class Link
 		}
 	}
 
+	/**
+	 * This is an wrapper of function {@link com.enioka.jqm.api.Dispatcher#enQueue(JobDefinition) Dispatcher.enqueue}
+	 * that can be called from within a payload context.
+	 * @param msg
+	 * @throws JqmKillException
+	 */
 	public int enQueue(String applicationName, String user, String mail, String sessionId, String application, String module,
 			String keyword1, String keyword2, String keyword3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
 	{
@@ -121,6 +147,13 @@ public class Link
 		return id;
 	}
 
+	/**
+	 * This is an wrapper of function {@link com.enioka.jqm.api.Dispatcher#enQueue(JobDefinition) Dispatcher.enqueue}
+	 * that can be called from within a payload context. This version will wait for the job to be finished
+	 * before returning.
+	 * @param msg
+	 * @throws JqmKillException
+	 */
 	public int enQueueSynchronously(String applicationName, String user, String mail, String sessionId, String application, String module,
 			String keyword1, String keyword2, String keyword3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
 	{

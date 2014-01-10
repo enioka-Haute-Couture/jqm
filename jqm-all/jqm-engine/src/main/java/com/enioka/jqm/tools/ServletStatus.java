@@ -11,7 +11,7 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import com.enioka.jqm.api.Dispatcher;
 
-public class ServletStatus extends HttpServlet
+class ServletStatus extends HttpServlet
 {
 	private static final long serialVersionUID = 1668370491597158300L;
 

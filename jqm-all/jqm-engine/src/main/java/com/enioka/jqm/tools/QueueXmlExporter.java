@@ -19,18 +19,18 @@ import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 
 
-public class QueueXmlExporter
+class QueueXmlExporter
 {
 	private static Logger jqmlogger = Logger.getLogger(QueueXmlExporter.class);
 	private EntityManager em = Helpers.getNewEm();
 	private String nodeName = null;
 
-	public QueueXmlExporter(String nodeName)
+	QueueXmlExporter(String nodeName)
 	{
 		this.nodeName = nodeName;
 	}
 
-	public void export(String path, String queueName)
+	void export(String path, String queueName)
 	{
 		Queue q = null;
 		Element root = new Element("jqm");
@@ -82,7 +82,7 @@ public class QueueXmlExporter
 		}
 	}
 
-	public void exportSeveral(String path, ArrayList<String> queueNames)
+	void exportSeveral(String path, ArrayList<String> queueNames)
 	{
 		Queue q = null;
 		Element root = new Element("jqm");
@@ -137,7 +137,7 @@ public class QueueXmlExporter
 		}
 	}
 
-	public void exportAll(String path)
+	void exportAll(String path)
 	{
 		ArrayList<Queue> qs = null;
 		Element root = new Element("jqm");
