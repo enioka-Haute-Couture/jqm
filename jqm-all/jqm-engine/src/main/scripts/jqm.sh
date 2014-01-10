@@ -52,7 +52,7 @@ jqm_start() {
         	fi
         fi
 	# We can go on...
-	nohup $JAVA -jar $JQM_JAR $JQM_NODE 2>&1 > ${LOCAL_DIR}/$JQM_LOG_FILE &
+	nohup $JAVA -jar $JQM_JAR -startnode $JQM_NODE 2>&1 > ${LOCAL_DIR}/$JQM_LOG_FILE &
 	JQM_PID=$!
 	echo $JQM_PID > ${LOCAL_DIR}/${JQM_PID_FILE}
 	echo "JQM Started with pid ${JQM_PID}"

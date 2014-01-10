@@ -93,7 +93,7 @@ public class FiboTest
 
 		// Start the engine
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start( "localhost" );
 
 		Thread.sleep(15000);
 		engine1.stop();
@@ -127,7 +127,7 @@ public class FiboTest
 		int i = Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 		Thread.sleep(25000);
 
 		engine1.stop();

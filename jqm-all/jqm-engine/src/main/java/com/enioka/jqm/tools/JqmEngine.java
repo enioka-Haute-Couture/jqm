@@ -64,12 +64,12 @@ class JqmEngine
 	 *            - [0] = nodename
 	 * @throws Exception
 	 */
-	public void start(String[] args) throws Exception
+	public void start(String nodeName) throws Exception
 	{
 		java.lang.System.setProperty("log4j.debug", "true");
 
 		// Node configuration is in the database
-		node = checkAndUpdateNode(args[0]);
+		node = checkAndUpdateNode(nodeName);
 
 		// Log level
 		try
@@ -109,9 +109,9 @@ class JqmEngine
 		}
 		jqmlogger.info("Jetty has started");
 
-		if (args.length == 1)
+		if (nodeName != null)
 		{
-			node = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :li", Node.class).setParameter("li", args[0])
+			node = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :li", Node.class).setParameter("li", nodeName)
 			        .getSingleResult();
 
 			dps = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)

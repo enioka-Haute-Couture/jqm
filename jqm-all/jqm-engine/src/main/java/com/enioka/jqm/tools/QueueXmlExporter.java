@@ -18,16 +18,13 @@ import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 
-
 class QueueXmlExporter
 {
 	private static Logger jqmlogger = Logger.getLogger(QueueXmlExporter.class);
 	private EntityManager em = Helpers.getNewEm();
-	private String nodeName = null;
 
-	QueueXmlExporter(String nodeName)
+	QueueXmlExporter()
 	{
-		this.nodeName = nodeName;
 	}
 
 	void export(String path, String queueName)
@@ -60,7 +57,8 @@ class QueueXmlExporter
 			Element jobs = new Element("jobs");
 			queue.addContent(jobs);
 
-			ArrayList<JobDef> jds = (ArrayList<JobDef>) em.createQuery("SELECT j FROM JobDef j WHERE j.queue = :q", JobDef.class).setParameter("q", q).getResultList();
+			ArrayList<JobDef> jds = (ArrayList<JobDef>) em.createQuery("SELECT j FROM JobDef j WHERE j.queue = :q", JobDef.class)
+			        .setParameter("q", q).getResultList();
 
 			for (JobDef j : jds)
 			{
@@ -93,7 +91,8 @@ class QueueXmlExporter
 
 		try
 		{
-			for (String queueName : queueNames) {
+			for (String queueName : queueNames)
+			{
 
 				q = em.createQuery("SELECT q FROM Queue q WHERE q.name = :n", Queue.class).setParameter("n", queueName).getSingleResult();
 
@@ -114,7 +113,8 @@ class QueueXmlExporter
 				Element jobs = new Element("jobs");
 				queue.addContent(jobs);
 
-				ArrayList<JobDef> jds = (ArrayList<JobDef>) em.createQuery("SELECT j FROM JobDef j WHERE j.queue = :q", JobDef.class).setParameter("q", q).getResultList();
+				ArrayList<JobDef> jds = (ArrayList<JobDef>) em.createQuery("SELECT j FROM JobDef j WHERE j.queue = :q", JobDef.class)
+				        .setParameter("q", q).getResultList();
 
 				for (JobDef j : jds)
 				{
@@ -172,7 +172,8 @@ class QueueXmlExporter
 			Element jobs = new Element("jobs");
 			queue.addContent(jobs);
 
-			ArrayList<JobDef> jds = (ArrayList<JobDef>) em.createQuery("SELECT j FROM JobDef j WHERE j.queue = :q", JobDef.class).setParameter("q", q).getResultList();
+			ArrayList<JobDef> jds = (ArrayList<JobDef>) em.createQuery("SELECT j FROM JobDef j WHERE j.queue = :q", JobDef.class)
+			        .setParameter("q", q).getResultList();
 
 			for (JobDef j : jds)
 			{
@@ -187,22 +188,15 @@ class QueueXmlExporter
 		save(path, document);
 	}
 
-	void save(String file, Document doc)
+	void save(String filePath, Document doc)
 	{
-		Node n = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :nn", Node.class).setParameter("nn", nodeName).getSingleResult();
-		jqmlogger.info("The file will be created in the repository: " + new File(n.getExportRepo() + file));
-
-		File exportDir = new File(n.getExportRepo());
-		if (!exportDir.exists())
-		{
-			exportDir.mkdir();
-		}
-
 		try
 		{
 			XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
-			out.output(doc, new FileOutputStream(new File(n.getExportRepo() + file)));
+			out.output(doc, new FileOutputStream(filePath));
+		} catch (java.io.IOException e)
+		{
+			jqmlogger.error("could not create file", e);
 		}
-		catch (java.io.IOException e){}
 	}
 }

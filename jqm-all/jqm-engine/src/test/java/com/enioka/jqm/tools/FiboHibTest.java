@@ -92,7 +92,7 @@ public class FiboHibTest
 
 		// Start the engine
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(20000);
 		engine1.stop();

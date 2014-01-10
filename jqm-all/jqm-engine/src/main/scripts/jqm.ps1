@@ -39,16 +39,16 @@ function Start-Jqm
 
 function Import-AllXml
 {
-    ls -Recurse $PSScriptRoot/jobs -Filter *.xml |% { & $java -jar jqm.jar $env:COMPUTERNAME -xml $_.FullName}
+    ls -Recurse $PSScriptRoot/jobs -Filter *.xml |% { & $java -jar jqm.jar -importjobdef $_.FullName}
 }
 
 
 switch($Command)
 {
-    "start" { Start-Job -ScriptBlock { cd $using:PSScriptRoot; & "$using:java" -jar jqm.jar $env:COMPUTERNAME}}
+    "start" { Start-Job -ScriptBlock { cd $using:PSScriptRoot; & "$using:java" -jar jqm.jar -startnode $env:COMPUTERNAME}}
     #"start" { cd $PSScriptRoot; Start-Process $java -NoNewWindow -argumentlist "-jar","jqm.jar",$env:COMPUTERNAME} 
     "stop" {Stop-Service jqm}
     "status" {(Get-Service jqm).Status}
-    "startconsole" { cd $PSScriptRoot;& $java -jar jqm.jar $env:COMPUTERNAME} 
+    "startconsole" { cd $PSScriptRoot;& $java -jar jqm.jar -startnode $env:COMPUTERNAME} 
     "allxml" { Import-AllXml}
 }

@@ -92,7 +92,7 @@ public class QueueTests
 		int i = 0;
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start( "localhost" );
 		EntityManager emm = Helpers.getNewEm();
 
 		while (i < 5)
@@ -172,7 +172,7 @@ public class QueueTests
 		int i = 0;
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start( "localhost" );
 
 		while (i < 5)
 		{
@@ -252,7 +252,7 @@ public class QueueTests
 		int i = 0;
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start( "localhost" );
 
 		while (i < 5)
 		{

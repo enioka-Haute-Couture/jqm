@@ -124,7 +124,7 @@ public class JobBaseTest
 		// em.getTransaction().commit();
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(8000);
 		engine1.stop();
@@ -172,7 +172,7 @@ public class JobBaseTest
 		em.getTransaction().commit();
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(10000);
 		engine1.stop();
@@ -211,7 +211,7 @@ public class JobBaseTest
 		Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(2000);
 		engine1.stop();
@@ -260,7 +260,7 @@ public class JobBaseTest
 		        .setParameter("myId", jdDemoMaven.getId()).getSingleResult();
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(10000);
 
@@ -314,7 +314,7 @@ public class JobBaseTest
 		        .setParameter("myId", jdDemoMaven.getId()).getSingleResult();
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(10000);
 
@@ -395,7 +395,7 @@ public class JobBaseTest
 		TestHelpers.printJobInstanceTable();
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(10000);
 		engine1.stop();
@@ -487,7 +487,7 @@ public class JobBaseTest
 		Dispatcher.enQueue(jjj);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(10);
 
@@ -571,7 +571,7 @@ public class JobBaseTest
 		        .setParameter("myId", jdDemoMaven.getId()).getSingleResult();
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(12000);
 
@@ -624,7 +624,7 @@ public class JobBaseTest
 		Dispatcher.enQueue(jj);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(3000);
 		engine1.stop();
@@ -649,7 +649,11 @@ public class JobBaseTest
 		TestHelpers.cleanup(em);
 		TestHelpers.createLocalNode(em);
 
-		Main.main(new String[] { "localhost", "-xml", "testprojects/jqm-test-xml/xmltest.xml" });
+		// Init the default queue (don't start the engine!)
+		JqmEngine engine1 = new JqmEngine();
+		engine1.checkAndUpdateNode("marsu");
+
+		Main.main(new String[] { "-importjobdef", "testprojects/jqm-test-xml/xmltest.xml" });
 
 		List<JobDef> jd = em.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
 
@@ -691,7 +695,7 @@ public class JobBaseTest
 		int i = Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(5000);
 
@@ -734,7 +738,7 @@ public class JobBaseTest
 		int i = Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(8000);
 
@@ -772,7 +776,7 @@ public class JobBaseTest
 		int i = Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(15000);
 
@@ -828,7 +832,7 @@ public class JobBaseTest
 		Message mm = em.createQuery("SELECT m FROM Message m WHERE m.history = :h", Message.class).setParameter("h", h).getSingleResult();
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(4000);
 
@@ -872,7 +876,7 @@ public class JobBaseTest
 		        .setParameter("myId", jdDemoMaven.getId()).getSingleResult();
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(10000);
 
@@ -926,7 +930,7 @@ public class JobBaseTest
 		int i = Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 		Thread.sleep(2000);
 
 		engine1.stop();
@@ -987,7 +991,7 @@ public class JobBaseTest
 		int i = Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 		Thread.sleep(2000);
 		engine1.stop();
 
@@ -1033,7 +1037,7 @@ public class JobBaseTest
 		int i = Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 		Thread.sleep(15000);
 
 		engine1.stop();
@@ -1073,7 +1077,7 @@ public class JobBaseTest
 		TestHelpers.printJobInstanceTable();
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 		Thread.sleep(3000);
 
 		Dispatcher.killJob(i);
@@ -1117,7 +1121,7 @@ public class JobBaseTest
 		int i = Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(6000);
 
@@ -1155,7 +1159,7 @@ public class JobBaseTest
 		int i = Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(8000);
 
@@ -1193,7 +1197,7 @@ public class JobBaseTest
 		int i = Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(4000);
 
@@ -1231,7 +1235,7 @@ public class JobBaseTest
 		int i = Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(4000);
 
@@ -1271,7 +1275,7 @@ public class JobBaseTest
 		int i = Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 		Thread.sleep(2000);
 
 		engine1.stop();
@@ -1334,7 +1338,7 @@ public class JobBaseTest
 		int i = Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 		Thread.sleep(10000);
 
 		engine1.stop();
@@ -1388,7 +1392,7 @@ public class JobBaseTest
 		jqmlogger.debug("EndDate: " + df.format(h.getEndDate().getTime()));
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 		Thread.sleep(3000);
 
 		engine1.stop();
@@ -1427,7 +1431,7 @@ public class JobBaseTest
 		JqmEngine engine1 = new JqmEngine();
 		Dispatcher.jobBreak(i);
 		TestHelpers.printJobInstanceTable();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 		Thread.sleep(5000);
 
 		engine1.stop();
@@ -1467,7 +1471,7 @@ public class JobBaseTest
 		int i = Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 		Thread.sleep(6000);
 
 		engine1.stop();
@@ -1507,7 +1511,7 @@ public class JobBaseTest
 		JqmEngine engine1 = new JqmEngine();
 		Dispatcher.cancelJobInQueue(i);
 		TestHelpers.printJobInstanceTable();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 		Thread.sleep(5000);
 
 		engine1.stop();
@@ -1546,7 +1550,7 @@ public class JobBaseTest
 		JqmEngine engine1 = new JqmEngine();
 		Dispatcher.changeQueue(i, TestHelpers.qSlow);
 		TestHelpers.printJobInstanceTable();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 		Thread.sleep(5000);
 
 		engine1.stop();
@@ -1585,7 +1589,7 @@ public class JobBaseTest
 		JqmEngine engine1 = new JqmEngine();
 		Dispatcher.delJobInQueue(i);
 		TestHelpers.printJobInstanceTable();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 		Thread.sleep(1000);
 
 		engine1.stop();
@@ -1621,7 +1625,7 @@ public class JobBaseTest
 		        "other", "other", true, em);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		HttpPost post = new HttpPost("http://localhost:8081/enqueue");
 		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
@@ -1683,7 +1687,7 @@ public class JobBaseTest
 		        "other", "other", true, em);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		HttpPost post = new HttpPost("http://localhost:8081/enqueue");
 		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
@@ -1760,7 +1764,7 @@ public class JobBaseTest
 		JqmEngine engine1 = new JqmEngine();
 		Dispatcher.jobBreak(i);
 		TestHelpers.printJobInstanceTable();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 		Thread.sleep(5000);
 		Dispatcher.resumeJob(i);
 		Thread.sleep(5000);
@@ -1789,12 +1793,11 @@ public class JobBaseTest
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
-		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/",
-		        "jqm-test-fibo/jqm-test-fibo.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2",
-		        false, em);
-		JobDef jdd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar",
-		        TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
-		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
+		CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/", "jqm-test-fibo/jqm-test-fibo.jar",
+		        TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+		CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar", TestHelpers.qVip, 42,
+		        "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+		CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
 		        "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "DateTime", null, "Franquin", "ModuleMachin",
 		        "other", "other", false, em);
 
@@ -1826,12 +1829,11 @@ public class JobBaseTest
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
-		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/",
-		        "jqm-test-fibo/jqm-test-fibo.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2",
-		        false, em);
-		JobDef jdd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar",
-		        TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
-		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
+		CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/", "jqm-test-fibo/jqm-test-fibo.jar",
+		        TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+		CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar", TestHelpers.qVip, 42,
+		        "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+		CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
 		        "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "DateTime", null, "Franquin", "ModuleMachin",
 		        "other", "other", false, em);
 
@@ -1839,8 +1841,8 @@ public class JobBaseTest
 		tmp.add("VIPQueue");
 		tmp.add("NormalQueue");
 
-		QueueXmlExporter qxe = new QueueXmlExporter("localhost");
-		qxe.exportSeveral("xmlexportqueuetest.xml", tmp);
+		QueueXmlExporter qxe = new QueueXmlExporter();
+		qxe.exportSeveral("./testprojects/jqm-test-xml/xmlexportqueuetest.xml", tmp);
 
 		File t = new File("./testprojects/jqm-test-xml/xmlexportqueuetest.xml");
 		Assert.assertEquals(true, t.exists());
@@ -1876,17 +1878,16 @@ public class JobBaseTest
 		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
 		jdargs.add(jdp);
 
-		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/",
-		        "jqm-test-fibo/jqm-test-fibo.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2",
-		        false, em);
-		JobDef jdd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar",
-		        TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
-		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
+		CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/", "jqm-test-fibo/jqm-test-fibo.jar",
+		        TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+		CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar", TestHelpers.qVip, 42,
+		        "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+		CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
 		        "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "DateTime", null, "Franquin", "ModuleMachin",
 		        "other", "other", false, em);
 
-		QueueXmlExporter qxe = new QueueXmlExporter("localhost");
-		qxe.exportAll("xmlexportqueuetest.xml");
+		QueueXmlExporter qxe = new QueueXmlExporter();
+		qxe.exportAll("./testprojects/jqm-test-xml/xmlexportqueuetest.xml");
 
 		File t = new File("./testprojects/jqm-test-xml/xmlexportqueuetest.xml");
 		Assert.assertEquals(true, t.exists());
@@ -1927,7 +1928,7 @@ public class JobBaseTest
 		Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(3000);
 		engine1.stop();
@@ -1958,7 +1959,7 @@ public class JobBaseTest
 		Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 
 		Thread.sleep(10000);
 		engine1.stop();
@@ -1989,7 +1990,7 @@ public class JobBaseTest
 		Dispatcher.enQueue(j);
 
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 		Thread.sleep(5000);
 		engine1.stop();
 

@@ -44,7 +44,8 @@ public final class Helpers
 	private static Logger jqmlogger = Logger.getLogger(Helpers.class);
 
 	// The one and only EMF in the engine.
-	private static EntityManagerFactory emf = createFactory();
+	private static Properties props = new Properties();
+	private static EntityManagerFactory emf;
 
 	/**
 	 * Get a fresh EM on the jobqueue-api-pu persistence Unit
@@ -53,24 +54,29 @@ public final class Helpers
 	 */
 	public static EntityManager getNewEm()
 	{
+		if (emf == null)
+		{
+			emf = createFactory();
+		}
 		return emf.createEntityManager();
 	}
 
 	private static EntityManagerFactory createFactory()
 	{
-		Properties p = new Properties();
 		FileInputStream fis = null;
 		try
 		{
+			Properties p = new Properties();
 			fis = new FileInputStream("conf/db.properties");
 			p.load(fis);
 			IOUtils.closeQuietly(fis);
-			return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, p);
+			props.putAll(p);
+			return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, props);
 		} catch (FileNotFoundException e)
 		{
 			// No properties file means we use the test HSQLDB (file, not in-memory) as specified in the persistence.xml
 			IOUtils.closeQuietly(fis);
-			return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
+			return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, props);
 		} catch (IOException e)
 		{
 			jqmlogger.fatal("conf/db.properties file is invalid", e);
@@ -80,14 +86,19 @@ public final class Helpers
 			return null;
 		} catch (Exception e)
 		{
-			jqmlogger.fatal("Unable to connect with the database. Maybe your configuration file is wrong. " +
-					"Please check the password or the url in the $JQM_DIR/conf/db.properties");
+			jqmlogger.fatal("Unable to connect with the database. Maybe your configuration file is wrong. "
+			        + "Please check the password or the url in the $JQM_DIR/conf/db.properties", e);
 			System.exit(1);
 			return null;
 		} finally
 		{
 			IOUtils.closeQuietly(fis);
 		}
+	}
+
+	static void allowCreateSchema()
+	{
+		props.put("hibernate.hbm2ddl.auto", "update");
 	}
 
 	/**

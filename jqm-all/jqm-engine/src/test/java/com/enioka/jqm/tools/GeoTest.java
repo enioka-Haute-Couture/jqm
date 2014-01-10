@@ -95,9 +95,9 @@ public class GeoTest
 		JqmEngine engine1 = new JqmEngine();
 		JqmEngine engine2 = new JqmEngine();
 		JqmEngine engine3 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
-		engine2.start(new String[] { "localhost4" });
-		engine3.start(new String[] { "localhost5" });
+		engine1.start("localhost");
+		engine2.start("localhost4");
+		engine3.start("localhost5");
 
 		Thread.sleep(25000);
 		jqmlogger.debug("###############################################################");

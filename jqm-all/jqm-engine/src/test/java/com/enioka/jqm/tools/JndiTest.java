@@ -91,7 +91,7 @@ public class JndiTest
 
 		// Start the engine
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start( "localhost" );
 
 		Thread.sleep(10000);
 		engine1.stop();
@@ -140,7 +140,7 @@ public class JndiTest
 
 		// Start the engine
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start( "localhost" );
 
 		Thread.sleep(10000);
 		engine1.stop();
@@ -186,7 +186,7 @@ public class JndiTest
 
 		// Start the engine
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start( "localhost" );
 
 		Thread.sleep(10000);
 		engine1.stop();
@@ -224,7 +224,7 @@ public class JndiTest
 
 		// Start the engine
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start( "localhost" );
 
 		Thread.sleep(3000);
 		engine1.stop();
@@ -264,7 +264,7 @@ public class JndiTest
 
 		// Start the engine to init the JNDI context
 		JqmEngine engine1 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
+		engine1.start("localhost");
 		engine1.stop();
 
 		try

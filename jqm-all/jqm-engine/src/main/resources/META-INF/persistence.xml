@@ -11,8 +11,6 @@
 		<jar-file>${modelJarName}</jar-file>
 		<properties>
 			<property name="javax.persistence.validation.mode" value="none" />
-			<!--<property name="hibernate.show_sql" value="true" /> <property name="hibernate.format_sql" 
-				value="true" /> -->
 
 			<!-- Database default configuration (see db.properties for overriding 
 				these values) -->
@@ -20,7 +18,6 @@
 			<property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:hsql://localhost/testdb" />
 			<property name="javax.persistence.jdbc.user" value="SA" />
 			<property name="javax.persistence.jdbc.password" value="" />
-			<property name="hibernate.hbm2ddl.auto" value="update" />
 		</properties>
 	</persistence-unit>
 </persistence>

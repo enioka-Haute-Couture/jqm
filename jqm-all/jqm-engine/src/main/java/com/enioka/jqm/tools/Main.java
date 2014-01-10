@@ -18,8 +18,17 @@
 
 package com.enioka.jqm.tools;
 
-import java.util.ArrayList;
+import javax.persistence.EntityManager;
 
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.OptionGroup;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.api.Dispatcher;
@@ -39,164 +48,163 @@ public class Main
 	 * @param args
 	 *            0 is node name
 	 */
+	@SuppressWarnings("static-access")
 	public static void main(String[] args)
 	{
-		JqmEngine engine = new JqmEngine();
+		Option o00 = OptionBuilder.withArgName("nodeName").hasArg().withDescription("name of the JQM node to start").isRequired()
+		        .create("startnode");
+		Option o01 = OptionBuilder.withDescription("display help").withLongOpt("help").create("h");
+		Option o11 = OptionBuilder.withArgName("applicationname").hasArg().withDescription("name of the application to launch")
+		        .isRequired().create("enqueue");
+		Option o21 = OptionBuilder.withArgName("xmlpath").hasArg().withDescription("path of the XML configuration file to import")
+		        .isRequired().create("importjobdef");
+		Option o31 = OptionBuilder.withArgName("xmlpath").hasArg().withDescription("export all queue definitions into an XML file")
+		        .isRequired().create("exportallqueues");
+		OptionBuilder.withArgName("xmlpath").hasArg().withDescription("export some queue definitions into an XML file").isRequired()
+		        .create("exportqueuefile");
+		OptionBuilder.withArgName("queues").hasArg().withDescription("queues to export").withValueSeparator(',').isRequired()
+		        .create("queue");
+		Option o51 = OptionBuilder.withArgName("xmlpath").hasArg().withDescription("import all queue definitions from an XML file")
+		        .isRequired().create("importqueuefile");
+		Option o61 = OptionBuilder.withArgName("nodeName").hasArg()
+		        .withDescription("create a JQM node of this name (init the database if needed").isRequired().create("createnode");
 
-		if (args.length == 1 && args[0].equals("-help"))
+		Options options = new Options();
+		OptionGroup og1 = new OptionGroup();
+		og1.setRequired(true);
+		og1.addOption(o00);
+		og1.addOption(o01);
+		og1.addOption(o11);
+		og1.addOption(o21);
+		og1.addOption(o31);
+		og1.addOption(o51);
+		og1.addOption(o61);
+		options.addOptionGroup(og1);
+
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.setWidth(160);
+
+		try
 		{
-			printUsage();
+			CommandLineParser parser = new BasicParser();
+			CommandLine line = parser.parse(options, args);
+
+			// Enqueue
+			if (line.getOptionValue(o11.getOpt()) != null)
+			{
+				enqueue(line.getOptionValue(o11.getOpt()));
+			}
+			// Import XML
+			else if (line.getOptionValue(o21.getOpt()) != null)
+			{
+				importJobDef(line.getOptionValue(o21.getOpt()));
+			}
+			// Start engine
+			else if (line.getOptionValue(o00.getOpt()) != null)
+			{
+				startEngine(line.getOptionValue(o00.getOpt()));
+			}
+			// Export all Queues
+			else if (line.getOptionValue(o31.getOpt()) != null)
+			{
+				exportAllQueues(line.getOptionValue(o31.getOpt()));
+			}
+			// Import queues
+			else if (line.getOptionValue(o51.getOpt()) != null)
+			{
+				importQueues(line.getOptionValue(o51.getOpt()));
+			}
+			// Create node
+			else if (line.getOptionValue(o61.getOpt()) != null)
+			{
+				createEngine(line.getOptionValue(o61.getOpt()));
+			}
+			// Help
+			else if (line.hasOption(o01.getOpt()))
+			{
+				formatter.printHelp("java -jar jqm-engine.jar", options, true);
+			}
+		} catch (ParseException exp)
+		{
+			jqmlogger.fatal("Could not read command line: " + exp.getMessage());
+			formatter.printHelp("java -jar jqm-engine.jar", options, true);
 			return;
 		}
-
-		if (args.length >= 4 && args[1].equals("-exportQueue"))
-		{
-			if (args.length == 4) // exportAll or export
-			{
-				if (!args[2].isEmpty())
-				{
-					if (args[3].equals("-all"))
-					{
-						try
-						{
-							engine.checkAndUpdateNode(args[0]);
-							QueueXmlExporter qxe = new QueueXmlExporter(args[0]);
-							qxe.exportAll(args[2]);
-							return;
-						} catch (Exception e)
-						{
-							jqmlogger.fatal(e);
-							return;
-						}
-					}
-					else
-					{
-						try
-						{
-							engine.checkAndUpdateNode(args[0]);
-							QueueXmlExporter qxe = new QueueXmlExporter(args[0]);
-							qxe.export(args[2], args[3]);
-							return;
-						} catch (Exception e)
-						{
-							jqmlogger.fatal(e);
-							return;
-						}
-					}
-				}
-			}
-			else if (args.length > 4) // exportSeveral
-			{
-				try
-				{
-					int i = 3;
-					engine.checkAndUpdateNode(args[0]);
-					ArrayList<String> qs = new ArrayList<String>();
-
-					while (!args[i].isEmpty())
-					{
-						qs.add(args[i]);
-						i++;
-					}
-
-					QueueXmlExporter qxe = new QueueXmlExporter(args[0]);
-					qxe.exportSeveral(args[2], qs);
-					return;
-				} catch (Exception e)
-				{
-					jqmlogger.fatal(e);
-					return;
-				}
-			}
-			else
-			{
-				jqmlogger.fatal("The command line is incorrect.");
-				printUsage();
-				return;
-			}
-		}
-		if (args.length >= 3)
-		{
-			if (args[1].equals("-xml"))
-			{
-				if (!args[2].isEmpty())
-				{
-					try
-					{
-						engine.checkAndUpdateNode(args[0]);
-						XmlParser parser = new XmlParser();
-						parser.parse(args[2]);
-						return;
-					} catch (Exception e)
-					{
-						jqmlogger.fatal(e);
-						return;
-					}
-
-				}
-			}
-			else if (args[1].equals("-enqueue"))
-			{
-				if (!args[2].isEmpty())
-				{
-					JobDefinition job = new JobDefinition(args[2], "TestUser");
-					Dispatcher.enQueue(job);
-					return;
-				}
-			}
-			else if (args[1].equals("-importQueue"))
-			{
-				if (!args[2].isEmpty())
-				{
-					try
-					{
-						engine.checkAndUpdateNode(args[0]);
-						QueueXmlParser parser = new QueueXmlParser();
-						parser.parse(args[2]);
-						return;
-					} catch (Exception e)
-					{
-						jqmlogger.fatal(e);
-						return;
-					}
-				}
-			}
-			else
-			{
-				jqmlogger.fatal("The command line is incorrect.");
-				printUsage();
-				return;
-			}
-		}
-		else if (args.length == 1)
-		{
-			try
-			{
-				jqmlogger.info("Starting engine node " + args[0]);
-				engine.start(args);
-			} catch (Exception e)
-			{
-				jqmlogger.fatal("Could not launch the engine", e);
-				return;
-			}
-		}
 	}
 
-	private static void printUsage()
+	private static void enqueue(String applicationName)
 	{
-		System.out.println("Usage: ");
-		System.out.println("--> To create a job definition");
-		System.out.println("    [node] -xml [path/to/the/file.xml]");
-		System.out.println("--> To enqueue an existing job");
-		System.out.println("    [node] -enqueue [job name]");
-		System.out.println("--> To import a queue configuration");
-		System.out.println("    [node] -importQueue [path/to/the/file.xml]");
-		System.out.println("--> To export a queue configuration");
-		System.out.println("    [node] -exportQueue [filename_out.xml] [queue name]");
-		System.out.println("--> To export several queue configurations");
-		System.out.println("    [node] -exportQueue [filename_out.xml] [queue names ...]");
-		System.out.println("--> To export all the queue configurations");
-		System.out.println("    " +
-				"[node] -exportQueue [filename_out.xml] -all");
+		jqmlogger.info("Will enqueue application named " + applicationName + " without parameter overloads");
+		JobDefinition job = new JobDefinition(applicationName, "TestUser");
+		Dispatcher.enQueue(job);
 	}
+
+	private static void importJobDef(String xmlpath)
+	{
+		try
+		{
+			EntityManager em = Helpers.getNewEm();
+			if (em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true").getResultList().size() != 1)
+			{
+				jqmlogger
+				        .fatal("Cannot import a Job Definition when there are no queues defined. Create at least an engine first to create one");
+				em.close();
+				return;
+			}
+			em.close();
+
+			XmlParser parser = new XmlParser();
+			parser.parse(xmlpath);
+		} catch (Exception e)
+		{
+			jqmlogger.fatal(e);
+			return;
+		}
+	}
+
+	private static void startEngine(String nodeName)
+	{
+		try
+		{
+			JqmEngine engine = new JqmEngine();
+			jqmlogger.info("Starting engine node " + nodeName);
+			engine.start(nodeName);
+		} catch (Exception e)
+		{
+			jqmlogger.fatal("Could not launch the engine - have you created the node? (this also creates tables in the database)", e);
+		}
+	}
+
+	private static void createEngine(String nodeName)
+	{
+		try
+		{
+			Helpers.allowCreateSchema();
+			JqmEngine engine = new JqmEngine();
+			jqmlogger.info("Creating engine node " + nodeName);
+			engine.checkAndUpdateNode(nodeName);
+		} catch (Exception e)
+		{
+			jqmlogger.fatal("Could not create the engine", e);
+		}
+	}
+
+	private static void exportAllQueues(String xmlPath)
+	{
+		QueueXmlExporter qxe = new QueueXmlExporter();
+		qxe.exportAll(xmlPath);
+	}
+
+	private static void importQueues(String xmlPath)
+	{
+		try
+		{
+			QueueXmlParser parser = new QueueXmlParser();
+			parser.parse(xmlPath);
+		} catch (Exception ex)
+		{
+			jqmlogger.fatal("Could not parse and import the file", ex);
+		}
+	}
+
 }

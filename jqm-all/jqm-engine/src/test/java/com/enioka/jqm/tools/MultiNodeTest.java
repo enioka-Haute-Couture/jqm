@@ -100,8 +100,8 @@ public class MultiNodeTest
 
 		JqmEngine engine1 = new JqmEngine();
 		JqmEngine engine2 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
-		engine2.start(new String[] { "localhost4" });
+		engine1.start("localhost");
+		engine2.start("localhost4");
 
 		int i = 0;
 		while (i < 3)
@@ -182,9 +182,9 @@ public class MultiNodeTest
 		JqmEngine engine1 = new JqmEngine();
 		JqmEngine engine2 = new JqmEngine();
 		JqmEngine engine3 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
-		engine2.start(new String[] { "localhost4" });
-		engine3.start(new String[] { "localhost5" });
+		engine1.start("localhost");
+		engine2.start("localhost4");
+		engine3.start("localhost5");
 
 		int i = 0;
 		while (i < 3)
@@ -260,8 +260,8 @@ public class MultiNodeTest
 
 		JqmEngine engine1 = new JqmEngine();
 		JqmEngine engine2 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
-		engine2.start(new String[] { "localhost2" });
+		engine1.start("localhost");
+		engine2.start("localhost2");
 
 		int i = 0;
 		while (i < 3)
@@ -403,9 +403,9 @@ public class MultiNodeTest
 		JqmEngine engine1 = new JqmEngine();
 		JqmEngine engine2 = new JqmEngine();
 		JqmEngine engine3 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
-		engine2.start(new String[] { "localhost2" });
-		engine3.start(new String[] { "localhost3" });
+		engine1.start("localhost");
+		engine2.start("localhost2");
+		engine3.start("localhost3");
 
 		int i = 0;
 		while (i < 3)
@@ -498,8 +498,8 @@ public class MultiNodeTest
 
 		JqmEngine engine1 = new JqmEngine();
 		JqmEngine engine2 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
-		engine2.start(new String[] { "localhost4" });
+		engine1.start("localhost");
+		engine2.start("localhost4");
 
 		Dispatcher.enQueue(j);
 		Dispatcher.enQueue(j);
@@ -625,9 +625,9 @@ public class MultiNodeTest
 		JqmEngine engine1 = new JqmEngine();
 		JqmEngine engine2 = new JqmEngine();
 		JqmEngine engine3 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
-		engine2.start(new String[] { "localhost2" });
-		engine3.start(new String[] { "localhost3" });
+		engine1.start("localhost");
+		engine2.start("localhost2");
+		engine3.start("localhost3");
 
 		int i = 0;
 		while (i < 3)
@@ -743,8 +743,8 @@ public class MultiNodeTest
 
 		JqmEngine engine1 = new JqmEngine();
 		JqmEngine engine2 = new JqmEngine();
-		engine1.start(new String[] { "localhost" });
-		engine2.start(new String[] { "localhost2" });
+		engine1.start("localhost");
+		engine2.start("localhost2");
 
 		int i = 0;
 		while (i <= 2)
