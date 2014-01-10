@@ -18,6 +18,8 @@
 
 package com.enioka.jqm.tools;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
@@ -42,13 +44,13 @@ public class GeoTests
 	public static Server s;
 
 	@BeforeClass
-	public static void testInit() throws InterruptedException
+	public static void testInit() throws InterruptedException, FileNotFoundException
 	{
 		s = new Server();
 		s.setDatabaseName(0, "testdbengine");
 		s.setDatabasePath(0, "mem:testdbengine");
-		s.setLogWriter(null);
-		s.setSilent(true);
+		s.setLogWriter(new PrintWriter("C:\\TEMP\\hsql.log"));
+		s.setSilent(false);
 		s.start();
 
 		Dispatcher.resetEM();
@@ -79,7 +81,7 @@ public class GeoTests
 
 		@SuppressWarnings("unused")
 		JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar",
-				TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+		        TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
 
 		JobDefinition form = new JobDefinition("Geo", "MAG");
 		form.addParameter("nbJob", "1");
@@ -98,7 +100,7 @@ public class GeoTests
 		engine2.start(new String[] { "localhost4" });
 		engine3.start(new String[] { "localhost5" });
 
-		Thread.sleep(15000);
+		Thread.sleep(25000);
 		jqmlogger.debug("###############################################################");
 		jqmlogger.debug("SHUTDOWN");
 		jqmlogger.debug("###############################################################");
@@ -119,6 +121,6 @@ public class GeoTests
 			}
 		}
 
-		Assert.assertEquals(31, res.size());
+		Assert.assertEquals(511, res.size());
 	}
 }

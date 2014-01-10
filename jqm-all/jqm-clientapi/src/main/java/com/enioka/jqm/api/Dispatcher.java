@@ -245,15 +245,17 @@ public final class Dispatcher
 		Integer hl = null;
 		Calendar enqueueDate = GregorianCalendar.getInstance(Locale.getDefault());
 
-		History h = null;
+		// Load parameters (may want one day to eager load them)
+		job.getParameters();
+		job.getQueue();
 
+		// Begin transaction
 		em.getTransaction().begin();
 
 		if (job.isHighlander())
 		{
 			hl = highlanderMode(job, em);
 		}
-		job.getParameters();
 
 		if (hl != null)
 		{
@@ -283,28 +285,29 @@ public final class Dispatcher
 			ji.setParentId(jd.getParentID());
 		}
 		ji.setProgress(0);
+		ji.setParameters(jps);
 
 		em.persist(ji);
 		ji.setInternalPosition(ji.getId());
-		ji.setParameters(jps);
 		jqmlogger.debug("JI just created: " + ji.getId());
 
+		History h = null;
 		h = new History();
 		h.setJd(job);
 		h.setSessionId(jd.getSessionID());
 		h.setQueue(job.getQueue());
 		h.setMessages(new ArrayList<Message>());
-		h.setJobInstanceId(ji.getId());
 		h.setEnqueueDate(enqueueDate);
 		h.setUserName(jd.getUser());
-		h.setEmail(ji.getEmail());
+		h.setEmail(jd.getEmail());
 		h.setParentJobId(jd.getParentID());
-		h.setApplication(ji.getJd().getApplication());
-		h.setModule(ji.getJd().getModule());
-		h.setKeyword1(ji.getJd().getKeyword1());
-		h.setKeyword2(ji.getJd().getKeyword2());
-		h.setKeyword3(ji.getJd().getKeyword3());
+		h.setApplication(jd.getApplication());
+		h.setModule(jd.getModule());
+		h.setKeyword1(jd.getKeyword1());
+		h.setKeyword2(jd.getKeyword2());
+		h.setKeyword3(jd.getKeyword3());
 		h.setProgress(0);
+		h.setJobInstanceId(ji.getId());
 
 		h.setParameters(new ArrayList<JobHistoryParameter>());
 		em.persist(h);
@@ -322,6 +325,7 @@ public final class Dispatcher
 		}
 
 		em.getTransaction().commit();
+
 		em.close();
 		return ji.getId();
 	}

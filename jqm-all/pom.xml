@@ -1,34 +1,37 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.enioka.jqm</groupId>
 	<artifactId>jqm-all</artifactId>
 	<version>1.1.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
-    
+
 	<name>jqm-all</name>
 	<url>http://maven.apache.org</url>
-    
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<jqm.version>0.0.1-SNAPSHOT</jqm.version>
+		<hibernate.version>4.2.8.Final</hibernate.version>
 	</properties>
+
 	<modules>
 		<module>jqm-model</module>
 		<module>jqm-clientapi</module>
 		<module>jqm-api</module>
 		<module>jqm-engine</module>
-    <module>jqm-tests</module>
-       
+		<module>jqm-tests</module>
+
 	</modules>
-    
+
 	<scm>
 		<developerConnection>scm:git:ssh://git@git.enioka.com/jqm.git</developerConnection>
 		<connection>scm:git:ssh://git@git.enioka.com/jqm.git</connection>
 		<url>https://git.enioka.com/?p=jqm.git;a=summary</url>
-	  <tag>HEAD</tag>
-  </scm>
-	
+		<tag>HEAD</tag>
+	</scm>
+
 	<profiles>
 		<profile>
 			<id>internal</id>
@@ -40,7 +43,7 @@
 					<uniqueVersion>false</uniqueVersion>
 					<url>http://10.0.3.128/nexus/content/repositories/snapshots/</url>
 				</snapshotRepository>
-				
+
 				<repository>
 					<id>nexus</id>
 					<name>internal publication Nexus repository</name>

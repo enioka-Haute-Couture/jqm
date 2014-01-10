@@ -31,7 +31,7 @@ public class App extends JobBase
 		Map<String, String> p = new HashMap<String, String>();
 		p.put("nbJob", ((Integer.parseInt(this.parameters.get("nbJob")) + 1) + ""));
 
-		if (Integer.parseInt(this.parameters.get("nbJob")) >= 5)
+		if (Integer.parseInt(this.parameters.get("nbJob")) >= 9)
 		{
 			System.out.println("END OF GEO - reached 5th generation");
 			return;

@@ -45,6 +45,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.log4j.Logger;
@@ -56,6 +57,7 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.jcabi.aether.Aether;
 
@@ -72,7 +74,9 @@ class Loader implements Runnable
 	private String res = null;
 	private String lib = null;
 	private URL jarUrl = null;
+	private File jarFile = null;
 	private File pomFile = null;
+	private File extractDir = null;
 	private boolean pomCustom = false;
 	private ClassLoader contextClassLoader = null;
 
@@ -83,11 +87,11 @@ class Loader implements Runnable
 		this.cache = cache;
 		this.p = p;
 		this.h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class).setParameter("j", job.getId())
-				.getSingleResult();
+		        .getSingleResult();
 	}
 
 	// ExtractJar
-	private void extractJar(String jarFile, String destDir) throws IOException
+	private void extractJar(String jarFile) throws IOException
 	{
 		jqmlogger.debug("jar: " + jarFile);
 		JarFile jar = null;
@@ -96,15 +100,13 @@ class Loader implements Runnable
 		try
 		{
 			jar = new JarFile(jarFile);
-			File tmp = new File(destDir + "tmp" + job.getId() + "/");
-			tmp.mkdir();
-			destDir += "tmp" + job.getId() + "/";
+			extractDir.mkdir();
 			Enumeration<JarEntry> enumm = jar.entries();
 			while (enumm.hasMoreElements())
 			{
 				JarEntry file = enumm.nextElement();
 				jqmlogger.debug("file: " + file.getName());
-				File f = new File(destDir + File.separator + file.getName());
+				File f = new File(extractDir + File.separator + file.getName());
 				if (file.isDirectory())
 				{ // if its a directory, create it
 					jqmlogger.debug("The file is actually a directory");
@@ -179,19 +181,33 @@ class Loader implements Runnable
 		}
 	}
 
+	private void cleanUpExtractedZip()
+	{
+		try
+		{
+			FileUtils.deleteDirectory(new File(CheckFilePath.fixFilePath(node.getRepo()
+			        + CheckFilePath.fixFilePath(job.getJd().getFilePath()))
+			        + "tmp" + job.getId() + "/"));
+		} catch (IOException e)
+		{
+			jqmlogger.warn("Could not delete a temp file. It may result in filling up the file system", e);
+		}
+	}
+
 	void classpathResolution(Node node) throws MalformedURLException, DependencyResolutionException, NoPomException
 	{
+		if (cache.containsKey(job.getJd().getApplicationName()))
+		{
+			return;
+		}
 		File local = new File(System.getProperty("user.home") + "/.m2/repository");
-		File jar = new File(CheckFilePath.fixFilePath(node.getRepo()) + job.getJd().getJarPath());
-		jarUrl = jar.toURI().toURL();
-		jqmlogger.debug("Loader will try to launch jar " + jar.getAbsolutePath() + " - " + job.getJd().getJavaClassName());
 		Collection<Artifact> deps = null;
 		pomFile = new File(CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath())) + "pom.xml");
 		jqmlogger.debug("Loader will try to load POM " + pomFile.getAbsolutePath());
 		pomCustom = false;
 
 		// 1st: if no pom, find a pom inside the JAR. (& copy it, we will read it in 2nd)
-		if (!cache.containsKey(job.getJd().getApplicationName()) && !pomFile.exists())
+		if (!pomFile.exists())
 		{
 			InputStream is = null;
 			OutputStream os = null;
@@ -199,20 +215,17 @@ class Loader implements Runnable
 			{
 				pomCustom = true;
 				jqmlogger.debug("POM doesn't exist, engine will try to find in the META-INF/maven directory of the Jar file");
-				String env = CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()));
 
-				extractJar(jar.getAbsolutePath(), env);
-				findFile("pom.xml", new File(env + "tmp" + job.getId() + "/" + "META-INF/maven/"));
+				extractJar(jarFile.getAbsolutePath());
+				findFile("pom.xml", new File(extractDir + "/META-INF/maven/"));
 
 				jqmlogger.debug("pomdebug: " + res);
 
 				if (res != null
-						&& (CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()))) != null)
+				        && (CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()))) != null)
 				{
 					is = new FileInputStream(res + "/pom.xml");
-					os = new FileOutputStream(CheckFilePath.fixFilePath(node.getRepo()
-							+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-							+ "pom.xml");
+					os = new FileOutputStream(pomFile);
 
 					int r = 0;
 					byte[] bytes = new byte[1024];
@@ -225,27 +238,27 @@ class Loader implements Runnable
 					IOUtils.closeQuietly(is);
 					IOUtils.closeQuietly(os);
 
+					// Cleanup extract dir - it is useless now as a pom was found and copied at its usual place
+					cleanUpExtractedZip();
 				}
 			} catch (Exception e)
 			{
 				IOUtils.closeQuietly(is);
 				IOUtils.closeQuietly(os);
 			}
-			pomFile = new File(CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath())) + "pom.xml");
 		}
 
 		// 2nd: if no pom, use lib.
-		if (!cache.containsKey(job.getJd().getApplicationName()) && !pomFile.exists())
+		if (!pomFile.exists())
 		{
-			// If here: no pom.xml was given, no pom.xml inside the jar. Just use a "lib" directory
+			// If here: no pom.xml was given at all, no pom.xml inside the jar. Just use a "lib" directory
 			jqmlogger.debug("POM doesn't exist, checking a lib directory in the Jar file");
-			String env = CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()));
-			findFile("lib", new File(env + "tmp" + job.getId() + "/"));
+			findFile("lib", extractDir);
 
 			if (lib == null)
 			{
 				throw new NoPomException(
-						"No pom.xml in the current jar or in the job directory. No lib/ directory in the current jar file.");
+				        "No pom.xml in the current jar or in the job directory. No lib/ directory in the current jar file.");
 			}
 
 			File dir = new File(lib);
@@ -253,7 +266,7 @@ class Loader implements Runnable
 			if (!dir.exists())
 			{
 				throw new NoPomException(
-						"No pom.xml in the current jar or in the job directory. No lib/ directory in the current jar file.");
+				        "No pom.xml in the current jar or in the job directory. No lib/ directory in the current jar file.");
 			}
 
 			FileFilter fileFilter = new WildcardFileFilter("*.jar");
@@ -270,13 +283,13 @@ class Loader implements Runnable
 		}
 
 		// 3rd: if pom, use pom!
-		if (!cache.containsKey(job.getJd().getApplicationName()) && pomFile.exists())
+		if (pomFile.exists())
 		{
 			Dependencies dependencies = new Dependencies(pomFile.getAbsolutePath());
 
 			List<GlobalParameter> repolist = em
-					.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
-					.setParameter("repo", "mavenRepo").getResultList();
+			        .createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
+			        .setParameter("repo", "mavenRepo").getResultList();
 
 			RemoteRepository[] rr = new RemoteRepository[repolist.size()];
 			int ii = 0;
@@ -295,10 +308,22 @@ class Loader implements Runnable
 				deps.addAll(new Aether(remotes, local).resolve(new DefaultArtifact(dependencies.getList().get(i)), "compile"));
 			}
 
-			URL[] tmp = new URL[deps.size()];
+			int size = 0;
+			for (Artifact artifact : deps)
+			{
+				if (!"pom".equals(artifact.getExtension()))
+				{
+					size++;
+				}
+			}
+			URL[] tmp = new URL[size];
 			int i = 0;
 			for (Artifact artifact : deps)
 			{
+				if ("pom".equals(artifact.getExtension()))
+				{
+					continue;
+				}
 				tmp[i] = artifact.getFile().toURI().toURL();
 				jqmlogger.debug("Artifact: " + artifact.getFile().toURI().toURL());
 				i++;
@@ -314,12 +339,40 @@ class Loader implements Runnable
 	public void run()
 	{
 		String resultStatus = "";
-		jqmlogger.debug("LOADER HAS JUST STARTED UP");
+		jqmlogger.debug("LOADER HAS JUST STARTED UP FOR JOB INSTANCE " + job.getId());
+		jarFile = new File(CheckFilePath.fixFilePath(node.getRepo()) + job.getJd().getJarPath());
+		try
+		{
+			jarUrl = jarFile.toURI().toURL();
+		} catch (MalformedURLException ex)
+		{
+			jqmlogger.warn("The JAR file path specified in Job Definition is incorrect " + job.getJd().getApplicationName(), ex);
+			endOfRun("CRASHED");
+			return;
+		}
+		extractDir = new File(CheckFilePath.fixFilePath(FilenameUtils.concat(node.getRepo(), job.getJd().getFilePath())) + "tmp/");
+		jqmlogger.debug("Loader will try to launch jar " + jarFile.getAbsolutePath() + " - " + job.getJd().getJavaClassName());
 
 		// Create the CLASSPATH for our classloader (if not already in cache)
 		try
 		{
-			classpathResolution(node);
+			synchronized (cache)
+			{
+				if (!cache.containsKey(job.getJd().getApplicationName()))
+				{
+					jqmlogger.info("Application " + job.getJd().getApplicationName() + " dependencies are not yet in cache");
+					classpathResolution(node);
+				}
+				else
+				{
+					jqmlogger.debug("Application " + job.getJd().getApplicationName() + " dependencies are already in cache - "
+					        + cache.get(job.getJd().getApplicationName()).length);
+					for (URL s : cache.get(job.getJd().getApplicationName()))
+					{
+						jqmlogger.trace("JI " + job.getId() + " - " + s.getPath());
+					}
+				}
+			}
 		} catch (Exception e1)
 		{
 			jqmlogger.warn("Could not resolve CLASSPATH for job " + job.getJd().getApplicationName(), e1);
@@ -331,8 +384,8 @@ class Loader implements Runnable
 		try
 		{
 			em.getTransaction().begin();
-			em.refresh(this.h, LockModeType.PESSIMISTIC_READ);
-			em.refresh(job, LockModeType.PESSIMISTIC_READ);
+			em.refresh(job, LockModeType.PESSIMISTIC_WRITE);
+			em.refresh(this.h);
 
 			Date date = new Date();
 			Calendar executionDate = GregorianCalendar.getInstance(Locale.getDefault());
@@ -358,7 +411,7 @@ class Loader implements Runnable
 
 		// Get the default connection
 		String defaultconnection = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = 'defaultConnection'",
-				String.class).getSingleResult();
+		        String.class).getSingleResult();
 
 		// Class loader switch
 		JarClassLoader jobClassLoader = null;
@@ -423,7 +476,7 @@ class Loader implements Runnable
 		// Retrieve the object to update
 		em.getTransaction().begin();
 		em.refresh(job, LockModeType.PESSIMISTIC_WRITE);
-		em.refresh(h);// , LockModeType.PESSIMISTIC_WRITE);
+		em.refresh(h);
 
 		jqmlogger.debug("Job status after execution: " + job.getState());
 		jqmlogger.debug("Progression after execution: " + job.getProgress());
@@ -455,18 +508,7 @@ class Loader implements Runnable
 			jqmlogger.warn("Could not retrieve deliverables from the result object. Won't impact the engine.", e);
 		}
 
-		// The temporary file containing the extracted jar must be deleted if it exists
-		jqmlogger.debug("The tmp directory will be removed");
-		try
-		{
-			FileUtils.deleteDirectory(new File(CheckFilePath.fixFilePath(node.getRepo()
-					+ CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-					+ "tmp" + job.getId() + "/"));
-		} catch (IOException e)
-		{
-			jqmlogger.warn("Could not delete a temp file. It may result in filling up the file system", e);
-		}
-
+		// Cleanup
 		if (pomCustom)
 		{
 			pomFile.delete();
@@ -484,13 +526,23 @@ class Loader implements Runnable
 				jqmlogger.warn("An e-mail could not be sent. No impact on the engine.", e);
 			}
 		}
+		em.getTransaction().commit();
 
 		// Done
 		if (job.getState() == "ENDED")
 		{
+			em.getTransaction().begin();
+			for (JobParameter p : job.getParameters())
+			{
+				em.remove(p);
+			}
+			em.getTransaction().commit();
+
+			em.getTransaction().begin();
 			em.remove(job);
+			em.getTransaction().commit();
 		}
-		em.getTransaction().commit();
+
 	}
 
 	// This method must be called inside an active JPA transaction.
@@ -528,8 +580,8 @@ class Loader implements Runnable
 			} catch (Exception e)
 			{
 				jqmlogger
-				.error("Could not analyse a deliverbale - it may be of an incorrect Java class. Job has run correctly - it's only missing its produce.",
-						e);
+				        .error("Could not analyse a deliverable - it may be of an incorrect Java class. Job has run correctly - it's only missing its produce.",
+				                e);
 			}
 		}
 	}

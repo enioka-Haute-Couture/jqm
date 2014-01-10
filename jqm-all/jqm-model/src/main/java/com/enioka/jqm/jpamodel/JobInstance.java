@@ -58,10 +58,10 @@ public class JobInstance implements Serializable
 	private String sessionID;
 	@Column(length = 50, name = "state")
 	private String state;
-	@ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Queue.class, fetch = FetchType.EAGER)
+	@ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Queue.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "queue_id")
 	private Queue queue;
-	@ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Node.class, fetch = FetchType.EAGER)
+	@ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Node.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "node_id")
 	private Node node;
 	@Column(name = "sendEmail")
@@ -71,7 +71,7 @@ public class JobInstance implements Serializable
 	@Column(name = "internalPosition", nullable = false)
 	private double internalPosition;
 
-	@OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "jobinstance")
+	@OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "jobinstance")
 	private List<JobParameter> parameters;
 
 	public int getCurrentPosition(EntityManager em)
@@ -79,8 +79,8 @@ public class JobInstance implements Serializable
 		if (this.state.equals("SUBMITTED"))
 		{
 			return em
-					.createQuery("SELECT COUNT(ji) FROM JobInstance ji WHERE ji.internalPosition < :p AND ji.state = 'SUBMITTED'",
-							Long.class).setParameter("p", this.internalPosition).getSingleResult().intValue() + 1;
+			        .createQuery("SELECT COUNT(ji) FROM JobInstance ji WHERE ji.internalPosition < :p AND ji.state = 'SUBMITTED'",
+			                Long.class).setParameter("p", this.internalPosition).getSingleResult().intValue() + 1;
 		}
 		else
 		{

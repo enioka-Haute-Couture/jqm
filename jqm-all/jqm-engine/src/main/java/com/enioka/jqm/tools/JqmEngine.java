@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
 import javax.persistence.EntityManager;
@@ -51,7 +52,7 @@ class JqmEngine
 	private List<Polling> pollers = new ArrayList<Polling>();
 	private Node node = null;
 	private EntityManager em = Helpers.getNewEm();
-	private Map<String, URL[]> cache = new HashMap<String, URL[]>();
+	private Map<String, URL[]> cache = new ConcurrentHashMap<String, URL[]>();
 	private Server server = null;
 	private JndiContext jndiCtx = null;
 	private static Logger jqmlogger = Logger.getLogger(JqmEngine.class);
@@ -77,7 +78,7 @@ class JqmEngine
 			Logger.getRootLogger().setLevel(Level.toLevel(node.getRootLogLevel()));
 			Logger.getLogger("com.enioka").setLevel(Level.toLevel(node.getRootLogLevel()));
 			jqmlogger.info("Log level is set at " + node.getRootLogLevel() + " which translates as log4j level "
-					+ Level.toLevel(node.getRootLogLevel()));
+			        + Level.toLevel(node.getRootLogLevel()));
 		} catch (Exception e)
 		{
 			jqmlogger.warn("Log level could not be set", e);
@@ -101,22 +102,21 @@ class JqmEngine
 		try
 		{
 			server.start();
-		}
-		catch(BindException e)
+		} catch (BindException e)
 		{
 			// JETTY-839: threadpool not daemon nor close on exception
 			server.stop();
 			throw e;
 		}
 		jqmlogger.info("Jetty has started");
-		
+
 		if (args.length == 1)
 		{
 			node = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :li", Node.class).setParameter("li", args[0])
-					.getSingleResult();
+			        .getSingleResult();
 
 			dps = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
-					.setParameter("n", node.getId()).getResultList();
+			        .setParameter("n", node.getId()).getResultList();
 		}
 
 		for (DeploymentParameter i : dps)
@@ -163,7 +163,7 @@ class JqmEngine
 		try
 		{
 			n = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :l", Node.class).setParameter("l", nodeName)
-					.getSingleResult();
+			        .getSingleResult();
 			jqmlogger.info("Node " + nodeName + " was found in the configuration");
 		} catch (NoResultException e)
 		{
@@ -217,7 +217,7 @@ class JqmEngine
 		// GlobalParameter
 		GlobalParameter gp = null;
 		i = (Long) em.createQuery("SELECT COUNT(gp) FROM GlobalParameter gp WHERE gp.key = :k").setParameter("k", "defaultConnection")
-				.getSingleResult();
+		        .getSingleResult();
 		if (i == 0)
 		{
 			gp = new GlobalParameter();
@@ -251,7 +251,7 @@ class JqmEngine
 		// Deployment parameter
 		DeploymentParameter dp = null;
 		i = (Long) em.createQuery("SELECT COUNT(dp) FROM DeploymentParameter dp WHERE dp.node = :localnode").setParameter("localnode", n)
-				.getSingleResult();
+		        .getSingleResult();
 		if (i == 0)
 		{
 			dp = new DeploymentParameter();
