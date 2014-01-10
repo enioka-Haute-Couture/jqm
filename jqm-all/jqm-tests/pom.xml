@@ -27,6 +27,7 @@
 		<module>jqm-test-datetimesendmsg</module>
 		<module>jqm-test-throwable</module>
 		<module>jqm-test-em</module>
+		<module>jqm-test-exit</module>
 	</modules>
 
 	<build>

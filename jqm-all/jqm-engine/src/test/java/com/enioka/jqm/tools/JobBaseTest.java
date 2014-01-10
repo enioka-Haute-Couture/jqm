@@ -1971,4 +1971,32 @@ public class JobBaseTest
 		Assert.assertEquals("ENDED", ji.get(1).getState());
 	}
 
+	@Test
+	public void testJobWithSystemExit() throws Exception
+	{
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("**********************************************************");
+		jqmlogger.debug("Starting test testJobWithSystemExit");
+		EntityManager em = Helpers.getNewEm();
+		TestHelpers.cleanup(em);
+		TestHelpers.createLocalNode(em);
+
+		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+		JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-exit", "jqm-test-exit/jqm-test-exit.jar",
+		        TestHelpers.qVip, 42, "jqm-test-exit", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+
+		JobDefinition j = new JobDefinition("jqm-test-exit", "MAG");
+		Dispatcher.enQueue(j);
+
+		JqmEngine engine1 = new JqmEngine();
+		engine1.start(new String[] { "localhost" });
+		Thread.sleep(5000);
+		engine1.stop();
+
+		List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)
+		        .setParameter("myId", jd.getId()).getResultList();
+
+		Assert.assertEquals(1, ji.size());
+		Assert.assertEquals("CRASHED", ji.get(0).getState());
+	}
 }

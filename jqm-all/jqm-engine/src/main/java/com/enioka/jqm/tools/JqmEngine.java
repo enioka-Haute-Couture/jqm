@@ -21,7 +21,6 @@ package com.enioka.jqm.tools;
 import java.net.BindException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -119,6 +118,13 @@ class JqmEngine
 			        .setParameter("n", node.getId()).getResultList();
 		}
 
+		// Security
+		if (System.getSecurityManager() == null)
+		{
+			System.setSecurityManager(new SecurityManagerPayload());
+		}
+
+		// Pollers
 		for (DeploymentParameter i : dps)
 		{
 			Polling p = new Polling(i, cache, this);
