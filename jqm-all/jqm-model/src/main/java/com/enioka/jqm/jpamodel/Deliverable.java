@@ -25,86 +25,93 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-
 /**
- *
+ * 
  * @author pierre.coppee
  */
 @Entity
-@Table(name="Deliverable")
-public class Deliverable {
+@Table(name = "Deliverable")
+public class Deliverable
+{
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    protected Integer id;
+    @Column(length = 1000, name = "filePath")
+    protected String filePath;
+    @Column(length = 1000, name = "fileFamily")
+    protected String fileFamily;
+    @Column(nullable = false, name = "jobId")
+    private Integer jobId;
+    @Column(name = "randomId")
+    private String randomId;
+    @Column(name = "originalFileName")
+    private String originalFileName;
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	protected Integer id;
-	@Column(length=1000, name="filePath")
-	protected String filePath;
-	@Column(length=1000, name="fileName")
-	protected String fileName;
-	@Column(length=1000, name="fileFamily")
-	protected String fileFamily;
-	@Column(nullable=false, name="jobId")
-	private Integer jobId;
-	@Column(name="hashPath")
-	private String hashPath;
+    public String getFileFamily()
+    {
+        return fileFamily;
+    }
 
+    /**
+     * @param fileFamily
+     *            the fileFamily to set
+     */
+    public void setFileFamily(final String fileFamily)
+    {
+        this.fileFamily = fileFamily;
+    }
 
+    public Integer getJobId()
+    {
 
-	public String getFileFamily() {
-		return fileFamily;
-	}
+        return jobId;
+    }
 
-	/**
-	 * @param fileFamily the fileFamily to set
-	 */
-	public void setFileFamily(final String fileFamily)
-	{
-		this.fileFamily = fileFamily;
-	}
+    public void setJobId(final Integer jobId)
+    {
 
+        this.jobId = jobId;
+    }
 
-	public Integer getJobId() {
+    public String getFilePath()
+    {
 
-		return jobId;
-	}
+        return filePath;
+    }
 
+    public void setFilePath(final String filePath)
+    {
 
-	public void setJobId(final Integer jobId) {
+        this.filePath = filePath;
+    }
 
-		this.jobId = jobId;
-	}
+    public Integer getId()
+    {
+        return id;
+    }
 
+    public void setId(Integer id)
+    {
+        this.id = id;
+    }
 
-	public String getFilePath() {
+    public String getOriginalFileName()
+    {
+        return originalFileName;
+    }
 
-		return filePath;
-	}
+    public void setOriginalFileName(String originalFileName)
+    {
+        this.originalFileName = originalFileName;
+    }
 
+    public String getRandomId()
+    {
+        return randomId;
+    }
 
-	public void setFilePath(final String filePath) {
-
-		this.filePath = filePath;
-	}
-
-	public String getFileName() {
-
-		return fileName;
-	}
-
-
-	public void setFileName(final String fileName) {
-
-		this.fileName = fileName;
-	}
-
-	public String getHashPath()
-	{
-		return hashPath;
-	}
-
-	public void setHashPath(String hashPath)
-	{
-		this.hashPath = hashPath;
-	}
-
+    public void setRandomId(String randomId)
+    {
+        this.randomId = randomId;
+    }
 }

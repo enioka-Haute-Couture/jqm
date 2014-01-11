@@ -28,6 +28,10 @@
 		<module>jqm-test-throwable</module>
 		<module>jqm-test-em</module>
 		<module>jqm-test-exit</module>
+		<module>jqm-test-runnable</module>
+		<module>jqm-test-main</module>
+		<module>jqm-test-runnable-inject</module>
+		<module>jqm-test-kill</module>
 	</modules>
 
 	<build>

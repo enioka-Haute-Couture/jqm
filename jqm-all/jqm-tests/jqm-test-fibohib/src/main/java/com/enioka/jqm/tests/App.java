@@ -25,21 +25,21 @@ import com.enioka.jqm.api.JobDefinition;
 public class App extends JobBase
 {
 
-	@Override
-	public void start()
-	{
-		System.out.println("PARAMETRE FIBO 2: " + this.parameters.get("p2"));
+    @Override
+    public void start()
+    {
+        System.out.println("PARAMETRE FIBO 2: " + this.getParameters().get("p2"));
 
-		JobDefinition jd = new JobDefinition("FiboHib", "Jean Paul");
+        JobDefinition jd = new JobDefinition("FiboHib", "Jean Paul");
 
-		jd.addParameter("p1", this.parameters.get("p2"));
-		jd.addParameter("p2", (Integer.parseInt(this.parameters.get("p1")) + Integer.parseInt(this.parameters.get("p2")) + ""));
-		System.out.println("BEFORE ENQUEUE");
+        jd.addParameter("p1", this.getParameters().get("p2"));
+        jd.addParameter("p2", (Integer.parseInt(this.getParameters().get("p1")) + Integer.parseInt(this.getParameters().get("p2")) + ""));
+        System.out.println("BEFORE ENQUEUE");
 
-		if (Integer.parseInt(this.parameters.get("p1")) <= 100)
-		{
-			Dispatcher.enQueue(jd);
-		}
-		System.out.println("QUIT FIBO");
-	}
+        if (Integer.parseInt(this.getParameters().get("p1")) <= 100)
+        {
+            Dispatcher.enQueue(jd);
+        }
+        System.out.println("QUIT FIBO");
+    }
 }

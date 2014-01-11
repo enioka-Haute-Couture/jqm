@@ -32,7 +32,6 @@ import javax.persistence.LockModeType;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.jetty.util.log.Log;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
@@ -44,259 +43,261 @@ import com.enioka.jqm.jpamodel.Queue;
 
 class Polling implements Runnable
 {
-	private static Logger jqmlogger = Logger.getLogger(Polling.class);
-	private DeploymentParameter dp = null;
-	private Queue queue = null;
-	private EntityManager em = Helpers.getNewEm();
-	private ThreadPool tp = null;
-	private boolean run = true;
-	private Integer actualNbThread;
-	private JqmEngine engine;
-	private boolean hasStopped = false;
+    private static Logger jqmlogger = Logger.getLogger(Polling.class);
+    private DeploymentParameter dp = null;
+    private Queue queue = null;
+    private EntityManager em = Helpers.getNewEm();
+    private ThreadPool tp = null;
+    private boolean run = true;
+    private Integer actualNbThread;
+    private JqmEngine engine;
+    private boolean hasStopped = false;
 
-	void stop()
-	{
-		run = false;
-	}
+    void stop()
+    {
+        run = false;
+    }
 
-	Polling(DeploymentParameter dp, Map<String, URL[]> cache, JqmEngine engine)
-	{
-		jqmlogger.debug("Polling JobInstances with the Deployment Parameter: " + dp.getClassId());
-		this.dp = em
-		        .createQuery("SELECT dp FROM DeploymentParameter dp LEFT JOIN FETCH dp.queue LEFT JOIN FETCH dp.node WHERE dp.id = :l",
-		                DeploymentParameter.class).setParameter("l", dp.getId()).getSingleResult();
-		this.queue = dp.getQueue();
-		this.actualNbThread = 0;
-		this.tp = new ThreadPool(queue, dp.getNbThread(), cache);
-		this.engine = engine;
-	}
+    Polling(DeploymentParameter dp, Map<String, URL[]> cache, JqmEngine engine)
+    {
+        jqmlogger.debug("Polling JobInstances with the Deployment Parameter: " + dp.getClassId());
+        this.dp = em
+                .createQuery("SELECT dp FROM DeploymentParameter dp LEFT JOIN FETCH dp.queue LEFT JOIN FETCH dp.node WHERE dp.id = :l",
+                        DeploymentParameter.class).setParameter("l", dp.getId()).getSingleResult();
+        this.queue = dp.getQueue();
+        this.actualNbThread = 0;
+        this.tp = new ThreadPool(queue, dp.getNbThread(), cache);
+        this.engine = engine;
+    }
 
-	protected JobInstance dequeue()
-	{
-		// Free room?
-		if (actualNbThread >= dp.getNbThread())
-		{
-			return null;
-		}
+    protected JobInstance dequeue()
+    {
+        // Free room?
+        if (actualNbThread >= dp.getNbThread())
+        {
+            return null;
+        }
 
-		// Get the list of all jobInstance within the defined queue, ordered by position
-		List<JobInstance> availableJobs = em
-		        .createQuery(
-		                "SELECT j FROM JobInstance j LEFT JOIN FETCH j.jd LEFT JOIN FETCH j.queue "
-		                        + "WHERE j.queue = :q AND j.state = 'SUBMITTED' ORDER BY j.internalPosition ASC", JobInstance.class)
-		        .setParameter("q", queue).getResultList();
+        // Get the list of all jobInstance within the defined queue, ordered by position
+        List<JobInstance> availableJobs = em
+                .createQuery(
+                        "SELECT j FROM JobInstance j LEFT JOIN FETCH j.jd LEFT JOIN FETCH j.queue "
+                                + "WHERE j.queue = :q AND j.state = 'SUBMITTED' ORDER BY j.internalPosition ASC", JobInstance.class)
+                .setParameter("q", queue).getResultList();
 
-		em.getTransaction().begin();
-		for (JobInstance res : availableJobs)
-		{
-			// Lock is given when object is read, not during select... stupid.
-			// So we must check if the object is still SUBMITTED.
-			try
-			{
-				em.refresh(res, LockModeType.PESSIMISTIC_WRITE);
-			} catch (EntityNotFoundException e)
-			{
-				// It has already been eaten and finished by another engine
-				continue;
-			}
-			if (!res.getState().equals("SUBMITTED"))
-			{
-				em.lock(res, LockModeType.NONE);
-				continue;
-			}
+        em.getTransaction().begin();
+        for (JobInstance res : availableJobs)
+        {
+            // Lock is given when object is read, not during select... stupid.
+            // So we must check if the object is still SUBMITTED.
+            try
+            {
+                em.refresh(res, LockModeType.PESSIMISTIC_WRITE);
+            }
+            catch (EntityNotFoundException e)
+            {
+                // It has already been eaten and finished by another engine
+                continue;
+            }
+            if (!res.getState().equals("SUBMITTED"))
+            {
+                em.lock(res, LockModeType.NONE);
+                continue;
+            }
 
-			// Highlander?
-			if (res.getJd().isHighlander() && !highlanderPollingMode(res, em))
-			{
-				em.lock(res, LockModeType.NONE);
-				continue;
-			}
+            // Highlander?
+            if (res.getJd().isHighlander() && !highlanderPollingMode(res, em))
+            {
+                em.lock(res, LockModeType.NONE);
+                continue;
+            }
 
-			// Reserve the JI for this engine
-			res.setState("ATTRIBUTED");
-			res.setNode(dp.getNode());
+            // Reserve the JI for this engine
+            res.setState("ATTRIBUTED");
+            res.setNode(dp.getNode());
 
-			// Stop at the first suitable JI. Release the lock & update the JI which has been attributed to us.
-			jqmlogger.debug("JI number " + res.getId() + " will be selected by this poller loop (already " + actualNbThread + "/"
-			        + dp.getNbThread() + " on " + this.queue.getName() + ")");
-			em.getTransaction().commit();
-			return res;
-		}
+            // Stop at the first suitable JI. Release the lock & update the JI which has been attributed to us.
+            jqmlogger.debug("JI number " + res.getId() + " will be selected by this poller loop (already " + actualNbThread + "/"
+                    + dp.getNbThread() + " on " + this.queue.getName() + ")");
+            em.getTransaction().commit();
+            return res;
+        }
 
-		// If here, no suitable JI is available
-		em.getTransaction().commit();
-		return null;
-	}
+        // If here, no suitable JI is available
+        em.getTransaction().commit();
+        return null;
+    }
 
-	/**
-	 * 
-	 * @param jobToTest
-	 * @param em
-	 * @return true if job can be launched even if it is in highlander mode
-	 */
-	protected boolean highlanderPollingMode(JobInstance jobToTest, EntityManager em)
-	{
-		ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
-		        .createQuery(
-		                "SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.id = :n AND (j.state = 'RUNNING' OR j.state = 'ATTRIBUTED')",
-		                JobInstance.class).setParameter("refid", jobToTest.getId()).setParameter("n", jobToTest.getJd().getId())
-		        .getResultList();
-		return jobs.isEmpty();
-	}
+    /**
+     * 
+     * @param jobToTest
+     * @param em
+     * @return true if job can be launched even if it is in highlander mode
+     */
+    protected boolean highlanderPollingMode(JobInstance jobToTest, EntityManager em)
+    {
+        ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
+                .createQuery(
+                        "SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.id = :n AND (j.state = 'RUNNING' OR j.state = 'ATTRIBUTED')",
+                        JobInstance.class).setParameter("refid", jobToTest.getId()).setParameter("n", jobToTest.getJd().getId())
+                .getResultList();
+        return jobs.isEmpty();
+    }
 
-	@SuppressWarnings("static-access")
-	@Override
-	public void run()
-	{
-		Calendar date = GregorianCalendar.getInstance(Locale.getDefault());
-		while (true)
-		{
-			Calendar today = GregorianCalendar.getInstance(Locale.getDefault());
-			if (em != null)
-			{
-				em.close();
-			}
-			em = Helpers.getNewEm();
-			try
-			{
-				// Sleep for the required time (& exit if asked to)
-				if (!run)
-				{
-					break;
-				}
+    @SuppressWarnings("static-access")
+    @Override
+    public void run()
+    {
+        Calendar date = GregorianCalendar.getInstance(Locale.getDefault());
+        while (true)
+        {
+            Calendar today = GregorianCalendar.getInstance(Locale.getDefault());
+            if (em != null)
+            {
+                em.close();
+            }
+            em = Helpers.getNewEm();
+            try
+            {
+                // Sleep for the required time (& exit if asked to)
+                if (!run)
+                {
+                    break;
+                }
 
-				// if true, CRASHED jobs are removed
-				if (date.DATE != today.DATE)
-				{
-					date = today;
-					Calendar ttt = GregorianCalendar.getInstance(Locale.getDefault());
-					GlobalParameter gp = em.createQuery("SELECT g FROM GlobalParameter g WHERE g.key = 'deadline'", GlobalParameter.class)
-					        .getSingleResult();
-					jqmlogger.debug("DEADLINE: " + gp.getValue());
-					Integer d = Integer.valueOf(gp.getValue());
+                // if true, CRASHED jobs are removed
+                if (date.DATE != today.DATE)
+                {
+                    date = today;
+                    Calendar ttt = GregorianCalendar.getInstance(Locale.getDefault());
+                    GlobalParameter gp = em.createQuery("SELECT g FROM GlobalParameter g WHERE g.key = 'deadline'", GlobalParameter.class)
+                            .getSingleResult();
+                    jqmlogger.debug("DEADLINE: " + gp.getValue());
+                    Integer d = Integer.valueOf(gp.getValue());
 
-					ArrayList<History> hs = (ArrayList<History>) em.createQuery(
-					        "SELECT h FROM JobInstance j, History h WHERE " + "j.state = 'CRASHED' AND h.jobInstanceId = j.id",
-					        History.class).getResultList();
+                    ArrayList<History> hs = (ArrayList<History>) em.createQuery(
+                            "SELECT h FROM JobInstance j, History h WHERE " + "j.state = 'CRASHED' AND h.jobInstanceId = j.id",
+                            History.class).getResultList();
 
-					for (History h : hs)
-					{
-						Calendar tt = h.getEndDate();
-						tt.setTime(DateUtils.addDays(h.getEndDate().getTime(), d));
-						em.getTransaction().begin();
-						if (tt.getTime().compareTo(ttt.getTime()) > 0)
-						{
-							jqmlogger.debug("Purging the CRASHED jobs" + h.getJobInstanceId());
-							em.remove(em.find(JobInstance.class, h.getJobInstanceId()));
-						}
-						em.getTransaction().commit();
-					}
-				}
+                    for (History h : hs)
+                    {
+                        Calendar tt = h.getEndDate();
+                        tt.setTime(DateUtils.addDays(h.getEndDate().getTime(), d));
+                        em.getTransaction().begin();
+                        if (tt.getTime().compareTo(ttt.getTime()) > 0)
+                        {
+                            jqmlogger.debug("Purging the CRASHED jobs" + h.getJobInstanceId());
+                            em.remove(em.find(JobInstance.class, h.getJobInstanceId()));
+                        }
+                        em.getTransaction().commit();
+                    }
+                }
 
-				// Wait according to the deploymentParameter
-				Thread.sleep(dp.getPollingInterval());
+                // Wait according to the deploymentParameter
+                Thread.sleep(dp.getPollingInterval());
 
-				if (!run)
-				{
-					break;
-				}
+                if (!run)
+                {
+                    break;
+                }
 
-				// Check if a stop order has been given
-				Node n = dp.getNode();
-				if (n.isStop())
-				{
-					jqmlogger.debug("Current node must be stopped: " + dp.getNode().isStop());
+                // Check if a stop order has been given
+                Node n = dp.getNode();
+                if (n.isStop())
+                {
+                    jqmlogger.debug("Current node must be stopped: " + dp.getNode().isStop());
 
-					Long nbRunning = (Long) em
-					        .createQuery(
-					                "SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
-					        .setParameter("node", n).getSingleResult();
-					jqmlogger.debug("Waiting the end of " + nbRunning + " job(s)");
+                    Long nbRunning = (Long) em
+                            .createQuery(
+                                    "SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
+                            .setParameter("node", n).getSingleResult();
+                    jqmlogger.debug("Waiting the end of " + nbRunning + " job(s)");
 
-					if (nbRunning == 0)
-					{
-						run = false;
-					}
+                    if (nbRunning == 0)
+                    {
+                        run = false;
+                    }
 
-					// Whatever happens, do not not take new jobs during shutdown
-					continue;
-				}
+                    // Whatever happens, do not not take new jobs during shutdown
+                    continue;
+                }
 
-				// Get a JI to run
-				JobInstance ji = dequeue();
-				if (ji == null)
-				{
-					continue;
-				}
+                // Get a JI to run
+                JobInstance ji = dequeue();
+                if (ji == null)
+                {
+                    continue;
+                }
 
-				jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
-				jqmlogger.debug("Actual deploymentParameter: " + dp.getNode().getId());
-				jqmlogger.debug("Theorical max nbThread: " + dp.getNbThread());
-				jqmlogger.debug("Actual nbThread: " + actualNbThread);
-				jqmlogger.debug("JI that will be attributed: " + ji.getId());
-				jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
+                jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
+                jqmlogger.debug("Actual deploymentParameter: " + dp.getNode().getId());
+                jqmlogger.debug("Theorical max nbThread: " + dp.getNbThread());
+                jqmlogger.debug("Actual nbThread: " + actualNbThread);
+                jqmlogger.debug("JI that will be attributed: " + ji.getId());
+                jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
 
-				// Update the history object: the JI has been attributed
-				em.getTransaction().begin();
-				History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class)
-				        .setParameter("j", ji.getId()).getSingleResult();
-				h.setNode(dp.getNode());
-				em.getTransaction().commit();
+                // Update the history object: the JI has been attributed
+                em.getTransaction().begin();
+                History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class)
+                        .setParameter("j", ji.getId()).getSingleResult();
+                h.setNode(dp.getNode());
+                em.getTransaction().commit();
 
-				jqmlogger.debug("The job " + ji.getId() + " has been updated with the node: " + ji.getNode().getListeningInterface());
-				jqmlogger.debug("The job history " + h.getId() + " has been updated with the node: " + h.getNode().getListeningInterface());
+                jqmlogger.debug("The job " + ji.getId() + " has been updated with the node: " + ji.getNode().getListeningInterface());
+                jqmlogger.debug("The job history " + h.getId() + " has been updated with the node: " + h.getNode().getListeningInterface());
 
-				// We will run this JI!
-				actualNbThread++;
+                // We will run this JI!
+                actualNbThread++;
 
-				jqmlogger.debug("TPS QUEUE: " + tp.getQueue().getId());
-				jqmlogger.debug("INCREMENTATION NBTHREAD: " + actualNbThread);
-				jqmlogger.debug("POLLING QUEUE: " + ji.getQueue().getId());
-				jqmlogger.debug("Should the node corresponding to the current job be stopped: " + ji.getNode().isStop());
+                jqmlogger.debug("TPS QUEUE: " + tp.getQueue().getId());
+                jqmlogger.debug("INCREMENTATION NBTHREAD: " + actualNbThread);
+                jqmlogger.debug("POLLING QUEUE: " + ji.getQueue().getId());
+                jqmlogger.debug("Should the node corresponding to the current job be stopped: " + ji.getNode().isStop());
 
-				em.getTransaction().begin();
-				Message m = new Message();
-				m.setTextMessage("Status updated: ATTRIBUTED");
-				m.setHistory(h);
-				em.persist(m);
-				em.getTransaction().commit();
+                em.getTransaction().begin();
+                Message m = new Message();
+                m.setTextMessage("Status updated: ATTRIBUTED");
+                m.setHistory(h);
+                em.persist(m);
+                em.getTransaction().commit();
 
-				// Run it
-				tp.run(ji, this, false);
+                // Run it
+                tp.run(ji, this, false);
 
-				// Done for this loop
-				jqmlogger.debug("End of poller loop  on queue " + this.queue.getName());
+                // Done for this loop
+                jqmlogger.debug("End of poller loop  on queue " + this.queue.getName());
 
-			} catch (InterruptedException e)
-			{
-				jqmlogger.warn(e);
-			}
-		}
-		jqmlogger.debug("Poller loop  on queue " + this.queue.getName() + " is stopping");
-		this.tp.stop();
-		this.hasStopped = true;
-		jqmlogger.info("Poller on queue " + dp.getQueue().getName() + " has ended");
-		// Let the engine decide if it should stop completely
-		this.engine.checkEngineEnd();
-	}
+            }
+            catch (InterruptedException e)
+            {
+                jqmlogger.warn(e);
+            }
+        }
+        jqmlogger.debug("Poller loop  on queue " + this.queue.getName() + " is stopping");
+        this.tp.stop();
+        this.hasStopped = true;
+        jqmlogger.info("Poller on queue " + dp.getQueue().getName() + " has ended");
+        // Let the engine decide if it should stop completely
+        this.engine.checkEngineEnd();
+    }
 
-	Integer getActualNbThread()
-	{
-		return actualNbThread;
-	}
+    Integer getActualNbThread()
+    {
+        return actualNbThread;
+    }
 
-	synchronized void decreaseNbThread()
-	{
-		this.actualNbThread--;
-	}
+    synchronized void decreaseNbThread()
+    {
+        this.actualNbThread--;
+    }
 
-	public DeploymentParameter getDp()
-	{
-		return dp;
-	}
+    public DeploymentParameter getDp()
+    {
+        return dp;
+    }
 
-	boolean isRunning()
-	{
-		return !this.hasStopped;
-	}
+    boolean isRunning()
+    {
+        return !this.hasStopped;
+    }
 }

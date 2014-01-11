@@ -28,25 +28,25 @@ import com.enioka.jqm.api.JobDefinition;
 
 public class App extends JobBase
 {
-	private static final Logger log = Logger.getLogger(App.class);
+    private static final Logger log = Logger.getLogger(App.class);
 
-	@Override
-	public void start()
-	{
-		log.info("Starting payload");
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("marsu-pu");
-		EntityManager em = emf.createEntityManager();
+    @Override
+    public void start()
+    {
+        log.info("Starting payload");
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("marsu-pu");
+        EntityManager em = emf.createEntityManager();
 
-		log.info("Running query");
-		em.createQuery("SELECT e from Entity e");
+        log.info("Running query");
+        em.createQuery("SELECT e from Entity e");
 
-		if (this.parameters.size() == 0)
-		{
-			log.info("Queuing again - with parameter and through he old API");
-			JobDefinition jd = new JobDefinition("jqm-test-em", "marsu");
-			jd.addParameter("stop", "1");
-			Dispatcher.enQueue(jd);
-		}
-		log.info("End of payload");
-	}
+        if (this.getParameters().size() == 0)
+        {
+            log.info("Queuing again - with parameter and through he old API");
+            JobDefinition jd = new JobDefinition("jqm-test-em", "marsu");
+            jd.addParameter("stop", "1");
+            Dispatcher.enQueue(jd);
+        }
+        log.info("End of payload");
+    }
 }

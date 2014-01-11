@@ -18,19 +18,11 @@
 
 package com.enioka.jqm.api;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.Map;
 
 import javax.naming.NamingException;
-import javax.naming.spi.NamingManager;
 import javax.sql.DataSource;
-
-import com.enioka.jqm.deliverabletools.Cryptonite;
-import com.enioka.jqm.deliverabletools.DeliverableStruct;
 
 /**
  * 
@@ -38,339 +30,104 @@ import com.enioka.jqm.deliverabletools.DeliverableStruct;
  */
 public class JobBase
 {
-	private Object myEngine = null;
-	protected Integer parentID;
-	protected Integer jobInstanceID;
-	protected Integer canBeRestart;
-	protected String applicationName;
-	protected String sessionID;
-	protected String application;
-	protected String module;
-	protected String keyword1;
-	protected String keyword2;
-	protected String keyword3;
-	protected Map<String, String> parameters = new HashMap<String, String>();
-	protected ArrayList<DeliverableStruct> sha1s = new ArrayList<DeliverableStruct>();
-	private String defaultConnect;
-
-	public void start()
-	{
-
-	}
-
-	public void stop()
-	{
-
-	}
-
-	public DataSource getDefaultConnection() throws NamingException
-	{
-		Object p = NamingManager.getInitialContext(null).lookup(defaultConnect);
-		DataSource q = (DataSource) p;
-
-		return q;
-	}
-
-	public void addDeliverable(final String path, final String fileName, final String fileLabel)
-	{
-		try
-		{
-			this.sha1s.add(new DeliverableStruct(path, fileName, Cryptonite.sha1(path + fileName), fileLabel));
-		} catch (final NoSuchAlgorithmException e)
-		{
-
-			e.printStackTrace();
-		}
-	}
-
-	public void sendMsg(final String msg)
-	{
-		// 1: get the method
-		Method getMyEngine = null;
-		Class c = null;
-		try
-		{
-			c = myEngine.getClass();
-			getMyEngine = c.getMethod("sendMsg", String.class);
-		} catch (SecurityException e)
-		{
-			throw new JqmApiException("Could not access the injected sendMsg method", e);
-		} catch (NoSuchMethodException e)
-		{
-			throw new JqmApiException("There was no sendMsg method in the injected object", e);
-		}
-
-		// 2: run the method
-		try
-		{
-			getMyEngine.invoke(myEngine, msg);
-		} catch (IllegalArgumentException e)
-		{
-			throw new JqmApiException("Inccorect parameters for sendMsg method", e);
-		} catch (IllegalAccessException e)
-		{
-			throw new JqmApiException("Could not execute the injected sendMsg method for security reasons", e);
-		} catch (InvocationTargetException e)
-		{
-			if (e.getCause() instanceof RuntimeException)
-			{
-				// it may be a Kill order, or whatever exception...
-				throw (RuntimeException) e.getCause();
-			}
-			else
-			{
-				throw new JqmApiException("An unexpected issue occured during sendMsg", e);
-			}
-		}
-	}
-
-	public void sendProgress(final Integer msg)
-	{
-		// 1: get the method
-		Method getMyEngine = null;
-		Class c = null;
-		try
-		{
-			c = myEngine.getClass();
-			getMyEngine = c.getMethod("sendProgress", Integer.class);
-		} catch (SecurityException e)
-		{
-			throw new JqmApiException("Could not access the injected sendProgress method", e);
-		} catch (NoSuchMethodException e)
-		{
-			throw new JqmApiException("There was no sendProgress method in the injected object", e);
-		}
-
-		// 2: run the method
-		try
-		{
-			getMyEngine.invoke(myEngine, msg);
-		} catch (IllegalArgumentException e)
-		{
-			throw new JqmApiException("Incorrect parameters for sendProgress method", e);
-		} catch (IllegalAccessException e)
-		{
-			throw new JqmApiException("Could not execute the injected sendProgress method for security reasons", e);
-		} catch (InvocationTargetException e)
-		{
-			if (e.getCause() instanceof RuntimeException)
-			{
-				// it may be a Kill order, or whatever exception...
-				throw (RuntimeException) e.getCause();
-			}
-			else
-			{
-				throw new JqmApiException("An unexpected issue occured during sendMsg", e);
-			}
-		}
-
-	}
-
-	public int enQueue(String applicationName, String user, String mail, String sessionID, String application, String module,
-			String keyword1, String keyword2, String keyword3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
-	{
-		try
-		{
-			// If not given, consider this is a child/parent launch.
-			if (parentId == null)
-			{
-				parentId = this.jobInstanceID;
-			}
-
-			Class c = myEngine.getClass();
-
-			Method getMyEngine = c.getMethod("enQueue", String.class, String.class, String.class, String.class, String.class, String.class,
-					String.class, String.class, String.class, Integer.class, Integer.class, Map.class);
-			return (Integer) getMyEngine.invoke(myEngine, applicationName, user, mail, sessionID, application, module, keyword1, keyword2,
-					keyword3, parentId, canBeRestart, parameters);
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		return 0;
-	}
-
-	public int enQueueSynchronously(String applicationName, String user, String mail, String sessionID, String application, String module,
-			String keyword1, String keyword2, String keyword3, Integer parentId, Integer canBeRestart, Map<String, String> parameters)
-	{
-		try
-		{
-			// If not given, consider this is a child/parent launch.
-			if (parentId == null)
-			{
-				parentId = this.jobInstanceID;
-			}
-
-			Class c = myEngine.getClass();
-
-			Method getMyEngine = c.getMethod("enQueueSynchronously", String.class, String.class, String.class, String.class, String.class, String.class,
-					String.class, String.class, String.class, Integer.class, Integer.class, Map.class);
-			return (Integer) getMyEngine.invoke(myEngine, applicationName, user, mail, sessionID, application, module, keyword1, keyword2,
-					keyword3, parentId, canBeRestart, parameters);
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		return 0;
-	}
-
-	// ---------
-
-	public Integer getParentID()
-	{
-
-		return parentID;
-	}
-
-	public void setParentID(final Integer parentID)
-	{
-
-		this.parentID = parentID;
-	}
-
-	public int getCanBeRestart()
-	{
-
-		return canBeRestart;
-	}
-
-	public void setCanBeRestart(final int canBeRestart)
-	{
-
-		this.canBeRestart = canBeRestart;
-	}
-
-	public String getApplicationName()
-	{
-
-		return applicationName;
-	}
-
-	public void setApplicationName(final String applicationName)
-	{
-
-		this.applicationName = applicationName;
-	}
-
-	public String getSessionID()
-	{
-
-		return sessionID;
-	}
-
-	public void setSessionID(final String sessionID)
-	{
-
-		this.sessionID = sessionID;
-	}
-
-	public String getApplication()
-	{
-
-		return application;
-	}
-
-	public void setApplication(final String application)
-	{
-
-		this.application = application;
-	}
-
-	public String getModule()
-	{
-
-		return module;
-	}
-
-	public void setModule(final String module)
-	{
-
-		this.module = module;
-	}
-
-	public String getkeyword1()
-	{
-
-		return keyword1;
-	}
-
-	public void setKeyword1(final String keyword1)
-	{
-
-		this.keyword1 = keyword1;
-	}
-
-	public String getKeyword2()
-	{
-
-		return keyword2;
-	}
-
-	public void setKeyword2(final String keyword2)
-	{
-
-		this.keyword2 = keyword2;
-	}
-
-	public String getKeyword3()
-	{
-
-		return keyword3;
-	}
-
-	public void setKeyword3(final String keyword3)
-	{
-
-		this.keyword3 = keyword3;
-	}
-
-	public ArrayList<DeliverableStruct> getSha1s()
-	{
-
-		return sha1s;
-	}
-
-	public void setSha1s(final ArrayList<DeliverableStruct> sha1s)
-	{
-
-		this.sha1s = sha1s;
-	}
-
-	public Map<String, String> getParameters()
-	{
-
-		return parameters;
-	}
-
-	public void setParameters(final Map<String, String> parameters)
-	{
-
-		this.parameters = parameters;
-	}
-
-	public String getDefaultConnect()
-	{
-		return defaultConnect;
-	}
-
-	public void setDefaultConnect(String defaultConnect)
-	{
-		this.defaultConnect = defaultConnect;
-	}
-
-	public Object getMyEngine()
-	{
-		return myEngine;
-	}
-
-	public void setMyEngine(Object myEngine)
-	{
-		this.myEngine = myEngine;
-	}
-
-	public void setJobInstanceID(Integer jobInstanceID)
-	{
-		this.jobInstanceID = jobInstanceID;
-	}
-
+    JobManager jm;
+
+    public void start()
+    {
+
+    }
+
+    public void stop()
+    {
+
+    }
+
+    public DataSource getDefaultConnection() throws NamingException
+    {
+        return jm.getDefaultConnection();
+    }
+
+    public void addDeliverable(String path, String fileLabel) throws IOException
+    {
+        jm.addDeliverable(path, fileLabel);
+    }
+
+    public void sendMsg(String msg)
+    {
+        jm.sendMsg(msg);
+    }
+
+    public void sendProgress(Integer progress)
+    {
+        jm.sendProgress(progress);
+    }
+
+    public int enQueue(String applicationName, String user, String mail, String sessionID, String application, String module,
+            String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
+    {
+        return jm.enqueue(applicationName, user, mail, sessionID, application, module, keyword1, keyword2, keyword3, parameters);
+    }
+
+    public int enQueueSynchronously(String applicationName, String user, String mail, String sessionID, String application, String module,
+            String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
+    {
+        return jm.enqueueSync(applicationName, user, mail, sessionID, application, module, keyword1, keyword2, keyword3, parameters);
+    }
+
+    // ---------
+
+    public Integer getParentID()
+    {
+        return jm.parentID();
+    }
+
+    public boolean canBeRestarted()
+    {
+        return jm.canBeRestarted();
+    }
+
+    public String getApplicationName()
+    {
+        return jm.applicationName();
+    }
+
+    public String getSessionID()
+    {
+        return jm.sessionID();
+    }
+
+    public String getApplication()
+    {
+        return jm.application();
+    }
+
+    public String getModule()
+    {
+        return jm.module();
+    }
+
+    public String getkeyword1()
+    {
+        return jm.keyword1();
+    }
+
+    public String getKeyword2()
+    {
+        return jm.keyword2();
+    }
+
+    public String getKeyword3()
+    {
+        return jm.keyword3();
+    }
+
+    public Map<String, String> getParameters()
+    {
+        return jm.parameters();
+    }
+
+    public String getDefaultConnect()
+    {
+        return jm.defaultConnect();
+    }
 }

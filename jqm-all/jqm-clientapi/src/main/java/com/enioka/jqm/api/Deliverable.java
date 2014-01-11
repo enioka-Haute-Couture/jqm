@@ -24,38 +24,52 @@ package com.enioka.jqm.api;
  */
 public class Deliverable
 {
-	private String filePath;
-	private String fileName;
+    private String filePath;
+    private String fileFamily;
+    private Integer id;
+    private String originalName;
 
-	/**
-	 * Construction. This will not create a new file on the file system!
-	 * 
-	 * @param filePath
-	 * @param fileName
-	 */
-	public Deliverable(String filePath, String fileName)
-	{
-		this.filePath = filePath;
-		this.fileName = fileName;
-	}
+    /**
+     * Construction. This will not create a new file on the file system!
+     * 
+     * @param filePath
+     * @param fileName
+     */
+    public Deliverable(String filePath, String fileFamily, Integer ID, String originalName)
+    {
+        this.filePath = filePath;
+        this.fileFamily = fileFamily;
+        this.id = ID;
+        this.originalName = originalName;
+    }
 
-	/**
-	 * File Path
-	 * 
-	 * @return
-	 */
-	public String getFilePath()
-	{
-		return filePath;
-	}
+    /**
+     * File Path
+     * 
+     * @return path
+     */
+    public String getFilePath()
+    {
+        return filePath;
+    }
 
-	/**
-	 * The family name
-	 * 
-	 * @return
-	 */
-	public String getFileName()
-	{
-		return fileName;
-	}
+    /**
+     * Optional file tag
+     * 
+     * @return the tag
+     */
+    public String getFileFamily()
+    {
+        return fileFamily;
+    }
+
+    public Integer getId()
+    {
+        return id;
+    }
+
+    public String getOriginalName()
+    {
+        return originalName;
+    }
 }

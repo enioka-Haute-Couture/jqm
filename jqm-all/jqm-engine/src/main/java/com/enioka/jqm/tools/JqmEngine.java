@@ -94,7 +94,7 @@ class JqmEngine
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setContextPath("/");
 		server.setHandler(context);
-		context.addServlet(new ServletHolder(new Servlet()), "/getfile");
+		context.addServlet(new ServletHolder(new ServletFile()), "/getfile");
 		context.addServlet(new ServletHolder(new ServletEnqueue()), "/enqueue");
 		context.addServlet(new ServletHolder(new ServletStatus()), "/status");
 		jqmlogger.info("Starting Jetty (port " + node.getPort() + ")");

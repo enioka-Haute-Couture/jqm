@@ -21,37 +21,25 @@ import java.io.PrintWriter;
 
 import com.enioka.jqm.api.JobBase;
 
-public class App extends JobBase{
+public class App extends JobBase
+{
+    @Override
+    public void start()
+    {
+        String file = this.getParameters().get("filepath");
+        String fileName = this.getParameters().get("fileName");
+        System.out.println("FILENAME: " + fileName);
+        try
+        {
+            PrintWriter out = new PrintWriter(new FileWriter(file + fileName));
+            out.println("Hello World!");
+            out.close();
 
-	@Override
-	public void start() {
-		String file = this.getParameters().get("filepath");
-		String fileName = this.getParameters().get("fileName");
-		System.out.println("FILENAME: " + fileName);
-		try{
-			PrintWriter out  = new PrintWriter(new FileWriter(file + fileName));
-			out.println("Hello World!");
-			out.close();
-
-			addDeliverable(file, fileName, "JobGenADeliverableFamily");
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
-	}
-
-	//	public static void main(String[] args) {
-	//
-	//		String file = "/Users/pico/Downloads/tests/JobGenADeliverable.txt";
-	//		try{
-	//			PrintWriter out  = new PrintWriter(new FileWriter(file));
-	//			out.println("Hello World!");
-	//			out.close();
-	//
-	//			//addDeliverable("/Users/pico/Downloads/tests/JobGenADeliverable.txt", "JobGenADeliverable");
-	//		}
-	//		catch(Exception e){
-	//			e.printStackTrace();
-	//		}
-	//    }
+            addDeliverable(file + fileName, "JobGenADeliverableFamily");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

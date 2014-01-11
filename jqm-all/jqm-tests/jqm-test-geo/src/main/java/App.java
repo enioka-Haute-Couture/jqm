@@ -24,25 +24,25 @@ import com.enioka.jqm.api.JobBase;
 public class App extends JobBase
 {
 
-	@Override
-	public void start()
-	{
-		System.out.println("BEGINING GEOJOB: " + this.parameters.get("nbJob"));
-		Map<String, String> p = new HashMap<String, String>();
-		p.put("nbJob", ((Integer.parseInt(this.parameters.get("nbJob")) + 1) + ""));
+    @Override
+    public void start()
+    {
+        System.out.println("BEGINING GEOJOB: " + this.getParameters().get("nbJob"));
+        Map<String, String> p = new HashMap<String, String>();
+        p.put("nbJob", ((Integer.parseInt(this.getParameters().get("nbJob")) + 1) + ""));
 
-		if (Integer.parseInt(this.parameters.get("nbJob")) >= 9)
-		{
-			System.out.println("END OF GEO - reached 5th generation");
-			return;
-		}
+        if (Integer.parseInt(this.getParameters().get("nbJob")) >= 9)
+        {
+            System.out.println("END OF GEO - reached 5th generation");
+            return;
+        }
 
-		sendMsg("launching first job");
-		System.out.println("LAUNCHING FIRST JOB");
-		enQueue("Geo", "Dark Vador", null, null, null, null, null, null, null, null, null, p);
-		sendMsg("launching second job");
-		System.out.println("LAUNCHING SECOND JOB");
-		enQueue("Geo", "Dark Vador", null, null, null, null, null, null, null, null, null, p);
-		System.out.println("ENDING GEOJOB");
-	}
+        sendMsg("launching first job");
+        System.out.println("LAUNCHING FIRST JOB");
+        enQueue("Geo", "Dark Vador", null, null, null, null, null, null, null, p);
+        sendMsg("launching second job");
+        System.out.println("LAUNCHING SECOND JOB");
+        enQueue("Geo", "Dark Vador", null, null, null, null, null, null, null, p);
+        System.out.println("ENDING GEOJOB");
+    }
 }

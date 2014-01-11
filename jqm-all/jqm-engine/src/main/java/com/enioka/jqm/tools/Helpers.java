@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -40,128 +41,132 @@ import com.enioka.jqm.jpamodel.Message;
  */
 public final class Helpers
 {
-	private static final String PERSISTENCE_UNIT = "jobqueue-api-pu";
-	private static Logger jqmlogger = Logger.getLogger(Helpers.class);
+    private static final String PERSISTENCE_UNIT = "jobqueue-api-pu";
+    private static Logger jqmlogger = Logger.getLogger(Helpers.class);
 
-	// The one and only EMF in the engine.
-	private static Properties props = new Properties();
-	private static EntityManagerFactory emf;
+    // The one and only EMF in the engine.
+    private static Properties props = new Properties();
+    private static EntityManagerFactory emf;
 
-	/**
-	 * Get a fresh EM on the jobqueue-api-pu persistence Unit
-	 * 
-	 * @return an EntityManager
-	 */
-	public static EntityManager getNewEm()
-	{
-		if (emf == null)
-		{
-			emf = createFactory();
-		}
-		return emf.createEntityManager();
-	}
+    /**
+     * Get a fresh EM on the jobqueue-api-pu persistence Unit
+     * 
+     * @return an EntityManager
+     */
+    public static EntityManager getNewEm()
+    {
+        if (emf == null)
+        {
+            emf = createFactory();
+        }
+        return emf.createEntityManager();
+    }
 
-	private static EntityManagerFactory createFactory()
-	{
-		FileInputStream fis = null;
-		try
-		{
-			Properties p = new Properties();
-			fis = new FileInputStream("conf/db.properties");
-			p.load(fis);
-			IOUtils.closeQuietly(fis);
-			props.putAll(p);
-			return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, props);
-		} catch (FileNotFoundException e)
-		{
-			// No properties file means we use the test HSQLDB (file, not in-memory) as specified in the persistence.xml
-			IOUtils.closeQuietly(fis);
-			return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, props);
-		} catch (IOException e)
-		{
-			jqmlogger.fatal("conf/db.properties file is invalid", e);
-			IOUtils.closeQuietly(fis);
-			System.exit(1);
-			// Stupid, just for Eclipse's parser and therefore avoid red lines...
-			return null;
-		} catch (Exception e)
-		{
-			jqmlogger.fatal("Unable to connect with the database. Maybe your configuration file is wrong. "
-			        + "Please check the password or the url in the $JQM_DIR/conf/db.properties", e);
-			System.exit(1);
-			return null;
-		} finally
-		{
-			IOUtils.closeQuietly(fis);
-		}
-	}
+    private static EntityManagerFactory createFactory()
+    {
+        FileInputStream fis = null;
+        try
+        {
+            Properties p = new Properties();
+            fis = new FileInputStream("conf/db.properties");
+            p.load(fis);
+            IOUtils.closeQuietly(fis);
+            props.putAll(p);
+            return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, props);
+        }
+        catch (FileNotFoundException e)
+        {
+            // No properties file means we use the test HSQLDB (file, not in-memory) as specified in the persistence.xml
+            IOUtils.closeQuietly(fis);
+            return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, props);
+        }
+        catch (IOException e)
+        {
+            jqmlogger.fatal("conf/db.properties file is invalid", e);
+            IOUtils.closeQuietly(fis);
+            System.exit(1);
+            // Stupid, just for Eclipse's parser and therefore avoid red lines...
+            return null;
+        }
+        catch (Exception e)
+        {
+            jqmlogger.fatal("Unable to connect with the database. Maybe your configuration file is wrong. "
+                    + "Please check the password or the url in the $JQM_DIR/conf/db.properties", e);
+            System.exit(1);
+            return null;
+        }
+        finally
+        {
+            IOUtils.closeQuietly(fis);
+        }
+    }
 
-	static void allowCreateSchema()
-	{
-		props.put("hibernate.hbm2ddl.auto", "update");
-	}
+    static void allowCreateSchema()
+    {
+        props.put("hibernate.hbm2ddl.auto", "update");
+    }
 
-	/**
-	 * For internal test use only <br/>
-	 * <bold>WARNING</bold> This will invalidate all open EntityManagers!
-	 */
-	static void resetEmf()
-	{
-		if (emf != null)
-		{
-			emf.close();
-		}
-		emf = createFactory();
-	}
+    /**
+     * For internal test use only <br/>
+     * <bold>WARNING</bold> This will invalidate all open EntityManagers!
+     */
+    static void resetEmf()
+    {
+        if (emf != null)
+        {
+            emf.close();
+        }
+        emf = createFactory();
+    }
 
-	/**
-	 * Create a text message that will be stored in the database. Must be called inside a JPA transaction.
-	 * 
-	 * @param textMessage
-	 * @param history
-	 * @param em
-	 * @return the JPA message created
-	 */
-	static Message createMessage(String textMessage, History history, EntityManager em)
-	{
-		Message m = new Message();
+    /**
+     * Create a text message that will be stored in the database. Must be called inside a JPA transaction.
+     * 
+     * @param textMessage
+     * @param history
+     * @param em
+     * @return the JPA message created
+     */
+    static Message createMessage(String textMessage, History history, EntityManager em)
+    {
+        Message m = new Message();
 
-		m.setTextMessage(textMessage);
-		m.setHistory(history);
+        m.setTextMessage(textMessage);
+        m.setHistory(history);
 
-		em.persist(m);
-		return m;
-	}
+        em.persist(m);
+        return m;
+    }
 
-	/**
-	 * Create a Deliverable inside the datbase that will track a file created by a JobInstance Must be called from inside a JPA transaction
-	 * 
-	 * @param fp
-	 *            FilePath (relative to a root directory - cf. Node)
-	 * @param fn
-	 *            FileName
-	 * @param hp
-	 *            HashPath
-	 * @param ff
-	 *            File family (may be null). E.g.: "daily report"
-	 * @param jobId
-	 *            Job Instance ID
-	 * @param em
-	 *            the EM to use.
-	 * @return
-	 */
-	static Deliverable createDeliverable(String fp, String fn, String hp, String ff, Integer jobId, EntityManager em)
-	{
-		Deliverable j = new Deliverable();
+    /**
+     * Create a Deliverable inside the datbase that will track a file created by a JobInstance Must be called from inside a JPA transaction
+     * 
+     * @param fp
+     *            FilePath (relative to a root directory - cf. Node)
+     * @param fn
+     *            FileName
+     * @param hp
+     *            HashPath
+     * @param ff
+     *            File family (may be null). E.g.: "daily report"
+     * @param jobId
+     *            Job Instance ID
+     * @param em
+     *            the EM to use.
+     * @return
+     */
+    static Deliverable createDeliverable(String path, String originalFileName, String fileFamily, Integer jobId, EntityManager em)
+    {
+        Deliverable j = new Deliverable();
 
-		j.setFilePath(fp);
-		j.setHashPath(hp);
-		j.setFileFamily(ff);
-		j.setJobId(jobId);
-		j.setFileName(fn);
+        j.setFilePath(path);
+        j.setRandomId(UUID.randomUUID().toString());
+        j.setFileFamily(fileFamily);
+        j.setJobId(jobId);
+        j.setOriginalFileName(originalFileName);
 
-		em.persist(j);
-		return j;
-	}
+        em.persist(j);
+        return j;
+    }
 
 }
