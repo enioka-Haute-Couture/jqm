@@ -846,8 +846,7 @@ public final class Dispatcher
 
         try
         {
-            url = new URL("http://" + h.getNode().getListeningInterface() + ":" + h.getNode().getPort() + "/getfile?file="
-                    + deliverable.getRandomId());
+            url = new URL("http://" + h.getNode().getDns() + ":" + h.getNode().getPort() + "/getfile?file=" + deliverable.getRandomId());
             jqmlogger.debug("URL: " + url.toString());
         }
         catch (MalformedURLException e)

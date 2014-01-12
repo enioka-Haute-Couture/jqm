@@ -37,7 +37,7 @@ public class TestPersistence
         em.getTransaction().begin();
 
         Node n = new Node();
-        n.setListeningInterface("localhost");
+        n.setName("localhost");
         n.setPort(1234);
         n.setDlRepo("/Temp/");
         n.setRepo("/tmp");

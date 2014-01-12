@@ -32,8 +32,13 @@ public class Node
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    @Column(nullable = false, length = 1000, name = "nodeName", unique = true)
-    private String listeningInterface;
+
+    @Column(nullable = false, length = 100, name = "nodeName", unique = true)
+    private String name;
+
+    @Column(nullable = false, length = 255, name = "dns")
+    private String dns = "localhost";
+
     @Column(nullable = false, name = "port")
     private Integer port;
 
@@ -41,7 +46,7 @@ public class Node
     @Column(nullable = false, name = "dlRepo")
     private String dlRepo;
 
-    // Repo where the jar repository and the pom repository must be relative
+    // Repo to which the jar repository and the pom repository must be relative
     @Column(nullable = false, name = "repo")
     private String repo;
 
@@ -53,7 +58,7 @@ public class Node
     @Column(name = "rootLogLevel")
     private String rootLogLevel = "DEBUG";
 
-    // Repo where the export repository must be relative
+    // Repo to which the export repository must be relative
     @Column(nullable = false, name = "exportRepo")
     private String exportRepo;
 
@@ -67,14 +72,14 @@ public class Node
         this.id = id;
     }
 
-    public String getListeningInterface()
+    public String getName()
     {
-        return listeningInterface;
+        return name;
     }
 
-    public void setListeningInterface(final String listeningInterface)
+    public void setName(final String name)
     {
-        this.listeningInterface = listeningInterface;
+        this.name = name;
     }
 
     public Integer getPort()
@@ -139,5 +144,15 @@ public class Node
     {
 
         this.exportRepo = exportRepo;
+    }
+
+    public String getDns()
+    {
+        return dns;
+    }
+
+    public void setDns(String dns)
+    {
+        this.dns = dns;
     }
 }

@@ -244,8 +244,7 @@ class Polling implements Runnable
                 h.setNode(dp.getNode());
                 em.getTransaction().commit();
 
-                jqmlogger.debug("The job " + ji.getId() + " has been updated with the node: " + ji.getNode().getListeningInterface());
-                jqmlogger.debug("The job history " + h.getId() + " has been updated with the node: " + h.getNode().getListeningInterface());
+                jqmlogger.debug("The job & history " + ji.getId() + " have been updated with the node: " + ji.getNode().getName());
 
                 // We will run this JI!
                 actualNbThread++;
@@ -274,8 +273,7 @@ class Polling implements Runnable
                 jqmlogger.warn(e);
             }
         }
-        jqmlogger.debug("Poller loop on queue " + this.queue.getName() + " is stopping [engine "
-                + this.dp.getNode().getListeningInterface() + "]");
+        jqmlogger.debug("Poller loop on queue " + this.queue.getName() + " is stopping [engine " + this.dp.getNode().getName() + "]");
         em.close();
         this.tp.stop();
         this.hasStopped = true;

@@ -255,7 +255,7 @@ public class CreationTools
         EntityTransaction transac = em.getTransaction();
         transac.begin();
 
-        n.setListeningInterface(listeningInterface);
+        n.setName(listeningInterface);
         n.setPort(port);
         n.setDlRepo(dlRepo);
         n.setRepo(repo);

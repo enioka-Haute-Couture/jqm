@@ -753,10 +753,10 @@ public class MultiNodeTest
             if (i == 1)
             {
                 em.getTransaction().begin();
-                em.createQuery("UPDATE Node n SET n.stop = 'true' WHERE n.listeningInterface = 'localhost'").executeUpdate();
+                em.createQuery("UPDATE Node n SET n.stop = 'true' WHERE n.name = 'localhost'").executeUpdate();
                 em.getTransaction().commit();
                 em.clear();
-                Node n = (Node) em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = 'localhost'").getSingleResult();
+                Node n = (Node) em.createQuery("SELECT n FROM Node n WHERE n.name = 'localhost'").getSingleResult();
                 jqmlogger.debug("Node stop updated: " + n.isStop());
             }
             TestHelpers.printJobInstanceTable();

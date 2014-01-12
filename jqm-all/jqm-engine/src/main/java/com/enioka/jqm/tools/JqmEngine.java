@@ -19,6 +19,7 @@
 package com.enioka.jqm.tools;
 
 import java.net.BindException;
+import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,7 +100,7 @@ class JqmEngine
         }
 
         // Jetty
-        server = new Server(node.getPort());
+        server = new Server(new InetSocketAddress(node.getDns(), node.getPort()));
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
         server.setHandler(context);
@@ -132,8 +133,7 @@ class JqmEngine
 
         if (nodeName != null)
         {
-            node = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :li", Node.class).setParameter("li", nodeName)
-                    .getSingleResult();
+            node = em.createQuery("SELECT n FROM Node n WHERE n.name = :li", Node.class).setParameter("li", nodeName).getSingleResult();
 
             dps = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
                     .setParameter("n", node.getId()).getResultList();
@@ -165,7 +165,7 @@ class JqmEngine
         // Stop pollers
         for (Polling p : pollers)
         {
-            jqmlogger.debug("Engine " + this.node.getListeningInterface() + " asks queue " + p.getDp().getQueue().getName() + " to stop.");
+            jqmlogger.debug("Engine " + this.node.getName() + " asks queue " + p.getDp().getQueue().getName() + " to stop.");
             p.stop();
         }
 
@@ -191,8 +191,7 @@ class JqmEngine
         Node n = null;
         try
         {
-            n = em.createQuery("SELECT n FROM Node n WHERE n.listeningInterface = :l", Node.class).setParameter("l", nodeName)
-                    .getSingleResult();
+            n = em.createQuery("SELECT n FROM Node n WHERE n.name = :l", Node.class).setParameter("l", nodeName).getSingleResult();
             jqmlogger.info("Node " + nodeName + " was found in the configuration");
         }
         catch (NoResultException e)
@@ -200,7 +199,7 @@ class JqmEngine
             jqmlogger.info("Node " + nodeName + " does not exist in the configuration and will be created with default values");
             n = new Node();
             n.setDlRepo(System.getProperty("user.dir") + "/outputfiles/");
-            n.setListeningInterface(nodeName);
+            n.setName(nodeName);
             n.setPort(1789);
             n.setRepo(System.getProperty("user.dir") + "/jobs/");
             n.setExportRepo(System.getProperty("user.dir") + "/exports/");

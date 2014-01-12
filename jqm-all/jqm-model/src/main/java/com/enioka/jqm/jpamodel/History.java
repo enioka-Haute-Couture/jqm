@@ -46,54 +46,75 @@ public class History implements Serializable
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+    
     @Column(name = "returnedValue")
     private Integer returnedValue;
+    
     @JoinColumn(name = "jd")
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.JobDef.class)
     private JobDef jd;
+    
     @Column(name = "sessionId")
     private String sessionId;
+    
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.Queue.class)
     @JoinColumn(name = "queue")
     private Queue queue;
+    
     @OneToMany(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Message.class, cascade = CascadeType.ALL, mappedBy = "history")
     private List<Message> messages;
+    
     @Column(nullable = true)
     private Integer jobInstanceId;
+    
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "enqueueDate")
     private Calendar enqueueDate;
+    
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "executionDate")
     private Calendar executionDate;
+    
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "endDate", nullable = true)
     private Calendar endDate;
+    
     @Column(name = "userName", nullable = true)
     private String userName;
+    
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Node.class)
     @JoinColumn(name = "node")
     private Node node;
+    
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "history_id")
     private List<JobHistoryParameter> parameters;
+    
     @Column(name = "email")
     private String email;
+    
     @Column(name = "parentJobId", nullable = true)
     private Integer parentJobId;
+    
     @Column(length = 20, name = "status")
     @Enumerated(EnumType.STRING)
     private State status = State.SUBMITTED;
+    
     @Column
     private String keyword1;
+    
     @Column
     private String keyword2;
+    
     @Column
     private String keyword3;
+    
     @Column
     private String application;
+    
     @Column
     private String module;
+    
     @Column
     private Integer progress;
 

@@ -97,7 +97,7 @@ class Mail
             msg.setText("The Job number " + ji.getId() + " finished correctly\n\n" + "Job description:\n" + "- Job definition: "
                     + ji.getJd().getApplicationName() + "\n" + "- Parent: " + ji.getParentId() + "\n" + "- User name: " + ji.getUserName()
                     + "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "- Queue: " + ji.getQueue().getName() + "\n" + "- Node: "
-                    + ji.getNode().getListeningInterface() + "\n" + "Best regards,\n");
+                    + ji.getNode().getName() + "\n" + "Best regards,\n");
 
             Transport.send(msg);
             jqmlogger.debug("Email sent successfully...");
