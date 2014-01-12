@@ -674,6 +674,38 @@ public class JobBaseTest
     }
 
     @Test
+    public void testNoPomLibDir() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testNoPomLibDir");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+
+        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemavennopomlib/",
+                "jqm-test-datetimemavennopomlib/jqm-test-datetimemavennopomlib.jar", TestHelpers.qVip, 42, "MarsuApplication", null,
+                "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+
+        @SuppressWarnings("unused")
+        int i = Dispatcher.enQueue(j);
+
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        Thread.sleep(5000);
+        engine1.stop();
+
+        TypedQuery<History> query = em.createQuery("SELECT j FROM History j", History.class);
+        ArrayList<History> res = (ArrayList<History>) query.getResultList();
+
+        Assert.assertEquals(1, res.size());
+        Assert.assertEquals("ENDED", res.get(0).getState());
+    }
+
+    @Test
     public void testEmail() throws Exception
     {
         jqmlogger.debug("**********************************************************");

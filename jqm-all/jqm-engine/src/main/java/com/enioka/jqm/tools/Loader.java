@@ -75,8 +75,8 @@ class Loader implements Runnable
     private File jarFile = null;
     private File pomFile = null;
     private File extractDir = null;
-    private boolean pomCustom = false;
     private ClassLoader contextClassLoader = null;
+    private boolean shouldCleanupExtractedZip = false;
 
     Loader(JobInstance job, Map<String, URL[]> cache, Polling p)
     {
@@ -145,7 +145,6 @@ class Loader implements Runnable
             }
             throw e;
         }
-
     }
 
     // FindFile
@@ -204,18 +203,20 @@ class Loader implements Runnable
         }
         File local = new File(System.getProperty("user.home") + "/.m2/repository");
         Collection<Artifact> deps = null;
-        pomFile = new File(CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath())) + "pom.xml");
+        pomFile = new File(FilenameUtils.concat(FilenameUtils.concat(node.getRepo(), job.getJd().getFilePath()), "pom.xml"));
+        File libDir = new File(FilenameUtils.concat(FilenameUtils.concat(node.getRepo(), job.getJd().getFilePath()), "lib"));
         jqmlogger.debug("Loader will try to load POM " + pomFile.getAbsolutePath());
-        pomCustom = false;
+        boolean pomFromJar = false;
 
-        // 1st: if no pom, find a pom inside the JAR. (& copy it, we will read it in 2nd)
-        if (!pomFile.exists())
+        // 1st: if no pom, no lib dir => find a pom inside the JAR. (& copy it, we will read later)
+        if (!pomFile.exists() && !libDir.exists())
         {
+            jqmlogger.debug("Pom does not exist. Checking for a pom inside the jar file");
             InputStream is = null;
             OutputStream os = null;
             try
             {
-                pomCustom = true;
+                pomFromJar = true;
                 jqmlogger.debug("POM doesn't exist, engine will try to find in the META-INF/maven directory of the Jar file");
 
                 extractJar(jarFile.getAbsolutePath());
@@ -251,43 +252,46 @@ class Loader implements Runnable
             }
         }
 
-        // 2nd: if no pom, use lib.
-        if (!pomFile.exists())
+        // 2nd: if no pom, no pom inside jar, no lib dir => find a lib dir inside the jar
+        if (!pomFile.exists() && !libDir.exists())
         {
-            // If here: no pom.xml was given at all, no pom.xml inside the jar. Just use a "lib" directory
-            jqmlogger.debug("POM doesn't exist, checking a lib directory in the Jar file");
+            jqmlogger.debug("POM doesn't exist, checking for a lib directory inside the jar file");
             findFile("lib", extractDir);
 
-            if (lib == null)
+            if (lib != null)
             {
-                throw new NoPomException(
-                        "No pom.xml in the current jar or in the job directory. No lib/ directory in the current jar file.");
+
+                File dir = new File(lib);
+
+                if (!dir.exists())
+                {
+                    throw new NoPomException(
+                            "No pom.xml in the current jar or in the job directory. No lib/ directory in the current jar file.");
+                }
+
+                FileFilter fileFilter = new WildcardFileFilter("*.jar");
+                File[] files = dir.listFiles(fileFilter);
+                URL[] libUrls = new URL[files.length];
+                for (int i = 0; i < files.length; i++)
+                {
+                    jqmlogger.debug("Jars in lib/ : " + files[i].toURI().toURL());
+                    libUrls[i] = files[i].toURI().toURL();
+                }
+
+                // Put in cache
+                this.cache.put(job.getJd().getApplicationName(), libUrls);
+                shouldCleanupExtractedZip = true;
             }
-
-            File dir = new File(lib);
-
-            if (!dir.exists())
+            else
             {
-                throw new NoPomException(
-                        "No pom.xml in the current jar or in the job directory. No lib/ directory in the current jar file.");
+                cleanUpExtractedZip();
             }
-
-            FileFilter fileFilter = new WildcardFileFilter("*.jar");
-            File[] files = dir.listFiles(fileFilter);
-            URL[] libUrls = new URL[files.length];
-            for (int i = 0; i < files.length; i++)
-            {
-                jqmlogger.debug("Jars in lib/ : " + files[i].toURI().toURL());
-                libUrls[i] = files[i].toURI().toURL();
-            }
-
-            // Put in cache
-            this.cache.put(job.getJd().getApplicationName(), libUrls);
         }
 
         // 3rd: if pom, use pom!
         if (pomFile.exists())
         {
+            jqmlogger.debug("Reading a pom file");
             Dependencies dependencies = new Dependencies(pomFile.getAbsolutePath());
 
             List<GlobalParameter> repolist = em
@@ -330,6 +334,29 @@ class Loader implements Runnable
                 tmp[i] = artifact.getFile().toURI().toURL();
                 jqmlogger.debug("Artifact: " + artifact.getFile().toURI().toURL());
                 i++;
+            }
+
+            // Put in cache
+            this.cache.put(job.getJd().getApplicationName(), tmp);
+
+            // Cleanup
+            if (pomFromJar)
+            {
+                pomFile.delete();
+            }
+        }
+
+        // 4: if lib, use lib... (pom has priority)
+        if (!pomFile.exists() && libDir.exists())
+        {
+            jqmlogger.debug("Using the lib directory " + libDir.getAbsolutePath() + " as the source for dependencies");
+            FileFilter fileFilter = new WildcardFileFilter("*.jar");
+            File[] files = libDir.listFiles(fileFilter);
+            URL[] tmp = new URL[files.length];
+            for (int i = 0; i < files.length; i++)
+            {
+                tmp[i] = files[i].toURI().toURL();
+                jqmlogger.debug("Artifact: " + tmp[i]);
             }
 
             // Put in cache
@@ -509,9 +536,9 @@ class Loader implements Runnable
         jqmlogger.debug("Final progression: " + h.getProgress());
 
         // Cleanup
-        if (pomCustom)
+        if (shouldCleanupExtractedZip)
         {
-            pomFile.delete();
+            this.cleanUpExtractedZip();
         }
 
         // Send e-mail
