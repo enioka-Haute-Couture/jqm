@@ -193,11 +193,11 @@ public interface JobManager
      * @return a File object describing a temp directory.
      */
     File getWorkDir();
-    
+
     /**
-     * Be a good citizen: call this function regularly. It does nothing but check if your job should be paused, killed & such. Java makes
-     * it impossible to kill a thread properly, so calling this function is the only way to allow it. 
-     * <br>Note: this function is also called by the other functions of the API.
+     * Be a good citizen: call this function regularly. It does nothing but check if your job should be paused, killed & such. Java makes it
+     * impossible to kill a thread properly, so calling this function is the only way to allow it. <br>
+     * Note: this function is also called by the other functions of the API.
      */
     void yield();
 }

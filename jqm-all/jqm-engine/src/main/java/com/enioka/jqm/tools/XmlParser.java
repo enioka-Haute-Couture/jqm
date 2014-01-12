@@ -42,146 +42,149 @@ import com.enioka.jqm.jpamodel.Queue;
 
 class XmlParser
 {
-	private static Logger jqmlogger = Logger.getLogger(XmlParser.class);
-	private EntityManager em = Helpers.getNewEm();
+    private static Logger jqmlogger = Logger.getLogger(XmlParser.class);
+    private EntityManager em = Helpers.getNewEm();
 
-	XmlParser()
-	{
-	}
+    XmlParser()
+    {}
 
-	void parse(String path) throws SAXException, ParserConfigurationException, IOException
-	{
-		File f = new File(path);
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder;
-		boolean canBeRestarted = true;
-		String javaClassName = null;
-		String filePath = null;
-		Queue queue = null;
-		Integer maxTimeRunning = null;
-		String applicationName = null;
-		String application = null;
-		String module = null;
-		String keyword1 = null;
-		String keyword2 = null;
-		String keyword3 = null;
-		boolean highlander = false;
-		String jarPath = null;
+    void parse(String path) throws SAXException, ParserConfigurationException, IOException
+    {
+        File f = new File(path);
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder;
+        boolean canBeRestarted = true;
+        String javaClassName = null;
+        String filePath = null;
+        Queue queue = null;
+        Integer maxTimeRunning = null;
+        String applicationName = null;
+        String application = null;
+        String module = null;
+        String keyword1 = null;
+        String keyword2 = null;
+        String keyword3 = null;
+        boolean highlander = false;
+        String jarPath = null;
 
-		// SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		// Schema schema = null;
+        // SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        // Schema schema = null;
 
-		// schema = factory.newSchema(new File("./lib/res.xsd"));
-		// Validator validator = schema.newValidator();
-		//DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		// Document document = parser.parse(f);
-		//validator.validate(new DOMSource(document));
+        // schema = factory.newSchema(new File("./lib/res.xsd"));
+        // Validator validator = schema.newValidator();
+        // DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        // Document document = parser.parse(f);
+        // validator.validate(new DOMSource(document));
 
+        try
+        {
+            jqmlogger.debug(f.getPath());
+            jqmlogger.debug("Working Directory = " + System.getProperty("user.dir"));
 
-		try
-		{
-			jqmlogger.debug(f.getPath());
-			jqmlogger.debug("Working Directory = " + System.getProperty("user.dir"));
+            if (f == null || !f.isFile())
+            {
+                throw new FileNotFoundException("The XML file " + f + " was not found");
+            }
 
-			if (f == null || !f.isFile())
-			{
-				throw new FileNotFoundException("The XML file " + f + " was not found");
-			}
+            dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(f);
 
-			dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(f);
+            doc.getDocumentElement().normalize();
+            NodeList nList = doc.getElementsByTagName("jqm");
 
-			doc.getDocumentElement().normalize();
-			NodeList nList = doc.getElementsByTagName("jqm");
+            for (int temp = 0; temp < nList.getLength(); temp++)
+            {
+                Node nNode = nList.item(temp);
+                if (nNode.getNodeType() == Node.ELEMENT_NODE)
+                {
+                    Element e = (Element) nNode;
 
-			for (int temp = 0; temp < nList.getLength(); temp++)
-			{
-				Node nNode = nList.item(temp);
-				if (nNode.getNodeType() == Node.ELEMENT_NODE)
-				{
-					Element e = (Element) nNode;
+                    NodeList nl = e.getElementsByTagName("jobDefinition");
 
-					NodeList nl = e.getElementsByTagName("jobDefinition");
+                    for (int i = 0; i < nl.getLength(); i++)
+                    {
+                        em.getTransaction().begin();
+                        Element ee = (Element) nl.item(i);
 
-					for (int i = 0; i < nl.getLength(); i++)
-					{
-						em.getTransaction().begin();
-						Element ee = (Element) nl.item(i);
+                        canBeRestarted = (ee.getElementsByTagName("canBeRestarted").item(0).getTextContent().equals("true")) ? true : false;
+                        javaClassName = ee.getElementsByTagName("javaClassName").item(0).getTextContent();
+                        queue = em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true", Queue.class).getSingleResult();
+                        maxTimeRunning = Integer.parseInt(ee.getElementsByTagName("maxTimeRunning").item(0).getTextContent());
 
-						canBeRestarted = (ee.getElementsByTagName("canBeRestarted").item(0).getTextContent().equals("true")) ? true : false;
-						javaClassName = ee.getElementsByTagName("javaClassName").item(0).getTextContent();
-						queue = em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true", Queue.class).getSingleResult();
-						maxTimeRunning = Integer.parseInt(ee.getElementsByTagName("maxTimeRunning").item(0).getTextContent());
+                        JobDef jd;
 
-						JobDef jd;
+                        TypedQuery<JobDef> q = em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = :n", JobDef.class);
+                        q.setParameter("n", ee.getElementsByTagName("name").item(0).getTextContent());
 
-						TypedQuery<JobDef> q = em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = :n", JobDef.class);
-						q.setParameter("n", ee.getElementsByTagName("name").item(0).getTextContent());
+                        try
+                        {
+                            jd = q.getSingleResult();
+                            jd.getParameters().clear();
+                        }
+                        catch (NoResultException x)
+                        {
+                            jd = new JobDef();
+                        }
 
-						try
-						{
-							jd = q.getSingleResult();
-							jd.getParameters().clear();
-						} catch (NoResultException x)
-						{
-							jd = new JobDef();
-						}
+                        applicationName = ee.getElementsByTagName("name").item(0).getTextContent();
+                        application = ee.getElementsByTagName("application").item(0).getTextContent();
+                        module = ee.getElementsByTagName("module").item(0).getTextContent();
+                        keyword1 = ee.getElementsByTagName("keyword1").item(0).getTextContent();
+                        keyword2 = ee.getElementsByTagName("keyword2").item(0).getTextContent();
+                        keyword3 = ee.getElementsByTagName("keyword3").item(0).getTextContent();
+                        highlander = (ee.getElementsByTagName("highlander").item(0).getTextContent().equals("true")) ? true : false;
+                        filePath = e.getElementsByTagName("filePath").item(0).getTextContent();
+                        jarPath = e.getElementsByTagName("path").item(0).getTextContent();
 
-						applicationName = ee.getElementsByTagName("name").item(0).getTextContent();
-						application = ee.getElementsByTagName("application").item(0).getTextContent();
-						module = ee.getElementsByTagName("module").item(0).getTextContent();
-						keyword1 = ee.getElementsByTagName("keyword1").item(0).getTextContent();
-						keyword2 = ee.getElementsByTagName("keyword2").item(0).getTextContent();
-						keyword3 = ee.getElementsByTagName("keyword3").item(0).getTextContent();
-						highlander = (ee.getElementsByTagName("highlander").item(0).getTextContent().equals("true")) ? true : false;
-						filePath = e.getElementsByTagName("filePath").item(0).getTextContent();
-						jarPath = e.getElementsByTagName("path").item(0).getTextContent();
+                        NodeList l = ee.getElementsByTagName("parameter");
 
-						NodeList l = ee.getElementsByTagName("parameter");
+                        for (int j = 0; j < l.getLength(); j++)
+                        {
+                            Element t = (Element) l.item(j);
 
-						for (int j = 0; j < l.getLength(); j++)
-						{
-							Element t = (Element) l.item(j);
+                            JobDefParameter jdp = new JobDefParameter();
+                            jdp.setKey(t.getElementsByTagName("key").item(0).getTextContent());
+                            jdp.setValue(t.getElementsByTagName("value").item(0).getTextContent());
+                            jd.getParameters().add(jdp);
+                        }
 
-							JobDefParameter jdp = new JobDefParameter();
-							jdp.setKey(t.getElementsByTagName("key").item(0).getTextContent());
-							jdp.setValue(t.getElementsByTagName("value").item(0).getTextContent());
-							jd.getParameters().add(jdp);
-						}
+                        jd.setCanBeRestarted(canBeRestarted);
+                        jd.setJavaClassName(javaClassName);
+                        jd.setFilePath(filePath);
+                        jd.setQueue(queue);
+                        jd.setMaxTimeRunning(maxTimeRunning);
+                        jd.setApplicationName(applicationName);
+                        jd.setApplication(application);
+                        jd.setModule(module);
+                        jd.setKeyword1(keyword1);
+                        jd.setKeyword2(keyword2);
+                        jd.setKeyword3(keyword3);
+                        jd.setHighlander(highlander);
+                        jd.setJarPath(jarPath);
 
-						jd.setCanBeRestarted(canBeRestarted);
-						jd.setJavaClassName(javaClassName);
-						jd.setFilePath(filePath);
-						jd.setQueue(queue);
-						jd.setMaxTimeRunning(maxTimeRunning);
-						jd.setApplicationName(applicationName);
-						jd.setApplication(application);
-						jd.setModule(module);
-						jd.setKeyword1(keyword1);
-						jd.setKeyword2(keyword2);
-						jd.setKeyword3(keyword3);
-						jd.setHighlander(highlander);
-						jd.setJarPath(jarPath);
+                        em.persist(jd);
+                        em.getTransaction().commit();
 
-						em.persist(jd);
-						em.getTransaction().commit();
-
-						jqmlogger.debug("XML parsed");
-					}
-				}
-			}
-		} catch (ParserConfigurationException e)
-		{
-			jqmlogger.error(e);
-		} catch (SAXException e)
-		{
-			jqmlogger.error("Invalid XML architecture. Please, fix correctly the dependencies", e);
-		} catch (IOException e)
-		{
-			jqmlogger.error("Invalid xml. Please check the xml & its filepath", e);
-		} catch (Exception e)
-		{
-			jqmlogger.error("Invalid xml. Please check the xml & its filepath", e);
-		}
-	}
+                        jqmlogger.debug("XML parsed");
+                    }
+                }
+            }
+        }
+        catch (ParserConfigurationException e)
+        {
+            jqmlogger.error(e);
+        }
+        catch (SAXException e)
+        {
+            jqmlogger.error("Invalid XML architecture. Please, fix correctly the dependencies", e);
+        }
+        catch (IOException e)
+        {
+            jqmlogger.error("Invalid xml. Please check the xml & its filepath", e);
+        }
+        catch (Exception e)
+        {
+            jqmlogger.error("Invalid xml. Please check the xml & its filepath", e);
+        }
+    }
 }

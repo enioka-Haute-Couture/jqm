@@ -30,66 +30,75 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="JobParameter")
+@Table(name = "JobParameter")
 public class JobParameter implements Serializable
 {
-	private static final long serialVersionUID = -8894511645365690426L;
+    private static final long serialVersionUID = -8894511645365690426L;
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Integer id;
-	@Column(nullable=false, length=50, name="KEYNAME")
-	private String key;
-	@Column(nullable=false, length=1000, name="VALUE")
-	private String value;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+    @Column(nullable = false, length = 50, name = "KEYNAME")
+    private String key;
+    @Column(nullable = false, length = 1000, name = "VALUE")
+    private String value;
 
-	@ManyToOne
-	@JoinColumn(name="jobinstance_id")
-	private JobInstance jobinstance;
+    @ManyToOne
+    @JoinColumn(name = "jobinstance_id")
+    private JobInstance jobinstance;
 
-	/**
-	 * @return the key
-	 */
-	public String getKey()
-	{
-		return key;
-	}
-	/**
-	 * @param key the key to set
-	 */
-	public void setKey(final String key)
-	{
-		this.key = key;
-	}
-	/**
-	 * @return the value
-	 */
-	public String getValue()
-	{
-		return value;
-	}
-	/**
-	 * @param value the value to set
-	 */
-	public void setValue(final String value)
-	{
-		this.value = value;
-	}
-	public Integer getId()
-	{
-		return id;
-	}
-	public void setId(final Integer id)
-	{
-		this.id = id;
-	}
-	public JobInstance getJobinstance()
-	{
-		return jobinstance;
-	}
-	public void setJobinstance(JobInstance jobinstance)
-	{
-		this.jobinstance = jobinstance;
-	}
+    /**
+     * @return the key
+     */
+    public String getKey()
+    {
+        return key;
+    }
+
+    /**
+     * @param key
+     *            the key to set
+     */
+    public void setKey(final String key)
+    {
+        this.key = key;
+    }
+
+    /**
+     * @return the value
+     */
+    public String getValue()
+    {
+        return value;
+    }
+
+    /**
+     * @param value
+     *            the value to set
+     */
+    public void setValue(final String value)
+    {
+        this.value = value;
+    }
+
+    public Integer getId()
+    {
+        return id;
+    }
+
+    public void setId(final Integer id)
+    {
+        this.id = id;
+    }
+
+    public JobInstance getJobinstance()
+    {
+        return jobinstance;
+    }
+
+    public void setJobinstance(JobInstance jobinstance)
+    {
+        this.jobinstance = jobinstance;
+    }
 
 }

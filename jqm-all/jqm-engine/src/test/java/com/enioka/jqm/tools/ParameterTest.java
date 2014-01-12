@@ -36,128 +36,128 @@ import com.enioka.jqm.jpamodel.JobDefParameter;
 
 public class ParameterTest
 {
-	public static Server s;
-	public static Logger jqmlogger = Logger.getLogger(ParameterTest.class);
+    public static Server s;
+    public static Logger jqmlogger = Logger.getLogger(ParameterTest.class);
 
-	@BeforeClass
-	public static void testInit()
-	{
-		s = new Server();
-		s.setDatabaseName(0, "testdbengine");
-		s.setDatabasePath(0, "mem:testdbengine");
-		s.setLogWriter(null);
-		s.setSilent(true);
-		s.start();
+    @BeforeClass
+    public static void testInit()
+    {
+        s = new Server();
+        s.setDatabaseName(0, "testdbengine");
+        s.setDatabasePath(0, "mem:testdbengine");
+        s.setLogWriter(null);
+        s.setSilent(true);
+        s.start();
 
-		Dispatcher.resetEM();
-		Helpers.resetEmf();
-	}
+        Dispatcher.resetEM();
+        Helpers.resetEmf();
+    }
 
-	@AfterClass
-	public static void stop()
-	{
-		s.shutdown();
-	}
+    @AfterClass
+    public static void stop()
+    {
+        s.shutdown();
+    }
 
-	@Test
-	public void testMixParameters() throws Exception
-	{
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("Starting test testMixParameters");
-		EntityManager em = Helpers.getNewEm();
-		TestHelpers.cleanup(em);
-		TestHelpers.createLocalNode(em);
+    @Test
+    public void testMixParameters() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testMixParameters");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
 
-		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp = CreationTools.createJobDefParameter("arg1", "argument1", em);
-		JobDefParameter jdp2 = CreationTools.createJobDefParameter("arg2", "Franquin", em);
-		jdargs.add(jdp);
-		jdargs.add(jdp2);
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        JobDefParameter jdp = CreationTools.createJobDefParameter("arg1", "argument1", em);
+        JobDefParameter jdp2 = CreationTools.createJobDefParameter("arg2", "Franquin", em);
+        jdargs.add(jdp);
+        jdargs.add(jdp2);
 
-		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-checkargs/",
-		        "jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
-		        "other", "other", false, em);
+        @SuppressWarnings("unused")
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-checkargs/",
+                "jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
+                "other", "other", false, em);
 
-		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
-		j.addParameter("arg2", "argument2");
+        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        j.addParameter("arg2", "argument2");
 
-		Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
 
-		JqmEngine engine1 = new JqmEngine();
-		engine1.start("localhost");
-		Thread.sleep(5000);
-		engine1.stop();
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        Thread.sleep(5000);
+        engine1.stop();
 
-		Assert.assertEquals(true, true);
-	}
+        Assert.assertEquals(true, true);
+    }
 
-	@Test
-	public void testDefaultParameters() throws Exception
-	{
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("Starting test testDefaultParameters");
-		EntityManager em = Helpers.getNewEm();
-		TestHelpers.cleanup(em);
-		TestHelpers.createLocalNode(em);
+    @Test
+    public void testDefaultParameters() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testDefaultParameters");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
 
-		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp = CreationTools.createJobDefParameter("arg1", "argument1", em);
-		JobDefParameter jdp2 = CreationTools.createJobDefParameter("arg2", "argument2", em);
-		jdargs.add(jdp);
-		jdargs.add(jdp2);
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        JobDefParameter jdp = CreationTools.createJobDefParameter("arg1", "argument1", em);
+        JobDefParameter jdp2 = CreationTools.createJobDefParameter("arg2", "argument2", em);
+        jdargs.add(jdp);
+        jdargs.add(jdp2);
 
-		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-checkargs/",
-		        "jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
-		        "other", "other", false, em);
+        @SuppressWarnings("unused")
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-checkargs/",
+                "jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
+                "other", "other", false, em);
 
-		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
-		Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
 
-		JqmEngine engine1 = new JqmEngine();
-		engine1.start("localhost");
-		Thread.sleep(5000);
-		engine1.stop();
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        Thread.sleep(5000);
+        engine1.stop();
 
-		Assert.assertEquals(true, true);
-	}
+        Assert.assertEquals(true, true);
+    }
 
-	@Test
-	public void testOverrideParmeters() throws Exception
-	{
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("Starting test testOverrideParameters");
-		EntityManager em = Helpers.getNewEm();
-		TestHelpers.cleanup(em);
-		TestHelpers.createLocalNode(em);
+    @Test
+    public void testOverrideParmeters() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testOverrideParameters");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
 
-		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp = CreationTools.createJobDefParameter("arg1", "Gaston Lagaffe", em);
-		JobDefParameter jdp2 = CreationTools.createJobDefParameter("arg2", "Franquin", em);
-		jdargs.add(jdp);
-		jdargs.add(jdp2);
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        JobDefParameter jdp = CreationTools.createJobDefParameter("arg1", "Gaston Lagaffe", em);
+        JobDefParameter jdp2 = CreationTools.createJobDefParameter("arg2", "Franquin", em);
+        jdargs.add(jdp);
+        jdargs.add(jdp2);
 
-		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-checkargs/",
-		        "jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
-		        "other", "other", false, em);
+        @SuppressWarnings("unused")
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-checkargs/",
+                "jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
+                "other", "other", false, em);
 
-		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
-		j.addParameter("arg1", "argument1");
-		j.addParameter("arg2", "argument2");
+        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        j.addParameter("arg1", "argument1");
+        j.addParameter("arg2", "argument2");
 
-		Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
 
-		JqmEngine engine1 = new JqmEngine();
-		engine1.start("localhost");
-		Thread.sleep(5000);
-		engine1.stop();
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        Thread.sleep(5000);
+        engine1.stop();
 
-		Assert.assertEquals(true, true);
-	}
+        Assert.assertEquals(true, true);
+    }
 }

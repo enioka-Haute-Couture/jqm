@@ -20,9 +20,9 @@ import com.enioka.jqm.api.JobBase;
 
 public class App extends JobBase
 {
-	@Override
-	public void start()
-	{
-		System.exit(1);
-	}
+    @Override
+    public void start()
+    {
+        System.exit(1);
+    }
 }

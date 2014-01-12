@@ -22,12 +22,12 @@ import com.enioka.jqm.api.JobBase;
 
 public class App extends JobBase
 {
-	private static final Logger LOG = Logger.getLogger(App.class);
+    private static final Logger LOG = Logger.getLogger(App.class);
 
-	@Override
-	public void start()
-	{
-		LOG.warn("WARN test");
-		throw new Error("test error");
-	}
+    @Override
+    public void start()
+    {
+        LOG.warn("WARN test");
+        throw new Error("test error");
+    }
 }

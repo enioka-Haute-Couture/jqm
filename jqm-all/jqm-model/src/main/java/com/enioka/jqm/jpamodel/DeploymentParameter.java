@@ -29,75 +29,84 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="DeploymentParameter")
+@Table(name = "DeploymentParameter")
 public class DeploymentParameter
 {
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Integer id;
-	@Column(nullable=true, name="classId")
-	private Integer classId;
-	@ManyToOne(fetch=FetchType.LAZY, targetEntity=com.enioka.jqm.jpamodel.Node.class)
-	@JoinColumn(name="node", nullable=false)
-	private Node node;
-	@Column(nullable=false, name="nbThread")
-	private Integer nbThread;
-	@Column(name="pollingInterval", nullable=false)
-	private Integer pollingInterval;
-	@ManyToOne(targetEntity=com.enioka.jqm.jpamodel.Queue.class)
-	@JoinColumn(name="queue", nullable=false)
-	private Queue queue;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+    @Column(nullable = true, name = "classId")
+    private Integer classId;
+    @ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.Node.class)
+    @JoinColumn(name = "node", nullable = false)
+    private Node node;
+    @Column(nullable = false, name = "nbThread")
+    private Integer nbThread;
+    @Column(name = "pollingInterval", nullable = false)
+    private Integer pollingInterval;
+    @ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Queue.class)
+    @JoinColumn(name = "queue", nullable = false)
+    private Queue queue;
 
+    public Integer getId()
+    {
+        return id;
+    }
 
+    public void setId(final Integer id)
+    {
+        this.id = id;
+    }
 
-	public Integer getId()
-	{
-		return id;
-	}
-	public void setId(final Integer id)
-	{
-		this.id = id;
-	}
-	public Integer getClassId()
-	{
-		return classId;
-	}
-	public void setClassId(final Integer classId)
-	{
-		this.classId = classId;
-	}
-	public void setNbThread(final Integer nbThread)
-	{
-		this.nbThread = nbThread;
-	}
-	public Node getNode()
-	{
-		return node;
-	}
-	public void setNode(final Node node)
-	{
-		this.node = node;
-	}
-	public Integer getPollingInterval()
-	{
-		return pollingInterval;
-	}
-	public void setPollingInterval(final Integer pollingInterval)
-	{
-		this.pollingInterval = pollingInterval;
-	}
-	public Integer getNbThread()
-	{
-		return nbThread;
-	}
+    public Integer getClassId()
+    {
+        return classId;
+    }
 
-	public Queue getQueue() {
+    public void setClassId(final Integer classId)
+    {
+        this.classId = classId;
+    }
 
-		return queue;
-	}
+    public void setNbThread(final Integer nbThread)
+    {
+        this.nbThread = nbThread;
+    }
 
-	public void setQueue(final Queue queue) {
+    public Node getNode()
+    {
+        return node;
+    }
 
-		this.queue = queue;
-	}
+    public void setNode(final Node node)
+    {
+        this.node = node;
+    }
+
+    public Integer getPollingInterval()
+    {
+        return pollingInterval;
+    }
+
+    public void setPollingInterval(final Integer pollingInterval)
+    {
+        this.pollingInterval = pollingInterval;
+    }
+
+    public Integer getNbThread()
+    {
+        return nbThread;
+    }
+
+    public Queue getQueue()
+    {
+
+        return queue;
+    }
+
+    public void setQueue(final Queue queue)
+    {
+
+        this.queue = queue;
+    }
 }

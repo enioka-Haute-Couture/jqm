@@ -18,14 +18,13 @@
 
 import com.enioka.jqm.api.JobBase;
 
+public class App extends JobBase
+{
 
-
-public class App extends JobBase{
-
-	@Override
-	public void start()
-	{
-		System.out.println((this.getParameters().containsValue("argument1")) ? true : false);
-		System.out.println((this.getParameters().containsValue("argument2")) ? true : false);
-	}
+    @Override
+    public void start()
+    {
+        System.out.println((this.getParameters().containsValue("argument1")) ? true : false);
+        System.out.println((this.getParameters().containsValue("argument2")) ? true : false);
+    }
 }

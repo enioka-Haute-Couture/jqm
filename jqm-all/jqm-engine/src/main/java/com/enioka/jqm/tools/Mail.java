@@ -37,73 +37,76 @@ import com.enioka.jqm.jpamodel.JobInstance;
 
 class Mail
 {
-	private Logger jqmlogger = Logger.getLogger(Mail.class);
-	private String to = null;
-	private String from = null;
-	private String host = null;
-	private JobInstance ji = null;
-	private String port = null;
-	private String pwd = "marsu1952";
+    private Logger jqmlogger = Logger.getLogger(Mail.class);
+    private String to = null;
+    private String from = null;
+    private String host = null;
+    private JobInstance ji = null;
+    private String port = null;
+    private String pwd = "marsu1952";
 
-	Mail(JobInstance ji, EntityManager em)
-	{
-		try
-		{
-			this.host = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-					.setParameter("k", "mailSmtp").getSingleResult();
-			this.from = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-					.setParameter("k", "mailFrom").getSingleResult();
-			this.ji = ji;
-			this.port = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-					.setParameter("k", "mailPort").getSingleResult();
-			this.to = ji.getEmail();
-		} catch (NoResultException e)
-		{
-			jqmlogger.debug("Some information have been forgotten. JQM can't send emails", e);
-		}
-	}
+    Mail(JobInstance ji, EntityManager em)
+    {
+        try
+        {
+            this.host = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
+                    .setParameter("k", "mailSmtp").getSingleResult();
+            this.from = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
+                    .setParameter("k", "mailFrom").getSingleResult();
+            this.ji = ji;
+            this.port = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
+                    .setParameter("k", "mailPort").getSingleResult();
+            this.to = ji.getEmail();
+        }
+        catch (NoResultException e)
+        {
+            jqmlogger.debug("Some information have been forgotten. JQM can't send emails", e);
+        }
+    }
 
-	void send()
-	{
-		jqmlogger.debug("Preparation of the email");
-		jqmlogger.debug("The email will be sent to: " + to);
-		Properties props = new Properties();
-		props.put("mail.smtp.auth", "true");
-		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.smtp.host", host);
-		props.put("mail.smtp.port", port);
-		props.put("mail.smtp.connectiontimeout", 5000);
-		props.put("mail.smtp.timeout", 5000);
-		props.put("mail.smtp.writetimeout", 5000);
+    void send()
+    {
+        jqmlogger.debug("Preparation of the email");
+        jqmlogger.debug("The email will be sent to: " + to);
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", port);
+        props.put("mail.smtp.connectiontimeout", 5000);
+        props.put("mail.smtp.timeout", 5000);
+        props.put("mail.smtp.writetimeout", 5000);
 
-		Session session = Session.getInstance(props, new javax.mail.Authenticator()
-		{
-			@Override
-			protected PasswordAuthentication getPasswordAuthentication()
-			{
-				return new PasswordAuthentication(to, pwd);
-			}
-		});
+        Session session = Session.getInstance(props, new javax.mail.Authenticator()
+        {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication()
+            {
+                return new PasswordAuthentication(to, pwd);
+            }
+        });
 
-		MimeMessage msg = new MimeMessage(session);
-		try
-		{
-			msg.setFrom(new InternetAddress(from));
-			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-			msg.setSubject("[JQM] Job: " + ji.getId() + " ENDED");
-			msg.setText("The Job number " + ji.getId() + " finished correctly\n\n" + "Job description:\n" + "- Job definition: "
-					+ ji.getJd().getApplicationName() + "\n" + "- Parent: " + ji.getParentId() + "\n" + "- User name: " + ji.getUserName()
-					+ "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "- Queue: " + ji.getQueue().getName() + "\n" + "- Node: "
-					+ ji.getNode().getListeningInterface() + "\n" + "Best regards,\n");
+        MimeMessage msg = new MimeMessage(session);
+        try
+        {
+            msg.setFrom(new InternetAddress(from));
+            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+            msg.setSubject("[JQM] Job: " + ji.getId() + " ENDED");
+            msg.setText("The Job number " + ji.getId() + " finished correctly\n\n" + "Job description:\n" + "- Job definition: "
+                    + ji.getJd().getApplicationName() + "\n" + "- Parent: " + ji.getParentId() + "\n" + "- User name: " + ji.getUserName()
+                    + "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "- Queue: " + ji.getQueue().getName() + "\n" + "- Node: "
+                    + ji.getNode().getListeningInterface() + "\n" + "Best regards,\n");
 
-			Transport.send(msg);
-			jqmlogger.debug("Email sent successfully...");
-		} catch (AddressException e)
-		{
-			jqmlogger.warn("Could not send email. Job has nevertheless run correctly", e);
-		} catch (MessagingException e)
-		{
-			jqmlogger.warn("Could not send email. Job has nevertheless run correctly", e);
-		}
-	}
+            Transport.send(msg);
+            jqmlogger.debug("Email sent successfully...");
+        }
+        catch (AddressException e)
+        {
+            jqmlogger.warn("Could not send email. Job has nevertheless run correctly", e);
+        }
+        catch (MessagingException e)
+        {
+            jqmlogger.warn("Could not send email. Job has nevertheless run correctly", e);
+        }
+    }
 }

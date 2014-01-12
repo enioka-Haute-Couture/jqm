@@ -28,50 +28,55 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="JobDefParameter")
-public class JobDefParameter implements Serializable{
+@Table(name = "JobDefParameter")
+public class JobDefParameter implements Serializable
+{
 
-	/**
+    /**
 	 *
 	 */
-	private static final long serialVersionUID = -5308516206913425230L;
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Integer id;
-	@Column(nullable=false, length=50, name="KEYNAME")
-	private String key;
-	@Column(nullable=false, length=1000, name="VALUE")
-	private String value;
+    private static final long serialVersionUID = -5308516206913425230L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+    @Column(nullable = false, length = 50, name = "KEYNAME")
+    private String key;
+    @Column(nullable = false, length = 1000, name = "VALUE")
+    private String value;
 
-	public JobParameter jDPtoJP(JobDefParameter jdp) {
+    public JobParameter jDPtoJP(JobDefParameter jdp)
+    {
 
-		final JobParameter jp = new JobParameter();
+        final JobParameter jp = new JobParameter();
 
-		jp.setKey(jdp.getKey());
-		jp.setValue(jdp.getValue());
+        jp.setKey(jdp.getKey());
+        jp.setValue(jdp.getValue());
 
-		return jp;
-	}
+        return jp;
+    }
 
+    public String getKey()
+    {
 
-	public String getKey() {
+        return key;
+    }
 
-		return key;
-	}
+    public void setKey(final String key)
+    {
 
-	public void setKey(final String key) {
+        this.key = key;
+    }
 
-		this.key = key;
-	}
+    public String getValue()
+    {
 
-	public String getValue() {
+        return value;
+    }
 
-		return value;
-	}
+    public void setValue(final String value)
+    {
 
-	public void setValue(final String value) {
-
-		this.value = value;
-	}
+        this.value = value;
+    }
 
 }

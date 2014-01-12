@@ -28,84 +28,84 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="DatabaseProp")
+@Table(name = "DatabaseProp")
 public class DatabaseProp implements Serializable
 {
 
-	/**
+    /**
 	 *
 	 */
-	private static final long serialVersionUID = 5286608402747360301L;
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	protected Integer id;
-	@Column(nullable = false, name="driver")
-	private String driver;
-	@Column(nullable = false, name="name", unique = true)
-	private String name;
-	@Column(nullable = false, name="url")
-	private String url;
-	@Column(nullable = false, name = "username")
-	private String userName;
-	@Column(nullable = false, name="pwd")
-	private String pwd;
+    private static final long serialVersionUID = 5286608402747360301L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    protected Integer id;
+    @Column(nullable = false, name = "driver")
+    private String driver;
+    @Column(nullable = false, name = "name", unique = true)
+    private String name;
+    @Column(nullable = false, name = "url")
+    private String url;
+    @Column(nullable = false, name = "username")
+    private String userName;
+    @Column(nullable = false, name = "pwd")
+    private String pwd;
 
-	public String getDriver()
-	{
-		return driver;
-	}
+    public String getDriver()
+    {
+        return driver;
+    }
 
-	public void setDriver(final String driver)
-	{
-		this.driver = driver;
-	}
+    public void setDriver(final String driver)
+    {
+        this.driver = driver;
+    }
 
-	public String getUrl()
-	{
-		return url;
-	}
+    public String getUrl()
+    {
+        return url;
+    }
 
-	public void setUrl(final String url)
-	{
-		this.url = url;
-	}
+    public void setUrl(final String url)
+    {
+        this.url = url;
+    }
 
-	public String getUserName()
-	{
-		return userName;
-	}
+    public String getUserName()
+    {
+        return userName;
+    }
 
-	public void setUserName(final String user)
-	{
-		this.userName = user;
-	}
+    public void setUserName(final String user)
+    {
+        this.userName = user;
+    }
 
-	public String getPwd()
-	{
-		return pwd;
-	}
+    public String getPwd()
+    {
+        return pwd;
+    }
 
-	public void setPwd(final String pwd)
-	{
+    public void setPwd(final String pwd)
+    {
 
-		this.pwd = pwd;
-	}
+        this.pwd = pwd;
+    }
 
-	public Integer getId()
-	{
+    public Integer getId()
+    {
 
-		return id;
-	}
+        return id;
+    }
 
-	public String getName()
-	{
+    public String getName()
+    {
 
-		return name;
-	}
+        return name;
+    }
 
-	public void setName(final String name)
-	{
+    public void setName(final String name)
+    {
 
-		this.name = name;
-	}
+        this.name = name;
+    }
 }

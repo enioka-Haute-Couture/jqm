@@ -31,54 +31,61 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="Message")
-public class Message implements Serializable{
+@Table(name = "Message")
+public class Message implements Serializable
+{
 
-	private static final long serialVersionUID = 1234354709423602792L;
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Integer id;
-	@Column(length=1000, name="textMessage")
-	private String textMessage;
-	@ManyToOne(optional=false, fetch=FetchType.EAGER)
-	@JoinColumn(name="message_history", nullable=false)
-	private History history;
+    private static final long serialVersionUID = 1234354709423602792L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+    @Column(length = 1000, name = "textMessage")
+    private String textMessage;
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @JoinColumn(name = "message_history", nullable = false)
+    private History history;
 
+    /**
+     * @return the id
+     */
+    public Integer getId()
+    {
+        return id;
+    }
 
-	/**
-	 * @return the id
-	 */
-	public Integer getId()
-	{
-		return id;
-	}
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(final Integer id)
-	{
-		this.id = id;
-	}
-	/**
-	 * @return the textMessage
-	 */
-	public String getTextMessage()
-	{
-		return textMessage;
-	}
-	/**
-	 * @param textMessage the textMessage to set
-	 */
-	public void setTextMessage(final String textMessage)
-	{
-		this.textMessage = textMessage;
-	}
-	public History getHistory()
-	{
-		return history;
-	}
-	public void setHistory(final History history)
-	{
-		this.history = history;
-	}
+    /**
+     * @param id
+     *            the id to set
+     */
+    public void setId(final Integer id)
+    {
+        this.id = id;
+    }
+
+    /**
+     * @return the textMessage
+     */
+    public String getTextMessage()
+    {
+        return textMessage;
+    }
+
+    /**
+     * @param textMessage
+     *            the textMessage to set
+     */
+    public void setTextMessage(final String textMessage)
+    {
+        this.textMessage = textMessage;
+    }
+
+    public History getHistory()
+    {
+        return history;
+    }
+
+    public void setHistory(final History history)
+    {
+        this.history = history;
+    }
 }

@@ -20,26 +20,25 @@ package com.enioka.jqm.tools;
 
 final class CheckFilePath
 {
-	private CheckFilePath()
-	{
-	}
+    private CheckFilePath()
+    {}
 
-	static boolean isValidFilePath(String fp)
-	{
-		Integer length = fp.length();
-		return (fp.charAt(length - 1) == '/');
+    static boolean isValidFilePath(String fp)
+    {
+        Integer length = fp.length();
+        return (fp.charAt(length - 1) == '/');
 
-	}
+    }
 
-	static String fixFilePath(String fp)
-	{
-		if (isValidFilePath(fp))
-		{
-			return fp;
-		}
-		else
-		{
-			return fp + "/";
-		}
-	}
+    static String fixFilePath(String fp)
+    {
+        if (isValidFilePath(fp))
+        {
+            return fp;
+        }
+        else
+        {
+            return fp + "/";
+        }
+    }
 }

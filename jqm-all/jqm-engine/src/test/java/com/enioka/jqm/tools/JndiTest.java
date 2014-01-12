@@ -39,243 +39,248 @@ import com.enioka.jqm.jpamodel.JobDefParameter;
 
 public class JndiTest
 {
-	public static Logger jqmlogger = Logger.getLogger(JndiTest.class);
-	public static Server s;
+    public static Logger jqmlogger = Logger.getLogger(JndiTest.class);
+    public static Server s;
 
-	@BeforeClass
-	public static void testInit() throws InterruptedException
-	{
-		s = new Server();
-		s.setDatabaseName(0, "testdbengine");
-		s.setDatabasePath(0, "mem:testdbengine");
-		s.setLogWriter(null);
-		s.setSilent(true);
-		s.start();
+    @BeforeClass
+    public static void testInit() throws InterruptedException
+    {
+        s = new Server();
+        s.setDatabaseName(0, "testdbengine");
+        s.setDatabasePath(0, "mem:testdbengine");
+        s.setLogWriter(null);
+        s.setSilent(true);
+        s.start();
 
-		Dispatcher.resetEM();
-		Helpers.resetEmf();
-	}
+        Dispatcher.resetEM();
+        Helpers.resetEmf();
+    }
 
-	@AfterClass
-	public static void end()
-	{
-		s.shutdown();
-		s.stop();
-	}
+    @AfterClass
+    public static void end()
+    {
+        s.shutdown();
+        s.stop();
+    }
 
-	// @Test
-	// NOT AN AUTO TEST: this requires to have MQ Series jars which are not libre software!
-	public void testJmsWmq() throws Exception
-	{
-		EntityManager em = Helpers.getNewEm();
-		TestHelpers.cleanup(em);
-		TestHelpers.createLocalNode(em);
+    // @Test
+    // NOT AN AUTO TEST: this requires to have MQ Series jars which are not libre software!
+    public void testJmsWmq() throws Exception
+    {
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
 
-		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 
-		@SuppressWarnings("unused")
-		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-wmq/",
-		        "jqm-test-jndijms-wmq/jqm-test-jndijms-wmq.jar", TestHelpers.qVip, 42, "Jms", "Franquin", "ModuleMachin", "other1",
-		        "other2", "other3", false, em);
+        @SuppressWarnings("unused")
+        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-wmq/",
+                "jqm-test-jndijms-wmq/jqm-test-jndijms-wmq.jar", TestHelpers.qVip, 42, "Jms", "Franquin", "ModuleMachin", "other1",
+                "other2", "other3", false, em);
 
-		JobDefinition form = new JobDefinition("Jms", "MAG");
-		form.addParameter("p1", "1");
-		form.addParameter("p2", "2");
-		Dispatcher.enQueue(form);
+        JobDefinition form = new JobDefinition("Jms", "MAG");
+        form.addParameter("p1", "1");
+        form.addParameter("p2", "2");
+        Dispatcher.enQueue(form);
 
-		// Create JMS JNDI references for use by the test jar
-		em.getTransaction().begin();
-		em.persist(CreationTools.createJndiQueueMQSeries(em, "jms/testqueue", "test Queue", "Q.GEO.OUT", null));
-		em.persist(CreationTools.createJndiQcfMQSeries(em, "jms/qcf", "test QCF", "10.0.1.90", "QM.TEC1", 1414, "WASCHANNEL"));
-		em.getTransaction().commit();
+        // Create JMS JNDI references for use by the test jar
+        em.getTransaction().begin();
+        em.persist(CreationTools.createJndiQueueMQSeries(em, "jms/testqueue", "test Queue", "Q.GEO.OUT", null));
+        em.persist(CreationTools.createJndiQcfMQSeries(em, "jms/qcf", "test QCF", "10.0.1.90", "QM.TEC1", 1414, "WASCHANNEL"));
+        em.getTransaction().commit();
 
-		// Start the engine
-		JqmEngine engine1 = new JqmEngine();
-		engine1.start( "localhost" );
+        // Start the engine
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
 
-		Thread.sleep(10000);
-		engine1.stop();
+        Thread.sleep(10000);
+        engine1.stop();
 
-		long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
-		Assert.assertTrue(i == 1);
+        long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
+        Assert.assertTrue(i == 1);
 
-		History h = null;
-		try
-		{
-			h = (History) em.createQuery("SELECT h FROM History h").getSingleResult();
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-			Assert.fail("History object was not created");
-			throw e;
-		}
+        History h = null;
+        try
+        {
+            h = (History) em.createQuery("SELECT h FROM History h").getSingleResult();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Assert.fail("History object was not created");
+            throw e;
+        }
 
-		Assert.assertEquals("ENDED", h.getStatus()); // Exception in jar => CRASHED
-	}
+        Assert.assertEquals("ENDED", h.getStatus()); // Exception in jar => CRASHED
+    }
 
-	@Test
-	public void testJmsAmq() throws Exception
-	{
-		jqmlogger.debug("AMQ: Starting");
-		EntityManager em = Helpers.getNewEm();
-		TestHelpers.cleanup(em);
-		TestHelpers.createLocalNode(em);
+    @Test
+    public void testJmsAmq() throws Exception
+    {
+        jqmlogger.debug("AMQ: Starting");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
 
-		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 
-		@SuppressWarnings("unused")
-		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-amq/",
-		        "jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
-		        "other2", false, em);
+        @SuppressWarnings("unused")
+        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-amq/",
+                "jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
+                "other2", false, em);
 
-		JobDefinition form = new JobDefinition("Jms", "MAG");
-		Dispatcher.enQueue(form);
+        JobDefinition form = new JobDefinition("Jms", "MAG");
+        Dispatcher.enQueue(form);
 
-		// Create JMS JNDI references for use by the test jar
-		em.getTransaction().begin();
-		CreationTools.createJndiQueueActiveMQ(em, "jms/testqueue", "test queue", "Q.TEST", null);
-		CreationTools.createJndiQcfActiveMQ(em, "jms/qcf", "test QCF", "vm:broker:(tcp://localhost:1234)?persistent=false&useJmx=false",
-		        null);
-		em.getTransaction().commit();
+        // Create JMS JNDI references for use by the test jar
+        em.getTransaction().begin();
+        CreationTools.createJndiQueueActiveMQ(em, "jms/testqueue", "test queue", "Q.TEST", null);
+        CreationTools.createJndiQcfActiveMQ(em, "jms/qcf", "test QCF", "vm:broker:(tcp://localhost:1234)?persistent=false&useJmx=false",
+                null);
+        em.getTransaction().commit();
 
-		// Start the engine
-		JqmEngine engine1 = new JqmEngine();
-		engine1.start( "localhost" );
+        // Start the engine
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
 
-		Thread.sleep(10000);
-		engine1.stop();
+        Thread.sleep(10000);
+        engine1.stop();
 
-		History h = null;
-		try
-		{
-			h = (History) em.createQuery("SELECT h FROM History h").getSingleResult();
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-			Assert.fail("History object was not created");
-			throw e;
-		}
+        History h = null;
+        try
+        {
+            h = (History) em.createQuery("SELECT h FROM History h").getSingleResult();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Assert.fail("History object was not created");
+            throw e;
+        }
 
-		Assert.assertEquals("ENDED", h.getStatus()); // Exception in jar => CRASHED
-	}
+        Assert.assertEquals("ENDED", h.getStatus()); // Exception in jar => CRASHED
+    }
 
-	@Test
-	public void testJmsAmqWrongAlias() throws Exception
-	{
-		jqmlogger.debug("WRONG ALIAS: Starting");
-		EntityManager em = Helpers.getNewEm();
-		TestHelpers.cleanup(em);
-		TestHelpers.createLocalNode(em);
+    @Test
+    public void testJmsAmqWrongAlias() throws Exception
+    {
+        jqmlogger.debug("WRONG ALIAS: Starting");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
 
-		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 
-		@SuppressWarnings("unused")
-		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-amq/",
-		        "jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
-		        "other2", false, em);
+        @SuppressWarnings("unused")
+        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-amq/",
+                "jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
+                "other2", false, em);
 
-		JobDefinition form = new JobDefinition("Jms", "MAG");
-		Dispatcher.enQueue(form);
+        JobDefinition form = new JobDefinition("Jms", "MAG");
+        Dispatcher.enQueue(form);
 
-		// Create JMS JNDI references for use by the test jar
-		em.getTransaction().begin();
-		CreationTools.createJndiQueueActiveMQ(em, "jms/testqueue", "test queue", "Q.TEST", null);
-		CreationTools.createJndiQcfActiveMQ(em, "jms/qcf2", "test QCF", "vm:broker:(tcp://localhost:1234)?persistent=false&useJmx=false",
-		        null);
-		em.getTransaction().commit();
+        // Create JMS JNDI references for use by the test jar
+        em.getTransaction().begin();
+        CreationTools.createJndiQueueActiveMQ(em, "jms/testqueue", "test queue", "Q.TEST", null);
+        CreationTools.createJndiQcfActiveMQ(em, "jms/qcf2", "test QCF", "vm:broker:(tcp://localhost:1234)?persistent=false&useJmx=false",
+                null);
+        em.getTransaction().commit();
 
-		// Start the engine
-		JqmEngine engine1 = new JqmEngine();
-		engine1.start( "localhost" );
+        // Start the engine
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
 
-		Thread.sleep(10000);
-		engine1.stop();
+        Thread.sleep(10000);
+        engine1.stop();
 
-		History h = null;
-		try
-		{
-			h = (History) em.createQuery("SELECT h FROM History h").getSingleResult();
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-			Assert.fail("History object was not created");
-			throw e;
-		}
+        History h = null;
+        try
+        {
+            h = (History) em.createQuery("SELECT h FROM History h").getSingleResult();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Assert.fail("History object was not created");
+            throw e;
+        }
 
-		Assert.assertEquals("CRASHED", h.getStatus()); // Exception in jar => CRASHED
-	}
+        Assert.assertEquals("CRASHED", h.getStatus()); // Exception in jar => CRASHED
+    }
 
-	@Test
-	public void testDefCon() throws Exception
-	{
-		jqmlogger.debug("Default connection: Starting");
-		EntityManager em = Helpers.getNewEm();
-		TestHelpers.cleanup(em);
-		TestHelpers.createLocalNode(em);
+    @Test
+    public void testDefCon() throws Exception
+    {
+        jqmlogger.debug("Default connection: Starting");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
 
-		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 
-		@SuppressWarnings("unused")
-		JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-defcon/", "jqm-test-defcon/jqm-test-defcon.jar",
-		        TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+        @SuppressWarnings("unused")
+        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-defcon/", "jqm-test-defcon/jqm-test-defcon.jar",
+                TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
 
-		JobDefinition form = new JobDefinition("Jms", "MAG");
-		Dispatcher.enQueue(form);
+        JobDefinition form = new JobDefinition("Jms", "MAG");
+        Dispatcher.enQueue(form);
 
-		// Start the engine
-		JqmEngine engine1 = new JqmEngine();
-		engine1.start( "localhost" );
+        // Start the engine
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
 
-		Thread.sleep(3000);
-		engine1.stop();
+        Thread.sleep(3000);
+        engine1.stop();
 
-		TestHelpers.printJobInstanceTable();
+        TestHelpers.printJobInstanceTable();
 
-		History h = null;
-		try
-		{
-			h = (History) Helpers.getNewEm().createQuery("SELECT h FROM History h").getSingleResult();
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-			Assert.fail("History object was not created");
-			throw e;
-		}
+        History h = null;
+        try
+        {
+            h = (History) Helpers.getNewEm().createQuery("SELECT h FROM History h").getSingleResult();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Assert.fail("History object was not created");
+            throw e;
+        }
 
-		Assert.assertEquals("ENDED", h.getStatus()); // Exception in jar => CRASHED
-	}
+        Assert.assertEquals("ENDED", h.getStatus()); // Exception in jar => CRASHED
+    }
 
-	@Test
-	public void testFileJndi() throws Exception
-	{
-		jqmlogger.debug("FILE JNDI: Starting");
-		EntityManager em = Helpers.getNewEm();
-		TestHelpers.cleanup(em);
-		TestHelpers.createLocalNode(em);
+    @Test
+    public void testFileJndi() throws Exception
+    {
+        jqmlogger.debug("FILE JNDI: Starting");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
 
-		// Create JMS JNDI references for use by the test jar
-		String path = "./testdir";
-		em.getTransaction().begin();
-		CreationTools.createJndiFile(em, "fs/testdirectory", "test directory", path);
-		em.getTransaction().commit();
+        // Create JMS JNDI references for use by the test jar
+        String path = "./testdir";
+        em.getTransaction().begin();
+        CreationTools.createJndiFile(em, "fs/testdirectory", "test directory", path);
+        em.getTransaction().commit();
 
-		// Create the directory...
-		(new File(path)).mkdir();
+        // Create the directory...
+        (new File(path)).mkdir();
 
-		// Start the engine to init the JNDI context
-		JqmEngine engine1 = new JqmEngine();
-		engine1.start("localhost");
-		engine1.stop();
+        // Start the engine to init the JNDI context
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        engine1.stop();
 
-		try
-		{
-			File f = (File) NamingManager.getInitialContext(null).lookup("fs/testdirectory");
-			Assert.assertTrue(f.isDirectory());
-			f.delete();
-		} catch (Exception e)
-		{
-			Assert.fail(e.getMessage());
-		}
-	}
+        try
+        {
+            File f = (File) NamingManager.getInitialContext(null).lookup("fs/testdirectory");
+            Assert.assertTrue(f.isDirectory());
+            f.delete();
+        }
+        catch (Exception e)
+        {
+            Assert.fail(e.getMessage());
+        }
+    }
 
 }

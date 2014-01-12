@@ -37,86 +37,90 @@ import org.xml.sax.SAXException;
 
 class Dependencies
 {
-	private List<String> list = new ArrayList<String>();
-	private static Logger jqmlogger = Logger.getLogger(Dependencies.class);
+    private List<String> list = new ArrayList<String>();
+    private static Logger jqmlogger = Logger.getLogger(Dependencies.class);
 
-	Dependencies(String path)
-	{
-		File fXmlFile = new File(path);
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder;
-		String dep = "";
+    Dependencies(String path)
+    {
+        File fXmlFile = new File(path);
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder;
+        String dep = "";
 
-		try
-		{
-			jqmlogger.debug(fXmlFile.getPath());
-			jqmlogger.debug("Working Directory = " + System.getProperty("user.dir"));
-			if (fXmlFile == null || !fXmlFile.isFile())
-			{
-				throw new FileNotFoundException("The XML file " + fXmlFile + " was not found");
-			}
+        try
+        {
+            jqmlogger.debug(fXmlFile.getPath());
+            jqmlogger.debug("Working Directory = " + System.getProperty("user.dir"));
+            if (fXmlFile == null || !fXmlFile.isFile())
+            {
+                throw new FileNotFoundException("The XML file " + fXmlFile + " was not found");
+            }
 
-			dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(fXmlFile);
+            dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(fXmlFile);
 
-			doc.getDocumentElement().normalize();
+            doc.getDocumentElement().normalize();
 
-			NodeList nList = doc.getElementsByTagName("parent");
+            NodeList nList = doc.getElementsByTagName("parent");
 
-			for (int temp = 0; temp < nList.getLength(); temp++)
-			{
-				Node nNode = nList.item(temp);
-				if (nNode.getNodeType() == Node.ELEMENT_NODE)
-				{
-					Element eElement = (Element) nNode;
+            for (int temp = 0; temp < nList.getLength(); temp++)
+            {
+                Node nNode = nList.item(temp);
+                if (nNode.getNodeType() == Node.ELEMENT_NODE)
+                {
+                    Element eElement = (Element) nNode;
 
-					dep += eElement.getElementsByTagName("groupId").item(0).getTextContent().toString() + ":";
-					dep += eElement.getElementsByTagName("artifactId").item(0).getTextContent().toString() + ":pom:";
-					dep += eElement.getElementsByTagName("version").item(0).getTextContent().toString();
+                    dep += eElement.getElementsByTagName("groupId").item(0).getTextContent().toString() + ":";
+                    dep += eElement.getElementsByTagName("artifactId").item(0).getTextContent().toString() + ":pom:";
+                    dep += eElement.getElementsByTagName("version").item(0).getTextContent().toString();
 
-					list.add(dep);
-					dep = "";
-				}
-			}
+                    list.add(dep);
+                    dep = "";
+                }
+            }
 
-			nList = doc.getElementsByTagName("dependency");
+            nList = doc.getElementsByTagName("dependency");
 
-			for (int temp = 0; temp < nList.getLength(); temp++)
-			{
-				Node nNode = nList.item(temp);
-				if (nNode.getNodeType() == Node.ELEMENT_NODE)
-				{
-					Element eElement = (Element) nNode;
+            for (int temp = 0; temp < nList.getLength(); temp++)
+            {
+                Node nNode = nList.item(temp);
+                if (nNode.getNodeType() == Node.ELEMENT_NODE)
+                {
+                    Element eElement = (Element) nNode;
 
-					dep += eElement.getElementsByTagName("groupId").item(0).getTextContent().toString() + ":";
-					dep += eElement.getElementsByTagName("artifactId").item(0).getTextContent().toString() + ":";
-					dep += eElement.getElementsByTagName("version").item(0).getTextContent().toString();
+                    dep += eElement.getElementsByTagName("groupId").item(0).getTextContent().toString() + ":";
+                    dep += eElement.getElementsByTagName("artifactId").item(0).getTextContent().toString() + ":";
+                    dep += eElement.getElementsByTagName("version").item(0).getTextContent().toString();
 
-					list.add(dep);
-					dep = "";
-				}
-			}
+                    list.add(dep);
+                    dep = "";
+                }
+            }
 
-		} catch (ParserConfigurationException e)
-		{
-			jqmlogger.error(e);
-		} catch (SAXException e)
-		{
-			jqmlogger.error("Invalid XML architecture. Please, fix correctly the dependencies", e);
-		} catch (IOException e)
-		{
-			jqmlogger.error("Invalid pom.xml. Please check the pom.xml & its filepath " + path, e);
-		} catch (Exception e)
-		{
-			jqmlogger.error("Invalid pom.xml. Please check the pom.xml & its filepath " + path, e);
-		}
-	}
+        }
+        catch (ParserConfigurationException e)
+        {
+            jqmlogger.error(e);
+        }
+        catch (SAXException e)
+        {
+            jqmlogger.error("Invalid XML architecture. Please, fix correctly the dependencies", e);
+        }
+        catch (IOException e)
+        {
+            jqmlogger.error("Invalid pom.xml. Please check the pom.xml & its filepath " + path, e);
+        }
+        catch (Exception e)
+        {
+            jqmlogger.error("Invalid pom.xml. Please check the pom.xml & its filepath " + path, e);
+        }
+    }
 
-	/**
-	 * @return the list
-	 */
-	List<String> getList()
-	{
-		return list;
-	}
+    /**
+     * @return the list
+     */
+    List<String> getList()
+    {
+        return list;
+    }
 }

@@ -25,49 +25,52 @@ package com.enioka.jqm.api;
  */
 public class Queue
 {
-	private int id;
-	private String name;
-	private String description;
+    private int id;
+    private String name;
+    private String description;
 
-	/**
-	 * Each queue has a unique ID
-	 * @return
-	 */
-	public int getId()
-	{
-		return id;
-	}
+    /**
+     * Each queue has a unique ID
+     * 
+     * @return
+     */
+    public int getId()
+    {
+        return id;
+    }
 
-	void setId(int id)
-	{
-		this.id = id;
-	}
+    void setId(int id)
+    {
+        this.id = id;
+    }
 
-	/**
-	 * Name of the queue, usually descriptive.
-	 * @return
-	 */
-	public String getName()
-	{
-		return name;
-	}
+    /**
+     * Name of the queue, usually descriptive.
+     * 
+     * @return
+     */
+    public String getName()
+    {
+        return name;
+    }
 
-	void setName(String name)
-	{
-		this.name = name;
-	}
+    void setName(String name)
+    {
+        this.name = name;
+    }
 
-	/**
-	 * Queue description.
-	 * @return
-	 */
-	public String getDescription()
-	{
-		return description;
-	}
+    /**
+     * Queue description.
+     * 
+     * @return
+     */
+    public String getDescription()
+    {
+        return description;
+    }
 
-	void setDescription(String description)
-	{
-		this.description = description;
-	}
+    void setDescription(String description)
+    {
+        this.description = description;
+    }
 }

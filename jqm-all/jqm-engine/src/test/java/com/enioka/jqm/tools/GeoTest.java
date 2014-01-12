@@ -39,87 +39,87 @@ import com.enioka.jqm.jpamodel.JobDefParameter;
 
 public class GeoTest
 {
-	public static Logger jqmlogger = Logger.getLogger(GeoTest.class);
-	public static Server s;
+    public static Logger jqmlogger = Logger.getLogger(GeoTest.class);
+    public static Server s;
 
-	@BeforeClass
-	public static void testInit() throws InterruptedException, FileNotFoundException
-	{
-		s = new Server();
-		s.setDatabaseName(0, "testdbengine");
-		s.setDatabasePath(0, "mem:testdbengine");
-		s.setLogWriter(null);
-		s.setSilent(true);
-		s.start();
+    @BeforeClass
+    public static void testInit() throws InterruptedException, FileNotFoundException
+    {
+        s = new Server();
+        s.setDatabaseName(0, "testdbengine");
+        s.setDatabasePath(0, "mem:testdbengine");
+        s.setLogWriter(null);
+        s.setSilent(true);
+        s.start();
 
-		Dispatcher.resetEM();
-		Helpers.resetEmf();
-	}
+        Dispatcher.resetEM();
+        Helpers.resetEmf();
+    }
 
-	@AfterClass
-	public static void stop()
-	{
-		Dispatcher.resetEM();
-		s.shutdown();
-		s.stop();
-	}
+    @AfterClass
+    public static void stop()
+    {
+        Dispatcher.resetEM();
+        s.shutdown();
+        s.stop();
+    }
 
-	@Test
-	public void testGeo() throws Exception
-	{
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("Starting test testGeo");
-		EntityManager em = Helpers.getNewEm();
-		TestHelpers.cleanup(em);
-		TestHelpers.createLocalNode(em);
+    @Test
+    public void testGeo() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testGeo");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
 
-		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-		jdargs.add(jdp);
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+        jdargs.add(jdp);
 
-		@SuppressWarnings("unused")
-		JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar",
-		        TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+        @SuppressWarnings("unused")
+        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar",
+                TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
 
-		JobDefinition form = new JobDefinition("Geo", "MAG");
-		form.addParameter("nbJob", "1");
-		Dispatcher.enQueue(form);
+        JobDefinition form = new JobDefinition("Geo", "MAG");
+        form.addParameter("nbJob", "1");
+        Dispatcher.enQueue(form);
 
-		// Create JNDI connection to write inside the engine database
-		em.getTransaction().begin();
-		CreationTools.createDatabaseProp("jdbc/jqm", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em);
-		em.getTransaction().commit();
+        // Create JNDI connection to write inside the engine database
+        em.getTransaction().begin();
+        CreationTools.createDatabaseProp("jdbc/jqm", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em);
+        em.getTransaction().commit();
 
-		// Start the engine
-		JqmEngine engine1 = new JqmEngine();
-		JqmEngine engine2 = new JqmEngine();
-		JqmEngine engine3 = new JqmEngine();
-		engine1.start("localhost");
-		engine2.start("localhost4");
-		engine3.start("localhost5");
+        // Start the engine
+        JqmEngine engine1 = new JqmEngine();
+        JqmEngine engine2 = new JqmEngine();
+        JqmEngine engine3 = new JqmEngine();
+        engine1.start("localhost");
+        engine2.start("localhost4");
+        engine3.start("localhost5");
 
-		Thread.sleep(25000);
-		jqmlogger.debug("###############################################################");
-		jqmlogger.debug("SHUTDOWN");
-		jqmlogger.debug("###############################################################");
-		engine1.stop();
-		engine2.stop();
-		engine3.stop();
+        Thread.sleep(25000);
+        jqmlogger.debug("###############################################################");
+        jqmlogger.debug("SHUTDOWN");
+        jqmlogger.debug("###############################################################");
+        engine1.stop();
+        engine2.stop();
+        engine3.stop();
 
-		long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
-		Assert.assertTrue(i > 3);
-		TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
-		ArrayList<History> res = (ArrayList<History>) query.getResultList();
+        long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
+        Assert.assertTrue(i > 3);
+        TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
+        ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
-		for (History history : res)
-		{
-			if (history.getState() == "CRASHED")
-			{
-				Assert.fail("No job should be crashed");
-			}
-		}
+        for (History history : res)
+        {
+            if (history.getState() == "CRASHED")
+            {
+                Assert.fail("No job should be crashed");
+            }
+        }
 
-		Assert.assertEquals(511, res.size());
-	}
+        Assert.assertEquals(511, res.size());
+    }
 }

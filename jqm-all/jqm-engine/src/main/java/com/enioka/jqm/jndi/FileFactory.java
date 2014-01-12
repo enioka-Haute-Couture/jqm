@@ -10,23 +10,23 @@ import javax.naming.spi.ObjectFactory;
 
 class FileFactory implements ObjectFactory
 {
-	FileFactory()
-	{
+    FileFactory()
+    {
 
-	}
+    }
 
-	@Override
-	public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment) throws Exception
-	{
-		JndiResourceDescriptor resource = (JndiResourceDescriptor) obj;
-		if (resource.get("PATH") != null)
-		{
-			String path = (String) resource.get("PATH").getContent();
-			return new File(path);
-		}
-		else
-		{
-			throw new NamingException("Resource does not have a valid PATH parameter");
-		}
-	}
+    @Override
+    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment) throws Exception
+    {
+        JndiResourceDescriptor resource = (JndiResourceDescriptor) obj;
+        if (resource.get("PATH") != null)
+        {
+            String path = (String) resource.get("PATH").getContent();
+            return new File(path);
+        }
+        else
+        {
+            throw new NamingException("Resource does not have a valid PATH parameter");
+        }
+    }
 }

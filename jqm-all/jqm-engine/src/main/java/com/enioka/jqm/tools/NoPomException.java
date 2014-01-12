@@ -20,15 +20,15 @@ package com.enioka.jqm.tools;
 
 class NoPomException extends Exception
 {
-	private static final long serialVersionUID = -4667925633105269270L;
+    private static final long serialVersionUID = -4667925633105269270L;
 
-	NoPomException(String msg)
-	{
-		super(msg);
-	}
+    NoPomException(String msg)
+    {
+        super(msg);
+    }
 
-	NoPomException(String msg, Exception e)
-	{
-		super(msg, e);
-	}
+    NoPomException(String msg, Exception e)
+    {
+        super(msg, e);
+    }
 }

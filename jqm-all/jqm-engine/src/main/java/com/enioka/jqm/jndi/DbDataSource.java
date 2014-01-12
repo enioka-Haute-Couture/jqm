@@ -34,76 +34,75 @@ import javax.sql.DataSource;
  */
 public class DbDataSource implements DataSource, Serializable
 {
-	private static final long serialVersionUID = -7943086055863888338L;
-	private String connectionString, userName, password;
+    private static final long serialVersionUID = -7943086055863888338L;
+    private String connectionString, userName, password;
 
-	/**
-	 * Constructor
-	 * 
-	 * @param connStr
-	 * @param username
-	 * @param password
-	 */
-	public DbDataSource(String connStr, String username, String password)
-	{
-		this.connectionString = connStr;
-		this.userName = username;
-		this.password = password;
-	}
+    /**
+     * Constructor
+     * 
+     * @param connStr
+     * @param username
+     * @param password
+     */
+    public DbDataSource(String connStr, String username, String password)
+    {
+        this.connectionString = connStr;
+        this.userName = username;
+        this.password = password;
+    }
 
-	@Override
-	public Connection getConnection() throws SQLException
-	{
-		return DriverManager.getConnection(connectionString, userName, password);
-	}
+    @Override
+    public Connection getConnection() throws SQLException
+    {
+        return DriverManager.getConnection(connectionString, userName, password);
+    }
 
-	@Override
-	public int getLoginTimeout() throws SQLException
-	{
-		return 0;
-	}
+    @Override
+    public int getLoginTimeout() throws SQLException
+    {
+        return 0;
+    }
 
-	@Override
-	public void setLoginTimeout(int seconds) throws SQLException
-	{
-	}
+    @Override
+    public void setLoginTimeout(int seconds) throws SQLException
+    {}
 
-	@Override
-	public PrintWriter getLogWriter() throws SQLException
-	{
-		return null;
-	}
+    @Override
+    public PrintWriter getLogWriter() throws SQLException
+    {
+        return null;
+    }
 
-	@Override
-	public void setLogWriter(PrintWriter out) throws SQLException
-	{
-	}
+    @Override
+    public void setLogWriter(PrintWriter out) throws SQLException
+    {}
 
-	@Override
-	public <T> T unwrap(Class<T> iface) throws SQLException
-	{
-		return null;
-	}
+    @Override
+    public <T> T unwrap(Class<T> iface) throws SQLException
+    {
+        return null;
+    }
 
-	@Override
-	public boolean isWrapperFor(Class<?> iface) throws SQLException
-	{
-		return false;
-	}
+    @Override
+    public boolean isWrapperFor(Class<?> iface) throws SQLException
+    {
+        return false;
+    }
 
-	@Override
-	public Connection getConnection(String username, String password) throws SQLException
-	{
-		return null;
-	}
+    @Override
+    public Connection getConnection(String username, String password) throws SQLException
+    {
+        return null;
+    }
 
-	/**
-	 * Not supported.
-	 * @return an exception
-	 * @throws SQLFeatureNotSupportedException
-	 */
-	public Logger getParentLogger() throws SQLFeatureNotSupportedException
-	{
-		return null;
-	}
+    /**
+     * Not supported.
+     * 
+     * @return an exception
+     * @throws SQLFeatureNotSupportedException
+     */
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException
+    {
+        return null;
+    }
 }

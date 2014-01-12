@@ -20,15 +20,15 @@ package com.enioka.jqm.tools;
 
 class JqmEngineException extends Exception
 {
-	private static final long serialVersionUID = -5834325251715846234L;
+    private static final long serialVersionUID = -5834325251715846234L;
 
-	JqmEngineException(String msg)
-	{
-		super(msg);
-	}
+    JqmEngineException(String msg)
+    {
+        super(msg);
+    }
 
-	JqmEngineException(String msg, Exception e)
-	{
-		super(msg, e);
-	}
+    JqmEngineException(String msg, Exception e)
+    {
+        super(msg, e);
+    }
 }

@@ -29,49 +29,49 @@ import com.enioka.jqm.jpamodel.Queue;
 
 class ThreadPool
 {
-	private static Logger jqmlogger = Logger.getLogger(ThreadPool.class);
-	private Queue queue = null;
-	private int nbThread = 0;
-	private ExecutorService pool = null;
-	private Map<String, URL[]> cache = null;
+    private static Logger jqmlogger = Logger.getLogger(ThreadPool.class);
+    private Queue queue = null;
+    private int nbThread = 0;
+    private ExecutorService pool = null;
+    private Map<String, URL[]> cache = null;
 
-	ThreadPool(Queue queue, int n, Map<String, URL[]> cache)
-	{
-		this.queue = queue;
-		this.cache = cache;
-		nbThread = n;
-		pool = Executors.newFixedThreadPool(nbThread);
-	}
+    ThreadPool(Queue queue, int n, Map<String, URL[]> cache)
+    {
+        this.queue = queue;
+        this.cache = cache;
+        nbThread = n;
+        pool = Executors.newFixedThreadPool(nbThread);
+    }
 
-	void run(com.enioka.jqm.jpamodel.JobInstance ji, Polling p, boolean stop)
-	{
-		jqmlogger.info("Job instance will be inserted inside a thread pool: " + ji.getId());
-		jqmlogger.debug("ThreadPool ActualNbThread: " + p.getActualNbThread());
+    void run(com.enioka.jqm.jpamodel.JobInstance ji, Polling p, boolean stop)
+    {
+        jqmlogger.info("Job instance will be inserted inside a thread pool: " + ji.getId());
+        jqmlogger.debug("ThreadPool ActualNbThread: " + p.getActualNbThread());
 
-		if (stop)
-		{
-			System.exit(0);
-		}
-		else
-		{
-			pool.submit(new Loader(ji, cache, p));
-		}
-	}
+        if (stop)
+        {
+            System.exit(0);
+        }
+        else
+        {
+            pool.submit(new Loader(ji, cache, p));
+        }
+    }
 
-	void stop()
-	{
-		jqmlogger.debug("A thread pool will now try to stop");
-		this.pool.shutdown();
-		jqmlogger.debug("A thread pool has stopped properly");
-	}
+    void stop()
+    {
+        jqmlogger.debug("A thread pool will now try to stop");
+        this.pool.shutdown();
+        jqmlogger.debug("A thread pool has stopped properly");
+    }
 
-	Queue getQueue()
-	{
-		return queue;
-	}
+    Queue getQueue()
+    {
+        return queue;
+    }
 
-	int getNbThread()
-	{
-		return nbThread;
-	}
+    int getNbThread()
+    {
+        return nbThread;
+    }
 }

@@ -28,49 +28,56 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="JobHistoryParameter")
-public class JobHistoryParameter implements Serializable{
+@Table(name = "JobHistoryParameter")
+public class JobHistoryParameter implements Serializable
+{
 
-	/**
+    /**
 	 *
 	 */
-	private static final long serialVersionUID = -667768580903076029L;
+    private static final long serialVersionUID = -667768580903076029L;
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Integer id;
-	@Column(nullable=false, length=50, name="KEYNAME")
-	private String key;
-	@Column(nullable=false, length=1000, name="VALUE")
-	private String value;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+    @Column(nullable = false, length = 50, name = "KEYNAME")
+    private String key;
+    @Column(nullable = false, length = 1000, name = "VALUE")
+    private String value;
 
-	public Integer getId() {
+    public Integer getId()
+    {
 
-		return id;
-	}
+        return id;
+    }
 
-	public void setId(final Integer id) {
+    public void setId(final Integer id)
+    {
 
-		this.id = id;
-	}
+        this.id = id;
+    }
 
-	public String getKey() {
+    public String getKey()
+    {
 
-		return key;
-	}
+        return key;
+    }
 
-	public void setKey(final String key) {
+    public void setKey(final String key)
+    {
 
-		this.key = key;
-	}
+        this.key = key;
+    }
 
-	public String getValue() {
+    public String getValue()
+    {
 
-		return value;
-	}
+        return value;
+    }
 
-	public void setValue(final String value) {
+    public void setValue(final String value)
+    {
 
-		this.value = value;
-	}
+        this.value = value;
+    }
 }

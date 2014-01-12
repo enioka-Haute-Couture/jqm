@@ -41,90 +41,90 @@ import javax.persistence.Table;
 @Table(name = "Queue")
 public class Queue implements Serializable
 {
-	private static final long serialVersionUID = 4677042929807285233L;
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int id;
-	@Column(nullable = false, length = 50, name="name", unique = true)
-	private String name;
-	@Column(nullable = false, length = 1000, name="description")
-	private String description;
-	@Column(nullable = false, name="maxTempInQueue")
-	private Integer maxTempInQueue;
-	@Column(nullable = false, name="maxTempRunning")
-	private Integer maxTempRunning;
-	@Column(name="defaultQueue")
-	private boolean defaultQueue;
+    private static final long serialVersionUID = 4677042929807285233L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
+    @Column(nullable = false, length = 50, name = "name", unique = true)
+    private String name;
+    @Column(nullable = false, length = 1000, name = "description")
+    private String description;
+    @Column(nullable = false, name = "maxTempInQueue")
+    private Integer maxTempInQueue;
+    @Column(nullable = false, name = "maxTempRunning")
+    private Integer maxTempRunning;
+    @Column(name = "defaultQueue")
+    private boolean defaultQueue;
 
-	@OneToMany(mappedBy="queue", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	//	@Column(name="jobdefs")
-	private List<JobDef> jobdefs = new ArrayList<JobDef>();
+    @OneToMany(mappedBy = "queue", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // @Column(name="jobdefs")
+    private List<JobDef> jobdefs = new ArrayList<JobDef>();
 
-	public String getName()
-	{
-		return name;
-	}
+    public String getName()
+    {
+        return name;
+    }
 
-	public String getDescription()
-	{
-		return description;
-	}
+    public String getDescription()
+    {
+        return description;
+    }
 
-	/**
-	 * @param name
-	 *            the name to set
-	 */
-	public void setName(final String name)
-	{
-		this.name = name;
-	}
+    /**
+     * @param name
+     *            the name to set
+     */
+    public void setName(final String name)
+    {
+        this.name = name;
+    }
 
-	/**
-	 * @param description
-	 *            the description to set
-	 */
-	public void setDescription(final String description)
-	{
-		this.description = description;
-	}
+    /**
+     * @param description
+     *            the description to set
+     */
+    public void setDescription(final String description)
+    {
+        this.description = description;
+    }
 
-	public int getId()
-	{
-		return id;
-	}
+    public int getId()
+    {
+        return id;
+    }
 
-	public void setId(final int id)
-	{
-		this.id = id;
-	}
+    public void setId(final int id)
+    {
+        this.id = id;
+    }
 
-	public Integer getMaxTempInQueue()
-	{
-		return maxTempInQueue;
-	}
+    public Integer getMaxTempInQueue()
+    {
+        return maxTempInQueue;
+    }
 
-	public void setMaxTempInQueue(final Integer maxTempInQueue)
-	{
-		this.maxTempInQueue = maxTempInQueue;
-	}
+    public void setMaxTempInQueue(final Integer maxTempInQueue)
+    {
+        this.maxTempInQueue = maxTempInQueue;
+    }
 
-	public Integer getMaxTempRunning()
-	{
-		return maxTempRunning;
-	}
+    public Integer getMaxTempRunning()
+    {
+        return maxTempRunning;
+    }
 
-	public void setMaxTempRunning(final Integer maxTempRunning)
-	{
-		this.maxTempRunning = maxTempRunning;
-	}
+    public void setMaxTempRunning(final Integer maxTempRunning)
+    {
+        this.maxTempRunning = maxTempRunning;
+    }
 
-	public boolean isDefaultQueue()
-	{
-		return defaultQueue;
-	}
+    public boolean isDefaultQueue()
+    {
+        return defaultQueue;
+    }
 
-	public void setDefaultQueue(final boolean defaultQueue)
-	{
-		this.defaultQueue = defaultQueue;
-	}
+    public void setDefaultQueue(final boolean defaultQueue)
+    {
+        this.defaultQueue = defaultQueue;
+    }
 }

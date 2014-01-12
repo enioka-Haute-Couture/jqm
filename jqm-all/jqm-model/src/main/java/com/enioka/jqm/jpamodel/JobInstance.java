@@ -43,167 +43,167 @@ import javax.persistence.Table;
 public class JobInstance implements Serializable
 {
 
-	private static final long serialVersionUID = -7710486847228806301L;
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer id;
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "jd_id")
-	private JobDef jd;
-	@Column(name = "parentId")
-	private Integer parentId;
-	@Column(length = 50, name = "username")
-	private String userName;
-	@Column(name = "sessionId")
-	private String sessionID;
-	@Column(length = 50, name = "state")
-	private String state;
-	@ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Queue.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "queue_id")
-	private Queue queue;
-	@ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Node.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "node_id")
-	private Node node;
-	@Column(name = "sendEmail")
-	private String email;
-	@Column(name = "progress")
-	private Integer progress;
-	@Column(name = "internalPosition", nullable = false)
-	private double internalPosition;
+    private static final long serialVersionUID = -7710486847228806301L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "jd_id")
+    private JobDef jd;
+    @Column(name = "parentId")
+    private Integer parentId;
+    @Column(length = 50, name = "username")
+    private String userName;
+    @Column(name = "sessionId")
+    private String sessionID;
+    @Column(length = 50, name = "state")
+    private String state;
+    @ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Queue.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "queue_id")
+    private Queue queue;
+    @ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Node.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "node_id")
+    private Node node;
+    @Column(name = "sendEmail")
+    private String email;
+    @Column(name = "progress")
+    private Integer progress;
+    @Column(name = "internalPosition", nullable = false)
+    private double internalPosition;
 
-	@OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "jobinstance")
-	private List<JobParameter> parameters;
+    @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "jobinstance")
+    private List<JobParameter> parameters;
 
-	public int getCurrentPosition(EntityManager em)
-	{
-		if (this.state.equals("SUBMITTED"))
-		{
-			return em
-			        .createQuery("SELECT COUNT(ji) FROM JobInstance ji WHERE ji.internalPosition < :p AND ji.state = 'SUBMITTED'",
-			                Long.class).setParameter("p", this.internalPosition).getSingleResult().intValue() + 1;
-		}
-		else
-		{
-			return 0;
-		}
-	}
+    public int getCurrentPosition(EntityManager em)
+    {
+        if (this.state.equals("SUBMITTED"))
+        {
+            return em
+                    .createQuery("SELECT COUNT(ji) FROM JobInstance ji WHERE ji.internalPosition < :p AND ji.state = 'SUBMITTED'",
+                            Long.class).setParameter("p", this.internalPosition).getSingleResult().intValue() + 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
 
-	public int getId()
-	{
-		return id;
-	}
+    public int getId()
+    {
+        return id;
+    }
 
-	public String getUserName()
-	{
-		return userName;
-	}
+    public String getUserName()
+    {
+        return userName;
+    }
 
-	public String getSessionID()
-	{
-		return sessionID;
-	}
+    public String getSessionID()
+    {
+        return sessionID;
+    }
 
-	public JobDef getJd()
-	{
-		return jd;
-	}
+    public JobDef getJd()
+    {
+        return jd;
+    }
 
-	public void setJd(final JobDef jd)
-	{
-		this.jd = jd;
-	}
+    public void setJd(final JobDef jd)
+    {
+        this.jd = jd;
+    }
 
-	public String getState()
-	{
-		return state;
-	}
+    public String getState()
+    {
+        return state;
+    }
 
-	public void setState(final String state)
-	{
-		this.state = state;
-	}
+    public void setState(final String state)
+    {
+        this.state = state;
+    }
 
-	public void setUserName(final String user)
-	{
-		this.userName = user;
-	}
+    public void setUserName(final String user)
+    {
+        this.userName = user;
+    }
 
-	public void setSessionID(final String sessionID)
-	{
-		this.sessionID = sessionID;
-	}
+    public void setSessionID(final String sessionID)
+    {
+        this.sessionID = sessionID;
+    }
 
-	public Queue getQueue()
-	{
+    public Queue getQueue()
+    {
 
-		return queue;
-	}
+        return queue;
+    }
 
-	public void setQueue(final Queue queue)
-	{
+    public void setQueue(final Queue queue)
+    {
 
-		this.queue = queue;
-	}
+        this.queue = queue;
+    }
 
-	public List<JobParameter> getParameters()
-	{
+    public List<JobParameter> getParameters()
+    {
 
-		return parameters;
-	}
+        return parameters;
+    }
 
-	public void setParameters(final List<JobParameter> parameters)
-	{
+    public void setParameters(final List<JobParameter> parameters)
+    {
 
-		this.parameters = parameters;
-	}
+        this.parameters = parameters;
+    }
 
-	public Node getNode()
-	{
-		return node;
-	}
+    public Node getNode()
+    {
+        return node;
+    }
 
-	public void setNode(final Node node)
-	{
-		this.node = node;
-	}
+    public void setNode(final Node node)
+    {
+        this.node = node;
+    }
 
-	public String getEmail()
-	{
-		return email;
-	}
+    public String getEmail()
+    {
+        return email;
+    }
 
-	public void setEmail(String email)
-	{
-		this.email = email;
-	}
+    public void setEmail(String email)
+    {
+        this.email = email;
+    }
 
-	public Integer getProgress()
-	{
-		return progress;
-	}
+    public Integer getProgress()
+    {
+        return progress;
+    }
 
-	public void setProgress(Integer progress)
-	{
-		this.progress = progress;
-	}
+    public void setProgress(Integer progress)
+    {
+        this.progress = progress;
+    }
 
-	public double getInternalPosition()
-	{
-		return internalPosition;
-	}
+    public double getInternalPosition()
+    {
+        return internalPosition;
+    }
 
-	public void setInternalPosition(double internalPosition)
-	{
-		this.internalPosition = internalPosition;
-	}
+    public void setInternalPosition(double internalPosition)
+    {
+        this.internalPosition = internalPosition;
+    }
 
-	public Integer getParentId()
-	{
-		return parentId;
-	}
+    public Integer getParentId()
+    {
+        return parentId;
+    }
 
-	public void setParentId(Integer parentId)
-	{
-		this.parentId = parentId;
-	}
+    public void setParentId(Integer parentId)
+    {
+        this.parentId = parentId;
+    }
 }

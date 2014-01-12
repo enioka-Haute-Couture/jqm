@@ -40,271 +40,274 @@ import com.enioka.jqm.jpamodel.Message;
 public class QueueTests
 {
 
-	public static Server s;
-	public static Logger jqmlogger = Logger.getLogger(QueueTests.class);
+    public static Server s;
+    public static Logger jqmlogger = Logger.getLogger(QueueTests.class);
 
-	@BeforeClass
-	public static void testInit()
-	{
-		s = new Server();
-		s.setDatabaseName(0, "testdbengine");
-		s.setDatabasePath(0, "mem:testdbengine");
-		s.setLogWriter(null);
-		s.setSilent(true);
-		s.start();
+    @BeforeClass
+    public static void testInit()
+    {
+        s = new Server();
+        s.setDatabaseName(0, "testdbengine");
+        s.setDatabasePath(0, "mem:testdbengine");
+        s.setLogWriter(null);
+        s.setSilent(true);
+        s.start();
 
-		Dispatcher.resetEM();
-		Helpers.resetEmf();
-	}
+        Dispatcher.resetEM();
+        Helpers.resetEmf();
+    }
 
-	@AfterClass
-	public static void stop()
-	{
-		s.shutdown();
-	}
+    @AfterClass
+    public static void stop()
+    {
+        s.shutdown();
+    }
 
-	@Test
-	public void testMaxThreadNormal() throws Exception
-	{
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("Starting test testMaxThreadNormal");
-		EntityManager em = Helpers.getNewEm();
-		TestHelpers.cleanup(em);
-		TestHelpers.createLocalNode(em);
-		ArrayList<JobInstance> job = null;
+    @Test
+    public void testMaxThreadNormal() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testMaxThreadNormal");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+        ArrayList<JobInstance> job = null;
 
-		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-		jdargs.add(jdp);
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+        jdargs.add(jdp);
 
-		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
-				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "MarsuApplication", null, "Franquin",
-				"ModuleMachin", "other", "other", false, em);
+        @SuppressWarnings("unused")
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
+                "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qNormal, 42, "MarsuApplication", null, "Franquin",
+                "ModuleMachin", "other", "other", false, em);
 
-		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
 
-		int i = 0;
+        int i = 0;
 
-		JqmEngine engine1 = new JqmEngine();
-		engine1.start( "localhost" );
-		EntityManager emm = Helpers.getNewEm();
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        EntityManager emm = Helpers.getNewEm();
 
-		while (i < 5)
-		{
-			em.getEntityManagerFactory().getCache().evictAll();
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Thread.sleep(10000);
+        while (i < 5)
+        {
+            em.getEntityManagerFactory().getCache().evictAll();
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Thread.sleep(10000);
 
-			TypedQuery<JobInstance> query = emm
-					.createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
-							JobInstance.class);
-			query.setParameter("s", "SUBMITTED").setParameter("ss", "ENDED");
-			job = (ArrayList<JobInstance>) query.getResultList();
-			TestHelpers.printJobInstanceTable();
-			if (job.size() > 2) {
-				Assert.assertEquals(false, true);
-			}
-			i++;
-		}
-		engine1.stop();
+            TypedQuery<JobInstance> query = emm
+                    .createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
+                            JobInstance.class);
+            query.setParameter("s", "SUBMITTED").setParameter("ss", "ENDED");
+            job = (ArrayList<JobInstance>) query.getResultList();
+            TestHelpers.printJobInstanceTable();
+            if (job.size() > 2)
+            {
+                Assert.assertEquals(false, true);
+            }
+            i++;
+        }
+        engine1.stop();
 
-		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
-		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+        TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+        ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
 
-		for (JobInstance jobInstance : res)
-		{
-			Assert.assertEquals("ENDED", jobInstance.getState());
-		}
-	}
+        for (JobInstance jobInstance : res)
+        {
+            Assert.assertEquals("ENDED", jobInstance.getState());
+        }
+    }
 
-	@Test
-	public void testMaxThreadVip() throws Exception
-	{
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("Starting test testMaxThreadVip");
-		EntityManager em = Helpers.getNewEm();
-		TestHelpers.cleanup(em);
-		TestHelpers.createLocalNode(em);
-		ArrayList<JobInstance> job = null;
+    @Test
+    public void testMaxThreadVip() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testMaxThreadVip");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+        ArrayList<JobInstance> job = null;
 
-		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-		jdargs.add(jdp);
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+        jdargs.add(jdp);
 
-		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
-				"jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-				"ModuleMachin", "other", "other", false, em);
+        @SuppressWarnings("unused")
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
+                "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+                "ModuleMachin", "other", "other", false, em);
 
-		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
 
-		int i = 0;
+        int i = 0;
 
-		JqmEngine engine1 = new JqmEngine();
-		engine1.start( "localhost" );
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
 
-		while (i < 5)
-		{
-			EntityManager emm = Helpers.getNewEm();
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			// Dispatcher.enQueue(j);
-			Thread.sleep(10000);
-			TestHelpers.printJobInstanceTable();
-			em.clear();
-			TypedQuery<JobInstance> query = emm
-					.createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
-							JobInstance.class);
-			query.setParameter("s", "SUBMITTED").setParameter("ss", "ENDED");
-			job = (ArrayList<JobInstance>) query.getResultList();
+        while (i < 5)
+        {
+            EntityManager emm = Helpers.getNewEm();
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            // Dispatcher.enQueue(j);
+            Thread.sleep(10000);
+            TestHelpers.printJobInstanceTable();
+            em.clear();
+            TypedQuery<JobInstance> query = emm
+                    .createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
+                            JobInstance.class);
+            query.setParameter("s", "SUBMITTED").setParameter("ss", "ENDED");
+            job = (ArrayList<JobInstance>) query.getResultList();
 
-			if (job.size() > 3) {
-				Assert.fail();
-			}
-			i++;
-		}
-		engine1.stop();
+            if (job.size() > 3)
+            {
+                Assert.fail();
+            }
+            i++;
+        }
+        engine1.stop();
 
-		TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
-		ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
+        TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.position ASC", JobInstance.class);
+        ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
 
-		for (JobInstance jobInstance : res)
-		{
-			Assert.assertEquals("ENDED", jobInstance.getState());
-		}
-	}
+        for (JobInstance jobInstance : res)
+        {
+            Assert.assertEquals("ENDED", jobInstance.getState());
+        }
+    }
 
-	@Test
-	public void testMaxThreadVipLock() throws Exception
-	{
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("Starting test testMaxThreadVipLock");
-		EntityManager em = Helpers.getNewEm();
-		TestHelpers.cleanup(em);
-		TestHelpers.createLocalNode(em);
-		ArrayList<JobInstance> job = null;
+    @Test
+    public void testMaxThreadVipLock() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testMaxThreadVipLock");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+        ArrayList<JobInstance> job = null;
 
-		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-		jdargs.add(jdp);
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+        jdargs.add(jdp);
 
-		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-				"jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-				"ModuleMachin", "other", "other", false, em);
+        @SuppressWarnings("unused")
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
+                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+                "ModuleMachin", "other", "other", false, em);
 
-		JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
 
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
-		Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
+        Dispatcher.enQueue(j);
 
-		int i = 0;
+        int i = 0;
 
-		JqmEngine engine1 = new JqmEngine();
-		engine1.start( "localhost" );
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
 
-		while (i < 5)
-		{
-			EntityManager emm = Helpers.getNewEm();
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Dispatcher.enQueue(j);
-			Thread.sleep(12000);
-			TestHelpers.printJobInstanceTable();
-			em.clear();
-			TypedQuery<JobInstance> query = emm
-					.createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
-							JobInstance.class);
-			// 134 messages must be printed
+        while (i < 5)
+        {
+            EntityManager emm = Helpers.getNewEm();
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Dispatcher.enQueue(j);
+            Thread.sleep(12000);
+            TestHelpers.printJobInstanceTable();
+            em.clear();
+            TypedQuery<JobInstance> query = emm
+                    .createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
+                            JobInstance.class);
+            // 134 messages must be printed
 
-			query.setParameter("s", "SUBMITTED").setParameter("ss", "ENDED");
-			job = (ArrayList<JobInstance>) query.getResultList();
+            query.setParameter("s", "SUBMITTED").setParameter("ss", "ENDED");
+            job = (ArrayList<JobInstance>) query.getResultList();
 
-			if (job.size() > 3) {
-				Assert.assertEquals(false, true);
-			}
-			i++;
-		}
-		engine1.stop();
+            if (job.size() > 3)
+            {
+                Assert.assertEquals(false, true);
+            }
+            i++;
+        }
+        engine1.stop();
 
-		ArrayList<Message> msgs = (ArrayList<Message>) em.createQuery("SELECT m FROM Message m WHERE m.textMessage = :m", Message.class)
-				.setParameter("m", "DateTime will be printed").getResultList();
+        ArrayList<Message> msgs = (ArrayList<Message>) em.createQuery("SELECT m FROM Message m WHERE m.textMessage = :m", Message.class)
+                .setParameter("m", "DateTime will be printed").getResultList();
 
-		Assert.assertEquals(139, msgs.size());
-		Assert.assertEquals(true, true);
-	}
+        Assert.assertEquals(139, msgs.size());
+        Assert.assertEquals(true, true);
+    }
 }

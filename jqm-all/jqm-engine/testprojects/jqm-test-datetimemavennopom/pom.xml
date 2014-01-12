@@ -55,7 +55,7 @@
 		</plugins>
 	</build>
 
-			<profiles>
+	<profiles>
 		<profile>
 			<id>internal</id>
 			<distributionManagement>
@@ -70,7 +70,7 @@
 		</profile>
 	</profiles>
 
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>org.hibernate</groupId>

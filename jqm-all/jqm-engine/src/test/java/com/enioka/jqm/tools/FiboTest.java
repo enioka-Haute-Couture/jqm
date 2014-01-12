@@ -38,107 +38,108 @@ import com.enioka.jqm.jpamodel.JobDefParameter;
 
 public class FiboTest
 {
-	public static Server s;
-	public static Logger jqmlogger = Logger.getLogger(FiboTest.class);
+    public static Server s;
+    public static Logger jqmlogger = Logger.getLogger(FiboTest.class);
 
-	@BeforeClass
-	public static void testInit() throws InterruptedException
-	{
-		s = new Server();
-		s.setDatabaseName(0, "testdbengine");
-		s.setDatabasePath(0, "mem:testdbengine");
-		s.setLogWriter(null);
-		s.setSilent(true);
-		s.start();
+    @BeforeClass
+    public static void testInit() throws InterruptedException
+    {
+        s = new Server();
+        s.setDatabaseName(0, "testdbengine");
+        s.setDatabasePath(0, "mem:testdbengine");
+        s.setLogWriter(null);
+        s.setSilent(true);
+        s.start();
 
-		Dispatcher.resetEM();
-		Helpers.resetEmf();
-	}
+        Dispatcher.resetEM();
+        Helpers.resetEmf();
+    }
 
-	@AfterClass
-	public static void end()
-	{
-		s.shutdown();
-		s.stop();
-	}
+    @AfterClass
+    public static void end()
+    {
+        s.shutdown();
+        s.stop();
+    }
 
-	@Test
-	public void testFibo() throws Exception
-	{
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("Starting test testFibo");
-		EntityManager em = Helpers.getNewEm();
-		TestHelpers.cleanup(em);
-		TestHelpers.createLocalNode(em);
+    @Test
+    public void testFibo() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testFibo");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
 
-		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-		jdargs.add(jdp);
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+        jdargs.add(jdp);
 
-		@SuppressWarnings("unused")
-		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/",
-				"jqm-test-fibo/jqm-test-fibo.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2",
-				false, em);
+        @SuppressWarnings("unused")
+        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/",
+                "jqm-test-fibo/jqm-test-fibo.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2",
+                false, em);
 
-		JobDefinition form = new JobDefinition("Fibo", "MAG");
-		form.addParameter("p1", "1");
-		form.addParameter("p2", "2");
-		Dispatcher.enQueue(form);
+        JobDefinition form = new JobDefinition("Fibo", "MAG");
+        form.addParameter("p1", "1");
+        form.addParameter("p2", "2");
+        Dispatcher.enQueue(form);
 
-		// Create JNDI connection to write inside the engine database
-		em.getTransaction().begin();
-		CreationTools.createDatabaseProp("jdbc/jqm", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em);
-		em.getTransaction().commit();
+        // Create JNDI connection to write inside the engine database
+        em.getTransaction().begin();
+        CreationTools.createDatabaseProp("jdbc/jqm", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em);
+        em.getTransaction().commit();
 
-		// Start the engine
-		JqmEngine engine1 = new JqmEngine();
-		engine1.start( "localhost" );
+        // Start the engine
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
 
-		Thread.sleep(15000);
-		engine1.stop();
+        Thread.sleep(15000);
+        engine1.stop();
 
-		long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
-		Assert.assertTrue(i > 2);
-	}
+        long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
+        Assert.assertTrue(i > 2);
+    }
 
-	@Test
-	public void testEnqueueSynchronously() throws Exception
-	{
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("Starting test testEnqueueSynchronously");
-		EntityManager em = Helpers.getNewEm();
-		TestHelpers.cleanup(em);
-		TestHelpers.createLocalNode(em);
+    @Test
+    public void testEnqueueSynchronously() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testEnqueueSynchronously");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
 
-		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-		jdargs.add(jdp);
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+        jdargs.add(jdp);
 
-		@SuppressWarnings("unused")
-		JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibosync/",
-				"jqm-test-fibosync/jqm-test-fibosync.jar", TestHelpers.qVip, 42, "FiboSync", null, "Franquin",
-				"ModuleMachin", "other", "other", false, em);
+        @SuppressWarnings("unused")
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibosync/",
+                "jqm-test-fibosync/jqm-test-fibosync.jar", TestHelpers.qVip, 42, "FiboSync", null, "Franquin", "ModuleMachin", "other",
+                "other", false, em);
 
-		JobDefinition j = new JobDefinition("FiboSync", "MAG");
-		j.addParameter("p1", "1");
-		j.addParameter("p2", "2");
-		int i = Dispatcher.enQueue(j);
+        JobDefinition j = new JobDefinition("FiboSync", "MAG");
+        j.addParameter("p1", "1");
+        j.addParameter("p2", "2");
+        int i = Dispatcher.enQueue(j);
 
-		JqmEngine engine1 = new JqmEngine();
-		engine1.start("localhost");
-		Thread.sleep(25000);
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        Thread.sleep(25000);
 
-		engine1.stop();
-		long ii = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
-		Assert.assertTrue(ii > 2);
-		TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.endDate ASC", History.class);
-		ArrayList<History> res = (ArrayList<History>) query.getResultList();
-		for (History history : res) {
-			Assert.assertEquals("ENDED", history.getState());
-		}
-		TestHelpers.printJobInstanceTable();
-		Assert.assertEquals(i, (int)res.get(res.size()- 1).getId());
-	}
+        engine1.stop();
+        long ii = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
+        Assert.assertTrue(ii > 2);
+        TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.endDate ASC", History.class);
+        ArrayList<History> res = (ArrayList<History>) query.getResultList();
+        for (History history : res)
+        {
+            Assert.assertEquals("ENDED", history.getState());
+        }
+        TestHelpers.printJobInstanceTable();
+        Assert.assertEquals(i, (int) res.get(res.size() - 1).getId());
+    }
 }

@@ -1,23 +1,23 @@
 ﻿<jqm>
-  <jar>
-    <path>jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar</path>
-	<filePath>jqm-test-jndijms-amq/</filePath>
-    <jobdefinitions>
-      <jobDefinition>
-        <name>AMQ</name>
-        <description>Write and peek ActiveMQ test</description>
-        <canBeRestarted>true</canBeRestarted>
-        <javaClassName>com.enioka.jqm.testpackages.SuperTestPayload</javaClassName>
-        <maxTimeRunning>42</maxTimeRunning>
-        <application>ApplicationTest</application>
-        <module>Tests</module>
-        <keyword1>AMQ</keyword1>
-        <keyword2>JNDI</keyword2>
-        <keyword3></keyword3>
-        <highlander>false</highlander>
-        <parameters>
-        </parameters>
-      </jobDefinition>
-    </jobdefinitions>
-  </jar>
+	<jar>
+		<path>jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar</path>
+		<filePath>jqm-test-jndijms-amq/</filePath>
+		<jobdefinitions>
+			<jobDefinition>
+				<name>AMQ</name>
+				<description>Write and peek ActiveMQ test</description>
+				<canBeRestarted>true</canBeRestarted>
+				<javaClassName>com.enioka.jqm.testpackages.SuperTestPayload</javaClassName>
+				<maxTimeRunning>42</maxTimeRunning>
+				<application>ApplicationTest</application>
+				<module>Tests</module>
+				<keyword1>AMQ</keyword1>
+				<keyword2>JNDI</keyword2>
+				<keyword3></keyword3>
+				<highlander>false</highlander>
+				<parameters>
+				</parameters>
+			</jobDefinition>
+		</jobdefinitions>
+	</jar>
 </jqm>

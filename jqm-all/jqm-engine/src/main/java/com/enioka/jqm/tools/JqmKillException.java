@@ -24,15 +24,15 @@ package com.enioka.jqm.tools;
  */
 class JqmKillException extends RuntimeException
 {
-	private static final long serialVersionUID = -2937310125732117976L;
+    private static final long serialVersionUID = -2937310125732117976L;
 
-	JqmKillException(String msg)
-	{
-		super(msg);
-	}
+    JqmKillException(String msg)
+    {
+        super(msg);
+    }
 
-	JqmKillException(String msg, Exception e)
-	{
-		super(msg, e);
-	}
+    JqmKillException(String msg, Exception e)
+    {
+        super(msg, e);
+    }
 }

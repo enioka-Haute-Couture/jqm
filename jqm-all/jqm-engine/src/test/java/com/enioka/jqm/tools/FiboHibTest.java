@@ -36,68 +36,68 @@ import com.enioka.jqm.jpamodel.JobDefParameter;
 
 public class FiboHibTest
 {
-	public static Server s;
-	public static Logger jqmlogger = Logger.getLogger(FiboHibTest.class);
+    public static Server s;
+    public static Logger jqmlogger = Logger.getLogger(FiboHibTest.class);
 
-	@BeforeClass
-	public static void testInit() throws InterruptedException
-	{
-		s = new Server();
-		s.setDatabaseName(0, "testdbengine");
-		s.setDatabasePath(0, "mem:testdbengine");
-		s.setLogWriter(null);
-		s.setSilent(true);
-		s.start();
+    @BeforeClass
+    public static void testInit() throws InterruptedException
+    {
+        s = new Server();
+        s.setDatabaseName(0, "testdbengine");
+        s.setDatabasePath(0, "mem:testdbengine");
+        s.setLogWriter(null);
+        s.setSilent(true);
+        s.start();
 
-		Dispatcher.resetEM();
-		Helpers.resetEmf();
-	}
+        Dispatcher.resetEM();
+        Helpers.resetEmf();
+    }
 
-	@AfterClass
-	public static void end()
-	{
-		s.shutdown();
-		s.stop();
-	}
+    @AfterClass
+    public static void end()
+    {
+        s.shutdown();
+        s.stop();
+    }
 
-	@Test
-	public void testFiboHib() throws Exception
-	{
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("**********************************************************");
-		jqmlogger.debug("Starting test testFiboHib");
-		EntityManager em = Helpers.getNewEm();
-		TestHelpers.cleanup(em);
-		TestHelpers.createLocalNode(em);
+    @Test
+    public void testFiboHib() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testFiboHib");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
 
-		ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-		JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-		jdargs.add(jdp);
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+        jdargs.add(jdp);
 
-		@SuppressWarnings("unused")
-		JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibohib/",
-		        "jqm-test-fibohib/jqm-test-fibohib.jar", TestHelpers.qVip, 42, "FiboHib", null, "Franquin", "ModuleMachin", "other1",
-		        "other2", false, em);
+        @SuppressWarnings("unused")
+        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibohib/",
+                "jqm-test-fibohib/jqm-test-fibohib.jar", TestHelpers.qVip, 42, "FiboHib", null, "Franquin", "ModuleMachin", "other1",
+                "other2", false, em);
 
-		JobDefinition form = new JobDefinition("FiboHib", "MAG");
-		form.addParameter("p1", "1");
-		form.addParameter("p2", "2");
-		Dispatcher.enQueue(form);
+        JobDefinition form = new JobDefinition("FiboHib", "MAG");
+        form.addParameter("p1", "1");
+        form.addParameter("p2", "2");
+        Dispatcher.enQueue(form);
 
-		// Create JNDI connection to write inside the engine database
-		em.getTransaction().begin();
-		em.createQuery("DELETE FROM DatabaseProp");
-		CreationTools.createDatabaseProp("jdbc/jqm", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em);
-		em.getTransaction().commit();
+        // Create JNDI connection to write inside the engine database
+        em.getTransaction().begin();
+        em.createQuery("DELETE FROM DatabaseProp");
+        CreationTools.createDatabaseProp("jdbc/jqm", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em);
+        em.getTransaction().commit();
 
-		// Start the engine
-		JqmEngine engine1 = new JqmEngine();
-		engine1.start("localhost");
+        // Start the engine
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
 
-		Thread.sleep(20000);
-		engine1.stop();
+        Thread.sleep(20000);
+        engine1.stop();
 
-		long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
-		Assert.assertTrue(i > 2);
-	}
+        long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
+        Assert.assertTrue(i > 2);
+    }
 }
