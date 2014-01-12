@@ -55,17 +55,17 @@ public class TestHelpers
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("defaultConnection", "jdbc/marsu", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("deadline", "10", em);
 
-        TestHelpers.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42, 100, em);
-        TestHelpers.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, 100, em);
-        TestHelpers.qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3, 100, em);
+        TestHelpers.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42, em);
+        TestHelpers.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, em);
+        TestHelpers.qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3, em);
 
-        TestHelpers.qVip2 = CreationTools.initQueue("VIPQueue2", "Queue for the winners2", 42, 100, em);
-        TestHelpers.qNormal2 = CreationTools.initQueue("NormalQueue2", "Queue for the ordinary job2", 7, 100, em);
-        TestHelpers.qSlow2 = CreationTools.initQueue("SlowQueue2", "Queue for the bad guys2", 3, 100, em);
+        TestHelpers.qVip2 = CreationTools.initQueue("VIPQueue2", "Queue for the winners2", 42, em);
+        TestHelpers.qNormal2 = CreationTools.initQueue("NormalQueue2", "Queue for the ordinary job2", 7, em);
+        TestHelpers.qSlow2 = CreationTools.initQueue("SlowQueue2", "Queue for the bad guys2", 3, em);
 
-        TestHelpers.qVip3 = CreationTools.initQueue("VIPQueue3", "Queue for the winners3", 42, 100, em);
-        TestHelpers.qNormal3 = CreationTools.initQueue("NormalQueue3", "Queue for the ordinary job3", 7, 100, em);
-        TestHelpers.qSlow3 = CreationTools.initQueue("SlowQueue3", "Queue for the bad guys3", 3, 100, em);
+        TestHelpers.qVip3 = CreationTools.initQueue("VIPQueue3", "Queue for the winners3", 42, em);
+        TestHelpers.qNormal3 = CreationTools.initQueue("NormalQueue3", "Queue for the ordinary job3", 7, em);
+        TestHelpers.qSlow3 = CreationTools.initQueue("SlowQueue3", "Queue for the bad guys3", 3, em);
 
         TestHelpers.node = CreationTools.createNode("localhost", 8081, "./testprojects/jqm-test-deliverable/", "./testprojects/",
                 "./testprojects/jqm-test-xml/", em);

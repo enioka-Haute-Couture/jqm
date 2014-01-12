@@ -65,8 +65,7 @@ public class TestPersistence
         Queue q = new Queue();
         q.setDefaultQueue(true);
         q.setDescription("ppp");
-        q.setMaxTempInQueue(12);
-        q.setMaxTempRunning(13);
+        q.setTimeToLive(12);
         q.setName("super queue");
         em.persist(q);
 

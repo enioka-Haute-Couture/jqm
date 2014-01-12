@@ -3,17 +3,16 @@
 		<queue>
 			<name>XmlQueue</name>
 			<description>Queue to test the xml import</description>
-			<maxTempInQueue>10</maxTempInQueue>
+			<timeToLive>10</timeToLive>
 			<jobs>
 				<applicationName>Fibo</applicationName>
 				<applicationName>Geo</applicationName>
-				<applicationName>DateTime</applicationName>
 			</jobs>
 		</queue>
 		<queue>
 			<name>XmlQueue2</name>
 			<description>Queue 2 to test the xml import</description>
-			<maxTempInQueue>42</maxTempInQueue>
+			<timeToLive>42</timeToLive>
 			<jobs>
 				<applicationName>DateTime</applicationName>
 			</jobs>

@@ -267,7 +267,7 @@ public class CreationTools
 
     // ------------------ QUEUE --------------------------------
 
-    public static Queue initQueue(String name, String description, Integer maxTempInQueue, Integer maxTempRunning, EntityManager em)
+    public static Queue initQueue(String name, String description, Integer timeToLive, EntityManager em)
     {
         Queue q = new Queue();
         EntityTransaction transac = em.getTransaction();
@@ -275,8 +275,7 @@ public class CreationTools
 
         q.setName(name);
         q.setDescription(description);
-        q.setMaxTempInQueue(maxTempInQueue);
-        q.setMaxTempRunning(maxTempRunning);
+        q.setTimeToLive(timeToLive);
 
         em.persist(q);
         transac.commit();
@@ -284,8 +283,7 @@ public class CreationTools
         return q;
     }
 
-    public static Queue createQueue(String name, String description, Integer maxTempInQueue, Integer maxTempRunning, boolean defaultQueue,
-            EntityManager em)
+    public static Queue createQueue(String name, String description, Integer timeToLive, boolean defaultQueue, EntityManager em)
     {
         Queue q = new Queue();
         EntityTransaction transac = em.getTransaction();
@@ -293,8 +291,7 @@ public class CreationTools
 
         q.setName(name);
         q.setDescription(description);
-        q.setMaxTempInQueue(maxTempInQueue);
-        q.setMaxTempRunning(maxTempRunning);
+        q.setTimeToLive(timeToLive);
         q.setDefaultQueue(defaultQueue);
 
         em.persist(q);

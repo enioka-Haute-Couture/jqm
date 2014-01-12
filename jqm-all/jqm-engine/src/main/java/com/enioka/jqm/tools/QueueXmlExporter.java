@@ -1,6 +1,5 @@
 package com.enioka.jqm.tools;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 
@@ -15,7 +14,6 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 
 class QueueXmlExporter
@@ -46,12 +44,12 @@ class QueueXmlExporter
             name.setText(q.getName());
             Element description = new Element("description");
             description.setText(q.getDescription());
-            Element maxTempInQueue = new Element("maxTempInQueue");
-            maxTempInQueue.setText(q.getMaxTempInQueue() + "");
+            Element timeToLive = new Element("timeToLive");
+            timeToLive.setText(q.getTimeToLive() + "");
 
             queue.addContent(name);
             queue.addContent(description);
-            queue.addContent(maxTempInQueue);
+            queue.addContent(timeToLive);
 
             Element jobs = new Element("jobs");
             queue.addContent(jobs);
@@ -104,12 +102,12 @@ class QueueXmlExporter
                 name.setText(q.getName());
                 Element description = new Element("description");
                 description.setText(q.getDescription());
-                Element maxTempInQueue = new Element("maxTempInQueue");
-                maxTempInQueue.setText(q.getMaxTempInQueue() + "");
+                Element timeToLive = new Element("timeToLive");
+                timeToLive.setText(q.getTimeToLive() + "");
 
                 queue.addContent(name);
                 queue.addContent(description);
-                queue.addContent(maxTempInQueue);
+                queue.addContent(timeToLive);
 
                 Element jobs = new Element("jobs");
                 queue.addContent(jobs);
@@ -165,12 +163,12 @@ class QueueXmlExporter
             name.setText(q.getName());
             Element description = new Element("description");
             description.setText(q.getDescription());
-            Element maxTempInQueue = new Element("maxTempInQueue");
-            maxTempInQueue.setText(q.getMaxTempInQueue() + "");
+            Element timeToLive = new Element("timeToLive");
+            timeToLive.setText(q.getTimeToLive() + "");
 
             queue.addContent(name);
             queue.addContent(description);
-            queue.addContent(maxTempInQueue);
+            queue.addContent(timeToLive);
 
             Element jobs = new Element("jobs");
             queue.addContent(jobs);

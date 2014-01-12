@@ -46,7 +46,7 @@ class QueueXmlParser
 
     private String name = null;
     private String description = null;
-    private String maxTempInQueue = null;
+    private String timeToLive = null;
     private ArrayList<String> jobs = new ArrayList<String>();
 
     QueueXmlParser()
@@ -92,11 +92,18 @@ class QueueXmlParser
 
                         name = ee.getElementsByTagName("name").item(0).getTextContent();
                         description = ee.getElementsByTagName("description").item(0).getTextContent();
-                        maxTempInQueue = ee.getElementsByTagName("maxTempInQueue").item(0).getTextContent();
+                        if (ee.getElementsByTagName("timeToLive").getLength() == 1)
+                        {
+                            timeToLive = ee.getElementsByTagName("timeToLive").item(0).getTextContent();
+                        }
+                        else
+                        {
+                            timeToLive = "0";
+                        }
 
                         jqmlogger.debug("Name: " + name);
                         jqmlogger.debug("Description: " + description);
-                        jqmlogger.debug("maxTempInQueue: " + maxTempInQueue);
+                        jqmlogger.debug("maxTempInQueue: " + timeToLive);
 
                         // The list must be purged
                         jobs.clear();
@@ -119,7 +126,7 @@ class QueueXmlParser
                                     .getSingleResult();
                             jqmlogger.info("The queue " + name + "already exists. The information will be overrided");
                             q.setDescription(description);
-                            q.setMaxTempInQueue(Integer.parseInt(maxTempInQueue));
+                            q.setTimeToLive(Integer.parseInt(timeToLive));
                         }
                         catch (NonUniqueResultException s)
                         {
@@ -133,8 +140,7 @@ class QueueXmlParser
 
                             queue.setDefaultQueue(false);
                             queue.setDescription(description);
-                            queue.setMaxTempInQueue(Integer.parseInt(maxTempInQueue));
-                            queue.setMaxTempRunning(0);
+                            queue.setTimeToLive(Integer.parseInt(timeToLive));
                             queue.setName(name);
 
                             em.persist(queue);

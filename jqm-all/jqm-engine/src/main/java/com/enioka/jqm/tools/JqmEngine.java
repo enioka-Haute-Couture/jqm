@@ -196,8 +196,7 @@ class JqmEngine
             q = new Queue();
             q.setDefaultQueue(true);
             q.setDescription("default queue");
-            q.setMaxTempInQueue(1024);
-            q.setMaxTempRunning(1024);
+            q.setTimeToLive(1024);
             q.setName("DEFAULT");
             em.persist(q);
 

@@ -49,10 +49,8 @@ public class Queue implements Serializable
     private String name;
     @Column(nullable = false, length = 1000, name = "description")
     private String description;
-    @Column(nullable = false, name = "maxTempInQueue")
-    private Integer maxTempInQueue;
-    @Column(nullable = false, name = "maxTempRunning")
-    private Integer maxTempRunning;
+    @Column(nullable = false, name = "timeToLive")
+    private Integer timeToLive;
     @Column(name = "defaultQueue")
     private boolean defaultQueue;
 
@@ -98,26 +96,6 @@ public class Queue implements Serializable
         this.id = id;
     }
 
-    public Integer getMaxTempInQueue()
-    {
-        return maxTempInQueue;
-    }
-
-    public void setMaxTempInQueue(final Integer maxTempInQueue)
-    {
-        this.maxTempInQueue = maxTempInQueue;
-    }
-
-    public Integer getMaxTempRunning()
-    {
-        return maxTempRunning;
-    }
-
-    public void setMaxTempRunning(final Integer maxTempRunning)
-    {
-        this.maxTempRunning = maxTempRunning;
-    }
-
     public boolean isDefaultQueue()
     {
         return defaultQueue;
@@ -126,5 +104,25 @@ public class Queue implements Serializable
     public void setDefaultQueue(final boolean defaultQueue)
     {
         this.defaultQueue = defaultQueue;
+    }
+
+    public Integer getTimeToLive()
+    {
+        return timeToLive;
+    }
+
+    public void setTimeToLive(Integer timeToLive)
+    {
+        this.timeToLive = timeToLive;
+    }
+
+    public List<JobDef> getJobdefs()
+    {
+        return jobdefs;
+    }
+
+    public void setJobdefs(List<JobDef> jobdefs)
+    {
+        this.jobdefs = jobdefs;
     }
 }
