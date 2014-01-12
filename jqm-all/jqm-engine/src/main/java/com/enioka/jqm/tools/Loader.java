@@ -113,7 +113,7 @@ class Loader implements Runnable
                 {
                     // if its a directory, create it
                     jqmlogger.debug("The file is actually a directory");
-                    if (!f.mkdir())
+                    if (!f.exists() && !f.mkdir())
                     {
                         throw new IOException("could not create directory " + f.getAbsolutePath());
                     }
