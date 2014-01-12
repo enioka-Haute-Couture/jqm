@@ -61,6 +61,7 @@ import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.jpamodel.State;
 
 public class JobBaseTest
 {
@@ -137,7 +138,7 @@ public class JobBaseTest
                 .getResultList();
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals("ENDED", res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
     }
 
     @Test
@@ -161,8 +162,8 @@ public class JobBaseTest
 
         em.getTransaction().begin();
 
-        JobInstance j = CreationTools.createJobInstance(jdDemoMaven, jps, "MAG", null, "SUBMITTED", 2, TestHelpers.qVip, null, em);
-        JobInstance jj = CreationTools.createJobInstance(jdDemoMaven, jps, "MAG", null, "RUNNING", 1, TestHelpers.qVip, null, em);
+        JobInstance j = CreationTools.createJobInstance(jdDemoMaven, jps, "MAG", null, State.SUBMITTED, 2, TestHelpers.qVip, null, em);
+        JobInstance jj = CreationTools.createJobInstance(jdDemoMaven, jps, "MAG", null, State.RUNNING, 1, TestHelpers.qVip, null, em);
 
         @SuppressWarnings("unused")
         History h = CreationTools.createhistory(null, null, jdDemoMaven, null, TestHelpers.qVip, null, null, j, null, null, null, null,
@@ -185,8 +186,8 @@ public class JobBaseTest
                 "SELECT j FROM JobInstance j ORDER BY j.internalPosition ASC", JobInstance.class).getResultList();
 
         Assert.assertEquals(2, res.size());
-        Assert.assertEquals("RUNNING", res.get(0).getState());
-        Assert.assertEquals("SUBMITTED", res.get(1).getState());
+        Assert.assertEquals(State.RUNNING, res.get(0).getState());
+        Assert.assertEquals(State.SUBMITTED, res.get(1).getState());
     }
 
     @Test
@@ -225,7 +226,7 @@ public class JobBaseTest
                 .setParameter("j", jdDemoMaven.getId()).getResultList();
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals("ENDED", res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
     }
 
     @Test
@@ -403,7 +404,7 @@ public class JobBaseTest
         Assert.assertEquals(3, res.size());
         for (History jobInstance : res)
         {
-            Assert.assertEquals("ENDED", jobInstance.getState());
+            Assert.assertEquals(State.ENDED, jobInstance.getState());
         }
 
         FileUtils.deleteDirectory(new File(FilenameUtils.concat(TestHelpers.node.getDlRepo(), "" + id1)));
@@ -557,8 +558,8 @@ public class JobBaseTest
         History ji2 = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId", History.class)
                 .setParameter("myId", jdDemoMaven2.getId()).getSingleResult();
 
-        Assert.assertEquals("CRASHED", ji1.getState());
-        Assert.assertEquals("ENDED", ji2.getState());
+        Assert.assertEquals(State.CRASHED, ji1.getState());
+        Assert.assertEquals(State.ENDED, ji2.getState());
     }
 
     @Test
@@ -637,7 +638,7 @@ public class JobBaseTest
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals("ENDED", res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
     }
 
     @Test
@@ -669,7 +670,7 @@ public class JobBaseTest
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals("ENDED", res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
     }
 
     @Test
@@ -707,7 +708,7 @@ public class JobBaseTest
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals("ENDED", res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
     }
 
     @Test
@@ -734,7 +735,7 @@ public class JobBaseTest
 
         em.getTransaction().begin();
         JobInstance ji = em.find(JobInstance.class, i);
-        ji.setState("CRASHED");
+        ji.setState(State.CRASHED);
         em.getTransaction().commit();
 
         TestHelpers.printJobInstanceTable();
@@ -764,7 +765,7 @@ public class JobBaseTest
         engine1.stop();
 
         em.refresh(h);
-        Assert.assertEquals("ENDED", h.getState());
+        Assert.assertEquals(State.ENDED, h.getState());
         Assert.assertEquals(jdDemoMaven.getId(), h.getJd().getId());
     }
 
@@ -855,7 +856,7 @@ public class JobBaseTest
                 .getResultList();
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals("ENDED", res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
 
         for (Message msg : m)
         {
@@ -958,7 +959,7 @@ public class JobBaseTest
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals("ENDED", res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
         Assert.assertEquals((Integer) 5000, res.get(0).getProgress());
     }
 
@@ -1004,7 +1005,7 @@ public class JobBaseTest
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals("KILLED", res.get(0).getState());
+        Assert.assertEquals(State.KILLED, res.get(0).getState());
     }
 
     @Test
@@ -1042,7 +1043,7 @@ public class JobBaseTest
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals("ENDED", res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
     }
 
     @Test
@@ -1080,7 +1081,7 @@ public class JobBaseTest
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals("ENDED", res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
     }
 
     @Test
@@ -1118,7 +1119,7 @@ public class JobBaseTest
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals("CRASHED", res.get(0).getState());
+        Assert.assertEquals(State.CRASHED, res.get(0).getState());
     }
 
     @Test
@@ -1156,7 +1157,7 @@ public class JobBaseTest
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals("ENDED", res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
     }
 
     @Test
@@ -1202,7 +1203,7 @@ public class JobBaseTest
                 .getResultList();
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals("ENDED", res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
 
         for (int k = 0; k < ress.size(); k++)
         {
@@ -1260,7 +1261,7 @@ public class JobBaseTest
         Integer k = Dispatcher.getProgress(i);
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals("ENDED", res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
         Assert.assertEquals((Integer) 5000, k);
     }
 
@@ -1289,7 +1290,7 @@ public class JobBaseTest
 
         em.getTransaction().begin();
         JobInstance t = em.find(JobInstance.class, i);
-        t.setState("CRASHED");
+        t.setState(State.CRASHED);
 
         History h = em.createQuery("SELECT j FROM History j WHERE j.id = 1", History.class).getSingleResult();
 
@@ -1351,8 +1352,8 @@ public class JobBaseTest
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
         Assert.assertEquals(2, res.size());
-        Assert.assertEquals("HOLDED", res.get(0).getState());
-        Assert.assertEquals("ENDED", res.get(1).getState());
+        Assert.assertEquals(State.HOLDED, res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(1).getState());
     }
 
     @Test
@@ -1391,7 +1392,7 @@ public class JobBaseTest
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals("ENDED", res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
     }
 
     @Test
@@ -1431,8 +1432,8 @@ public class JobBaseTest
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
         Assert.assertEquals(2, res.size());
-        Assert.assertEquals("CANCELLED", res.get(0).getState());
-        Assert.assertEquals("ENDED", res.get(1).getState());
+        Assert.assertEquals(State.CANCELLED, res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(1).getState());
     }
 
     @Test
@@ -1470,7 +1471,7 @@ public class JobBaseTest
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals("ENDED", res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
         Assert.assertEquals(TestHelpers.qSlow.getName(), res.get(0).getQueue().getName());
     }
 
@@ -1574,7 +1575,7 @@ public class JobBaseTest
 
         // Check run is OK
         History h = em.createQuery("SELECT j FROM History j", History.class).getSingleResult();
-        Assert.assertEquals("ENDED", h.getStatus());
+        Assert.assertEquals(State.ENDED, h.getStatus());
         Assert.assertEquals(jid, h.getJobInstanceId());
     }
 
@@ -1642,11 +1643,11 @@ public class JobBaseTest
         in = entity.getContent();
         writer = new StringWriter();
         IOUtils.copy(in, writer);
-        result = writer.toString();
+        State currentState = State.valueOf(writer.toString());
         IOUtils.closeQuietly(in);
         engine1.stop();
 
-        Assert.assertEquals("ENDED", result);
+        Assert.assertEquals(State.ENDED, currentState);
     }
 
     @Test
@@ -1688,8 +1689,8 @@ public class JobBaseTest
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
         Assert.assertEquals(2, res.size());
-        Assert.assertEquals("ENDED", res.get(0).getState());
-        Assert.assertEquals("ENDED", res.get(1).getState());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(1).getState());
     }
 
     @Test
@@ -1755,7 +1756,7 @@ public class JobBaseTest
         History ji1 = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId", History.class)
                 .setParameter("myId", jd.getId()).getSingleResult();
 
-        Assert.assertEquals("CRASHED", ji1.getState());
+        Assert.assertEquals(State.CRASHED, ji1.getState());
     }
 
     @Test
@@ -1787,8 +1788,8 @@ public class JobBaseTest
                 .setParameter("myId", jd.getId()).getResultList();
 
         Assert.assertEquals(2, ji.size());
-        Assert.assertEquals("ENDED", ji.get(0).getState());
-        Assert.assertEquals("ENDED", ji.get(1).getState());
+        Assert.assertEquals(State.ENDED, ji.get(0).getState());
+        Assert.assertEquals(State.ENDED, ji.get(1).getState());
     }
 
     @Test
@@ -1817,6 +1818,6 @@ public class JobBaseTest
                 .setParameter("myId", jd.getId()).getResultList();
 
         Assert.assertEquals(1, ji.size());
-        Assert.assertEquals("CRASHED", ji.get(0).getState());
+        Assert.assertEquals(State.CRASHED, ji.get(0).getState());
     }
 }

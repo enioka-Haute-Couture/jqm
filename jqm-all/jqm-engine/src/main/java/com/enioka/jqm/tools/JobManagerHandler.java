@@ -26,6 +26,7 @@ import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
+import com.enioka.jqm.jpamodel.State;
 
 public class JobManagerHandler implements InvocationHandler
 {
@@ -171,7 +172,7 @@ public class JobManagerHandler implements InvocationHandler
     {
         em.refresh(ji);
         jqmlogger.debug("Analysis: should JI " + ji.getId() + " get killed? Status is " + ji.getState());
-        if (ji.getState().equals("KILLED"))
+        if (ji.getState().equals(State.KILLED))
         {
             jqmlogger.debug("Link: Job will be KILLED");
             Thread.currentThread().interrupt();
@@ -252,7 +253,7 @@ public class JobManagerHandler implements InvocationHandler
             }
             em.refresh(child);
 
-            if (child.getState().equals("ENDED") || child.getState().equals("CRASHED"))
+            if (child.getState().equals(State.ENDED) || child.getState().equals(State.CRASHED))
             {
                 break;
             }

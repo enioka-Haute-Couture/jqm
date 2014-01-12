@@ -58,6 +58,7 @@ import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Node;
+import com.enioka.jqm.jpamodel.State;
 import com.jcabi.aether.Aether;
 
 class Loader implements Runnable
@@ -368,7 +369,7 @@ class Loader implements Runnable
     @Override
     public void run()
     {
-        String resultStatus = "";
+        State resultStatus = State.SUBMITTED;
         jqmlogger.debug("LOADER HAS JUST STARTED UP FOR JOB INSTANCE " + job.getId());
         jarFile = new File(CheckFilePath.fixFilePath(node.getRepo()) + job.getJd().getJarPath());
         try
@@ -378,7 +379,7 @@ class Loader implements Runnable
         catch (MalformedURLException ex)
         {
             jqmlogger.warn("The JAR file path specified in Job Definition is incorrect " + job.getJd().getApplicationName(), ex);
-            endOfRun("CRASHED");
+            endOfRun(State.CRASHED);
             return;
         }
         extractDir = new File(CheckFilePath.fixFilePath(FilenameUtils.concat(node.getRepo(), job.getJd().getFilePath())) + "tmp/");
@@ -408,7 +409,7 @@ class Loader implements Runnable
         catch (Exception e1)
         {
             jqmlogger.warn("Could not resolve CLASSPATH for job " + job.getJd().getApplicationName(), e1);
-            endOfRun("CRASHED");
+            endOfRun(State.CRASHED);
             return;
         }
 
@@ -426,11 +427,11 @@ class Loader implements Runnable
 
             // Add a message
             Helpers.createMessage("Status updated: RUNNING", h, em);
-            if (job.getState() != "KILLED")
+            if (!job.getState().equals(State.KILLED))
             {
-                job.setState("RUNNING");
+                job.setState(State.RUNNING);
             }
-            h.setStatus("RUNNING");
+            h.setStatus(State.RUNNING);
             em.getTransaction().commit();
             jqmlogger.debug("JobInstance was updated: " + job.getState());
         }
@@ -438,7 +439,7 @@ class Loader implements Runnable
         {
             jqmlogger.error("Could not update internal elements", e);
             em.getTransaction().rollback();
-            endOfRun("CRASHED");
+            endOfRun(State.CRASHED);
             return;
         }
 
@@ -464,7 +465,7 @@ class Loader implements Runnable
         catch (Exception e)
         {
             jqmlogger.error("Could not switch classloaders", e);
-            endOfRun("CRASHED");
+            endOfRun(State.CRASHED);
             return;
         }
 
@@ -475,17 +476,17 @@ class Loader implements Runnable
         try
         {
             jobClassLoader.launchJar(job, defaultconnection, contextClassLoader, em);
-            resultStatus = "ENDED";
+            resultStatus = State.ENDED;
         }
         catch (JqmKillException e)
         {
             jqmlogger.info("Job instance " + job.getId() + " has been killed.");
-            resultStatus = "KILLED";
+            resultStatus = State.KILLED;
         }
         catch (Exception e)
         {
             jqmlogger.info("Job instance " + job.getId() + " has crashed. Exception was:", e);
-            resultStatus = "CRASHED";
+            resultStatus = State.CRASHED;
         }
         jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
 
@@ -500,7 +501,7 @@ class Loader implements Runnable
 
     }
 
-    private void endOfRun(String status)
+    private void endOfRun(State status)
     {
         // Restore class loader
         if (this.contextClassLoader != null)
@@ -557,7 +558,7 @@ class Loader implements Runnable
         em.getTransaction().commit();
 
         // Done
-        if (job.getState() == "ENDED")
+        if (job.getState().equals(State.ENDED))
         {
             em.getTransaction().begin();
             for (JobParameter p : job.getParameters())

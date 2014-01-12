@@ -39,6 +39,7 @@ import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
+import com.enioka.jqm.jpamodel.State;
 
 public class MultiNodeTest
 {
@@ -144,7 +145,7 @@ public class MultiNodeTest
 
         for (History jobInstance : res)
         {
-            Assert.assertEquals("ENDED", jobInstance.getState());
+            Assert.assertEquals(State.ENDED, jobInstance.getState());
         }
     }
 
@@ -218,7 +219,7 @@ public class MultiNodeTest
 
         for (History jobInstance : res)
         {
-            Assert.assertEquals("ENDED", jobInstance.getState());
+            Assert.assertEquals(State.ENDED, jobInstance.getState());
         }
 
         Assert.assertEquals((Long) 180L, em.createQuery("SELECT COUNT(m) from Message m", Long.class).getSingleResult());
@@ -295,7 +296,7 @@ public class MultiNodeTest
 
         for (History jobInstance : res)
         {
-            Assert.assertEquals("ENDED", jobInstance.getState());
+            Assert.assertEquals(State.ENDED, jobInstance.getState());
         }
     }
 
@@ -457,7 +458,7 @@ public class MultiNodeTest
 
         for (History jobInstance : res)
         {
-            Assert.assertEquals("ENDED", jobInstance.getState());
+            Assert.assertEquals(State.ENDED, jobInstance.getState());
         }
 
         Assert.assertEquals((Long) 432L, em.createQuery("SELECT COUNT(m) from Message m", Long.class).getSingleResult());
@@ -513,8 +514,8 @@ public class MultiNodeTest
         TestHelpers.printJobInstanceTable();
 
         Assert.assertEquals(2, res.size());
-        Assert.assertEquals("ENDED", res.get(0).getState());
-        Assert.assertEquals("ENDED", res.get(1).getState());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
+        Assert.assertEquals(State.ENDED, res.get(1).getState());
     }
 
     @Test
@@ -683,7 +684,7 @@ public class MultiNodeTest
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j WHERE j.status = :ss", History.class);
         // 134 messages must be printed
 
-        query.setParameter("ss", "ENDED");
+        query.setParameter("ss", State.ENDED);
         job = (ArrayList<History>) query.getResultList();
 
         // 171
@@ -795,7 +796,7 @@ public class MultiNodeTest
 
         for (JobInstance jobInstance : res)
         {
-            if (jobInstance.getState().equals("ATTRIBUTED") || jobInstance.getState().equals("RUNNING"))
+            if (jobInstance.getState().equals(State.ATTRIBUTED) || jobInstance.getState().equals(State.RUNNING))
             {
                 Assert.assertEquals(true, false);
             }

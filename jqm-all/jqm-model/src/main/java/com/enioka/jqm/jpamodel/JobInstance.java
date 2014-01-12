@@ -25,6 +25,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -57,7 +59,8 @@ public class JobInstance implements Serializable
     @Column(name = "sessionId")
     private String sessionID;
     @Column(length = 50, name = "state")
-    private String state;
+    @Enumerated(EnumType.STRING)
+    private State state;
     @ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Queue.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "queue_id")
     private Queue queue;
@@ -76,7 +79,7 @@ public class JobInstance implements Serializable
 
     public int getCurrentPosition(EntityManager em)
     {
-        if (this.state.equals("SUBMITTED"))
+        if (this.state.equals(State.SUBMITTED))
         {
             return em
                     .createQuery("SELECT COUNT(ji) FROM JobInstance ji WHERE ji.internalPosition < :p AND ji.state = 'SUBMITTED'",
@@ -113,12 +116,12 @@ public class JobInstance implements Serializable
         this.jd = jd;
     }
 
-    public String getState()
+    public State getState()
     {
         return state;
     }
 
-    public void setState(final String state)
+    public void setState(State state)
     {
         this.state = state;
     }

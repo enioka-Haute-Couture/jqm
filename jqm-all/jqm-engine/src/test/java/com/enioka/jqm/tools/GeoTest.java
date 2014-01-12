@@ -36,6 +36,7 @@ import com.enioka.jqm.api.JobDefinition;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
+import com.enioka.jqm.jpamodel.State;
 
 public class GeoTest
 {
@@ -114,7 +115,7 @@ public class GeoTest
 
         for (History history : res)
         {
-            if (history.getState() == "CRASHED")
+            if (history.getState().equals(State.CRASHED))
             {
                 Assert.fail("No job should be crashed");
             }

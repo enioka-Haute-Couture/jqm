@@ -35,6 +35,7 @@ import com.enioka.jqm.api.JobDefinition;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
+import com.enioka.jqm.jpamodel.State;
 
 public class NoApiPayloadTest
 {
@@ -92,7 +93,7 @@ public class NoApiPayloadTest
                 .setParameter("myId", jd.getId()).getResultList();
 
         Assert.assertEquals(1, ji.size());
-        Assert.assertEquals("ENDED", ji.get(0).getState());
+        Assert.assertEquals(State.ENDED, ji.get(0).getState());
     }
 
     @Test
@@ -121,7 +122,7 @@ public class NoApiPayloadTest
                 .setParameter("myId", jd.getId()).getResultList();
 
         Assert.assertEquals(1, ji.size());
-        Assert.assertEquals("ENDED", ji.get(0).getState());
+        Assert.assertEquals(State.ENDED, ji.get(0).getState());
     }
 
     @Test
@@ -152,8 +153,8 @@ public class NoApiPayloadTest
                 .setParameter("myId", jd.getId()).getResultList();
 
         Assert.assertEquals(3, ji.size());
-        Assert.assertEquals("ENDED", ji.get(0).getState());
-        Assert.assertEquals("ENDED", ji.get(1).getState());
+        Assert.assertEquals(State.ENDED, ji.get(0).getState());
+        Assert.assertEquals(State.ENDED, ji.get(1).getState());
 
         Assert.assertEquals(4, ji.get(0).getMessages().size()); // 3 auto messages + 1 message per run.
         Assert.assertEquals(100, (int) ji.get(0).getProgress());

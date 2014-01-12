@@ -40,6 +40,7 @@ import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.jpamodel.State;
 
 class Polling implements Runnable
 {
@@ -82,8 +83,8 @@ class Polling implements Runnable
         List<JobInstance> availableJobs = em
                 .createQuery(
                         "SELECT j FROM JobInstance j LEFT JOIN FETCH j.jd LEFT JOIN FETCH j.queue "
-                                + "WHERE j.queue = :q AND j.state = 'SUBMITTED' ORDER BY j.internalPosition ASC", JobInstance.class)
-                .setParameter("q", queue).getResultList();
+                                + "WHERE j.queue = :q AND j.state = :s ORDER BY j.internalPosition ASC", JobInstance.class)
+                .setParameter("q", queue).setParameter("s", State.SUBMITTED).getResultList();
 
         em.getTransaction().begin();
         for (JobInstance res : availableJobs)
@@ -99,7 +100,7 @@ class Polling implements Runnable
                 // It has already been eaten and finished by another engine
                 continue;
             }
-            if (!res.getState().equals("SUBMITTED"))
+            if (!res.getState().equals(State.SUBMITTED))
             {
                 em.lock(res, LockModeType.NONE);
                 continue;
@@ -113,7 +114,7 @@ class Polling implements Runnable
             }
 
             // Reserve the JI for this engine
-            res.setState("ATTRIBUTED");
+            res.setState(State.ATTRIBUTED);
             res.setNode(dp.getNode());
 
             // Stop at the first suitable JI. Release the lock & update the JI which has been attributed to us.

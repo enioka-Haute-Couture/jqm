@@ -36,6 +36,7 @@ import com.enioka.jqm.api.JobDefinition;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
+import com.enioka.jqm.jpamodel.State;
 
 public class JndiTest
 {
@@ -111,7 +112,7 @@ public class JndiTest
             throw e;
         }
 
-        Assert.assertEquals("ENDED", h.getStatus()); // Exception in jar => CRASHED
+        Assert.assertEquals(State.ENDED, h.getStatus()); // Exception in jar => CRASHED
     }
 
     @Test
@@ -158,7 +159,7 @@ public class JndiTest
             throw e;
         }
 
-        Assert.assertEquals("ENDED", h.getStatus()); // Exception in jar => CRASHED
+        Assert.assertEquals(State.ENDED, h.getStatus()); // Exception in jar => CRASHED
     }
 
     @Test
@@ -205,7 +206,7 @@ public class JndiTest
             throw e;
         }
 
-        Assert.assertEquals("CRASHED", h.getStatus()); // Exception in jar => CRASHED
+        Assert.assertEquals(State.CRASHED, h.getStatus()); // Exception in jar => CRASHED
     }
 
     @Test
@@ -246,7 +247,7 @@ public class JndiTest
             throw e;
         }
 
-        Assert.assertEquals("ENDED", h.getStatus()); // Exception in jar => CRASHED
+        Assert.assertEquals(State.ENDED, h.getStatus()); // Exception in jar => CRASHED
     }
 
     @Test

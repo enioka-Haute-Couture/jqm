@@ -35,6 +35,7 @@ import com.enioka.jqm.api.JobDefinition;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
+import com.enioka.jqm.jpamodel.State;
 
 public class FiboTest
 {
@@ -137,7 +138,7 @@ public class FiboTest
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
         for (History history : res)
         {
-            Assert.assertEquals("ENDED", history.getState());
+            Assert.assertEquals(State.ENDED, history.getState());
         }
         TestHelpers.printJobInstanceTable();
         Assert.assertEquals(i, (int) res.get(res.size() - 1).getId());

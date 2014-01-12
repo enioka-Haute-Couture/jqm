@@ -25,6 +25,8 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -80,7 +82,8 @@ public class History implements Serializable
     @Column(name = "parentJobId", nullable = true)
     private Integer parentJobId;
     @Column(length = 20, name = "status")
-    private String status = "SUBMITTED";
+    @Enumerated(EnumType.STRING)
+    private State status = State.SUBMITTED;
     @Column
     private String keyword1;
     @Column
@@ -255,17 +258,17 @@ public class History implements Serializable
         this.parentJobId = parentJobId;
     }
 
-    public String getStatus()
+    public State getStatus()
     {
         return status;
     }
 
-    public String getState()
+    public State getState()
     {
         return status;
     }
 
-    public void setStatus(String status)
+    public void setStatus(State status)
     {
         this.status = status;
     }

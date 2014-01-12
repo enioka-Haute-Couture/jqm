@@ -43,6 +43,7 @@ import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.jpamodel.State;
 
 /**
  * This class will soon become private. It is not part of the API.
@@ -199,7 +200,7 @@ public class CreationTools
 
     // ------------------ JOBINSTANCE --------------------------
 
-    public static JobInstance createJobInstance(JobDef jd, List<JobParameter> jps, String user, String sessionID, String state,
+    public static JobInstance createJobInstance(JobDef jd, List<JobParameter> jps, String user, String sessionID, State state,
             Integer position, Queue queue, Node node, EntityManager em)
     {
         JobInstance j = new JobInstance();

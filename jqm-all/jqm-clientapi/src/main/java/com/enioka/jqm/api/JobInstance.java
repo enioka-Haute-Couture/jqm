@@ -21,6 +21,8 @@ package com.enioka.jqm.api;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.enioka.jqm.jpamodel.State;
+
 /**
  * Represents the result of a job execution request - either a queued request, or a running job, or the result of said execution.
  * 
@@ -32,7 +34,7 @@ public class JobInstance
     private Integer parent;
     private String user;
     private String sessionID;
-    private String state;
+    private State state;
     private Integer position;
     private Queue queue;
     private Map<String, String> parameters = new HashMap<String, String>();
@@ -118,12 +120,12 @@ public class JobInstance
      * 
      * @return
      */
-    public String getState()
+    public State getState()
     {
         return state;
     }
 
-    void setState(String state)
+    void setState(State state)
     {
         this.state = state;
     }

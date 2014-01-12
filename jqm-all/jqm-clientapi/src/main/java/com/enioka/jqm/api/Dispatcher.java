@@ -57,6 +57,7 @@ import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.jpamodel.State;
 
 /**
  * Main JQM client API entry point.
@@ -279,7 +280,7 @@ public final class Dispatcher
         ji.setJd(job);
         ji.setSessionID(jd.getSessionID());
         ji.setUserName(jd.getUser());
-        ji.setState("SUBMITTED");
+        ji.setState(State.SUBMITTED);
         ji.setQueue(job.getQueue());
         ji.setNode(null);
         // Can be null (if no email is asked for)
@@ -413,18 +414,19 @@ public final class Dispatcher
         Integer res = null;
         jqmlogger.debug("Highlander mode analysis is begining");
         ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
-                .createQuery("SELECT j FROM JobInstance j WHERE j.jd.applicationName = :j", JobInstance.class)
-                .setParameter("j", jd.getApplicationName()).getResultList();
+                .createQuery("SELECT j FROM JobInstance j WHERE j.jd.applicationName = :j AND j.state = :s", JobInstance.class)
+                .setParameter("j", jd.getApplicationName()).setParameter("s", State.SUBMITTED).getResultList();
 
         for (JobInstance j : jobs)
         {
-            jqmlogger.debug("JI seeing by highlander: " + j.getId() + j.getState());
-            if (j.getState().equals("SUBMITTED"))
+            jqmlogger.debug("JI seen by highlander: " + j.getId() + j.getState());
+            if (j.getState().equals(State.SUBMITTED))
             {
                 // HIGLANDER: only one enqueued job can survive!
                 // current request must be cancelled and enqueue must returned the id of the existing submitted JI
                 jqmlogger.debug("In the highlander if");
                 res = j.getId();
+                break;
             }
         }
         jqmlogger.debug("Highlander mode will return: " + res);
@@ -566,7 +568,7 @@ public final class Dispatcher
         History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class).setParameter("j", idJob)
                 .getSingleResult();
 
-        j.setState("KILLED");
+        j.setState(State.KILLED);
 
         Message m = new Message();
         m.setHistory(h);
@@ -604,7 +606,7 @@ public final class Dispatcher
         Message m = em.createQuery("SELECT m FROM Message m WHERE m.history.id = :h AND m.textMessage = :msg", Message.class)
                 .setParameter("h", h.getId()).setParameter("msg", "Status updated: CRASHED").getSingleResult();
         em.remove(m);
-        ji.setState("SUBMITTED");
+        ji.setState(State.SUBMITTED);
         em.getTransaction().commit();
     }
 
@@ -666,7 +668,7 @@ public final class Dispatcher
                     "Could not lock a job by the given ID. It may already have been executed or a timeout may have occurred.", e);
         }
 
-        if (ji.getState() != "SUBMITTED")
+        if (!ji.getState().equals(State.SUBMITTED))
         {
             em.getTransaction().rollback();
             em.close();

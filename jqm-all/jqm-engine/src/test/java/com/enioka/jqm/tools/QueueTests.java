@@ -36,6 +36,7 @@ import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
+import com.enioka.jqm.jpamodel.State;
 
 public class QueueTests
 {
@@ -118,7 +119,7 @@ public class QueueTests
             TypedQuery<JobInstance> query = emm
                     .createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
                             JobInstance.class);
-            query.setParameter("s", "SUBMITTED").setParameter("ss", "ENDED");
+            query.setParameter("s", State.SUBMITTED).setParameter("ss", State.ENDED);
             job = (ArrayList<JobInstance>) query.getResultList();
             TestHelpers.printJobInstanceTable();
             if (job.size() > 2)
@@ -134,7 +135,7 @@ public class QueueTests
 
         for (JobInstance jobInstance : res)
         {
-            Assert.assertEquals("ENDED", jobInstance.getState());
+            Assert.assertEquals(State.ENDED, jobInstance.getState());
         }
     }
 
@@ -199,7 +200,7 @@ public class QueueTests
             TypedQuery<JobInstance> query = emm
                     .createQuery("SELECT j FROM JobInstance j WHERE j.state IS NOT :s AND j.state IS NOT :ss ORDER BY j.position ASC",
                             JobInstance.class);
-            query.setParameter("s", "SUBMITTED").setParameter("ss", "ENDED");
+            query.setParameter("s", State.SUBMITTED).setParameter("ss", State.ENDED);
             job = (ArrayList<JobInstance>) query.getResultList();
 
             if (job.size() > 3)
@@ -215,7 +216,7 @@ public class QueueTests
 
         for (JobInstance jobInstance : res)
         {
-            Assert.assertEquals("ENDED", jobInstance.getState());
+            Assert.assertEquals(State.ENDED, jobInstance.getState());
         }
     }
 
@@ -293,7 +294,7 @@ public class QueueTests
                             JobInstance.class);
             // 134 messages must be printed
 
-            query.setParameter("s", "SUBMITTED").setParameter("ss", "ENDED");
+            query.setParameter("s", State.SUBMITTED).setParameter("ss", State.ENDED);
             job = (ArrayList<JobInstance>) query.getResultList();
 
             if (job.size() > 3)
