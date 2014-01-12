@@ -18,6 +18,8 @@
 
 package com.enioka.jqm.jpamodel;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,19 +33,26 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "Deliverable")
-public class Deliverable
+public class Deliverable implements Serializable
 {
+    private static final long serialVersionUID = 4803101067798401977L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Integer id;
-    @Column(length = 1000, name = "filePath")
+
+    @Column(length = 1000, name = "filepath")
     protected String filePath;
-    @Column(length = 1000, name = "fileFamily")
+
+    @Column(length = 1000, name = "file_family")
     protected String fileFamily;
+
     @Column(nullable = false, name = "jobId")
     private Integer jobId;
+
     @Column(name = "randomId")
     private String randomId;
+
     @Column(name = "originalFileName")
     private String originalFileName;
 

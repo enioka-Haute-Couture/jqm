@@ -47,35 +47,50 @@ public class JobDef implements Serializable
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+
     @Column(name = "description")
     private String description;
+
     @Column(name = "canBeRestarted")
     private boolean canBeRestarted = true;
+
     @Column(nullable = false, length = 100, name = "javaClassName")
     private String javaClassName;
+
     @Column(length = 1000, name = "filePath")
     private String filePath;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "queue_id")
     private Queue queue;
+
     @Column(name = "maxTimeRunning")
     private Integer maxTimeRunning;
+
     @Column(nullable = false, name = "applicationName", unique = true)
     private String applicationName;
+
     @Column(length = 50, name = "application")
     private String application;
+
     @Column(length = 50, name = "module")
     private String module;
+
     @Column(length = 50, name = "keyword1")
     private String keyword1;
+
     @Column(length = 50, name = "keyword2")
     private String keyword2;
+
     @Column(length = 50, name = "keyword3")
     private String keyword3;
+
     @Column(name = "highlander", nullable = false)
     private boolean highlander = false;
+
     @Column(name = "jarPath")
     private String jarPath;
+
     @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "JobDefId")
     private List<JobDefParameter> parameters = new ArrayList<JobDefParameter>();

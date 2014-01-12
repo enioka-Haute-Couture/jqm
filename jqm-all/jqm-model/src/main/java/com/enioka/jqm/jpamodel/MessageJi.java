@@ -30,75 +30,64 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "JobParameter")
-public class JobParameter implements Serializable
+@Table(name = "MessageJi")
+public class MessageJi implements Serializable
 {
-    private static final long serialVersionUID = -8894511645365690426L;
+    private static final long serialVersionUID = 1234354709423602792L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    @Column(nullable = false, length = 50, name = "KEYNAME")
-    private String key;
-    @Column(nullable = false, length = 1000, name = "VALUE")
-    private String value;
 
-    @ManyToOne
-    @JoinColumn(name = "jobinstance_id")
+    @Column(length = 1000, name = "textmessage")
+    private String textMessage;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "jobinstance_id", nullable = false)
     private JobInstance jobInstance;
 
     /**
-     * @return the key
+     * @return the id
      */
-    public String getKey()
-    {
-        return key;
-    }
-
-    /**
-     * @param key
-     *            the key to set
-     */
-    public void setKey(final String key)
-    {
-        this.key = key;
-    }
-
-    /**
-     * @return the value
-     */
-    public String getValue()
-    {
-        return value;
-    }
-
-    /**
-     * @param value
-     *            the value to set
-     */
-    public void setValue(final String value)
-    {
-        this.value = value;
-    }
-
     public Integer getId()
     {
         return id;
     }
 
+    /**
+     * @param id
+     *            the id to set
+     */
     public void setId(final Integer id)
     {
         this.id = id;
     }
 
-    public JobInstance getJobinstance()
+    /**
+     * @return the textMessage
+     */
+    public String getTextMessage()
+    {
+        return textMessage;
+    }
+
+    /**
+     * @param textMessage
+     *            the textMessage to set
+     */
+    public void setTextMessage(final String textMessage)
+    {
+        this.textMessage = textMessage;
+    }
+
+    public JobInstance getJobInstance()
     {
         return jobInstance;
     }
 
-    public void setJobinstance(JobInstance jobinstance)
+    public void setJobInstance(JobInstance jobInstance)
     {
-        this.jobInstance = jobinstance;
+        this.jobInstance = jobInstance;
     }
 
 }

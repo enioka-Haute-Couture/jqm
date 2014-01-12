@@ -13,6 +13,7 @@
 		<class>com.enioka.jqm.jpamodel.JobDef</class>
 		<class>com.enioka.jqm.jpamodel.JobParameter</class>
 		<class>com.enioka.jqm.jpamodel.Message</class>
+		<class>com.enioka.jqm.jpamodel.MessageJi</class>
 		<class>com.enioka.jqm.jpamodel.DeploymentParameter</class>
 		<class>com.enioka.jqm.jpamodel.Node</class>
 		<class>com.enioka.jqm.jpamodel.Queue</class>

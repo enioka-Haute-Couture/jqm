@@ -1341,7 +1341,7 @@ public class JobBaseTest
         int ii = Dispatcher.enQueue(j);
 
         JqmEngine engine1 = new JqmEngine();
-        Dispatcher.jobBreak(i);
+        Dispatcher.pauseJob(i);
         TestHelpers.printJobInstanceTable();
         engine1.start("localhost");
         Thread.sleep(5000);
@@ -1676,7 +1676,7 @@ public class JobBaseTest
         int ii = Dispatcher.enQueue(j);
 
         JqmEngine engine1 = new JqmEngine();
-        Dispatcher.jobBreak(i);
+        Dispatcher.pauseJob(i);
         TestHelpers.printJobInstanceTable();
         engine1.start("localhost");
         Thread.sleep(5000);

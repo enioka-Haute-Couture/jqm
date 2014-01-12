@@ -19,6 +19,7 @@
 package com.enioka.jqm.api;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.enioka.jqm.jpamodel.State;
@@ -37,8 +38,10 @@ public class JobInstance
     private State state;
     private Integer position;
     private Queue queue;
+    private String keyword1, keyword2, keyword3;
     private Map<String, String> parameters = new HashMap<String, String>();
     private Integer progress;
+    private List<String> messages;
 
     /**
      * The Job instance ID. This is a key for numerous Dispatcher functions.
@@ -181,8 +184,48 @@ public class JobInstance
         return progress;
     }
 
-    public void setProgress(Integer progress)
+    void setProgress(Integer progress)
     {
         this.progress = progress;
+    }
+
+    public List<String> getMessages()
+    {
+        return messages;
+    }
+
+    void setMessages(List<String> messages)
+    {
+        this.messages = messages;
+    }
+
+    public String getKeyword1()
+    {
+        return keyword1;
+    }
+
+    void setKeyword1(String keyword1)
+    {
+        this.keyword1 = keyword1;
+    }
+
+    public String getKeyword2()
+    {
+        return keyword2;
+    }
+
+    void setKeyword2(String keyword2)
+    {
+        this.keyword2 = keyword2;
+    }
+
+    public String getKeyword3()
+    {
+        return keyword3;
+    }
+
+    void setKeyword3(String keyword3)
+    {
+        this.keyword3 = keyword3;
     }
 }

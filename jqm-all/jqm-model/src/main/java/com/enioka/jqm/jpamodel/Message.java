@@ -22,7 +22,6 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,15 +33,17 @@ import javax.persistence.Table;
 @Table(name = "Message")
 public class Message implements Serializable
 {
-
     private static final long serialVersionUID = 1234354709423602792L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    @Column(length = 1000, name = "textMessage")
+
+    @Column(length = 1000, name = "text_message")
     private String textMessage;
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "message_history", nullable = false)
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "history_id", nullable = false)
     private History history;
 
     /**

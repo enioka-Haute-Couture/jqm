@@ -68,7 +68,9 @@ public final class Dispatcher
     private static final String PERSISTENCE_UNIT = "jobqueue-api-pu";
 
     private Dispatcher()
-    {}
+    {
+
+    }
 
     private static EntityManagerFactory emf = null;
 
@@ -342,7 +344,7 @@ public final class Dispatcher
      * @param idJob
      * @return void
      */
-    public static void jobBreak(int idJob)
+    public static void pauseJob(int idJob)
     {
         jqmlogger.debug("Job status number " + idJob + " will be set to HOLDED");
         EntityManager em = getEm();
@@ -405,7 +407,7 @@ public final class Dispatcher
 
     // ----------------------------- HIGHLANDER --------------------------------------
     // Must be called within an active JPA transaction
-    public static Integer highlanderMode(JobDef jd, EntityManager em)
+    private static Integer highlanderMode(JobDef jd, EntityManager em)
     {
         // Synchronization is done through locking the JobDef
         em.lock(jd, LockModeType.PESSIMISTIC_WRITE);

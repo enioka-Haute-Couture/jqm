@@ -19,6 +19,7 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -35,6 +36,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  * 
@@ -49,33 +52,65 @@ public class JobInstance implements Serializable
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "jd_id")
     private JobDef jd;
+
     @Column(name = "parentId")
     private Integer parentId;
+
     @Column(length = 50, name = "username")
     private String userName;
+
     @Column(name = "sessionId")
     private String sessionID;
+
     @Column(length = 50, name = "state")
     @Enumerated(EnumType.STRING)
     private State state;
+
     @ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Queue.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "queue_id")
     private Queue queue;
+
     @ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Node.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "node_id")
     private Node node;
+
     @Column(name = "sendEmail")
     private String email;
+
     @Column(name = "progress")
     private Integer progress;
+
     @Column(name = "internalPosition", nullable = false)
     private double internalPosition;
 
-    @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "jobinstance")
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "creationDate")
+    private Calendar creationDate;
+
+    @Column(length = 50, name = "application")
+    private String application;
+
+    @Column(length = 50, name = "module")
+    private String module;
+
+    @Column(length = 50, name = "keyword1")
+    private String keyword1;
+
+    @Column(length = 50, name = "keyword2")
+    private String keyword2;
+
+    @Column(length = 50, name = "keyword3")
+    private String keyword3;
+
+    @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "jobInstance")
     private List<JobParameter> parameters;
+
+    @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "jobInstance")
+    private List<MessageJi> messages;
 
     public int getCurrentPosition(EntityManager em)
     {
@@ -208,5 +243,80 @@ public class JobInstance implements Serializable
     public void setParentId(Integer parentId)
     {
         this.parentId = parentId;
+    }
+
+    public Calendar getCreationDate()
+    {
+        return creationDate;
+    }
+
+    public void setCreationDate(Calendar creationDate)
+    {
+        this.creationDate = creationDate;
+    }
+
+    public String getApplication()
+    {
+        return application;
+    }
+
+    public void setApplication(String application)
+    {
+        this.application = application;
+    }
+
+    public String getModule()
+    {
+        return module;
+    }
+
+    public void setModule(String module)
+    {
+        this.module = module;
+    }
+
+    public String getKeyword1()
+    {
+        return keyword1;
+    }
+
+    public void setKeyword1(String keyword1)
+    {
+        this.keyword1 = keyword1;
+    }
+
+    public String getKeyword2()
+    {
+        return keyword2;
+    }
+
+    public void setKeyword2(String keyword2)
+    {
+        this.keyword2 = keyword2;
+    }
+
+    public String getKeyword3()
+    {
+        return keyword3;
+    }
+
+    public void setKeyword3(String keyword3)
+    {
+        this.keyword3 = keyword3;
+    }
+
+    public List<MessageJi> getMessages()
+    {
+        return messages;
+    }
+
+    public void setMessages(List<MessageJi> messages)
+    {
+        this.messages = messages;
+    }
+
+    public void setId(Integer id)
+    {
+        this.id = id;
     }
 }

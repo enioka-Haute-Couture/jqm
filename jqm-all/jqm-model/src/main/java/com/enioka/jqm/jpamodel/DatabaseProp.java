@@ -31,22 +31,24 @@ import javax.persistence.Table;
 @Table(name = "DatabaseProp")
 public class DatabaseProp implements Serializable
 {
-
-    /**
-	 *
-	 */
     private static final long serialVersionUID = 5286608402747360301L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Integer id;
+
     @Column(nullable = false, name = "driver")
     private String driver;
+
     @Column(nullable = false, name = "name", unique = true)
     private String name;
+
     @Column(nullable = false, name = "url")
     private String url;
+
     @Column(nullable = false, name = "username")
     private String userName;
+
     @Column(nullable = false, name = "pwd")
     private String pwd;
 

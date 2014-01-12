@@ -43,80 +43,113 @@ import javax.persistence.TemporalType;
 public class History implements Serializable
 {
     private static final long serialVersionUID = -5249529794213078668L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    
-    @Column(name = "returnedValue")
-    private Integer returnedValue;
-    
-    @JoinColumn(name = "jd")
+
+    /************/
+    /* Identity */
+
+    @JoinColumn(name = "jobdef_id")
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.JobDef.class)
     private JobDef jd;
-    
-    @Column(name = "sessionId")
-    private String sessionId;
-    
+
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.Queue.class)
-    @JoinColumn(name = "queue")
+    @JoinColumn(name = "queue_id")
     private Queue queue;
-    
-    @OneToMany(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Message.class, cascade = CascadeType.ALL, mappedBy = "history")
-    private List<Message> messages;
-    
-    @Column(nullable = true)
-    private Integer jobInstanceId;
-    
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "enqueueDate")
-    private Calendar enqueueDate;
-    
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "executionDate")
-    private Calendar executionDate;
-    
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "endDate", nullable = true)
-    private Calendar endDate;
-    
-    @Column(name = "userName", nullable = true)
-    private String userName;
-    
+
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Node.class)
-    @JoinColumn(name = "node")
+    @JoinColumn(name = "node_id")
     private Node node;
-    
+
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "history_id")
     private List<JobHistoryParameter> parameters;
-    
-    @Column(name = "email")
-    private String email;
-    
-    @Column(name = "parentJobId", nullable = true)
-    private Integer parentJobId;
-    
+
+    @Column(name = "highlander")
+    private boolean highlander = false;
+
+    /***********/
+    /* RESULTS */
+
     @Column(length = 20, name = "status")
     @Enumerated(EnumType.STRING)
     private State status = State.SUBMITTED;
-    
-    @Column
-    private String keyword1;
-    
-    @Column
-    private String keyword2;
-    
-    @Column
-    private String keyword3;
-    
-    @Column
-    private String application;
-    
-    @Column
-    private String module;
-    
+
+    @Column(name = "return_code")
+    private Integer returnedValue;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "history")
+    private List<Message> messages;
+
     @Column
     private Integer progress;
+
+    /***********/
+    /* TIME */
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "enqueue_date")
+    private Calendar enqueueDate;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "execution_date")
+    private Calendar executionDate;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "end_date", nullable = true)
+    private Calendar endDate;
+
+    /***************************/
+    /* Instance classification */
+
+    @Column(name = "session_id")
+    private String sessionId;
+
+    @Column(name = "job_instance_id", nullable = false)
+    private Integer jobInstanceId;
+
+    @Column(name = "username")
+    private String userName;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "parent_job_id")
+    private Integer parentJobId;
+
+    @Column(length = 50, name = "instance_application")
+    private String instanceApplication;
+
+    @Column(length = 50, name = "instance_module")
+    private String instanceModule;
+
+    @Column(length = 50, name = "instance_keyword1")
+    private String instanceKeyword1;
+
+    @Column(length = 50, name = "instance_keyword2")
+    private String instanceKeyword2;
+
+    @Column(length = 50, name = "instance_keyword3")
+    private String instanceKeyword3;
+
+    /**************************/
+    /* Job Def classification */
+    @Column(length = 50, name = "keyword1")
+    private String keyword1;
+
+    @Column(length = 50, name = "keyword2")
+    private String keyword2;
+
+    @Column(length = 50, name = "keyword3")
+    private String keyword3;
+
+    @Column(length = 50, name = "application")
+    private String application;
+
+    @Column(length = 50, name = "module")
+    private String module;
 
     public Integer getId()
     {
@@ -364,5 +397,65 @@ public class History implements Serializable
     {
 
         this.progress = progress;
+    }
+
+    public boolean isHighlander()
+    {
+        return highlander;
+    }
+
+    public void setHighlander(boolean highlander)
+    {
+        this.highlander = highlander;
+    }
+
+    public String getInstanceApplication()
+    {
+        return instanceApplication;
+    }
+
+    public void setInstanceApplication(String instanceApplication)
+    {
+        this.instanceApplication = instanceApplication;
+    }
+
+    public String getInstanceModule()
+    {
+        return instanceModule;
+    }
+
+    public void setInstanceModule(String instanceModule)
+    {
+        this.instanceModule = instanceModule;
+    }
+
+    public String getInstanceKeyword1()
+    {
+        return instanceKeyword1;
+    }
+
+    public void setInstanceKeyword1(String instanceKeyword1)
+    {
+        this.instanceKeyword1 = instanceKeyword1;
+    }
+
+    public String getInstanceKeyword2()
+    {
+        return instanceKeyword2;
+    }
+
+    public void setInstanceKeyword2(String instanceKeyword2)
+    {
+        this.instanceKeyword2 = instanceKeyword2;
+    }
+
+    public String getInstanceKeyword3()
+    {
+        return instanceKeyword3;
+    }
+
+    public void setInstanceKeyword3(String instanceKeyword3)
+    {
+        this.instanceKeyword3 = instanceKeyword3;
     }
 }

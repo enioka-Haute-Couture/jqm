@@ -37,6 +37,7 @@ public class JobDefinition
     private String keyword2;
     private String keyword3;
     private String email = null;
+    private String parentJobId = null;
     private Map<String, String> parameters = new HashMap<String, String>();
 
     JobDefinition()
@@ -335,5 +336,15 @@ public class JobDefinition
     public void setEmail(String email)
     {
         this.email = email;
+    }
+
+    public String getParentJobId()
+    {
+        return parentJobId;
+    }
+
+    public void setParentJobId(String parentJobId)
+    {
+        this.parentJobId = parentJobId;
     }
 }
