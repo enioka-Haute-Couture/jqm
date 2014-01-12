@@ -21,11 +21,9 @@ package com.enioka.jqm.tools;
 import java.util.Properties;
 
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityManager;
@@ -49,23 +47,27 @@ class Mail
     {
         try
         {
-            this.host = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-                    .setParameter("k", "mailSmtp").getSingleResult();
-            this.from = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-                    .setParameter("k", "mailFrom").getSingleResult();
             this.ji = ji;
-            this.port = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k", String.class)
-                    .setParameter("k", "mailPort").getSingleResult();
             this.to = ji.getEmail();
+
+            String query = "SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k";
+            this.host = em.createQuery(query, String.class).setParameter("k", "mailSmtp").getSingleResult();
+            this.from = em.createQuery(query, String.class).setParameter("k", "mailFrom").getSingleResult();
+            this.port = em.createQuery(query, String.class).setParameter("k", "mailPort").getSingleResult();
         }
         catch (NoResultException e)
         {
-            jqmlogger.debug("Some information have been forgotten. JQM can't send emails", e);
+            jqmlogger.warn("Some JQM configuration data is missing. JQM can't send emails", e);
         }
     }
 
     void send()
     {
+        if (this.to == null || this.host == null || this.from == null || this.port == null)
+        {
+            jqmlogger.warn("cannot send mails - incorrect configuration");
+            return;
+        }
         jqmlogger.debug("Preparation of the email");
         jqmlogger.debug("The email will be sent to: " + to);
         Properties props = new Properties();
@@ -100,11 +102,7 @@ class Mail
             Transport.send(msg);
             jqmlogger.debug("Email sent successfully...");
         }
-        catch (AddressException e)
-        {
-            jqmlogger.warn("Could not send email. Job has nevertheless run correctly", e);
-        }
-        catch (MessagingException e)
+        catch (Exception e)
         {
             jqmlogger.warn("Could not send email. Job has nevertheless run correctly", e);
         }

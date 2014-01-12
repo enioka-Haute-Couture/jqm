@@ -18,6 +18,7 @@
 
 package com.enioka.jqm.jndi;
 
+import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
 import org.apache.log4j.Logger;
@@ -33,7 +34,9 @@ public final class JndiContextFactory
     private static Logger jqmlogger = Logger.getLogger(JndiContextFactory.class);
 
     private JndiContextFactory()
-    {}
+    {
+
+    }
 
     /**
      * Will create a JNDI Context and register it as the initial context factory builder
@@ -41,9 +44,9 @@ public final class JndiContextFactory
      * @param cl
      *            a classloader with visibility on the JPA files
      * @return the context
-     * @throws Exception
+     * @throws NamingExceptions
      */
-    public static JndiContext createJndiContext(ClassLoader cl) throws Exception
+    public static JndiContext createJndiContext(ClassLoader cl) throws NamingException
     {
         try
         {
@@ -57,7 +60,9 @@ public final class JndiContextFactory
         catch (Exception e)
         {
             jqmlogger.error("Could not create JNDI context: " + e.getMessage());
-            throw new Exception("could not init Jndi Context", e);
+            NamingException ex = new NamingException("could not init Jndi Context");
+            ex.setRootCause(e);
+            throw ex;
         }
 
     }

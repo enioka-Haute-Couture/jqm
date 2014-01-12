@@ -27,6 +27,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -72,9 +74,7 @@ class Loader implements Runnable
     private Polling p = null;
     private String res = null;
     private String lib = null;
-    private URL jarUrl = null;
     private File jarFile = null;
-    private File pomFile = null;
     private File extractDir = null;
     private ClassLoader contextClassLoader = null;
     private boolean shouldCleanupExtractedZip = false;
@@ -99,7 +99,10 @@ class Loader implements Runnable
         try
         {
             jar = new JarFile(jarFile);
-            extractDir.mkdir();
+            if (!extractDir.exists() && !extractDir.mkdir())
+            {
+                throw new IOException("could not create directory " + extractDir.getAbsolutePath());
+            }
             Enumeration<JarEntry> enumm = jar.entries();
             while (enumm.hasMoreElements())
             {
@@ -107,9 +110,13 @@ class Loader implements Runnable
                 jqmlogger.debug("file: " + file.getName());
                 File f = new File(extractDir + File.separator + file.getName());
                 if (file.isDirectory())
-                { // if its a directory, create it
+                {
+                    // if its a directory, create it
                     jqmlogger.debug("The file is actually a directory");
-                    f.mkdir();
+                    if (!f.mkdir())
+                    {
+                        throw new IOException("could not create directory " + f.getAbsolutePath());
+                    }
                     continue;
                 }
 
@@ -196,7 +203,7 @@ class Loader implements Runnable
         }
     }
 
-    void classpathResolution(Node node) throws MalformedURLException, DependencyResolutionException, NoPomException
+    private void classpathResolution(Node node) throws MalformedURLException, DependencyResolutionException, NoPomException
     {
         if (cache.containsKey(job.getJd().getApplicationName()))
         {
@@ -204,7 +211,7 @@ class Loader implements Runnable
         }
         File local = new File(System.getProperty("user.home") + "/.m2/repository");
         Collection<Artifact> deps = null;
-        pomFile = new File(FilenameUtils.concat(FilenameUtils.concat(node.getRepo(), job.getJd().getFilePath()), "pom.xml"));
+        File pomFile = new File(FilenameUtils.concat(FilenameUtils.concat(node.getRepo(), job.getJd().getFilePath()), "pom.xml"));
         File libDir = new File(FilenameUtils.concat(FilenameUtils.concat(node.getRepo(), job.getJd().getFilePath()), "lib"));
         jqmlogger.debug("Loader will try to load POM " + pomFile.getAbsolutePath());
         boolean pomFromJar = false;
@@ -246,10 +253,11 @@ class Loader implements Runnable
                     cleanUpExtractedZip();
                 }
             }
-            catch (Exception e)
+            catch (IOException e)
             {
                 IOUtils.closeQuietly(is);
                 IOUtils.closeQuietly(os);
+                throw new NoPomException("Could not handle pom", e);
             }
         }
 
@@ -333,7 +341,7 @@ class Loader implements Runnable
                     continue;
                 }
                 tmp[i] = artifact.getFile().toURI().toURL();
-                jqmlogger.debug("Artifact: " + artifact.getFile().toURI().toURL());
+                jqmlogger.debug("Artifact from pom: " + artifact.getFile().toURI().toURL());
                 i++;
             }
 
@@ -341,9 +349,9 @@ class Loader implements Runnable
             this.cache.put(job.getJd().getApplicationName(), tmp);
 
             // Cleanup
-            if (pomFromJar)
+            if (pomFromJar && !pomFile.delete())
             {
-                pomFile.delete();
+                jqmlogger.warn("Could not delete the temp pom file extracted from the jar.");
             }
         }
 
@@ -357,7 +365,7 @@ class Loader implements Runnable
             for (int i = 0; i < files.length; i++)
             {
                 tmp[i] = files[i].toURI().toURL();
-                jqmlogger.debug("Artifact: " + tmp[i]);
+                jqmlogger.debug("Artifact from lib dir: " + tmp[i]);
             }
 
             // Put in cache
@@ -372,6 +380,7 @@ class Loader implements Runnable
         State resultStatus = State.SUBMITTED;
         jqmlogger.debug("LOADER HAS JUST STARTED UP FOR JOB INSTANCE " + job.getId());
         jarFile = new File(CheckFilePath.fixFilePath(node.getRepo()) + job.getJd().getJarPath());
+        final URL jarUrl;
         try
         {
             jarUrl = jarFile.toURI().toURL();
@@ -397,7 +406,7 @@ class Loader implements Runnable
                 }
                 else
                 {
-                    jqmlogger.debug("Application " + job.getJd().getApplicationName() + " dependencies are already in cache - "
+                    jqmlogger.debug("Application  " + job.getJd().getApplicationName() + " dependencies are already in cache - "
                             + cache.get(job.getJd().getApplicationName()).length);
                     for (URL s : cache.get(job.getJd().getApplicationName()))
                     {
@@ -455,7 +464,13 @@ class Loader implements Runnable
             contextClassLoader = Thread.currentThread().getContextClassLoader();
 
             // At this point, the CLASSPATH is always in cache, so just create the CL with it.
-            jobClassLoader = new JarClassLoader(jarUrl, cache.get(job.getJd().getApplicationName()));
+            jobClassLoader = AccessController.doPrivileged(new PrivilegedAction<JarClassLoader>()
+            {
+                public JarClassLoader run()
+                {
+                    return new JarClassLoader(jarUrl, cache.get(job.getJd().getApplicationName()));
+                }
+            });
 
             // Switch
             jqmlogger.debug("Setting class loader");
@@ -480,7 +495,7 @@ class Loader implements Runnable
         }
         catch (JqmKillException e)
         {
-            jqmlogger.info("Job instance " + job.getId() + " has been killed.");
+            jqmlogger.info("Job instance  " + job.getId() + " has been killed.");
             resultStatus = State.KILLED;
         }
         catch (Exception e)
@@ -488,14 +503,14 @@ class Loader implements Runnable
             jqmlogger.info("Job instance " + job.getId() + " has crashed. Exception was:", e);
             resultStatus = State.CRASHED;
         }
-        jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
+        jqmlogger.debug("++++++++++++++++++++++++++++++++++++++++");
 
         // Job instance has now ended its run
         endOfRun(resultStatus);
 
         jqmlogger.debug("End of loader. Thread will now end");
         jqmlogger.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-        jqmlogger.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+        jqmlogger.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
         em.close();
 
@@ -571,16 +586,5 @@ class Loader implements Runnable
             em.remove(job);
             em.getTransaction().commit();
         }
-
-    }
-
-    public String getLib()
-    {
-        return lib;
-    }
-
-    public void setLib(String lib)
-    {
-        this.lib = lib;
     }
 }

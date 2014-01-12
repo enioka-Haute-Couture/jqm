@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -47,10 +48,7 @@ class QueueXmlParser
     private String name = null;
     private String description = null;
     private String timeToLive = null;
-    private ArrayList<String> jobs = new ArrayList<String>();
-
-    QueueXmlParser()
-    {}
+    private List<String> jobs = new ArrayList<String>();
 
     void parse(String path) throws ParserConfigurationException, IOException
     {
@@ -124,7 +122,7 @@ class QueueXmlParser
                         {
                             q = em.createQuery("SELECT q FROM Queue q WHERE q.name = :n", Queue.class).setParameter("n", name)
                                     .getSingleResult();
-                            jqmlogger.info("The queue " + name + "already exists. The information will be overrided");
+                            jqmlogger.info("The queue " + name + "already exists. It will be overriden");
                             q.setDescription(description);
                             q.setTimeToLive(Integer.parseInt(timeToLive));
                         }

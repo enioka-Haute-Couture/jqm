@@ -73,7 +73,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
         String baseCtx = name.split("/")[0];
         ClassLoader tmp = Thread.currentThread().getContextClassLoader();
 
-        if (baseCtx.equals("jdbc"))
+        if ("jdbc".equals(baseCtx))
         {
             jqmlogger.debug("JNDI context is database");
 
@@ -120,7 +120,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
             Thread.currentThread().setContextClassLoader(tmp);
             return ds;
         }
-        else if (baseCtx.equals("jms") || baseCtx.equals("fs"))
+        else if ("jms".equals(baseCtx) || "fs".equals(baseCtx))
         {
             // Retrieve the resource description from the database
             JndiObjectResource resource = null;
@@ -155,8 +155,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
             // Create the resource
             try
             {
-                Object o = rf.getObjectInstance(d, new CompositeName(baseCtx), this, new Hashtable<String, Object>());
-                return o;
+                return rf.getObjectInstance(d, new CompositeName(baseCtx), this, new Hashtable<String, Object>());
             }
             catch (Exception e)
             {

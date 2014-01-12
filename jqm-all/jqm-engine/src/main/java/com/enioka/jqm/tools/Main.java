@@ -42,6 +42,11 @@ public class Main
 {
     private static Logger jqmlogger = Logger.getLogger(Main.class);
 
+    private Main()
+    {
+        // Static class
+    }
+
     /**
      * Startup method for the packaged JAR
      * 

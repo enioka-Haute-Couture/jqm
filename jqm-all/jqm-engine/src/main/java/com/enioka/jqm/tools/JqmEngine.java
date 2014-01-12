@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
+import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
@@ -64,7 +65,7 @@ class JqmEngine
      *            - [0] = nodename
      * @throws Exception
      */
-    public void start(String nodeName) throws Exception
+    public void start(String nodeName)
     {
         java.lang.System.setProperty("log4j.debug", "true");
 
@@ -87,7 +88,14 @@ class JqmEngine
         // JNDI
         if (jndiCtx == null)
         {
-            jndiCtx = JndiContextFactory.createJndiContext(Thread.currentThread().getContextClassLoader());
+            try
+            {
+                jndiCtx = JndiContextFactory.createJndiContext(Thread.currentThread().getContextClassLoader());
+            }
+            catch (NamingException e)
+            {
+                throw new JqmInitError("Could not register the JNDI provider", e);
+            }
         }
 
         // Jetty
@@ -106,8 +114,19 @@ class JqmEngine
         catch (BindException e)
         {
             // JETTY-839: threadpool not daemon nor close on exception
-            server.stop();
-            throw e;
+            try
+            {
+                server.stop();
+            }
+            catch (Exception e1)
+            {
+                // We are crashing anyway...
+            }
+            throw new JqmInitError("Could not start web server - check there is no other process binding on this port & interface", e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmInitError("Could not start web server - not a port issue, but a generic one", e);
         }
         jqmlogger.info("Jetty has started");
 
@@ -214,21 +233,21 @@ class JqmEngine
                 // Faulty configuration, but why not
                 q = em.createQuery("SELECT q FROM Queue q", Queue.class).getResultList().get(0);
                 q.setDefaultQueue(true);
-                jqmlogger.warn("Queue " + q.getName() + " was modified to become the default queue as there was no default queue");
+                jqmlogger.warn("Queue " + q.getName() + " was modified to become the default queue as there were mutliple default queue");
             }
             catch (NoResultException e)
             {
                 // Faulty configuration, but why not
                 q = em.createQuery("SELECT q FROM Queue q", Queue.class).getResultList().get(0);
                 q.setDefaultQueue(true);
-                jqmlogger.warn("Queue " + q.getName() + " was modified to become the default queue as there was no default queue");
+                jqmlogger.warn("Queue  " + q.getName() + " was modified to become the default queue as there was no default queue");
             }
         }
 
         // GlobalParameter
         GlobalParameter gp = null;
-        i = (Long) em.createQuery("SELECT COUNT(gp) FROM GlobalParameter gp WHERE gp.key = :k").setParameter("k", "defaultConnection")
-                .getSingleResult();
+        i = (Long) em.createQuery("SELECT COUNT(gp) FROM GlobalParameter gp WHERE gp.key = :k")
+                .setParameter("k", Constants.GP_DEFAULT_CONNECTION_KEY).getSingleResult();
         if (i == 0)
         {
             gp = new GlobalParameter();
@@ -243,8 +262,8 @@ class JqmEngine
             em.persist(gp);
 
             gp = new GlobalParameter();
-            gp.setKey("defaultConnection");
-            gp.setValue("jdbc/jqm");
+            gp.setKey(Constants.GP_DEFAULT_CONNECTION_KEY);
+            gp.setValue(Constants.GP_JQM_CONNECTION_ALIAS);
             em.persist(gp);
 
             gp = new GlobalParameter();
@@ -283,7 +302,8 @@ class JqmEngine
         DatabaseProp localDb = null;
         try
         {
-            localDb = (DatabaseProp) em.createQuery("SELECT dp FROM DatabaseProp dp WHERE dp.name = 'jdbc/jqm'").getSingleResult();
+            localDb = (DatabaseProp) em.createQuery("SELECT dp FROM DatabaseProp dp WHERE dp.name = :alias")
+                    .setParameter("alias", Constants.GP_JQM_CONNECTION_ALIAS).getSingleResult();
             jqmlogger.info("The jdbc/jqm alias already exists and references " + localDb.getUrl());
         }
         catch (NoResultException e)
@@ -291,7 +311,7 @@ class JqmEngine
             Map<String, Object> props = em.getEntityManagerFactory().getProperties();
             localDb = new DatabaseProp();
             localDb.setDriver((String) props.get("javax.persistence.jdbc.driver"));
-            localDb.setName("jdbc/jqm");
+            localDb.setName(Constants.GP_JQM_CONNECTION_ALIAS);
             localDb.setPwd((String) props.get("javax.persistence.jdbc.password"));
             localDb.setUrl((String) props.get("javax.persistence.jdbc.url"));
             localDb.setUserName((String) props.get("javax.persistence.jdbc.user"));

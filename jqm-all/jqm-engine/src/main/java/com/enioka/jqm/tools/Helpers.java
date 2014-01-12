@@ -48,6 +48,11 @@ public final class Helpers
     private static Properties props = new Properties();
     private static EntityManagerFactory emf;
 
+    Helpers()
+    {
+
+    }
+
     /**
      * Get a fresh EM on the jobqueue-api-pu persistence Unit
      * 
@@ -84,16 +89,13 @@ public final class Helpers
         {
             jqmlogger.fatal("conf/db.properties file is invalid", e);
             IOUtils.closeQuietly(fis);
-            System.exit(1);
-            // Stupid, just for Eclipse's parser and therefore avoid red lines...
-            return null;
+            throw new JqmInitError("Invalid database configuration configuration file", e);
         }
         catch (Exception e)
         {
             jqmlogger.fatal("Unable to connect with the database. Maybe your configuration file is wrong. "
                     + "Please check the password or the url in the $JQM_DIR/conf/db.properties", e);
-            System.exit(1);
-            return null;
+            throw new JqmInitError("Database connection issue", e);
         }
         finally
         {

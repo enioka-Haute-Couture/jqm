@@ -21,13 +21,14 @@ package com.enioka.jqm.tools;
 final class CheckFilePath
 {
     private CheckFilePath()
-    {}
+    {
+        // Static class
+    }
 
     static boolean isValidFilePath(String fp)
     {
         Integer length = fp.length();
-        return (fp.charAt(length - 1) == '/');
-
+        return fp.charAt(length - 1) == '/';
     }
 
     static String fixFilePath(String fp)

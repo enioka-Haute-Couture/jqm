@@ -17,7 +17,7 @@ public class SecurityManagerPayload extends SecurityManager
     @Override
     public void checkPermission(Permission perm)
     {
-
+        // Not throwing SecurityException = allowed.
     }
 
     /**
@@ -26,7 +26,7 @@ public class SecurityManagerPayload extends SecurityManager
     @Override
     public void checkExit(int status)
     {
-        Class stack[] = getClassContext();
+        Class[] stack = getClassContext();
         if (stack.length > 3 && stack[3].getClassLoader() instanceof JarClassLoader)
         {
             throw new SecurityException("JQM payloads cannot call System.exit() - this would stop JQM itself!");

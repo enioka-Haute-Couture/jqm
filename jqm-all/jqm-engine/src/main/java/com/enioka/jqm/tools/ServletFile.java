@@ -61,6 +61,7 @@ class ServletFile extends HttpServlet
         {
             jqmlogger.info("A request for an unexisting file was received", e);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
         File f = new File(d.getFilePath());
         jqmlogger.debug("A file will be returned: " + f.getAbsolutePath());

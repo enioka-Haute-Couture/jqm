@@ -263,7 +263,7 @@ class Polling implements Runnable
                 em.getTransaction().commit();
 
                 // Run it
-                tp.run(ji, this, false);
+                tp.run(ji, this);
 
                 // Done for this loop
                 jqmlogger.debug("End of poller loop  on queue " + this.queue.getName());

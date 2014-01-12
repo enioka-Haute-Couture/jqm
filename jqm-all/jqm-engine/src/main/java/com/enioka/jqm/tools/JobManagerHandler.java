@@ -28,7 +28,7 @@ import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.State;
 
-public class JobManagerHandler implements InvocationHandler
+class JobManagerHandler implements InvocationHandler
 {
     private Logger jqmlogger = Logger.getLogger(JobManagerHandler.class);
 
@@ -48,58 +48,58 @@ public class JobManagerHandler implements InvocationHandler
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
-        String method_name = method.getName();
+        String methodName = method.getName();
         Class<?>[] classes = method.getParameterTypes();
-        jqmlogger.trace("An engine API method was called: " + method_name + " with nb arguments: " + classes.length);
+        jqmlogger.trace("An engine API method was called: " + methodName + " with nb arguments: " + classes.length);
         shouldKill();
 
         if (classes.length == 0)
         {
-            if (method_name.equals("jobApplicationId"))
+            if ("jobApplicationId".equals(methodName))
             {
                 return ji.getJd().getId();
             }
-            else if (method_name.equals("parentID"))
+            else if ("parentID".equals(methodName))
             {
                 return ji.getParentId();
             }
-            else if (method_name.equals("jobInstanceID"))
+            else if ("jobInstanceID".equals(methodName))
             {
                 return ji.getId();
             }
-            else if (method_name.equals("canBeRestarted"))
+            else if ("canBeRestarted".equals(methodName))
             {
                 return ji.getJd().isCanBeRestarted();
             }
-            else if (method_name.equals("applicationName"))
+            else if ("applicationName".equals(methodName))
             {
                 return ji.getJd().getApplicationName();
             }
-            else if (method_name.equals("sessionID"))
+            else if ("sessionID".equals(methodName))
             {
                 return ji.getSessionID();
             }
-            else if (method_name.equals("application"))
+            else if ("application".equals(methodName))
             {
                 return ji.getJd().getApplication();
             }
-            else if (method_name.equals("module"))
+            else if ("module".equals(methodName))
             {
                 return ji.getJd().getModule();
             }
-            else if (method_name.equals("keyword1"))
+            else if ("keyword1".equals(methodName))
             {
                 return ji.getJd().getKeyword1();
             }
-            else if (method_name.equals("keyword2"))
+            else if ("keyword2".equals(methodName))
             {
                 return ji.getJd().getKeyword2();
             }
-            else if (method_name.equals("keyword3"))
+            else if ("keyword3".equals(methodName))
             {
                 return ji.getJd().getKeyword3();
             }
-            else if (method_name.equals("parameters"))
+            else if ("parameters".equals(methodName))
             {
                 Map<String, String> res = new HashMap<String, String>();
                 for (JobParameter p : ji.getParameters())
@@ -108,67 +108,52 @@ public class JobManagerHandler implements InvocationHandler
                 }
                 return res;
             }
-            else if (method_name.equals("defaultConnect"))
+            else if ("defaultConnect".equals(methodName))
             {
                 return this.getDefaultConnectionAlias();
             }
-            else if (method_name.equals("getDefaultConnection"))
+            else if ("getDefaultConnection".equals(methodName))
             {
                 return this.getDefaultConnection();
             }
-            else if (method_name.equals("getWorkDir"))
+            else if ("getWorkDir".equals(methodName))
             {
                 return getWorkDir();
             }
-            else if (method_name.equals("yield"))
+            else if ("yield".equals(methodName))
             {
                 return null;
             }
         }
-        else if (method_name.equals("sendMsg"))
+        else if ("sendMsg".equals(methodName) && classes.length == 1 && classes[0] == String.class)
         {
-            if (classes.length == 1 && classes[0] == String.class)
-            {
-                sendMsg((String) args[0]);
-                return null;
-            }
+            sendMsg((String) args[0]);
+            return null;
         }
-        else if (method_name.equals("sendProgress"))
+        else if ("sendProgress".equals(methodName) && classes.length == 1 && classes[0] == Integer.class)
         {
-            if (classes.length == 1 && classes[0] == Integer.class)
-            {
-                sendProgress((Integer) args[0]);
-                return null;
-            }
+            sendProgress((Integer) args[0]);
+            return null;
         }
-        else if (method_name.equals("enqueue"))
+        else if ("enqueue".equals(methodName) && classes.length == 10 && classes[0] == String.class)
         {
-            if (classes.length == 10 && classes[0] == String.class)
-            {
-                return enqueue((String) args[0], (String) args[1], (String) args[2], (String) args[3], (String) args[4], (String) args[5],
-                        (String) args[6], (String) args[7], (String) args[8], (Map<String, String>) args[9]);
-            }
+            return enqueue((String) args[0], (String) args[1], (String) args[2], (String) args[3], (String) args[4], (String) args[5],
+                    (String) args[6], (String) args[7], (String) args[8], (Map<String, String>) args[9]);
         }
-        else if (method_name.equals("enqueueSync"))
+        else if ("enqueueSync".equals(methodName) && classes.length == 10 && classes[0] == String.class)
         {
-            if (classes.length == 10 && classes[0] == String.class)
-            {
-                return enqueueSync((String) args[0], (String) args[1], (String) args[2], (String) args[3], (String) args[4],
-                        (String) args[5], (String) args[6], (String) args[7], (String) args[8], (Map<String, String>) args[9]);
-            }
+            return enqueueSync((String) args[0], (String) args[1], (String) args[2], (String) args[3], (String) args[4], (String) args[5],
+                    (String) args[6], (String) args[7], (String) args[8], (Map<String, String>) args[9]);
         }
-        else if (method_name.equals("addDeliverable"))
+        else if ("addDeliverable".equals(methodName) && classes.length == 2 && classes[0] == String.class && classes[1] == String.class)
         {
-            if (classes.length == 2 && classes[0] == String.class && classes[1] == String.class)
-            {
-                return addDeliverable((String) args[0], (String) args[1]);
-            }
+            return addDeliverable((String) args[0], (String) args[1]);
         }
 
-        throw new NoSuchMethodException(method_name);
+        throw new NoSuchMethodException(methodName);
     }
 
-    private void shouldKill() throws JqmKillException
+    private void shouldKill()
     {
         em.refresh(ji);
         jqmlogger.debug("Analysis: should JI " + ji.getId() + " get killed? Status is " + ji.getState());
@@ -187,7 +172,7 @@ public class JobManagerHandler implements InvocationHandler
      * @param msg
      * @throws JqmKillException
      */
-    public void sendMsg(String msg) throws JqmKillException
+    private void sendMsg(String msg)
     {
         em.getTransaction().begin();
         Message mssg = new Message();
@@ -203,7 +188,7 @@ public class JobManagerHandler implements InvocationHandler
      * @param msg
      * @throws JqmKillException
      */
-    public void sendProgress(Integer msg) throws JqmKillException
+    private void sendProgress(Integer msg)
     {
         em.getTransaction().begin();
         em.refresh(ji, LockModeType.PESSIMISTIC_WRITE);
@@ -214,7 +199,7 @@ public class JobManagerHandler implements InvocationHandler
         jqmlogger.debug("Current progression: " + h.getProgress());
     }
 
-    public Integer enqueue(String applicationName, String user, String mail, String sessionId, String application, String module,
+    private Integer enqueue(String applicationName, String user, String mail, String sessionId, String application, String module,
             String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
         JobDefinition jd = new JobDefinition(applicationName, user, mail);
@@ -230,11 +215,10 @@ public class JobManagerHandler implements InvocationHandler
         jd.setParentID(this.ji.getId());
         jd.setParameters(parameters);
 
-        Integer id = Dispatcher.enQueue(jd);
-        return id;
+        return Dispatcher.enQueue(jd);
     }
 
-    public int enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module,
+    private int enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module,
             String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
         int i = enqueue(applicationName, user, mail, sessionId, application, module, keyword1, keyword2, keyword3, parameters);
@@ -262,7 +246,7 @@ public class JobManagerHandler implements InvocationHandler
         return i;
     }
 
-    public Integer addDeliverable(String path, String fileLabel) throws IOException
+    private Integer addDeliverable(String path, String fileLabel) throws IOException
     {
         String outputRoot = this.ji.getNode().getDlRepo();
         String ext = FilenameUtils.getExtension(path);
@@ -279,14 +263,17 @@ public class JobManagerHandler implements InvocationHandler
         return d.getId();
     }
 
-    File getWorkDir()
+    private File getWorkDir()
     {
         File f = new File(FilenameUtils.concat(this.ji.getNode().getDlRepo(), "" + this.ji.getId()));
-        f.mkdir();
+        if (!f.isDirectory() && !f.mkdir())
+        {
+            throw new JqmRuntimeException("Could not create work directory");
+        }
         return f;
     }
 
-    String getDefaultConnectionAlias()
+    private String getDefaultConnectionAlias()
     {
         try
         {
@@ -299,7 +286,7 @@ public class JobManagerHandler implements InvocationHandler
         }
     }
 
-    DataSource getDefaultConnection() throws NamingException
+    private DataSource getDefaultConnection() throws NamingException
     {
         Object p = NamingManager.getInitialContext(null).lookup(this.getDefaultConnectionAlias());
         DataSource q = (DataSource) p;

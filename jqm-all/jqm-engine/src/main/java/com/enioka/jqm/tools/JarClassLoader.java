@@ -43,10 +43,7 @@ class JarClassLoader extends URLClassLoader
     {
         URL[] urls = new URL[libs.length + 1];
         urls[0] = url;
-        for (int i = 0; i < libs.length; i++)
-        {
-            urls[i + 1] = libs[i];
-        }
+        System.arraycopy(libs, 0, urls, 1, libs.length);
         return urls;
     }
 
@@ -55,7 +52,7 @@ class JarClassLoader extends URLClassLoader
         super(addUrls(url, libs), null);
     }
 
-    Object launchJar(JobInstance job, String defaultConnection, ClassLoader old, EntityManager em) throws Exception
+    Object launchJar(JobInstance job, String defaultConnection, ClassLoader old, EntityManager em) throws JqmEngineException
     {
         // 1st:load the class
         String classQualifiedName = job.getJd().getJavaClassName();
@@ -69,7 +66,7 @@ class JarClassLoader extends URLClassLoader
         catch (Exception e)
         {
             jqmlogger.error("Could not load class", e);
-            throw e;
+            throw new JqmEngineException("could not load class " + classQualifiedName, e);
         }
         jqmlogger.debug("Class " + classQualifiedName + " was correctly loaded");
 
@@ -77,18 +74,18 @@ class JarClassLoader extends URLClassLoader
         if (Runnable.class.isAssignableFrom(c))
         {
             jqmlogger.info("This payload is of type: Runnable");
-            return launchRunnable(c, job, defaultConnection, em);
+            return launchRunnable(c, job, em);
         }
-        else if (c.getSuperclass().getName().equals("com.enioka.jqm.api.JobBase"))
+        else if (c.getSuperclass().getName().equals(Constants.API_OLD_IMPL))
         {
             jqmlogger.info("This payload is of type: explicit API implementation");
-            return launchApiPayload(c, job, defaultConnection, em);
+            return launchApiPayload(c, job, em);
         }
 
         throw new JqmEngineException("This type of class cannot be launched by JQM. Please consult the documentation for more details.");
     }
 
-    private Object launchApiPayload(Class c, JobInstance job, String defaultConnection, EntityManager em) throws JqmEngineException
+    private Object launchApiPayload(Class c, JobInstance job, EntityManager em) throws JqmEngineException
     {
         Object o = null;
         try
@@ -134,7 +131,7 @@ class JarClassLoader extends URLClassLoader
         return o;
     }
 
-    private Object launchRunnable(Class<Runnable> c, JobInstance job, String defaultConnection, EntityManager em) throws JqmEngineException
+    private Object launchRunnable(Class<Runnable> c, JobInstance job, EntityManager em) throws JqmEngineException
     {
         Runnable o = null;
         try
@@ -164,7 +161,7 @@ class JarClassLoader extends URLClassLoader
         boolean inject = false;
         for (Field f : ff)
         {
-            if (f.getType().getName().equals("com.enioka.jqm.api.JobManager"))
+            if (Constants.API_INTERFACE.equals(f.getType().getName()))
             {
                 jqmlogger.debug("The object should be injected at least on field " + f.getName());
                 inject = true;

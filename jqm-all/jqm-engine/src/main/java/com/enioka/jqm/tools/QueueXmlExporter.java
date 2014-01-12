@@ -2,6 +2,7 @@ package com.enioka.jqm.tools;
 
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -22,7 +23,9 @@ class QueueXmlExporter
     private EntityManager em = Helpers.getNewEm();
 
     QueueXmlExporter()
-    {}
+    {
+
+    }
 
     void export(String path, String queueName)
     {
@@ -36,7 +39,73 @@ class QueueXmlExporter
         try
         {
             q = em.createQuery("SELECT q FROM Queue q WHERE q.name = :n", Queue.class).setParameter("n", queueName).getSingleResult();
+        }
+        catch (NonUniqueResultException s)
+        {
+            jqmlogger.error("Queue " + queueName + " is non unique. The admin must change the queue configurations");
+            return;
+        }
+        catch (NoResultException ss)
+        {
+            jqmlogger.error("This queue doesn't exist");
+            return;
+        }
 
+        Element queue = new Element("queue");
+        queues.addContent(queue);
+
+        Element name = new Element("name");
+        name.setText(q.getName());
+        Element description = new Element("description");
+        description.setText(q.getDescription());
+        Element timeToLive = new Element("timeToLive");
+        timeToLive.setText(q.getTimeToLive() + "");
+
+        queue.addContent(name);
+        queue.addContent(description);
+        queue.addContent(timeToLive);
+
+        Element jobs = new Element("jobs");
+        queue.addContent(jobs);
+
+        ArrayList<JobDef> jds = (ArrayList<JobDef>) em.createQuery("SELECT j FROM JobDef j WHERE j.queue = :q", JobDef.class)
+                .setParameter("q", q).getResultList();
+
+        for (JobDef j : jds)
+        {
+            Element job = new Element("applicationName");
+            job.setText(j.getApplicationName());
+            jobs.addContent(job);
+        }
+
+        jds.clear();
+
+        save(path, document);
+    }
+
+    void exportSeveral(String path, List<String> queueNames)
+    {
+        Queue q = null;
+        Element root = new Element("jqm");
+        Document document = new Document(root);
+
+        Element queues = new Element("queues");
+        root.addContent(queues);
+
+        for (String queueName : queueNames)
+        {
+            try
+            {
+                q = em.createQuery("SELECT q FROM Queue q WHERE q.name = :n", Queue.class).setParameter("n", queueName).getSingleResult();
+            }
+            catch (NonUniqueResultException s)
+            {
+                jqmlogger.warn("Queue " + queueName + " is non unique. The admin must change the queue configuration");
+            }
+            catch (NoResultException ss)
+            {
+                jqmlogger.debug("This queue doesn't exist");
+            }
             Element queue = new Element("queue");
             queues.addContent(queue);
 
@@ -65,77 +134,9 @@ class QueueXmlExporter
             }
 
             jds.clear();
-
-            save(path, document);
-
         }
-        catch (NonUniqueResultException s)
-        {
-            jqmlogger.warn("Queue " + q.getName() + " is non unique. The admin must change the queue configurations");
-        }
-        catch (NoResultException ss)
-        {
-            jqmlogger.debug("This queue doesn't exist");
-        }
-    }
 
-    void exportSeveral(String path, ArrayList<String> queueNames)
-    {
-        Queue q = null;
-        Element root = new Element("jqm");
-        Document document = new Document(root);
-
-        Element queues = new Element("queues");
-        root.addContent(queues);
-
-        try
-        {
-            for (String queueName : queueNames)
-            {
-
-                q = em.createQuery("SELECT q FROM Queue q WHERE q.name = :n", Queue.class).setParameter("n", queueName).getSingleResult();
-
-                Element queue = new Element("queue");
-                queues.addContent(queue);
-
-                Element name = new Element("name");
-                name.setText(q.getName());
-                Element description = new Element("description");
-                description.setText(q.getDescription());
-                Element timeToLive = new Element("timeToLive");
-                timeToLive.setText(q.getTimeToLive() + "");
-
-                queue.addContent(name);
-                queue.addContent(description);
-                queue.addContent(timeToLive);
-
-                Element jobs = new Element("jobs");
-                queue.addContent(jobs);
-
-                ArrayList<JobDef> jds = (ArrayList<JobDef>) em.createQuery("SELECT j FROM JobDef j WHERE j.queue = :q", JobDef.class)
-                        .setParameter("q", q).getResultList();
-
-                for (JobDef j : jds)
-                {
-                    Element job = new Element("applicationName");
-                    job.setText(j.getApplicationName());
-                    jobs.addContent(job);
-                }
-
-                jds.clear();
-            }
-
-            save(path, document);
-
-        }
-        catch (NonUniqueResultException s)
-        {
-            jqmlogger.warn("Queue " + q.getName() + " is non unique. The admin must change the queue configurations");
-        }
-        catch (NoResultException ss)
-        {
-            jqmlogger.debug("This queue doesn't exist");
-        }
+        save(path, document);
     }
 
     void exportAll(String path)
@@ -149,7 +150,7 @@ class QueueXmlExporter
 
         qs = (ArrayList<Queue>) em.createQuery("SELECT q FROM Queue q", Queue.class).getResultList();
 
-        if (qs.size() == 0)
+        if (qs.isEmpty())
         {
             jqmlogger.warn("No queue");
         }

@@ -104,11 +104,11 @@ class Dependencies
         }
         catch (SAXException e)
         {
-            jqmlogger.error("Invalid XML architecture. Please, fix correctly the dependencies", e);
+            jqmlogger.error("Invalid POM XML file content. Please fix the Maven file.", e);
         }
         catch (IOException e)
         {
-            jqmlogger.error("Invalid pom.xml. Please check the pom.xml & its filepath " + path, e);
+            jqmlogger.error("Invalid pom.xml definition - could not read the file. Please check the pom.xml & its filepath " + path, e);
         }
         catch (Exception e)
         {

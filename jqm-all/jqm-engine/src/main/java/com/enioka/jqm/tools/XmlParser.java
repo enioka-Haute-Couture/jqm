@@ -20,21 +20,17 @@ package com.enioka.jqm.tools;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
@@ -46,9 +42,11 @@ class XmlParser
     private EntityManager em = Helpers.getNewEm();
 
     XmlParser()
-    {}
+    {
 
-    void parse(String path) throws SAXException, ParserConfigurationException, IOException
+    }
+
+    void parse(String path) throws JqmEngineException
     {
         File f = new File(path);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -69,7 +67,6 @@ class XmlParser
 
         // SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         // Schema schema = null;
-
         // schema = factory.newSchema(new File("./lib/res.xsd"));
         // Validator validator = schema.newValidator();
         // DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -106,22 +103,20 @@ class XmlParser
                         em.getTransaction().begin();
                         Element ee = (Element) nl.item(i);
 
-                        canBeRestarted = (ee.getElementsByTagName("canBeRestarted").item(0).getTextContent().equals("true")) ? true : false;
+                        canBeRestarted = ("true".equals(ee.getElementsByTagName("canBeRestarted").item(0).getTextContent())) ? true : false;
                         javaClassName = ee.getElementsByTagName("javaClassName").item(0).getTextContent();
                         queue = em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true", Queue.class).getSingleResult();
                         maxTimeRunning = Integer.parseInt(ee.getElementsByTagName("maxTimeRunning").item(0).getTextContent());
 
                         JobDef jd;
-
                         TypedQuery<JobDef> q = em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = :n", JobDef.class);
                         q.setParameter("n", ee.getElementsByTagName("name").item(0).getTextContent());
-
-                        try
+                        if (q.getResultList().size() == 1)
                         {
-                            jd = q.getSingleResult();
+                            jd = q.getResultList().get(0);
                             jd.getParameters().clear();
                         }
-                        catch (NoResultException x)
+                        else
                         {
                             jd = new JobDef();
                         }
@@ -132,7 +127,7 @@ class XmlParser
                         keyword1 = ee.getElementsByTagName("keyword1").item(0).getTextContent();
                         keyword2 = ee.getElementsByTagName("keyword2").item(0).getTextContent();
                         keyword3 = ee.getElementsByTagName("keyword3").item(0).getTextContent();
-                        highlander = (ee.getElementsByTagName("highlander").item(0).getTextContent().equals("true")) ? true : false;
+                        highlander = ("true".equals(ee.getElementsByTagName("highlander").item(0).getTextContent())) ? true : false;
                         filePath = e.getElementsByTagName("filePath").item(0).getTextContent();
                         jarPath = e.getElementsByTagName("path").item(0).getTextContent();
 
@@ -170,21 +165,9 @@ class XmlParser
                 }
             }
         }
-        catch (ParserConfigurationException e)
-        {
-            jqmlogger.error(e);
-        }
-        catch (SAXException e)
-        {
-            jqmlogger.error("Invalid XML architecture. Please, fix correctly the dependencies", e);
-        }
-        catch (IOException e)
-        {
-            jqmlogger.error("Invalid xml. Please check the xml & its filepath", e);
-        }
         catch (Exception e)
         {
-            jqmlogger.error("Invalid xml. Please check the xml & its filepath", e);
+            throw new JqmEngineException("an error occured while parsing the XML file", e);
         }
     }
 }
