@@ -30,7 +30,6 @@ public class App extends JobBase
         }
         catch (Exception e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             throw new RuntimeException("arg", e);
         }

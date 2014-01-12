@@ -87,6 +87,8 @@ public class SuperTestPayload extends JobBase
             connection2.start();
             Session session2 = connection2.createSession(false, Session.AUTO_ACKNOWLEDGE);
             QueueBrowser qb = session2.createBrowser(q);
+            // Warning is suppressed - the API gives a the choice between raw generics and unsafe cast!
+            @SuppressWarnings("unchecked")
             Enumeration<TextMessage> msgs = qb.getEnumeration();
             while (msgs.hasMoreElements())
             {
