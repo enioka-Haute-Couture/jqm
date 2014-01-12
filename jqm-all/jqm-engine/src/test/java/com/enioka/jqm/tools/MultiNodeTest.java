@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -45,6 +46,13 @@ public class MultiNodeTest
 {
     public static Logger jqmlogger = Logger.getLogger(JobBaseTest.class);
     public static Server s;
+
+    @Before
+    public void before()
+    {
+        Dispatcher.resetEM();
+        Helpers.resetEmf();
+    }
 
     @BeforeClass
     public static void testInit() throws FileNotFoundException
@@ -267,8 +275,6 @@ public class MultiNodeTest
         int i = 0;
         while (i < 3)
         {
-            TestHelpers.printJobInstanceTable();
-
             Dispatcher.enQueue(j11);
             Dispatcher.enQueue(j11);
             Dispatcher.enQueue(j11);
@@ -282,7 +288,7 @@ public class MultiNodeTest
             Dispatcher.enQueue(j21);
             Dispatcher.enQueue(j21);
 
-            Thread.sleep(5000);
+            Thread.sleep(3000);
 
             TestHelpers.printJobInstanceTable();
             i++;
@@ -293,11 +299,13 @@ public class MultiNodeTest
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.executionDate ASC", History.class);
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
-
+        Assert.assertEquals(42, res.size());
+        Assert.assertEquals(168, em.createQuery("SELECT j FROM Message j", Message.class).getResultList().size());
         for (History jobInstance : res)
         {
             Assert.assertEquals(State.ENDED, jobInstance.getState());
         }
+        em.close();
     }
 
     @Test
@@ -475,22 +483,18 @@ public class MultiNodeTest
         TestHelpers.createLocalNode(em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-        jdargs.add(jdp);
 
         @SuppressWarnings("unused")
         JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
                 "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
+        em.close();
 
         JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
-
         for (int i = 0; i < 9; i++)
         {
             Dispatcher.enQueue(j);
         }
-
-        TestHelpers.printJobInstanceTable();
 
         JqmEngine engine1 = new JqmEngine();
         JqmEngine engine2 = new JqmEngine();
@@ -502,16 +506,14 @@ public class MultiNodeTest
             Dispatcher.enQueue(j);
         }
 
-        Thread.sleep(10000);
+        Thread.sleep(7000);
         engine1.stop();
         engine2.stop();
 
-        EntityManager emm = Helpers.getNewEm();
-
-        ArrayList<History> res = (ArrayList<History>) emm.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class)
+        em = Helpers.getNewEm();
+        ArrayList<History> res = (ArrayList<History>) em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class)
                 .getResultList();
-
-        TestHelpers.printJobInstanceTable();
+        em.close();
 
         Assert.assertEquals(2, res.size());
         Assert.assertEquals(State.ENDED, res.get(0).getState());

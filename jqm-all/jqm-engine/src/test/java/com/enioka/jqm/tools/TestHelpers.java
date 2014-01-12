@@ -128,5 +128,7 @@ public class TestHelpers
                     + jobInstance.getState() + " | " + jobInstance.getJd().getId() + " | " + jobInstance.getQueue().getName());
             jqmlogger.debug("==========================================================================================");
         }
+
+        em.close();
     }
 }

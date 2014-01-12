@@ -165,6 +165,7 @@ class JqmEngine
         // Stop pollers
         for (Polling p : pollers)
         {
+            jqmlogger.debug("Engine " + this.node.getListeningInterface() + " asks queue " + p.getDp().getQueue().getName() + " to stop.");
             p.stop();
         }
 

@@ -274,7 +274,9 @@ class Polling implements Runnable
                 jqmlogger.warn(e);
             }
         }
-        jqmlogger.debug("Poller loop  on queue " + this.queue.getName() + " is stopping");
+        jqmlogger.debug("Poller loop on queue " + this.queue.getName() + " is stopping [engine "
+                + this.dp.getNode().getListeningInterface() + "]");
+        em.close();
         this.tp.stop();
         this.hasStopped = true;
         jqmlogger.info("Poller on queue " + dp.getQueue().getName() + " has ended");
