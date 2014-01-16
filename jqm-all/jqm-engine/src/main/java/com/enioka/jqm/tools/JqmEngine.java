@@ -118,6 +118,7 @@ class JqmEngine
             try
             {
                 server.stop();
+                server.join();
             }
             catch (Exception e1)
             {
@@ -350,6 +351,7 @@ class JqmEngine
         {
             jqmlogger.debug("Jetty will be stopped");
             this.server.stop();
+            this.server.join();
         }
         catch (Exception e)
         {
