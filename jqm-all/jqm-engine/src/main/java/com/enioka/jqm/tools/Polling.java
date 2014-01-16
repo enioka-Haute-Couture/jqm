@@ -125,7 +125,7 @@ class Polling implements Runnable
         }
 
         // If here, no suitable JI is available
-        em.getTransaction().commit();
+        em.getTransaction().rollback();
         return null;
     }
 
