@@ -23,17 +23,17 @@ public class App extends JobBase
     @Override
     public void start()
     {
-        for (int i = 0; i <= 5000; i++)
+        for (int i = 0; i <= 50; i++)
         {
             // System.out.println(i);
-            if (i == 500 || i == 1000 || i == 3500 || i == 5000)
+            if (i == 5 || i == 10 || i == 35 || i == 50)
             {
                 sendProgress(i);
                 System.out.println("Progress: " + i);
             }
             try
             {
-                Thread.sleep(1);
+                Thread.sleep(100);
             }
             catch (InterruptedException e)
             {
