@@ -100,7 +100,7 @@ public class GeoTest
         engine2.start("localhost4");
         engine3.start("localhost5");
 
-        Thread.sleep(25000);
+        TestHelpers.waitFor(511, 30000);
         jqmlogger.debug("###############################################################");
         jqmlogger.debug("SHUTDOWN");
         jqmlogger.debug("###############################################################");

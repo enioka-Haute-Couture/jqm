@@ -19,8 +19,10 @@
 package com.enioka.jqm.tools;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import org.apache.log4j.Logger;
 
@@ -130,5 +132,23 @@ public class TestHelpers
         }
 
         em.close();
+    }
+
+    public static void waitFor(long nbHistories, int timeoutMs)
+    {
+        EntityManager em = Helpers.getNewEm();
+        TypedQuery<Long> q = em.createQuery("SELECT COUNT(h) FROM History h WHERE h.status = 'ENDED' OR h.status = 'CRASHED'", Long.class);
+
+        Calendar start = Calendar.getInstance();
+        while (q.getSingleResult() != nbHistories && Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis() <= timeoutMs)
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+            }
+        }
     }
 }

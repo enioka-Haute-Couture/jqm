@@ -86,7 +86,7 @@ public class NoApiPayloadTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(5000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)
@@ -115,7 +115,7 @@ public class NoApiPayloadTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(5000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)
@@ -146,7 +146,7 @@ public class NoApiPayloadTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(5000);
+        TestHelpers.waitFor(3, 10000);
         engine1.stop();
 
         List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)

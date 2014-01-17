@@ -129,7 +129,7 @@ public class JobBaseTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(8000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         EntityManager emm = Helpers.getNewEm();
@@ -177,7 +177,7 @@ public class JobBaseTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(10000);
+        TestHelpers.waitFor(2, 10000);
         engine1.stop();
 
         EntityManager emm = Helpers.getNewEm();
@@ -216,7 +216,7 @@ public class JobBaseTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(2000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         EntityManager emm = Helpers.getNewEm();
@@ -255,7 +255,7 @@ public class JobBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(5000);
+        TestHelpers.waitFor(1, 10000);
 
         TestHelpers.printJobInstanceTable();
 
@@ -298,7 +298,7 @@ public class JobBaseTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(5000);
+        TestHelpers.waitFor(1, 10000);
 
         File f = new File("./testprojects/jqm-test-deliverable/JobGenADeliverable42.txt");
         Assert.assertEquals(false, f.exists()); // file should have been moved
@@ -374,7 +374,7 @@ public class JobBaseTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(5000);
+        TestHelpers.waitFor(3, 10000);
         engine1.stop();
 
         TestHelpers.printJobInstanceTable();
@@ -484,7 +484,7 @@ public class JobBaseTest
         Dispatcher.enQueue(jj);
         Dispatcher.enQueue(j);
 
-        Thread.sleep(5000);
+        TestHelpers.waitFor(10, 10000);
         engine1.stop();
 
         TypedQuery<History> query = em
@@ -549,7 +549,7 @@ public class JobBaseTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(3000);
+        TestHelpers.waitFor(2, 10000);
         engine1.stop();
 
         History ji1 = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId", History.class)
@@ -587,11 +587,9 @@ public class JobBaseTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(5000);
-
+        TestHelpers.waitFor(1, 10000);
         Dispatcher.restartJob(i);
-
-        Thread.sleep(5000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -630,8 +628,7 @@ public class JobBaseTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(8000);
-
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j", History.class);
@@ -663,7 +660,7 @@ public class JobBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(5000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j", History.class);
@@ -700,8 +697,7 @@ public class JobBaseTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(15000);
-
+        TestHelpers.waitFor(1, 20000);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -800,7 +796,7 @@ public class JobBaseTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(5000);
+        TestHelpers.waitFor(1, 10000);
 
         File f = new File("./testprojects/jqm-test-deliverable/JobGenADeliverable42.txt");
         Assert.assertEquals(false, f.exists());
@@ -844,7 +840,7 @@ public class JobBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(2000);
+        TestHelpers.waitFor(1, 10000);
 
         engine1.stop();
 
@@ -905,7 +901,7 @@ public class JobBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(2000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :i", History.class).setParameter("i", i)
@@ -951,8 +947,7 @@ public class JobBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(15000);
-
+        TestHelpers.waitFor(1, 20000);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -1034,9 +1029,7 @@ public class JobBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-
-        Thread.sleep(6000);
-
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -1072,9 +1065,7 @@ public class JobBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-
-        Thread.sleep(8000);
-
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -1110,9 +1101,7 @@ public class JobBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-
-        Thread.sleep(4000);
-
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -1148,9 +1137,7 @@ public class JobBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-
-        Thread.sleep(4000);
-
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -1188,8 +1175,7 @@ public class JobBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(2000);
-
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -1251,8 +1237,7 @@ public class JobBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(10000);
-
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -1384,8 +1369,7 @@ public class JobBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(6000);
-
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -1462,9 +1446,9 @@ public class JobBaseTest
         JqmEngine engine1 = new JqmEngine();
         Dispatcher.changeQueue(i, TestHelpers.qSlow);
         TestHelpers.printJobInstanceTable();
-        engine1.start("localhost");
-        Thread.sleep(5000);
 
+        engine1.start("localhost");
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -1571,7 +1555,7 @@ public class JobBaseTest
             Assert.fail("result was not an integer " + e.getMessage());
         }
 
-        Thread.sleep(3000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         // Check run is OK
@@ -1635,7 +1619,7 @@ public class JobBaseTest
             Assert.fail("result was not an integer " + e.getMessage());
         }
 
-        Thread.sleep(3000);
+        TestHelpers.waitFor(1, 10000);
 
         HttpGet rq = new HttpGet("http://localhost:" + TestHelpers.node.getPort() + "/status?id=" + jid);
         res = client.execute(rq);
@@ -1752,7 +1736,7 @@ public class JobBaseTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(3000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         History ji1 = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId", History.class)
@@ -1783,7 +1767,7 @@ public class JobBaseTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(10000);
+        TestHelpers.waitFor(2, 10000);
         engine1.stop();
 
         List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)
@@ -1813,7 +1797,7 @@ public class JobBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(5000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)

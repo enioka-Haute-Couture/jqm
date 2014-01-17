@@ -94,7 +94,7 @@ public class FiboHibTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(20000);
+        TestHelpers.waitFor(11, 30000);
         engine1.stop();
 
         long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();

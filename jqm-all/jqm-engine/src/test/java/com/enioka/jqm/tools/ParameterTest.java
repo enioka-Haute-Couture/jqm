@@ -87,7 +87,7 @@ public class ParameterTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(5000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         Assert.assertEquals(true, true);
@@ -120,7 +120,7 @@ public class ParameterTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(5000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         Assert.assertEquals(true, true);
@@ -155,7 +155,7 @@ public class ParameterTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(5000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         Assert.assertEquals(true, true);

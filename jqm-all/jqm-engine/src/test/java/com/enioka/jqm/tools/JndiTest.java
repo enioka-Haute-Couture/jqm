@@ -94,7 +94,7 @@ public class JndiTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(10000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
@@ -144,7 +144,7 @@ public class JndiTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(10000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         History h = null;
@@ -191,7 +191,7 @@ public class JndiTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(10000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         History h = null;
@@ -230,7 +230,7 @@ public class JndiTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(3000);
+        TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
         TestHelpers.printJobInstanceTable();

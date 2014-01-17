@@ -96,7 +96,7 @@ public class FiboTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(15000);
+        TestHelpers.waitFor(11, 15000);
         engine1.stop();
 
         long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
@@ -129,7 +129,7 @@ public class FiboTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(25000);
+        TestHelpers.waitFor(11, 30000);
 
         engine1.stop();
         long ii = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();

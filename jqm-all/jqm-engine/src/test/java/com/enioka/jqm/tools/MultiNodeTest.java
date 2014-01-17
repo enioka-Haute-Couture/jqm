@@ -130,11 +130,12 @@ public class MultiNodeTest
             Dispatcher.enQueue(j11);
             Dispatcher.enQueue(j11);
 
-            Thread.sleep(10000);
+            Thread.sleep(1000);
 
             TestHelpers.printJobInstanceTable();
             i++;
         }
+        TestHelpers.waitFor(45, 30000);
 
         for (Message m : em.createQuery("SELECT j FROM Message j ORDER BY j.history asc, j.id asc", Message.class).getResultList())
         {
@@ -213,12 +214,13 @@ public class MultiNodeTest
             Dispatcher.enQueue(j11);
             Dispatcher.enQueue(j11);
 
-            Thread.sleep(7000);
+            Thread.sleep(1000);
 
             TestHelpers.printJobInstanceTable();
             i++;
         }
 
+        TestHelpers.waitFor(45, 10000);
         engine1.stop();
         engine2.stop();
 
@@ -288,12 +290,13 @@ public class MultiNodeTest
             Dispatcher.enQueue(j21);
             Dispatcher.enQueue(j21);
 
-            Thread.sleep(3000);
+            Thread.sleep(1000);
 
             TestHelpers.printJobInstanceTable();
             i++;
         }
 
+        TestHelpers.waitFor(42, 10000);
         engine1.stop();
         engine2.stop();
 
@@ -451,12 +454,13 @@ public class MultiNodeTest
             Dispatcher.enQueue(j33);
             Dispatcher.enQueue(j33);
 
-            Thread.sleep(8000);
+            Thread.sleep(1000);
 
             TestHelpers.printJobInstanceTable();
             i++;
         }
 
+        TestHelpers.waitFor(108, 30000);
         engine1.stop();
         engine2.stop();
         engine3.stop();
@@ -506,7 +510,7 @@ public class MultiNodeTest
             Dispatcher.enQueue(j);
         }
 
-        Thread.sleep(7000);
+        TestHelpers.waitFor(2, 10000);
         engine1.stop();
         engine2.stop();
 
@@ -673,23 +677,23 @@ public class MultiNodeTest
             Dispatcher.enQueue(j33);
             Dispatcher.enQueue(j33);
 
-            Thread.sleep(10000);
+            Thread.sleep(1000);
 
             TestHelpers.printJobInstanceTable();
             i++;
         }
 
+        TestHelpers.waitFor(135, 30000);
         engine1.stop();
         engine2.stop();
         engine3.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j WHERE j.status = :ss", History.class);
-        // 134 messages must be printed
 
         query.setParameter("ss", State.ENDED);
         job = (ArrayList<History>) query.getResultList();
 
-        // 171
+        // 135
         ArrayList<Message> msgs = (ArrayList<Message>) em.createQuery("SELECT m FROM Message m WHERE m.textMessage = :m", Message.class)
                 .setParameter("m", "DateTime will be printed").getResultList();
 
