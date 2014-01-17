@@ -130,7 +130,15 @@ class JqmEngine
         {
             throw new JqmInitError("Could not start web server - not a port issue, but a generic one", e);
         }
-        jqmlogger.info("Jetty has started");
+        jqmlogger.info("Jetty has started on port " + server.getConnectors()[0].getLocalPort());
+        if (node.getPort() == 0)
+        {
+            // During tests, we use a random port (0) so we must update configuration.
+            // New nodes are also created with a non-assigned port.
+            em.getTransaction().begin();
+            node.setPort(server.getConnectors()[0].getLocalPort());
+            em.getTransaction().commit();
+        }
 
         if (nodeName != null)
         {
@@ -201,7 +209,7 @@ class JqmEngine
             n = new Node();
             n.setDlRepo(System.getProperty("user.dir") + "/outputfiles/");
             n.setName(nodeName);
-            n.setPort(1789);
+            n.setPort(0);
             n.setRepo(System.getProperty("user.dir") + "/jobs/");
             n.setExportRepo(System.getProperty("user.dir") + "/exports/");
             em.persist(n);

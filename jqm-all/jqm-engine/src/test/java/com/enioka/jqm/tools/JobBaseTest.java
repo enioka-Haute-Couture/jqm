@@ -1539,7 +1539,8 @@ public class JobBaseTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        HttpPost post = new HttpPost("http://localhost:8081/enqueue");
+        em.refresh(TestHelpers.node);
+        HttpPost post = new HttpPost("http://localhost:" + TestHelpers.node.getPort() + "/enqueue");
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("applicationname", "Marsu-Application"));
         nvps.add(new BasicNameValuePair("user", "testuser"));
@@ -1602,7 +1603,8 @@ public class JobBaseTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        HttpPost post = new HttpPost("http://localhost:8081/enqueue");
+        em.refresh(TestHelpers.node);
+        HttpPost post = new HttpPost("http://localhost:" + TestHelpers.node.getPort() + "/enqueue");
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("applicationname", "Marsu-Application"));
         nvps.add(new BasicNameValuePair("user", "testuser"));
@@ -1635,7 +1637,7 @@ public class JobBaseTest
 
         Thread.sleep(3000);
 
-        HttpGet rq = new HttpGet("http://localhost:8081/status?id=" + jid);
+        HttpGet rq = new HttpGet("http://localhost:" + TestHelpers.node.getPort() + "/status?id=" + jid);
         res = client.execute(rq);
         Assert.assertEquals(200, res.getStatusLine().getStatusCode());
 
