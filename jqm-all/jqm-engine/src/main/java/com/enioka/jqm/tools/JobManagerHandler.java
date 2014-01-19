@@ -11,6 +11,7 @@ import java.util.UUID;
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.sql.DataSource;
@@ -22,10 +23,8 @@ import org.apache.log4j.Logger;
 import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobDefinition;
 import com.enioka.jqm.jpamodel.Deliverable;
-import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
-import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.State;
 
 class JobManagerHandler implements InvocationHandler
@@ -34,14 +33,11 @@ class JobManagerHandler implements InvocationHandler
 
     private JobInstance ji;
     private EntityManager em;
-    private History h;
 
     JobManagerHandler(JobInstance ji, EntityManager em)
     {
         this.ji = ji;
         this.em = em;
-        h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :i", History.class).setParameter("i", this.ji.getId())
-                .getSingleResult();
     }
 
     @SuppressWarnings("unchecked")
@@ -175,10 +171,7 @@ class JobManagerHandler implements InvocationHandler
     private void sendMsg(String msg)
     {
         em.getTransaction().begin();
-        Message mssg = new Message();
-        mssg.setHistory(h);
-        mssg.setTextMessage(msg);
-        em.persist(mssg);
+        Helpers.createMessage(msg, ji, em);
         em.getTransaction().commit();
     }
 
@@ -193,10 +186,8 @@ class JobManagerHandler implements InvocationHandler
         em.getTransaction().begin();
         em.refresh(ji, LockModeType.PESSIMISTIC_WRITE);
         ji.setProgress(msg);
-        h.setProgress(msg);
         em.getTransaction().commit();
-
-        jqmlogger.debug("Current progression: " + h.getProgress());
+        jqmlogger.debug("Current progression: " + msg);
     }
 
     private Integer enqueue(String applicationName, String user, String mail, String sessionId, String application, String module,
@@ -222,7 +213,7 @@ class JobManagerHandler implements InvocationHandler
             String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
         int i = enqueue(applicationName, user, mail, sessionId, application, module, keyword1, keyword2, keyword3, parameters);
-        History child = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :id", History.class).setParameter("id", i)
+        JobInstance child = em.createQuery("SELECT h FROM JobInstance h WHERE h.id = :id", JobInstance.class).setParameter("id", i)
                 .getSingleResult();
 
         while (true)
@@ -235,9 +226,11 @@ class JobManagerHandler implements InvocationHandler
             {
                 jqmlogger.debug(e);
             }
-            em.refresh(child);
-
-            if (child.getState().equals(State.ENDED) || child.getState().equals(State.CRASHED))
+            try
+            {
+                em.refresh(child);
+            }
+            catch (EntityNotFoundException e)
             {
                 break;
             }

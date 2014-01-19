@@ -29,6 +29,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
+
 @Entity
 @Table(name = "JobParameter")
 public class JobParameter implements Serializable
@@ -45,6 +47,7 @@ public class JobParameter implements Serializable
 
     @ManyToOne
     @JoinColumn(name = "jobinstance_id")
+    @Index(name = "idx_fk_jobparameter_jobinstance")
     private JobInstance jobInstance;
 
     /**

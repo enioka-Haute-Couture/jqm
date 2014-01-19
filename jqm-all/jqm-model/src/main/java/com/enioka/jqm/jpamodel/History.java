@@ -28,8 +28,6 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -45,7 +43,6 @@ public class History implements Serializable
     private static final long serialVersionUID = -5249529794213078668L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
     /************/
@@ -94,6 +91,10 @@ public class History implements Serializable
     private Calendar enqueueDate;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "attributionDate")
+    private Calendar attributionDate;
+
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "execution_date")
     private Calendar executionDate;
 
@@ -106,9 +107,6 @@ public class History implements Serializable
 
     @Column(name = "session_id")
     private String sessionId;
-
-    @Column(name = "job_instance_id", nullable = false)
-    private Integer jobInstanceId;
 
     @Column(name = "username")
     private String userName;
@@ -292,16 +290,6 @@ public class History implements Serializable
         this.email = email;
     }
 
-    public Integer getJobInstanceId()
-    {
-        return jobInstanceId;
-    }
-
-    public void setJobInstanceId(Integer jobInstanceId)
-    {
-        this.jobInstanceId = jobInstanceId;
-    }
-
     public Integer getParentJobId()
     {
         return parentJobId;
@@ -457,5 +445,15 @@ public class History implements Serializable
     public void setInstanceKeyword3(String instanceKeyword3)
     {
         this.instanceKeyword3 = instanceKeyword3;
+    }
+
+    public Calendar getAttributionDate()
+    {
+        return attributionDate;
+    }
+
+    public void setAttributionDate(Calendar attributionDate)
+    {
+        this.attributionDate = attributionDate;
     }
 }

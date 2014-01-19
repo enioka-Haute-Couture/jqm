@@ -19,25 +19,17 @@
 package com.enioka.jqm.tools;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.LockModeType;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.State;
@@ -82,9 +74,8 @@ class Polling implements Runnable
         // Get the list of all jobInstance within the defined queue, ordered by position
         List<JobInstance> availableJobs = em
                 .createQuery(
-                        "SELECT j FROM JobInstance j LEFT JOIN FETCH j.jd LEFT JOIN FETCH j.queue "
-                                + "WHERE j.queue = :q AND j.state = :s ORDER BY j.internalPosition ASC", JobInstance.class)
-                .setParameter("q", queue).setParameter("s", State.SUBMITTED).getResultList();
+                        "SELECT j FROM JobInstance j LEFT JOIN FETCH j.jd WHERE j.queue = :q AND j.state = :s ORDER BY j.internalPosition ASC",
+                        JobInstance.class).setParameter("q", queue).setParameter("s", State.SUBMITTED).getResultList();
 
         em.getTransaction().begin();
         for (JobInstance res : availableJobs)
@@ -102,25 +93,28 @@ class Polling implements Runnable
             }
             if (!res.getState().equals(State.SUBMITTED))
             {
-                em.lock(res, LockModeType.NONE);
+                // Already eaten by another engine, not yet done
                 continue;
             }
 
             // Highlander?
             if (res.getJd().isHighlander() && !highlanderPollingMode(res, em))
             {
-                em.lock(res, LockModeType.NONE);
                 continue;
             }
 
-            // Reserve the JI for this engine
-            res.setState(State.ATTRIBUTED);
-            res.setNode(dp.getNode());
+            // Reserve the JI for this engine. Use a query rather than setter to avoid updating all fields (and locks when verifying FKs)
+            em.createQuery(
+                    "UPDATE JobInstance j SET j.state = 'ATTRIBUTED', j.node = :n, j.attributionDate = current_timestamp() WHERE id=:i")
+                    .setParameter("i", res.getId()).setParameter("n", dp.getNode()).executeUpdate();
 
             // Stop at the first suitable JI. Release the lock & update the JI which has been attributed to us.
             jqmlogger.debug("JI number " + res.getId() + " will be selected by this poller loop (already " + actualNbThread + "/"
                     + dp.getNbThread() + " on " + this.queue.getName() + ")");
             em.getTransaction().commit();
+
+            // Refresh: we have used update queries, so the cached entity is out of date.
+            em.refresh(res);
             return res;
         }
 
@@ -137,22 +131,18 @@ class Polling implements Runnable
      */
     protected boolean highlanderPollingMode(JobInstance jobToTest, EntityManager em)
     {
-        ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
+        List<JobInstance> jobs = em
                 .createQuery(
-                        "SELECT j FROM JobInstance j WHERE j.id IS NOT :refid AND j.jd.id = :n AND (j.state = 'RUNNING' OR j.state = 'ATTRIBUTED')",
-                        JobInstance.class).setParameter("refid", jobToTest.getId()).setParameter("n", jobToTest.getJd().getId())
-                .getResultList();
+                        "SELECT j FROM JobInstance j WHERE j IS NOT :refid AND j.jd = :jd AND (j.state = 'RUNNING' OR j.state = 'ATTRIBUTED')",
+                        JobInstance.class).setParameter("refid", jobToTest).setParameter("jd", jobToTest.getJd()).getResultList();
         return jobs.isEmpty();
     }
 
-    @SuppressWarnings("static-access")
     @Override
     public void run()
     {
-        Calendar date = GregorianCalendar.getInstance(Locale.getDefault());
         while (true)
         {
-            Calendar today = GregorianCalendar.getInstance(Locale.getDefault());
             if (em != null)
             {
                 em.close();
@@ -166,37 +156,8 @@ class Polling implements Runnable
                     break;
                 }
 
-                // if true, CRASHED jobs are removed
-                if (date.DATE != today.DATE)
-                {
-                    date = today;
-                    Calendar ttt = GregorianCalendar.getInstance(Locale.getDefault());
-                    GlobalParameter gp = em.createQuery("SELECT g FROM GlobalParameter g WHERE g.key = 'deadline'", GlobalParameter.class)
-                            .getSingleResult();
-                    jqmlogger.debug("DEADLINE: " + gp.getValue());
-                    Integer d = Integer.valueOf(gp.getValue());
-
-                    ArrayList<History> hs = (ArrayList<History>) em.createQuery(
-                            "SELECT h FROM JobInstance j, History h WHERE " + "j.state = 'CRASHED' AND h.jobInstanceId = j.id",
-                            History.class).getResultList();
-
-                    for (History h : hs)
-                    {
-                        Calendar tt = h.getEndDate();
-                        tt.setTime(DateUtils.addDays(h.getEndDate().getTime(), d));
-                        em.getTransaction().begin();
-                        if (tt.getTime().compareTo(ttt.getTime()) > 0)
-                        {
-                            jqmlogger.debug("Purging the CRASHED jobs" + h.getJobInstanceId());
-                            em.remove(em.find(JobInstance.class, h.getJobInstanceId()));
-                        }
-                        em.getTransaction().commit();
-                    }
-                }
-
                 // Wait according to the deploymentParameter
                 Thread.sleep(dp.getPollingInterval());
-
                 if (!run)
                 {
                     break;
@@ -237,15 +198,6 @@ class Polling implements Runnable
                 jqmlogger.debug("JI that will be attributed: " + ji.getId());
                 jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
 
-                // Update the history object: the JI has been attributed
-                em.getTransaction().begin();
-                History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class)
-                        .setParameter("j", ji.getId()).getSingleResult();
-                h.setNode(dp.getNode());
-                em.getTransaction().commit();
-
-                jqmlogger.debug("The job & history " + ji.getId() + " have been updated with the node: " + ji.getNode().getName());
-
                 // We will run this JI!
                 actualNbThread++;
 
@@ -255,18 +207,12 @@ class Polling implements Runnable
                 jqmlogger.debug("Should the node corresponding to the current job be stopped: " + ji.getNode().isStop());
 
                 em.getTransaction().begin();
-                Message m = new Message();
-                m.setTextMessage("Status updated: ATTRIBUTED");
-                m.setHistory(h);
-                em.persist(m);
+                Helpers.createMessage("Status updated: ATTRIBUTED", ji, em);
                 em.getTransaction().commit();
 
                 // Run it
                 tp.run(ji, this);
-
-                // Done for this loop
-                jqmlogger.debug("End of poller loop  on queue " + this.queue.getName());
-
+                ji = null;
             }
             catch (InterruptedException e)
             {

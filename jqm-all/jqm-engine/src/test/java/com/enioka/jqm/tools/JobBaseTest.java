@@ -58,7 +58,6 @@ import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.State;
@@ -90,143 +89,6 @@ public class JobBaseTest
         Dispatcher.resetEM();
         s.shutdown();
         s.stop();
-    }
-
-    @Test
-    public void testHighlanderMode() throws Exception
-    {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testHighlanderMode");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-        jdargs.add(jdp);
-
-        @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
-                "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", true, em);
-
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
-
-        Dispatcher.enQueue(j);
-        Dispatcher.enQueue(j);
-
-        // em.getTransaction().begin();
-        //
-        // JobInstance ji = em.createQuery("SELECT j FROM JobInstance j WHERE j.position = :myId AND j.jd.id = :i", JobInstance.class)
-        // .setParameter("myId", 2).setParameter("i", jdDemoMaven.getId()).getSingleResult();
-        //
-        // em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED' WHERE j.id = :idJob").setParameter("idJob", ji.getId())
-        // .executeUpdate();
-        //
-        // em.getTransaction().commit();
-
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
-
-        TestHelpers.waitFor(1, 10000);
-        engine1.stop();
-
-        EntityManager emm = Helpers.getNewEm();
-
-        ArrayList<History> res = (ArrayList<History>) emm.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class)
-                .getResultList();
-
-        Assert.assertEquals(1, res.size());
-        Assert.assertEquals(State.ENDED, res.get(0).getState());
-    }
-
-    @Test
-    public void testHighlanderMode2() throws Exception
-    {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testHighlanderMode2");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-        jdargs.add(jdp);
-        List<JobParameter> jps = new ArrayList<JobParameter>();
-
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
-                "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", true, em);
-
-        em.getTransaction().begin();
-
-        JobInstance j = CreationTools.createJobInstance(jdDemoMaven, jps, "MAG", null, State.SUBMITTED, 2, TestHelpers.qVip, null, em);
-        JobInstance jj = CreationTools.createJobInstance(jdDemoMaven, jps, "MAG", null, State.RUNNING, 1, TestHelpers.qVip, null, em);
-
-        @SuppressWarnings("unused")
-        History h = CreationTools.createhistory(null, null, jdDemoMaven, null, TestHelpers.qVip, null, null, j, null, null, null, null,
-                TestHelpers.node, null, em);
-        @SuppressWarnings("unused")
-        History hh = CreationTools.createhistory(null, null, jdDemoMaven, null, TestHelpers.qVip, null, null, jj, null, null, null, null,
-                TestHelpers.node, null, em);
-
-        em.getTransaction().commit();
-
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
-
-        TestHelpers.waitFor(2, 10000);
-        engine1.stop();
-
-        EntityManager emm = Helpers.getNewEm();
-
-        ArrayList<JobInstance> res = (ArrayList<JobInstance>) emm.createQuery(
-                "SELECT j FROM JobInstance j ORDER BY j.internalPosition ASC", JobInstance.class).getResultList();
-
-        Assert.assertEquals(2, res.size());
-        Assert.assertEquals(State.RUNNING, res.get(0).getState());
-        Assert.assertEquals(State.SUBMITTED, res.get(1).getState());
-    }
-
-    @Test
-    public void testHighlanderModeMultiQueue() throws Exception
-    {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testHighlanderModeMultiQueue");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-        jdargs.add(jdp);
-
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
-                "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", true, em);
-
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
-
-        Dispatcher.enQueue(j);
-        Dispatcher.enQueue(j);
-
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
-
-        TestHelpers.waitFor(1, 10000);
-        engine1.stop();
-
-        EntityManager emm = Helpers.getNewEm();
-
-        ArrayList<History> res = (ArrayList<History>) emm
-                .createQuery("SELECT j FROM History j WHERE j.jd.id = :j ORDER BY j.enqueueDate ASC", History.class)
-                .setParameter("j", jdDemoMaven.getId()).getResultList();
-
-        Assert.assertEquals(1, res.size());
-        Assert.assertEquals(State.ENDED, res.get(0).getState());
     }
 
     @Test
@@ -708,64 +570,6 @@ public class JobBaseTest
     }
 
     @Test
-    public void testRestartCrashedJob() throws Exception
-    {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testRestartCrashedJob");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-        jdargs.add(jdp);
-
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
-                "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", true, em);
-
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
-
-        int i = Dispatcher.enQueue(j);
-
-        em.getTransaction().begin();
-        JobInstance ji = em.find(JobInstance.class, i);
-        ji.setState(State.CRASHED);
-        em.getTransaction().commit();
-
-        TestHelpers.printJobInstanceTable();
-
-        History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class).setParameter("j", ji.getId())
-                .getSingleResult();
-        em.getTransaction().begin();
-        Message m = new Message();
-        m.setHistory(h);
-        m.setTextMessage("Status updated: CRASHED");
-        em.persist(m);
-        em.getTransaction().commit();
-        TestHelpers.printJobInstanceTable();
-
-        @SuppressWarnings("unused")
-        Message mm = em.createQuery("SELECT m FROM Message m WHERE m.history = :h", Message.class).setParameter("h", h).getSingleResult();
-
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
-
-        Thread.sleep(4000);
-
-        Dispatcher.restartCrashedJob(i);
-        TestHelpers.printJobInstanceTable();
-
-        Thread.sleep(4000);
-        engine1.stop();
-
-        em.refresh(h);
-        Assert.assertEquals(State.ENDED, h.getState());
-        Assert.assertEquals(jdDemoMaven.getId(), h.getJd().getId());
-    }
-
-    @Test
     public void testGetAllDeliverables() throws Exception
     {
         jqmlogger.debug("**********************************************************");
@@ -847,9 +651,8 @@ public class JobBaseTest
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
-        ArrayList<Message> m = (ArrayList<Message>) em
-                .createQuery("SELECT m FROM Message m WHERE m.history.jobInstanceId = :i", Message.class).setParameter("i", i)
-                .getResultList();
+        ArrayList<Message> m = (ArrayList<Message>) em.createQuery("SELECT m FROM Message m WHERE m.history.id = :i", Message.class)
+                .setParameter("i", i).getResultList();
 
         Assert.assertEquals(1, res.size());
         Assert.assertEquals(State.ENDED, res.get(0).getState());
@@ -904,8 +707,7 @@ public class JobBaseTest
         TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
-        History h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :i", History.class).setParameter("i", i)
-                .getSingleResult();
+        History h = em.createQuery("SELECT h FROM History h WHERE h.id = :i", History.class).setParameter("i", i).getSingleResult();
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         jqmlogger.debug("EnqueueDate: " + df.format(h.getEnqueueDate().getTime()));
@@ -914,7 +716,6 @@ public class JobBaseTest
         jqmlogger.debug("EndDate: " + df.format(h.getEndDate().getTime()));
 
         Assert.assertTrue(h.getEnqueueDate() != null);
-        Assert.assertTrue(h.getReturnedValue() != null);
         Assert.assertTrue(h.getUserName() != null);
         Assert.assertTrue(h.getEndDate() != null);
         Assert.assertTrue(h.getExecutionDate() != null);
@@ -1184,9 +985,8 @@ public class JobBaseTest
         ArrayList<String> ress = (ArrayList<String>) Dispatcher.getMsg(i);
 
         @SuppressWarnings("unused")
-        ArrayList<Message> m = (ArrayList<Message>) em
-                .createQuery("SELECT m FROM Message m WHERE m.history.jobInstanceId = :i", Message.class).setParameter("i", i)
-                .getResultList();
+        ArrayList<Message> m = (ArrayList<Message>) em.createQuery("SELECT m FROM Message m WHERE m.history.id = :i", Message.class)
+                .setParameter("i", i).getResultList();
 
         Assert.assertEquals(1, res.size());
         Assert.assertEquals(State.ENDED, res.get(0).getState());
@@ -1334,11 +1134,13 @@ public class JobBaseTest
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
-        ArrayList<History> res = (ArrayList<History>) query.getResultList();
+        List<History> res1 = (ArrayList<History>) query.getResultList();
+        List<JobInstance> res2 = em.createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList();
 
-        Assert.assertEquals(2, res.size());
-        Assert.assertEquals(State.HOLDED, res.get(0).getState());
-        Assert.assertEquals(State.ENDED, res.get(1).getState());
+        Assert.assertEquals(1, res1.size());
+        Assert.assertEquals(1, res2.size());
+        Assert.assertEquals(State.HOLDED, res2.get(0).getState());
+        Assert.assertEquals(State.ENDED, res1.get(0).getState());
     }
 
     @Test
@@ -1561,7 +1363,7 @@ public class JobBaseTest
         // Check run is OK
         History h = em.createQuery("SELECT j FROM History j", History.class).getSingleResult();
         Assert.assertEquals(State.ENDED, h.getStatus());
-        Assert.assertEquals(jid, h.getJobInstanceId());
+        Assert.assertEquals(jid, h.getId());
     }
 
     @Test

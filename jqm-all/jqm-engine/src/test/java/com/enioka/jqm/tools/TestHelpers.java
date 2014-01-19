@@ -18,8 +18,9 @@
 
 package com.enioka.jqm.tools;
 
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -29,6 +30,7 @@ import org.apache.log4j.Logger;
 import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
+import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Node;
 
@@ -103,6 +105,7 @@ public class TestHelpers
         em.createQuery("DELETE DeploymentParameter WHERE 1=1").executeUpdate();
         em.createQuery("DELETE JobHistoryParameter WHERE 1=1").executeUpdate();
         em.createQuery("DELETE Message WHERE 1=1").executeUpdate();
+        em.createQuery("DELETE MessageJi WHERE 1=1").executeUpdate();
         em.createQuery("DELETE History WHERE 1=1").executeUpdate();
         em.createQuery("DELETE JobDefParameter WHERE 1=1").executeUpdate();
         em.createQuery("DELETE JobParameter WHERE 1=1").executeUpdate();
@@ -120,8 +123,7 @@ public class TestHelpers
     {
         EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
 
-        ArrayList<JobInstance> res = (ArrayList<JobInstance>) em.createQuery("SELECT j FROM JobInstance j", JobInstance.class)
-                .getResultList();
+        List<JobInstance> res = em.createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList();
 
         for (JobInstance jobInstance : res)
         {
@@ -134,10 +136,30 @@ public class TestHelpers
         em.close();
     }
 
+    public static void printHistoryTable()
+    {
+        EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
+
+        List<History> res = em.createQuery("SELECT j FROM History j", History.class).getResultList();
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss.SSS");
+
+        jqmlogger.debug("==========================================================================================");
+        for (History h : res)
+        {
+            jqmlogger.debug("JobInstance Id: " + h.getId() + " | " + h.getState() + " | JD: " + h.getJd().getId() + " | "
+                    + h.getQueue().getName() + " | enqueue: " + format.format(h.getEnqueueDate().getTime()) + " | attr: "
+                    + format.format(h.getAttributionDate().getTime()) + " | exec: " + format.format(h.getExecutionDate().getTime())
+                    + " | end: " + format.format(h.getEndDate().getTime()));
+        }
+        jqmlogger.debug("==========================================================================================");
+        em.close();
+    }
+
     public static void waitFor(long nbHistories, int timeoutMs)
     {
         EntityManager em = Helpers.getNewEm();
-        TypedQuery<Long> q = em.createQuery("SELECT COUNT(h) FROM History h WHERE h.status = 'ENDED' OR h.status = 'CRASHED'", Long.class);
+        TypedQuery<Long> q = em.createQuery(
+                "SELECT COUNT(h) FROM History h WHERE h.status = 'ENDED' OR h.status = 'CRASHED'  OR h.status = 'KILLED'", Long.class);
 
         Calendar start = Calendar.getInstance();
         while (q.getSingleResult() != nbHistories && Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis() <= timeoutMs)

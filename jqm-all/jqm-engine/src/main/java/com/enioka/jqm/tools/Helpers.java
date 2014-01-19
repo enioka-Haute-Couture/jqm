@@ -32,8 +32,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.Deliverable;
-import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.jpamodel.Message;
+import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.MessageJi;
 
 /**
  * This is a helper class for internal use only.
@@ -129,19 +129,17 @@ public final class Helpers
      * @param em
      * @return the JPA message created
      */
-    static Message createMessage(String textMessage, History history, EntityManager em)
+    static MessageJi createMessage(String textMessage, JobInstance jobInstance, EntityManager em)
     {
-        Message m = new Message();
-
+        MessageJi m = new MessageJi();
         m.setTextMessage(textMessage);
-        m.setHistory(history);
-
+        m.setJobInstance(jobInstance);
         em.persist(m);
         return m;
     }
 
     /**
-     * Create a Deliverable inside the datbase that will track a file created by a JobInstance Must be called from inside a JPA transaction
+     * Create a Deliverable inside the database that will track a file created by a JobInstance Must be called from inside a JPA transaction
      * 
      * @param fp
      *            FilePath (relative to a root directory - cf. Node)

@@ -39,12 +39,15 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.Index;
+
 /**
  * 
  * @author pierre.coppee
  */
 @Entity
 @Table(name = "JobInstance")
+@org.hibernate.annotations.Table(indexes = @Index(name = "idx_lock_jobinstance_2", columnNames = { "jd_id", "state" }), appliesTo = "JobInstance")
 public class JobInstance implements Serializable
 {
 
@@ -53,7 +56,7 @@ public class JobInstance implements Serializable
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "jd_id")
     private JobDef jd;
 
@@ -68,10 +71,12 @@ public class JobInstance implements Serializable
 
     @Column(length = 50, name = "state")
     @Enumerated(EnumType.STRING)
+    @Index(name = "idx_lock_jobinstance_1")
     private State state;
 
     @ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Queue.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "queue_id")
+    @Index(name = "idx_lock_jobinstance_1")
     private Queue queue;
 
     @ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Node.class, fetch = FetchType.LAZY)
@@ -91,6 +96,14 @@ public class JobInstance implements Serializable
     @Column(name = "creationDate")
     private Calendar creationDate;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "attributionDate")
+    private Calendar attributionDate;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "executionDate")
+    private Calendar executionDate;
+
     @Column(length = 50, name = "application")
     private String application;
 
@@ -106,10 +119,10 @@ public class JobInstance implements Serializable
     @Column(length = 50, name = "keyword3")
     private String keyword3;
 
-    @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "jobInstance")
+    @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST }, mappedBy = "jobInstance")
     private List<JobParameter> parameters;
 
-    @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "jobInstance")
+    @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST }, mappedBy = "jobInstance")
     private List<MessageJi> messages;
 
     public int getCurrentPosition(EntityManager em)
@@ -124,6 +137,15 @@ public class JobInstance implements Serializable
         {
             return 0;
         }
+    }
+
+    public JobParameter addParameter(String key, String value)
+    {
+        JobParameter jp = new JobParameter();
+        jp.setJobinstance(this);
+        jp.setKey(key);
+        jp.setValue(value);
+        return jp;
     }
 
     public int getId()
@@ -318,5 +340,25 @@ public class JobInstance implements Serializable
     public void setId(Integer id)
     {
         this.id = id;
+    }
+
+    public Calendar getExecutionDate()
+    {
+        return executionDate;
+    }
+
+    public void setExecutionDate(Calendar executionDate)
+    {
+        this.executionDate = executionDate;
+    }
+
+    public Calendar getAttributionDate()
+    {
+        return attributionDate;
+    }
+
+    public void setAttributionDate(Calendar attributionDate)
+    {
+        this.attributionDate = attributionDate;
     }
 }

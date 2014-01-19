@@ -161,20 +161,6 @@ public class CreationTools
 
     // ------------------ HISTORY ------------------------------
 
-    public static History initHistory(Integer returnedValue, List<Message> messages, JobInstance jobInstance,
-            List<JobHistoryParameter> jhp, EntityManager em)
-    {
-        History h = new History();
-
-        h.setReturnedValue(returnedValue);
-        h.setMessages(messages);
-        h.setJobInstanceId(jobInstance.getId());
-        h.setParameters(jhp);
-
-        em.persist(h);
-        return h;
-    }
-
     public static History createhistory(Integer returnedValue, Calendar jobDate, JobDef JobDefId, String sessionId, Queue queue,
             String msg, List<Message> messages, JobInstance jobInstance, Calendar enqueueDate, Calendar executionDate, Calendar endDate,
             String userName, Node node, List<JobHistoryParameter> jhp, EntityManager em)
@@ -186,7 +172,7 @@ public class CreationTools
         h.setSessionId(sessionId);
         h.setQueue(queue);
         h.setMessages(messages);
-        h.setJobInstanceId(jobInstance.getId());
+        h.setId(jobInstance.getId());
         h.setEnqueueDate(enqueueDate);
         h.setExecutionDate(executionDate);
         h.setEndDate(endDate);

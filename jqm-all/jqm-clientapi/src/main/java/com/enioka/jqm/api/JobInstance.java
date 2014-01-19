@@ -18,6 +18,7 @@
 
 package com.enioka.jqm.api;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class JobInstance
     private String keyword1, keyword2, keyword3;
     private Map<String, String> parameters = new HashMap<String, String>();
     private Integer progress;
-    private List<String> messages;
+    private List<String> messages = new ArrayList<String>();
 
     /**
      * The Job instance ID. This is a key for numerous Dispatcher functions.

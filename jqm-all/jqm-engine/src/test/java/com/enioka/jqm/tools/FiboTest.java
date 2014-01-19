@@ -100,7 +100,7 @@ public class FiboTest
         engine1.stop();
 
         long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
-        Assert.assertTrue(i > 2);
+        Assert.assertEquals(11, i);
     }
 
     @Test
@@ -133,7 +133,7 @@ public class FiboTest
 
         engine1.stop();
         long ii = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
-        Assert.assertTrue(ii > 2);
+        Assert.assertEquals(11, ii);
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.endDate ASC", History.class);
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
         for (History history : res)

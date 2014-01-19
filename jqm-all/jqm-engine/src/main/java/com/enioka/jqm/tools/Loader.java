@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -57,8 +56,11 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
+import com.enioka.jqm.jpamodel.JobHistoryParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
+import com.enioka.jqm.jpamodel.Message;
+import com.enioka.jqm.jpamodel.MessageJi;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.State;
 import com.jcabi.aether.Aether;
@@ -66,7 +68,6 @@ import com.jcabi.aether.Aether;
 class Loader implements Runnable
 {
     private JobInstance job = null;
-    private History h = null;
     private Node node = null;
     private EntityManager em = Helpers.getNewEm();
     private Map<String, URL[]> cache = null;
@@ -85,8 +86,6 @@ class Loader implements Runnable
         this.node = em.find(Node.class, p.getDp().getNode().getId());
         this.cache = cache;
         this.p = p;
-        this.h = em.createQuery("SELECT h FROM History h WHERE h.jobInstanceId = :j", History.class).setParameter("j", job.getId())
-                .getSingleResult();
     }
 
     // ExtractJar
@@ -379,6 +378,7 @@ class Loader implements Runnable
     {
         State resultStatus = State.SUBMITTED;
         jqmlogger.debug("LOADER HAS JUST STARTED UP FOR JOB INSTANCE " + job.getId());
+        jqmlogger.debug("Job instance " + job.getId() + " has " + job.getParameters().size() + " parameters");
         jarFile = new File(CheckFilePath.fixFilePath(node.getRepo()) + job.getJd().getJarPath());
         final URL jarUrl;
         try
@@ -427,20 +427,17 @@ class Loader implements Runnable
         {
             em.getTransaction().begin();
             em.refresh(job, LockModeType.PESSIMISTIC_WRITE);
-            em.refresh(this.h);
 
-            Date date = new Date();
-            Calendar executionDate = GregorianCalendar.getInstance(Locale.getDefault());
-            executionDate.setTime(date);
-            h.setExecutionDate(executionDate);
-
-            // Add a message
-            Helpers.createMessage("Status updated: RUNNING", h, em);
             if (!job.getState().equals(State.KILLED))
             {
-                job.setState(State.RUNNING);
+                // Use a query to avoid locks on FK checks (with setters, every field is updated!)
+                em.createQuery("UPDATE JobInstance j SET j.executionDate = current_timestamp(), state = 'RUNNING' WHERE j.id = :i")
+                        .setParameter("i", job.getId()).executeUpdate();
             }
-            h.setStatus(State.RUNNING);
+
+            // Add a message
+            Helpers.createMessage("Status updated: RUNNING", job, em);
+
             em.getTransaction().commit();
             jqmlogger.debug("JobInstance was updated: " + job.getState());
         }
@@ -451,10 +448,6 @@ class Loader implements Runnable
             endOfRun(State.CRASHED);
             return;
         }
-
-        // Get the default connection
-        String defaultconnection = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = 'defaultConnection'",
-                String.class).getSingleResult();
 
         // Class loader switch
         JarClassLoader jobClassLoader = null;
@@ -490,7 +483,7 @@ class Loader implements Runnable
         jqmlogger.debug("JOB MAIN FUNCTION WILL BE INVOKED NOW");
         try
         {
-            jobClassLoader.launchJar(job, defaultconnection, contextClassLoader, em);
+            jobClassLoader.launchJar(job, contextClassLoader, em);
             resultStatus = State.ENDED;
         }
         catch (JqmKillException e)
@@ -506,18 +499,26 @@ class Loader implements Runnable
         jqmlogger.debug("++++++++++++++++++++++++++++++++++++++++");
 
         // Job instance has now ended its run
-        endOfRun(resultStatus);
+        try
+        {
+            endOfRun(resultStatus);
+        }
+        catch (Exception e)
+        {
+            jqmlogger.error("An error occurred while finalizing the job instance.", e);
+        }
 
         jqmlogger.debug("End of loader. Thread will now end");
         jqmlogger.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         jqmlogger.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
         em.close();
-
     }
 
     private void endOfRun(State status)
     {
+        p.decreaseNbThread();
+
         // Restore class loader
         if (this.contextClassLoader != null)
         {
@@ -527,29 +528,80 @@ class Loader implements Runnable
 
         // Retrieve the object to update
         em.getTransaction().begin();
-        em.refresh(job, LockModeType.PESSIMISTIC_WRITE);
-        em.refresh(h);
-
+        em.refresh(job);
         jqmlogger.debug("Job status after execution: " + job.getState());
         jqmlogger.debug("Progression after execution: " + job.getProgress());
-        p.decreaseNbThread();
         jqmlogger.debug("Post execution, the number of running threads for the current queue is " + p.getActualNbThread());
 
         // Update end date
-        Date datee = new Date();
         Calendar endDate = GregorianCalendar.getInstance(Locale.getDefault());
-        endDate.setTime(datee);
-        h.setEndDate(endDate);
 
         // STATE UPDATED
-        job.setState(status);
-        jqmlogger.debug("In the Loader --> ENDED: HISTORY: " + h.getId());
-        Helpers.createMessage("Status updated: " + status, h, em);
-        h.setReturnedValue(0);
-        h.setStatus(status);
+        // job.setState(status);
+        jqmlogger.debug("In the Loader --> ENDED");
 
-        jqmlogger.debug("Final status: " + h.getState());
-        jqmlogger.debug("Final progression: " + h.getProgress());
+        // Done: put inside history & remove instance from queue.
+        History h = new History();
+        h.setId(job.getId());
+        h.setJd(job.getJd());
+        h.setSessionId(job.getSessionID());
+        h.setQueue(job.getQueue());
+        h.setMessages(new ArrayList<Message>());
+        h.setEnqueueDate(job.getCreationDate());
+        h.setEndDate(endDate);
+        h.setAttributionDate(job.getAttributionDate());
+        h.setExecutionDate(job.getExecutionDate());
+        h.setUserName(job.getUserName());
+        h.setEmail(job.getEmail());
+        h.setParentJobId(job.getParentId());
+        h.setApplication(job.getApplication());
+        h.setModule(job.getModule());
+        h.setKeyword1(job.getKeyword1());
+        h.setKeyword2(job.getKeyword2());
+        h.setKeyword3(job.getKeyword3());
+        h.setProgress(job.getProgress());
+        h.setParameters(new ArrayList<JobHistoryParameter>());
+        h.setStatus(status);
+        h.setNode(job.getNode());
+
+        em.persist(h);
+        jqmlogger.debug("An History was just created: " + h.getId());
+
+        for (JobParameter j : job.getParameters())
+        {
+            JobHistoryParameter jp = new JobHistoryParameter();
+            jp.setKey(j.getKey());
+            jp.setValue(j.getValue());
+            em.persist(jp);
+            h.getParameters().add(jp);
+        }
+        for (MessageJi p : job.getMessages())
+        {
+            Message m = new Message();
+            m.setHistory(h);
+            m.setTextMessage(p.getTextMessage());
+            em.persist(m);
+        }
+
+        // A last message (directly created on History, not JI)
+        Message m = new Message();
+        m.setHistory(h);
+        m.setTextMessage("Status updated: " + status);
+        em.persist(m);
+
+        // Purge the JI (using query, not em - more efficient + avoid cache issues on MessageJI which are not up to date here)
+        em.getTransaction().commit();
+        em.getTransaction().begin();
+        em.createQuery("DELETE FROM MessageJi WHERE jobInstance = :i").setParameter("i", job).executeUpdate();
+        em.getTransaction().commit();
+        em.getTransaction().begin();
+        em.createQuery("DELETE FROM JobParameter WHERE jobInstance = :i").setParameter("i", job).executeUpdate();
+        em.getTransaction().commit();
+
+        // Other transaction for purging the JI (deadlock power - beware of MessageJi)
+        em.getTransaction().begin();
+        em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", job.getId()).executeUpdate();
+        em.getTransaction().commit();
 
         // Cleanup
         if (shouldCleanupExtractedZip)
@@ -569,22 +621,6 @@ class Loader implements Runnable
             {
                 jqmlogger.warn("An e-mail could not be sent. No impact on the engine.", e);
             }
-        }
-        em.getTransaction().commit();
-
-        // Done
-        if (job.getState().equals(State.ENDED))
-        {
-            em.getTransaction().begin();
-            for (JobParameter p : job.getParameters())
-            {
-                em.remove(p);
-            }
-            em.getTransaction().commit();
-
-            em.getTransaction().begin();
-            em.remove(job);
-            em.getTransaction().commit();
         }
     }
 }

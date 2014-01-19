@@ -52,7 +52,7 @@ class JarClassLoader extends URLClassLoader
         super(addUrls(url, libs), null);
     }
 
-    Object launchJar(JobInstance job, String defaultConnection, ClassLoader old, EntityManager em) throws JqmEngineException
+    Object launchJar(JobInstance job, ClassLoader old, EntityManager em) throws JqmEngineException
     {
         // 1st:load the class
         String classQualifiedName = job.getJd().getJavaClassName();
