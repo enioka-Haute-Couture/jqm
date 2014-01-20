@@ -18,11 +18,17 @@
 
 package com.enioka.jqm.api;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * A job instance queue. Job request (i.e. job instances) are put inside queues. There are different queues for different uses depending on
  * the environment.
  * 
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Queue
 {
     private int id;

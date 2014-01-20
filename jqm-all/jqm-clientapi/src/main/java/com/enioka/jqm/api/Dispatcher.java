@@ -140,31 +140,6 @@ public final class Dispatcher
         }
     }
 
-    private static com.enioka.jqm.api.JobDefinition jobDefToJobDefinition(JobDef jd)
-    {
-
-        com.enioka.jqm.api.JobDefinition job = new com.enioka.jqm.api.JobDefinition();
-        Map<String, String> h = new HashMap<String, String>();
-
-        if (jd.getParameters() != null)
-        {
-            for (JobDefParameter i : jd.getParameters())
-            {
-                h.put(i.getKey(), i.getValue());
-            }
-        }
-
-        job.setParameters(h);
-        job.setApplicationName(jd.getApplicationName());
-        job.setApplication(jd.getApplication());
-        job.setModule(jd.getModule());
-        job.setKeyword1(jd.getKeyword1());
-        job.setKeyword2(jd.getKeyword2());
-        job.setKeyword3(jd.getKeyword3());
-
-        return job;
-    }
-
     private static com.enioka.jqm.api.JobInstance getJobInstance(int idJob)
     {
         EntityManager em = getEm();
@@ -309,7 +284,7 @@ public final class Dispatcher
         {
             jqmlogger.error("Job definition named " + jd.getApplicationName() + " does not exist");
             em.close();
-            throw new JqmException("no such job definition");
+            throw new JqmInvalidRequestException("no such job definition");
         }
 
         jqmlogger.debug("Job to enqueue is from JobDef " + job.getId());
@@ -1016,26 +991,15 @@ public final class Dispatcher
      */
     public static List<com.enioka.jqm.api.JobInstance> getJobs()
     {
-        ArrayList<com.enioka.jqm.api.JobInstance> res = new ArrayList<com.enioka.jqm.api.JobInstance>();
-        ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) getEm().createQuery("SELECT j FROM JobInstance j", JobInstance.class)
-                .getResultList();
+        List<com.enioka.jqm.api.JobInstance> res = new ArrayList<com.enioka.jqm.api.JobInstance>();
 
-        for (JobInstance j : jobs)
+        for (JobInstance j : getEm().createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList())
         {
-            com.enioka.jqm.api.JobInstance tmp = new com.enioka.jqm.api.JobInstance();
-
-            tmp.setId(j.getId());
-            tmp.setJd(jobDefToJobDefinition(j.getJd()));
-            if (j.getParentId() != null)
-            {
-                tmp.setParent(j.getParentId());
-            }
-            else
-            {
-                tmp.setParent(null);
-            }
-
-            res.add(tmp);
+            res.add(getJobInstance(j));
+        }
+        for (History j : getEm().createQuery("SELECT j FROM History j", History.class).getResultList())
+        {
+            res.add(getJobInstance(j));
         }
 
         return res;

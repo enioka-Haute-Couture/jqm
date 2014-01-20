@@ -21,10 +21,13 @@ package com.enioka.jqm.api;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * Job execution request. It contains all the data needed to enqueue a request, as well as non-mandatory data.
  * 
  */
+@XmlRootElement
 public class JobDefinition
 {
     private Integer parentID;

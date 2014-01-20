@@ -23,16 +23,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.enioka.jqm.jpamodel.State;
 
 /**
  * Represents the result of a job execution request - either a queued request, or a running job, or the result of said execution.
  * 
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class JobInstance
 {
     private Integer id;
-    private JobDefinition jd;
     private Integer parent;
     private String user;
     private String sessionID;
@@ -57,21 +62,6 @@ public class JobInstance
     void setId(Integer id)
     {
         this.id = id;
-    }
-
-    /**
-     * A JobDefinition that contains all the data that was used to create the job request.
-     * 
-     * @return
-     */
-    public JobDefinition getJd()
-    {
-        return jd;
-    }
-
-    void setJd(JobDefinition jd)
-    {
-        this.jd = jd;
     }
 
     /**
