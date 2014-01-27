@@ -18,6 +18,9 @@
 
 package com.enioka.jqm.tools;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 import javax.persistence.EntityManager;
 
 import org.apache.commons.cli.BasicParser;
@@ -47,6 +50,23 @@ public class Main
         // Static class
     }
 
+    private static String getMavenVersion()
+    {
+        String res = "";
+        InputStream is = Main.class.getResourceAsStream("/META-INF/maven/com.enioka.jqm/jqm-engine/pom.properties");
+        Properties p = new Properties();
+        try
+        {
+            p.load(is);
+            res = p.getProperty("version");
+        }
+        catch (Exception e)
+        {
+            res = "not a valid maven version";
+        }
+        return res;
+    }
+
     /**
      * Startup method for the packaged JAR
      * 
@@ -73,6 +93,7 @@ public class Main
                 .isRequired().create("importqueuefile");
         Option o61 = OptionBuilder.withArgName("nodeName").hasArg()
                 .withDescription("create a JQM node of this name (init the database if needed").isRequired().create("createnode");
+        Option o71 = OptionBuilder.withDescription("display JQM engine version").withLongOpt("version").create("v");
 
         Options options = new Options();
         OptionGroup og1 = new OptionGroup();
@@ -84,6 +105,7 @@ public class Main
         og1.addOption(o31);
         og1.addOption(o51);
         og1.addOption(o61);
+        og1.addOption(o71);
         options.addOptionGroup(og1);
 
         HelpFormatter formatter = new HelpFormatter();
@@ -128,6 +150,11 @@ public class Main
             else if (line.hasOption(o01.getOpt()))
             {
                 formatter.printHelp("java -jar jqm-engine.jar", options, true);
+            }
+            // Version
+            else if (line.hasOption(o71.getOpt()))
+            {
+                jqmlogger.info("Engine version: " + getMavenVersion());
             }
         }
         catch (ParseException exp)
@@ -174,6 +201,7 @@ public class Main
         try
         {
             JqmEngine engine = new JqmEngine();
+            jqmlogger.info("Engine version is: " + getMavenVersion());
             jqmlogger.info("Starting engine node " + nodeName);
             engine.start(nodeName);
         }
