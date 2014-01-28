@@ -30,7 +30,7 @@
 
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-clientapi</artifactId>
+			<artifactId>jqm-api-client-hibernate</artifactId>
 			<type>jar</type>
 			<version>${project.version}</version>
 		</dependency>

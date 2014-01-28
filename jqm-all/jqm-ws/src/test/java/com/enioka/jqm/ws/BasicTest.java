@@ -13,8 +13,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.enioka.jqm.api.JobDefinition;
 import com.enioka.jqm.api.JobInstance;
+import com.enioka.jqm.api.JobRequest;
 
 public class BasicTest extends JerseyTest
 {
@@ -44,7 +44,7 @@ public class BasicTest extends JerseyTest
     @Test
     public void testX()
     {
-        final JobDefinition hello = target("test/testx").request().get(JobDefinition.class);
+        final JobRequest hello = target("test/testx").request().get(JobRequest.class);
         Assert.assertEquals("hhh", hello.getUser());
     }
 
@@ -54,7 +54,7 @@ public class BasicTest extends JerseyTest
         CreationTools.createJobDef(null, true, "App", null, "jqm-test-datetimemaven/", "jqm-test-datetimemaven/jqm-test-datetimemaven.jar",
                 TestHelpers.qVip, 42, "TestApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition jd = new JobDefinition("TestApplication", "SuperUser");
+        JobRequest jd = new JobRequest("TestApplication", "SuperUser");
         int newJobId = target("ji").request().put(Entity.entity(jd, MediaType.APPLICATION_XML), Integer.class);
         Assert.assertEquals(1, newJobId);
     }
@@ -65,7 +65,7 @@ public class BasicTest extends JerseyTest
         CreationTools.createJobDef(null, true, "App", null, "jqm-test-datetimemaven/", "jqm-test-datetimemaven/jqm-test-datetimemaven.jar",
                 TestHelpers.qVip, 42, "TestApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition jd = new JobDefinition("TestApplication", "SuperUser");
+        JobRequest jd = new JobRequest("TestApplication", "SuperUser");
         int newJobId = target("ji").request().put(Entity.entity(jd, MediaType.APPLICATION_XML), Integer.class);
 
         List<JobInstance> res = target("ji").request().get(new GenericType<List<JobInstance>>()

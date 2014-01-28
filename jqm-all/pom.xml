@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.enioka.jqm</groupId>
 	<artifactId>jqm-all</artifactId>
@@ -12,18 +13,19 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<jqm.version>0.0.1-SNAPSHOT</jqm.version>
 		<hibernate.version>4.2.8.Final</hibernate.version>
+		<junit.version>4.11</junit.version>
+		<hsqldb.version>2.3.1</hsqldb.version>
 	</properties>
 
 	<modules>
 		<module>jqm-model</module>
-		<module>jqm-clientapi</module>
 		<module>jqm-api</module>
 		<module>jqm-engine</module>
 		<module>jqm-tests</module>
-    <module>jqm-ws</module>
-  </modules>
+		<module>jqm-ws</module>
+		<module>jqm-client</module>
+	</modules>
 
 	<scm>
 		<developerConnection>scm:git:ssh://git@git.enioka.com/jqm.git</developerConnection>

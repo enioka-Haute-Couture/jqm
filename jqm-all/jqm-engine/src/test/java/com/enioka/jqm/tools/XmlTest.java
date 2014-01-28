@@ -13,7 +13,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.enioka.jqm.api.Dispatcher;
+import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 
@@ -32,7 +32,7 @@ public class XmlTest
         s.setSilent(true);
         s.start();
 
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         Helpers.resetEmf();
 
         jqmlogger.debug("log init");
@@ -41,7 +41,7 @@ public class XmlTest
     @AfterClass
     public static void stop()
     {
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         s.shutdown();
         s.stop();
     }

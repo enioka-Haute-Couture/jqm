@@ -11,9 +11,9 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
 
-import com.enioka.jqm.api.Dispatcher;
-import com.enioka.jqm.api.JobDefinition;
 import com.enioka.jqm.api.JobInstance;
+import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 
 @Path("ji")
 public class QueueOperation
@@ -22,16 +22,16 @@ public class QueueOperation
 
     @PUT
     @Consumes(MediaType.APPLICATION_XML)
-    public int enqueue(JobDefinition jd)
+    public int enqueue(JobRequest jd)
     {
         log.debug("enqueue xs");
-        return Dispatcher.enQueue(jd);
+        return JqmClientFactory.getClient().enqueue(jd);
     }
 
     @GET
     @Produces(MediaType.APPLICATION_XML)
     public List<JobInstance> getJobInstances()
     {
-        return Dispatcher.getJobs();
+        return JqmClientFactory.getClient().getJobs();
     }
 }

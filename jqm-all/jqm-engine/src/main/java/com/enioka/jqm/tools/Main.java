@@ -31,8 +31,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 
-import com.enioka.jqm.api.Dispatcher;
-import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.api.JqmClientFactory;
 
 /**
  * Starter class & parameter parsing
@@ -141,8 +140,7 @@ public class Main
     private static void enqueue(String applicationName)
     {
         jqmlogger.info("Will enqueue application named " + applicationName + " without parameter overloads");
-        JobDefinition job = new JobDefinition(applicationName, "TestUser");
-        Dispatcher.enQueue(job);
+        JqmClientFactory.getClient().enqueue(applicationName, "CommandLineUser");
     }
 
     private static void importJobDef(String xmlpath)

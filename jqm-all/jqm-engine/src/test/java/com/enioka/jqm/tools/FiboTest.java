@@ -30,8 +30,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.enioka.jqm.api.Dispatcher;
-import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
@@ -52,7 +52,7 @@ public class FiboTest
         s.setSilent(true);
         s.start();
 
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         Helpers.resetEmf();
     }
 
@@ -82,10 +82,10 @@ public class FiboTest
                 "jqm-test-fibo/jqm-test-fibo.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2",
                 false, em);
 
-        JobDefinition form = new JobDefinition("Fibo", "MAG");
+        JobRequest form = new JobRequest("Fibo", "MAG");
         form.addParameter("p1", "1");
         form.addParameter("p2", "2");
-        Dispatcher.enQueue(form);
+        JqmClientFactory.getClient().enqueue(form);
 
         // Create JNDI connection to write inside the engine database
         em.getTransaction().begin();
@@ -104,11 +104,11 @@ public class FiboTest
     }
 
     @Test
-    public void testEnqueueSynchronously() throws Exception
+    public void testenqueueSynchronously() throws Exception
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testEnqueueSynchronously");
+        jqmlogger.debug("Starting test testenqueueSynchronously");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
@@ -122,10 +122,10 @@ public class FiboTest
                 "jqm-test-fibosync/jqm-test-fibosync.jar", TestHelpers.qVip, 42, "FiboSync", null, "Franquin", "ModuleMachin", "other",
                 "other", false, em);
 
-        JobDefinition j = new JobDefinition("FiboSync", "MAG");
+        JobRequest j = new JobRequest("FiboSync", "MAG");
         j.addParameter("p1", "1");
         j.addParameter("p2", "2");
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");

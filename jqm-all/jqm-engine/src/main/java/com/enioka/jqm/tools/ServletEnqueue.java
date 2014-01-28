@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.http.HttpStatus;
 
-import com.enioka.jqm.api.Dispatcher;
-import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 
 class ServletEnqueue extends HttpServlet
 {
@@ -29,7 +29,7 @@ class ServletEnqueue extends HttpServlet
         // If authentication is used one day, replace this line by the name from the context
         String user = req.getParameter("user");
 
-        JobDefinition jd = new JobDefinition(applicationName, user);
+        JobRequest jd = new JobRequest(applicationName, user);
 
         jd.setModule(req.getParameter("module"));
         jd.setEmail(req.getParameter("mail"));
@@ -50,7 +50,7 @@ class ServletEnqueue extends HttpServlet
             jd.addParameter(req.getParameter("param_" + j), req.getParameter("paramvalue_" + j));
         }
 
-        int i = Dispatcher.enQueue(jd);
+        int i = JqmClientFactory.getClient().enqueue(jd);
         resp.getWriter().write("" + i);
         resp.getWriter().close();
     }

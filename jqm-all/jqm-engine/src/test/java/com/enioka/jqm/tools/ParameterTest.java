@@ -29,8 +29,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.enioka.jqm.api.Dispatcher;
-import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 
@@ -49,7 +49,7 @@ public class ParameterTest
         s.setSilent(true);
         s.start();
 
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         Helpers.resetEmf();
     }
 
@@ -80,10 +80,10 @@ public class ParameterTest
                 "jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
                 "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
         j.addParameter("arg2", "argument2");
 
-        Dispatcher.enQueue(j);
+        JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -114,9 +114,9 @@ public class ParameterTest
                 "jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
                 "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
-        Dispatcher.enQueue(j);
+        JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -147,11 +147,11 @@ public class ParameterTest
                 "jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
                 "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
         j.addParameter("arg1", "argument1");
         j.addParameter("arg2", "argument2");
 
-        Dispatcher.enQueue(j);
+        JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");

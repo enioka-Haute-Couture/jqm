@@ -32,8 +32,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.enioka.jqm.api.Dispatcher;
-import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
@@ -47,7 +47,7 @@ public class HighlanderTest
     @Before
     public void before()
     {
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         Helpers.resetEmf();
     }
 
@@ -63,14 +63,14 @@ public class HighlanderTest
         s.setSilent(true);
         s.start();
 
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         Helpers.resetEmf();
     }
 
     @AfterClass
     public static void stop()
     {
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         s.shutdown();
         s.stop();
     }
@@ -93,10 +93,10 @@ public class HighlanderTest
                 "ModuleMachin", "other", "other", true, em);
         em.close();
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
         for (int i = 0; i < 9; i++)
         {
-            Dispatcher.enQueue(j);
+            JqmClientFactory.getClient().enqueue(j);
         }
 
         JqmEngine engine1 = new JqmEngine();
@@ -106,7 +106,7 @@ public class HighlanderTest
 
         for (int i = 0; i < 9; i++)
         {
-            Dispatcher.enQueue(j);
+            JqmClientFactory.getClient().enqueue(j);
         }
 
         TestHelpers.waitFor(2, 10000);
@@ -124,11 +124,11 @@ public class HighlanderTest
     }
 
     @Test
-    public void testHighlanderEnqueueEngineDead() throws Exception
+    public void testHighlanderenqueueEngineDead() throws Exception
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testHighlanderModeEnqueueEngineDead");
+        jqmlogger.debug("Starting test testHighlanderModeenqueueEngineDead");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
@@ -142,10 +142,10 @@ public class HighlanderTest
                 "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
-        Dispatcher.enQueue(j);
-        Dispatcher.enQueue(j);
+        JqmClientFactory.getClient().enqueue(j);
+        JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -181,14 +181,14 @@ public class HighlanderTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        int firstJob = Dispatcher.enQueue(new JobDefinition("kill", "MAG"));
+        int firstJob = JqmClientFactory.getClient().enqueue(new JobRequest("kill", "MAG"));
         for (int i = 0; i < 100; i++)
         {
-            Dispatcher.enQueue(new JobDefinition("kill", "MAG"));
+            JqmClientFactory.getClient().enqueue(new JobRequest("kill", "MAG"));
         }
-        Dispatcher.killJob(firstJob);
+        JqmClientFactory.getClient().killJob(firstJob);
         Thread.sleep(4000);
-        Dispatcher.killJob(Dispatcher.getUserJobs("MAG").get(0).getId());
+        JqmClientFactory.getClient().killJob(JqmClientFactory.getClient().getUserActiveJobs("MAG").get(0).getId());
 
         TestHelpers.waitFor(2, 10000);
         engine1.stop();
@@ -219,10 +219,10 @@ public class HighlanderTest
                 "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
-        Dispatcher.enQueue(j);
-        Dispatcher.enQueue(j);
+        JqmClientFactory.getClient().enqueue(j);
+        JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");

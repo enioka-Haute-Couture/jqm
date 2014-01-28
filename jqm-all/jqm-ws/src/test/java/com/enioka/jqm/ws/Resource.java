@@ -5,7 +5,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.api.JobRequest;
 
 /**
  * Example resource class hosted at the URI path "/test"
@@ -29,8 +29,8 @@ public class Resource
     @GET
     @Path("testx")
     @Produces(MediaType.APPLICATION_XML)
-    public JobDefinition getJobDef()
+    public JobRequest getJobDef()
     {
-        return new JobDefinition("rrr", "hhh");
+        return new JobRequest("rrr", "hhh");
     }
 }

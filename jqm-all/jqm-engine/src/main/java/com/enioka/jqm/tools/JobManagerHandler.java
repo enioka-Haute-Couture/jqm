@@ -20,8 +20,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
-import com.enioka.jqm.api.Dispatcher;
-import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
@@ -193,7 +193,7 @@ class JobManagerHandler implements InvocationHandler
     private Integer enqueue(String applicationName, String user, String mail, String sessionId, String application, String module,
             String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
-        JobDefinition jd = new JobDefinition(applicationName, user, mail);
+        JobRequest jd = new JobRequest(applicationName, user, mail);
         jd.setApplicationName(applicationName);
         jd.setUser(user == null ? ji.getUserName() : user);
         jd.setEmail(mail);
@@ -206,7 +206,7 @@ class JobManagerHandler implements InvocationHandler
         jd.setParentID(this.ji.getId());
         jd.setParameters(parameters);
 
-        return Dispatcher.enQueue(jd);
+        return JqmClientFactory.getClient().enqueue(jd);
     }
 
     private int enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module,

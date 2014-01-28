@@ -31,8 +31,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.enioka.jqm.api.Dispatcher;
-import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
@@ -53,14 +53,14 @@ public class GeoTest
         s.setSilent(true);
         s.start();
 
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         Helpers.resetEmf();
     }
 
     @AfterClass
     public static void stop()
     {
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         s.shutdown();
         s.stop();
     }
@@ -83,9 +83,9 @@ public class GeoTest
         JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-geo/", "jqm-test-geo/jqm-test-geo.jar",
                 TestHelpers.qVip, 42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
 
-        JobDefinition form = new JobDefinition("Geo", "MAG");
+        JobRequest form = new JobRequest("Geo", "MAG");
         form.addParameter("nbJob", "1");
-        Dispatcher.enQueue(form);
+        JqmClientFactory.getClient().enqueue(form);
 
         // Create JNDI connection to write inside the engine database
         em.getTransaction().begin();
