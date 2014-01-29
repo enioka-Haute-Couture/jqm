@@ -6,7 +6,8 @@ to use it (a file path, a database connection string + password, ...)
 
 There are many approaches to define these resources (directly in the code, in a configuration file...) but they all have caveats
 (mostly: they are not easy to use in a multi environment context, where resource descriptions change from one environment to another).
-Java has standardized JNDI as a way to define these resources, and JQM provides a limited JNDI directory implementation.
+Java has standardized JNDI as a way to define these resources, and JQM provides a limited JNDI directory implementation that can be used by 
+the [payloads](writing_payloads.md).
 
 JQM JNDI can be used for:
 
@@ -18,20 +19,26 @@ JQM JNDI can be used for:
 that it is present does **not** mean that JQM is a JEE container. Notably, there is no injection mechanism and JNDI resources have to be
 manually looked up.
 
-:grey_exclamation: an object returned by a JNDI lookup is just a description. The JNDI system has not checked if the object existed, if
+:grey_exclamation: An object returned by a JNDI lookup is just a description. The JNDI system has not checked if the object existed, if
 all parameters are present, etc. It also means that it is the client's respsonsbility to open files, database connections... and close them
 in the end.
+
+The JNDI system is totally independent from the JQM API described in [payload API](writing_payloads.md#Accessing the JQM engine API). It is always
+present, whatever type your payload is and even if the jqm-api jar is not present.
 
 ## JDBC
 
 ### Using
-
 ```java
 DataSource ds = (DataSource) NamingManager.getInitialContext(null).lookup("jdbc/superalias");
 ```
 
 It could of interest to note that the JQM NamingManager is standard - it can be used from wherever is needed, such as a JPA provider configuration:
 in a persistence.xml, it is perfectly valid to use <non-jta-datasource>jdbc/superalias</non-jta-datasource>.
+
+If all programs running inside a JQM cluster always use the same database, it is possible to define a JDBC alias as the "default 
+connection" (cf. [parameters](parameters.md)). It can then be retrieved directly through the getDefaultConnection method of the JQM API.
+(this is the only JNDI-related element that requires the API).
 
 ### Defining
 
@@ -42,7 +49,6 @@ A line must be created inside the JQM database table named DatabaseProp. Fields 
 ## JMS
 
 ### Using
-
 ```java
 import javax.jms.Connection;
 import javax.jms.MessageProducer;
@@ -87,19 +93,12 @@ public class SuperTestPayload extends JobBase
             producer.send(message);
             producer.close();
             session.commit();
-            System.out.println("A message was sent to the broker");
- 
-            // We are done!
             connection.close();
+			System.out.println("A message was sent to the broker");
         }
         catch (Exception e)
         {
             e.printStackTrace();
-        }
-
-        if (nb == 0)
-        {
-            throw new RuntimeException("test has failed - no messages were received.");
         }
     }
 }
@@ -158,7 +157,6 @@ physicalName    | queue name
 ## Files
 
 ### Using
-
 ```java
 File f = (File) NamingManager.getInitialContext(null).lookup("fs/superalias");
 ```

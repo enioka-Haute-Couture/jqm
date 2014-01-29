@@ -13,11 +13,11 @@ There are three payload types
 This a classic class containing a "static void main" function (with or without a single parameter of type String[]).
 
 In that case, JQM will simply launch the main function. If there are some arguments defined (default arguments in the JobDef or
-arguments given at enqueue time) their value will put inside the String[] parameter *ordered by key name*.
+arguments given at enqueue time) their value will be put inside the String[] parameter *ordered by key name*.
 
 There is no need for any dependencies in that case - direct reuse of existing code is possible.
 
-This would perfectly run, without any specific dependencies:
+This would run perfectly, without any specific dependencies or imports:
 ```java
 public class App
 {
@@ -33,11 +33,11 @@ public class App
 ### Runnable
 
 Some existing code is written to be run as a thread, implementing the Runnable interface. If these classes have a no-argument
-constructor, JQM can instanciate them and launch them (this is not imposed by the Runnable interface - as if interfaces could 
-impose a constructor!). In that case, the run() method from the interface is executed - therefore it is not possible to access
-parameters without using JQM advanced function described later.
+constructor (this is not imposed by the Runnable interface as interfaces cannot impose a constructor), JQM can instanciate 
+and launch them . In that case, the run() method from the interface is executed - therefore it is not possible to access
+parameters without using JQM advanced function described later in this chapter.
 
-This would perfectly run, without any specific dependencies:
+This would run perfectly, without any specific dependencies or imports:
 ```java
 public class App implements Runnable
 {
@@ -54,7 +54,7 @@ public class App implements Runnable
 This type of job only exists for ascending compatibility with a former limited JQM version. It consisted in subclassing class JobBase,
  overloading method start() and keeping a no-arg constructor. Parameters are accessible through a number of accessors of the base class.
 
-For exemple (note the import and the use of an accessor):
+For example (note the import and the use of an accessor):
 ```java
 import com.enioka.jqm.api.JobBase;
 
@@ -80,7 +80,7 @@ It requires the following dependency (Maven):
 
 ## Accessing the JQM engine API
 
-Often, a job will want to interact with JQM, for operations such as:
+Often, a job will need to interact with JQM, for operations such as:
 
 * enqueue a new job
 * get the different IDs that identify a job instance (i.e. a run)
@@ -93,8 +93,8 @@ For this, an interface exists called JobManager inside jar jqm-api.jar. Using it
 just create a field (static or not) inside your job class (whatever type - Main, Runnable or JQM) and the engine 
 will **inject an implementation ready for use**.
 
-> :grey_exclamation: the JQM type already has one JobManager field named jm defined in the base class JobBase - it would have
-stupid not to define it with the API already present. 
+> :grey_exclamation: the JQM payload type already has one JobManager field named jm defined in the base class JobBase - it would have
+been stupid not to define it while the API is always present for that payload type. 
 
 ## Creating files
 
