@@ -192,9 +192,8 @@ class Loader implements Runnable
     {
         try
         {
-            FileUtils.deleteDirectory(new File(CheckFilePath.fixFilePath(node.getRepo()
-                    + CheckFilePath.fixFilePath(job.getJd().getFilePath()))
-                    + "tmp" + job.getId() + "/"));
+            FileUtils.deleteDirectory(new File(FilenameUtils.concat(FilenameUtils.concat(node.getRepo(), job.getJd().getFilePath()), "tmp"
+                    + job.getId())));
         }
         catch (IOException e)
         {
@@ -231,8 +230,7 @@ class Loader implements Runnable
 
                 jqmlogger.debug("pomdebug: " + res);
 
-                if (res != null
-                        && (CheckFilePath.fixFilePath(node.getRepo() + CheckFilePath.fixFilePath(job.getJd().getFilePath()))) != null)
+                if (res != null && FilenameUtils.concat(node.getRepo(), job.getJd().getFilePath()) != null)
                 {
                     is = new FileInputStream(res + "/pom.xml");
                     os = new FileOutputStream(pomFile);
@@ -379,7 +377,7 @@ class Loader implements Runnable
         State resultStatus = State.SUBMITTED;
         jqmlogger.debug("LOADER HAS JUST STARTED UP FOR JOB INSTANCE " + job.getId());
         jqmlogger.debug("Job instance " + job.getId() + " has " + job.getParameters().size() + " parameters");
-        jarFile = new File(CheckFilePath.fixFilePath(node.getRepo()) + job.getJd().getJarPath());
+        jarFile = new File(FilenameUtils.concat(node.getRepo(), job.getJd().getJarPath()));
         final URL jarUrl;
         try
         {
@@ -391,7 +389,7 @@ class Loader implements Runnable
             endOfRun(State.CRASHED);
             return;
         }
-        extractDir = new File(CheckFilePath.fixFilePath(FilenameUtils.concat(node.getRepo(), job.getJd().getFilePath())) + "tmp/");
+        extractDir = new File(FilenameUtils.concat(FilenameUtils.concat(node.getRepo(), job.getJd().getFilePath()), "tmp/"));
         jqmlogger.debug("Loader will try to launch jar " + jarFile.getAbsolutePath() + " - " + job.getJd().getJavaClassName());
 
         // Create the CLASSPATH for our classloader (if not already in cache)
