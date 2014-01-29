@@ -18,12 +18,16 @@
 
 package com.enioka.jqm.jpamodel;
 
+import java.util.Calendar;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "Node")
@@ -61,6 +65,11 @@ public class Node
     // Repo to which the export repository must be relative
     @Column(nullable = false, name = "exportRepo")
     private String exportRepo;
+
+    // Updated regularly by a living node. Null means stopped correctly.
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "lastSeenAlive", nullable = true)
+    private Calendar lastSeenAlive;
 
     public Integer getId()
     {
@@ -154,5 +163,15 @@ public class Node
     public void setDns(String dns)
     {
         this.dns = dns;
+    }
+
+    public Calendar getLastSeenAlive()
+    {
+        return lastSeenAlive;
+    }
+
+    public void setLastSeenAlive(Calendar lastSeenAlive)
+    {
+        this.lastSeenAlive = lastSeenAlive;
     }
 }
