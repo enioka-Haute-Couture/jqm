@@ -614,8 +614,7 @@ class Loader implements Runnable
         {
             try
             {
-                Mail mail = new Mail(job, em);
-                mail.send();
+                Mail.send(job, em);
             }
             catch (Exception e)
             {

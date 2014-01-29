@@ -559,7 +559,7 @@ public class JobBaseTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        TestHelpers.waitFor(1, 20000);
+        TestHelpers.waitFor(2, 7000); // Need time for async mail sending.
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);

@@ -53,9 +53,12 @@ public class TestHelpers
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenRepo", "http://repo1.maven.org/maven2/", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenRepo", "http://download.eclipse.org/rt/eclipselink/maven.repo/",
                 em);
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("mailSmtp", "smtp.gmail.com", em);
+        TestHelpers.gpCentral = CreationTools.createGlobalParameter("mailSmtpServer", "smtp.gmail.com", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("mailFrom", "jqm-noreply@gmail.com", em);
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("mailPort", "587", em);
+        TestHelpers.gpCentral = CreationTools.createGlobalParameter("mailSmtpPort", "587", em);
+        TestHelpers.gpCentral = CreationTools.createGlobalParameter("mailSmtpUser", "jqm.noreply@gmail.com", em);
+        TestHelpers.gpCentral = CreationTools.createGlobalParameter("mailSmtpPassword", "marsu1952", em);
+        TestHelpers.gpCentral = CreationTools.createGlobalParameter("mailUseTls", "true", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("defaultConnection", "jdbc/marsu", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("deadline", "10", em);
 

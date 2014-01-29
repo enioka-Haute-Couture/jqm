@@ -18,6 +18,8 @@
 
 package com.enioka.jqm.tools;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -27,67 +29,107 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 
 import org.apache.log4j.Logger;
 
+import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 
 class Mail
 {
-    private Logger jqmlogger = Logger.getLogger(Mail.class);
-    private String to = null;
-    private String from = null;
-    private String host = null;
-    private JobInstance ji = null;
-    private String port = null;
-    private String pwd = "marsu1952";
+    private static Logger jqmlogger = Logger.getLogger(Mail.class);
 
-    Mail(JobInstance ji, EntityManager em)
+    static void send(JobInstance ji, EntityManager em)
     {
+        String to = ji.getEmail();
+        String from = null;
+        String host = null;
+        int port = 25;
+        // Final fields because they will be used in inner function
+        final String pwd;
+        final String userName;
+        boolean useAuth = false;
+        boolean useTLS = false;
+
+        Map<String, String> params = new HashMap<String, String>();
+        for (GlobalParameter gp : em.createQuery("SELECT gp FROM GlobalParameter gp", GlobalParameter.class).getResultList())
+        {
+            params.put(gp.getKey(), gp.getValue());
+        }
+
+        // Get basic parameters
+        host = params.get("mailSmtpServer");
+        from = params.get("mailFrom");
         try
         {
-            this.ji = ji;
-            this.to = ji.getEmail();
-
-            String query = "SELECT gp.value FROM GlobalParameter gp WHERE gp.key = :k";
-            this.host = em.createQuery(query, String.class).setParameter("k", "mailSmtp").getSingleResult();
-            this.from = em.createQuery(query, String.class).setParameter("k", "mailFrom").getSingleResult();
-            this.port = em.createQuery(query, String.class).setParameter("k", "mailPort").getSingleResult();
+            port = Integer.parseInt(params.get("mailSmtpPort"));
         }
-        catch (NoResultException e)
+        catch (NumberFormatException e)
         {
-            jqmlogger.warn("Some JQM configuration data is missing. JQM can't send emails", e);
-        }
-    }
-
-    void send()
-    {
-        if (this.to == null || this.host == null || this.from == null || this.port == null)
-        {
-            jqmlogger.warn("cannot send mails - incorrect configuration");
+            jqmlogger.warn("Parameter mailSmtpPort is not an integer. JQM can't send emails", e);
             return;
         }
-        jqmlogger.debug("Preparation of the email");
-        jqmlogger.debug("The email will be sent to: " + to);
+        if (host == null || from == null)
+        {
+            jqmlogger.warn("Cannot send mails - incorrect configuration. Check parameters mailSmtpServer, mailFrom, mailSmtpPort.");
+            return;
+        }
+
+        // Is there authentication information?
+        pwd = params.get("mailSmtpPassword");
+        if (pwd != null)
+        {
+            String un = params.get("mailSmtpUser");
+            if (un != null)
+            {
+                userName = un;
+            }
+            else
+            {
+                userName = from;
+            }
+            useAuth = true;
+            jqmlogger.debug("Mail will be sent using login " + userName + " and a password");
+        }
+        else
+        {
+            userName = null;
+        }
+
+        // SSL?
+        useTLS = Boolean.parseBoolean(params.get("mailUseTls"));
+
+        // Set properties
+        jqmlogger.debug("An email will be sent to: " + to + " using server " + host + ":" + port + " (TLS: " + useTLS + " - auth: "
+                + useAuth + ")");
         Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.auth", String.valueOf(useAuth));
+        props.put("mail.smtp.starttls.enable", String.valueOf(useTLS));
         props.put("mail.smtp.host", host);
         props.put("mail.smtp.port", port);
         props.put("mail.smtp.connectiontimeout", 5000);
         props.put("mail.smtp.timeout", 5000);
         props.put("mail.smtp.writetimeout", 5000);
 
-        Session session = Session.getInstance(props, new javax.mail.Authenticator()
+        // Create SMTP session
+        Session session = null;
+        if (useAuth)
         {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication()
+            session = Session.getInstance(props, new javax.mail.Authenticator()
             {
-                return new PasswordAuthentication(to, pwd);
-            }
-        });
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication()
+                {
+                    return new PasswordAuthentication(userName, pwd);
+                }
+            });
+        }
+        else
+        {
+            session = Session.getInstance(props);
+        }
 
+        // Create message
         MimeMessage msg = new MimeMessage(session);
         try
         {
@@ -100,7 +142,7 @@ class Mail
                     + ji.getNode().getName() + "\n" + "Best regards,\n");
 
             Transport.send(msg);
-            jqmlogger.debug("Email sent successfully...");
+            jqmlogger.debug("Email sent successfully.");
         }
         catch (Exception e)
         {
