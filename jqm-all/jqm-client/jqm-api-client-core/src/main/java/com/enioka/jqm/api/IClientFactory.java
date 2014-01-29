@@ -1,5 +1,7 @@
 package com.enioka.jqm.api;
 
+import java.util.Properties;
+
 interface IClientFactory
 {
     /**
@@ -18,7 +20,7 @@ interface IClientFactory
      * 
      * @return the required client
      */
-    public JqmClient getClient(String name);
+    public JqmClient getClient(String name, Properties props);
 
     /**
      * Will remove the client of the given name from the static cache. Next time {@link #getClient(String)} is called, initialization cost

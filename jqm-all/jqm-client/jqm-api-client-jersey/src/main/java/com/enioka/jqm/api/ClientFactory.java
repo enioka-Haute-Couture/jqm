@@ -12,14 +12,7 @@ class ClientFactory implements IClientFactory
     @Override
     public JqmClient getClient()
     {
-        synchronized (clients)
-        {
-            if (defaultClient == null)
-            {
-                defaultClient = new HibernateClient();
-            }
-            return defaultClient;
-        }
+        return getClient(null, null);
     }
 
     @Override
@@ -36,13 +29,13 @@ class ClientFactory implements IClientFactory
             {
                 if (defaultClient == null)
                 {
-                    defaultClient = new HibernateClient(props);
+                    defaultClient = new JerseyClient(props);
                 }
                 return defaultClient;
             }
             else
             {
-                clients.putIfAbsent(name, new HibernateClient(props));
+                clients.putIfAbsent(name, new JerseyClient(props));
                 return clients.get(name);
             }
         }

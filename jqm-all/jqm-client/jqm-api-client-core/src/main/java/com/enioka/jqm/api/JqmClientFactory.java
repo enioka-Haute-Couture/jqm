@@ -2,8 +2,10 @@ package com.enioka.jqm.api;
 
 import java.io.IOException;
 import java.net.URL;
+import java.security.InvalidParameterException;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -15,6 +17,29 @@ public class JqmClientFactory
     private static String STATIC_CLIENT_BINDER_PATH = "com/enioka/jqm/api/StaticClientBinder.class";
     private static String STATIC_CLIENT_BINDER_NAME = "com.enioka.jqm.api.StaticClientBinder";
     private static IClientFactoryBinder binder;
+    private static Properties props = new Properties();
+
+    /**
+     * Most client providers use a specific configuration file (such as persistence.xml for the Hibernate provider). However, it may be
+     * desired to overload these values with runtime values. This method enables a client to specify these values.<br>
+     * <strong>Note that the parameter names depend on the provider!</strong><br>
+     * Moreover, changing the properties only impact <code>JqmClient</code>s created after the modification. It is important to keep in mind
+     * that created <code>JqmClient</code>s are cached - therefore it is customary to use this function <strong>before creating any
+     * clients</strong>.
+     * 
+     * @param properties
+     *            a non null property bag
+     * @throws InvalidParameterException
+     *             if props is null
+     */
+    public static void setProperties(Properties properties)
+    {
+        if (props == null)
+        {
+            throw new InvalidParameterException("props cannot be null");
+        }
+        JqmClientFactory.props = properties;
+    }
 
     private final static Set<URL> findClientBinders()
     {
@@ -88,7 +113,7 @@ public class JqmClientFactory
         {
             bind();
         }
-        return binder.getClientFactory().getClient();
+        return binder.getClientFactory().getClient(null, props);
     }
 
     /**
