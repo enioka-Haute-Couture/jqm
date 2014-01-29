@@ -21,11 +21,14 @@ package com.enioka.jqm.tools;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -33,6 +36,7 @@ import javax.persistence.EntityManager;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.JobParameter;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 class JarClassLoader extends URLClassLoader
@@ -52,7 +56,7 @@ class JarClassLoader extends URLClassLoader
         super(addUrls(url, libs), null);
     }
 
-    Object launchJar(JobInstance job, ClassLoader old, EntityManager em) throws JqmEngineException
+    void launchJar(JobInstance job, ClassLoader old, EntityManager em) throws JqmEngineException
     {
         // 1st:load the class
         String classQualifiedName = job.getJd().getJavaClassName();
@@ -74,18 +78,50 @@ class JarClassLoader extends URLClassLoader
         if (Runnable.class.isAssignableFrom(c))
         {
             jqmlogger.info("This payload is of type: Runnable");
-            return launchRunnable(c, job, em);
+            launchRunnable(c, job, em);
+            return;
         }
         else if (c.getSuperclass().getName().equals(Constants.API_OLD_IMPL))
         {
             jqmlogger.info("This payload is of type: explicit API implementation");
-            return launchApiPayload(c, job, em);
+            launchApiPayload(c, job, em);
+            return;
+        }
+        else
+        {
+            // Might have a main
+            Method start = null;
+            try
+            {
+                start = c.getMethod("main");
+            }
+            catch (NoSuchMethodException e)
+            {
+                // Nothing - let's try with arguments
+            }
+            if (start == null)
+            {
+                try
+                {
+                    start = c.getMethod("main", String[].class);
+                }
+                catch (NoSuchMethodException e)
+                {
+                    // Nothing
+                }
+            }
+            if (start != null)
+            {
+                jqmlogger.info("This payload is of type: static main");
+                launchMain(c, job, em);
+                return;
+            }
         }
 
         throw new JqmEngineException("This type of class cannot be launched by JQM. Please consult the documentation for more details.");
     }
 
-    private Object launchApiPayload(Class c, JobInstance job, EntityManager em) throws JqmEngineException
+    private void launchApiPayload(Class c, JobInstance job, EntityManager em) throws JqmEngineException
     {
         Object o = null;
         try
@@ -99,7 +135,7 @@ class JarClassLoader extends URLClassLoader
         }
 
         // Injection
-        inject(o, job, em);
+        inject(o.getClass(), o, job, em);
 
         try
         {
@@ -127,11 +163,9 @@ class JarClassLoader extends URLClassLoader
         {
             throw new JqmEngineException("Payload launch failed for " + c.getCanonicalName() + ".", e);
         }
-
-        return o;
     }
 
-    private Object launchRunnable(Class<Runnable> c, JobInstance job, EntityManager em) throws JqmEngineException
+    private void launchRunnable(Class<Runnable> c, JobInstance job, EntityManager em) throws JqmEngineException
     {
         Runnable o = null;
         try
@@ -144,17 +178,90 @@ class JarClassLoader extends URLClassLoader
         }
 
         // Injection stuff (if needed)
-        inject(o, job, em);
+        inject(o.getClass(), o, job, em);
 
         // Go
         o.run();
-
-        return o;
     }
 
-    private void inject(Object o, JobInstance job, EntityManager em) throws JqmEngineException
+    private void launchMain(Class c, JobInstance job, EntityManager em) throws JqmEngineException
     {
-        Class c = o.getClass();
+        boolean withArgs = false;
+        Method start = null;
+        try
+        {
+            start = c.getMethod("main");
+        }
+        catch (NoSuchMethodException e)
+        {
+            // Nothing - let's try with arguments
+        }
+        try
+        {
+            start = c.getMethod("main", String[].class);
+            withArgs = true;
+        }
+        catch (NoSuchMethodException e)
+        {
+            throw new JqmEngineException("The main type payload does not have a valid main static method");
+        }
+
+        if (!Modifier.isStatic(start.getModifiers()))
+        {
+            throw new JqmEngineException("The main type payload has a main function but it is not static");
+        }
+
+        // Injection
+        inject(c, null, job, em);
+
+        // Parameters
+        String[] params = new String[job.getParameters().size()];
+        Collections.sort(job.getParameters(), new Comparator<JobParameter>()
+        {
+            public int compare(JobParameter o1, JobParameter o2)
+            {
+                return o1.getKey().compareTo(o2.getKey());
+            };
+        });
+        int i = 0;
+        for (JobParameter p : job.getParameters())
+        {
+            params[i] = p.getValue();
+            i++;
+        }
+
+        // Start
+        try
+        {
+            if (withArgs)
+            {
+                start.invoke(null, (Object) params);
+            }
+            else
+            {
+                start.invoke(null);
+            }
+        }
+        catch (InvocationTargetException e)
+        {
+            if (e.getCause() instanceof RuntimeException)
+            {
+                // it may be a Kill order, or whatever exception...
+                throw (RuntimeException) e.getCause();
+            }
+            else
+            {
+                throw new JqmEngineException("Payload has failed", e);
+            }
+        }
+        catch (Exception e)
+        {
+            throw new JqmEngineException("Payload launch failed for " + c.getCanonicalName() + ".", e);
+        }
+    }
+
+    private void inject(Class c, Object o, JobInstance job, EntityManager em) throws JqmEngineException
+    {
         List<Field> ff = new ArrayList<Field>();
         ff.addAll(Arrays.asList(c.getDeclaredFields()));
         ff.addAll(Arrays.asList(c.getSuperclass().getDeclaredFields()));

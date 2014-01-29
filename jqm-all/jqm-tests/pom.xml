@@ -30,6 +30,7 @@
 		<module>jqm-test-exit</module>
 		<module>jqm-test-runnable</module>
 		<module>jqm-test-main</module>
+		<module>jqm-test-main-inject</module>
 		<module>jqm-test-runnable-inject</module>
 		<module>jqm-test-kill</module>
 	</modules>

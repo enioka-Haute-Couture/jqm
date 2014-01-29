@@ -20,8 +20,9 @@
 		<module>jqm-model</module>
 		<module>jqm-clientapi</module>
 		<module>jqm-api</module>
-		<module>jqm-engine</module>
 		<module>jqm-tests</module>
+		<module>jqm-engine</module>
+
 
 	</modules>
 

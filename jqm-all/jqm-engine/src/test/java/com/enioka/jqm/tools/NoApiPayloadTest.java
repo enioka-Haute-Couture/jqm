@@ -159,4 +159,68 @@ public class NoApiPayloadTest
         Assert.assertEquals(4, ji.get(0).getMessages().size()); // 3 auto messages + 1 message per run.
         Assert.assertEquals(100, (int) ji.get(0).getProgress());
     }
+
+    @Test
+    public void testMainType() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testMainType");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-main", "jqm-test-main/jqm-test-main.jar",
+                TestHelpers.qVip, 42, "jqm-test-main", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+
+        JobDefinition j = new JobDefinition("jqm-test-main", "MAG");
+        Dispatcher.enQueue(j);
+
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        TestHelpers.waitFor(1, 10000);
+        engine1.stop();
+
+        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)
+                .setParameter("myId", jd.getId()).getResultList();
+
+        Assert.assertEquals(1, ji.size());
+        Assert.assertEquals(State.ENDED, ji.get(0).getState());
+    }
+
+    @Test
+    public void testMainTypeInject() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testMainTypeInject");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        JobDef jd = CreationTools.createJobDef("super app", true, "App", jdargs, "jqm-test-main-inject",
+                "jqm-test-main-inject/jqm-test-main-inject.jar", TestHelpers.qVip, 42, "jqm-test-main-inject", "testapp", "Franquin",
+                "ModuleMachin", "other", "other", false, em);
+
+        JobDefinition j = new JobDefinition("jqm-test-main-inject", "MAG");
+        j.setSessionID("123X");
+        Dispatcher.enQueue(j);
+
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        TestHelpers.waitFor(3, 10000);
+        engine1.stop();
+
+        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)
+                .setParameter("myId", jd.getId()).getResultList();
+
+        Assert.assertEquals(3, ji.size());
+        Assert.assertEquals(State.ENDED, ji.get(0).getState());
+        Assert.assertEquals(State.ENDED, ji.get(1).getState());
+
+        Assert.assertEquals(4, ji.get(0).getMessages().size()); // 3 auto messages + 1 message per run.
+        Assert.assertEquals(100, (int) ji.get(0).getProgress());
+    }
 }
