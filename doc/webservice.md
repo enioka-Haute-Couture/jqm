@@ -1,7 +1,8 @@
 ﻿# Web Service Client API
 
-**Client API** is the name of the API offered to the end users of JQM: it allows to interact with running jobs, oferring operations
-such as creating a new execution request, cancelling a request, viewing all currently running jobs, etc.
+**Client API** is the name of the API offered to the end users of JQM: it allows to interact with running jobs, offering operations
+such as creating a new execution request, cancelling a request, viewing all currently running jobs, etc. Read [client API](client.md) 
+before this chapter, as it gives the definition of many terms used here as well as the general way to use clients.
 
 The main client API is the Hibernate Client API, which runs directly against the JQM central database. As JQM is database centric,
 finding jobs to run by polling the database, this is most efficient. However, this API has a serious drawback: it forces the user of the API to
@@ -110,23 +111,23 @@ All objects are serialized to XML. The service is a REST-style web service, so n
 
 URL pattern           | Method | Non-URL arguments     | Return type         | Return MIME         | Interface equivalent | Description
 --------------------- | ------ | --------------------- | ------------------- | ------------------- | ---------------------| ----------------
-/ji                   | GET    |                       | List<JobInstance>   | application/xml     | getJobs              | List all known job instances
+/ji                   | GET    |                       | List<JobInstance\>  | application/xml     | getJobs              | List all known job instances
 /ji                   | POST   | JobRequest            | int                 | text/plain          | enqueue              | New execution request
 /ji/{jobId}           | GET    |                       | JobInstance         | application/xml     | getJob(int)          | Details of a Job instance
-/ji/{jobId}/messages  | GET    |                       | List<String>        | application/xml     | getJobMessages(int)  | Retrieve messages created by a Job Instance
+/ji/{jobId}/messages  | GET    |                       | List<String\>       | application/xml     | getJobMessages(int)  | Retrieve messages created by a Job Instance
 /ji/{jobId}/progress  | GET    |                       | int                 | application/xml     | getJobProgress(int)  | Retrieve advancement status of a Job Instance
-/ji/{jobId}/files     | GET    |                       | List<Deliverables>  | application/xml     | getJobDeliverables   | Retrieve  the description of all files created by a JI
+/ji/{jobId}/files     | GET    |                       | List<Deliverables\> | application/xml     | getJobDeliverables   | Retrieve  the description of all files created by a JI
 /ji/{jobId}           | DELETE |                       | void                | text/plain          | deleteJob(int)       | Completely cancel/remove a waiting Job Instance (even history)
-/ji/active            | GET    |                       | List<JobInstance>   | application/xml     | getActiveJobs        | List all waiting or running job instances
+/ji/active            | GET    |                       | List<JobInstance\>  | application/xml     | getActiveJobs        | List all waiting or running job instances
 /ji/cancelled/{jobId} | POST   |                       | void                | text/plain          | cancelJob(int)       | Cancel a waiting Job Instance (leaves history)
 /ji/killed/{jobId}    | POST   |                       | void                | text/plain          | killJob(int)         | Stop (crashes) a running job instance if possible
 /ji/paused/{jobId}    | POST   |                       | void                | text/plain          | pauseQueuedJob(int)  | Pause a waiting job instance
 /ji/waiting/{jobId}   | POST   |                       | void                | text/plain          | resumeJob(int)       | Resume a paused job instance
 /ji/crashed/{jobId}   | DELETE |                       | int                 | text/plain          | restartCrashedJob    | Restarts a crashed job instance (deletes failed history)
-/q                    | GET    |                       | List<Queue>         | application/xml     | getQueues            | List all queues defined in the JQM instance
+/q                    | GET    |                       | List<Queue\>        | application/xml     | getQueues            | List all queues defined in the JQM instance
 /q/{qId}/{jobId}      | POST   |                       | void                | text/plain          | setJobQueue          | Puts an existing waiting JI into a given queue.
 XXXXX/q/{qId}/{jobId} | POST   |                       | void                | text/plain          | setJobQueuePosition  | Change the position of a waiting job instance inside a queue.
-/user/{uname}/ji      | GET    |                       | List<JobInstance>   | application/xml     | getActiveJobs        | List all waiting or running job instances for a user
+/user/{uname}/ji      | GET    |                       | List<JobInstance\>  | application/xml     | getActiveJobs        | List all waiting or running job instances for a user
 
 > :todo: deliverables content (getJobDeliverablesContent/getDeliverableContent) + setJobQueuePosition
 
