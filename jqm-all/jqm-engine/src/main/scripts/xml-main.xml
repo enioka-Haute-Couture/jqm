@@ -1,0 +1,23 @@
+﻿<jqm>
+	<jar>
+		<path>jqm-test-main/jqm-test-main.jar</path>
+		<filePath>jqm-test-main/</filePath>
+		<jobdefinitions>
+			<jobDefinition>
+				<name>TestEcho</name>
+				<description>Test that only echoes something</description>
+				<canBeRestarted>true</canBeRestarted>
+				<javaClassName>App</javaClassName>
+				<maxTimeRunning>42</maxTimeRunning>
+				<application>ApplicationTest</application>
+				<module>TestModuleRATONLAVEUR</module>
+				<keyword1>vdjvkdv</keyword1>
+				<keyword2>sgfbgg</keyword2>
+				<keyword3>jvhkdfl</keyword3>
+				<highlander>false</highlander>
+				<parameters>					
+				</parameters>
+			</jobDefinition>
+		</jobdefinitions>
+	</jar>
+</jqm>

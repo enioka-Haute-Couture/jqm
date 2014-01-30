@@ -45,6 +45,14 @@
 			</includes>
 		</fileSet>
 		<fileSet>
+			<directory>${project.basedir}/src/main/scripts</directory>
+			<outputDirectory>/bin</outputDirectory>
+			<includes>
+				<include>*.exe</include>
+			</includes>
+			<fileMode>0755</fileMode>
+		</fileSet>
+		<fileSet>
 			<directory>${project.basedir}/src/main/scripts/empty</directory>
 			<outputDirectory>logs</outputDirectory>
 			<excludes>
@@ -54,6 +62,20 @@
 		<fileSet>
 			<directory>${project.basedir}/src/main/scripts/empty</directory>
 			<outputDirectory>outputfiles</outputDirectory>
+			<excludes>
+				<exclude>*</exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}/src/main/scripts/empty</directory>
+			<outputDirectory>db</outputDirectory>
+			<excludes>
+				<exclude>*</exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}/src/main/scripts/empty</directory>
+			<outputDirectory>jobs/jqm-test-main/lib</outputDirectory>
 			<excludes>
 				<exclude>*</exclude>
 			</excludes>
@@ -87,6 +109,7 @@
 				<include>com.enioka.jqm:jqm-test-fibo:jar</include>
 				<include>com.enioka.jqm:jqm-test-geo:jar</include>
 				<include>com.enioka.jqm:jqm-test-jndijms-amq:jar</include>
+				<include>com.enioka.jqm:jqm-test-main:jar</include>
 			</includes>
 			<scope>test</scope>
 		</dependencySet>

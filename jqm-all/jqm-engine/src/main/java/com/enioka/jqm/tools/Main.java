@@ -44,10 +44,33 @@ import com.enioka.jqm.api.JobDefinition;
 public class Main
 {
     private static Logger jqmlogger = Logger.getLogger(Main.class);
+    private static JqmEngine engine;
 
     private Main()
     {
         // Static class
+    }
+
+    /**
+     * Windows service entry point for service start
+     * 
+     * @param args
+     */
+    static void start(String[] args)
+    {
+        jqmlogger.info("Service start");
+        main(args);
+    }
+
+    /**
+     * Windows service entry point for service stop
+     * 
+     * @param args
+     */
+    static void stop(String[] args)
+    {
+        jqmlogger.info("Service stop");
+        engine.stop();
     }
 
     private static String getMavenVersion()
@@ -200,7 +223,7 @@ public class Main
     {
         try
         {
-            JqmEngine engine = new JqmEngine();
+            engine = new JqmEngine();
             jqmlogger.info("Engine version is: " + getMavenVersion());
             jqmlogger.info("Starting engine node " + nodeName);
             engine.start(nodeName);
