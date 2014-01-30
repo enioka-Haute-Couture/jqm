@@ -295,7 +295,7 @@ class Loader implements Runnable
         }
 
         // 3rd: if pom, use pom!
-        if (pomFile.exists())
+        if (pomFile.exists() && !libDir.exists())
         {
             jqmlogger.debug("Reading a pom file");
             Dependencies dependencies = new Dependencies(pomFile.getAbsolutePath());
@@ -352,8 +352,8 @@ class Loader implements Runnable
             }
         }
 
-        // 4: if lib, use lib... (pom has priority)
-        if (!pomFile.exists() && libDir.exists())
+        // 4: if lib, use lib... (lib has priority over pom)
+        if (libDir.exists())
         {
             jqmlogger.debug("Using the lib directory " + libDir.getAbsolutePath() + " as the source for dependencies");
             FileFilter fileFilter = new WildcardFileFilter("*.jar");
