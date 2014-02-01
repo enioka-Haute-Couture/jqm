@@ -111,23 +111,23 @@ All objects are serialized to XML. The service is a REST-style web service, so n
 
 URL pattern           | Method | Non-URL arguments     | Return type         | Return MIME         | Interface equivalent | Description
 --------------------- | ------ | --------------------- | ------------------- | ------------------- | ---------------------| ----------------
-/ji                   | GET    |                       | List<JobInstance\>  | application/xml     | getJobs              | List all known job instances
-/ji                   | POST   | JobRequest            | int                 | text/plain          | enqueue              | New execution request
+/ji                   | GET    |                       | List_<JobInstance\> | application/xml     | getJobs              | List all known job instances
+/ji                   | POST   | JobRequest            | JobInstance         | application/xml     | enqueue              | New execution request
 /ji/{jobId}           | GET    |                       | JobInstance         | application/xml     | getJob(int)          | Details of a Job instance
-/ji/{jobId}/messages  | GET    |                       | List<String\>       | application/xml     | getJobMessages(int)  | Retrieve messages created by a Job Instance
+/ji/{jobId}/messages  | GET    |                       | List\<String\>      | application/xml     | getJobMessages(int)  | Retrieve messages created by a Job Instance
 /ji/{jobId}/progress  | GET    |                       | int                 | application/xml     | getJobProgress(int)  | Retrieve advancement status of a Job Instance
-/ji/{jobId}/files     | GET    |                       | List<Deliverables\> | application/xml     | getJobDeliverables   | Retrieve  the description of all files created by a JI
-/ji/{jobId}           | DELETE |                       | void                | text/plain          | deleteJob(int)       | Completely cancel/remove a waiting Job Instance (even history)
-/ji/active            | GET    |                       | List<JobInstance\>  | application/xml     | getActiveJobs        | List all waiting or running job instances
-/ji/cancelled/{jobId} | POST   |                       | void                | text/plain          | cancelJob(int)       | Cancel a waiting Job Instance (leaves history)
-/ji/killed/{jobId}    | POST   |                       | void                | text/plain          | killJob(int)         | Stop (crashes) a running job instance if possible
-/ji/paused/{jobId}    | POST   |                       | void                | text/plain          | pauseQueuedJob(int)  | Pause a waiting job instance
-/ji/waiting/{jobId}   | POST   |                       | void                | text/plain          | resumeJob(int)       | Resume a paused job instance
-/ji/crashed/{jobId}   | DELETE |                       | int                 | text/plain          | restartCrashedJob    | Restarts a crashed job instance (deletes failed history)
-/q                    | GET    |                       | List<Queue\>        | application/xml     | getQueues            | List all queues defined in the JQM instance
-/q/{qId}/{jobId}      | POST   |                       | void                | text/plain          | setJobQueue          | Puts an existing waiting JI into a given queue.
-XXXXX/q/{qId}/{jobId} | POST   |                       | void                | text/plain          | setJobQueuePosition  | Change the position of a waiting job instance inside a queue.
-/user/{uname}/ji      | GET    |                       | List<JobInstance\>  | application/xml     | getActiveJobs        | List all waiting or running job instances for a user
+/ji/{jobId}/files     | GET    |                       | List\<Deliverables\>| application/xml     | getJobDeliverables   | Retrieve  the description of all files created by a JI
+/ji/active            | GET    |                       | List\<JobInstance\> | application/xml     | getActiveJobs        | List all waiting or running job instances
+/ji/cancelled/{jobId} | POST   |                       | void                |                     | cancelJob(int)       | Cancel a waiting Job Instance (leaves history)
+/ji/killed/{jobId}    | POST   |                       | void                |                     | killJob(int)         | Stop (crashes) a running job instance if possible
+/ji/paused/{jobId}    | POST   |                       | void                |                     | pauseQueuedJob(int)  | Pause a waiting job instance
+/ji/waiting/{jobId}   | POST   |                       | void                |                     | resumeJob(int)       | Resume a paused job instance
+/ji/waiting/{jobId}   | DELETE |                       | void                |                     | deleteJob(int)       | Completely cancel/remove a waiting Job Instance (even history)
+/ji/crashed/{jobId}   | DELETE |                       | JobInstance         | application/xml     | restartCrashedJob    | Restarts a crashed job instance (deletes failed history)
+/q                    | GET    |                       | List\<Queue\>       | application/xml     | getQueues            | List all queues defined in the JQM instance
+/q/{qId}/{jobId}      | POST   |                       | void                |                     | setJobQueue          | Puts an existing waiting JI into a given queue.
+XXXXX/q/{qId}/{jobId} | POST   |                       | void                |                     | setJobQueuePosition  | Change the position of a waiting job instance inside a queue.
+/user/{uname}/ji      | GET    |                       | List\<JobInstance\> | application/xml     | getActiveJobs        | List all waiting or running job instances for a user
 
 > :todo: deliverables content (getJobDeliverablesContent/getDeliverableContent) + setJobQueuePosition
 
