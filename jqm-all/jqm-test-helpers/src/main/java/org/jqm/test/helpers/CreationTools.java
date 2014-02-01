@@ -1,3 +1,5 @@
+package org.jqm.test.helpers;
+
 /**
  * Copyright © 2013 enioka. All rights reserved
  * Authors: Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
@@ -15,8 +17,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.enioka.jqm.tools;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -54,7 +54,7 @@ import com.enioka.jqm.jpamodel.State;
 public class CreationTools
 {
     private static Logger jqmlogger = Logger.getLogger(CreationTools.class);
-    public static EntityManagerFactory emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+    public static EntityManagerFactory emf = reset();
 
     private CreationTools()
     {}
@@ -401,9 +401,13 @@ public class CreationTools
 
     // ------------------ CLOSE ENTITYs ------------------------
 
-    public static void close(EntityManager em)
+    public static EntityManagerFactory reset()
     {
-        em.close();
-        emf.close();
+        if (emf != null)
+        {
+            emf.close();
+        }
+        emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+        return emf;
     }
 }

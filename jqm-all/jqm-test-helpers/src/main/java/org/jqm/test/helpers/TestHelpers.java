@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.tools;
+package org.jqm.test.helpers;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -121,7 +121,7 @@ public class TestHelpers
 
     public static void printJobInstanceTable()
     {
-        EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
+        EntityManager em = CreationTools.emf.createEntityManager();
 
         List<JobInstance> res = em.createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList();
 
@@ -138,7 +138,7 @@ public class TestHelpers
 
     public static void printHistoryTable()
     {
-        EntityManager em = com.enioka.jqm.tools.Helpers.getNewEm();
+        EntityManager em = CreationTools.emf.createEntityManager();
 
         List<History> res = em.createQuery("SELECT j FROM History j", History.class).getResultList();
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss.SSS");
@@ -157,7 +157,7 @@ public class TestHelpers
 
     public static void waitFor(long nbHistories, int timeoutMs)
     {
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = CreationTools.emf.createEntityManager();
         TypedQuery<Long> q = em.createQuery(
                 "SELECT COUNT(h) FROM History h WHERE h.status = 'ENDED' OR h.status = 'CRASHED'  OR h.status = 'KILLED'", Long.class);
 

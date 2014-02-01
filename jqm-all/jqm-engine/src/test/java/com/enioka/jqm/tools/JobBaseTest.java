@@ -46,6 +46,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
+import org.jqm.test.helpers.CreationTools;
+import org.jqm.test.helpers.TestHelpers;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -76,10 +78,9 @@ public class JobBaseTest
         s.setSilent(true);
         s.start();
 
-        JqmClientFactory.resetClient();
+        JqmClientFactory.resetClient(null);
         Helpers.resetEmf();
-
-        jqmlogger.debug("log init");
+        CreationTools.reset();
     }
 
     @AfterClass

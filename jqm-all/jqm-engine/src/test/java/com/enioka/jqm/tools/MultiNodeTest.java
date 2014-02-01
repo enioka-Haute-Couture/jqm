@@ -26,6 +26,8 @@ import javax.persistence.TypedQuery;
 
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
+import org.jqm.test.helpers.CreationTools;
+import org.jqm.test.helpers.TestHelpers;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -66,6 +68,7 @@ public class MultiNodeTest
 
         JqmClientFactory.resetClient(null);
         Helpers.resetEmf();
+        CreationTools.reset();
     }
 
     @AfterClass
