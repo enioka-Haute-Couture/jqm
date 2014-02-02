@@ -120,7 +120,6 @@ final class HibernateClient implements JqmClient
 
         try
         {
-            jqmlogger.debug("A new EM will be created");
             return emf.createEntityManager();
         }
         catch (Exception e)
@@ -481,10 +480,6 @@ final class HibernateClient implements JqmClient
             @SuppressWarnings("unused")
             int q = em.createQuery("UPDATE JobInstance j SET j.state = 'SUBMITTED' WHERE j.id = :idJob").setParameter("idJob", idJob)
                     .executeUpdate();
-            @SuppressWarnings("unused")
-            int qq = em.createQuery("UPDATE History j SET j.status = 'SUBMITTED' WHERE j.jobInstanceId = :idJob")
-                    .setParameter("idJob", idJob).executeUpdate();
-
         }
         catch (Exception e)
         {
@@ -667,6 +662,7 @@ final class HibernateClient implements JqmClient
     {
         com.enioka.jqm.api.JobInstance ji = new com.enioka.jqm.api.JobInstance();
         ji.setId(h.getId());
+        ji.setApplicationName(h.getJd().getApplicationName());
         ji.setParameters(new HashMap<String, String>());
         ji.setParent(h.getParentId());
         ji.setQueue(getQueue(h.getQueue()));
@@ -682,6 +678,12 @@ final class HibernateClient implements JqmClient
         {
             ji.getMessages().add(m.getTextMessage());
         }
+        ji.setKeyword1(h.getKeyword1());
+        ji.setKeyword2(h.getKeyword2());
+        ji.setKeyword3(h.getKeyword3());
+        ji.setApplication(h.getApplication());
+        ji.setModule(h.getModule());
+        ji.setEmail(h.getEmail());
 
         return ji;
     }
@@ -691,6 +693,7 @@ final class HibernateClient implements JqmClient
     {
         com.enioka.jqm.api.JobInstance ji = new com.enioka.jqm.api.JobInstance();
         ji.setId(h.getId());
+        ji.setApplication(h.getApplication());
         ji.setParameters(new HashMap<String, String>());
         ji.setParent(h.getParentJobId());
         ji.setQueue(getQueue(h.getQueue()));
@@ -706,6 +709,12 @@ final class HibernateClient implements JqmClient
         {
             ji.getMessages().add(m.getTextMessage());
         }
+        ji.setKeyword1(h.getKeyword1());
+        ji.setKeyword2(h.getKeyword2());
+        ji.setKeyword3(h.getKeyword3());
+        ji.setApplication(h.getApplication());
+        ji.setModule(h.getModule());
+        ji.setEmail(h.getEmail());
 
         return ji;
     }

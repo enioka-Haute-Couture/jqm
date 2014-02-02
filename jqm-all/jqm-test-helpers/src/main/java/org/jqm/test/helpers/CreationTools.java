@@ -18,16 +18,22 @@ package org.jqm.test.helpers;
  * limitations under the License.
  */
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.hsqldb.Server;
 
 import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
@@ -55,9 +61,31 @@ public class CreationTools
 {
     private static Logger jqmlogger = Logger.getLogger(CreationTools.class);
     public static EntityManagerFactory emf = reset();
+    public static Server s;
 
     private CreationTools()
     {}
+
+    public static void reinitHsqldbServer() throws InterruptedException, FileNotFoundException
+    {
+        stopHsqldbServer();
+        s = new Server();
+        s.setDatabaseName(0, "testdbengine");
+        s.setDatabasePath(0, "mem:testdbengine");
+        s.setLogWriter(null);
+        s.setSilent(true);
+        s.start();
+        TestHelpers.cleanup(emf.createEntityManager());
+    }
+
+    public static void stopHsqldbServer()
+    {
+        if (s != null)
+        {
+            s.shutdown();
+            s.stop();
+        }
+    }
 
     // ------------------ GLOBALPARAMETER ------------------------
 
@@ -407,7 +435,34 @@ public class CreationTools
         {
             emf.close();
         }
-        emf = Persistence.createEntityManagerFactory("jobqueue-api-pu");
+
+        Properties p = new Properties();
+        InputStream fis = null;
+        try
+        {
+            fis = CreationTools.class.getClassLoader().getResourceAsStream("META-INF/jqm.properties");
+            if (fis == null)
+            {
+                jqmlogger.info("No jqm.properties file found. Defaults or parameter values will be used");
+            }
+            else
+            {
+                p.load(fis);
+                jqmlogger.debug("A jqm.properties file was found");
+            }
+        }
+        catch (IOException e)
+        {
+            // We allow no configuration file, but not an unreadable configuration file.
+            throw new RuntimeException("META-INF/jqm.properties file is invalid", e);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(fis);
+        }
+
+        // PropertiesHandler.addDefaults(p);
+        emf = Persistence.createEntityManagerFactory("jobqueue-api-pu", p);
         return emf;
     }
 }

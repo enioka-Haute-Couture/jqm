@@ -9,12 +9,15 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 
 import org.glassfish.jersey.test.JerseyTest;
+import org.jqm.test.helpers.CreationTools;
+import org.jqm.test.helpers.TestHelpers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmWsApp;
 
 public class BasicTest extends JerseyTest
 {
@@ -29,7 +32,7 @@ public class BasicTest extends JerseyTest
     @Before
     public void before()
     {
-        em = TestHelpers.getNewEm();
+        em = CreationTools.emf.createEntityManager();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
     }

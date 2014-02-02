@@ -1,4 +1,4 @@
-package com.enioka.jqm.ws;
+package com.enioka.jqm.api;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;

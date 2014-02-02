@@ -38,13 +38,14 @@ import com.enioka.jqm.api.State;
 public class JobInstance
 {
     private Integer id;
+    private String applicationName;
     private Integer parent;
     private String user;
     private String sessionID;
     private State state;
     private Integer position;
     private Queue queue;
-    private String keyword1, keyword2, keyword3;
+    private String keyword1, keyword2, keyword3, module, email, application;
     private Map<String, String> parameters = new HashMap<String, String>();
     private Integer progress;
     private List<String> messages = new ArrayList<String>();
@@ -218,5 +219,45 @@ public class JobInstance
     void setKeyword3(String keyword3)
     {
         this.keyword3 = keyword3;
+    }
+
+    public String getApplication()
+    {
+        return application;
+    }
+
+    void setApplication(String application)
+    {
+        this.application = application;
+    }
+
+    public String getApplicationName()
+    {
+        return applicationName;
+    }
+
+    void setApplicationName(String applicationName)
+    {
+        this.applicationName = applicationName;
+    }
+
+    public String getModule()
+    {
+        return module;
+    }
+
+    void setModule(String module)
+    {
+        this.module = module;
+    }
+
+    public String getEmail()
+    {
+        return email;
+    }
+
+    void setEmail(String email)
+    {
+        this.email = email;
     }
 }

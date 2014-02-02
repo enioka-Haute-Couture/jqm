@@ -121,7 +121,7 @@ URL pattern           | Method | Non-URL arguments     | Return type         | R
 /ji/cancelled/{jobId} | POST   |                       | void                |                     | cancelJob(int)       | Cancel a waiting Job Instance (leaves history)
 /ji/killed/{jobId}    | POST   |                       | void                |                     | killJob(int)         | Stop (crashes) a running job instance if possible
 /ji/paused/{jobId}    | POST   |                       | void                |                     | pauseQueuedJob(int)  | Pause a waiting job instance
-/ji/waiting/{jobId}   | POST   |                       | void                |                     | resumeJob(int)       | Resume a paused job instance
+/ji/paused/{jobId}    | DELETE |                       | void                |                     | resumeJob(int)       | Resume a paused job instance
 /ji/waiting/{jobId}   | DELETE |                       | void                |                     | deleteJob(int)       | Completely cancel/remove a waiting Job Instance (even history)
 /ji/crashed/{jobId}   | DELETE |                       | JobInstance         | application/xml     | restartCrashedJob    | Restarts a crashed job instance (deletes failed history)
 /q                    | GET    |                       | List\<Queue\>       | application/xml     | getQueues            | List all queues defined in the JQM instance

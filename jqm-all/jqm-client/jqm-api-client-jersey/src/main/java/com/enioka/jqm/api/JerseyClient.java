@@ -20,6 +20,7 @@ package com.enioka.jqm.api;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.ws.rs.client.Client;
@@ -67,7 +68,7 @@ final class JerseyClient implements JqmClient
     @Override
     public int enqueue(JobRequest jd)
     {
-        return client.target("ji").request().put(Entity.entity(jd, MediaType.APPLICATION_XML), Integer.class);
+        return target.path("ji").request().post(Entity.entity(jd, MediaType.APPLICATION_XML), JobInstance.class).getId();
     }
 
     @Override
@@ -79,8 +80,25 @@ final class JerseyClient implements JqmClient
     @Override
     public int enqueueFromHistory(int jobIdToCopy)
     {
-        // TODO
-        return 0;
+        JobInstance h = getJob(jobIdToCopy);
+        JobRequest jd = new JobRequest();
+        jd.setApplication(h.getApplication());
+        jd.setApplicationName(h.getApplicationName());
+        jd.setEmail(h.getEmail());
+        jd.setKeyword1(h.getKeyword1());
+        jd.setKeyword2(h.getKeyword2());
+        jd.setKeyword3(h.getKeyword3());
+        jd.setModule(h.getModule());
+        jd.setParentID(h.getParent());
+        jd.setSessionID(h.getSessionID());
+        jd.setUser(h.getUser());
+
+        for (Map.Entry<String, String> p : h.getParameters().entrySet())
+        {
+            jd.addParameter(p.getKey(), p.getValue());
+        }
+
+        return enqueue(jd);
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -90,19 +108,19 @@ final class JerseyClient implements JqmClient
     @Override
     public void cancelJob(int idJob)
     {
-        // TODO
+        target.path("ji/cancelled/" + idJob).request().post(null);
     }
 
     @Override
     public void deleteJob(int idJob)
     {
-        // TODO
+        target.path("ji/waiting/" + idJob).request().delete();
     }
 
     @Override
     public void killJob(int idJob)
     {
-        // TODO
+        target.path("ji/killed/" + idJob).request().post(null);
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -112,19 +130,18 @@ final class JerseyClient implements JqmClient
     @Override
     public void pauseQueuedJob(int idJob)
     {
-        // TODO
+        target.path("ji/paused/" + idJob).request().post(null);
     }
 
     @Override
     public void resumeJob(int idJob)
     {
-        // TODO
+        target.path("ji/paused/" + idJob).request().delete();
     }
 
     public int restartCrashedJob(int idJob)
     {
-        // TODO
-        return 0;
+        return target.path("ji/crashed/" + idJob).request().delete(JobInstance.class).getId();
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -134,7 +151,8 @@ final class JerseyClient implements JqmClient
     @Override
     public void setJobQueue(int idJob, int idQueue)
     {
-        // TODO
+        System.out.println(target.path("q/" + idQueue + "/" + idJob).request().post(null).toString());
+        target.path("q/" + idQueue + "/" + idJob).request().post(null);
     }
 
     @Override
@@ -146,7 +164,8 @@ final class JerseyClient implements JqmClient
     @Override
     public void setJobQueuePosition(int idJob, int position)
     {
-        // TODO
+        // TODO: implement this
+        throw new UnsupportedOperationException();
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -156,14 +175,12 @@ final class JerseyClient implements JqmClient
     @Override
     public com.enioka.jqm.api.JobInstance getJob(int idJob)
     {
-        // TODO
-        return null;
+        return target.path("ji/" + idJob).request().get(JobInstance.class);
     }
 
     @Override
     public List<com.enioka.jqm.api.JobInstance> getJobs()
     {
-        System.out.println(target.path("ji").getUri());
         return target.path("ji").request().get(new GenericType<List<JobInstance>>()
         {
         });
@@ -172,15 +189,17 @@ final class JerseyClient implements JqmClient
     @Override
     public List<com.enioka.jqm.api.JobInstance> getActiveJobs()
     {
-        // TODO
-        return null;
+        return target.path("ji/active").request().get(new GenericType<List<JobInstance>>()
+        {
+        });
     }
 
     @Override
     public List<com.enioka.jqm.api.JobInstance> getUserActiveJobs(String user)
     {
-        // TODO
-        return null;
+        return target.path("user/" + user + "/ji").request().get(new GenericType<List<JobInstance>>()
+        {
+        });
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -206,21 +225,23 @@ final class JerseyClient implements JqmClient
     @Override
     public List<com.enioka.jqm.api.Deliverable> getJobDeliverables(int idJob)
     {
-        // TODO
-        return null;
+        return target.path("ji/" + idJob + "/files").request().get(new GenericType<List<Deliverable>>()
+        {
+        });
     }
 
     @Override
     public List<InputStream> getJobDeliverablesContent(int idJob)
     {
-        // TODO
-        return null;
+        // TODO: implement this
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public InputStream getDeliverableContent(com.enioka.jqm.api.Deliverable d)
     {
-        return null;
+        // TODO: implement this
+        throw new UnsupportedOperationException();
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -230,7 +251,8 @@ final class JerseyClient implements JqmClient
     @Override
     public List<com.enioka.jqm.api.Queue> getQueues()
     {
-        // TODO
-        return null;
+        return target.path("q").request().get(new GenericType<List<Queue>>()
+        {
+        });
     }
 }
