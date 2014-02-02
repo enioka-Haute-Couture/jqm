@@ -723,18 +723,27 @@ final class HibernateClient implements JqmClient
     public com.enioka.jqm.api.JobInstance getJob(int idJob)
     {
         EntityManager em = getEm();
-        try
+        History h = em.find(History.class, idJob);
+        com.enioka.jqm.api.JobInstance res = null;
+        if (h != null)
         {
-            return getJob(em.find(History.class, idJob));
+            res = getJob(h);
         }
-        catch (NoResultException e)
+        else
         {
-            return getJob(em.find(JobInstance.class, idJob));
+            JobInstance ji = em.find(JobInstance.class, idJob);
+            if (ji != null)
+            {
+                res = getJob(ji);
+            }
+            else
+            {
+                em.close();
+                throw new JqmInvalidRequestException("No job instance of ID " + idJob);
+            }
         }
-        finally
-        {
-            em.close();
-        }
+        em.close();
+        return res;
     }
 
     @Override

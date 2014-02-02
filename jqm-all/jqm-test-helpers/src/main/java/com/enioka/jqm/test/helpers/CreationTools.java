@@ -1,4 +1,4 @@
-package org.jqm.test.helpers;
+package com.enioka.jqm.test.helpers;
 
 /**
  * Copyright © 2013 enioka. All rights reserved
@@ -52,9 +52,6 @@ import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.State;
 
 /**
- * This class will soon become private. It is not part of the API.
- * 
- * @author Marc-Antoine
  * 
  */
 public class CreationTools
@@ -69,6 +66,7 @@ public class CreationTools
     public static void reinitHsqldbServer() throws InterruptedException, FileNotFoundException
     {
         stopHsqldbServer();
+        jqmlogger.debug("Starting HSQLDB");
         s = new Server();
         s.setDatabaseName(0, "testdbengine");
         s.setDatabasePath(0, "mem:testdbengine");
@@ -76,14 +74,44 @@ public class CreationTools
         s.setSilent(true);
         s.start();
         TestHelpers.cleanup(emf.createEntityManager());
+
+        while (s.getState() != 1)
+        {
+            try
+            {
+                Thread.sleep(10);
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        jqmlogger.debug("HSQLDB is now running");
     }
 
     public static void stopHsqldbServer()
     {
         if (s != null)
         {
+            jqmlogger.debug("Stopping HSQLDB");
+            s.signalCloseAllServerConnections();
             s.shutdown();
             s.stop();
+
+            while (s.getState() != 16)
+            {
+                try
+                {
+                    Thread.sleep(10);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            s = null;
+            reset();
+            jqmlogger.debug("HSQLDB is now stopped");
         }
     }
 

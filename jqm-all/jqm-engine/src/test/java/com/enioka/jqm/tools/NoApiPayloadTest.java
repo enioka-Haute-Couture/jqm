@@ -25,8 +25,6 @@ import javax.persistence.EntityManager;
 
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
-import org.jqm.test.helpers.CreationTools;
-import org.jqm.test.helpers.TestHelpers;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -38,6 +36,8 @@ import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.test.helpers.CreationTools;
+import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class NoApiPayloadTest
 {

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -59,6 +60,7 @@ final class JerseyClient implements JqmClient
     public void dispose()
     {
         p = null;
+        this.client.close();
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -68,7 +70,18 @@ final class JerseyClient implements JqmClient
     @Override
     public int enqueue(JobRequest jd)
     {
-        return target.path("ji").request().post(Entity.entity(jd, MediaType.APPLICATION_XML), JobInstance.class).getId();
+        try
+        {
+            return target.path("ji").request().post(Entity.entity(jd, MediaType.APPLICATION_XML), JobInstance.class).getId();
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     @Override
@@ -108,19 +121,52 @@ final class JerseyClient implements JqmClient
     @Override
     public void cancelJob(int idJob)
     {
-        target.path("ji/cancelled/" + idJob).request().post(null);
+        try
+        {
+            target.path("ji/cancelled/" + idJob).request().post(null);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     @Override
     public void deleteJob(int idJob)
     {
-        target.path("ji/waiting/" + idJob).request().delete();
+        try
+        {
+            target.path("ji/waiting/" + idJob).request().delete();
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     @Override
     public void killJob(int idJob)
     {
-        target.path("ji/killed/" + idJob).request().post(null);
+        try
+        {
+            target.path("ji/killed/" + idJob).request().post(null);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -130,18 +176,51 @@ final class JerseyClient implements JqmClient
     @Override
     public void pauseQueuedJob(int idJob)
     {
-        target.path("ji/paused/" + idJob).request().post(null);
+        try
+        {
+            target.path("ji/paused/" + idJob).request().post(null);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     @Override
     public void resumeJob(int idJob)
     {
-        target.path("ji/paused/" + idJob).request().delete();
+        try
+        {
+            target.path("ji/paused/" + idJob).request().delete();
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     public int restartCrashedJob(int idJob)
     {
-        return target.path("ji/crashed/" + idJob).request().delete(JobInstance.class).getId();
+        try
+        {
+            return target.path("ji/crashed/" + idJob).request().delete(JobInstance.class).getId();
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -151,8 +230,18 @@ final class JerseyClient implements JqmClient
     @Override
     public void setJobQueue(int idJob, int idQueue)
     {
-        System.out.println(target.path("q/" + idQueue + "/" + idJob).request().post(null).toString());
-        target.path("q/" + idQueue + "/" + idJob).request().post(null);
+        try
+        {
+            target.path("q/" + idQueue + "/" + idJob).request().post(null);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     @Override
@@ -175,31 +264,67 @@ final class JerseyClient implements JqmClient
     @Override
     public com.enioka.jqm.api.JobInstance getJob(int idJob)
     {
-        return target.path("ji/" + idJob).request().get(JobInstance.class);
+        try
+        {
+            return target.path("ji/" + idJob).request().get(JobInstance.class);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("An internal JQM error occured", e);
+        }
     }
 
     @Override
     public List<com.enioka.jqm.api.JobInstance> getJobs()
     {
-        return target.path("ji").request().get(new GenericType<List<JobInstance>>()
+        try
         {
-        });
+            return target.path("ji").request().get(new GenericType<List<JobInstance>>()
+            {
+            });
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     @Override
     public List<com.enioka.jqm.api.JobInstance> getActiveJobs()
     {
-        return target.path("ji/active").request().get(new GenericType<List<JobInstance>>()
+        try
         {
-        });
+            return target.path("ji/active").request().get(new GenericType<List<JobInstance>>()
+            {
+            });
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     @Override
     public List<com.enioka.jqm.api.JobInstance> getUserActiveJobs(String user)
     {
-        return target.path("user/" + user + "/ji").request().get(new GenericType<List<JobInstance>>()
+        try
         {
-        });
+            return target.path("user/" + user + "/ji").request().get(new GenericType<List<JobInstance>>()
+            {
+            });
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -209,13 +334,35 @@ final class JerseyClient implements JqmClient
     @Override
     public List<String> getJobMessages(int idJob)
     {
-        return getJob(idJob).getMessages();
+        try
+        {
+            return getJob(idJob).getMessages();
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     @Override
     public int getJobProgress(int idJob)
     {
-        return getJob(idJob).getProgress();
+        try
+        {
+            return getJob(idJob).getProgress();
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -225,9 +372,20 @@ final class JerseyClient implements JqmClient
     @Override
     public List<com.enioka.jqm.api.Deliverable> getJobDeliverables(int idJob)
     {
-        return target.path("ji/" + idJob + "/files").request().get(new GenericType<List<Deliverable>>()
+        try
         {
-        });
+            return target.path("ji/" + idJob + "/files").request().get(new GenericType<List<Deliverable>>()
+            {
+            });
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     @Override
@@ -251,8 +409,15 @@ final class JerseyClient implements JqmClient
     @Override
     public List<com.enioka.jqm.api.Queue> getQueues()
     {
-        return target.path("q").request().get(new GenericType<List<Queue>>()
+        try
         {
-        });
+            return target.path("q").request().get(new GenericType<List<Queue>>()
+            {
+            });
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 }

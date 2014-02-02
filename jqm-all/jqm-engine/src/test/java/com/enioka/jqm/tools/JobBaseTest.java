@@ -46,8 +46,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
-import org.jqm.test.helpers.CreationTools;
-import org.jqm.test.helpers.TestHelpers;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -62,6 +60,8 @@ import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.test.helpers.CreationTools;
+import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class JobBaseTest
 {

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jqm.test.helpers;
+package com.enioka.jqm.test.helpers;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
