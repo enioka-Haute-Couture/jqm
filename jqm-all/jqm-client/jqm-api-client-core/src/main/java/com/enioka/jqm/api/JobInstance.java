@@ -25,6 +25,8 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.enioka.jqm.api.State;
@@ -48,6 +50,8 @@ public class JobInstance
     private String keyword1, keyword2, keyword3, module, email, application;
     private Map<String, String> parameters = new HashMap<String, String>();
     private Integer progress;
+    @XmlElementWrapper(name = "messages")
+    @XmlElement(name = "message", type = String.class)
     private List<String> messages = new ArrayList<String>();
 
     /**
