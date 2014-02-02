@@ -18,8 +18,6 @@
 
 package com.enioka.jqm.tools;
 
-import java.net.BindException;
-import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +33,8 @@ import javax.persistence.NonUniqueResultException;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 
+import com.amazonaws.services.cloudfront_2012_03_15.model.InvalidArgumentException;
 import com.enioka.jqm.jndi.JndiContext;
 import com.enioka.jqm.jndi.JndiContextFactory;
 import com.enioka.jqm.jpamodel.DatabaseProp;
@@ -54,7 +50,7 @@ class JqmEngine
     private Node node = null;
     private EntityManager em = Helpers.getNewEm();
     private Map<String, URL[]> cache = new ConcurrentHashMap<String, URL[]>();
-    private Server server = null;
+    private JettyServer server = null;
     private JndiContext jndiCtx = null;
     private static Logger jqmlogger = Logger.getLogger(JqmEngine.class);
     private Semaphore ended = new Semaphore(0);
@@ -62,13 +58,16 @@ class JqmEngine
     /**
      * Starts the engine
      * 
-     * @param args
-     *            - [0] = nodename
-     * @throws Exception
+     * @param nodeName
+     *            the node to start
+     * @throws JqmInitError
      */
     public void start(String nodeName)
     {
-        java.lang.System.setProperty("log4j.debug", "true");
+        if (nodeName == null || nodeName.isEmpty())
+        {
+            throw new InvalidArgumentException("nodeName cannot be null or empty");
+        }
 
         // Node configuration is in the database
         node = checkAndUpdateNode(nodeName);
@@ -100,53 +99,20 @@ class JqmEngine
         }
 
         // Jetty
-        server = new Server(new InetSocketAddress(node.getDns(), node.getPort()));
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-        server.setHandler(context);
-        context.addServlet(new ServletHolder(new ServletFile()), "/getfile");
-        context.addServlet(new ServletHolder(new ServletEnqueue()), "/enqueue");
-        context.addServlet(new ServletHolder(new ServletStatus()), "/status");
-        jqmlogger.info("Starting Jetty (port " + node.getPort() + ")");
-        try
-        {
-            server.start();
-        }
-        catch (BindException e)
-        {
-            // JETTY-839: threadpool not daemon nor close on exception
-            try
-            {
-                server.stop();
-                server.join();
-            }
-            catch (Exception e1)
-            {
-                // We are crashing anyway...
-            }
-            throw new JqmInitError("Could not start web server - check there is no other process binding on this port & interface", e);
-        }
-        catch (Exception e)
-        {
-            throw new JqmInitError("Could not start web server - not a port issue, but a generic one", e);
-        }
-        jqmlogger.info("Jetty has started on port " + server.getConnectors()[0].getLocalPort());
+        this.server = new JettyServer();
+        this.server.start(node);
         if (node.getPort() == 0)
         {
             // During tests, we use a random port (0) so we must update configuration.
             // New nodes are also created with a non-assigned port.
             em.getTransaction().begin();
-            node.setPort(server.getConnectors()[0].getLocalPort());
+            node.setPort(server.getActualPort());
             em.getTransaction().commit();
         }
 
-        if (nodeName != null)
-        {
-            node = em.createQuery("SELECT n FROM Node n WHERE n.name = :li", Node.class).setParameter("li", nodeName).getSingleResult();
-
-            dps = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
-                    .setParameter("n", node.getId()).getResultList();
-        }
+        // Get queues to listen to
+        dps = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
+                .setParameter("n", node.getId()).getResultList();
 
         // Security
         if (System.getSecurityManager() == null)
@@ -355,16 +321,7 @@ class JqmEngine
         }
 
         // If here, all pollers are down. Stop Jetty too
-        try
-        {
-            jqmlogger.debug("Jetty will be stopped");
-            this.server.stop();
-            this.server.join();
-        }
-        catch (Exception e)
-        {
-            // Who cares, we are dying.
-        }
+        this.server.stop();
 
         // Reset the stop counter - we may want to restart one day
         this.em.getTransaction().begin();
