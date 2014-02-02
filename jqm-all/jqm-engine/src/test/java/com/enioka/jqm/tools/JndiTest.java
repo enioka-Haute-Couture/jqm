@@ -31,12 +31,14 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.enioka.jqm.api.Dispatcher;
-import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.test.helpers.CreationTools;
+import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class JndiTest
 {
@@ -53,8 +55,9 @@ public class JndiTest
         s.setSilent(true);
         s.start();
 
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         Helpers.resetEmf();
+        CreationTools.reset();
     }
 
     @AfterClass
@@ -79,10 +82,10 @@ public class JndiTest
                 "jqm-test-jndijms-wmq/jqm-test-jndijms-wmq.jar", TestHelpers.qVip, 42, "Jms", "Franquin", "ModuleMachin", "other1",
                 "other2", "other3", false, em);
 
-        JobDefinition form = new JobDefinition("Jms", "MAG");
+        JobRequest form = new JobRequest("Jms", "MAG");
         form.addParameter("p1", "1");
         form.addParameter("p2", "2");
-        Dispatcher.enQueue(form);
+        JqmClientFactory.getClient().enqueue(form);
 
         // Create JMS JNDI references for use by the test jar
         em.getTransaction().begin();
@@ -130,8 +133,8 @@ public class JndiTest
                 "jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
                 "other2", false, em);
 
-        JobDefinition form = new JobDefinition("Jms", "MAG");
-        Dispatcher.enQueue(form);
+        JobRequest form = new JobRequest("Jms", "MAG");
+        JqmClientFactory.getClient().enqueue(form);
 
         // Create JMS JNDI references for use by the test jar
         em.getTransaction().begin();
@@ -177,8 +180,8 @@ public class JndiTest
                 "jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
                 "other2", false, em);
 
-        JobDefinition form = new JobDefinition("Jms", "MAG");
-        Dispatcher.enQueue(form);
+        JobRequest form = new JobRequest("Jms", "MAG");
+        JqmClientFactory.getClient().enqueue(form);
 
         // Create JMS JNDI references for use by the test jar
         em.getTransaction().begin();
@@ -223,8 +226,8 @@ public class JndiTest
         JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-defcon/", "jqm-test-defcon/jqm-test-defcon.jar",
                 TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
 
-        JobDefinition form = new JobDefinition("Jms", "MAG");
-        Dispatcher.enQueue(form);
+        JobRequest form = new JobRequest("Jms", "MAG");
+        JqmClientFactory.getClient().enqueue(form);
 
         // Start the engine
         JqmEngine engine1 = new JqmEngine();

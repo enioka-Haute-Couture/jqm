@@ -51,9 +51,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.enioka.jqm.api.Deliverable;
-import com.enioka.jqm.api.Dispatcher;
-import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
@@ -61,6 +60,8 @@ import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.test.helpers.CreationTools;
+import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class JobBaseTest
 {
@@ -77,16 +78,15 @@ public class JobBaseTest
         s.setSilent(true);
         s.start();
 
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         Helpers.resetEmf();
-
-        jqmlogger.debug("log init");
+        CreationTools.reset();
     }
 
     @AfterClass
     public static void stop()
     {
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient();
         s.shutdown();
         s.stop();
     }
@@ -110,8 +110,8 @@ public class JobBaseTest
         CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-deliverable/", "jqm-test-deliverable/jqm-test-deliverable.jar",
                 TestHelpers.qVip, 42, "getDeliverables", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("getDeliverables", "MAG");
-        int id = Dispatcher.enQueue(j);
+        JobRequest j = new JobRequest("getDeliverables", "MAG");
+        int id = JqmClientFactory.getClient().enqueue(j);
 
         TestHelpers.printJobInstanceTable();
 
@@ -121,8 +121,7 @@ public class JobBaseTest
 
         TestHelpers.printJobInstanceTable();
 
-        Dispatcher.resetEM();
-        List<InputStream> tmp = Dispatcher.getDeliverables(id);
+        List<InputStream> tmp = JqmClientFactory.getClient().getJobDeliverablesContent(id);
         engine1.stop();
         Assert.assertEquals(1, tmp.size());
 
@@ -153,9 +152,9 @@ public class JobBaseTest
         CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-deliverable/", "jqm-test-deliverable/jqm-test-deliverable.jar",
                 TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "Franquin");
+        JobRequest j = new JobRequest("MarsuApplication", "Franquin");
 
-        int jobId = Dispatcher.enQueue(j);
+        int jobId = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -165,11 +164,10 @@ public class JobBaseTest
         File f = new File("./testprojects/jqm-test-deliverable/JobGenADeliverable42.txt");
         Assert.assertEquals(false, f.exists()); // file should have been moved
 
-        Dispatcher.resetEM();
-        List<com.enioka.jqm.api.Deliverable> files = Dispatcher.getAllDeliverables(jobId);
+        List<com.enioka.jqm.api.Deliverable> files = JqmClientFactory.getClient().getJobDeliverables(jobId);
         Assert.assertEquals(1, files.size());
 
-        InputStream tmp = Dispatcher.getOneDeliverable(files.get(0));
+        InputStream tmp = JqmClientFactory.getClient().getDeliverableContent(files.get(0));
         engine1.stop();
         Assert.assertTrue(tmp.available() > 0);
 
@@ -178,106 +176,6 @@ public class JobBaseTest
         FileUtils.deleteDirectory(new File(FilenameUtils.concat(TestHelpers.node.getDlRepo(), "" + jobId)));
         FileUtils.deleteDirectory(new File(FilenameUtils.concat(TestHelpers.node.getDlRepo(), "MarsuApplication")));
         FileUtils.deleteDirectory(new File(System.getProperty("java.io.tmpdir") + "/" + jobId));
-    }
-
-    @Test
-    public void testGetUserDeliverables() throws Exception
-    {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testGetUserDeliverables");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", "./testprojects/jqm-test-deliverable/", em);
-        JobDefParameter jdpp = CreationTools.createJobDefParameter("fileName", "JobGenADeliverable.txt", em);
-        jdargs.add(jdp);
-        jdargs.add(jdpp);
-
-        ArrayList<JobDefParameter> jdargs2 = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp2 = CreationTools.createJobDefParameter("filepath", "./testprojects/jqm-test-deliverable/", em);
-        JobDefParameter jdpp2 = CreationTools.createJobDefParameter("fileName", "JobGenADeliverable2.txt", em);
-        jdargs2.add(jdp2);
-        jdargs2.add(jdpp2);
-
-        ArrayList<JobDefParameter> jdargs3 = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp3 = CreationTools.createJobDefParameter("filepath", "./testprojects/jqm-test-deliverable/", em);
-        JobDefParameter jdpp3 = CreationTools.createJobDefParameter("fileName", "JobGenADeliverable3.txt", em);
-        jdargs3.add(jdp3);
-        jdargs3.add(jdpp3);
-
-        @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-deliverable/",
-                "jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication1", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
-
-        @SuppressWarnings("unused")
-        JobDef jdDemoMaven2 = CreationTools.createJobDef(null, true, "App", jdargs2, "jqm-test-deliverable/",
-                "jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication2", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
-
-        @SuppressWarnings("unused")
-        JobDef jdDemoMaven3 = CreationTools.createJobDef(null, true, "App", jdargs3, "jqm-test-deliverable/",
-                "jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication3", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
-
-        JobDefinition j1 = new JobDefinition("MarsuApplication1", "Franquin");
-        JobDefinition j2 = new JobDefinition("MarsuApplication2", "Franquin");
-        JobDefinition j3 = new JobDefinition("MarsuApplication3", "Franquin");
-
-        int id1 = Dispatcher.enQueue(j1);
-        int id2 = Dispatcher.enQueue(j2);
-        int id3 = Dispatcher.enQueue(j3);
-
-        TestHelpers.printJobInstanceTable();
-
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
-
-        TestHelpers.waitFor(3, 10000);
-        engine1.stop();
-
-        TestHelpers.printJobInstanceTable();
-
-        File f1 = new File("./testprojects/jqm-test-deliverable/JobGenADeliverable.txt");
-        File f2 = new File("./testprojects/jqm-test-deliverable/JobGenADeliverable2.txt");
-        File f3 = new File("./testprojects/jqm-test-deliverable/JobGenADeliverable3.txt");
-
-        // Files moved?
-        Assert.assertEquals(false, f1.exists());
-        Assert.assertEquals(false, f2.exists());
-        Assert.assertEquals(false, f3.exists());
-
-        TestHelpers.printJobInstanceTable();
-
-        List<com.enioka.jqm.api.Deliverable> tmp = Dispatcher.getUserDeliverables("Franquin");
-
-        Assert.assertEquals(3, tmp.size());
-        for (Deliverable d : tmp)
-        {
-            FileUtils.deleteQuietly(new File(d.getFilePath()));
-        }
-
-        TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
-        ArrayList<History> res = (ArrayList<History>) query.getResultList();
-
-        Assert.assertEquals(3, res.size());
-        for (History jobInstance : res)
-        {
-            Assert.assertEquals(State.ENDED, jobInstance.getState());
-        }
-
-        FileUtils.deleteDirectory(new File(FilenameUtils.concat(TestHelpers.node.getDlRepo(), "" + id1)));
-        FileUtils.deleteDirectory(new File(FilenameUtils.concat(TestHelpers.node.getDlRepo(), "" + id2)));
-        FileUtils.deleteDirectory(new File(FilenameUtils.concat(TestHelpers.node.getDlRepo(), "" + id3)));
-        FileUtils.deleteDirectory(new File(System.getProperty("java.io.tmpdir") + "/" + id1));
-        FileUtils.deleteDirectory(new File(System.getProperty("java.io.tmpdir") + "/" + id2));
-        FileUtils.deleteDirectory(new File(System.getProperty("java.io.tmpdir") + "/" + id3));
-        FileUtils.deleteDirectory(new File(FilenameUtils.concat(TestHelpers.node.getDlRepo(), "MarsuApplication1")));
-        FileUtils.deleteDirectory(new File(FilenameUtils.concat(TestHelpers.node.getDlRepo(), "MarsuApplication2")));
-        FileUtils.deleteDirectory(new File(FilenameUtils.concat(TestHelpers.node.getDlRepo(), "MarsuApplication3")));
     }
 
     @Test
@@ -325,26 +223,26 @@ public class JobBaseTest
                 "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qSlow, 42, "MarsuApplication3", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
-        JobDefinition jj = new JobDefinition("MarsuApplication2", "Franquin");
-        JobDefinition jjj = new JobDefinition("MarsuApplication3", "Franquin");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
+        JobRequest jj = new JobRequest("MarsuApplication2", "Franquin");
+        JobRequest jjj = new JobRequest("MarsuApplication3", "Franquin");
 
-        Dispatcher.enQueue(j);
-        Dispatcher.enQueue(j);
-        Dispatcher.enQueue(j);
-        Dispatcher.enQueue(jj);
-        Dispatcher.enQueue(jj);
-        Dispatcher.enQueue(jjj);
+        JqmClientFactory.getClient().enqueue(j);
+        JqmClientFactory.getClient().enqueue(j);
+        JqmClientFactory.getClient().enqueue(j);
+        JqmClientFactory.getClient().enqueue(jj);
+        JqmClientFactory.getClient().enqueue(jj);
+        JqmClientFactory.getClient().enqueue(jjj);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
         Thread.sleep(10);
 
-        Dispatcher.enQueue(jjj);
-        Dispatcher.enQueue(j);
-        Dispatcher.enQueue(jj);
-        Dispatcher.enQueue(j);
+        JqmClientFactory.getClient().enqueue(jjj);
+        JqmClientFactory.getClient().enqueue(j);
+        JqmClientFactory.getClient().enqueue(jj);
+        JqmClientFactory.getClient().enqueue(j);
 
         TestHelpers.waitFor(10, 10000);
         engine1.stop();
@@ -402,11 +300,11 @@ public class JobBaseTest
                 "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication2", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
-        JobDefinition jj = new JobDefinition("MarsuApplication2", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
+        JobRequest jj = new JobRequest("MarsuApplication2", "MAG");
 
-        Dispatcher.enQueue(j);
-        Dispatcher.enQueue(jj);
+        JqmClientFactory.getClient().enqueue(j);
+        JqmClientFactory.getClient().enqueue(jj);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -442,15 +340,15 @@ public class JobBaseTest
                 "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
         TestHelpers.waitFor(1, 10000);
-        Dispatcher.restartJob(i);
+        JqmClientFactory.getClient().enqueueFromHistory(i);
         TestHelpers.waitFor(1, 10000);
         engine1.stop();
 
@@ -479,13 +377,13 @@ public class JobBaseTest
 
         @SuppressWarnings("unused")
         JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemavennopom/",
-                "jqm-test-datetimemavennopom/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+                "jqm-test-datetimemavennopom/jqm-test-datetimemavennopom.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
         @SuppressWarnings("unused")
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -515,10 +413,10 @@ public class JobBaseTest
         CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemavennopomlib/",
                 "jqm-test-datetimemavennopomlib/jqm-test-datetimemavennopomlib.jar", TestHelpers.qVip, 42, "MarsuApplication", null,
                 "Franquin", "ModuleMachin", "other", "other", false, em);
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
         @SuppressWarnings("unused")
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -551,10 +449,10 @@ public class JobBaseTest
                 "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG", "jqm.noreply@gmail.com");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG", "jqm.noreply@gmail.com");
 
         @SuppressWarnings("unused")
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -590,9 +488,9 @@ public class JobBaseTest
                 "jqm-test-deliverable/jqm-test-deliverable.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "Franquin");
+        JobRequest j = new JobRequest("MarsuApplication", "Franquin");
 
-        int id = Dispatcher.enQueue(j);
+        int id = JqmClientFactory.getClient().enqueue(j);
 
         JobInstance ji = emm.createQuery("SELECT j FROM JobInstance j WHERE j.jd.id = :myId", JobInstance.class)
                 .setParameter("myId", jdDemoMaven.getId()).getSingleResult();
@@ -605,8 +503,7 @@ public class JobBaseTest
         File f = new File("./testprojects/jqm-test-deliverable/JobGenADeliverable42.txt");
         Assert.assertEquals(false, f.exists());
 
-        Dispatcher.resetEM();
-        List<com.enioka.jqm.api.Deliverable> tmp = Dispatcher.getAllDeliverables(ji.getId());
+        List<com.enioka.jqm.api.Deliverable> tmp = JqmClientFactory.getClient().getJobDeliverables(ji.getId());
         engine1.stop();
 
         Assert.assertEquals(1, tmp.size());
@@ -638,9 +535,9 @@ public class JobBaseTest
                 "jqm-test-sendmsg/jqm-test-sendmsg.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
                 "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -697,10 +594,10 @@ public class JobBaseTest
                 "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
         j.setSessionID("session42");
 
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -710,7 +607,7 @@ public class JobBaseTest
         History h = em.createQuery("SELECT h FROM History h WHERE h.id = :i", History.class).setParameter("i", i).getSingleResult();
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-        jqmlogger.debug("EnqueueDate: " + df.format(h.getEnqueueDate().getTime()));
+        jqmlogger.debug("enqueueDate: " + df.format(h.getEnqueueDate().getTime()));
         jqmlogger.debug("ReturnedValue: " + h.getReturnedValue());
         jqmlogger.debug("ExecutionDate: " + df.format(h.getExecutionDate().getTime()));
         jqmlogger.debug("EndDate: " + df.format(h.getEndDate().getTime()));
@@ -741,10 +638,10 @@ public class JobBaseTest
                 "jqm-test-sendprogress/jqm-test-sendprogress.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
         @SuppressWarnings("unused")
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -777,10 +674,10 @@ public class JobBaseTest
         JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-kill/", "jqm-test-kill/jqm-test-kill.jar",
                 TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
-        int i = Dispatcher.enQueue(j);
-        // Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
+        // JqmClientFactory.getClient().enqueue(j);
 
         TestHelpers.printJobInstanceTable();
 
@@ -788,7 +685,7 @@ public class JobBaseTest
         engine1.start("localhost");
         Thread.sleep(3000);
 
-        Dispatcher.killJob(i);
+        JqmClientFactory.getClient().killJob(i);
         TestHelpers.printJobInstanceTable();
 
         Thread.sleep(3000);
@@ -823,46 +720,10 @@ public class JobBaseTest
                 "jqm-test-datetimemavenlib/jqm-test-datetime.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
         @SuppressWarnings("unused")
-        int i = Dispatcher.enQueue(j);
-
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
-        TestHelpers.waitFor(1, 10000);
-        engine1.stop();
-
-        TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
-        ArrayList<History> res = (ArrayList<History>) query.getResultList();
-
-        Assert.assertEquals(1, res.size());
-        Assert.assertEquals(State.ENDED, res.get(0).getState());
-    }
-
-    @Test
-    public void testPomOnlyInJar2() throws Exception
-    {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testPomOnlyInJar2");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-        jdargs.add(jdp);
-
-        @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemavennopom/",
-                "jqm-test-datetimemavennopom/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", true, em);
-
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
-
-        @SuppressWarnings("unused")
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -895,10 +756,10 @@ public class JobBaseTest
                 "jqm-test-datetimemavennopom/nothing.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
                 "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
         @SuppressWarnings("unused")
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -931,10 +792,10 @@ public class JobBaseTest
                 "jqm-test-datetimemavenparent/jqm-test-datetimemavenparent.jar", TestHelpers.qVip, 42, "MarsuApplication", null,
                 "Franquin", "ModuleMachin", "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
         @SuppressWarnings("unused")
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -970,9 +831,9 @@ public class JobBaseTest
                 "jqm-test-sendmsg/jqm-test-sendmsg.jar", TestHelpers.qVip, 42, "Marsu-Application", null, "Franquin", "ModuleMachin",
                 "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition("Marsu-Application", "MAG");
+        JobRequest j = new JobRequest("Marsu-Application", "MAG");
 
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -982,7 +843,7 @@ public class JobBaseTest
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
-        ArrayList<String> ress = (ArrayList<String>) Dispatcher.getMsg(i);
+        ArrayList<String> ress = (ArrayList<String>) JqmClientFactory.getClient().getJobMessages(i);
 
         @SuppressWarnings("unused")
         ArrayList<Message> m = (ArrayList<Message>) em.createQuery("SELECT m FROM Message m WHERE m.history.id = :i", Message.class)
@@ -1031,9 +892,9 @@ public class JobBaseTest
                 "jqm-test-sendprogress/jqm-test-sendprogress.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -1043,7 +904,7 @@ public class JobBaseTest
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
-        Integer k = Dispatcher.getProgress(i);
+        Integer k = JqmClientFactory.getClient().getJobProgress(i);
 
         Assert.assertEquals(1, res.size());
         Assert.assertEquals(State.ENDED, res.get(0).getState());
@@ -1069,9 +930,9 @@ public class JobBaseTest
                 "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         em.getTransaction().begin();
         JobInstance t = em.find(JobInstance.class, i);
@@ -1119,14 +980,14 @@ public class JobBaseTest
                 "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
         @SuppressWarnings("unused")
-        int ii = Dispatcher.enQueue(j);
+        int ii = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
-        Dispatcher.pauseJob(i);
+        JqmClientFactory.getClient().pauseQueuedJob(i);
         TestHelpers.printJobInstanceTable();
         engine1.start("localhost");
         Thread.sleep(5000);
@@ -1163,11 +1024,11 @@ public class JobBaseTest
                 "Marsu-Application-nnnnnnnn-nnnnnn-nnnnnnnnnn-nnNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNnn-nnnnnnnnnnnnnn", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
-        JobDefinition j = new JobDefinition(
+        JobRequest j = new JobRequest(
                 "Marsu-Application-nnnnnnnn-nnnnnn-nnnnnnnnnn-nnNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNnn-nnnnnnnnnnnnnn", "MAG");
 
         @SuppressWarnings("unused")
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -1200,14 +1061,14 @@ public class JobBaseTest
                 "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
         @SuppressWarnings("unused")
-        int ii = Dispatcher.enQueue(j);
+        int ii = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
-        Dispatcher.cancelJobInQueue(i);
+        JqmClientFactory.getClient().cancelJob(i);
         TestHelpers.printJobInstanceTable();
         engine1.start("localhost");
         Thread.sleep(5000);
@@ -1241,12 +1102,12 @@ public class JobBaseTest
                 "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
-        Dispatcher.changeQueue(i, TestHelpers.qSlow);
+        JqmClientFactory.getClient().setJobQueue(i, TestHelpers.qSlow.getId());
         TestHelpers.printJobInstanceTable();
 
         engine1.start("localhost");
@@ -1280,12 +1141,12 @@ public class JobBaseTest
                 "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
-        Dispatcher.delJobInQueue(i);
+        JqmClientFactory.getClient().deleteJob(i);
         TestHelpers.printJobInstanceTable();
         engine1.start("localhost");
         Thread.sleep(1000);
@@ -1303,11 +1164,11 @@ public class JobBaseTest
     }
 
     @Test
-    public void testHttpEnqueue() throws Exception
+    public void testHttpenqueue() throws Exception
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testHttpEnqueue");
+        jqmlogger.debug("Starting test testHttpenqueue");
 
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -1371,7 +1232,7 @@ public class JobBaseTest
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testHttpEnqueue");
+        jqmlogger.debug("Starting test testHttpenqueue");
 
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -1457,18 +1318,18 @@ public class JobBaseTest
                 "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
-        int i = Dispatcher.enQueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
         @SuppressWarnings("unused")
-        int ii = Dispatcher.enQueue(j);
+        int ii = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
-        Dispatcher.pauseJob(i);
+        JqmClientFactory.getClient().pauseQueuedJob(i);
         TestHelpers.printJobInstanceTable();
         engine1.start("localhost");
         Thread.sleep(5000);
-        Dispatcher.resumeJob(i);
+        JqmClientFactory.getClient().resumeJob(i);
         Thread.sleep(5000);
 
         engine1.stop();
@@ -1532,8 +1393,8 @@ public class JobBaseTest
                 "jqm-test-throwable/jqm-test-throwable.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
                 "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
-        Dispatcher.enQueue(j);
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
+        JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -1563,8 +1424,8 @@ public class JobBaseTest
         JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-em", "jqm-test-em/jqm-test-em.jar", TestHelpers.qVip,
                 42, "jqm-test-em", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("jqm-test-em", "MAG");
-        Dispatcher.enQueue(j);
+        JobRequest j = new JobRequest("jqm-test-em", "MAG");
+        JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -1594,8 +1455,8 @@ public class JobBaseTest
         JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-exit", "jqm-test-exit/jqm-test-exit.jar",
                 TestHelpers.qVip, 42, "jqm-test-exit", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("jqm-test-exit", "MAG");
-        Dispatcher.enQueue(j);
+        JobRequest j = new JobRequest("jqm-test-exit", "MAG");
+        JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");

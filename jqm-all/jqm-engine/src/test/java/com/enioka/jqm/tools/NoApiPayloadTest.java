@@ -30,12 +30,14 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.enioka.jqm.api.Dispatcher;
-import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.test.helpers.CreationTools;
+import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class NoApiPayloadTest
 {
@@ -52,16 +54,15 @@ public class NoApiPayloadTest
         s.setSilent(true);
         s.start();
 
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         Helpers.resetEmf();
-
-        jqmlogger.debug("log init");
+        CreationTools.reset();
     }
 
     @AfterClass
     public static void stop()
     {
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         s.shutdown();
         s.stop();
     }
@@ -81,8 +82,8 @@ public class NoApiPayloadTest
                 "jqm-test-datetimemaven/jqm-test-datetimemaven.jar", TestHelpers.qVip, 42, "jqm-test-datetimemaven", null, "Franquin",
                 "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("jqm-test-datetimemaven", "MAG");
-        Dispatcher.enQueue(j);
+        JobRequest j = new JobRequest("jqm-test-datetimemaven", "MAG");
+        JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -110,8 +111,8 @@ public class NoApiPayloadTest
         JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-runnable", "jqm-test-runnable/jqm-test-runnable.jar",
                 TestHelpers.qVip, 42, "jqm-test-runnable", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("jqm-test-runnable", "MAG");
-        Dispatcher.enQueue(j);
+        JobRequest j = new JobRequest("jqm-test-runnable", "MAG");
+        JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -140,9 +141,9 @@ public class NoApiPayloadTest
                 "jqm-test-runnable-inject/jqm-test-runnable-inject.jar", TestHelpers.qVip, 42, "jqm-test-runnable-inject", "testapp",
                 "Franquin", "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("jqm-test-runnable-inject", "MAG");
+        JobRequest j = new JobRequest("jqm-test-runnable-inject", "MAG");
         j.setSessionID("123X");
-        Dispatcher.enQueue(j);
+        JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -174,8 +175,8 @@ public class NoApiPayloadTest
         JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-main", "jqm-test-main/jqm-test-main.jar",
                 TestHelpers.qVip, 42, "jqm-test-main", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("jqm-test-main", "MAG");
-        Dispatcher.enQueue(j);
+        JobRequest j = new JobRequest("jqm-test-main", "MAG");
+        JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -204,9 +205,9 @@ public class NoApiPayloadTest
                 "jqm-test-main-inject/jqm-test-main-inject.jar", TestHelpers.qVip, 42, "jqm-test-main-inject", "testapp", "Franquin",
                 "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j = new JobDefinition("jqm-test-main-inject", "MAG");
+        JobRequest j = new JobRequest("jqm-test-main-inject", "MAG");
         j.setSessionID("123X");
-        Dispatcher.enQueue(j);
+        JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");

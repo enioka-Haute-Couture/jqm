@@ -29,10 +29,12 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.enioka.jqm.api.Dispatcher;
-import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
+import com.enioka.jqm.test.helpers.CreationTools;
+import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class FiboHibTest
 {
@@ -49,8 +51,9 @@ public class FiboHibTest
         s.setSilent(true);
         s.start();
 
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         Helpers.resetEmf();
+        CreationTools.reset();
     }
 
     @AfterClass
@@ -79,10 +82,10 @@ public class FiboHibTest
                 "jqm-test-fibohib/jqm-test-fibohib.jar", TestHelpers.qVip, 42, "FiboHib", null, "Franquin", "ModuleMachin", "other1",
                 "other2", false, em);
 
-        JobDefinition form = new JobDefinition("FiboHib", "MAG");
+        JobRequest form = new JobRequest("FiboHib", "MAG");
         form.addParameter("p1", "1");
         form.addParameter("p2", "2");
-        Dispatcher.enQueue(form);
+        JqmClientFactory.getClient().enqueue(form);
 
         // Create JNDI connection to write inside the engine database
         em.getTransaction().begin();

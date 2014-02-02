@@ -22,9 +22,9 @@ import javax.persistence.Persistence;
 
 import org.apache.log4j.Logger;
 
-import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobBase;
-import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 
 public class App extends JobBase
 {
@@ -43,9 +43,9 @@ public class App extends JobBase
         if (this.getParameters().size() == 0)
         {
             log.info("Queuing again - with parameter and through he old API");
-            JobDefinition jd = new JobDefinition("jqm-test-em", "marsu");
+            JobRequest jd = new JobRequest("jqm-test-em", "marsu");
             jd.addParameter("stop", "1");
-            Dispatcher.enQueue(jd);
+            JqmClientFactory.getClient().enqueue(jd);
         }
         log.info("End of payload");
     }

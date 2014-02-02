@@ -18,9 +18,9 @@
 
 package com.enioka.jqm.tests;
 
-import com.enioka.jqm.api.Dispatcher;
 import com.enioka.jqm.api.JobBase;
-import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 
 public class App extends JobBase
 {
@@ -30,7 +30,7 @@ public class App extends JobBase
     {
         System.out.println("PARAMETRE FIBO 2: " + this.getParameters().get("p2"));
 
-        JobDefinition jd = new JobDefinition("FiboHib", "Jean Paul");
+        JobRequest jd = new JobRequest("FiboHib", "Jean Paul");
 
         jd.addParameter("p1", this.getParameters().get("p2"));
         jd.addParameter("p2", (Integer.parseInt(this.getParameters().get("p1")) + Integer.parseInt(this.getParameters().get("p2")) + ""));
@@ -38,7 +38,7 @@ public class App extends JobBase
 
         if (Integer.parseInt(this.getParameters().get("p1")) <= 100)
         {
-            Dispatcher.enQueue(jd);
+            JqmClientFactory.getClient().enqueue(jd);
         }
         System.out.println("QUIT FIBO");
     }

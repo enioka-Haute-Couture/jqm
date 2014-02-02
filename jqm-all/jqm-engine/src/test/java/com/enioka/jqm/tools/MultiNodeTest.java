@@ -32,8 +32,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.enioka.jqm.api.Dispatcher;
-import com.enioka.jqm.api.JobDefinition;
+import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
@@ -41,6 +41,8 @@ import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.test.helpers.CreationTools;
+import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class MultiNodeTest
 {
@@ -50,7 +52,7 @@ public class MultiNodeTest
     @Before
     public void before()
     {
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         Helpers.resetEmf();
     }
 
@@ -64,14 +66,15 @@ public class MultiNodeTest
         s.setSilent(true);
         s.start();
 
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         Helpers.resetEmf();
+        CreationTools.reset();
     }
 
     @AfterClass
     public static void stop()
     {
-        Dispatcher.resetEM();
+        JqmClientFactory.resetClient(null);
         s.shutdown();
         s.stop();
     }
@@ -95,17 +98,17 @@ public class MultiNodeTest
                 "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "AppliNode1-1", null, "Franquin",
                 "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j11 = new JobDefinition("AppliNode1-1", "MAG");
+        JobRequest j11 = new JobRequest("AppliNode1-1", "MAG");
 
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
 
         JqmEngine engine1 = new JqmEngine();
         JqmEngine engine2 = new JqmEngine();
@@ -117,18 +120,18 @@ public class MultiNodeTest
         {
             TestHelpers.printJobInstanceTable();
 
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
 
             Thread.sleep(1000);
 
@@ -177,17 +180,17 @@ public class MultiNodeTest
                 "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "AppliNode1-1", null, "Franquin",
                 "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j11 = new JobDefinition("AppliNode1-1", "MAG");
+        JobRequest j11 = new JobRequest("AppliNode1-1", "MAG");
 
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
 
         JqmEngine engine1 = new JqmEngine();
         JqmEngine engine2 = new JqmEngine();
@@ -201,18 +204,18 @@ public class MultiNodeTest
         {
             TestHelpers.printJobInstanceTable();
 
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
 
             Thread.sleep(1000);
 
@@ -259,15 +262,15 @@ public class MultiNodeTest
                 "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip2, 42, "AppliNode2-1", null, "Franquin",
                 "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j11 = new JobDefinition("AppliNode1-1", "MAG");
-        JobDefinition j21 = new JobDefinition("AppliNode2-1", "MAG");
+        JobRequest j11 = new JobRequest("AppliNode1-1", "MAG");
+        JobRequest j21 = new JobRequest("AppliNode2-1", "MAG");
 
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j21);
-        Dispatcher.enQueue(j21);
-        Dispatcher.enQueue(j21);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j21);
+        JqmClientFactory.getClient().enqueue(j21);
+        JqmClientFactory.getClient().enqueue(j21);
 
         JqmEngine engine1 = new JqmEngine();
         JqmEngine engine2 = new JqmEngine();
@@ -277,18 +280,18 @@ public class MultiNodeTest
         int i = 0;
         while (i < 3)
         {
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j21);
-            Dispatcher.enQueue(j21);
-            Dispatcher.enQueue(j21);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j21);
-            Dispatcher.enQueue(j21);
-            Dispatcher.enQueue(j21);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j21);
+            JqmClientFactory.getClient().enqueue(j21);
+            JqmClientFactory.getClient().enqueue(j21);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j21);
+            JqmClientFactory.getClient().enqueue(j21);
+            JqmClientFactory.getClient().enqueue(j21);
 
             Thread.sleep(1000);
 
@@ -370,47 +373,47 @@ public class MultiNodeTest
                 "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qSlow3, 42, "AppliNode3-3", null, "Franquin",
                 "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j11 = new JobDefinition("AppliNode1-1", "MAG");
-        JobDefinition j12 = new JobDefinition("AppliNode1-2", "MAG");
-        JobDefinition j13 = new JobDefinition("AppliNode1-3", "MAG");
+        JobRequest j11 = new JobRequest("AppliNode1-1", "MAG");
+        JobRequest j12 = new JobRequest("AppliNode1-2", "MAG");
+        JobRequest j13 = new JobRequest("AppliNode1-3", "MAG");
 
-        JobDefinition j21 = new JobDefinition("AppliNode2-1", "MAG");
-        JobDefinition j22 = new JobDefinition("AppliNode2-2", "MAG");
-        JobDefinition j23 = new JobDefinition("AppliNode2-3", "MAG");
+        JobRequest j21 = new JobRequest("AppliNode2-1", "MAG");
+        JobRequest j22 = new JobRequest("AppliNode2-2", "MAG");
+        JobRequest j23 = new JobRequest("AppliNode2-3", "MAG");
 
-        JobDefinition j31 = new JobDefinition("AppliNode3-1", "MAG");
-        JobDefinition j32 = new JobDefinition("AppliNode3-2", "MAG");
-        JobDefinition j33 = new JobDefinition("AppliNode3-3", "MAG");
+        JobRequest j31 = new JobRequest("AppliNode3-1", "MAG");
+        JobRequest j32 = new JobRequest("AppliNode3-2", "MAG");
+        JobRequest j33 = new JobRequest("AppliNode3-3", "MAG");
 
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j12);
-        Dispatcher.enQueue(j12);
-        Dispatcher.enQueue(j12);
-        Dispatcher.enQueue(j13);
-        Dispatcher.enQueue(j13);
-        Dispatcher.enQueue(j13);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j13);
+        JqmClientFactory.getClient().enqueue(j13);
+        JqmClientFactory.getClient().enqueue(j13);
 
-        Dispatcher.enQueue(j21);
-        Dispatcher.enQueue(j21);
-        Dispatcher.enQueue(j21);
-        Dispatcher.enQueue(j22);
-        Dispatcher.enQueue(j22);
-        Dispatcher.enQueue(j22);
-        Dispatcher.enQueue(j23);
-        Dispatcher.enQueue(j23);
-        Dispatcher.enQueue(j23);
+        JqmClientFactory.getClient().enqueue(j21);
+        JqmClientFactory.getClient().enqueue(j21);
+        JqmClientFactory.getClient().enqueue(j21);
+        JqmClientFactory.getClient().enqueue(j22);
+        JqmClientFactory.getClient().enqueue(j22);
+        JqmClientFactory.getClient().enqueue(j22);
+        JqmClientFactory.getClient().enqueue(j23);
+        JqmClientFactory.getClient().enqueue(j23);
+        JqmClientFactory.getClient().enqueue(j23);
 
-        Dispatcher.enQueue(j31);
-        Dispatcher.enQueue(j31);
-        Dispatcher.enQueue(j31);
-        Dispatcher.enQueue(j32);
-        Dispatcher.enQueue(j32);
-        Dispatcher.enQueue(j32);
-        Dispatcher.enQueue(j33);
-        Dispatcher.enQueue(j33);
-        Dispatcher.enQueue(j33);
+        JqmClientFactory.getClient().enqueue(j31);
+        JqmClientFactory.getClient().enqueue(j31);
+        JqmClientFactory.getClient().enqueue(j31);
+        JqmClientFactory.getClient().enqueue(j32);
+        JqmClientFactory.getClient().enqueue(j32);
+        JqmClientFactory.getClient().enqueue(j32);
+        JqmClientFactory.getClient().enqueue(j33);
+        JqmClientFactory.getClient().enqueue(j33);
+        JqmClientFactory.getClient().enqueue(j33);
 
         JqmEngine engine1 = new JqmEngine();
         JqmEngine engine2 = new JqmEngine();
@@ -424,35 +427,35 @@ public class MultiNodeTest
         {
             TestHelpers.printJobInstanceTable();
 
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j12);
-            Dispatcher.enQueue(j12);
-            Dispatcher.enQueue(j12);
-            Dispatcher.enQueue(j13);
-            Dispatcher.enQueue(j13);
-            Dispatcher.enQueue(j13);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j12);
+            JqmClientFactory.getClient().enqueue(j12);
+            JqmClientFactory.getClient().enqueue(j12);
+            JqmClientFactory.getClient().enqueue(j13);
+            JqmClientFactory.getClient().enqueue(j13);
+            JqmClientFactory.getClient().enqueue(j13);
 
-            Dispatcher.enQueue(j21);
-            Dispatcher.enQueue(j21);
-            Dispatcher.enQueue(j21);
-            Dispatcher.enQueue(j22);
-            Dispatcher.enQueue(j22);
-            Dispatcher.enQueue(j22);
-            Dispatcher.enQueue(j23);
-            Dispatcher.enQueue(j23);
-            Dispatcher.enQueue(j23);
+            JqmClientFactory.getClient().enqueue(j21);
+            JqmClientFactory.getClient().enqueue(j21);
+            JqmClientFactory.getClient().enqueue(j21);
+            JqmClientFactory.getClient().enqueue(j22);
+            JqmClientFactory.getClient().enqueue(j22);
+            JqmClientFactory.getClient().enqueue(j22);
+            JqmClientFactory.getClient().enqueue(j23);
+            JqmClientFactory.getClient().enqueue(j23);
+            JqmClientFactory.getClient().enqueue(j23);
 
-            Dispatcher.enQueue(j31);
-            Dispatcher.enQueue(j31);
-            Dispatcher.enQueue(j31);
-            Dispatcher.enQueue(j32);
-            Dispatcher.enQueue(j32);
-            Dispatcher.enQueue(j32);
-            Dispatcher.enQueue(j33);
-            Dispatcher.enQueue(j33);
-            Dispatcher.enQueue(j33);
+            JqmClientFactory.getClient().enqueue(j31);
+            JqmClientFactory.getClient().enqueue(j31);
+            JqmClientFactory.getClient().enqueue(j31);
+            JqmClientFactory.getClient().enqueue(j32);
+            JqmClientFactory.getClient().enqueue(j32);
+            JqmClientFactory.getClient().enqueue(j32);
+            JqmClientFactory.getClient().enqueue(j33);
+            JqmClientFactory.getClient().enqueue(j33);
+            JqmClientFactory.getClient().enqueue(j33);
 
             Thread.sleep(1000);
 
@@ -494,10 +497,10 @@ public class MultiNodeTest
                 "ModuleMachin", "other", "other", true, em);
         em.close();
 
-        JobDefinition j = new JobDefinition("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
         for (int i = 0; i < 9; i++)
         {
-            Dispatcher.enQueue(j);
+            JqmClientFactory.getClient().enqueue(j);
         }
 
         JqmEngine engine1 = new JqmEngine();
@@ -507,7 +510,7 @@ public class MultiNodeTest
 
         for (int i = 0; i < 9; i++)
         {
-            Dispatcher.enQueue(j);
+            JqmClientFactory.getClient().enqueue(j);
         }
 
         TestHelpers.waitFor(2, 10000);
@@ -584,47 +587,47 @@ public class MultiNodeTest
                 "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qSlow3, 42, "AppliNode3-3", null, "Franquin",
                 "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j11 = new JobDefinition("AppliNode1-1", "MAG");
-        JobDefinition j12 = new JobDefinition("AppliNode1-2", "MAG");
-        JobDefinition j13 = new JobDefinition("AppliNode1-3", "MAG");
+        JobRequest j11 = new JobRequest("AppliNode1-1", "MAG");
+        JobRequest j12 = new JobRequest("AppliNode1-2", "MAG");
+        JobRequest j13 = new JobRequest("AppliNode1-3", "MAG");
 
-        JobDefinition j21 = new JobDefinition("AppliNode2-1", "MAG");
-        JobDefinition j22 = new JobDefinition("AppliNode2-2", "MAG");
-        JobDefinition j23 = new JobDefinition("AppliNode2-3", "MAG");
+        JobRequest j21 = new JobRequest("AppliNode2-1", "MAG");
+        JobRequest j22 = new JobRequest("AppliNode2-2", "MAG");
+        JobRequest j23 = new JobRequest("AppliNode2-3", "MAG");
 
-        JobDefinition j31 = new JobDefinition("AppliNode3-1", "MAG");
-        JobDefinition j32 = new JobDefinition("AppliNode3-2", "MAG");
-        JobDefinition j33 = new JobDefinition("AppliNode3-3", "MAG");
+        JobRequest j31 = new JobRequest("AppliNode3-1", "MAG");
+        JobRequest j32 = new JobRequest("AppliNode3-2", "MAG");
+        JobRequest j33 = new JobRequest("AppliNode3-3", "MAG");
 
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j12);
-        Dispatcher.enQueue(j12);
-        Dispatcher.enQueue(j12);
-        Dispatcher.enQueue(j13);
-        Dispatcher.enQueue(j13);
-        Dispatcher.enQueue(j13);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j13);
+        JqmClientFactory.getClient().enqueue(j13);
+        JqmClientFactory.getClient().enqueue(j13);
 
-        Dispatcher.enQueue(j21);
-        Dispatcher.enQueue(j21);
-        Dispatcher.enQueue(j21);
-        Dispatcher.enQueue(j22);
-        Dispatcher.enQueue(j22);
-        Dispatcher.enQueue(j22);
-        Dispatcher.enQueue(j23);
-        Dispatcher.enQueue(j23);
-        Dispatcher.enQueue(j23);
+        JqmClientFactory.getClient().enqueue(j21);
+        JqmClientFactory.getClient().enqueue(j21);
+        JqmClientFactory.getClient().enqueue(j21);
+        JqmClientFactory.getClient().enqueue(j22);
+        JqmClientFactory.getClient().enqueue(j22);
+        JqmClientFactory.getClient().enqueue(j22);
+        JqmClientFactory.getClient().enqueue(j23);
+        JqmClientFactory.getClient().enqueue(j23);
+        JqmClientFactory.getClient().enqueue(j23);
 
-        Dispatcher.enQueue(j31);
-        Dispatcher.enQueue(j31);
-        Dispatcher.enQueue(j31);
-        Dispatcher.enQueue(j32);
-        Dispatcher.enQueue(j32);
-        Dispatcher.enQueue(j32);
-        Dispatcher.enQueue(j33);
-        Dispatcher.enQueue(j33);
-        Dispatcher.enQueue(j33);
+        JqmClientFactory.getClient().enqueue(j31);
+        JqmClientFactory.getClient().enqueue(j31);
+        JqmClientFactory.getClient().enqueue(j31);
+        JqmClientFactory.getClient().enqueue(j32);
+        JqmClientFactory.getClient().enqueue(j32);
+        JqmClientFactory.getClient().enqueue(j32);
+        JqmClientFactory.getClient().enqueue(j33);
+        JqmClientFactory.getClient().enqueue(j33);
+        JqmClientFactory.getClient().enqueue(j33);
 
         JqmEngine engine1 = new JqmEngine();
         JqmEngine engine2 = new JqmEngine();
@@ -638,44 +641,44 @@ public class MultiNodeTest
         {
             TestHelpers.printJobInstanceTable();
 
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j12);
-            Dispatcher.enQueue(j12);
-            Dispatcher.enQueue(j12);
-            Dispatcher.enQueue(j13);
-            Dispatcher.enQueue(j13);
-            Dispatcher.enQueue(j13);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j12);
+            JqmClientFactory.getClient().enqueue(j12);
+            JqmClientFactory.getClient().enqueue(j12);
+            JqmClientFactory.getClient().enqueue(j13);
+            JqmClientFactory.getClient().enqueue(j13);
+            JqmClientFactory.getClient().enqueue(j13);
 
-            Dispatcher.enQueue(j21);
-            Dispatcher.enQueue(j21);
-            Dispatcher.enQueue(j21);
-            Dispatcher.enQueue(j22);
-            Dispatcher.enQueue(j22);
-            Dispatcher.enQueue(j22);
-            Dispatcher.enQueue(j23);
-            Dispatcher.enQueue(j23);
-            Dispatcher.enQueue(j23);
+            JqmClientFactory.getClient().enqueue(j21);
+            JqmClientFactory.getClient().enqueue(j21);
+            JqmClientFactory.getClient().enqueue(j21);
+            JqmClientFactory.getClient().enqueue(j22);
+            JqmClientFactory.getClient().enqueue(j22);
+            JqmClientFactory.getClient().enqueue(j22);
+            JqmClientFactory.getClient().enqueue(j23);
+            JqmClientFactory.getClient().enqueue(j23);
+            JqmClientFactory.getClient().enqueue(j23);
 
-            Dispatcher.enQueue(j31);
-            Dispatcher.enQueue(j31);
-            Dispatcher.enQueue(j31);
-            Dispatcher.enQueue(j32);
-            Dispatcher.enQueue(j32);
-            Dispatcher.enQueue(j32);
-            Dispatcher.enQueue(j33);
-            Dispatcher.enQueue(j33);
-            Dispatcher.enQueue(j33);
+            JqmClientFactory.getClient().enqueue(j31);
+            JqmClientFactory.getClient().enqueue(j31);
+            JqmClientFactory.getClient().enqueue(j31);
+            JqmClientFactory.getClient().enqueue(j32);
+            JqmClientFactory.getClient().enqueue(j32);
+            JqmClientFactory.getClient().enqueue(j32);
+            JqmClientFactory.getClient().enqueue(j33);
+            JqmClientFactory.getClient().enqueue(j33);
+            JqmClientFactory.getClient().enqueue(j33);
 
             Thread.sleep(1000);
 
@@ -729,21 +732,21 @@ public class MultiNodeTest
                 "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip2, 42, "AppliNode2-1", null, "Franquin",
                 "ModuleMachin", "other", "other", false, em);
 
-        JobDefinition j11 = new JobDefinition("AppliNode1-1", "MAG");
-        JobDefinition j12 = new JobDefinition("AppliNode1-2", "MAG");
+        JobRequest j11 = new JobRequest("AppliNode1-1", "MAG");
+        JobRequest j12 = new JobRequest("AppliNode1-2", "MAG");
 
-        JobDefinition j21 = new JobDefinition("AppliNode2-1", "MAG");
+        JobRequest j21 = new JobRequest("AppliNode2-1", "MAG");
 
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j11);
-        Dispatcher.enQueue(j12);
-        Dispatcher.enQueue(j12);
-        Dispatcher.enQueue(j12);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j12);
 
-        Dispatcher.enQueue(j21);
-        Dispatcher.enQueue(j21);
-        Dispatcher.enQueue(j21);
+        JqmClientFactory.getClient().enqueue(j21);
+        JqmClientFactory.getClient().enqueue(j21);
+        JqmClientFactory.getClient().enqueue(j21);
 
         JqmEngine engine1 = new JqmEngine();
         JqmEngine engine2 = new JqmEngine();
@@ -765,28 +768,28 @@ public class MultiNodeTest
             }
             TestHelpers.printJobInstanceTable();
 
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j12);
-            Dispatcher.enQueue(j12);
-            Dispatcher.enQueue(j12);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j12);
-            Dispatcher.enQueue(j12);
-            Dispatcher.enQueue(j12);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j11);
-            Dispatcher.enQueue(j12);
-            Dispatcher.enQueue(j12);
-            Dispatcher.enQueue(j12);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j12);
+            JqmClientFactory.getClient().enqueue(j12);
+            JqmClientFactory.getClient().enqueue(j12);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j12);
+            JqmClientFactory.getClient().enqueue(j12);
+            JqmClientFactory.getClient().enqueue(j12);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j11);
+            JqmClientFactory.getClient().enqueue(j12);
+            JqmClientFactory.getClient().enqueue(j12);
+            JqmClientFactory.getClient().enqueue(j12);
 
-            Dispatcher.enQueue(j21);
-            Dispatcher.enQueue(j21);
-            Dispatcher.enQueue(j21);
+            JqmClientFactory.getClient().enqueue(j21);
+            JqmClientFactory.getClient().enqueue(j21);
+            JqmClientFactory.getClient().enqueue(j21);
 
             Thread.sleep(4000);
 

@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.http.HttpStatus;
 
-import com.enioka.jqm.api.Dispatcher;
+import com.enioka.jqm.api.JqmClientFactory;
 
 class ServletStatus extends HttpServlet
 {
@@ -36,7 +36,7 @@ class ServletStatus extends HttpServlet
             return;
         }
 
-        resp.getWriter().write("" + Dispatcher.getJob(id).getState());
+        resp.getWriter().write("" + JqmClientFactory.getClient().getJob(id).getState());
         resp.getWriter().close();
     }
 }
