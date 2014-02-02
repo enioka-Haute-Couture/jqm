@@ -34,7 +34,7 @@
 							<mainClass>com.enioka.jqm.tools.Main</mainClass>
 						</manifest>
 						<manifestEntries>
-							<Class-Path>lib/jdbcdriver.jar</Class-Path>
+							<Class-Path>lib/jdbcdriver.jar conf/</Class-Path>
 						</manifestEntries>
 					</archive>
 				</configuration>

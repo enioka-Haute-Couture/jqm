@@ -86,20 +86,32 @@ final class HibernateClient implements JqmClient
         InputStream fis = null;
         try
         {
+            jqmlogger.debug("Current . is:" + (new File(".")).getAbsolutePath());
             fis = this.getClass().getClassLoader().getResourceAsStream("META-INF/jqm.properties");
             if (fis == null)
             {
-                jqmlogger.info("No jqm.properties file found. Defaults or parameter values will be used");
+                jqmlogger.info("No jqm.properties file found.");
             }
             else
             {
                 p.load(fis);
                 jqmlogger.debug("A jqm.properties file was found");
             }
+
+            fis = this.getClass().getClassLoader().getResourceAsStream("db.properties");
+            if (fis == null)
+            {
+                jqmlogger.info("No db.properties file found.");
+            }
+            else
+            {
+                p.load(fis);
+                jqmlogger.debug("A db.properties file was found");
+            }
         }
         catch (IOException e)
         {
-            // We allow no configuration file, but not an unreadable configuration file.
+            // We allow no configuration files, but not an unreadable configuration file.
             throw new JqmClientException("META-INF/jqm.properties file is invalid", e);
         }
         finally

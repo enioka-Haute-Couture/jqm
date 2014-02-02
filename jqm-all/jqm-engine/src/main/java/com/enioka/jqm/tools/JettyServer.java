@@ -6,8 +6,6 @@ import java.net.InetSocketAddress;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
-import org.eclipse.jetty.plus.webapp.EnvConfiguration;
-import org.eclipse.jetty.plus.webapp.PlusConfiguration;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -108,20 +106,22 @@ class JettyServer
             exclusions[i] = defExcl[i - nbEx];
         }
         exclusions[0] = "com.enioka.";
-        exclusions[1] = "org.hibernate.";
-        exclusions[2] = "org.jboss.";
+        // exclusions[1] = "org.hibernate.";
+        // exclusions[2] = "org.jboss.";
         exclusions[3] = "org.slf4j.";
         exclusions[4] = "org.apache.log4j.";
         exclusions[5] = "org.glassfish."; // Jersey
-        exclusions[6] = "org.junit.";
-        exclusions[7] = "org.jvnet.";
+        // exclusions[6] = "org.junit.";
+        // exclusions[7] = "org.jvnet.";
         // exclusions[8] = "javax.persistence.";
         webAppContext.setServerClasses(exclusions);
 
+        // Database configuration should be on the class path
+        webAppContext.setExtraClasspath("conf/db.properties");
+
         // Set configurations (order is important: need to unpack war before reading web.xml)
         webAppContext.setConfigurations(new Configuration[] { new WebInfConfiguration(), new WebXmlConfiguration(),
-                new MetaInfConfiguration(), new FragmentConfiguration(), new EnvConfiguration(), new PlusConfiguration(),
-                new AnnotationConfiguration(), new TagLibConfiguration() });
+                new MetaInfConfiguration(), new FragmentConfiguration(), new AnnotationConfiguration(), new TagLibConfiguration() });
 
         h.addHandler(webAppContext);
     }

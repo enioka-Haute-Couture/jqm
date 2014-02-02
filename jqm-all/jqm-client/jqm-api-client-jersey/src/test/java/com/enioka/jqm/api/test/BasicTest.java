@@ -7,8 +7,6 @@ import java.util.Properties;
 import javax.persistence.EntityManager;
 
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
-import org.eclipse.jetty.plus.webapp.EnvConfiguration;
-import org.eclipse.jetty.plus.webapp.PlusConfiguration;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.Configuration;
@@ -88,7 +86,7 @@ public class BasicTest
 
         // Set configurations (order is important: need to unpack war before reading web.xml)
         webAppContext.setConfigurations(new Configuration[] { new WebInfConfiguration(), new WebXmlConfiguration(),
-                new MetaInfConfiguration(), new FragmentConfiguration(), new EnvConfiguration(), new PlusConfiguration(),
+                new MetaInfConfiguration(), new FragmentConfiguration(), // new EnvConfiguration(), new PlusConfiguration(),
                 new AnnotationConfiguration(), new TagLibConfiguration() });
 
         server.setHandler(webAppContext);
