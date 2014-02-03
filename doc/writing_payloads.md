@@ -140,6 +140,21 @@ public class App extends JobBase
 }
 ```
 
+## Going to the culling
+
+Payloads are run inside a thread by the JQM engine. Alas, Java threads have one caveat: they cannot be cleanly killed. 
+Therefore, there is no obvious way to allow a user to kill a job instance that has gone haywire. To provide some measure
+of relief, the engine API provides a method called *yield* that, when called, will do nothing but give briefly control
+of the job's thread to the engine. This allows the engine to check if the job should be killed (it throws an exception to 
+do so). Now, if the job instance really has entered an infinete loop where yield is not called, it won't help much. It is more
+to allow killing instances that run well (user has changed his mind, etc.).
+
+To ease the use of the kill function, all other engine API methods actually call yield before doing their own work.
+
+Finally, for voluntarily killing a running payload, it is possible to do much of the same: throwing a runtime exception.
+Note that System.exit is forbidden by the Java security manager inside paylaods - it would stop the whole JQM engine, which
+would be rather impolite towards other running job instances.
+
 ## Full exemple
 
 This fully commented payload uses nearly all the API.
