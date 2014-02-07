@@ -5,8 +5,8 @@
 	version="2.0">
 
 	<persistence-unit name="jobqueue-api-pu">
-        <non-jta-data-source>jdbc/jqm</non-jta-data-source>
-    
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<non-jta-data-source>jdbc/jqm</non-jta-data-source>
 
 		<class>com.enioka.jqm.jpamodel.JobInstance</class>
 		<class>com.enioka.jqm.jpamodel.Deliverable</class>
@@ -27,7 +27,7 @@
 
 		<properties>
 			<property name="javax.persistence.validation.mode" value="NONE" />
-			<property name="javax.persistence.lock.timeout" value="10000"/>
+			<property name="javax.persistence.lock.timeout" value="10000" />
 		</properties>
 	</persistence-unit>
 </persistence>
