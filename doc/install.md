@@ -1,5 +1,7 @@
 ﻿# Installation
 
+Please follow the paragraph specific to your OS and then go through the common chapter.
+
 ## Windows
 
 ### Binary install
@@ -68,6 +70,22 @@ Then, test again (assuming this is not HSQLDB in file mode anymore, and therefor
 ./jqm.ps1 allxml
 ./jqm.ps1 -Enqueue TestEcho
 ```
+
+## Linux
+
+```bash
+JQM_ROOT = "/opt/jqm"
+JQM_VERSION = "1.1.4"
+mkdir -f $JQM_ROOT; cd $JQM_ROOT
+wget https://github.com/enioka/jqm/archive/jqm-$JQM_VERSION.zip > jqm.zip
+unzip jqm.zip
+mv jqm*/* .
+rm jqm.zip; mv jqm*/* .
+```
+
+Then use the provided jqm.sh.
+
+## For all OSes
 
 ### Global configuration
 

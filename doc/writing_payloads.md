@@ -260,3 +260,7 @@ JQM is some sort of light application server - therefore the same guidelines app
 and we wouldn't want existing code using these frameworks to fail just because we are being too strict.
 * Don't create threads. A thread is an unmanageable object in Java - if it blocks for whatever reason, the whole pplication server
 has to be restarted, impacting other jobs/users. They are only allowed for the same reason as for creating classloaders.
+* Be wary of bootstrap static contexts. Using static elements is all-right as long as the statix context is from your classloader (in our case, it means 
+classes from your own code or dependencies). Messing with
+static elements from the bootstrap classloader is opening the door to weird interactions between jobs running in parallel. For exemple, loading a JDBC
+driver does store such static elements, and should be frowned upon.
