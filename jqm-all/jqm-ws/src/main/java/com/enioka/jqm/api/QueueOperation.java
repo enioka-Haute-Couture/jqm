@@ -184,6 +184,17 @@ public class QueueOperation implements JqmClient
         return JqmClientFactory.getClient().getUserActiveJobs(userName);
     }
 
+    @Override
+    @Path("ji/query")
+    @Consumes(MediaType.APPLICATION_XML)
+    @POST
+    @Produces(MediaType.APPLICATION_XML)
+    public List<JobInstance> getJobs(Query query)
+    {
+        log.debug("calling WS getJobs_Query");
+        return JqmClientFactory.getClient().getJobs(query);
+    }
+
     // Not exposed. Use getJob => messages
     @Override
     @Path("ji/{jobId}/messages")

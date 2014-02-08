@@ -182,6 +182,15 @@ public interface JqmClient
      */
     public List<JobInstance> getUserActiveJobs(String userName);
 
+    /**
+     * Generic query method. See {@link Query} for arguments.
+     * 
+     * @param query
+     *            the query parameters.
+     * @return the selected JobInstances
+     */
+    public List<JobInstance> getJobs(Query query);
+
     // /////////////////////////////////////////////////////////////////////
     // Helpers to quickly access some job instance properties
     // /////////////////////////////////////////////////////////////////////

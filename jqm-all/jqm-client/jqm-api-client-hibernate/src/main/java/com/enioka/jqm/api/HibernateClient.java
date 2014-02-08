@@ -37,6 +37,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -729,6 +730,109 @@ final class HibernateClient implements JqmClient
         ji.setEmail(h.getEmail());
 
         return ji;
+    }
+
+    // GetJob helper - String predicates are all created the same way, so this factors some code.
+    private String getStringPredicate(String fieldName, String filterValue, Map<String, Object> prms)
+    {
+        if (filterValue != null)
+        {
+            if (!filterValue.isEmpty())
+            {
+                String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1];
+                prms.put(prmName, filterValue);
+                return String.format("AND (%s = :%s) ", fieldName, prmName);
+            }
+            else
+            {
+                return String.format("AND (h.%s IS NULL OR h.%s = '') ", fieldName, fieldName);
+            }
+        }
+        return "";
+    }
+
+    private String getIntPredicate(String fieldName, Integer filterValue, Map<String, Object> prms)
+    {
+        if (filterValue != null)
+        {
+            if (filterValue != -1)
+            {
+                String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1];
+                prms.put(prmName, filterValue);
+                return String.format("AND (%s = :%s) ", fieldName, prmName);
+            }
+            else
+            {
+                return String.format("AND (h.%s IS NULL) ", fieldName);
+            }
+        }
+        return "";
+    }
+
+    @Override
+    public List<com.enioka.jqm.api.JobInstance> getJobs(Query query)
+    {
+        EntityManager em = getEm();
+
+        // Not using CriteriaBuilder - too much hassle for too little benefit
+        String wh = "";
+        Map<String, Object> prms = new HashMap<String, Object>();
+
+        // String predicates
+        wh += getStringPredicate("jd.applicationName", query.getApplicationName(), prms);
+        wh += getStringPredicate("userName", query.getUser(), prms);
+        wh += getStringPredicate("sessionId", query.getSessionId(), prms);
+        wh += getStringPredicate("instanceKeyword1", query.getInstanceKeyword1(), prms);
+        wh += getStringPredicate("instanceKeyword2", query.getInstanceKeyword2(), prms);
+        wh += getStringPredicate("instanceKeyword3", query.getInstanceKeyword3(), prms);
+        wh += getStringPredicate("instanceModule", query.getInstanceModule(), prms);
+        wh += getStringPredicate("instanceApplication", query.getInstanceApplication(), prms);
+        wh += getStringPredicate("jd.keyword1", query.getJobDefKeyword1(), prms);
+        wh += getStringPredicate("jd.keyword2", query.getJobDefKeyword2(), prms);
+        wh += getStringPredicate("jd.keyword3", query.getJobDefKeyword3(), prms);
+        wh += getStringPredicate("jd.module", query.getJobDefModule(), prms);
+        wh += getStringPredicate("jd.application", query.getJobDefApplication(), prms);
+
+        // Integer
+        wh += getIntPredicate("parentId", query.getParentId(), prms);
+        wh += getIntPredicate("id", query.getJobInstanceId(), prms);
+        wh += getIntPredicate("queue.id", query.getQueue() == null ? null : query.getQueue().getId(), prms);
+
+        if (wh.length() >= 3)
+        {
+            wh = wh.substring(3);
+        }
+
+        // Now, run queries...
+        List<com.enioka.jqm.api.JobInstance> res2 = new ArrayList<com.enioka.jqm.api.JobInstance>();
+
+        // Job Instance query
+        if (query.isQueryLiveInstances())
+        {
+            TypedQuery<JobInstance> q2 = em.createQuery("SELECT h FROM JobInstance h WHERE " + wh, JobInstance.class);
+            for (Map.Entry<String, Object> entry : prms.entrySet())
+            {
+                q2.setParameter(entry.getKey(), entry.getValue());
+            }
+            for (JobInstance ji : q2.getResultList())
+            {
+                res2.add(getJob(ji));
+            }
+        }
+
+        // History query
+        TypedQuery<History> q1 = em.createQuery("SELECT h FROM History h WHERE " + wh, History.class);
+        for (Map.Entry<String, Object> entry : prms.entrySet())
+        {
+            q1.setParameter(entry.getKey(), entry.getValue());
+        }
+        for (History ji : q1.getResultList())
+        {
+            res2.add(getJob(ji));
+        }
+
+        em.close();
+        return res2;
     }
 
     @Override

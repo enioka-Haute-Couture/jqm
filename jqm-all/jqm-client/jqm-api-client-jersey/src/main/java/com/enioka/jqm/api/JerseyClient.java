@@ -327,6 +327,26 @@ final class JerseyClient implements JqmClient
         }
     }
 
+    @Override
+    public List<JobInstance> getJobs(Query query)
+    {
+        try
+        {
+            return target.path("ji/query").request()
+                    .post(Entity.entity(query, MediaType.APPLICATION_XML), new GenericType<List<JobInstance>>()
+                    {
+                    });
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
     // /////////////////////////////////////////////////////////////////////
     // Helpers to quickly access some job instance properties
     // /////////////////////////////////////////////////////////////////////

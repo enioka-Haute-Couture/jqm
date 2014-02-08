@@ -115,7 +115,7 @@ public class History implements Serializable
     private String email;
 
     @Column(name = "parent_job_id")
-    private Integer parentJobId;
+    private Integer parentId;
 
     @Column(length = 50, name = "instance_application")
     private String instanceApplication;
@@ -292,12 +292,12 @@ public class History implements Serializable
 
     public Integer getParentJobId()
     {
-        return parentJobId;
+        return parentId;
     }
 
     public void setParentJobId(Integer parentJobId)
     {
-        this.parentJobId = parentJobId;
+        this.parentId = parentJobId;
     }
 
     public State getStatus()

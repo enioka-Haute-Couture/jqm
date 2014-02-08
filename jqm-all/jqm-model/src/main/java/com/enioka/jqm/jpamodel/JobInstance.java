@@ -105,19 +105,19 @@ public class JobInstance implements Serializable
     private Calendar executionDate;
 
     @Column(length = 50, name = "application")
-    private String application;
+    private String instanceApplication;
 
     @Column(length = 50, name = "module")
-    private String module;
+    private String instanceModule;
 
     @Column(length = 50, name = "keyword1")
-    private String keyword1;
+    private String instanceKeyword1;
 
     @Column(length = 50, name = "keyword2")
-    private String keyword2;
+    private String instanceKeyword2;
 
     @Column(length = 50, name = "keyword3")
-    private String keyword3;
+    private String instanceKeyword3;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST }, mappedBy = "jobInstance")
     private List<JobParameter> parameters;
@@ -279,52 +279,52 @@ public class JobInstance implements Serializable
 
     public String getApplication()
     {
-        return application;
+        return instanceApplication;
     }
 
     public void setApplication(String application)
     {
-        this.application = application;
+        this.instanceApplication = application;
     }
 
     public String getModule()
     {
-        return module;
+        return instanceModule;
     }
 
     public void setModule(String module)
     {
-        this.module = module;
+        this.instanceModule = module;
     }
 
     public String getKeyword1()
     {
-        return keyword1;
+        return instanceKeyword1;
     }
 
     public void setKeyword1(String keyword1)
     {
-        this.keyword1 = keyword1;
+        this.instanceKeyword1 = keyword1;
     }
 
     public String getKeyword2()
     {
-        return keyword2;
+        return instanceKeyword2;
     }
 
     public void setKeyword2(String keyword2)
     {
-        this.keyword2 = keyword2;
+        this.instanceKeyword2 = keyword2;
     }
 
     public String getKeyword3()
     {
-        return keyword3;
+        return instanceKeyword3;
     }
 
     public void setKeyword3(String keyword3)
     {
-        this.keyword3 = keyword3;
+        this.instanceKeyword3 = keyword3;
     }
 
     public List<MessageJi> getMessages()
