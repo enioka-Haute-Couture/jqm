@@ -42,7 +42,8 @@ import javax.persistence.TypedQuery;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.History;
@@ -61,7 +62,7 @@ import com.enioka.jqm.jpamodel.State;
  */
 final class HibernateClient implements JqmClient
 {
-    private static Logger jqmlogger = Logger.getLogger(HibernateClient.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(HibernateClient.class);
     private static final String PERSISTENCE_UNIT = "jobqueue-api-pu";
     private EntityManagerFactory emf = null;
     Properties p;
@@ -175,7 +176,7 @@ final class HibernateClient implements JqmClient
         }
         catch (Exception e)
         {
-            jqmlogger.fatal("Could not create EM. Exiting.", e);
+            jqmlogger.error("Could not create EM. Exiting.", e);
             throw new JqmClientException("Could not create EntityManager", e);
         }
     }
@@ -462,7 +463,7 @@ final class HibernateClient implements JqmClient
         }
         catch (Exception e)
         {
-            jqmlogger.info(e);
+            jqmlogger.info("unknown exception", e);
         }
         finally
         {
@@ -510,7 +511,7 @@ final class HibernateClient implements JqmClient
         }
         catch (Exception e)
         {
-            jqmlogger.debug(e);
+            jqmlogger.error("Could not pause job", e);
         }
 
         em.getTransaction().commit();
@@ -534,7 +535,7 @@ final class HibernateClient implements JqmClient
         }
         catch (Exception e)
         {
-            jqmlogger.debug(e);
+            jqmlogger.error("could not resume job", e);
         }
 
         em.getTransaction().commit();
@@ -1057,7 +1058,7 @@ final class HibernateClient implements JqmClient
         }
         catch (Exception e)
         {
-            jqmlogger.info(e);
+            jqmlogger.info("could not get file content", e);
             em.close();
             throw new JqmClientException("Could not get find deliverable description inside DB - your ID may be wrong", e);
         }
