@@ -124,9 +124,21 @@ class XmlParser
                         applicationName = ee.getElementsByTagName("name").item(0).getTextContent();
                         application = ee.getElementsByTagName("application").item(0).getTextContent();
                         module = ee.getElementsByTagName("module").item(0).getTextContent();
-                        keyword1 = ee.getElementsByTagName("keyword1").item(0).getTextContent();
-                        keyword2 = ee.getElementsByTagName("keyword2").item(0).getTextContent();
-                        keyword3 = ee.getElementsByTagName("keyword3").item(0).getTextContent();
+                        // Keyword used to be called "other". We allow both for ascending compatibility. ("other" is deprecated - don't use)
+                        if (ee.getElementsByTagName("other1").getLength() > 0 && ee.getElementsByTagName("other2").getLength() > 0
+                                && ee.getElementsByTagName("other3").getLength() > 0)
+                        {
+                            keyword1 = ee.getElementsByTagName("other1").item(0).getTextContent();
+                            keyword2 = ee.getElementsByTagName("other2").item(0).getTextContent();
+                            keyword3 = ee.getElementsByTagName("other3").item(0).getTextContent();
+                        }
+                        else if (ee.getElementsByTagName("keyword1").getLength() > 0 && ee.getElementsByTagName("keyword2").getLength() > 0
+                                && ee.getElementsByTagName("keyword3").getLength() > 0)
+                        {
+                            keyword1 = ee.getElementsByTagName("keyword1").item(0).getTextContent();
+                            keyword2 = ee.getElementsByTagName("keyword2").item(0).getTextContent();
+                            keyword3 = ee.getElementsByTagName("keyword3").item(0).getTextContent();
+                        }
                         highlander = ("true".equals(ee.getElementsByTagName("highlander").item(0).getTextContent())) ? true : false;
                         filePath = e.getElementsByTagName("filePath").item(0).getTextContent();
                         jarPath = e.getElementsByTagName("path").item(0).getTextContent();
