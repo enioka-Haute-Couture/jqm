@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import javax.naming.NameNotFoundException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.LockModeType;
@@ -120,8 +121,45 @@ final class HibernateClient implements JqmClient
             IOUtils.closeQuietly(fis);
         }
 
-        // PropertiesHandler.addDefaults(p);
-        return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, p);
+        EntityManagerFactory newEmf = null;
+        if (p.containsKey("javax.persistence.nonJtaDataSource"))
+        {
+            // This is a hack. Some containers will use root context as default for JNDI (WebSphere, Glassfish...), other will use
+            // java:/comp/env/ (Tomcat...). So if we actually know the required alias, we try both, and the user only has to provide a
+            // root JNDI alias that will work in both cases.
+            try
+            {
+                newEmf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, p);
+                // Do a stupid query to force EMF initialization
+                EntityManager em = newEmf.createEntityManager();
+                em.createQuery("SELECT n from Node n WHERE 1=0").getResultList().size();
+                em.close();
+            }
+            catch (RuntimeException e)
+            {
+                if (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof NameNotFoundException)
+                {
+                    jqmlogger.debug("JNDI alias " + p.getProperty("javax.persistence.nonJtaDataSource")
+                            + " was not found. Trying with java:/comp/env/ prefix");
+                    p.setProperty("javax.persistence.nonJtaDataSource",
+                            "java:/comp/env/" + p.getProperty("javax.persistence.nonJtaDataSource"));
+                    newEmf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, p);
+                    // Do a stupid query to force EMF initialization
+                    EntityManager em = newEmf.createEntityManager();
+                    em.createQuery("SELECT n from Node n WHERE 1=3").getResultList().size();
+                    em.close();
+                }
+                else
+                {
+                    throw e;
+                }
+            }
+        }
+        else
+        {
+            newEmf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, p);
+        }
+        return newEmf;
     }
 
     EntityManager getEm()

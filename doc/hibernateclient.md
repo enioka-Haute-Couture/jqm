@@ -98,3 +98,17 @@ JqmClientFactory.setProperties(p);
 The different properties possible are JPA2 properties (http://download.oracle.com/otndocs/jcp/persistence-2.0-fr-eval-oth-JSpec/) and 
 Hibernate properties (http://docs.jboss.org/hibernate/orm/4.2/manual/en-US/html/ch03.html#configuration-optional). 
 The preceding exemple changed (or set in the first place) the <non-jta-datasource\> to some JNDI alias.
+
+### Making it work with both Tomcat and Glassfish/WebSphere
+
+Servlet containers such as Tomcat have a different way of handling JNDI alias contexts than full JEE containers. Basically, a developper would use java:/comp/env/jdbc/datasource inside Tomcat
+and simply jdbc/datasource in Glassfish. JQM implements a hack to make it work anyway in both cases. To enable it, it is compulsory to specify the JNDI alias inside the configuration file
+or inside the Properrty object, just like above.
+
+TL;DR: to make it work in both cases, don't write anything specific inside your web.xml and use this in your code before making any API call:
+
+```java
+Properties p = new Properties();
+p.put("javax.persistence.nonJtaDataSource", "jdbc/jqm");
+JqmClientFactory.setProperties(p);
+```
