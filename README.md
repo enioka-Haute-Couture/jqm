@@ -2,7 +2,7 @@
 
 **[Full documentation is here](doc/index.md)**
 
-JQM (short for Job Queue Manager) is a middleware allowing to runs arbitrary Java code asynchronously on a distributed network of servers.
+JQM (short for Job Queue Manager) is a middleware allowing to run arbitrary Java code asynchronously on a distributed network of servers.
 It is useful for adding a level of control between a job execution request and its technical execution - the two most obvious needs being:
 
 * getting long running jobs out of the application server. An application server is not supposed to handle these, which fill up its 
@@ -14,7 +14,7 @@ launch - so there is really no need for multiple instances in parallel). JQM wil
 
 Basically, JQM is the middle ground between "forking a new JVM for a heavy load" and "small thread that takes a few milliseconds to complete".
 
-Most of the time, the code that can be run by JQM will be a direct reuse of existing code without modifications (for jars with a main function,
+Most of the time, the code that can be run by JQM will be a direct reuse of existing code without any modifications (for jars with a main function,
 or Runnables). But is also optionaly offers a rich API that allows running code to ask for another execution, to retrieve structured parameters,
 send messages and other advancement notices... Also of note, JQM is pure Java Standard Edition 6 (JSE 1.6) to enable not only code but binary reuse.
 
