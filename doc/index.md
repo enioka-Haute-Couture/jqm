@@ -2,6 +2,8 @@
 
 [Introduction](../README.md)
 
+[Latest release notes](release_notes.md)
+
 1. [How it works](archi.md) - read first, contains definitions!
 2. [Installation](install.md)
 3. Jobs
@@ -22,4 +24,4 @@
   
 ## Bug report
 
-Reports bugs or features requests on [github](https://github.com/enioka/jqm/issues)
+Please report bugs or feature requests on [github](https://github.com/enioka/jqm/issues)
