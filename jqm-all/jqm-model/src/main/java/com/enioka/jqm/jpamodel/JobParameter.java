@@ -47,7 +47,7 @@ public class JobParameter implements Serializable
 
     @ManyToOne
     @JoinColumn(name = "jobinstance_id")
-    @Index(name = "idx_fk_jobparameter_jobinstance")
+    @Index(name = "idx_fk_jp_ji")
     private JobInstance jobInstance;
 
     /**
