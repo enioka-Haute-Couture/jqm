@@ -8,7 +8,7 @@
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<non-jta-data-source>jdbc/jqm2</non-jta-data-source>
 
-		<jar-file>../jqm-model/target/jqm-model-1.1.5-SNAPSHOT.jar</jar-file>
+		<jar-file>../jqm-model/target/jqm-model-${project.version}.jar</jar-file>
 
 		<properties>
 			<property name="javax.persistence.validation.mode" value="none" />
