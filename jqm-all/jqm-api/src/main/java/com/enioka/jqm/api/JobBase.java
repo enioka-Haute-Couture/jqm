@@ -30,7 +30,7 @@ import javax.sql.DataSource;
  */
 public class JobBase
 {
-    JobManager jm;
+    protected JobManager jm;
 
     public void start()
     {
@@ -129,5 +129,10 @@ public class JobBase
     public String getDefaultConnect()
     {
         return jm.defaultConnect();
+    }
+
+    public Integer getJobInstanceId()
+    {
+        return jm.jobInstanceID();
     }
 }
