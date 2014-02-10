@@ -4,30 +4,32 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 class ClientFactory implements IClientFactory
 {
+    private static Logger jqmlogger = LoggerFactory.getLogger(ClientFactory.class);
     private static JqmClient defaultClient;
     private static ConcurrentMap<String, JqmClient> clients = new ConcurrentHashMap<String, JqmClient>();
 
     @Override
     public JqmClient getClient()
     {
-        synchronized (clients)
-        {
-            if (defaultClient == null)
-            {
-                defaultClient = new HibernateClient();
-            }
-            return defaultClient;
-        }
+        return getClient(null, null, true);
     }
 
     @Override
-    public JqmClient getClient(String name, Properties props)
+    public JqmClient getClient(String name, Properties props, boolean cached)
     {
         if (props == null)
         {
             props = new Properties();
+        }
+
+        if (!cached)
+        {
+            return new HibernateClient(props);
         }
 
         synchronized (clients)
@@ -36,6 +38,7 @@ class ClientFactory implements IClientFactory
             {
                 if (defaultClient == null)
                 {
+                    jqmlogger.debug("creating default client");
                     defaultClient = new HibernateClient(props);
                 }
                 return defaultClient;
@@ -57,6 +60,7 @@ class ClientFactory implements IClientFactory
             {
                 if (clients.containsKey(name))
                 {
+                    jqmlogger.debug("resetting client " + name);
                     clients.get(name).dispose();
                     clients.remove(name);
                 }
@@ -68,6 +72,7 @@ class ClientFactory implements IClientFactory
             {
                 if (defaultClient != null)
                 {
+                    jqmlogger.debug("resetting defauilt client");
                     defaultClient.dispose();
                     defaultClient = null;
                 }

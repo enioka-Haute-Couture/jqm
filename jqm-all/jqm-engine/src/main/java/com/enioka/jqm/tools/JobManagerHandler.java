@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 
 import javax.naming.NamingException;
@@ -21,6 +22,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClient;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.JobInstance;
@@ -38,6 +40,13 @@ class JobManagerHandler implements InvocationHandler
     {
         this.ji = ji;
         this.em = em;
+    }
+
+    private JqmClient getJqmClient()
+    {
+        Properties p = new Properties();
+        p.put("emf", this.em.getEntityManagerFactory());
+        return JqmClientFactory.getClient("uncached", p, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -206,7 +215,7 @@ class JobManagerHandler implements InvocationHandler
         jd.setParentID(this.ji.getId());
         jd.setParameters(parameters);
 
-        return JqmClientFactory.getClient().enqueue(jd);
+        return getJqmClient().enqueue(jd);
     }
 
     private int enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module,

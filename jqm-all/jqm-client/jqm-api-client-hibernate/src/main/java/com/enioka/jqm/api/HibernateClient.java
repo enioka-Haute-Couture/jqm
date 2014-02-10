@@ -80,6 +80,11 @@ final class HibernateClient implements JqmClient
     HibernateClient(Properties p)
     {
         this.p = p;
+        if (p.containsKey("emf"))
+        {
+            jqmlogger.debug("emf present in properties");
+            emf = (EntityManagerFactory) p.get("emf");
+        }
     }
 
     private EntityManagerFactory createFactory()
@@ -192,6 +197,7 @@ final class HibernateClient implements JqmClient
         {
             // Nothing - dispose function must fail silently.
         }
+        this.emf = null;
         p = null;
     }
 

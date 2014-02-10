@@ -20,7 +20,7 @@ interface IClientFactory
      * 
      * @return the required client
      */
-    public JqmClient getClient(String name, Properties props);
+    public JqmClient getClient(String name, Properties props, boolean cached);
 
     /**
      * Will remove the client of the given name from the static cache. Next time {@link #getClient(String)} is called, initialization cost

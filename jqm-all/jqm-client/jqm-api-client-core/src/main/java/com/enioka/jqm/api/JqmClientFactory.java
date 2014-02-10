@@ -109,11 +109,32 @@ public class JqmClientFactory
      */
     public static JqmClient getClient()
     {
+        return getClient(null, null, true);
+    }
+
+    /**
+     * Return a new client that may be cached or not. Given properties are always use when not cached, and only used at creation time for
+     * cached clients.
+     * 
+     * @param name
+     *            if null, default client. Otherwise, helpful to retrieve cached clients later.
+     * @param p
+     *            a set of properties. Implementation specific. Unknown properties are silently ignored.
+     * @param cached
+     *            if false, the client will not be cached and subsequent calls with the same name will return different objects.
+     * @return
+     */
+    public static JqmClient getClient(String name, Properties p, boolean cached)
+    {
         if (binder == null)
         {
             bind();
         }
-        return binder.getClientFactory().getClient(null, props);
+        if (p == null)
+        {
+            p = props;
+        }
+        return binder.getClientFactory().getClient(name, p, cached);
     }
 
     /**

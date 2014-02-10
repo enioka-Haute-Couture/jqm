@@ -12,15 +12,20 @@ class ClientFactory implements IClientFactory
     @Override
     public JqmClient getClient()
     {
-        return getClient(null, null);
+        return getClient(null, null, true);
     }
 
     @Override
-    public JqmClient getClient(String name, Properties props)
+    public JqmClient getClient(String name, Properties props, boolean cached)
     {
         if (props == null)
         {
             props = new Properties();
+        }
+
+        if (!cached)
+        {
+            return new JerseyClient(props);
         }
 
         synchronized (clients)
