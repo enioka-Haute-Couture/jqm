@@ -11,6 +11,10 @@
 	<artifactId>jqm-api-client-hibernate</artifactId>
 	<name>jqm-api-client-hibernate</name>
 
+	<properties>
+		<maven.javadoc.skip>true</maven.javadoc.skip>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
@@ -47,7 +51,7 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>${hibernate.version}</version>
-			<scope>test</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>
@@ -55,7 +59,7 @@
 			<version>${hsqldb.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>

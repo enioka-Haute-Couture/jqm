@@ -9,6 +9,10 @@
 	<artifactId>jqm-model</artifactId>
 	<packaging>jar</packaging>
 
+	<properties>
+		<maven.javadoc.skip>true</maven.javadoc.skip>
+	</properties>
+
 	<build>
 		<plugins>
 			<plugin>

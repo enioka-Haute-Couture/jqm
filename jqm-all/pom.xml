@@ -33,7 +33,7 @@
 	<scm>
 		<developerConnection>scm:git:ssh://git@git.enioka.com/jqm.git</developerConnection>
 		<connection>scm:git:ssh://git@git.enioka.com/jqm.git</connection>
-		<url>https://git.enioka.com/?p=jqm.git;a=summary</url>
+		<url>https://github.com/enioka/jqm/</url>
 		<tag>HEAD</tag>
 	</scm>
 
@@ -69,6 +69,18 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.4.2</version>
+				<configuration>
+					<!-- Only use local Git repository, push will be manual -->
+					<localCheckout>true</localCheckout>
+					<pushChanges>false</pushChanges>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 
