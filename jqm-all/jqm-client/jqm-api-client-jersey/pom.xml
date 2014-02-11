@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.enioka.jqm</groupId>
 		<artifactId>jqm-client</artifactId>
-		<version>1.1.5-SNAPSHOT</version>
+		<version>1.1.5</version>
 	</parent>
 	<artifactId>jqm-api-client-jersey</artifactId>
 
@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-api-client-core</artifactId>
-			<version>1.1.5-SNAPSHOT</version>
+			<version>1.1.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
