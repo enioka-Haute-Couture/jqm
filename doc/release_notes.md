@@ -1,5 +1,25 @@
 # Release notes
 
+## 1.1.5
+
+### Release goal
+
+Bugfix release. 
+
+### Upgrade notes
+
+No breaking changes. 
+
+### Major
+
+*Nothing*
+
+### Minor
+
+* Engine API: engine API enqueue works again
+* Engine API: added get ID method
+* Db: index name shortened to please Oracle
+
 ## 1.1.4
 
 ### Release goal
