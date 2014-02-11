@@ -10,6 +10,7 @@
   1. [Writing a job](writing_payloads.md)
   2. [Using JNDI resources inside a job](resources.md)
   3. [Packaging a job](packaging.md)
+  4. [Testing a job](testing_payloads.md)
 4. Clients
   1. [The client API](client.md)
   2. [Hibernate client API specifics](hibernateclient.md)
