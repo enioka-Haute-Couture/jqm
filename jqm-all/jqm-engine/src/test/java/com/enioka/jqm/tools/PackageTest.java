@@ -216,4 +216,33 @@ public class PackageTest
         Assert.assertEquals(1, res.size());
         Assert.assertEquals(State.ENDED, res.get(0).getState());
     }
+
+    @Test
+    public void testIncompleteClass() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testIncompleteClass");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        CreationTools.createJobDef(null, true, "App", null, null, "jqm-tests/jqm-test-missingapi/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
+
+        JqmClientFactory.getClient().enqueue(j);
+
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        TestHelpers.waitFor(1, 10000);
+        engine1.stop();
+
+        TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
+        ArrayList<History> res = (ArrayList<History>) query.getResultList();
+
+        Assert.assertEquals(1, res.size());
+        Assert.assertEquals(State.CRASHED, res.get(0).getState());
+    }
 }

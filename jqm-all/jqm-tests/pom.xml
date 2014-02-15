@@ -38,6 +38,7 @@
 		<module>jqm-test-runnable-inject</module>
 		<module>jqm-test-kill</module>
 		<module>jqm-test-legacyinheritance</module>
+		<module>jqm-test-missingapi</module>
 	</modules>
 
 	<build>

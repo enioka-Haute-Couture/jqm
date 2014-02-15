@@ -16,19 +16,14 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.tools;
+import com.enioka.jqm.api.JobBase;
 
-class JqmEngineException extends Exception
+public class App extends JobBase
 {
-    private static final long serialVersionUID = -5834325251715846234L;
-
-    JqmEngineException(String msg)
+    @Override
+    public void start()
     {
-        super(msg);
+        System.out.println("payload");
     }
 
-    JqmEngineException(String msg, Throwable e)
-    {
-        super(msg, e);
-    }
 }

@@ -81,9 +81,9 @@ class JarClassLoader extends URLClassLoader
         {
             c = loadClass(classQualifiedName);
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
-            jqmlogger.error("Could not load class", e);
+            jqmlogger.warn("Could not load class");
             throw new JqmEngineException("could not load class " + classQualifiedName, e);
         }
         jqmlogger.debug("Class " + classQualifiedName + " was correctly loaded");
