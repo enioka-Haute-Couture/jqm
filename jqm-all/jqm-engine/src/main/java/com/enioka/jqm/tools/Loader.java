@@ -75,10 +75,9 @@ class Loader implements Runnable
     private Polling p = null;
     private String res = null;
     private String lib = null;
-    private File jarFile = null;
+    private File jarFile = null, jarDir = null;
     private File extractDir = null;
     private ClassLoader contextClassLoader = null;
-    private boolean shouldCleanupExtractedZip = false;
 
     Loader(JobInstance job, Map<String, URL[]> cache, Polling p)
     {
@@ -95,6 +94,7 @@ class Loader implements Runnable
         JarFile jar = null;
         InputStream is = null;
         FileOutputStream fos = null;
+        cleanUpExtractedZip();
         try
         {
             jar = new JarFile(jarFile);
@@ -190,10 +190,13 @@ class Loader implements Runnable
 
     private void cleanUpExtractedZip()
     {
+        if (!extractDir.canExecute())
+        {
+            return;
+        }
         try
         {
-            FileUtils.deleteDirectory(new File(FilenameUtils.concat(FilenameUtils.concat(node.getRepo(), job.getJd().getFilePath()), "tmp"
-                    + job.getId())));
+            FileUtils.deleteDirectory(extractDir);
         }
         catch (IOException e)
         {
@@ -209,15 +212,15 @@ class Loader implements Runnable
         }
         File local = new File(System.getProperty("user.home") + "/.m2/repository");
         Collection<Artifact> deps = null;
-        File pomFile = new File(FilenameUtils.concat(FilenameUtils.concat(node.getRepo(), job.getJd().getFilePath()), "pom.xml"));
-        File libDir = new File(FilenameUtils.concat(FilenameUtils.concat(node.getRepo(), job.getJd().getFilePath()), "lib"));
+        File pomFile = new File(FilenameUtils.concat(jarDir.getAbsolutePath(), "pom.xml"));
+        File libDir = new File(FilenameUtils.concat(jarDir.getAbsolutePath(), "lib"));
         jqmlogger.debug("Loader will try to load POM " + pomFile.getAbsolutePath());
         boolean pomFromJar = false;
 
         // 1st: if no pom, no lib dir => find a pom inside the JAR. (& copy it, we will read later)
         if (!pomFile.exists() && !libDir.exists())
         {
-            jqmlogger.debug("Pom does not exist. Checking for a pom inside the jar file");
+            jqmlogger.debug("No pom inside jar directory. Checking for a pom inside the jar file");
             InputStream is = null;
             OutputStream os = null;
             try
@@ -227,53 +230,41 @@ class Loader implements Runnable
 
                 extractJar(jarFile.getAbsolutePath());
                 findFile("pom.xml", new File(extractDir + "/META-INF/maven/"));
-
                 jqmlogger.debug("pomdebug: " + res);
 
-                if (res != null && FilenameUtils.concat(node.getRepo(), job.getJd().getFilePath()) != null)
+                if (res != null)
                 {
                     is = new FileInputStream(res + "/pom.xml");
                     os = new FileOutputStream(pomFile);
-
-                    int r = 0;
-                    byte[] bytes = new byte[1024];
-
-                    while ((r = is.read(bytes)) != -1)
-                    {
-                        os.write(bytes, 0, r);
-                    }
-
-                    IOUtils.closeQuietly(is);
-                    IOUtils.closeQuietly(os);
-
-                    // Cleanup extract dir - it is useless now as a pom was found and copied at its usual place
-                    cleanUpExtractedZip();
+                    IOUtils.copy(is, os);
                 }
             }
             catch (IOException e)
             {
+                throw new NoPomException("Could not handle pom", e);
+            }
+            finally
+            {
                 IOUtils.closeQuietly(is);
                 IOUtils.closeQuietly(os);
-                throw new NoPomException("Could not handle pom", e);
+            }
+
+            // Cleanup extract dir - it is useless now as a pom was found and copied at its usual place
+            if (res != null)
+            {
+                cleanUpExtractedZip();
             }
         }
 
         // 2nd: if no pom, no pom inside jar, no lib dir => find a lib dir inside the jar
         if (!pomFile.exists() && !libDir.exists())
         {
-            jqmlogger.debug("POM doesn't exist, checking for a lib directory inside the jar file");
+            jqmlogger.debug("Trying lib inside jar");
             findFile("lib", extractDir);
 
             if (lib != null)
             {
-
                 File dir = new File(lib);
-
-                if (!dir.exists())
-                {
-                    throw new NoPomException(
-                            "No pom.xml in the current jar or in the job directory. No lib/ directory in the current jar file.");
-                }
 
                 FileFilter fileFilter = new WildcardFileFilter("*.jar");
                 File[] files = dir.listFiles(fileFilter);
@@ -286,10 +277,11 @@ class Loader implements Runnable
 
                 // Put in cache
                 this.cache.put(job.getJd().getApplicationName(), libUrls);
-                shouldCleanupExtractedZip = true;
+                return;
             }
             else
             {
+                jqmlogger.debug("no lib directory inside jar");
                 cleanUpExtractedZip();
             }
         }
@@ -350,6 +342,7 @@ class Loader implements Runnable
             {
                 jqmlogger.warn("Could not delete the temp pom file extracted from the jar.");
             }
+            return;
         }
 
         // 4: if lib, use lib... (lib has priority over pom)
@@ -367,7 +360,11 @@ class Loader implements Runnable
 
             // Put in cache
             this.cache.put(job.getJd().getApplicationName(), tmp);
+            return;
         }
+
+        throw new NoPomException(
+                "There is no lib dir or no pom.xml inside the directory containing the jar or inside the jar. The jar cannot be launched.");
     }
 
     // Run
@@ -377,7 +374,17 @@ class Loader implements Runnable
         State resultStatus = State.SUBMITTED;
         jqmlogger.debug("LOADER HAS JUST STARTED UP FOR JOB INSTANCE " + job.getId());
         jqmlogger.debug("Job instance " + job.getId() + " has " + job.getParameters().size() + " parameters");
-        jarFile = new File(FilenameUtils.concat(node.getRepo(), job.getJd().getJarPath()));
+        jarFile = new File(FilenameUtils.concat(new File(node.getRepo()).getAbsolutePath(), job.getJd().getJarPath()));
+        jarDir = jarFile.getParentFile();
+
+        if (!jarFile.canRead())
+        {
+            jqmlogger.warn("Cannot read file at " + jarFile.getAbsolutePath()
+                    + ". Job instance will crash. Check job definition or permissions on file.");
+            endOfRun(State.CRASHED);
+            return;
+        }
+
         final URL jarUrl;
         try
         {
@@ -389,7 +396,7 @@ class Loader implements Runnable
             endOfRun(State.CRASHED);
             return;
         }
-        extractDir = new File(FilenameUtils.concat(FilenameUtils.concat(node.getRepo(), job.getJd().getFilePath()), "tmp/"));
+        extractDir = new File(FilenameUtils.concat(jarDir.getAbsolutePath(), "tmp/"));
         jqmlogger.debug("Loader will try to launch jar " + jarFile.getAbsolutePath() + " - " + job.getJd().getJavaClassName());
 
         // Create the CLASSPATH for our classloader (if not already in cache)
@@ -600,12 +607,6 @@ class Loader implements Runnable
         em.getTransaction().begin();
         em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", job.getId()).executeUpdate();
         em.getTransaction().commit();
-
-        // Cleanup
-        if (shouldCleanupExtractedZip)
-        {
-            this.cleanUpExtractedZip();
-        }
 
         // Send e-mail
         if (job.getEmail() != null)
