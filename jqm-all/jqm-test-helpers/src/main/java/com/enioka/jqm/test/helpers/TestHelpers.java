@@ -74,16 +74,11 @@ public class TestHelpers
         TestHelpers.qNormal3 = CreationTools.initQueue("NormalQueue3", "Queue for the ordinary job3", 7, em);
         TestHelpers.qSlow3 = CreationTools.initQueue("SlowQueue3", "Queue for the bad guys3", 3, em);
 
-        TestHelpers.node = CreationTools.createNode("localhost", 0, "./testprojects/jqm-test-deliverable/", "./testprojects/",
-                "./testprojects/jqm-test-xml/", em);
-        TestHelpers.node2 = CreationTools.createNode("localhost2", 0, "./testprojects/jqm-test-deliverable/", "./testprojects/",
-                "./testprojects/jqm-test-xml/", em);
-        TestHelpers.node3 = CreationTools.createNode("localhost3", 0, "./testprojects/jqm-test-deliverable/", "./testprojects/",
-                "./testprojects/jqm-test-xml/", em);
-        TestHelpers.nodeMix = CreationTools.createNode("localhost4", 0, "./testprojects/jqm-test-deliverable/", "./testprojects/",
-                "./testprojects/jqm-test-xml/", em);
-        TestHelpers.nodeMix2 = CreationTools.createNode("localhost5", 0, "./testprojects/jqm-test-deliverable/", "./testprojects/",
-                "./testprojects/jqm-test-xml/", em);
+        TestHelpers.node = CreationTools.createNode("localhost", 0, "./target/payloads/", "./../", "./testprojects/jqm-test-xml/", em);
+        TestHelpers.node2 = CreationTools.createNode("localhost2", 0, "./target/payloads/", "./../", "./testprojects/jqm-test-xml/", em);
+        TestHelpers.node3 = CreationTools.createNode("localhost3", 0, "./target/payloads/", "./../", "./testprojects/jqm-test-xml/", em);
+        TestHelpers.nodeMix = CreationTools.createNode("localhost4", 0, "./target/payloads/", "./../", "./testprojects/jqm-test-xml/", em);
+        TestHelpers.nodeMix2 = CreationTools.createNode("localhost5", 0, "./target/payloads/", "./../", "./testprojects/jqm-test-xml/", em);
 
         TestHelpers.dpVip = CreationTools.createDeploymentParameter(1, node, 40, 1, qVip, em);
         TestHelpers.dpVipMix = CreationTools.createDeploymentParameter(2, nodeMix, 3, 1, qVip, em);

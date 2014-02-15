@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jqm>
+  <queues>
+    <queue>
+      <name>VIPQueue</name>
+      <description>Queue for the winners</description>
+      <timeToLive>42</timeToLive>
+      <jobs>
+        <applicationName>Fibo</applicationName>
+        <applicationName>Geo</applicationName>
+      </jobs>
+    </queue>
+    <queue>
+      <name>NormalQueue</name>
+      <description>Queue for the ordinary job</description>
+      <timeToLive>7</timeToLive>
+      <jobs>
+        <applicationName>DateTime</applicationName>
+      </jobs>
+    </queue>
+  </queues>
+</jqm>
+

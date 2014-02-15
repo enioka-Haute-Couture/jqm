@@ -46,7 +46,7 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class MultiNodeTest
 {
-    public static Logger jqmlogger = Logger.getLogger(JobBaseTest.class);
+    public static Logger jqmlogger = Logger.getLogger(MultiNodeTest.class);
     public static Server s;
 
     @Before
@@ -94,9 +94,8 @@ public class MultiNodeTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jd11 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "AppliNode1-1", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd11 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qVip, 42, "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j11 = new JobRequest("AppliNode1-1", "MAG");
 
@@ -176,9 +175,8 @@ public class MultiNodeTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jd11 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "AppliNode1-1", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd11 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qVip, 42, "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j11 = new JobRequest("AppliNode1-1", "MAG");
 
@@ -253,14 +251,12 @@ public class MultiNodeTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jd11 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "AppliNode1-1", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd11 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qVip, 42, "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd21 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip2, 42, "AppliNode2-1", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd21 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qVip2, 42, "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j11 = new JobRequest("AppliNode1-1", "MAG");
         JobRequest j21 = new JobRequest("AppliNode2-1", "MAG");
@@ -329,49 +325,40 @@ public class MultiNodeTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jd11 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "AppliNode1-1", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd11 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qVip, 42, "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd12 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qNormal, 42, "AppliNode1-2", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd12 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qNormal, 42, "AppliNode1-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd13 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qSlow, 42, "AppliNode1-3", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd13 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qSlow, 42, "AppliNode1-3", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd21 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip2, 42, "AppliNode2-1", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd21 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qVip2, 42, "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd22 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qNormal2, 42, "AppliNode2-2", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd22 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qNormal2, 42, "AppliNode2-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd23 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qSlow2, 42, "AppliNode2-3", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd23 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qSlow2, 42, "AppliNode2-3", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd31 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip3, 42, "AppliNode3-1", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd31 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qVip3, 42, "AppliNode3-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd32 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qNormal3, 42, "AppliNode3-2", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd32 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qNormal3, 42, "AppliNode3-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd33 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qSlow3, 42, "AppliNode3-3", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd33 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qSlow3, 42, "AppliNode3-3", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j11 = new JobRequest("AppliNode1-1", "MAG");
         JobRequest j12 = new JobRequest("AppliNode1-2", "MAG");
@@ -492,8 +479,8 @@ public class MultiNodeTest
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null,
+                "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
         em.close();
 
@@ -543,49 +530,40 @@ public class MultiNodeTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jd11 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "AppliNode1-1", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd11 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qVip, 42, "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd12 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qNormal, 42, "AppliNode1-2", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd12 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qNormal, 42, "AppliNode1-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd13 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qSlow, 42, "AppliNode1-3", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd13 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qSlow, 42, "AppliNode1-3", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd21 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip2, 42, "AppliNode2-1", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd21 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qVip2, 42, "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd22 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qNormal2, 42, "AppliNode2-2", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd22 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qNormal2, 42, "AppliNode2-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd23 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qSlow2, 42, "AppliNode2-3", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd23 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qSlow2, 42, "AppliNode2-3", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd31 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip3, 42, "AppliNode3-1", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd31 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qVip3, 42, "AppliNode3-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd32 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qNormal3, 42, "AppliNode3-2", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd32 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qNormal3, 42, "AppliNode3-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd33 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qSlow3, 42, "AppliNode3-3", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd33 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qSlow3, 42, "AppliNode3-3", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j11 = new JobRequest("AppliNode1-1", "MAG");
         JobRequest j12 = new JobRequest("AppliNode1-2", "MAG");
@@ -718,19 +696,16 @@ public class MultiNodeTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jd11 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip, 42, "AppliNode1-1", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd11 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qVip, 42, "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd12 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qNormal, 42, "AppliNode1-2", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd12 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qNormal, 42, "AppliNode1-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         @SuppressWarnings("unused")
-        JobDef jd21 = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimesendmsg/",
-                "jqm-test-datetimesendmsg/jqm-test-datetimesendmsg.jar", TestHelpers.qVip2, 42, "AppliNode2-1", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jd21 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qVip2, 42, "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j11 = new JobRequest("AppliNode1-1", "MAG");
         JobRequest j12 = new JobRequest("AppliNode1-2", "MAG");

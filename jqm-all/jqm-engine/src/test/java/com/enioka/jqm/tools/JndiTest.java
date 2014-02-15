@@ -78,8 +78,8 @@ public class JndiTest
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 
         @SuppressWarnings("unused")
-        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-wmq/",
-                "jqm-test-jndijms-wmq/jqm-test-jndijms-wmq.jar", TestHelpers.qVip, 42, "Jms", "Franquin", "ModuleMachin", "other1",
+        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, null,
+                "jqm-tests/jqm-test-jndijms-wmq/target/test.jar", TestHelpers.qVip, 42, "Jms", "Franquin", "ModuleMachin", "other1",
                 "other2", "other3", false, em);
 
         JobRequest form = new JobRequest("Jms", "MAG");
@@ -129,8 +129,8 @@ public class JndiTest
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 
         @SuppressWarnings("unused")
-        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-amq/",
-                "jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
+        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, null,
+                "jqm-tests/jqm-test-jndijms-amq/target/test.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
                 "other2", false, em);
 
         JobRequest form = new JobRequest("Jms", "MAG");
@@ -176,8 +176,8 @@ public class JndiTest
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 
         @SuppressWarnings("unused")
-        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, "jqm-test-jndijms-amq/",
-                "jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
+        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs, null,
+                "jqm-tests/jqm-test-jndijms-amq/target/test.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
                 "other2", false, em);
 
         JobRequest form = new JobRequest("Jms", "MAG");
@@ -223,7 +223,7 @@ public class JndiTest
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 
         @SuppressWarnings("unused")
-        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-defcon/", "jqm-test-defcon/jqm-test-defcon.jar",
+        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-defcon/target/test.jar",
                 TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
 
         JobRequest form = new JobRequest("Jms", "MAG");

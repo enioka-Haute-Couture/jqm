@@ -81,9 +81,9 @@ public class FiboTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibo/",
-                "jqm-test-fibo/jqm-test-fibo.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2",
-                false, em);
+        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, null,
+                "jqm-tests/jqm-test-fibo/target/test.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1",
+                "other2", false, em);
 
         JobRequest form = new JobRequest("Fibo", "MAG");
         form.addParameter("p1", "1");
@@ -121,8 +121,8 @@ public class FiboTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibosync/",
-                "jqm-test-fibosync/jqm-test-fibosync.jar", TestHelpers.qVip, 42, "FiboSync", null, "Franquin", "ModuleMachin", "other",
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, null,
+                "jqm-tests/jqm-test-fibosync/target/test.jar", TestHelpers.qVip, 42, "FiboSync", null, "Franquin", "ModuleMachin", "other",
                 "other", false, em);
 
         JobRequest j = new JobRequest("FiboSync", "MAG");

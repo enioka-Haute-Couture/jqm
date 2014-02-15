@@ -7,7 +7,7 @@
 		<version>1.1.6-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>jqm-test-datetimemavennopom</artifactId>
+	<artifactId>jqm-test-datetimemavennolibdef</artifactId>
 
 	<build>
 		<plugins>
@@ -17,6 +17,18 @@
 				<version>2.8</version>
 				<configuration>
 					<skip>true</skip>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<finalName>test</finalName>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+					</archive>
 				</configuration>
 			</plugin>
 		</plugins>

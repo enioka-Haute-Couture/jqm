@@ -78,8 +78,8 @@ public class FiboHibTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-test-fibohib/",
-                "jqm-test-fibohib/jqm-test-fibohib.jar", TestHelpers.qVip, 42, "FiboHib", null, "Franquin", "ModuleMachin", "other1",
+        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, null,
+                "jqm-tests/jqm-test-fibohib/target/test.jar", TestHelpers.qVip, 42, "FiboHib", null, "Franquin", "ModuleMachin", "other1",
                 "other2", false, em);
 
         JobRequest form = new JobRequest("FiboHib", "MAG");

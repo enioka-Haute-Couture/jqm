@@ -79,9 +79,8 @@ public class ParameterTest
         jdargs.add(jdp2);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-checkargs/",
-                "jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
-                "other", "other", false, em);
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-checkargs/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
         j.addParameter("arg2", "argument2");
@@ -113,9 +112,8 @@ public class ParameterTest
         jdargs.add(jdp2);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-checkargs/",
-                "jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
-                "other", "other", false, em);
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-checkargs/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
@@ -146,9 +144,8 @@ public class ParameterTest
         jdargs.add(jdp2);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-checkargs/",
-                "jqm-test-checkargs/jqm-test-checkargs.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin",
-                "other", "other", false, em);
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-checkargs/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
         j.addParameter("arg1", "argument1");

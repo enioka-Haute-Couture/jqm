@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.enioka.jqm</groupId>
@@ -17,6 +18,9 @@
 		<module>jqm-test-datetimemaven</module>
 		<module>jqm-test-datetimemaven2</module>
 		<module>jqm-test-datetimemavennopom</module>
+		<module>jqm-test-datetimemavennopomlib</module>
+		<module>jqm-test-datetimemavenjarinlib</module>
+		<module>jqm-test-datetimemavennolibdef</module>
 		<module>jqm-test-deliverable</module>
 		<module>jqm-test-geo</module>
 		<module>jqm-test-jndijms-amq</module>
@@ -49,6 +53,15 @@
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<finalName>test</finalName>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>2.8</version>
 				<executions>
@@ -64,41 +77,17 @@
 									<groupId>${project.groupId}</groupId>
 									<artifactId>${project.artifactId}</artifactId>
 									<version>${project.version}</version>
-									<type>${project.packaging}</type>
-									<overWrite>true</overWrite>
-									<destFileName>${project.artifactId}.jar</destFileName>
-								</artifactItem>
-								<artifactItem>
-									<groupId>${project.groupId}</groupId>
-									<artifactId>${project.artifactId}</artifactId>
-									<version>${project.version}</version>
 									<type>pom</type>
 									<overWrite>true</overWrite>
 									<destFileName>pom.xml</destFileName>
 								</artifactItem>
 							</artifactItems>
-							<outputDirectory>../../jqm-engine/testprojects/${project.artifactId}</outputDirectory>
+							<outputDirectory>${project.build.directory}</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>internal</id>
-			<distributionManagement>
-				<snapshotRepository>
-					<id>snapshot-nexus</id>
-					<name>repository for daily snaps</name>
-					<layout>default</layout>
-					<uniqueVersion>false</uniqueVersion>
-					<url>http://10.0.3.128/nexus/content/repositories/snapshots/</url>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>
-	</profiles>
-
 
 </project>
