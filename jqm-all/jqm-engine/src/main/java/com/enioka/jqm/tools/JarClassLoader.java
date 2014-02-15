@@ -56,6 +56,20 @@ class JarClassLoader extends URLClassLoader
         super(addUrls(url, libs), null);
     }
 
+    private boolean isLegacyPayload(Class c)
+    {
+        Class clazz = c;
+        while (!clazz.equals(Object.class))
+        {
+            if (clazz.getName().equals(Constants.API_OLD_IMPL))
+            {
+                return true;
+            }
+            clazz = clazz.getSuperclass();
+        }
+        return false;
+    }
+
     void launchJar(JobInstance job, ClassLoader old, EntityManager em) throws JqmEngineException
     {
         // 1st:load the class
@@ -81,7 +95,7 @@ class JarClassLoader extends URLClassLoader
             launchRunnable(c, job, em);
             return;
         }
-        else if (c.getSuperclass().getName().equals(Constants.API_OLD_IMPL))
+        else if (isLegacyPayload(c))
         {
             jqmlogger.info("This payload is of type: explicit API implementation");
             launchApiPayload(c, job, em);
@@ -263,8 +277,12 @@ class JarClassLoader extends URLClassLoader
     private void inject(Class c, Object o, JobInstance job, EntityManager em) throws JqmEngineException
     {
         List<Field> ff = new ArrayList<Field>();
-        ff.addAll(Arrays.asList(c.getDeclaredFields()));
-        ff.addAll(Arrays.asList(c.getSuperclass().getDeclaredFields()));
+        Class clazz = c;
+        while (!clazz.equals(Object.class))
+        {
+            ff.addAll(Arrays.asList(clazz.getDeclaredFields()));
+            clazz = clazz.getSuperclass();
+        }
         boolean inject = false;
         for (Field f : ff)
         {
@@ -309,8 +327,7 @@ class JarClassLoader extends URLClassLoader
         }
         catch (Exception e)
         {
-            throw new JqmEngineException("Could not inject JQM interface into taget payload", e);
+            throw new JqmEngineException("Could not inject JQM interface into target payload", e);
         }
     }
-
 }
