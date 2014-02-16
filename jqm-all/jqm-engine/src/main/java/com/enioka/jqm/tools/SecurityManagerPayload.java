@@ -20,6 +20,21 @@ public class SecurityManagerPayload extends SecurityManager
         // Not throwing SecurityException = allowed.
     }
 
+    @Override
+    public void checkPermission(Permission perm, Object context)
+    {
+        // Default implementation for payloads, no checks for inner code.
+        Class[] stack = getClassContext();
+        if (stack.length > 3 && stack[3].getClassLoader() instanceof JarClassLoader)
+        {
+            super.checkPermission(perm, context);
+        }
+        else
+        {
+            return;
+        }
+    }
+
     /**
      * Ensures payloads are not allowed to call <code>System.exit()</code>
      */

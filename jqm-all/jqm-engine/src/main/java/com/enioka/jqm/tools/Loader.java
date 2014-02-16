@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.AccessController;
@@ -38,9 +39,12 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 
@@ -54,6 +58,7 @@ import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
+import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobHistoryParameter;
@@ -65,7 +70,7 @@ import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.State;
 import com.jcabi.aether.Aether;
 
-class Loader implements Runnable
+class Loader implements Runnable, LoaderMBean
 {
     private JobInstance job = null;
     private Node node = null;
@@ -78,6 +83,7 @@ class Loader implements Runnable
     private File jarFile = null, jarDir = null;
     private File extractDir = null;
     private ClassLoader contextClassLoader = null;
+    private ObjectName name = null;
 
     Loader(JobInstance job, Map<String, URL[]> cache, Polling p)
     {
@@ -85,6 +91,19 @@ class Loader implements Runnable
         this.node = em.find(Node.class, p.getDp().getNode().getId());
         this.cache = cache;
         this.p = p;
+
+        // JMX
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        try
+        {
+            name = new ObjectName("com.enioka.jqm:type=Node.Queue.JobInstance,Node=" + this.job.getNode().getName() + ",Queue="
+                    + this.job.getQueue().getName() + ",name=" + this.job.getId());
+            mbs.registerMBean(this, name);
+        }
+        catch (Exception e)
+        {
+            throw new JqmInitError("Could not create JMX beans", e);
+        }
     }
 
     // ExtractJar
@@ -536,7 +555,7 @@ class Loader implements Runnable
         em.refresh(job);
         jqmlogger.debug("Job status after execution: " + job.getState());
         jqmlogger.debug("Progression after execution: " + job.getProgress());
-        jqmlogger.debug("Post execution, the number of running threads for the current queue is " + p.getActualNbThread());
+        jqmlogger.debug("Post execution, the number of running threads for the current queue is " + p.getCurrentActiveThreadCount());
 
         // Update end date
         Calendar endDate = GregorianCalendar.getInstance(Locale.getDefault());
@@ -620,5 +639,88 @@ class Loader implements Runnable
                 jqmlogger.warn("An e-mail could not be sent. No impact on the engine.", e);
             }
         }
+
+        // Unregister MBean
+        try
+        {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            mbs.unregisterMBean(name);
+        }
+        catch (Exception e)
+        {
+            jqmlogger.error("Could not unregister JobInstance JMX bean", e);
+        }
+    }
+
+    // ////////////////////////////////////////////////////////////
+    // JMX methods
+    // ////////////////////////////////////////////////////////////
+
+    @Override
+    public void kill()
+    {
+        Properties p = new Properties();
+        p.put("emf", this.em.getEntityManagerFactory());
+        JqmClientFactory.getClient("uncached", p, false).killJob(this.job.getId());
+    }
+
+    @Override
+    public String getApplicationName()
+    {
+        return this.job.getJd().getApplicationName();
+    }
+
+    @Override
+    public Calendar getEnqueueDate()
+    {
+        return this.job.getCreationDate();
+    }
+
+    @Override
+    public String getKeyword1()
+    {
+        return this.job.getKeyword1();
+    }
+
+    @Override
+    public String getKeyword2()
+    {
+        return this.job.getKeyword2();
+    }
+
+    @Override
+    public String getKeyword3()
+    {
+        return this.job.getKeyword3();
+    }
+
+    @Override
+    public String getModule()
+    {
+        return this.job.getModule();
+    }
+
+    @Override
+    public String getUser()
+    {
+        return this.job.getUserName();
+    }
+
+    @Override
+    public String getSessionId()
+    {
+        return this.job.getSessionID();
+    }
+
+    @Override
+    public Integer getId()
+    {
+        return this.job.getId();
+    }
+
+    @Override
+    public Long getRunTimeSeconds()
+    {
+        return (Calendar.getInstance().getTimeInMillis() - this.job.getExecutionDate().getTimeInMillis()) / 1000;
     }
 }

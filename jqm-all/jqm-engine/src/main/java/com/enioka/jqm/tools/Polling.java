@@ -18,10 +18,14 @@
 
 package com.enioka.jqm.tools;
 
+import java.lang.management.ManagementFactory;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.LockModeType;
@@ -34,7 +38,7 @@ import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.State;
 
-class Polling implements Runnable
+class Polling implements Runnable, PollingMBean
 {
     private static Logger jqmlogger = Logger.getLogger(Polling.class);
     private DeploymentParameter dp = null;
@@ -45,8 +49,10 @@ class Polling implements Runnable
     private Integer actualNbThread;
     private JqmEngine engine;
     private boolean hasStopped = false;
+    private ObjectName name = null;
 
-    void stop()
+    @Override
+    public void stop()
     {
         run = false;
     }
@@ -61,6 +67,18 @@ class Polling implements Runnable
         this.actualNbThread = 0;
         this.tp = new ThreadPool(queue, dp.getNbThread(), cache);
         this.engine = engine;
+
+        try
+        {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            name = new ObjectName("com.enioka.jqm:type=Node.Queue,Node=" + this.dp.getNode().getName() + ",name="
+                    + this.dp.getQueue().getName());
+            mbs.registerMBean(this, name);
+        }
+        catch (Exception e)
+        {
+            throw new JqmInitError("Could not create JMX beans", e);
+        }
     }
 
     protected JobInstance dequeue()
@@ -226,9 +244,20 @@ class Polling implements Runnable
         jqmlogger.info("Poller on queue " + dp.getQueue().getName() + " has ended");
         // Let the engine decide if it should stop completely
         this.engine.checkEngineEnd();
+
+        // JMX
+        try
+        {
+            ManagementFactory.getPlatformMBeanServer().unregisterMBean(name);
+        }
+        catch (Exception e)
+        {
+            jqmlogger.error("Could not create JMX beans", e);
+        }
     }
 
-    Integer getActualNbThread()
+    @Override
+    public Integer getCurrentActiveThreadCount()
     {
         return actualNbThread;
     }
@@ -246,5 +275,54 @@ class Polling implements Runnable
     boolean isRunning()
     {
         return !this.hasStopped;
+    }
+
+    // //////////////////////////////////////////////////////////
+    // JMX
+    // //////////////////////////////////////////////////////////
+
+    @Override
+    public long getCumulativeJobInstancesCount()
+    {
+        EntityManager em = Helpers.getNewEm();
+        Long nb = em.createQuery("SELECT COUNT(i) From History i WHERE i.node = :n AND i.queue = :q", Long.class)
+                .setParameter("n", this.dp.getNode()).setParameter("q", this.dp.getQueue()).getSingleResult();
+        em.close();
+        return nb;
+    }
+
+    @Override
+    public float getJobsFinishedPerSecondLastMinute()
+    {
+        EntityManager em = Helpers.getNewEm();
+        Calendar minusOneMinute = Calendar.getInstance();
+        minusOneMinute.add(Calendar.MINUTE, -1);
+        Float nb = em.createQuery("SELECT COUNT(i) From History i WHERE i.endDate >= :d and i.node = :n AND i.queue = :q", Long.class)
+                .setParameter("d", minusOneMinute).setParameter("n", this.dp.getNode()).setParameter("q", this.dp.getQueue())
+                .getSingleResult() / 60f;
+        em.close();
+        return nb;
+    }
+
+    @Override
+    public long getCurrentlyRunningJobCount()
+    {
+        EntityManager em = Helpers.getNewEm();
+        Long nb = em.createQuery("SELECT COUNT(i) From JobInstance i WHERE i.node = :n AND i.queue = :q", Long.class)
+                .setParameter("n", this.dp.getNode()).setParameter("q", this.dp.getQueue()).getSingleResult();
+        em.close();
+        return nb;
+    }
+
+    @Override
+    public Integer getPollingIntervalMilliseconds()
+    {
+        return this.dp.getPollingInterval();
+    }
+
+    @Override
+    public Integer getMaxConcurrentJobInstanceCount()
+    {
+        return this.dp.getNbThread();
     }
 }

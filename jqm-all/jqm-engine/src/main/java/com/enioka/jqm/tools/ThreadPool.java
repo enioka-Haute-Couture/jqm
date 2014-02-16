@@ -46,7 +46,7 @@ class ThreadPool
     void run(com.enioka.jqm.jpamodel.JobInstance ji, Polling p)
     {
         jqmlogger.info("Job instance will be inserted inside a thread pool: " + ji.getId());
-        jqmlogger.debug("ThreadPool ActualNbThread: " + p.getActualNbThread());
+        jqmlogger.debug("ThreadPool ActualNbThread: " + p.getCurrentActiveThreadCount());
         pool.submit(new Loader(ji, cache, p));
     }
 

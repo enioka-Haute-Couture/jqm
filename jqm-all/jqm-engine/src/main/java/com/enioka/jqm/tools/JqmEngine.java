@@ -18,13 +18,17 @@
 
 package com.enioka.jqm.tools;
 
+import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -34,7 +38,6 @@ import javax.persistence.NonUniqueResultException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.amazonaws.services.cloudfront_2012_03_15.model.InvalidArgumentException;
 import com.enioka.jqm.jndi.JndiContext;
 import com.enioka.jqm.jndi.JndiContextFactory;
 import com.enioka.jqm.jpamodel.DatabaseProp;
@@ -43,7 +46,7 @@ import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 
-class JqmEngine
+class JqmEngine implements JqmEngineMBean
 {
     private List<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
     private List<Polling> pollers = new ArrayList<Polling>();
@@ -54,6 +57,7 @@ class JqmEngine
     private JndiContext jndiCtx = null;
     private static Logger jqmlogger = Logger.getLogger(JqmEngine.class);
     private Semaphore ended = new Semaphore(0);
+    private ObjectName name;
 
     /**
      * Starts the engine
@@ -66,7 +70,7 @@ class JqmEngine
     {
         if (nodeName == null || nodeName.isEmpty())
         {
-            throw new InvalidArgumentException("nodeName cannot be null or empty");
+            throw new IllegalArgumentException("nodeName cannot be null or empty");
         }
 
         // Node configuration is in the database
@@ -110,15 +114,27 @@ class JqmEngine
             em.getTransaction().commit();
         }
 
-        // Get queues to listen to
-        dps = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
-                .setParameter("n", node.getId()).getResultList();
+        // JMX
+        try
+        {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            name = new ObjectName("com.enioka.jqm:type=Node,name=" + this.node.getName());
+            mbs.registerMBean(this, name);
+        }
+        catch (Exception e)
+        {
+            throw new JqmInitError("Could not create JMX beans", e);
+        }
 
         // Security
         if (System.getSecurityManager() == null)
         {
             System.setSecurityManager(new SecurityManagerPayload());
         }
+
+        // Get queues to listen to
+        dps = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
+                .setParameter("n", node.getId()).getResultList();
 
         // Pollers
         for (DeploymentParameter i : dps)
@@ -129,11 +145,13 @@ class JqmEngine
             t.start();
         }
         jqmlogger.info("End of JQM engine initialization");
+
     }
 
     /**
      * Nicely stop the engine
      */
+    @Override
     public void stop()
     {
         jqmlogger.debug("JQM engine has received a stop order");
@@ -310,6 +328,11 @@ class JqmEngine
         this.dps = dps;
     }
 
+    Node getNode()
+    {
+        return this.node;
+    }
+
     synchronized void checkEngineEnd()
     {
         for (Polling poller : pollers)
@@ -337,8 +360,55 @@ class JqmEngine
             this.em.getTransaction().rollback();
         }
 
+        // JMX
+        try
+        {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            mbs.unregisterMBean(name);
+        }
+        catch (Exception e)
+        {
+            jqmlogger.error("Could not unregister engine JMX bean", e);
+        }
+
         // Done
         this.ended.release();
         jqmlogger.info("JQM engine has stopped");
+    }
+
+    // //////////////////////////////////////////////////////////////////////////
+    // JMX stat methods (they get their own EM to be thread safe)
+    // //////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public long getCumulativeJobInstancesCount()
+    {
+        EntityManager em = Helpers.getNewEm();
+        Long nb = em.createQuery("SELECT COUNT(i) From History i WHERE i.node = :n", Long.class).setParameter("n", this.node)
+                .getSingleResult();
+        em.close();
+        return nb;
+    }
+
+    @Override
+    public float getJobsFinishedPerSecondLastMinute()
+    {
+        EntityManager em = Helpers.getNewEm();
+        Calendar minusOneMinute = Calendar.getInstance();
+        minusOneMinute.add(Calendar.MINUTE, -1);
+        Float nb = em.createQuery("SELECT COUNT(i) From History i WHERE i.endDate >= :d and i.node = :n", Long.class)
+                .setParameter("d", minusOneMinute).setParameter("n", this.node).getSingleResult() / 60f;
+        em.close();
+        return nb;
+    }
+
+    @Override
+    public long getCurrentlyRunningJobCount()
+    {
+        EntityManager em = Helpers.getNewEm();
+        Long nb = em.createQuery("SELECT COUNT(i) From JobInstance i WHERE i.node = :n", Long.class).setParameter("n", this.node)
+                .getSingleResult();
+        em.close();
+        return nb;
     }
 }
