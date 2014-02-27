@@ -4,8 +4,9 @@ source_suffix = '.rst'
 source_encoding = 'utf-8'
 master_doc = 'index'
 exclude_dirnames = ['.git', '.svn']
+extensions = ['sphinx.ext.todo',]
 
-project = 'Chronix'
+project = 'JQM'
 copyright = '2012-2014, Enioka'
-release = '1.0'
+#release = '1.0'
 hightlight_language = 'java'
