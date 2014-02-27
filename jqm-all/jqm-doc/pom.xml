@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.enioka.jqm</groupId>
+		<artifactId>jqm-all</artifactId>
+		<version>1.1.6-SNAPSHOT</version>
+	</parent>
+	<artifactId>jqm-doc</artifactId>
+
+	<properties>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.tomdz.maven</groupId>
+				<artifactId>sphinx-maven-plugin</artifactId>
+				<version>1.0.3</version>
+				<configuration>
+					<outputDirectory>${project.build.directory}/docs</outputDirectory>
+				</configuration>
+				<executions>					
+				</executions>
+			</plugin>
+		</plugins>
+
+		<resources>
+			<resource>
+				<directory>src/site/sphinx</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.rst</include>
+					<include>**/*.py</include>
+				</includes>
+			</resource>
+		</resources>
+
+	</build>
+
+	<dependencies>
+	</dependencies>
+
+</project>

@@ -1,4 +1,5 @@
-﻿# Troubleshooting & known bugs
+﻿Troubleshooting & known bugs
+#######################################
 
 * When starting JQM, “address already in use” error appears. Change the ports of your nodes (by default a node is on a random free port, but you may have started multiple nodes on the same port)
 * When starting JQM, “Unable to build EntityManager factory” error appears. It means JQM cannot connect o its database. Check the information in the conf/db.properties file.

@@ -1,27 +1,40 @@
-﻿# How JQM works
+﻿How JQM works
+#####################
 
-
-## Concepts
+Concepts
+***************
 
 The goal of JQM is to launch payloads, i.e. Java code doing something useful for the end user, aysnchronously.
 The payload is described inside a job definition - so that JQM knows things like the class to load, the path of the jar file, etc.
 A running payload is called a job instance (the "instance of the job definition"). To create a job instance, a job request
 is emitted by a client. It contains things such as parameter values, and references a job definition so that JQM will know what to run.
 
-## Definitions
+Definitions
+*****************
 
-| Name | Definition | 
-| ------- | ----------- | 
-| Payload | the actual Java code that runs inside the JQM engine, containing business logics | 
-| Job Definition | the metadata describing the payload. Also called JobDef. Entirely described inside the JobDef XML file. Identified by a name called "Application Name" |
-| Job Request | the action of asking politely the execution of a JobDef (which in turn means running the payload) |
-| Job Instance | the result of of a Job Request. It obeys the Job Instance lifecycle (enqueued, running, endded, ...) |
-| JQM Node | an instance of the JQM service that can run payloads |
-| JQM Engine | synonym to JQM Node |
+Full definitions are given inside the :doc:`glossary`.
 
-## General architecture
++----------------+-----------------------------------------------------------------------------------------------------------+
+| Name           | Definition                                                                                                | 
++================+===========================================================================================================+
+| Payload        | the actual Java code that runs inside the JQM engine, containing business logics                          |
++----------------+-----------------------------------------------------------------------------------------------------------+ 
+| Job Definition | the metadata describing the payload. Also called JobDef. Entirely described inside the JobDef XML file.   |
+|                | Identified by a name called "Application Name"                                                            |
++----------------+-----------------------------------------------------------------------------------------------------------+
+| Job Request    | the action of asking politely the execution of a JobDef (which in turn means running the payload)         |
++----------------+-----------------------------------------------------------------------------------------------------------+
+| Job Instance   | the result of of a Job Request. It obeys the Job Instance lifecycle (enqueued, running, endded, ...)      |
++----------------+-----------------------------------------------------------------------------------------------------------+
+| JQM Node       | an instance of the JQM service that can run payloads                                                      |
++----------------+-----------------------------------------------------------------------------------------------------------+
+| JQM Engine     | synonym to JQM Node                                                                                       |
++----------------+-----------------------------------------------------------------------------------------------------------+
 
-![alt text](pic_general.png "archi")
+General architecture
+***********************
+
+.. image:: /media/pic_general.png
 
 On this picture, JQM elements are in green while non-JQM elements are in blue.
 
@@ -42,7 +55,8 @@ the engine. This avoids creating and maintaining a central file repository.
 
 
 
-## Nodes, queues and polling
+Nodes, queues and polling
+****************************
 
 As it names entails, JQM is actually a queue manager. As many queues as needed can be created. A queue contains job instances waiting to be executed.
 

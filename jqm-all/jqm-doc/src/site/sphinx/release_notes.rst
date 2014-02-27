@@ -1,39 +1,49 @@
-# Release notes
+Release notes
+######################
 
-## 1.1.5
+1.1.5
+***********
 
-### Release goal
+Release goal
+++++++++++++++++++
 
 Bugfix release. 
 
-### Upgrade notes
+Upgrade notes
++++++++++++++++++++
 
 No breaking changes. 
 
-### Major
+Major
+++++++++++++
 
 *Nothing*
 
-### Minor
+Minor
++++++++++++++
 
 * Engine API: engine API enqueue works again
 * Engine API: added get ID method
 * Db: index name shortened to please Oracle
 
-## 1.1.4
+1.1.4
+**************
 
-### Release goal
+Release goal
+++++++++++++++++++
 
 This release aimed at fulfilling all the accepted enhancement requests that involved breaking changes, so as to clear up the path for future evolutions.
 
-### Upgrade notes
+Upgrade notes
+++++++++++++++++++
 
 Many breaking changes in this release in all components. Upgrade of engine, upgrade of all libraries are required plus rebuild of database. *There
 is no compatibiliy whatsoever between version 1.1.4 of the libraries and previous versions of the engine and database.*
 
 Please read the rest of the release notes and check the updated documentation at https://github.com/enioka/jqm/blob/master/doc/index.md 
 
-### Major
+Major
+++++++++++++++++++
 
 * Documentation: now fully on Github
 * Client API: - **breaking** - is no longer static. This allows:
@@ -49,11 +59,12 @@ Please read the rest of the release notes and check the updated documentation at
 * Engine: - **breaking** - the engine command line, which was purely a debug feature up to now, is officialized and was made usable and documented.
 * Engine API: now offers a File resource through the JNDI API
 * Engine API: payloads no longer need to use the client or engine API. A simple static main is enough, or implementing Runnable. 
-Access to the API is done through injection with a provided interface.
+  Access to the API is done through injection with a provided interface.
 * Engine API: added a method to provide a temporary work directory
 
 
-### Minor
+Minor
+++++++++++++++++++
 
 * Engine: various code refactoring, including cleanup according to Sonar rules.
 * Engine: performance enhancements (History is now insert only, classpaths are truly cached, no more unzipping at every launch)
@@ -71,17 +82,21 @@ Access to the API is done through injection with a provided interface.
 * General: - **breaking** - tags fields (other1, other2, ...) were renamed "keyword" to make their purpose clearer
 * General: packaging now done with Maven
 
-### 1.1.3
+1.1.3
+***********
 
-### Release goal
+Release goal
+++++++++++++++++++
 
 Fix release for the client API.
 
-### Major
+Major
+++++++++++++++++++
 
 * No more System.exit() inside the client API.
 
-### Minor
+Minor
+++++++++++++++++++
 
 *Nothing*
 

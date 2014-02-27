@@ -20,7 +20,8 @@
 	</properties>
 
 	<modules>
-		<module>jqm-tests</module>
+		<module>jqm-doc</module>
+        <module>jqm-tests</module>
 		<module>jqm-model</module>
 		<module>jqm-api</module>		
 		<module>jqm-ws</module>
