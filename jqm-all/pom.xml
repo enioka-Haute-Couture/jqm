@@ -28,6 +28,7 @@
 		<module>jqm-client</module>
 		<module>jqm-test-helpers</module>
 		<module>jqm-engine</module>
+		<module>jqm-webui</module>
 	</modules>
 
 	<scm>

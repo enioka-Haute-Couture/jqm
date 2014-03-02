@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE resources PUBLIC "-//GlassFish.org//DTD GlassFish Application Server 3.1 Resource Definitions//EN" "http://glassfish.org/dtds/glassfish-resources_1_5.dtd">
+<resources>
+	<jdbc-connection-pool driver-classname="org.hsqldb.jdbcDriver"
+		datasource-classname="" res-type="java.sql.Driver" name="HSQLDB">
+		<property name="URL" value="jdbc:hsqldb:mem:testdbengine"></property>
+		<property name="user" value="SA"></property>
+		<property name="password" value=""></property>
+	</jdbc-connection-pool>
+	<jdbc-resource pool-name="HSQLDB" jndi-name="jdbc/jqm"></jdbc-resource>
+</resources>

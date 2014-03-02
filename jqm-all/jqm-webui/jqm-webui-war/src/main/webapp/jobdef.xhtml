@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<meta http-equiv="cache-control" content="no-cache" />
+
+<h:head>
+	<title>JQM job definitions</title>
+</h:head>
+
+<h:form id="mainForm">
+	<!-- MENU -->
+	<h:outputLink value="jobdef.xhtml">
+		<h:outputText value="Job definition" />
+	</h:outputLink>
+
+	<h:outputText value="   --   " />
+
+	<h:outputLink value="queue.xhtml">
+		<h:outputText value="Queue" />
+	</h:outputLink>
+
+	<h:outputText value="   --   " />
+
+	<h:outputLink value="history.xhtml">
+		<h:outputText value="History" />
+	</h:outputLink>
+	<!-- END MENU -->
+
+	<p:growl id="growl" showDetail="true" />
+
+	<h1>Job definitions currently registered</h1>
+	<p:dataTable id="jdGrid" value="#{jobDefControler.jobs}" var="job"
+		paginator="true" selection="#{jobDefControler.selectedJob}" rows="25"
+		selectionMode="single" rowsPerPageTemplate="5,10,15,20,25,30,40,50,60"
+		width="90%">
+
+		<p:ajax event="rowSelect" listener="#{jobDefControler.onRowSelect}"
+			update=":mainForm:enqueue :mainForm:growl" />
+		<p:ajax event="rowUnselect"
+			listener="#{jobDefControler.onRowUnselect}"
+			update=":mainForm:enqueue :mainForm:growl" />
+
+		<!-- 	update=":form:display :form:growl"
+			oncomplete="PF('carDialog').show()" /> -->
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="ID" />
+			</f:facet>
+			<h:outputText value="#{job.id}" />
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Name" />
+			</f:facet>
+			<h:outputText value="#{job.applicationName}" />
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Description" />
+			</f:facet>
+			<h:outputText value="#{job.description}" />
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="FilePath" />
+			</f:facet>
+			<h:outputText value="#{job.filePath}" />
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Queue" />
+			</f:facet>
+			<h:outputText value="#{job.queue.name}" />
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Restartable" />
+			</f:facet>
+			<h:outputText value="#{job.canBeRestarted}" />
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Main Class" />
+			</f:facet>
+			<h:outputText value="#{job.javaClassName}" />
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Application" />
+			</f:facet>
+			<h:outputText value="#{job.application}" />
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Module" />
+			</f:facet>
+			<h:outputText value="#{job.module}" />
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Keyword 1" />
+			</f:facet>
+			<h:outputText value="#{job.keyword1}" />
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Keyword 2" />
+			</f:facet>
+			<h:outputText value="#{job.keyword2}" />
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Keyword 3" />
+			</f:facet>
+			<h:outputText value="#{job.keyword3}" />
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Highlander" />
+			</f:facet>
+			<h:outputText value="#{job.highlander}" />
+		</p:column>
+		<p:column>
+			<f:facet name="header">
+				<h:outputText value="Jar filepath" />
+			</f:facet>
+			<h:outputText value="#{job.jarPath}" />
+		</p:column>
+	</p:dataTable>
+
+	<p>
+		<h:inputText value="#{jobDefControler.userName}" />
+		<h:commandButton id="enqueue" value="Enqueue selected items"
+			action="#{jobDefControler.enqueue}"
+			disabled="#{empty jobDefControler.selectedJob}" />
+	</p>
+
+</h:form>
+</html>

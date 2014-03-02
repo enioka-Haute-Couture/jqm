@@ -1,0 +1,95 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>jqm-webui-war</artifactId>
+	<parent>
+		<groupId>com.enioka.jqm</groupId>
+		<artifactId>jqm-webui</artifactId>
+		<version>1.1.6-SNAPSHOT</version>
+	</parent>
+	<packaging>war</packaging>
+	<name>jqm-webui-war</name>
+
+	<properties>
+	</properties>
+
+	<dependencies>
+		<!-- Using Hibernate full client -->
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-api-client-hibernate</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-test-helpers</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- container may provide a non Hibernate JTA provider - so we impose 
+			Hibernate -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
+
+		<!-- JSF + PrimeFaces for pretty looking widgets -->
+		<dependency>
+			<groupId>javax.faces</groupId>
+			<artifactId>jsf-api</artifactId>
+			<version>2.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.primefaces</groupId>
+			<artifactId>primefaces</artifactId>
+			<version>4.0</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.glassfish.embedded</groupId>
+				<artifactId>maven-embedded-glassfish-plugin</artifactId>
+				<version>3.1.2.2</version>
+
+				<configuration>
+					<app>target/${project.name}-${project.version}</app>
+					<name>jqmadminwar</name>
+					<contextRoot>/</contextRoot>
+					<ports>
+						<http-listener-1>8079</http-listener-1>
+					</ports>
+					<configFile>../jqm-webui-ear/src/main/resources/domain.xml</configFile>
+				</configuration>
+
+				<dependencies>
+					<!-- Our datasource will be an in-memory HSQLDB -->
+					<dependency>
+						<groupId>org.hsqldb</groupId>
+						<artifactId>hsqldb</artifactId>
+						<version>${hsqldb.version}</version>
+					</dependency>
+					<!-- Weld update from the one provided by Glassfish - avoids HHH-8778 -->
+					<dependency>
+						<groupId>org.jboss.weld</groupId>
+						<artifactId>weld-osgi-bundle</artifactId>
+						<version>1.1.18.Final</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.4</version>
+			</plugin>
+
+		</plugins>
+	</build>
+
+</project>
