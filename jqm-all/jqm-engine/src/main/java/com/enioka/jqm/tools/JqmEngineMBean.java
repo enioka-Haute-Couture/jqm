@@ -25,4 +25,14 @@ public interface JqmEngineMBean
      * @return
      */
     long getCurrentlyRunningJobCount();
+
+    /**
+     * True if, for all pollers, the last time the poller looped was less than a polling period ago.
+     */
+    boolean isAllPollersPolling();
+
+    /**
+     * True if at least one queue is full
+     */
+    boolean isFull();
 }

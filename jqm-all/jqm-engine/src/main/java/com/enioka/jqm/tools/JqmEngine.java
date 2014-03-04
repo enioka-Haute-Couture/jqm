@@ -433,4 +433,30 @@ class JqmEngine implements JqmEngineMBean
         em.close();
         return nb;
     }
+
+    @Override
+    public boolean isAllPollersPolling()
+    {
+        for (Polling p : this.pollers)
+        {
+            if (!p.isRunning())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isFull()
+    {
+        for (Polling p : this.pollers)
+        {
+            if (p.isFull())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }

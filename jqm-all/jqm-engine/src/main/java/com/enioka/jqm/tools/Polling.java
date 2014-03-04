@@ -50,6 +50,7 @@ class Polling implements Runnable, PollingMBean
     private JqmEngine engine;
     private boolean hasStopped = false;
     private ObjectName name = null;
+    private Calendar lastLoop = null;
 
     @Override
     public void stop()
@@ -161,6 +162,8 @@ class Polling implements Runnable, PollingMBean
     {
         while (true)
         {
+            lastLoop = Calendar.getInstance();
+
             if (em != null)
             {
                 em.close();
@@ -324,5 +327,17 @@ class Polling implements Runnable, PollingMBean
     public Integer getMaxConcurrentJobInstanceCount()
     {
         return this.dp.getNbThread();
+    }
+
+    @Override
+    public boolean isActuallyPolling()
+    {
+        return (Calendar.getInstance().getTimeInMillis() - this.lastLoop.getTimeInMillis()) <= Math.max(2, dp.getPollingInterval());
+    }
+
+    @Override
+    public boolean isFull()
+    {
+        return this.actualNbThread >= this.dp.getNbThread();
     }
 }

@@ -46,4 +46,14 @@ public interface PollingMBean
      * @return
      */
     long getCurrentlyRunningJobCount();
+
+    /**
+     * True if the last time the poller looped was less than a period ago.
+     */
+    boolean isActuallyPolling();
+    
+    /**
+     * True if running count equals max job number
+     */
+    boolean isFull();
 }
