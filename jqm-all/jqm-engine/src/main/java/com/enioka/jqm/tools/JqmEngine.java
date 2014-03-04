@@ -18,6 +18,7 @@
 
 package com.enioka.jqm.tools;
 
+import java.io.OutputStreamWriter;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.util.ArrayList;
@@ -35,8 +36,11 @@ import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.RollingFileAppender;
 
 import com.enioka.jqm.jndi.JndiContext;
 import com.enioka.jqm.jndi.JndiContextFactory;
@@ -87,6 +91,19 @@ class JqmEngine implements JqmEngineMBean
         catch (Exception e)
         {
             jqmlogger.warn("Log level could not be set", e);
+        }
+
+        // Log multicasting (& log4j stdout redirect)
+        GlobalParameter gp1 = em.createQuery("SELECT g FROM GlobalParameter g WHERE g.key = :k", GlobalParameter.class)
+                .setParameter("k", "logFilePerLaunch").getSingleResult();
+        if (gp1.getValue().equals("true"))
+        {
+            RollingFileAppender a = ((RollingFileAppender) Logger.getRootLogger().getAppender("rollingfile"));
+            MulticastPrintStream s = new MulticastPrintStream(System.out, FilenameUtils.getFullPath(a.getFile()));
+            System.setOut(s);
+            ((ConsoleAppender) Logger.getRootLogger().getAppender("consoleAppender")).setWriter(new OutputStreamWriter(s));
+            s = new MulticastPrintStream(System.err, "C:/TEMP");
+            System.setErr(s);
         }
 
         // JNDI
@@ -262,6 +279,11 @@ class JqmEngine implements JqmEngineMBean
             gp = new GlobalParameter();
             gp.setKey("deadline");
             gp.setValue("10");
+            em.persist(gp);
+
+            gp = new GlobalParameter();
+            gp.setKey("logFilePerLaunch");
+            gp.setValue("true");
             em.persist(gp);
 
             jqmlogger.info("This GlobalParameter will allow to download maven resources");

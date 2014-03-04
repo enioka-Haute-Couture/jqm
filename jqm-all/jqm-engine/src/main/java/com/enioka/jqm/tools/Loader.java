@@ -52,6 +52,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.repository.RemoteRepository;
@@ -390,6 +391,15 @@ class Loader implements Runnable, LoaderMBean
     @Override
     public void run()
     {
+        if (System.out instanceof MulticastPrintStream)
+        {
+            String fileName = StringUtils.leftPad("" + this.job.getId(), 10, "0");
+            MulticastPrintStream mps = (MulticastPrintStream) System.out;
+            mps.registerThread(String.valueOf(fileName + ".stdout.log"));
+            mps = (MulticastPrintStream) System.err;
+            mps.registerThread(String.valueOf(fileName + ".stderr.log"));
+        }
+
         State resultStatus = State.SUBMITTED;
         jqmlogger.debug("LOADER HAS JUST STARTED UP FOR JOB INSTANCE " + job.getId());
         jqmlogger.debug("Job instance " + job.getId() + " has " + job.getParameters().size() + " parameters");
@@ -649,6 +659,15 @@ class Loader implements Runnable, LoaderMBean
         catch (Exception e)
         {
             jqmlogger.error("Could not unregister JobInstance JMX bean", e);
+        }
+
+        // Unregister logger
+        if (System.out instanceof MulticastPrintStream)
+        {
+            MulticastPrintStream mps = (MulticastPrintStream) System.out;
+            mps.unregisterThread();
+            mps = (MulticastPrintStream) System.err;
+            mps.unregisterThread();
         }
     }
 
