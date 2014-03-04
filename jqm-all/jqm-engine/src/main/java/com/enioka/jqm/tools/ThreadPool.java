@@ -47,7 +47,14 @@ class ThreadPool
     {
         jqmlogger.info("Job instance will be inserted inside a thread pool: " + ji.getId());
         jqmlogger.debug("ThreadPool ActualNbThread: " + p.getCurrentActiveThreadCount());
-        pool.submit(new Loader(ji, cache, p));
+        try
+        {
+            pool.submit(new Loader(ji, cache, p));
+        }
+        catch (Throwable t)
+        {
+            jqmlogger.error("An unexpected error has occurred while creating a loader - job cannot be launched", t);
+        }
     }
 
     void stop()

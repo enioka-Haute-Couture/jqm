@@ -387,9 +387,20 @@ class Loader implements Runnable, LoaderMBean
                 "There is no lib dir or no pom.xml inside the directory containing the jar or inside the jar. The jar cannot be launched.");
     }
 
-    // Run
     @Override
     public void run()
+    {
+        try
+        {
+            runPayload();
+        }
+        catch (Throwable t)
+        {
+            jqmlogger.error("An unexpected error has occurred - the engine may have become unstable", t);
+        }
+    };
+
+    private void runPayload()
     {
         if (System.out instanceof MulticastPrintStream)
         {
