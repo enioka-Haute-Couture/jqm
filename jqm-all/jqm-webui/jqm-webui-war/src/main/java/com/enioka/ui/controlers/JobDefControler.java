@@ -57,13 +57,15 @@ public class JobDefControler extends ListDataModel<JobDef> implements Serializab
         return this;
     }
 
-    public void enqueue()
+    public String enqueue()
     {
         JobRequest jr = new JobRequest(this.selected.getApplicationName(), this.userName);
         int i = JqmClientFactory.getClient().enqueue(jr);
 
         FacesMessage msg = new FacesMessage("Enqueue done", "request number " + i);
         FacesContext.getCurrentInstance().addMessage(null, msg);
+
+        return ((Integer) i).toString();
     }
 
     public void setSelectedJob(JobDef job)

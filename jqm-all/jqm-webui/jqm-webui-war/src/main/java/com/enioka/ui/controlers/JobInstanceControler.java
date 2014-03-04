@@ -27,9 +27,10 @@ public class JobInstanceControler extends ListDataModel<JobInstance> implements 
         getJobs();
     }
 
-    public void stop()
+    public String stop()
     {
         JqmClientFactory.getClient().cancelJob(selected.getId());
+        return selected.getId().toString();
     }
 
     public ListDataModel<JobInstance> getJobs()
