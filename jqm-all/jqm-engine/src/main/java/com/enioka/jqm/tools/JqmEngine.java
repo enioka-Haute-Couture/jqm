@@ -171,6 +171,7 @@ class JqmEngine implements JqmEngineMBean
         t.start();
 
         // Done
+        em.close();
         jqmlogger.info("End of JQM engine initialization");
 
     }
@@ -393,10 +394,11 @@ class JqmEngine implements JqmEngineMBean
         this.intPoller.stop();
 
         // Reset the stop counter - we may want to restart one day
+        em = Helpers.getNewEm();
         this.em.getTransaction().begin();
         try
         {
-            this.em.refresh(this.node, LockModeType.PESSIMISTIC_WRITE);
+            this.em.find(Node.class, this.node.getId(), LockModeType.PESSIMISTIC_WRITE);
             this.node.setStop(false);
             this.em.getTransaction().commit();
         }
@@ -405,6 +407,7 @@ class JqmEngine implements JqmEngineMBean
             // Shutdown exception is ignored (happens during tests)
             this.em.getTransaction().rollback();
         }
+        em.close();
 
         // JMX
         try
