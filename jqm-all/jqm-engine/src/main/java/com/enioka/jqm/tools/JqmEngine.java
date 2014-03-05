@@ -63,6 +63,7 @@ class JqmEngine implements JqmEngineMBean
     private static Logger jqmlogger = Logger.getLogger(JqmEngine.class);
     private Semaphore ended = new Semaphore(0);
     private ObjectName name;
+    private boolean hasEnded = false;
 
     /**
      * Starts the engine
@@ -143,6 +144,7 @@ class JqmEngine implements JqmEngineMBean
         {
             throw new JqmInitError("Could not create JMX beans", e);
         }
+        jqmlogger.debug("JMX management bean for the engine was registered");
 
         // Security
         if (System.getSecurityManager() == null)
@@ -199,6 +201,7 @@ class JqmEngine implements JqmEngineMBean
         {
             jqmlogger.error("interrutped", e);
         }
+        hasEnded = true;
         jqmlogger.debug("Stop order was correctly handled");
     }
 
@@ -377,6 +380,10 @@ class JqmEngine implements JqmEngineMBean
             {
                 return;
             }
+        }
+        if (hasEnded)
+        {
+            return;
         }
 
         // If here, all pollers are down. Stop Jetty too

@@ -34,12 +34,12 @@ import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
-import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -467,54 +467,6 @@ public class MultiNodeTest
     }
 
     @Test
-    public void testHighlanderMode() throws Exception
-    {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testHighlanderMode");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-
-        @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null,
-                "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", true, em);
-        em.close();
-
-        JobRequest j = new JobRequest("MarsuApplication", "MAG");
-        for (int i = 0; i < 9; i++)
-        {
-            JqmClientFactory.getClient().enqueue(j);
-        }
-
-        JqmEngine engine1 = new JqmEngine();
-        JqmEngine engine2 = new JqmEngine();
-        engine1.start("localhost");
-        engine2.start("localhost4");
-
-        for (int i = 0; i < 9; i++)
-        {
-            JqmClientFactory.getClient().enqueue(j);
-        }
-
-        TestHelpers.waitFor(2, 10000);
-        engine1.stop();
-        engine2.stop();
-
-        em = Helpers.getNewEm();
-        ArrayList<History> res = (ArrayList<History>) em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class)
-                .getResultList();
-        em.close();
-
-        Assert.assertEquals(2, res.size());
-        Assert.assertEquals(State.ENDED, res.get(0).getState());
-        Assert.assertEquals(State.ENDED, res.get(1).getState());
-    }
-
-    @Test
     public void testThreeNodesThreeQueuesLock() throws Exception
     {
         jqmlogger.debug("**********************************************************");
@@ -691,25 +643,25 @@ public class MultiNodeTest
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
 
+        em.getTransaction().begin();
+        GlobalParameter gp = em.createQuery("SELECT n from GlobalParameter n WHERE n.key = 'internalPollingPeriodMs'",
+                GlobalParameter.class).getSingleResult();
+        gp.setValue("10");
+        em.getTransaction().commit();
+
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
         jdargs.add(jdp);
 
-        @SuppressWarnings("unused")
-        JobDef jd11 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
-                TestHelpers.qVip, 42, "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-
-        @SuppressWarnings("unused")
-        JobDef jd12 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
-                TestHelpers.qNormal, 42, "AppliNode1-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-
-        @SuppressWarnings("unused")
-        JobDef jd21 = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
-                TestHelpers.qVip2, 42, "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qVip,
+                42, "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qVip,
+                42, "AppliNode1-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qNormal, 42, "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j11 = new JobRequest("AppliNode1-1", "MAG");
         JobRequest j12 = new JobRequest("AppliNode1-2", "MAG");
-
         JobRequest j21 = new JobRequest("AppliNode2-1", "MAG");
 
         JqmClientFactory.getClient().enqueue(j11);
@@ -718,7 +670,6 @@ public class MultiNodeTest
         JqmClientFactory.getClient().enqueue(j12);
         JqmClientFactory.getClient().enqueue(j12);
         JqmClientFactory.getClient().enqueue(j12);
-
         JqmClientFactory.getClient().enqueue(j21);
         JqmClientFactory.getClient().enqueue(j21);
         JqmClientFactory.getClient().enqueue(j21);
@@ -726,68 +677,65 @@ public class MultiNodeTest
         JqmEngine engine1 = new JqmEngine();
         JqmEngine engine2 = new JqmEngine();
         engine1.start("localhost");
-        engine2.start("localhost2");
+        engine2.start("localhost4");
 
-        int i = 0;
-        while (i <= 2)
-        {
-            System.out.println(i);
-            if (i == 1)
-            {
-                em.getTransaction().begin();
-                em.createQuery("UPDATE Node n SET n.stop = 'true' WHERE n.name = 'localhost'").executeUpdate();
-                em.getTransaction().commit();
-                em.clear();
-                Node n = (Node) em.createQuery("SELECT n FROM Node n WHERE n.name = 'localhost'").getSingleResult();
-                jqmlogger.debug("Node stop updated: " + n.isStop());
-            }
-            TestHelpers.printJobInstanceTable();
+        // Wait for runs
+        TestHelpers.waitFor(9, 5000);
 
-            JqmClientFactory.getClient().enqueue(j11);
-            JqmClientFactory.getClient().enqueue(j11);
-            JqmClientFactory.getClient().enqueue(j11);
-            JqmClientFactory.getClient().enqueue(j12);
-            JqmClientFactory.getClient().enqueue(j12);
-            JqmClientFactory.getClient().enqueue(j12);
-            JqmClientFactory.getClient().enqueue(j11);
-            JqmClientFactory.getClient().enqueue(j11);
-            JqmClientFactory.getClient().enqueue(j11);
-            JqmClientFactory.getClient().enqueue(j12);
-            JqmClientFactory.getClient().enqueue(j12);
-            JqmClientFactory.getClient().enqueue(j12);
-            JqmClientFactory.getClient().enqueue(j11);
-            JqmClientFactory.getClient().enqueue(j11);
-            JqmClientFactory.getClient().enqueue(j11);
-            JqmClientFactory.getClient().enqueue(j12);
-            JqmClientFactory.getClient().enqueue(j12);
-            JqmClientFactory.getClient().enqueue(j12);
+        // Stop one node
+        em.getTransaction().begin();
+        em.createQuery("UPDATE Node n SET n.stop = 'true' WHERE n.name = 'localhost'").executeUpdate();
+        em.getTransaction().commit();
+        Thread.sleep(100);
 
-            JqmClientFactory.getClient().enqueue(j21);
-            JqmClientFactory.getClient().enqueue(j21);
-            JqmClientFactory.getClient().enqueue(j21);
+        // Enqueue other requests.. they should run on node 2
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j11);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j12);
+        JqmClientFactory.getClient().enqueue(j21);
+        JqmClientFactory.getClient().enqueue(j21);
+        JqmClientFactory.getClient().enqueue(j21);
 
-            Thread.sleep(4000);
+        TestHelpers.waitFor(27, 5000);
 
-            TestHelpers.printJobInstanceTable();
-            i++;
-        }
-
-        engine1.stop();
+        // Only stop node2... node1 should be already dead.
         engine2.stop();
 
-        TypedQuery<JobInstance> query = em.createQuery("SELECT j FROM JobInstance j ORDER BY j.internalPosition ASC", JobInstance.class);
-        ArrayList<JobInstance> res = (ArrayList<JobInstance>) query.getResultList();
-
-        for (JobInstance jobInstance : res)
+        // Check 27 have ended (3 should be blocked in queue)
+        int i = 0;
+        for (History jobInstance : em.createQuery("SELECT j FROM History j ORDER BY j.id ASC", History.class).getResultList())
         {
-            if (jobInstance.getState().equals(State.ATTRIBUTED) || jobInstance.getState().equals(State.RUNNING))
+            if (!jobInstance.getState().equals(State.ENDED))
             {
-                Assert.assertEquals(true, false);
+                Assert.fail();
             }
+            i++;
         }
-
-        TestHelpers.printJobInstanceTable();
-        Assert.assertEquals(true, true);
+        Assert.assertEquals(27, i);
+        i = 0;
+        for (JobInstance jobInstance : em.createQuery("SELECT j FROM JobInstance j ORDER BY j.id ASC", JobInstance.class).getResultList())
+        {
+            if (!jobInstance.getState().equals(State.SUBMITTED))
+            {
+                Assert.fail();
+            }
+            i++;
+        }
+        Assert.assertEquals(3, i);
     }
-
 }

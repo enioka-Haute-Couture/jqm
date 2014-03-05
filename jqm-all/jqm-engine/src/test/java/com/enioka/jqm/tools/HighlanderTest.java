@@ -20,6 +20,7 @@ package com.enioka.jqm.tools;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -107,23 +108,33 @@ public class HighlanderTest
         engine1.start("localhost");
         engine2.start("localhost4");
 
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < 99; i++)
         {
             JqmClientFactory.getClient().enqueue(j);
         }
 
-        TestHelpers.waitFor(2, 10000);
+        TestHelpers.waitFor(20, 5000); // Actually wait.
         engine1.stop();
         engine2.stop();
 
         em = Helpers.getNewEm();
-        ArrayList<History> res = (ArrayList<History>) em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class)
+        ArrayList<History> res = (ArrayList<History>) em.createQuery("SELECT j FROM History j ORDER BY j.id ASC", History.class)
                 .getResultList();
         em.close();
 
-        Assert.assertEquals(2, res.size());
         Assert.assertEquals(State.ENDED, res.get(0).getState());
         Assert.assertEquals(State.ENDED, res.get(1).getState());
+
+        Calendar prevEnd = null;
+        for (History h : res)
+        {
+            if (h.getExecutionDate().before(prevEnd))
+            {
+                Assert.fail("executions were not exclusive");
+            }
+            prevEnd = h.getEndDate();
+        }
+        System.out.println("there were n histories: " + res.size());
     }
 
     @Test
