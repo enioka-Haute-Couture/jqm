@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
@@ -185,6 +186,33 @@ public class MiscTest
         Assert.assertEquals(2, ji.size());
         Assert.assertEquals(State.ENDED, ji.get(0).getState());
         Assert.assertEquals(State.ENDED, ji.get(1).getState());
+    }
+
+    @Test
+    public void testRemoteStop() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testRemoteStop");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        em.getTransaction().begin();
+        GlobalParameter gp = em.createQuery("SELECT n from GlobalParameter n WHERE n.key = 'internalPollingPeriodMs'",
+                GlobalParameter.class).getSingleResult();
+        gp.setValue("10");
+        em.getTransaction().commit();
+
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+
+        em.getTransaction().begin();
+        TestHelpers.node.setStop(true);
+        em.getTransaction().commit();
+
+        TestHelpers.waitFor(2, 3000);
+        Assert.assertFalse(engine1.isAllPollersPolling());
     }
 
 }

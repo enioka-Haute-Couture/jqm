@@ -62,6 +62,7 @@ public class TestHelpers
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("defaultConnection", "jdbc/marsu", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("deadline", "10", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("logFilePerLaunch", "false", em);
+        TestHelpers.gpCentral = CreationTools.createGlobalParameter("internalPollingPeriodMs", "10000", em);
 
         TestHelpers.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42, em);
         TestHelpers.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, em);

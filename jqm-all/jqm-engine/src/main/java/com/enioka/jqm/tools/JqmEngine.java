@@ -54,6 +54,7 @@ class JqmEngine implements JqmEngineMBean
 {
     private List<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
     private List<Polling> pollers = new ArrayList<Polling>();
+    private InternalPoller intPoller = null;
     private Node node = null;
     private EntityManager em = Helpers.getNewEm();
     private Map<String, URL[]> cache = new ConcurrentHashMap<String, URL[]>();
@@ -161,6 +162,13 @@ class JqmEngine implements JqmEngineMBean
             Thread t = new Thread(p);
             t.start();
         }
+
+        // Internal poller (stop notifications, keepalive)
+        intPoller = new InternalPoller(this);
+        Thread t = new Thread(intPoller);
+        t.start();
+
+        // Done
         jqmlogger.info("End of JQM engine initialization");
 
     }
@@ -172,6 +180,7 @@ class JqmEngine implements JqmEngineMBean
     public void stop()
     {
         jqmlogger.debug("JQM engine has received a stop order");
+
         // Stop pollers
         for (Polling p : pollers)
         {
@@ -188,7 +197,7 @@ class JqmEngine implements JqmEngineMBean
         }
         catch (InterruptedException e)
         {
-            jqmlogger.error(e);
+            jqmlogger.error("interrutped", e);
         }
         jqmlogger.debug("Stop order was correctly handled");
     }
@@ -286,6 +295,11 @@ class JqmEngine implements JqmEngineMBean
             gp.setValue("true");
             em.persist(gp);
 
+            gp = new GlobalParameter();
+            gp.setKey("internalPollingPeriodMs");
+            gp.setValue("10000");
+            em.persist(gp);
+
             jqmlogger.info("This GlobalParameter will allow to download maven resources");
         }
         else
@@ -367,6 +381,9 @@ class JqmEngine implements JqmEngineMBean
 
         // If here, all pollers are down. Stop Jetty too
         this.server.stop();
+
+        // Also stop the internal poller
+        this.intPoller.stop();
 
         // Reset the stop counter - we may want to restart one day
         this.em.getTransaction().begin();

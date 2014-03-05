@@ -26,12 +26,14 @@ import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.Deliverable;
+import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.MessageJi;
 
@@ -169,4 +171,25 @@ public final class Helpers
         return j;
     }
 
+    /**
+     * Retrieve the value of a single-valued parameter.
+     * 
+     * @param key
+     * @param defaultValue
+     * @param em
+     * @return
+     */
+    static String getParameter(String key, String defaultValue, EntityManager em)
+    {
+        try
+        {
+            GlobalParameter gp = em.createQuery("SELECT n from GlobalParameter n WHERE n.key = :key", GlobalParameter.class)
+                    .setParameter("key", key).getSingleResult();
+            return gp.getValue();
+        }
+        catch (NoResultException e)
+        {
+            return defaultValue;
+        }
+    }
 }

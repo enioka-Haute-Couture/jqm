@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.State;
 
@@ -51,11 +50,16 @@ class Polling implements Runnable, PollingMBean
     private boolean hasStopped = false;
     private ObjectName name = null;
     private Calendar lastLoop = null;
+    private Thread localThread = null;
 
     @Override
     public void stop()
     {
         run = false;
+        if (localThread != null)
+        {
+            localThread.interrupt();
+        }
     }
 
     Polling(DeploymentParameter dp, Map<String, URL[]> cache, JqmEngine engine)
@@ -160,91 +164,71 @@ class Polling implements Runnable, PollingMBean
     @Override
     public void run()
     {
+        this.localThread = Thread.currentThread();
         while (true)
         {
             lastLoop = Calendar.getInstance();
 
+            // Reset the em on each loop.
+            // TODO: why is this necessary? Only for dp refresh? Cache size?
             if (em != null)
             {
                 em.close();
             }
             em = Helpers.getNewEm();
+
+            // Wait according to the deploymentParameter
             try
             {
-                // Sleep for the required time (& exit if asked to)
-                if (!run)
-                {
-                    break;
-                }
-
-                // Wait according to the deploymentParameter
                 Thread.sleep(dp.getPollingInterval());
-                if (!run)
-                {
-                    break;
-                }
-
-                // Check if a stop order has been given
-                Node n = dp.getNode();
-                if (n.isStop())
-                {
-                    jqmlogger.debug("Current node must be stopped: " + dp.getNode().isStop());
-
-                    Long nbRunning = (Long) em
-                            .createQuery(
-                                    "SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
-                            .setParameter("node", n).getSingleResult();
-                    jqmlogger.debug("Waiting the end of " + nbRunning + " job(s)");
-
-                    if (nbRunning == 0)
-                    {
-                        run = false;
-                    }
-
-                    // Whatever happens, do not not take new jobs during shutdown
-                    continue;
-                }
-
-                // Get a JI to run
-                JobInstance ji = dequeue();
-                if (ji == null)
-                {
-                    continue;
-                }
-
-                jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
-                jqmlogger.debug("Actual deploymentParameter: " + dp.getNode().getId());
-                jqmlogger.debug("Theorical max nbThread: " + dp.getNbThread());
-                jqmlogger.debug("Actual nbThread: " + actualNbThread);
-                jqmlogger.debug("JI that will be attributed: " + ji.getId());
-                jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
-
-                // We will run this JI!
-                actualNbThread++;
-
-                jqmlogger.debug("TPS QUEUE: " + tp.getQueue().getId());
-                jqmlogger.debug("INCREMENTATION NBTHREAD: " + actualNbThread);
-                jqmlogger.debug("POLLING QUEUE: " + ji.getQueue().getId());
-                jqmlogger.debug("Should the node corresponding to the current job be stopped: " + ji.getNode().isStop());
-
-                em.getTransaction().begin();
-                Helpers.createMessage("Status updated: ATTRIBUTED", ji, em);
-                em.getTransaction().commit();
-
-                // Run it
-                tp.run(ji, this);
-                ji = null;
             }
             catch (InterruptedException e)
             {
-                jqmlogger.warn(e);
             }
+
+            // Exit if asked to
+            if (!run)
+            {
+                break;
+            }
+
+            // Get a JI to run
+            JobInstance ji = dequeue();
+            if (ji == null)
+            {
+                continue;
+            }
+
+            jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
+            jqmlogger.debug("Actual deploymentParameter: " + dp.getNode().getId());
+            jqmlogger.debug("Theorical max nbThread: " + dp.getNbThread());
+            jqmlogger.debug("Actual nbThread: " + actualNbThread);
+            jqmlogger.debug("JI that will be attributed: " + ji.getId());
+            jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
+
+            // We will run this JI!
+            actualNbThread++;
+
+            jqmlogger.debug("TPS QUEUE: " + tp.getQueue().getId());
+            jqmlogger.debug("INCREMENTATION NBTHREAD: " + actualNbThread);
+            jqmlogger.debug("POLLING QUEUE: " + ji.getQueue().getId());
+            jqmlogger.debug("Should the node corresponding to the current job be stopped: " + ji.getNode().isStop());
+
+            em.getTransaction().begin();
+            Helpers.createMessage("Status updated: ATTRIBUTED", ji, em);
+            em.getTransaction().commit();
+
+            // Run it
+            tp.run(ji, this);
+            ji = null;
         }
         jqmlogger.debug("Poller loop on queue " + this.queue.getName() + " is stopping [engine " + this.dp.getNode().getName() + "]");
+        waitForAllThreads(60 * 1000);
         em.close();
         this.tp.stop();
         this.hasStopped = true;
         jqmlogger.info("Poller on queue " + dp.getQueue().getName() + " has ended");
+
         // Let the engine decide if it should stop completely
         this.engine.checkEngineEnd();
 
@@ -278,6 +262,37 @@ class Polling implements Runnable, PollingMBean
     boolean isRunning()
     {
         return !this.hasStopped;
+    }
+
+    private void waitForAllThreads(long timeOutMs)
+    {
+        long timeWaitedMs = 0;
+        long stepMs = 1000;
+        while (timeWaitedMs <= timeOutMs)
+        {
+            Long nbRunning = (Long) em
+                    .createQuery(
+                            "SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
+                    .setParameter("node", this.dp.getNode()).getSingleResult();
+            jqmlogger.debug("Waiting the end of " + nbRunning + " job(s)");
+
+            if (nbRunning == 0)
+            {
+                break;
+            }
+            try
+            {
+                Thread.sleep(stepMs);
+            }
+            catch (InterruptedException e)
+            {
+            }
+            timeWaitedMs += stepMs;
+        }
+        if (timeWaitedMs > timeOutMs)
+        {
+            jqmlogger.warn("Some job instances did not finish in time - they will be killed for the poller to be able to stop");
+        }
     }
 
     // //////////////////////////////////////////////////////////
