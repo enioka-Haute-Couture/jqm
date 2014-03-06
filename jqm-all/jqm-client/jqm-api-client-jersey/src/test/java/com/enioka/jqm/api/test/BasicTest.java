@@ -8,7 +8,6 @@ import javax.persistence.EntityManager;
 
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.FragmentConfiguration;
 import org.eclipse.jetty.webapp.MetaInfConfiguration;
@@ -45,9 +44,9 @@ public class BasicTest
         System.out.println("Starting Jetty");
         server = new Server(0);
         server.setSendServerVersion(true);
-        QueuedThreadPool threadPool = new QueuedThreadPool();
-        threadPool.setMaxThreads(10);
-        server.setThreadPool(threadPool);
+        // QueuedThreadPool threadPool = new QueuedThreadPool();
+        // threadPool.setMaxThreads(Math.max(10, (Runtime.getRuntime().availableProcessors())));
+        // server.setThreadPool(threadPool);
 
         // Load web application.
         WebAppContext webAppContext = new WebAppContext("../../jqm-ws/target/jqm-ws.war", "/marsu");
