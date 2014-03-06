@@ -1,4 +1,4 @@
-﻿ Contributing to JQM
+﻿Contributing to JQM
 #############################
 
 JQM is an Open Source project under the Apache v2 license. We welcome every contribution through GitHub pull requests.

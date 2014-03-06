@@ -7,4 +7,5 @@
 	:maxdepth: 2
 
 	cli
+	jmx
 
