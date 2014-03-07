@@ -224,6 +224,7 @@ public class MultiNodeTest
         TestHelpers.waitFor(45, 10000);
         engine1.stop();
         engine2.stop();
+        engine3.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.executionDate ASC", History.class);
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
