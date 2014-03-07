@@ -38,7 +38,7 @@ class ClientFactory implements IClientFactory
             {
                 if (defaultClient == null)
                 {
-                    jqmlogger.debug("creating default client");
+                    jqmlogger.trace("creating default client");
                     defaultClient = new HibernateClient(props);
                 }
                 return defaultClient;
@@ -60,7 +60,7 @@ class ClientFactory implements IClientFactory
             {
                 if (clients.containsKey(name))
                 {
-                    jqmlogger.debug("resetting client " + name);
+                    jqmlogger.trace("resetting client " + name);
                     clients.get(name).dispose();
                     clients.remove(name);
                 }
@@ -72,7 +72,7 @@ class ClientFactory implements IClientFactory
             {
                 if (defaultClient != null)
                 {
-                    jqmlogger.debug("resetting defauilt client");
+                    jqmlogger.trace("resetting default client");
                     defaultClient.dispose();
                     defaultClient = null;
                 }

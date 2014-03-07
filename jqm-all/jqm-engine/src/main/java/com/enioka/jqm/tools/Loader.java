@@ -103,14 +103,14 @@ class Loader implements Runnable, LoaderMBean
         }
         catch (Exception e)
         {
-            throw new JqmInitError("Could not create JMX beans", e);
+            throw new JqmInitError("Could not create JMX bean for running job instance", e);
         }
     }
 
     // ExtractJar
     private void extractJar(String jarFile) throws IOException
     {
-        jqmlogger.debug("jar: " + jarFile);
+        jqmlogger.trace("Unpacking jar: " + jarFile);
         JarFile jar = null;
         InputStream is = null;
         FileOutputStream fos = null;
@@ -126,12 +126,10 @@ class Loader implements Runnable, LoaderMBean
             while (enumm.hasMoreElements())
             {
                 JarEntry file = enumm.nextElement();
-                jqmlogger.debug("file: " + file.getName());
                 File f = new File(extractDir + File.separator + file.getName());
                 if (file.isDirectory())
                 {
                     // if its a directory, create it
-                    jqmlogger.debug("The file is actually a directory");
                     if (!f.exists() && !f.mkdir())
                     {
                         throw new IOException("could not create directory " + f.getAbsolutePath());
@@ -179,7 +177,7 @@ class Loader implements Runnable, LoaderMBean
     {
         try
         {
-            jqmlogger.debug("Trying to find the job in the directory: " + f);
+            jqmlogger.trace("Trying to find the job in the directory: " + f);
             File[] list = f.listFiles();
             if (list != null)
             {
@@ -187,7 +185,6 @@ class Loader implements Runnable, LoaderMBean
                 {
                     if (ff.isDirectory() && path.equalsIgnoreCase(ff.getName()))
                     {
-                        jqmlogger.debug("findFile lib " + ff.getPath());
                         lib = ff.getAbsolutePath();
                     }
                     if (ff.isDirectory())
@@ -196,7 +193,6 @@ class Loader implements Runnable, LoaderMBean
                     }
                     else if (path.equalsIgnoreCase(ff.getName()))
                     {
-                        jqmlogger.debug("findFile returning " + ff.getPath());
                         res = ff.getParentFile().getAbsolutePath();
                     }
                 }
@@ -226,6 +222,7 @@ class Loader implements Runnable, LoaderMBean
 
     private void classpathResolution(Node node) throws MalformedURLException, DependencyResolutionException, NoPomException
     {
+        jqmlogger.debug("resolving classpath for job " + this.job.getId());
         if (cache.containsKey(job.getJd().getApplicationName()))
         {
             return;
@@ -234,23 +231,21 @@ class Loader implements Runnable, LoaderMBean
         Collection<Artifact> deps = null;
         File pomFile = new File(FilenameUtils.concat(jarDir.getAbsolutePath(), "pom.xml"));
         File libDir = new File(FilenameUtils.concat(jarDir.getAbsolutePath(), "lib"));
-        jqmlogger.debug("Loader will try to load POM " + pomFile.getAbsolutePath());
         boolean pomFromJar = false;
 
         // 1st: if no pom, no lib dir => find a pom inside the JAR. (& copy it, we will read later)
         if (!pomFile.exists() && !libDir.exists())
         {
-            jqmlogger.debug("No pom inside jar directory. Checking for a pom inside the jar file");
+            jqmlogger.trace("No pom inside jar directory. Checking for a pom inside the jar file");
             InputStream is = null;
             OutputStream os = null;
             try
             {
                 pomFromJar = true;
-                jqmlogger.debug("POM doesn't exist, engine will try to find in the META-INF/maven directory of the Jar file");
+                jqmlogger.trace("POM doesn't exist, engine will try to find in the META-INF/maven directory of the Jar file");
 
                 extractJar(jarFile.getAbsolutePath());
                 findFile("pom.xml", new File(extractDir + "/META-INF/maven/"));
-                jqmlogger.debug("pomdebug: " + res);
 
                 if (res != null)
                 {
@@ -279,7 +274,7 @@ class Loader implements Runnable, LoaderMBean
         // 2nd: if no pom, no pom inside jar, no lib dir => find a lib dir inside the jar
         if (!pomFile.exists() && !libDir.exists())
         {
-            jqmlogger.debug("Trying lib inside jar");
+            jqmlogger.trace("Trying lib inside jar");
             findFile("lib", extractDir);
 
             if (lib != null)
@@ -291,7 +286,6 @@ class Loader implements Runnable, LoaderMBean
                 URL[] libUrls = new URL[files.length];
                 for (int i = 0; i < files.length; i++)
                 {
-                    jqmlogger.debug("Jars in lib/ : " + files[i].toURI().toURL());
                     libUrls[i] = files[i].toURI().toURL();
                 }
 
@@ -301,7 +295,7 @@ class Loader implements Runnable, LoaderMBean
             }
             else
             {
-                jqmlogger.debug("no lib directory inside jar");
+                jqmlogger.trace("no lib directory inside jar");
                 cleanUpExtractedZip();
             }
         }
@@ -309,7 +303,7 @@ class Loader implements Runnable, LoaderMBean
         // 3rd: if pom, use pom!
         if (pomFile.exists() && !libDir.exists())
         {
-            jqmlogger.debug("Reading a pom file");
+            jqmlogger.trace("Reading a pom file");
             Dependencies dependencies = new Dependencies(pomFile.getAbsolutePath());
 
             List<GlobalParameter> repolist = em
@@ -329,7 +323,6 @@ class Loader implements Runnable, LoaderMBean
             deps = new ArrayList<Artifact>();
             for (int i = 0; i < dependencies.getList().size(); i++)
             {
-                jqmlogger.debug("Resolving Maven dep " + dependencies.getList().get(i));
                 deps.addAll(new Aether(remotes, local).resolve(new DefaultArtifact(dependencies.getList().get(i)), "compile"));
             }
 
@@ -350,7 +343,6 @@ class Loader implements Runnable, LoaderMBean
                     continue;
                 }
                 tmp[i] = artifact.getFile().toURI().toURL();
-                jqmlogger.debug("Artifact from pom: " + artifact.getFile().toURI().toURL());
                 i++;
             }
 
@@ -368,14 +360,13 @@ class Loader implements Runnable, LoaderMBean
         // 4: if lib, use lib... (lib has priority over pom)
         if (libDir.exists())
         {
-            jqmlogger.debug("Using the lib directory " + libDir.getAbsolutePath() + " as the source for dependencies");
+            jqmlogger.trace("Using the lib directory " + libDir.getAbsolutePath() + " as the source for dependencies");
             FileFilter fileFilter = new WildcardFileFilter("*.jar");
             File[] files = libDir.listFiles(fileFilter);
             URL[] tmp = new URL[files.length];
             for (int i = 0; i < files.length; i++)
             {
                 tmp[i] = files[i].toURI().toURL();
-                jqmlogger.debug("Artifact from lib dir: " + tmp[i]);
             }
 
             // Put in cache
@@ -412,8 +403,8 @@ class Loader implements Runnable, LoaderMBean
         }
 
         State resultStatus = State.SUBMITTED;
-        jqmlogger.debug("LOADER HAS JUST STARTED UP FOR JOB INSTANCE " + job.getId());
-        jqmlogger.debug("Job instance " + job.getId() + " has " + job.getParameters().size() + " parameters");
+        jqmlogger.debug("A loader/runner thread has just started for Job Instance " + job.getId() + " with " + job.getParameters().size()
+                + " parameters. Jar is: " + job.getJd().getJarPath() + " - class is: " + job.getJd().getJavaClassName());
         jarFile = new File(FilenameUtils.concat(new File(node.getRepo()).getAbsolutePath(), job.getJd().getJarPath()));
         jarDir = jarFile.getParentFile();
 
@@ -437,7 +428,6 @@ class Loader implements Runnable, LoaderMBean
             return;
         }
         extractDir = new File(FilenameUtils.concat(jarDir.getAbsolutePath(), "tmp/"));
-        jqmlogger.debug("Loader will try to launch jar " + jarFile.getAbsolutePath() + " - " + job.getJd().getJavaClassName());
 
         // Create the CLASSPATH for our classloader (if not already in cache)
         try
@@ -446,12 +436,12 @@ class Loader implements Runnable, LoaderMBean
             {
                 if (!cache.containsKey(job.getJd().getApplicationName()))
                 {
-                    jqmlogger.info("Application " + job.getJd().getApplicationName() + " dependencies are not yet in cache");
+                    jqmlogger.trace("Application " + job.getJd().getApplicationName() + " dependencies are not yet in cache");
                     classpathResolution(node);
                 }
                 else
                 {
-                    jqmlogger.debug("Application  " + job.getJd().getApplicationName() + " dependencies are already in cache - "
+                    jqmlogger.trace("Application  " + job.getJd().getApplicationName() + " dependencies are already in cache - "
                             + cache.get(job.getJd().getApplicationName()).length);
                     for (URL s : cache.get(job.getJd().getApplicationName()))
                     {
@@ -484,7 +474,6 @@ class Loader implements Runnable, LoaderMBean
             Helpers.createMessage("Status updated: RUNNING", job, em);
 
             em.getTransaction().commit();
-            jqmlogger.debug("JobInstance was updated: " + job.getState());
         }
         catch (Exception e)
         {
@@ -511,9 +500,9 @@ class Loader implements Runnable, LoaderMBean
             });
 
             // Switch
-            jqmlogger.debug("Setting class loader");
+            jqmlogger.trace("Setting class loader");
             Thread.currentThread().setContextClassLoader(jobClassLoader);
-            jqmlogger.debug("Class Loader was set correctly");
+            jqmlogger.trace("Class Loader was set correctly");
         }
         catch (Exception e)
         {
@@ -523,9 +512,6 @@ class Loader implements Runnable, LoaderMBean
         }
 
         // Go! (launches the main function in the startup class designated in the manifest)
-        jqmlogger.debug("+++++++++++++++++++++++++++++++++++++++");
-        jqmlogger.debug("Job is running in the thread: " + Thread.currentThread().getName());
-        jqmlogger.debug("JOB MAIN FUNCTION WILL BE INVOKED NOW");
         try
         {
             jobClassLoader.launchJar(job, contextClassLoader, em);
@@ -533,15 +519,14 @@ class Loader implements Runnable, LoaderMBean
         }
         catch (JqmKillException e)
         {
-            jqmlogger.info("Job instance  " + job.getId() + " has been killed.");
+            jqmlogger.debug("Job instance  " + job.getId() + " has been killed.");
             resultStatus = State.KILLED;
         }
         catch (Exception e)
         {
-            jqmlogger.info("Job instance " + job.getId() + " has crashed. Exception was:", e);
+            jqmlogger.debug("Job instance " + job.getId() + " has crashed. Exception was:", e);
             resultStatus = State.CRASHED;
         }
-        jqmlogger.debug("++++++++++++++++++++++++++++++++++++++++");
 
         // Job instance has now ended its run
         try
@@ -553,10 +538,7 @@ class Loader implements Runnable, LoaderMBean
             jqmlogger.error("An error occurred while finalizing the job instance.", e);
         }
 
-        jqmlogger.debug("End of loader. Thread will now end");
-        jqmlogger.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-        jqmlogger.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-
+        jqmlogger.debug("End of loader for JobInstance " + this.job.getId() + ". Thread will now end");
         em.close();
     }
 
@@ -568,22 +550,16 @@ class Loader implements Runnable, LoaderMBean
         if (this.contextClassLoader != null)
         {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
-            jqmlogger.debug("Class Loader was correctly restored");
+            jqmlogger.trace("Class Loader was correctly restored");
         }
 
         // Retrieve the object to update
         em.getTransaction().begin();
         em.refresh(job);
-        jqmlogger.debug("Job status after execution: " + job.getState());
-        jqmlogger.debug("Progression after execution: " + job.getProgress());
-        jqmlogger.debug("Post execution, the number of running threads for the current queue is " + p.getCurrentActiveThreadCount());
+        jqmlogger.trace("Progression after execution: " + job.getProgress());
 
         // Update end date
         Calendar endDate = GregorianCalendar.getInstance(Locale.getDefault());
-
-        // STATE UPDATED
-        // job.setState(status);
-        jqmlogger.debug("In the Loader --> ENDED");
 
         // Done: put inside history & remove instance from queue.
         History h = new History();
@@ -610,7 +586,7 @@ class Loader implements Runnable, LoaderMBean
         h.setNode(job.getNode());
 
         em.persist(h);
-        jqmlogger.debug("An History was just created: " + h.getId());
+        jqmlogger.trace("An History was just created: " + h.getId());
 
         for (JobParameter j : job.getParameters())
         {

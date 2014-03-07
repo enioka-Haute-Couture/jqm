@@ -73,7 +73,7 @@ class JettyServer
 
     void stop()
     {
-        jqmlogger.debug("Jetty will be stopped");
+        jqmlogger.info("Jetty will now stop");
         try
         {
             this.server.stop();
@@ -92,6 +92,7 @@ class JettyServer
         {
             return;
         }
+        jqmlogger.info("Jetty will now load the web service application war");
 
         // Load web application.
         WebAppContext webAppContext = new WebAppContext(war.getPath(), "/api");

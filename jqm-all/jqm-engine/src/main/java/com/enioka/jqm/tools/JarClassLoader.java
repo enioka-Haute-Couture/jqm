@@ -72,7 +72,7 @@ class JarClassLoader extends URLClassLoader
 
     void launchJar(JobInstance job, ClassLoader old, EntityManager em) throws JqmEngineException
     {
-        // 1st:load the class
+        // 1st: load the class
         String classQualifiedName = job.getJd().getJavaClassName();
         jqmlogger.debug("Will now load class: " + classQualifiedName);
 
@@ -83,21 +83,20 @@ class JarClassLoader extends URLClassLoader
         }
         catch (Throwable e)
         {
-            jqmlogger.warn("Could not load class");
             throw new JqmEngineException("could not load class " + classQualifiedName, e);
         }
-        jqmlogger.debug("Class " + classQualifiedName + " was correctly loaded");
+        jqmlogger.trace("Class " + classQualifiedName + " was correctly loaded");
 
         // 2nd: what type of payload is this?
         if (Runnable.class.isAssignableFrom(c))
         {
-            jqmlogger.info("This payload is of type: Runnable");
+            jqmlogger.trace("This payload is of type: Runnable");
             launchRunnable(c, job, em);
             return;
         }
         else if (isLegacyPayload(c))
         {
-            jqmlogger.info("This payload is of type: explicit API implementation");
+            jqmlogger.trace("This payload is of type: explicit API implementation");
             launchApiPayload(c, job, em);
             return;
         }
@@ -126,7 +125,7 @@ class JarClassLoader extends URLClassLoader
             }
             if (start != null)
             {
-                jqmlogger.info("This payload is of type: static main");
+                jqmlogger.trace("This payload is of type: static main");
                 launchMain(c, job, em);
                 return;
             }
@@ -144,8 +143,8 @@ class JarClassLoader extends URLClassLoader
         }
         catch (Exception e)
         {
-            jqmlogger.error("Cannot create an instance of class " + c.getCanonicalName() + ". Does it have an argumentless constructor?");
-            throw new JqmEngineException("Could not create payload instance", e);
+            throw new JqmEngineException("Cannot create an instance of class " + c.getCanonicalName()
+                    + ". Does it have an argumentless constructor?", e);
         }
 
         // Injection
@@ -288,14 +287,14 @@ class JarClassLoader extends URLClassLoader
         {
             if (Constants.API_INTERFACE.equals(f.getType().getName()))
             {
-                jqmlogger.debug("The object should be injected at least on field " + f.getName());
+                jqmlogger.trace("The object should be injected at least on field " + f.getName());
                 inject = true;
                 break;
             }
         }
         if (!inject)
         {
-            jqmlogger.debug("This object has no fields available for injection. No injection will take place.");
+            jqmlogger.trace("This object has no fields available for injection. No injection will take place.");
             return;
         }
 
@@ -317,7 +316,7 @@ class JarClassLoader extends URLClassLoader
             {
                 if (f.getType().equals(injInt))
                 {
-                    jqmlogger.debug("Injecting interface JQM into field " + f.getName());
+                    jqmlogger.trace("Injecting interface JQM into field " + f.getName());
                     boolean acc = f.isAccessible();
                     f.setAccessible(true);
                     f.set(o, proxy);

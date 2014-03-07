@@ -64,7 +64,8 @@ class Polling implements Runnable, PollingMBean
 
     Polling(DeploymentParameter dp, Map<String, URL[]> cache, JqmEngine engine)
     {
-        jqmlogger.debug("Polling JobInstances with the Deployment Parameter: " + dp.getClassId());
+        jqmlogger.info("Engine " + engine.getNode().getName() + " will poll JobInstances on queue " + dp.getQueue().getName() + " every "
+                + dp.getPollingInterval() / 1000 + "s with " + dp.getNbThread() + " threads for concurrent instances");
         this.dp = em
                 .createQuery("SELECT dp FROM DeploymentParameter dp LEFT JOIN FETCH dp.queue LEFT JOIN FETCH dp.node WHERE dp.id = :l",
                         DeploymentParameter.class).setParameter("l", dp.getId()).getSingleResult();
@@ -132,8 +133,6 @@ class Polling implements Runnable, PollingMBean
                     .setParameter("i", res.getId()).setParameter("n", dp.getNode()).executeUpdate();
 
             // Stop at the first suitable JI. Release the lock & update the JI which has been attributed to us.
-            jqmlogger.debug("JI number " + res.getId() + " will be selected by this poller loop (already " + actualNbThread + "/"
-                    + dp.getNbThread() + " on " + this.queue.getName() + ")");
             em.getTransaction().commit();
 
             // Refresh: we have used update queries, so the cached entity is out of date.
@@ -199,20 +198,10 @@ class Polling implements Runnable, PollingMBean
                 continue;
             }
 
-            jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
-            jqmlogger.debug("Actual deploymentParameter: " + dp.getNode().getId());
-            jqmlogger.debug("Theorical max nbThread: " + dp.getNbThread());
-            jqmlogger.debug("Actual nbThread: " + actualNbThread);
-            jqmlogger.debug("JI that will be attributed: " + ji.getId());
-            jqmlogger.debug("((((((((((((((((((()))))))))))))))))");
-
             // We will run this JI!
+            jqmlogger.trace("JI number " + ji.getId() + " will be run by this poller this loop (already " + actualNbThread + "/"
+                    + dp.getNbThread() + " on " + this.queue.getName() + ")");
             actualNbThread++;
-
-            jqmlogger.debug("TPS QUEUE: " + tp.getQueue().getId());
-            jqmlogger.debug("INCREMENTATION NBTHREAD: " + actualNbThread);
-            jqmlogger.debug("POLLING QUEUE: " + ji.getQueue().getId());
-            jqmlogger.debug("Should the node corresponding to the current job be stopped: " + ji.getNode().isStop());
 
             em.getTransaction().begin();
             Helpers.createMessage("Status updated: ATTRIBUTED", ji, em);
@@ -222,7 +211,7 @@ class Polling implements Runnable, PollingMBean
             tp.run(ji, this);
             ji = null;
         }
-        jqmlogger.debug("Poller loop on queue " + this.queue.getName() + " is stopping [engine " + this.dp.getNode().getName() + "]");
+        jqmlogger.info("Poller loop on queue " + this.queue.getName() + " is stopping [engine " + this.dp.getNode().getName() + "]");
         waitForAllThreads(60 * 1000);
         em.close();
         this.tp.stop();
@@ -274,7 +263,7 @@ class Polling implements Runnable, PollingMBean
                     .createQuery(
                             "SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
                     .setParameter("node", this.dp.getNode()).getSingleResult();
-            jqmlogger.debug("Waiting the end of " + nbRunning + " job(s)");
+            jqmlogger.trace("Waiting the end of " + nbRunning + " job(s)");
 
             if (nbRunning == 0)
             {

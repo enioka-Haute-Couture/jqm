@@ -69,7 +69,7 @@ class JqmEngine implements JqmEngineMBean
      * Starts the engine
      * 
      * @param nodeName
-     *            the node to start
+     *            the name of the node to start, as in the NODE table of the database.
      * @throws JqmInitError
      */
     public void start(String nodeName)
@@ -94,6 +94,9 @@ class JqmEngine implements JqmEngineMBean
         {
             jqmlogger.warn("Log level could not be set", e);
         }
+
+        // Log!
+        jqmlogger.info("JQM engine for node " + nodeName + " is starting");
 
         // Log multicasting (& log4j stdout redirect)
         GlobalParameter gp1 = em.createQuery("SELECT g FROM GlobalParameter g WHERE g.key = :k", GlobalParameter.class)
@@ -144,13 +147,14 @@ class JqmEngine implements JqmEngineMBean
         {
             throw new JqmInitError("Could not create JMX beans", e);
         }
-        jqmlogger.debug("JMX management bean for the engine was registered");
+        jqmlogger.info("JMX management bean for the engine was registered");
 
         // Security
         if (System.getSecurityManager() == null)
         {
             System.setSecurityManager(new SecurityManagerPayload());
         }
+        jqmlogger.info("Security manager was registered");
 
         // Get queues to listen to
         dps = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
@@ -164,6 +168,7 @@ class JqmEngine implements JqmEngineMBean
             Thread t = new Thread(p);
             t.start();
         }
+        jqmlogger.info("All required queues are now polled");
 
         // Internal poller (stop notifications, keepalive)
         intPoller = new InternalPoller(this);
@@ -173,7 +178,6 @@ class JqmEngine implements JqmEngineMBean
         // Done
         em.close();
         jqmlogger.info("End of JQM engine initialization");
-
     }
 
     /**
@@ -182,12 +186,11 @@ class JqmEngine implements JqmEngineMBean
     @Override
     public void stop()
     {
-        jqmlogger.debug("JQM engine has received a stop order");
+        jqmlogger.info("JQM engine " + this.node.getName() + " has received a stop order");
 
         // Stop pollers
         for (Polling p : pollers)
         {
-            jqmlogger.debug("Engine " + this.node.getName() + " asks queue " + p.getDp().getQueue().getName() + " to stop.");
             p.stop();
         }
 
@@ -203,7 +206,7 @@ class JqmEngine implements JqmEngineMBean
             jqmlogger.error("interrutped", e);
         }
         hasEnded = true;
-        jqmlogger.debug("Stop order was correctly handled");
+        jqmlogger.debug("Stop order was correctly handled. Engine for node " + this.node.getName() + " has stopped.");
     }
 
     Node checkAndUpdateNode(String nodeName)
@@ -215,7 +218,6 @@ class JqmEngine implements JqmEngineMBean
         try
         {
             n = em.createQuery("SELECT n FROM Node n WHERE n.name = :l", Node.class).setParameter("l", nodeName).getSingleResult();
-            jqmlogger.info("Node " + nodeName + " was found in the configuration");
         }
         catch (NoResultException e)
         {
@@ -256,7 +258,7 @@ class JqmEngine implements JqmEngineMBean
                 // Faulty configuration, but why not
                 q = em.createQuery("SELECT q FROM Queue q", Queue.class).getResultList().get(0);
                 q.setDefaultQueue(true);
-                jqmlogger.warn("Queue " + q.getName() + " was modified to become the default queue as there were mutliple default queue");
+                jqmlogger.info("Queue " + q.getName() + " was modified to become the default queue as there were mutliple default queue");
             }
             catch (NoResultException e)
             {
@@ -280,11 +282,6 @@ class JqmEngine implements JqmEngineMBean
             em.persist(gp);
 
             gp = new GlobalParameter();
-            gp.setKey("mavenRepo");
-            gp.setValue("http://download.eclipse.org/rt/eclipselink/maven.repo/");
-            em.persist(gp);
-
-            gp = new GlobalParameter();
             gp.setKey(Constants.GP_DEFAULT_CONNECTION_KEY);
             gp.setValue(Constants.GP_JQM_CONNECTION_ALIAS);
             em.persist(gp);
@@ -303,12 +300,6 @@ class JqmEngine implements JqmEngineMBean
             gp.setKey("internalPollingPeriodMs");
             gp.setValue("10000");
             em.persist(gp);
-
-            jqmlogger.info("This GlobalParameter will allow to download maven resources");
-        }
-        else
-        {
-            jqmlogger.info("This GlobalParameter is already exists");
         }
 
         // Deployment parameter
@@ -328,7 +319,7 @@ class JqmEngine implements JqmEngineMBean
         }
         else
         {
-            jqmlogger.info("This node is already configured to take jobs from the default queue");
+            jqmlogger.info("This node is configured to take jobs from at least one queue");
         }
 
         // JNDI alias for the JDBC connection to the JQM database
@@ -337,7 +328,7 @@ class JqmEngine implements JqmEngineMBean
         {
             localDb = (DatabaseProp) em.createQuery("SELECT dp FROM DatabaseProp dp WHERE dp.name = :alias")
                     .setParameter("alias", Constants.GP_JQM_CONNECTION_ALIAS).getSingleResult();
-            jqmlogger.info("The jdbc/jqm alias already exists and references " + localDb.getUrl());
+            jqmlogger.trace("The jdbc/jqm alias already exists and references " + localDb.getUrl());
         }
         catch (NoResultException e)
         {
@@ -350,7 +341,8 @@ class JqmEngine implements JqmEngineMBean
             localDb.setUserName((String) props.get("javax.persistence.jdbc.user"));
             em.persist(localDb);
 
-            jqmlogger.info("A  JNDI alias towards the JQM db has been created. It references: " + localDb.getUrl());
+            jqmlogger.info("A  JNDI alias named " + Constants.GP_JQM_CONNECTION_ALIAS
+                    + " towards the JQM db has been created. It references: " + localDb.getUrl());
         }
 
         // Done
@@ -375,6 +367,7 @@ class JqmEngine implements JqmEngineMBean
 
     synchronized void checkEngineEnd()
     {
+        jqmlogger.trace("Checking if engine should end with the latest poller");
         for (Polling poller : pollers)
         {
             if (poller.isRunning())
@@ -386,6 +379,7 @@ class JqmEngine implements JqmEngineMBean
         {
             return;
         }
+        jqmlogger.trace("The engine should end with the latest poller");
 
         // If here, all pollers are down. Stop Jetty too
         this.server.stop();

@@ -31,7 +31,7 @@ import com.enioka.jqm.jpamodel.State;
 
 class JobManagerHandler implements InvocationHandler
 {
-    private Logger jqmlogger = Logger.getLogger(JobManagerHandler.class);
+    private static Logger jqmlogger = Logger.getLogger(JobManagerHandler.class);
 
     private JobInstance ji;
     private EntityManager em;
@@ -161,10 +161,10 @@ class JobManagerHandler implements InvocationHandler
     private void shouldKill()
     {
         em.refresh(ji);
-        jqmlogger.debug("Analysis: should JI " + ji.getId() + " get killed? Status is " + ji.getState());
+        jqmlogger.trace("Analysis: should JI " + ji.getId() + " get killed? Status is " + ji.getState());
         if (ji.getState().equals(State.KILLED))
         {
-            jqmlogger.debug("Link: Job will be KILLED");
+            jqmlogger.info("Job will be killed at the request of a user");
             Thread.currentThread().interrupt();
             throw new JqmKillException("This job" + "(ID: " + ji.getId() + ")" + " has been killed by a user");
         }
@@ -196,7 +196,6 @@ class JobManagerHandler implements InvocationHandler
         em.refresh(ji, LockModeType.PESSIMISTIC_WRITE);
         ji.setProgress(msg);
         em.getTransaction().commit();
-        jqmlogger.debug("Current progression: " + msg);
     }
 
     private Integer enqueue(String applicationName, String user, String mail, String sessionId, String application, String module,
@@ -233,7 +232,7 @@ class JobManagerHandler implements InvocationHandler
             }
             catch (InterruptedException e)
             {
-                jqmlogger.debug(e);
+                break;
             }
             try
             {
@@ -256,7 +255,7 @@ class JobManagerHandler implements InvocationHandler
                 "" + ji.getJd().getApplicationName() + "/" + ji.getId() + "/" + UUID.randomUUID() + "." + ext);
         String fileName = FilenameUtils.getName(path);
         FileUtils.moveFile(new File(path), new File(destPath));
-        jqmlogger.info("A deliverable is added. Stored as " + destPath + ". Initial name: " + fileName);
+        jqmlogger.debug("A deliverable is added. Stored as " + destPath + ". Initial name: " + fileName);
 
         em.getTransaction().begin();
         Deliverable d = Helpers.createDeliverable(destPath, fileName, fileLabel, this.ji.getId(), em);

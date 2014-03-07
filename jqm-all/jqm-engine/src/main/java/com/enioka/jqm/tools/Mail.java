@@ -89,7 +89,7 @@ class Mail
                 userName = from;
             }
             useAuth = true;
-            jqmlogger.debug("Mail will be sent using login " + userName + " and a password");
+            jqmlogger.trace("Mail will be sent using login " + userName + " and a password");
         }
         else
         {
@@ -142,7 +142,7 @@ class Mail
                     + ji.getNode().getName() + "\n" + "Best regards,\n");
 
             Transport.send(msg);
-            jqmlogger.debug("Email sent successfully.");
+            jqmlogger.trace("Email sent successfully.");
         }
         catch (Exception e)
         {

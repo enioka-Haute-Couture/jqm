@@ -40,6 +40,7 @@ class InternalPoller implements Runnable
     @Override
     public void run()
     {
+        jqmlogger.info("Start of the internal poller");
         this.localThread = Thread.currentThread();
         while (true)
         {
@@ -59,15 +60,15 @@ class InternalPoller implements Runnable
             em.refresh(this.node);
             if (this.node.isStop())
             {
-                jqmlogger.debug("Node has received a stop order");
-                jqmlogger.debug("At stop order time, there are " + this.engine.getCurrentlyRunningJobCount() + " jobs running in the node");
+                jqmlogger.info("Node has received a stop order from the database");
+                jqmlogger.trace("At stop order time, there are " + this.engine.getCurrentlyRunningJobCount() + " jobs running in the node");
                 this.run = false;
                 this.engine.stop();
                 break;
             }
         }
 
-        jqmlogger.info("End of internal poller");
+        jqmlogger.info("End of the internal poller");
     }
 
 }

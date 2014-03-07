@@ -82,39 +82,39 @@ final class HibernateClient implements JqmClient
         this.p = p;
         if (p.containsKey("emf"))
         {
-            jqmlogger.debug("emf present in properties");
+            jqmlogger.trace("emf present in properties");
             emf = (EntityManagerFactory) p.get("emf");
         }
     }
 
     private EntityManagerFactory createFactory()
     {
-        jqmlogger.info("Creating connection pool to database");
+        jqmlogger.debug("Creating connection pool to database");
 
         InputStream fis = null;
         try
         {
-            jqmlogger.debug("Current . is:" + (new File(".")).getAbsolutePath());
+            jqmlogger.trace("Current . is:" + (new File(".")).getAbsolutePath());
             fis = this.getClass().getClassLoader().getResourceAsStream("META-INF/jqm.properties");
             if (fis == null)
             {
-                jqmlogger.info("No jqm.properties file found.");
+                jqmlogger.trace("No jqm.properties file found.");
             }
             else
             {
                 p.load(fis);
-                jqmlogger.debug("A jqm.properties file was found");
+                jqmlogger.trace("A jqm.properties file was found");
             }
 
             fis = this.getClass().getClassLoader().getResourceAsStream("db.properties");
             if (fis == null)
             {
-                jqmlogger.info("No db.properties file found.");
+                jqmlogger.trace("No db.properties file found.");
             }
             else
             {
                 p.load(fis);
-                jqmlogger.debug("A db.properties file was found");
+                jqmlogger.trace("A db.properties file was found");
             }
         }
         catch (IOException e)
@@ -181,7 +181,7 @@ final class HibernateClient implements JqmClient
         }
         catch (Exception e)
         {
-            jqmlogger.error("Could not create EM. Exiting.", e);
+            jqmlogger.error("Could not create EM.", e);
             throw new JqmClientException("Could not create EntityManager", e);
         }
     }
@@ -208,7 +208,7 @@ final class HibernateClient implements JqmClient
     @Override
     public int enqueue(JobRequest jd)
     {
-        jqmlogger.debug("BEGINING ENQUEUE");
+        jqmlogger.trace("BEGINING ENQUEUE");
         EntityManager em = getEm();
         JobDef job = null;
         try
@@ -224,7 +224,7 @@ final class HibernateClient implements JqmClient
             throw new JqmInvalidRequestException("no such job definition");
         }
 
-        jqmlogger.debug("Job to enqueue is from JobDef " + job.getId());
+        jqmlogger.trace("Job to enqueue is from JobDef " + job.getId());
         Integer hl = null;
         List<JobParameter> jps = overrideParameter(job, jd, em);
 
@@ -238,12 +238,12 @@ final class HibernateClient implements JqmClient
 
         if (hl != null)
         {
-            jqmlogger.debug("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + hl);
+            jqmlogger.trace("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + hl);
             em.getTransaction().rollback();
             em.close();
             return hl;
         }
-        jqmlogger.debug("Not in highlander mode or no currently enqueued instance");
+        jqmlogger.trace("Not in highlander mode or no currently enqueued instance");
 
         JobInstance ji = new JobInstance();
         ji.setJd(job);
@@ -266,7 +266,7 @@ final class HibernateClient implements JqmClient
 
         for (JobParameter jp : jps)
         {
-            jqmlogger.debug("Parameter: " + jp.getKey() + " - " + jp.getValue());
+            jqmlogger.trace("Parameter: " + jp.getKey() + " - " + jp.getValue());
             em.persist(ji.addParameter(jp.getKey(), jp.getValue()));
         }
         jqmlogger.debug("JI just created: " + ji.getId());
@@ -331,14 +331,14 @@ final class HibernateClient implements JqmClient
 
         // Do the analysis
         Integer res = null;
-        jqmlogger.debug("Highlander mode analysis is begining");
+        jqmlogger.trace("Highlander mode analysis is begining");
         ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
                 .createQuery("SELECT j FROM JobInstance j WHERE j.jd = :j AND j.state = :s", JobInstance.class).setParameter("j", jd)
                 .setParameter("s", State.SUBMITTED).getResultList();
 
         for (JobInstance j : jobs)
         {
-            jqmlogger.debug("JI seen by highlander: " + j.getId() + j.getState());
+            jqmlogger.trace("JI seen by highlander: " + j.getId() + j.getState());
             if (j.getState().equals(State.SUBMITTED))
             {
                 // HIGHLANDER: only one enqueued job can survive!
@@ -347,7 +347,7 @@ final class HibernateClient implements JqmClient
                 break;
             }
         }
-        jqmlogger.debug("Highlander mode will return: " + res);
+        jqmlogger.trace("Highlander mode will return: " + res);
         return res;
     }
 
@@ -494,7 +494,6 @@ final class HibernateClient implements JqmClient
 
         em.getTransaction().commit();
         em.close();
-        jqmlogger.debug("Job status after killJob: " + j.getState());
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -1039,9 +1038,6 @@ final class HibernateClient implements JqmClient
         tmp = em.createQuery("SELECT d FROM Deliverable d WHERE d.jobId = :idJob", Deliverable.class).setParameter("idJob", idJob)
                 .getResultList();
 
-        jqmlogger.debug("idJob of the deliverable: " + idJob);
-        jqmlogger.debug("size of the deliverable list: " + tmp.size());
-
         for (Deliverable del : tmp)
         {
             streams.add(getDeliverableContent(del));
@@ -1064,7 +1060,6 @@ final class HibernateClient implements JqmClient
         }
         catch (Exception e)
         {
-            jqmlogger.info("could not get file content", e);
             em.close();
             throw new JqmClientException("Could not get find deliverable description inside DB - your ID may be wrong", e);
         }
@@ -1088,19 +1083,18 @@ final class HibernateClient implements JqmClient
         catch (Exception e)
         {
             h = null;
-            jqmlogger.info("GetOneDeliverable: No ended job found with this deliverable ID");
             em.close();
             throw new JqmClientException("No ended job found with the deliverable ID", e);
         }
 
         String destDir = System.getProperty("java.io.tmpdir") + "/" + h.getId();
         (new File(destDir)).mkdir();
-        jqmlogger.debug("File will be copied into " + destDir);
+        jqmlogger.trace("File will be copied into " + destDir);
 
         try
         {
             url = new URL("http://" + h.getNode().getDns() + ":" + h.getNode().getPort() + "/getfile?file=" + deliverable.getRandomId());
-            jqmlogger.debug("URL: " + url.toString());
+            jqmlogger.trace("URL: " + url.toString());
         }
         catch (MalformedURLException e)
         {
@@ -1111,7 +1105,7 @@ final class HibernateClient implements JqmClient
         {
             file = new File(destDir + "/" + h.getId() + deliverable.getOriginalFileName());
             FileUtils.copyURLToFile(url, file);
-            jqmlogger.debug("File was downloaded to " + file.getAbsolutePath());
+            jqmlogger.trace("File was downloaded to " + file.getAbsolutePath());
         }
         catch (IOException e)
         {

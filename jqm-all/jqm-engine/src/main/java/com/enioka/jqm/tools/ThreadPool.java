@@ -45,8 +45,7 @@ class ThreadPool
 
     void run(com.enioka.jqm.jpamodel.JobInstance ji, Polling p)
     {
-        jqmlogger.info("Job instance will be inserted inside a thread pool: " + ji.getId());
-        jqmlogger.debug("ThreadPool ActualNbThread: " + p.getCurrentActiveThreadCount());
+        jqmlogger.trace("Thread pool is taking inside JobInstance nb " + ji.getId());
         try
         {
             pool.submit(new Loader(ji, cache, p));
@@ -59,9 +58,9 @@ class ThreadPool
 
     void stop()
     {
-        jqmlogger.debug("A thread pool will now try to stop");
+        jqmlogger.trace("A thread pool will now try to stop");
         this.pool.shutdown();
-        jqmlogger.debug("A thread pool has stopped properly");
+        jqmlogger.trace("A thread pool has stopped properly");
     }
 
     Queue getQueue()

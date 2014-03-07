@@ -49,8 +49,7 @@ class Dependencies
 
         try
         {
-            jqmlogger.debug(fXmlFile.getPath());
-            jqmlogger.debug("Working Directory = " + System.getProperty("user.dir"));
+            jqmlogger.trace("Resolving dependencies from pom file at " + fXmlFile.getPath());
             if (fXmlFile == null || !fXmlFile.isFile())
             {
                 throw new FileNotFoundException("The XML file " + fXmlFile + " was not found");
@@ -98,6 +97,7 @@ class Dependencies
             }
 
         }
+        // All this is ugly but will disappear with #44
         catch (ParserConfigurationException e)
         {
             jqmlogger.error(e);
