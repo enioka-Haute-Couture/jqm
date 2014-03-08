@@ -44,7 +44,11 @@ import com.enioka.jqm.jndi.JndiContext;
 import com.enioka.jqm.jndi.JndiContextFactory;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
+import com.enioka.jqm.jpamodel.History;
+import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
+import com.enioka.jqm.jpamodel.State;
 
 class JqmEngine implements JqmEngineMBean
 {
@@ -161,6 +165,9 @@ class JqmEngine implements JqmEngineMBean
             System.setSecurityManager(new SecurityManagerPayload());
         }
         jqmlogger.info("Security manager was registered");
+
+        // Cleanup
+        purgeDeadJobInstances(em, this.node);
 
         // Get queues to listen to
         dps = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
@@ -283,6 +290,26 @@ class JqmEngine implements JqmEngineMBean
         // Done
         this.ended.release();
         jqmlogger.info("JQM engine has stopped");
+    }
+
+    private void purgeDeadJobInstances(EntityManager em, Node node)
+    {
+        em.getTransaction().begin();
+        for (JobInstance ji : em
+                .createQuery("SELECT ji FROM JobInstance ji WHERE ji.node = :node AND (ji.state = 'SUBMITTED' OR ji.state = 'RUNNING')",
+                        JobInstance.class).setParameter("node", node).getResultList())
+        {
+            History h = Helpers.createHistory(ji, em, State.CRASHED, Calendar.getInstance());
+            Message m = new Message();
+            m.setHistory(h);
+            m.setTextMessage("Job was supposed to be running at server startup - usually means it was killed along a server by an admin or a crash");
+            em.persist(m);
+
+            em.createQuery("DELETE FROM MessageJi WHERE jobInstance = :i").setParameter("i", ji).executeUpdate();
+            em.createQuery("DELETE FROM JobParameter WHERE jobInstance = :i").setParameter("i", ji).executeUpdate();
+            em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", ji.getId()).executeUpdate();
+        }
+        em.getTransaction().commit();
     }
 
     // //////////////////////////////////////////////////////////////////////////

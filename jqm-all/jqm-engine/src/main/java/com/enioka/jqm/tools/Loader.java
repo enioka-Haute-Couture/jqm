@@ -62,11 +62,8 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.jpamodel.JobHistoryParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
-import com.enioka.jqm.jpamodel.MessageJi;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.State;
 import com.jcabi.aether.Aether;
@@ -562,47 +559,8 @@ class Loader implements Runnable, LoaderMBean
         Calendar endDate = GregorianCalendar.getInstance(Locale.getDefault());
 
         // Done: put inside history & remove instance from queue.
-        History h = new History();
-        h.setId(job.getId());
-        h.setJd(job.getJd());
-        h.setSessionId(job.getSessionID());
-        h.setQueue(job.getQueue());
-        h.setMessages(new ArrayList<Message>());
-        h.setEnqueueDate(job.getCreationDate());
-        h.setEndDate(endDate);
-        h.setAttributionDate(job.getAttributionDate());
-        h.setExecutionDate(job.getExecutionDate());
-        h.setUserName(job.getUserName());
-        h.setEmail(job.getEmail());
-        h.setParentJobId(job.getParentId());
-        h.setApplication(job.getApplication());
-        h.setModule(job.getModule());
-        h.setKeyword1(job.getKeyword1());
-        h.setKeyword2(job.getKeyword2());
-        h.setKeyword3(job.getKeyword3());
-        h.setProgress(job.getProgress());
-        h.setParameters(new ArrayList<JobHistoryParameter>());
-        h.setStatus(status);
-        h.setNode(job.getNode());
-
-        em.persist(h);
-        jqmlogger.trace("An History was just created: " + h.getId());
-
-        for (JobParameter j : job.getParameters())
-        {
-            JobHistoryParameter jp = new JobHistoryParameter();
-            jp.setKey(j.getKey());
-            jp.setValue(j.getValue());
-            em.persist(jp);
-            h.getParameters().add(jp);
-        }
-        for (MessageJi p : job.getMessages())
-        {
-            Message m = new Message();
-            m.setHistory(h);
-            m.setTextMessage(p.getTextMessage());
-            em.persist(m);
-        }
+        History h = Helpers.createHistory(job, em, status, endDate);
+        jqmlogger.trace("An History was just created for job instance " + h.getId());
 
         // A last message (directly created on History, not JI)
         Message m = new Message();

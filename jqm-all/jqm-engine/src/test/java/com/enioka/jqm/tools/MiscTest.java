@@ -1,6 +1,7 @@
 package com.enioka.jqm.tools;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -19,6 +20,7 @@ import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
+import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -253,6 +255,42 @@ public class MiscTest
         {
             engine1.stop();
         }
+    }
+
+    @Test
+    public void testStartupCleanup() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testStartupCleanup");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+        JobDef jd = CreationTools.createJobDef(null, true, "App", null, null, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip,
+                42, "jqm-test-em", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+
+        // Create a running job that should be cleaned at startup
+        em.getTransaction().begin();
+        JobInstance ji = new JobInstance();
+        ji.setApplication("marsu");
+        ji.setAttributionDate(Calendar.getInstance());
+        ji.setCreationDate(Calendar.getInstance());
+        ji.setExecutionDate(Calendar.getInstance());
+        ji.setInternalPosition(0);
+        ji.setJd(jd);
+        ji.setNode(TestHelpers.node);
+        ji.setQueue(TestHelpers.qVip);
+        ji.setState(State.RUNNING);
+        em.persist(ji);
+        em.getTransaction().commit();
+
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        engine1.stop();
+
+        Assert.assertEquals(0, em.createQuery("SELECT ji FROM JobInstance ji", JobInstance.class).getResultList().size());
+        Assert.assertEquals(1, em.createQuery("SELECT ji FROM History ji", History.class).getResultList().size());
+        Assert.assertEquals(State.CRASHED, em.createQuery("SELECT ji FROM History ji", History.class).getResultList().get(0).getState());
     }
 
 }
