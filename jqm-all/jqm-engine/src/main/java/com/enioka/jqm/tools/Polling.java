@@ -42,7 +42,7 @@ class Polling implements Runnable, PollingMBean
     private static Logger jqmlogger = Logger.getLogger(Polling.class);
     private DeploymentParameter dp = null;
     private Queue queue = null;
-    private EntityManager em = Helpers.getNewEm();
+    private EntityManager em = null;
     private ThreadPool tp = null;
     private boolean run = true;
     private Integer actualNbThread;
@@ -66,6 +66,7 @@ class Polling implements Runnable, PollingMBean
     {
         jqmlogger.info("Engine " + engine.getNode().getName() + " will poll JobInstances on queue " + dp.getQueue().getName() + " every "
                 + dp.getPollingInterval() / 1000 + "s with " + dp.getNbThread() + " threads for concurrent instances");
+        em = Helpers.getNewEm("JQM queue poller", "checking fo jobs to run", "" + dp.getQueue().getName());
         this.dp = em
                 .createQuery("SELECT dp FROM DeploymentParameter dp LEFT JOIN FETCH dp.queue LEFT JOIN FETCH dp.node WHERE dp.id = :l",
                         DeploymentParameter.class).setParameter("l", dp.getId()).getSingleResult();
@@ -174,7 +175,7 @@ class Polling implements Runnable, PollingMBean
             {
                 em.close();
             }
-            em = Helpers.getNewEm();
+            em = Helpers.getNewEm("JQM queue poller", "checking for jobs to run", "" + dp.getQueue().getName());
 
             // Wait according to the deploymentParameter
             try

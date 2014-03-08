@@ -21,6 +21,7 @@ package com.enioka.jqm.tools;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Map;
@@ -35,6 +36,7 @@ import javax.persistence.Persistence;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.hibernate.internal.SessionImpl;
 
 import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.Deliverable;
@@ -62,6 +64,7 @@ public final class Helpers
     // The one and only EMF in the engine.
     private static Properties props = new Properties();
     private static EntityManagerFactory emf;
+    private static String driverName = null;
 
     private Helpers()
     {
@@ -80,6 +83,19 @@ public final class Helpers
             emf = createFactory();
         }
         return emf.createEntityManager();
+    }
+
+    /**
+     * Get a fresh EM with audit parameters set (for Oracle, ignored for other databases)
+     * 
+     * @param module
+     * @param action
+     * @param clientInfo
+     * @return
+     */
+    public static EntityManager getNewEm(String module, String action, String clientInfo)
+    {
+        return setAuditProperties(getNewEm(), module, action, clientInfo);
     }
 
     private static EntityManagerFactory createFactory()
@@ -116,6 +132,24 @@ public final class Helpers
         {
             IOUtils.closeQuietly(fis);
         }
+    }
+
+    static EntityManager setAuditProperties(EntityManager em, String module, String action, String clientInfo)
+    {
+        if (driverName == null)
+        {
+            Connection conn = em.unwrap(SessionImpl.class).connection();
+            driverName = conn.getClass().toString();
+        }
+
+        if (driverName.contains("oracle"))
+        {
+            em.getTransaction().begin();
+            em.createNativeQuery("CALL DBMS_APPLICATION_INFO.SET_MODULE('" + module + "', '" + action + "')").executeUpdate();
+            em.createNativeQuery("CALL DBMS_APPLICATION_INFO.SET_CLIENT_INFO('" + clientInfo + "')").executeUpdate();
+            em.getTransaction().commit();
+        }
+        return em;
     }
 
     static void allowCreateSchema()

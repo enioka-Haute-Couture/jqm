@@ -72,7 +72,7 @@ class Loader implements Runnable, LoaderMBean
 {
     private JobInstance job = null;
     private Node node = null;
-    private EntityManager em = Helpers.getNewEm();
+    private EntityManager em = null;
     private Map<String, URL[]> cache = null;
     private Logger jqmlogger = Logger.getLogger(this.getClass());
     private Polling p = null;
@@ -85,6 +85,8 @@ class Loader implements Runnable, LoaderMBean
 
     Loader(JobInstance job, Map<String, URL[]> cache, Polling p)
     {
+        em = Helpers.getNewEm(job.getJd().getApplicationName(), "JQM is running the payload", String.valueOf(job.getId()));
+
         this.job = em.find(JobInstance.class, job.getId());
         this.node = em.find(Node.class, p.getDp().getNode().getId());
         this.cache = cache;

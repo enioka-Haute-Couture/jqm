@@ -11,7 +11,7 @@ class InternalPoller implements Runnable
     private static Logger jqmlogger = Logger.getLogger(InternalPoller.class);
     private boolean run = true;
     private JqmEngine engine = null;
-    private EntityManager em = Helpers.getNewEm();
+    private EntityManager em = Helpers.getNewEm("JQM internal poller", "looking for orders & keepalive", "");
     private Node node = null;
     private Thread localThread = null;
     private long step = 10000;

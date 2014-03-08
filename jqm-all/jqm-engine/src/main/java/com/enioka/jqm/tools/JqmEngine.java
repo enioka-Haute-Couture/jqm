@@ -56,7 +56,6 @@ class JqmEngine implements JqmEngineMBean
     private List<Polling> pollers = new ArrayList<Polling>();
     private InternalPoller intPoller = null;
     private Node node = null;
-    private EntityManager em = Helpers.getNewEm();
     private Map<String, URL[]> cache = new ConcurrentHashMap<String, URL[]>();
     private JettyServer server = null;
     private JndiContext jndiCtx = null;
@@ -78,6 +77,9 @@ class JqmEngine implements JqmEngineMBean
         {
             throw new IllegalArgumentException("nodeName cannot be null or empty");
         }
+
+        // Database connection
+        EntityManager em = Helpers.getNewEm("JQM engine", "starting", "");
 
         // Node configuration is in the database
         node = Helpers.checkAndUpdateNodeConfiguration(nodeName, em);
@@ -190,6 +192,7 @@ class JqmEngine implements JqmEngineMBean
 
         // Done
         em.close();
+        em = null;
         jqmlogger.info("End of JQM engine initialization");
     }
 
@@ -260,19 +263,19 @@ class JqmEngine implements JqmEngineMBean
         this.intPoller.stop();
 
         // Reset the stop counter - we may want to restart one day
-        em = Helpers.getNewEm();
-        this.em.getTransaction().begin();
+        EntityManager em = Helpers.getNewEm("JQM Engine", "stopping", "");
+        em.getTransaction().begin();
         try
         {
-            this.em.find(Node.class, this.node.getId(), LockModeType.PESSIMISTIC_WRITE);
+            em.find(Node.class, this.node.getId(), LockModeType.PESSIMISTIC_WRITE);
             this.node.setStop(false);
             this.node.setLastSeenAlive(null);
-            this.em.getTransaction().commit();
+            em.getTransaction().commit();
         }
         catch (Exception e)
         {
             // Shutdown exception is ignored (happens during tests)
-            this.em.getTransaction().rollback();
+            em.getTransaction().rollback();
         }
         em.close();
 

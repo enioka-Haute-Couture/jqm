@@ -24,6 +24,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -54,7 +55,12 @@ public class DbDataSource implements DataSource, Serializable
     @Override
     public Connection getConnection() throws SQLException
     {
-        return DriverManager.getConnection(connectionString, userName, password);
+        Properties p = new Properties();
+        p.setProperty("password", password);
+        p.setProperty("user", userName);
+        p.setProperty("v$session.program", "JQM payload " + Thread.currentThread().getName());
+
+        return DriverManager.getConnection(connectionString, p);
     }
 
     @Override
