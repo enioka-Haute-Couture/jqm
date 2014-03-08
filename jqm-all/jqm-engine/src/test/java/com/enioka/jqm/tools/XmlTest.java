@@ -152,8 +152,7 @@ public class XmlTest
         TestHelpers.createLocalNode(em);
 
         // Init the default queue (don't start the engine!)
-        JqmEngine engine1 = new JqmEngine();
-        engine1.checkAndUpdateNode("marsu");
+        Helpers.checkAndUpdateNodeConfiguration("marsu", em);
 
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest.xml" });
 

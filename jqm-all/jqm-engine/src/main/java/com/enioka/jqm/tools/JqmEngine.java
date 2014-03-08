@@ -33,8 +33,6 @@ import javax.management.ObjectName;
 import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.ConsoleAppender;
@@ -44,11 +42,9 @@ import org.apache.log4j.RollingFileAppender;
 
 import com.enioka.jqm.jndi.JndiContext;
 import com.enioka.jqm.jndi.JndiContextFactory;
-import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.Queue;
 
 class JqmEngine implements JqmEngineMBean
 {
@@ -80,7 +76,7 @@ class JqmEngine implements JqmEngineMBean
         }
 
         // Node configuration is in the database
-        node = checkAndUpdateNode(nodeName);
+        node = Helpers.checkAndUpdateNodeConfiguration(nodeName, em);
 
         // Check if double-start
         long toWait = (long) (1.1 * Long.parseLong(Helpers.getParameter("aliveSignalMs", "60000", em)));
@@ -217,152 +213,6 @@ class JqmEngine implements JqmEngineMBean
         }
         hasEnded = true;
         jqmlogger.debug("Stop order was correctly handled. Engine for node " + this.node.getName() + " has stopped.");
-    }
-
-    Node checkAndUpdateNode(String nodeName)
-    {
-        em.getTransaction().begin();
-
-        // Node
-        Node n = null;
-        try
-        {
-            n = em.createQuery("SELECT n FROM Node n WHERE n.name = :l", Node.class).setParameter("l", nodeName).getSingleResult();
-        }
-        catch (NoResultException e)
-        {
-            jqmlogger.info("Node " + nodeName + " does not exist in the configuration and will be created with default values");
-            n = new Node();
-            n.setDlRepo(System.getProperty("user.dir") + "/outputfiles/");
-            n.setName(nodeName);
-            n.setPort(0);
-            n.setRepo(System.getProperty("user.dir") + "/jobs/");
-            n.setExportRepo(System.getProperty("user.dir") + "/exports/");
-            em.persist(n);
-        }
-
-        // Default queue
-        Queue q = null;
-        long i = (Long) em.createQuery("SELECT COUNT(qu) FROM Queue qu").getSingleResult();
-        jqmlogger.info("There are " + i + " queues defined in the database");
-        if (i == 0L)
-        {
-            q = new Queue();
-            q.setDefaultQueue(true);
-            q.setDescription("default queue");
-            q.setTimeToLive(1024);
-            q.setName("DEFAULT");
-            em.persist(q);
-
-            jqmlogger.info("A default queue was created in the configuration");
-        }
-        else
-        {
-            try
-            {
-                q = em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true", Queue.class).getSingleResult();
-                jqmlogger.info("Default queue is named " + q.getName());
-            }
-            catch (NonUniqueResultException e)
-            {
-                // Faulty configuration, but why not
-                q = em.createQuery("SELECT q FROM Queue q", Queue.class).getResultList().get(0);
-                q.setDefaultQueue(true);
-                jqmlogger.info("Queue " + q.getName() + " was modified to become the default queue as there were mutliple default queue");
-            }
-            catch (NoResultException e)
-            {
-                // Faulty configuration, but why not
-                q = em.createQuery("SELECT q FROM Queue q", Queue.class).getResultList().get(0);
-                q.setDefaultQueue(true);
-                jqmlogger.warn("Queue  " + q.getName() + " was modified to become the default queue as there was no default queue");
-            }
-        }
-
-        // GlobalParameter
-        GlobalParameter gp = null;
-        i = (Long) em.createQuery("SELECT COUNT(gp) FROM GlobalParameter gp WHERE gp.key = :k")
-                .setParameter("k", Constants.GP_DEFAULT_CONNECTION_KEY).getSingleResult();
-        if (i == 0)
-        {
-            gp = new GlobalParameter();
-
-            gp.setKey("mavenRepo");
-            gp.setValue("http://repo1.maven.org/maven2/");
-            em.persist(gp);
-
-            gp = new GlobalParameter();
-            gp.setKey(Constants.GP_DEFAULT_CONNECTION_KEY);
-            gp.setValue(Constants.GP_JQM_CONNECTION_ALIAS);
-            em.persist(gp);
-
-            gp = new GlobalParameter();
-            gp.setKey("deadline");
-            gp.setValue("10");
-            em.persist(gp);
-
-            gp = new GlobalParameter();
-            gp.setKey("logFilePerLaunch");
-            gp.setValue("true");
-            em.persist(gp);
-
-            gp = new GlobalParameter();
-            gp.setKey("internalPollingPeriodMs");
-            gp.setValue("10000");
-            em.persist(gp);
-
-            gp = new GlobalParameter();
-            gp.setKey("aliveSignalMs");
-            gp.setValue("60000");
-            em.persist(gp);
-        }
-
-        // Deployment parameter
-        DeploymentParameter dp = null;
-        i = (Long) em.createQuery("SELECT COUNT(dp) FROM DeploymentParameter dp WHERE dp.node = :localnode").setParameter("localnode", n)
-                .getSingleResult();
-        if (i == 0)
-        {
-            dp = new DeploymentParameter();
-            dp.setClassId(1);
-            dp.setNbThread(5);
-            dp.setNode(n);
-            dp.setPollingInterval(1000);
-            dp.setQueue(q);
-            em.persist(dp);
-            jqmlogger.info("This node will poll from the default queue with default parameters");
-        }
-        else
-        {
-            jqmlogger.info("This node is configured to take jobs from at least one queue");
-        }
-
-        // JNDI alias for the JDBC connection to the JQM database
-        DatabaseProp localDb = null;
-        try
-        {
-            localDb = (DatabaseProp) em.createQuery("SELECT dp FROM DatabaseProp dp WHERE dp.name = :alias")
-                    .setParameter("alias", Constants.GP_JQM_CONNECTION_ALIAS).getSingleResult();
-            jqmlogger.trace("The jdbc/jqm alias already exists and references " + localDb.getUrl());
-        }
-        catch (NoResultException e)
-        {
-            Map<String, Object> props = em.getEntityManagerFactory().getProperties();
-            localDb = new DatabaseProp();
-            localDb.setDriver((String) props.get("javax.persistence.jdbc.driver"));
-            localDb.setName(Constants.GP_JQM_CONNECTION_ALIAS);
-            localDb.setPwd((String) props.get("javax.persistence.jdbc.password"));
-            localDb.setUrl((String) props.get("javax.persistence.jdbc.url"));
-            localDb.setUserName((String) props.get("javax.persistence.jdbc.user"));
-            em.persist(localDb);
-
-            jqmlogger.info("A  JNDI alias named " + Constants.GP_JQM_CONNECTION_ALIAS
-                    + " towards the JQM db has been created. It references: " + localDb.getUrl());
-        }
-
-        // Done
-        em.getTransaction().commit();
-        return n;
     }
 
     public List<DeploymentParameter> getDps()

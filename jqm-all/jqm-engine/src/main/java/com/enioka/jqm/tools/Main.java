@@ -237,9 +237,10 @@ public class Main
         try
         {
             Helpers.allowCreateSchema();
-            JqmEngine engine = new JqmEngine();
             jqmlogger.info("Creating engine node " + nodeName);
-            engine.checkAndUpdateNode(nodeName);
+            EntityManager em = Helpers.getNewEm();
+            Helpers.checkAndUpdateNodeConfiguration(nodeName, em);
+            em.close();
         }
         catch (Exception e)
         {
