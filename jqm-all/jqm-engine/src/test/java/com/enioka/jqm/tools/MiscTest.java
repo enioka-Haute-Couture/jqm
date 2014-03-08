@@ -215,4 +215,42 @@ public class MiscTest
         Assert.assertFalse(engine1.isAllPollersPolling());
     }
 
+    @Test
+    public void testNoDoubleStart() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testNoDoubleStart");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        em.getTransaction().begin();
+        GlobalParameter gp = em.createQuery("SELECT n from GlobalParameter n WHERE n.key = 'internalPollingPeriodMs'",
+                GlobalParameter.class).getSingleResult();
+        gp.setValue("100");
+        gp = em.createQuery("SELECT n from GlobalParameter n WHERE n.key = 'aliveSignalMs'", GlobalParameter.class).getSingleResult();
+        gp.setValue("100");
+        em.getTransaction().commit();
+
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+
+        Thread.sleep(200);
+
+        JqmEngine engine2 = new JqmEngine();
+
+        try
+        {
+            engine2.start("localhost");
+            Assert.fail("engine should not have been able to start");
+        }
+        catch (JqmInitErrorTooSoon e)
+        {
+            jqmlogger.info(e);
+        }
+
+        engine1.stop();
+    }
+
 }

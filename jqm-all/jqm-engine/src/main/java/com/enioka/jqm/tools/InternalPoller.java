@@ -15,12 +15,14 @@ class InternalPoller implements Runnable
     private Node node = null;
     private Thread localThread = null;
     private long step = 10000;
+    private long alive = 60000;
 
     InternalPoller(JqmEngine e)
     {
         this.engine = e;
         this.node = em.find(Node.class, e.getNode().getId());
         this.step = Long.parseLong(Helpers.getParameter("internalPollingPeriodMs", String.valueOf(this.step), em));
+        this.alive = Long.parseLong(Helpers.getParameter("aliveSignalMs", String.valueOf(this.step), em));
     }
 
     void stop()
@@ -42,6 +44,7 @@ class InternalPoller implements Runnable
     {
         jqmlogger.info("Start of the internal poller");
         this.localThread = Thread.currentThread();
+        long sinceLatestPing = 0;
         while (true)
         {
             try
@@ -66,9 +69,20 @@ class InternalPoller implements Runnable
                 this.engine.stop();
                 break;
             }
+
+            // I am alive signal
+            sinceLatestPing += this.step;
+            if (sinceLatestPing >= this.alive * 0.9)
+            {
+                em.getTransaction().begin();
+                em.createQuery("UPDATE Node n SET n.lastSeenAlive = current_timestamp() WHERE n.id = :id")
+                        .setParameter("id", this.node.getId()).executeUpdate();
+                em.getTransaction().commit();
+                sinceLatestPing = 0;
+            }
         }
 
+        em.close();
         jqmlogger.info("End of the internal poller");
     }
-
 }

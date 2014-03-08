@@ -82,6 +82,16 @@ class JqmEngine implements JqmEngineMBean
         // Node configuration is in the database
         node = checkAndUpdateNode(nodeName);
 
+        // Check if double-start
+        long toWait = (long) (1.1 * Long.parseLong(Helpers.getParameter("aliveSignalMs", "60000", em)));
+        if (node.getLastSeenAlive() != null
+                && Calendar.getInstance().getTimeInMillis() - node.getLastSeenAlive().getTimeInMillis() <= toWait)
+        {
+            long r = Calendar.getInstance().getTimeInMillis() - node.getLastSeenAlive().getTimeInMillis();
+            throw new JqmInitErrorTooSoon("Another engine named " + nodeName + " was running no less than " + r / 1000
+                    + " seconds ago. Either stop the other node, or if it already stopped, please wait " + (toWait - r) / 1000 + " seconds");
+        }
+
         // Log level
         try
         {
@@ -300,6 +310,11 @@ class JqmEngine implements JqmEngineMBean
             gp.setKey("internalPollingPeriodMs");
             gp.setValue("10000");
             em.persist(gp);
+
+            gp = new GlobalParameter();
+            gp.setKey("aliveSignalMs");
+            gp.setValue("60000");
+            em.persist(gp);
         }
 
         // Deployment parameter
@@ -394,6 +409,7 @@ class JqmEngine implements JqmEngineMBean
         {
             this.em.find(Node.class, this.node.getId(), LockModeType.PESSIMISTIC_WRITE);
             this.node.setStop(false);
+            this.node.setLastSeenAlive(null);
             this.em.getTransaction().commit();
         }
         catch (Exception e)
