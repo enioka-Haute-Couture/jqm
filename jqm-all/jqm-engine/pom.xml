@@ -218,5 +218,31 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Test files that will be included in the package -->
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-test-fibo</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-test-geo</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-test-main</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-test-jndijms-amq</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 </project>
