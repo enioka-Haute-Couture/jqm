@@ -79,7 +79,7 @@ class JqmEngine implements JqmEngineMBean
         node = Helpers.checkAndUpdateNodeConfiguration(nodeName, em);
 
         // Check if double-start
-        long toWait = (long) (1.1 * Long.parseLong(Helpers.getParameter("aliveSignalMs", "60000", em)));
+        long toWait = (long) (2 * Long.parseLong(Helpers.getParameter("aliveSignalMs", "60000", em)));
         if (node.getLastSeenAlive() != null
                 && Calendar.getInstance().getTimeInMillis() - node.getLastSeenAlive().getTimeInMillis() <= toWait)
         {

@@ -228,9 +228,9 @@ public class MiscTest
         em.getTransaction().begin();
         GlobalParameter gp = em.createQuery("SELECT n from GlobalParameter n WHERE n.key = 'internalPollingPeriodMs'",
                 GlobalParameter.class).getSingleResult();
-        gp.setValue("100");
+        gp.setValue("50");
         gp = em.createQuery("SELECT n from GlobalParameter n WHERE n.key = 'aliveSignalMs'", GlobalParameter.class).getSingleResult();
-        gp.setValue("100");
+        gp.setValue("50");
         em.getTransaction().commit();
 
         JqmEngine engine1 = new JqmEngine();
@@ -249,8 +249,10 @@ public class MiscTest
         {
             jqmlogger.info(e);
         }
-
-        engine1.stop();
+        finally
+        {
+            engine1.stop();
+        }
     }
 
 }
