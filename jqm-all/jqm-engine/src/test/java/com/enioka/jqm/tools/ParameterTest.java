@@ -22,11 +22,7 @@ import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.Logger;
-import org.hsqldb.Server;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
@@ -36,32 +32,8 @@ import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-public class ParameterTest
+public class ParameterTest extends JqmBaseTest
 {
-    public static Server s;
-    public static Logger jqmlogger = Logger.getLogger(ParameterTest.class);
-
-    @BeforeClass
-    public static void testInit()
-    {
-        s = new Server();
-        s.setDatabaseName(0, "testdbengine");
-        s.setDatabasePath(0, "mem:testdbengine");
-        s.setLogWriter(null);
-        s.setSilent(true);
-        s.start();
-
-        JqmClientFactory.resetClient(null);
-        Helpers.resetEmf();
-        CreationTools.reset();
-    }
-
-    @AfterClass
-    public static void stop()
-    {
-        s.shutdown();
-    }
-
     @Test
     public void testMixParameters() throws Exception
     {
@@ -89,7 +61,7 @@ public class ParameterTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
         Assert.assertEquals(true, true);
@@ -121,7 +93,7 @@ public class ParameterTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
         Assert.assertEquals(true, true);
@@ -155,7 +127,7 @@ public class ParameterTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
         Assert.assertEquals(true, true);

@@ -18,18 +18,12 @@
 
 package com.enioka.jqm.tools;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import org.apache.log4j.Logger;
-import org.hsqldb.Server;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
@@ -44,41 +38,8 @@ import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-public class MultiNodeTest
+public class MultiNodeTest extends JqmBaseTest
 {
-    public static Logger jqmlogger = Logger.getLogger(MultiNodeTest.class);
-    public static Server s;
-
-    @Before
-    public void before()
-    {
-        JqmClientFactory.resetClient(null);
-        Helpers.resetEmf();
-    }
-
-    @BeforeClass
-    public static void testInit() throws FileNotFoundException
-    {
-        s = new Server();
-        s.setDatabaseName(0, "testdbengine");
-        s.setDatabasePath(0, "mem:testdbengine");
-        s.setLogWriter(null);
-        s.setSilent(true);
-        s.start();
-
-        JqmClientFactory.resetClient(null);
-        Helpers.resetEmf();
-        CreationTools.reset();
-    }
-
-    @AfterClass
-    public static void stop()
-    {
-        JqmClientFactory.resetClient(null);
-        s.shutdown();
-        s.stop();
-    }
-
     @Test
     public void testOneQueueTwoNodes() throws Exception
     {
@@ -117,7 +78,7 @@ public class MultiNodeTest
         int i = 0;
         while (i < 3)
         {
-            TestHelpers.printJobInstanceTable();
+            TestHelpers.printJobInstanceTable(em);
 
             JqmClientFactory.getClient().enqueue(j11);
             JqmClientFactory.getClient().enqueue(j11);
@@ -134,10 +95,10 @@ public class MultiNodeTest
 
             Thread.sleep(1000);
 
-            TestHelpers.printJobInstanceTable();
+            TestHelpers.printJobInstanceTable(em);
             i++;
         }
-        TestHelpers.waitFor(45, 30000);
+        TestHelpers.waitFor(45, 30000, em);
 
         for (Message m : em.createQuery("SELECT j FROM Message j ORDER BY j.history asc, j.id asc", Message.class).getResultList())
         {
@@ -200,7 +161,7 @@ public class MultiNodeTest
         int i = 0;
         while (i < 3)
         {
-            TestHelpers.printJobInstanceTable();
+            TestHelpers.printJobInstanceTable(em);
 
             JqmClientFactory.getClient().enqueue(j11);
             JqmClientFactory.getClient().enqueue(j11);
@@ -217,11 +178,11 @@ public class MultiNodeTest
 
             Thread.sleep(1000);
 
-            TestHelpers.printJobInstanceTable();
+            TestHelpers.printJobInstanceTable(em);
             i++;
         }
 
-        TestHelpers.waitFor(45, 10000);
+        TestHelpers.waitFor(45, 10000, em);
         engine1.stop();
         engine2.stop();
         engine3.stop();
@@ -292,11 +253,11 @@ public class MultiNodeTest
 
             Thread.sleep(1000);
 
-            TestHelpers.printJobInstanceTable();
+            TestHelpers.printJobInstanceTable(em);
             i++;
         }
 
-        TestHelpers.waitFor(42, 10000);
+        TestHelpers.waitFor(42, 10000, em);
         engine1.stop();
         engine2.stop();
 
@@ -413,7 +374,7 @@ public class MultiNodeTest
         int i = 0;
         while (i < 3)
         {
-            TestHelpers.printJobInstanceTable();
+            TestHelpers.printJobInstanceTable(em);
 
             JqmClientFactory.getClient().enqueue(j11);
             JqmClientFactory.getClient().enqueue(j11);
@@ -447,11 +408,11 @@ public class MultiNodeTest
 
             Thread.sleep(1000);
 
-            TestHelpers.printJobInstanceTable();
+            TestHelpers.printJobInstanceTable(em);
             i++;
         }
 
-        TestHelpers.waitFor(108, 30000);
+        TestHelpers.waitFor(108, 30000, em);
         engine1.stop();
         engine2.stop();
         engine3.stop();
@@ -570,7 +531,7 @@ public class MultiNodeTest
         int i = 0;
         while (i < 3)
         {
-            TestHelpers.printJobInstanceTable();
+            TestHelpers.printJobInstanceTable(em);
 
             JqmClientFactory.getClient().enqueue(j11);
             JqmClientFactory.getClient().enqueue(j11);
@@ -613,11 +574,11 @@ public class MultiNodeTest
 
             Thread.sleep(1000);
 
-            TestHelpers.printJobInstanceTable();
+            TestHelpers.printJobInstanceTable(em);
             i++;
         }
 
-        TestHelpers.waitFor(135, 30000);
+        TestHelpers.waitFor(135, 30000, em);
         engine1.stop();
         engine2.stop();
         engine3.stop();
@@ -681,7 +642,7 @@ public class MultiNodeTest
         engine2.start("localhost4");
 
         // Wait for runs
-        TestHelpers.waitFor(9, 5000);
+        TestHelpers.waitFor(9, 5000, em);
 
         // Stop one node
         em.getTransaction().begin();
@@ -712,7 +673,7 @@ public class MultiNodeTest
         JqmClientFactory.getClient().enqueue(j21);
         JqmClientFactory.getClient().enqueue(j21);
 
-        TestHelpers.waitFor(27, 5000);
+        TestHelpers.waitFor(27, 5000, em);
 
         // Only stop node2... node1 should be already dead.
         engine2.stop();

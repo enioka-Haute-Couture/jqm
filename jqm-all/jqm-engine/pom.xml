@@ -189,6 +189,13 @@
 			<version>1.1.6-SNAPSHOT</version>
 		</dependency>
 
+		<!-- Connection pooling -->
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jdbc</artifactId>
+			<version>7.0.52</version>
+		</dependency>
+
 		<!-- TEST DEPENDENCIES -->
 		<dependency>
 			<groupId>org.hsqldb</groupId>

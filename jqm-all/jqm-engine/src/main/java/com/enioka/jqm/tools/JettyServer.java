@@ -117,8 +117,8 @@ class JettyServer
         // exclusions[8] = "javax.persistence.";
         webAppContext.setServerClasses(exclusions);
 
-        // Database configuration should be on the class path
-        webAppContext.setExtraClasspath("conf/db.properties");
+        // JQM configuration should be on the class path
+        webAppContext.setExtraClasspath("conf/jqm.properties");
 
         // Set configurations (order is important: need to unpack war before reading web.xml)
         webAppContext.setConfigurations(new Configuration[] { new WebInfConfiguration(), new WebXmlConfiguration(),

@@ -7,11 +7,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import org.apache.log4j.Logger;
-import org.hsqldb.Server;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
@@ -25,34 +21,8 @@ import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-public class MiscTest
+public class MiscTest extends JqmBaseTest
 {
-    public static Logger jqmlogger = Logger.getLogger(MiscTest.class);
-    public static Server s;
-
-    @BeforeClass
-    public static void testInit() throws InterruptedException
-    {
-        s = new Server();
-        s.setDatabaseName(0, "testdbengine");
-        s.setDatabasePath(0, "mem:testdbengine");
-        s.setLogWriter(null);
-        s.setSilent(true);
-        s.start();
-
-        JqmClientFactory.resetClient(null);
-        Helpers.resetEmf();
-        CreationTools.reset();
-    }
-
-    @AfterClass
-    public static void stop()
-    {
-        JqmClientFactory.resetClient();
-        s.shutdown();
-        s.stop();
-    }
-
     @Test
     public void testEmail() throws Exception
     {
@@ -80,7 +50,7 @@ public class MiscTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        TestHelpers.waitFor(2, 7000); // Need time for async mail sending.
+        TestHelpers.waitFor(2, 7000, em); // Need time for async mail sending.
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -118,7 +88,7 @@ public class MiscTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -147,7 +117,7 @@ public class MiscTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
         List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)
@@ -167,8 +137,10 @@ public class MiscTest
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
 
-        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", em);
-        CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbengine", "SA", "", em);
+        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", em,
+                "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
+        CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbengine", "SA", "", em,
+                "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip,
                 42, "jqm-test-em", null, "Franquin", "ModuleMachin", "other", "other", false, em);
@@ -179,7 +151,7 @@ public class MiscTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        TestHelpers.waitFor(2, 10000);
+        TestHelpers.waitFor(2, 10000, em);
         engine1.stop();
 
         List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)
@@ -213,7 +185,7 @@ public class MiscTest
         TestHelpers.node.setStop(true);
         em.getTransaction().commit();
 
-        TestHelpers.waitFor(2, 3000);
+        TestHelpers.waitFor(2, 3000, em);
         Assert.assertFalse(engine1.isAllPollersPolling());
     }
 

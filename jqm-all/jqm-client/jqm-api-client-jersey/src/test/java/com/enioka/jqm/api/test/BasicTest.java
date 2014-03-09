@@ -1,5 +1,5 @@
 package com.enioka.jqm.api.test;
-
+/*
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
@@ -26,10 +26,10 @@ import com.enioka.jqm.api.Queue;
 import com.enioka.jqm.api.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
-
+*/
 public class BasicTest
 {
-    public static Server server;
+/*    public static Server server;
 
     public static void startJettyServer() throws Exception
     {
@@ -335,5 +335,5 @@ public class BasicTest
         // Done
         stopJettyServer();
         CreationTools.stopHsqldbServer();
-    }
+    }*/
 }

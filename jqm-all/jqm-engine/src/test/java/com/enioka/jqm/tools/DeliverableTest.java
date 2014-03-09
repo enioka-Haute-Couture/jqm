@@ -9,11 +9,7 @@ import javax.persistence.EntityManager;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
-import org.hsqldb.Server;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
@@ -24,34 +20,8 @@ import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-public class DeliverableTest
+public class DeliverableTest extends JqmBaseTest
 {
-    public static Logger jqmlogger = Logger.getLogger(DeliverableTest.class);
-    public static Server s;
-
-    @BeforeClass
-    public static void testInit() throws InterruptedException
-    {
-        s = new Server();
-        s.setDatabaseName(0, "testdbengine");
-        s.setDatabasePath(0, "mem:testdbengine");
-        s.setLogWriter(null);
-        s.setSilent(true);
-        s.start();
-
-        JqmClientFactory.resetClient(null);
-        Helpers.resetEmf();
-        CreationTools.reset();
-    }
-
-    @AfterClass
-    public static void stop()
-    {
-        JqmClientFactory.resetClient();
-        s.shutdown();
-        s.stop();
-    }
-
     @Test
     public void testGetDeliverables() throws Exception
     {
@@ -74,13 +44,13 @@ public class DeliverableTest
         JobRequest j = new JobRequest("getDeliverables", "MAG");
         int id = JqmClientFactory.getClient().enqueue(j);
 
-        TestHelpers.printJobInstanceTable();
+        TestHelpers.printJobInstanceTable(em);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
 
-        TestHelpers.printJobInstanceTable();
+        TestHelpers.printJobInstanceTable(em);
 
         List<InputStream> tmp = JqmClientFactory.getClient().getJobDeliverablesContent(id);
         engine1.stop();
@@ -119,7 +89,7 @@ public class DeliverableTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
 
         File f = new File(TestHelpers.node.getDlRepo() + "jqm-test-deliverable2.txt");
         Assert.assertEquals(false, f.exists()); // file should have been moved
@@ -166,7 +136,7 @@ public class DeliverableTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
 
         List<com.enioka.jqm.api.Deliverable> tmp = JqmClientFactory.getClient().getJobDeliverables(ji.getId());
         engine1.stop();

@@ -25,8 +25,7 @@ class JndiResourceDescriptor extends Reference
 {
     private static final long serialVersionUID = 3348684996519775949L;
 
-    JndiResourceDescriptor(String resourceClass, String description, String scope, String auth, boolean singleton, String factory,
-            String factoryLocation)
+    JndiResourceDescriptor(String resourceClass, String description, String scope, String auth, String factory, String factoryLocation)
     {
         super(resourceClass, factory, factoryLocation);
         StringRefAddr refAddr = null;
@@ -45,8 +44,21 @@ class JndiResourceDescriptor extends Reference
             refAddr = new StringRefAddr("auth", auth);
             add(refAddr);
         }
-        // singleton is a boolean so slightly different handling
-        refAddr = new StringRefAddr("singleton", Boolean.toString(singleton));
-        add(refAddr);
+    }
+
+    /**
+     * Singleton means: one per engine, loaded with the engine classloader. Not singelton = one credated at each lookup call, loaded with
+     * the payload classloader.
+     * 
+     * @return
+     */
+    boolean isSingleton()
+    {
+        Boolean res = this.get("singleton") == null ? false : Boolean.parseBoolean((String) this.get("singleton").getContent());
+        if (res == null)
+        {
+            res = false;
+        }
+        return res;
     }
 }

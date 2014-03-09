@@ -24,11 +24,7 @@ import java.util.ArrayList;
 import javax.naming.spi.NamingManager;
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.Logger;
-import org.hsqldb.Server;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
@@ -40,33 +36,8 @@ import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-public class JndiTest
+public class JndiTest extends JqmBaseTest
 {
-    public static Logger jqmlogger = Logger.getLogger(JndiTest.class);
-    public static Server s;
-
-    @BeforeClass
-    public static void testInit() throws InterruptedException
-    {
-        s = new Server();
-        s.setDatabaseName(0, "testdbengine");
-        s.setDatabasePath(0, "mem:testdbengine");
-        s.setLogWriter(null);
-        s.setSilent(true);
-        s.start();
-
-        JqmClientFactory.resetClient(null);
-        Helpers.resetEmf();
-        CreationTools.reset();
-    }
-
-    @AfterClass
-    public static void end()
-    {
-        s.shutdown();
-        s.stop();
-    }
-
     // @Test
     // NOT AN AUTO TEST: this requires to have MQ Series jars which are not libre software!
     public void testJmsWmq() throws Exception
@@ -97,7 +68,7 @@ public class JndiTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
         long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
@@ -147,7 +118,7 @@ public class JndiTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
         History h = null;
@@ -194,7 +165,7 @@ public class JndiTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
         History h = null;
@@ -233,10 +204,10 @@ public class JndiTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
-        TestHelpers.printJobInstanceTable();
+        TestHelpers.printJobInstanceTable(em);
 
         History h = null;
         try
@@ -286,5 +257,4 @@ public class JndiTest
             Assert.fail(e.getMessage());
         }
     }
-
 }

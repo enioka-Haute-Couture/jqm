@@ -78,8 +78,25 @@ class JqmEngine implements JqmEngineMBean
             throw new IllegalArgumentException("nodeName cannot be null or empty");
         }
 
+        // Set thread name - used in audits
+        Thread.currentThread().setName("JQM engine;;" + nodeName);
+
+        // JNDI first - the engine itself uses JNDI to fetch its connections!
+        if (jndiCtx == null)
+        {
+            try
+            {
+                jndiCtx = JndiContextFactory.createJndiContext(Thread.currentThread().getContextClassLoader());
+                jqmlogger.info("JNDI context was registered");
+            }
+            catch (NamingException e)
+            {
+                throw new JqmInitError("Could not register the JNDI provider", e);
+            }
+        }
+
         // Database connection
-        EntityManager em = Helpers.getNewEm("JQM engine", "starting", "");
+        EntityManager em = Helpers.getNewEm();
 
         // Node configuration is in the database
         node = Helpers.checkAndUpdateNodeConfiguration(nodeName, em);
@@ -121,19 +138,6 @@ class JqmEngine implements JqmEngineMBean
             ((ConsoleAppender) Logger.getRootLogger().getAppender("consoleAppender")).setWriter(new OutputStreamWriter(s));
             s = new MulticastPrintStream(System.err, "C:/TEMP");
             System.setErr(s);
-        }
-
-        // JNDI
-        if (jndiCtx == null)
-        {
-            try
-            {
-                jndiCtx = JndiContextFactory.createJndiContext(Thread.currentThread().getContextClassLoader());
-            }
-            catch (NamingException e)
-            {
-                throw new JqmInitError("Could not register the JNDI provider", e);
-            }
         }
 
         // Jetty
@@ -263,7 +267,7 @@ class JqmEngine implements JqmEngineMBean
         this.intPoller.stop();
 
         // Reset the stop counter - we may want to restart one day
-        EntityManager em = Helpers.getNewEm("JQM Engine", "stopping", "");
+        EntityManager em = Helpers.getNewEm();
         em.getTransaction().begin();
         try
         {

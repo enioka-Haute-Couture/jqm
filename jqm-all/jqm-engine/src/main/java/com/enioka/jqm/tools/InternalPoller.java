@@ -11,7 +11,7 @@ class InternalPoller implements Runnable
     private static Logger jqmlogger = Logger.getLogger(InternalPoller.class);
     private boolean run = true;
     private JqmEngine engine = null;
-    private EntityManager em = Helpers.getNewEm("JQM internal poller", "looking for orders & keepalive", "");
+    private EntityManager em = null;
     private Node node = null;
     private Thread localThread = null;
     private long step = 10000;
@@ -20,9 +20,6 @@ class InternalPoller implements Runnable
     InternalPoller(JqmEngine e)
     {
         this.engine = e;
-        this.node = em.find(Node.class, e.getNode().getId());
-        this.step = Long.parseLong(Helpers.getParameter("internalPollingPeriodMs", String.valueOf(this.step), em));
-        this.alive = Long.parseLong(Helpers.getParameter("aliveSignalMs", String.valueOf(this.step), em));
     }
 
     void stop()
@@ -42,8 +39,21 @@ class InternalPoller implements Runnable
     @Override
     public void run()
     {
+        // Log
         jqmlogger.info("Start of the internal poller");
+        Thread.currentThread().setName("INTERNAL_POLLER;polling for orders;");
+
+        // New EM (after setting thread name)
+        em = Helpers.getNewEm();
+
+        // Get configuration data
+        this.node = em.find(Node.class, this.engine.getNode().getId());
+        this.step = Long.parseLong(Helpers.getParameter("internalPollingPeriodMs", String.valueOf(this.step), em));
+        this.alive = Long.parseLong(Helpers.getParameter("aliveSignalMs", String.valueOf(this.step), em));
+
         this.localThread = Thread.currentThread();
+
+        // Launch main loop
         long sinceLatestPing = 0;
         while (true)
         {

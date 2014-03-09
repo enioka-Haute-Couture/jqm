@@ -32,6 +32,12 @@ import org.apache.log4j.Logger;
 class ResourceFactory implements ObjectFactory
 {
     private static Logger jqmlogger = Logger.getLogger(ResourceFactory.class);
+    private ClassLoader clResourceClasses = null;
+
+    public ResourceFactory(ClassLoader clResourcesClasses)
+    {
+        this.clResourceClasses = clResourcesClasses;
+    }
 
     @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment) throws Exception
@@ -40,14 +46,13 @@ class ResourceFactory implements ObjectFactory
         JndiResourceDescriptor resource = (JndiResourceDescriptor) obj;
 
         // Get class loader, we'll need it to load the factory class
-        ClassLoader tcl = Thread.currentThread().getContextClassLoader();
         Class<?> factoryClass = null;
         ObjectFactory factory = null;
 
         try
         {
             jqmlogger.debug("Attempting to load ObjectFactory class " + resource.getFactoryClassName());
-            factoryClass = tcl.loadClass(resource.getFactoryClassName());
+            factoryClass = clResourceClasses.loadClass(resource.getFactoryClassName());
             jqmlogger.debug("ObjectFactory class was successfully loaded: " + resource.getFactoryClassName());
         }
         catch (ClassNotFoundException e)

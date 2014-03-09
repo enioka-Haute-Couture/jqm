@@ -6,49 +6,16 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.Logger;
-import org.hsqldb.Server;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-public class XmlTest
+public class XmlTest extends JqmBaseTest
 {
-    public static Logger jqmlogger = Logger.getLogger(XmlTest.class);
-    public static Server s;
-
-    @BeforeClass
-    public static void testInit() throws InterruptedException
-    {
-        s = new Server();
-        s.setDatabaseName(0, "testdbengine");
-        s.setDatabasePath(0, "mem:testdbengine");
-        s.setLogWriter(null);
-        s.setSilent(true);
-        s.start();
-
-        JqmClientFactory.resetClient(null);
-        Helpers.resetEmf();
-        CreationTools.reset();
-
-        jqmlogger.debug("log init");
-    }
-
-    @AfterClass
-    public static void stop()
-    {
-        JqmClientFactory.resetClient(null);
-        s.shutdown();
-        s.stop();
-    }
-
     @Test
     public void testExportQueue() throws Exception
     {

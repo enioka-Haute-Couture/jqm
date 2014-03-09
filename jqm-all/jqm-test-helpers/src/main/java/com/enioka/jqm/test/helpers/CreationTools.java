@@ -19,23 +19,16 @@ package com.enioka.jqm.test.helpers;
  */
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 
-import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
@@ -57,7 +50,6 @@ import com.enioka.jqm.jpamodel.State;
 public class CreationTools
 {
     private static Logger jqmlogger = Logger.getLogger(CreationTools.class);
-    public static EntityManagerFactory emf = reset();
     public static Server s;
 
     private CreationTools()
@@ -73,7 +65,6 @@ public class CreationTools
         s.setLogWriter(null);
         s.setSilent(true);
         s.start();
-        TestHelpers.cleanup(emf.createEntityManager());
 
         while (s.getState() != 1)
         {
@@ -110,7 +101,6 @@ public class CreationTools
                 }
             }
             s = null;
-            reset();
             jqmlogger.debug("HSQLDB is now stopped");
         }
     }
@@ -344,18 +334,29 @@ public class CreationTools
 
     // ------------------ DATABASEPROP --------------------------------
 
-    public static DatabaseProp createDatabaseProp(String name, String driver, String url, String user, String pwd, EntityManager em)
+    public static JndiObjectResource createDatabaseProp(String name, String driver, String url, String user, String pwd, EntityManager em,
+            String validationQuery, HashMap<String, String> parameters)
     {
-        DatabaseProp h = new DatabaseProp();
+        HashMap<String, String> prms = new HashMap<String, String>();
+        prms.put("testWhileIdle", "true");
+        prms.put("testOnBorrow", "false");
+        prms.put("testOnReturn", "true");
+        prms.put("maxActive", "100");
+        prms.put("minIdle", "1");
+        prms.put("maxWait", "30000");
+        prms.put("initialSize", "2");
+        prms.put("jmxEnabled", "false");
+        prms.put("username", user);
+        prms.put("password", pwd);
+        prms.put("driverClassName", driver);
+        prms.put("url", url);
+        prms.put("singleton", "true");
+        prms.put("validationQuery", validationQuery);
+        prms.put("testWhileIdle", "true");
+        prms.put("testOnBorrow", "true");
 
-        h.setName(name);
-        h.setDriver(driver);
-        h.setUrl(url);
-        h.setUserName(user);
-        h.setPwd(pwd);
-
-        em.persist(h);
-        return h;
+        return createJndiObjectResource(em, name, "javax.sql.DataSource", "org.apache.tomcat.jdbc.pool.DataSourceFactory",
+                "connection for " + user, prms);
     }
 
     // ------------------ JNDI FOR JMS & co --------------------------------
@@ -452,45 +453,8 @@ public class CreationTools
     {
         HashMap<String, String> prms = new HashMap<String, String>();
         prms.put("PATH", path);
+        prms.put("singleton", "true");
         return createJndiObjectResource(em, jndiAlias, "java.io.File.File", "com.enioka.jqm.jndi.FileFactory", description, prms);
     }
 
-    // ------------------ CLOSE ENTITYs ------------------------
-
-    public static EntityManagerFactory reset()
-    {
-        if (emf != null)
-        {
-            emf.close();
-        }
-
-        Properties p = new Properties();
-        InputStream fis = null;
-        try
-        {
-            fis = CreationTools.class.getClassLoader().getResourceAsStream("META-INF/jqm.properties");
-            if (fis == null)
-            {
-                jqmlogger.info("No jqm.properties file found. Defaults or parameter values will be used");
-            }
-            else
-            {
-                p.load(fis);
-                jqmlogger.debug("A jqm.properties file was found");
-            }
-        }
-        catch (IOException e)
-        {
-            // We allow no configuration file, but not an unreadable configuration file.
-            throw new RuntimeException("META-INF/jqm.properties file is invalid", e);
-        }
-        finally
-        {
-            IOUtils.closeQuietly(fis);
-        }
-
-        // PropertiesHandler.addDefaults(p);
-        emf = Persistence.createEntityManagerFactory("jobqueue-api-pu", p);
-        return emf;
-    }
 }

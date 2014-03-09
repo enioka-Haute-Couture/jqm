@@ -23,11 +23,7 @@ import java.util.ArrayList;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import org.apache.log4j.Logger;
-import org.hsqldb.Server;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
@@ -39,33 +35,8 @@ import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-public class FiboTest
+public class FiboTest extends JqmBaseTest
 {
-    public static Server s;
-    public static Logger jqmlogger = Logger.getLogger(FiboTest.class);
-
-    @BeforeClass
-    public static void testInit() throws InterruptedException
-    {
-        s = new Server();
-        s.setDatabaseName(0, "testdbengine");
-        s.setDatabasePath(0, "mem:testdbengine");
-        s.setLogWriter(null);
-        s.setSilent(true);
-        s.start();
-
-        JqmClientFactory.resetClient(null);
-        Helpers.resetEmf();
-        CreationTools.reset();
-    }
-
-    @AfterClass
-    public static void end()
-    {
-        s.shutdown();
-        s.stop();
-    }
-
     @Test
     public void testFibo() throws Exception
     {
@@ -90,16 +61,11 @@ public class FiboTest
         form.addParameter("p2", "2");
         JqmClientFactory.getClient().enqueue(form);
 
-        // Create JNDI connection to write inside the engine database
-        em.getTransaction().begin();
-        CreationTools.createDatabaseProp("jdbc/jqm", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em);
-        em.getTransaction().commit();
-
         // Start the engine
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        TestHelpers.waitFor(11, 15000);
+        TestHelpers.waitFor(11, 15000, em);
         engine1.stop();
 
         long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
@@ -132,7 +98,7 @@ public class FiboTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        TestHelpers.waitFor(11, 30000);
+        TestHelpers.waitFor(11, 30000, em);
 
         engine1.stop();
         long ii = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
@@ -143,7 +109,7 @@ public class FiboTest
         {
             Assert.assertEquals(State.ENDED, history.getState());
         }
-        TestHelpers.printJobInstanceTable();
+        TestHelpers.printJobInstanceTable(em);
         Assert.assertEquals(i, (int) res.get(res.size() - 1).getId());
     }
 }

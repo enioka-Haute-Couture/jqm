@@ -85,12 +85,9 @@ class Loader implements Runnable, LoaderMBean
 
     Loader(JobInstance job, Map<String, URL[]> cache, Polling p)
     {
-        em = Helpers.getNewEm(job.getJd().getApplicationName(), "JQM is running the payload", String.valueOf(job.getId()));
-
-        this.job = em.find(JobInstance.class, job.getId());
-        this.node = em.find(Node.class, p.getDp().getNode().getId());
         this.cache = cache;
         this.p = p;
+        this.job = job;
 
         // JMX
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -401,9 +398,18 @@ class Loader implements Runnable, LoaderMBean
             mps.registerThread(String.valueOf(fileName + ".stderr.log"));
         }
 
+        // Var init
+        Thread.currentThread().setName(this.job.getJd().getApplicationName() + ";running payload;" + this.job.getId());
+        em = Helpers.getNewEm();
+        this.job = em.find(JobInstance.class, job.getId());
+        this.node = em.find(Node.class, p.getDp().getNode().getId());
+
+        // Log
         State resultStatus = State.SUBMITTED;
         jqmlogger.debug("A loader/runner thread has just started for Job Instance " + job.getId() + " with " + job.getParameters().size()
                 + " parameters. Jar is: " + job.getJd().getJarPath() + " - class is: " + job.getJd().getJavaClassName());
+
+        // Set file paths
         jarFile = new File(FilenameUtils.concat(new File(node.getRepo()).getAbsolutePath(), job.getJd().getJarPath()));
         jarDir = jarFile.getParentFile();
 

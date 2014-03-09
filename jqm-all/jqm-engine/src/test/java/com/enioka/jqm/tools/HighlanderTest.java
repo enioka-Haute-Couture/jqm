@@ -18,19 +18,13 @@
 
 package com.enioka.jqm.tools;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.Logger;
-import org.hsqldb.Server;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
@@ -42,43 +36,8 @@ import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-public class HighlanderTest
+public class HighlanderTest extends JqmBaseTest
 {
-    public static Logger jqmlogger = Logger.getLogger(HighlanderTest.class);
-    public static Server s;
-
-    @Before
-    public void before()
-    {
-        JqmClientFactory.resetClient(null);
-        Helpers.resetEmf();
-    }
-
-    @BeforeClass
-    public static void testInit() throws FileNotFoundException
-    {
-        s = new Server();
-        s.setDatabaseName(0, "testdbengine");
-        s.setDatabasePath(0, "mem:testdbengine");
-        // s.setLogWriter(new PrintWriter("C:\\TEMP\\toto2.log"));
-        // s.setSilent(false);
-        s.setLogWriter(null);
-        s.setSilent(true);
-        s.start();
-
-        JqmClientFactory.resetClient(null);
-        Helpers.resetEmf();
-        CreationTools.reset();
-    }
-
-    @AfterClass
-    public static void stop()
-    {
-        JqmClientFactory.resetClient(null);
-        s.shutdown();
-        s.stop();
-    }
-
     @Test
     public void testHighlanderMultiNode() throws Exception
     {
@@ -95,7 +54,6 @@ public class HighlanderTest
         JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null,
                 "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
-        em.close();
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
         for (int i = 0; i < 9; i++)
@@ -113,9 +71,10 @@ public class HighlanderTest
             JqmClientFactory.getClient().enqueue(j);
         }
 
-        TestHelpers.waitFor(20, 5000); // Actually wait.
+        TestHelpers.waitFor(20, 5000, em); // Actually wait.
         engine1.stop();
         engine2.stop();
+        em.close();
 
         em = Helpers.getNewEm();
         ArrayList<History> res = (ArrayList<History>) em.createQuery("SELECT j FROM History j ORDER BY j.id ASC", History.class)
@@ -164,7 +123,7 @@ public class HighlanderTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
         EntityManager emm = Helpers.getNewEm();
@@ -204,14 +163,14 @@ public class HighlanderTest
         Thread.sleep(4000);
         JqmClientFactory.getClient().killJob(JqmClientFactory.getClient().getUserActiveJobs("MAG").get(0).getId());
 
-        TestHelpers.waitFor(2, 10000);
+        TestHelpers.waitFor(2, 10000, em);
         engine1.stop();
 
         List<History> res = em.createQuery("SELECT j FROM History j ORDER BY j.id ASC", History.class).getResultList();
         Assert.assertEquals(2, res.size());
         Assert.assertEquals(State.KILLED, res.get(0).getState());
         Assert.assertEquals(State.KILLED, res.get(1).getState());
-        TestHelpers.printHistoryTable();
+        TestHelpers.printHistoryTable(em);
         Assert.assertTrue(res.get(0).getAttributionDate().compareTo(res.get(1).getEnqueueDate()) <= 0);
     }
 
@@ -241,7 +200,7 @@ public class HighlanderTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
         EntityManager emm = Helpers.getNewEm();

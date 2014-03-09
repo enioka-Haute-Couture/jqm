@@ -37,11 +37,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.log4j.Logger;
-import org.hsqldb.Server;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
@@ -55,34 +51,8 @@ import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-public class ClientApiTest
+public class ClientApiTest extends JqmBaseTest
 {
-    public static Logger jqmlogger = Logger.getLogger(ClientApiTest.class);
-    public static Server s;
-
-    @BeforeClass
-    public static void testInit() throws InterruptedException
-    {
-        s = new Server();
-        s.setDatabaseName(0, "testdbengine");
-        s.setDatabasePath(0, "mem:testdbengine");
-        s.setLogWriter(null);
-        s.setSilent(true);
-        s.start();
-
-        JqmClientFactory.resetClient(null);
-        Helpers.resetEmf();
-        CreationTools.reset();
-    }
-
-    @AfterClass
-    public static void stop()
-    {
-        JqmClientFactory.resetClient();
-        s.shutdown();
-        s.stop();
-    }
-
     @Test
     public void testRestartJob() throws Exception
     {
@@ -108,9 +78,9 @@ public class ClientApiTest
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         JqmClientFactory.getClient().enqueueFromHistory(i);
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -148,7 +118,7 @@ public class ClientApiTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
         History h = em.createQuery("SELECT h FROM History h WHERE h.id = :i", History.class).setParameter("i", i).getSingleResult();
@@ -189,20 +159,20 @@ public class ClientApiTest
         int i = JqmClientFactory.getClient().enqueue(j);
         // JqmClientFactory.getClient().enqueue(j);
 
-        TestHelpers.printJobInstanceTable();
+        TestHelpers.printJobInstanceTable(em);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
         Thread.sleep(3000);
 
         JqmClientFactory.getClient().killJob(i);
-        TestHelpers.printJobInstanceTable();
+        TestHelpers.printJobInstanceTable(em);
 
         Thread.sleep(3000);
 
         engine1.stop();
 
-        TestHelpers.printJobInstanceTable();
+        TestHelpers.printJobInstanceTable(em);
 
         TypedQuery<History> query = Helpers.getNewEm().createQuery("SELECT j FROM History j", History.class);
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
@@ -238,7 +208,7 @@ public class ClientApiTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -298,7 +268,7 @@ public class ClientApiTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -338,7 +308,7 @@ public class ClientApiTest
 
         JqmEngine engine1 = new JqmEngine();
         JqmClientFactory.getClient().pauseQueuedJob(i);
-        TestHelpers.printJobInstanceTable();
+        TestHelpers.printJobInstanceTable(em);
         engine1.start("localhost");
         Thread.sleep(5000);
 
@@ -381,7 +351,7 @@ public class ClientApiTest
 
         JqmEngine engine1 = new JqmEngine();
         JqmClientFactory.getClient().cancelJob(i);
-        TestHelpers.printJobInstanceTable();
+        TestHelpers.printJobInstanceTable(em);
         engine1.start("localhost");
         Thread.sleep(5000);
 
@@ -420,10 +390,10 @@ public class ClientApiTest
 
         JqmEngine engine1 = new JqmEngine();
         JqmClientFactory.getClient().setJobQueue(i, TestHelpers.qSlow.getId());
-        TestHelpers.printJobInstanceTable();
+        TestHelpers.printJobInstanceTable(em);
 
         engine1.start("localhost");
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
@@ -459,7 +429,7 @@ public class ClientApiTest
 
         JqmEngine engine1 = new JqmEngine();
         JqmClientFactory.getClient().deleteJob(i);
-        TestHelpers.printJobInstanceTable();
+        TestHelpers.printJobInstanceTable(em);
         engine1.start("localhost");
         Thread.sleep(1000);
 
@@ -529,7 +499,7 @@ public class ClientApiTest
             Assert.fail("result was not an integer " + e.getMessage());
         }
 
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
         // Check run is OK
@@ -592,7 +562,7 @@ public class ClientApiTest
             Assert.fail("result was not an integer " + e.getMessage());
         }
 
-        TestHelpers.waitFor(1, 10000);
+        TestHelpers.waitFor(1, 10000, em);
 
         HttpGet rq = new HttpGet("http://localhost:" + TestHelpers.node.getPort() + "/status?id=" + jid);
         res = client.execute(rq);
@@ -636,7 +606,7 @@ public class ClientApiTest
 
         JqmEngine engine1 = new JqmEngine();
         JqmClientFactory.getClient().pauseQueuedJob(i);
-        TestHelpers.printJobInstanceTable();
+        TestHelpers.printJobInstanceTable(em);
         engine1.start("localhost");
         Thread.sleep(5000);
         JqmClientFactory.getClient().resumeJob(i);

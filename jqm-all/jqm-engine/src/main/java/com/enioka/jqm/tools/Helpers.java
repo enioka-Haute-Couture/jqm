@@ -18,13 +18,10 @@
 
 package com.enioka.jqm.tools;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.sql.Connection;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -36,9 +33,7 @@ import javax.persistence.Persistence;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.hibernate.internal.SessionImpl;
 
-import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
@@ -64,7 +59,6 @@ public final class Helpers
     // The one and only EMF in the engine.
     private static Properties props = new Properties();
     private static EntityManagerFactory emf;
-    private static String driverName = null;
 
     private Helpers()
     {
@@ -85,71 +79,38 @@ public final class Helpers
         return emf.createEntityManager();
     }
 
-    /**
-     * Get a fresh EM with audit parameters set (for Oracle, ignored for other databases)
-     * 
-     * @param module
-     * @param action
-     * @param clientInfo
-     * @return
-     */
-    public static EntityManager getNewEm(String module, String action, String clientInfo)
-    {
-        return setAuditProperties(getNewEm(), module, action, clientInfo);
-    }
-
     private static EntityManagerFactory createFactory()
     {
-        FileInputStream fis = null;
+        InputStream fis = null;
         try
         {
             Properties p = new Properties();
-            fis = new FileInputStream("conf/db.properties");
-            p.load(fis);
-            IOUtils.closeQuietly(fis);
-            props.putAll(p);
-            return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, props);
-        }
-        catch (FileNotFoundException e)
-        {
-            // No properties file means we use the test HSQLDB (file, not in-memory) as specified in the persistence.xml
-            IOUtils.closeQuietly(fis);
+            fis = Helpers.class.getClassLoader().getResourceAsStream("jqm.properties");
+            if (fis != null)
+            {
+                jqmlogger.debug("A jqm.properties file was found");
+                p.load(fis);
+                IOUtils.closeQuietly(fis);
+                props.putAll(p);
+            }
             return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, props);
         }
         catch (IOException e)
         {
-            jqmlogger.fatal("conf/db.properties file is invalid", e);
+            jqmlogger.fatal("conf/jqm.properties file is invalid", e);
             IOUtils.closeQuietly(fis);
-            throw new JqmInitError("Invalid database configuration configuration file", e);
+            throw new JqmInitError("Invalid JQM configuration file", e);
         }
         catch (Exception e)
         {
             jqmlogger.fatal("Unable to connect with the database. Maybe your configuration file is wrong. "
-                    + "Please check the password or the url in the $JQM_DIR/conf/db.properties", e);
+                    + "Please check the password or the url in the $JQM_DIR/conf/resources.xml", e);
             throw new JqmInitError("Database connection issue", e);
         }
         finally
         {
             IOUtils.closeQuietly(fis);
         }
-    }
-
-    static EntityManager setAuditProperties(EntityManager em, String module, String action, String clientInfo)
-    {
-        if (driverName == null)
-        {
-            Connection conn = em.unwrap(SessionImpl.class).connection();
-            driverName = conn.getClass().toString();
-        }
-
-        if (driverName.contains("oracle"))
-        {
-            em.getTransaction().begin();
-            em.createNativeQuery("CALL DBMS_APPLICATION_INFO.SET_MODULE('" + module + "', '" + action + "')").executeUpdate();
-            em.createNativeQuery("CALL DBMS_APPLICATION_INFO.SET_CLIENT_INFO('" + clientInfo + "')").executeUpdate();
-            em.getTransaction().commit();
-        }
-        return em;
     }
 
     static void allowCreateSchema()
@@ -166,8 +127,8 @@ public final class Helpers
         if (emf != null)
         {
             emf.close();
+            emf = null;
         }
-        emf = createFactory();
     }
 
     /**
@@ -356,29 +317,6 @@ public final class Helpers
         else
         {
             jqmlogger.info("This node is configured to take jobs from at least one queue");
-        }
-
-        // JNDI alias for the JDBC connection to the JQM database
-        DatabaseProp localDb = null;
-        try
-        {
-            localDb = (DatabaseProp) em.createQuery("SELECT dp FROM DatabaseProp dp WHERE dp.name = :alias")
-                    .setParameter("alias", Constants.GP_JQM_CONNECTION_ALIAS).getSingleResult();
-            jqmlogger.trace("The jdbc/jqm alias already exists and references " + localDb.getUrl());
-        }
-        catch (NoResultException e)
-        {
-            Map<String, Object> props = em.getEntityManagerFactory().getProperties();
-            localDb = new DatabaseProp();
-            localDb.setDriver((String) props.get("javax.persistence.jdbc.driver"));
-            localDb.setName(Constants.GP_JQM_CONNECTION_ALIAS);
-            localDb.setPwd((String) props.get("javax.persistence.jdbc.password"));
-            localDb.setUrl((String) props.get("javax.persistence.jdbc.url"));
-            localDb.setUserName((String) props.get("javax.persistence.jdbc.user"));
-            em.persist(localDb);
-
-            jqmlogger.info("A  JNDI alias named " + Constants.GP_JQM_CONNECTION_ALIAS
-                    + " towards the JQM db has been created. It references: " + localDb.getUrl());
         }
 
         // Done

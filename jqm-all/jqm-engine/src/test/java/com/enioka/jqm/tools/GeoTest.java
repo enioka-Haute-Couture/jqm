@@ -18,17 +18,12 @@
 
 package com.enioka.jqm.tools;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import org.apache.log4j.Logger;
-import org.hsqldb.Server;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
@@ -40,34 +35,8 @@ import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-public class GeoTest
+public class GeoTest extends JqmBaseTest
 {
-    public static Logger jqmlogger = Logger.getLogger(GeoTest.class);
-    public static Server s;
-
-    @BeforeClass
-    public static void testInit() throws InterruptedException, FileNotFoundException
-    {
-        s = new Server();
-        s.setDatabaseName(0, "testdbengine");
-        s.setDatabasePath(0, "mem:testdbengine");
-        s.setLogWriter(null);
-        s.setSilent(true);
-        s.start();
-
-        JqmClientFactory.resetClient(null);
-        Helpers.resetEmf();
-        CreationTools.reset();
-    }
-
-    @AfterClass
-    public static void stop()
-    {
-        JqmClientFactory.resetClient(null);
-        s.shutdown();
-        s.stop();
-    }
-
     @Test
     public void testGeo() throws Exception
     {
@@ -90,11 +59,6 @@ public class GeoTest
         form.addParameter("nbJob", "1");
         JqmClientFactory.getClient().enqueue(form);
 
-        // Create JNDI connection to write inside the engine database
-        em.getTransaction().begin();
-        CreationTools.createDatabaseProp("jdbc/jqm", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em);
-        em.getTransaction().commit();
-
         // Start the engine
         JqmEngine engine1 = new JqmEngine();
         JqmEngine engine2 = new JqmEngine();
@@ -103,7 +67,7 @@ public class GeoTest
         engine2.start("localhost4");
         engine3.start("localhost5");
 
-        TestHelpers.waitFor(511, 30000);
+        TestHelpers.waitFor(511, 30000, em);
         jqmlogger.debug("###############################################################");
         jqmlogger.debug("SHUTDOWN");
         jqmlogger.debug("###############################################################");

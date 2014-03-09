@@ -27,17 +27,17 @@ import javax.persistence.TypedQuery;
 
 import org.apache.log4j.Logger;
 
-import com.enioka.jqm.jpamodel.DatabaseProp;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
+import com.enioka.jqm.jpamodel.JndiObjectResource;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Node;
 
 public class TestHelpers
 {
     public static Logger jqmlogger = Logger.getLogger(TestHelpers.class);
-    public static DatabaseProp db = null;
+    public static JndiObjectResource db = null;
 
     public static com.enioka.jqm.jpamodel.Queue qVip, qNormal, qSlow, qVip2, qNormal2, qSlow2, qVip3, qNormal3, qSlow3;
     public static Node node, node2, node3, nodeMix, nodeMix2;
@@ -48,7 +48,8 @@ public class TestHelpers
 
     public static void createLocalNode(EntityManager em)
     {
-        db = CreationTools.createDatabaseProp("jdbc/marsu", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb", "SA", "", em);
+        db = CreationTools.createDatabaseProp("jdbc/marsu", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb", "SA", "", em,
+                "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
 
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenRepo", "http://repo1.maven.org/maven2/", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenRepo", "http://download.eclipse.org/rt/eclipselink/maven.repo/",
@@ -120,10 +121,8 @@ public class TestHelpers
         em.getTransaction().commit();
     }
 
-    public static void printJobInstanceTable()
+    public static void printJobInstanceTable(EntityManager em)
     {
-        EntityManager em = CreationTools.emf.createEntityManager();
-
         List<JobInstance> res = em.createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList();
 
         for (JobInstance jobInstance : res)
@@ -133,14 +132,10 @@ public class TestHelpers
                     + jobInstance.getState() + " | " + jobInstance.getJd().getId() + " | " + jobInstance.getQueue().getName());
             jqmlogger.debug("==========================================================================================");
         }
-
-        em.close();
     }
 
-    public static void printHistoryTable()
+    public static void printHistoryTable(EntityManager em)
     {
-        EntityManager em = CreationTools.emf.createEntityManager();
-
         List<History> res = em.createQuery("SELECT j FROM History j", History.class).getResultList();
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss.SSS");
 
@@ -153,12 +148,10 @@ public class TestHelpers
                     + " | end: " + format.format(h.getEndDate().getTime()));
         }
         jqmlogger.debug("==========================================================================================");
-        em.close();
     }
 
-    public static void waitFor(long nbHistories, int timeoutMs)
+    public static void waitFor(long nbHistories, int timeoutMs, EntityManager em)
     {
-        EntityManager em = CreationTools.emf.createEntityManager();
         TypedQuery<Long> q = em.createQuery(
                 "SELECT COUNT(h) FROM History h WHERE h.status = 'ENDED' OR h.status = 'CRASHED'  OR h.status = 'KILLED'", Long.class);
 

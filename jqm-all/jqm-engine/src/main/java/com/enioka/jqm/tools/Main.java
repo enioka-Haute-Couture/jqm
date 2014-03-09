@@ -21,6 +21,7 @@ package com.enioka.jqm.tools;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 
 import org.apache.commons.cli.BasicParser;
@@ -35,6 +36,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.jndi.JndiContextFactory;
 
 /**
  * Starter class & parameter parsing
@@ -130,6 +132,15 @@ public class Main
         og1.addOption(o71);
         options.addOptionGroup(og1);
 
+        try
+        {
+            JndiContextFactory.createJndiContext(Thread.currentThread().getContextClassLoader());
+        }
+        catch (NamingException e)
+        {
+            e.printStackTrace();
+            return;
+        }
         HelpFormatter formatter = new HelpFormatter();
         formatter.setWidth(160);
 

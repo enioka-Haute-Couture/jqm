@@ -66,7 +66,7 @@ class Polling implements Runnable, PollingMBean
     {
         jqmlogger.info("Engine " + engine.getNode().getName() + " will poll JobInstances on queue " + dp.getQueue().getName() + " every "
                 + dp.getPollingInterval() / 1000 + "s with " + dp.getNbThread() + " threads for concurrent instances");
-        em = Helpers.getNewEm("JQM queue poller", "checking fo jobs to run", "" + dp.getQueue().getName());
+        em = Helpers.getNewEm();
         this.dp = em
                 .createQuery("SELECT dp FROM DeploymentParameter dp LEFT JOIN FETCH dp.queue LEFT JOIN FETCH dp.node WHERE dp.id = :l",
                         DeploymentParameter.class).setParameter("l", dp.getId()).getSingleResult();
@@ -165,6 +165,7 @@ class Polling implements Runnable, PollingMBean
     public void run()
     {
         this.localThread = Thread.currentThread();
+        this.localThread.setName("QUEUE_POLLER;checking for jobs to run;" + this.dp.getQueue().getName());
         while (true)
         {
             lastLoop = Calendar.getInstance();
@@ -175,7 +176,7 @@ class Polling implements Runnable, PollingMBean
             {
                 em.close();
             }
-            em = Helpers.getNewEm("JQM queue poller", "checking for jobs to run", "" + dp.getQueue().getName());
+            em = Helpers.getNewEm();
 
             // Wait according to the deploymentParameter
             try
