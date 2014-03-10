@@ -61,41 +61,39 @@ public class JndiContext extends InitialContext implements InitialContextFactory
     @Override
     public Object lookup(String name) throws NamingException
     {
-        jqmlogger.debug("Looking up a JNDI element named " + name);
-        String baseCtx = name.split("/")[0];
-
-        if ("jms".equals(baseCtx) || "fs".equals(baseCtx) || "jdbc".equals(baseCtx))
+        if (name == null)
         {
-            // If in cache...
-            if (singletons.containsKey(name))
-            {
-                return singletons.get(name);
-            }
+            throw new IllegalArgumentException("name cannot be null");
+        }
+        jqmlogger.debug("Looking up a JNDI element named " + name);
 
-            // Retrieve the resource description from the database
-            JndiResourceDescriptor d = ResourceParser.getDescriptor(name);
-
-            // Create the resource
-            try
-            {
-                ResourceFactory rf = new ResourceFactory(d.isSingleton() ? cl : Thread.currentThread().getContextClassLoader());
-                Object res = rf.getObjectInstance(d, new CompositeName(baseCtx), this, new Hashtable<String, Object>());
-                if (d.isSingleton())
-                {
-                    singletons.put(name, res);
-                }
-                return res;
-            }
-            catch (Exception e)
-            {
-                jqmlogger.warn("Could not instanciate JNDI object resource " + name, e);
-                NamingException ex = new NamingException(e.getMessage());
-                ex.initCause(e);
-                throw ex;
-            }
+        // If in cache...
+        if (singletons.containsKey(name))
+        {
+            return singletons.get(name);
         }
 
-        throw new NamingException("Unknown context " + baseCtx);
+        // Retrieve the resource description from the database or the XML file
+        JndiResourceDescriptor d = ResourceParser.getDescriptor(name);
+
+        // Create the resource
+        try
+        {
+            ResourceFactory rf = new ResourceFactory(d.isSingleton() ? cl : Thread.currentThread().getContextClassLoader());
+            Object res = rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
+            if (d.isSingleton())
+            {
+                singletons.put(name, res);
+            }
+            return res;
+        }
+        catch (Exception e)
+        {
+            jqmlogger.warn("Could not instanciate JNDI object resource " + name, e);
+            NamingException ex = new NamingException(e.getMessage());
+            ex.initCause(e);
+            throw ex;
+        }
     }
 
     public void resetSingletons()
