@@ -19,6 +19,7 @@
 package com.enioka.jqm.tools;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 
 import javax.naming.spi.NamingManager;
@@ -241,16 +242,37 @@ public class JndiTest extends JqmBaseTest
         // Create the directory...
         (new File(path)).mkdir();
 
-        // Start the engine to init the JNDI context
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
-        engine1.stop();
-
+        // Test
         try
         {
             File f = (File) NamingManager.getInitialContext(null).lookup("fs/testdirectory");
             Assert.assertTrue(f.isDirectory());
             f.delete();
+        }
+        catch (Exception e)
+        {
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testUrlJndi() throws Exception
+    {
+        jqmlogger.debug("URL JNDI: Starting");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        // Create JMS JNDI references for use by the test jar
+        String url = "http://www.marsupilami.com";
+        em.getTransaction().begin();
+        CreationTools.createJndiUrl(em, "url/testurl", "test directory", url);
+        em.getTransaction().commit();
+
+        try
+        {
+            URL f = (URL) NamingManager.getInitialContext(null).lookup("url/testurl");
+            Assert.assertEquals(url, f.toString());
         }
         catch (Exception e)
         {

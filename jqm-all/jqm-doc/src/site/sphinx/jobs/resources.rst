@@ -18,6 +18,7 @@ JQM JNDI can be used for:
 * JDBC connections
 * JMS resources
 * Files
+* URLs
 
 .. warning:: JNDI is actually part of JEE, not JSE, but it is so useful in the context of JQM use cases that it was implemented. The fact
 	that it is present does **not** mean that JQM is a JEE container. Notably, there is no injection mechanism and JNDI resources have to be
@@ -49,7 +50,7 @@ connection" (cf. [parameters](parameters.md)). It can then be retrieved directly
 Defining
 ++++++++++++
 
-.. warning:: JDBC aliases must begin with jdbc/
+.. note:: the recommended naming pattern for JDBC aliases is jdbc/name
 
 A line must be created inside the JQM database table named DatabaseProp. Fields are self-explanatory.
 
@@ -117,7 +118,7 @@ Using
 Defining
 +++++++++++++
 
-.. warning:: JMS aliases must begin with jms/
+.. note:: the recommended naming pattern for JMS aliases is jms/name
 
 An entry must be created inside the JQM database table JndiObjectResource and the object parameters must be added to the table JndoObjectResourceParameter.
 
@@ -197,7 +198,7 @@ Using
 Defining
 ++++++++++++++
 
-.. warning:: file aliases must begin with fs/
+.. note:: the recommended naming pattern for files is fs/name
 
 Same tables as for JMS resources. (these tables can actually hold whatever JNDI object resource)
 
@@ -211,4 +212,33 @@ Same tables as for JMS resources. (these tables can actually hold whatever JNDI 
 | Parameter name | Value                                                |
 +================+======================================================+
 | PATH           | path that will be used to initialize the File object |
++----------------+------------------------------------------------------+
+
+
+UrL
+***********
+
+Using
+++++++++++
+::
+
+	URL f = (URL) NamingManager.getInitialContext(null).lookup("url/testurl");
+
+Defining
+++++++++++++++
+
+.. note:: the recommended naming pattern for URL is fs/name
+
+Same tables as for JMS resources. (these tables can actually hold whatever JNDI object resource)
+
++-------------------+---------------------------------+
+| Classname         | Factory class name              |
++===================+=================================+
+| java.io.URL       | com.enioka.jqm.jndi.UrlFactory  |
++-------------------+---------------------------------+
+
++----------------+------------------------------------------------------+
+| Parameter name | Value                                                |
++================+======================================================+
+| URL            | url that will be used to initialize the URL object   |
 +----------------+------------------------------------------------------+

@@ -457,4 +457,12 @@ public class CreationTools
         return createJndiObjectResource(em, jndiAlias, "java.io.File.File", "com.enioka.jqm.jndi.FileFactory", description, prms);
     }
 
+    public static JndiObjectResource createJndiUrl(EntityManager em, String jndiAlias, String description, String url)
+    {
+        HashMap<String, String> prms = new HashMap<String, String>();
+        prms.put("URL", url);
+        prms.put("singleton", "true");
+        return createJndiObjectResource(em, jndiAlias, "java.io.URL", "com.enioka.jqm.jndi.UrlFactory", description, prms);
+    }
+
 }
