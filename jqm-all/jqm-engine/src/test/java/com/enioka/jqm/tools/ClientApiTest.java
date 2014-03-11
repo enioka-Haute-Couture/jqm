@@ -80,7 +80,7 @@ public class ClientApiTest extends JqmBaseTest
 
         TestHelpers.waitFor(1, 10000, em);
         JqmClientFactory.getClient().enqueueFromHistory(i);
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(2, 10000, em);
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
