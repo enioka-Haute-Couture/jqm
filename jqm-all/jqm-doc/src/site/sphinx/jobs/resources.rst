@@ -31,11 +31,81 @@ JQM JNDI can be used for:
 The JNDI system is totally independent from the JQM API described in :ref:`accessing_jqm_api`. It is always
 present, whatever type your payload is and even if the jqm-api jar is not present.
 
-JDBC
-*******
+JNDI resources
+***************************************
 
 Using
-+++++++++
++++++++++++++
+
+This is vanilla JNDI inside the root JNDI context: ::
+
+	DataSource ds = (DataSource) NamingManager.getInitialContext(null).lookup("jdbc/superalias");
+
+
+Please note the "null" for the context lookup: JQM only uses a root context. See below for details.
+	
+Defining
+++++++++++++
+
+Resources are defined inside the JQM database, and are therefore accessible from all JQM nodes.
+By 'resource' JNDI means an object that can be created through a (provided) 
+`ObjectFactory <http://docs.oracle.com/javase/7/docs/api/javax/naming/spi/ObjectFactory.html>`_. There are multiple factories provided with JQM, concerning databases,
+files & URLs which are detailed below. Moreover, the :term:`payload` may provide whatever factories it needs, such as a JMS driver (example also below).
+
+The main JNDI directory table is named :class:`JndiObjectResource` and the object parameters belong to the table :class:`JndiObjectResourceParameter`.
+
+The following elements are needed for every resource, and are defined in the main table:
+
++----------------+-----------------------------------------------------------------------------------------+------------------------------------------------+
+| Name           | Description                                                                             | Example                                        |
++================+=========================================================================================+================================================+
+| name           | The JNDI alias - the string used to refer to the resource in the :term:`payload` code   | jdbc/mydatasource                              |
++----------------+-----------------------------------------------------------------------------------------+------------------------------------------------+
+| description    | a short string giving the admin every info he needs                                     | connection to main db                          |
++----------------+-----------------------------------------------------------------------------------------+------------------------------------------------+
+| type           | the class name of the desired resource                                                  | com.ibm.mq.jms.MQQueueConnectionFactory        |
++----------------+-----------------------------------------------------------------------------------------+------------------------------------------------+
+| factory        | the class name of the ObjectFactory able to create the desired resource                 | com.ibm.mq.jms.MQQueueConnectionFactoryFactory |
++----------------+-----------------------------------------------------------------------------------------+------------------------------------------------+
+
+For every resource type (and therefore, every ObjectFactory), there may be different parameters: connection strings, paths, ports, ... These
+parameters are to be put inside the table JndiObjectResourceParameter.
+
+The JNDI alias is free to choose - even if conventions exist. Please note that JQM only provides a root context, and no subcontexts. Therefore, in all 
+lookups, the given alias will searched 'as provided' (including case) inside the database.
+
+Singletons
+-------------
+
+One parameter is special: it is named "singleton". If not present, it is considered to be 'false'. If 'true', the creation and caching of the
+resource is made by the engine itself in its own class context, and not inside the payload's context (i.e. classloader). It is useful for the
+following reasons:
+
+* Many resources are actually to be shared between payloads, such as a connection pool
+* Very often, the payload will expect to be returned the same resource when making multiple JNDI lookups, not a different one on each call. Once again, 
+  one would expect to be returned the same connection pool on each call, and definitiely not to have a new pool created on each call!
+* Some resources are dangerous to create inside the payload's context. As stated in :doc:`writing_payloads`, loading a JDBC driver creates
+  memory leaks (actually, classloader leaks). By delegating this to the engine, the issue disappears.
+
+Singleton resources are created the first time they are looked up, and kept forever afterwards.
+
+As singleton resources are created by the engine, the jar files containing resource & resource factory must be available to its classloader.
+For this reason, the jar files must be placed manually inside the $JQM_ROOT/ext directory (and they do not need to be placed inside the 
+dependencies of the payload, even if it does not hurt to have them there). For a resource which provider is within the payload, being
+a singleton is impossible - the engine context has no access to the payload context.
+
+
+Examples
+***************
+
+JDBC
++++++++++++++
+
+Connection pools to databases through JDBC is provided by an ObjectFactory embedded with JQM named tomcat-jdbc.
+Connection pools should always be singletons.
+
+Using
+---------
 ::
 
 	DataSource ds = (DataSource) NamingManager.getInitialContext(null).lookup("jdbc/superalias");
@@ -44,21 +114,47 @@ It could of interest to note that the JQM NamingManager is standard - it can be 
 in a persistence.xml, it is perfectly valid to use <non-jta-datasource>jdbc/superalias</non-jta-datasource>.
 
 If all programs running inside a JQM cluster always use the same database, it is possible to define a JDBC alias as the "default 
-connection" (cf. [parameters](parameters.md)). It can then be retrieved directly through the getDefaultConnection method of the JQM API.
+connection" (cf. :doc:`parameters`). It can then be retrieved directly through the getDefaultConnection method of the JQM API.
 (this is the only JNDI-related element that requires the API).
 
 Defining
-++++++++++++
+---------
 
 .. note:: the recommended naming pattern for JDBC aliases is jdbc/name
 
-A line must be created inside the JQM database table named DatabaseProp. Fields are self-explanatory.
++-----------------------------------------+-------------------------------------------------+
+| Classname                               | Factory class name                              |
++=========================================+=================================================+
+| javax.sql.DataSource                    | org.apache.tomcat.jdbc.pool.DataSourceFactory   |
++-----------------------------------------+-------------------------------------------------+
+
++----------------+-----------------------------------------+
+| Parameter name | Value                                   |
++================+=========================================+
+| maxActive      | max number of pooled connections        |
++----------------+-----------------------------------------+
+| driverClassName| class of the db JDBC driver             |
++----------------+-----------------------------------------+
+| url            | database url (see db documentation)     |
++----------------+-----------------------------------------+
+| singleton      | always true (since engine provider)     |
++----------------+-----------------------------------------+
+| username       | database account name                   |
++----------------+-----------------------------------------+
+| password       | password for the database account       |
++----------------+-----------------------------------------+
+
+There are many options, detailed in the `Tomcat JDBC documentation <https://tomcat.apache.org/tomcat-7.0-doc/jdbc-pool.html>`_.
 
 JMS
-********
+++++++++++++
+
+Connecting to a JMS broker to send or receive messages, such as ActiveMQ or MQSeries, requires 
+first a QueueConnectionFactory, then a Queue object. The implementation of these interfaces
+changes with brokers, and are not provided by JQM - they must be provided with the payload or put inside ext.
 
 Using
-++++++++++
+---------
 ::
 
 	import javax.jms.Connection;
@@ -116,11 +212,9 @@ Using
 
 
 Defining
-+++++++++++++
+---------
 
 .. note:: the recommended naming pattern for JMS aliases is jms/name
-
-An entry must be created inside the JQM database table JndiObjectResource and the object parameters must be added to the table JndoObjectResourceParameter.
 
 *Exemple for MQ Series QueueConnectionFactory:*
 
@@ -187,20 +281,20 @@ An entry must be created inside the JQM database table JndiObjectResource and th
 +----------------+---------------+
 
 Files
-***********
++++++++++++
+
+Provided by the engine - these resources must therefore always be singletons.
 
 Using
-++++++++++
+---------
 ::
 
 	File f = (File) NamingManager.getInitialContext(null).lookup("fs/superalias");
 
 Defining
-++++++++++++++
+---------
 
 .. note:: the recommended naming pattern for files is fs/name
-
-Same tables as for JMS resources. (these tables can actually hold whatever JNDI object resource)
 
 +-------------------+---------------------------------+
 | Classname         | Factory class name              |
@@ -215,21 +309,21 @@ Same tables as for JMS resources. (these tables can actually hold whatever JNDI 
 +----------------+------------------------------------------------------+
 
 
-UrL
-***********
+URL
++++++++++
+
+Provided by the engine - these resources must therefore always be singletons.
 
 Using
-++++++++++
+---------
 ::
 
 	URL f = (URL) NamingManager.getInitialContext(null).lookup("url/testurl");
 
 Defining
-++++++++++++++
+---------
 
-.. note:: the recommended naming pattern for URL is fs/name
-
-Same tables as for JMS resources. (these tables can actually hold whatever JNDI object resource)
+.. note:: the recommended naming pattern for URL is url/name
 
 +-------------------+---------------------------------+
 | Classname         | Factory class name              |
