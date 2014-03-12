@@ -263,8 +263,8 @@ class Polling implements Runnable, PollingMBean
         {
             Long nbRunning = (Long) em
                     .createQuery(
-                            "SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.state = 'ATTRIBUTED' OR j.state = 'RUNNING'")
-                    .setParameter("node", this.dp.getNode()).getSingleResult();
+                            "SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.queue = :queue AND (j.state = 'ATTRIBUTED' OR j.state = 'RUNNING')")
+                    .setParameter("node", this.dp.getNode()).setParameter("queue", this.dp.getQueue()).getSingleResult();
             jqmlogger.trace("Waiting the end of " + nbRunning + " job(s)");
 
             if (nbRunning == 0)
