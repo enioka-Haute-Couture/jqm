@@ -18,11 +18,16 @@
 
 package com.enioka.jqm.jndi;
 
+import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.naming.CompositeName;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -34,6 +39,7 @@ import javax.naming.spi.InitialContextFactoryBuilder;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
  * This class implements a basic JNDI context
@@ -44,6 +50,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
     private static Logger jqmlogger = Logger.getLogger(JndiContext.class);
     private ClassLoader cl = null;
     private Map<String, Object> singletons = new HashMap<String, Object>();
+    private List<ObjectName> jmxNames = new ArrayList<ObjectName>();
 
     /**
      * Create a new Context
@@ -84,6 +91,16 @@ public class JndiContext extends InitialContext implements InitialContextFactory
             if (d.isSingleton())
             {
                 singletons.put(name, res);
+
+                // Pool JMX registration
+                if ("org.apache.tomcat.jdbc.pool.DataSourceFactory".equals(d.getFactoryClassName())
+                        && (d.get("jmxEnabled") == null ? true : Boolean.parseBoolean((String) d.get("jmxEnabled").getContent())))
+                {
+                    MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                    ObjectName jmxname = new ObjectName("com.enioka.jqm:type=JdbcPool,name=" + name);
+                    mbs.registerMBean(((DataSource) res).getPool().getJmxPool(), jmxname);
+                    jmxNames.add(jmxname);
+                }
             }
             return res;
         }
@@ -96,9 +113,26 @@ public class JndiContext extends InitialContext implements InitialContextFactory
         }
     }
 
+    /**
+     * This is a test method only.
+     */
     public void resetSingletons()
     {
         this.singletons = new HashMap<String, Object>();
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        for (ObjectName n : this.jmxNames)
+        {
+            try
+            {
+                mbs.unregisterMBean(n);
+            }
+            catch (Exception e)
+            {
+                jqmlogger.error("could not unregister bean", e);
+                // Yet continue - this is a method only used in tests
+            }
+        }
+        this.jmxNames = new ArrayList<ObjectName>(); 
     }
 
     @Override
