@@ -35,4 +35,9 @@ public interface JqmEngineMBean
      * True if at least one queue is full
      */
     boolean isFull();
+
+    /**
+     * The number of seconds since engine start.
+     */
+    long getUptime();
 }

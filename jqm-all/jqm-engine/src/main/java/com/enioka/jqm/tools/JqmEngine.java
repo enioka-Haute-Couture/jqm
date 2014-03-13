@@ -63,6 +63,7 @@ class JqmEngine implements JqmEngineMBean
     private Semaphore ended = new Semaphore(0);
     private ObjectName name;
     private boolean hasEnded = false;
+    private Calendar startTime = Calendar.getInstance();
 
     /**
      * Starts the engine
@@ -379,5 +380,11 @@ class JqmEngine implements JqmEngineMBean
             }
         }
         return false;
+    }
+
+    @Override
+    public long getUptime()
+    {
+        return (Calendar.getInstance().getTimeInMillis() - this.startTime.getTimeInMillis()) / 1000;
     }
 }
