@@ -1,5 +1,7 @@
 package com.enioka.jqm.tools;
 
+import java.net.ServerSocket;
+
 import javax.persistence.EntityManager;
 
 import com.enioka.jqm.api.JobRequest;
@@ -16,7 +18,7 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 public class ManualTests extends JqmBaseTest
 {
     // @Test
-    public void jmxTestEnvt() throws InterruptedException
+    public void jmxTestEnvt() throws Exception
     {
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -28,6 +30,18 @@ public class ManualTests extends JqmBaseTest
                 null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
         CreationTools.createJobDef(null, true, "App", null, null, "jqm-tests/jqm-test-kill/target/test.jar", TestHelpers.qVip, 42,
                 "KillApp", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+
+        // Get free ports
+        ServerSocket s1 = new ServerSocket(0);
+        int port1 = s1.getLocalPort();
+        ServerSocket s2 = new ServerSocket(0);
+        int port2 = s2.getLocalPort();
+        s1.close();
+        s2.close();
+        em.getTransaction().begin();
+        TestHelpers.node.setJmxRegistryPort(port1);
+        TestHelpers.node.setJmxServerPort(port2);
+        em.getTransaction().commit();
         em.close();
 
         Main.main(new String[] { "-startnode", "localhost" });

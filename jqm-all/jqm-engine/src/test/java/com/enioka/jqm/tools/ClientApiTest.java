@@ -468,7 +468,7 @@ public class ClientApiTest extends JqmBaseTest
         engine1.start("localhost");
 
         em.refresh(TestHelpers.node);
-        HttpPost post = new HttpPost("http://localhost:" + TestHelpers.node.getPort() + "/enqueue");
+        HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + TestHelpers.node.getPort() + "/enqueue");
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("applicationname", "Marsu-Application"));
         nvps.add(new BasicNameValuePair("user", "testuser"));
@@ -531,7 +531,7 @@ public class ClientApiTest extends JqmBaseTest
         engine1.start("localhost");
 
         em.refresh(TestHelpers.node);
-        HttpPost post = new HttpPost("http://localhost:" + TestHelpers.node.getPort() + "/enqueue");
+        HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + TestHelpers.node.getPort() + "/enqueue");
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("applicationname", "Marsu-Application"));
         nvps.add(new BasicNameValuePair("user", "testuser"));
@@ -564,7 +564,7 @@ public class ClientApiTest extends JqmBaseTest
 
         TestHelpers.waitFor(1, 10000, em);
 
-        HttpGet rq = new HttpGet("http://localhost:" + TestHelpers.node.getPort() + "/status?id=" + jid);
+        HttpGet rq = new HttpGet("http://" + TestHelpers.node.getDns() + ":" + TestHelpers.node.getPort() + "/status?id=" + jid);
         res = client.execute(rq);
         Assert.assertEquals(200, res.getStatusLine().getStatusCode());
 

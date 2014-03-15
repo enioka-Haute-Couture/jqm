@@ -19,6 +19,8 @@
 package com.enioka.jqm.jndi;
 
 import java.lang.management.ManagementFactory;
+import java.rmi.Remote;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,6 +53,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
     private ClassLoader cl = null;
     private Map<String, Object> singletons = new HashMap<String, Object>();
     private List<ObjectName> jmxNames = new ArrayList<ObjectName>();
+    private Registry r = null;
 
     /**
      * Create a new Context
@@ -73,6 +76,21 @@ public class JndiContext extends InitialContext implements InitialContextFactory
             throw new IllegalArgumentException("name cannot be null");
         }
         jqmlogger.debug("Looking up a JNDI element named " + name);
+
+        // Special delegated cases
+        if (name.startsWith("rmi:"))
+        {
+            try
+            {
+                return this.r.lookup(name.split("/")[3]);
+            }
+            catch (Exception e)
+            {
+                NamingException e1 = new NamingException();
+                e1.setRootCause(e);
+                throw e1;
+            }
+        }
 
         // If in cache...
         if (singletons.containsKey(name))
@@ -174,12 +192,72 @@ public class JndiContext extends InitialContext implements InitialContextFactory
     @Override
     public void bind(String name, Object obj) throws NamingException
     {
-        this.singletons.put(name, obj);
+        jqmlogger.debug("binding [" + name + "] to a [" + obj.getClass().getCanonicalName() + "]");
+        if (r != null && name.startsWith("rmi://"))
+        {
+            try
+            {
+                jqmlogger.debug("binding [" + name.split("/")[3] + "] to a [" + obj.getClass().getCanonicalName() + "]");
+                this.r.bind(name.split("/")[3], (Remote) obj);
+            }
+            catch (Exception e)
+            {
+                NamingException e1 = new NamingException("could not bind RMI object");
+                e1.setRootCause(e);
+                throw e1;
+            }
+        }
+        else
+        {
+            this.singletons.put(name, obj);
+        }
     }
 
     @Override
     public void bind(Name name, Object obj) throws NamingException
     {
-        this.singletons.put(StringUtils.join(Collections.list(name.getAll()), "/"), obj);
+        this.bind(StringUtils.join(Collections.list(name.getAll()), "/"), obj);
+    }
+
+    /**
+     * Will register the given Registry as a provider for the RMI: context. If there is already a registered Registry, the call is ignored.
+     * 
+     * @param r
+     */
+    public void registerRmiContext(Registry r)
+    {
+        if (this.r == null)
+        {
+            this.r = r;
+        }
+    }
+
+    @Override
+    public void unbind(Name name) throws NamingException
+    {
+        this.unbind(StringUtils.join(Collections.list(name.getAll()), "/"));
+    }
+
+    @Override
+    public void unbind(String name) throws NamingException
+    {
+        if (r != null && name.startsWith("rmi://"))
+        {
+            try
+            {
+                jqmlogger.debug("unbinding RMI name " + name);
+                this.r.unbind(name.split("/")[3]);
+            }
+            catch (Exception e)
+            {
+                NamingException e1 = new NamingException("could not unbind RMI name");
+                e1.setRootCause(e);
+                throw e1;
+            }
+        }
+        else
+        {
+            this.singletons.remove(name);
+        }
     }
 }

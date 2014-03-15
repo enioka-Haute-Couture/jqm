@@ -3,7 +3,7 @@
 
 JQM fully embraces JMX as its main way of being monitored.
 
-.. highlight:: bash
+.. highlight:: java
 
 Monitoring JQM through JMX
 ****************************
@@ -30,6 +30,25 @@ In JConsole, this shows as:
 
 .. image:: /media/jmx.png
 
+Remote JMX access
+************************
+
+By default, JQM does not start the remote JMX server and the JMX beans can only be accessed locally. To start the JMX remote server, two :class:`Node` (i.e. the 
+parameters of a :term:`JQM engine`) parameters must be set: jmxRegistryPort (the connection port) and jmxServerPort (the port on which the real communicate will occur).
+If one of these two parameters is null or less than one, the JMX remote server is disabled. 
+
+The connection string is displayed (INFO level) inside the main engine log at startup. It is in the style of ::
+
+	service:jmx:rmi://dnsname:jmxServerPort/jndi/rmi://dnsname:jmxRegistryPort/jmxrmi
+
+When using jConsole, it is possible to simply specify dnsname:jmxRegistryPort.
+
+Remark: JMX usually uses a random port instead of a fixed jmxServerPort. As this is a hassle in an environment with firewalls, JQM includes a JMX server that uses a fixed port,
+and specifying jmxServerPort in the configuration is therefore mandatory.
+
+.. warning:: JQM does not implement any JMX authentication nor encryption. This is a huge security risk, as JMX allows to run arbitrary code remotely.
+	**Only enable this in production within a secure network**. Making JQM secure is already an open enhancement request.
+
 Beans detail
 *****************
 
@@ -39,24 +58,28 @@ Beans detail
 	
 	.. method:: getCumulativeJobInstancesCount
 	
-		The total number of job instances that were run on this node since the last history purge. (integer)
+		The total number of job instances that were run on this node since the last history purge. (long)
 
 	.. method:: getJobsFinishedPerSecondLastMinute
 	
-		On all queues, the number of job requests that ended last minute. (integer)
+		On all queues, the number of job requests that ended last minute. (float)
 		
 	.. method:: getCurrentlyRunningJobCount
 	
-		The number of currently running job instances on all queues
+		The number of currently running job instances on all queues (long)
+		
+	.. method:: getUptime
+	
+		The number of seconds since engine start. (long)
 		
 	.. method:: isAllPollersPolling
 		
 		A must-be-monitored element: True if, for all pollers, the last time the poller looped was less than a polling period ago.
-		Said the other way: will be false if at least one queue is late on evaluating job requests.
+		Said the other way: will be false if at least one queue is late on evaluating job requests. (boolean)
 		
 	.. method:: isFull
 	
-		Will usually be a warning element inside monitoring. True if at least one queue is full.
+		Will usually be a warning element inside monitoring. True if at least one queue is full. (boolean)
 
 	.. method:: stop
 	
@@ -92,7 +115,7 @@ Beans detail
 	
 		The number of job requests that ended last minute. (integer)
 		
-	... method:: getCurrentlyRunningJobCount
+	.. method:: getCurrentlyRunningJobCount
 	
 		The number of currently running job instances inside this queue.
 		
@@ -104,6 +127,8 @@ Beans detail
 	
 		True if running count equals max job number. (the max count number can be retrieved through :meth:`getMaxConcurrentJobInstanceCount`)
 
+		
+		
 .. class:: LoaderMBean
 
 	This bean tracks a running job, allowing to query its properties and (try to) stop it. It is created just before the start of the :term:`payload` and destroyed when it ends.
@@ -111,44 +136,44 @@ Beans detail
 	.. method:: kill()
 	
 		Tries to kill the job. As Java is not very good at killing threads, it will often fail to achieve anything. See :ref:`the job documentation<culling>` for more details.
-
-    .. method:: getApplicationName();
+		
+	.. method:: getApplicationName();
 	
 		The name of the job. (String)
-
-    .. method:: getEnqueueDate();
+		
+	.. method:: getEnqueueDate();
 	
 		Start time (Calendar)
-
-    .. method:: getKeyword1();
+		
+	.. method:: getKeyword1();
 	
 		A fully customizable and optional tag to help sorting job requests. (String)
-
-    .. method:: getKeyword2();
+		
+	.. method:: getKeyword2();
 	
 		A fully customizable and optional tag to help sorting job requests. (String)
-
-    .. method:: getKeyword3();
+		
+	.. method:: getKeyword3();
 	
 		A fully customizable and optional tag to help sorting job requests. (String)
-
-    .. method:: getModule();
+		
+	.. method:: getModule();
 	
 		A fully customizable and optional tag to help sorting job requests. (String)
-
-    .. method:: getUser();
+		
+	.. method:: getUser();
 		
 		A fully customizable and optional tag to help sorting job requests. (String)
-
-    .. method:: getSessionId();
+		
+	.. method:: getSessionId();
 	
 		A fully customizable and optional tag to help sorting job requests. (int)
-
-    .. method:: getId();
+		
+	.. method:: getId();
 	
 		The unique ID attributed by JQM to the execution request. (int)
-
-    .. method:: getRunTimeSeconds();
+		
+	.. method:: getRunTimeSeconds();
 	
 		Time elapsed between startup and current time. (int)
 

@@ -71,6 +71,12 @@ public class Node
     @Column(name = "lastSeenAlive", nullable = true)
     private Calendar lastSeenAlive;
 
+    // JMX registry port (i.e. connection port)
+    private Integer jmxRegistryPort = 0;
+
+    // JMX server port
+    private Integer jmxServerPort = 0;
+
     public Integer getId()
     {
         return id;
@@ -173,5 +179,25 @@ public class Node
     public void setLastSeenAlive(Calendar lastSeenAlive)
     {
         this.lastSeenAlive = lastSeenAlive;
+    }
+
+    public Integer getJmxRegistryPort()
+    {
+        return jmxRegistryPort;
+    }
+
+    public void setJmxRegistryPort(Integer jmxRegistryPort)
+    {
+        this.jmxRegistryPort = jmxRegistryPort;
+    }
+
+    public Integer getJmxServerPort()
+    {
+        return jmxServerPort;
+    }
+
+    public void setJmxServerPort(Integer jmxServerPort)
+    {
+        this.jmxServerPort = jmxServerPort;
     }
 }

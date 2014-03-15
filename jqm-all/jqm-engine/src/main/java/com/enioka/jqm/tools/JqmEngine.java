@@ -141,6 +141,13 @@ class JqmEngine implements JqmEngineMBean
             System.setErr(s);
         }
 
+        // Remote JMX server
+        if (node.getJmxRegistryPort() != null && node.getJmxServerPort() != null && node.getJmxRegistryPort() > 0
+                && node.getJmxServerPort() > 0)
+        {
+            JmxAgent.registerAgent(node.getJmxRegistryPort(), node.getJmxServerPort(), node.getDns());
+        }
+
         // Jetty
         this.server = new JettyServer();
         this.server.start(node);
@@ -289,11 +296,13 @@ class JqmEngine implements JqmEngineMBean
         {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             mbs.unregisterMBean(name);
+            jqmlogger.debug("unregistered bean " + name);
         }
         catch (Exception e)
         {
             jqmlogger.error("Could not unregister engine JMX bean", e);
         }
+        // Note: if present, the JMX listener is not stopped as it is JVM-global, like the JNDI context
 
         // Done
         this.ended.release();

@@ -19,6 +19,8 @@ package com.enioka.jqm.test.helpers;
  */
 
 import java.io.FileNotFoundException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -281,18 +283,25 @@ public class CreationTools
 
     // ------------------ NODE ---------------------------------
 
-    public static Node createNode(String listeningInterface, Integer port, String dlRepo, String repo, String exportRepo, EntityManager em)
+    public static Node createNode(String nodeName, Integer port, String dlRepo, String repo, String exportRepo, EntityManager em)
     {
         Node n = new Node();
         EntityTransaction transac = em.getTransaction();
         transac.begin();
 
-        n.setName(listeningInterface);
+        n.setName(nodeName);
         n.setPort(port);
         n.setDlRepo(dlRepo);
         n.setRepo(repo);
         n.setExportRepo(exportRepo);
-
+        try
+        {
+            n.setDns(InetAddress.getLocalHost().getHostName());
+        }
+        catch (UnknownHostException e)
+        {
+            n.setDns("localhost");
+        }
         em.persist(n);
         transac.commit();
         return n;

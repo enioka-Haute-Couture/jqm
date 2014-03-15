@@ -50,12 +50,16 @@ public final class JndiContextFactory
     {
         try
         {
-            JndiContext ctx = new JndiContext(cl);
             if (!NamingManager.hasInitialContextFactoryBuilder())
             {
+                JndiContext ctx = new JndiContext(cl);
                 NamingManager.setInitialContextFactoryBuilder(ctx);
+                return ctx;
             }
-            return ctx;
+            else
+            {
+                return (JndiContext) NamingManager.getInitialContext(null);
+            }
         }
         catch (Exception e)
         {
