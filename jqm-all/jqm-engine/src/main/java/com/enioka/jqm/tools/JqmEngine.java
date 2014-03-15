@@ -233,7 +233,6 @@ class JqmEngine implements JqmEngineMBean
         {
             jqmlogger.error("interrutped", e);
         }
-        hasEnded = true;
         jqmlogger.debug("Stop order was correctly handled. Engine for node " + this.node.getName() + " has stopped.");
     }
 
@@ -267,6 +266,7 @@ class JqmEngine implements JqmEngineMBean
             return;
         }
         jqmlogger.trace("The engine should end with the latest poller");
+        hasEnded = true;
 
         // If here, all pollers are down. Stop Jetty too
         this.server.stop();
