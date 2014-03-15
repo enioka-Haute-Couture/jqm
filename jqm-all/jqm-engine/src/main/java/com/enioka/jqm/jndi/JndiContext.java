@@ -132,7 +132,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
                 // Yet continue - this is a method only used in tests
             }
         }
-        this.jmxNames = new ArrayList<ObjectName>(); 
+        this.jmxNames = new ArrayList<ObjectName>();
     }
 
     @Override
@@ -169,5 +169,17 @@ public class JndiContext extends InitialContext implements InitialContextFactory
     public void close() throws NamingException
     {
         // Nothing to do.
+    }
+
+    @Override
+    public void bind(String name, Object obj) throws NamingException
+    {
+        this.singletons.put(name, obj);
+    }
+
+    @Override
+    public void bind(Name name, Object obj) throws NamingException
+    {
+        this.singletons.put(StringUtils.join(Collections.list(name.getAll()), "/"), obj);
     }
 }
