@@ -82,6 +82,9 @@ class JqmEngine implements JqmEngineMBean
         // Set thread name - used in audits
         Thread.currentThread().setName("JQM engine;;" + nodeName);
 
+        // Log: we are starting...
+        jqmlogger.info("JQM engine for node " + nodeName + " is starting");
+
         // JNDI first - the engine itself uses JNDI to fetch its connections!
         if (jndiCtx == null)
         {
@@ -117,16 +120,13 @@ class JqmEngine implements JqmEngineMBean
         {
             Logger.getRootLogger().setLevel(Level.toLevel(node.getRootLogLevel()));
             Logger.getLogger("com.enioka").setLevel(Level.toLevel(node.getRootLogLevel()));
-            jqmlogger.info("Log level is set at " + node.getRootLogLevel() + " which translates as log4j level "
+            jqmlogger.info("Setting general log level at " + node.getRootLogLevel() + " which translates as log4j level "
                     + Level.toLevel(node.getRootLogLevel()));
         }
         catch (Exception e)
         {
             jqmlogger.warn("Log level could not be set", e);
         }
-
-        // Log!
-        jqmlogger.info("JQM engine for node " + nodeName + " is starting");
 
         // Log multicasting (& log4j stdout redirect)
         GlobalParameter gp1 = em.createQuery("SELECT g FROM GlobalParameter g WHERE g.key = :k", GlobalParameter.class)
@@ -171,7 +171,7 @@ class JqmEngine implements JqmEngineMBean
         {
             throw new JqmInitError("Could not create JMX beans", e);
         }
-        jqmlogger.info("JMX management bean for the engine was registered");
+        jqmlogger.trace("JMX management bean for the engine was registered");
 
         // Security
         if (System.getSecurityManager() == null)
@@ -296,7 +296,7 @@ class JqmEngine implements JqmEngineMBean
         {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             mbs.unregisterMBean(name);
-            jqmlogger.debug("unregistered bean " + name);
+            jqmlogger.trace("unregistered bean " + name);
         }
         catch (Exception e)
         {

@@ -27,7 +27,6 @@ public class MiscTest extends JqmBaseTest
     public void testEmail() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testSendEmail");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -63,7 +62,6 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testLongName() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testLongName");
         EntityManager em = Helpers.getNewEm();
@@ -102,7 +100,6 @@ public class MiscTest extends JqmBaseTest
     public void testJobWithSystemExit() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testJobWithSystemExit");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -130,7 +127,6 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testJobWithPersistenceUnit() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testJobWithPersistenceUnit");
         EntityManager em = Helpers.getNewEm();
@@ -166,7 +162,6 @@ public class MiscTest extends JqmBaseTest
     public void testRemoteStop() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testRemoteStop");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -192,7 +187,6 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testNoDoubleStart() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testNoDoubleStart");
         EntityManager em = Helpers.getNewEm();
@@ -232,7 +226,6 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testStartupCleanup() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testStartupCleanup");
         EntityManager em = Helpers.getNewEm();

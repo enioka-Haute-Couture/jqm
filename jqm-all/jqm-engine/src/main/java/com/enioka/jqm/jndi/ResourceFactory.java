@@ -27,11 +27,8 @@ import javax.naming.Name;
 import javax.naming.NamingException;
 import javax.naming.spi.ObjectFactory;
 
-import org.apache.log4j.Logger;
-
 class ResourceFactory implements ObjectFactory
 {
-    private static Logger jqmlogger = Logger.getLogger(ResourceFactory.class);
     private ClassLoader clResourceClasses = null;
 
     public ResourceFactory(ClassLoader clResourcesClasses)
@@ -51,9 +48,7 @@ class ResourceFactory implements ObjectFactory
 
         try
         {
-            jqmlogger.debug("Attempting to load ObjectFactory class " + resource.getFactoryClassName());
             factoryClass = clResourceClasses.loadClass(resource.getFactoryClassName());
-            jqmlogger.debug("ObjectFactory class was successfully loaded: " + resource.getFactoryClassName());
         }
         catch (ClassNotFoundException e)
         {
@@ -70,9 +65,7 @@ class ResourceFactory implements ObjectFactory
 
         try
         {
-            jqmlogger.debug("Creating ObjectFactory instance");
             factory = (ObjectFactory) factoryClass.newInstance();
-            jqmlogger.debug("Factory was successfully created");
         }
         catch (Exception e)
         {
@@ -84,9 +77,7 @@ class ResourceFactory implements ObjectFactory
         Object result = null;
         try
         {
-            jqmlogger.debug("Creating Object instance from ObjectFactory instance");
             result = factory.getObjectInstance(obj, name, nameCtx, environment);
-            jqmlogger.debug("Object was successfully created");
         }
         catch (Exception e)
         {

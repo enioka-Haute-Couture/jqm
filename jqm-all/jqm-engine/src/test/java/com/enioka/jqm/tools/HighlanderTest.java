@@ -42,7 +42,6 @@ public class HighlanderTest extends JqmBaseTest
     public void testHighlanderMultiNode() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testHighlanderMultiNode");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -100,7 +99,6 @@ public class HighlanderTest extends JqmBaseTest
     public void testHighlanderenqueueEngineDead() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testHighlanderModeenqueueEngineDead");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -141,7 +139,6 @@ public class HighlanderTest extends JqmBaseTest
         // This test launches an infinite loop as Highlander, checks if no other job can launch. Job is killed at the end - which allows a
         // second one to run, which also has to be killed.
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testHighlanderEngineRunning");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -170,14 +167,12 @@ public class HighlanderTest extends JqmBaseTest
         Assert.assertEquals(2, res.size());
         Assert.assertEquals(State.KILLED, res.get(0).getState());
         Assert.assertEquals(State.KILLED, res.get(1).getState());
-        TestHelpers.printHistoryTable(em);
         Assert.assertTrue(res.get(0).getAttributionDate().compareTo(res.get(1).getEnqueueDate()) <= 0);
     }
 
     @Test
     public void testHighlanderModeMultiQueue() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testHighlanderModeMultiQueue");
         EntityManager em = Helpers.getNewEm();

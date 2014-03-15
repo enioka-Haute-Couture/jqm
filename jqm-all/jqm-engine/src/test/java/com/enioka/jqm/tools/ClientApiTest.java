@@ -57,7 +57,6 @@ public class ClientApiTest extends JqmBaseTest
     public void testRestartJob() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testRestartJob");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -95,7 +94,6 @@ public class ClientApiTest extends JqmBaseTest
     @Test
     public void testHistoryFields() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testHistoryFields");
         EntityManager em = Helpers.getNewEm();
@@ -140,7 +138,6 @@ public class ClientApiTest extends JqmBaseTest
     public void testKillJob() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testKillJob");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -159,20 +156,15 @@ public class ClientApiTest extends JqmBaseTest
         int i = JqmClientFactory.getClient().enqueue(j);
         // JqmClientFactory.getClient().enqueue(j);
 
-        TestHelpers.printJobInstanceTable(em);
-
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
         Thread.sleep(3000);
 
         JqmClientFactory.getClient().killJob(i);
-        TestHelpers.printJobInstanceTable(em);
 
         Thread.sleep(3000);
 
         engine1.stop();
-
-        TestHelpers.printJobInstanceTable(em);
 
         TypedQuery<History> query = Helpers.getNewEm().createQuery("SELECT j FROM History j", History.class);
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
@@ -184,7 +176,6 @@ public class ClientApiTest extends JqmBaseTest
     @Test
     public void testGetMsg() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testGetMsg");
         EntityManager em = Helpers.getNewEm();
@@ -248,7 +239,6 @@ public class ClientApiTest extends JqmBaseTest
     public void testGetProgress() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testGetProgress");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -285,7 +275,6 @@ public class ClientApiTest extends JqmBaseTest
     public void testPause() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testPause");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -308,7 +297,6 @@ public class ClientApiTest extends JqmBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         JqmClientFactory.getClient().pauseQueuedJob(i);
-        TestHelpers.printJobInstanceTable(em);
         engine1.start("localhost");
         Thread.sleep(5000);
 
@@ -327,7 +315,6 @@ public class ClientApiTest extends JqmBaseTest
     @Test
     public void testCancelJob() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testCancelJob");
         EntityManager em = Helpers.getNewEm();
@@ -351,7 +338,6 @@ public class ClientApiTest extends JqmBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         JqmClientFactory.getClient().cancelJob(i);
-        TestHelpers.printJobInstanceTable(em);
         engine1.start("localhost");
         Thread.sleep(5000);
 
@@ -368,7 +354,6 @@ public class ClientApiTest extends JqmBaseTest
     @Test
     public void testChangeQueue() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testChanegQueue");
         EntityManager em = Helpers.getNewEm();
@@ -390,7 +375,6 @@ public class ClientApiTest extends JqmBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         JqmClientFactory.getClient().setJobQueue(i, TestHelpers.qSlow.getId());
-        TestHelpers.printJobInstanceTable(em);
 
         engine1.start("localhost");
         TestHelpers.waitFor(1, 10000, em);
@@ -407,7 +391,6 @@ public class ClientApiTest extends JqmBaseTest
     @Test
     public void testDelJobInQueue() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testDelJobInQueue");
         EntityManager em = Helpers.getNewEm();
@@ -429,7 +412,6 @@ public class ClientApiTest extends JqmBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         JqmClientFactory.getClient().deleteJob(i);
-        TestHelpers.printJobInstanceTable(em);
         engine1.start("localhost");
         Thread.sleep(1000);
 
@@ -448,7 +430,6 @@ public class ClientApiTest extends JqmBaseTest
     @Test
     public void testHttpEnqueue() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testHttpEnqueue");
 
@@ -511,7 +492,6 @@ public class ClientApiTest extends JqmBaseTest
     @Test
     public void testHttpStatus() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testHttpenqueue");
 
@@ -583,7 +563,6 @@ public class ClientApiTest extends JqmBaseTest
     public void testResume() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testResume");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -606,7 +585,6 @@ public class ClientApiTest extends JqmBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         JqmClientFactory.getClient().pauseQueuedJob(i);
-        TestHelpers.printJobInstanceTable(em);
         engine1.start("localhost");
         Thread.sleep(5000);
         JqmClientFactory.getClient().resumeJob(i);

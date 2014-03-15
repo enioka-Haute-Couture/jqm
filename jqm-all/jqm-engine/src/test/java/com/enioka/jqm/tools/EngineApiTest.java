@@ -24,7 +24,6 @@ public class EngineApiTest extends JqmBaseTest
     public void testSendMsg() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testSendMsg");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -85,7 +84,6 @@ public class EngineApiTest extends JqmBaseTest
     public void testSendProgress() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testSendProgress");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -123,7 +121,6 @@ public class EngineApiTest extends JqmBaseTest
     @Test
     public void testThrowable() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testThrowable");
         EntityManager em = Helpers.getNewEm();

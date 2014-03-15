@@ -41,7 +41,6 @@ public class NoApiPayloadTest extends JqmBaseTest
     public void testClassicPayload() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testClassicPayload");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -70,7 +69,6 @@ public class NoApiPayloadTest extends JqmBaseTest
     public void testRunnable() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testRunnable");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -98,7 +96,6 @@ public class NoApiPayloadTest extends JqmBaseTest
     @Test
     public void testRunnableInject() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testRunnable");
         EntityManager em = Helpers.getNewEm();
@@ -134,7 +131,6 @@ public class NoApiPayloadTest extends JqmBaseTest
     public void testMainType() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testMainType");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -162,7 +158,6 @@ public class NoApiPayloadTest extends JqmBaseTest
     @Test
     public void testMainTypeInject() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testMainTypeInject");
         EntityManager em = Helpers.getNewEm();

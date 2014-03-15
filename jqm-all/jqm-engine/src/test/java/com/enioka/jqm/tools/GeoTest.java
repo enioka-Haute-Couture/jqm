@@ -41,11 +41,16 @@ public class GeoTest extends JqmBaseTest
     public void testGeo() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testGeo");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
+
+        em.getTransaction().begin();
+        TestHelpers.node.setRootLogLevel("INFO");
+        TestHelpers.nodeMix.setRootLogLevel("INFO");
+        TestHelpers.nodeMix2.setRootLogLevel("INFO");
+        em.getTransaction().commit();
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
@@ -68,9 +73,6 @@ public class GeoTest extends JqmBaseTest
         engine3.start("localhost5");
 
         TestHelpers.waitFor(511, 30000, em);
-        jqmlogger.debug("###############################################################");
-        jqmlogger.debug("SHUTDOWN");
-        jqmlogger.debug("###############################################################");
         engine1.stop();
         engine2.stop();
         engine3.stop();

@@ -26,7 +26,6 @@ public class DeliverableTest extends JqmBaseTest
     public void testGetDeliverables() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testGetDeliverables");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -44,13 +43,9 @@ public class DeliverableTest extends JqmBaseTest
         JobRequest j = new JobRequest("getDeliverables", "MAG");
         int id = JqmClientFactory.getClient().enqueue(j);
 
-        TestHelpers.printJobInstanceTable(em);
-
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
         TestHelpers.waitFor(1, 10000, em);
-
-        TestHelpers.printJobInstanceTable(em);
 
         List<InputStream> tmp = JqmClientFactory.getClient().getJobDeliverablesContent(id);
         engine1.stop();
@@ -66,7 +61,6 @@ public class DeliverableTest extends JqmBaseTest
     @Test
     public void testGetOneDeliverable() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testGetOneDeliverable");
         EntityManager em = Helpers.getNewEm();
@@ -110,7 +104,6 @@ public class DeliverableTest extends JqmBaseTest
     @Test
     public void testGetAllDeliverables() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testGetAllDeliverables");
         EntityManager em = Helpers.getNewEm();

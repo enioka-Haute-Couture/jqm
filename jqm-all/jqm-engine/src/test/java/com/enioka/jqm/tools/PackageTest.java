@@ -23,7 +23,6 @@ public class PackageTest extends JqmBaseTest
     public void testPomOnlyInJar() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testPomOnlyInJar");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -60,7 +59,6 @@ public class PackageTest extends JqmBaseTest
     public void testNoPomLibDir() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testNoPomLibDir");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -90,7 +88,6 @@ public class PackageTest extends JqmBaseTest
     @Test
     public void testLibInJar() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testLibInJar");
         EntityManager em = Helpers.getNewEm();
@@ -127,7 +124,6 @@ public class PackageTest extends JqmBaseTest
     public void testNoDependencyDefinition() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testNoDependencyDefinition");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -162,7 +158,6 @@ public class PackageTest extends JqmBaseTest
     public void testInheritedLegacyPayload() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testInheritedLegacyPayload");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -190,7 +185,6 @@ public class PackageTest extends JqmBaseTest
     @Test
     public void testIncompleteClass() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testIncompleteClass");
         EntityManager em = Helpers.getNewEm();

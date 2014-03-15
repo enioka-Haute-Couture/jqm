@@ -399,7 +399,7 @@ class Loader implements Runnable, LoaderMBean
         }
 
         // Var init
-        Thread.currentThread().setName(this.job.getJd().getApplicationName() + ";running payload;" + this.job.getId());
+        Thread.currentThread().setName(this.job.getJd().getApplicationName() + ";payload;" + this.job.getId());
         em = Helpers.getNewEm();
         this.job = em.find(JobInstance.class, job.getId());
         this.node = em.find(Node.class, p.getDp().getNode().getId());

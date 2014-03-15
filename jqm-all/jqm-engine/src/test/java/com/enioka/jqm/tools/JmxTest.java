@@ -15,7 +15,6 @@ import javax.persistence.EntityManager;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.enioka.jqm.jndi.JndiContextFactory;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -24,7 +23,8 @@ public class JmxTest extends JqmBaseTest
     @Test
     public void jmxRemoteTest() throws Exception
     {
-        JndiContextFactory.createJndiContext(Thread.currentThread().getContextClassLoader());
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test jmxRemoteTest");
 
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);

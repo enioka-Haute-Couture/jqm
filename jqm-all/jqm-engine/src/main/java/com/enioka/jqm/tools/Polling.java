@@ -165,7 +165,7 @@ class Polling implements Runnable, PollingMBean
     public void run()
     {
         this.localThread = Thread.currentThread();
-        this.localThread.setName("QUEUE_POLLER;checking for jobs to run;" + this.dp.getQueue().getName());
+        this.localThread.setName("QUEUE_POLLER;polling;" + this.dp.getQueue().getName());
         while (true)
         {
             lastLoop = Calendar.getInstance();

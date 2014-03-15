@@ -41,7 +41,6 @@ public class FiboTest extends JqmBaseTest
     public void testFibo() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testFibo");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -76,7 +75,6 @@ public class FiboTest extends JqmBaseTest
     public void testenqueueSynchronously() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testenqueueSynchronously");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -109,7 +107,6 @@ public class FiboTest extends JqmBaseTest
         {
             Assert.assertEquals(State.ENDED, history.getState());
         }
-        TestHelpers.printJobInstanceTable(em);
         Assert.assertEquals(i, (int) res.get(res.size() - 1).getId());
     }
 }

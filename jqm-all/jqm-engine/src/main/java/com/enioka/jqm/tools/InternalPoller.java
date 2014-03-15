@@ -41,7 +41,7 @@ class InternalPoller implements Runnable
     {
         // Log
         jqmlogger.info("Start of the internal poller");
-        Thread.currentThread().setName("INTERNAL_POLLER;polling for orders;");
+        Thread.currentThread().setName("INTERNAL_POLLER;polling orders;");
 
         // New EM (after setting thread name)
         em = Helpers.getNewEm();

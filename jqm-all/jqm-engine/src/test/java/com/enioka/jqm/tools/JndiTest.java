@@ -43,6 +43,8 @@ public class JndiTest extends JqmBaseTest
     // NOT AN AUTO TEST: this requires to have MQ Series jars which are not libre software!
     public void testJmsWmq() throws Exception
     {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("starting test testJmsWmq");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
@@ -93,7 +95,8 @@ public class JndiTest extends JqmBaseTest
     @Test
     public void testJmsAmq() throws Exception
     {
-        jqmlogger.debug("AMQ: Starting");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting testJmqAmq");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
@@ -140,7 +143,8 @@ public class JndiTest extends JqmBaseTest
     @Test
     public void testJmsAmqWrongAlias() throws Exception
     {
-        jqmlogger.debug("WRONG ALIAS: Starting");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting testJmsAmqWrongAlias");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
@@ -187,7 +191,8 @@ public class JndiTest extends JqmBaseTest
     @Test
     public void testDefCon() throws Exception
     {
-        jqmlogger.debug("Default connection: Starting");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting testDefCon");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
@@ -208,8 +213,6 @@ public class JndiTest extends JqmBaseTest
         TestHelpers.waitFor(1, 10000, em);
         engine1.stop();
 
-        TestHelpers.printJobInstanceTable(em);
-
         History h = null;
         try
         {
@@ -228,7 +231,8 @@ public class JndiTest extends JqmBaseTest
     @Test
     public void testFileJndi() throws Exception
     {
-        jqmlogger.debug("FILE JNDI: Starting");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting testFileJndi");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
@@ -258,7 +262,8 @@ public class JndiTest extends JqmBaseTest
     @Test
     public void testUrlJndi() throws Exception
     {
-        jqmlogger.debug("URL JNDI: Starting");
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting testUrlJndi");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);

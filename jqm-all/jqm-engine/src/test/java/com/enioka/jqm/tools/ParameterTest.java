@@ -38,7 +38,6 @@ public class ParameterTest extends JqmBaseTest
     public void testMixParameters() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testMixParameters");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -71,7 +70,6 @@ public class ParameterTest extends JqmBaseTest
     public void testDefaultParameters() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testDefaultParameters");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -102,7 +100,6 @@ public class ParameterTest extends JqmBaseTest
     @Test
     public void testOverrideParmeters() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testOverrideParameters");
         EntityManager em = Helpers.getNewEm();

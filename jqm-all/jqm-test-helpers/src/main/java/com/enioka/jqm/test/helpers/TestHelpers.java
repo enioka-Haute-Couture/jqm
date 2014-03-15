@@ -31,7 +31,6 @@ import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JndiObjectResource;
-import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Node;
 
 public class TestHelpers
@@ -119,19 +118,6 @@ public class TestHelpers
         em.createQuery("DELETE JndiObjectResource WHERE 1=1").executeUpdate();
         em.createQuery("DELETE DatabaseProp WHERE 1=1").executeUpdate();
         em.getTransaction().commit();
-    }
-
-    public static void printJobInstanceTable(EntityManager em)
-    {
-        List<JobInstance> res = em.createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList();
-
-        for (JobInstance jobInstance : res)
-        {
-            jqmlogger.debug("==========================================================================================");
-            jqmlogger.debug("JobInstance Id: " + jobInstance.getId() + " ---> " + jobInstance.getCurrentPosition(em) + " | "
-                    + jobInstance.getState() + " | " + jobInstance.getJd().getId() + " | " + jobInstance.getQueue().getName());
-            jqmlogger.debug("==========================================================================================");
-        }
     }
 
     public static void printHistoryTable(EntityManager em)

@@ -48,7 +48,7 @@ class JettyServer
         loadWar();
 
         // Start the server
-        jqmlogger.info("Starting Jetty (port " + node.getPort() + ")");
+        jqmlogger.trace("Starting Jetty (port " + node.getPort() + ")");
         try
         {
             server.start();
@@ -73,11 +73,12 @@ class JettyServer
 
     void stop()
     {
-        jqmlogger.info("Jetty will now stop");
+        jqmlogger.trace("Jetty will now stop");
         try
         {
             this.server.stop();
             this.server.join();
+            jqmlogger.info("Jetty has stopped");
         }
         catch (Exception e)
         {

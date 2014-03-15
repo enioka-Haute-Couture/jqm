@@ -44,7 +44,6 @@ public class MultiNodeTest extends JqmBaseTest
     public void testOneQueueTwoNodes() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testOneQueueTwoNodes");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -78,8 +77,6 @@ public class MultiNodeTest extends JqmBaseTest
         int i = 0;
         while (i < 3)
         {
-            TestHelpers.printJobInstanceTable(em);
-
             JqmClientFactory.getClient().enqueue(j11);
             JqmClientFactory.getClient().enqueue(j11);
             JqmClientFactory.getClient().enqueue(j11);
@@ -94,16 +91,9 @@ public class MultiNodeTest extends JqmBaseTest
             JqmClientFactory.getClient().enqueue(j11);
 
             Thread.sleep(1000);
-
-            TestHelpers.printJobInstanceTable(em);
             i++;
         }
         TestHelpers.waitFor(45, 30000, em);
-
-        for (Message m : em.createQuery("SELECT j FROM Message j ORDER BY j.history asc, j.id asc", Message.class).getResultList())
-        {
-            jqmlogger.debug(m.getHistory().getId() + " - " + m.getTextMessage());
-        }
 
         Assert.assertEquals(45, em.createQuery("SELECT j FROM History j ORDER BY j.executionDate ASC", History.class).getResultList()
                 .size());
@@ -124,7 +114,6 @@ public class MultiNodeTest extends JqmBaseTest
     @Test
     public void testOneQueueThreeNodes() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testOneQueueThreeNodes");
         EntityManager em = Helpers.getNewEm();
@@ -161,8 +150,6 @@ public class MultiNodeTest extends JqmBaseTest
         int i = 0;
         while (i < 3)
         {
-            TestHelpers.printJobInstanceTable(em);
-
             JqmClientFactory.getClient().enqueue(j11);
             JqmClientFactory.getClient().enqueue(j11);
             JqmClientFactory.getClient().enqueue(j11);
@@ -177,8 +164,6 @@ public class MultiNodeTest extends JqmBaseTest
             JqmClientFactory.getClient().enqueue(j11);
 
             Thread.sleep(1000);
-
-            TestHelpers.printJobInstanceTable(em);
             i++;
         }
 
@@ -201,7 +186,6 @@ public class MultiNodeTest extends JqmBaseTest
     @Test
     public void testTwoNodesTwoQueues() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testTwoNodesTwoQueues");
         EntityManager em = Helpers.getNewEm();
@@ -252,8 +236,6 @@ public class MultiNodeTest extends JqmBaseTest
             JqmClientFactory.getClient().enqueue(j21);
 
             Thread.sleep(1000);
-
-            TestHelpers.printJobInstanceTable(em);
             i++;
         }
 
@@ -275,7 +257,6 @@ public class MultiNodeTest extends JqmBaseTest
     @Test
     public void testThreeNodesThreeQueues() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testThreeNodesThreeQueues");
         EntityManager em = Helpers.getNewEm();
@@ -374,8 +355,6 @@ public class MultiNodeTest extends JqmBaseTest
         int i = 0;
         while (i < 3)
         {
-            TestHelpers.printJobInstanceTable(em);
-
             JqmClientFactory.getClient().enqueue(j11);
             JqmClientFactory.getClient().enqueue(j11);
             JqmClientFactory.getClient().enqueue(j11);
@@ -407,8 +386,6 @@ public class MultiNodeTest extends JqmBaseTest
             JqmClientFactory.getClient().enqueue(j33);
 
             Thread.sleep(1000);
-
-            TestHelpers.printJobInstanceTable(em);
             i++;
         }
 
@@ -431,7 +408,6 @@ public class MultiNodeTest extends JqmBaseTest
     @Test
     public void testThreeNodesThreeQueuesLock() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testThreeNodesThreeQueuesLock");
         EntityManager em = Helpers.getNewEm();
@@ -531,8 +507,6 @@ public class MultiNodeTest extends JqmBaseTest
         int i = 0;
         while (i < 3)
         {
-            TestHelpers.printJobInstanceTable(em);
-
             JqmClientFactory.getClient().enqueue(j11);
             JqmClientFactory.getClient().enqueue(j11);
             JqmClientFactory.getClient().enqueue(j11);
@@ -573,8 +547,6 @@ public class MultiNodeTest extends JqmBaseTest
             JqmClientFactory.getClient().enqueue(j33);
 
             Thread.sleep(1000);
-
-            TestHelpers.printJobInstanceTable(em);
             i++;
         }
 
@@ -598,7 +570,6 @@ public class MultiNodeTest extends JqmBaseTest
     @Test
     public void testStopNicely() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testStopNicely");
         EntityManager em = Helpers.getNewEm();

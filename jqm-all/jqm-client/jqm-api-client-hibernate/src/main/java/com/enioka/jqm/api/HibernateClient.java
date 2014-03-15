@@ -269,7 +269,7 @@ final class HibernateClient implements JqmClient
             jqmlogger.trace("Parameter: " + jp.getKey() + " - " + jp.getValue());
             em.persist(ji.addParameter(jp.getKey(), jp.getValue()));
         }
-        jqmlogger.debug("JI just created: " + ji.getId());
+        jqmlogger.trace("JI just created: " + ji.getId());
 
         em.getTransaction().commit();
         em.close();
@@ -436,7 +436,7 @@ final class HibernateClient implements JqmClient
     @Override
     public void deleteJob(int idJob)
     {
-        jqmlogger.debug("Job status number " + idJob + " will be deleted");
+        jqmlogger.trace("Job status number " + idJob + " will be deleted");
         EntityManager em = getEm();
 
         try
@@ -483,7 +483,7 @@ final class HibernateClient implements JqmClient
         EntityManager em = getEm();
         em.getTransaction().begin();
         JobInstance j = em.find(JobInstance.class, idJob, LockModeType.PESSIMISTIC_READ);
-        jqmlogger.debug("The " + j.getState() + " job (ID: " + idJob + ")" + " will be marked for kill");
+        jqmlogger.trace("The " + j.getState() + " job (ID: " + idJob + ")" + " will be marked for kill");
 
         j.setState(State.KILLED);
 
@@ -503,7 +503,7 @@ final class HibernateClient implements JqmClient
     @Override
     public void pauseQueuedJob(int idJob)
     {
-        jqmlogger.debug("Job status number " + idJob + " will be set to HOLDED");
+        jqmlogger.trace("Job status number " + idJob + " will be set to HOLDED");
         EntityManager em = getEm();
 
         em.getTransaction().begin();
@@ -527,7 +527,7 @@ final class HibernateClient implements JqmClient
     @Override
     public void resumeJob(int idJob)
     {
-        jqmlogger.debug("Job status number " + idJob + " will be resumed");
+        jqmlogger.trace("Job status number " + idJob + " will be resumed");
         EntityManager em = getEm();
 
         em.getTransaction().begin();

@@ -38,7 +38,6 @@ public class FiboHibTest extends JqmBaseTest
     public void testFiboHib() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testFiboHib");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
