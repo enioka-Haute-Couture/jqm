@@ -220,6 +220,7 @@ public final class Helpers
             n.setPort(0);
             n.setRepo(System.getProperty("user.dir") + "/jobs/");
             n.setExportRepo(System.getProperty("user.dir") + "/exports/");
+            n.setRootLogLevel("INFO");
             em.persist(n);
         }
 
