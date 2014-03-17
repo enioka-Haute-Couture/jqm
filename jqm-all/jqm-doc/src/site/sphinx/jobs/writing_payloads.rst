@@ -1,4 +1,4 @@
-Writing Payloads
+Payload basics
 #########################
 
 The goal of JQM is to run some Java code containing some business logic: the :term:`payload`. This chapter describes how to write the Java code 

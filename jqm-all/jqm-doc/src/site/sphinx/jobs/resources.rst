@@ -114,7 +114,7 @@ It could of interest to note that the JQM NamingManager is standard - it can be 
 in a persistence.xml, it is perfectly valid to use <non-jta-datasource>jdbc/superalias</non-jta-datasource>.
 
 If all programs running inside a JQM cluster always use the same database, it is possible to define a JDBC alias as the "default 
-connection" (cf. :doc:`parameters`). It can then be retrieved directly through the getDefaultConnection method of the JQM API.
+connection" (cf. :doc:`../admin/parameters`). It can then be retrieved directly through the getDefaultConnection method of the JQM API.
 (this is the only JNDI-related element that requires the API).
 
 Defining

@@ -29,36 +29,22 @@ is offered to do every imaginable operation (new execution request, querying the
 Documentation
 ******************
 
-:doc:`Latest release notes<release_notes>`.
-
 .. toctree::
 	:numbered:
 	:titlesonly:
 	:maxdepth: 2
 
 	archi
-	admin/install
+	quickstart
 	
 	jobs/index
 	client/index
 	
 	admin/index	
-	admin/troubleshooting
+
+	trouble/index
 	
 	dev/index
 	
 	glossary
 
-
-
-To be added:
-
-* admin/logs
-* admin/basic operations (start, stop, ...)
-* quick run guide (install will be moved to admin)
-
-  
-Bug report
-**************
-
-Please direct all bug reports or feature requests at `GitHub <https://github.com/enioka/jqm/issues>`_.
