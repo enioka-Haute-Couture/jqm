@@ -20,12 +20,9 @@ package com.enioka.jqm.tools;
 
 import java.io.OutputStreamWriter;
 import java.lang.management.ManagementFactory;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
 import javax.management.MBeanServer;
@@ -56,7 +53,7 @@ class JqmEngine implements JqmEngineMBean
     private List<Polling> pollers = new ArrayList<Polling>();
     private InternalPoller intPoller = null;
     private Node node = null;
-    private Map<String, URL[]> cache = new ConcurrentHashMap<String, URL[]>();
+    private LibraryCache cache = new LibraryCache();
     private JettyServer server = null;
     private JndiContext jndiCtx = null;
     private static Logger jqmlogger = Logger.getLogger(JqmEngine.class);

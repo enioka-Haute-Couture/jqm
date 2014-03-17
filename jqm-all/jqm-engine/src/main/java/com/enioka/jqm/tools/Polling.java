@@ -19,10 +19,8 @@
 package com.enioka.jqm.tools;
 
 import java.lang.management.ManagementFactory;
-import java.net.URL;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -62,7 +60,7 @@ class Polling implements Runnable, PollingMBean
         }
     }
 
-    Polling(DeploymentParameter dp, Map<String, URL[]> cache, JqmEngine engine)
+    Polling(DeploymentParameter dp, LibraryCache cache, JqmEngine engine)
     {
         jqmlogger.info("Engine " + engine.getNode().getName() + " will poll JobInstances on queue " + dp.getQueue().getName() + " every "
                 + dp.getPollingInterval() / 1000 + "s with " + dp.getNbThread() + " threads for concurrent instances");

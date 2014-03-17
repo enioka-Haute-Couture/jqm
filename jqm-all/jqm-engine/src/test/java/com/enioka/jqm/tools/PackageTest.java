@@ -1,5 +1,6 @@
 package com.enioka.jqm.tools;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
@@ -208,5 +209,61 @@ public class PackageTest extends JqmBaseTest
 
         Assert.assertEquals(1, res.size());
         Assert.assertEquals(State.CRASHED, res.get(0).getState());
+    }
+
+    // Can't work with Java6: http://bugs.java.com/view_bug.do?bug_id=4950148 (2003!)
+    // @Test
+    public void testLibInJarReload() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testLibInJarReload");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
+        jdargs.add(jdp);
+
+        @SuppressWarnings("unused")
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null,
+                "jqm-tests/jqm-test-datetimemavenjarinlib/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
+                "ModuleMachin", "other", "other", true, em);
+
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
+        JqmClientFactory.getClient().enqueue(j);
+
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        TestHelpers.waitFor(1, 10000, em);
+
+        File libDir = new File("../jqm-tests/jqm-test-datetimemavenjarinlib/target/libFromJar");
+        long firstDate = libDir.lastModified();
+
+        // Modify the jar file - it should trigger a reload
+        System.gc();
+        Thread.sleep(5000); // Most systems are 1s precise
+        File jarFile = new File("../jqm-tests/jqm-test-datetimemavenjarinlib/target/test.jar");
+        boolean res = jarFile.setLastModified(firstDate + 100000);
+        System.out.println(res);
+        System.out.println(jarFile.isFile());
+        System.out.println(firstDate);
+
+        // New run - should reload
+        JqmClientFactory.getClient().enqueue(j);
+        TestHelpers.waitFor(2, 10000000, em);
+        System.out.println(libDir.lastModified());
+
+        // Check the lib dir has been reconstructed
+        Assert.assertTrue(libDir.lastModified() > firstDate);
+        long secondDate = libDir.lastModified();
+
+        // Now, check that if nothing is modified, the libs are not reloaded
+        JqmClientFactory.getClient().enqueue(j);
+        TestHelpers.waitFor(3, 10000, em);
+        Assert.assertEquals(secondDate, libDir.lastModified());
+
+        // Done
+        engine1.stop();
     }
 }
