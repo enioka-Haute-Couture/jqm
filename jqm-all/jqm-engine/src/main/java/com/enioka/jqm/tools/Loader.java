@@ -218,7 +218,7 @@ class Loader implements Runnable, LoaderMBean
         // Go! (launches the main function in the startup class designated in the manifest)
         try
         {
-            jobClassLoader.launchJar(job, contextClassLoader);
+            jobClassLoader.launchJar(job);
             resultStatus = State.ENDED;
         }
         catch (JqmKillException e)

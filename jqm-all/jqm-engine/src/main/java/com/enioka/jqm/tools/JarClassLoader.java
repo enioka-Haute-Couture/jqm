@@ -68,7 +68,7 @@ class JarClassLoader extends URLClassLoader
         return false;
     }
 
-    void launchJar(JobInstance job, ClassLoader old) throws JqmEngineException
+    void launchJar(JobInstance job) throws JqmEngineException
     {
         // 1st: load the class
         String classQualifiedName = job.getJd().getJavaClassName();
