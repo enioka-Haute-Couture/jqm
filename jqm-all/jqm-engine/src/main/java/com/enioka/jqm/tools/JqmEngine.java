@@ -134,7 +134,7 @@ class JqmEngine implements JqmEngineMBean
             MulticastPrintStream s = new MulticastPrintStream(System.out, FilenameUtils.getFullPath(a.getFile()));
             System.setOut(s);
             ((ConsoleAppender) Logger.getRootLogger().getAppender("consoleAppender")).setWriter(new OutputStreamWriter(s));
-            s = new MulticastPrintStream(System.err, "C:/TEMP");
+            s = new MulticastPrintStream(System.err, FilenameUtils.getFullPath(a.getFile()));
             System.setErr(s);
         }
 
