@@ -50,7 +50,7 @@ class InternalPoller implements Runnable
         this.node = em.find(Node.class, this.engine.getNode().getId());
         this.step = Long.parseLong(Helpers.getParameter("internalPollingPeriodMs", String.valueOf(this.step), em));
         this.alive = Long.parseLong(Helpers.getParameter("aliveSignalMs", String.valueOf(this.step), em));
-
+        em.close();
         this.localThread = Thread.currentThread();
 
         // Launch main loop
@@ -69,14 +69,18 @@ class InternalPoller implements Runnable
                 break;
             }
 
+            // Get session
+            em = Helpers.getNewEm();
+
             // Check if stop order
-            em.refresh(this.node);
+            this.node = em.find(Node.class, this.node.getId());
             if (this.node.isStop())
             {
                 jqmlogger.info("Node has received a stop order from the database");
                 jqmlogger.trace("At stop order time, there are " + this.engine.getCurrentlyRunningJobCount() + " jobs running in the node");
                 this.run = false;
                 this.engine.stop();
+                em.close();
                 break;
             }
 
@@ -90,9 +94,11 @@ class InternalPoller implements Runnable
                 em.getTransaction().commit();
                 sinceLatestPing = 0;
             }
+
+            // Loop is done, let session go
+            em.close();
         }
 
-        em.close();
         jqmlogger.info("End of the internal poller");
     }
 }
