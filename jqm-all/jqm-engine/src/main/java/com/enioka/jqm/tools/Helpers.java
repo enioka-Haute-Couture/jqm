@@ -72,11 +72,17 @@ public final class Helpers
      */
     public static EntityManager getNewEm()
     {
+        getEmf();
+        return emf.createEntityManager();
+    }
+
+    static EntityManagerFactory getEmf()
+    {
         if (emf == null)
         {
             emf = createFactory();
         }
-        return emf.createEntityManager();
+        return emf;
     }
 
     private static EntityManagerFactory createFactory()

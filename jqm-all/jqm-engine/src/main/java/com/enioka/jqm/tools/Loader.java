@@ -41,6 +41,7 @@ import org.apache.log4j.Logger;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.State;
@@ -49,15 +50,13 @@ class Loader implements Runnable, LoaderMBean
 {
     private Logger jqmlogger = Logger.getLogger(this.getClass());
 
+    private JobInstance job = null;
     private Node node = null;
-    private Polling p = null;
 
-    private ObjectName name = null;
-    private EntityManager em = null;
+    private Polling p = null;
     private LibraryCache cache = null;
 
-    private JobInstance job = null;
-
+    private ObjectName name = null;
     private ClassLoader contextClassLoader = null;
 
     Loader(JobInstance job, LibraryCache cache, Polling p)
@@ -106,7 +105,7 @@ class Loader implements Runnable, LoaderMBean
 
         // Var init
         Thread.currentThread().setName(this.job.getJd().getApplicationName() + ";payload;" + this.job.getId());
-        em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewEm();
         this.job = em.find(JobInstance.class, job.getId());
         this.node = em.find(Node.class, p.getDp().getNode().getId());
 
@@ -122,6 +121,7 @@ class Loader implements Runnable, LoaderMBean
             jqmlogger.warn("Cannot read file at " + jarFile.getAbsolutePath()
                     + ". Job instance will crash. Check job definition or permissions on file.");
             endOfRun(State.CRASHED);
+            em.close();
             return;
         }
         final URL jarUrl;
@@ -133,6 +133,7 @@ class Loader implements Runnable, LoaderMBean
         {
             jqmlogger.warn("The JAR file path specified in Job Definition is incorrect " + job.getJd().getApplicationName(), ex);
             endOfRun(State.CRASHED);
+            em.close();
             return;
         }
 
@@ -146,6 +147,7 @@ class Loader implements Runnable, LoaderMBean
         {
             jqmlogger.warn("Could not resolve CLASSPATH for job " + job.getJd().getApplicationName(), e1);
             endOfRun(State.CRASHED);
+            em.close();
             return;
         }
 
@@ -171,9 +173,19 @@ class Loader implements Runnable, LoaderMBean
         {
             jqmlogger.error("Could not update internal elements", e);
             em.getTransaction().rollback();
+            em.close();
             endOfRun(State.CRASHED);
             return;
         }
+
+        // Trace
+        for (JobParameter jp : this.job.getParameters())
+        {
+            jqmlogger.trace("Parameter " + jp.getKey() + " - " + jp.getValue());
+        }
+
+        // No need anymore for the EM.
+        em.close();
 
         // Class loader switch
         JarClassLoader jobClassLoader = null;
@@ -206,7 +218,7 @@ class Loader implements Runnable, LoaderMBean
         // Go! (launches the main function in the startup class designated in the manifest)
         try
         {
-            jobClassLoader.launchJar(job, contextClassLoader, em);
+            jobClassLoader.launchJar(job, contextClassLoader);
             resultStatus = State.ENDED;
         }
         catch (JqmKillException e)
@@ -231,12 +243,12 @@ class Loader implements Runnable, LoaderMBean
         }
 
         jqmlogger.debug("End of loader for JobInstance " + this.job.getId() + ". Thread will now end");
-        em.close();
     }
 
     private void endOfRun(State status)
     {
         p.decreaseNbThread();
+        EntityManager em = Helpers.getNewEm();
 
         // Restore class loader
         if (this.contextClassLoader != null)
@@ -246,14 +258,13 @@ class Loader implements Runnable, LoaderMBean
         }
 
         // Retrieve the object to update
-        em.getTransaction().begin();
-        em.refresh(job);
-        jqmlogger.trace("Progression after execution: " + job.getProgress());
+        job = em.find(JobInstance.class, this.job.getId());
 
         // Update end date
         Calendar endDate = GregorianCalendar.getInstance(Locale.getDefault());
 
         // Done: put inside history & remove instance from queue.
+        em.getTransaction().begin();
         History h = Helpers.createHistory(job, em, status, endDate);
         jqmlogger.trace("An History was just created for job instance " + h.getId());
 
@@ -309,6 +320,9 @@ class Loader implements Runnable, LoaderMBean
             mps = (MulticastPrintStream) System.err;
             mps.unregisterThread();
         }
+
+        // Done
+        em.close();
     }
 
     // ////////////////////////////////////////////////////////////
@@ -319,7 +333,7 @@ class Loader implements Runnable, LoaderMBean
     public void kill()
     {
         Properties p = new Properties();
-        p.put("emf", this.em.getEntityManagerFactory());
+        p.put("emf", Helpers.getEmf());
         JqmClientFactory.getClient("uncached", p, false).killJob(this.job.getId());
     }
 

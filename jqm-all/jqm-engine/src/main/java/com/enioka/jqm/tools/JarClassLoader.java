@@ -31,8 +31,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.JobInstance;
@@ -70,7 +68,7 @@ class JarClassLoader extends URLClassLoader
         return false;
     }
 
-    void launchJar(JobInstance job, ClassLoader old, EntityManager em) throws JqmEngineException
+    void launchJar(JobInstance job, ClassLoader old) throws JqmEngineException
     {
         // 1st: load the class
         String classQualifiedName = job.getJd().getJavaClassName();
@@ -91,13 +89,13 @@ class JarClassLoader extends URLClassLoader
         if (Runnable.class.isAssignableFrom(c))
         {
             jqmlogger.trace("This payload is of type: Runnable");
-            launchRunnable(c, job, em);
+            launchRunnable(c, job);
             return;
         }
         else if (isLegacyPayload(c))
         {
             jqmlogger.trace("This payload is of type: explicit API implementation");
-            launchApiPayload(c, job, em);
+            launchApiPayload(c, job);
             return;
         }
         else
@@ -126,7 +124,7 @@ class JarClassLoader extends URLClassLoader
             if (start != null)
             {
                 jqmlogger.trace("This payload is of type: static main");
-                launchMain(c, job, em);
+                launchMain(c, job);
                 return;
             }
         }
@@ -134,7 +132,7 @@ class JarClassLoader extends URLClassLoader
         throw new JqmEngineException("This type of class cannot be launched by JQM. Please consult the documentation for more details.");
     }
 
-    private void launchApiPayload(Class c, JobInstance job, EntityManager em) throws JqmEngineException
+    private void launchApiPayload(Class c, JobInstance job) throws JqmEngineException
     {
         Object o = null;
         try
@@ -148,7 +146,7 @@ class JarClassLoader extends URLClassLoader
         }
 
         // Injection
-        inject(o.getClass(), o, job, em);
+        inject(o.getClass(), o, job);
 
         try
         {
@@ -178,7 +176,7 @@ class JarClassLoader extends URLClassLoader
         }
     }
 
-    private void launchRunnable(Class<Runnable> c, JobInstance job, EntityManager em) throws JqmEngineException
+    private void launchRunnable(Class<Runnable> c, JobInstance job) throws JqmEngineException
     {
         Runnable o = null;
         try
@@ -191,13 +189,13 @@ class JarClassLoader extends URLClassLoader
         }
 
         // Injection stuff (if needed)
-        inject(o.getClass(), o, job, em);
+        inject(o.getClass(), o, job);
 
         // Go
         o.run();
     }
 
-    private void launchMain(Class c, JobInstance job, EntityManager em) throws JqmEngineException
+    private void launchMain(Class c, JobInstance job) throws JqmEngineException
     {
         boolean withArgs = false;
         Method start = null;
@@ -225,7 +223,7 @@ class JarClassLoader extends URLClassLoader
         }
 
         // Injection
-        inject(c, null, job, em);
+        inject(c, null, job);
 
         // Parameters
         String[] params = new String[job.getParameters().size()];
@@ -273,7 +271,7 @@ class JarClassLoader extends URLClassLoader
         }
     }
 
-    private void inject(Class c, Object o, JobInstance job, EntityManager em) throws JqmEngineException
+    private void inject(Class c, Object o, JobInstance job) throws JqmEngineException
     {
         List<Field> ff = new ArrayList<Field>();
         Class clazz = c;
@@ -298,7 +296,7 @@ class JarClassLoader extends URLClassLoader
             return;
         }
 
-        JobManagerHandler h = new JobManagerHandler(job, em);
+        JobManagerHandler h = new JobManagerHandler(job);
         Class injInt = null;
         Object proxy = null;
         try
