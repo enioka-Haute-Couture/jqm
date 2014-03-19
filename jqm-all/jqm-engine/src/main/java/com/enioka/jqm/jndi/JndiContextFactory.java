@@ -46,13 +46,13 @@ public final class JndiContextFactory
      * @return the context
      * @throws NamingExceptions
      */
-    public static JndiContext createJndiContext(ClassLoader cl) throws NamingException
+    public static JndiContext createJndiContext() throws NamingException
     {
         try
         {
             if (!NamingManager.hasInitialContextFactoryBuilder())
             {
-                JndiContext ctx = new JndiContext(cl);
+                JndiContext ctx = new JndiContext();
                 NamingManager.setInitialContextFactoryBuilder(ctx);
                 return ctx;
             }

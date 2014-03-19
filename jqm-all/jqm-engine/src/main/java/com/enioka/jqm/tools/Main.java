@@ -134,7 +134,7 @@ public class Main
 
         try
         {
-            JndiContextFactory.createJndiContext(Thread.currentThread().getContextClassLoader());
+            JndiContextFactory.createJndiContext();
         }
         catch (NamingException e)
         {

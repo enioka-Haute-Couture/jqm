@@ -50,7 +50,6 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 public class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory, NameParser
 {
     private static Logger jqmlogger = Logger.getLogger(JndiContext.class);
-    private ClassLoader cl = null;
     private Map<String, Object> singletons = new HashMap<String, Object>();
     private List<ObjectName> jmxNames = new ArrayList<ObjectName>();
     private Registry r = null;
@@ -62,10 +61,9 @@ public class JndiContext extends InitialContext implements InitialContextFactory
      *            the classloader with access to Hibernate & JQM persistence.xml
      * @throws NamingException
      */
-    public JndiContext(ClassLoader cl) throws NamingException
+    public JndiContext() throws NamingException
     {
         super();
-        this.cl = cl;
     }
 
     @Override
@@ -104,7 +102,8 @@ public class JndiContext extends InitialContext implements InitialContextFactory
         // Create the resource
         try
         {
-            ResourceFactory rf = new ResourceFactory(d.isSingleton() ? cl : Thread.currentThread().getContextClassLoader());
+            ResourceFactory rf = new ResourceFactory(d.isSingleton() ? JndiContext.class.getClassLoader() : Thread.currentThread()
+                    .getContextClassLoader());
             Object res = rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
             if (d.isSingleton())
             {

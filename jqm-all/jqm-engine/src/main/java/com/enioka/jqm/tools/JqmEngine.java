@@ -87,7 +87,7 @@ class JqmEngine implements JqmEngineMBean
         {
             try
             {
-                jndiCtx = JndiContextFactory.createJndiContext(Thread.currentThread().getContextClassLoader());
+                jndiCtx = JndiContextFactory.createJndiContext();
                 jqmlogger.info("JNDI context was registered");
             }
             catch (NamingException e)
