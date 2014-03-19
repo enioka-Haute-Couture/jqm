@@ -75,7 +75,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<hibernate.version>4.2.8.Final</hibernate.version>
+		<hibernate.version>4.2.11.Final</hibernate.version>
 		<junit.version>4.11</junit.version>
 		<hsqldb.version>2.3.1</hsqldb.version>
 		<jersey-version>2.5.1</jersey-version>
