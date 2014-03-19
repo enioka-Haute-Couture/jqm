@@ -31,6 +31,7 @@ public class Interceptor extends JdbcInterceptor
                 Statement s = con.getConnection().createStatement();
                 s.execute("CALL DBMS_APPLICATION_INFO.SET_MODULE(" + module + ", " + action + ")");
                 s.execute("CALL DBMS_APPLICATION_INFO.SET_CLIENT_INFO(" + clientInfo + ")");
+                s.close();
             }
             catch (SQLException e)
             {
