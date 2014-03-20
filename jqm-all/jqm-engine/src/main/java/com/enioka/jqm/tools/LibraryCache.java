@@ -6,9 +6,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -24,15 +21,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.log4j.Logger;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.resolution.DependencyResolutionException;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.jboss.shrinkwrap.resolver.api.maven.ConfigurableMavenResolverSystem;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenRemoteRepositories;
+import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenUpdatePolicy;
 
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.Node;
-import com.jcabi.aether.Aether;
 
 class LibraryCache
 {
@@ -98,7 +94,6 @@ class LibraryCache
         return false;
     }
 
-    @SuppressWarnings("resource")
     private void loadCache(Node node, JobDef jd, EntityManager em) throws JqmPayloadException
     {
         jqmlogger.debug("Resolving classpath for job definition " + jd.getApplicationName());
@@ -108,13 +103,10 @@ class LibraryCache
         File libDir = new File(FilenameUtils.concat(jarDir.getAbsolutePath(), "lib"));
         File libDirExtracted = new File(FilenameUtils.concat(jarDir.getAbsolutePath(), "libFromJar"));
         File pomFile = new File(FilenameUtils.concat(jarDir.getAbsolutePath(), "pom.xml"));
-        File local = new File(System.getProperty("user.home") + "/.m2/repository");
 
         // POM file should be deleted if it comes from the jar file. Otherwise, it would stay into place and modifications to the internal
         // pom would be ignored.
         boolean pomFromJar = false;
-
-        Collection<Artifact> deps = null;
 
         // 1st: if no pom, no lib dir => find a pom inside the JAR. (& copy it, we will read later)
         if (!pomFile.exists() && !libDir.exists())
@@ -231,54 +223,50 @@ class LibraryCache
         if (pomFile.exists() && !libDir.exists())
         {
             jqmlogger.trace("Reading a pom file");
-            Dependencies dependencies = new Dependencies(pomFile.getAbsolutePath());
 
             List<GlobalParameter> repolist = em
                     .createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
                     .setParameter("repo", "mavenRepo").getResultList();
 
-            RemoteRepository[] rr = new RemoteRepository[repolist.size()];
-            int ii = 0;
-            for (GlobalParameter g : repolist)
+            ConfigurableMavenResolverSystem resolver = Maven.configureResolver();
+            for (GlobalParameter gp : repolist)
             {
-                rr[ii] = new RemoteRepository(g.getKey(), "default", g.getValue());
-                ii++;
+                resolver = resolver.withRemoteRepo(MavenRemoteRepositories.createRemoteRepository(gp.getId().toString(), gp.getValue(),
+                        "default").setUpdatePolicy(MavenUpdatePolicy.UPDATE_POLICY_NEVER));
             }
-            Collection<RemoteRepository> remotes = Arrays.asList(rr);
 
-            deps = new ArrayList<Artifact>();
+            File[] depFiles = null;
 
-            for (int i = 0; i < dependencies.getList().size(); i++)
+            try
             {
-                try
-                {
-                    deps.addAll(new Aether(remotes, local).resolve(new DefaultArtifact(dependencies.getList().get(i)), "compile"));
-                }
-                catch (DependencyResolutionException e)
-                {
-                    throw new JqmPayloadException("Could not resolve POM file", e);
-                }
+                depFiles = resolver.loadPomFromFile(pomFile).importRuntimeDependencies().resolve().withTransitivity().asFile();
+            }
+            catch (IllegalArgumentException e)
+            {
+                // Happens when no dependencies inside pom, which is a weird use of the feature...
+                jqmlogger.trace("No dependencies inside pom.xml file - no libs will be used");
+                depFiles = new File[0];
             }
 
             int size = 0;
-            for (Artifact artifact : deps)
+            for (File artifact : depFiles)
             {
-                if (!"pom".equals(artifact.getExtension()))
+                if (!"pom".equals(FilenameUtils.getExtension(artifact.getName())))
                 {
                     size++;
                 }
             }
             URL[] tmp = new URL[size];
             int i = 0;
-            for (Artifact artifact : deps)
+            for (File artifact : depFiles)
             {
-                if ("pom".equals(artifact.getExtension()))
+                if ("pom".equals(FilenameUtils.getExtension(artifact.getName())))
                 {
                     continue;
                 }
                 try
                 {
-                    tmp[i] = artifact.getFile().toURI().toURL();
+                    tmp[i] = artifact.toURI().toURL();
                 }
                 catch (MalformedURLException e)
                 {
