@@ -61,6 +61,7 @@ class JqmEngine implements JqmEngineMBean
     private ObjectName name;
     private boolean hasEnded = false;
     private Calendar startTime = Calendar.getInstance();
+    private Thread killHook = null;
 
     /**
      * Starts the engine
@@ -199,6 +200,10 @@ class JqmEngine implements JqmEngineMBean
         Thread t = new Thread(intPoller);
         t.start();
 
+        // Kill notifications
+        killHook = new SignalHandler(this);
+        Runtime.getRuntime().addShutdownHook(killHook);
+
         // Done
         em.close();
         em = null;
@@ -211,7 +216,24 @@ class JqmEngine implements JqmEngineMBean
     @Override
     public void stop()
     {
-        jqmlogger.info("JQM engine " + this.node.getName() + " has received a stop order");
+        synchronized (killHook)
+        {
+            jqmlogger.info("JQM engine " + this.node.getName() + " has received a stop order");
+
+            // Kill hook should be removed
+            try
+            {
+                if (!Runtime.getRuntime().removeShutdownHook(killHook))
+                {
+                    jqmlogger.error("The engine could not unregister its shutdown hook");
+                }
+            }
+            catch (IllegalStateException e)
+            {
+                // This happens if the stop sequence is initiated by the shutdown hook itself.
+                jqmlogger.info("Stop order is due to an admin operation (KILL/INT)");
+            }
+        }
 
         // Stop pollers
         for (Polling p : pollers)
@@ -276,7 +298,7 @@ class JqmEngine implements JqmEngineMBean
         em.getTransaction().begin();
         try
         {
-            em.find(Node.class, this.node.getId(), LockModeType.PESSIMISTIC_WRITE);
+            this.node = em.find(Node.class, this.node.getId(), LockModeType.PESSIMISTIC_WRITE);
             this.node.setStop(false);
             this.node.setLastSeenAlive(null);
             em.getTransaction().commit();

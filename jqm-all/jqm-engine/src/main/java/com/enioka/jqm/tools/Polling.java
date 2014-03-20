@@ -269,6 +269,11 @@ class Polling implements Runnable, PollingMBean
             {
                 break;
             }
+            if (timeWaitedMs == 0)
+            {
+                jqmlogger.info("Waiting for the end of " + nbRunning + " jobs on queue " + this.dp.getQueue().getName() + " - timeout is "
+                        + timeOutMs + "ms");
+            }
             try
             {
                 Thread.sleep(stepMs);
