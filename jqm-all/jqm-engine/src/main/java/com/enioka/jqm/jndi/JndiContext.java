@@ -73,7 +73,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
         {
             throw new IllegalArgumentException("name cannot be null");
         }
-        jqmlogger.debug("Looking up a JNDI element named " + name);
+        jqmlogger.trace("Looking up a JNDI element named " + name);
 
         // Special delegated cases
         if (name.startsWith("rmi:"))
