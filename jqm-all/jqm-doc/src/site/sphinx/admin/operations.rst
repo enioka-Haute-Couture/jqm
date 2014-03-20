@@ -4,6 +4,11 @@
 Starting
 ************
 
+.. note:: there is a safeguard mechanism which prevents two engines (JQM java processes) to run with the same node name.
+	In case of engine crash (kill -9) the engine will ask you to wait (max. 2 minutes) to restart so as to be sure
+	there is no other engine running with the same name. On the other hand, cleanly stopping the engine is totally transparent without ever 
+	any need to wait.
+	
 Windows
 +++++++++
 
@@ -50,6 +55,9 @@ Unix
 ::
 
 	./jqm.sh stop
+	
+The clean stop sequence is actually triggered by a SIGTERM (normal kill) - the jqm.sh script simply stores the PID at startup and 
+does a kill to shutdown.
 
 Restarting
 ****************
