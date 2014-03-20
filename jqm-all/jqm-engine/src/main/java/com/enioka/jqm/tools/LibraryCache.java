@@ -239,7 +239,8 @@ class LibraryCache
 
             try
             {
-                depFiles = resolver.loadPomFromFile(pomFile).importRuntimeDependencies().resolve().withTransitivity().asFile();
+                depFiles = resolver.fromClassloaderResource("META-INF/settings.xml").loadPomFromFile(pomFile).importRuntimeDependencies()
+                        .resolve().withTransitivity().asFile();
             }
             catch (IllegalArgumentException e)
             {
