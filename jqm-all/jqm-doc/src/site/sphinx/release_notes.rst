@@ -1,6 +1,66 @@
 Release notes
 ######################
 
+1.1.6
+***********
+
+Release goal
+++++++++++++++++++
+
+This release was aimed at making JQM easier to intagrate in production environments, with new features like
+JMX monitoring, better log file handling, JDBC connection pooling, etc.
+
+A very few developer features slipped inside the release.
+
+Upgrade notes
++++++++++++++++++++
+
+No breaking changes. 
+
+Compatibility matrix:
+
++-------------------------------+----------+------------+------------+
+| Version 1.1.6 / Other version | Engine   | Client API | Engine API |
++===============================+==========+============+============+
+| Engine                        |          | >= 1.1.4   | >= 1.1.4   |
++-------------------------------+----------+------------+------------+
+| Client API                    | == 1.1.6 |            |            |
++-------------------------------+----------+------------+------------+
+| Engine API                    | >= 1.1.5 |            |            |
++-------------------------------+----------+------------+------------+
+
+How to read the compatibility matrix: each line corresponds to one JQM element in version 1.1.6. 
+The different versions given correspond to the minimal version of other components for version 1.1.6 to work.
+A void cell means there is no constraint between these components.
+
+For exemple : a payload using engine API 1.1.6 requires at least an engine 1.1.5 to work.
+
+Major
+++++++++++++
+
+* Documentation: now in human readable form and on https://jqm.readthedocs.org
+* Distribution: releases now published on Maven Central, snapshots on Sonatype OSSRH.
+* Engine: added JDBC connection pooling
+* Engine: added JMX monitoring (local & remote on fixed ports). See http://jqm.readthedocs.org/en/latest/admin/jmx.html for details
+* Engine: each job instance now has its own logfile
+* Engine: it is now impossible to launch two engines with the same node name (prevent startup cleanup issues creating data loss)
+* Engine: failed job requests due to engine kill are now reported as crashed jobs on next engine startup
+* Engine: added UrlFactory to create URL JNDI resources
+* Engine: dependencies/libs are now reloaded when the payload jar file is modified or lib folder is modified. No JQM restart needed anymore.
+
+Minor
++++++++++++++
+
+* Engine API: legacy JobBase class can now be inherited through multiple levels
+* Engine: incomplete payload classes (missing parent class or lib) are now correctly reported instead of failing silently
+* Engine: refactor of main engine classes
+* Engine: races condition fixes in stop sequence (issue happening only in JUnit tests)
+* Engine: no longer any permanent database connection
+* Engine: Oracle db connections now report V$SESSION program, module and user info
+* Engine: logs are less verbose, default log level is now INFO, log line formatting is now cleaner and more readable
+* General: Hibernate minor version upgrade due to major Hibernate bugfixes
+* General: cleaned test build order and artifact names
+
 1.1.5
 ***********
 
