@@ -228,12 +228,19 @@ class LibraryCache
                     .createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
                     .setParameter("repo", "mavenRepo").getResultList();
 
+            boolean withCentral = false;
             ConfigurableMavenResolverSystem resolver = Maven.configureResolver();
+
             for (GlobalParameter gp : repolist)
             {
+                if (gp.getValue().contains("repo1.maven.org"))
+                {
+                    withCentral = true;
+                }
                 resolver = resolver.withRemoteRepo(MavenRemoteRepositories.createRemoteRepository(gp.getId().toString(), gp.getValue(),
                         "default").setUpdatePolicy(MavenUpdatePolicy.UPDATE_POLICY_NEVER));
             }
+            resolver.withMavenCentralRepo(withCentral);
 
             File[] depFiles = null;
 
