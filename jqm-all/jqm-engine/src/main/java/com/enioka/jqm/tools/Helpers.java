@@ -207,6 +207,27 @@ public final class Helpers
         }
     }
 
+    /**
+     * Checks if a parameter exists. If it exists, it is left untouched. If it doesn't, it is created. Only works for parameters which key
+     * is unique. Must be called from within an open JPA transaction.
+     */
+    static void initSingleParam(String key, String initValue, EntityManager em)
+    {
+        try
+        {
+            em.createQuery("SELECT n from GlobalParameter n WHERE n.key = :key", GlobalParameter.class).setParameter("key", key)
+                    .getSingleResult();
+            return;
+        }
+        catch (NoResultException e)
+        {
+            GlobalParameter gp = new GlobalParameter();
+            gp.setKey(key);
+            gp.setValue(initValue);
+            em.persist(gp);
+        }
+    }
+
     static Node checkAndUpdateNodeConfiguration(String nodeName, EntityManager em)
     {
         em.getTransaction().begin();
@@ -268,45 +289,15 @@ public final class Helpers
             }
         }
 
-        // GlobalParameter
-        GlobalParameter gp = null;
-        i = (Long) em.createQuery("SELECT COUNT(gp) FROM GlobalParameter gp WHERE gp.key = :k")
-                .setParameter("k", Constants.GP_DEFAULT_CONNECTION_KEY).getSingleResult();
-        if (i == 0)
-        {
-            gp = new GlobalParameter();
+        // Global parameters
+        initSingleParam("mavenRepo", "http://repo1.maven.org/maven2/", em);
+        initSingleParam(Constants.GP_DEFAULT_CONNECTION_KEY, Constants.GP_JQM_CONNECTION_ALIAS, em);
+        initSingleParam("deadline", "10", em);
+        initSingleParam("logFilePerLaunch", "true", em);
+        initSingleParam("internalPollingPeriodMs", "10000", em);
+        initSingleParam("aliveSignalMs", "60000", em);
 
-            gp.setKey("mavenRepo");
-            gp.setValue("http://repo1.maven.org/maven2/");
-            em.persist(gp);
-
-            gp = new GlobalParameter();
-            gp.setKey(Constants.GP_DEFAULT_CONNECTION_KEY);
-            gp.setValue(Constants.GP_JQM_CONNECTION_ALIAS);
-            em.persist(gp);
-
-            gp = new GlobalParameter();
-            gp.setKey("deadline");
-            gp.setValue("10");
-            em.persist(gp);
-
-            gp = new GlobalParameter();
-            gp.setKey("logFilePerLaunch");
-            gp.setValue("true");
-            em.persist(gp);
-
-            gp = new GlobalParameter();
-            gp.setKey("internalPollingPeriodMs");
-            gp.setValue("10000");
-            em.persist(gp);
-
-            gp = new GlobalParameter();
-            gp.setKey("aliveSignalMs");
-            gp.setValue("60000");
-            em.persist(gp);
-        }
-
-        // Deployment parameter
+        // Deployment parameters
         DeploymentParameter dp = null;
         i = (Long) em.createQuery("SELECT COUNT(dp) FROM DeploymentParameter dp WHERE dp.node = :localnode").setParameter("localnode", n)
                 .getSingleResult();
