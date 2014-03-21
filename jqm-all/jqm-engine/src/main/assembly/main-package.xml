@@ -115,12 +115,14 @@
 		</dependencySet>
 
 		<dependencySet>
-			<outputDirectory>/lib</outputDirectory>
+			<outputDirectory>/ext</outputDirectory>
 			<useProjectArtifact>false</useProjectArtifact>
 			<unpack>false</unpack>
-			<outputFileNameMapping>jdbcdriver.jar</outputFileNameMapping>
 			<includes>
 				<include>org.hsqldb:hsqldb</include>
+				<include>org.apache.tomcat:tomcat-jdbc</include>
+				<include>org.apache.tomcat:tomcat-juli</include>
+				<include>com.enioka.jqm:jqm-providers</include>
 			</includes>
 			<scope>test</scope>
 		</dependencySet>

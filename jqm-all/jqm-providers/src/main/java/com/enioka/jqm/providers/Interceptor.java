@@ -1,4 +1,4 @@
-package com.enioka.jqm.jndi;
+package com.enioka.jqm.providers;
 
 import java.sql.SQLException;
 import java.sql.Statement;

@@ -18,7 +18,11 @@
 
 package com.enioka.jqm.jndi;
 
+import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.rmi.Remote;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
@@ -41,7 +45,6 @@ import javax.naming.spi.InitialContextFactoryBuilder;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
  * This class implements a basic JNDI context
@@ -53,17 +56,52 @@ public class JndiContext extends InitialContext implements InitialContextFactory
     private Map<String, Object> singletons = new HashMap<String, Object>();
     private List<ObjectName> jmxNames = new ArrayList<ObjectName>();
     private Registry r = null;
+    private ClassLoader extResources;
 
     /**
      * Create a new Context
      * 
-     * @param cl
-     *            the classloader with access to Hibernate & JQM persistence.xml
      * @throws NamingException
      */
     public JndiContext() throws NamingException
     {
         super();
+
+        // List all jars inside ext directory
+        File extDir = new File("ext/");
+        List<URL> urls = new ArrayList<URL>();
+        if (extDir.isDirectory())
+        {
+            for (File f : extDir.listFiles())
+            {
+                if (!f.canRead())
+                {
+                    throw new NamingException("can't access file " + f.getAbsolutePath());
+                }
+                try
+                {
+                    urls.add(f.toURI().toURL());
+                }
+                catch (MalformedURLException e)
+                {
+                    jqmlogger.error("Error when parsing the content of ext directory. File will be ignored", e);
+                }
+            }
+
+            // Create classloader
+            URL[] aUrls = urls.toArray(new URL[0]);
+            for (URL u : aUrls)
+            {
+                jqmlogger.trace(u.toString());
+            }
+            extResources = new URLClassLoader(aUrls, null);
+        }
+        else
+        {
+            // Mostly for tests: if no ext dir, use current class loader.
+            extResources = JndiContext.class.getClassLoader();
+        }
+
     }
 
     @Override
@@ -102,8 +140,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
         // Create the resource
         try
         {
-            ResourceFactory rf = new ResourceFactory(d.isSingleton() ? JndiContext.class.getClassLoader() : Thread.currentThread()
-                    .getContextClassLoader());
+            ResourceFactory rf = new ResourceFactory(d.isSingleton() ? extResources : Thread.currentThread().getContextClassLoader());
             Object res = rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
             if (d.isSingleton())
             {
@@ -115,7 +152,9 @@ public class JndiContext extends InitialContext implements InitialContextFactory
                 {
                     MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
                     ObjectName jmxname = new ObjectName("com.enioka.jqm:type=JdbcPool,name=" + name);
-                    mbs.registerMBean(((DataSource) res).getPool().getJmxPool(), jmxname);
+                    mbs.registerMBean(
+                            res.getClass().getMethod("getPool").invoke(res).getClass().getMethod("getJmxPool")
+                                    .invoke(res.getClass().getMethod("getPool").invoke(res)), jmxname);
                     jmxNames.add(jmxname);
                 }
             }

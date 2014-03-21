@@ -40,7 +40,7 @@
 							<mainClass>com.enioka.jqm.tools.Main</mainClass>
 						</manifest>
 						<manifestEntries>
-							<Class-Path>lib/jdbcdriver.jar conf/</Class-Path>
+							<Class-Path>conf/</Class-Path>
 						</manifestEntries>
 					</archive>
 				</configuration>
@@ -174,12 +174,20 @@
 			<version>1.1.6-SNAPSHOT</version>
 		</dependency>
 
-		<!-- Connection pooling -->
+		<!-- Connection pooling. Test - only put in ext dir, not lib -->
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-jdbc</artifactId>
 			<version>7.0.52</version>
+			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-providers</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 
 		<!-- TEST DEPENDENCIES -->
 		<dependency>

@@ -1,4 +1,4 @@
-package com.enioka.jqm.jndi;
+package com.enioka.jqm.providers;
 
 import java.io.File;
 import java.util.Hashtable;
@@ -6,19 +6,15 @@ import java.util.Hashtable;
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NamingException;
+import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
-class FileFactory implements ObjectFactory
+public class FileFactory implements ObjectFactory
 {
-    FileFactory()
-    {
-
-    }
-
     @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment) throws Exception
     {
-        JndiResourceDescriptor resource = (JndiResourceDescriptor) obj;
+        Reference resource = (Reference) obj;
         if (resource.get("PATH") != null)
         {
             String path = (String) resource.get("PATH").getContent();

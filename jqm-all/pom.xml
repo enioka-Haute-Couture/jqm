@@ -92,6 +92,7 @@
 		<module>jqm-test-helpers</module>
 		<module>jqm-engine</module>
 		<module>jqm-webui</module>
+		<module>jqm-providers</module>
 	</modules>
 
 	<scm>
