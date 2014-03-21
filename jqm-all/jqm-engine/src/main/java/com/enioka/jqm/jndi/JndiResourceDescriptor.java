@@ -24,10 +24,11 @@ import javax.naming.StringRefAddr;
 class JndiResourceDescriptor extends Reference
 {
     private static final long serialVersionUID = 3348684996519775949L;
+    private boolean singleton = false;
 
-    JndiResourceDescriptor(String resourceClass, String description, String scope, String auth, String factory, String factoryLocation)
+    JndiResourceDescriptor(String resourceClass, String description, String scope, String auth, String factory, boolean singleton)
     {
-        super(resourceClass, factory, factoryLocation);
+        super(resourceClass, factory, null);
         StringRefAddr refAddr = null;
         if (description != null)
         {
@@ -44,6 +45,7 @@ class JndiResourceDescriptor extends Reference
             refAddr = new StringRefAddr("auth", auth);
             add(refAddr);
         }
+        this.singleton = singleton;
     }
 
     /**
@@ -54,11 +56,6 @@ class JndiResourceDescriptor extends Reference
      */
     boolean isSingleton()
     {
-        Boolean res = this.get("singleton") == null ? false : Boolean.parseBoolean((String) this.get("singleton").getContent());
-        if (res == null)
-        {
-            res = false;
-        }
-        return res;
+        return singleton;
     }
 }

@@ -359,18 +359,17 @@ public class CreationTools
         prms.put("password", pwd);
         prms.put("driverClassName", driver);
         prms.put("url", url);
-        prms.put("singleton", "true");
         prms.put("validationQuery", validationQuery);
         prms.put("testWhileIdle", "true");
         prms.put("testOnBorrow", "true");
 
         return createJndiObjectResource(em, name, "javax.sql.DataSource", "org.apache.tomcat.jdbc.pool.DataSourceFactory",
-                "connection for " + user, prms);
+                "connection for " + user, true, prms);
     }
 
     // ------------------ JNDI FOR JMS & co --------------------------------
     public static JndiObjectResource createJndiObjectResource(EntityManager em, String jndiAlias, String className, String factoryClass,
-            String description, HashMap<String, String> parameters)
+            String description, boolean singleton, HashMap<String, String> parameters)
     {
         JndiObjectResource res = new JndiObjectResource();
         res.setAuth(null);
@@ -378,6 +377,7 @@ public class CreationTools
         res.setFactory(factoryClass);
         res.setName(jndiAlias);
         res.setType(className);
+        res.setSingleton(singleton);
         em.persist(res);
 
         for (String parameterName : parameters.keySet())
@@ -414,7 +414,7 @@ public class CreationTools
         }
 
         return createJndiObjectResource(em, jndiAlias, "com.ibm.mq.jms.MQQueueConnectionFactory",
-                "com.ibm.mq.jms.MQQueueConnectionFactoryFactory", description, prms);
+                "com.ibm.mq.jms.MQQueueConnectionFactoryFactory", description, false, prms);
     }
 
     public static JndiObjectResource createJndiQueueMQSeries(EntityManager em, String jndiAlias, String description, String queueName,
@@ -427,7 +427,7 @@ public class CreationTools
             prms.putAll(optionalParameters);
         }
 
-        return createJndiObjectResource(em, jndiAlias, "com.ibm.mq.jms.MQQueue", "com.ibm.mq.jms.MQQueueFactory", description, prms);
+        return createJndiObjectResource(em, jndiAlias, "com.ibm.mq.jms.MQQueue", "com.ibm.mq.jms.MQQueueFactory", description, false, prms);
     }
 
     public static JndiObjectResource createJndiQcfActiveMQ(EntityManager em, String jndiAlias, String description, String Url,
@@ -441,7 +441,7 @@ public class CreationTools
         }
 
         return createJndiObjectResource(em, jndiAlias, "org.apache.activemq.ActiveMQConnectionFactory",
-                "org.apache.activemq.jndi.JNDIReferenceFactory", description, prms);
+                "org.apache.activemq.jndi.JNDIReferenceFactory", description, false, prms);
     }
 
     public static JndiObjectResource createJndiQueueActiveMQ(EntityManager em, String jndiAlias, String description, String queueName,
@@ -455,23 +455,21 @@ public class CreationTools
         }
 
         return createJndiObjectResource(em, jndiAlias, "org.apache.activemq.command.ActiveMQQueue",
-                "org.apache.activemq.jndi.JNDIReferenceFactory", description, prms);
+                "org.apache.activemq.jndi.JNDIReferenceFactory", description, false, prms);
     }
 
     public static JndiObjectResource createJndiFile(EntityManager em, String jndiAlias, String description, String path)
     {
         HashMap<String, String> prms = new HashMap<String, String>();
         prms.put("PATH", path);
-        prms.put("singleton", "true");
-        return createJndiObjectResource(em, jndiAlias, "java.io.File.File", "com.enioka.jqm.providers.FileFactory", description, prms);
+        return createJndiObjectResource(em, jndiAlias, "java.io.File.File", "com.enioka.jqm.providers.FileFactory", description, true, prms);
     }
 
     public static JndiObjectResource createJndiUrl(EntityManager em, String jndiAlias, String description, String url)
     {
         HashMap<String, String> prms = new HashMap<String, String>();
         prms.put("URL", url);
-        prms.put("singleton", "true");
-        return createJndiObjectResource(em, jndiAlias, "java.io.URL", "com.enioka.jqm.providers.UrlFactory", description, prms);
+        return createJndiObjectResource(em, jndiAlias, "java.io.URL", "com.enioka.jqm.providers.UrlFactory", description, true, prms);
     }
 
 }

@@ -68,6 +68,19 @@ public class JndiObjectResource implements Serializable
     // @Column(name="parameters")
     private Collection<JndiObjectResourceParameter> parameters = new ArrayList<JndiObjectResourceParameter>();
 
+    // If true: loaded by the engine and cached. If not, loaded by payload CL and created on each lookup call
+    private Boolean singleton = false;
+
+    public Boolean getSingleton()
+    {
+        return singleton;
+    }
+
+    public void setSingleton(Boolean singleton)
+    {
+        this.singleton = singleton;
+    }
+
     public int getId()
     {
         return id;

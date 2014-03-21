@@ -67,6 +67,8 @@ The following elements are needed for every resource, and are defined in the mai
 +----------------+-----------------------------------------------------------------------------------------+------------------------------------------------+
 | factory        | the class name of the ObjectFactory able to create the desired resource                 | com.ibm.mq.jms.MQQueueConnectionFactoryFactory |
 +----------------+-----------------------------------------------------------------------------------------+------------------------------------------------+
+| singleton      | see below                                                                               | false                                          |
++----------------+-----------------------------------------------------------------------------------------+------------------------------------------------+
 
 For every resource type (and therefore, every ObjectFactory), there may be different parameters: connection strings, paths, ports, ... These
 parameters are to be put inside the table JndiObjectResourceParameter.
@@ -77,7 +79,7 @@ lookups, the given alias will searched 'as provided' (including case) inside the
 Singletons
 -------------
 
-One parameter is special: it is named "singleton". If not present, it is considered to be 'false'. If 'true', the creation and caching of the
+One parameter is special: it is named "singleton". Default is 'false'. If 'true', the creation and caching of the
 resource is made by the engine itself in its own class context, and not inside the payload's context (i.e. classloader). It is useful for the
 following reasons:
 
@@ -92,7 +94,16 @@ Singleton resources are created the first time they are looked up, and kept fore
 As singleton resources are created by the engine, the jar files containing resource & resource factory must be available to its classloader.
 For this reason, the jar files must be placed manually inside the $JQM_ROOT/ext directory (and they do not need to be placed inside the 
 dependencies of the payload, even if it does not hurt to have them there). For a resource which provider is within the payload, being
-a singleton is impossible - the engine context has no access to the payload context.
+a singleton is impossible - the engine class context has no access to the payload class context.
+
+By default, the $JQM_ROOT/ext directory contains the following providers, ready to be used as singleton resources:
+
+* the File provider and URl provider inside a single jar named jqm-provider
+* the JDBC pool, inside two jars (tomcat-jdbc and tomcat-juli)
+* the HSQLDB driver
+
+Besides the HSQLDB driver, which can be removed if another database is used, the provided jars should never be removed. Jars added
+later (custom resources, other JDBC drivers, ...) can of course be removed.
 
 
 Examples

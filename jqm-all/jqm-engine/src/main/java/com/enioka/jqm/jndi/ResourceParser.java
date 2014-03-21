@@ -83,7 +83,7 @@ public class ResourceParser
 
         // Create the ResourceDescriptor from the JPA object
         JndiResourceDescriptor d = new JndiResourceDescriptor(resource.getType(), resource.getDescription(), null, resource.getAuth(),
-                resource.getFactory(), null);
+                resource.getFactory(), resource.getSingleton());
         for (JndiObjectResourceParameter prm : resource.getParameters())
         {
             d.add(new StringRefAddr(prm.getKey(), prm.getValue()));
@@ -105,7 +105,8 @@ public class ResourceParser
 
             NodeList nList = doc.getElementsByTagName("resource");
 
-            String jndiAlias = null, resourceClass = null, description = "no description", scope = null, auth = "Container", factory = null, factoryLocation = null;
+            String jndiAlias = null, resourceClass = null, description = "no description", scope = null, auth = "Container", factory = null;
+            boolean singleton = false;
 
             for (int i = 0; i < nList.getLength(); i++)
             {
@@ -118,6 +119,7 @@ public class ResourceParser
                     Node attr = attrs.item(j);
                     String key = attr.getNodeName();
                     String value = attr.getNodeValue();
+
                     if ("name".equals(key))
                     {
                         jndiAlias = value;
@@ -138,6 +140,10 @@ public class ResourceParser
                     {
                         auth = value;
                     }
+                    else if ("singleton".equals(key))
+                    {
+                        singleton = Boolean.parseBoolean(value);
+                    }
                     else
                     {
                         otherParams.put(key, value);
@@ -149,7 +155,7 @@ public class ResourceParser
                     throw new NamingException("could not load the resource.xml file");
                 }
 
-                JndiResourceDescriptor jrd = new JndiResourceDescriptor(resourceClass, description, scope, auth, factory, factoryLocation);
+                JndiResourceDescriptor jrd = new JndiResourceDescriptor(resourceClass, description, scope, auth, factory, singleton);
                 for (Map.Entry<String, String> prm : otherParams.entrySet())
                 {
                     jrd.add(new StringRefAddr(prm.getKey(), prm.getValue()));
