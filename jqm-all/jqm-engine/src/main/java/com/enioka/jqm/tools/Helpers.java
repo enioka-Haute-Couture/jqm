@@ -226,6 +226,10 @@ public final class Helpers
             gp.setValue(initValue);
             em.persist(gp);
         }
+        catch (NonUniqueResultException e)
+        {
+            // It exists! Nothing to do...
+        }
     }
 
     static Node checkAndUpdateNodeConfiguration(String nodeName, EntityManager em)
