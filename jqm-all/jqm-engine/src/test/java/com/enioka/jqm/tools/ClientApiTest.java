@@ -66,9 +66,8 @@ public class ClientApiTest extends JqmBaseTest
         JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
         jdargs.add(jdp);
 
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-test-datetimemaven/",
-                "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", true, em);
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
@@ -105,9 +104,8 @@ public class ClientApiTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null,
-                "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", true, em);
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
         j.setSessionID("session42");
@@ -148,7 +146,7 @@ public class ClientApiTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-kill/target/test.jar",
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-kill/target/test.jar",
                 TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
@@ -190,7 +188,7 @@ public class ClientApiTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-sendmsg/target/test.jar",
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-sendmsg/target/test.jar",
                 TestHelpers.qVip, 42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         JobRequest j = new JobRequest("Marsu-Application", "MAG");
@@ -249,7 +247,7 @@ public class ClientApiTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-sendprogress/target/test.jar",
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-sendprogress/target/test.jar",
                 TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
@@ -285,9 +283,8 @@ public class ClientApiTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null,
-                "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
@@ -326,9 +323,8 @@ public class ClientApiTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null,
-                "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
@@ -365,9 +361,8 @@ public class ClientApiTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null,
-                "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
@@ -402,9 +397,8 @@ public class ClientApiTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null,
-                "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
@@ -442,7 +436,7 @@ public class ClientApiTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-sendmsg/target/test.jar",
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-sendmsg/target/test.jar",
                 TestHelpers.qVip, 42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         JqmEngine engine1 = new JqmEngine();
@@ -504,7 +498,7 @@ public class ClientApiTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-sendmsg/target/test.jar",
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-sendmsg/target/test.jar",
                 TestHelpers.qVip, 42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         JqmEngine engine1 = new JqmEngine();
@@ -573,9 +567,8 @@ public class ClientApiTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null,
-                "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", false, em);
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
 

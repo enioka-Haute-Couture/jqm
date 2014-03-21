@@ -37,7 +37,7 @@ public class DeliverableTest extends JqmBaseTest
         jdargs.add(jdp);
         jdargs.add(jdp2);
 
-        CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-deliverable/target/test.jar", TestHelpers.qVip, 42,
+        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-deliverable/target/test.jar", TestHelpers.qVip, 42,
                 "getDeliverables", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("getDeliverables", "MAG");
@@ -73,7 +73,7 @@ public class DeliverableTest extends JqmBaseTest
         jdargs.add(jdp);
         jdargs.add(jdp2);
 
-        CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-deliverable/target/test.jar", TestHelpers.qVip, 42,
+        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-deliverable/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "Franquin");
@@ -117,7 +117,7 @@ public class DeliverableTest extends JqmBaseTest
         jdargs.add(jdp);
         jdargs.add(jdp2);
 
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-deliverable/target/test.jar",
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-deliverable/target/test.jar",
                 TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "Franquin");

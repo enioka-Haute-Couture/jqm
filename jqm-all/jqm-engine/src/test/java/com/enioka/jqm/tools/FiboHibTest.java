@@ -48,7 +48,7 @@ public class FiboHibTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, null,
+        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs,
                 "jqm-tests/jqm-test-fibohib/target/test.jar", TestHelpers.qVip, 42, "FiboHib", null, "Franquin", "ModuleMachin", "other1",
                 "other2", false, em);
 

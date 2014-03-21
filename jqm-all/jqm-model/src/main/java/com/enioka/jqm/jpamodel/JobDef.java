@@ -48,7 +48,7 @@ public class JobDef implements Serializable
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 1024)
     private String description;
 
     @Column(name = "canBeRestarted")
@@ -57,7 +57,7 @@ public class JobDef implements Serializable
     @Column(nullable = false, length = 100, name = "javaClassName")
     private String javaClassName;
 
-    @Column(length = 1000, name = "filePath")
+    @Column(length = 1024, name = "filePath")
     private String filePath;
 
     @ManyToOne(optional = false)
@@ -88,7 +88,7 @@ public class JobDef implements Serializable
     @Column(name = "highlander", nullable = false)
     private boolean highlander = false;
 
-    @Column(name = "jarPath")
+    @Column(name = "jarPath", length = 1024)
     private String jarPath;
 
     @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -210,11 +210,23 @@ public class JobDef implements Serializable
         this.queue = queue;
     }
 
+    /**
+     * Used to contain the path to the directory containing the jar file.
+     * 
+     * @deprecated jarPath contains the full path.
+     * @return
+     */
     public String getFilePath()
     {
         return filePath;
     }
 
+    /**
+     * Used to contain the path to the directory containing the jar file.
+     * 
+     * @deprecated jarPath contains the full path.
+     * @return
+     */
     public void setFilePath(final String filePath)
     {
         this.filePath = filePath;

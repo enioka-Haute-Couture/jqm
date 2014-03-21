@@ -61,7 +61,6 @@ The general XML structure is this::
 	<jqm>
 		<jar>
 			<path>jqm-test-fibo/jqm-test-fibo.jar</path>
-			<filePath>jqm-test-fibo/</filePath>
 
 			<jobdefinitions>
 				<jobDefinition>
@@ -82,8 +81,10 @@ Jar attributes
 +============+=============================================================================================================+
 | path       | the path to the jar. It must be relative to the "repo" attribute of the nodes. (default is installdir/jobs) |
 +------------+-------------------------------------------------------------------------------------------------------------+
-| filepath   | directory part of the "path". Present for legacy reasons.                                                   |
-+------------+-------------------------------------------------------------------------------------------------------------+
+
+.. versionadded:: 1.1.6
+	There used to be a field named "filePath" that was redundant. It is no longer used and should not be specified in new xmls.
+	For existing files, the field is simply ignored so there is no need to modify the files.
 
 JobDef attributes
 +++++++++++++++++++++++

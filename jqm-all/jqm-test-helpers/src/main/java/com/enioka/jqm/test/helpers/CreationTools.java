@@ -125,14 +125,13 @@ public class CreationTools
 
     // ------------------ JOBDEFINITION ------------------------
 
-    public static JobDef initJobDefinition(String javaClassName, String filePath, Queue queue, EntityManager em)
+    public static JobDef initJobDefinition(String javaClassName, Queue queue, EntityManager em)
     {
         JobDef j = new JobDef();
         EntityTransaction transac = em.getTransaction();
         transac.begin();
 
         j.setJavaClassName(javaClassName);
-        j.setFilePath(filePath);
         j.setQueue(queue);
 
         em.persist(j);
@@ -142,8 +141,8 @@ public class CreationTools
     }
 
     public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps,
-            String filePath, String jp, Queue queue, Integer maxTimeRunning, String applicationName, String application, String module,
-            String keyword1, String keyword2, String keyword3, boolean highlander, EntityManager em)
+            String jp, Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+            String keyword2, String keyword3, boolean highlander, EntityManager em)
     {
         JobDef j = new JobDef();
         EntityTransaction transac = em.getTransaction();
@@ -155,7 +154,6 @@ public class CreationTools
         j.setCanBeRestarted(canBeRestarted);
         j.setJavaClassName(javaClassName);
         j.setParameters(jps);
-        j.setFilePath(filePath);
         j.setQueue(queue);
         j.setMaxTimeRunning(maxTimeRunning);
         j.setApplicationName(applicationName);

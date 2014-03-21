@@ -19,7 +19,6 @@
 package com.enioka.jqm.tools;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -39,21 +38,37 @@ import com.enioka.jqm.jpamodel.Queue;
 class XmlParser
 {
     private static Logger jqmlogger = Logger.getLogger(XmlParser.class);
-    private EntityManager em = Helpers.getNewEm();
 
-    XmlParser()
+    private XmlParser()
     {
 
     }
 
-    void parse(String path) throws JqmEngineException
+    /**
+     * Will import all JobDef from a XM file. Must not be called from within an open JPA transaction.
+     * 
+     * @param path
+     * @param em
+     * @throws JqmEngineException
+     */
+    static void parse(String path, EntityManager em) throws JqmEngineException
     {
+        if (path == null || path.isEmpty())
+        {
+            throw new IllegalArgumentException("XML file path cannot be empty");
+        }
+        jqmlogger.trace(path);
         File f = new File(path);
+        if (f == null || !f.isFile())
+        {
+            throw new JqmEngineException("The XML file " + f + " was not found");
+        }
+
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
+
         boolean canBeRestarted = true;
         String javaClassName = null;
-        String filePath = null;
         Queue queue = null;
         Integer maxTimeRunning = null;
         String applicationName = null;
@@ -75,19 +90,13 @@ class XmlParser
 
         try
         {
-            jqmlogger.debug(f.getPath());
-            jqmlogger.debug("Working Directory = " + System.getProperty("user.dir"));
-
-            if (f == null || !f.isFile())
-            {
-                throw new FileNotFoundException("The XML file " + f + " was not found");
-            }
-
             dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(f);
 
             doc.getDocumentElement().normalize();
             NodeList nList = doc.getElementsByTagName("jqm");
+
+            em.getTransaction().begin();
 
             for (int temp = 0; temp < nList.getLength(); temp++)
             {
@@ -95,12 +104,11 @@ class XmlParser
                 if (nNode.getNodeType() == Node.ELEMENT_NODE)
                 {
                     Element e = (Element) nNode;
-
                     NodeList nl = e.getElementsByTagName("jobDefinition");
 
                     for (int i = 0; i < nl.getLength(); i++)
                     {
-                        em.getTransaction().begin();
+
                         Element ee = (Element) nl.item(i);
 
                         canBeRestarted = ("true".equals(ee.getElementsByTagName("canBeRestarted").item(0).getTextContent())) ? true : false;
@@ -140,7 +148,6 @@ class XmlParser
                             keyword3 = ee.getElementsByTagName("keyword3").item(0).getTextContent();
                         }
                         highlander = ("true".equals(ee.getElementsByTagName("highlander").item(0).getTextContent())) ? true : false;
-                        filePath = e.getElementsByTagName("filePath").item(0).getTextContent();
                         jarPath = e.getElementsByTagName("path").item(0).getTextContent();
 
                         NodeList l = ee.getElementsByTagName("parameter");
@@ -157,7 +164,6 @@ class XmlParser
 
                         jd.setCanBeRestarted(canBeRestarted);
                         jd.setJavaClassName(javaClassName);
-                        jd.setFilePath(filePath);
                         jd.setQueue(queue);
                         jd.setMaxTimeRunning(maxTimeRunning);
                         jd.setApplicationName(applicationName);
@@ -170,16 +176,15 @@ class XmlParser
                         jd.setJarPath(jarPath);
 
                         em.persist(jd);
-                        em.getTransaction().commit();
-
-                        jqmlogger.debug("XML parsed");
+                        jqmlogger.debug("Imported application " + applicationName);
                     }
                 }
             }
+            em.getTransaction().commit();
         }
         catch (Exception e)
         {
-            throw new JqmEngineException("an error occured while parsing the XML file", e);
+            throw new JqmEngineException("an error occured while parsing the XML file. No changes were done to the configuration.", e);
         }
     }
 }

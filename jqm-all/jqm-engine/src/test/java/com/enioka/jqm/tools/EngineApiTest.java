@@ -37,7 +37,7 @@ public class EngineApiTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-sendmsg/target/test.jar",
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-sendmsg/target/test.jar",
                 TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
@@ -94,7 +94,7 @@ public class EngineApiTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-sendprogress/target/test.jar",
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-sendprogress/target/test.jar",
                 TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
@@ -128,8 +128,8 @@ public class EngineApiTest extends JqmBaseTest
         TestHelpers.createLocalNode(em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-throwable/target/test.jar",
-                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-throwable/target/test.jar", TestHelpers.qVip,
+                42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
         JqmClientFactory.getClient().enqueue(j);

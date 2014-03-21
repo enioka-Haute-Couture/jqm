@@ -30,12 +30,12 @@ public class JmxTest extends JqmBaseTest
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
 
-        CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, null, "jqm-tests/jqm-test-fibo/target/test.jar",
+        CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
                 TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
-        CreationTools.createJobDef(null, true, "App", null, null, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42, "Geo",
-                null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
-        CreationTools.createJobDef(null, true, "App", null, null, "jqm-tests/jqm-test-kill/target/test.jar", TestHelpers.qVip, 42,
-                "KillApp", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42, "Geo", null,
+                "Franquin", "ModuleMachin", "other1", "other2", false, em);
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-kill/target/test.jar", TestHelpers.qVip, 42, "KillApp",
+                null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         // Get free ports
         ServerSocket s1 = new ServerSocket(0);

@@ -37,9 +37,8 @@ public class MiscTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null,
-                "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", true, em);
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG", "jqm.noreply@gmail.com");
 
@@ -73,8 +72,8 @@ public class MiscTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null,
-                "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
+                TestHelpers.qVip, 42,
                 "Marsu-Application-nnnnnnnn-nnnnnn-nnnnnnnnnn-nnNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNnn-nnnnnnnnnnnnnn", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
@@ -106,8 +105,8 @@ public class MiscTest extends JqmBaseTest
         TestHelpers.createLocalNode(em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-exit/target/test.jar",
-                TestHelpers.qVip, 42, "jqm-test-exit", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-exit/target/test.jar", TestHelpers.qVip, 42,
+                "jqm-test-exit", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("jqm-test-exit", "MAG");
         JqmClientFactory.getClient().enqueue(j);
@@ -138,8 +137,8 @@ public class MiscTest extends JqmBaseTest
         CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbengine", "SA", "", em,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip,
-                42, "jqm-test-em", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip, 42,
+                "jqm-test-em", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("jqm-test-em", "MAG");
         JqmClientFactory.getClient().enqueue(j);
@@ -231,8 +230,8 @@ public class MiscTest extends JqmBaseTest
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
-        JobDef jd = CreationTools.createJobDef(null, true, "App", null, null, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip,
-                42, "jqm-test-em", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobDef jd = CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip, 42,
+                "jqm-test-em", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         // Create a running job that should be cleaned at startup
         em.getTransaction().begin();

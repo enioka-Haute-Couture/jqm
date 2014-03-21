@@ -57,8 +57,8 @@ public class GeoTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip,
-                42, "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42,
+                "Geo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
 
         JobRequest form = new JobRequest("Geo", "MAG");
         form.addParameter("nbJob", "1");

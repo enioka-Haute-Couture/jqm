@@ -38,15 +38,15 @@ public class JobDefControler extends ListDataModel<JobDef> implements Serializab
         if (em.createQuery("SELECT COUNT(n) FROM Node n", Long.class).getSingleResult().equals(0l))
         {
             TestHelpers.createLocalNode(em);
-            CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, null, "jqm-tests/jqm-test-fibo/target/test.jar",
+            CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
                     TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
-            CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, null, "jqm-tests/jqm-test-fibo/target/test.jar",
+            CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
                     TestHelpers.qVip, 42, "Fibo2", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
-            CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, null, "jqm-tests/jqm-test-fibo/target/test.jar",
+            CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
                     TestHelpers.qVip, 42, "Fibo3", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
-            CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, null, "jqm-tests/jqm-test-fibo/target/test.jar",
+            CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
                     TestHelpers.qVip, 42, "Fibo4", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
-            CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, null, "jqm-tests/jqm-test-fibo/target/test.jar",
+            CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
                     TestHelpers.qVip, 42, "Fibo5", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
         }
     }

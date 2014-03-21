@@ -47,7 +47,7 @@ public class NoApiPayloadTest extends JqmBaseTest
         TestHelpers.createLocalNode(em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
+        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
                 TestHelpers.qVip, 42, "jqm-test-datetimemaven", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("jqm-test-datetimemaven", "MAG");
@@ -75,8 +75,8 @@ public class NoApiPayloadTest extends JqmBaseTest
         TestHelpers.createLocalNode(em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-runnable/target/test.jar",
-                TestHelpers.qVip, 42, "jqm-test-runnable", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-runnable/target/test.jar", TestHelpers.qVip,
+                42, "jqm-test-runnable", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("jqm-test-runnable", "MAG");
         JqmClientFactory.getClient().enqueue(j);
@@ -103,9 +103,8 @@ public class NoApiPayloadTest extends JqmBaseTest
         TestHelpers.createLocalNode(em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDef jd = CreationTools.createJobDef("super app", true, "App", jdargs, null,
-                "jqm-tests/jqm-test-runnable-inject/target/test.jar", TestHelpers.qVip, 42, "jqm-test-runnable-inject", "testapp",
-                "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobDef jd = CreationTools.createJobDef("super app", true, "App", jdargs, "jqm-tests/jqm-test-runnable-inject/target/test.jar",
+                TestHelpers.qVip, 42, "jqm-test-runnable-inject", "testapp", "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("jqm-test-runnable-inject", "MAG");
         j.setSessionID("123X");
@@ -137,8 +136,8 @@ public class NoApiPayloadTest extends JqmBaseTest
         TestHelpers.createLocalNode(em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-main/target/test.jar",
-                TestHelpers.qVip, 42, "jqm-test-main", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-main/target/test.jar", TestHelpers.qVip, 42,
+                "jqm-test-main", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("jqm-test-main", "MAG");
         JqmClientFactory.getClient().enqueue(j);
@@ -165,7 +164,7 @@ public class NoApiPayloadTest extends JqmBaseTest
         TestHelpers.createLocalNode(em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDef jd = CreationTools.createJobDef("super app", true, "App", jdargs, null, "jqm-tests/jqm-test-main-inject/target/test.jar",
+        JobDef jd = CreationTools.createJobDef("super app", true, "App", jdargs, "jqm-tests/jqm-test-main-inject/target/test.jar",
                 TestHelpers.qVip, 42, "jqm-test-main-inject", "testapp", "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j = new JobRequest("jqm-test-main-inject", "MAG");

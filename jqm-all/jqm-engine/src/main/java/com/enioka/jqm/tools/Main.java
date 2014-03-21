@@ -216,10 +216,9 @@ public class Main
                 em.close();
                 return;
             }
-            em.close();
 
-            XmlParser parser = new XmlParser();
-            parser.parse(xmlpath);
+            XmlParser.parse(xmlpath, em);
+            em.close();
         }
         catch (Exception e)
         {

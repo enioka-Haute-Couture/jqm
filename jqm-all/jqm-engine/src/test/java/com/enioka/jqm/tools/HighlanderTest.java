@@ -50,9 +50,8 @@ public class HighlanderTest extends JqmBaseTest
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null,
-                "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", true, em);
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
         for (int i = 0; i < 9; i++)
@@ -109,9 +108,8 @@ public class HighlanderTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null,
-                "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", true, em);
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
@@ -145,8 +143,8 @@ public class HighlanderTest extends JqmBaseTest
         TestHelpers.createLocalNode(em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        CreationTools.createJobDef(null, true, "App", jdargs, null, "jqm-tests/jqm-test-kill/target/test.jar", TestHelpers.qVip, 42,
-                "kill", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-kill/target/test.jar", TestHelpers.qVip, 42, "kill",
+                null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -183,9 +181,8 @@ public class HighlanderTest extends JqmBaseTest
         JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
         jdargs.add(jdp);
 
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, null,
-                "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", true, em);
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
