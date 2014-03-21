@@ -47,24 +47,24 @@ public class Node
     private Integer port;
 
     // Repo where the deliverables must be downloaded
-    @Column(nullable = false, name = "dlRepo")
+    @Column(nullable = false, name = "dlRepo", length = 1024)
     private String dlRepo;
 
     // Repo to which the jar repository and the pom repository must be relative
-    @Column(nullable = false, name = "repo")
+    @Column(nullable = false, name = "repo", length = 1024)
     private String repo;
+
+    // Repo to which the export repository must be relative
+    @Column(nullable = false, name = "exportRepo", length = 1024)
+    private String exportRepo;
 
     // To stop nicely the current node
     @Column(nullable = false, name = "stop")
     private boolean stop = false;
 
     // To set the log level
-    @Column(name = "rootLogLevel")
+    @Column(name = "rootLogLevel", length = 10)
     private String rootLogLevel = "DEBUG";
-
-    // Repo to which the export repository must be relative
-    @Column(nullable = false, name = "exportRepo")
-    private String exportRepo;
 
     // Updated regularly by a living node. Null means stopped correctly.
     @Temporal(TemporalType.TIMESTAMP)
