@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
+import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -19,7 +20,6 @@ public class XmlTest extends JqmBaseTest
     @Test
     public void testExportQueue() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testExportQueue");
         EntityManager em = Helpers.getNewEm();
@@ -68,7 +68,6 @@ public class XmlTest extends JqmBaseTest
     public void testExportQueueAll() throws Exception
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testExportQueueAll");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -112,7 +111,6 @@ public class XmlTest extends JqmBaseTest
     public void testXmlParser()
     {
         jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testXmlParser");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
@@ -138,9 +136,32 @@ public class XmlTest extends JqmBaseTest
     }
 
     @Test
-    public void testImportQueue() throws Exception
+    public void testImportJobdefWithQueue()
     {
         jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testImportJobdefWithQueue");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        // Init the default queue (don't start the engine!)
+        Helpers.checkAndUpdateNodeConfiguration("marsu", em);
+
+        Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltestnewqueue.xml" });
+
+        List<JobDef> jd = em.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
+        Assert.assertEquals(2, jd.size());
+
+        // Was the queue created (and only once)?
+        Queue q = em.createQuery("SELECT q from Queue q where q.name = :name", Queue.class).setParameter("name", "NewQueue")
+                .getSingleResult();
+        Assert.assertEquals("Created from a jobdef import. Description should be set later", q.getDescription());
+        em.close();
+    }
+
+    @Test
+    public void testImportQueue() throws Exception
+    {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testImportQueue");
         EntityManager em = Helpers.getNewEm();

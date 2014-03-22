@@ -19,8 +19,11 @@
 package com.enioka.jqm.tools;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -45,7 +48,7 @@ class XmlParser
     }
 
     /**
-     * Will import all JobDef from a XM file. Must not be called from within an open JPA transaction.
+     * Will import all JobDef from an XML file. Must not be called from within an open JPA transaction.
      * 
      * @param path
      * @param em
@@ -66,6 +69,7 @@ class XmlParser
 
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
+        Map<String, Queue> createdQueues = new HashMap<String, Queue>();
 
         boolean canBeRestarted = true;
         String javaClassName = null;
@@ -107,12 +111,10 @@ class XmlParser
 
                     for (int i = 0; i < nl.getLength(); i++)
                     {
-
                         Element ee = (Element) nl.item(i);
 
                         canBeRestarted = ("true".equals(ee.getElementsByTagName("canBeRestarted").item(0).getTextContent())) ? true : false;
                         javaClassName = ee.getElementsByTagName("javaClassName").item(0).getTextContent();
-                        queue = em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true", Queue.class).getSingleResult();
 
                         JobDef jd;
                         TypedQuery<JobDef> q = em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = :n", JobDef.class);
@@ -127,6 +129,41 @@ class XmlParser
                             jd = new JobDef();
                         }
 
+                        // Queue
+                        if (jd.getQueue() == null && ee.getElementsByTagName("queue").getLength() == 0)
+                        {
+                            // Not specified => default queue
+                            queue = em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true", Queue.class).getSingleResult();
+                        }
+                        else
+                        {
+                            // Specified inside the XML. Does the queue already exist?
+                            String qname = ee.getElementsByTagName("queue").item(0).getTextContent();
+                            try
+                            {
+                                queue = em.createQuery("SELECT q FROM Queue q WHERE q.name = :name", Queue.class)
+                                        .setParameter("name", qname).getSingleResult();
+                                // The queue exists
+                            }
+                            catch (NoResultException noe)
+                            {
+                                // The queue must be created.
+                                if (createdQueues.containsKey(qname))
+                                {
+                                    queue = createdQueues.get(qname);
+                                }
+                                else
+                                {
+                                    queue = new Queue();
+                                    queue.setDescription("Created from a jobdef import. Description should be set later");
+                                    queue.setName(qname);
+                                    em.persist(queue);
+                                    createdQueues.put(qname, queue);
+                                }
+                            }
+                        }
+
+                        // Easy attributes
                         applicationName = ee.getElementsByTagName("name").item(0).getTextContent();
                         application = ee.getElementsByTagName("application").item(0).getTextContent();
                         module = ee.getElementsByTagName("module").item(0).getTextContent();

@@ -52,7 +52,7 @@ public class Queue implements Serializable
     private String description;
 
     @Column(nullable = false, name = "timeToLive")
-    private Integer timeToLive;
+    private Integer timeToLive = 0;
 
     @Column(name = "defaultQueue")
     private boolean defaultQueue;

@@ -122,6 +122,8 @@ All attributes are case sensitive.
 It is also possible to define parameters, as key/value pairs. Note that it is also possible to give parameters inside the :term:`Job Request` (i.e. at runtime).
 If a parameter specified inside the request has the same name as one from the :term:`JobDef`, the runtime value wins.
 
+There is an optional parameter named "queue" in which it is possible ot specify the name of the queue to use for all instances created from this job definition. If not
+specified (the default), JQM will use the default queue.
 
 XML example
 +++++++++++++++++++

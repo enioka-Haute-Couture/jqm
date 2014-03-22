@@ -4,6 +4,7 @@
 		<jobdefinitions>
 			<jobDefinition>
 				<name>Fibo</name>
+				<queue>NewQueue</queue>
 				<description>Test based on the Fibonachi suite</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>com.enioka.jqm.tests.App</javaClassName>
@@ -27,6 +28,7 @@
 			</jobDefinition>
 			<jobDefinition>
 				<name>Fibo2</name>
+				<queue>NewQueue</queue>
 				<description>Test to check the xml implementation</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>com.enioka.jqm.tests.App</javaClassName>

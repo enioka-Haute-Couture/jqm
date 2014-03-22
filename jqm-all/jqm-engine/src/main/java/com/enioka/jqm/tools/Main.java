@@ -222,7 +222,7 @@ public class Main
         }
         catch (Exception e)
         {
-            jqmlogger.fatal(e);
+            jqmlogger.fatal("Could not import file", e);
             return;
         }
     }
