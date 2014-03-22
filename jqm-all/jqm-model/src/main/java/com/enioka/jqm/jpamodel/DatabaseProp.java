@@ -27,6 +27,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
+ * JPA persistence class for storing JNDI JDBC data source definitions.
+ * 
+ * @deprecated Data sources are now defined as {@link JndiObjectResource}
+ */
 @Entity
 @Table(name = "DatabaseProp")
 public class DatabaseProp implements Serializable

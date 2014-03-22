@@ -250,7 +250,6 @@ public final class Helpers
             n.setName(nodeName);
             n.setPort(0);
             n.setRepo(System.getProperty("user.dir") + "/jobs/");
-            n.setExportRepo(System.getProperty("user.dir") + "/exports/");
             n.setRootLogLevel("INFO");
             em.persist(n);
         }
@@ -308,7 +307,6 @@ public final class Helpers
         if (i == 0)
         {
             dp = new DeploymentParameter();
-            dp.setClassId(1);
             dp.setNbThread(5);
             dp.setNode(n);
             dp.setPollingInterval(1000);

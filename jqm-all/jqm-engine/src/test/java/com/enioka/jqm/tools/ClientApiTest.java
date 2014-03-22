@@ -121,7 +121,6 @@ public class ClientApiTest extends JqmBaseTest
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         jqmlogger.debug("enqueueDate: " + df.format(h.getEnqueueDate().getTime()));
-        jqmlogger.debug("ReturnedValue: " + h.getReturnedValue());
         jqmlogger.debug("ExecutionDate: " + df.format(h.getExecutionDate().getTime()));
         jqmlogger.debug("EndDate: " + df.format(h.getEndDate().getTime()));
 

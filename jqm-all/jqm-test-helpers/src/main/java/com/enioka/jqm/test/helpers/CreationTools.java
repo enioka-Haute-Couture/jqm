@@ -155,7 +155,6 @@ public class CreationTools
         j.setJavaClassName(javaClassName);
         j.setParameters(jps);
         j.setQueue(queue);
-        j.setMaxTimeRunning(maxTimeRunning);
         j.setApplicationName(applicationName);
         j.setApplication(application);
         j.setModule(module);
@@ -187,14 +186,13 @@ public class CreationTools
         return dp;
     }
 
-    public static DeploymentParameter createDeploymentParameter(Integer classId, Node node, Integer nbThread, Integer pollingInterval,
-            Queue qVip, EntityManager em)
+    public static DeploymentParameter createDeploymentParameter(Node node, Integer nbThread, Integer pollingInterval, Queue qVip,
+            EntityManager em)
     {
         DeploymentParameter dp = new DeploymentParameter();
         EntityTransaction transac = em.getTransaction();
         transac.begin();
 
-        dp.setClassId(classId);
         dp.setNode(node);
         dp.setNbThread(nbThread);
         dp.setPollingInterval(pollingInterval);
@@ -207,13 +205,12 @@ public class CreationTools
 
     // ------------------ HISTORY ------------------------------
 
-    public static History createhistory(Integer returnedValue, Calendar jobDate, JobDef JobDefId, String sessionId, Queue queue,
-            String msg, List<Message> messages, JobInstance jobInstance, Calendar enqueueDate, Calendar executionDate, Calendar endDate,
+    public static History createhistory(Calendar jobDate, JobDef JobDefId, String sessionId, Queue queue, String msg,
+            List<Message> messages, JobInstance jobInstance, Calendar enqueueDate, Calendar executionDate, Calendar endDate,
             String userName, Node node, List<JobHistoryParameter> jhp, EntityManager em)
     {
         History h = new History();
 
-        h.setReturnedValue(returnedValue);
         h.setJd(JobDefId);
         h.setSessionId(sessionId);
         h.setQueue(queue);
@@ -281,7 +278,7 @@ public class CreationTools
 
     // ------------------ NODE ---------------------------------
 
-    public static Node createNode(String nodeName, Integer port, String dlRepo, String repo, String exportRepo, EntityManager em)
+    public static Node createNode(String nodeName, Integer port, String dlRepo, String repo, EntityManager em)
     {
         Node n = new Node();
         EntityTransaction transac = em.getTransaction();
@@ -291,7 +288,6 @@ public class CreationTools
         n.setPort(port);
         n.setDlRepo(dlRepo);
         n.setRepo(repo);
-        n.setExportRepo(exportRepo);
         try
         {
             n.setDns(InetAddress.getLocalHost().getHostName());

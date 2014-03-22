@@ -130,7 +130,6 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals(true, jd.get(0).isCanBeRestarted());
         Assert.assertEquals("com.enioka.jqm.tests.App", jd.get(0).getJavaClassName());
         Assert.assertEquals(TestHelpers.qVip, jd.get(0).getQueue());
-        Assert.assertEquals((Integer) 42, jd.get(0).getMaxTimeRunning());
         Assert.assertEquals("ApplicationTest", jd.get(0).getApplication());
         Assert.assertEquals("TestModuleRATONLAVEUR", jd.get(0).getModule());
         Assert.assertEquals(false, jd.get(0).isHighlander());

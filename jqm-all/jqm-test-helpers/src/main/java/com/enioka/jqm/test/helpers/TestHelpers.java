@@ -75,25 +75,25 @@ public class TestHelpers
         TestHelpers.qNormal3 = CreationTools.initQueue("NormalQueue3", "Queue for the ordinary job3", 7, em);
         TestHelpers.qSlow3 = CreationTools.initQueue("SlowQueue3", "Queue for the bad guys3", 3, em);
 
-        TestHelpers.node = CreationTools.createNode("localhost", 0, "./target/payloads/", "./../", "./testprojects/jqm-test-xml/", em);
-        TestHelpers.node2 = CreationTools.createNode("localhost2", 0, "./target/payloads/", "./../", "./testprojects/jqm-test-xml/", em);
-        TestHelpers.node3 = CreationTools.createNode("localhost3", 0, "./target/payloads/", "./../", "./testprojects/jqm-test-xml/", em);
-        TestHelpers.nodeMix = CreationTools.createNode("localhost4", 0, "./target/payloads/", "./../", "./testprojects/jqm-test-xml/", em);
-        TestHelpers.nodeMix2 = CreationTools.createNode("localhost5", 0, "./target/payloads/", "./../", "./testprojects/jqm-test-xml/", em);
+        TestHelpers.node = CreationTools.createNode("localhost", 0, "./target/payloads/", "./../", em);
+        TestHelpers.node2 = CreationTools.createNode("localhost2", 0, "./target/payloads/", "./../", em);
+        TestHelpers.node3 = CreationTools.createNode("localhost3", 0, "./target/payloads/", "./../", em);
+        TestHelpers.nodeMix = CreationTools.createNode("localhost4", 0, "./target/payloads/", "./../", em);
+        TestHelpers.nodeMix2 = CreationTools.createNode("localhost5", 0, "./target/payloads/", "./../", em);
 
-        TestHelpers.dpVip = CreationTools.createDeploymentParameter(1, node, 40, 1, qVip, em);
-        TestHelpers.dpVipMix = CreationTools.createDeploymentParameter(2, nodeMix, 3, 1, qVip, em);
-        TestHelpers.dpVipMix2 = CreationTools.createDeploymentParameter(2, nodeMix2, 3, 1, qVip, em);
-        TestHelpers.dpNormal = CreationTools.createDeploymentParameter(1, node, 2, 300, qNormal, em);
-        TestHelpers.dpSlow = CreationTools.createDeploymentParameter(1, node, 1, 1000, qSlow, em);
+        TestHelpers.dpVip = CreationTools.createDeploymentParameter(node, 40, 1, qVip, em);
+        TestHelpers.dpVipMix = CreationTools.createDeploymentParameter(nodeMix, 3, 1, qVip, em);
+        TestHelpers.dpVipMix2 = CreationTools.createDeploymentParameter(nodeMix2, 3, 1, qVip, em);
+        TestHelpers.dpNormal = CreationTools.createDeploymentParameter(node, 2, 300, qNormal, em);
+        TestHelpers.dpSlow = CreationTools.createDeploymentParameter(node, 1, 1000, qSlow, em);
 
-        TestHelpers.dpVip2 = CreationTools.createDeploymentParameter(1, node2, 3, 100, qVip2, em);
-        TestHelpers.dpNormal2 = CreationTools.createDeploymentParameter(1, node2, 2, 300, qNormal2, em);
-        TestHelpers.dpSlow2 = CreationTools.createDeploymentParameter(1, node2, 1, 1000, qSlow2, em);
+        TestHelpers.dpVip2 = CreationTools.createDeploymentParameter(node2, 3, 100, qVip2, em);
+        TestHelpers.dpNormal2 = CreationTools.createDeploymentParameter(node2, 2, 300, qNormal2, em);
+        TestHelpers.dpSlow2 = CreationTools.createDeploymentParameter(node2, 1, 1000, qSlow2, em);
 
-        TestHelpers.dpVip3 = CreationTools.createDeploymentParameter(1, node3, 3, 100, qVip3, em);
-        TestHelpers.dpNormal3 = CreationTools.createDeploymentParameter(1, node3, 2, 300, qNormal3, em);
-        TestHelpers.dpSlow3 = CreationTools.createDeploymentParameter(1, node3, 1, 1000, qSlow3, em);
+        TestHelpers.dpVip3 = CreationTools.createDeploymentParameter(node3, 3, 100, qVip3, em);
+        TestHelpers.dpNormal3 = CreationTools.createDeploymentParameter(node3, 2, 300, qNormal3, em);
+        TestHelpers.dpSlow3 = CreationTools.createDeploymentParameter(node3, 1, 1000, qSlow3, em);
     }
 
     public static void cleanup(EntityManager em)

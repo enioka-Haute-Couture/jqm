@@ -70,7 +70,6 @@ class XmlParser
         boolean canBeRestarted = true;
         String javaClassName = null;
         Queue queue = null;
-        Integer maxTimeRunning = null;
         String applicationName = null;
         String application = null;
         String module = null;
@@ -114,7 +113,6 @@ class XmlParser
                         canBeRestarted = ("true".equals(ee.getElementsByTagName("canBeRestarted").item(0).getTextContent())) ? true : false;
                         javaClassName = ee.getElementsByTagName("javaClassName").item(0).getTextContent();
                         queue = em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true", Queue.class).getSingleResult();
-                        maxTimeRunning = Integer.parseInt(ee.getElementsByTagName("maxTimeRunning").item(0).getTextContent());
 
                         JobDef jd;
                         TypedQuery<JobDef> q = em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = :n", JobDef.class);
@@ -165,7 +163,6 @@ class XmlParser
                         jd.setCanBeRestarted(canBeRestarted);
                         jd.setJavaClassName(javaClassName);
                         jd.setQueue(queue);
-                        jd.setMaxTimeRunning(maxTimeRunning);
                         jd.setApplicationName(applicationName);
                         jd.setApplication(application);
                         jd.setModule(module);
