@@ -30,6 +30,10 @@ In JConsole, this shows as:
 
 .. image:: /media/jmx.png
 
+.. note:: there is another type of object which is exposed by JQM: the JDBC pools. Actually, the pool JMX beans come from tomcat-jdbc, and
+	for more details please use their documentation at https://tomcat.apache.org/tomcat-7.0-doc/jdbc-pool.html. Suffice to say it is very complete,
+	and exposes methods to recycle, free connections, etc.
+
 Remote JMX access
 ************************
 
