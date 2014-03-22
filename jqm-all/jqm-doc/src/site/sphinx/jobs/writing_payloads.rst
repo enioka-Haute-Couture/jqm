@@ -279,3 +279,4 @@ JQM is some sort of light application server - therefore the same guidelines app
   classes from your own code or dependencies). Messing with
   static elements from the bootstrap classloader is opening the door to weird interactions between jobs running in parallel. For exemple, loading a JDBC
   driver does store such static elements, and should be frowned upon.
+* Don't redefine System.setOut and System.setErr - if you do so, you will loose the log created by JQM from your console output. 
