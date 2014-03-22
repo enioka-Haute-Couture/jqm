@@ -9,8 +9,10 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- * More than heavily inspired by slf4j.
- * 
+ * The entry point to create a {@link JqmClient} that will be able to interact with JQM.<br>
+ * {@link JqmClient}s should never be created outside of this factory.<br>
+ * The factory also holds the client cache - clients are cached to avoid creating useless objects and connections. (it is possible to create
+ * a non-cached client but this is not the default)
  */
 public class JqmClientFactory
 {

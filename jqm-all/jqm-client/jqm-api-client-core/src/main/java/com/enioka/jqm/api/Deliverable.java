@@ -35,7 +35,7 @@ public class Deliverable
      * @param filePath
      * @param fileName
      */
-    public Deliverable(String filePath, String fileFamily, Integer ID, String originalName)
+    Deliverable(String filePath, String fileFamily, Integer ID, String originalName)
     {
         this.filePath = filePath;
         this.fileFamily = fileFamily;

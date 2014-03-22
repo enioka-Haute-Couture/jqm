@@ -2,6 +2,10 @@ package com.enioka.jqm.api;
 
 import java.util.Properties;
 
+/**
+ * This interface must be implemented by all client providers. It simply defines the "create client" interface.
+ * 
+ */
 interface IClientFactory
 {
     /**

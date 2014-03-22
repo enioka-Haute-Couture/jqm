@@ -17,7 +17,7 @@ public interface JqmClient
      * Will create a new job instance inside an execution queue. All parameters (JQM parameters such as queue name, etc) as well as job
      * parameters) are given inside the job request argument <br>
      * <br>
-     * Do not use this version for simple requests - there is a dedicated overload.
+     * Do not use this complex version for simple requests - there is a dedicated overload.
      * 
      * @param jobRequest
      *            a property bag for all the parameters that can be specified at enqueue time.

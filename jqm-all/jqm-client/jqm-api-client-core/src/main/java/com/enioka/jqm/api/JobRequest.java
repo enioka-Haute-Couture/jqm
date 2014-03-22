@@ -24,13 +24,12 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Job execution request. It contains all the data needed to enqueue a request, as well as non-mandatory data.
- * 
+ * Job execution request. It contains all the data needed to enqueue a request (the application name), as well as non-mandatory data. It is
+ * consumed by {@link JqmClient#enqueue(JobRequest)}
  */
 @XmlRootElement
 public class JobRequest
 {
-    private Integer parentID;
     private String applicationName;
     private String sessionID;
     private String application;
@@ -40,7 +39,7 @@ public class JobRequest
     private String keyword2;
     private String keyword3;
     private String email = null;
-    private String parentJobId = null;
+    private Integer parentJobId = null;
     private Map<String, String> parameters = new HashMap<String, String>();
 
     JobRequest()
@@ -54,7 +53,8 @@ public class JobRequest
      * @param applicationName
      *            name (key) of the job to launch
      * @param user
-     *            name of the human user that is at the origin of the request. If no user, use the application module name.
+     *            name of the human user that is at the origin of the request. If no user (e.g. inside an automated system), the application
+     *            module name should be used.
      */
     public JobRequest(String applicationName, String user)
     {
@@ -70,7 +70,7 @@ public class JobRequest
      * @param user
      *            name of the human user that is at the origin of the request. If no user, use the application module name.
      * @param email
-     *            email of the human user that to want to receive it when the job will ended.
+     *            email of the human user that to want to receive a notification when the job ends.
      */
     public JobRequest(String applicationName, String user, String email)
     {
@@ -84,7 +84,9 @@ public class JobRequest
      * job itself.
      * 
      * @param key
+     *            max length is 50
      * @param value
+     *            max length is 1000
      */
     public void addParameter(String key, String value)
     {
@@ -103,34 +105,8 @@ public class JobRequest
     }
 
     /**
-     * <strong>Optional</strong><br>
-     * A job instance can be the child of another job instance. This allows you to retrieve the ID of that parent. It is null if there is no
-     * parent.
-     * 
-     * @return
-     */
-    public Integer getParentID()
-    {
-        return parentID;
-    }
-
-    /**
-     * <strong>Optional</strong><br>
-     * A job instance can be the child of another job instance. This allows you to retrieve the ID of that parent. It is null if there is no
-     * parent.
-     * 
-     * @param parentID
-     */
-    public void setParentID(Integer parentID)
-    {
-        this.parentID = parentID;
-    }
-
-    /**
      * <strong>Compulsory</strong><br>
      * The name of the batch job to launch. It is the "Job Definition" name, and the most important parameter in this form.
-     * 
-     * @return
      */
     public String getApplicationName()
     {
@@ -142,6 +118,7 @@ public class JobRequest
      * The name of the batch job to launch. It is the "Job Definition" name, and the most important parameter in this form.
      * 
      * @param applicationName
+     *            max length is 100
      */
     public void setApplicationName(String applicationName)
     {
@@ -152,8 +129,6 @@ public class JobRequest
      * <strong>Optional</strong><br>
      * It is possible to link a job instance to an arbitrary ID, such as a session ID and later query result by this ID.<br>
      * Default is null.
-     * 
-     * @return
      */
     public String getSessionID()
     {
@@ -166,6 +141,7 @@ public class JobRequest
      * Default is null.
      * 
      * @param sessionID
+     *            max length is 100
      */
     public void setSessionID(String sessionID)
     {
@@ -175,8 +151,6 @@ public class JobRequest
     /**
      * <strong>Optional</strong><br>
      * The application making the query. E.g.: Accounting, Interfaces, ...
-     * 
-     * @return
      */
     public String getApplication()
     {
@@ -188,6 +162,7 @@ public class JobRequest
      * The application making the query. E.g.: Accounting, Interfaces, ...
      * 
      * @param application
+     *            max length is 50
      */
     public void setApplication(String application)
     {
@@ -197,8 +172,6 @@ public class JobRequest
     /**
      * <strong>Optional</strong><br>
      * An optional classification axis (and therefore query criterion)
-     * 
-     * @return
      */
     public String getModule()
     {
@@ -210,6 +183,7 @@ public class JobRequest
      * An optional classification axis (and therefore query criterion)
      * 
      * @param module
+     *            max length is 50
      */
     public void setModule(String module)
     {
@@ -219,8 +193,6 @@ public class JobRequest
     /**
      * <strong>Optional</strong><br>
      * An optional classification axis (and therefore query criterion)
-     * 
-     * @return
      */
     public String getKeyword1()
     {
@@ -232,6 +204,7 @@ public class JobRequest
      * An optional classification axis (and therefore query criterion)
      * 
      * @param keyword1
+     *            max length is 50
      */
     public void setKeyword1(String keyword1)
     {
@@ -241,8 +214,6 @@ public class JobRequest
     /**
      * <strong>Optional</strong><br>
      * An optional classification axis (and therefore query criterion)
-     * 
-     * @return
      */
     public String getKeyword2()
     {
@@ -254,6 +225,7 @@ public class JobRequest
      * An optional classification axis (and therefore query criterion)
      * 
      * @param keyword2
+     *            max length is 50
      */
     public void setKeyword2(String keyword2)
     {
@@ -263,8 +235,6 @@ public class JobRequest
     /**
      * <strong>Optional</strong><br>
      * An optional classification axis (and therefore query criterion)
-     * 
-     * @return
      */
     public String getKeyword3()
     {
@@ -276,6 +246,7 @@ public class JobRequest
      * An optional classification axis (and therefore query criterion)
      * 
      * @param keyword3
+     *            max length is 50
      */
     public void setKeyword3(String keyword3)
     {
@@ -300,8 +271,6 @@ public class JobRequest
     /**
      * <strong>Optional</strong><br>
      * It is possible to associate a user to a job execution request, and later query job execution by user.
-     * 
-     * @return
      */
     public String getUser()
     {
@@ -313,6 +282,7 @@ public class JobRequest
      * It is possible to associate a user to a job execution request, and later query job execution by user.
      * 
      * @param user
+     *            max length is 50
      */
     public void setUser(String user)
     {
@@ -320,10 +290,8 @@ public class JobRequest
     }
 
     /**
-     * <strong>Compulsory</strong><br>
-     * The email of the user that want to received it.
-     * 
-     * @return
+     * <strong>Optional</strong><br>
+     * The email of the user that want to received a notification.
      */
     public String getEmail()
     {
@@ -331,22 +299,53 @@ public class JobRequest
     }
 
     /**
-     * <strong>Compulsory</strong><br>
+     * <strong>Optional</strong><br>
      * The user can enter an email to receive an email when the job is ended.
      * 
      * @param email
+     *            max length is 100
      */
     public void setEmail(String email)
     {
         this.email = email;
     }
 
+    /**
+     * <strong>Optional</strong><br>
+     * A job instance can be the child of another job instance. This allows you to retrieve the ID of that parent. It is null if there is no
+     * parent.
+     */
     public String getParentJobId()
+    {
+        return parentJobId == null ? null : parentJobId.toString();
+    }
+
+    /**
+     * <strong>Optional</strong><br>
+     * A job instance can be the child of another job instance. This allows you to set the ID of that parent. It should be left null if
+     * there is no parent.
+     */
+    public void setParentJobId(String parentJobId)
+    {
+        this.parentJobId = Integer.parseInt(parentJobId);
+    }
+
+    /**
+     * <strong>Optional</strong><br>
+     * A job instance can be the child of another job instance. This allows you to retrieve the ID of that parent. It is null if there is no
+     * parent.
+     */
+    public Integer getParentID()
     {
         return parentJobId;
     }
 
-    public void setParentJobId(String parentJobId)
+    /**
+     * <strong>Optional</strong><br>
+     * A job instance can be the child of another job instance. This allows you to set the ID of that parent. It should be left null if
+     * there is no parent.
+     */
+    public void setParentID(Integer parentJobId)
     {
         this.parentJobId = parentJobId;
     }

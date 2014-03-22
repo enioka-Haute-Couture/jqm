@@ -5,7 +5,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * Parameters for querying JobInstances. A null parameter (the default) is ignored in the query. To query a null String, specify "" (empty
  * String). To query a null Integer, specify -1. <br>
- * See individual setters for the signification of query parameters.
+ * See individual setters for the signification of query parameters.<br>
+ * <br>
+ * By default, querying only retrieves instances that have ended. See {@link Query#setQueryLiveInstances(boolean)} for details and how to
+ * retrieve living instances.
  * 
  */
 @XmlRootElement
@@ -313,7 +316,9 @@ public final class Query
 
     /**
      * By default, querying only occurs on ended (OK or not) job instances. If this parameter is set to true, it will also include living
-     * (waiting, running, ...) job instances.
+     * (waiting, running, ...) job instances.<br>
+     * <br>
+     * Setting this to true has a noticeable performance impact and should be used as little as possible.
      * 
      * @param queryLiveInstances
      */

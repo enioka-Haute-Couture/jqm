@@ -55,9 +55,7 @@ public class JobInstance
     private List<String> messages = new ArrayList<String>();
 
     /**
-     * The Job instance ID. This is a key for numerous Dispatcher functions.
-     * 
-     * @return
+     * The Job Instance ID, i.e. the unique identifier of the execution request. This is a key for numerous {@link JqmClient} functions.
      */
     public Integer getId()
     {
@@ -70,9 +68,7 @@ public class JobInstance
     }
 
     /**
-     * The ID of the parent job that has enqueued this job instance. Optionnal.
-     * 
-     * @return
+     * The ID of the parent job that has enqueued this job instance. Null if the execution request was not done by a running job.
      */
     public Integer getParent()
     {
@@ -85,9 +81,7 @@ public class JobInstance
     }
 
     /**
-     * The user that was given at enqueue time.
-     * 
-     * @return
+     * The user name that was given at enqueue time. Optional.
      */
     public String getUser()
     {
@@ -101,8 +95,6 @@ public class JobInstance
 
     /**
      * The session ID that was given at enqueue time. Optional.
-     * 
-     * @return
      */
     public String getSessionID()
     {
@@ -115,9 +107,7 @@ public class JobInstance
     }
 
     /**
-     * Status of the job. usual values: SUBMITTED, ATTRIBUTED, RUNNING, DONE, CRASHED.
-     * 
-     * @return
+     * Status of the job. Usual cycle: SUBMITTED -> ATTRIBUTED -> RUNNING, -> DONE or CRASHED.
      */
     public State getState()
     {
@@ -130,9 +120,8 @@ public class JobInstance
     }
 
     /**
-     * Position in the queue. 0 if running.
-     * 
-     * @return
+     * Position in the queue. 0 if running.<br>
+     * <strong>This is the value retrieved during the latest {@link JqmClient#getJob(int)} call and may not be up to date!</strong>
      */
     public Integer getPosition()
     {
@@ -146,8 +135,6 @@ public class JobInstance
 
     /**
      * The queue in which the job was enqueued.
-     * 
-     * @return
      */
     public Queue getQueue()
     {
@@ -160,10 +147,8 @@ public class JobInstance
     }
 
     /**
-     * A list of all the parameters used by this job (both those passed at enqueue time and those defined as default parameters fot this
+     * A list of all the parameters used by this job (both those passed at enqueue time and those defined as default parameters for this
      * kind of jobs)
-     * 
-     * @return
      */
     public Map<String, String> getParameters()
     {
@@ -175,6 +160,10 @@ public class JobInstance
         this.parameters = parameters;
     }
 
+    /**
+     * An optional integer that running user code may update from time to time. Used to give an idea of the progress of the job instance.<br>
+     * <strong>This is the value retrieved during the latest {@link JqmClient#getJob(int)} call and may not be up to date!</strong>
+     */
     public Integer getProgress()
     {
         return progress;
@@ -185,6 +174,11 @@ public class JobInstance
         this.progress = progress;
     }
 
+    /**
+     * An optional list of strings that running user code may emit from time to time. Used to give an idea of the progress of the job
+     * instance.<br>
+     * <strong>This is the value retrieved during the latest {@link JqmClient#getJob(int)} call and may not be up to date!</strong>
+     */
     public List<String> getMessages()
     {
         return messages;
@@ -195,6 +189,9 @@ public class JobInstance
         this.messages = messages;
     }
 
+    /**
+     * An optional classification tag which can be specified inside the execution request (default is NULL).
+     */
     public String getKeyword1()
     {
         return keyword1;
@@ -205,6 +202,9 @@ public class JobInstance
         this.keyword1 = keyword1;
     }
 
+    /**
+     * An optional classification tag which can be specified inside the execution request (default is NULL).
+     */
     public String getKeyword2()
     {
         return keyword2;
@@ -215,6 +215,9 @@ public class JobInstance
         this.keyword2 = keyword2;
     }
 
+    /**
+     * An optional classification tag which can be specified inside the execution request (default is NULL).
+     */
     public String getKeyword3()
     {
         return keyword3;
@@ -225,6 +228,9 @@ public class JobInstance
         this.keyword3 = keyword3;
     }
 
+    /**
+     * An optional classification tag which can be specified inside the execution request (default is NULL).
+     */
     public String getApplication()
     {
         return application;
@@ -235,6 +241,9 @@ public class JobInstance
         this.application = application;
     }
 
+    /**
+     * The functional key that identifies a job definition template (a JobDef, as imported from XML).
+     */
     public String getApplicationName()
     {
         return applicationName;
@@ -255,6 +264,9 @@ public class JobInstance
         this.module = module;
     }
 
+    /**
+     * If this field is non-null, an e-mail will be sent at this address at the end of the run.
+     */
     public String getEmail()
     {
         return email;

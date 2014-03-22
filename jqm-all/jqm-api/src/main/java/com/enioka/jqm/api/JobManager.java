@@ -9,7 +9,10 @@ import javax.sql.DataSource;
 
 /**
  * This interface gives access to JQM engine variables and methods. It allows to retrieve the characteristics of the currently running job
- * instance, as well as creating new instances and other useful methods.
+ * instance, as well as creating new instances and other useful methods.<br>
+ * <br>
+ * It should never be instantiated but injected by the JQM engine. For the injection to take place, the payload main class should have a
+ * field of type JobManager (directly or through inheritance, as well as public or private).
  * 
  */
 public interface JobManager

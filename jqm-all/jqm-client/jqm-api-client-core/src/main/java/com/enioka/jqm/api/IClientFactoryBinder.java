@@ -1,5 +1,10 @@
 package com.enioka.jqm.api;
 
+/**
+ * A Binder is a class inside a client implementation that gives the name of a class implementing {@link IClientFactory}. Every client
+ * implementation should have a class named <code>com.enioka.jqm.api.StaticClientBinder</code> implementing this interface for the static
+ * binding system to work. This system was copied from slf4j.
+ */
 interface IClientFactoryBinder
 {
     /**
