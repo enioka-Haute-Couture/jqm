@@ -18,6 +18,9 @@
 
 package com.enioka.jqm.tools;
 
+/**
+ * The root exception for all internal exceptions
+ */
 class JqmEngineException extends Exception
 {
     private static final long serialVersionUID = -5834325251715846234L;

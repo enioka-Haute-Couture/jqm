@@ -25,6 +25,11 @@ import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.Queue;
 
+/**
+ * There is one thread pool per {@link Polling}, i.e. per queue polled by this engine.<br>
+ * The pool is actually an {@link ExecutorService}.<br>
+ * The stop method of the pool does not wait for threads to end.
+ */
 class ThreadPool
 {
     private static Logger jqmlogger = Logger.getLogger(ThreadPool.class);

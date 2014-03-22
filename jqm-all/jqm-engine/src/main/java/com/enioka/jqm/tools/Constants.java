@@ -1,5 +1,8 @@
 package com.enioka.jqm.tools;
 
+/**
+ * Some strings and other values are reused throughout the whole engine and are centralized here to avoid multiple redefinitions.
+ */
 class Constants
 {
     Constants()

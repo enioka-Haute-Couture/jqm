@@ -10,7 +10,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpStatus;
 
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.jpamodel.JobInstance;
 
+/**
+ * Servlet for getting the status of {@link JobInstance} through HTTP GET.
+ */
 class ServletStatus extends HttpServlet
 {
     private static final long serialVersionUID = 1668370491597158300L;

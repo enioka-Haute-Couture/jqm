@@ -31,6 +31,13 @@ import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.Node;
 
+/**
+ * The cache is responsible for resolving the dependencies of a payload (from a pom, from a lib directory, ...). As the resolution is
+ * costly, it is only done the first time and cached afterwards. <br>
+ * Cache invalidation is done by analyzing the last modification date of the payload jar and of the lib directory (if any) on each call.<br>
+ * There is one library cache per engine.<br>
+ * This object is thread-safe.
+ */
 class LibraryCache
 {
     private static Logger jqmlogger = Logger.getLogger(LibraryCache.class);

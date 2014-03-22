@@ -27,6 +27,10 @@ import javax.naming.Name;
 import javax.naming.NamingException;
 import javax.naming.spi.ObjectFactory;
 
+/**
+ * An {@link ObjectFactory} which delegates all work to the {@link ObjectFactory} described inside a {@link JndiResourceDescriptor}.<br>
+ * For all accounts, it is a proxy ObjectFactory.
+ */
 class ResourceFactory implements ObjectFactory
 {
     private ClassLoader clResourceClasses = null;

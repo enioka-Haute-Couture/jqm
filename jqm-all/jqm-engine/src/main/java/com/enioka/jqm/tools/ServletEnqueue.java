@@ -12,6 +12,9 @@ import org.eclipse.jetty.http.HttpStatus;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 
+/**
+ * Servlet for enqueing job execution requests through HTTP POST.
+ */
 class ServletEnqueue extends HttpServlet
 {
     private static final long serialVersionUID = 5632427472597258194L;

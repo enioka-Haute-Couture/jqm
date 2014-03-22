@@ -29,6 +29,9 @@ import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.State;
 
+/**
+ * This is the implementation behind the proxy described in {@link JobManager}.
+ */
 class JobManagerHandler implements InvocationHandler
 {
     private static Logger jqmlogger = Logger.getLogger(JobManagerHandler.class);

@@ -1,10 +1,7 @@
 package com.enioka.jqm.tools;
 
 /**
- * An error denotes something fatal and should never be caught.
- * 
- * @author Marc-Antoine
- * 
+ * Thrown when an engine tries to start with a node name associated to a recent lastseenalive date.
  */
 class JqmInitErrorTooSoon extends JqmInitError
 {

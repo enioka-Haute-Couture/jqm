@@ -26,8 +26,8 @@ import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
 import com.enioka.jqm.tools.Helpers;
 
 /**
- * For parsing XML resource file.
- * 
+ * Helper class to retrieve a {@link JndiResourceDescriptor} either from the XML resource file or from the database. <br>
+ * XML file has priority over database.
  */
 public class ResourceParser
 {

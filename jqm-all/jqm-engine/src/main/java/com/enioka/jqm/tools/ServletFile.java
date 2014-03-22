@@ -34,6 +34,9 @@ import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.Deliverable;
 
+/**
+ * Servlet for retrieving the {@link Deliverable}s created by a job execution.
+ */
 @SuppressWarnings("serial")
 class ServletFile extends HttpServlet
 {

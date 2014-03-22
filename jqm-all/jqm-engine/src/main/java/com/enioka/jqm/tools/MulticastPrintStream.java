@@ -14,6 +14,15 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
+import com.enioka.jqm.jpamodel.GlobalParameter;
+
+/**
+ * The goal of this Stream is to provide a replacement for stdout/err in which every running job instance has its own personal flow. This is
+ * basically flow multiplexing, with the multiplexing key being the caller Thread object. Used by default, can be disabled with a
+ * {@link GlobalParameter}. <br>
+ * Should a payload crate a new thread, its stdout would go to the global log as the multiplexing key is the Thread. But is not a big deal
+ * as creating threads inside an app server is not a good idea anyway.
+ */
 public class MulticastPrintStream extends PrintStream
 {
     private static Logger jqmlogger = Logger.getLogger(MulticastPrintStream.class);

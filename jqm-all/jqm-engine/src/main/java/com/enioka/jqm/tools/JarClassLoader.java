@@ -36,6 +36,10 @@ import org.apache.log4j.Logger;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
 
+/**
+ * The {@link URLClassLoader} that will load everything related to a payload (the payload jar and all its dependencies).<br>
+ * It is also responsible for launching the payload (be it a Runnable, a main function, etc).
+ */
 @SuppressWarnings({ "unchecked", "rawtypes" })
 class JarClassLoader extends URLClassLoader
 {

@@ -35,6 +35,9 @@ import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.State;
 
+/**
+ * A thread that polls a queue according to the parameters defined inside a {@link DeploymentParameter}.
+ */
 class Polling implements Runnable, PollingMBean
 {
     private static Logger jqmlogger = Logger.getLogger(Polling.class);

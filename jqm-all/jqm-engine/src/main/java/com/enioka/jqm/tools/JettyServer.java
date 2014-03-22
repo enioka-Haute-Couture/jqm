@@ -20,6 +20,10 @@ import org.eclipse.jetty.webapp.WebXmlConfiguration;
 
 import com.enioka.jqm.jpamodel.Node;
 
+/**
+ * Every engine has an embedded Jetty engine that serves the servlet API ({@link ServletFile}, {@link ServletStatus}, {@link ServletEnqueue}
+ * ). It may also serve the REST API.
+ */
 class JettyServer
 {
     private static Logger jqmlogger = Logger.getLogger(JettyServer.class);

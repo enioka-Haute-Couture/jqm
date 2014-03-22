@@ -2,6 +2,9 @@ package com.enioka.jqm.tools;
 
 import java.util.Calendar;
 
+/**
+ * Monitoring interface for a running job instance.
+ */
 public interface LoaderMBean
 {
     /**

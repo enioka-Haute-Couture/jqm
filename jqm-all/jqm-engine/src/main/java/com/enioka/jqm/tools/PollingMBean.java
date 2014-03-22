@@ -1,5 +1,8 @@
 package com.enioka.jqm.tools;
 
+/**
+ * Monitoring interface for queue pollers
+ */
 public interface PollingMBean
 {
     /**
@@ -51,7 +54,7 @@ public interface PollingMBean
      * True if the last time the poller looped was less than a period ago.
      */
     boolean isActuallyPolling();
-    
+
     /**
      * True if running count equals max job number
      */

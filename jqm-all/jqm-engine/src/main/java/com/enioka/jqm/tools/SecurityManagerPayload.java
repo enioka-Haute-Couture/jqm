@@ -4,9 +4,6 @@ import java.security.Permission;
 
 /**
  * A security manager ensuring a minimal good behavior for payloads running inside the JQM engine.
- * 
- * @author Marc-Antoine
- * 
  */
 @SuppressWarnings("rawtypes")
 public class SecurityManagerPayload extends SecurityManager

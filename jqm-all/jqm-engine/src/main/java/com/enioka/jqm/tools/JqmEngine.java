@@ -47,6 +47,9 @@ import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.State;
 
+/**
+ * The engine itself. Everything starts in this class.
+ */
 class JqmEngine implements JqmEngineMBean
 {
     private List<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();

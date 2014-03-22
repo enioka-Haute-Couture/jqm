@@ -35,6 +35,9 @@ import org.apache.log4j.Logger;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 
+/**
+ * Helper static class to send e-mails
+ */
 class Mail
 {
     private static Logger jqmlogger = Logger.getLogger(Mail.class);

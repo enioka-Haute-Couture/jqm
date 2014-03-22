@@ -6,6 +6,11 @@ import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.Node;
 
+/**
+ * The internal poller is responsible for doing all the repetitive tasks of an engine (excluding polling queues). Namely: check if
+ * {@link Node#isStop()} has become true (stop order) and update {@link Node#setLastSeenAlive(java.util.Calendar)} to make visible to the
+ * whole cluster that the engine is still alive and that no other engine should start with the same node name.
+ */
 class InternalPoller implements Runnable
 {
     private static Logger jqmlogger = Logger.getLogger(InternalPoller.class);

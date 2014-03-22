@@ -1,5 +1,8 @@
 package com.enioka.jqm.tools;
 
+/**
+ * Monitoring interface for the Engine
+ */
 public interface JqmEngineMBean
 {
     /**
