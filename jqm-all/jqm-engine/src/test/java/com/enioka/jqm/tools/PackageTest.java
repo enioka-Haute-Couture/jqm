@@ -6,8 +6,12 @@ import java.util.ArrayList;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import org.jboss.shrinkwrap.resolver.api.NoResolvedResultException;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenRemoteRepositories;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
@@ -34,9 +38,8 @@ public class PackageTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, 
-                "jqm-tests/jqm-test-datetimemavennopom/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
-                "ModuleMachin", "other", "other", true, em);
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemavennopom/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
@@ -67,8 +70,8 @@ public class PackageTest extends JqmBaseTest
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
 
-        CreationTools.createJobDef(null, true, "App", jdargs,  "jqm-tests/jqm-test-datetimemavennopomlib/target/test.jar",
-                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemavennopomlib/target/test.jar", TestHelpers.qVip,
+                42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
         @SuppressWarnings("unused")
@@ -100,7 +103,7 @@ public class PackageTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, 
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs,
                 "jqm-tests/jqm-test-datetimemavenjarinlib/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
@@ -135,7 +138,7 @@ public class PackageTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, 
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs,
                 "jqm-tests/jqm-test-datetimemavennolibdef/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
@@ -164,8 +167,8 @@ public class PackageTest extends JqmBaseTest
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
 
-        CreationTools.createJobDef(null, true, "App", null,  "jqm-tests/jqm-test-legacyinheritance/target/test.jar", TestHelpers.qVip,
-                42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-legacyinheritance/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
 
@@ -192,7 +195,7 @@ public class PackageTest extends JqmBaseTest
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
 
-        CreationTools.createJobDef(null, true, "App", null,  "jqm-tests/jqm-test-missingapi/target/test.jar", TestHelpers.qVip, 42,
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-missingapi/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         JobRequest j = new JobRequest("MarsuApplication", "MAG");
@@ -226,7 +229,7 @@ public class PackageTest extends JqmBaseTest
         jdargs.add(jdp);
 
         @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, 
+        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs,
                 "jqm-tests/jqm-test-datetimemavenjarinlib/target/test.jar", TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin",
                 "ModuleMachin", "other", "other", true, em);
 
@@ -265,5 +268,18 @@ public class PackageTest extends JqmBaseTest
 
         // Done
         engine1.stop();
+    }
+
+    @Test(expected = NoResolvedResultException.class)
+    public void testFailingDependency() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testFailingDependency");
+
+        SLF4JBridgeHandler.install();
+
+        Maven.configureResolver()
+                .withRemoteRepo(MavenRemoteRepositories.createRemoteRepository("marsu", "http://marsupilami.com", "default"))
+                .withMavenCentralRepo(false).resolve("com.enioka.jqm:marsu:1.1.4").withTransitivity().asFile();
     }
 }

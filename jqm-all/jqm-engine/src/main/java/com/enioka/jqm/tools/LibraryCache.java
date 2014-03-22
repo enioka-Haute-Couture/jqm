@@ -25,6 +25,7 @@ import org.jboss.shrinkwrap.resolver.api.maven.ConfigurableMavenResolverSystem;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenRemoteRepositories;
 import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenUpdatePolicy;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JobDef;
@@ -33,6 +34,12 @@ import com.enioka.jqm.jpamodel.Node;
 class LibraryCache
 {
     private static Logger jqmlogger = Logger.getLogger(LibraryCache.class);
+
+    static
+    {
+        jqmlogger.debug("init logger for SWR");
+        SLF4JBridgeHandler.install();
+    }
 
     private class JobDefLibrary
     {
