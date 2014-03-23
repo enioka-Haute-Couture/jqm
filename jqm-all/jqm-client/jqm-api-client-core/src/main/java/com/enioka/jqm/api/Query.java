@@ -1,10 +1,15 @@
 package com.enioka.jqm.api;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Parameters for querying JobInstances. A null parameter (the default) is ignored in the query. To query a null String, specify "" (empty
- * String). To query a null Integer, specify -1. <br>
+ * String). To query a null Integer, specify -1. It is not possible to query for null Calendar values, since it is far more efficient to
+ * query by status (the different Calendar fields are only null at certain statuses).<br>
  * See individual setters for the signification of query parameters.<br>
  * <br>
  * By default, querying only retrieves instances that have ended. See {@link Query#setQueryLiveInstances(boolean)} for details and how to
@@ -22,6 +27,8 @@ public final class Query
     private String jobDefKeyword1, jobDefKeyword2, jobDefKeyword3, jobDefModule, jobDefApplication;
     private String instanceKeyword1, instanceKeyword2, instanceKeyword3, instanceModule, instanceApplication;
     private Queue queue;
+    private Calendar enqueuedBefore, enqueuedAfter, beganRunningBefore, beganRunningAfter, endedBefore, endedAfter;
+    private List<State> status = new ArrayList<State>();
 
     private boolean queryLiveInstances = false;
 
@@ -327,4 +334,111 @@ public final class Query
         this.queryLiveInstances = queryLiveInstances;
     }
 
+    Calendar getEnqueuedBefore()
+    {
+        return enqueuedBefore;
+    }
+
+    /**
+     * The time at which the execution request was given to {@link JqmClient#enqueue(JobRequest)}. This is an <= comparison.
+     * 
+     * @param enqueuedBefore
+     */
+    public void setEnqueuedBefore(Calendar enqueuedBefore)
+    {
+        this.enqueuedBefore = enqueuedBefore;
+    }
+
+    Calendar getEnqueuedAfter()
+    {
+        return enqueuedAfter;
+    }
+
+    /**
+     * The time at which the execution request was given to {@link JqmClient#enqueue(JobRequest)}. This is an >= comparison.
+     * 
+     * @param enqueuedAfter
+     */
+    public void setEnqueuedAfter(Calendar enqueuedAfter)
+    {
+        this.enqueuedAfter = enqueuedAfter;
+    }
+
+    Calendar getBeganRunningBefore()
+    {
+        return beganRunningBefore;
+    }
+
+    /**
+     * The time at which the execution really began (the request arrived at the top of the queue and was run by an engine). This is an <=
+     * comparison.
+     * 
+     * @param beganRunningBefore
+     */
+    public void setBeganRunningBefore(Calendar beganRunningBefore)
+    {
+        this.beganRunningBefore = beganRunningBefore;
+    }
+
+    Calendar getBeganRunningAfter()
+    {
+        return beganRunningAfter;
+    }
+
+    /**
+     * The time at which the execution really began (the request arrived at the top of the queue and was run by an engine). This is an >=
+     * comparison.
+     * 
+     * @param beganRunningAfter
+     */
+    public void setBeganRunningAfter(Calendar beganRunningAfter)
+    {
+        this.beganRunningAfter = beganRunningAfter;
+    }
+
+    Calendar getEndedBefore()
+    {
+        return endedBefore;
+    }
+
+    /**
+     * The time at which the execution ended, resulting in an ENDED or CRASHED status. This is an <= comparison.
+     * 
+     * @param endedBefore
+     */
+    public void setEndedBefore(Calendar endedBefore)
+    {
+        this.endedBefore = endedBefore;
+    }
+
+    Calendar getEndedAfter()
+    {
+        return endedAfter;
+    }
+
+    /**
+     * The time at which the execution ended, resulting in an ENDED or CRASHED status. This is an <= comparison.
+     * 
+     * @param endedAfter
+     */
+    public void setEndedAfter(Calendar endedAfter)
+    {
+        this.endedAfter = endedAfter;
+    }
+
+    List<State> getStatus()
+    {
+        return status;
+    }
+
+    /**
+     * Filter by status. See {@link State} for the different possible values and their meaning. If multiple values are added, a logical OR
+     * will take place.
+     * 
+     * @param status
+     */
+    public void addStatusFilter(State status)
+    {
+        this.status.add(status);
+    }
 }

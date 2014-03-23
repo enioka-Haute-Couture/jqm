@@ -813,6 +813,39 @@ final class HibernateClient implements JqmClient
         return "";
     }
 
+    private String getCalendarPredicate(String fieldName, Calendar filterValue, String comparison, Map<String, Object> prms)
+    {
+        if (filterValue != null)
+        {
+            String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1] + +comparison.hashCode();
+            prms.put(prmName, filterValue);
+            return String.format("AND (%s %s :%s) ", fieldName, comparison, prmName);
+        }
+        else
+        {
+            return "";
+        }
+    }
+
+    private String getStatusPredicate(String fieldName, List<com.enioka.jqm.api.State> status, Map<String, Object> prms)
+    {
+        if (status == null || status.size() == 0)
+        {
+            return "";
+        }
+
+        String res = String.format("AND ( %s IN ( ", fieldName);
+
+        for (com.enioka.jqm.api.State s : status)
+        {
+            String prmName = "status" + s.hashCode();
+            res += " :" + prmName + ",";
+            prms.put(prmName, State.valueOf(s.toString()));
+        }
+        res = res.substring(0, res.length() - 1) + ")) ";
+        return res;
+    }
+
     @Override
     public List<com.enioka.jqm.api.JobInstance> getJobs(Query query)
     {
@@ -842,19 +875,30 @@ final class HibernateClient implements JqmClient
         wh += getIntPredicate("id", query.getJobInstanceId(), prms);
         wh += getIntPredicate("queue.id", query.getQueue() == null ? null : query.getQueue().getId(), prms);
 
-        if (wh.length() >= 3)
-        {
-            wh = wh.substring(3);
-        }
-
         // Now, run queries...
         List<com.enioka.jqm.api.JobInstance> res2 = new ArrayList<com.enioka.jqm.api.JobInstance>();
 
+        // ////////////////////////////////////////
         // Job Instance query
         if (query.isQueryLiveInstances())
         {
-            TypedQuery<JobInstance> q2 = em.createQuery("SELECT h FROM JobInstance h WHERE " + wh, JobInstance.class);
-            for (Map.Entry<String, Object> entry : prms.entrySet())
+            // Calendar fields are specific (no common fields between History and JobInstance)
+            String wh2 = "" + wh;
+            Map<String, Object> prms2 = new HashMap<String, Object>();
+            prms2.putAll(prms);
+            wh2 += getCalendarPredicate("creationDate", query.getEnqueuedAfter(), ">=", prms2);
+            wh2 += getCalendarPredicate("creationDate", query.getEnqueuedBefore(), "<=", prms2);
+            wh2 += getCalendarPredicate("executionDate", query.getBeganRunningAfter(), ">=", prms2);
+            wh2 += getCalendarPredicate("executionDate", query.getBeganRunningBefore(), "<=", prms2);
+            wh2 += getStatusPredicate("state", query.getStatus(), prms2);
+            if (wh2.length() >= 3)
+            {
+                wh2 = wh2.substring(3);
+            }
+
+            TypedQuery<JobInstance> q2 = em.createQuery("SELECT h FROM JobInstance h WHERE " + wh2, JobInstance.class);
+            jqmlogger.debug(wh2);
+            for (Map.Entry<String, Object> entry : prms2.entrySet())
             {
                 q2.setParameter(entry.getKey(), entry.getValue());
             }
@@ -864,7 +908,22 @@ final class HibernateClient implements JqmClient
             }
         }
 
+        // ////////////////////////////////////////
         // History query
+
+        // Calendar fields are specific (no common fields between History and JobInstance)
+        wh += getCalendarPredicate("enqueueDate", query.getEnqueuedAfter(), ">=", prms);
+        wh += getCalendarPredicate("enqueueDate", query.getEnqueuedBefore(), "<=", prms);
+        wh += getCalendarPredicate("executionDate", query.getBeganRunningAfter(), ">=", prms);
+        wh += getCalendarPredicate("executionDate", query.getBeganRunningBefore(), "<=", prms);
+        wh += getCalendarPredicate("endDate", query.getEndedAfter(), ">=", prms);
+        wh += getCalendarPredicate("endDate", query.getEndedBefore(), "<=", prms);
+        wh += getStatusPredicate("status", query.getStatus(), prms);
+
+        if (wh.length() >= 3)
+        {
+            wh = wh.substring(3);
+        }
         TypedQuery<History> q1 = em.createQuery("SELECT h FROM History h WHERE " + wh, History.class);
         for (Map.Entry<String, Object> entry : prms.entrySet())
         {
