@@ -897,7 +897,6 @@ final class HibernateClient implements JqmClient
             }
 
             TypedQuery<JobInstance> q2 = em.createQuery("SELECT h FROM JobInstance h WHERE " + wh2, JobInstance.class);
-            jqmlogger.debug(wh2);
             for (Map.Entry<String, Object> entry : prms2.entrySet())
             {
                 q2.setParameter(entry.getKey(), entry.getValue());
@@ -919,11 +918,11 @@ final class HibernateClient implements JqmClient
         wh += getCalendarPredicate("endDate", query.getEndedAfter(), ">=", prms);
         wh += getCalendarPredicate("endDate", query.getEndedBefore(), "<=", prms);
         wh += getStatusPredicate("status", query.getStatus(), prms);
-
         if (wh.length() >= 3)
         {
             wh = wh.substring(3);
         }
+
         TypedQuery<History> q1 = em.createQuery("SELECT h FROM History h WHERE " + wh, History.class);
         for (Map.Entry<String, Object> entry : prms.entrySet())
         {

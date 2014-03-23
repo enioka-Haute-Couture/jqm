@@ -86,6 +86,18 @@ public class BasicTest
     }
 
     @Test
+    public void testFluentQuery()
+    {
+        Query q = new Query("toto", null);
+        q.setQueryLiveInstances(true);
+        q.setInstanceApplication("marsu");
+        q.addStatusFilter(State.CRASHED);
+        q.addStatusFilter(State.HOLDED);
+
+        JqmClientFactory.getClient().getJobs(Query.create().addStatusFilter(State.RUNNING).setApplicationName("MARSU"));
+    }
+
+    @Test
     public void testQueryNull()
     {
         JqmClientFactory.getClient().getJobs(new Query("", null));

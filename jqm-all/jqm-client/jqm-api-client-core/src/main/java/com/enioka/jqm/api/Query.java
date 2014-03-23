@@ -53,6 +53,15 @@ public final class Query
     }
 
     // //////////////////////////////////////////
+    // Builder
+    // //////////////////////////////////////////
+
+    public static Query create()
+    {
+        return new Query();
+    }
+
+    // //////////////////////////////////////////
     // Stupid get/set
     // //////////////////////////////////////////
 
@@ -69,9 +78,10 @@ public final class Query
      * @param jobInstanceId
      *            the job instance ID
      */
-    public void setJobInstanceId(Integer jobInstanceId)
+    public Query setJobInstanceId(Integer jobInstanceId)
     {
         this.jobInstanceId = jobInstanceId;
+        return this;
     }
 
     Integer getParentId()
@@ -86,9 +96,10 @@ public final class Query
      * @param parentId
      *            the ID of the parent job instance.
      */
-    public void setParentId(Integer parentId)
+    public Query setParentId(Integer parentId)
     {
         this.parentId = parentId;
+        return this;
     }
 
     String getApplicationName()
@@ -102,9 +113,10 @@ public final class Query
      * 
      * @param applicationName
      */
-    public void setApplicationName(String applicationName)
+    public Query setApplicationName(String applicationName)
     {
         this.applicationName = applicationName;
+        return this;
     }
 
     String getUser()
@@ -118,9 +130,10 @@ public final class Query
      * 
      * @param user
      */
-    public void setUser(String user)
+    public Query setUser(String user)
     {
         this.user = user;
+        return this;
     }
 
     String getSessionId()
@@ -134,9 +147,10 @@ public final class Query
      * 
      * @param sessionId
      */
-    public void setSessionId(String sessionId)
+    public Query setSessionId(String sessionId)
     {
         this.sessionId = sessionId;
+        return this;
     }
 
     String getJobDefKeyword1()
@@ -150,9 +164,10 @@ public final class Query
      * 
      * @param jobDefKeyword1
      */
-    public void setJobDefKeyword1(String jobDefKeyword1)
+    public Query setJobDefKeyword1(String jobDefKeyword1)
     {
         this.jobDefKeyword1 = jobDefKeyword1;
+        return this;
     }
 
     String getJobDefKeyword2()
@@ -166,9 +181,10 @@ public final class Query
      * 
      * @param jobDefKeyword2
      */
-    public void setJobDefKeyword2(String jobDefKeyword2)
+    public Query setJobDefKeyword2(String jobDefKeyword2)
     {
         this.jobDefKeyword2 = jobDefKeyword2;
+        return this;
     }
 
     String getJobDefKeyword3()
@@ -182,9 +198,10 @@ public final class Query
      * 
      * @param jobDefKeyword3
      */
-    public void setJobDefKeyword3(String jobDefKeyword3)
+    public Query setJobDefKeyword3(String jobDefKeyword3)
     {
         this.jobDefKeyword3 = jobDefKeyword3;
+        return this;
     }
 
     String getJobDefModule()
@@ -198,9 +215,10 @@ public final class Query
      * 
      * @param jobDefModule
      */
-    public void setJobDefModule(String jobDefModule)
+    public Query setJobDefModule(String jobDefModule)
     {
         this.jobDefModule = jobDefModule;
+        return this;
     }
 
     String getJobDefApplication()
@@ -215,9 +233,10 @@ public final class Query
      * 
      * @param jobDefApplication
      */
-    public void setJobDefApplication(String jobDefApplication)
+    public Query setJobDefApplication(String jobDefApplication)
     {
         this.jobDefApplication = jobDefApplication;
+        return this;
     }
 
     String getInstanceKeyword1()
@@ -231,9 +250,10 @@ public final class Query
      * 
      * @param instanceKeyword1
      */
-    public void setInstanceKeyword1(String instanceKeyword1)
+    public Query setInstanceKeyword1(String instanceKeyword1)
     {
         this.instanceKeyword1 = instanceKeyword1;
+        return this;
     }
 
     String getInstanceKeyword2()
@@ -247,9 +267,10 @@ public final class Query
      * 
      * @param instanceKeyword2
      */
-    public void setInstanceKeyword2(String instanceKeyword2)
+    public Query setInstanceKeyword2(String instanceKeyword2)
     {
         this.instanceKeyword2 = instanceKeyword2;
+        return this;
     }
 
     String getInstanceKeyword3()
@@ -263,9 +284,10 @@ public final class Query
      * 
      * @param instanceKeyword3
      */
-    public void setInstanceKeyword3(String instanceKeyword3)
+    public Query setInstanceKeyword3(String instanceKeyword3)
     {
         this.instanceKeyword3 = instanceKeyword3;
+        return this;
     }
 
     String getInstanceModule()
@@ -279,9 +301,10 @@ public final class Query
      * 
      * @param instanceModule
      */
-    public void setInstanceModule(String instanceModule)
+    public Query setInstanceModule(String instanceModule)
     {
         this.instanceModule = instanceModule;
+        return this;
     }
 
     String getInstanceApplication()
@@ -296,9 +319,10 @@ public final class Query
      * 
      * @param instanceApplication
      */
-    public void setInstanceApplication(String instanceApplication)
+    public Query setInstanceApplication(String instanceApplication)
     {
         this.instanceApplication = instanceApplication;
+        return this;
     }
 
     Queue getQueue()
@@ -311,9 +335,10 @@ public final class Query
      * 
      * @param queue
      */
-    public void setQueue(Queue queue)
+    public Query setQueue(Queue queue)
     {
         this.queue = queue;
+        return this;
     }
 
     boolean isQueryLiveInstances()
@@ -329,9 +354,10 @@ public final class Query
      * 
      * @param queryLiveInstances
      */
-    public void setQueryLiveInstances(boolean queryLiveInstances)
+    public Query setQueryLiveInstances(boolean queryLiveInstances)
     {
         this.queryLiveInstances = queryLiveInstances;
+        return this;
     }
 
     Calendar getEnqueuedBefore()
@@ -344,9 +370,10 @@ public final class Query
      * 
      * @param enqueuedBefore
      */
-    public void setEnqueuedBefore(Calendar enqueuedBefore)
+    public Query setEnqueuedBefore(Calendar enqueuedBefore)
     {
         this.enqueuedBefore = enqueuedBefore;
+        return this;
     }
 
     Calendar getEnqueuedAfter()
@@ -359,9 +386,10 @@ public final class Query
      * 
      * @param enqueuedAfter
      */
-    public void setEnqueuedAfter(Calendar enqueuedAfter)
+    public Query setEnqueuedAfter(Calendar enqueuedAfter)
     {
         this.enqueuedAfter = enqueuedAfter;
+        return this;
     }
 
     Calendar getBeganRunningBefore()
@@ -375,9 +403,10 @@ public final class Query
      * 
      * @param beganRunningBefore
      */
-    public void setBeganRunningBefore(Calendar beganRunningBefore)
+    public Query setBeganRunningBefore(Calendar beganRunningBefore)
     {
         this.beganRunningBefore = beganRunningBefore;
+        return this;
     }
 
     Calendar getBeganRunningAfter()
@@ -391,9 +420,10 @@ public final class Query
      * 
      * @param beganRunningAfter
      */
-    public void setBeganRunningAfter(Calendar beganRunningAfter)
+    public Query setBeganRunningAfter(Calendar beganRunningAfter)
     {
         this.beganRunningAfter = beganRunningAfter;
+        return this;
     }
 
     Calendar getEndedBefore()
@@ -406,9 +436,10 @@ public final class Query
      * 
      * @param endedBefore
      */
-    public void setEndedBefore(Calendar endedBefore)
+    public Query setEndedBefore(Calendar endedBefore)
     {
         this.endedBefore = endedBefore;
+        return this;
     }
 
     Calendar getEndedAfter()
@@ -421,9 +452,10 @@ public final class Query
      * 
      * @param endedAfter
      */
-    public void setEndedAfter(Calendar endedAfter)
+    public Query setEndedAfter(Calendar endedAfter)
     {
         this.endedAfter = endedAfter;
+        return this;
     }
 
     List<State> getStatus()
@@ -437,8 +469,9 @@ public final class Query
      * 
      * @param status
      */
-    public void addStatusFilter(State status)
+    public Query addStatusFilter(State status)
     {
         this.status.add(status);
+        return this;
     }
 }
