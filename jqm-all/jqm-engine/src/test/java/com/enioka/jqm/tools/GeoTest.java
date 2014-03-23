@@ -72,7 +72,7 @@ public class GeoTest extends JqmBaseTest
         engine2.start("localhost4");
         engine3.start("localhost5");
 
-        TestHelpers.waitFor(511, 30000, em);
+        TestHelpers.waitFor(511, 60000, em);
         engine1.stop();
         engine2.stop();
         engine3.stop();
