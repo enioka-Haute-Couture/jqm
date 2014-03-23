@@ -741,6 +741,12 @@ final class HibernateClient implements JqmClient
         ji.setApplication(h.getApplication());
         ji.setModule(h.getModule());
         ji.setEmail(h.getEmail());
+        ji.setEnqueueDate(h.getCreationDate());
+        ji.setBeganRunningDate(h.getExecutionDate());
+        if (h.getNode() != null)
+        {
+            ji.setNodeName(h.getNode().getName());
+        }
 
         return ji;
     }
@@ -772,6 +778,13 @@ final class HibernateClient implements JqmClient
         ji.setApplication(h.getApplication());
         ji.setModule(h.getModule());
         ji.setEmail(h.getEmail());
+        ji.setEnqueueDate(h.getEnqueueDate());
+        ji.setBeganRunningDate(h.getExecutionDate());
+        ji.setEndDate(h.getEndDate());
+        if (h.getNode() != null)
+        {
+            ji.setNodeName(h.getNode().getName());
+        }
 
         return ji;
     }

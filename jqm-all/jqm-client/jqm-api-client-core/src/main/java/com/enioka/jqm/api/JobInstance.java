@@ -19,6 +19,7 @@
 package com.enioka.jqm.api;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,8 @@ public class JobInstance
     @XmlElementWrapper(name = "messages")
     @XmlElement(name = "message", type = String.class)
     private List<String> messages = new ArrayList<String>();
+    private Calendar enqueueDate, beganRunningDate, endDate;
+    private String nodeName;
 
     /**
      * The Job Instance ID, i.e. the unique identifier of the execution request. This is a key for numerous {@link JqmClient} functions.
@@ -275,5 +278,58 @@ public class JobInstance
     void setEmail(String email)
     {
         this.email = email;
+    }
+
+    /**
+     * The time at which the execution request was given to {@link JqmClient#enqueue(JobRequest)}.
+     */
+    public Calendar getEnqueueDate()
+    {
+        return enqueueDate;
+    }
+
+    void setEnqueueDate(Calendar enqueueDate)
+    {
+        this.enqueueDate = enqueueDate;
+    }
+
+    /**
+     * The time at which the execution really began (the request arrived at the top of the queue and was run by an engine).
+     */
+    public Calendar getBeganRunningDate()
+    {
+        return beganRunningDate;
+    }
+
+    void setBeganRunningDate(Calendar beganRunningDate)
+    {
+        this.beganRunningDate = beganRunningDate;
+    }
+
+    /**
+     * The time at which the execution ended, resulting in an ENDED or CRASHED status.
+     */
+    public Calendar getEndDate()
+    {
+        return endDate;
+    }
+
+    void setEndDate(Calendar endDate)
+    {
+        this.endDate = endDate;
+    }
+
+    /**
+     * The name of the JQM node that is running or has run the job instance. This is a String that logically identifies the node, not the
+     * hostname.
+     */
+    public String getNodeName()
+    {
+        return nodeName;
+    }
+
+    void setNodeName(String nodeName)
+    {
+        this.nodeName = nodeName;
     }
 }
