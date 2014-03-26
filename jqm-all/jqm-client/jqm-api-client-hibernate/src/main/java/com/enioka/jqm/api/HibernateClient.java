@@ -756,7 +756,7 @@ final class HibernateClient implements JqmClient
     {
         com.enioka.jqm.api.JobInstance ji = new com.enioka.jqm.api.JobInstance();
         ji.setId(h.getId());
-        ji.setApplication(h.getApplication());
+        ji.setApplicationName(h.getJd().getApplicationName());
         ji.setParameters(new HashMap<String, String>());
         ji.setParent(h.getParentJobId());
         ji.setQueue(getQueue(h.getQueue()));
