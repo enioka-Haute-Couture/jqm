@@ -33,6 +33,7 @@
 			<property name="DatabaseName" value="sun-appserv-samples"></property>
 			<property name="connectionAttributes" value=";create=true"></property>
 		</jdbc-connection-pool>
+		
 		<jdbc-connection-pool driver-classname="org.hsqldb.jdbcDriver"
 			datasource-classname="" res-type="java.sql.Driver" description=""
 			name="HSQLDB">
@@ -40,7 +41,16 @@
 			<property name="user" value="SA"></property>
 			<property name="password" value=""></property>
 		</jdbc-connection-pool>
-		<jdbc-resource pool-name="HSQLDB" description="pouet"
+		
+		<jdbc-connection-pool driver-classname="com.mysql.jdbc.Driver"
+			datasource-classname="" res-type="java.sql.Driver" description=""
+			name="MYSQL">
+			<property name="URL" value="jdbc:mysql://pic:3306/jqm"></property>
+			<property name="user" value="jqm"></property>
+			<property name="password" value="jqm"></property>
+		</jdbc-connection-pool>
+				
+		<jdbc-resource pool-name="MYSQL" description="pouet"
 			jndi-name="jdbc/jqm"></jdbc-resource>
 	</resources>
 	<servers>
