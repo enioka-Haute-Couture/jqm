@@ -31,8 +31,16 @@ public class JobInstanceControler extends ListDataModel<JobInstance> implements 
 
     public String stop()
     {
-        JqmClientFactory.getClient().cancelJob(selected.getId());
-        return selected.getId().toString();
+        if (selected.getState().equals(State.SUBMITTED))
+        {
+            JqmClientFactory.getClient().cancelJob(selected.getId());
+        }
+        else
+        {
+            JqmClientFactory.getClient().killJob(selected.getId());
+        }
+
+        return "queue?faces-redirect=true";
     }
 
     public ListDataModel<JobInstance> getJobs()
@@ -43,8 +51,8 @@ public class JobInstanceControler extends ListDataModel<JobInstance> implements 
 
     public ListDataModel<JobInstance> getHistoryJobs()
     {
-        this.setWrappedData(JqmClientFactory.getClient()
-                .getJobs(Query.create().addStatusFilter(State.ENDED).addStatusFilter(State.CRASHED)));
+        this.setWrappedData(JqmClientFactory.getClient().getJobs(
+                Query.create().addStatusFilter(State.ENDED).addStatusFilter(State.CRASHED).addStatusFilter(State.KILLED)));
         return this;
     }
 

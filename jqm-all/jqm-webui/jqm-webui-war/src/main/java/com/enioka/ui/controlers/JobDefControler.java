@@ -48,7 +48,7 @@ public class JobDefControler extends ListDataModel<JobDef> implements Serializab
         FacesMessage msg = new FacesMessage("Enqueue done", "request number " + i);
         FacesContext.getCurrentInstance().addMessage(null, msg);
 
-        return ((Integer) i).toString();
+        return "jobdef?faces-redirect=true";
     }
 
     public void setSelectedJob(JobDef job)

@@ -25,41 +25,35 @@
 					<p:column id="idColumn" headerText="ID" filterBy="id">
 						<h:outputText value="#{h.id}" />
 					</p:column>
-					<p:column headerText="JobDef" filterBy="jd.applicationName">
+					<p:column headerText="Job Definition" filterBy="h.applicationName">
 						<h:outputText value="#{h.applicationName}" />
-					</p:column>
-					<p:column headerText="Session ID" filterBy="sessionID">
-						<h:outputText value="#{h.sessionID}" />
 					</p:column>
 					<p:column headerText="Queue" filterBy="queue.name">
 						<h:outputText value="#{h.queue.name}" />
 					</p:column>
+					<p:column headerText="Status" filterBy="state">
+						<h:outputText value="#{h.state}" />
+					</p:column>
 					<p:column headerText="Enqueue Date" filterBy="enqueueDate.time">
 						<h:outputText value="#{h.enqueueDate.time}">
-							<f:convertDateTime type="date" pattern="yyyy.MM.dd 'at' HH:mm:ss" />
+							<f:convertDateTime type="date" pattern="dd/MM HH:mm" />
 						</h:outputText>
 					</p:column>
 					<p:column headerText="Execution Date" filterBy="executionDate.time">
 						<h:outputText value="#{h.beganRunningDate.time}">
-							<f:convertDateTime type="date" pattern="yyyy.MM.dd 'at' HH:mm:ss" />
+							<f:convertDateTime type="date" pattern="dd/MM HH:mm" />
 						</h:outputText>
 					</p:column>
 					<p:column headerText="End Date" filterBy="endDate.time">
 						<h:outputText value="#{h.endDate.time}">
-							<f:convertDateTime type="date" pattern="yyyy.MM.dd 'at' HH:mm:ss" />
+							<f:convertDateTime type="date" pattern="dd/MM HH:mm" />
 						</h:outputText>
 					</p:column>
 					<p:column headerText="User Name" filterBy="user">
 						<h:outputText value="#{h.user}" />
 					</p:column>
-					<p:column headerText="Email" filterBy="email">
-						<h:outputText value="#{h.email}" />
-					</p:column>
 					<p:column headerText="Parent Job ID" filterBy="parent">
 						<h:outputText value="#{h.parent}" />
-					</p:column>
-					<p:column headerText="Status" filterBy="state">
-						<h:outputText value="#{h.state}" />
 					</p:column>
 					<p:column headerText="Keyword 1" filterBy="keyword1">
 						<h:outputText value="#{h.keyword1}" />
@@ -78,6 +72,9 @@
 					</p:column>
 					<p:column headerText="Progress" filterBy="progress">
 						<h:outputText value="#{h.progress}" />
+					</p:column>
+					<p:column headerText="Session ID" filterBy="sessionID">
+						<h:outputText value="#{h.sessionID}" />
 					</p:column>
 
 				</p:dataTable>

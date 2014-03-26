@@ -21,7 +21,7 @@
 				<p:dataTable id="dataTable" value="#{jobInstanceControler.jobs}"
 					var="job" selection="#{jobInstanceControler.selected}"
 					selectionMode="single" cellspacing="4" width="100%"
-					paginator="true" rows="25"
+					paginator="true" rows="50"
 					rowsPerPageTemplate="5,10,15,20,25,30,40,50,60">
 
 					<p:ajax event="rowSelect" update=":mainForm:btStop" />
@@ -35,7 +35,27 @@
 					</p:column>
 					<p:column>
 						<f:facet name="header">
-							<h:outputText value="JobDef" />
+							<h:outputText value="Queue" />
+						</f:facet>
+						<h:outputText value="#{job.queue.name}" />
+					</p:column>
+
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Position" />
+						</f:facet>
+						<h:outputText value="#{job.position}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Status" />
+						</f:facet>
+						<h:outputText value="#{job.state}" />
+					</p:column>
+
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Job definition name" />
 						</f:facet>
 						<h:outputText value="#{job.applicationName}" />
 					</p:column>
@@ -47,13 +67,7 @@
 					</p:column>
 					<p:column>
 						<f:facet name="header">
-							<h:outputText value="Position" />
-						</f:facet>
-						<h:outputText value="#{job.position}" />
-					</p:column>
-					<p:column>
-						<f:facet name="header">
-							<h:outputText value="Progression" />
+							<h:outputText value="Progress" />
 						</f:facet>
 						<h:outputText value="#{job.progress}" />
 					</p:column>
@@ -63,24 +77,24 @@
 						</f:facet>
 						<h:outputText value="#{job.user}" />
 					</p:column>
+
 					<p:column>
 						<f:facet name="header">
-							<h:outputText value="Status" />
+							<h:outputText value="Enqueued" />
 						</f:facet>
-						<h:outputText value="#{job.state}" />
+						<h:outputText value="#{job.enqueueDate.time}">
+							<f:convertDateTime type="date" pattern="HH:mm:ss" />
+						</h:outputText>
 					</p:column>
 					<p:column>
 						<f:facet name="header">
-							<h:outputText value="Queue" />
+							<h:outputText value="Started" />
 						</f:facet>
-						<h:outputText value="#{job.queue.name}" />
+						<h:outputText value="#{job.beganRunningDate.time}">
+							<f:convertDateTime type="date" pattern="HH:mm:ss" />
+						</h:outputText>
 					</p:column>
-					<p:column>
-						<f:facet name="header">
-							<h:outputText value="Email" />
-						</f:facet>
-						<h:outputText value="#{job.email}" />
-					</p:column>
+
 				</p:dataTable>
 
 				<p>
