@@ -1223,7 +1223,7 @@ final class HibernateClient implements JqmClient
         return res;
     }
 
-    private com.enioka.jqm.api.Queue getQueue(Queue queue)
+    private static com.enioka.jqm.api.Queue getQueue(Queue queue)
     {
         com.enioka.jqm.api.Queue q = new com.enioka.jqm.api.Queue();
 
@@ -1243,5 +1243,52 @@ final class HibernateClient implements JqmClient
 
         em.persist(j);
         return j;
+    }
+
+    @Override
+    public List<com.enioka.jqm.api.JobDef> getJobDefinitions()
+    {
+        return getJobDefinitions(null);
+    }
+
+    @Override
+    public List<com.enioka.jqm.api.JobDef> getJobDefinitions(String application)
+    {
+        List<com.enioka.jqm.api.JobDef> res = new ArrayList<com.enioka.jqm.api.JobDef>();
+        EntityManager em = getEm();
+        List<JobDef> dbr = null;
+        if (application == null)
+        {
+            dbr = em.createQuery("SELECT jd from JobDef jd ORDER BY jd.applicationName", JobDef.class).getResultList();
+        }
+        else
+        {
+            dbr = em.createQuery("SELECT jd from JobDef jd WHERE jd.application = :name ORDER BY jd.applicationName", JobDef.class)
+                    .setParameter("name", application).getResultList();
+        }
+
+        for (JobDef jd : dbr)
+        {
+            res.add(getJobDef(jd));
+        }
+        em.close();
+        return res;
+    }
+
+    private static com.enioka.jqm.api.JobDef getJobDef(JobDef jd)
+    {
+        com.enioka.jqm.api.JobDef res = new com.enioka.jqm.api.JobDef();
+        res.setApplication(jd.getApplication());
+        res.setApplicationName(jd.getApplicationName());
+        res.setCanBeRestarted(jd.isCanBeRestarted());
+        res.setDescription(jd.getDescription());
+        res.setHighlander(jd.isHighlander());
+        res.setKeyword1(jd.getKeyword1());
+        res.setKeyword2(jd.getKeyword2());
+        res.setKeyword3(jd.getKeyword3());
+        res.setModule(jd.getModule());
+        res.setQueue(getQueue(jd.getQueue()));
+        res.setId(jd.getId());
+        return res;
     }
 }

@@ -440,4 +440,25 @@ final class JerseyClient implements JqmClient
             throw new JqmClientException(e);
         }
     }
+
+    @Override
+    public List<JobDef> getJobDefinitions()
+    {
+        return getJobDefinitions(null);
+    }
+
+    @Override
+    public List<JobDef> getJobDefinitions(String application)
+    {
+        try
+        {
+            return target.path("jd").request().get(new GenericType<List<JobDef>>()
+            {
+            });
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
 }

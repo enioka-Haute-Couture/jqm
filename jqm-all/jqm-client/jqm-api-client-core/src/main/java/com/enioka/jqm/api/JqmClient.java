@@ -255,6 +255,22 @@ public interface JqmClient
      */
     public List<Queue> getQueues();
 
+    /**
+     * Lists all the available {@link JobDef} objects, i.e. the different payloads that can be launched by JQM.
+     * 
+     * @return a list of JobDef
+     */
+    public List<JobDef> getJobDefinitions();
+
+    /**
+     * Lists all the available {@link JobDef} objects for a given application, i.e. the different payloads that can be launched by JQM. The
+     * "application" is the optional tag that can be given inside the <application> tag of the JobDef XML file.<br>
+     * If application is null, this method is equivalent to {@link #getJobDefinitions()}.
+     * 
+     * @return a list of JobDef
+     */
+    public List<JobDef> getJobDefinitions(String application);
+
     // /////////////////////////////////////////////////////////////////////
     // Technical
     // /////////////////////////////////////////////////////////////////////

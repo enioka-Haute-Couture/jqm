@@ -52,15 +52,27 @@
 					</p:column>
 					<p:column>
 						<f:facet name="header">
+							<h:outputText value="FilePath" />
+						</f:facet>
+						<h:outputText value="#{job.filePath}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
 							<h:outputText value="Queue" />
 						</f:facet>
-						<h:outputText value="#{job.defaultQueue.name}" />
+						<h:outputText value="#{job.queue.name}" />
 					</p:column>
 					<p:column>
 						<f:facet name="header">
 							<h:outputText value="Restartable" />
 						</f:facet>
-						<h:outputText value="#{job.restartable}" />
+						<h:outputText value="#{job.canBeRestarted}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Main Class" />
+						</f:facet>
+						<h:outputText value="#{job.javaClassName}" />
 					</p:column>
 					<p:column>
 						<f:facet name="header">
@@ -97,6 +109,12 @@
 							<h:outputText value="Highlander" />
 						</f:facet>
 						<h:outputText value="#{job.highlander}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Jar filepath" />
+						</f:facet>
+						<h:outputText value="#{job.jarPath}" />
 					</p:column>
 				</p:dataTable>
 

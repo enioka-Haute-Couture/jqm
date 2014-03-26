@@ -272,4 +272,22 @@ public class QueueOperation implements JqmClient
 
         return ji;
     }
+
+    @Path("jd")
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    @Override
+    public List<JobDef> getJobDefinitions()
+    {
+        return JqmClientFactory.getClient().getJobDefinitions();
+    }
+
+    @Path("jd/{applicationName}")
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    @Override
+    public List<JobDef> getJobDefinitions(@PathParam("applicationName") String application)
+    {
+        return JqmClientFactory.getClient().getJobDefinitions(application);
+    }
 }

@@ -7,30 +7,36 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.ListDataModel;
+import javax.persistence.EntityManager;
 
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
 import org.primefaces.model.SelectableDataModel;
 
-import com.enioka.jqm.api.JobDef;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.jpamodel.JobDef;
+import com.enioka.ui.helpers.Db;
 
 @ManagedBean(eager = true)
 @SessionScoped
-public class JobDefControler extends ListDataModel<JobDef> implements Serializable, SelectableDataModel<JobDef>
+public class AdminJobDefControler extends ListDataModel<JobDef> implements Serializable, SelectableDataModel<JobDef>
 {
     private static final long serialVersionUID = -608970776489109835L;
+
+    EntityManager em = null;
 
     private JobDef selected = null;
     private String userName = "user";
 
-    public JobDefControler()
-    {}
+    public AdminJobDefControler()
+    {
+        em = Db.getEm();
+    }
 
     public ListDataModel<JobDef> getJobs()
     {
-        this.setWrappedData(JqmClientFactory.getClient().getJobDefinitions());
+        this.setWrappedData(em.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList());
         return this;
     }
 
@@ -86,13 +92,9 @@ public class JobDefControler extends ListDataModel<JobDef> implements Serializab
     @Override
     public JobDef getRowData(String rowKey)
     {
-        for (JobDef jd : JqmClientFactory.getClient().getJobDefinitions())
-        {
-            if (jd.getId().toString().equals(rowKey))
-            {
-                return jd;
-            }
-        }
-        return null;
+        EntityManager em = Db.getEm();
+        JobDef jd = em.find(JobDef.class, Integer.parseInt(rowKey));
+        em.close();
+        return jd;
     }
 }
