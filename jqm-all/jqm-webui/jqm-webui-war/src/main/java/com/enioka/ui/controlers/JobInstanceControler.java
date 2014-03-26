@@ -12,6 +12,8 @@ import org.primefaces.model.SelectableDataModel;
 
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.Query;
+import com.enioka.jqm.api.State;
 
 @ManagedBean(eager = true)
 @SessionScoped
@@ -41,7 +43,8 @@ public class JobInstanceControler extends ListDataModel<JobInstance> implements 
 
     public ListDataModel<JobInstance> getHistoryJobs()
     {
-        this.setWrappedData(JqmClientFactory.getClient().getJobs());
+        this.setWrappedData(JqmClientFactory.getClient()
+                .getJobs(Query.create().addStatusFilter(State.ENDED).addStatusFilter(State.CRASHED)));
         return this;
     }
 

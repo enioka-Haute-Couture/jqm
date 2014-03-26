@@ -2,104 +2,98 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui">
 
 <meta http-equiv="cache-control" content="no-cache" />
 
 <h:head>
-	<title>JQM queue</title>
+	<title>JQM queue content</title>
 </h:head>
 
-<h:form id="mainForm">
+<h:body>
+	<ui:composition template="common.xhtml">
+		<ui:define name="title">Queue content</ui:define>
 
-	<h:outputLink value="jobdef.xhtml">
-		<h:outputText value="Job definition" />
-	</h:outputLink>
+		<ui:define name="content">
 
-	<h:outputText value="   --   " />
+			<h:form id="mainForm">
+				<p:dataTable id="dataTable" value="#{jobInstanceControler.jobs}"
+					var="job" selection="#{jobInstanceControler.selected}"
+					selectionMode="single" cellspacing="4" width="100%"
+					paginator="true" rows="25"
+					rowsPerPageTemplate="5,10,15,20,25,30,40,50,60">
 
-	<h:outputLink value="queue.xhtml">
-		<h:outputText value="Queue" />
-	</h:outputLink>
+					<p:ajax event="rowSelect" update=":mainForm:btStop" />
+					<p:ajax event="rowUnselect" update=":mainForm:btStop" />
 
-	<h:outputText value="   --   " />
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="ID" />
+						</f:facet>
+						<h:outputText value="#{job.id}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="JobDef" />
+						</f:facet>
+						<h:outputText value="#{job.applicationName}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Parent ID" />
+						</f:facet>
+						<h:outputText value="#{job.parent}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Position" />
+						</f:facet>
+						<h:outputText value="#{job.position}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Progression" />
+						</f:facet>
+						<h:outputText value="#{job.progress}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="User" />
+						</f:facet>
+						<h:outputText value="#{job.user}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Status" />
+						</f:facet>
+						<h:outputText value="#{job.state}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Queue" />
+						</f:facet>
+						<h:outputText value="#{job.queue.name}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Email" />
+						</f:facet>
+						<h:outputText value="#{job.email}" />
+					</p:column>
+				</p:dataTable>
 
-	<h:outputLink value="history.xhtml">
-		<h:outputText value="History" />
-	</h:outputLink>
+				<p>
+					<h:commandButton id="btStop" value="Stop"
+						action="#{jobInstanceControler.stop}"
+						disabled="#{empty jobInstanceControler.selected}" />
+				</p>
+				<p>
+					<p:commandButton value="Refresh" update=":mainForm:dataTable" />
+				</p>
+			</h:form>
+		</ui:define>
+	</ui:composition>
+</h:body>
 
-	<h1>Jobs currently enqueued</h1>
-	<p:dataTable id="dataTable" value="#{jobInstanceControler.jobs}"
-		var="job" selection="#{jobInstanceControler.selected}"
-		selectionMode="single" cellspacing="4" width="100%" paginator="true"
-		rows="25" rowsPerPageTemplate="5,10,15,20,25,30,40,50,60">
-
-		<p:ajax event="rowSelect" update=":mainForm:btStop" />
-		<p:ajax event="rowUnselect" update=":mainForm:btStop" />
-
-		<p:column>
-			<f:facet name="header">
-				<h:outputText value="ID" />
-			</f:facet>
-			<h:outputText value="#{job.id}" />
-		</p:column>
-		<p:column>
-			<f:facet name="header">
-				<h:outputText value="JobDef" />
-			</f:facet>
-			<h:outputText value="#{job.applicationName}" />
-		</p:column>
-		<p:column>
-			<f:facet name="header">
-				<h:outputText value="Parent ID" />
-			</f:facet>
-			<h:outputText value="#{job.parent}" />
-		</p:column>
-		<p:column>
-			<f:facet name="header">
-				<h:outputText value="Position" />
-			</f:facet>
-			<h:outputText value="#{job.position}" />
-		</p:column>
-		<p:column>
-			<f:facet name="header">
-				<h:outputText value="Progression" />
-			</f:facet>
-			<h:outputText value="#{job.progress}" />
-		</p:column>
-		<p:column>
-			<f:facet name="header">
-				<h:outputText value="User" />
-			</f:facet>
-			<h:outputText value="#{job.user}" />
-		</p:column>
-		<p:column>
-			<f:facet name="header">
-				<h:outputText value="Status" />
-			</f:facet>
-			<h:outputText value="#{job.state}" />
-		</p:column>
-		<p:column>
-			<f:facet name="header">
-				<h:outputText value="Queue" />
-			</f:facet>
-			<h:outputText value="#{job.queue.name}" />
-		</p:column>
-		<p:column>
-			<f:facet name="header">
-				<h:outputText value="Email" />
-			</f:facet>
-			<h:outputText value="#{job.email}" />
-		</p:column>
-	</p:dataTable>
-
-	<p>
-		<h:commandButton id="btStop" value="Stop"
-			action="#{jobInstanceControler.stop}"
-			disabled="#{empty jobInstanceControler.selected}" />
-	</p>
-	<p>
-		<p:commandButton value="Refresh" update=":mainForm:dataTable" />
-	</p>
-</h:form>
 </html>

@@ -18,6 +18,7 @@ import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
+import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -64,7 +65,21 @@ public class JobDefControler extends ListDataModel<JobDef> implements Serializab
             h.setUserName("houba");
             h.setNode(TestHelpers.node);
             h.setStatus(State.ENDED);
+            h.setProgress(12);
             em.persist(h);
+
+            JobInstance ji = new JobInstance();
+            ji.setApplication("appli 1");
+            ji.setAttributionDate(Calendar.getInstance());
+            ji.setCreationDate(Calendar.getInstance());
+            ji.setExecutionDate(Calendar.getInstance());
+            ji.setInternalPosition(1);
+            ji.setJd(jd1);
+            ji.setNode(TestHelpers.node);
+            ji.setQueue(TestHelpers.qNormal);
+            ji.setState(State.RUNNING);
+            em.persist(ji);
+
             em.getTransaction().commit();
         }
     }

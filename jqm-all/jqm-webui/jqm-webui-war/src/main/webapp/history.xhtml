@@ -8,87 +8,86 @@
 <meta http-equiv="cache-control" content="no-cache" />
 
 <h:head>
-	<title>JQM HistoryPPPP</title>
+	<title>JQM Execution History</title>
 </h:head>
 
-<h:form id="mainForm">
-	<!-- MENU -->
-	<h:link value="Job definitions" outcome="jobdef" />
-	<h:outputText value="   --   " />
-	<h:link value="Queue definitions" outcome="queue" />
-	<h:outputText value="   --   " />
-	<h:link value="Execution history" outcome="history" />
-	<!-- END MENU -->
+<h:body>
+	<ui:composition template="common.xhtml">
+		<ui:define name="title">History</ui:define>
 
-	<h1>History</h1>
-	<p:dataTable id="dataTable" var="h"
-		value="#{jobInstanceControler.historyJobs}" sortMode="multiple"
-		rows="25" paginator="true" filteredValue="#{history.filteredhs}"
-		rowsPerPageTemplate="5,10,15,20,25,30,40,50,60">
+		<ui:define name="content">
+			<h:form id="mainForm">
+				<p:dataTable id="dataTable" var="h"
+					value="#{jobInstanceControler.historyJobs}" sortMode="multiple"
+					rows="25" paginator="true" filteredValue="#{history.filteredhs}"
+					rowsPerPageTemplate="5,10,15,20,25,30,40,50,60">
 
-		<p:column id="idColumn" headerText="ID" filterBy="id">
-			<h:outputText value="#{h.id}" />
-		</p:column>
-		<p:column headerText="JobDef" filterBy="jd.applicationName">
-			<h:outputText value="#{h.applicationName}" />
-		</p:column>
-		<p:column headerText="Session ID" filterBy="sessionID">
-			<h:outputText value="#{h.sessionID}" />
-		</p:column>
-		<p:column headerText="Queue" filterBy="queue.name">
-			<h:outputText value="#{h.queue.name}" />
-		</p:column>
-		<p:column headerText="Enqueue Date" filterBy="enqueueDate.time">
-			<h:outputText value="#{h.enqueueDate.time}">
-				<f:convertDateTime type="date" pattern="yyyy.MM.dd 'at' HH:mm:ss" />
-			</h:outputText>
-		</p:column>
-		<p:column headerText="Execution Date" filterBy="executionDate.time">
-			<h:outputText value="#{h.beganRunningDate.time}">
-				<f:convertDateTime type="date" pattern="yyyy.MM.dd 'at' HH:mm:ss" />
-			</h:outputText>
-		</p:column>
-		<p:column headerText="End Date" filterBy="endDate.time">
-			<h:outputText value="#{h.endDate.time}">
-				<f:convertDateTime type="date" pattern="yyyy.MM.dd 'at' HH:mm:ss" />
-			</h:outputText>
-		</p:column>
-		<p:column headerText="User Name" filterBy="user">
-			<h:outputText value="#{h.user}" />
-		</p:column>
-		<p:column headerText="Email" filterBy="email">
-			<h:outputText value="#{h.email}" />
-		</p:column>
-		<p:column headerText="Parent Job ID" filterBy="parent">
-			<h:outputText value="#{h.parent}" />
-		</p:column>
-		<p:column headerText="Status" filterBy="state">
-			<h:outputText value="#{h.state}" />
-		</p:column>
-		<p:column headerText="Keyword 1" filterBy="keyword1">
-			<h:outputText value="#{h.keyword1}" />
-		</p:column>
-		<p:column headerText="Keyword 2" filterBy="keyword2">
-			<h:outputText value="#{h.keyword2}" />
-		</p:column>
-		<p:column headerText="Keyword 3" filterBy="keyword3">
-			<h:outputText value="#{h.keyword3}" />
-		</p:column>
-		<p:column headerText="Application" filterBy="application">
-			<h:outputText value="#{h.application}" />
-		</p:column>
-		<p:column headerText="Module" filterBy="module">
-			<h:outputText value="#{h.module}" />
-		</p:column>
-		<p:column headerText="Progress" filterBy="progress">
-			<h:outputText value="#{h.progress}" />
-		</p:column>
+					<p:column id="idColumn" headerText="ID" filterBy="id">
+						<h:outputText value="#{h.id}" />
+					</p:column>
+					<p:column headerText="JobDef" filterBy="jd.applicationName">
+						<h:outputText value="#{h.applicationName}" />
+					</p:column>
+					<p:column headerText="Session ID" filterBy="sessionID">
+						<h:outputText value="#{h.sessionID}" />
+					</p:column>
+					<p:column headerText="Queue" filterBy="queue.name">
+						<h:outputText value="#{h.queue.name}" />
+					</p:column>
+					<p:column headerText="Enqueue Date" filterBy="enqueueDate.time">
+						<h:outputText value="#{h.enqueueDate.time}">
+							<f:convertDateTime type="date" pattern="yyyy.MM.dd 'at' HH:mm:ss" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Execution Date" filterBy="executionDate.time">
+						<h:outputText value="#{h.beganRunningDate.time}">
+							<f:convertDateTime type="date" pattern="yyyy.MM.dd 'at' HH:mm:ss" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="End Date" filterBy="endDate.time">
+						<h:outputText value="#{h.endDate.time}">
+							<f:convertDateTime type="date" pattern="yyyy.MM.dd 'at' HH:mm:ss" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="User Name" filterBy="user">
+						<h:outputText value="#{h.user}" />
+					</p:column>
+					<p:column headerText="Email" filterBy="email">
+						<h:outputText value="#{h.email}" />
+					</p:column>
+					<p:column headerText="Parent Job ID" filterBy="parent">
+						<h:outputText value="#{h.parent}" />
+					</p:column>
+					<p:column headerText="Status" filterBy="state">
+						<h:outputText value="#{h.state}" />
+					</p:column>
+					<p:column headerText="Keyword 1" filterBy="keyword1">
+						<h:outputText value="#{h.keyword1}" />
+					</p:column>
+					<p:column headerText="Keyword 2" filterBy="keyword2">
+						<h:outputText value="#{h.keyword2}" />
+					</p:column>
+					<p:column headerText="Keyword 3" filterBy="keyword3">
+						<h:outputText value="#{h.keyword3}" />
+					</p:column>
+					<p:column headerText="Application" filterBy="application">
+						<h:outputText value="#{h.application}" />
+					</p:column>
+					<p:column headerText="Module" filterBy="module">
+						<h:outputText value="#{h.module}" />
+					</p:column>
+					<p:column headerText="Progress" filterBy="progress">
+						<h:outputText value="#{h.progress}" />
+					</p:column>
 
-	</p:dataTable>
-	<!-- 
+				</p:dataTable>
+				<!-- 
 	<p>
 		<p:commandButton value="Refresh" update=":mainForm:dataTable"/>
 	</p>
 -->
-</h:form>
+			</h:form>
+		</ui:define>
+	</ui:composition>
+</h:body>
 </html>

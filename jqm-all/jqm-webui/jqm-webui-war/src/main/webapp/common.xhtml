@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<h:outputStylesheet name="common.css" library="css" />
+	<title>main template</title>
+</h:head>
+
+<h:body>
+	<p:panel>
+
+		<div id="pageContainer">
+			<div id="menu">
+				<h:link value="Job definitions" outcome="jobdef" />
+				<h:outputText value="   --   " />
+				<h:link value="Queues content" outcome="queue" />
+				<h:outputText value="   --   " />
+				<h:link value="Execution history" outcome="history" />
+			</div>
+
+			<div id="header">
+				<h1>
+					<ui:insert name="title">
+					</ui:insert>
+				</h1>
+			</div>
+
+			<div id="content">
+				<ui:insert name="content">
+				</ui:insert>
+			</div>
+			
+			<div id="footer">
+				<ui:insert name="footertext">JQM admin</ui:insert>
+			</div>
+		</div>
+	</p:panel>
+</h:body>
+</html>
