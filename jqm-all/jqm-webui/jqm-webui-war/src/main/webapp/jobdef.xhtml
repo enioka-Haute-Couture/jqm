@@ -13,21 +13,11 @@
 
 <h:form id="mainForm">
 	<!-- MENU -->
-	<h:outputLink value="jobdef.xhtml">
-		<h:outputText value="Job definition" />
-	</h:outputLink>
-
+	<h:link value="Job definitions" outcome="jobdef" />
 	<h:outputText value="   --   " />
-
-	<h:outputLink value="queue.xhtml">
-		<h:outputText value="Queue" />
-	</h:outputLink>
-
+	<h:link value="Queue definitions" outcome="queue" />
 	<h:outputText value="   --   " />
-
-	<h:outputLink value="history.xhtml">
-		<h:outputText value="History" />
-	</h:outputLink>
+	<h:link value="Execution history" outcome="history" />
 	<!-- END MENU -->
 
 	<p:growl id="growl" showDetail="true" />

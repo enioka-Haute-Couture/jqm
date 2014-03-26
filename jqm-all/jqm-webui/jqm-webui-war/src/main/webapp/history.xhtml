@@ -8,38 +8,29 @@
 <meta http-equiv="cache-control" content="no-cache" />
 
 <h:head>
-	<title>JQM History</title>
+	<title>JQM HistoryPPPP</title>
 </h:head>
 
 <h:form id="mainForm">
-
-	<h:outputLink value="jobdef.xhtml">
-		<h:outputText value="Job definition" />
-	</h:outputLink>
-
+	<!-- MENU -->
+	<h:link value="Job definitions" outcome="jobdef" />
 	<h:outputText value="   --   " />
-
-	<h:outputLink value="queue.xhtml">
-		<h:outputText value="Queue" />
-	</h:outputLink>
-
+	<h:link value="Queue definitions" outcome="queue" />
 	<h:outputText value="   --   " />
-
-	<h:outputLink value="history.xhtml">
-		<h:outputText value="History" />
-	</h:outputLink>
+	<h:link value="Execution history" outcome="history" />
+	<!-- END MENU -->
 
 	<h1>History</h1>
-	<p:dataTable id="dataTable" var="h" value="#{JobInstanceConstroler.historyJobs}"
-		sortMode="multiple" rows="25" paginator="true"
-		filteredValue="#{history.filteredhs}"
+	<p:dataTable id="dataTable" var="h"
+		value="#{jobInstanceControler.historyJobs}" sortMode="multiple"
+		rows="25" paginator="true" filteredValue="#{history.filteredhs}"
 		rowsPerPageTemplate="5,10,15,20,25,30,40,50,60">
 
 		<p:column id="idColumn" headerText="ID" filterBy="id">
 			<h:outputText value="#{h.id}" />
-		</p:column>		
+		</p:column>
 		<p:column headerText="JobDef" filterBy="jd.applicationName">
-			<h:outputText value="#{h.jd.applicationName}" />
+			<h:outputText value="#{h.applicationName}" />
 		</p:column>
 		<p:column headerText="Session ID" filterBy="sessionID">
 			<h:outputText value="#{h.sessionID}" />
@@ -47,16 +38,13 @@
 		<p:column headerText="Queue" filterBy="queue.name">
 			<h:outputText value="#{h.queue.name}" />
 		</p:column>
-		<p:column headerText="JobInstance ID" filterBy="id">
-			<h:outputText value="#{h.id}" />
-		</p:column>
-	<!-- 	<p:column headerText="Enqueue Date" filterBy="enqueueDate.time">
+		<p:column headerText="Enqueue Date" filterBy="enqueueDate.time">
 			<h:outputText value="#{h.enqueueDate.time}">
 				<f:convertDateTime type="date" pattern="yyyy.MM.dd 'at' HH:mm:ss" />
 			</h:outputText>
 		</p:column>
 		<p:column headerText="Execution Date" filterBy="executionDate.time">
-			<h:outputText value="#{h.executionDate.time}">
+			<h:outputText value="#{h.beganRunningDate.time}">
 				<f:convertDateTime type="date" pattern="yyyy.MM.dd 'at' HH:mm:ss" />
 			</h:outputText>
 		</p:column>
@@ -64,7 +52,7 @@
 			<h:outputText value="#{h.endDate.time}">
 				<f:convertDateTime type="date" pattern="yyyy.MM.dd 'at' HH:mm:ss" />
 			</h:outputText>
-		</p:column> -->
+		</p:column>
 		<p:column headerText="User Name" filterBy="user">
 			<h:outputText value="#{h.user}" />
 		</p:column>
@@ -92,15 +80,15 @@
 		<p:column headerText="Module" filterBy="module">
 			<h:outputText value="#{h.module}" />
 		</p:column>
-		<p:column headerText="Progression" filterBy="progress">
+		<p:column headerText="Progress" filterBy="progress">
 			<h:outputText value="#{h.progress}" />
 		</p:column>
 
 	</p:dataTable>
-
+	<!-- 
 	<p>
 		<p:commandButton value="Refresh" update=":mainForm:dataTable"/>
 	</p>
-
+-->
 </h:form>
 </html>

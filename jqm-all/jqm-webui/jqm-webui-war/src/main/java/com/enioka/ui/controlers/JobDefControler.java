@@ -1,6 +1,7 @@
 package com.enioka.ui.controlers;
 
 import java.io.Serializable;
+import java.util.Calendar;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -15,7 +16,9 @@ import org.primefaces.model.SelectableDataModel;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
+import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 import com.enioka.ui.helpers.Db;
@@ -38,8 +41,9 @@ public class JobDefControler extends ListDataModel<JobDef> implements Serializab
         if (em.createQuery("SELECT COUNT(n) FROM Node n", Long.class).getSingleResult().equals(0l))
         {
             TestHelpers.createLocalNode(em);
-            CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
-                    TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+            JobDef jd1 = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null,
+                    "jqm-tests/jqm-test-fibo/target/test.jar", TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1",
+                    "other2", false, em);
             CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
                     TestHelpers.qVip, 42, "Fibo2", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
             CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
@@ -48,6 +52,20 @@ public class JobDefControler extends ListDataModel<JobDef> implements Serializab
                     TestHelpers.qVip, 42, "Fibo4", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
             CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
                     TestHelpers.qVip, 42, "Fibo5", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+
+            em.getTransaction().begin();
+            History h = new History();
+            h.setJd(jd1);
+            h.setQueue(TestHelpers.qVip);
+            h.setId(12);
+            h.setEnqueueDate(Calendar.getInstance());
+            h.setExecutionDate(Calendar.getInstance());
+            h.setEndDate(Calendar.getInstance());
+            h.setUserName("houba");
+            h.setNode(TestHelpers.node);
+            h.setStatus(State.ENDED);
+            em.persist(h);
+            em.getTransaction().commit();
         }
     }
 
