@@ -98,6 +98,12 @@ public class BasicTest
     }
 
     @Test
+    public void testQueryPercent()
+    {
+        JqmClientFactory.getClient().getJobs(Query.create().setApplicationName("%TEST"));
+    }
+
+    @Test
     public void testQueryNull()
     {
         JqmClientFactory.getClient().getJobs(new Query("", null));

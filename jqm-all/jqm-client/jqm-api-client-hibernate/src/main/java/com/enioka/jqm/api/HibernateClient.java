@@ -798,7 +798,14 @@ final class HibernateClient implements JqmClient
             {
                 String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1];
                 prms.put(prmName, filterValue);
-                return String.format("AND (%s = :%s) ", fieldName, prmName);
+                if (filterValue.contains("%"))
+                {
+                    return String.format("AND (%s LIKE :%s) ", fieldName, prmName);
+                }
+                else
+                {
+                    return String.format("AND (%s = :%s) ", fieldName, prmName);
+                }
             }
             else
             {
