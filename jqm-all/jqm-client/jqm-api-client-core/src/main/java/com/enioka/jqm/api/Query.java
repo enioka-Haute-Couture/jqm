@@ -29,6 +29,9 @@ public final class Query
     private Queue queue;
     private Calendar enqueuedBefore, enqueuedAfter, beganRunningBefore, beganRunningAfter, endedBefore, endedAfter;
     private List<State> status = new ArrayList<State>();
+    private Integer firstRow, pageSize;
+    private Long resultSize;
+    private List<JobInstance> results;
 
     private boolean queryLiveInstances = false;
 
@@ -59,6 +62,56 @@ public final class Query
     public static Query create()
     {
         return new Query();
+    }
+
+    public List<JobInstance> run()
+    {
+        return JqmClientFactory.getClient().getJobs(this);
+    }
+
+    // //////////////////////////////////////////
+    // Results handling
+    // //////////////////////////////////////////
+
+    public Query setPageSize(Integer pageSize)
+    {
+        this.pageSize = pageSize;
+        return this;
+    }
+
+    public Long getResultSize()
+    {
+        if (results == null)
+        {
+            throw new IllegalStateException("Cannot retrieve the results of a query that was not run");
+        }
+        if (this.pageSize != null || this.firstRow != null)
+        {
+            return resultSize;
+        }
+        else
+        {
+            return (long) results.size();
+        }
+    }
+
+    void setResultSize(Long resultSize)
+    {
+        this.resultSize = resultSize;
+    }
+
+    public List<JobInstance> getResults()
+    {
+        if (results == null)
+        {
+            throw new IllegalStateException("Cannot retrieve the results of a query that was not run");
+        }
+        return results;
+    }
+
+    void setResults(List<JobInstance> results)
+    {
+        this.results = results;
     }
 
     // //////////////////////////////////////////
@@ -474,4 +527,21 @@ public final class Query
         this.status.add(status);
         return this;
     }
+
+    Integer getFirstRow()
+    {
+        return firstRow;
+    }
+
+    public Query setFirstRow(Integer firstRow)
+    {
+        this.firstRow = firstRow;
+        return this;
+    }
+
+    Integer getPageSize()
+    {
+        return pageSize;
+    }
+
 }

@@ -1,14 +1,19 @@
 package com.enioka.ui.controlers;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.model.ListDataModel;
 
+import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SelectableDataModel;
+import org.primefaces.model.SortMeta;
+import org.primefaces.model.SortOrder;
 
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
@@ -17,7 +22,7 @@ import com.enioka.jqm.api.State;
 
 @ManagedBean(eager = true)
 @SessionScoped
-public class JobInstanceControler extends ListDataModel<JobInstance> implements Serializable, SelectableDataModel<JobInstance>
+public class JobInstanceControler extends LazyDataModel<JobInstance> implements Serializable, SelectableDataModel<JobInstance>
 {
     private static final long serialVersionUID = 7869897762565932002L;
     private JobInstance selected = null;
@@ -43,13 +48,13 @@ public class JobInstanceControler extends ListDataModel<JobInstance> implements 
         return "queue?faces-redirect=true";
     }
 
-    public ListDataModel<JobInstance> getJobs()
+    public LazyDataModel<JobInstance> getJobs()
     {
         this.setWrappedData(JqmClientFactory.getClient().getActiveJobs());
         return this;
     }
 
-    public ListDataModel<JobInstance> getHistoryJobs()
+    public LazyDataModel<JobInstance> getHistoryJobs()
     {
         this.setWrappedData(JqmClientFactory.getClient().getJobs(
                 Query.create().addStatusFilter(State.ENDED).addStatusFilter(State.CRASHED).addStatusFilter(State.KILLED)));
@@ -59,6 +64,21 @@ public class JobInstanceControler extends ListDataModel<JobInstance> implements 
     public JobInstance getSelected()
     {
         return selected;
+    }
+
+    @Override
+    public List<JobInstance> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, String> filters)
+    {
+        Query q = Query.create().setFirstRow(first).setPageSize(pageSize);
+        q.run();
+        this.setRowCount(new BigDecimal(q.getResultSize()).intValueExact());
+        return q.getResults();
+    }
+
+    @Override
+    public List<JobInstance> load(int first, int pageSize, List<SortMeta> multiSortMeta, Map<String, String> filters)
+    {
+        return load(first, pageSize, null, null, filters);
     }
 
     public void setSelected(JobInstance selected)

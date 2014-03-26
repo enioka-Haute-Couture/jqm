@@ -869,6 +869,11 @@ final class HibernateClient implements JqmClient
     @Override
     public List<com.enioka.jqm.api.JobInstance> getJobs(Query query)
     {
+        if ((query.getFirstRow() != null || query.getPageSize() != null) && query.isQueryLiveInstances())
+        {
+            throw new IllegalArgumentException("cannot use paging on live instances");
+        }
+
         EntityManager em = getEm();
 
         // Not using CriteriaBuilder - too much hassle for too little benefit
@@ -913,14 +918,15 @@ final class HibernateClient implements JqmClient
             wh2 += getStatusPredicate("state", query.getStatus(), prms2);
             if (wh2.length() >= 3)
             {
-                wh2 = wh2.substring(3);
+                wh2 = " WHERE " + wh2.substring(3);
             }
 
-            TypedQuery<JobInstance> q2 = em.createQuery("SELECT h FROM JobInstance h WHERE " + wh2, JobInstance.class);
+            TypedQuery<JobInstance> q2 = em.createQuery("SELECT h FROM JobInstance h " + wh2, JobInstance.class);
             for (Map.Entry<String, Object> entry : prms2.entrySet())
             {
                 q2.setParameter(entry.getKey(), entry.getValue());
             }
+
             for (JobInstance ji : q2.getResultList())
             {
                 res2.add(getJob(ji));
@@ -940,20 +946,34 @@ final class HibernateClient implements JqmClient
         wh += getStatusPredicate("status", query.getStatus(), prms);
         if (wh.length() >= 3)
         {
-            wh = wh.substring(3);
+            wh = " WHERE " + wh.substring(3);
         }
 
-        TypedQuery<History> q1 = em.createQuery("SELECT h FROM History h WHERE " + wh, History.class);
+        TypedQuery<History> q1 = em.createQuery("SELECT h FROM History h " + wh + " ORDER BY h.id ", History.class);
         for (Map.Entry<String, Object> entry : prms.entrySet())
         {
             q1.setParameter(entry.getKey(), entry.getValue());
         }
+        if (query.getFirstRow() != null)
+        {
+            q1.setFirstResult(query.getFirstRow());
+        }
+        if (query.getPageSize() != null)
+        {
+            q1.setMaxResults(query.getPageSize());
+        }
+        if (query.getFirstRow() != null || query.getPageSize() != null)
+        {
+            query.setResultSize(em.createQuery("SELECT COUNT(h) FROM History h " + wh, Long.class).getSingleResult());
+        }
+
         for (History ji : q1.getResultList())
         {
             res2.add(getJob(ji));
         }
 
         em.close();
+        query.setResults(res2);
         return res2;
     }
 
