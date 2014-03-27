@@ -1,20 +1,19 @@
 ﻿<jqm>
 	<jar>
 		<path>jqm-test-main/jqm-test-main.jar</path>
-		<filePath>jqm-test-main/</filePath>
 		<jobdefinitions>
 			<jobDefinition>
-				<name>TestEcho</name>
-				<description>Test that only echoes something</description>
+				<name>DemoEcho</name>
+				<description>Demonstrates the direct reuse of a jar with a main function. Simply writes a line on stdout.</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>App</javaClassName>
-				<maxTimeRunning>42</maxTimeRunning>
-				<application>ApplicationTest</application>
-				<module>TestModuleRATONLAVEUR</module>
-				<keyword1>vdjvkdv</keyword1>
-				<keyword2>sgfbgg</keyword2>
-				<keyword3>jvhkdfl</keyword3>
+				<application>JQM</application>
+				<module>Demos</module>
+				<keyword1>Payload</keyword1>
+				<keyword2>Main</keyword2>
+				<keyword3></keyword3>
 				<highlander>false</highlander>
+				<queue>NewQueue</queue>
 				<parameters>					
 				</parameters>
 			</jobDefinition>

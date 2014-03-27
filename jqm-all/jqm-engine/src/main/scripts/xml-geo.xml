@@ -1,19 +1,17 @@
 ﻿<jqm>
 	<jar>
 		<path>jqm-test-geo/jqm-test-geo.jar</path>
-		<filePath>jqm-test-geo/</filePath>
 		<jobdefinitions>
 			<jobDefinition>
-				<name>Geo</name>
-				<description>Test based on a geometric suite</description>
+				<name>DemoGeo</name>
+				<description>Demonstrates the use of the engine API, the ue of parameters and creates load (geometric suite)</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>App</javaClassName>
-				<maxTimeRunning>42</maxTimeRunning>
-				<application>ApplicationTest</application>
-				<module>TestModuleRATONLAVEUR</module>
-				<keyword1>vdjvkdv</keyword1>
-				<keyword2>sgfbgg</keyword2>
-				<keyword3>jvhkdfl</keyword3>
+				<application>JQM</application>
+				<module>Demos</module>
+				<keyword1>EngineAPI</keyword1>
+				<keyword2>enqueue</keyword2>
+				<keyword3>load</keyword3>
 				<highlander>false</highlander>
 				<parameters>
 					<parameter>

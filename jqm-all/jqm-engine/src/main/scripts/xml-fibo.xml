@@ -1,20 +1,17 @@
 <jqm>
 	<jar>
 		<path>jqm-test-fibo/jqm-test-fibo.jar</path>
-		<filePath>jqm-test-fibo/</filePath>
-
 		<jobdefinitions>
 			<jobDefinition>
-				<name>Fibo</name>
-				<description>Test based on the Fibonachi suite</description>
+				<name>DemoFibo1</name>
+				<description>Demonstrates the use of parameters and engine API (computes the Fibonachi suite)</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>com.enioka.jqm.tests.App</javaClassName>
-				<maxTimeRunning>42</maxTimeRunning>
-				<application>ApplicationTest</application>
-				<module>TestModuleRATONLAVEUR</module>
-				<keyword1>vdjvkdv</keyword1>
-				<keyword2>sgfbgg</keyword2>
-				<keyword3>jvhkdfl</keyword3>
+				<application>JQM</application>
+				<module>Demos</module>
+				<keyword1>EngineAPI</keyword1>
+				<keyword2>parameters</keyword2>
+				<keyword3></keyword3>
 				<highlander>false</highlander>
 				<parameters>
 					<parameter>
@@ -28,16 +25,15 @@
 				</parameters>
 			</jobDefinition>
 			<jobDefinition>
-				<name>Fibo2</name>
-				<description>Test to check the xml implementation</description>
+				<name>DemoFibo2</name>
+				<description>Demonstrates the possibility to define multiple payloads on the same jar/class with different parameters</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>com.enioka.jqm.tests.App</javaClassName>
-				<maxTimeRunning>42</maxTimeRunning>
-				<application>ApplicationTest</application>
-				<module>TestModule</module>
-				<keyword1>vdjvkdv</keyword1>
-				<keyword2>sgfbgg</keyword2>
-				<keyword3>jvhkdfl</keyword3>
+				<application>JQM</application>
+				<module>Demos</module>
+				<keyword1>EngineAPI</keyword1>
+				<keyword2>parameters</keyword2>
+				<keyword3></keyword3>
 				<highlander>false</highlander>
 				<parameters>
 					<parameter>

@@ -1,18 +1,16 @@
 ﻿<jqm>
 	<jar>
 		<path>jqm-test-jndijms-amq/jqm-test-jndijms-amq.jar</path>
-		<filePath>jqm-test-jndijms-amq/</filePath>
 		<jobdefinitions>
 			<jobDefinition>
-				<name>AMQ</name>
-				<description>Write and peek ActiveMQ test</description>
+				<name>DemoAMQ</name>
+				<description>Demonstrates the use of JMS through JNDI. Writes and peeks inside an ActiveMQ queue created on the fly.</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>com.enioka.jqm.testpackages.SuperTestPayload</javaClassName>
-				<maxTimeRunning>42</maxTimeRunning>
-				<application>ApplicationTest</application>
-				<module>Tests</module>
-				<keyword1>AMQ</keyword1>
-				<keyword2>JNDI</keyword2>
+				<application>JQM</application>
+				<module>Demos</module>
+				<keyword1>JNDI</keyword1>
+				<keyword2>AMQ</keyword2>
 				<keyword3></keyword3>
 				<highlander>false</highlander>
 				<parameters>

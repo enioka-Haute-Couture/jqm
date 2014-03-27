@@ -129,13 +129,8 @@ class XmlParser
                             jd = new JobDef();
                         }
 
-                        // Queue
-                        if (jd.getQueue() == null && ee.getElementsByTagName("queue").getLength() == 0)
-                        {
-                            // Not specified => default queue
-                            queue = em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true", Queue.class).getSingleResult();
-                        }
-                        else
+                        // Queue                        
+                        if (jd.getQueue() == null && ee.getElementsByTagName("queue").getLength() != 0)
                         {
                             // Specified inside the XML. Does the queue already exist?
                             String qname = ee.getElementsByTagName("queue").item(0).getTextContent();
@@ -161,6 +156,11 @@ class XmlParser
                                     createdQueues.put(qname, queue);
                                 }
                             }
+                        }
+						else						
+                        {
+                            // Not specified => default queue
+                            queue = em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true", Queue.class).getSingleResult();
                         }
 
                         // Easy attributes
@@ -210,7 +210,7 @@ class XmlParser
                         jd.setJarPath(jarPath);
 
                         em.persist(jd);
-                        jqmlogger.debug("Imported application " + applicationName);
+                        jqmlogger.info("Imported application " + applicationName);
                     }
                 }
             }
