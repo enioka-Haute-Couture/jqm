@@ -292,12 +292,16 @@ final class HibernateClient implements JqmClient
         try
         {
             h = em.find(History.class, jobIdToCopy);
+            return enqueue(getJobRequest(h));
         }
         catch (NoResultException e)
         {
             throw new JqmInvalidRequestException("No job for this ID in the history");
         }
-        return enqueue(getJobRequest(h));
+        finally
+        {
+            em.close();
+        }
     }
 
     // Helper
@@ -433,6 +437,7 @@ final class HibernateClient implements JqmClient
         em.createQuery("DELETE FROM JobParameter WHERE jobInstance = :i").setParameter("i", ji).executeUpdate();
         em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", ji.getId()).executeUpdate();
         em.getTransaction().commit();
+        em.close();
     }
 
     @Override
@@ -515,15 +520,16 @@ final class HibernateClient implements JqmClient
             @SuppressWarnings("unused")
             int q = em.createQuery("UPDATE JobInstance j SET j.state = 'HOLDED' WHERE j.id = :idJob").setParameter("idJob", idJob)
                     .executeUpdate();
+            em.getTransaction().commit();
         }
         catch (Exception e)
         {
             jqmlogger.error("Could not pause job", e);
         }
-
-        em.getTransaction().commit();
-
-        em.close();
+        finally
+        {
+            em.close();
+        }
     }
 
     @Override
@@ -539,15 +545,17 @@ final class HibernateClient implements JqmClient
             @SuppressWarnings("unused")
             int q = em.createQuery("UPDATE JobInstance j SET j.state = 'SUBMITTED' WHERE j.id = :idJob").setParameter("idJob", idJob)
                     .executeUpdate();
+
+            em.getTransaction().commit();
         }
         catch (Exception e)
         {
             jqmlogger.error("could not resume job", e);
         }
-
-        em.getTransaction().commit();
-
-        em.close();
+        finally
+        {
+            em.close();
+        }
     }
 
     public int restartCrashedJob(int idJob)
@@ -1086,8 +1094,10 @@ final class HibernateClient implements JqmClient
         {
             throw new JqmClientException("The user cannot be found or an error occured getting his jobs", e);
         }
-
-        em.close();
+        finally
+        {
+            em.close();
+        }
         return jobs;
     }
 
@@ -1114,8 +1124,10 @@ final class HibernateClient implements JqmClient
         {
             throw new JqmClientException("The user cannot be found or an error occured getting his jobs", e);
         }
-
-        em.close();
+        finally
+        {
+            em.close();
+        }
         return jobs;
     }
 
@@ -1142,21 +1154,24 @@ final class HibernateClient implements JqmClient
     @Override
     public List<com.enioka.jqm.api.Deliverable> getJobDeliverables(int idJob)
     {
-        ArrayList<Deliverable> deliverables = null;
+        List<Deliverable> deliverables = null;
+        EntityManager em = getEm();
 
         try
         {
-            deliverables = (ArrayList<Deliverable>) getEm()
-                    .createQuery("SELECT d FROM Deliverable d WHERE d.jobId = :idJob", Deliverable.class).setParameter("idJob", idJob)
-                    .getResultList();
+            deliverables = em.createQuery("SELECT d FROM Deliverable d WHERE d.jobId = :idJob", Deliverable.class)
+                    .setParameter("idJob", idJob).getResultList();
         }
         catch (Exception e)
         {
             throw new JqmClientException("Deliverables cannot be found", e);
         }
+        finally
+        {
+            em.close();
+        }
 
         List<com.enioka.jqm.api.Deliverable> res = new ArrayList<com.enioka.jqm.api.Deliverable>();
-
         for (Deliverable d : deliverables)
         {
             res.add(new com.enioka.jqm.api.Deliverable(d.getFilePath(), d.getFileFamily(), d.getId(), d.getOriginalFileName()));
@@ -1193,12 +1208,14 @@ final class HibernateClient implements JqmClient
         try
         {
             deliverable = em.find(Deliverable.class, d.getId());
-            em.close();
         }
         catch (Exception e)
         {
-            em.close();
             throw new JqmClientException("Could not get find deliverable description inside DB - your ID may be wrong", e);
+        }
+        finally
+        {
+            em.close();
         }
 
         return getDeliverableContent(deliverable);
@@ -1279,6 +1296,7 @@ final class HibernateClient implements JqmClient
             res.add(tmp);
         }
 
+        em.close();
         return res;
     }
 
