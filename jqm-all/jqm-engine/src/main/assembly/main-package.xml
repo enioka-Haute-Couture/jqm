@@ -31,10 +31,10 @@
 			<fileMode>0755</fileMode>
 		</fileSet>
 		<fileSet>
-			<directory>${project.basedir}/src/main/scripts</directory>
+			<directory>${project.basedir}/src/main/scripts/conf</directory>
 			<outputDirectory>/conf</outputDirectory>
 			<includes>
-				<include>*.properties</include>
+				<include>*</include>
 			</includes>
 		</fileSet>
 		<fileSet>
