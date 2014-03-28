@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -1002,7 +1003,7 @@ final class HibernateClient implements JqmClient
             {
                 qCount.setParameter(entry.getKey(), entry.getValue());
             }
-            query.setResultSize(qCount.getSingleResult());
+            query.setResultSize(new BigDecimal(qCount.getSingleResult()).intValueExact());
         }
 
         for (History ji : q1.getResultList())

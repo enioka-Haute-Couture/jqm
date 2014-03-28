@@ -31,7 +31,7 @@ public final class Query
     private Calendar enqueuedBefore, enqueuedAfter, beganRunningBefore, beganRunningAfter, endedBefore, endedAfter;
     private List<State> status = new ArrayList<State>();
     private Integer firstRow, pageSize;
-    private Long resultSize;
+    private Integer resultSize;
     private List<JobInstance> results;
     private List<SortSpec> sorts = new ArrayList<Query.SortSpec>();
 
@@ -162,7 +162,7 @@ public final class Query
         return this;
     }
 
-    public Long getResultSize()
+    public Integer getResultSize()
     {
         if (results == null)
         {
@@ -174,11 +174,11 @@ public final class Query
         }
         else
         {
-            return (long) results.size();
+            return results.size();
         }
     }
 
-    void setResultSize(Long resultSize)
+    void setResultSize(Integer resultSize)
     {
         this.resultSize = resultSize;
     }

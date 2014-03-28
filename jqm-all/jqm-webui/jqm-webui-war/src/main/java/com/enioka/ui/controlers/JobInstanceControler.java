@@ -181,7 +181,7 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
 
         // Run the query
         q.run();
-        this.setRowCount(new BigDecimal(q.getResultSize()).intValueExact());
+        this.setRowCount(q.getResultSize());
         return q.getResults();
     }
 
