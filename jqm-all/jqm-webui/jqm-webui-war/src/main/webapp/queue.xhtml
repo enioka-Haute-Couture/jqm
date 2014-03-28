@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<meta http-equiv="cache-control" content="no-cache" />
+
+<h:head>
+	<title>Queue definitions</title>
+</h:head>
+
+<h:body>
+	<ui:composition template="common.xhtml">
+		<ui:define name="title">Available job definitions</ui:define>
+
+		<ui:define name="content">
+			<h:form id="mainForm">
+				<p:growl id="growl" showDetail="true" />
+
+				<p:dataTable id="dataGrid" value="#{queueControler.queues}" var="q"
+					paginator="true" selection="#{queueControler.selectedQueue}"
+					rows="25" selectionMode="single"
+					rowsPerPageTemplate="5,10,15,20,25,30,40,50,60" width="90%">
+
+					<p:ajax event="rowSelect" listener="#{queueControler.onRowSelect}"
+						update=":mainForm:growl" />
+					<p:ajax event="rowUnselect"
+						listener="#{queueControler.onRowUnselect}"
+						update=":mainForm:growl" />
+
+					<p:column headerText="ID">
+						<h:outputText value="#{q.id}" />
+					</p:column>
+					<p:column headerText="Name">
+						<h:outputText value="#{q.name}" />
+					</p:column>
+					<p:column headerText="Description">
+						<h:outputText value="#{q.description}" />
+					</p:column>
+				</p:dataTable>
+			</h:form>
+
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+</html>

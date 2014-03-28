@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SelectableDataModel;
@@ -30,13 +28,6 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
     private boolean renderKeywords = false;
     private List<SortMeta> sortCache = null;
 
-    @PostConstruct
-    public void init()
-    {
-        FacesContext.getCurrentInstance().getExternalContext().getSession(true);
-        getJobs();
-    }
-
     public String stop()
     {
         if (selected.getState().equals(State.SUBMITTED))
@@ -47,20 +38,17 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
         {
             JqmClientFactory.getClient().killJob(selected.getId());
         }
-
-        return "queue?faces-redirect=true";
+        return "queuecontent?faces-redirect=true";
     }
 
-    public LazyDataModel<JobInstance> getJobs()
+    public LazyDataModel<JobInstance> getActiveJobs()
     {
-        this.setWrappedData(JqmClientFactory.getClient().getActiveJobs());
-        return this;
-    }
-
-    public LazyDataModel<JobInstance> getHistoryJobs()
-    {
-        this.setWrappedData(JqmClientFactory.getClient().getJobs(
-                Query.create().addStatusFilter(State.ENDED).addStatusFilter(State.CRASHED).addStatusFilter(State.KILLED)));
+        System.out.println("1");
+        List<JobInstance> jis = JqmClientFactory.getClient().getActiveJobs();
+        System.out.println("2 - " + jis.size());
+        this.setWrappedData(jis);
+        System.out.println("3");
+        this.setRowCount(jis.size());
         return this;
     }
 
