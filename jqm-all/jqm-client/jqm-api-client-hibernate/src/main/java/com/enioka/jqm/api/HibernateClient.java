@@ -1318,12 +1318,14 @@ final class HibernateClient implements JqmClient
         List<JobDef> dbr = null;
         if (application == null)
         {
-            dbr = em.createQuery("SELECT jd from JobDef jd ORDER BY jd.applicationName", JobDef.class).getResultList();
+            dbr = em.createQuery("SELECT jd from JobDef jd ORDER BY jd.application, jd.module, jd.applicationName", JobDef.class)
+                    .getResultList();
         }
         else
         {
-            dbr = em.createQuery("SELECT jd from JobDef jd WHERE jd.application = :name ORDER BY jd.applicationName", JobDef.class)
-                    .setParameter("name", application).getResultList();
+            dbr = em.createQuery(
+                    "SELECT jd from JobDef jd WHERE jd.application = :name ORDER BY jd.application, jd.module, jd.applicationName",
+                    JobDef.class).setParameter("name", application).getResultList();
         }
 
         for (JobDef jd : dbr)
