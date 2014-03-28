@@ -45,6 +45,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.enioka.jqm.api.Query.SortSpec;
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
@@ -908,6 +909,22 @@ final class HibernateClient implements JqmClient
         // Job Instance query
         if (query.isQueryLiveInstances())
         {
+            // Sort
+            String sort = "";
+            for (SortSpec s : query.getSorts())
+            {
+                sort += s.col.getJiField() == null ? "" : ",h." + s.col.getJiField() + " "
+                        + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
+            }
+            if (sort.isEmpty())
+            {
+                sort = " ORDER BY h.id";
+            }
+            else
+            {
+                sort = " ORDER BY " + sort.substring(1);
+            }
+
             // Calendar fields are specific (no common fields between History and JobInstance)
             String wh2 = "" + wh;
             Map<String, Object> prms2 = new HashMap<String, Object>();
@@ -950,7 +967,22 @@ final class HibernateClient implements JqmClient
             wh = " WHERE " + wh.substring(3);
         }
 
-        TypedQuery<History> q1 = em.createQuery("SELECT h FROM History h " + wh + " ORDER BY h.id ", History.class);
+        // Order by
+        String sort = "";
+        for (SortSpec s : query.getSorts())
+        {
+            sort += ",h." + s.col.getHistoryField() + " " + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
+        }
+        if (sort.isEmpty())
+        {
+            sort = " ORDER BY h.id";
+        }
+        else
+        {
+            sort = " ORDER BY " + sort.substring(1);
+        }
+
+        TypedQuery<History> q1 = em.createQuery("SELECT h FROM History h " + wh + sort, History.class);
         for (Map.Entry<String, Object> entry : prms.entrySet())
         {
             q1.setParameter(entry.getKey(), entry.getValue());

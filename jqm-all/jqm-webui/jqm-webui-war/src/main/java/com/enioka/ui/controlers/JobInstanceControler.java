@@ -2,6 +2,7 @@ package com.enioka.ui.controlers;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,7 @@ import org.primefaces.model.SortOrder;
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
+import com.enioka.jqm.api.Query.Sort;
 import com.enioka.jqm.api.State;
 
 @ManagedBean(eager = true)
@@ -27,6 +29,7 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
     private static final long serialVersionUID = 7869897762565932002L;
     private JobInstance selected = null;
     private boolean renderKeywords = false;
+    private List<SortMeta> sortCache = null;
 
     @PostConstruct
     public void init()
@@ -69,6 +72,15 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
 
     @Override
     public List<JobInstance> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, String> filters)
+    {
+        System.out.println("using wrong method");
+        // SortMeta sm = new SortMeta(null, sortField, sortOrder, null);
+        return load(first, pageSize, new ArrayList<SortMeta>(), filters);
+    }
+
+    @SuppressWarnings("unused")
+    @Override
+    public List<JobInstance> load(int first, int pageSize, List<SortMeta> multiSortMeta, Map<String, String> filters)
     {
         // Pagination is very important here - we are querying a table that could count millions of rows
         Query q = Query.create().setFirstRow(first).setPageSize(pageSize);
@@ -118,16 +130,59 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
             }
         }
 
+        // Add sorts
+        if (multiSortMeta == null && sortCache != null)
+        {
+            multiSortMeta = sortCache;
+        }
+        if (multiSortMeta != null)
+        {
+            sortCache = multiSortMeta;
+            for (SortMeta sm : multiSortMeta)
+            {
+                if ("queue.name".equals(sm.getSortField()))
+                {
+                    Object p = sm.getSortOrder().equals(SortOrder.ASCENDING) ? q.addSortAsc(Sort.QUEUENAME) : q.addSortDesc(Sort.QUEUENAME);
+                }
+                else if ("h.id".equals(sm.getSortField()))
+                {
+                    Object p = sm.getSortOrder().equals(SortOrder.ASCENDING) ? q.addSortAsc(Sort.ID) : q.addSortDesc(Sort.ID);
+                }
+                else if ("jd.applicationName".equals(sm.getSortField()))
+                {
+                    Object p = sm.getSortOrder().equals(SortOrder.ASCENDING) ? q.addSortAsc(Sort.APPLICATIONNAME) : q
+                            .addSortDesc(Sort.APPLICATIONNAME);
+                }
+                else if ("h.user".equals(sm.getSortField()))
+                {
+                    Object p = sm.getSortOrder().equals(SortOrder.ASCENDING) ? q.addSortAsc(Sort.USERNAME) : q.addSortDesc(Sort.USERNAME);
+                }
+                else if ("h.parent".equals(sm.getSortField()))
+                {
+                    Object p = sm.getSortOrder().equals(SortOrder.ASCENDING) ? q.addSortAsc(Sort.PARENTID) : q.addSortDesc(Sort.PARENTID);
+                }
+
+                else if ("h.enqueue".equals(sm.getSortField()))
+                {
+                    Object p = sm.getSortOrder().equals(SortOrder.ASCENDING) ? q.addSortAsc(Sort.DATEENQUEUE) : q
+                            .addSortDesc(Sort.DATEENQUEUE);
+                }
+                else if ("h.begin".equals(sm.getSortField()))
+                {
+                    Object p = sm.getSortOrder().equals(SortOrder.ASCENDING) ? q.addSortAsc(Sort.DATEEXECUTION) : q
+                            .addSortDesc(Sort.DATEENQUEUE);
+                }
+                else if ("h.end".equals(sm.getSortField()))
+                {
+                    Object p = sm.getSortOrder().equals(SortOrder.ASCENDING) ? q.addSortAsc(Sort.DATEEND) : q.addSortDesc(Sort.DATEEND);
+                }
+            }
+        }
+
         // Run the query
         q.run();
         this.setRowCount(new BigDecimal(q.getResultSize()).intValueExact());
         return q.getResults();
-    }
-
-    @Override
-    public List<JobInstance> load(int first, int pageSize, List<SortMeta> multiSortMeta, Map<String, String> filters)
-    {
-        return load(first, pageSize, null, null, filters);
     }
 
     public void setSelected(JobInstance selected)

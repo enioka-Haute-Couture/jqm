@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
+import com.enioka.jqm.api.Query.Sort;
 import com.enioka.jqm.api.State;
 
 /**
@@ -130,5 +131,21 @@ public class BasicTest
     public void testUsername()
     {
         Query.create().setUser("test").setPageSize(10).run();
+    }
+
+    @Test
+    public void testSortHistory()
+    {
+        Query.create().setUser("test").setPageSize(10).addSortAsc(Sort.APPLICATIONNAME).addSortDesc(Sort.DATEATTRIBUTION)
+                .addSortAsc(Sort.DATEEND).addSortDesc(Sort.DATEENQUEUE).addSortAsc(Sort.ID).addSortDesc(Sort.QUEUENAME)
+                .addSortAsc(Sort.STATUS).addSortDesc(Sort.USERNAME).addSortAsc(Sort.PARENTID).run();
+    }
+
+    @Test
+    public void testSortJi()
+    {
+        Query.create().setQueryLiveInstances(true).setUser("test").addSortAsc(Sort.APPLICATIONNAME).addSortDesc(Sort.DATEATTRIBUTION)
+                .addSortAsc(Sort.DATEEND).addSortDesc(Sort.DATEENQUEUE).addSortAsc(Sort.ID).addSortDesc(Sort.QUEUENAME)
+                .addSortAsc(Sort.STATUS).addSortDesc(Sort.USERNAME).addSortAsc(Sort.PARENTID).run();
     }
 }

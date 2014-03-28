@@ -23,37 +23,41 @@
 					value="#{jobInstanceControler}" sortMode="multiple" rows="25"
 					paginator="true" rowsPerPageTemplate="5,10,15,20,25,30,40,50,60">
 
-					<p:column id="idColumn" headerText="ID" filterBy="h.id">
+					<p:column id="idColumn" headerText="ID" filterBy="h.id"
+						sortBy="h.id">
 						<h:outputText value="#{h.id}" />
 					</p:column>
-					<p:column headerText="Job Definition" filterBy="jd.applicationName">
+					<p:column headerText="Job Definition" filterBy="jd.applicationName"
+						sortBy="jd.applicationName">
 						<h:outputText value="#{h.applicationName}" />
 					</p:column>
-					<p:column headerText="Queue" filterBy="queue.name">
+					<p:column headerText="Queue" filterBy="queue.name"
+						sortBy="queue.name">
 						<h:outputText value="#{h.queue.name}" />
 					</p:column>
 					<p:column headerText="Status">
 						<h:outputText value="#{h.state}" />
 					</p:column>
-					<p:column headerText="Enqueue Date">
+					<p:column headerText="Enqueue Date" sortBy="h.enqueue">
 						<h:outputText value="#{h.enqueueDate.time}">
 							<f:convertDateTime type="date" pattern="dd/MM HH:mm" />
 						</h:outputText>
 					</p:column>
-					<p:column headerText="Execution Date">
+					<p:column headerText="Execution Date" sortBy="h.begin">
 						<h:outputText value="#{h.beganRunningDate.time}">
 							<f:convertDateTime type="date" pattern="dd/MM HH:mm" />
 						</h:outputText>
 					</p:column>
-					<p:column headerText="End Date">
+					<p:column headerText="End Date" sortBy="h.end">
 						<h:outputText value="#{h.endDate.time}">
 							<f:convertDateTime type="date" pattern="dd/MM HH:mm" />
 						</h:outputText>
 					</p:column>
-					<p:column headerText="User Name" filterBy="h.user">
+					<p:column headerText="User Name" filterBy="h.user" sortBy="h.user">
 						<h:outputText value="#{h.user}" />
 					</p:column>
-					<p:column headerText="Parent Job ID" filterBy="h.parent">
+					<p:column headerText="Parent Job ID" filterBy="h.parent"
+						sortBy="h.parent">
 						<h:outputText value="#{h.parent}" />
 					</p:column>
 					<p:column headerText="Keyword 1" filterBy="jd.keyword1"

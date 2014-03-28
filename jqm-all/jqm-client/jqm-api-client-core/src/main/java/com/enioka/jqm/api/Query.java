@@ -33,8 +33,90 @@ public final class Query
     private Integer firstRow, pageSize;
     private Long resultSize;
     private List<JobInstance> results;
+    private List<SortSpec> sorts = new ArrayList<Query.SortSpec>();
 
     private boolean queryLiveInstances = false;
+
+    /**
+     * The different fields that can be used in sorting.
+     */
+    public enum Sort {
+        ID("id"), APPLICATIONNAME("jd.applicationName"), QUEUENAME("queue.name"), STATUS("status", "state"), DATEENQUEUE("enqueueDate"), DATEATTRIBUTION(
+                "attributionDate"), DATEEXECUTION("executionDate"), DATEEND("endDate", null), USERNAME("userName"), PARENTID("parentId");
+
+        private String historyField, jiField;
+
+        private Sort(String historyField, String jiField)
+        {
+            this.historyField = historyField;
+            this.jiField = jiField;
+        }
+
+        private Sort(String commonField)
+        {
+            this.historyField = commonField;
+            this.jiField = commonField;
+        }
+
+        String getHistoryField()
+        {
+            return this.historyField;
+        }
+
+        String getJiField()
+        {
+            return this.jiField;
+        }
+    }
+
+    /**
+     * The sort order
+     */
+    enum SortOrder {
+        ASCENDING, DESCENDING;
+    }
+
+    /**
+     * Internal description of a sorting operation
+     */
+    class SortSpec
+    {
+        public SortOrder order = SortOrder.ASCENDING;
+        public Sort col;
+
+        SortSpec(SortOrder order, Sort column)
+        {
+            this.order = order;
+            this.col = column;
+        }
+    }
+
+    /**
+     * Adds a new column a the end of the sorting clause.
+     * 
+     * @see #addSortDesc(Sort)
+     */
+    public Query addSortAsc(Sort column)
+    {
+        this.sorts.add(new SortSpec(SortOrder.ASCENDING, column));
+        return this;
+    }
+
+    /**
+     * Adds a new column a the end of the sorting clause.
+     * 
+     * @see #addSortAsc(Sort)
+     */
+    public Query addSortDesc(Sort column)
+    {
+        this.sorts.add(new SortSpec(SortOrder.DESCENDING, column));
+        return this;
+    }
+
+    List<SortSpec> getSorts()
+    {
+        return this.sorts;
+    }
 
     // //////////////////////////////////////////
     // Accelerator constructors
