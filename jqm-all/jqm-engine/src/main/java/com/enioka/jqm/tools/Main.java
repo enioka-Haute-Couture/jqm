@@ -118,6 +118,7 @@ public class Main
         Option o61 = OptionBuilder.withArgName("nodeName").hasArg()
                 .withDescription("create a JQM node of this name (init the database if needed").isRequired().create("createnode");
         Option o71 = OptionBuilder.withDescription("display JQM engine version").withLongOpt("version").create("v");
+        Option o81 = OptionBuilder.withDescription("upgrade JQM database").withLongOpt("upgrade").create("u");
 
         Options options = new Options();
         OptionGroup og1 = new OptionGroup();
@@ -130,6 +131,7 @@ public class Main
         og1.addOption(o51);
         og1.addOption(o61);
         og1.addOption(o71);
+        og1.addOption(o81);
         options.addOptionGroup(og1);
 
         try
@@ -178,6 +180,11 @@ public class Main
             else if (line.getOptionValue(o61.getOpt()) != null)
             {
                 createEngine(line.getOptionValue(o61.getOpt()));
+            }
+            // Upgrade
+            else if (line.hasOption(o81.getOpt()))
+            {
+                upgrade();
             }
             // Help
             else if (line.hasOption(o01.getOpt()))
@@ -255,6 +262,22 @@ public class Main
         catch (Exception e)
         {
             jqmlogger.fatal("Could not create the engine", e);
+        }
+    }
+
+    private static void upgrade()
+    {
+        try
+        {
+            Helpers.allowCreateSchema();
+            jqmlogger.info("Upgrading");
+            EntityManager em = Helpers.getNewEm();
+            Helpers.getParameter("none", "", em);
+            em.close();
+        }
+        catch (Exception e)
+        {
+            jqmlogger.fatal("Could not upgrade", e);
         }
     }
 
