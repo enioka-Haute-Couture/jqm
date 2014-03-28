@@ -26,7 +26,8 @@ public final class Query
     private String sessionId;
     private String jobDefKeyword1, jobDefKeyword2, jobDefKeyword3, jobDefModule, jobDefApplication;
     private String instanceKeyword1, instanceKeyword2, instanceKeyword3, instanceModule, instanceApplication;
-    private Queue queue;
+    private String queueName;
+    private Integer queueId;
     private Calendar enqueuedBefore, enqueuedAfter, beganRunningBefore, beganRunningAfter, endedBefore, endedAfter;
     private List<State> status = new ArrayList<State>();
     private Integer firstRow, pageSize;
@@ -378,22 +379,6 @@ public final class Query
         return this;
     }
 
-    Queue getQueue()
-    {
-        return queue;
-    }
-
-    /**
-     * For querying jobs on a given queue. The list of queues can be retrieved through {@link JqmClient#getQueues()}.
-     * 
-     * @param queue
-     */
-    public Query setQueue(Queue queue)
-    {
-        this.queue = queue;
-        return this;
-    }
-
     boolean isQueryLiveInstances()
     {
         return queryLiveInstances;
@@ -544,4 +529,32 @@ public final class Query
         return pageSize;
     }
 
+    String getQueueName()
+    {
+        return queueName;
+    }
+
+    /**
+     * For querying jobs on a given queue. The list of queues can be retrieved through {@link JqmClient#getQueues()}.
+     */
+    public Query setQueueName(String queueName)
+    {
+        this.queueName = queueName;
+        return this;
+    }
+
+    Integer getQueueId()
+    {
+        return queueId;
+    }
+
+    /**
+     * For querying jobs on a given queue. The list of queues can be retrieved through {@link JqmClient#getQueues()}.<br>
+     * Ignored if setQueueName is used.
+     */
+    public Query setQueueId(Integer queueId)
+    {
+        this.queueId = queueId;
+        return this;
+    }
 }

@@ -9,6 +9,9 @@ import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
 import com.enioka.jqm.api.State;
 
+/**
+ * Simple tests for checking JPA query syntax (no data)
+ */
 public class BasicTest
 {
     private static Logger jqmlogger = Logger.getLogger(BasicTest.class);
@@ -107,5 +110,25 @@ public class BasicTest
     public void testQueryNull()
     {
         JqmClientFactory.getClient().getJobs(new Query("", null));
+    }
+
+    @Test
+    public void testQueueNameId()
+    {
+        Query.create().setQueueName("test").run();
+        Query.create().setQueueId(12).run();
+    }
+
+    @Test
+    public void testPaginationWithFilter()
+    {
+        Query.create().setQueueName("test").setPageSize(10).run();
+        Query.create().setQueueId(12).setPageSize(10).run();
+    }
+
+    @Test
+    public void testUsername()
+    {
+        Query.create().setUser("test").setPageSize(10).run();
     }
 }

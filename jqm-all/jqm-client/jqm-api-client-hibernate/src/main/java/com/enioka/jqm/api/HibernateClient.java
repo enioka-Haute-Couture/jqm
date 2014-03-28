@@ -796,7 +796,7 @@ final class HibernateClient implements JqmClient
         {
             if (!filterValue.isEmpty())
             {
-                String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1];
+                String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1] + Math.abs(fieldName.hashCode());
                 prms.put(prmName, filterValue);
                 if (filterValue.contains("%"))
                 {
@@ -837,7 +837,7 @@ final class HibernateClient implements JqmClient
     {
         if (filterValue != null)
         {
-            String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1] + +comparison.hashCode();
+            String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1] + Math.abs(comparison.hashCode());
             prms.put(prmName, filterValue);
             return String.format("AND (%s %s :%s) ", fieldName, comparison, prmName);
         }
@@ -894,11 +894,12 @@ final class HibernateClient implements JqmClient
         wh += getStringPredicate("jd.keyword3", query.getJobDefKeyword3(), prms);
         wh += getStringPredicate("jd.module", query.getJobDefModule(), prms);
         wh += getStringPredicate("jd.application", query.getJobDefApplication(), prms);
+        wh += getStringPredicate("queue.name", query.getQueueName(), prms);
 
         // Integer
         wh += getIntPredicate("parentId", query.getParentId(), prms);
         wh += getIntPredicate("id", query.getJobInstanceId(), prms);
-        wh += getIntPredicate("queue.id", query.getQueue() == null ? null : query.getQueue().getId(), prms);
+        wh += getIntPredicate("queue.id", query.getQueueName() == null ? null : query.getQueueId(), prms);
 
         // Now, run queries...
         List<com.enioka.jqm.api.JobInstance> res2 = new ArrayList<com.enioka.jqm.api.JobInstance>();
@@ -964,7 +965,12 @@ final class HibernateClient implements JqmClient
         }
         if (query.getFirstRow() != null || query.getPageSize() != null)
         {
-            query.setResultSize(em.createQuery("SELECT COUNT(h) FROM History h " + wh, Long.class).getSingleResult());
+            TypedQuery<Long> qCount = em.createQuery("SELECT COUNT(h) FROM History h " + wh, Long.class);
+            for (Map.Entry<String, Object> entry : prms.entrySet())
+            {
+                qCount.setParameter(entry.getKey(), entry.getValue());
+            }
+            query.setResultSize(qCount.getSingleResult());
         }
 
         for (History ji : q1.getResultList())

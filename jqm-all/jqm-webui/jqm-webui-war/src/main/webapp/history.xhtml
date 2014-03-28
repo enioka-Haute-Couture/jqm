@@ -17,72 +17,80 @@
 
 		<ui:define name="content">
 			<h:form id="mainForm">
+
 				<!--  filteredValue="#{history.filteredhs}" -->
 				<p:dataTable id="dataTable" var="h" lazy="true"
 					value="#{jobInstanceControler}" sortMode="multiple" rows="25"
 					paginator="true" rowsPerPageTemplate="5,10,15,20,25,30,40,50,60">
 
-					<p:column id="idColumn" headerText="ID" filterBy="id">
+					<p:column id="idColumn" headerText="ID" filterBy="h.id">
 						<h:outputText value="#{h.id}" />
 					</p:column>
-					<p:column headerText="Job Definition" filterBy="h.applicationName">
+					<p:column headerText="Job Definition" filterBy="jd.applicationName">
 						<h:outputText value="#{h.applicationName}" />
 					</p:column>
 					<p:column headerText="Queue" filterBy="queue.name">
 						<h:outputText value="#{h.queue.name}" />
 					</p:column>
-					<p:column headerText="Status" filterBy="state">
+					<p:column headerText="Status">
 						<h:outputText value="#{h.state}" />
 					</p:column>
-					<p:column headerText="Enqueue Date" filterBy="enqueueDate.time">
+					<p:column headerText="Enqueue Date">
 						<h:outputText value="#{h.enqueueDate.time}">
 							<f:convertDateTime type="date" pattern="dd/MM HH:mm" />
 						</h:outputText>
 					</p:column>
-					<p:column headerText="Execution Date" filterBy="executionDate.time">
+					<p:column headerText="Execution Date">
 						<h:outputText value="#{h.beganRunningDate.time}">
 							<f:convertDateTime type="date" pattern="dd/MM HH:mm" />
 						</h:outputText>
 					</p:column>
-					<p:column headerText="End Date" filterBy="endDate.time">
+					<p:column headerText="End Date">
 						<h:outputText value="#{h.endDate.time}">
 							<f:convertDateTime type="date" pattern="dd/MM HH:mm" />
 						</h:outputText>
 					</p:column>
-					<p:column headerText="User Name" filterBy="user">
+					<p:column headerText="User Name" filterBy="h.user">
 						<h:outputText value="#{h.user}" />
 					</p:column>
-					<p:column headerText="Parent Job ID" filterBy="parent">
+					<p:column headerText="Parent Job ID" filterBy="h.parent">
 						<h:outputText value="#{h.parent}" />
 					</p:column>
-					<p:column headerText="Keyword 1" filterBy="keyword1">
+					<p:column headerText="Keyword 1" filterBy="jd.keyword1"
+						rendered="#{jobInstanceControler.renderKeywords}">
 						<h:outputText value="#{h.keyword1}" />
 					</p:column>
-					<p:column headerText="Keyword 2" filterBy="keyword2">
+					<p:column headerText="Keyword 2" filterBy="jd.keyword2"
+						rendered="#{jobInstanceControler.renderKeywords}">
 						<h:outputText value="#{h.keyword2}" />
 					</p:column>
-					<p:column headerText="Keyword 3" filterBy="keyword3">
+					<p:column headerText="Keyword 3" filterBy="jd.keyword3"
+						rendered="#{jobInstanceControler.renderKeywords}">
 						<h:outputText value="#{h.keyword3}" />
 					</p:column>
-					<p:column headerText="Application" filterBy="application">
+					<p:column headerText="Application" filterBy="jd.application">
 						<h:outputText value="#{h.application}" />
 					</p:column>
-					<p:column headerText="Module" filterBy="module">
+					<p:column headerText="Module" filterBy="jd.module">
 						<h:outputText value="#{h.module}" />
 					</p:column>
-					<p:column headerText="Progress" filterBy="progress">
+					<p:column headerText="Progress">
 						<h:outputText value="#{h.progress}" />
 					</p:column>
-					<p:column headerText="Session ID" filterBy="sessionID">
+					<p:column headerText="Session ID">
 						<h:outputText value="#{h.sessionID}" />
 					</p:column>
 
 				</p:dataTable>
-				<!-- 
-	<p>
-		<p:commandButton value="Refresh" update=":mainForm:dataTable"/>
-	</p>
--->
+
+				<p:commandButton value="Refresh" update="dataTable" />
+
+				<p:commandButton value="Show keywords" update="dataTable"
+					widgetVar="showKw" onclick="showKw.disable()">
+					<f:setPropertyActionListener value="true"
+						target="#{jobInstanceControler.renderKeywords}" />
+				</p:commandButton>
+
 			</h:form>
 		</ui:define>
 	</ui:composition>

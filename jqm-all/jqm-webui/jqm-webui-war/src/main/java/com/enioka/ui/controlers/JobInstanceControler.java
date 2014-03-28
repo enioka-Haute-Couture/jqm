@@ -26,6 +26,7 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
 {
     private static final long serialVersionUID = 7869897762565932002L;
     private JobInstance selected = null;
+    private boolean renderKeywords = false;
 
     @PostConstruct
     public void init()
@@ -69,7 +70,55 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
     @Override
     public List<JobInstance> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, String> filters)
     {
+        // Pagination is very important here - we are querying a table that could count millions of rows
         Query q = Query.create().setFirstRow(first).setPageSize(pageSize);
+
+        // Add filters
+        for (String key : filters.keySet())
+        {
+            if ("queue.name".equals(key))
+            {
+                q.setQueueName(filters.get(key));
+            }
+            else if ("h.id".equals(key))
+            {
+                q.setJobInstanceId(Integer.parseInt(filters.get(key)));
+            }
+            else if ("jd.applicationName".equals(key))
+            {
+                q.setApplicationName(filters.get(key));
+            }
+            else if ("h.user".equals(key))
+            {
+                q.setUser(filters.get(key));
+            }
+            else if ("h.parent".equals(key))
+            {
+                q.setParentId(Integer.parseInt(filters.get(key)));
+            }
+            else if ("jd.keyword1".equals(key))
+            {
+                q.setJobDefKeyword1(filters.get(key));
+            }
+            else if ("jd.keyword2".equals(key))
+            {
+                q.setJobDefKeyword2(filters.get(key));
+            }
+            else if ("jd.keyword3".equals(key))
+            {
+                q.setJobDefKeyword3(filters.get(key));
+            }
+            else if ("jd.application".equals(key))
+            {
+                q.setJobDefApplication(filters.get(key));
+            }
+            else if ("jd.module".equals(key))
+            {
+                q.setJobDefModule(filters.get(key));
+            }
+        }
+
+        // Run the query
         q.run();
         this.setRowCount(new BigDecimal(q.getResultSize()).intValueExact());
         return q.getResults();
@@ -96,5 +145,15 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
     public JobInstance getRowData(String rowKey)
     {
         return JqmClientFactory.getClient().getJob(Integer.parseInt(rowKey));
+    }
+
+    public boolean isRenderKeywords()
+    {
+        return renderKeywords;
+    }
+
+    public void setRenderKeywords(boolean renderKeywords)
+    {
+        this.renderKeywords = renderKeywords;
     }
 }
