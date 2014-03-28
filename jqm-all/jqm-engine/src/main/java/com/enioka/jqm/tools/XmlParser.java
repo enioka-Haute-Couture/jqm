@@ -82,6 +82,7 @@ class XmlParser
         String keyword3 = null;
         boolean highlander = false;
         String jarPath = null;
+        String description = null;
 
         // SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         // Schema schema = null;
@@ -129,7 +130,7 @@ class XmlParser
                             jd = new JobDef();
                         }
 
-                        // Queue                        
+                        // Queue
                         if (jd.getQueue() == null && ee.getElementsByTagName("queue").getLength() != 0)
                         {
                             // Specified inside the XML. Does the queue already exist?
@@ -157,13 +158,14 @@ class XmlParser
                                 }
                             }
                         }
-						else						
+                        else
                         {
                             // Not specified => default queue
                             queue = em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true", Queue.class).getSingleResult();
                         }
 
                         // Easy attributes
+                        description = ee.getElementsByTagName("description").item(0).getTextContent();
                         applicationName = ee.getElementsByTagName("name").item(0).getTextContent();
                         application = ee.getElementsByTagName("application").item(0).getTextContent();
                         module = ee.getElementsByTagName("module").item(0).getTextContent();
@@ -208,6 +210,7 @@ class XmlParser
                         jd.setKeyword3(keyword3);
                         jd.setHighlander(highlander);
                         jd.setJarPath(jarPath);
+                        jd.setDescription(description);
 
                         em.persist(jd);
                         jqmlogger.info("Imported application " + applicationName);
