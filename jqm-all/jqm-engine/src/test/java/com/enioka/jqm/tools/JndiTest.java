@@ -284,4 +284,49 @@ public class JndiTest extends JqmBaseTest
             Assert.fail(e.getMessage());
         }
     }
+
+    @Test
+    public void testJndiFile() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting testJndiFile");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+
+        CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", jdargs,
+                "jqm-tests/jqm-test-jndifile/target/test.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
+                "other2", false, em);
+
+        JobRequest form = new JobRequest("Jms", "MAG");
+        JqmClientFactory.getClient().enqueue(form);
+
+        // Create JMS JNDI references for use by the test jar
+        em.getTransaction().begin();
+        CreationTools.createJndiFile(em, "fs/test", "test resource", "/tmp");
+        em.getTransaction().commit();
+
+        // Start the engine
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+
+        TestHelpers.waitFor(1, 10000, em);
+        engine1.stop();
+
+        History h = null;
+        try
+        {
+            h = (History) em.createQuery("SELECT h FROM History h").getSingleResult();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Assert.fail("History object was not created");
+            throw e;
+        }
+
+        Assert.assertEquals(State.ENDED, h.getStatus()); // Exception in jar => CRASHED
+    }
 }
