@@ -96,6 +96,10 @@ jqm_status() {
 	fi
 }
 
+jqm_createnode() {
+	$JAVA -jar $JQM_JAR -createnode $JQM_NODE
+}
+
 
 
 ###############################
@@ -115,7 +119,10 @@ case "$ACTION" in
 	'status')
 		jqm_status
 		;;
+	'createnode')
+		jqm_createnode
+		;;
 	*)
-		echo "Usage: $0 {start|stop|restart|status}"
+		echo "Usage: $0 {start|stop|restart|status|createnode|allxml|enqueue}"
 		;;
 esac
