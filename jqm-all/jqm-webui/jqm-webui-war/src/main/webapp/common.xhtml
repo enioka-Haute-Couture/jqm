@@ -12,9 +12,9 @@
 </h:head>
 
 <h:body>
-	<p:panel>
+	<p:layout fullPage="true">
 
-		<div id="pageContainer">
+		<p:layoutUnit position="north">
 			<div id="menu">
 				<h:outputText value="Client sample: " />
 				<h:link value="Job definitions" outcome="jobdef" />
@@ -25,23 +25,28 @@
 				<h:outputText value="   --   " />
 				<h:link value="Execution history" outcome="history" />
 			</div>
+		</p:layoutUnit>
 
+
+		<p:layoutUnit position="center">
 			<div id="header">
 				<h1>
 					<ui:insert name="title">
 					</ui:insert>
 				</h1>
 			</div>
-
 			<div id="content">
 				<ui:insert name="content">
 				</ui:insert>
 			</div>
-			
+		</p:layoutUnit>
+
+		<p:layoutUnit position="south">
 			<div id="footer">
-				<ui:insert name="footertext">JQM admin</ui:insert>
+				<ui:insert name="footertext">JQM sample JSF2 application</ui:insert>
 			</div>
-		</div>
-	</p:panel>
+		</p:layoutUnit>
+	</p:layout>
+
 </h:body>
 </html>

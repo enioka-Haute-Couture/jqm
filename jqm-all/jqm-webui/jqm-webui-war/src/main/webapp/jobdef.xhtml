@@ -21,8 +21,8 @@
 
 				<p:dataTable id="jdGrid" value="#{jobDefControler.jobs}" var="job"
 					paginator="true" selection="#{jobDefControler.selectedJob}"
-					rows="25" selectionMode="single"
-					rowsPerPageTemplate="5,10,15,20,25,30,40,50,60" width="90%">
+					rows="15" selectionMode="single"
+					rowsPerPageTemplate="10,15,20,25,30,40,50,60" width="90%">
 
 					<p:ajax event="rowSelect" listener="#{jobDefControler.onRowSelect}"
 						update=":mainForm:enqueue :mainForm:growl" />

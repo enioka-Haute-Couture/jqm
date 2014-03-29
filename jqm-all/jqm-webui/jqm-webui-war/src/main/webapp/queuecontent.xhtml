@@ -21,8 +21,8 @@
 				<p:dataTable id="qcDataTable"
 					value="#{activeQueueControler.activeJobs}" var="job"
 					selection="#{activeQueueControler.selected}" selectionMode="single"
-					cellspacing="4" width="100%" paginator="true" rows="50"
-					rowsPerPageTemplate="5,10,15,20,25,30,40,50,60" lazy="false">
+					cellspacing="4" width="100%" paginator="true" rows="15"
+					rowsPerPageTemplate="10,15,20,25,30,40,50,60" lazy="false">
 
 					<p:ajax event="rowSelect" update=":qcForm:btStop" />
 					<p:ajax event="rowUnselect" update=":qcForm:btStop" />
