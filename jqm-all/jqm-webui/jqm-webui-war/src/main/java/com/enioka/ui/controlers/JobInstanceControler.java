@@ -1,5 +1,6 @@
 package com.enioka.ui.controlers;
 
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,11 +9,14 @@ import java.util.Map;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SelectableDataModel;
 import org.primefaces.model.SortMeta;
 import org.primefaces.model.SortOrder;
+import org.primefaces.model.StreamedContent;
 
+import com.enioka.jqm.api.Deliverable;
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
@@ -28,6 +32,7 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
     private boolean renderKeywords = false;
     private List<SortMeta> sortCache = null;
     private List<JobInstance> jiCache = null;
+    private Deliverable selDel = null;
 
     public String stop()
     {
@@ -215,5 +220,26 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
     public List<String> getSelectedInstanceMessages()
     {
         return JqmClientFactory.getClient().getJobMessages(selected.getId());
+    }
+
+    public List<Deliverable> getSelectedInstanceFiles()
+    {
+        return JqmClientFactory.getClient().getJobDeliverables(selected.getId());
+    }
+
+    public StreamedContent getFile()
+    {
+        InputStream is = JqmClientFactory.getClient().getDeliverableContent(selDel);
+        return new DefaultStreamedContent(is, null, selected.getId() + " - " + selDel.getOriginalName());
+    }
+
+    public Deliverable getSelDel()
+    {
+        return selDel;
+    }
+
+    public void setSelDel(Deliverable selDel)
+    {
+        this.selDel = selDel;
     }
 }
