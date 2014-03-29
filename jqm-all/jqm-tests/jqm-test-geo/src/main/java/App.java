@@ -19,25 +19,26 @@
 import java.util.HashMap;
 import java.util.Map;
 
-import com.enioka.jqm.api.JobBase;
+import com.enioka.jqm.api.JobManager;
 
-public class App extends JobBase
+public class App implements Runnable
 {
+    JobManager jm;
 
     @Override
-    public void start()
+    public void run()
     {
         Map<String, String> p = new HashMap<String, String>();
-        p.put("nbJob", ((Integer.parseInt(this.getParameters().get("nbJob")) + 1) + ""));
+        p.put("nbJob", ((Integer.parseInt(jm.parameters().get("nbJob")) + 1) + ""));
 
-        if (Integer.parseInt(this.getParameters().get("nbJob")) >= 9)
+        if (Integer.parseInt(jm.parameters().get("nbJob")) >= 9)
         {
             return;
         }
 
-        sendMsg("launching first job");
-        enQueue("Geo", "Dark Vador", null, null, null, null, null, null, null, p);
-        sendMsg("launching second job");
-        enQueue("Geo", "Dark Vador", null, null, null, null, null, null, null, p);
+        jm.sendMsg("launching first job");
+        jm.enqueue(jm.applicationName(), null, null, null, null, null, null, null, null, p);
+        jm.sendMsg("launching second job");
+        jm.enqueue(jm.applicationName(), null, null, null, null, null, null, null, null, p);
     }
 }

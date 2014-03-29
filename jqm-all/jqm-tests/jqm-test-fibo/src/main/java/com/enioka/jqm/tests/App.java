@@ -39,7 +39,7 @@ public class App extends JobBase
 
         if (Integer.parseInt(this.getParameters().get("p1")) <= 100)
         {
-            enQueue("Fibo", "Dark Vador", null, null, null, null, null, null, null, p);
+            enQueue(jm.applicationName(), null, null, null, null, null, null, null, null, p);
         }
         System.out.println("QUIT FIBO");
     }
