@@ -119,6 +119,8 @@ public class Main
                 .withDescription("create a JQM node of this name (init the database if needed").isRequired().create("createnode");
         Option o71 = OptionBuilder.withDescription("display JQM engine version").withLongOpt("version").create("v");
         Option o81 = OptionBuilder.withDescription("upgrade JQM database").withLongOpt("upgrade").create("u");
+        Option o91 = OptionBuilder.withArgName("jobInstanceId").hasArg().withDescription("get job instance status by ID").isRequired()
+                .withLongOpt("getstatus").create("g");
 
         Options options = new Options();
         OptionGroup og1 = new OptionGroup();
@@ -132,6 +134,7 @@ public class Main
         og1.addOption(o61);
         og1.addOption(o71);
         og1.addOption(o81);
+        og1.addOption(o91);
         options.addOptionGroup(og1);
 
         try
@@ -155,6 +158,11 @@ public class Main
             if (line.getOptionValue(o11.getOpt()) != null)
             {
                 enqueue(line.getOptionValue(o11.getOpt()));
+            }
+            // Get status
+            if (line.getOptionValue(o91.getOpt()) != null)
+            {
+                getStatus(Integer.parseInt(line.getOptionValue(o91.getOpt())));
             }
             // Import XML
             else if (line.getOptionValue(o21.getOpt()) != null)
@@ -208,7 +216,12 @@ public class Main
     private static void enqueue(String applicationName)
     {
         jqmlogger.info("Will enqueue application named " + applicationName + " without parameter overloads");
-        JqmClientFactory.getClient().enqueue(applicationName, "CommandLineUser");
+        jqmlogger.info("Request ID is: " + JqmClientFactory.getClient().enqueue(applicationName, "CommandLineUser"));
+    }
+
+    private static void getStatus(int id)
+    {
+        jqmlogger.info("Status is: " + JqmClientFactory.getClient().getJob(id).getState());
     }
 
     private static void importJobDef(String xmlpath)
