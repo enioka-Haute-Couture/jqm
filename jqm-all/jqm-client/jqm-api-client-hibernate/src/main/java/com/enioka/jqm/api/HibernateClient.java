@@ -962,61 +962,63 @@ final class HibernateClient implements JqmClient
 
         // ////////////////////////////////////////
         // History query
+        if (query.isQueryHistoryInstances())
+        {
+            // Calendar fields are specific (no common fields between History and JobInstance)
+            wh += getCalendarPredicate("enqueueDate", query.getEnqueuedAfter(), ">=", prms);
+            wh += getCalendarPredicate("enqueueDate", query.getEnqueuedBefore(), "<=", prms);
+            wh += getCalendarPredicate("executionDate", query.getBeganRunningAfter(), ">=", prms);
+            wh += getCalendarPredicate("executionDate", query.getBeganRunningBefore(), "<=", prms);
+            wh += getCalendarPredicate("endDate", query.getEndedAfter(), ">=", prms);
+            wh += getCalendarPredicate("endDate", query.getEndedBefore(), "<=", prms);
+            wh += getStatusPredicate("status", query.getStatus(), prms);
+            if (wh.length() >= 3)
+            {
+                wh = " WHERE " + wh.substring(3);
+            }
 
-        // Calendar fields are specific (no common fields between History and JobInstance)
-        wh += getCalendarPredicate("enqueueDate", query.getEnqueuedAfter(), ">=", prms);
-        wh += getCalendarPredicate("enqueueDate", query.getEnqueuedBefore(), "<=", prms);
-        wh += getCalendarPredicate("executionDate", query.getBeganRunningAfter(), ">=", prms);
-        wh += getCalendarPredicate("executionDate", query.getBeganRunningBefore(), "<=", prms);
-        wh += getCalendarPredicate("endDate", query.getEndedAfter(), ">=", prms);
-        wh += getCalendarPredicate("endDate", query.getEndedBefore(), "<=", prms);
-        wh += getStatusPredicate("status", query.getStatus(), prms);
-        if (wh.length() >= 3)
-        {
-            wh = " WHERE " + wh.substring(3);
-        }
+            // Order by
+            String sort = "";
+            for (SortSpec s : query.getSorts())
+            {
+                sort += ",h." + s.col.getHistoryField() + " " + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
+            }
+            if (sort.isEmpty())
+            {
+                sort = " ORDER BY h.id";
+            }
+            else
+            {
+                sort = " ORDER BY " + sort.substring(1);
+            }
 
-        // Order by
-        String sort = "";
-        for (SortSpec s : query.getSorts())
-        {
-            sort += ",h." + s.col.getHistoryField() + " " + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
-        }
-        if (sort.isEmpty())
-        {
-            sort = " ORDER BY h.id";
-        }
-        else
-        {
-            sort = " ORDER BY " + sort.substring(1);
-        }
-
-        TypedQuery<History> q1 = em.createQuery("SELECT h FROM History h " + wh + sort, History.class);
-        for (Map.Entry<String, Object> entry : prms.entrySet())
-        {
-            q1.setParameter(entry.getKey(), entry.getValue());
-        }
-        if (query.getFirstRow() != null)
-        {
-            q1.setFirstResult(query.getFirstRow());
-        }
-        if (query.getPageSize() != null)
-        {
-            q1.setMaxResults(query.getPageSize());
-        }
-        if (query.getFirstRow() != null || query.getPageSize() != null)
-        {
-            TypedQuery<Long> qCount = em.createQuery("SELECT COUNT(h) FROM History h " + wh, Long.class);
+            TypedQuery<History> q1 = em.createQuery("SELECT h FROM History h " + wh + sort, History.class);
             for (Map.Entry<String, Object> entry : prms.entrySet())
             {
-                qCount.setParameter(entry.getKey(), entry.getValue());
+                q1.setParameter(entry.getKey(), entry.getValue());
             }
-            query.setResultSize(new BigDecimal(qCount.getSingleResult()).intValueExact());
-        }
+            if (query.getFirstRow() != null)
+            {
+                q1.setFirstResult(query.getFirstRow());
+            }
+            if (query.getPageSize() != null)
+            {
+                q1.setMaxResults(query.getPageSize());
+            }
+            if (query.getFirstRow() != null || query.getPageSize() != null)
+            {
+                TypedQuery<Long> qCount = em.createQuery("SELECT COUNT(h) FROM History h " + wh, Long.class);
+                for (Map.Entry<String, Object> entry : prms.entrySet())
+                {
+                    qCount.setParameter(entry.getKey(), entry.getValue());
+                }
+                query.setResultSize(new BigDecimal(qCount.getSingleResult()).intValueExact());
+            }
 
-        for (History ji : q1.getResultList())
-        {
-            res2.add(getJob(ji));
+            for (History ji : q1.getResultList())
+            {
+                res2.add(getJob(ji));
+            }
         }
 
         em.close();

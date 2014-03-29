@@ -35,7 +35,7 @@ public final class Query
     private List<JobInstance> results;
     private List<SortSpec> sorts = new ArrayList<Query.SortSpec>();
 
-    private boolean queryLiveInstances = false;
+    private boolean queryLiveInstances = false, queryHistoryInstances = true;
 
     /**
      * The different fields that can be used in sorting.
@@ -470,13 +470,28 @@ public final class Query
      * By default, querying only occurs on ended (OK or not) job instances. If this parameter is set to true, it will also include living
      * (waiting, running, ...) job instances.<br>
      * <br>
-     * Setting this to true has a noticeable performance impact and should be used as little as possible.
-     * 
-     * @param queryLiveInstances
+     * Setting this to true has a noticeable performance impact and should be used as little as possible (or should be used when
+     * {@link #setQueryHistoryInstances(boolean)} is false, which is not the default)
      */
     public Query setQueryLiveInstances(boolean queryLiveInstances)
     {
         this.queryLiveInstances = queryLiveInstances;
+        return this;
+    }
+
+    boolean isQueryHistoryInstances()
+    {
+        return queryHistoryInstances;
+    }
+
+    /**
+     * By default, querying only occurs on ended (OK or not) job instances. If this parameter is set to false, however, the History will not
+     * be used. This is usually used in conjunction with {@link #setQueryLiveInstances(boolean)}<br>
+     * <br>
+     */
+    public Query setQueryHistoryInstances(boolean queryHistoryInstances)
+    {
+        this.queryHistoryInstances = queryHistoryInstances;
         return this;
     }
 

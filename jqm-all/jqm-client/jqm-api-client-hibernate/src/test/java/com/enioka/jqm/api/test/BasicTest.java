@@ -148,4 +148,10 @@ public class BasicTest
                 .addSortAsc(Sort.DATEEND).addSortDesc(Sort.DATEENQUEUE).addSortAsc(Sort.ID).addSortDesc(Sort.QUEUENAME)
                 .addSortAsc(Sort.STATUS).addSortDesc(Sort.USERNAME).addSortAsc(Sort.PARENTID).run();
     }
+
+    @Test
+    public void testOnlyQueue()
+    {
+        Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false).setUser("test").run();
+    }
 }
