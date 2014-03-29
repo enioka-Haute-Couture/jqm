@@ -196,23 +196,23 @@ class Polling implements Runnable, PollingMBean
 
             // Get a JI to run
             JobInstance ji = dequeue();
-            if (ji == null)
+            while (ji != null)
             {
-                continue;
+                // We will run this JI!
+                jqmlogger.trace("JI number " + ji.getId() + " will be run by this poller this loop (already " + actualNbThread + "/"
+                        + dp.getNbThread() + " on " + this.queue.getName() + ")");
+                actualNbThread++;
+
+                em.getTransaction().begin();
+                Helpers.createMessage("Status updated: ATTRIBUTED", ji, em);
+                em.getTransaction().commit();
+
+                // Run it
+                tp.run(ji, this);
+
+                // Check if there is another job to run (does nothing - no db query - if queue is full so this is not expensive)
+                ji = dequeue();
             }
-
-            // We will run this JI!
-            jqmlogger.trace("JI number " + ji.getId() + " will be run by this poller this loop (already " + actualNbThread + "/"
-                    + dp.getNbThread() + " on " + this.queue.getName() + ")");
-            actualNbThread++;
-
-            em.getTransaction().begin();
-            Helpers.createMessage("Status updated: ATTRIBUTED", ji, em);
-            em.getTransaction().commit();
-
-            // Run it
-            tp.run(ji, this);
-            ji = null;
         }
         jqmlogger.info("Poller loop on queue " + this.queue.getName() + " is stopping [engine " + this.dp.getNode().getName() + "]");
         waitForAllThreads(60 * 1000);
