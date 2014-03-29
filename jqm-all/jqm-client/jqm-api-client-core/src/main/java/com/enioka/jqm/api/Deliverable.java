@@ -44,9 +44,7 @@ public class Deliverable
     }
 
     /**
-     * File Path
-     * 
-     * @return path
+     * File Path on the JQM server. This is purely informational.
      */
     public String getFilePath()
     {
@@ -54,7 +52,7 @@ public class Deliverable
     }
 
     /**
-     * Optional file tag
+     * Optional file tag.
      * 
      * @return the tag
      */
@@ -63,11 +61,17 @@ public class Deliverable
         return fileFamily;
     }
 
+    /**
+     * Unique ID of the file. This is purely technical and has no meaning to end users.
+     */
     public Integer getId()
     {
         return id;
     }
 
+    /**
+     * The name of the file as it was when created by the payload.
+     */
     public String getOriginalName()
     {
         return originalName;

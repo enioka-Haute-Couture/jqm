@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.naming.NameNotFoundException;
 import javax.persistence.EntityManager;
@@ -1362,8 +1363,7 @@ final class HibernateClient implements JqmClient
             throw new JqmInvalidRequestException("No ended job found with the deliverable ID", e);
         }
 
-        String destDir = System.getProperty("java.io.tmpdir") + "/" + h.getId();
-        (new File(destDir)).mkdir();
+        String destDir = System.getProperty("java.io.tmpdir");
         jqmlogger.trace("File will be copied into " + destDir);
 
         try
@@ -1378,7 +1378,7 @@ final class HibernateClient implements JqmClient
 
         try
         {
-            file = new File(destDir + "/" + h.getId() + deliverable.getOriginalFileName());
+            file = new File(destDir + "/" + UUID.randomUUID().toString() + deliverable.getOriginalFileName());
             FileUtils.copyURLToFile(url, file);
             jqmlogger.trace("File was downloaded to " + file.getAbsolutePath());
         }
@@ -1391,7 +1391,7 @@ final class HibernateClient implements JqmClient
         FileInputStream res = null;
         try
         {
-            res = new FileInputStream(file);
+            res = new SelfDestructFileStream(file);
         }
         catch (IOException e)
         {

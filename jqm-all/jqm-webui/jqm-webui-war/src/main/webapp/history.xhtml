@@ -87,40 +87,53 @@
 					<p:column headerText="Session ID">
 						<h:outputText value="#{h.sessionID}" />
 					</p:column>
-
 				</p:dataTable>
 
 				<p:dialog id="jiDetail" widgetVar="dlg" showEffect="fade"
 					minWidth="300" hideEffect="fade" modal="true" closable="true"
 					appendTo="@(body)" closeOnEscape="true">
-					<p:outputPanel id="detail">
-						<h:panelGrid columns="2" cellpadding="15"
+					<p:panel id="detail">
+						<p:outputPanel
 							rendered="#{not empty jobInstanceControler.selected}">
-							<h:outputText value="ID " />
-							<h:outputText value="#{jobInstanceControler.selected.id}" />
+							<h:panelGrid columns="2" cellpadding="15">
+								<h:outputText value="ID " />
+								<h:outputText value="#{jobInstanceControler.selected.id}" />
 
-							<h:outputText value="Keyword1 " />
-							<h:outputText value="#{jobInstanceControler.selected.keyword1}" />
-							<h:outputText value="Keyword2 " />
-							<h:outputText value="#{jobInstanceControler.selected.keyword2}" />
-							<h:outputText value="Keyword3 " />
-							<h:outputText value="#{jobInstanceControler.selected.keyword3}" />
-						</h:panelGrid>
+								<h:outputText value="Keyword1 " />
+								<h:outputText value="#{jobInstanceControler.selected.keyword1}" />
+								<h:outputText value="Keyword2 " />
+								<h:outputText value="#{jobInstanceControler.selected.keyword2}" />
+								<h:outputText value="Keyword3 " />
+								<h:outputText value="#{jobInstanceControler.selected.keyword3}" />
+							</h:panelGrid>
 
-						<h:outputText value="Messages" />
-						<p:dataList rendered="#{not empty jobInstanceControler.selected}"
-							value="#{jobInstanceControler.selectedInstanceMessages}"
-							var="msg">
-							#{msg}
-						</p:dataList>
+							<h:outputText value=" Messages" />
+							<p:dataList
+								value="#{jobInstanceControler.selectedInstanceMessages}"
+								var="msg">
+								#{msg}
+							</p:dataList>
 
-						<h:outputText value="Parameters which were used:" />
-						<p:dataList rendered="#{not empty jobInstanceControler.selected}"
-							value="#{jobInstanceControler.selected.parameters.entrySet().toArray()}"
-							var="prm">
-							#{prm.key} - #{prm.value}
-						</p:dataList>
-					</p:outputPanel>
+							<h:outputText value="Parameters which were used:" />
+							<p:dataList
+								value="#{jobInstanceControler.selected.parameters.entrySet().toArray()}"
+								var="prm">
+								#{prm.key} - #{prm.value}
+							</p:dataList>
+
+							<h:outputText value="Files created:" />
+							<p:dataList value="#{jobInstanceControler.selectedInstanceFiles}"
+								var="f">
+								<h:commandLink ajax="false"
+									value="#{f.fileFamily} - #{f.originalName}">
+									<f:setPropertyActionListener
+										target="#{jobInstanceControler.selDel}" value="#{f}" />
+									<p:fileDownload value="#{jobInstanceControler.file}" />
+								</h:commandLink>
+
+							</p:dataList>
+						</p:outputPanel>
+					</p:panel>
 				</p:dialog>
 
 				<p:commandButton value="Refresh" update="dataTable" />

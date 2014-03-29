@@ -301,8 +301,8 @@ public interface JqmClient
     public List<Deliverable> getJobDeliverables(int jobId);
 
     /**
-     * Return all files created by a job instance if any. The stream is not open: opening and closing it is the caller's responsibility,
-     * <strong>as well as deleting the temporary file that is behind the stream</strong>.
+     * Return all files created by a job instance if any. The stream is not open: opening and closing it is the caller's responsibility.<br>
+     * <strong>The underlying temporary files are deleted at stream closure</strong>.
      * 
      * @param jobId
      * @return a list of streams
@@ -314,8 +314,8 @@ public interface JqmClient
     public List<InputStream> getJobDeliverablesContent(int jobId);
 
     /**
-     * Return one file created by a job instance. The stream is not open: opening and closing it is the caller's responsibility, <strong>as
-     * well as deleting the temporary file that is behind the stream</strong>.
+     * Return one file created by a job instance. The stream is not open: opening and closing it is the caller's responsibility.<br>
+     * <strong>The underlying temporary files are deleted at stream closure</strong>.
      * 
      * @param file
      *            the file to retrieve (usually obtained through {@link #getJobDeliverables(int)})
