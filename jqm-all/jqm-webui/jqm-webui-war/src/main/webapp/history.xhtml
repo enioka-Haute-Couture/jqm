@@ -25,6 +25,8 @@
 
 					<p:ajax event="rowSelect" update=":mainForm:dspDetail" />
 					<p:ajax event="rowUnselect" update=":mainForm:dspDetail" />
+					<p:ajax event="rowDblselect" update=":mainForm:detail"
+						oncomplete="PF('dlg').show()" />
 
 					<p:column id="idColumn" headerText="ID" filterBy="h.id"
 						sortBy="h.id">
@@ -135,6 +137,10 @@
 						</p:outputPanel>
 					</p:panel>
 				</p:dialog>
+
+
+				<h:outputText
+					value="Double-click on a row to show its detail and related files. In text filters, use % as wildcard  --  " />
 
 				<p:commandButton value="Refresh" update="dataTable" />
 
