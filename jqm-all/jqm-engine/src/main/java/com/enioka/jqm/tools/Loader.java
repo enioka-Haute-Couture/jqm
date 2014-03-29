@@ -34,6 +34,7 @@ import javax.management.ObjectName;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -303,6 +304,12 @@ class Loader implements Runnable, LoaderMBean
             {
                 jqmlogger.warn("An e-mail could not be sent. No impact on the engine.", e);
             }
+        }
+
+        // Clean temp dir (if it exists)
+        if (FileUtils.deleteQuietly(new File(FilenameUtils.concat(node.getDlRepo(), "" + job.getId()))))
+        {
+            jqmlogger.trace("temp directory was removed");
         }
 
         // Unregister MBean
