@@ -9,3 +9,4 @@
 	client
 	hibernateclient
 	webservice
+	query
