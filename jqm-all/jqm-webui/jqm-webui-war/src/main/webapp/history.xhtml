@@ -18,10 +18,13 @@
 		<ui:define name="content">
 			<h:form id="mainForm">
 
-				<!--  filteredValue="#{history.filteredhs}" -->
 				<p:dataTable id="dataTable" var="h" lazy="true"
 					value="#{jobInstanceControler}" sortMode="multiple" rows="15"
-					paginator="true" rowsPerPageTemplate="10,15,20,25,30,40,50,60">
+					paginator="true" rowsPerPageTemplate="10,15,20,25,30,40,50,60"
+					selection="#{jobInstanceControler.selected}" selectionMode="single">
+
+					<p:ajax event="rowSelect" update=":mainForm:dspDetail" />
+					<p:ajax event="rowUnselect" update=":mainForm:dspDetail" />
 
 					<p:column id="idColumn" headerText="ID" filterBy="h.id"
 						sortBy="h.id">
@@ -87,12 +90,51 @@
 
 				</p:dataTable>
 
+				<p:dialog id="jiDetail" widgetVar="dlg" showEffect="fade"
+					minWidth="300" hideEffect="fade" modal="true" closable="true"
+					appendTo="@(body)" closeOnEscape="true">
+					<p:outputPanel id="detail">
+						<h:panelGrid columns="2" cellpadding="15"
+							rendered="#{not empty jobInstanceControler.selected}">
+							<h:outputText value="ID " />
+							<h:outputText value="#{jobInstanceControler.selected.id}" />
+
+							<h:outputText value="Keyword1 " />
+							<h:outputText value="#{jobInstanceControler.selected.keyword1}" />
+							<h:outputText value="Keyword2 " />
+							<h:outputText value="#{jobInstanceControler.selected.keyword2}" />
+							<h:outputText value="Keyword3 " />
+							<h:outputText value="#{jobInstanceControler.selected.keyword3}" />
+						</h:panelGrid>
+
+						<h:outputText value="Messages" />
+						<p:dataList rendered="#{not empty jobInstanceControler.selected}"
+							value="#{jobInstanceControler.selectedInstanceMessages}"
+							var="msg">
+							#{msg}
+						</p:dataList>
+
+						<h:outputText value="Parameters which were used:" />
+						<p:dataList rendered="#{not empty jobInstanceControler.selected}"
+							value="#{jobInstanceControler.selected.parameters.entrySet().toArray()}"
+							var="prm">
+							#{prm.key} - #{prm.value}
+						</p:dataList>
+					</p:outputPanel>
+				</p:dialog>
+
 				<p:commandButton value="Refresh" update="dataTable" />
 
 				<p:commandButton value="Show keywords" update="dataTable"
 					widgetVar="showKw" onclick="showKw.disable()">
 					<f:setPropertyActionListener value="true"
 						target="#{jobInstanceControler.renderKeywords}" />
+				</p:commandButton>
+
+				<p:commandButton id="dspDetail"
+					disabled="#{empty jobInstanceControler.selected}"
+					value="Show details" update=":mainForm:detail"
+					oncomplete="PF('dlg').show()">
 				</p:commandButton>
 
 			</h:form>

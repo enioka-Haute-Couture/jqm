@@ -27,6 +27,7 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
     private JobInstance selected = null;
     private boolean renderKeywords = false;
     private List<SortMeta> sortCache = null;
+    private List<JobInstance> jiCache = null;
 
     public String stop()
     {
@@ -169,6 +170,7 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
         // Run the query
         q.run();
         this.setRowCount(q.getResultSize());
+        jiCache = q.getResults();
         return q.getResults();
     }
 
@@ -186,7 +188,18 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
     @Override
     public JobInstance getRowData(String rowKey)
     {
-        return JqmClientFactory.getClient().getJob(Integer.parseInt(rowKey));
+        if (jiCache == null)
+        {
+            return null;
+        }
+        for (JobInstance ji : jiCache)
+        {
+            if (ji.getId().toString().equals(rowKey))
+            {
+                return ji;
+            }
+        }
+        return null;
     }
 
     public boolean isRenderKeywords()
@@ -197,5 +210,10 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
     public void setRenderKeywords(boolean renderKeywords)
     {
         this.renderKeywords = renderKeywords;
+    }
+
+    public List<String> getSelectedInstanceMessages()
+    {
+        return JqmClientFactory.getClient().getJobMessages(selected.getId());
     }
 }
