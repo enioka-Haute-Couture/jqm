@@ -96,7 +96,6 @@ final class HibernateClient implements JqmClient
         InputStream fis = null;
         try
         {
-            jqmlogger.trace("Current . is:" + (new File(".")).getAbsolutePath());
             fis = this.getClass().getClassLoader().getResourceAsStream("META-INF/jqm.properties");
             if (fis == null)
             {
@@ -223,7 +222,7 @@ final class HibernateClient implements JqmClient
         {
             jqmlogger.error("Job definition named " + jd.getApplicationName() + " does not exist");
             em.close();
-            throw new JqmInvalidRequestException("no such job definition");
+            throw new JqmInvalidRequestException("no job definition named " + jd.getApplicationName());
         }
 
         jqmlogger.trace("Job to enqueue is from JobDef " + job.getId());
@@ -231,51 +230,69 @@ final class HibernateClient implements JqmClient
         List<JobParameter> jps = overrideParameter(job, jd, em);
 
         // Begin transaction (that will hold a lock in case of Highlander)
-        em.getTransaction().begin();
-
-        if (job.isHighlander())
+        try
         {
-            hl = highlanderMode(job, em);
+            em.getTransaction().begin();
+
+            if (job.isHighlander())
+            {
+                hl = highlanderMode(job, em);
+            }
+
+            if (hl != null)
+            {
+                jqmlogger.trace("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + hl);
+                em.getTransaction().rollback();
+                em.close();
+                return hl;
+            }
+            jqmlogger.trace("Not in highlander mode or no currently enqueued instance");
         }
-
-        if (hl != null)
+        catch (Exception e)
         {
-            jqmlogger.trace("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + hl);
-            em.getTransaction().rollback();
             em.close();
-            return hl;
+            throw new JqmClientException("Could not do highlander analysis", e);
         }
-        jqmlogger.trace("Not in highlander mode or no currently enqueued instance");
 
-        JobInstance ji = new JobInstance();
-        ji.setJd(job);
-        ji.setSessionID(jd.getSessionID());
-        ji.setUserName(jd.getUser());
-        ji.setState(State.SUBMITTED);
-        ji.setQueue(job.getQueue());
-        ji.setNode(null);
-        // Can be null (if no email is asked for)
-        ji.setEmail(jd.getEmail());
-        ji.setCreationDate(Calendar.getInstance());
-        if (jd.getParentID() != null)
+        try
         {
-            ji.setParentId(jd.getParentID());
-        }
-        ji.setProgress(0);
-        ji.setParameters(new ArrayList<JobParameter>());
-        em.persist(ji);
-        ji.setInternalPosition(ji.getId());
+            JobInstance ji = new JobInstance();
+            ji.setJd(job);
+            ji.setSessionID(jd.getSessionID());
+            ji.setUserName(jd.getUser());
+            ji.setState(State.SUBMITTED);
+            ji.setQueue(job.getQueue());
+            ji.setNode(null);
+            // Can be null (if no email is asked for)
+            ji.setEmail(jd.getEmail());
+            ji.setCreationDate(Calendar.getInstance());
+            if (jd.getParentID() != null)
+            {
+                ji.setParentId(jd.getParentID());
+            }
+            ji.setProgress(0);
+            ji.setParameters(new ArrayList<JobParameter>());
+            em.persist(ji);
+            ji.setInternalPosition(ji.getId());
 
-        for (JobParameter jp : jps)
+            for (JobParameter jp : jps)
+            {
+                jqmlogger.trace("Parameter: " + jp.getKey() + " - " + jp.getValue());
+                em.persist(ji.addParameter(jp.getKey(), jp.getValue()));
+            }
+            jqmlogger.trace("JI just created: " + ji.getId());
+
+            em.getTransaction().commit();
+            return ji.getId();
+        }
+        catch (Exception e)
         {
-            jqmlogger.trace("Parameter: " + jp.getKey() + " - " + jp.getValue());
-            em.persist(ji.addParameter(jp.getKey(), jp.getValue()));
+            throw new JqmClientException("Could not create new JobInstance", e);
         }
-        jqmlogger.trace("JI just created: " + ji.getId());
-
-        em.getTransaction().commit();
-        em.close();
-        return ji.getId();
+        finally
+        {
+            em.close();
+        }
     }
 
     @Override
@@ -411,33 +428,43 @@ final class HibernateClient implements JqmClient
             throw new JqmClientException("the job is already running, has already finished or never existed to begin with");
         }
 
-        em.getTransaction().begin();
-        History h = new History();
-        h.setId(ji.getId());
-        h.setJd(ji.getJd());
-        h.setSessionId(ji.getSessionID());
-        h.setQueue(ji.getQueue());
-        h.setMessages(new ArrayList<Message>());
-        h.setEnqueueDate(ji.getCreationDate());
-        h.setUserName(ji.getUserName());
-        h.setEmail(ji.getEmail());
-        h.setParentJobId(ji.getParentId());
-        h.setApplication(ji.getApplication());
-        h.setModule(ji.getModule());
-        h.setKeyword1(ji.getKeyword1());
-        h.setKeyword2(ji.getKeyword2());
-        h.setKeyword3(ji.getKeyword3());
-        h.setProgress(ji.getProgress());
-        h.setParameters(new ArrayList<JobHistoryParameter>());
-        h.setStatus(State.CANCELLED);
-        h.setNode(ji.getNode());
-        em.persist(h);
+        try
+        {
+            em.getTransaction().begin();
+            History h = new History();
+            h.setId(ji.getId());
+            h.setJd(ji.getJd());
+            h.setSessionId(ji.getSessionID());
+            h.setQueue(ji.getQueue());
+            h.setMessages(new ArrayList<Message>());
+            h.setEnqueueDate(ji.getCreationDate());
+            h.setUserName(ji.getUserName());
+            h.setEmail(ji.getEmail());
+            h.setParentJobId(ji.getParentId());
+            h.setApplication(ji.getApplication());
+            h.setModule(ji.getModule());
+            h.setKeyword1(ji.getKeyword1());
+            h.setKeyword2(ji.getKeyword2());
+            h.setKeyword3(ji.getKeyword3());
+            h.setProgress(ji.getProgress());
+            h.setParameters(new ArrayList<JobHistoryParameter>());
+            h.setStatus(State.CANCELLED);
+            h.setNode(ji.getNode());
+            em.persist(h);
 
-        em.createQuery("DELETE FROM MessageJi WHERE jobInstance = :i").setParameter("i", ji).executeUpdate();
-        em.createQuery("DELETE FROM JobParameter WHERE jobInstance = :i").setParameter("i", ji).executeUpdate();
-        em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", ji.getId()).executeUpdate();
-        em.getTransaction().commit();
-        em.close();
+            em.createQuery("DELETE FROM MessageJi WHERE jobInstance = :i").setParameter("i", ji).executeUpdate();
+            em.createQuery("DELETE FROM JobParameter WHERE jobInstance = :i").setParameter("i", ji).executeUpdate();
+            em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", ji.getId()).executeUpdate();
+            em.getTransaction().commit();
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not cancel job instance", e);
+        }
+        finally
+        {
+            em.close();
+        }
     }
 
     @Override
@@ -472,11 +499,11 @@ final class HibernateClient implements JqmClient
         }
         catch (NoResultException e)
         {
-            jqmlogger.info("An attempt was made to delete a job instance that did not exist, which can be perfectly normal.");
+            throw new JqmInvalidRequestException("An attempt was made to delete a job instance that did not exist.");
         }
         catch (Exception e)
         {
-            jqmlogger.info("unknown exception", e);
+            throw new JqmClientException("could not delete a job (internal error)", e);
         }
         finally
         {
@@ -487,20 +514,34 @@ final class HibernateClient implements JqmClient
     @Override
     public void killJob(int idJob)
     {
-        EntityManager em = getEm();
-        em.getTransaction().begin();
-        JobInstance j = em.find(JobInstance.class, idJob, LockModeType.PESSIMISTIC_READ);
-        jqmlogger.trace("The " + j.getState() + " job (ID: " + idJob + ")" + " will be marked for kill");
+        EntityManager em = null;
+        try
+        {
+            em = getEm();
+            em.getTransaction().begin();
+            JobInstance j = em.find(JobInstance.class, idJob, LockModeType.PESSIMISTIC_READ);
+            jqmlogger.trace("The " + j.getState() + " job (ID: " + idJob + ")" + " will be marked for kill");
 
-        j.setState(State.KILLED);
+            j.setState(State.KILLED);
 
-        MessageJi m = new MessageJi();
-        m.setJobInstance(j);
-        m.setTextMessage("Kill attempt on the job");
-        em.persist(m);
-
-        em.getTransaction().commit();
-        em.close();
+            MessageJi m = new MessageJi();
+            m.setJobInstance(j);
+            m.setTextMessage("Kill attempt on the job");
+            em.persist(m);
+            em.getTransaction().commit();
+        }
+        catch (NoResultException e)
+        {
+            throw new JqmInvalidRequestException("An attempt was made to kill a job instance that did not exist.");
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not kill a job (internal error)", e);
+        }
+        finally
+        {
+            em.close();
+        }
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -511,20 +552,22 @@ final class HibernateClient implements JqmClient
     public void pauseQueuedJob(int idJob)
     {
         jqmlogger.trace("Job status number " + idJob + " will be set to HOLDED");
-        EntityManager em = getEm();
-
-        em.getTransaction().begin();
+        EntityManager em = null;
 
         try
         {
-            @SuppressWarnings("unused")
-            int q = em.createQuery("UPDATE JobInstance j SET j.state = 'HOLDED' WHERE j.id = :idJob").setParameter("idJob", idJob)
-                    .executeUpdate();
+            em = getEm();
+            em.getTransaction().begin();
+            em.createQuery("UPDATE JobInstance j SET j.state = 'HOLDED' WHERE j.id = :idJob").setParameter("idJob", idJob).executeUpdate();
             em.getTransaction().commit();
+        }
+        catch (NoResultException e)
+        {
+            throw new JqmInvalidRequestException("An attempt was made to pause a job instance that did not exist.");
         }
         catch (Exception e)
         {
-            jqmlogger.error("Could not pause job", e);
+            throw new JqmClientException("could not pause a job (internal error)", e);
         }
         finally
         {
@@ -536,21 +579,23 @@ final class HibernateClient implements JqmClient
     public void resumeJob(int idJob)
     {
         jqmlogger.trace("Job status number " + idJob + " will be resumed");
-        EntityManager em = getEm();
-
-        em.getTransaction().begin();
+        EntityManager em = null;
 
         try
         {
-            @SuppressWarnings("unused")
-            int q = em.createQuery("UPDATE JobInstance j SET j.state = 'SUBMITTED' WHERE j.id = :idJob").setParameter("idJob", idJob)
+            em = getEm();
+            em.getTransaction().begin();
+            em.createQuery("UPDATE JobInstance j SET j.state = 'SUBMITTED' WHERE j.id = :idJob").setParameter("idJob", idJob)
                     .executeUpdate();
-
             em.getTransaction().commit();
+        }
+        catch (NoResultException e)
+        {
+            throw new JqmInvalidRequestException("An attempt was made to resume a job instance that did not exist.");
         }
         catch (Exception e)
         {
-            jqmlogger.error("could not resume job", e);
+            throw new JqmClientException("could not resume a job (internal error)", e);
         }
         finally
         {
@@ -560,18 +605,24 @@ final class HibernateClient implements JqmClient
 
     public int restartCrashedJob(int idJob)
     {
-        EntityManager em = getEm();
+        EntityManager em = null;
 
         // History and Job ID have the same ID.
         History h = null;
         try
         {
+            em = getEm();
             h = em.find(History.class, idJob);
         }
         catch (NoResultException e)
         {
             em.close();
             throw new JqmClientException("You cannot restart a job that is not done or which was purged from history");
+        }
+        catch (Exception e)
+        {
+            em.close();
+            throw new JqmClientException("could not restart a job (internal error)", e);
         }
 
         if (!h.getState().equals(State.CRASHED))
@@ -586,12 +637,21 @@ final class HibernateClient implements JqmClient
             throw new JqmClientException("This type of job was configured to prevent being restarded");
         }
 
-        em.getTransaction().begin();
-        em.remove(h);
-        em.getTransaction().commit();
-        em.close();
-
-        return enqueue(getJobRequest(h));
+        try
+        {
+            em.getTransaction().begin();
+            em.remove(h);
+            em.getTransaction().commit();
+            return enqueue(getJobRequest(h));
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not purge & restart a job (internal error)", e);
+        }
+        finally
+        {
+            em.close();
+        }
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -631,6 +691,10 @@ final class HibernateClient implements JqmClient
             em.getTransaction().rollback();
             throw new JqmClientException("Job instance does not exist or has already started");
         }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not change the queue of a job (internal error)", e);
+        }
         finally
         {
             em.close();
@@ -646,17 +710,24 @@ final class HibernateClient implements JqmClient
     @Override
     public void setJobQueuePosition(int idJob, int position)
     {
-        EntityManager em = getEm();
-        em.getTransaction().begin();
+        EntityManager em = null;
         JobInstance ji = null;
         try
         {
+            em = getEm();
+            em.getTransaction().begin();
             ji = em.find(JobInstance.class, idJob, LockModeType.PESSIMISTIC_WRITE);
         }
         catch (Exception e)
         {
-            em.getTransaction().rollback();
-            em.close();
+            if (em != null && em.getTransaction().isActive())
+            {
+                em.getTransaction().rollback();
+            }
+            if (em != null)
+            {
+                em.close();
+            }
             throw new JqmClientException(
                     "Could not lock a job by the given ID. It may already have been executed or a timeout may have occurred.", e);
         }
@@ -665,58 +736,60 @@ final class HibernateClient implements JqmClient
         {
             em.getTransaction().rollback();
             em.close();
-            throw new JqmClientException("Job is already set for execution. Too late to change its position in the queue");
+            throw new JqmInvalidRequestException("Job is already set for execution. Too late to change its position in the queue");
         }
 
-        int current = ji.getCurrentPosition(em);
-        int betweenUp = 0;
-        int betweenDown = 0;
+        try
+        {
+            int current = ji.getCurrentPosition(em);
+            int betweenUp = 0;
+            int betweenDown = 0;
 
-        if (current == position)
-        {
-            // Nothing to do
-            em.getTransaction().rollback();
-            em.close();
-            return;
-        }
-        else if (current < position)
-        {
-            betweenDown = position;
-            betweenUp = position + 1;
-        }
-        else
-        {
-            betweenDown = position - 1;
-            betweenUp = position;
-        }
+            if (current == position)
+            {
+                // Nothing to do
+                em.getTransaction().rollback();
+                return;
+            }
+            else if (current < position)
+            {
+                betweenDown = position;
+                betweenUp = position + 1;
+            }
+            else
+            {
+                betweenDown = position - 1;
+                betweenUp = position;
+            }
 
-        // No locking - we'll deal with exceptions
-        List<JobInstance> currentJobs = em
-                .createQuery("SELECT JobInstance ji from JobInstance ORDER BY ji.internalPosition", JobInstance.class)
-                .setMaxResults(betweenUp).getResultList();
+            // No locking - we'll deal with exceptions
+            List<JobInstance> currentJobs = em
+                    .createQuery("SELECT JobInstance ji from JobInstance ORDER BY ji.internalPosition", JobInstance.class)
+                    .setMaxResults(betweenUp).getResultList();
 
-        if (currentJobs.size() == 0)
-        {
-            ji.setInternalPosition(0);
-            em.getTransaction().rollback();
-            em.close();
-            return;
+            if (currentJobs.size() == 0)
+            {
+                ji.setInternalPosition(0);
+            }
+            else if (currentJobs.size() < betweenUp)
+            {
+                ji.setInternalPosition(currentJobs.get(currentJobs.size() - 1).getInternalPosition() + 0.00001);
+            }
+            else
+            {
+                // Normal case: put the JI between the two others.
+                ji.setInternalPosition((currentJobs.get(betweenUp - 1).getInternalPosition() + currentJobs.get(betweenDown - 1)
+                        .getInternalPosition()) / 2);
+            }
+            em.getTransaction().commit();
         }
-        else if (currentJobs.size() < betweenUp)
+        catch (Exception e)
         {
-            ji.setInternalPosition(currentJobs.get(currentJobs.size() - 1).getInternalPosition() + 0.00001);
-            em.getTransaction().rollback();
-            em.close();
-            return;
+            throw new JqmClientException("could not change the queue position of a job (internal error)", e);
         }
-        else
+        finally
         {
-            // Normal case: put the JI between the two others.
-            ji.setInternalPosition((currentJobs.get(betweenUp - 1).getInternalPosition() + currentJobs.get(betweenDown - 1)
-                    .getInternalPosition()) / 2);
-            em.getTransaction().rollback();
             em.close();
-            return;
         }
     }
 
@@ -881,186 +954,212 @@ final class HibernateClient implements JqmClient
     {
         if ((query.getFirstRow() != null || query.getPageSize() != null) && query.isQueryLiveInstances())
         {
-            throw new IllegalArgumentException("cannot use paging on live instances");
+            throw new JqmInvalidRequestException("cannot use paging on live instances");
         }
 
-        EntityManager em = getEm();
-
-        // Not using CriteriaBuilder - too much hassle for too little benefit
-        String wh = "";
-        Map<String, Object> prms = new HashMap<String, Object>();
-
-        // String predicates
-        wh += getStringPredicate("jd.applicationName", query.getApplicationName(), prms);
-        wh += getStringPredicate("userName", query.getUser(), prms);
-        wh += getStringPredicate("sessionId", query.getSessionId(), prms);
-        wh += getStringPredicate("instanceKeyword1", query.getInstanceKeyword1(), prms);
-        wh += getStringPredicate("instanceKeyword2", query.getInstanceKeyword2(), prms);
-        wh += getStringPredicate("instanceKeyword3", query.getInstanceKeyword3(), prms);
-        wh += getStringPredicate("instanceModule", query.getInstanceModule(), prms);
-        wh += getStringPredicate("instanceApplication", query.getInstanceApplication(), prms);
-        wh += getStringPredicate("jd.keyword1", query.getJobDefKeyword1(), prms);
-        wh += getStringPredicate("jd.keyword2", query.getJobDefKeyword2(), prms);
-        wh += getStringPredicate("jd.keyword3", query.getJobDefKeyword3(), prms);
-        wh += getStringPredicate("jd.module", query.getJobDefModule(), prms);
-        wh += getStringPredicate("jd.application", query.getJobDefApplication(), prms);
-        wh += getStringPredicate("queue.name", query.getQueueName(), prms);
-
-        // Integer
-        wh += getIntPredicate("parentId", query.getParentId(), prms);
-        wh += getIntPredicate("id", query.getJobInstanceId(), prms);
-        wh += getIntPredicate("queue.id", query.getQueueName() == null ? null : query.getQueueId(), prms);
-
-        // Now, run queries...
-        List<com.enioka.jqm.api.JobInstance> res2 = new ArrayList<com.enioka.jqm.api.JobInstance>();
-
-        // ////////////////////////////////////////
-        // Job Instance query
-        if (query.isQueryLiveInstances())
+        EntityManager em = null;
+        try
         {
-            // Sort
-            String sort = "";
-            for (SortSpec s : query.getSorts())
+            em = getEm();
+
+            // Not using CriteriaBuilder - too much hassle for too little benefit
+            String wh = "";
+            Map<String, Object> prms = new HashMap<String, Object>();
+
+            // String predicates
+            wh += getStringPredicate("jd.applicationName", query.getApplicationName(), prms);
+            wh += getStringPredicate("userName", query.getUser(), prms);
+            wh += getStringPredicate("sessionId", query.getSessionId(), prms);
+            wh += getStringPredicate("instanceKeyword1", query.getInstanceKeyword1(), prms);
+            wh += getStringPredicate("instanceKeyword2", query.getInstanceKeyword2(), prms);
+            wh += getStringPredicate("instanceKeyword3", query.getInstanceKeyword3(), prms);
+            wh += getStringPredicate("instanceModule", query.getInstanceModule(), prms);
+            wh += getStringPredicate("instanceApplication", query.getInstanceApplication(), prms);
+            wh += getStringPredicate("jd.keyword1", query.getJobDefKeyword1(), prms);
+            wh += getStringPredicate("jd.keyword2", query.getJobDefKeyword2(), prms);
+            wh += getStringPredicate("jd.keyword3", query.getJobDefKeyword3(), prms);
+            wh += getStringPredicate("jd.module", query.getJobDefModule(), prms);
+            wh += getStringPredicate("jd.application", query.getJobDefApplication(), prms);
+            wh += getStringPredicate("queue.name", query.getQueueName(), prms);
+
+            // Integer
+            wh += getIntPredicate("parentId", query.getParentId(), prms);
+            wh += getIntPredicate("id", query.getJobInstanceId(), prms);
+            wh += getIntPredicate("queue.id", query.getQueueName() == null ? null : query.getQueueId(), prms);
+
+            // Now, run queries...
+            List<com.enioka.jqm.api.JobInstance> res2 = new ArrayList<com.enioka.jqm.api.JobInstance>();
+
+            // ////////////////////////////////////////
+            // Job Instance query
+            if (query.isQueryLiveInstances())
             {
-                sort += s.col.getJiField() == null ? "" : ",h." + s.col.getJiField() + " "
-                        + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
-            }
-            if (sort.isEmpty())
-            {
-                sort = " ORDER BY h.id";
-            }
-            else
-            {
-                sort = " ORDER BY " + sort.substring(1);
+                // Sort
+                String sort = "";
+                for (SortSpec s : query.getSorts())
+                {
+                    sort += s.col.getJiField() == null ? "" : ",h." + s.col.getJiField() + " "
+                            + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
+                }
+                if (sort.isEmpty())
+                {
+                    sort = " ORDER BY h.id";
+                }
+                else
+                {
+                    sort = " ORDER BY " + sort.substring(1);
+                }
+
+                // Calendar fields are specific (no common fields between History and JobInstance)
+                String wh2 = "" + wh;
+                Map<String, Object> prms2 = new HashMap<String, Object>();
+                prms2.putAll(prms);
+                wh2 += getCalendarPredicate("creationDate", query.getEnqueuedAfter(), ">=", prms2);
+                wh2 += getCalendarPredicate("creationDate", query.getEnqueuedBefore(), "<=", prms2);
+                wh2 += getCalendarPredicate("executionDate", query.getBeganRunningAfter(), ">=", prms2);
+                wh2 += getCalendarPredicate("executionDate", query.getBeganRunningBefore(), "<=", prms2);
+                wh2 += getStatusPredicate("state", query.getStatus(), prms2);
+                if (wh2.length() >= 3)
+                {
+                    wh2 = " WHERE " + wh2.substring(3);
+                }
+
+                TypedQuery<JobInstance> q2 = em.createQuery("SELECT h FROM JobInstance h " + wh2, JobInstance.class);
+                for (Map.Entry<String, Object> entry : prms2.entrySet())
+                {
+                    q2.setParameter(entry.getKey(), entry.getValue());
+                }
+
+                for (JobInstance ji : q2.getResultList())
+                {
+                    res2.add(getJob(ji));
+                }
             }
 
-            // Calendar fields are specific (no common fields between History and JobInstance)
-            String wh2 = "" + wh;
-            Map<String, Object> prms2 = new HashMap<String, Object>();
-            prms2.putAll(prms);
-            wh2 += getCalendarPredicate("creationDate", query.getEnqueuedAfter(), ">=", prms2);
-            wh2 += getCalendarPredicate("creationDate", query.getEnqueuedBefore(), "<=", prms2);
-            wh2 += getCalendarPredicate("executionDate", query.getBeganRunningAfter(), ">=", prms2);
-            wh2 += getCalendarPredicate("executionDate", query.getBeganRunningBefore(), "<=", prms2);
-            wh2 += getStatusPredicate("state", query.getStatus(), prms2);
-            if (wh2.length() >= 3)
+            // ////////////////////////////////////////
+            // History query
+            if (query.isQueryHistoryInstances())
             {
-                wh2 = " WHERE " + wh2.substring(3);
-            }
+                // Calendar fields are specific (no common fields between History and JobInstance)
+                wh += getCalendarPredicate("enqueueDate", query.getEnqueuedAfter(), ">=", prms);
+                wh += getCalendarPredicate("enqueueDate", query.getEnqueuedBefore(), "<=", prms);
+                wh += getCalendarPredicate("executionDate", query.getBeganRunningAfter(), ">=", prms);
+                wh += getCalendarPredicate("executionDate", query.getBeganRunningBefore(), "<=", prms);
+                wh += getCalendarPredicate("endDate", query.getEndedAfter(), ">=", prms);
+                wh += getCalendarPredicate("endDate", query.getEndedBefore(), "<=", prms);
+                wh += getStatusPredicate("status", query.getStatus(), prms);
+                if (wh.length() >= 3)
+                {
+                    wh = " WHERE " + wh.substring(3);
+                }
 
-            TypedQuery<JobInstance> q2 = em.createQuery("SELECT h FROM JobInstance h " + wh2, JobInstance.class);
-            for (Map.Entry<String, Object> entry : prms2.entrySet())
-            {
-                q2.setParameter(entry.getKey(), entry.getValue());
-            }
+                // Order by
+                String sort = "";
+                for (SortSpec s : query.getSorts())
+                {
+                    sort += ",h." + s.col.getHistoryField() + " " + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
+                }
+                if (sort.isEmpty())
+                {
+                    sort = " ORDER BY h.id";
+                }
+                else
+                {
+                    sort = " ORDER BY " + sort.substring(1);
+                }
 
-            for (JobInstance ji : q2.getResultList())
-            {
-                res2.add(getJob(ji));
-            }
-        }
-
-        // ////////////////////////////////////////
-        // History query
-        if (query.isQueryHistoryInstances())
-        {
-            // Calendar fields are specific (no common fields between History and JobInstance)
-            wh += getCalendarPredicate("enqueueDate", query.getEnqueuedAfter(), ">=", prms);
-            wh += getCalendarPredicate("enqueueDate", query.getEnqueuedBefore(), "<=", prms);
-            wh += getCalendarPredicate("executionDate", query.getBeganRunningAfter(), ">=", prms);
-            wh += getCalendarPredicate("executionDate", query.getBeganRunningBefore(), "<=", prms);
-            wh += getCalendarPredicate("endDate", query.getEndedAfter(), ">=", prms);
-            wh += getCalendarPredicate("endDate", query.getEndedBefore(), "<=", prms);
-            wh += getStatusPredicate("status", query.getStatus(), prms);
-            if (wh.length() >= 3)
-            {
-                wh = " WHERE " + wh.substring(3);
-            }
-
-            // Order by
-            String sort = "";
-            for (SortSpec s : query.getSorts())
-            {
-                sort += ",h." + s.col.getHistoryField() + " " + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
-            }
-            if (sort.isEmpty())
-            {
-                sort = " ORDER BY h.id";
-            }
-            else
-            {
-                sort = " ORDER BY " + sort.substring(1);
-            }
-
-            TypedQuery<History> q1 = em.createQuery("SELECT h FROM History h " + wh + sort, History.class);
-            for (Map.Entry<String, Object> entry : prms.entrySet())
-            {
-                q1.setParameter(entry.getKey(), entry.getValue());
-            }
-            if (query.getFirstRow() != null)
-            {
-                q1.setFirstResult(query.getFirstRow());
-            }
-            if (query.getPageSize() != null)
-            {
-                q1.setMaxResults(query.getPageSize());
-            }
-            if (query.getFirstRow() != null || query.getPageSize() != null)
-            {
-                TypedQuery<Long> qCount = em.createQuery("SELECT COUNT(h) FROM History h " + wh, Long.class);
+                TypedQuery<History> q1 = em.createQuery("SELECT h FROM History h " + wh + sort, History.class);
                 for (Map.Entry<String, Object> entry : prms.entrySet())
                 {
-                    qCount.setParameter(entry.getKey(), entry.getValue());
+                    q1.setParameter(entry.getKey(), entry.getValue());
                 }
-                query.setResultSize(new BigDecimal(qCount.getSingleResult()).intValueExact());
+                if (query.getFirstRow() != null)
+                {
+                    q1.setFirstResult(query.getFirstRow());
+                }
+                if (query.getPageSize() != null)
+                {
+                    q1.setMaxResults(query.getPageSize());
+                }
+                if (query.getFirstRow() != null || query.getPageSize() != null)
+                {
+                    TypedQuery<Long> qCount = em.createQuery("SELECT COUNT(h) FROM History h " + wh, Long.class);
+                    for (Map.Entry<String, Object> entry : prms.entrySet())
+                    {
+                        qCount.setParameter(entry.getKey(), entry.getValue());
+                    }
+                    query.setResultSize(new BigDecimal(qCount.getSingleResult()).intValueExact());
+                }
+
+                for (History ji : q1.getResultList())
+                {
+                    res2.add(getJob(ji));
+                }
             }
 
-            for (History ji : q1.getResultList())
-            {
-                res2.add(getJob(ji));
-            }
+            query.setResults(res2);
+            return res2;
         }
-
-        em.close();
-        query.setResults(res2);
-        return res2;
+        catch (Exception e)
+        {
+            throw new JqmClientException("an error occured during query execution", e);
+        }
+        finally
+        {
+            em.close();
+        }
     }
 
     @Override
     public com.enioka.jqm.api.JobInstance getJob(int idJob)
     {
-        EntityManager em = getEm();
-        History h = em.find(History.class, idJob);
-        com.enioka.jqm.api.JobInstance res = null;
-        if (h != null)
+        EntityManager em = null;
+        try
         {
-            res = getJob(h);
-        }
-        else
-        {
-            JobInstance ji = em.find(JobInstance.class, idJob);
-            if (ji != null)
+            em = getEm();
+            History h = em.find(History.class, idJob);
+            com.enioka.jqm.api.JobInstance res = null;
+            if (h != null)
             {
-                res = getJob(ji);
+                res = getJob(h);
             }
             else
             {
-                em.close();
-                throw new JqmInvalidRequestException("No job instance of ID " + idJob);
+                JobInstance ji = em.find(JobInstance.class, idJob);
+                if (ji != null)
+                {
+                    res = getJob(ji);
+                }
+                else
+                {
+                    throw new JqmInvalidRequestException("No job instance of ID " + idJob);
+                }
             }
+            return res;
         }
-        em.close();
-        return res;
+        catch (JqmInvalidRequestException e)
+        {
+            throw e;
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("an error occured during query execution", e);
+        }
+        finally
+        {
+            em.close();
+        }
     }
 
     @Override
     public List<com.enioka.jqm.api.JobInstance> getJobs()
     {
         ArrayList<com.enioka.jqm.api.JobInstance> jobs = new ArrayList<com.enioka.jqm.api.JobInstance>();
-        EntityManager em = getEm();
+        EntityManager em = null;
 
         try
         {
+            em = getEm();
             for (JobInstance h : em.createQuery("SELECT j FROM JobInstance j ORDER BY j.id", JobInstance.class).getResultList())
             {
                 jobs.add(getJob(h));
@@ -1072,10 +1171,12 @@ final class HibernateClient implements JqmClient
         }
         catch (Exception e)
         {
-            throw new JqmClientException("The user cannot be found or an error occured getting his jobs", e);
+            throw new JqmClientException("Could not query history and queues", e);
         }
-
-        em.close();
+        finally
+        {
+            em.close();
+        }
         return jobs;
     }
 
@@ -1083,10 +1184,11 @@ final class HibernateClient implements JqmClient
     public List<com.enioka.jqm.api.JobInstance> getActiveJobs()
     {
         ArrayList<com.enioka.jqm.api.JobInstance> jobs = new ArrayList<com.enioka.jqm.api.JobInstance>();
-        EntityManager em = getEm();
+        EntityManager em = null;
 
         try
         {
+            em = getEm();
             for (JobInstance h : em.createQuery("SELECT j FROM JobInstance j ORDER BY j.id", JobInstance.class).getResultList())
             {
                 jobs.add(getJob(h));
@@ -1094,7 +1196,7 @@ final class HibernateClient implements JqmClient
         }
         catch (Exception e)
         {
-            throw new JqmClientException("The user cannot be found or an error occured getting his jobs", e);
+            throw new JqmClientException("Could not query queues", e);
         }
         finally
         {
@@ -1106,11 +1208,16 @@ final class HibernateClient implements JqmClient
     @Override
     public List<com.enioka.jqm.api.JobInstance> getUserActiveJobs(String user)
     {
+        if (user == null || user.isEmpty())
+        {
+            throw new JqmInvalidRequestException("user cannot be null or empty");
+        }
         ArrayList<com.enioka.jqm.api.JobInstance> jobs = new ArrayList<com.enioka.jqm.api.JobInstance>();
-        EntityManager em = getEm();
+        EntityManager em = null;
 
         try
         {
+            em = getEm();
             for (JobInstance h : em.createQuery("SELECT j FROM JobInstance j WHERE j.userName = :u ORDER BY j.id", JobInstance.class)
                     .setParameter("u", user).getResultList())
             {
@@ -1124,7 +1231,7 @@ final class HibernateClient implements JqmClient
         }
         catch (Exception e)
         {
-            throw new JqmClientException("The user cannot be found or an error occured getting his jobs", e);
+            throw new JqmClientException("Could not query both queues and history for job instances of user " + user, e);
         }
         finally
         {
@@ -1157,10 +1264,11 @@ final class HibernateClient implements JqmClient
     public List<com.enioka.jqm.api.Deliverable> getJobDeliverables(int idJob)
     {
         List<Deliverable> deliverables = null;
-        EntityManager em = getEm();
+        EntityManager em = null;
 
         try
         {
+            em = getEm();
             deliverables = em.createQuery("SELECT d FROM Deliverable d WHERE d.jobId = :idJob", Deliverable.class)
                     .setParameter("idJob", idJob).getResultList();
         }
@@ -1185,35 +1293,46 @@ final class HibernateClient implements JqmClient
     @Override
     public List<InputStream> getJobDeliverablesContent(int idJob)
     {
-        EntityManager em = getEm();
+        EntityManager em = null;
         ArrayList<InputStream> streams = new ArrayList<InputStream>();
         List<Deliverable> tmp = null;
 
-        tmp = em.createQuery("SELECT d FROM Deliverable d WHERE d.jobId = :idJob", Deliverable.class).setParameter("idJob", idJob)
-                .getResultList();
-
-        for (Deliverable del : tmp)
+        try
         {
-            streams.add(getDeliverableContent(del));
-        }
+            em = getEm();
+            tmp = em.createQuery("SELECT d FROM Deliverable d WHERE d.jobId = :idJob", Deliverable.class).setParameter("idJob", idJob)
+                    .getResultList();
 
-        em.close();
+            for (Deliverable del : tmp)
+            {
+                streams.add(getDeliverableContent(del));
+            }
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not retrieve file streams", e);
+        }
+        finally
+        {
+            em.close();
+        }
         return streams;
     }
 
     @Override
     public InputStream getDeliverableContent(com.enioka.jqm.api.Deliverable d)
     {
-        EntityManager em = getEm();
+        EntityManager em = null;
         Deliverable deliverable = null;
 
         try
         {
+            em = getEm();
             deliverable = em.find(Deliverable.class, d.getId());
         }
         catch (Exception e)
         {
-            throw new JqmClientException("Could not get find deliverable description inside DB - your ID may be wrong", e);
+            throw new JqmInvalidRequestException("Could not get find deliverable description inside DB - your ID may be wrong", e);
         }
         finally
         {
@@ -1240,7 +1359,7 @@ final class HibernateClient implements JqmClient
         {
             h = null;
             em.close();
-            throw new JqmClientException("No ended job found with the deliverable ID", e);
+            throw new JqmInvalidRequestException("No ended job found with the deliverable ID", e);
         }
 
         String destDir = System.getProperty("java.io.tmpdir") + "/" + h.getId();
@@ -1289,17 +1408,27 @@ final class HibernateClient implements JqmClient
     public List<com.enioka.jqm.api.Queue> getQueues()
     {
         List<com.enioka.jqm.api.Queue> res = new ArrayList<com.enioka.jqm.api.Queue>();
-        EntityManager em = getEm();
+        EntityManager em = null;
         com.enioka.jqm.api.Queue tmp = null;
 
-        for (Queue q : em.createQuery("SELECT q FROM Queue q ORDER BY q.name", Queue.class).getResultList())
+        try
         {
-            tmp = getQueue(q);
-            res.add(tmp);
+            em = getEm();
+            for (Queue q : em.createQuery("SELECT q FROM Queue q ORDER BY q.name", Queue.class).getResultList())
+            {
+                tmp = getQueue(q);
+                res.add(tmp);
+            }
+            return res;
         }
-
-        em.close();
-        return res;
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not query queues", e);
+        }
+        finally
+        {
+            em.close();
+        }
     }
 
     private static com.enioka.jqm.api.Queue getQueue(Queue queue)
@@ -1334,26 +1463,38 @@ final class HibernateClient implements JqmClient
     public List<com.enioka.jqm.api.JobDef> getJobDefinitions(String application)
     {
         List<com.enioka.jqm.api.JobDef> res = new ArrayList<com.enioka.jqm.api.JobDef>();
-        EntityManager em = getEm();
+        EntityManager em = null;
         List<JobDef> dbr = null;
-        if (application == null)
-        {
-            dbr = em.createQuery("SELECT jd from JobDef jd ORDER BY jd.application, jd.module, jd.applicationName", JobDef.class)
-                    .getResultList();
-        }
-        else
-        {
-            dbr = em.createQuery(
-                    "SELECT jd from JobDef jd WHERE jd.application = :name ORDER BY jd.application, jd.module, jd.applicationName",
-                    JobDef.class).setParameter("name", application).getResultList();
-        }
 
-        for (JobDef jd : dbr)
+        try
         {
-            res.add(getJobDef(jd));
+            em = getEm();
+            if (application == null)
+            {
+                dbr = em.createQuery("SELECT jd from JobDef jd ORDER BY jd.application, jd.module, jd.applicationName", JobDef.class)
+                        .getResultList();
+            }
+            else
+            {
+                dbr = em.createQuery(
+                        "SELECT jd from JobDef jd WHERE jd.application = :name ORDER BY jd.application, jd.module, jd.applicationName",
+                        JobDef.class).setParameter("name", application).getResultList();
+            }
+
+            for (JobDef jd : dbr)
+            {
+                res.add(getJobDef(jd));
+            }
+            return res;
         }
-        em.close();
-        return res;
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not query JobDef", e);
+        }
+        finally
+        {
+            em.close();
+        }
     }
 
     private static com.enioka.jqm.api.JobDef getJobDef(JobDef jd)
