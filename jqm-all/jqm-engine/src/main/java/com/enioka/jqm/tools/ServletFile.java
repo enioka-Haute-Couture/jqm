@@ -41,7 +41,6 @@ import com.enioka.jqm.jpamodel.Deliverable;
 class ServletFile extends HttpServlet
 {
     private static Logger jqmlogger = Logger.getLogger(ServletFile.class);
-    private EntityManager em = Helpers.getNewEm();
 
     public ServletFile()
     {
@@ -55,8 +54,10 @@ class ServletFile extends HttpServlet
         FileInputStream fis = null;
         OutputStream out = null;
         Deliverable d = null;
+        EntityManager em = null;
         try
         {
+            em = Helpers.getNewEm();
             d = em.createQuery("SELECT d from Deliverable d WHERE d.randomId = :ii", Deliverable.class).setParameter("ii", fileRandomId)
                     .getSingleResult();
         }
@@ -66,8 +67,12 @@ class ServletFile extends HttpServlet
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
+        finally
+        {
+            em.close();
+        }
         File f = new File(d.getFilePath());
-        jqmlogger.debug("A file will be returned: " + f.getAbsolutePath());
+        jqmlogger.trace("A file will be returned: " + f.getAbsolutePath());
 
         try
         {
