@@ -163,7 +163,7 @@ case "$ACTION" in
 	importxml|import|xml)
 		jqm_import_xml $2
 		;;
-	importallxml)
+	importallxml|allxml)
 		jqm_import_all_xml
 		;;
 	*)
