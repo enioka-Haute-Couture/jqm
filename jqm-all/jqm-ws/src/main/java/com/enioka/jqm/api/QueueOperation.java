@@ -239,6 +239,20 @@ public class QueueOperation implements JqmClient
     }
 
     @Override
+    public InputStream getJobLogStdErr(int jobId)
+    {
+        log.debug("calling WS getJobLogStdErr");
+        throw new NotSupportedException();
+    }
+
+    @Override
+    public InputStream getJobLogStdOut(int jobId)
+    {
+        log.debug("calling WS getJobLogStdOut");
+        throw new NotSupportedException();
+    }
+
+    @Override
     @Path("q")
     @GET
     @Produces(MediaType.APPLICATION_XML)

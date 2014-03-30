@@ -422,6 +422,20 @@ final class JerseyClient implements JqmClient
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public InputStream getJobLogStdErr(int jobId)
+    {
+        // TODO: implement this
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public InputStream getJobLogStdOut(int jobId)
+    {
+        // TODO: implement this
+        throw new UnsupportedOperationException();
+    }
+
     // /////////////////////////////////////////////////////////////////////
     // Parameters retrieval
     // /////////////////////////////////////////////////////////////////////

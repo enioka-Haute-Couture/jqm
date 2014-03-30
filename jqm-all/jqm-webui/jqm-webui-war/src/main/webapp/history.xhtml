@@ -132,8 +132,16 @@
 										target="#{jobInstanceControler.selDel}" value="#{f}" />
 									<p:fileDownload value="#{jobInstanceControler.file}" />
 								</h:commandLink>
-
 							</p:dataList>
+
+							<h:outputText value="Log files -- " />
+							<h:commandLink ajax="false" value="StdOut">
+								<p:fileDownload value="#{jobInstanceControler.selOut}" />
+							</h:commandLink>
+							<h:outputText value="  --  " />
+							<h:commandLink ajax="false" value="StdErr">
+								<p:fileDownload value="#{jobInstanceControler.selErr}" />
+							</h:commandLink>
 						</p:outputPanel>
 					</p:panel>
 				</p:dialog>

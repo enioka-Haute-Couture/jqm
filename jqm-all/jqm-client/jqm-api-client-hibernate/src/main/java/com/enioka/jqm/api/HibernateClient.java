@@ -1384,10 +1384,85 @@ final class HibernateClient implements JqmClient
         }
         catch (IOException e)
         {
-            throw new JqmClientException("Could not copy the downloaded file", e);
+            throw new JqmClientException("Could not create a webserver-local copy of the file", e);
         }
         em.close();
 
+        FileInputStream res = null;
+        try
+        {
+            res = new SelfDestructFileStream(file);
+        }
+        catch (IOException e)
+        {
+            throw new JqmClientException("File seems not to be present where it should have been downloaded", e);
+        }
+        return res;
+    }
+
+    @Override
+    public InputStream getJobLogStdOut(int jobId)
+    {
+        return getJobLog(jobId, ".stdout", "out");
+    }
+
+    @Override
+    public InputStream getJobLogStdErr(int jobId)
+    {
+        return getJobLog(jobId, ".stderr", "err");
+    }
+
+    private InputStream getJobLog(int jobId, String extension, String param)
+    {
+        // 1: retrieve node to address
+        EntityManager em = null;
+        History h = null;
+        try
+        {
+            em = getEm();
+            h = em.find(History.class, jobId);
+            if (h == null)
+            {
+                throw new NoResultException("No history for this jobId. perhaps the job isn't ended yet");
+            }
+        }
+        catch (Exception e)
+        {
+            h = null;
+            throw new JqmInvalidRequestException("No ended job found with the deliverable ID " + jobId, e);
+        }
+        finally
+        {
+            em.close();
+        }
+
+        // 2: build URL
+        URL url = null;
+        try
+        {
+            url = new URL("http://" + h.getNode().getDns() + ":" + h.getNode().getPort() + "/log?" + param + "=" + jobId);
+            jqmlogger.trace("URL: " + url.toString());
+        }
+        catch (MalformedURLException e)
+        {
+            throw new JqmClientException("URL is not valid " + url, e);
+        }
+
+        // 3: copy file locally
+        File file = null;
+        String destDir = System.getProperty("java.io.tmpdir");
+        try
+        {
+            file = new File(destDir + "/" + UUID.randomUUID().toString() + jobId + extension);
+            FileUtils.copyURLToFile(url, file);
+            jqmlogger.trace("File was downloaded to " + file.getAbsolutePath());
+        }
+        catch (IOException e)
+        {
+            throw new JqmClientException("Could not create a webserver-local copy of the file", e);
+        }
+
+        // 4: wrap the local copy inside a self destructable stream so that we won't fill the file system
         FileInputStream res = null;
         try
         {

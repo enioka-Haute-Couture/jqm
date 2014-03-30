@@ -233,6 +233,18 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
         return new DefaultStreamedContent(is, null, selected.getId() + " - " + selDel.getOriginalName());
     }
 
+    public StreamedContent getSelOut()
+    {
+        InputStream is = JqmClientFactory.getClient().getJobLogStdOut(this.selected.getId());
+        return new DefaultStreamedContent(is, "text/plain;charset=utf-8", selected.getId() + ".stdout.txt");
+    }
+
+    public StreamedContent getSelErr()
+    {
+        InputStream is = JqmClientFactory.getClient().getJobLogStdErr(this.selected.getId());
+        return new DefaultStreamedContent(is, "text/plain;charset=utf-8", selected.getId() + ".stderr.txt");
+    }
+
     public Deliverable getSelDel()
     {
         return selDel;

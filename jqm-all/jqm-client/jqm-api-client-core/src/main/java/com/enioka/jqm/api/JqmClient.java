@@ -302,7 +302,9 @@ public interface JqmClient
 
     /**
      * Return all files created by a job instance if any. The stream is not open: opening and closing it is the caller's responsibility.<br>
-     * <strong>The underlying temporary files are deleted at stream closure</strong>.
+     * <strong>The underlying temporary files are deleted at stream closure</strong>.<br>
+     * <strong>In some implementations, this client method may require a direct TCP connection to the engine that has run the instance. In
+     * all implementations, the engine that has run the instance must be up.</strong>
      * 
      * @param jobId
      * @return a list of streams
@@ -315,7 +317,9 @@ public interface JqmClient
 
     /**
      * Return one file created by a job instance. The stream is not open: opening and closing it is the caller's responsibility.<br>
-     * <strong>The underlying temporary files are deleted at stream closure</strong>.
+     * <strong>The underlying temporary files are deleted at stream closure</strong>. <br>
+     * <strong>In some implementations, this client method may require a direct TCP connection to the engine that has run the instance. In
+     * all implementations, the engine that has run the instance must be up.</strong>
      * 
      * @param file
      *            the file to retrieve (usually obtained through {@link #getJobDeliverables(int)})
@@ -324,6 +328,32 @@ public interface JqmClient
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
     public InputStream getDeliverableContent(Deliverable file);
+
+    /**
+     * Returns the standard output flow of of an ended job instance <br>
+     * <strong>In some implementations, this client method may require a direct TCP connection to the engine that has run the instance. In
+     * all implementations, the engine that has run the instance must be up.</strong>
+     * 
+     * @throws JqmInvalidRequestException
+     *             when input data is invalid (job instance does not exist)
+     * @throws JqmClientException
+     *             when an internal API implementation occurs. Usually linked to a configuration issue.
+     * @see #getJobLogStdErr(int)
+     */
+    public InputStream getJobLogStdOut(int jobId);
+
+    /**
+     * Returns the standard error flow of of an ended job instance<br>
+     * <strong>In some implementations, this client method may require a direct TCP connection to the engine that has run the instance. In
+     * all implementations, the engine that has run the instance must be up.</strong>
+     * 
+     * @throws JqmInvalidRequestException
+     *             when input data is invalid (job does not exist)
+     * @throws JqmClientException
+     *             when an internal API implementation occurs. Usually linked to a configuration issue.
+     * @see #getJobLogStdOut(int)
+     */
+    public InputStream getJobLogStdErr(int jobId);
 
     // /////////////////////////////////////////////////////////////////////
     // Parameters retrieval

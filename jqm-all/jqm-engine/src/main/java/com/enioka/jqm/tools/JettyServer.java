@@ -78,6 +78,7 @@ class JettyServer
         context.addServlet(new ServletHolder(new ServletFile()), "/getfile");
         context.addServlet(new ServletHolder(new ServletEnqueue()), "/enqueue");
         context.addServlet(new ServletHolder(new ServletStatus()), "/status");
+        context.addServlet(new ServletHolder(new ServletLog()), "/log");
 
         h.addHandler(context);
 
