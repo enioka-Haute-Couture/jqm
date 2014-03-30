@@ -1,4 +1,4 @@
-﻿Web Service Client API
+Web Service Client API
 #############################
 
 **Client API** is the name of the API offered to the end users of JQM: it allows to interact with running jobs, offering operations
@@ -106,7 +106,7 @@ It is not necessary to enable the service on all JQM nodes. It is actually recom
 Moreover, it is a standard web application with purely stateless sessions,
 so the standard mechanisms for load balancing or high availability apply if you want them.
 
-> :warning: currently, there is no authentication mechanism implemented. See ticket #9 for the implementation of this function.
+.. warning:: currently, there is no authentication mechanism implemented. See `ticket #9 <https://github.com/enioka/jqm/issues/9>`_ for the implementation of this function.
 
 .. _web_service_ref:
 
