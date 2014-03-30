@@ -55,10 +55,10 @@ jqm_start() {
                 	exit 1
         	fi
         fi
-	# Rotate previous logs if any
+	# Rotate previous logs if it exceeds 10 Mo
 	for JQM_LOG_FILE in $JQM_LOG_OUT_FILE $JQM_LOG_ERR_FILE
 	do
-		if [[ -e $JQM_LOG_FILE ]]
+		if [[ -e $JQM_LOG_FILE ]] && [[  $(du -sm $JQM_LOG_FILE | awk '{ print $1 }') -gt 10 ]]
 		then
 			mv $JQM_LOG_FILE ${JQM_LOG_FILE}.$(date +%Y%m%H%M%S)
 			find logs -name "$(basename ${JQM_LOG_FILE})*" -mtime +${JQM_LOG_HISTORY} | xargs -r rm
