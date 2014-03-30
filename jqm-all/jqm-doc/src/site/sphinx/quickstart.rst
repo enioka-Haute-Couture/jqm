@@ -12,7 +12,7 @@ Windows
 
 Prerequisites:
 
-* A directory where JQM will be installed, named JQM_ROOT afterwards.
+* A directory where JQM will be installed, named JQM_ROOT afterward.
 * An account with full permissions in JQM_ROOT. Not need for admin or special rights - it just needs to be able to open a PowerShell session.
 
 The following script will download and copy the binaries (adapt the first two lines). ::
@@ -47,7 +47,7 @@ Linux / Unix
 
 Prerequisites:
 
-* A directory where JQM will be installed, named JQM_ROOT afterwards.
+* A directory where JQM will be installed, named JQM_ROOT afterward.
 * An account with full permissions in JQM_ROOT. Not need for admin or special rights.
 
 The following script will download and install the binaries (adapt the first two lines). ::

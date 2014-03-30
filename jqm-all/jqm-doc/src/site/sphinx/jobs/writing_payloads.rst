@@ -10,7 +10,7 @@ of some JQM functionalities is easy to add to any code be it new or existing.
 Payloads types
 ********************
 
-There are three payload types: just launching the good old main (the prefered method for newly written jobs), and two 
+There are three payload types: just launching the good old main (the preferred method for newly written jobs), and two 
 types designed to allow reuse of even more existing binaries: Runnable & JQM API.
 
 Main
@@ -40,7 +40,7 @@ Runnable
 --------------
 
 Some existing code is written to be run as a thread, implementing the Runnable interface. If these classes have a no-argument
-constructor (this is not imposed by the Runnable interface as interfaces cannot impose a constructor), JQM can instanciate 
+constructor (this is not imposed by the Runnable interface as interfaces cannot impose a constructor), JQM can instantiate 
 and launch them. In that case, the run() method from the interface is executed - therefore it is not possible to access
 parameters without using JQM advanced function described later in this chapter.
 
@@ -122,7 +122,7 @@ TL;DR: when a file is created that should be accessible to remote clients, use J
 
 .. note:: work directories are obtained through JobManager.getWorkDir. These are purged after execution.
 
-Exemple::
+Example::
 
 	import java.io.FileWriter;
 	import java.io.PrintWriter;
@@ -167,7 +167,7 @@ Finally, for voluntarily killing a running payload, it is possible to do much of
 Note that System.exit is forbidden by the Java security manager inside paylaods - it would stop the whole JQM engine, which
 would be rather impolite towards other running job instances.
 
-Full exemple
+Full example
 *******************
 
 This fully commented payload uses nearly all the API. ::
@@ -273,10 +273,10 @@ JQM is some sort of light application server - therefore the same guidelines app
 
 * Don't play (too much) with classloaders. This is allowed because some frameworks require them (such as Hibernate)
   and we wouldn't want existing code using these frameworks to fail just because we are being too strict.
-* Don't create threads. A thread is an unmanageable object in Java - if it blocks for whatever reason, the whole pplication server
+* Don't create threads. A thread is an unmanageable object in Java - if it blocks for whatever reason, the whole application server
   has to be restarted, impacting other jobs/users. They are only allowed for the same reason as for creating classloaders.
-* Be wary of bootstrap static contexts. Using static elements is all-right as long as the statix context is from your classloader (in our case, it means 
+* Be wary of bootstrap static contexts. Using static elements is all-right as long as the static context is from your classloader (in our case, it means 
   classes from your own code or dependencies). Messing with
-  static elements from the bootstrap classloader is opening the door to weird interactions between jobs running in parallel. For exemple, loading a JDBC
+  static elements from the bootstrap classloader is opening the door to weird interactions between jobs running in parallel. For example, loading a JDBC
   driver does store such static elements, and should be frowned upon.
 * Don't redefine System.setOut and System.setErr - if you do so, you will loose the log created by JQM from your console output. 
