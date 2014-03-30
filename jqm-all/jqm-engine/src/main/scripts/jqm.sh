@@ -7,8 +7,10 @@
 
 ACTION=$1
 
-LOCAL_DIR=$(dirname $0)
-JQM_JAR=${LOCAL_DIR}/jqm.jar
+# Go to JQM DIR. This is needed as JQM builds its path from its starting dir
+cd $(dirname $0)
+
+JQM_JAR="jqm.jar"
 
 if [[ $JQM_NODE == "" ]]
 then
@@ -25,8 +27,10 @@ then
 fi
 
 
-JQM_PID_FILE=${LOCAL_DIR}/jqm_${JQM_NODE}.pid
-JQM_LOG_FILE=${LOCAL_DIR}/logs/jqm_${JQM_NODE}.log
+JQM_PID_FILE=jqm_${JQM_NODE}.pid
+JQM_LOG_OUT_FILE=logs/jqm_${JQM_NODE}_out.log
+JQM_LOG_ERR_FILE=logs/jqm_${JQM_NODE}_err.log
+JQM_LOG_HISTORY=30  # Days of log history to keep
 
 
 #############################################
@@ -51,8 +55,17 @@ jqm_start() {
                 	exit 1
         	fi
         fi
+	# Rotate previous logs if any
+	for JQM_LOG_FILE in $JQM_LOG_OUT_FILE $JQM_LOG_ERR_FILE
+	do
+		if [[ -e $JQM_LOG_FILE ]]
+		then
+			mv $JQM_LOG_FILE ${JQM_LOG_FILE}.$(date +%Y%m%H%M%S)
+			find logs -name "$(basename ${JQM_LOG_FILE})*" -mtime +${JQM_LOG_HISTORY} | xargs -r rm
+		fi
+	done
 	# We can go on...
-	nohup $JAVA -jar $JQM_JAR -startnode $JQM_NODE 2>&1 > $JQM_LOG_FILE &
+	nohup $JAVA -jar $JQM_JAR -startnode $JQM_NODE > $JQM_LOG_OUT_FILE 2> $JQM_LOG_ERR_FILE &
 	JQM_PID=$!
 	echo $JQM_PID > ${JQM_PID_FILE}
 	echo "JQM Started with pid ${JQM_PID}"
