@@ -1,14 +1,14 @@
-﻿Installation
+Installation
 ###################
 
 Please follow the paragraph specific to your OS and then go through the common chapter.
 
 .. highlight:: bash
 
-Windows
+Binary install
 *************
 
-Binary install
+Windows
 ------------------
 
 Prerequisites:
@@ -36,20 +36,59 @@ Then create a service (adapt user and password)::
 
 And it's done, a JQM service node is now running.
 
+Linux / Unix
+-------------
+
+Prerequisites:
+
+* A directory where JQM will be installed, named JQM_ROOT afterwards
+* A user account with read/write rights on JQM_ROOT
+
+The following script will download and copy the binaries (adapt the first two lines). ::
+
+        JQM_ROOT = "/opt/jqm"
+        JQM_VERSION = "1.1.6"
+        mkdir -p $JQM_ROOT; cd $JQM_ROOT
+        wget https://github.com/enioka/jqm/archive/jqm-$JQM_VERSION.taz.gz
+        tar xvf jqm-$JQM_VERSION.taz.gz
+        rm jqm-$JQM_VERSION.taz.gz
+        mv jqm-*/* .
+        rmdir jqm-*
+        
+
+Then use the provided jqm.sh script::
+
+        jqm.sh createnode
+        jqm.sh start
+
+And it's done, a JQM service node is now running.
+
+
 Testing
 -------------
 
-The following will import the definition of three test jobs included in the distribution, then launch one. (no admin rights necessary nor variables) ::
+The following will import the definition of three test jobs included in the distribution, then launch one. (no admin rights necessary nor variables).
+
+Windows::
 
 	./jqm.ps1 stop  ## Default database is a single file... that is locked by the engine if started
 	./jqm.ps1 allxml  # This will import all the test job definitions
 	./jqm.ps1 -Enqueue TestEcho
 	./jqm.ps1 start
 
+Linux / Unix::
+
+        ./jqm.sh stop  ## Default database is a single file... that is locked by the engine if started
+        ./jqm.sh allxml  # This will import all the test job definitions
+        ./jqm.sh Enqueue TestEcho
+        ./jqm.sh start
+
+
 Check JQM_ROOT/logs/jqm.log: a job should have launched (and suceeded). Success!
 
+
 Database configuration
-------------------------
+************************
 
 The node created in the previous step has serious drawbacks:
 
@@ -64,38 +103,35 @@ It contains by default sample configuration for Oracle and HSQLDB, but MySQL is 
 
 Afterwards, place your JDBC driver inside the "lib" directory. **It must be renamed jdbcdriver.jar**.
 
-Then stop the service::
+Then stop the service.
+
+Windows::
 
 	./jqm.ps1 stop
 	./jqm.ps1 createnode
 	./jqm.ps1 start
 
-Then, test again (assuming this is not HSQLDB in file mode anymore, and therefore that there is no need to stop the engine)::
+Linux / Unix::
+
+        ./jqm.sh stop
+        ./jqm.sh createnode
+        ./jqm.sh start
+
+Then, test again (assuming this is not HSQLDB in file mode anymore, and therefore that there is no need to stop the engine).
+
+Windows::
 
 	./jqm.ps1 allxml
 	./jqm.ps1 -Enqueue TestEcho
 
+Linux / Unix::
 
-Linux
-*********
+        ./jqm.sh allxml
+        ./jqm.sh enqueue TestEcho
 
-::
-
-	JQM_ROOT = "/opt/jqm"
-	JQM_VERSION = "1.1.4"
-	mkdir -f $JQM_ROOT; cd $JQM_ROOT
-	wget https://github.com/enioka/jqm/archive/jqm-$JQM_VERSION.zip > jqm.zip
-	unzip jqm.zip
-	mv jqm*/* .
-	rm jqm.zip; mv jqm*/* .
-
-Then use the provided jqm.sh.
-
-For all OSes
-****************
 
 Global configuration
--------------------------
+**********************
 
 When the first node is created inside a database, some parameters are automatically created. You may want to change them using your prefered 
 database editing tool.
@@ -115,7 +151,7 @@ Table GLOBALPARAMETER:
 +---------------------+--------------------------------+--------------------------------------------------------------+
 
 JNDI configuration
----------------------
+*******************
 
 See [resources](resources.md).
 
