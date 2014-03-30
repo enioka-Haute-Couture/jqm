@@ -178,12 +178,6 @@
 		<!-- JQM APIs -->
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-model</artifactId>
-			<type>jar</type>
-			<version>1.1.6-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-api-client-hibernate</artifactId>
 			<type>jar</type>
 			<version>1.1.6-SNAPSHOT</version>

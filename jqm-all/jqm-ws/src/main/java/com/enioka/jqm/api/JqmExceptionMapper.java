@@ -4,8 +4,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import com.enioka.jqm.api.JqmInvalidRequestException;
-
 @Provider
 public class JqmExceptionMapper implements ExceptionMapper<JqmInvalidRequestException>
 {
@@ -14,5 +12,4 @@ public class JqmExceptionMapper implements ExceptionMapper<JqmInvalidRequestExce
     {
         return Response.status(Response.Status.BAD_REQUEST).entity(exception.getMessage()).build();
     }
-
 }

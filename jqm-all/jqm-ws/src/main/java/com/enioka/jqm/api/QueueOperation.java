@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 /**
  * The main web service class. Interface {@link JqmClient} is implemented, but it is not compulsory at all. (done for completion sake & and
  * ease of update). Not all methods are exposed - some things are better left to the caller.
- * 
  */
 @Path("/")
 public class QueueOperation implements JqmClient
@@ -29,12 +28,13 @@ public class QueueOperation implements JqmClient
     public int enqueue(JobRequest jd)
     {
         log.debug("calling WS enqueue");
-        return JqmClientFactory.getClient().enqueue(jd);
+        throw new NotSupportedException();
     }
 
     @POST
     @Path("ji")
     @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public JobInstance enqueue_object(JobRequest jd)
     {
         log.debug("calling WS enqueue_object");
@@ -104,7 +104,7 @@ public class QueueOperation implements JqmClient
         JqmClientFactory.getClient().resumeJob(jobId);
     }
 
-    // Not exposed - we prefer objects to primitive types
+    // Not exposed directly - we prefer objects to primitive types
     public int restartCrashedJob(int jobId)
     {
         log.debug("calling WS restartCrashedJob");
@@ -112,6 +112,7 @@ public class QueueOperation implements JqmClient
     }
 
     @Path("ji/crashed/{jobId}")
+    @Produces(MediaType.APPLICATION_XML)
     @DELETE
     public JobInstance restartCrashedJob_object(@PathParam("jobId") int jobId)
     {
@@ -129,7 +130,7 @@ public class QueueOperation implements JqmClient
         JqmClientFactory.getClient().setJobQueue(jobId, queueId);
     }
 
-    // No need to expose.
+    // No need to expose. CLient side work.
     @Override
     public void setJobQueue(int jobId, Queue queue)
     {
@@ -137,9 +138,10 @@ public class QueueOperation implements JqmClient
         JqmClientFactory.getClient().setJobQueue(jobId, queue);
     }
 
-    // For now, not exposed. May be one day.
     @Override
-    public void setJobQueuePosition(int jobId, int newPosition)
+    @POST
+    @Path("ji/{jobId}/position/{newPosition}")
+    public void setJobQueuePosition(@PathParam("jobId") int jobId, @PathParam("newPosition") int newPosition)
     {
         log.debug("calling WS setJobQueuePosition");
         JqmClientFactory.getClient().setJobQueuePosition(jobId, newPosition);
@@ -147,6 +149,7 @@ public class QueueOperation implements JqmClient
 
     @Override
     @GET
+    @Produces(MediaType.APPLICATION_XML)
     @Path("ji/{jobId}")
     public JobInstance getJob(@PathParam("jobId") int jobId)
     {
@@ -184,18 +187,25 @@ public class QueueOperation implements JqmClient
         return JqmClientFactory.getClient().getUserActiveJobs(userName);
     }
 
+    // Not exposed directly - the Query object passed as parameter actually contains results...
     @Override
-    @Path("ji/query")
-    @Consumes(MediaType.APPLICATION_XML)
-    @POST
-    @Produces(MediaType.APPLICATION_XML)
     public List<JobInstance> getJobs(Query query)
     {
         log.debug("calling WS getJobs_Query");
         return JqmClientFactory.getClient().getJobs(query);
     }
 
-    // Not exposed. Use getJob => messages
+    @Path("ji/query")
+    @Consumes(MediaType.APPLICATION_XML)
+    @POST
+    @Produces(MediaType.APPLICATION_XML)
+    public Query getJobsQuery(Query query)
+    {
+        log.debug("calling WS getJobsQuery");
+        query.run();
+        return query;
+    }
+
     @Override
     @Path("ji/{jobId}/messages")
     @GET
@@ -221,9 +231,11 @@ public class QueueOperation implements JqmClient
     public List<Deliverable> getJobDeliverables(@PathParam("jobId") int jobId)
     {
         log.debug("calling WS getJobDeliverables");
-        return JqmClientFactory.getClient().getJobDeliverables(jobId);
+        List<Deliverable> res = JqmClientFactory.getClient().getJobDeliverables(jobId);
+        return res;
     }
 
+    // Not exposed. Returning a list of files is a joke anyway... Loop should be client-side.
     @Override
     public List<InputStream> getJobDeliverablesContent(int jobId)
     {
@@ -232,24 +244,34 @@ public class QueueOperation implements JqmClient
     }
 
     @Override
+    @Path("ji/files")
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces("application/octet-stream")
+    @POST
     public InputStream getDeliverableContent(Deliverable file)
     {
         log.debug("calling WS getDeliverableContent");
-        throw new NotSupportedException();
+        return JqmClientFactory.getClient().getDeliverableContent(file);
     }
 
     @Override
-    public InputStream getJobLogStdErr(int jobId)
+    @Path("ji/{jobId}/stderr")
+    @Produces("application/octet-stream")
+    @GET
+    public InputStream getJobLogStdErr(@PathParam("jobId") int jobId)
     {
         log.debug("calling WS getJobLogStdErr");
-        throw new NotSupportedException();
+        return JqmClientFactory.getClient().getJobLogStdErr(jobId);
     }
 
     @Override
-    public InputStream getJobLogStdOut(int jobId)
+    @Path("ji/{jobId}/stdout")
+    @Produces("application/octet-stream")
+    @GET
+    public InputStream getJobLogStdOut(@PathParam("jobId") int jobId)
     {
         log.debug("calling WS getJobLogStdOut");
-        throw new NotSupportedException();
+        return JqmClientFactory.getClient().getJobLogStdOut(jobId);
     }
 
     @Override
@@ -293,6 +315,7 @@ public class QueueOperation implements JqmClient
     @Override
     public List<JobDef> getJobDefinitions()
     {
+        log.debug("calling WS getJobDefinitions-no args");
         return JqmClientFactory.getClient().getJobDefinitions();
     }
 
@@ -302,6 +325,7 @@ public class QueueOperation implements JqmClient
     @Override
     public List<JobDef> getJobDefinitions(@PathParam("applicationName") String application)
     {
+        log.debug("calling WS getJobDefinitions-app");
         return JqmClientFactory.getClient().getJobDefinitions(application);
     }
 }

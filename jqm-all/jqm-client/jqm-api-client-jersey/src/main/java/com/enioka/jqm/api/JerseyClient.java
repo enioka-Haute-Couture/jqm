@@ -19,6 +19,7 @@
 package com.enioka.jqm.api;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -53,7 +54,7 @@ final class JerseyClient implements JqmClient
         ClientConfig cc = new ClientConfig();
         // Later on, put SSL things here.
         client = ClientBuilder.newClient(cc);
-        this.target = client.target(this.p.getProperty("com.enioka.ws.url", "http://localhost:1789/ws"));
+        this.target = client.target(this.p.getProperty("com.enioka.ws.url", "http://localhost:1789/api/ws"));
     }
 
     @Override
@@ -72,6 +73,7 @@ final class JerseyClient implements JqmClient
     {
         try
         {
+            System.out.println(target.getUri().toString());
             return target.path("ji").request().post(Entity.entity(jd, MediaType.APPLICATION_XML), JobInstance.class).getId();
         }
         catch (BadRequestException e)
@@ -253,8 +255,18 @@ final class JerseyClient implements JqmClient
     @Override
     public void setJobQueuePosition(int idJob, int position)
     {
-        // TODO: implement this
-        throw new UnsupportedOperationException();
+        try
+        {
+            target.path("ji/" + idJob + "/position/" + position).request().post(null);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -332,10 +344,10 @@ final class JerseyClient implements JqmClient
     {
         try
         {
-            return target.path("ji/query").request()
-                    .post(Entity.entity(query, MediaType.APPLICATION_XML), new GenericType<List<JobInstance>>()
-                    {
-                    });
+            Query res = target.path("ji/query").request().post(Entity.entity(query, MediaType.APPLICATION_XML), Query.class);
+            query.setResultSize(res.getResultSize());
+            query.setResults(res.getResults());
+            return query.getResults();
         }
         catch (BadRequestException e)
         {
@@ -411,29 +423,63 @@ final class JerseyClient implements JqmClient
     @Override
     public List<InputStream> getJobDeliverablesContent(int idJob)
     {
-        // TODO: implement this
-        throw new UnsupportedOperationException();
+        List<InputStream> res = new ArrayList<InputStream>();
+        for (Deliverable d : getJobDeliverables(idJob))
+        {
+            res.add(getDeliverableContent(d));
+        }
+        return res;
     }
 
     @Override
     public InputStream getDeliverableContent(com.enioka.jqm.api.Deliverable d)
     {
-        // TODO: implement this
-        throw new UnsupportedOperationException();
+        try
+        {
+            return target.path("ji/files").request().post(Entity.entity(d, MediaType.APPLICATION_XML), InputStream.class);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     @Override
     public InputStream getJobLogStdErr(int jobId)
     {
-        // TODO: implement this
-        throw new UnsupportedOperationException();
+        try
+        {
+            return target.path("ji/" + jobId + "/stderr").request().get(InputStream.class);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     @Override
     public InputStream getJobLogStdOut(int jobId)
     {
-        // TODO: implement this
-        throw new UnsupportedOperationException();
+        try
+        {
+            return target.path("ji/" + jobId + "/stdout").request().get(InputStream.class);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     // /////////////////////////////////////////////////////////////////////

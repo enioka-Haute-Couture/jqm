@@ -18,10 +18,16 @@
 
 package com.enioka.jqm.api;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * Represents a file created by a job instance
  * 
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Deliverable
 {
     private String filePath;
@@ -41,6 +47,13 @@ public class Deliverable
         this.fileFamily = fileFamily;
         this.id = ID;
         this.originalName = originalName;
+    }
+
+    // Argless constructor for bean conventions
+    @SuppressWarnings("unused")
+    private Deliverable()
+    {
+
     }
 
     /**
@@ -75,5 +88,25 @@ public class Deliverable
     public String getOriginalName()
     {
         return originalName;
+    }
+
+    void setFilePath(String filePath)
+    {
+        this.filePath = filePath;
+    }
+
+    void setFileFamily(String fileFamily)
+    {
+        this.fileFamily = fileFamily;
+    }
+
+    void setId(Integer id)
+    {
+        this.id = id;
+    }
+
+    void setOriginalName(String originalName)
+    {
+        this.originalName = originalName;
     }
 }

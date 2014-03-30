@@ -765,7 +765,7 @@ final class HibernateClient implements JqmClient
 
             // No locking - we'll deal with exceptions
             List<JobInstance> currentJobs = em
-                    .createQuery("SELECT JobInstance ji from JobInstance ORDER BY ji.internalPosition", JobInstance.class)
+                    .createQuery("SELECT ji from JobInstance ji ORDER BY ji.internalPosition", JobInstance.class)
                     .setMaxResults(betweenUp).getResultList();
 
             if (currentJobs.size() == 0)

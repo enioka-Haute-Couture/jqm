@@ -10,6 +10,8 @@ test.txt
 *.log
 *.log.*
 *.releaseBackup
+*.war
+*.ear
 release.properties
 
 /jqm-all/jqm-engine/compile.sh

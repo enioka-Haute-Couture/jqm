@@ -118,17 +118,23 @@ All objects are serialized to XML. The service is a REST-style web service, so n
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
 | URL pattern           | Method | Non-URL arguments     | Return type         | Return MIME         | Interface equivalent | Description                                                    |
 +=======================+========+=======================+=====================+=====================+======================+================================================================+
-| /ji                   | GET    |                       | List_<JobInstance\> | application/xml     | getJobs              | List all known job instances                                   |
+| /ji                   | GET    |                       | List\<JobInstance\> | application/xml     | getJobs              | List all known job instances                                   |
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
 | /ji                   | POST   | JobRequest            | JobInstance         | application/xml     | enqueue              | New execution request                                          |
++-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
+| /ji/query             | POST   | Query                 | Query               | application/xml     | getJobs(Query)       | Returns the executed query                                     |
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
 | /ji/{jobId}           | GET    |                       | JobInstance         | application/xml     | getJob(int)          | Details of a Job instance                                      |
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
 | /ji/{jobId}/messages  | GET    |                       | List\<String\>      | application/xml     | getJobMessages(int)  | Retrieve messages created by a Job Instance                    |
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
-| /ji/{jobId}/progress  | GET    |                       | int                 | application/xml     | getJobProgress(int)  | Retrieve advancement status of a Job Instance                  |
-+-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
 | /ji/{jobId}/files     | GET    |                       | List\<Deliverables\>| application/xml     | getJobDeliverables   | Retrieve  the description of all files created by a JI         |
++-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
+| /ji/{jobId}/stdout    | GET    |                       | InputStream         | application/os      | getJobLogStdOut      | Retrieve the stdout log file of the (ended) instance           |
++-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
+| /ji/{jobId}/stderr    | GET    |                       | InputStream         | application/os      | getJobLogStdErr      | Retrieve the stderr log file of the (ended) instance           |
++-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
+|/ji/{jobId}/position/{}| POST   |                       | void                |                     | setJobQueuePosition  | Change the position of a waiting job instance inside a queue.  |
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
 | /ji/active            | GET    |                       | List\<JobInstance\> | application/xml     | getActiveJobs        | List all waiting or running job instances                      |
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
@@ -148,12 +154,14 @@ All objects are serialized to XML. The service is a REST-style web service, so n
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
 | /q/{qId}/{jobId}      | POST   |                       | void                |                     | setJobQueue          | Puts an existing waiting JI into a given queue.                |
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
-| XXXXX/q/{qId}/{jobId} | POST   |                       | void                |                     | setJobQueuePosition  | Change the position of a waiting job instance inside a queue.  |
-+-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
 | /user/{uname}/ji      | GET    |                       | List\<JobInstance\> | application/xml     | getActiveJobs        | List all waiting or running job instances for a user           |
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
+| /jd                   | GET    |                       | List\<JobDef\>      | application/xml     | getActiveJobs        | List all job definitions                                       |
++-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
+| /jd/{appName}         | GET    |                       | List\<JobInstance\> | application/xml     | getActiveJobs        | List all job definitions  for a given application              |
++-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
 
-.. todo:: deliverables content (getJobDeliverablesContent/getDeliverableContent) + setJobQueuePosition
+Note: application/os = application/output-stream.
 
 Used HTTP error codes are:
 

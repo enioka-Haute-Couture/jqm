@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -17,22 +21,31 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  */
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public final class Query
 {
-    private Integer jobInstanceId;
-    private Integer parentId;
+    private Integer jobInstanceId, parentId;
     private String applicationName;
-    private String user;
-    private String sessionId;
+    private String user, sessionId;
     private String jobDefKeyword1, jobDefKeyword2, jobDefKeyword3, jobDefModule, jobDefApplication;
     private String instanceKeyword1, instanceKeyword2, instanceKeyword3, instanceModule, instanceApplication;
     private String queueName;
     private Integer queueId;
     private Calendar enqueuedBefore, enqueuedAfter, beganRunningBefore, beganRunningAfter, endedBefore, endedAfter;
+
+    @XmlElementWrapper(name = "statuses")
+    @XmlElement(name = "status", type = State.class)
     private List<State> status = new ArrayList<State>();
+
     private Integer firstRow, pageSize;
     private Integer resultSize;
+
+    @XmlElementWrapper(name = "instances")
+    @XmlElement(name = "instance", type = JobInstance.class)
     private List<JobInstance> results;
+
+    @XmlElementWrapper(name = "sortby")
+    @XmlElement(name = "sortitem", type = SortSpec.class)
     private List<SortSpec> sorts = new ArrayList<Query.SortSpec>();
 
     private boolean queryLiveInstances = false, queryHistoryInstances = true;
@@ -40,7 +53,7 @@ public final class Query
     /**
      * The different fields that can be used in sorting.
      */
-    public enum Sort {
+    public static enum Sort {
         ID("id"), APPLICATIONNAME("jd.applicationName"), QUEUENAME("queue.name"), STATUS("status", "state"), DATEENQUEUE("enqueueDate"), DATEATTRIBUTION(
                 "attributionDate"), DATEEXECUTION("executionDate"), DATEEND("endDate", null), USERNAME("userName"), PARENTID("parentId");
 
@@ -72,17 +85,22 @@ public final class Query
     /**
      * The sort order
      */
-    enum SortOrder {
+    static enum SortOrder {
         ASCENDING, DESCENDING;
     }
 
     /**
      * Internal description of a sorting operation
      */
-    class SortSpec
+    static class SortSpec
     {
         public SortOrder order = SortOrder.ASCENDING;
         public Sort col;
+
+        // Bean convention
+        @SuppressWarnings("unused")
+        private SortSpec()
+        {}
 
         SortSpec(SortOrder order, Sort column)
         {
