@@ -2,12 +2,18 @@ package com.enioka.jqm.tools;
 
 import java.io.File;
 import java.net.BindException;
-import java.net.InetSocketAddress;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.Configuration;
@@ -33,7 +39,34 @@ class JettyServer
 
     void start(Node node)
     {
-        server = new Server(new InetSocketAddress(node.getDns(), node.getPort()));
+        server = new Server();
+
+        // Connectors.
+        List<Connector> ls = new ArrayList<Connector>();
+        try
+        {
+            InetAddress[] adresses = InetAddress.getAllByName(node.getDns());
+            for (InetAddress s : adresses)
+            {
+                if (s instanceof Inet4Address)
+                {
+                    Connector connector = new SelectChannelConnector();
+                    connector.setHost(s.getHostAddress());
+                    connector.setPort(node.getPort());
+                    ls.add(connector);
+                    jqmlogger.debug("Jetty will bind on " + s.getHostAddress() + ":" + node.getPort());
+                }
+            }
+        }
+        catch (UnknownHostException e1)
+        {
+            jqmlogger.warn("Could not resolve name " + node.getDns() + ". Will bind on all interfaces.");
+            Connector connector = new SelectChannelConnector();
+            connector.setHost(null);
+            connector.setPort(node.getPort());
+            ls.add(connector);
+        }
+        server.setConnectors(ls.toArray(new Connector[ls.size()]));
 
         // Collection handler
         server.setHandler(h);
