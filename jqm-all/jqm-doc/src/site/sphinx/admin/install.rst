@@ -153,7 +153,7 @@ Table GLOBALPARAMETER:
 JNDI configuration
 *******************
 
-See [resources](resources.md).
+See :doc:`/jobs/resources`
 
 Note that one JDBC JNDI alias is created, named jdbc/jqm, referencing the JQM database but has no password - you should set it.
 
