@@ -65,10 +65,15 @@ jqm_start() {
 		fi
 	done
 	# We can go on...
-	nohup $JAVA -jar $JQM_JAR -startnode $JQM_NODE > $JQM_LOG_OUT_FILE 2> $JQM_LOG_ERR_FILE &
-	JQM_PID=$!
-	echo $JQM_PID > ${JQM_PID_FILE}
-	echo "JQM Started with pid ${JQM_PID}"
+	if [[ $1 == "console" ]]
+	then
+		$JAVA -jar $JQM_JAR -startnode $JQM_NODE
+	else
+		nohup $JAVA -jar $JQM_JAR -startnode $JQM_NODE > $JQM_LOG_OUT_FILE 2> $JQM_LOG_ERR_FILE &
+		JQM_PID=$!
+		echo $JQM_PID > ${JQM_PID_FILE}
+		echo "JQM Started with pid ${JQM_PID}"
+	fi
 }
 
 jqm_stop() {
@@ -135,6 +140,9 @@ jqm_import_all_xml() {
 case "$ACTION" in
 	start)
 		jqm_start
+		;;
+	startconsole)
+		jqm_start "console"
 		;;
 	stop)
 		jqm_stop
