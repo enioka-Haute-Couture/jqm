@@ -1,16 +1,16 @@
-﻿<jqm>
+<jqm>
 	<jar>
-		<path>jqm-test-main/jqm-test-main.jar</path>
+		<path>jqm-test-kill/jqm-test-kill.jar</path>
 		<jobdefinitions>
 			<jobDefinition>
-				<name>DemoEcho</name>
-				<description>Demonstrates the direct reuse of a jar with a main function without any libs. Simply writes a line on stdout.</description>
+				<name>DemoKill</name>
+				<description>Demonstrates the use of yield - this waits eternally to be killed.</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>App</javaClassName>
 				<application>JQM</application>
 				<module>Demos</module>
-				<keyword1>Payload</keyword1>
-				<keyword2>Main</keyword2>
+				<keyword1>EngineApi</keyword1>
+				<keyword2>Kill</keyword2>
 				<keyword3></keyword3>
 				<highlander>false</highlander>
 				<parameters>					

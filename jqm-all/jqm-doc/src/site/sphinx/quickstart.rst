@@ -33,7 +33,7 @@ The following script will create a database and reference the test jobs (i.e. :t
 
 The following script will :term:`enqueue` an execution request for one of the test jobs::
 
-	./jqm.ps1 -Enqueue TestEcho
+	./jqm.ps1 -Enqueue DemoEcho
 
 Finally this will start an engine inside the console.::
 

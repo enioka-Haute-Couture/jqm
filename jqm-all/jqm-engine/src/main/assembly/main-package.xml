@@ -108,8 +108,9 @@
 			<includes>
 				<include>com.enioka.jqm:jqm-test-fibo:jar</include>
 				<include>com.enioka.jqm:jqm-test-geo:jar</include>
-				<include>com.enioka.jqm:jqm-test-jndijms-amq:jar</include>
 				<include>com.enioka.jqm:jqm-test-main:jar</include>
+				<include>com.enioka.jqm:jqm-test-main-inject:jar</include>
+				<include>com.enioka.jqm:jqm-test-kill:jar</include>
 			</includes>
 			<scope>test</scope>
 		</dependencySet>

@@ -1,17 +1,17 @@
 ﻿<jqm>
 	<jar>
-		<path>jqm-test-main/jqm-test-main.jar</path>
+		<path>jqm-test-main/jqm-test-main-inject.jar</path>
 		<jobdefinitions>
 			<jobDefinition>
-				<name>DemoEcho</name>
-				<description>Demonstrates the direct reuse of a jar with a main function without any libs. Simply writes a line on stdout.</description>
+				<name>DemoApi</name>
+				<description>Demonstrates the use of a jar with a main function. It then uses the injected engine API (nearly every method of it).</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>App</javaClassName>
 				<application>JQM</application>
 				<module>Demos</module>
 				<keyword1>Payload</keyword1>
 				<keyword2>Main</keyword2>
-				<keyword3></keyword3>
+				<keyword3>EngineApi</keyword3>
 				<highlander>false</highlander>
 				<parameters>					
 				</parameters>

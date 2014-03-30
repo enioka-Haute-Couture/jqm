@@ -248,13 +248,19 @@
 		</dependency>
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-test-main-inject</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-test-main</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-test-jndijms-amq</artifactId>
+			<artifactId>jqm-test-kill</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

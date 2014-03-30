@@ -23,7 +23,7 @@
           username="SA"
           password=""
           driverClassName="org.hsqldb.jdbcDriver"
-          url="jdbc:hsqldb:hsql://localhost/testdbengine"
+          url="jdbc:hsqldb:file:db/jqmdatabase;shutdown=true;hsqldb.write_delay=false"
           singleton="true"/>
 
 <!--          
