@@ -1,4 +1,4 @@
-﻿Logs
+Logs
 #######################################
 
 There are two kinds of logs in JQM: the engine log, and the job instances logs.
@@ -33,6 +33,11 @@ Engine log
 It is named jqm.log. It is rotated as soon as it reaches 10MB. The five most recent files are kept.
 
 It contains everything related to the engine - job instance launches leave no traces here.
+
+Java Virtual Machine Log
+*************************
+
+Named jqm_<nodename>_std.log and jqm_<nodename>_err.log for respectively standard ouput and error output. It contains every log that the engine did not manage to catch. For instance low level JVM error statement such as OutOfMemoryException. It is rotated at startup when it reaches 10MB. 30 days of such logs are kept.
 
 Payload logs
 ***************

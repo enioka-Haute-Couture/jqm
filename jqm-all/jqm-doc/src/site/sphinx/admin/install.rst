@@ -6,7 +6,7 @@ Please follow the paragraph specific to your OS and then go through the common c
 .. highlight:: bash
 
 Binary install
-*************
+***************
 
 Windows
 ------------------

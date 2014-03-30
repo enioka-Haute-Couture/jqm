@@ -43,3 +43,6 @@ Command Line Interface (CLI)
 .. option:: -v, --version               
 	
 	display JQM engine version
+
+
+.. note:: Common options like start, createnode, importxml etc. can be used with convenience script jqm.sh / jqm.ps1
