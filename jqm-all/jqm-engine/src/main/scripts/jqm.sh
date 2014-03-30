@@ -113,29 +113,52 @@ jqm_createnode() {
 	$JAVA -jar $JQM_JAR -createnode $JQM_NODE
 }
 
+jqm_enqueue() {
+	$JAVA -jar $JQM_JAR -enqueue $1
+}
+
+jqm_import_xml() {
+	$JAVA -jar $JQM_JAR -importjobdef $1
+}
+
+jqm_import_all_xml() {
+	for job in $(find jobs -name "*xml" -type f)
+	do
+		jqm_import_xml $job
+	done
+}
 
 
 ###############################
 ##### Decide what to do... ####
 ###############################
 case "$ACTION" in
-	'start')
+	start)
 		jqm_start
 		;;
-	'stop')
+	stop)
 		jqm_stop
 		;;
-	'restart')
+	restart)
 		jqm_stop
 		jqm_start
 		;;
-	'status')
+	status)
 		jqm_status
 		;;
-	'createnode')
+	createnode)
 		jqm_createnode
 		;;
+	enqueue|run|execute)
+		jqm_enqueue $2
+		;;
+	importxml|import|xml)
+		jqm_import_xml $2
+		;;
+	importallxml)
+		jqm_import_all_xml
+		;;
 	*)
-		echo "Usage: $0 {start|stop|restart|status|createnode|allxml|enqueue}"
+		echo "Usage: $0 {start|stop|restart|status|createnode|importxml|allxml|enqueue}"
 		;;
 esac
