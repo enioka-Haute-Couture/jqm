@@ -10,7 +10,6 @@
 	<artifactId>jqm-api-client-jersey</artifactId>
 
 	<properties>
-		<maven.javadoc.skip>true</maven.javadoc.skip>
 	</properties>
 
 	<build>
@@ -33,9 +32,10 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.glassfish.jersey.core</groupId>
-			<artifactId>jersey-client</artifactId>
-			<version>${jersey-version}</version>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<version>2.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -43,7 +43,9 @@
 			<version>1.7.5</version>
 		</dependency>
 
-		<!-- TEST: add a full server to host the REST web service -->
+		<!-- TEST: host the service inside the engine's Jetty. Provide Jersey as 
+			JAX-RS client implementation. Engine already provides the server part for 
+			the ws.war -->
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-engine</artifactId>
@@ -54,6 +56,14 @@
 					<groupId>com.enioka.jqm</groupId>
 				</exclusion>
 			</exclusions>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>${jersey-version}</version>
+			
 		</dependency>
 
 		<dependency>

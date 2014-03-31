@@ -17,6 +17,7 @@
 	<modules>
 		<module>jqm-webui-war</module>
 		<module>jqm-webui-ear</module>
+		<module>jqm-webui-war-ws</module>
 	</modules>
 
 	<dependencies>

@@ -32,8 +32,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 
-import org.glassfish.jersey.client.ClientConfig;
-
 /**
  * Main JQM client API entry point.
  */
@@ -51,9 +49,44 @@ final class JerseyClient implements JqmClient
     JerseyClient(Properties p)
     {
         this.p = p;
-        ClientConfig cc = new ClientConfig();
         // Later on, put SSL things here.
-        client = ClientBuilder.newClient(cc);
+        client = ClientBuilder.newClient();
+
+        // Load conf file if any
+        InputStream fis = null;
+        try
+        {
+            if (System.getProperty("com.enioka.ws.url") != null)
+            {
+                p.setProperty("com.enioka.ws.url", System.getProperty("com.enioka.ws.url"));
+            }
+            else
+            {
+                fis = this.getClass().getClassLoader().getResourceAsStream("jqm.properties");
+                if (fis != null)
+                {
+                    p.load(fis);
+                }
+            }
+
+        }
+        catch (Exception e)
+        {
+            // Ignore invalid files
+        }
+        finally
+        {
+            try
+            {
+                fis.close();
+            }
+            catch (Exception e)
+            {
+                // Ignore.
+            }
+        }
+
+        // Set properties
         this.target = client.target(this.p.getProperty("com.enioka.ws.url", "http://localhost:1789/api/ws"));
     }
 
