@@ -40,7 +40,7 @@ the following will query only the queues and won't touch the history::
 
 .. note:: When looking for instances of a desired state (ENDED, RUNNING, ...), it is highly recommended to query only the queue or only the history.
 	Indeed, states are specific either to the queue or to history: an ended instance is always in the history, a running instance always 
-	in the queue, etc. This is far quicker than querying both history and queues and fltering on state.
+	in the queue, etc. This is far quicker than querying both history and queues while filtering on state.
 
 Pagination
 **************
@@ -56,7 +56,7 @@ The API implements pagination for this case, with the usual first row and page s
 .. warning:: failing to use pagination on huge datasets will simply crash your application.
 
 Pagination cannot be used on live data queries - it is supposed there are never more than a few rows inside the queues.
-Trying to use it nevertheless will trigger an IllegalArgumentException.
+Trying to use it nevertheless will trigger an JqmInvalidRequestException.
 
 Sorting
 ********

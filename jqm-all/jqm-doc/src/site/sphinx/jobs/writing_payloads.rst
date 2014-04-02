@@ -2,7 +2,7 @@ Payload basics
 #########################
 
 The goal of JQM is to run some Java code containing some business logic: the :term:`payload`. This chapter describes how to write the Java code 
-that will be really be executed. The philosophy is: JQM is able to run most existing code without adaptations, and taking advantage 
+that will really be executed. The philosophy is: JQM is able to run most existing code without adaptations, and taking advantage 
 of some JQM functionalities is easy to add to any code be it new or existing.
 
 .. highlight:: java
@@ -16,7 +16,7 @@ types designed to allow reuse of even more existing binaries: Runnable & JQM API
 Main
 ---------
 
-This a classic class containing a "static void main" function (with or without a single parameter of type String[]).
+This a classic class containing a "static void main(String[] args)" function.
 
 In that case, JQM will simply launch the main function. If there are some arguments defined (default arguments in the :term:`JobDef` or
 arguments given at enqueue time) their value will be put inside the String[] parameter *ordered by key name*.
@@ -39,10 +39,10 @@ This would run perfectly, without any specific dependencies or imports::
 Runnable
 --------------
 
-Some existing code is written to be run as a thread, implementing the Runnable interface. If these classes have a no-argument
+Some existing code is already written to be run as a thread, implementing the Runnable interface. If these classes have a no-argument
 constructor (this is not imposed by the Runnable interface as interfaces cannot impose a constructor), JQM can instantiate 
 and launch them. In that case, the run() method from the interface is executed - therefore it is not possible to access
-parameters without using JQM advanced function described later in this chapter.
+parameters without using JQM specific methods as described later in this chapter.
 
 This would run perfectly, without any specific dependencies or imports::
 
@@ -59,9 +59,9 @@ Explicit JQM job
 -------------------
 
 This type of job only exists for ascending compatibility with a former limited JQM version. It consisted in subclassing class JobBase,
-overloading method start() and keeping a no-arg constructor. Parameters are accessible through a number of accessors of the base class.
+overloading method start() and keeping a no-arg constructor. Parameters were accessible through a number of accessors of the base class.
 
-For example (note the import and the use of an accessor)::
+For example (note the import and the use of an accessor from the base class)::
 
 	import com.enioka.jqm.api.JobBase;
 	
@@ -105,6 +105,14 @@ will **inject an implementation ready for use**.
 .. note:: the JQM payload type already has one JobManager field named jm defined in the base class JobBase - it would have
 	been stupid not to define it while the API is always present for that payload type. 
 
+The dependency is::
+
+	<dependency>
+		<groupId>com.enioka.jqm</groupId>
+		<artifactId>jqm-api</artifactId>
+		<version>${jqm.version}</version>
+	</dependency>
+
 Creating files
 ******************
 
@@ -116,11 +124,12 @@ The report generation is the payload - but how should the file be sent to the en
 unless it is forced into a single node deployment, the end user has no idea where the file was generated (and it is definitely not
 on the application server, so not easy to access from the web interface). The idea is to notify JQM of a file creation, so that
 JQM will take it (remove it from the work directory) and reference it. It is then be made available to clients through a small
-HTTP GET that is leveraged by the client API (the API used by the application server).
+HTTP GET that is leveraged by the engine itself.
 
 TL;DR: when a file is created that should be accessible to remote clients, use JobManager.addDeliverable
 
-.. note:: work directories are obtained through JobManager.getWorkDir. These are purged after execution.
+.. note:: work directories are obtained through JobManager.getWorkDir. These are purged after execution. Never use a temporary java file - these
+	are purged on JVM exit - which on the whole never happens inside an application server.
 
 Example::
 
@@ -157,14 +166,15 @@ Going to the culling
 Payloads are run inside a thread by the JQM engine. Alas, Java threads have one caveat: they cannot be cleanly killed. 
 Therefore, there is no obvious way to allow a user to kill a job instance that has gone haywire. To provide some measure
 of relief, the engine API provides a method called *yield* that, when called, will do nothing but give briefly control
-of the job's thread to the engine. This allows the engine to check if the job should be killed (it throws an exception to 
-do so). Now, if the job instance really has entered an infinite loop where yield is not called, it won't help much. It is more
-to allow killing instances that run well (user has changed his mind, etc.).
+of the job's thread to the engine. This allows the engine to check if the job should be killed (it throws an exception
+as well as sets the thread's interruption status to do so). Now, if the job instance really has entered an infinite loop where 
+yield is not called not the interruption status read, it won't help much. It is more to allow killing instances that 
+run well (user has changed his mind, etc.).
 
 To ease the use of the kill function, all other engine API methods actually call yield before doing their own work.
 
 Finally, for voluntarily killing a running payload, it is possible to do much of the same: throwing a runtime exception.
-Note that System.exit is forbidden by the Java security manager inside paylaods - it would stop the whole JQM engine, which
+Note that System.exit is forbidden by the Java security manager inside payloads - it would stop the whole JQM engine, which
 would be rather impolite towards other running job instances.
 
 Full example
@@ -279,4 +289,4 @@ JQM is some sort of light application server - therefore the same guidelines app
   classes from your own code or dependencies). Messing with
   static elements from the bootstrap classloader is opening the door to weird interactions between jobs running in parallel. For example, loading a JDBC
   driver does store such static elements, and should be frowned upon.
-* Don't redefine System.setOut and System.setErr - if you do so, you will loose the log created by JQM from your console output. 
+* Don't redefine System.setOut and System.setErr - if you do so, you will loose the log created by JQM from your console output. See :doc:`logging`.

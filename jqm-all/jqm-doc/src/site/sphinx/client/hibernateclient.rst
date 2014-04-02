@@ -83,6 +83,8 @@ always be "jobqueue-api-pu". The **file path inside the jar tag must be adapted 
 version**. The non-jta-datasource alias can be named anything you want (you may even want to redefine completely the datasource here,
 not using JNDI - see the Hibernate reference for the properties to set to do so).
 
+.. warning:: the use of the <jar-file> tag is only allowed if the application package is an ear file, not a war.
+
 Optional parameters
 ++++++++++++++++++++++++
 

@@ -73,18 +73,18 @@ Windows::
 
 	./jqm.ps1 stop  ## Default database is a single file... that is locked by the engine if started
 	./jqm.ps1 allxml  # This will import all the test job definitions
-	./jqm.ps1 -Enqueue TestEcho
+	./jqm.ps1 -Enqueue DemoEcho
 	./jqm.ps1 start
 
 Linux / Unix::
 
-        ./jqm.sh stop  ## Default database is a single file... that is locked by the engine if started
-        ./jqm.sh allxml  # This will import all the test job definitions
-        ./jqm.sh Enqueue TestEcho
-        ./jqm.sh start
+	./jqm.sh stop  ## Default database is a single file... that is locked by the engine if started
+	./jqm.sh allxml  # This will import all the test job definitions
+	./jqm.sh Enqueue DemoEcho
+	./jqm.sh start
 
 
-Check JQM_ROOT/logs/jqm.log: a job should have launched (and suceeded). Success!
+Check the JQM_ROOT/logs directory: two log files (stdout, stderr) should have been created (and contain no errors). Success!
 
 
 Database configuration
@@ -96,12 +96,13 @@ The node created in the previous step has serious drawbacks:
 * it cannot be used in a network as nodes communicate through the database
 * General low performances and persistence issues inherent to HSQLDB
 
-Just edit JQM_ROOT/conf/db.properties file to reference your own database. 
-It contains by default sample configuration for Oracle and HSQLDB, but MySQL is also supported.
+Just edit JQM_ROOT/conf/resources.xml file to reference your own database and delete or comment JQM_ROOT/conf/db.properties.
+It contains by default sample configuration for Oracle, HSQLDB and MySQL which are the three supported databases. (HSQLDB is not supported
+in production environments)
 
 .. note:: the database is intended to be shared between all JQM nodes - you should not create a schema/database per node.
 
-Afterwards, place your JDBC driver inside the "lib" directory. **It must be renamed jdbcdriver.jar**.
+Afterwards, place your JDBC driver inside the "ext" directory.
 
 Then stop the service.
 
@@ -113,49 +114,30 @@ Windows::
 
 Linux / Unix::
 
-        ./jqm.sh stop
-        ./jqm.sh createnode
-        ./jqm.sh start
+	./jqm.sh stop
+	./jqm.sh createnode
+	./jqm.sh start
 
 Then, test again (assuming this is not HSQLDB in file mode anymore, and therefore that there is no need to stop the engine).
 
 Windows::
 
 	./jqm.ps1 allxml
-	./jqm.ps1 -Enqueue TestEcho
+	./jqm.ps1 -Enqueue DemoEcho
 
 Linux / Unix::
 
-        ./jqm.sh allxml
-        ./jqm.sh enqueue TestEcho
+	./jqm.sh allxml
+	./jqm.sh enqueue DemoEcho
 
 
 Global configuration
 **********************
 
 When the first node is created inside a database, some parameters are automatically created. You may want to change them using your prefered 
-database editing tool.
-
-Table GLOBALPARAMETER:
-
-+---------------------+--------------------------------+--------------------------------------------------------------+
-| Name                | default value                  | Description                                                  |
-+=====================+================================+==============================================================+
-| mavenRepo           | http://repo1.maven.org/maven2/ | Maven/Nexus repositories to use to resolve dependencies.     |
-|                     |                                | There can be as many entries with this name as needed.       |
-+---------------------+--------------------------------+--------------------------------------------------------------+
-| defaultConnection   | jdbc/jqm                       | JNDI alias that will be used by the getDefaultConnection     |
-|                     |                                | function of the engine API.                                  |
-+---------------------+--------------------------------+--------------------------------------------------------------+
-| deadline            | 10                             | Purge limit, in days, of jobs stuck in queue                 |
-+---------------------+--------------------------------+--------------------------------------------------------------+
+database editing tool. See :doc:`parameters` for this.
 
 JNDI configuration
 *******************
 
-See :doc:`/jobs/resources`
-
-Note that one JDBC JNDI alias is created, named jdbc/jqm, referencing the JQM database but has no password - you should set it.
-
-
-
+See :doc:`/jobs/resources`.

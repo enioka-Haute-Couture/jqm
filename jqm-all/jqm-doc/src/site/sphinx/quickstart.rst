@@ -81,7 +81,5 @@ Next steps...
 To exit the engine, simply do Ctrl+C or close your console.
 
 *To go further*: engines under Windows should be installed as services. This is easily done and explained in the :doc:`full 
-install documentation<admin/install>`. Moreover, this test install is using a very limited database - the full doc also 
+install documentation<admin/install>`. Moreover, this test install is using a very limited (and limiting) database - the full doc also 
 explains how to use fully fledged databases.
-
-

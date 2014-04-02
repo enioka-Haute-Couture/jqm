@@ -4,10 +4,10 @@
 Concepts
 ***************
 
-The goal of JQM is to launch payloads, i.e. Java code doing something useful for the end user, aysnchronously.
-The payload is described inside a job definition - so that JQM knows things like the class to load, the path of the jar file, etc.
-A running payload is called a job instance (the "instance of the job definition"). To create a job instance, a job request
-is emitted by a client. It contains things such as parameter values, and references a job definition so that JQM will know what to run.
+The goal of JQM is to launch :term:`payloads<payload>`, i.e. Java code doing something useful for the end user, aysnchronously.
+The payload is described inside a :term:`job definition` - so that JQM knows things like the class to load, the path of the jar file, etc.
+A running payload is called a :term:`job instance` (the "instance of the job definition"). To create a job instance, a :term:`job request`
+is posted by a client. It contains things such as parameter values, and references a job definition so that JQM will know what to run.
 
 Definitions
 *****************
@@ -49,10 +49,12 @@ JQM works like this:
 * during the run, the application that was at the origin of the request can use other methods of the client API to retrieve the status, the advancement, etc. of the job instance
 * at the end of the run, the JQM engine updates the database and is ready to accept new jobs. The client can still query the history of executions.
 
-It should be noted that clients never speak directly to a JQM engine - it all goes through the database. There is only one exception to this:
-when job instances create files that should be retrieved by the requester, the requester will download the files through a direct HTTP GET call to
-the engine. This avoids creating and maintaining a central file repository.
+It should be noted that clients never speak directly to a JQM engine - it all goes through the database. 
 
+.. note:: There is one exception to this:
+	when job instances create files that should be retrieved by the requester, the the 'direct to database' client will 
+	download the files through a direct HTTP GET call to
+	the engine. This avoids creating and maintaining a central file repository. The 'web service' client does not expose this issue.
 
 
 Nodes, queues and polling
@@ -62,13 +64,15 @@ As it names entails, JQM is actually a queue manager. As many queues as needed c
 
 An engine (a node) is associated to as many queues as needed. The engine will poll job instances that are posted on these queues.
 The polling frequency is defined per node/queue association: it is possible to have one engine polling very often a queue while
-another polls slowly the same queue (minimum period: 1s). Also, the number of slots is defined at the same level: one engine may be able to run 10 jobs in parallel
-while another, on a more powerful server, may run 50. When all slots of all nodes polling a given queue are filled, job instances stay in the queue, waiting for a slot
+another polls slowly the same queue (minimum period: 1s). Also, the number of slots is defined at the same level: one engine may be able to 
+run 10 jobs for a queue in parallel
+while another, on a more powerful server, may run 50 for the same queue. 
+When all slots of all nodes polling a given queue are filled, job instances stay in the queue, waiting for a slot
 to be freed. Note that it also allows some queues to be defined only on some nodes and not others, therefore giving some control over where payloads are
 actually run.
 
-A Job definition is associated to a queue. It is the jobdef default queue: all job requests pertaining to a jobdef are created inside the jobdef default queue. It
-is possible, once created, to move a job instance from one queue to another.
+A Job Definition (JobDef) is associated to a queue. It is the jobdef default queue: all job requests pertaining to a jobdef 
+are created inside the jobdef default queue. It is possible, once created, to move a job instance from one queue to another as long as it has not already run.
 
 By default, when creating the first engine, one queue is created and is tagged as the default queue (meaning all jobdef that do not have a specific queue
-will end on this one).
+will end on that one).

@@ -29,13 +29,12 @@ Example (with explicit libraries)::
 	$JQM_DIR\jobs\myjob\lib\mylib1.jar
 	$JQM_DIR\jobs\myjob\lib\mylib2.jar
 
-.. note:: the jar files can be replaced at will, without restarting anything as long as the class path does not change.
-	The class path will change, for example, when a library is added, or when a library is upgraded.
+.. note:: there is no need to restart the engine on any import, jar modification or whatever.
 
 Import the metadata
 ****************************
 
-.. note:: this only has to be done the first time. Later, this is only necessery if the XML changes.
+.. note:: this only has to be done the first time. Later, this is only necessary if the XML changes.
 	Each time the XML is imported, it overwrites the previous values so it can also be done at will.
 
 Open a command line (bash, powershell, ksh...) and run the following commands (adapt JQM_DIR and xxxx)::
@@ -51,5 +50,5 @@ This part can be run as many times as needed. (adapt the job name, it is the "na
 	java -jar jqm.jar -enqueue JOBNAME
 
 The logs are inside JQM_ROOT/logs. The user may want to do "tail -f" (or "cat -Wait" in PowerShell) on these files
-during tests.
-
+during tests. There are two files per launch: one containing the standard output flow, the other with the
+standard error flow.

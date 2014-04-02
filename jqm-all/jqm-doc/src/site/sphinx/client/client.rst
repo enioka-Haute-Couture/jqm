@@ -30,18 +30,19 @@ it contains many methods related to:
 
 For exemple, to list all executions known to JQM::
 
-	List<JobInstance> jobs = JqmClientFactory.getClient().().getJobs();
+	List<JobInstance> jobs = JqmClientFactory.getClient().getJobs();
 
 Now, each implementation has different needs as far as configuration is concerned. Basically, Hibernate needs to know how to 
 connect to the database, and the web service must know the web service server. To allow easy configuration, the following principles apply:
 
-#. Each client provider can have one (always optional) configuration file inside META-INF. It is specific for each provider, see their doc
+#. Each client provider can have one (always optional) configuration file inside the classpath. It is specific for each provider, see their doc
 #. It is possible to overload these values through the API **before the first call to getClient**::
 
 	Properties p = new Properties();
 	p.put("com.enioka.ws.url", "http://localhost:9999/marsu/ws");
 	JqmClientFactory.setProperties(p);
 	List<JobInstance> jobs = JqmClientFactory.getClient().().getJobs();
+#. An implementation can use obvious other means. E.g. Hibernate will try JNDI to retrieve a database connection.
 
 The name of the properties depends on the provider, refer to their respective documentations.
 
@@ -63,3 +64,11 @@ and paramvalue_nn for the value. Signification of these is the same as in the cl
 To retrieve the status of a request, GET on /status?id=nnn Status is given as text.
 
 .. warning:: there is no authentication. It will be implemented one day as an option. See ticket #9.
+
+From the command line
+***********************
+
+A few options of the engine command line allow the same kind of limited interaction with JQM than the s"script API" described  in the
+previous paragraph.
+
+See :doc:`/admin/cli` for details.

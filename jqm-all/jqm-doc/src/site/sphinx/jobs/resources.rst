@@ -9,8 +9,8 @@ to use it (a file path, a database connection string + password, ...)
 
 There are many approaches to define these resources (directly in the code, in a configuration file...) but they all have caveats
 (mostly: they are not easy to use in a multi environment context, where resource descriptions change from one environment to another).
-All thses approches can be used with JQM since JQM runs all JSE code.
-Yet, Java has standardized JNDI as a way to define these resources, and JQM provides a limited JNDI directory implementation that can be used by 
+All these approaches can be used with JQM since JQM runs all JSE code.
+Yet, Java has standardized JNDI as a way to retrieve these resources, and JQM provides a limited JNDI directory implementation that can be used by 
 the :term:`payloads<payload>`.
 
 JQM JNDI can be used for:
@@ -19,6 +19,7 @@ JQM JNDI can be used for:
 * JMS resources
 * Files
 * URLs
+* every ObjectFactory provided by the payloads
 
 .. warning:: JNDI is actually part of JEE, not JSE, but it is so useful in the context of JQM use cases that it was implemented. The fact
 	that it is present does **not** mean that JQM is a JEE container. Notably, there is no injection mechanism and JNDI resources have to be

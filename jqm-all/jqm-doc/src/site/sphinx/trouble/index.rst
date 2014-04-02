@@ -8,12 +8,6 @@
 
 	troubleshooting
 	bugs
-
-
-To be added:
-
-* quick run guide (install will be moved to admin)
-
   
 Bug report
 **************

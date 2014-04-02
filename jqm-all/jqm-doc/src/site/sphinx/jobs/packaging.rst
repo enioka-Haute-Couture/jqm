@@ -15,9 +15,9 @@ Libraries handling
 **************************
 
 JQM itself does not provide any libraries to the payloads - all its internal classes are hidden. But there are two ways, each with two variants, to make sure the required
-libraires are presnet at runtime.
+libraires are present at runtime.
 
-.. note:: all the four variants are exclusive. **Only one libray source it used at the same time**.
+.. note:: All the four variants are exclusive. **Only one libray source it used at the same time**.
 
 Maven POM
 ++++++++++++++++
@@ -27,9 +27,11 @@ putting them on the payload's class path. (the repositories used can be paramete
 
 It is also possible to put a pom.xml file in the same directory as the jar, in which case it will have priority over the one inside the jar.
 
+JQM uses the Maven 3 engine internally, so the pom resolution should be exactly similar to one done with the command line.
+
 Conclusion: in that case, no packaging to do.
 
-.. warning:: JQM does not currently support the use of variables (${my.var}) inside dependency definitions
+.. warning:: using this means the pom is fully resolvable from the engine server. This includes every parent pom.xml used.
 
 lib directory
 +++++++++++++++++
@@ -89,7 +91,7 @@ Jar attributes
 JobDef attributes
 +++++++++++++++++++++++
 
-All JobDefinition attributes are mandatory, yet they can be void.
+All JobDefinition attributes are mandatory, yet the tag fields (keyword, module, ...) can be empty.
 
 All attributes are case sensitive.
 

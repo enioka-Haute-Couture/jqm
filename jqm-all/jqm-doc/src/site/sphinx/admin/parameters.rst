@@ -8,7 +8,7 @@ These parameters gouvern the behaviour of the JQM engines.
 
 There are three sets of engine parameters:
 
-* node parameters, for paraemters that are specific to a single engine (for example, the TCP ports to use).
+* node parameters, for parameters that are specific to a single engine (for example, the TCP ports to use).
   These are stored inside the database.
 * global parameters, for parameters concerning all engines (for example, a list of Nexus repositories).
   These are stored inside the database.
@@ -28,8 +28,8 @@ Actually, resources.xml can contain any resource, not just the connection to the
 recommended - the resource would only be available to the local node, while resources defined in the database are
 available to any node.
 
-A second file exists, named JQM_ROOT\conf\jqm.properties. It is not currently used, except if you are using the (not
-production grade) database HSQLDB, in which case the line it contains must be uncommented.
+A second file exists, named JQM_ROOT/conf/jqm.properties. It is not currently used, except if you are using the (not
+production grade) database HSQLDB, in which case the line it contains must be uncommented. It can be safely deleted otherwise.
 
 **Changes to bootstrap files require an engine restart**.
 
@@ -52,7 +52,7 @@ have to be altered directly inside the database with your tool of choice.
 +-------------------+------------------------------------------------------------------------------------+-----------------------+----------+------------------+
 | ROOTLOGLEVEL      | The log level for this engine (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)             | INFO                  | No       | Yes              |
 +-------------------+------------------------------------------------------------------------------------+-----------------------+----------+------------------+
-| EXPORTREPO        |                                                                                    |                       |          |                  |
+| EXPORTREPO        | Not used                                                                           |                       |          |                  |
 +-------------------+------------------------------------------------------------------------------------+-----------------------+----------+------------------+
 | JMXREGISTRYPORT   | TCP port on which the JMX registry will listen. Remote JMX disabled if NULL or <1. | NULL                  | Yes      | Yes              |
 +-------------------+------------------------------------------------------------------------------------+-----------------------+----------+------------------+
@@ -97,11 +97,3 @@ have to be altered directly inside the database with your tool of choice.
 Here, nullable means the parameter can be absent from the table.
 
 Parameter name is case-sensitive.
-
-Payload parameters
-**********************
-
-These parameters allow the engine to know of the existence of payloads and provide resources to them.
-  
-* resource parameters: the definition of resources that can be used by :term:`payloads<payload>`. E.g. a datasource.
-  These are stored inside the database.

@@ -25,16 +25,17 @@ Using the Java client
 
 .. highlight:: xml
 
-This is a standard client API implementing the JqmClient interface. Like all clients, it is used by putting its jar on your classpath 
-(no other first-elve dependencies). For Maven users::
+This is a standard client API implementing the JqmClient interface. Like all clients, it is used by putting its jar on your classpath.
+The client uses the JAX-RS 2 API, so it needs an implementation such as Jersey (obviously not provided, the one provided by the container will
+be used).
+
+For Maven users::
 
 	<dependency>
 		<groupId>com.enioka.jqm</groupId>
 		<artifactId>jqm-api-client-jersey</artifactId>
 		<version>${jqm.version}</version>
-	</dependency>
-
-.. highlight:: xml
+	</dependency>	
 
 and then using the API::
 
@@ -48,11 +49,11 @@ Interrogating the API is then also exactly the same as with any other client. Fo
 
 The specific parameters are:
 
-+-------------------+------------+---------------------------------+--------------------------+
-| Name              | Compulsory | Description                     | Example                  |
-+===================+============+=================================+==========================+
-| com.enioka.ws.url | YES        | The base URL of the web service | http://localhost:1789/ws |
-+-------------------+------------+---------------------------------+--------------------------+
++-------------------+------------+---------------------------------+------------------------------+
+| Name              | Compulsory | Description                     | Example                      |
++===================+============+=================================+==============================+
+| com.enioka.ws.url | YES        | The base URL of the web service | http://localhost:1789/api/ws |
++-------------------+------------+---------------------------------+------------------------------+
 
 and can be set:
 
@@ -62,11 +63,12 @@ and can be set:
 	Properties p = new Properties();
 	p.put("com.enioka.ws.url", "http://localhost:9999/marsu/ws");
 	JqmClientFactory.setProperties(p);
-
+* through a system parameter (-Dcom.enioka.ws.url=http://...)
+	
 Interrogating the service directly
 ++++++++++++++++++++++++++++++++++++++++
 
-The previous client is only an encapsulation of the Jersey client library. You can also create your own web service proxy
+The previous client is only a use of the JAX-RS 2 API. You can also create your own web service proxy
 by interrogating the web service  with the library of your choice (including the simple commons-http). See the :ref:`web_service_ref` for that.
 
 .. highlight:: xml
@@ -92,8 +94,8 @@ When using Java, the recommended approach is to **use the provided client**. Thi
 The only situations when it is recommended to build your own WS client are:
 
 * when using another language
-* when you don't want the WS client library Jersey on your classpath (for exemple, in a REST application using competiting 
-  library Apache CXF). Note only the client part of Jersey is present, not the server part, so this should not be needed very often.
+* when you don't want or can't place the WS client library Jersey on your classpath. For exemple, in an EE6 server that provides JAX-RS 1 and
+  just don't want to work with version 2.
 
 Server side
 ********************
