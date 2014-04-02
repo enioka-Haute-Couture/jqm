@@ -53,5 +53,31 @@
           connectionProperties="v$session.program=JQM;"
           singleton="true"
           initSQL="CALL DBMS_APPLICATION_INFO.SET_MODULE('CONNECTION POOL', 'IDLE IN POOL')"
-          jdbcInterceptors="com.enioka.jqm.jndi.Interceptor"/>
+          jdbcInterceptors="com.enioka.jqm.providers.Interceptor"/>
+          
+	<resource 
+	      name="jdbc/mysql"
+          auth="Container"
+          type="javax.sql.DataSource"
+          factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+          testWhileIdle="true"
+          testOnBorrow="false"
+          testOnReturn="true"
+          validationQuery="SELECT version()"
+          validationInterval="1000"
+          timeBetweenEvictionRunsMillis="60000"
+          maxActive="100"
+          minIdle="2"
+          maxWait="30000"
+          initialSize="5"
+          removeAbandonedTimeout="3600"
+          removeAbandoned="true"
+          logAbandoned="true"
+          minEvictableIdleTimeMillis="60000"
+          jmxEnabled="true"
+          username="jqm"
+          password="jqm"
+          driverClassName="com.mysql.jdbc.Driver"
+          url="jdbc:mysql://pic:3306/jqm"
+          singleton="true"/>
 </resources>
