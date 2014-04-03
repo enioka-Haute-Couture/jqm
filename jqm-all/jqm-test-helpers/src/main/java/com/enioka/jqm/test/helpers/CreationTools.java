@@ -305,21 +305,10 @@ public class CreationTools
 
     public static Queue initQueue(String name, String description, Integer timeToLive, EntityManager em)
     {
-        Queue q = new Queue();
-        EntityTransaction transac = em.getTransaction();
-        transac.begin();
-
-        q.setName(name);
-        q.setDescription(description);
-        q.setTimeToLive(timeToLive);
-
-        em.persist(q);
-        transac.commit();
-
-        return q;
+        return initQueue(name, description, timeToLive, em, false);
     }
 
-    public static Queue createQueue(String name, String description, Integer timeToLive, boolean defaultQueue, EntityManager em)
+    public static Queue initQueue(String name, String description, Integer timeToLive, EntityManager em, boolean defaultQueue)
     {
         Queue q = new Queue();
         EntityTransaction transac = em.getTransaction();
@@ -332,6 +321,7 @@ public class CreationTools
 
         em.persist(q);
         transac.commit();
+
         return q;
     }
 
