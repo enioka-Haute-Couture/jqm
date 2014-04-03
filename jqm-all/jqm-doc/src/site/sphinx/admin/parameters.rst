@@ -97,3 +97,7 @@ have to be altered directly inside the database with your tool of choice.
 Here, nullable means the parameter can be absent from the table.
 
 Parameter name is case-sensitive.
+
+.. note:: the mavenRepo is the only parameter that can be specified multiple times. There must be at least one repository specified.
+	If using Maven central, please specify 'http://repo1.maven.org/maven2/' and not one the numerous other aliases that exist.
+	Maven Central is only used if explicitely specified (which is the default).
