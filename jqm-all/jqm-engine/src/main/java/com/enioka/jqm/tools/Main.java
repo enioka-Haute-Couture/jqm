@@ -237,7 +237,11 @@ public class Main
                 return;
             }
 
-            XmlParser.parse(xmlpath, em);
+            String[] pathes = xmlpath.split(",");
+            for (String path : pathes)
+            {
+                XmlParser.parse(path, em);
+            }
             em.close();
         }
         catch (Exception e)

@@ -127,10 +127,7 @@ jqm_import_xml() {
 }
 
 jqm_import_all_xml() {
-	for job in $(find jobs -name "*xml" -type f)
-	do
-		jqm_import_xml $job
-	done
+	$JAVA -jar $JQM_JAR -importjobdef $(find jobs -name "*xml" -type f | tr "\\n" ",")
 }
 
 

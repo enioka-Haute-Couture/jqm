@@ -72,7 +72,7 @@ function Start-Jqm
 
 function Import-AllXml
 {
-    ls -Recurse $PSScriptRoot/jobs -Filter *.xml |% { & $java -jar jqm.jar -importjobdef $_.FullName}
+    & $java -jar jqm.jar -importjobdef ((ls $PSScriptRoot -Recurse -Filter *.xml |% FullName) -join ',')
 }
 
 
