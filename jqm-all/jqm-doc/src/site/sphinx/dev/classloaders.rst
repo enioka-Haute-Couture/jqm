@@ -3,13 +3,18 @@ Classloading
 
 JQM obeys a very simple classloading architecture, respecting the design goal of simplicity and robustness (to the expense of PermGen space).
 
-The engine classloader stack is as follows:
+The engine classloader stack is as follows (bottom of the stack is at the bottom of the table):
 
-* Bootstrap classloader
-	* Extension class loader (not used)
-		* System class loader (App class loader), loading everything inside JQM_ROOT/lib
-			* Jndi Classloader, loading everything inside JQM_ROOT/ext
-		* Payload class loader (JarClassLoader), loading the libs of payloads from .m2 or from the payload "lib" directory
++----------------------------------------------------------+------------------------------------------------------------------------------+
+| JNDI class loader (JQM provided - type URLClassloader)   | Payload class loader (JQM provided - type JarClassLoader).                   |
+| Loads everything inside JQM_ROOT/ext                     | Loads the libs of payloads from .m2 or from the payload's "lib" directory    |
++----------------------------------------------------------+------------------------------------------------------------------------------+
+| System class loader (JVM provided - type AppClassLoader)                                                                                |
++----------------------------------------------------------+------------------------------------------------------------------------------+
+| Extension class loader (JVM provided - no need in JQM)                                                                                  |
++----------------------------------------------------------+------------------------------------------------------------------------------+
+| Bootstrap class loader (JVM provided)                                                                                                   |
++----------------------------------------------------------+------------------------------------------------------------------------------+
 
 		
 The general idea is:
