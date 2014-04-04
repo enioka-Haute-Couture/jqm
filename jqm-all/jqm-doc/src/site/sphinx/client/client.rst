@@ -51,6 +51,11 @@ each time a client is needed, rather than storing it inside a local variable.
 
 For non-Java clients, use the :doc:`web service API<webservice>` which can be called from anywhere.
 
+Finally, JQM uses unchecked exception as most APIs should (see `this article <http://www.artima.com/intv/handcuffs.html>`_). As much as possible the API will throw:
+
+* :class:`JqmInvalidRequestException` when the source of the error comes from the caller (inconsistent arguments, null arguments, ...)
+* :class:`JqmClientException` when it comes from the API's internals - usually due to a misconfiguration or an environment issue (network down, etc).
+
 From scripts
 *******************
 
