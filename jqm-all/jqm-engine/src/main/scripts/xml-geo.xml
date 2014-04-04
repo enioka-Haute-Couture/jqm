@@ -4,7 +4,7 @@
 		<jobdefinitions>
 			<jobDefinition>
 				<name>DemoGeo</name>
-				<description>Demonstrates the use of the engine API, the ue of parameters and creates load (geometric suite)</description>
+				<description>Demonstrates the use of the engine API, the use of parameters and creates load (geometric suite).</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>App</javaClassName>
 				<application>JQM</application>

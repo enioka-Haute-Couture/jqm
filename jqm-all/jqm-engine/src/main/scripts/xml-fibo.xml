@@ -4,7 +4,7 @@
 		<jobdefinitions>
 			<jobDefinition>
 				<name>DemoFibo1</name>
-				<description>Demonstrates the use of parameters and engine API (computes the Fibonachi suite)</description>
+				<description>Demonstrates the use of parameters and engine API (computes the Fibonacci suite).</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>com.enioka.jqm.tests.App</javaClassName>
 				<application>JQM</application>
@@ -26,7 +26,7 @@
 			</jobDefinition>
 			<jobDefinition>
 				<name>DemoFibo2</name>
-				<description>Demonstrates the possibility to define multiple payloads on the same jar/class with different parameters</description>
+				<description>Demonstrates the possibility to define multiple payloads on the same jar/class with different parameters.</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>com.enioka.jqm.tests.App</javaClassName>
 				<application>JQM</application>
