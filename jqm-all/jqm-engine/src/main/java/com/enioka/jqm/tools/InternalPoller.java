@@ -16,8 +16,6 @@ class InternalPoller implements Runnable
     private static Logger jqmlogger = Logger.getLogger(InternalPoller.class);
     private boolean run = true;
     private JqmEngine engine = null;
-    private EntityManager em = null;
-    private Node node = null;
     private Thread localThread = null;
     private long step = 10000;
     private long alive = 60000;
@@ -49,10 +47,10 @@ class InternalPoller implements Runnable
         Thread.currentThread().setName("INTERNAL_POLLER;polling orders;");
 
         // New EM (after setting thread name)
-        em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewEm();
 
         // Get configuration data
-        this.node = em.find(Node.class, this.engine.getNode().getId());
+        Node node = em.find(Node.class, this.engine.getNode().getId());
         this.step = Long.parseLong(Helpers.getParameter("internalPollingPeriodMs", String.valueOf(this.step), em));
         this.alive = Long.parseLong(Helpers.getParameter("aliveSignalMs", String.valueOf(this.step), em));
         em.close();
@@ -68,6 +66,7 @@ class InternalPoller implements Runnable
             }
             catch (InterruptedException e)
             {
+                run = false;
             }
             if (!run)
             {
@@ -78,8 +77,8 @@ class InternalPoller implements Runnable
             em = Helpers.getNewEm();
 
             // Check if stop order
-            this.node = em.find(Node.class, this.node.getId());
-            if (this.node.isStop())
+            node = em.find(Node.class, node.getId());
+            if (node.isStop())
             {
                 jqmlogger.info("Node has received a stop order from the database");
                 jqmlogger.trace("At stop order time, there are " + this.engine.getCurrentlyRunningJobCount() + " jobs running in the node");
@@ -94,8 +93,8 @@ class InternalPoller implements Runnable
             if (sinceLatestPing >= this.alive * 0.9)
             {
                 em.getTransaction().begin();
-                em.createQuery("UPDATE Node n SET n.lastSeenAlive = current_timestamp() WHERE n.id = :id")
-                        .setParameter("id", this.node.getId()).executeUpdate();
+                em.createQuery("UPDATE Node n SET n.lastSeenAlive = current_timestamp() WHERE n.id = :id").setParameter("id", node.getId())
+                        .executeUpdate();
                 em.getTransaction().commit();
                 sinceLatestPing = 0;
             }

@@ -69,7 +69,10 @@ class ServletFile extends HttpServlet
         }
         finally
         {
-            em.close();
+            if (em != null)
+            {
+                em.close();
+            }
         }
         File f = new File(d.getFilePath());
         jqmlogger.trace("A file will be returned: " + f.getAbsolutePath());

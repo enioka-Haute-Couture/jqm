@@ -49,7 +49,7 @@ class LibraryCache
         SLF4JBridgeHandler.install();
     }
 
-    private class JobDefLibrary
+    private static class JobDefLibrary
     {
         URL[] urls;
         Date loadTime;

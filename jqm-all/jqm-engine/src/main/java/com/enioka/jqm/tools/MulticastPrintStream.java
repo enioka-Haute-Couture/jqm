@@ -27,7 +27,6 @@ public class MulticastPrintStream extends PrintStream
 {
     private static Logger jqmlogger = Logger.getLogger(MulticastPrintStream.class);
 
-    // private PrintStream original;
     private BufferedWriter original = null;
     private Map<Thread, BufferedWriter> loggers = new HashMap<Thread, BufferedWriter>();
     private String rootLogDir;
@@ -85,7 +84,9 @@ public class MulticastPrintStream extends PrintStream
     private void ensureOpen() throws IOException
     {
         if (out == null)
+        {
             throw new IOException("Stream closed");
+        }
     }
 
     private void write(String s)
@@ -121,7 +122,7 @@ public class MulticastPrintStream extends PrintStream
 
     // TODO: write something that's not a performance hog...
     @Override
-    public void write(byte buf[], int off, int len)
+    public void write(byte[] buf, int off, int len)
     {
         write(new String(buf, off, len));
     }
@@ -170,7 +171,7 @@ public class MulticastPrintStream extends PrintStream
     }
 
     @Override
-    public void println(char x[])
+    public void println(char[] x)
     {
         write(String.valueOf(x), true);
     }
@@ -225,7 +226,7 @@ public class MulticastPrintStream extends PrintStream
     }
 
     @Override
-    public void print(char x[])
+    public void print(char[] x)
     {
         write(String.valueOf(x), false);
     }

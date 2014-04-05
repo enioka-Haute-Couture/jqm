@@ -29,9 +29,14 @@ import com.enioka.jqm.tools.Helpers;
  * Helper class to retrieve a {@link JndiResourceDescriptor} either from the XML resource file or from the database. <br>
  * XML file has priority over database.
  */
-public class ResourceParser
+final class ResourceParser
 {
     private static Map<String, JndiResourceDescriptor> xml = null;
+
+    private ResourceParser()
+    {
+        // Utility class
+    }
 
     static JndiResourceDescriptor getDescriptor(String alias) throws NamingException
     {
@@ -78,7 +83,10 @@ public class ResourceParser
         }
         finally
         {
-            em.close();
+            if (em != null)
+            {
+                em.close();
+            }
         }
 
         // Create the ResourceDescriptor from the JPA object

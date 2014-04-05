@@ -38,9 +38,14 @@ import com.enioka.jqm.jpamodel.JobInstance;
 /**
  * Helper static class to send e-mails
  */
-class Mail
+final class Mail
 {
     private static Logger jqmlogger = Logger.getLogger(Mail.class);
+
+    private Mail()
+    {
+        // utility class
+    }
 
     static void send(JobInstance ji, EntityManager em)
     {

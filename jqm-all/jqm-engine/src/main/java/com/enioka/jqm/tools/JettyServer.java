@@ -138,7 +138,7 @@ class JettyServer
         webAppContext.setDisplayName("JqmWebServices");
 
         // Hide server classes from the web app
-        final int nbEx = 9;
+        final int nbEx = 4;
         String[] defExcl = webAppContext.getDefaultServerClasses();
         String[] exclusions = new String[defExcl.length + nbEx];
         for (int i = nbEx; i <= defExcl.length; i++)
@@ -146,14 +146,9 @@ class JettyServer
             exclusions[i] = defExcl[i - nbEx];
         }
         exclusions[0] = "com.enioka.";
-        // exclusions[1] = "org.hibernate.";
-        // exclusions[2] = "org.jboss.";
-        exclusions[3] = "org.slf4j.";
-        exclusions[4] = "org.apache.log4j.";
-        exclusions[5] = "org.glassfish."; // Jersey
-        // exclusions[6] = "org.junit.";
-        // exclusions[7] = "org.jvnet.";
-        // exclusions[8] = "javax.persistence.";
+        exclusions[1] = "org.slf4j.";
+        exclusions[2] = "org.apache.log4j.";
+        exclusions[3] = "org.glassfish."; // Jersey
         webAppContext.setServerClasses(exclusions);
 
         // JQM configuration should be on the class path

@@ -95,7 +95,7 @@ class Loader implements Runnable, LoaderMBean
         {
             jqmlogger.error("An unexpected error has occurred - the engine may have become unstable", t);
         }
-    };
+    }
 
     private void runPayload()
     {
@@ -343,9 +343,9 @@ class Loader implements Runnable, LoaderMBean
     @Override
     public void kill()
     {
-        Properties p = new Properties();
-        p.put("emf", Helpers.getEmf());
-        JqmClientFactory.getClient("uncached", p, false).killJob(this.job.getId());
+        Properties props = new Properties();
+        props.put("emf", Helpers.getEmf());
+        JqmClientFactory.getClient("uncached", props, false).killJob(this.job.getId());
     }
 
     @Override

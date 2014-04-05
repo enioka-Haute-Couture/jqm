@@ -186,6 +186,7 @@ class Polling implements Runnable, PollingMBean
             }
             catch (InterruptedException e)
             {
+                run = false;
             }
 
             // Exit if asked to
@@ -283,6 +284,9 @@ class Polling implements Runnable, PollingMBean
             }
             catch (InterruptedException e)
             {
+                // Interruption => stop right now
+                jqmlogger.warn("Some job instances did not finish in time - wait was interrupted");
+                return;
             }
             timeWaitedMs += stepMs;
         }
@@ -309,23 +313,23 @@ class Polling implements Runnable, PollingMBean
     @Override
     public float getJobsFinishedPerSecondLastMinute()
     {
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em2 = Helpers.getNewEm();
         Calendar minusOneMinute = Calendar.getInstance();
         minusOneMinute.add(Calendar.MINUTE, -1);
-        Float nb = em.createQuery("SELECT COUNT(i) From History i WHERE i.endDate >= :d and i.node = :n AND i.queue = :q", Long.class)
+        Float nb = em2.createQuery("SELECT COUNT(i) From History i WHERE i.endDate >= :d and i.node = :n AND i.queue = :q", Long.class)
                 .setParameter("d", minusOneMinute).setParameter("n", this.dp.getNode()).setParameter("q", this.dp.getQueue())
                 .getSingleResult() / 60f;
-        em.close();
+        em2.close();
         return nb;
     }
 
     @Override
     public long getCurrentlyRunningJobCount()
     {
-        EntityManager em = Helpers.getNewEm();
-        Long nb = em.createQuery("SELECT COUNT(i) From JobInstance i WHERE i.node = :n AND i.queue = :q", Long.class)
+        EntityManager em2 = Helpers.getNewEm();
+        Long nb = em2.createQuery("SELECT COUNT(i) From JobInstance i WHERE i.node = :n AND i.queue = :q", Long.class)
                 .setParameter("n", this.dp.getNode()).setParameter("q", this.dp.getQueue()).getSingleResult();
-        em.close();
+        em2.close();
         return nb;
     }
 

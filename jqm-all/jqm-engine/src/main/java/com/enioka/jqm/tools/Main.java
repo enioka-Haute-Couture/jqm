@@ -143,8 +143,7 @@ public class Main
         }
         catch (NamingException e)
         {
-            e.printStackTrace();
-            return;
+            jqmlogger.fatal("could not create JNDI context", e);
         }
         HelpFormatter formatter = new HelpFormatter();
         formatter.setWidth(160);

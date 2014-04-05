@@ -25,6 +25,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.rmi.Remote;
 import java.rmi.registry.Registry;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -89,12 +91,18 @@ public class JndiContext extends InitialContext implements InitialContextFactory
             }
 
             // Create classloader
-            URL[] aUrls = urls.toArray(new URL[0]);
+            final URL[] aUrls = urls.toArray(new URL[0]);
             for (URL u : aUrls)
             {
                 jqmlogger.trace(u.toString());
             }
-            extResources = new URLClassLoader(aUrls, null);
+            extResources = AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>()
+            {
+                public URLClassLoader run()
+                {
+                    return new URLClassLoader(aUrls, null);
+                };
+            });
         }
         else
         {

@@ -236,7 +236,7 @@ class JarClassLoader extends URLClassLoader
             public int compare(JobParameter o1, JobParameter o2)
             {
                 return o1.getKey().compareTo(o2.getKey());
-            };
+            }
         });
         int i = 0;
         for (JobParameter p : job.getParameters())

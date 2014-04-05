@@ -45,7 +45,7 @@ class ServletLog extends HttpServlet
 
     public ServletLog()
     {
-        RollingFileAppender a = ((RollingFileAppender) Logger.getRootLogger().getAppender("rollingfile"));
+        RollingFileAppender a = (RollingFileAppender) Logger.getRootLogger().getAppender("rollingfile");
         logRoot = FilenameUtils.getFullPath(a.getFile());
     }
 

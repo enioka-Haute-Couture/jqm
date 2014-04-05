@@ -265,11 +265,11 @@ class JobManagerHandler implements InvocationHandler
     {
         int i = enqueue(applicationName, user, mail, sessionId, application, module, keyword1, keyword2, keyword3, parameters);
         JqmClient c = getJqmClient();
-        com.enioka.jqm.api.JobInstance ji = null;
+        com.enioka.jqm.api.JobInstance jiLocal = null;
         while (true)
         {
-            ji = c.getJob(i);
-            if (ji.getState().equals(com.enioka.jqm.api.State.CRASHED) || ji.getState().equals(com.enioka.jqm.api.State.ENDED))
+            jiLocal = c.getJob(i);
+            if (jiLocal.getState().equals(com.enioka.jqm.api.State.CRASHED) || jiLocal.getState().equals(com.enioka.jqm.api.State.ENDED))
             {
                 break;
             }
@@ -325,8 +325,8 @@ class JobManagerHandler implements InvocationHandler
 
     private DataSource getDefaultConnection() throws NamingException
     {
-        Object p = NamingManager.getInitialContext(null).lookup(this.defaultCon);
-        DataSource q = (DataSource) p;
+        Object dso = NamingManager.getInitialContext(null).lookup(this.defaultCon);
+        DataSource q = (DataSource) dso;
 
         return q;
     }
