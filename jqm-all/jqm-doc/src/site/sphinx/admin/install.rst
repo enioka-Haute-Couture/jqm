@@ -149,7 +149,7 @@ MySQL 5.x is supported with InnoDB (the default).
 
 No specific configuration is required in JQM: no options inside jqm.properties (or absent file).
 
-With InnoDB, a `startup script<http://dev.mysql.com/doc/refman/5.6/en/server-options.html#option_mysqld_init-file>`_ 
+With InnoDB, a `startup script <http://dev.mysql.com/doc/refman/5.6/en/server-options.html#option_mysqld_init-file>`_ 
 must be used to reset an auto-increment inside the database (InnoDB behaviour messes up with
 JQM handling of keys, as it resets increment seeds with MAX(ID) on each startup even on empty tables). 
 The idea is to initialize the auto increment for the JobInstance table at the same level as for the History table.
@@ -171,6 +171,12 @@ As Hibernate support of HSQLDB has a bug, the jqm.properties file must contain t
 	
 No specific HSQLDB configuration is required. Please note that if using a file database, HSQLDB prevents multiple processes from accessing it
 so it will cause issues for creating multi node environments.
+
+PostGresql
+--------------
+
+Should work but has not been tested yet.
+
 
 Global configuration
 **********************
