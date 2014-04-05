@@ -130,6 +130,47 @@ Linux / Unix::
 	./jqm.sh allxml
 	./jqm.sh enqueue DemoEcho
 
+Database support
+++++++++++++++++++++
+
+Oracle
+----------
+
+Oracle 10gR2 & 11gR2 are supported. 
+
+No specific configuration is required in JQM: no options inside jqm.properties (or absent file).
+
+No specific database configuration is required.
+
+MySQL
+-----------
+
+MySQL 5.x is supported with InnoDB (the default).
+
+No specific configuration is required in JQM: no options inside jqm.properties (or absent file).
+
+With InnoDB, a `startup script<http://dev.mysql.com/doc/refman/5.6/en/server-options.html#option_mysqld_init-file>`_ 
+must be used to reset an auto-increment inside the database (InnoDB behaviour messes up with
+JQM handling of keys, as it resets increment seeds with MAX(ID) on each startup even on empty tables). 
+The idea is to initialize the auto increment for the JobInstance table at the same level as for the History table.
+An example of script is (adapt the db name & path)::
+
+	select concat('ALTER TABLE jqm.JobInstance AUTO_INCREMENT = ',max(ID)+1,';') as alter_stmt into outfile '/tmp/alter_JI_auto_increment.sql' from jqm.History;
+	\. /tmp/alter_JI_auto_increment.sql
+	\! rm -f /tmp/alter_JI_auto_increment.sql
+
+
+HSQLDB
+----------
+
+HSQLDB 2.3.x is supported in test environments only.
+
+As Hibernate support of HSQLDB has a bug, the jqm.properties file must contain the following line::
+
+	hibernate.dialect=com.enioka.jqm.tools.HSQLDialect7479
+	
+No specific HSQLDB configuration is required. Please note that if using a file database, HSQLDB prevents multiple processes from accessing it
+so it will cause issues for creating multi node environments.
 
 Global configuration
 **********************
