@@ -17,6 +17,31 @@
 
 		<ui:define name="content">
 			<h:form id="mainForm">
+				<h:outputText value="Began running from " />
+				<p:calendar id="from" value="#{jobInstanceControler.fromFilter}"
+					pattern="dd/MM/yyyy HH:mm" showButtonPanel="false">
+					<p:ajax event="dateSelect" update="dataTable" />
+					<p:ajax update="dataTable" />
+				</p:calendar>
+				<h:outputText value=" until " />
+				<p:calendar id="until" value="#{jobInstanceControler.untilFilter}"
+					pattern="dd/MM/yyyy HH:mm" showButtonPanel="false">
+					<p:ajax event="dateSelect" update="dataTable" />
+					<p:ajax update="dataTable" />
+				</p:calendar>
+				<h:outputText value=" -- " />
+				<p:commandButton value="Latest ten mn"
+					update=":mainForm:from :mainForm:until dataTable"
+					actionListener="#{jobInstanceControler.lastTenMn}" />
+				<p:commandButton value="Latest hour"
+					update=":mainForm:from :mainForm:until dataTable"
+					actionListener="#{jobInstanceControler.lastHour}" />
+				<p:commandButton value="Latest day"
+					update=":mainForm:from :mainForm:until dataTable"
+					actionListener="#{jobInstanceControler.lastDay}" />
+				<p:commandButton value="Reset date filters"
+					update=":mainForm:from :mainForm:until dataTable"
+					actionListener="#{jobInstanceControler.resetDateFilters}" />
 
 				<p:dataTable id="dataTable" var="h" lazy="true"
 					value="#{jobInstanceControler}" sortMode="multiple" rows="15"

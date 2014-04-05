@@ -3,6 +3,8 @@ package com.enioka.ui.controlers;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +35,7 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
     private List<SortMeta> sortCache = null;
     private List<JobInstance> jiCache = null;
     private Deliverable selDel = null;
+    private Date fromFilter, untilFilter;
 
     public String stop()
     {
@@ -121,6 +124,18 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
             {
                 q.setJobDefModule(filters.get(key));
             }
+        }
+        if (this.fromFilter != null)
+        {
+            Calendar tCalendar = Calendar.getInstance();
+            tCalendar.setTime(fromFilter);
+            q.setBeganRunningAfter(tCalendar);
+        }
+        if (this.untilFilter != null)
+        {
+            Calendar tCalendar = Calendar.getInstance();
+            tCalendar.setTime(untilFilter);
+            q.setBeganRunningBefore(tCalendar);
         }
 
         // Add sorts
@@ -253,5 +268,55 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
     public void setSelDel(Deliverable selDel)
     {
         this.selDel = selDel;
+    }
+
+    public Date getFromFilter()
+    {
+        return fromFilter;
+    }
+
+    public void setFromFilter(Date fromDate)
+    {
+        this.fromFilter = fromDate;
+    }
+
+    public Date getUntilFilter()
+    {
+        return untilFilter;
+    }
+
+    public void setUntilFilter(Date untilFilter)
+    {
+        this.untilFilter = untilFilter;
+    }
+
+    public void lastHour()
+    {
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.HOUR, -1);
+        this.fromFilter = c.getTime();
+        this.untilFilter = null;
+    }
+
+    public void lastTenMn()
+    {
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.MINUTE, -10);
+        this.fromFilter = c.getTime();
+        this.untilFilter = null;
+    }
+
+    public void lastDay()
+    {
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.DAY_OF_YEAR, -1);
+        this.fromFilter = c.getTime();
+        this.untilFilter = null;
+    }
+
+    public void resetDateFilters()
+    {
+        this.fromFilter = null;
+        this.untilFilter = null;
     }
 }
