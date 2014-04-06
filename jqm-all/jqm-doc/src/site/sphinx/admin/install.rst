@@ -136,18 +136,32 @@ Database support
 Oracle
 ----------
 
-Oracle 10gR2 & 11gR2 are supported. 
+Oracle 10gR2 & 11gR2 are supported. No specific configuration is required in JQM: no options inside jqm.properties (or absent file). No specific database configuration is required.
 
-No specific configuration is required in JQM: no options inside jqm.properties (or absent file).
 
-No specific database configuration is required.
+PostgreSQL
+--------------
+
+PostgreSQL 9 is supported (tested with PostgresSQL 9.3). It is the recommanded open source database to work with JQM.
+No specific configuration is required in JQM: no options inside jqm.properties (or absent file). No specific database configuration is required. 
+
+Here's a quickstart to setup a test database. As postgres user::
+
+        $ psql
+        postgres=# create database jqm template template1;
+        CREATE DATABASE
+        postgres=# create user jqm with password 'jqm';
+        CREATE ROLE
+        postgres=# grant all privileges on database jqm to jqm;
+        GRANT
+        postgres=# grant all privileges on database jqm to jqm;
+        GRANT
+
 
 MySQL
 -----------
 
-MySQL 5.x is supported with InnoDB (the default).
-
-No specific configuration is required in JQM: no options inside jqm.properties (or absent file).
+MySQL 5.x is supported with InnoDB (the default). No specific configuration is required in JQM: no options inside jqm.properties (or absent file).
 
 With InnoDB, a `startup script <http://dev.mysql.com/doc/refman/5.6/en/server-options.html#option_mysqld_init-file>`_ 
 must be used to reset an auto-increment inside the database (InnoDB behaviour messes up with
@@ -171,11 +185,6 @@ As Hibernate support of HSQLDB has a bug, the jqm.properties file must contain t
 	
 No specific HSQLDB configuration is required. Please note that if using a file database, HSQLDB prevents multiple processes from accessing it
 so it will cause issues for creating multi node environments.
-
-PostGresql
---------------
-
-Should work but has not been tested yet.
 
 
 Global configuration

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>	
+	<!-- HSQL configuration. For test environments only. Not suitable for production -->
 	<resource 
 	      name="jdbc/jqm"
           auth="Container"
@@ -26,6 +27,7 @@
           url="jdbc:hsqldb:file:db/jqmdatabase;shutdown=true;hsqldb.write_delay=false"
           singleton="true"/>
 
+	<!-- Oracle configuration. -->
 <!--          
      <resource 
 	      name="jdbc/jqm"
@@ -56,6 +58,38 @@
           initSQL="CALL DBMS_APPLICATION_INFO.SET_MODULE('CONNECTION POOL', 'IDLE IN POOL')"
           jdbcInterceptors="com.enioka.jqm.providers.Interceptor"/>
 -->
+
+	<!-- PostgreSQL configuration. -->
+<!--
+    <resource 
+          name="jdbc/jqm"
+          auth="Container"
+          type="javax.sql.DataSource"
+          factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+          testWhileIdle="true"
+          testOnBorrow="false"
+          testOnReturn="true"
+          validationQuery="SELECT version()"
+          validationInterval="1000"
+          timeBetweenEvictionRunsMillis="60000"
+          maxActive="100"
+          minIdle="2"
+          maxWait="30000"
+          initialSize="5"
+          removeAbandonedTimeout="3600"
+          removeAbandoned="true"
+          logAbandoned="true"
+          minEvictableIdleTimeMillis="60000"
+          jmxEnabled="true"
+          username="jqm"
+          password="jqm"
+          driverClassName="org.postgresql.Driver"
+          url="jdbc:postgresql://127.0.0.1:5432/jqm"
+          singleton="true"/>
+-->
+
+
+	<!-- MySQL configuration. -->
 <!--
 	<resource 
 	      name="jdbc/jqm"
