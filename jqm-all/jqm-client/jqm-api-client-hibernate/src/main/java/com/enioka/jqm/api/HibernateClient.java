@@ -188,6 +188,25 @@ final class HibernateClient implements JqmClient
         }
     }
 
+    private void closeQuietly(EntityManager em)
+    {
+        try
+        {
+            if (em != null)
+            {
+                if (em.getTransaction().isActive())
+                {
+                    em.getTransaction().rollback();
+                }
+                em.close();
+            }
+        }
+        catch (Exception e)
+        {
+            // fail silently
+        }
+    }
+
     @Override
     public void dispose()
     {
@@ -222,7 +241,7 @@ final class HibernateClient implements JqmClient
         catch (NoResultException ex)
         {
             jqmlogger.error("Job definition named " + jd.getApplicationName() + " does not exist");
-            em.close();
+            closeQuietly(em);
             throw new JqmInvalidRequestException("no job definition named " + jd.getApplicationName());
         }
 
@@ -243,15 +262,14 @@ final class HibernateClient implements JqmClient
             if (hl != null)
             {
                 jqmlogger.trace("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + hl);
-                em.getTransaction().rollback();
-                em.close();
+                closeQuietly(em);
                 return hl;
             }
             jqmlogger.trace("Not in highlander mode or no currently enqueued instance");
         }
         catch (Exception e)
         {
-            em.close();
+            closeQuietly(em);
             throw new JqmClientException("Could not do highlander analysis", e);
         }
 
@@ -292,7 +310,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
     }
 
@@ -305,10 +323,11 @@ final class HibernateClient implements JqmClient
     @Override
     public int enqueueFromHistory(int jobIdToCopy)
     {
-        EntityManager em = getEm();
+        EntityManager em = null;
         History h = null;
         try
         {
+            em = getEm();
             h = em.find(History.class, jobIdToCopy);
             return enqueue(getJobRequest(h));
         }
@@ -318,7 +337,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
     }
 
@@ -405,11 +424,11 @@ final class HibernateClient implements JqmClient
     @Override
     public void cancelJob(int idJob)
     {
-        EntityManager em = getEm();
-
+        EntityManager em = null;
         JobInstance ji = null;
         try
         {
+            em = getEm();
             em.getTransaction().begin();
             ji = em.find(JobInstance.class, idJob, LockModeType.PESSIMISTIC_WRITE);
             if (ji.getState().equals(State.SUBMITTED))
@@ -424,8 +443,7 @@ final class HibernateClient implements JqmClient
         }
         catch (NoResultException e)
         {
-            em.getTransaction().commit();
-            em.close();
+            closeQuietly(em);
             throw new JqmClientException("the job is already running, has already finished or never existed to begin with");
         }
 
@@ -464,7 +482,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
     }
 
@@ -472,10 +490,12 @@ final class HibernateClient implements JqmClient
     public void deleteJob(int idJob)
     {
         jqmlogger.trace("Job status number " + idJob + " will be deleted");
-        EntityManager em = getEm();
+        EntityManager em = null;
 
         try
         {
+            em = getEm();
+
             // Two transactions against deadlock.
             JobInstance job = em.find(JobInstance.class, idJob);
             em.getTransaction().begin();
@@ -508,7 +528,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
     }
 
@@ -541,7 +561,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
     }
 
@@ -572,7 +592,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
     }
 
@@ -600,7 +620,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
     }
 
@@ -617,24 +637,24 @@ final class HibernateClient implements JqmClient
         }
         catch (NoResultException e)
         {
-            em.close();
+            closeQuietly(em);
             throw new JqmClientException("You cannot restart a job that is not done or which was purged from history");
         }
         catch (Exception e)
         {
-            em.close();
+            closeQuietly(em);
             throw new JqmClientException("could not restart a job (internal error)", e);
         }
 
         if (!h.getState().equals(State.CRASHED))
         {
-            em.close();
+            closeQuietly(em);
             throw new JqmClientException("You cannot restart a job that has not crashed");
         }
 
         if (!h.getJd().isCanBeRestarted())
         {
-            em.close();
+            closeQuietly(em);
             throw new JqmClientException("This type of job was configured to prevent being restarded");
         }
 
@@ -651,7 +671,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
     }
 
@@ -662,18 +682,24 @@ final class HibernateClient implements JqmClient
     @Override
     public void setJobQueue(int idJob, int idQueue)
     {
-        EntityManager em = getEm();
+        EntityManager em = null;
         JobInstance ji = null;
         Queue q = null;
 
         try
         {
+            em = getEm();
             q = em.find(Queue.class, idQueue);
         }
         catch (NoResultException e)
         {
-            em.close();
+            closeQuietly(em);
             throw new JqmClientException("Queue does not exist");
+        }
+        catch (Exception e)
+        {
+            closeQuietly(em);
+            throw new JqmClientException("Cannot retrieve queue", e);
         }
 
         try
@@ -689,7 +715,6 @@ final class HibernateClient implements JqmClient
         }
         catch (NoResultException e)
         {
-            em.getTransaction().rollback();
             throw new JqmClientException("Job instance does not exist or has already started");
         }
         catch (Exception e)
@@ -698,7 +723,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
     }
 
@@ -721,22 +746,14 @@ final class HibernateClient implements JqmClient
         }
         catch (Exception e)
         {
-            if (em != null && em.getTransaction().isActive())
-            {
-                em.getTransaction().rollback();
-            }
-            if (em != null)
-            {
-                em.close();
-            }
+            closeQuietly(em);
             throw new JqmClientException(
                     "Could not lock a job by the given ID. It may already have been executed or a timeout may have occurred.", e);
         }
 
         if (!ji.getState().equals(State.SUBMITTED))
         {
-            em.getTransaction().rollback();
-            em.close();
+            closeQuietly(em);
             throw new JqmInvalidRequestException("Job is already set for execution. Too late to change its position in the queue");
         }
 
@@ -764,11 +781,10 @@ final class HibernateClient implements JqmClient
             }
 
             // No locking - we'll deal with exceptions
-            List<JobInstance> currentJobs = em
-                    .createQuery("SELECT ji from JobInstance ji ORDER BY ji.internalPosition", JobInstance.class)
+            List<JobInstance> currentJobs = em.createQuery("SELECT ji from JobInstance ji ORDER BY ji.internalPosition", JobInstance.class)
                     .setMaxResults(betweenUp).getResultList();
 
-            if (currentJobs.size() == 0)
+            if (currentJobs.isEmpty())
             {
                 ji.setInternalPosition(0);
             }
@@ -790,7 +806,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
     }
 
@@ -933,7 +949,7 @@ final class HibernateClient implements JqmClient
 
     private String getStatusPredicate(String fieldName, List<com.enioka.jqm.api.State> status, Map<String, Object> prms)
     {
-        if (status == null || status.size() == 0)
+        if (status == null || status.isEmpty())
         {
             return "";
         }
@@ -1107,7 +1123,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
     }
 
@@ -1148,7 +1164,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
     }
 
@@ -1176,7 +1192,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
         return jobs;
     }
@@ -1201,7 +1217,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
         return jobs;
     }
@@ -1236,7 +1252,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
         return jobs;
     }
@@ -1279,7 +1295,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
 
         List<com.enioka.jqm.api.Deliverable> res = new ArrayList<com.enioka.jqm.api.Deliverable>();
@@ -1315,7 +1331,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
         return streams;
     }
@@ -1337,7 +1353,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
 
         return getDeliverableContent(deliverable);
@@ -1359,7 +1375,7 @@ final class HibernateClient implements JqmClient
         catch (Exception e)
         {
             h = null;
-            em.close();
+            closeQuietly(em);
             throw new JqmInvalidRequestException("No ended job found with the deliverable ID", e);
         }
 
@@ -1386,7 +1402,10 @@ final class HibernateClient implements JqmClient
         {
             throw new JqmClientException("Could not create a webserver-local copy of the file", e);
         }
-        em.close();
+        finally
+        {
+            closeQuietly(em);
+        }
 
         FileInputStream res = null;
         try
@@ -1433,7 +1452,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
 
         // 2: build URL
@@ -1502,7 +1521,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
     }
 
@@ -1568,7 +1587,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            em.close();
+            closeQuietly(em);
         }
     }
 

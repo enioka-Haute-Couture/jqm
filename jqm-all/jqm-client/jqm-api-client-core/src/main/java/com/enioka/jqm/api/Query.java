@@ -94,13 +94,15 @@ public final class Query
      */
     static class SortSpec
     {
-        public SortOrder order = SortOrder.ASCENDING;
-        public Sort col;
+        SortOrder order = SortOrder.ASCENDING;
+        Sort col;
 
         // Bean convention
         @SuppressWarnings("unused")
         private SortSpec()
-        {}
+        {
+
+        }
 
         SortSpec(SortOrder order, Sort column)
         {

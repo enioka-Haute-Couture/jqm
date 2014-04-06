@@ -14,7 +14,7 @@ interface IClientFactory
      * 
      * @return the default client
      */
-    public JqmClient getClient();
+    JqmClient getClient();
 
     /**
      * Return a named client. Note this client is shared in the static context. (said otherwise: for a given name, the same client is always
@@ -24,7 +24,7 @@ interface IClientFactory
      * 
      * @return the required client
      */
-    public JqmClient getClient(String name, Properties props, boolean cached);
+    JqmClient getClient(String name, Properties props, boolean cached);
 
     /**
      * Will remove the client of the given name from the static cache. Next time {@link #getClient(String)} is called, initialization cost
@@ -37,5 +37,5 @@ interface IClientFactory
      * @param name
      *            the client to reset, or <code>null</code> for the default client
      */
-    public void resetClient(String name);
+    void resetClient(String name);
 }

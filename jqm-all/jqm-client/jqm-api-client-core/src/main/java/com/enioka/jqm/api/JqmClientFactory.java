@@ -14,12 +14,17 @@ import java.util.Set;
  * The factory also holds the client cache - clients are cached to avoid creating useless objects and connections. (it is possible to create
  * a non-cached client but this is not the default)
  */
-public class JqmClientFactory
+public final class JqmClientFactory
 {
     private static String STATIC_CLIENT_BINDER_PATH = "com/enioka/jqm/api/StaticClientBinder.class";
     private static String STATIC_CLIENT_BINDER_NAME = "com.enioka.jqm.api.StaticClientBinder";
     private static IClientFactoryBinder binder;
     private static Properties props = new Properties();
+
+    private JqmClientFactory()
+    {
+        // Utility class
+    }
 
     /**
      * Most client providers use a specific configuration file (such as persistence.xml for the Hibernate provider). However, it may be
@@ -43,7 +48,7 @@ public class JqmClientFactory
         JqmClientFactory.props = properties;
     }
 
-    private final static Set<URL> findClientBinders()
+    private static final Set<URL> findClientBinders()
     {
         Set<URL> res = new LinkedHashSet<URL>();
         try
@@ -71,11 +76,11 @@ public class JqmClientFactory
         return res;
     }
 
-    private final static void bind()
+    private static final void bind()
     {
         Set<URL> staticClientBinderPathSet = findClientBinders();
 
-        if (staticClientBinderPathSet.size() == 0)
+        if (staticClientBinderPathSet.isEmpty())
         {
             throw new JqmClientException("there was no client implementation on the classpath");
         }

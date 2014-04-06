@@ -12,10 +12,10 @@ interface IClientFactoryBinder
      * 
      * @return
      */
-    public IClientFactory getClientFactory();
+    IClientFactory getClientFactory();
 
     /**
      * @return the class name of the intended {@link IClientFactory} instance
      */
-    public String getClientFactoryName();
+    String getClientFactoryName();
 }

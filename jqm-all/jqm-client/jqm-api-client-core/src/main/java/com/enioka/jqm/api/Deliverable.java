@@ -41,11 +41,11 @@ public class Deliverable
      * @param filePath
      * @param fileName
      */
-    Deliverable(String filePath, String fileFamily, Integer ID, String originalName)
+    Deliverable(String filePath, String fileFamily, Integer id, String originalName)
     {
         this.filePath = filePath;
         this.fileFamily = fileFamily;
-        this.id = ID;
+        this.id = id;
         this.originalName = originalName;
     }
 

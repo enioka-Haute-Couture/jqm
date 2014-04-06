@@ -29,7 +29,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public int enqueue(JobRequest jobRequest);
+    int enqueue(JobRequest jobRequest);
 
     /**
      * Will create a new job instance inside an execution queue. All parameters (JQM parameters such as queue name, etc) as well as job
@@ -46,7 +46,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public int enqueue(String applicationName, String userName);
+    int enqueue(String applicationName, String userName);
 
     /**
      * Create a new job instance from another job instance that has successfully ended. This does not change the copied instance. Everything
@@ -60,7 +60,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public int enqueueFromHistory(int jobIdToCopy);
+    int enqueueFromHistory(int jobIdToCopy);
 
     // /////////////////////////////////////////////////////////////////////
     // Job destruction
@@ -79,7 +79,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public void cancelJob(int jobId);
+    void cancelJob(int jobId);
 
     /**
      * Remove an enqueued job from the queue, leaving no trace of it. This is an exceptional event - usually cancelJob would be used <br>
@@ -93,7 +93,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public void deleteJob(int jobId);
+    void deleteJob(int jobId);
 
     /**
      * Kill a running job. Kill is not immediate, and is only possible when a job payload calls some JQM APIs. If none are called, the job
@@ -105,7 +105,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public void killJob(int jobId);
+    void killJob(int jobId);
 
     // /////////////////////////////////////////////////////////////////////
     // Job Pause/restart
@@ -122,7 +122,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public void pauseQueuedJob(int jobId);
+    void pauseQueuedJob(int jobId);
 
     /**
      * Resume a paused request.
@@ -135,7 +135,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public void resumeJob(int jobId);
+    void resumeJob(int jobId);
 
     /**
      * Will restart a crashed job. This will remove all trace of the failed execution.
@@ -149,7 +149,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public int restartCrashedJob(int jobId);
+    int restartCrashedJob(int jobId);
 
     // /////////////////////////////////////////////////////////////////////
     // Misc.
@@ -167,7 +167,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public void setJobQueue(int jobId, int queueId);
+    void setJobQueue(int jobId, int queueId);
 
     /**
      * Move a job instance from a queue to another queue
@@ -181,7 +181,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public void setJobQueue(int jobId, Queue queue);
+    void setJobQueue(int jobId, Queue queue);
 
     /**
      * Change the position of a waiting job instance inside a queue.
@@ -195,7 +195,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public void setJobQueuePosition(int jobId, int newPosition);
+    void setJobQueuePosition(int jobId, int newPosition);
 
     // /////////////////////////////////////////////////////////////////////
     // Job queries
@@ -213,7 +213,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public JobInstance getJob(int jobId);
+    JobInstance getJob(int jobId);
 
     /**
      * Administrative method. List all currently running or waiting or finished job instances.
@@ -222,7 +222,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public List<JobInstance> getJobs();
+    List<JobInstance> getJobs();
 
     /**
      * Administrative method. List all currently running or waiting job instances.
@@ -231,7 +231,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public List<JobInstance> getActiveJobs();
+    List<JobInstance> getActiveJobs();
 
     /**
      * List all currently running or waiting job instances for a given "user" (see userName parameter at enqueue time)
@@ -240,7 +240,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public List<JobInstance> getUserActiveJobs(String userName);
+    List<JobInstance> getUserActiveJobs(String userName);
 
     /**
      * Generic query method. See {@link Query} for arguments.
@@ -253,7 +253,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public List<JobInstance> getJobs(Query query);
+    List<JobInstance> getJobs(Query query);
 
     // /////////////////////////////////////////////////////////////////////
     // Helpers to quickly access some job instance properties
@@ -270,7 +270,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public List<String> getJobMessages(int jobId);
+    List<String> getJobMessages(int jobId);
 
     /**
      * Get the progress indication that may have been given by a job instance (running or done).
@@ -282,7 +282,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public int getJobProgress(int jobId);
+    int getJobProgress(int jobId);
 
     // /////////////////////////////////////////////////////////////////////
     // Deliverables retrieval
@@ -298,7 +298,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public List<Deliverable> getJobDeliverables(int jobId);
+    List<Deliverable> getJobDeliverables(int jobId);
 
     /**
      * Return all files created by a job instance if any. The stream is not open: opening and closing it is the caller's responsibility.<br>
@@ -313,7 +313,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public List<InputStream> getJobDeliverablesContent(int jobId);
+    List<InputStream> getJobDeliverablesContent(int jobId);
 
     /**
      * Return one file created by a job instance. The stream is not open: opening and closing it is the caller's responsibility.<br>
@@ -327,7 +327,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public InputStream getDeliverableContent(Deliverable file);
+    InputStream getDeliverableContent(Deliverable file);
 
     /**
      * Returns the standard output flow of of an ended job instance <br>
@@ -340,7 +340,7 @@ public interface JqmClient
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      * @see #getJobLogStdErr(int)
      */
-    public InputStream getJobLogStdOut(int jobId);
+    InputStream getJobLogStdOut(int jobId);
 
     /**
      * Returns the standard error flow of of an ended job instance<br>
@@ -353,7 +353,7 @@ public interface JqmClient
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      * @see #getJobLogStdOut(int)
      */
-    public InputStream getJobLogStdErr(int jobId);
+    InputStream getJobLogStdErr(int jobId);
 
     // /////////////////////////////////////////////////////////////////////
     // Parameters retrieval
@@ -367,7 +367,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public List<Queue> getQueues();
+    List<Queue> getQueues();
 
     /**
      * Lists all the available {@link JobDef} objects, i.e. the different payloads that can be launched by JQM.
@@ -376,7 +376,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public List<JobDef> getJobDefinitions();
+    List<JobDef> getJobDefinitions();
 
     /**
      * Lists all the available {@link JobDef} objects for a given application, i.e. the different payloads that can be launched by JQM. The
@@ -387,7 +387,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    public List<JobDef> getJobDefinitions(String application);
+    List<JobDef> getJobDefinitions(String application);
 
     // /////////////////////////////////////////////////////////////////////
     // Technical
@@ -397,5 +397,5 @@ public interface JqmClient
      * Free resources. Client is unusable after calling this method. What is freed depends on the implementation, it may be nothing at all.
      * This method should never throw any exception.
      */
-    public void dispose();
+    void dispose();
 }

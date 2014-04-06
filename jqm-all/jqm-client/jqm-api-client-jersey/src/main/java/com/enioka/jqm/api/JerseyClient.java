@@ -106,7 +106,6 @@ final class JerseyClient implements JqmClient
     {
         try
         {
-            System.out.println(target.getUri().toString());
             return target.path("ji").request().post(Entity.entity(jd, MediaType.APPLICATION_XML), JobInstance.class).getId();
         }
         catch (BadRequestException e)
