@@ -97,7 +97,7 @@ The node created in the previous step has serious drawbacks:
 * General low performances and persistence issues inherent to HSQLDB
 
 Just edit JQM_ROOT/conf/resources.xml file to reference your own database and delete or comment JQM_ROOT/conf/db.properties.
-It contains by default sample configuration for Oracle, HSQLDB and MySQL which are the three supported databases. (HSQLDB is not supported
+It contains by default sample configuration for Oracle, PostgreSQL, HSQLDB and MySQL which are the three supported databases. (HSQLDB is not supported
 in production environments)
 
 .. note:: the database is intended to be shared between all JQM nodes - you should not create a schema/database per node.
@@ -142,7 +142,7 @@ Oracle 10gR2 & 11gR2 are supported. No specific configuration is required in JQM
 PostgreSQL
 --------------
 
-PostgreSQL 9 is supported (tested with PostgresSQL 9.3). It is the recommanded open source database to work with JQM.
+PostgreSQL 9 is supported (tested with PostgreSQL 9.3). It is the recommanded open source database to work with JQM.
 No specific configuration is required in JQM: no options inside jqm.properties (or absent file). No specific database configuration is required. 
 
 Here's a quickstart to setup a test database. As postgres user::

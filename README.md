@@ -27,7 +27,7 @@ is offered to do every imaginable operation (new execution request, querying the
 
 Finally, JQM was created with compatibility in mind:
 
-* uses either MySQL, Oracle or HSQLDB
+* uses either PostgreSQL, MySQL, Oracle or HSQLDB
 * the client API is usable in all application servers and JSE code (tested with WebsSphere 8.x, Glassfish 3.x, Tomcat 7.x)
 * one of the client API implementations is a REST-like API, callable from everywhere, not only Java but also .NET or shell scripts (allows easy
 scheduler integration).
