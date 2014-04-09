@@ -392,7 +392,7 @@ class JqmEngine implements JqmEngineMBean
     {
         for (Polling p : this.pollers)
         {
-            if (!p.isRunning())
+            if (!p.isActuallyPolling())
             {
                 return false;
             }
