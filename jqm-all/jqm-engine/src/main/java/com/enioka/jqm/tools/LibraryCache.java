@@ -261,13 +261,13 @@ class LibraryCache
 
             try
             {
-                depFiles = resolver.fromClassloaderResource("META-INF/settings.xml").loadPomFromFile(pomFile).importRuntimeDependencies()
+                depFiles = resolver.loadPomFromFile(pomFile).importRuntimeDependencies()
                         .resolve().withTransitivity().asFile();
             }
             catch (IllegalArgumentException e)
             {
                 // Happens when no dependencies inside pom, which is a weird use of the feature...
-                jqmlogger.trace("No dependencies inside pom.xml file - no libs will be used");
+                jqmlogger.trace("No dependencies inside pom.xml file - no libs will be used", e);
                 depFiles = new File[0];
             }
 
