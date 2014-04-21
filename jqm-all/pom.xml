@@ -176,31 +176,24 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5</version><!--$NO-MVN-MAN-VER$ -->
+				<version>2.4.2</version><!--$NO-MVN-MAN-VER$ -->
 				<configuration>
 					<!-- Only use local Git repository, push will be manual -->
 					<localCheckout>true</localCheckout>
 					<pushChanges>false</pushChanges>
-					
+
 					<!-- One version to rule them all -->
 					<autoVersionSubmodules>true</autoVersionSubmodules>
+
+					<!-- Use custom release profile -->
+					<useReleaseProfile>false</useReleaseProfile>
+					<releaseProfiles>release</releaseProfiles>
 				</configuration>
 			</plugin>
 		</plugins>
 
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-release-plugin</artifactId>
-					<version>2.5</version>
-					<configuration>
-						<mavenExecutorId>forked-path</mavenExecutorId>
-						<useReleaseProfile>false</useReleaseProfile>
-						<arguments>${arguments} -Prelease</arguments>
-					</configuration>
-				</plugin>
-
 				<!-- Stupid M2E stuff, no influence on build -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
