@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.enioka.jqm</groupId>
 		<artifactId>jqm-all</artifactId>
-		<version>1.1.6</version>
+		<version>1.1.7-SNAPSHOT</version>
 	</parent>
 	<artifactId>jqm-engine</artifactId>
 
@@ -182,7 +182,7 @@
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-api-client-hibernate</artifactId>
 			<type>jar</type>
-			<version>1.1.6</version>
+			<version>1.1.7-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Connection pooling. Test - only put in ext dir, not lib -->
