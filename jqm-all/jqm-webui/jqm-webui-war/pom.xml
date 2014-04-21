@@ -9,10 +9,9 @@
 		<version>1.1.6-SNAPSHOT</version>
 	</parent>
 	<packaging>war</packaging>
-	<name>jqm-webui-war</name>
 
-	<properties>
-	</properties>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<url>http://jqm.readthedocs.org</url>
 
 	<dependencies>
 		<!-- Using Hibernate full client -->
@@ -22,7 +21,7 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- container may provide a non Hibernate JTA provider - so we impose 
+		<!-- container may provide a non Hibernate JPA provider - so we impose 
 			Hibernate -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -30,7 +29,7 @@
 			<version>${hibernate.version}</version>
 		</dependency>
 
-		<!-- JSF + PrimeFaces for pretty looking widgets -->
+		<!-- JSF2 + PrimeFaces for pretty looking widgets -->
 		<dependency>
 			<groupId>javax.faces</groupId>
 			<artifactId>jsf-api</artifactId>
@@ -76,7 +75,7 @@
 				</configuration>
 
 				<dependencies>
-					<!-- Our datasource will be an in-memory HSQLDB -->
+					<!-- Our datasource will be an in-memory HSQLDB or mysql -->
 					<dependency>
 						<groupId>org.hsqldb</groupId>
 						<artifactId>hsqldb</artifactId>

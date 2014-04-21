@@ -8,6 +8,8 @@
 	</parent>
 
 	<artifactId>jqm-test-missingapi</artifactId>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<url>http://jqm.readthedocs.org</url>
 
 	<build>
 		<plugins>

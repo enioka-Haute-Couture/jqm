@@ -8,6 +8,9 @@
 	</parent>
 	<artifactId>jqm-engine</artifactId>
 
+	<name>${project.groupId}:${project.artifactId}</name>
+	<url>http://jqm.readthedocs.org</url>
+
 	<properties>
 		<modelJarName>./lib/jqm-model-${project.version}.jar</modelJarName>
 	</properties>

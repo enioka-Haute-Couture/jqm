@@ -8,6 +8,8 @@
 	</parent>
 
 	<artifactId>jqm-test-datetimemavenjarinlib</artifactId>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<url>http://jqm.readthedocs.org</url>
 
 	<build>
 		<plugins>
@@ -17,7 +19,6 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.4</version>
 				<configuration>
-					<finalName>test</finalName>
 					<archive>
 						<addMavenDescriptor>false</addMavenDescriptor>
 					</archive>
@@ -49,8 +50,16 @@
 						</goals>
 						<configuration>
 							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>${project.artifactId}</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<overWrite>true</overWrite>
+									<destFileName>test.jar</destFileName>
+								</artifactItem>
 							</artifactItems>
-							<outputDirectory>${project.build.directory}/useless</outputDirectory>
+							<outputDirectory>${project.build.directory}</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>

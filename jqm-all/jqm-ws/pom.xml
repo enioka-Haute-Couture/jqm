@@ -9,7 +9,9 @@
 	</parent>
 	<artifactId>jqm-ws</artifactId>
 	<packaging>war</packaging>
+
 	<name>jqm-ws Jersey Webapp</name>
+	<url>http://jqm.readthedocs.org</url>
 
 	<properties>
 	</properties>

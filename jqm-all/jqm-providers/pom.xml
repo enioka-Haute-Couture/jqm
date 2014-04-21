@@ -9,7 +9,9 @@
 		<version>1.1.6-SNAPSHOT</version>
 	</parent>
 	<artifactId>jqm-providers</artifactId>
-	<name>jqm-providers</name>
+
+	<name>${project.groupId}:${project.artifactId}</name>
+	<url>http://jqm.readthedocs.org</url>
 
 	<properties>
 	</properties>

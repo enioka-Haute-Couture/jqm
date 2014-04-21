@@ -10,17 +10,13 @@
 	</parent>
 	<packaging>pom</packaging>
 
-	<properties>
-	</properties>
-
+	<name>${project.groupId}:${project.artifactId}</name>
+	<url>http://jqm.readthedocs.org</url>
 
 	<modules>
 		<module>jqm-webui-war</module>
 		<module>jqm-webui-ear</module>
 		<module>jqm-webui-war-ws</module>
 	</modules>
-
-	<dependencies>
-	</dependencies>
 
 </project>

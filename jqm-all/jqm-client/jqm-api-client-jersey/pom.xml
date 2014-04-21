@@ -9,6 +9,9 @@
 	</parent>
 	<artifactId>jqm-api-client-jersey</artifactId>
 
+	<name>${project.groupId}:${project.artifactId}</name>
+	<url>http://jqm.readthedocs.org</url>
+
 	<properties>
 	</properties>
 
@@ -20,6 +23,23 @@
 				<version>2.16</version>
 				<configuration>
 					<argLine>-XX:MaxPermSize=128m -Xms150m -Xmx256m</argLine>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<show>package</show>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -63,7 +83,7 @@
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-client</artifactId>
 			<version>${jersey-version}</version>
-			
+
 		</dependency>
 
 		<dependency>

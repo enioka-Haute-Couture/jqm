@@ -9,7 +9,9 @@
 		<version>1.1.6-SNAPSHOT</version>
 	</parent>
 	<packaging>war</packaging>
-	<name>jqm-webui-war-ws</name>
+
+	<name>${project.groupId}:${project.artifactId}</name>
+	<url>http://jqm.readthedocs.org</url>
 
 	<properties>
 	</properties>

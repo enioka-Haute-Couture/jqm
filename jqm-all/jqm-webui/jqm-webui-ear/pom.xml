@@ -9,10 +9,9 @@
 		<version>1.1.6-SNAPSHOT</version>
 	</parent>
 	<packaging>ear</packaging>
-	<name>jqm-webui-ear</name>
 
-	<properties>
-	</properties>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<url>http://jqm.readthedocs.org</url>
 
 	<dependencies>
 		<dependency>
