@@ -64,7 +64,7 @@
 				<version>3.1.2.2</version>
 
 				<configuration>
-					<app>target/${project.name}-${project.version}</app>
+					<app>target/${project.artifactId}-${project.version}</app>
 					<name>jqmadminwar</name>
 					<contextRoot>/</contextRoot>
 					<ports>
