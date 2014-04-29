@@ -1,4 +1,4 @@
-package com.enioka.jqm.jndi;
+package com.enioka.jqm.tools;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -23,7 +23,6 @@ import org.w3c.dom.NodeList;
 
 import com.enioka.jqm.jpamodel.JndiObjectResource;
 import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
-import com.enioka.jqm.tools.Helpers;
 
 /**
  * Helper class to retrieve a {@link JndiResourceDescriptor} either from the XML resource file or from the database. <br>

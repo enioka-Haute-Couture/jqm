@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.jndi;
+package com.enioka.jqm.tools;
 
 // Thanks Apache Tomcat!
 
@@ -35,7 +35,7 @@ class ResourceFactory implements ObjectFactory
 {
     private ClassLoader clResourceClasses = null;
 
-    public ResourceFactory(ClassLoader clResourcesClasses)
+    ResourceFactory(ClassLoader clResourcesClasses)
     {
         this.clResourceClasses = clResourcesClasses;
     }

@@ -25,6 +25,7 @@ import java.util.Calendar;
 import java.util.Properties;
 import java.util.UUID;
 
+import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
@@ -51,7 +52,7 @@ import com.enioka.jqm.jpamodel.State;
  * This is a helper class for internal use only.
  * 
  */
-public final class Helpers
+final class Helpers
 {
     private static final String PERSISTENCE_UNIT = "jobqueue-api-pu";
     private static Logger jqmlogger = Logger.getLogger(Helpers.class);
@@ -70,7 +71,7 @@ public final class Helpers
      * 
      * @return an EntityManager
      */
-    public static EntityManager getNewEm()
+    static EntityManager getNewEm()
     {
         getEmf();
         return emf.createEntityManager();
@@ -122,6 +123,19 @@ public final class Helpers
     static void allowCreateSchema()
     {
         props.put("hibernate.hbm2ddl.auto", "update");
+    }
+
+    static void registerJndiIfNeeded()
+    {
+        try
+        {
+            JndiContextFactory.createJndiContext();
+            jqmlogger.debug("JNDI context was registered");
+        }
+        catch (NamingException e)
+        {
+            throw new JqmInitError("Could not register the JNDI provider", e);
+        }
     }
 
     /**

@@ -11,7 +11,6 @@ import javax.naming.spi.NamingManager;
 
 import org.apache.log4j.Logger;
 
-import com.enioka.jqm.jndi.JndiContext;
 
 /**
  * The JMX Agent is (JVM-wide) RMI for serving remote JMX requests. It is compulsory because JQM uses fixed ports for the JMX server.

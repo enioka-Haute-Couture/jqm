@@ -14,8 +14,10 @@ Should some terms prove to be obscure, please refer to the :doc:`../glossary`.
 Libraries handling
 **************************
 
-JQM itself does not provide any libraries to the payloads - all its internal classes are hidden. But there are two ways, each with two variants, to make sure the required
-libraires are present at runtime.
+JQM itself is hidden from the payloads - payloads cannot see any of its internal classes and resources. So JQM itself does not provide anything to 
+payloads in terms of libraries (with the exception of libraries explicitly added to the ext directory, see below).
+
+But there are two ways, each with two variants, to make sure that required libraires are present at runtime.
 
 .. note:: All the four variants are exclusive. **Only one libray source it used at the same time**.
 
@@ -44,6 +46,18 @@ POM files are ignored if a lib directory is present. An empty lib directory is v
 The lib directory may also be situated at the root of the jar file (lower priority than external lib directory).
 
 Conclusion: in that case, libraries must be packaged.
+
+Shared libraries
+*******************
+
+It is possible to copy jars inside the JQM_ROOT/ext directory. In that case, these resources will be loaded by a
+classloader common to all libraries and will therefore be available to all payloads. 
+
+This should only be used very rarely, and is not to be considered in packaging. This exists mostly for shared JNDI resources
+such as JDBC connection pools. Note that a lib in ext has priority over one provided by the payload (through Maven or lib directory).
+
+.. note:: JQM actually makes use of this priority to always provide the latest version of the jqm-api and jqm-client-api to payloads. The APIs can
+	therefore be referenced as "provided" dependencies if using Maven.
 
 Creating a JobDef
 *********************
@@ -137,7 +151,6 @@ This shows a single jar containing two payloads. ::
 	<jqm>
 		<jar>
 			<path>jqm-test-fibo/jqm-test-fibo.jar</path>
-			<filePath>jqm-test-fibo/</filePath>
 
 			<jobdefinitions>
 				<jobDefinition>
@@ -145,7 +158,6 @@ This shows a single jar containing two payloads. ::
 					<description>Test based on the Fibonachi suite</description>
 					<canBeRestarted>true</canBeRestarted>
 					<javaClassName>com.enioka.jqm.tests.App</javaClassName>
-					<maxTimeRunning>42</maxTimeRunning>
 					<application>CrmBatchs</application>
 					<module>Consolidation</module>
 					<keyword1>nightly</keyword1>
@@ -168,7 +180,6 @@ This shows a single jar containing two payloads. ::
 					<description>Test to check the xml implementation</description>
 					<canBeRestarted>true</canBeRestarted>
 					<javaClassName>com.enioka.jqm.tests.App</javaClassName>
-					<maxTimeRunning>42</maxTimeRunning>
 					<application>ApplicationTest</application>
 					<module>TestModule</module>
 					<keyword1></keyword1>
@@ -199,3 +210,5 @@ The XML can be imported through the command line. ::
 
 Please note that if your JQM deployment has multiple engines, it is not necessary to import the file on each node - only once is enough
 (all nodes share the same configuration). However, the jar file must obviously still be present on the nodes that will run it.
+
+Also, jmq.ps1 or jqm.sh scripts have an "allxml" option that will reimport all xml found under JQM_ROOT/jobs and subdirectories.

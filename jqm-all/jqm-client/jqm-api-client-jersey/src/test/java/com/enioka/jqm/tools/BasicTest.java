@@ -26,8 +26,6 @@ import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
 import com.enioka.jqm.api.Queue;
 import com.enioka.jqm.api.State;
-import com.enioka.jqm.jndi.JndiContext;
-import com.enioka.jqm.jndi.JndiContextFactory;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;

@@ -43,7 +43,7 @@ class ServletLog extends HttpServlet
     private static Logger jqmlogger = Logger.getLogger(ServletLog.class);
     private String logRoot = "";
 
-    public ServletLog()
+    ServletLog()
     {
         RollingFileAppender a = (RollingFileAppender) Logger.getRootLogger().getAppender("rollingfile");
         logRoot = FilenameUtils.getFullPath(a.getFile());

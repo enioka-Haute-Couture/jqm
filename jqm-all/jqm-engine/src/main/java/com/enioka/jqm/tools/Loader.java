@@ -31,6 +31,8 @@ import java.util.Properties;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.naming.NamingException;
+import javax.naming.spi.NamingManager;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 
@@ -202,9 +204,19 @@ class Loader implements Runnable, LoaderMBean
             // At this point, the CLASSPATH is always in cache, so just create the CL with it.
             jobClassLoader = AccessController.doPrivileged(new PrivilegedAction<JarClassLoader>()
             {
+                @Override
                 public JarClassLoader run()
                 {
-                    return new JarClassLoader(jarUrl, classpath);
+                    ClassLoader extLoader = null;
+                    try
+                    {
+                        extLoader = ((JndiContext) NamingManager.getInitialContext(null)).getExtCl();
+                    }
+                    catch (NamingException e)
+                    {
+                        jqmlogger.warn("could not find ext directory class loader. No parent classloader will be used", e);
+                    }
+                    return new JarClassLoader(jarUrl, classpath, extLoader);
                 }
             });
 

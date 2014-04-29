@@ -9,8 +9,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.jndi.JndiContext;
-import com.enioka.jqm.jndi.JndiContextFactory;
 
 public class JqmBaseTest
 {

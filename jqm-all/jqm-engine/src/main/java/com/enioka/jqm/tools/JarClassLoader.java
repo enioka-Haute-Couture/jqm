@@ -53,9 +53,9 @@ class JarClassLoader extends URLClassLoader
         return urls;
     }
 
-    JarClassLoader(URL url, URL[] libs)
+    JarClassLoader(URL url, URL[] libs, ClassLoader parent)
     {
-        super(addUrls(url, libs), null);
+        super(addUrls(url, libs), parent);
     }
 
     private boolean isLegacyPayload(Class c)
@@ -233,6 +233,7 @@ class JarClassLoader extends URLClassLoader
         String[] params = new String[job.getParameters().size()];
         Collections.sort(job.getParameters(), new Comparator<JobParameter>()
         {
+            @Override
             public int compare(JobParameter o1, JobParameter o2)
             {
                 return o1.getKey().compareTo(o2.getKey());

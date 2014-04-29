@@ -21,7 +21,6 @@ package com.enioka.jqm.tools;
 import java.io.InputStream;
 import java.util.Properties;
 
-import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 
 import org.apache.commons.cli.BasicParser;
@@ -36,7 +35,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.jndi.JndiContextFactory;
 
 /**
  * Starter class & parameter parsing
@@ -137,21 +135,17 @@ public class Main
         og1.addOption(o91);
         options.addOptionGroup(og1);
 
-        try
-        {
-            JndiContextFactory.createJndiContext();
-        }
-        catch (NamingException e)
-        {
-            jqmlogger.fatal("could not create JNDI context", e);
-        }
         HelpFormatter formatter = new HelpFormatter();
         formatter.setWidth(160);
 
         try
         {
+            // Parse arguments
             CommandLineParser parser = new BasicParser();
             CommandLine line = parser.parse(options, args);
+
+            // Set db connection
+            Helpers.registerJndiIfNeeded();
 
             // Enqueue
             if (line.getOptionValue(o11.getOpt()) != null)

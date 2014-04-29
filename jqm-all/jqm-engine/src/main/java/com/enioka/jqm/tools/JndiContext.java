@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.jndi;
+package com.enioka.jqm.tools;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
@@ -52,9 +52,10 @@ import org.apache.log4j.Logger;
  * This class implements a basic JNDI context
  * 
  */
-public class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory, NameParser
+class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory, NameParser
 {
     private static Logger jqmlogger = Logger.getLogger(JndiContext.class);
+
     private Map<String, Object> singletons = new HashMap<String, Object>();
     private List<ObjectName> jmxNames = new ArrayList<ObjectName>();
     private Registry r = null;
@@ -65,7 +66,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
      * 
      * @throws NamingException
      */
-    public JndiContext() throws NamingException
+    JndiContext() throws NamingException
     {
         super();
 
@@ -98,6 +99,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
             }
             extResources = AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>()
             {
+                @Override
                 public URLClassLoader run()
                 {
                     return new URLClassLoader(aUrls, null);
@@ -106,10 +108,8 @@ public class JndiContext extends InitialContext implements InitialContextFactory
         }
         else
         {
-            // Mostly for tests: if no ext dir, use current class loader.
-            extResources = JndiContext.class.getClassLoader();
+            throw new NamingException("JQM_ROOT/ext directory does not exist or cannot be read");
         }
-
     }
 
     @Override
@@ -148,9 +148,18 @@ public class JndiContext extends InitialContext implements InitialContextFactory
         // Create the resource
         try
         {
-            ResourceFactory rf = new ResourceFactory(d.isSingleton() ? extResources : Thread.currentThread().getContextClassLoader());
+            // We use the current thread loader to find the resource and resource factory class - ext is inside that CL.
+            // This is done only for payload CL - engine only need ext, not its own CL (as its own CL does NOT include ext).
+            ResourceFactory rf = new ResourceFactory(
+                    Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.tools.JarClassLoader ? Thread.currentThread()
+                            .getContextClassLoader() : extResources);
             Object res = rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
-            if (d.isSingleton())
+            if (d.isSingleton() && (res.getClass().getClassLoader() instanceof JarClassLoader))
+            {
+                jqmlogger
+                        .warn("A JNDI resource was defined as singleton but was loaded by a payload class loader - it won't be cached to avoid class loader leaks");
+            }
+            else if (d.isSingleton() && !(res.getClass().getClassLoader() instanceof JarClassLoader))
             {
                 singletons.put(name, res);
 
@@ -180,7 +189,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
     /**
      * This is a test method only.
      */
-    public void resetSingletons()
+    void resetSingletons()
     {
         this.singletons = new HashMap<String, Object>();
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -270,12 +279,20 @@ public class JndiContext extends InitialContext implements InitialContextFactory
      * 
      * @param r
      */
-    public void registerRmiContext(Registry r)
+    void registerRmiContext(Registry r)
     {
         if (this.r == null)
         {
             this.r = r;
         }
+    }
+
+    /**
+     * @return the class loader holding the ext directory (or null if no ext directory - should never happen)
+     */
+    ClassLoader getExtCl()
+    {
+        return this.extResources;
     }
 
     @Override

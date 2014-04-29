@@ -27,7 +27,6 @@ import java.util.concurrent.Semaphore;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 
@@ -37,8 +36,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.RollingFileAppender;
 
-import com.enioka.jqm.jndi.JndiContext;
-import com.enioka.jqm.jndi.JndiContextFactory;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
@@ -58,7 +55,6 @@ class JqmEngine implements JqmEngineMBean
     private Node node = null;
     private LibraryCache cache = new LibraryCache();
     private JettyServer server = null;
-    private JndiContext jndiCtx = null;
     private static Logger jqmlogger = Logger.getLogger(JqmEngine.class);
     private Semaphore ended = new Semaphore(0);
     private ObjectName name;
@@ -73,7 +69,7 @@ class JqmEngine implements JqmEngineMBean
      *            the name of the node to start, as in the NODE table of the database.
      * @throws JqmInitError
      */
-    public void start(String nodeName)
+    void start(String nodeName)
     {
         if (nodeName == null || nodeName.isEmpty())
         {
@@ -87,18 +83,7 @@ class JqmEngine implements JqmEngineMBean
         jqmlogger.info("JQM engine for node " + nodeName + " is starting");
 
         // JNDI first - the engine itself uses JNDI to fetch its connections!
-        if (jndiCtx == null)
-        {
-            try
-            {
-                jndiCtx = JndiContextFactory.createJndiContext();
-                jqmlogger.info("JNDI context was registered");
-            }
-            catch (NamingException e)
-            {
-                throw new JqmInitError("Could not register the JNDI provider", e);
-            }
-        }
+        Helpers.registerJndiIfNeeded();
 
         // Database connection
         EntityManager em = Helpers.getNewEm();
@@ -256,16 +241,6 @@ class JqmEngine implements JqmEngineMBean
             jqmlogger.error("interrutped", e);
         }
         jqmlogger.debug("Stop order was correctly handled. Engine for node " + this.node.getName() + " has stopped.");
-    }
-
-    public List<DeploymentParameter> getDps()
-    {
-        return dps;
-    }
-
-    public void setDps(List<DeploymentParameter> dps)
-    {
-        this.dps = dps;
     }
 
     Node getNode()

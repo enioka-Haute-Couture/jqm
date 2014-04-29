@@ -23,7 +23,7 @@ import com.enioka.jqm.jpamodel.GlobalParameter;
  * Should a payload crate a new thread, its stdout would go to the global log as the multiplexing key is the Thread. But is not a big deal
  * as creating threads inside an app server is not a good idea anyway.
  */
-public class MulticastPrintStream extends PrintStream
+class MulticastPrintStream extends PrintStream
 {
     private static Logger jqmlogger = Logger.getLogger(MulticastPrintStream.class);
 

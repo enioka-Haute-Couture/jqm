@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.jndi;
+package com.enioka.jqm.tools;
 
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
  * @author Marc-Antoine
  * 
  */
-public final class JndiContextFactory
+final class JndiContextFactory
 {
     private static Logger jqmlogger = Logger.getLogger(JndiContextFactory.class);
 

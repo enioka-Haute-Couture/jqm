@@ -42,7 +42,7 @@ class ServletFile extends HttpServlet
 {
     private static Logger jqmlogger = Logger.getLogger(ServletFile.class);
 
-    public ServletFile()
+    ServletFile()
     {
 
     }

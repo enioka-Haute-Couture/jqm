@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.jndi;
+package com.enioka.jqm.tools;
 
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
