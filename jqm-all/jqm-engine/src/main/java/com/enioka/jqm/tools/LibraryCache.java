@@ -245,20 +245,33 @@ class LibraryCache
                     .setParameter("repo", "mavenRepo").getResultList();
             List<GlobalParameter> settings = em.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :k", GlobalParameter.class)
                     .setParameter("k", "mavenSettingsCL").getResultList();
+            List<GlobalParameter> settingFiles = em
+                    .createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :k", GlobalParameter.class)
+                    .setParameter("k", "mavenSettingsFile").getResultList();
 
             boolean withCentral = false;
             String withCustomSettings = null;
-            if (settings.size() == 1)
+            String withCustomSettingsFile = null;
+            if (settings.size() == 1 && settingFiles.size() == 0)
             {
                 jqmlogger.trace("Custom settings file will be used: " + settings.get(0).getValue());
                 withCustomSettings = settings.get(0).getValue();
             }
+            if (settingFiles.size() == 1)
+            {
+                jqmlogger.trace("Custom settings file will be used: " + settingFiles.get(0).getValue());
+                withCustomSettingsFile = settingFiles.get(0).getValue();
+            }
 
             // Configure resolver
             ConfigurableMavenResolverSystem resolver = Maven.configureResolver();
-            if (withCustomSettings != null)
+            if (withCustomSettings != null && withCustomSettingsFile == null)
             {
                 resolver.fromClassloaderResource(withCustomSettings);
+            }
+            if (withCustomSettingsFile != null)
+            {
+                resolver.fromFile(withCustomSettingsFile);
             }
 
             for (GlobalParameter gp : repolist)
