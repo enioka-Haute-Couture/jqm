@@ -62,6 +62,7 @@ public class TestHelpers
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("logFilePerLaunch", "false", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("internalPollingPeriodMs", "10000", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("aliveSignalMs", "60000", em);
+        TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenSettingsCL", "META-INF/settings.xml", em);
 
         TestHelpers.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42, em, true);
         TestHelpers.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, em);

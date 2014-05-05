@@ -239,12 +239,27 @@ class LibraryCache
         {
             jqmlogger.trace("Reading a pom file");
 
+            // Retrieve resolver configuration
             List<GlobalParameter> repolist = em
                     .createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
                     .setParameter("repo", "mavenRepo").getResultList();
+            List<GlobalParameter> settings = em.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :k", GlobalParameter.class)
+                    .setParameter("k", "mavenSettingsCL").getResultList();
 
             boolean withCentral = false;
+            String withCustomSettings = null;
+            if (settings.size() == 1)
+            {
+                jqmlogger.trace("Custom settings file will be used: " + settings.get(0).getValue());
+                withCustomSettings = settings.get(0).getValue();
+            }
+
+            // Configure resolver
             ConfigurableMavenResolverSystem resolver = Maven.configureResolver();
+            if (withCustomSettings != null)
+            {
+                resolver.fromClassloaderResource(withCustomSettings);
+            }
 
             for (GlobalParameter gp : repolist)
             {
@@ -257,12 +272,11 @@ class LibraryCache
             }
             resolver.withMavenCentralRepo(withCentral);
 
+            // Resolve
             File[] depFiles = null;
-
             try
             {
-                depFiles = resolver.loadPomFromFile(pomFile).importRuntimeDependencies()
-                        .resolve().withTransitivity().asFile();
+                depFiles = resolver.loadPomFromFile(pomFile).importRuntimeDependencies().resolve().withTransitivity().asFile();
             }
             catch (IllegalArgumentException e)
             {
@@ -271,6 +285,7 @@ class LibraryCache
                 depFiles = new File[0];
             }
 
+            // Extract results
             int size = 0;
             for (File artifact : depFiles)
             {
