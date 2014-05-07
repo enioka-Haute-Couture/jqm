@@ -85,6 +85,10 @@ Beans detail
 	
 		Will usually be a warning element inside monitoring. True if at least one queue is full. (boolean)
 
+	.. method:: getVersion
+	
+		The engine version, in x.x.x form. (string)
+
 	.. method:: stop
 	
 		Stops the engine, exactly as if stopping the service (see stop procedure for details).

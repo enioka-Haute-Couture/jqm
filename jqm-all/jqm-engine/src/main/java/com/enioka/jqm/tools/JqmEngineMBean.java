@@ -43,4 +43,9 @@ public interface JqmEngineMBean
      * The number of seconds since engine start.
      */
     long getUptime();
+
+    /**
+     * The package version, in x.x.x form.
+     */
+    String getVersion();
 }

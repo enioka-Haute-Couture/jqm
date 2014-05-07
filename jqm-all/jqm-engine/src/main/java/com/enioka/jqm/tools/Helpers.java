@@ -390,4 +390,21 @@ final class Helpers
 
         return h;
     }
+
+    static String getMavenVersion()
+    {
+        String res = "";
+        InputStream is = Main.class.getResourceAsStream("/META-INF/maven/com.enioka.jqm/jqm-engine/pom.properties");
+        Properties p = new Properties();
+        try
+        {
+            p.load(is);
+            res = p.getProperty("version");
+        }
+        catch (Exception e)
+        {
+            res = "not a valid maven version";
+        }
+        return res;
+    }
 }

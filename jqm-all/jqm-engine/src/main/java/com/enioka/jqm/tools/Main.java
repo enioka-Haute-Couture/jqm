@@ -18,9 +18,6 @@
 
 package com.enioka.jqm.tools;
 
-import java.io.InputStream;
-import java.util.Properties;
-
 import javax.persistence.EntityManager;
 
 import org.apache.commons.cli.BasicParser;
@@ -70,23 +67,6 @@ public class Main
     {
         jqmlogger.info("Service stop");
         engine.stop();
-    }
-
-    private static String getMavenVersion()
-    {
-        String res = "";
-        InputStream is = Main.class.getResourceAsStream("/META-INF/maven/com.enioka.jqm/jqm-engine/pom.properties");
-        Properties p = new Properties();
-        try
-        {
-            p.load(is);
-            res = p.getProperty("version");
-        }
-        catch (Exception e)
-        {
-            res = "not a valid maven version";
-        }
-        return res;
     }
 
     /**
@@ -195,7 +175,7 @@ public class Main
             // Version
             else if (line.hasOption(o71.getOpt()))
             {
-                jqmlogger.info("Engine version: " + getMavenVersion());
+                jqmlogger.info("Engine version: " + Helpers.getMavenVersion());
             }
         }
         catch (ParseException exp)
@@ -249,7 +229,7 @@ public class Main
         try
         {
             engine = new JqmEngine();
-            jqmlogger.info("Engine version is: " + getMavenVersion());
+            jqmlogger.info("Engine version is: " + Helpers.getMavenVersion());
             jqmlogger.info("Starting engine node " + nodeName);
             engine.start(nodeName);
         }

@@ -393,4 +393,10 @@ class JqmEngine implements JqmEngineMBean
     {
         return (Calendar.getInstance().getTimeInMillis() - this.startTime.getTimeInMillis()) / 1000;
     }
+
+    @Override
+    public String getVersion()
+    {
+        return Helpers.getMavenVersion();
+    }
 }
