@@ -1,0 +1,24 @@
+# Everyone should work with LF. If CRLF, remove them at check-in.
+* eol=lf
+
+# msysgit stuff
+*.doc	 diff=astextplain
+*.DOC	 diff=astextplain
+*.docx diff=astextplain
+*.DOCX diff=astextplain
+*.dot  diff=astextplain
+*.DOT  diff=astextplain
+*.pdf  diff=astextplain
+*.PDF	 diff=astextplain
+*.rtf	 diff=astextplain
+*.RTF	 diff=astextplain
+*.rst   diff=astextplain
+*.RST   diff=astextplain
+
+# specific stuff
+*.jar -text
+*.JAR -text
+*.png -text
+*.PNG -text
+*.exe -text
+*.EXE -text

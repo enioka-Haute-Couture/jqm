@@ -185,7 +185,7 @@ public class Node
     }
 
     /**
-     * See {@link #getRootLogLevel()
+     * See {@link #getRootLogLevel()
      */
     public void setRootLogLevel(String rootLogLevel)
     {
