@@ -186,7 +186,7 @@ public class PackageTest extends JqmBaseTest
         Assert.assertEquals(State.ENDED, res.get(0).getState());
     }
 
-    @Test
+    // @Test // Commented. API is now always present.
     public void testIncompleteClass() throws Exception
     {
         jqmlogger.debug("**********************************************************");

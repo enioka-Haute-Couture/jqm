@@ -141,6 +141,11 @@
 									<artifactId>jqm-providers</artifactId>
 									<version>${project.version}</version>
 								</artifactItem>
+								<artifactItem>
+									<groupId>com.enioka.jqm</groupId>
+									<artifactId>jqm-api</artifactId>
+									<version>${project.version}</version>
+								</artifactItem>
 							</artifactItems>
 							<outputDirectory>${project.basedir}/ext</outputDirectory>
 						</configuration>

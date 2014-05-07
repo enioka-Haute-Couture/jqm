@@ -56,7 +56,7 @@ classloader common to all libraries and will therefore be available to all paylo
 This should only be used very rarely, and is not to be considered in packaging. This exists mostly for shared JNDI resources
 such as JDBC connection pools. Note that a lib in ext has priority over one provided by the payload (through Maven or lib directory).
 
-.. note:: JQM actually makes use of this priority to always provide the latest version of the jqm-api and jqm-client-api to payloads. The APIs can
+.. note:: JQM actually makes use of this priority to always provide the latest version of the jqm-api to payloads. The APIs can
 	therefore be referenced as "provided" dependencies if using Maven.
 
 Creating a JobDef
