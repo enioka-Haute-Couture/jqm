@@ -348,7 +348,8 @@ class Polling implements Runnable, PollingMBean
     @Override
     public boolean isActuallyPolling()
     {
-        return (Calendar.getInstance().getTimeInMillis() - this.lastLoop.getTimeInMillis()) <= Math.max(2, dp.getPollingInterval());
+        // 100ms is a rough estimate of the time taken to do the actual poll. If it's more, there is a huge issue elsewhere.
+        return (Calendar.getInstance().getTimeInMillis() - this.lastLoop.getTimeInMillis()) <= dp.getPollingInterval() + 100;
     }
 
     @Override
