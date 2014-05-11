@@ -273,20 +273,37 @@ public class Main
 
     private static void exportAllQueues(String xmlPath)
     {
-        QueueXmlExporter qxe = new QueueXmlExporter();
-        qxe.exportAll(xmlPath);
+        EntityManager em = null;
+        try
+        {
+            em = Helpers.getNewEm();
+            XmlQueueExporter.export(xmlPath, em);
+        }
+        catch (Exception ex)
+        {
+            jqmlogger.fatal("Could not create the file", ex);
+        }
+        finally
+        {
+            em.close();
+        }
     }
 
     private static void importQueues(String xmlPath)
     {
+        EntityManager em = null;
         try
         {
-            QueueXmlParser parser = new QueueXmlParser();
-            parser.parse(xmlPath);
+            em = Helpers.getNewEm();
+            XmlQueueParser.parse(xmlPath, em);
         }
         catch (Exception ex)
         {
             jqmlogger.fatal("Could not parse and import the file", ex);
+        }
+        finally
+        {
+            em.close();
         }
     }
 

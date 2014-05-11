@@ -41,16 +41,13 @@ public class XmlTest extends JqmBaseTest
         tmp.add("VIPQueue");
         tmp.add("NormalQueue");
 
-        QueueXmlExporter qxe = new QueueXmlExporter();
-        qxe.exportSeveral(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml", tmp);
+        XmlQueueExporter.export(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml", em, tmp);
 
         File t = new File(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml");
         Assert.assertEquals(true, t.exists());
 
         // --> Test Import
-
-        QueueXmlParser qxp = new QueueXmlParser();
-        qxp.parse(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml");
+        XmlQueueParser.parse(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml", em);
 
         long ii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'VIPQueue'").getSingleResult();
         long iii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'NormalQueue'").getSingleResult();
@@ -84,16 +81,13 @@ public class XmlTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
                 "DateTime", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
-        QueueXmlExporter qxe = new QueueXmlExporter();
-        qxe.exportAll(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml");
+        XmlQueueExporter.export(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml", em);
 
         File t = new File(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml");
         Assert.assertEquals(true, t.exists());
 
         // --> Test Import
-
-        QueueXmlParser qxp = new QueueXmlParser();
-        qxp.parse(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml");
+        XmlQueueParser.parse(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml", em);
 
         long ii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'VIPQueue'").getSingleResult();
         long iii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'NormalQueue'").getSingleResult();
@@ -177,8 +171,7 @@ public class XmlTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
                 "DateTime", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
-        QueueXmlParser qxp = new QueueXmlParser();
-        qxp.parse("target/payloads/jqm-test-xml/xmlqueuetest.xml");
+        XmlQueueParser.parse("target/payloads/jqm-test-xml/xmlqueuetest.xml", em);
 
         long ii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'XmlQueue'").getSingleResult();
         long iii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'XmlQueue2'").getSingleResult();
