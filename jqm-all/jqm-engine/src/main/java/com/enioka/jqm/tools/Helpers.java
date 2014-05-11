@@ -121,6 +121,25 @@ final class Helpers
         }
     }
 
+    static void closeQuietly(EntityManager em)
+    {
+        try
+        {
+            if (em != null)
+            {
+                if (em.getTransaction().isActive())
+                {
+                    em.getTransaction().rollback();
+                }
+                em.close();
+            }
+        }
+        catch (Exception e)
+        {
+            // fail silently
+        }
+    }
+
     static void allowCreateSchema()
     {
         props.put("hibernate.hbm2ddl.auto", "update");

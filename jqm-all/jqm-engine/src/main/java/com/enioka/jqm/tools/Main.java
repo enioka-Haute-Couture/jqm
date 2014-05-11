@@ -285,7 +285,7 @@ public class Main
         }
         finally
         {
-            em.close();
+            Helpers.closeQuietly(em);
         }
     }
 
@@ -303,7 +303,7 @@ public class Main
         }
         finally
         {
-            em.close();
+            Helpers.closeQuietly(em);
         }
     }
 

@@ -127,7 +127,7 @@ class XmlQueueExporter
         }
     }
 
-    static private Element getQueueElement(Queue q, EntityManager em)
+    private static Element getQueueElement(Queue q, EntityManager em)
     {
         Element queue = new Element("queue");
 

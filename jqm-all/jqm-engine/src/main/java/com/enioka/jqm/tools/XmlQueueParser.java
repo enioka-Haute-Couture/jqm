@@ -36,6 +36,11 @@ class XmlQueueParser
 {
     private static Logger jqmlogger = Logger.getLogger(XmlQueueParser.class);
 
+    private XmlQueueParser()
+    {
+        // Utility class.
+    }
+
     static void parse(String path, EntityManager em) throws JqmEngineException
     {
         // Argument checks
