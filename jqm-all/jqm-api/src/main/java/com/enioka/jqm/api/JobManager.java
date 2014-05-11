@@ -87,6 +87,13 @@ public interface JobManager
     String keyword3();
 
     /**
+     * Optional arbitrary user classification
+     * 
+     * @return the user name that was given at enqueue time, null if none.
+     */
+    String userName();
+
+    /**
      * Parameters are from the Job Definition (i.e. default parameters) as well as values given at enqueue time. This is the privileged way
      * of giving parameters to a job instance.
      * 
@@ -203,4 +210,21 @@ public interface JobManager
      * Note: this function is also called by the other functions of the API.
      */
     void yield();
+
+    /**
+     * This method will only return after the job request of given ID is completed (be it in error or correctly). It is not guaranteed to
+     * return as soon as the request is over - simply sometimes after it is over.
+     * 
+     * @param requestId
+     *            the ID as returned by {@link #enqueue(String, String, String, String, String, String, String, String, String, Map)}
+     */
+    void waitChild(int requestId);
+
+    /**
+     * This method will only return after all job requests that were explicitly designated as children of the current one are completed (be
+     * it in error or correctly). Job requests created through
+     * {@link #enqueue(String, String, String, String, String, String, String, String, String, Map)} always create the child/parent
+     * relationship so this method will wait for at least the requests created through the JobManager APIs.
+     */
+    void waitChildren();
 }

@@ -1,6 +1,8 @@
 package com.enioka.jqm.tools;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -144,6 +146,42 @@ public class EngineApiTest extends JqmBaseTest
                 .setParameter("myId", jd.getId()).getSingleResult();
 
         Assert.assertEquals(State.CRASHED, ji1.getState());
+    }
+
+    /**
+     * A parent job can wait for all its children - then its end date should be after the end date of the children.
+     */
+    @Test
+    public void testWaitChildren() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testWaitChildren");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-waitall/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
+        JqmClientFactory.getClient().enqueue(j);
+
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+
+        TestHelpers.waitFor(6, 10000, em);
+        engine1.stop();
+
+        List<History> ji = Helpers.getNewEm()
+                .createQuery("SELECT j FROM History j WHERE j.status = 'ENDED' ORDER BY j.id ASC", History.class).getResultList();
+        Assert.assertEquals(6, ji.size());
+
+        Calendar parentEnd = ji.get(0).getEndDate();
+        for (int i = 1; i < 6; i++)
+        {
+            Assert.assertTrue(parentEnd.after(ji.get(i).getEndDate()));
+        }
     }
 
 }

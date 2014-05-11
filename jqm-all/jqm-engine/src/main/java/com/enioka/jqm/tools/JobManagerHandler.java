@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClient;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.Query;
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobInstance;
@@ -128,6 +129,10 @@ class JobManagerHandler implements InvocationHandler
             {
                 return jd.getKeyword3();
             }
+            else if ("userName".equals(methodName))
+            {
+                return ji.getUserName();
+            }
             else if ("parameters".equals(methodName))
             {
                 return params;
@@ -146,6 +151,11 @@ class JobManagerHandler implements InvocationHandler
             }
             else if ("yield".equals(methodName))
             {
+                return null;
+            }
+            else if ("waitChildren".equals(methodName))
+            {
+                waitChildren();
                 return null;
             }
         }
@@ -172,6 +182,11 @@ class JobManagerHandler implements InvocationHandler
         else if ("addDeliverable".equals(methodName) && classes.length == 2 && classes[0] == String.class && classes[1] == String.class)
         {
             return addDeliverable((String) args[0], (String) args[1]);
+        }
+        else if ("waitChild".equals(methodName) && classes.length == 1 && classes[0] == Integer.class)
+        {
+            waitChild((Integer) args[0]);
+            return null;
         }
 
         throw new NoSuchMethodException(methodName);
@@ -264,26 +279,46 @@ class JobManagerHandler implements InvocationHandler
             String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
         int i = enqueue(applicationName, user, mail, sessionId, application, module, keyword1, keyword2, keyword3, parameters);
+        waitChild(i);
+        return i;
+    }
+
+    private void waitChild(int id)
+    {
         JqmClient c = getJqmClient();
-        com.enioka.jqm.api.JobInstance jiLocal = null;
-        while (true)
+        Query q = Query.create().setQueryHistoryInstances(false).setQueryLiveInstances(true).setJobInstanceId(id);
+
+        while (c.getJobs(q).size() > 0)
         {
-            jiLocal = c.getJob(i);
-            if (jiLocal.getState().equals(com.enioka.jqm.api.State.CRASHED) || jiLocal.getState().equals(com.enioka.jqm.api.State.ENDED))
-            {
-                break;
-            }
             try
             {
                 Thread.sleep(1000);
+                shouldKill();
             }
             catch (InterruptedException e)
             {
                 break;
             }
         }
+    }
 
-        return i;
+    private void waitChildren()
+    {
+        JqmClient c = getJqmClient();
+        Query q = Query.create().setQueryHistoryInstances(false).setQueryLiveInstances(true).setParentId(ji.getId());
+
+        while (c.getJobs(q).size() > 0)
+        {
+            try
+            {
+                Thread.sleep(1000);
+                shouldKill();
+            }
+            catch (InterruptedException e)
+            {
+                break;
+            }
+        }
     }
 
     private Integer addDeliverable(String path, String fileLabel) throws IOException
