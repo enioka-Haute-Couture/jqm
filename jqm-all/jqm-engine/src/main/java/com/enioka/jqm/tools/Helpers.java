@@ -39,6 +39,7 @@ import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
+import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobHistoryParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
@@ -406,5 +407,30 @@ final class Helpers
             res = "not a valid maven version";
         }
         return res;
+    }
+
+    static JobDef findJobDef(String applicationName, EntityManager em)
+    {
+        try
+        {
+            return em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = :n", JobDef.class).setParameter("n", applicationName)
+                    .getSingleResult();
+        }
+        catch (NoResultException ex)
+        {
+            return null;
+        }
+    }
+
+    static Queue findQueue(String qName, EntityManager em)
+    {
+        try
+        {
+            return em.createQuery("SELECT q FROM Queue q WHERE q.name = :name", Queue.class).setParameter("name", qName).getSingleResult();
+        }
+        catch (NoResultException ex)
+        {
+            return null;
+        }
     }
 }

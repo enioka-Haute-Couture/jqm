@@ -213,7 +213,7 @@ public class Main
             String[] pathes = xmlpath.split(",");
             for (String path : pathes)
             {
-                XmlParser.parse(path, em);
+                XmlJobDefParser.parse(path, em);
             }
             em.close();
         }
