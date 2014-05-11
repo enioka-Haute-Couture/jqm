@@ -162,6 +162,8 @@ All objects are serialized to XML. The service is a REST-style web service, so n
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
 | /jd/{appName}         | GET    |                       | List\<JobInstance\> | application/xml     | getActiveJobs        | List all job definitions  for a given application              |
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
+| /jr                   | GET    |                       | JobRequest          | application/xml     | N/A                  | Returns an empty JobRequest. Usefull for scripts.              |
++-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
 
 Note: application/os = application/output-stream.
 
@@ -171,3 +173,32 @@ Used HTTP error codes are:
 * 500 when it hangs on the server (unexpected error)
 
 On the full Java client side, these are respectively translated to :class:`JqmInvalidRequestException` and :class:`JqmClientException`.
+
+Script sample
+****************
+
+PowerShell script. Logics is the same in any language, script or compiled.::
+
+	# Ask for an empty JobRequest (avoids creating the XML from scratch, which is of course also possible)
+	$request = Invoke-RestMethod -Uri http://localhost:50813/api/ws/jr
+
+	# We decide to enqueue a request for the second existing JobDef.. Usually, one would know this name without having to query for it.
+	$appName = (Invoke-RestMethod -Uri http://localhost:50813/api/ws/jd).jobDefs.jobDef[1].applicationName
+
+	# Enqueue it
+	$request.jobRequest.applicationName = $appName
+	$request.jobRequest.user = $env:USERNAME
+	$ji = Invoke-RestMethod -Uri http://localhost:50813/api/ws/ji -Method Post -Body $request -ContentType "application/xml"
+
+	# Check the status of the job instance - one just has to refresh the JI for this.
+	$ji = Invoke-RestMethod -Uri http://localhost:50813/api/ws/ji/$($ji.jobInstance.id)
+	$ji.jobInstance | select id, applicationName, state -ExpandProperty messages
+
+	# We could also do a query instead of doing the previous explicit "lookup by id" API. The following line will create an empty query.
+	$query = Invoke-RestMethod -Uri http://localhost:50813/api/ws/ji/query
+	# As the query is empty, it has no usefull attributes (JAXB does not translate null as an empty tag but removes them). We must explicitely add them.
+	$query.query.AppendChild($query.CreateElement("jobInstanceId"))
+	$query.query.jobInstanceId = $ji.jobInstance.id
+	$res = Invoke-RestMethod -Uri http://localhost:50813/api/ws/ji/query -Method Post -Body $query -ContentType "application/xml"
+	# Display the status of the one instance returned (only one result, so no need for index)
+	$res.query.instances.instance

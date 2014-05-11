@@ -328,4 +328,21 @@ public class QueueOperation implements JqmClient
         log.debug("calling WS getJobDefinitions-app");
         return JqmClientFactory.getClient().getJobDefinitions(application);
     }
+
+    @Path("ji/query")
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    public Query getEmptyQuery()
+    {
+        return Query.create();
+    }
+
+    @Path("jr")
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    public JobRequest getEmptyJobRequest()
+    {
+        return new JobRequest("appName", "rsapi user");
+    }
+
 }
