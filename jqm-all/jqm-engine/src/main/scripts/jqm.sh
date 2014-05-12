@@ -28,10 +28,25 @@ fi
 
 
 JQM_PID_FILE=jqm_${JQM_NODE}.pid
-JQM_LOG_OUT_FILE=logs/jqm_${JQM_NODE}_out.log
-JQM_LOG_ERR_FILE=logs/jqm_${JQM_NODE}_err.log
+JQM_LOG_OUT_FILE=logs/jqm_${JQM_NODE}_out
+JQM_LOG_ERR_FILE=logs/jqm_${JQM_NODE}_err
+STDOUT_NPIPE=logs/stdout_$$.pipe
+STDERR_NPIPE=logs/stderr_$$.pipe
 JQM_LOG_HISTORY=30  # Days of log history to keep
 
+# Helper function to log output with rotation on time basis (per hour)
+# Arg 1 is log file prefix
+log_rotate() {
+	while read i
+    do
+        echo "$i" >> $1_$(date +%Y.%m.%d-%H).log
+    done
+}
+
+# Helper function to cleanup log pipes
+remove_npipes() {
+	rm logs/stdout_*.pipe logs/stderr_*.pipe > /dev/null 2>&1
+}
 
 #############################################
 #### Start/Stop/Restart/Status functions ####
@@ -55,21 +70,24 @@ jqm_start() {
                 	exit 1
         	fi
         fi
-	# Rotate previous logs if it exceeds 10 Mo
+	# Remove old logs
 	for JQM_LOG_FILE in $JQM_LOG_OUT_FILE $JQM_LOG_ERR_FILE
 	do
-		if [[ -e $JQM_LOG_FILE ]] && [[  $(du -sm $JQM_LOG_FILE | awk '{ print $1 }') -gt 10 ]]
-		then
-			mv $JQM_LOG_FILE ${JQM_LOG_FILE}.$(date +%Y%m%H%M%S)
-			find logs -name "$(basename ${JQM_LOG_FILE})*" -mtime +${JQM_LOG_HISTORY} | xargs -r rm
-		fi
+		find logs -name "$(basename ${JQM_LOG_FILE})*.log" -mtime +${JQM_LOG_HISTORY} | xargs -r rm
 	done
 	# We can go on...
 	if [[ $1 == "console" ]]
 	then
 		$JAVA -jar $JQM_JAR -startnode $JQM_NODE
 	else
-		nohup $JAVA -jar $JQM_JAR -startnode $JQM_NODE > $JQM_LOG_OUT_FILE 2> $JQM_LOG_ERR_FILE &
+		remove_npipes
+		mknod $STDOUT_NPIPE p
+		mknod $STDERR_NPIPE p
+		log_rotate <$STDOUT_NPIPE $JQM_LOG_OUT_FILE &
+		log_rotate <$STDERR_NPIPE $JQM_LOG_ERR_FILE &
+		exec 1> $STDOUT_NPIPE
+		exec 2> $STDERR_NPIPE
+		nohup $JAVA -jar $JQM_JAR -startnode $JQM_NODE &
 		JQM_PID=$!
 		echo $JQM_PID > ${JQM_PID_FILE}
 		echo "JQM Started with pid ${JQM_PID}"
@@ -90,6 +108,7 @@ jqm_stop() {
 	echo "Killing process $JQM_PID"
 	kill $JQM_PID
 	rm ${JQM_PID_FILE}
+	remove_npipes
 }
 
 jqm_status() {
@@ -108,6 +127,7 @@ jqm_status() {
 		echo "PID file is here (${JQM_PID_FILE}) but JQM daemon is gone..."
 		echo "Cleaning up pid file"
 		rm ${JQM_PID_FILE}
+		remove_npipes
 		exit 1
 	else
 		echo "JQM is running with PID ${JQM_PID}"
