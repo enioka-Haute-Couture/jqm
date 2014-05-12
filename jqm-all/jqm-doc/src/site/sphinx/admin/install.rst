@@ -22,7 +22,7 @@ The following script will download and copy the binaries (adapt the first two li
 	$JQM_ROOT = "C:\TEMP\jqm"
 	$JQM_VERSION = "${project.version}"
 	mkdir -Force $JQM_ROOT; cd $JQM_ROOT
-	Invoke-RestMethod https://github.com/enioka/jqm/archive/jqm-$JQM_VERSION.zip -OutFile jqm.zip
+	Invoke-RestMethod https://github.com/enioka/jqm/releases/download/jqm-all-$JQM_VERSION/jqm-engine-$JQM_VERSION.zip -OutFile jqm.zip
 	$shell = new-object -com shell.application
 	$zip = $shell.NameSpace((Resolve-Path .\jqm.zip).Path)
 	foreach($item in $zip.items()) { $shell.Namespace($JQM_ROOT).copyhere($item) }
@@ -46,12 +46,12 @@ Prerequisites:
 
 The following script will download and copy the binaries (adapt the first two lines). ::
 
-        JQM_ROOT = "/opt/jqm"
-        JQM_VERSION = "1.1.6"
+        JQM_ROOT="/opt/jqm"
+        JQM_VERSION="1.1.6"
         mkdir -p $JQM_ROOT; cd $JQM_ROOT
-        wget https://github.com/enioka/jqm/archive/jqm-$JQM_VERSION.taz.gz
-        tar xvf jqm-$JQM_VERSION.taz.gz
-        rm jqm-$JQM_VERSION.taz.gz
+        wget https://github.com/enioka/jqm/releases/download/jqm-all-$JQM_VERSION/jqm-engine-$JQM_VERSION.tar.gz
+        tar xvf jqm-engine-$JQM_VERSION.tar.gz
+        rm jqm-engine-$JQM_VERSION.tar.gz
         mv jqm-*/* .
         rmdir jqm-*
         
