@@ -10,7 +10,8 @@ ACTION=$1
 # Go to JQM DIR. This is needed as JQM builds its path from its starting dir
 cd $(dirname $0)
 
-JQM_JAR="jqm.jar"
+JQM_JAR="jqm.jar"  # Name of JQM Java archive file
+WAITING_TIME=70    # Seconds to wait for JQM to shutdown gracefully
 
 if [[ $JQM_NODE == "" ]]
 then
@@ -105,8 +106,28 @@ jqm_stop() {
         	exit 1
 	fi
 	JQM_PID=$(cat ${JQM_PID_FILE})
-	echo "Killing process $JQM_PID"
+	echo "Sending SIGTERM to process $JQM_PID and waiting for graceful shutdown."
+	GRACEFUL_KILL="no"
 	kill $JQM_PID
+	while [ $(( WAITING_TIME -= 1 )) -ge 0 ]
+	do
+		printf "."
+		ps -p $JQM_PID > /dev/null 2>&1
+		if [[ $? -ne 0 ]]
+		then
+			GRACEFUL_KILL="yes"
+			break;
+		fi
+		sleep 1
+	done
+	echo ""
+	if [[ $GRACEFUL_KILL == "no" ]]
+	then
+		echo "JQM Engine did not respond to SIGTERM. Killing (SIGKILL) JQM Engine..."
+		kill -9 $JQM_PID
+	else
+		echo "JQM engine shutdown properly."
+	fi
 	rm ${JQM_PID_FILE}
 	remove_npipes
 }
@@ -115,10 +136,10 @@ jqm_status() {
 	test -e ${JQM_PID_FILE}
 	if [[ $? -ne 0 ]]
 	then
-        	echo "PID file not found (${JQM_PID_FILE})."
+       	echo "PID file not found (${JQM_PID_FILE})."
 		echo "Here are all jqm engine running on this host"
 		ps -ef |grep $JQM_JAR | grep -v grep
-        	exit 1
+       	exit 1
 	fi
 	JQM_PID=$(cat ${JQM_PID_FILE})
 	ps -p $JQM_PID > /dev/null 2>&1
