@@ -1,0 +1,13 @@
+<div>
+   <div class='gridClass' ng-grid='gridOptions'></div>
+   <button ng-click="neworaclepool()">New Oracle Pool</button>
+   <button ng-click="removealias()" ng-show="selected.length !== 0">Remove selected alias</button>
+   <button ng-click="savealias()" ng-show="selected.length !== 0">Save selected alias</button>
+   <input type="text" ng-minlength="3" ng-maxlength="50" ng-model="selected[0].name" ng-show="selected.length !== 0"/>
+
+   <div ng-show="selected.length !== 0">
+      <div class='gridClass' ng-grid='gridOptions2'></div>
+      <button ng-click="removeprms()" ng-show="selected2.length !== 0">Remove selected parameters</button>
+   </div>
+</div>
+

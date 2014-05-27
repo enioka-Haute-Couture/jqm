@@ -1,0 +1,13 @@
+<div>
+   Search: <input ng-model="query" /> Order by:
+   <select ng-model="sortvar">
+      <option value="name">name</option>
+      <option value="jmxRegistryPort">JMX</option>
+   </select>
+
+   <ul>
+      <li ng-repeat="node in nodes  | filter:query | orderBy:sortvar"><a href="#/node/{{node.id}}"> {{node.name}}</a></li>
+   </ul>
+
+</div>
+

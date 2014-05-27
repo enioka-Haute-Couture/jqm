@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" ng-app="jqmApp">
+<head>
+<meta charset="utf-8">
+<title>JQM administration</title>
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/bootstrap.css">
+<link rel="stylesheet" href="css/ng-grid.css">
+<script src="libs/jquery-1.11.1.js"></script>
+<script src="libs/angular.js"></script>
+<script src="libs/angular-route.js"></script>
+<script src="libs/angular-resource.js"></script>
+<script src="libs/ui-bootstrap-tpls-0.11.0.js"></script>
+<script src="libs/ng-grid-2.0.11.js"></script>
+<script src="app.js"></script>
+<script src="controller/node.js"></script>
+<script src="controller/q.js"></script>
+<script src="controller/mapping.js"></script>
+<script src="controller/jndi.js"></script>
+<script src="service/data.js"></script>
+</head>
+
+<body>
+   <div ng-controller="AlertDemoCtrl">
+      <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}
+      <button ng-click="closeAlert($index)">X</button>
+      </alert>
+      <!--  <button class='btn btn-default' ng-click="addAlert()">Add Alert</button> -->
+   </div>
+   <ul class="nav nav-tabs" ng-controller="TabsCtrl">
+      <li ng-repeat="tab in tabs" ng-class="tabClass(tab)"><a href="{{tab.link}}" ng-click="setSelectedTab(tab)">{{tab.label}}</a></li>
+   </ul>
+   <div ng-view></div>
+
+
+
+</body>
+
+</html>
+
