@@ -82,7 +82,7 @@ function TabsCtrl($scope, $location)
 function AlertDemoCtrl($scope)
 {
 	$scope.alerts = [
-	{
+	/*{
 		type : 'danger',
 		msg : 'Oh snap!'
 	},

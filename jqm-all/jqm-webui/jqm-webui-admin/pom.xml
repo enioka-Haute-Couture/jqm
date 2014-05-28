@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
-<project
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.enioka.jqm</groupId>
@@ -13,6 +12,10 @@
 	<name>jqm-webui-admin</name>
 	<packaging>war</packaging>
 
+	<properties>
+		<jersey-version>2.6</jersey-version>
+	</properties>
+
 	<url>http://maven.apache.org</url>
 
 	<dependencies>
@@ -23,8 +26,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Jersey 2.x JAX-RS implementation, running inside a servlet, with a 
-			JSON mapper -->
+		<!-- Jersey 2.x JAX-RS implementation, running inside a servlet, with a JSON mapper -->
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-servlet</artifactId>
@@ -39,6 +41,12 @@
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-moxy</artifactId>
 			<version>${jersey-version}</version>
+		</dependency>
+		<!-- We impose a newer version of Moxy to avoid nasty bug 411001 (2.5.0 -> 2.5.1) -->
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>org.eclipse.persistence.moxy</artifactId>
+			<version>2.5.1</version>
 		</dependency>
 
 		<!-- We need an actual JPA2 implementation to run inside a servlet container -->

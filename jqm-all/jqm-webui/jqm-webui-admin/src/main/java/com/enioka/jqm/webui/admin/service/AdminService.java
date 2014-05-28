@@ -341,29 +341,40 @@ public class AdminService
 
     private JndiObjectResource setJndiResource(EntityManager em, JndiObjectResourceDto dto)
     {
-        JndiObjectResource n = null;
+        JndiObjectResource jpa = null;
 
         if (dto.getId() == null)
         {
-            n = new JndiObjectResource();
+            jpa = new JndiObjectResource();
         }
         else
         {
-            n = em.find(JndiObjectResource.class, dto.getId());
+            jpa = em.find(JndiObjectResource.class, dto.getId());
         }
 
-        n.setAuth(dto.getAuth());
-        n.setDescription(dto.getDescription());
-        n.setFactory(dto.getFactory());
-        n.setName(dto.getName());
-        n.setSingleton(dto.getSingleton());
-        n.setType(dto.getType());
+        jpa.setAuth(dto.getAuth());
+        jpa.setDescription(dto.getDescription());
+        jpa.setFactory(dto.getFactory());
+        jpa.setName(dto.getName());
+        jpa.setSingleton(dto.getSingleton());
+        jpa.setType(dto.getType());
 
-        n = em.merge(n);
+        jpa = em.merge(jpa);
+
+        List<JndiObjectResourceParameter> prmFromBefore = new ArrayList<JndiObjectResourceParameter>();
+        List<JndiObjectResourceParameter> prmNow = new ArrayList<JndiObjectResourceParameter>();
+        for (JndiObjectResourceParameter ee : jpa.getParameters())
+        {
+            prmFromBefore.add(ee);
+        }
 
         for (JndiObjectResourcePrmDto p : dto.getParameters())
         {
-            System.out.println(p.getKey());
+            if (p.getKey() == null || p.getKey().isEmpty() || p.getValue() == null || p.getValue().isEmpty())
+            {
+                continue;
+            }
+
             JndiObjectResourceParameter np = null;
             if (p.getId() == null)
             {
@@ -375,11 +386,26 @@ public class AdminService
             }
             np.setKey(p.getKey());
             np.setValue(p.getValue());
-            np.setResource(n);
-            em.merge(np);
+            np.setResource(jpa);
+            np = em.merge(np);
+            prmNow.add(np);
         }
 
-        return n;
+        // Remove parameters that are not present anymore
+        ml: for (JndiObjectResourceParameter presentbefore : prmFromBefore)
+        {
+            for (JndiObjectResourceParameter stillhere : prmNow)
+            {
+                if (stillhere.getId() == presentbefore.getId())
+                {
+                    continue ml;
+                }
+            }
+            jpa.getParameters().remove(presentbefore);
+            em.remove(presentbefore);
+        }
+
+        return jpa;
     }
 
     // Add one element to the collection => POST.
