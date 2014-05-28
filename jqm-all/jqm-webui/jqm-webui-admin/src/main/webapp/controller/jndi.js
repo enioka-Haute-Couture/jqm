@@ -167,7 +167,7 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
         columnDefs : [ {
             field : 'key',
             displayName : 'Resource parameter',
-            width : 180,
+            width : 160,
         }, {
             field : 'value',
             displayName : 'Value',

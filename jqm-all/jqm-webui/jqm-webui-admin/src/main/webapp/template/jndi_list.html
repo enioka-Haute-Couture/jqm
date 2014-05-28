@@ -1,28 +1,38 @@
-<div>
-    <div class='gridClass' ng-grid='gridOptions'></div>
-    <div>
-        <button ng-click="neworaclepool()">New Oracle Pool</button>
-        <button ng-click="newmysqlpool()">New MySQL Pool</button>
-        <button ng-click="newpspool()">New PostgreSQL Pool</button>
-        <button ng-click="newhsqldbpool()">New HSQLDB Pool</button>
-        <button ng-click="newotherpool()">New JDBC Pool (other databases)</button>
-    </div>
-    <div>
-        <button ng-click="newmqqcf()">New MQSeries QCF</button>
-        <button ng-click="newmqq()">New MQSeries Q</button>
-        <button ng-click="newamqqcf()">New AMQ QCF</button>
-        <button ng-click="newamqq()">New AMQ Q</button>
-    </div>
-    <div>
-        <button ng-click="newfile()">New File</button>
-        <button ng-click="newurl()">New URL</button>
-        <button ng-click="newgeneric()">New generic resource</button>
-    </div>
-    <button ng-click="removealias()" ng-show="selected.length !== 0">Remove selected alias</button>
-    <button ng-click="savealias()" ng-show="selected.length !== 0">Save selected alias</button>
-    <div ng-show="selected.length !== 0">
-        <div class='gridClass' ng-grid='gridOptions2'></div>
-        <button ng-click="removeprms()" ng-show="selected2.length !== 0">Remove selected parameters</button>
-        <button ng-click="addprm()">Add new parameter</button>
-    </div>
-</div>
+<table>
+    <tr>
+        <td style="width: 1px;">
+            <div class='gridClass' style="width: 65em;" ng-grid='gridOptions'></div>
+        </td>
+        <td ng-show="selected.length !== 0">
+            <div class='gridClass' style="width: 35em; margin-left: 10px;" ng-grid='gridOptions2'></div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div>
+                <button ng-click="neworaclepool()">New Oracle Pool</button>
+                <button ng-click="newmysqlpool()">New MySQL Pool</button>
+                <button ng-click="newpspool()">New PostgreSQL Pool</button>
+                <button ng-click="newhsqldbpool()">New HSQLDB Pool</button>
+                <button ng-click="newotherpool()">New JDBC Pool (other databases)</button>
+            </div>
+            <div>
+                <button ng-click="newmqqcf()">New MQSeries QCF</button>
+                <button ng-click="newmqq()">New MQSeries Q</button>
+                <button ng-click="newamqqcf()">New AMQ QCF</button>
+                <button ng-click="newamqq()">New AMQ Q</button>
+            </div>
+            <div>
+                <button ng-click="newfile()">New File</button>
+                <button ng-click="newurl()">New URL</button>
+                <button ng-click="newgeneric()">New generic resource</button>
+            </div>
+            <button ng-click="removealias()" ng-show="selected.length !== 0">Remove selected alias</button>
+            <button ng-click="savealias()" ng-show="selected.length !== 0">Save selected alias</button>
+        </td>
+        <td ng-show="selected.length !== 0" style="vertical-align: top;">
+            <button ng-click="addprm()">Add new parameter</button>
+            <button ng-click="removeprms()" ng-show="selected2.length !== 0">Remove selected parameters</button>
+        </td>
+    </tr>
+</table>
