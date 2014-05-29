@@ -3,6 +3,7 @@ package com.enioka.jqm.webui.admin.dto;
 import java.util.ArrayList;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
+import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JndiObjectResource;
 import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
 import com.enioka.jqm.jpamodel.Node;
@@ -69,6 +70,16 @@ public class Frontier
         {
             res.getParameters().add(new JndiObjectResourcePrmDto(p.getId(), p.getKey(), p.getValue()));
         }
+
+        return res;
+    }
+
+    public static GlobalParameterDto getDTO(GlobalParameter s)
+    {
+        GlobalParameterDto res = new GlobalParameterDto();
+        res.setId(s.getId());
+        res.setKey(s.getKey());
+        res.setValue(s.getValue());
 
         return res;
     }

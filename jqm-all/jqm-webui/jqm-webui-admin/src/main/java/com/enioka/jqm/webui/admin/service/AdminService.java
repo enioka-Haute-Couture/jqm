@@ -18,11 +18,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
+import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JndiObjectResource;
 import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.webui.admin.dto.Frontier;
+import com.enioka.jqm.webui.admin.dto.GlobalParameterDto;
 import com.enioka.jqm.webui.admin.dto.JndiObjectResourceDto;
 import com.enioka.jqm.webui.admin.dto.JndiObjectResourcePrmDto;
 import com.enioka.jqm.webui.admin.dto.NodeDTO;
@@ -45,6 +47,10 @@ public class AdminService
 
         return emf.createEntityManager();
     }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // Nodes
+    // ////////////////////////////////////////////////////////////////////////
 
     @GET
     @Path("node")
@@ -80,6 +86,10 @@ public class AdminService
             em.close();
         }
     }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // Queues
+    // ////////////////////////////////////////////////////////////////////////
 
     @GET
     @Path("q")
@@ -212,6 +222,10 @@ public class AdminService
         }
     }
 
+    // ////////////////////////////////////////////////////////////////////////
+    // Deployment parameters - queue mappings
+    // ////////////////////////////////////////////////////////////////////////
+
     @GET
     @Path("qmapping")
     @Produces(MediaType.APPLICATION_JSON)
@@ -299,6 +313,10 @@ public class AdminService
             em.close();
         }
     }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // JNDI
+    // ////////////////////////////////////////////////////////////////////////
 
     @GET
     @Path("jndi")
@@ -419,6 +437,161 @@ public class AdminService
         {
             em.getTransaction().begin();
             setJndiResource(em, queue);
+            em.getTransaction().commit();
+        }
+        finally
+        {
+            em.close();
+        }
+    }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // Global parameters
+    // ////////////////////////////////////////////////////////////////////////
+
+    // Must be called within a JPA transaction
+    private GlobalParameter setGlobalParameter(EntityManager em, GlobalParameterDto dto)
+    {
+        GlobalParameter n = null;
+
+        if (dto.getId() == null)
+        {
+            n = new GlobalParameter();
+        }
+        else
+        {
+            n = em.find(GlobalParameter.class, dto.getId());
+        }
+
+        // Update or set fields
+        n.setKey(dto.getKey());
+        n.setValue(dto.getValue());
+
+        // save
+        n = em.merge(n);
+
+        // Done
+        return n;
+    }
+
+    @GET
+    @Path("prm")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<GlobalParameterDto> getGlobalParameters()
+    {
+        List<GlobalParameterDto> res = new ArrayList<GlobalParameterDto>();
+        EntityManager em = getEm();
+
+        try
+        {
+            List<GlobalParameter> r = em.createQuery("SELECT n FROM GlobalParameter n", GlobalParameter.class).getResultList();
+            for (GlobalParameter n : r)
+            {
+                res.add(Frontier.getDTO(n));
+            }
+            return res;
+        }
+        finally
+        {
+            em.close();
+        }
+    }
+
+    @PUT
+    @Path("prm")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setGlobalParameters(List<GlobalParameterDto> dtos)
+    {
+        EntityManager em = getEm();
+        try
+        {
+            List<GlobalParameter> existBefore = em.createQuery("SELECT n FROM GlobalParameter n", GlobalParameter.class).getResultList();
+            List<GlobalParameter> existAfter = new ArrayList<GlobalParameter>();
+
+            em.getTransaction().begin();
+
+            // Update or create items
+            for (GlobalParameterDto dto : dtos)
+            {
+                existAfter.add(setGlobalParameter(em, dto));
+            }
+
+            // Delete old items
+            old: for (GlobalParameter before : existBefore)
+            {
+                for (GlobalParameter after : existAfter)
+                {
+                    if (before.getId().equals(after.getId()))
+                    {
+                        continue old;
+                    }
+                }
+                em.remove(before);
+            }
+
+            // Done
+            em.getTransaction().commit();
+        }
+        finally
+        {
+            em.close();
+        }
+    }
+
+    @POST
+    @Path("prm")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setGlobalParameter(GlobalParameterDto dto)
+    {
+        EntityManager em = getEm();
+        try
+        {
+            em.getTransaction().begin();
+            setGlobalParameter(em, dto);
+            em.getTransaction().commit();
+        }
+        finally
+        {
+            em.close();
+        }
+    }
+
+    @PUT
+    @Path("prm/{pId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setGlobalParameter(@PathParam("pId") Integer pId, GlobalParameterDto dto)
+    {
+        dto.setId(pId);
+        setGlobalParameter(dto);
+    }
+
+    @GET
+    @Path("prm/{pId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public GlobalParameterDto getGlobalParameter(@PathParam("pId") int pId)
+    {
+        EntityManager em = getEm();
+        try
+        {
+            return Frontier.getDTO(em.find(GlobalParameter.class, pId));
+        }
+        finally
+        {
+            em.close();
+        }
+    }
+
+    @DELETE
+    @Path("prm/{pId}")
+    public void deleteGlobalParameter(@PathParam("pId") Integer pId)
+    {
+        EntityManager em = getEm();
+        GlobalParameter q = null;
+        try
+        {
+            q = em.find(GlobalParameter.class, pId);
+            em.getTransaction().begin();
+            em.remove(q);
             em.getTransaction().commit();
         }
         finally
