@@ -7,6 +7,7 @@ import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JndiObjectResource;
 import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
 import com.enioka.jqm.jpamodel.JobDef;
+import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.webui.admin.dto.GlobalParameterDto;
@@ -129,6 +130,19 @@ public class Jpa2Dto
         res.setApplicationName(d.getApplicationName());
         res.setCanBeRestarted(d.isCanBeRestarted());
         res.setDescription(d.getDescription());
+        res.setHighlander(d.isHighlander());
+        res.setJarPath(d.getJarPath());
+        res.setJavaClassName(d.getJavaClassName());
+        res.setKeyword1(d.getKeyword1());
+        res.setKeyword2(d.getKeyword2());
+        res.setKeyword3(d.getKeyword3());
+        res.setModule(d.getModule());
+        res.setQueueId(d.getQueue().getId());
+
+        for (JobDefParameter p : d.getParameters())
+        {
+            res.getParameters().add(new ParameterDto(p.getId(), p.getKey(), p.getValue()));
+        }
 
         return res;
     }

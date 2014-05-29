@@ -16,6 +16,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
@@ -67,8 +68,8 @@ public class AdminService
         }
         catch (Exception e)
         {
-            e.printStackTrace();
-            return null;
+            throw new ErrorDto("The server failed to list all objects of type " + jpaClass.getSimpleName(), 2, e,
+                    Status.INTERNAL_SERVER_ERROR);
         }
         finally
         {
@@ -81,7 +82,13 @@ public class AdminService
         EntityManager em = getEm();
         try
         {
-            return Jpa2Dto.<D> getDTO(em.find(jpaClass, id));
+            D res = Jpa2Dto.<D> getDTO(em.find(jpaClass, id));
+            if (res == null)
+            {
+                throw new ErrorDto("There is no object of type " + jpaClass.getSimpleName() + " in the database with ID " + id + ".",
+                        "An attempt was made to GET an object that does not exist by a client", 1, Status.NOT_FOUND);
+            }
+            return res;
         }
         finally
         {
@@ -96,6 +103,11 @@ public class AdminService
         try
         {
             j = em.find(jpaClass, id);
+            if (j == null)
+            {
+                throw new ErrorDto("There is no object of type " + jpaClass.getSimpleName() + " in the database",
+                        "An attempt was made to DELETE an object that does not exist by a client", 3, Status.NOT_FOUND);
+            }
             em.getTransaction().begin();
             em.remove(j);
             em.getTransaction().commit();

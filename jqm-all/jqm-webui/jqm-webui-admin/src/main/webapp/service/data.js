@@ -66,3 +66,15 @@ jqmServices.factory('µPrmDto', function($resource)
         },
     });
 });
+
+jqmServices.factory('µJdDto', function($resource)
+{
+    return $resource('admin/jd/:id', {
+        id : ''
+    }, {
+        saveAll : {
+            method : 'PUT',
+            isArray : true
+        },
+    });
+});

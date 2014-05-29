@@ -1,0 +1,22 @@
+<div>
+    <alert type="danger">
+    <div>
+    {{$location.path()}}
+        <span>{{error.userReadableMessage}}</span>
+
+        <button class="btn btn-default" ng-click="isCollapsed = !isCollapsed">Show developer information</button>
+        <div collapse="! isCollapsed">
+            <div class="well well-lg">
+                <div>Error code: {{error.errorCode}}</div>
+                <div>
+                    <span>Debug message: </span> <span>{{error.developerMessage}}</span>
+                </div>
+                <div>
+                    <div>Stacktrace:</div>
+                    <span style="white-space: pre;">{{error.stacktrace}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    </alert>
+</div>

@@ -12,7 +12,18 @@ jqmControllers.controller('µNodeListCtrl', function($scope, $http, µNodeDto)
 jqmControllers.controller('µNodeDetailCtrl', [ '$scope', '$routeParams', 'µNodeDto', function($scope, $routeParams, µNodeDto)
 {
     $scope.nodeId = $routeParams.nodeId;
+    $scope.error = null;
+
+    $scope.error = function(errorResult)
+    {
+        console.debug(errorResult);
+        $scope.error = errorResult.data;
+    };
+
     $scope.node = µNodeDto.get({
         id : $routeParams.nodeId
-    });
+    }, function()
+    {
+    }, $scope.error);
+
 } ]);

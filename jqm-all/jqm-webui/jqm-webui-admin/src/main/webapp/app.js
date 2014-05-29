@@ -22,8 +22,11 @@ jqmApp.config([ '$routeProvider', function($routeProvider)
     }).when('/prm', {
         templateUrl : 'template/prm_list.html',
         controller : 'µPrmListCtrl'
+    }).when('/jd', {
+        templateUrl : 'template/jd_list.html',
+        controller : 'µJdListCtrl'
     }).otherwise({
-        redirectTo : '/prm'
+        redirectTo : '/jd'
     });
 } ]);
 
@@ -44,6 +47,9 @@ function TabsCtrl($scope, $location)
     }, {
         link : '#/prm',
         label : 'Cluster-wide parameters'
+    }, {
+        link : '#/jd',
+        label : 'Job definitions'
     }, ];
 
     $scope.selectedTab = $scope.tabs[0];
@@ -73,25 +79,4 @@ function TabsCtrl($scope, $location)
             return "";
         }
     };
-}
-
-function AlertDemoCtrl($scope)
-{
-    $scope.alerts = [
-    /*
-     * { type : 'danger', msg : 'Oh snap!' }, /* { type : 'success', msg : 'Well done! You successfully read this important alert message.' }
-     */];
-
-    $scope.addAlert = function()
-    {
-        $scope.alerts.push({
-            msg : 'Another alert!'
-        });
-    };
-
-    $scope.closeAlert = function(index)
-    {
-        $scope.alerts.splice(index, 1);
-    };
-
 }
