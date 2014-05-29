@@ -5,19 +5,19 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class JndiObjectResourcePrmDto implements Serializable
+public class ParameterDto implements Serializable
 {
     private static final long serialVersionUID = -8561440788482185421L;
 
     private Integer id;
     private String key, value;
 
-    public JndiObjectResourcePrmDto()
+    public ParameterDto()
     {
         // Java bean convention
     }
 
-    public JndiObjectResourcePrmDto(Integer id, String key, String value)
+    public ParameterDto(Integer id, String key, String value)
     {
         this.id = id;
         this.key = key;

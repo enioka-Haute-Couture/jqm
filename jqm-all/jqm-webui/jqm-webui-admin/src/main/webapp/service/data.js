@@ -1,8 +1,8 @@
 var jqmServices = angular.module('jqmServices', [ 'ngResource' ]);
 
-jqmServices.factory('µNodeService', [ '$resource', function($resource)
+jqmServices.factory('µNodeDto', [ '$resource', function($resource)
 {
-    return $resource('admin/node/:nodeId', {}, {
+    return $resource('admin/node/:id', {}, {
         query : {
             method : 'GET',
             params : {
@@ -15,8 +15,8 @@ jqmServices.factory('µNodeService', [ '$resource', function($resource)
 
 jqmServices.factory('µQueueDto', function($resource)
 {
-    return $resource('admin/q/:qId', {
-        qId : ''
+    return $resource('admin/q/:id', {
+        id : ''
     }, {
         query : {
             method : 'GET',
@@ -38,8 +38,8 @@ jqmServices.factory('µQueueDto', function($resource)
 
 jqmServices.factory('µQueueMappingDto', function($resource)
 {
-    return $resource('admin/qmapping/:mId', {
-        mId : ''
+    return $resource('admin/qmapping/:id', {
+        id : ''
     }, {
         saveAll : {
             method : 'PUT',
@@ -50,15 +50,15 @@ jqmServices.factory('µQueueMappingDto', function($resource)
 
 jqmServices.factory('µJndiDto', function($resource)
 {
-    return $resource('admin/jndi/:mId', {
-        mId : ''
+    return $resource('admin/jndi/:id', {
+        id : ''
     });
 });
 
 jqmServices.factory('µPrmDto', function($resource)
 {
-    return $resource('admin/prm/:pId', {
-        pId : ''
+    return $resource('admin/prm/:id', {
+        id : ''
     }, {
         saveAll : {
             method : 'PUT',

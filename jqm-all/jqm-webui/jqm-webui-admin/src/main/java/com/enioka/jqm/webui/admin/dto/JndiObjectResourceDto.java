@@ -21,8 +21,8 @@ public class JndiObjectResourceDto implements Serializable
     private Boolean singleton = false;
 
     @XmlElementWrapper(name = "parameters")
-    @XmlElement(name = "parameter", type = JndiObjectResourcePrmDto.class)
-    private List<JndiObjectResourcePrmDto> parameters;
+    @XmlElement(name = "parameter", type = ParameterDto.class)
+    private List<ParameterDto> parameters;
 
     public Integer getId()
     {
@@ -94,12 +94,12 @@ public class JndiObjectResourceDto implements Serializable
         this.singleton = singleton;
     }
 
-    public void setParameters(List<JndiObjectResourcePrmDto> parameters)
+    public void setParameters(List<ParameterDto> parameters)
     {
         this.parameters = parameters;
     }
 
-    public List<JndiObjectResourcePrmDto> getParameters()
+    public List<ParameterDto> getParameters()
     {
         return parameters;
     }

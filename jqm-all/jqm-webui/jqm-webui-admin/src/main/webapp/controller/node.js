@@ -1,19 +1,18 @@
 'use strict';
 
-var jqmControllers = angular.module('jqmControllers', ['jqmConstants', 'jqmServices']);
+var jqmControllers = angular.module('jqmControllers', [ 'jqmConstants', 'jqmServices' ]);
 
-jqmControllers.controller('µNodeListCtrl', function($scope, $http, µNodeService)
+jqmControllers.controller('µNodeListCtrl', function($scope, $http, µNodeDto)
 {
-	$scope.nodes = µNodeService.query();
+    $scope.nodes = µNodeDto.query();
 
-	$scope.sortvar = 'jmxRegistryPort';
+    $scope.sortvar = 'jmxRegistryPort';
 });
 
-jqmControllers.controller('µNodeDetailCtrl', [ '$scope', '$routeParams', 'µNodeService', function($scope, $routeParams, µNodeService)
+jqmControllers.controller('µNodeDetailCtrl', [ '$scope', '$routeParams', 'µNodeDto', function($scope, $routeParams, µNodeDto)
 {
-	$scope.nodeId = $routeParams.nodeId;
-	$scope.node = µNodeService.get(
-	{
-		nodeId : $routeParams.nodeId
-	});
+    $scope.nodeId = $routeParams.nodeId;
+    $scope.node = µNodeDto.get({
+        id : $routeParams.nodeId
+    });
 } ]);
