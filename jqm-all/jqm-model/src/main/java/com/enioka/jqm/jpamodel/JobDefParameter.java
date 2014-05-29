@@ -94,4 +94,12 @@ public class JobDefParameter implements Serializable
     {
         this.value = value;
     }
+
+    /**
+     * A technical ID without special meaning.
+     */
+    public Integer getId()
+    {
+        return id;
+    }
 }
