@@ -6,6 +6,10 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.crypto.hash.Sha512Hash;
+import org.apache.shiro.util.ByteSource;
+
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JndiObjectResource;
@@ -326,10 +330,11 @@ class Dto2Jpa
             r.getUsers().add(jpa);
         }
 
-        // TODO: password hash & salt
         if (dto.getNewPassword() != null && !dto.getNewPassword().isEmpty())
         {
-            jpa.setPassword(dto.getNewPassword());
+            ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
+            jpa.setPassword(new Sha512Hash(dto.getNewPassword(), salt, 100000).toHex());
+            jpa.setHashSalt(salt.toHex());
         }
 
         // Done
