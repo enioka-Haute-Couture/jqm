@@ -78,3 +78,37 @@ jqmServices.factory('µJdDto', function($resource)
         },
     });
 });
+
+jqmServices.factory('µUserDto', function($resource)
+{
+    return $resource('admin/user/:id', {
+        id : ''
+    }, {
+        saveAll : {
+            method : 'PUT',
+            isArray : true
+        },
+    });
+});
+
+jqmServices.factory('µRoleDto', function($resource)
+{
+    return $resource('admin/role/:id', {
+        id : ''
+    }, {
+        saveAll : {
+            method : 'PUT',
+            isArray : true
+        },
+    });
+});
+
+jqmServices.factory('µUserPerms', function($resource)
+{
+    return $resource('admin/me', {}, {
+        query : {
+            method : 'GET',
+            isArray : false
+        },
+    });
+});

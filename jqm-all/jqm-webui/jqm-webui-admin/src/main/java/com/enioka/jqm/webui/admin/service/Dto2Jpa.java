@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.ws.rs.core.Response.Status;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
@@ -13,12 +14,17 @@ import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.jpamodel.RPermission;
+import com.enioka.jqm.jpamodel.RRole;
+import com.enioka.jqm.jpamodel.RUser;
 import com.enioka.jqm.webui.admin.dto.GlobalParameterDto;
 import com.enioka.jqm.webui.admin.dto.JndiObjectResourceDto;
 import com.enioka.jqm.webui.admin.dto.JobDefDto;
 import com.enioka.jqm.webui.admin.dto.ParameterDto;
 import com.enioka.jqm.webui.admin.dto.QueueDTO;
 import com.enioka.jqm.webui.admin.dto.QueueMappingDTO;
+import com.enioka.jqm.webui.admin.dto.RRoleDto;
+import com.enioka.jqm.webui.admin.dto.RUserDto;
 
 class Dto2Jpa
 {
@@ -49,6 +55,14 @@ class Dto2Jpa
         else if (dto instanceof QueueDTO)
         {
             return (J) setJpa(em, (QueueDTO) dto);
+        }
+        else if (dto instanceof RUserDto)
+        {
+            return (J) setJpa(em, (RUserDto) dto);
+        }
+        else if (dto instanceof RRoleDto)
+        {
+            return (J) setJpa(em, (RRoleDto) dto);
         }
         return null;
     }
@@ -273,4 +287,87 @@ class Dto2Jpa
         return jpa;
     }
 
+    private static RUser setJpa(EntityManager em, RUserDto dto)
+    {
+        RUser jpa = null;
+
+        if (dto.getId() == null)
+        {
+            jpa = new RUser();
+        }
+        else
+        {
+            jpa = em.find(RUser.class, dto.getId());
+        }
+
+        jpa.setCertificateThumbprint(dto.getCertificateThumbprint());
+        jpa.setEmail(dto.getEmail());
+        jpa.setExpirationDate(dto.getExpirationDate());
+        jpa.setFreeText(dto.getFreeText());
+        jpa.setLocked(dto.getLocked());
+        jpa.setLogin(dto.getLogin());
+
+        jpa = em.merge(jpa);
+
+        RRole r = null;
+        for (RRole ex : jpa.getRoles())
+        {
+            ex.getUsers().remove(jpa);
+            // jpa.getRoles().remove(ex);
+        }
+        for (Integer rid : dto.getRoles())
+        {
+            r = em.find(RRole.class, rid);
+            if (r == null)
+            {
+                throw new ErrorDto("Trying to associate an account with a non-existing role", "", 4, Status.BAD_REQUEST);
+            }
+            jpa.getRoles().add(r);
+            r.getUsers().add(jpa);
+        }
+
+        // TODO: password hash & salt
+        if (dto.getNewPassword() != null && !dto.getNewPassword().isEmpty())
+        {
+            jpa.setPassword(dto.getNewPassword());
+        }
+
+        // Done
+        return jpa;
+    }
+
+    private static RRole setJpa(EntityManager em, RRoleDto dto)
+    {
+        RRole jpa = null;
+
+        if (dto.getId() == null)
+        {
+            jpa = new RRole();
+        }
+        else
+        {
+            jpa = em.find(RRole.class, dto.getId());
+        }
+
+        jpa.setName(dto.getName());
+        jpa.setDescription(dto.getDescription());
+
+        jpa = em.merge(jpa);
+
+        for (RPermission perm : jpa.getPermissions())
+        {
+            em.remove(perm);
+        }
+        jpa.getPermissions().clear();
+        for (String perm : dto.getPermissions())
+        {
+            RPermission jp = new RPermission();
+            jp.setName(perm);
+            jp.setRole(jpa);
+            jpa.getPermissions().add(jp);
+        }
+
+        // Done
+        return jpa;
+    }
 }

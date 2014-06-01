@@ -1,12 +1,23 @@
 <div>
-   <ng-include src="'template/error_detail.html'"></ng-include>
-   <div><span>Name: </span><span>{{node.name}}</span></div>
-   <div><span>Listens on interface: </span><span>{{node.dns}}</span></div>
-   <div><span>HTTP port: </span><span>{{node.port}}</span></div>
-   <div><span>Output file directory: </span><span>{{node.outputDirectory}}</span></div>
-   <div><span>Job repository directory: </span><span>{{node.jobRepoDirectory}}</span></div>
-   <div><span>Log level: </span><span>{{node.rootLogLevel}}</span></div>
-   <div><span>Last seen alive: </span><span>{{node.lastSeenAlive}}</span></div>
-   <div><span>JMX registry TCP port: </span><span>{{node.jmxRegistryPort}}</span></div>
-   <div><span>JMX server TCP port: </span><span>{{node.jmxServerPort}}</span></div>
+    <ng-include src="'template/error_detail.html'"></ng-include>
+    <dl class="dl-horizontal">
+        <dt>Name</dt>
+        <dd>{{node.name}}</dd>
+        <dt>Listens on interface:</dt>
+        <dd>{{node.dns}}</dd>
+        <dt>HTTP port:</dt>
+        <dd>{{node.port}}</dd>
+        <dt>Output file directory:</dt>
+        <dd>{{node.outputDirectory}}</dd>
+        <dt>Job repository directory:</dt>
+        <dd>{{node.jobRepoDirectory}}</dd>
+        <dt>Log level:</dt>
+        <dd>{{node.rootLogLevel}}</dd>
+        <dt>Last seen alive:</dt>
+        <dd>{{node.lastSeenAlive}}</dd>
+        <dt>JMX registry TCP port:</dt>
+        <dd>{{node.jmxRegistryPort}}</dd>
+        <dt>JMX server TCP port:</dt>
+        <dd>{{node.jmxServerPort}}</dd>
+    </dl>
 </div>

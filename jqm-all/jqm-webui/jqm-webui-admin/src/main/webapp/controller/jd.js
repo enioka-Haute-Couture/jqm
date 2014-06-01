@@ -65,15 +65,17 @@ jqmControllers.controller('µJdListCtrl', function($scope, $http, µJdDto)
                 {
                     field : 'description',
                     displayName : 'Description',
-                    width : '****',
+                    width : '***',
                 },
                 {
                     field : 'javaClassName',
-                    displayName : 'Class to launch'
+                    displayName : 'Class to launch',
+                    width : '**',
                 },
                 {
                     field : 'jarPath',
-                    displayName : 'Path to the jar (relative to repo)'
+                    displayName : 'Path to the jar (relative to repo)',
+                    width : '***',
                 },
                 {
                     field : 'canBeRestarted',

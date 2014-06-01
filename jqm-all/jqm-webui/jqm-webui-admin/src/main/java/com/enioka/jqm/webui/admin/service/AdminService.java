@@ -7,6 +7,7 @@ import java.util.Properties;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -15,8 +16,11 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
+
+import org.apache.shiro.SecurityUtils;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
@@ -24,19 +28,25 @@ import com.enioka.jqm.jpamodel.JndiObjectResource;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.jpamodel.RPermission;
+import com.enioka.jqm.jpamodel.RRole;
+import com.enioka.jqm.jpamodel.RUser;
 import com.enioka.jqm.webui.admin.dto.GlobalParameterDto;
 import com.enioka.jqm.webui.admin.dto.JndiObjectResourceDto;
 import com.enioka.jqm.webui.admin.dto.JobDefDto;
 import com.enioka.jqm.webui.admin.dto.NodeDTO;
+import com.enioka.jqm.webui.admin.dto.PemissionsBagDto;
 import com.enioka.jqm.webui.admin.dto.QueueDTO;
 import com.enioka.jqm.webui.admin.dto.QueueMappingDTO;
+import com.enioka.jqm.webui.admin.dto.RRoleDto;
+import com.enioka.jqm.webui.admin.dto.RUserDto;
 
 @Path("/")
 public class AdminService
 {
     private static EntityManagerFactory emf;
 
-    private synchronized static EntityManager getEm()
+    public synchronized static EntityManager getEm()
     {
         if (emf == null)
         {
@@ -188,6 +198,7 @@ public class AdminService
     @Produces(MediaType.APPLICATION_JSON)
     public NodeDTO getNode(@PathParam("id") int id)
     {
+        System.out.println(SecurityUtils.getSubject().getPrincipal());
         return getDto(Node.class, id);
     }
 
@@ -430,7 +441,7 @@ public class AdminService
     @PUT
     @Path("jd/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setJobDef(@PathParam("id") Integer id, GlobalParameterDto dto)
+    public void setJobDef(@PathParam("id") Integer id, JobDefDto dto)
     {
         dto.setId(id);
         setItem(dto);
@@ -449,5 +460,139 @@ public class AdminService
     public void deleteJobDef(@PathParam("id") Integer id)
     {
         deleteItem(JobDef.class, id);
+    }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // User
+    // ////////////////////////////////////////////////////////////////////////
+
+    @GET
+    @Path("user")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<RUserDto> getUsers()
+    {
+        return getDtoList(RUser.class);
+    }
+
+    @PUT
+    @Path("user")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setUsers(List<RUserDto> dtos)
+    {
+        setItems(RUser.class, dtos);
+    }
+
+    @GET
+    @Path("user/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public RUserDto getUser(@PathParam("id") int id)
+    {
+        return getDto(RUser.class, id);
+    }
+
+    @PUT
+    @Path("user/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setUser(@PathParam("id") Integer id, RUserDto dto)
+    {
+        dto.setId(id);
+        setItem(dto);
+    }
+
+    @POST
+    @Path("user")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setUser(RUserDto dto)
+    {
+        setItem(dto);
+    }
+
+    @DELETE
+    @Path("user/{id}")
+    public void deleteUser(@PathParam("id") Integer id)
+    {
+        deleteItem(RUser.class, id);
+    }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // Role
+    // ////////////////////////////////////////////////////////////////////////
+
+    @GET
+    @Path("role")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<RRoleDto> getRoles()
+    {
+        return getDtoList(RRole.class);
+    }
+
+    @PUT
+    @Path("role")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setRoles(List<RRoleDto> dtos)
+    {
+        setItems(RRole.class, dtos);
+    }
+
+    @GET
+    @Path("role/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public RRoleDto getRole(@PathParam("id") int id)
+    {
+        return getDto(RRole.class, id);
+    }
+
+    @PUT
+    @Path("role/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setRole(@PathParam("id") Integer id, RRoleDto dto)
+    {
+        dto.setId(id);
+        setItem(dto);
+    }
+
+    @POST
+    @Path("role")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setRole(RRoleDto dto)
+    {
+        setItem(dto);
+    }
+
+    @DELETE
+    @Path("role/{id}")
+    public void deleteRole(@PathParam("id") Integer id)
+    {
+        deleteItem(RRole.class, id);
+    }
+
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("me")
+    public PemissionsBagDto getMyself(@Context HttpServletRequest req)
+    {
+        System.out.println("RRRRRRRRRRRR");
+        System.out.println(req.getUserPrincipal().getName());
+        EntityManager em = getEm();
+        List<String> res = new ArrayList<String>();
+        RUser memyselfandi = em.createQuery("SELECT u FROM RUser u WHERE u.login = :l", RUser.class)
+                .setParameter("l", req.getUserPrincipal().getName()).getSingleResult();
+
+        for (RRole r : memyselfandi.getRoles())
+        {
+            for (RPermission p : r.getPermissions())
+            {
+                res.add(p.getName());
+            }
+        }
+
+        System.out.println(res);
+
+        em.close();
+        System.out.println("end....");
+
+        PemissionsBagDto b = new PemissionsBagDto();
+        b.permissions = res;
+        return b;
     }
 }

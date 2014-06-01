@@ -1,10 +1,8 @@
-<div>
+<div ng-show="error">
     <alert type="danger">
     <div>
-    {{$location.path()}}
         <span>{{error.userReadableMessage}}</span>
-
-        <button class="btn btn-default" ng-click="isCollapsed = !isCollapsed">Show developer information</button>
+        <button class="btn btn-default" ng-click="isCollapsed = !isCollapsed">Show advanced data</button>
         <div collapse="! isCollapsed">
             <div class="well well-lg">
                 <div>Error code: {{error.errorCode}}</div>

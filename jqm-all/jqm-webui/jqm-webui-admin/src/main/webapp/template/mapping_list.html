@@ -1,9 +1,10 @@
 <div>
     <div class='gridClass' ng-grid='gridOptions'></div>
 
-    <button ng-click="newmapping()" ng-disabled="bDbBusy">New mapping</button>
-    <button ng-click="save()" ng-disabled="bDbBusy">Save mappings</button>
-    <button ng-click="refresh()" ng-disabled="bDbBusy">Refresh</button>
-    <button ng-click="remove()" ng-disabled="bDbBusy || selected.length === 0">Delete selected</button>
+    <button class="btn btn-default" ng-click="newmapping()" ng-disabled="bDbBusy" jqm-permission="qmapping:create">New mapping</button>
+    <button class="btn btn-default" ng-click="save()" ng-disabled="bDbBusy" jqm-permission="qmapping:create">Save mappings</button>
+    <button class="btn btn-default" ng-click="refresh()" ng-disabled="bDbBusy" jqm-permission="qmapping:read">Refresh</button>
+    <button class="btn btn-default" ng-click="remove()" ng-disabled="bDbBusy || selected.length === 0" jqm-permission="qmapping:delete">Delete
+        selected</button>
 </div>
 

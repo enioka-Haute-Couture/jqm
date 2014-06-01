@@ -1,0 +1,81 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-2">
+            Search:
+            <input ng-model="queryStr" />
+            <select class="form-control" style="overflow: auto; height: 100%;" ng-model="role" size="25"
+                ng-options="o as o.name for o in roles | filter: queryStr  | orderBy: name"
+            ></select>
+            <button class="btn btn-default" ng-click="newitem()">New role</button>
+            <button class="btn btn-default" ng-click="refresh()">Refresh</button>
+        </div>
+
+        <div class="col-xs-10" ng-show="role">
+            <div class="form-horizontal" style="max-width: 750px;">
+                <div class="form-group">
+                    <label for="txtName" class="col-sm-2 control-label">Name</label>
+                    <div class="col-sm-10">
+                        <input id="txtName" class="form-control" type="text" ng-model="role.name" />
+                        <span class="help-block">Name of the role. Must be unique.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-horizontal" style="max-width: 750px;">
+                <div class="form-group">
+                    <label for="txtDescription" class="col-sm-2 control-label">Description</label>
+                    <div class="col-sm-10">
+                        <input id="txtDescription" class="form-control" type="text" ng-model="role.description" />
+                        <span class="help-block">What the role does.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-horizontal" style="max-width: 750px;">
+                <div class="form-group">
+                    <label for="lsPerm" class="col-sm-2 control-label">Permissions</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <label>Can </label>
+                            <select ng-model="verb">
+                                <option value="read">read</option>
+                                <option value="create">create</option>
+                                <option value="update">update</option>
+                                <option value="delete">delete</option>
+                                <option value="*">do everything on</option>
+                            </select>
+                            <label> objects of type </label>
+                            <select ng-model="noun">
+                                <option value="node">node</option>
+                                <option value="queue">queue</option>
+                                <option value="qmapping">mapping</option>
+                                <option value="jndi">JNDI resource</option>
+                                <option value="prm">parameter</option>
+                                <option value="jd">job definition</option>
+                                <option value="user">user</option>
+                                <option value="role">role</option>
+                                <option value="*">all types</option>
+                            </select>
+                            <button ng-click="addperm()">add permission</button>
+                        </div>
+                        <select id="lsPerm" class="form-control" size="10" multiple ng-options="r for r in role.permissions" ng-model="perm"
+                            ng-dblclick="removeperm()"
+                        />
+                        <span class="help-block">What the role can do. Use * for all sub permissions</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button class="btn btn-default" ng-click="saveitem()">
+                        Save role {{role.id}} <span style="color: green;" class="glyphicon glyphicon-ok">
+                    </button>
+                    <button class="btn btn-default" ng-click="deleteitem()">
+                        Delete role {{role.id}} <span style="color: red;" class="glyphicon glyphicon-remove"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

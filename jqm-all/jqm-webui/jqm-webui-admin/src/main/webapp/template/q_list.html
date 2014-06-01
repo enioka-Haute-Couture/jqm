@@ -1,8 +1,8 @@
 <div>
     <div class='gridClass' ng-grid='gridOptions'></div>
-    <button ng-click="newqueue()">New Queue</button>
-    <button ng-click="save()">Save queues</button>
-    <button ng-click="refresh()">Refresh</button>
-    <button ng-click="remove()" ng-disabled="selected.length === 0">Delete selected</button>
+    <button class="btn btn-default" ng-click="newqueue()" jqm-permission="prm:create">New Queue</button>
+    <button class=" btn btn-default" ng-click="save()" jqm-permission="prm:create">Save queues</button>
+    <button class="btn btn-default" ng-click="refresh()" jqm-permission="prm:read">Refresh</button>
+    <button class="btn btn-default" ng-click="remove()" ng-disabled="selected.length === 0" jqm-permission="prm:delete">Delete selected</button>
 </div>
 

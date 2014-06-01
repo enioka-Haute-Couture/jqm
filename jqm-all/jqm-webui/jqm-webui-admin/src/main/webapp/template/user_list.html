@@ -1,0 +1,101 @@
+<div>
+    <table>
+        <tr>
+            <td style="padding-right: 10px; vertical-align: top;">
+                Search:
+                <input ng-model="queryStr" />
+                <select class="form-control" style="overflow: auto; width: 200px;" ng-model="usr" size="25"
+                    ng-options="o as o.login for o in users| filter: queryStr  | orderBy: login"
+                ></select>
+                <br />
+                <button class="btn btn-default" ng-click="newitem()">New user</button>
+                <button class="btn btn-default" ng-click="refresh()">Refresh</button>
+            </td>
+            <td>
+                <div class="form-horizontal" style="max-width: 750px;" ng-show="usr">
+                    <div class="form-group">
+                        <label for="txtLogin" class="col-sm-2 control-label">Login</label>
+                        <div class="col-sm-10">
+                            <input id="txtLogin" class="form-control" type="text" ng-model="usr.login" />
+                            <span class="help-block">Login or CN for a certificate)  Case insensitive. Must be unique.</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtFree" class="col-sm-2 control-label">Full name</label>
+                        <div class="col-sm-10">
+                            <input id="txtFree" class="form-control" type="text" ng-model="usr.freeText" />
+                            <span class="help-block">Optional description of the account (real name or service name)</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtMail" class="col-sm-2 control-label">E-mail</label>
+                        <div class="col-sm-10">
+                            <input id="txtMail" class="form-control" type="text" ng-model="usr.email" />
+                            <span class="help-block">Optional contact e-mail address</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="txtPassword" class="col-sm-2 control-label">Change password</label>
+                        <div class="col-sm-10">
+                            <input id="txtPassword" class="form-control" type="text" ng-model="usr.newPassword" />
+                            <span class="help-block">Leave empty to leave password untouched on save. Passwords are ignored if a certificate is
+                                used.</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtCert" class="col-sm-2 control-label">Certificate thumbprint</label>
+                        <div class="col-sm-10">
+                            <input id="txtCert" class="form-control" type="text" ng-model="usr.certificateThumbprint" />
+                            <span class="help-block">The thumbprint to wait for, in the NN:NN:NN... format. Leave empty to use a password
+                                instead.</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dtExp" class="col-sm-2 control-label">Expiration</label>
+                        <div class="col-sm-10">
+                            <span class="input-group"><input id="dtExp" class="form-control" ng-model="usr.expirationDate" min-date="minDate"
+                                    is-open="opened" show-weeks="true" starting-day="1" init-date="minDate" year-range="10"
+                                    datepicker-popup="dd/MM/yyyy" datepicker-options="dateOptions"
+                                /> <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" ng-click="open($event)">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </button>
+                            </span> </span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cbLocked" class="col-sm-2 control-label">Locked</label>
+                        <div class="col-sm-10">
+                            <input id="cbLocked" class="form-control" type="checkbox" ng-model="usr.locked" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lsRoles" class="col-sm-2 control-label">Roles</label>
+                        <div class="col-sm-10">
+                            <select id="lsRoles" class="form-control" size="10" multiple ng-options="r.id as r.name for r in roles | orderBy: name"
+                                ng-model="usr.roles"
+                            />
+                            <span class="help-block">Use CTRL+click to select multiple roles</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button class="btn btn-default" ng-click="saveitem()">
+                                Save user {{usr.id}} <span style="color: green;" class="glyphicon glyphicon-ok">
+                            </button>
+                            <button class="btn btn-default" ng-click="deleteitem()">
+                                Delete user {{usr.id}} <span style="color: red;" class="glyphicon glyphicon-remove"></span>
+                            </button>
+                            (Created: <label id="txtCreation" class="form-label">{{usr.creationDate | date: 'dd/MM/yyyy HH:mm'}}</label>)
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>

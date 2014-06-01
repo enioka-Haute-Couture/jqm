@@ -10,6 +10,9 @@ import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.jpamodel.RPermission;
+import com.enioka.jqm.jpamodel.RRole;
+import com.enioka.jqm.jpamodel.RUser;
 import com.enioka.jqm.webui.admin.dto.GlobalParameterDto;
 import com.enioka.jqm.webui.admin.dto.JndiObjectResourceDto;
 import com.enioka.jqm.webui.admin.dto.ParameterDto;
@@ -17,6 +20,8 @@ import com.enioka.jqm.webui.admin.dto.JobDefDto;
 import com.enioka.jqm.webui.admin.dto.NodeDTO;
 import com.enioka.jqm.webui.admin.dto.QueueDTO;
 import com.enioka.jqm.webui.admin.dto.QueueMappingDTO;
+import com.enioka.jqm.webui.admin.dto.RRoleDto;
+import com.enioka.jqm.webui.admin.dto.RUserDto;
 
 @SuppressWarnings("unchecked")
 public class Jpa2Dto
@@ -47,6 +52,15 @@ public class Jpa2Dto
         {
             return (D) getDTO((JndiObjectResource) o);
         }
+        else if (o instanceof RUser)
+        {
+            return (D) getDTO((RUser) o);
+        }
+        else if (o instanceof RRole)
+        {
+            return (D) getDTO((RRole) o);
+        }
+
         return null;
     }
 
@@ -142,6 +156,42 @@ public class Jpa2Dto
         for (JobDefParameter p : d.getParameters())
         {
             res.getParameters().add(new ParameterDto(p.getId(), p.getKey(), p.getValue()));
+        }
+
+        return res;
+    }
+
+    private static RUserDto getDTO(RUser d)
+    {
+        RUserDto res = new RUserDto();
+        res.setCertificateThumbprint(d.getCertificateThumbprint());
+        res.setCreationDate(d.getCreationDate());
+        res.setExpirationDate(d.getExpirationDate());
+        res.setId(d.getId());
+        res.setLocked(d.getLocked());
+        res.setLogin(d.getLogin());
+        res.setNewPassword(null);
+        res.setFreeText(d.getFreeText());
+        res.setEmail(d.getEmail());
+
+        for (RRole r : d.getRoles())
+        {
+            res.getRoles().add(r.getId());
+        }
+
+        return res;
+    }
+
+    private static RRoleDto getDTO(RRole d)
+    {
+        RRoleDto res = new RRoleDto();
+        res.setDescription(d.getDescription());
+        res.setId(d.getId());
+        res.setName(d.getName());
+
+        for (RPermission p : d.getPermissions())
+        {
+            res.getPermissions().add(p.getName());
         }
 
         return res;

@@ -1,0 +1,20 @@
+<div class="container-fluid modal-dialog">
+    <div class="modal-body">
+        <div class="form-horizontal">
+            The resource you have requested is protected. Please use the following form to log in.
+            <div class="form-group">
+                <label for="txtLogin" class="col-sm-2 control-label">Login</label>
+                <div class="col-sm-10">
+                    <input id="txtLogin" class="form-control" type="text" ng-model="data.login" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="txtPassword" class="col-sm-2 control-label">Password</label>
+                <div class="col-sm-10">
+                    <input id="txtPassword" class="form-control" type="text" ng-model="data.password" />
+                </div>
+            </div>
+            <button class="btn btn-default" ng-click="logmein()" ng-disabled="!data.login || !data.password">Login</button>
+        </div>
+    </div>
+</div>

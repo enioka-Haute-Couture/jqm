@@ -14,7 +14,7 @@ jqmControllers.controller('µNodeDetailCtrl', [ '$scope', '$routeParams', 'µNod
     $scope.nodeId = $routeParams.nodeId;
     $scope.error = null;
 
-    $scope.error = function(errorResult)
+    $scope.onError = function(errorResult)
     {
         console.debug(errorResult);
         $scope.error = errorResult.data;
@@ -24,6 +24,6 @@ jqmControllers.controller('µNodeDetailCtrl', [ '$scope', '$routeParams', 'µNod
         id : $routeParams.nodeId
     }, function()
     {
-    }, $scope.error);
+    }, $scope.onError);
 
 } ]);

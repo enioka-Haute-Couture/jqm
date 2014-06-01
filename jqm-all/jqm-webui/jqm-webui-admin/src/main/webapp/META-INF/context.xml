@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context>
+<Context cookies="false">
 	<Resource name="jdbc/jqm" auth="Container" type="javax.sql.DataSource"
 		driverClassName="org.postgresql.Driver" url="jdbc:postgresql://centos1:5432/jqm"
 		username="jqm" password="jqm" maxActive="20" maxIdle="10" maxWait="-1" />

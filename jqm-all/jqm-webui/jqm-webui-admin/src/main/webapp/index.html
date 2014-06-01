@@ -9,6 +9,7 @@
 <script src="libs/jquery-1.11.1.js"></script>
 <script src="libs/angular.js"></script>
 <script src="libs/angular-route.js"></script>
+<script src="libs/angular-cookies.js"></script>
 <script src="libs/angular-resource.js"></script>
 <script src="libs/ui-bootstrap-tpls-0.11.0.js"></script>
 <script src="libs/ng-grid-2.0.11.js"></script>
@@ -19,17 +20,30 @@
 <script src="controller/jndi.js"></script>
 <script src="controller/prm.js"></script>
 <script src="controller/jd.js"></script>
+<script src="controller/user.js"></script>
+<script src="controller/role.js"></script>
 <script src="service/data.js"></script>
 <script src="constant/resource_template.js"></script>
 </head>
 
 <body>
-    <ul class="nav nav-tabs" ng-controller="TabsCtrl">
-        <li ng-repeat="tab in tabs" ng-class="tabClass(tab)"><a href="{{tab.link}}" ng-click="setSelectedTab(tab)">{{tab.label}}</a></li>
-    </ul>
-    <div ng-view></div>
+    <div id="wrap">
+
+        <ul class="nav nav-tabs" ng-controller="TabsCtrl">
+            <li ng-repeat="tab in tabs" ng-class="tabClass(tab)" jqm-permission="{{tab.permission}}"><a href="{{tab.link}}"
+                ng-click="setSelectedTab(tab)"
+            >{{tab.label}}</a></li>
+        </ul>
+        <div ng-view></div>
 
 
+        <div id="push"></div>
+    </div>
+
+    <div id="footer">
+        JQM administration, (C) 2014
+        <login-dialog />
+    </div>
 
 </body>
 

@@ -1,8 +1,8 @@
 <div>
-    <div class='gridClass' ng-grid='gridOptions'></div>
-    <button ng-click="newitem()">New definition</button>
-    <button ng-click="remove()" ng-disabled="selected.length === 0">Delete selected</button>
-    <button ng-click="refresh()">Refresh</button>
-    <button ng-click="save()">Save definitions</button>
+    <div class='gridClass' ng-grid='gridOptions' style='width: 1350px;'></div>
+    <button class="btn btn-default" ng-click="newitem()" jqm-permission="jd:create">New definition</button>
+    <button class="btn btn-default" ng-click="remove()" ng-disabled="selected.length === 0" jqm-permission="jd:delete">Delete selected</button>
+    <button class="btn btn-default" ng-click="refresh()">Refresh</button>
+    <button class="btn btn-default" ng-click="save()" jqm-permission="jd:create">Save definitions</button>
 </div>
 
