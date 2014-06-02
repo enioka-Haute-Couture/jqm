@@ -41,6 +41,10 @@ import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.ParameterExpression;
+import javax.persistence.criteria.Root;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -234,9 +238,13 @@ final class HibernateClient implements JqmClient
         JobDef job = null;
         try
         {
-            job = em.createQuery(
-                    "SELECT j FROM JobDef j LEFT JOIN FETCH j.queue LEFT JOIN FETCH j.parameters WHERE j.applicationName = :name",
-                    JobDef.class).setParameter("name", jd.getApplicationName()).getSingleResult();
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<JobDef> cq = cb.createQuery(JobDef.class);
+            Root<JobDef> j = cq.from(JobDef.class);
+            ParameterExpression<String> prm = cb.parameter(String.class);
+            cq.select(j).where(cb.equal(j.get("applicationName"), prm));
+
+            job = em.createQuery(cq).setParameter(prm, jd.getApplicationName()).getSingleResult();
         }
         catch (NoResultException ex)
         {

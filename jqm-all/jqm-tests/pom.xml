@@ -44,14 +44,13 @@
 		<module>jqm-test-missingapi</module>
 		<module>jqm-test-jndifile</module>
 		<module>jqm-test-waitall</module>
+		<module>jqm-test-emplusapi</module>
 	</modules>
 
 	<profiles>
-		<!-- Tests should produce a "test.jar" file - not a traditionally-named 
-			jar - to ease their use inside the engine auto tests. The dependency plugin 
-			creates that test.jar (by copying the artifact). (We do not actually rename 
-			the artifacts, as this would be contrary to Maven Central rules.) Renaming 
-			is inside a profile to avoid running it on the parent (pom-packaged) project -->
+		<!-- Tests should produce a "test.jar" file - not a traditionally-named jar - to ease their use inside the engine auto tests. The dependency 
+			plugin creates that test.jar (by copying the artifact). (We do not actually rename the artifacts, as this would be contrary to Maven Central 
+			rules.) Renaming is inside a profile to avoid running it on the parent (pom-packaged) project -->
 		<profile>
 			<activation>
 				<file>

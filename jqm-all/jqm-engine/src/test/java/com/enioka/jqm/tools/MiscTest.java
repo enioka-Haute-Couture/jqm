@@ -157,6 +157,40 @@ public class MiscTest extends JqmBaseTest
     }
 
     @Test
+    public void testJobWithPersistenceUnitAndEngineApi() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testJobWithPersistenceUnitAndEngineApi");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", em,
+                "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
+        CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em,
+                "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-emplusapi/target/test.jar", TestHelpers.qVip,
+                42, "jqm-test-emplusapi", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+
+        JobRequest j = new JobRequest("jqm-test-emplusapi", "MAG");
+        JqmClientFactory.getClient().enqueue(j);
+
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+
+        TestHelpers.waitFor(2, 10000, em);
+        engine1.stop();
+
+        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)
+                .setParameter("myId", jd.getId()).getResultList();
+
+        Assert.assertEquals(2, ji.size());
+        Assert.assertEquals(State.ENDED, ji.get(0).getState());
+        Assert.assertEquals(State.ENDED, ji.get(1).getState());
+    }
+
+    @Test
     public void testRemoteStop() throws Exception
     {
         jqmlogger.debug("**********************************************************");

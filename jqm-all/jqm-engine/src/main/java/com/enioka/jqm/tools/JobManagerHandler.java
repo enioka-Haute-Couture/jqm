@@ -183,7 +183,7 @@ class JobManagerHandler implements InvocationHandler
         {
             return addDeliverable((String) args[0], (String) args[1]);
         }
-        else if ("waitChild".equals(methodName) && classes.length == 1 && classes[0] == Integer.class)
+        else if ("waitChild".equals(methodName) && classes.length == 1 && (args[0] instanceof Integer))
         {
             waitChild((Integer) args[0]);
             return null;
