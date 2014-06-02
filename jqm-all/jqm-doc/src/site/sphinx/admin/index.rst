@@ -15,3 +15,4 @@
 	queues
 	resources
 	security
+	rest

@@ -2,7 +2,7 @@ var jqmServices = angular.module('jqmServices', [ 'ngResource' ]);
 
 jqmServices.factory('µNodeDto', [ '$resource', function($resource)
 {
-    return $resource('admin/node/:id', {}, {
+    return $resource('ws/admin/node/:id', {}, {
         query : {
             method : 'GET',
             params : {
@@ -15,7 +15,7 @@ jqmServices.factory('µNodeDto', [ '$resource', function($resource)
 
 jqmServices.factory('µQueueDto', function($resource)
 {
-    return $resource('admin/q/:id', {
+    return $resource('ws/admin/q/:id', {
         id : ''
     }, {
         query : {
@@ -38,7 +38,7 @@ jqmServices.factory('µQueueDto', function($resource)
 
 jqmServices.factory('µQueueMappingDto', function($resource)
 {
-    return $resource('admin/qmapping/:id', {
+    return $resource('ws/admin/qmapping/:id', {
         id : ''
     }, {
         saveAll : {
@@ -50,14 +50,14 @@ jqmServices.factory('µQueueMappingDto', function($resource)
 
 jqmServices.factory('µJndiDto', function($resource)
 {
-    return $resource('admin/jndi/:id', {
+    return $resource('ws/admin/jndi/:id', {
         id : ''
     });
 });
 
 jqmServices.factory('µPrmDto', function($resource)
 {
-    return $resource('admin/prm/:id', {
+    return $resource('ws/admin/prm/:id', {
         id : ''
     }, {
         saveAll : {
@@ -69,7 +69,7 @@ jqmServices.factory('µPrmDto', function($resource)
 
 jqmServices.factory('µJdDto', function($resource)
 {
-    return $resource('admin/jd/:id', {
+    return $resource('ws/admin/jd/:id', {
         id : ''
     }, {
         saveAll : {
@@ -81,7 +81,7 @@ jqmServices.factory('µJdDto', function($resource)
 
 jqmServices.factory('µUserDto', function($resource)
 {
-    return $resource('admin/user/:id', {
+    return $resource('ws/admin/user/:id', {
         id : ''
     }, {
         saveAll : {
@@ -93,7 +93,7 @@ jqmServices.factory('µUserDto', function($resource)
 
 jqmServices.factory('µRoleDto', function($resource)
 {
-    return $resource('admin/role/:id', {
+    return $resource('ws/admin/role/:id', {
         id : ''
     }, {
         saveAll : {
@@ -105,7 +105,7 @@ jqmServices.factory('µRoleDto', function($resource)
 
 jqmServices.factory('µUserPerms', function($resource)
 {
-    return $resource('admin/me', {}, {
+    return $resource('ws/admin/me', {}, {
         query : {
             method : 'GET',
             isArray : false

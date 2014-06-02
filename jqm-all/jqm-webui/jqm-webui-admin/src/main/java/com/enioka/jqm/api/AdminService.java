@@ -1,4 +1,4 @@
-package com.enioka.jqm.webui.admin.service;
+package com.enioka.jqm.api;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ import com.enioka.jqm.webui.admin.dto.QueueMappingDTO;
 import com.enioka.jqm.webui.admin.dto.RRoleDto;
 import com.enioka.jqm.webui.admin.dto.RUserDto;
 
-@Path("/")
+@Path("/admin")
 public class AdminService
 {
     private static EntityManagerFactory emf;

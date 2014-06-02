@@ -1,4 +1,4 @@
-package com.enioka.jqm.webui.admin.service;
+package com.enioka.jqm.api;
 
 import java.util.ArrayList;
 

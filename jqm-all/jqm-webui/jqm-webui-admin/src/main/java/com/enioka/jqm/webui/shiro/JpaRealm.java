@@ -16,10 +16,10 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 
+import com.enioka.jqm.api.AdminService;
 import com.enioka.jqm.jpamodel.RPermission;
 import com.enioka.jqm.jpamodel.RRole;
 import com.enioka.jqm.jpamodel.RUser;
-import com.enioka.jqm.webui.admin.service.AdminService;
 
 public class JpaRealm extends AuthorizingRealm
 {
