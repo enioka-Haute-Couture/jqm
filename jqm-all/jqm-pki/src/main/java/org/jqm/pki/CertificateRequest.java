@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -16,6 +17,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -31,6 +33,7 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.crypto.engines.DESedeEngine;
 import org.bouncycastle.crypto.modes.CBCBlockCipher;
@@ -49,7 +52,7 @@ import org.bouncycastle.util.BigIntegers;
 public class CertificateRequest
 {
     // Parameter fields
-    private String password, prettyName;
+    private String prettyName;
     private Integer size = 2048;
     private X509CertificateHolder authorityCertificate = null;
     private PrivateKey authorityKey = null;
@@ -67,13 +70,12 @@ public class CertificateRequest
     PrivateKey privateKey;
 
     // Public API
-    public void generateCA(String pfxPassword, String prettyName) throws Exception
+    public void generateCA(String prettyName)
     {
         this.prettyName = prettyName;
-        this.password = pfxPassword;
 
         Subject = "CN=JQM-CA,OU=ServerProducts,O=Oxymores,C=FR";
-        size = 1024;
+        size = 4096;
 
         EKU = new KeyPurposeId[4];
         EKU[0] = KeyPurposeId.id_kp_codeSigning;
@@ -83,62 +85,143 @@ public class CertificateRequest
 
         keyUsage = KeyUsage.cRLSign | KeyUsage.keyCertSign;
 
-        generateKeyPair();
-        generateX509();
-        generatePem();
-        generatedPfx();
+        generateAll();
     }
 
-    public void generateClientCert(String pfxPassword, String prettyName, X509CertificateHolder authority, PrivateKey issuerPrivateKey)
-            throws Exception
+    public void generateClientCert(String prettyName, X509CertificateHolder authority, PrivateKey issuerPrivateKey)
     {
         this.prettyName = prettyName;
-        this.password = pfxPassword;
 
         authorityCertificate = authority;
         authorityKey = issuerPrivateKey;
 
         Subject = "CN=JQMUser,OU=ServerProducts,O=Oxymores,C=FR";
 
-        size = 1024;
+        size = 2048;
 
         EKU = new KeyPurposeId[1];
         EKU[0] = KeyPurposeId.id_kp_clientAuth;
 
         keyUsage = KeyUsage.dataEncipherment;
 
-        generateKeyPair();
-        generateX509();
-        generatePem();
-        generatedPfx();
+        generateAll();
     }
 
-    public void writePemPublicToFile(String path) throws IOException
+    public void generateServerCert(String prettyName, X509CertificateHolder authority, PrivateKey authorityPrivateKey, String subject)
     {
-        FileWriter fw = new FileWriter(path);
-        PEMWriter wr = new PEMWriter(fw);
-        wr.writeObject(holder);
-        wr.close();
-        fw.close();
+        this.prettyName = prettyName;
+
+        authorityCertificate = authority;
+        authorityKey = authorityPrivateKey;
+
+        this.Subject = subject;
+
+        size = 2048;
+
+        EKU = new KeyPurposeId[1];
+        EKU[0] = KeyPurposeId.id_kp_serverAuth;
+
+        keyUsage = KeyUsage.digitalSignature | KeyUsage.keyEncipherment;
+
+        generateAll();
     }
 
-    public void writePemPrivateToFile(String path) throws IOException
+    public void writePemPublicToFile(String path)
     {
-        FileWriter fw = new FileWriter(path);
-        PEMWriter wr = new PEMWriter(fw);
-        wr.writeObject(privateKey);
-        wr.close();
-        fw.close();
+        try
+        {
+            FileWriter fw = new FileWriter(path);
+            PEMWriter wr = new PEMWriter(fw);
+            wr.writeObject(holder);
+            wr.close();
+            fw.close();
+        }
+        catch (Exception e)
+        {
+            throw new PkiException(e);
+        }
     }
 
-    public void writePfxToFile(String path) throws IOException
+    public String writePemPublicToString()
     {
-        FileOutputStream fos = new FileOutputStream(path);
-        fos.write(pfxFile);
-        fos.close();
+        try
+        {
+            StringWriter sw = new StringWriter();
+            PEMWriter wr = new PEMWriter(sw);
+            wr.writeObject(holder);
+            wr.close();
+            sw.close();
+            return sw.toString();
+        }
+        catch (Exception e)
+        {
+            throw new PkiException(e);
+        }
+    }
+
+    public void writePemPrivateToFile(String path)
+    {
+        try
+        {
+            FileWriter fw = new FileWriter(path);
+            PEMWriter wr = new PEMWriter(fw);
+            wr.writeObject(privateKey);
+            wr.close();
+            fw.close();
+        }
+        catch (Exception e)
+        {
+            throw new PkiException(e);
+        }
+    }
+
+    public String writePemPrivateToString()
+    {
+        try
+        {
+            StringWriter sw = new StringWriter();
+            PEMWriter wr = new PEMWriter(sw);
+            wr.writeObject(privateKey);
+            wr.close();
+            sw.close();
+            return sw.toString();
+        }
+        catch (Exception e)
+        {
+            throw new PkiException(e);
+        }
+    }
+
+    public void writePfxToFile(String path, String password)
+    {
+        try
+        {
+            generatedPfx(password);
+            FileOutputStream fos = new FileOutputStream(path);
+            fos.write(pfxFile);
+            fos.close();
+        }
+        catch (Exception e)
+        {
+            throw new PkiException(e);
+        }
     }
 
     // Internal methods
+    private void generateAll()
+    {
+        try
+        {
+            generateKeyPair();
+            generateX509();
+            generatePem();
+        }
+        catch (Exception e)
+        {
+            throw new PkiException(e);
+        }
+    }
+
     private void generatePem() throws IOException
     {
         // PEM public key
@@ -156,25 +239,42 @@ public class CertificateRequest
         wr.close();
     }
 
-    private void generatedPfx() throws Exception
+    private void generatedPfx(String pfxPassword) throws Exception
     {
         PKCS12PfxPduBuilder b = new PKCS12PfxPduBuilder();
 
         PKCS12SafeBagBuilder sbb_public = new PKCS12SafeBagBuilder(holder);
         JcaX509ExtensionUtils extUtils = new JcaX509ExtensionUtils();
+
+        // CA
+        PKCS12SafeBagBuilder ca_builder = null;
+        if (authorityCertificate != null)
+        {
+            X509Certificate ca = new JcaX509CertificateConverter().setProvider(Constants.JCA_PROVIDER).getCertificate(authorityCertificate);
+            ca_builder = new JcaPKCS12SafeBagBuilder(ca);
+            ca_builder.addBagAttribute(PKCSObjectIdentifiers.pkcs_9_at_friendlyName, new DERBMPString("CA"));
+        }
+
+        // Public key has a bag by itself
         sbb_public.addBagAttribute(PKCSObjectIdentifiers.pkcs_9_at_friendlyName, new DERBMPString(prettyName));
         sbb_public.addBagAttribute(PKCSObjectIdentifiers.pkcs_9_at_localKeyId, extUtils.createSubjectKeyIdentifier(publicKey));
 
-        PKCS12SafeBagBuilder sbb_private = new JcaPKCS12SafeBagBuilder(privateKey,
-                new BcPKCS12PBEOutputEncryptorBuilder(PKCSObjectIdentifiers.pbeWithSHAAnd3_KeyTripleDES_CBC, new CBCBlockCipher(
-                        new DESedeEngine())).build(password.toCharArray()));
+        // Private key
+        PKCS12SafeBagBuilder sbb_private = new JcaPKCS12SafeBagBuilder(privateKey, new BcPKCS12PBEOutputEncryptorBuilder(
+                PKCSObjectIdentifiers.pbeWithSHAAnd3_KeyTripleDES_CBC, new CBCBlockCipher(new DESedeEngine())).build(pfxPassword
+                .toCharArray()));
         sbb_private.addBagAttribute(PKCSObjectIdentifiers.pkcs_9_at_friendlyName, new DERBMPString(prettyName));
         sbb_private.addBagAttribute(PKCSObjectIdentifiers.pkcs_9_at_localKeyId, extUtils.createSubjectKeyIdentifier(publicKey));
 
+        // Add all bags to PFX
         b.addData(sbb_public.build());
         b.addData(sbb_private.build());
+        if (ca_builder != null)
+        {
+            b.addData(ca_builder.build());
+        }
 
-        PKCS12PfxPdu pfx = b.build(new BcPKCS12MacCalculatorBuilder(), password.toCharArray());
+        PKCS12PfxPdu pfx = b.build(new BcPKCS12MacCalculatorBuilder(), pfxPassword.toCharArray());
         pfxFile = pfx.getEncoded();
     }
 
@@ -183,7 +283,7 @@ public class CertificateRequest
         Security.addProvider(new BouncyCastleProvider());
 
         SecureRandom random = new SecureRandom();
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", "BC");
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(Constants.KEY_ALGORITHM, Constants.JCA_PROVIDER);
         keyPairGenerator.initialize(size, random);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
@@ -229,7 +329,7 @@ public class CertificateRequest
         }
 
         // Signer
-        ContentSigner signer = new JcaContentSignerBuilder("SHA512WithRSAEncryption").setProvider("BC").build(
+        ContentSigner signer = new JcaContentSignerBuilder("SHA512WithRSAEncryption").setProvider(Constants.JCA_PROVIDER).build(
                 authorityKey == null ? privateKey : authorityKey);
 
         // Go
