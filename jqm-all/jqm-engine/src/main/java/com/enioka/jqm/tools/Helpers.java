@@ -266,6 +266,30 @@ final class Helpers
         }
     }
 
+    /**
+     * Checks if a parameter exists. If it exists, it is updated. If it doesn't, it is created. Only works for parameters which key is
+     * unique. Will create a transaction on the given entity manager.
+     */
+    static void setSingleParam(String key, String value, EntityManager em)
+    {
+        try
+        {
+            em.getTransaction().begin();
+            GlobalParameter prm = em.createQuery("SELECT n from GlobalParameter n WHERE n.key = :key", GlobalParameter.class)
+                    .setParameter("key", key).getSingleResult();
+            prm.setValue(value);
+            em.getTransaction().commit();
+        }
+        catch (NoResultException e)
+        {
+            GlobalParameter gp = new GlobalParameter();
+            gp.setKey(key);
+            gp.setValue(value);
+            em.persist(gp);
+            em.getTransaction().commit();
+        }
+    }
+
     static Node checkAndUpdateNodeConfiguration(String nodeName, EntityManager em)
     {
         em.getTransaction().begin();

@@ -1,6 +1,7 @@
-package org.jqm.pki;
+package com.enioka.jqm.pki;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,18 +12,17 @@ import java.io.Writer;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
-import java.security.cert.X509Certificate;
+import java.security.cert.Certificate;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.bouncycastle.asn1.DERBMPString;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
@@ -34,19 +34,10 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
-import org.bouncycastle.crypto.engines.DESedeEngine;
-import org.bouncycastle.crypto.modes.CBCBlockCipher;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.pkcs.PKCS12PfxPdu;
-import org.bouncycastle.pkcs.PKCS12PfxPduBuilder;
-import org.bouncycastle.pkcs.PKCS12SafeBagBuilder;
-import org.bouncycastle.pkcs.bc.BcPKCS12MacCalculatorBuilder;
-import org.bouncycastle.pkcs.bc.BcPKCS12PBEOutputEncryptorBuilder;
-import org.bouncycastle.pkcs.jcajce.JcaPKCS12SafeBagBuilder;
 import org.bouncycastle.util.BigIntegers;
 
 public class CertificateRequest
@@ -64,7 +55,6 @@ public class CertificateRequest
     // Result fields
     OutputStream pemPublicFile;
     OutputStream pemPrivateFile;
-    byte[] pfxFile;
     X509CertificateHolder holder;
     PublicKey publicKey;
     PrivateKey privateKey;
@@ -88,31 +78,31 @@ public class CertificateRequest
         generateAll();
     }
 
-    public void generateClientCert(String prettyName, X509CertificateHolder authority, PrivateKey issuerPrivateKey)
+    public void generateClientCert(String prettyName, X509CertificateHolder authority, PrivateKey issuerPrivateKey, String subject)
     {
         this.prettyName = prettyName;
 
         authorityCertificate = authority;
         authorityKey = issuerPrivateKey;
 
-        Subject = "CN=JQMUser,OU=ServerProducts,O=Oxymores,C=FR";
+        this.Subject = subject;
 
         size = 2048;
 
         EKU = new KeyPurposeId[1];
         EKU[0] = KeyPurposeId.id_kp_clientAuth;
 
-        keyUsage = KeyUsage.dataEncipherment;
+        keyUsage = KeyUsage.digitalSignature | KeyUsage.keyEncipherment;
 
         generateAll();
     }
 
-    public void generateServerCert(String prettyName, X509CertificateHolder authority, PrivateKey authorityPrivateKey, String subject)
+    public void generateServerCert(String prettyName, X509CertificateHolder authority, PrivateKey issuerPrivateKey, String subject)
     {
         this.prettyName = prettyName;
 
         authorityCertificate = authority;
-        authorityKey = authorityPrivateKey;
+        authorityKey = issuerPrivateKey;
 
         this.Subject = subject;
 
@@ -130,6 +120,11 @@ public class CertificateRequest
     {
         try
         {
+            File f = new File(path);
+            if (!f.getParentFile().isDirectory() && !f.getParentFile().mkdir())
+            {
+                throw new PkiException("couldn't create directory " + f.getParentFile().getAbsolutePath() + " for storing the SSL keystore");
+            }
             FileWriter fw = new FileWriter(path);
             PEMWriter wr = new PEMWriter(fw);
             wr.writeObject(holder);
@@ -192,21 +187,6 @@ public class CertificateRequest
         }
     }
 
-    public void writePfxToFile(String path, String password)
-    {
-        try
-        {
-            generatedPfx(password);
-            FileOutputStream fos = new FileOutputStream(path);
-            fos.write(pfxFile);
-            fos.close();
-        }
-        catch (Exception e)
-        {
-            throw new PkiException(e);
-        }
-    }
-
     // Internal methods
     private void generateAll()
     {
@@ -239,43 +219,57 @@ public class CertificateRequest
         wr.close();
     }
 
-    private void generatedPfx(String pfxPassword) throws Exception
+    void writePfxToFile(String path, String password)
     {
-        PKCS12PfxPduBuilder b = new PKCS12PfxPduBuilder();
-
-        PKCS12SafeBagBuilder sbb_public = new PKCS12SafeBagBuilder(holder);
-        JcaX509ExtensionUtils extUtils = new JcaX509ExtensionUtils();
-
-        // CA
-        PKCS12SafeBagBuilder ca_builder = null;
-        if (authorityCertificate != null)
+        try
         {
-            X509Certificate ca = new JcaX509CertificateConverter().setProvider(Constants.JCA_PROVIDER).getCertificate(authorityCertificate);
-            ca_builder = new JcaPKCS12SafeBagBuilder(ca);
-            ca_builder.addBagAttribute(PKCSObjectIdentifiers.pkcs_9_at_friendlyName, new DERBMPString("CA"));
+            KeyStore ks = KeyStore.getInstance("PKCS12");
+            ks.load(null, null);
+
+            Certificate[] chain = null;
+            if (authorityCertificate != null)
+            {
+                chain = new Certificate[2];
+                chain[0] = new JcaX509CertificateConverter().getCertificate(this.holder);
+                chain[1] = new JcaX509CertificateConverter().getCertificate(this.authorityCertificate);
+            }
+            else
+            {
+                chain = new Certificate[1];
+                chain[0] = new JcaX509CertificateConverter().setProvider("BC").getCertificate(this.holder);
+            }
+
+            ks.setKeyEntry("private key for " + this.prettyName, privateKey, password.toCharArray(), chain);
+
+            FileOutputStream fos = new FileOutputStream(path);
+            ks.store(fos, password.toCharArray());
+            fos.close();
         }
-
-        // Public key has a bag by itself
-        sbb_public.addBagAttribute(PKCSObjectIdentifiers.pkcs_9_at_friendlyName, new DERBMPString(prettyName));
-        sbb_public.addBagAttribute(PKCSObjectIdentifiers.pkcs_9_at_localKeyId, extUtils.createSubjectKeyIdentifier(publicKey));
-
-        // Private key
-        PKCS12SafeBagBuilder sbb_private = new JcaPKCS12SafeBagBuilder(privateKey, new BcPKCS12PBEOutputEncryptorBuilder(
-                PKCSObjectIdentifiers.pbeWithSHAAnd3_KeyTripleDES_CBC, new CBCBlockCipher(new DESedeEngine())).build(pfxPassword
-                .toCharArray()));
-        sbb_private.addBagAttribute(PKCSObjectIdentifiers.pkcs_9_at_friendlyName, new DERBMPString(prettyName));
-        sbb_private.addBagAttribute(PKCSObjectIdentifiers.pkcs_9_at_localKeyId, extUtils.createSubjectKeyIdentifier(publicKey));
-
-        // Add all bags to PFX
-        b.addData(sbb_public.build());
-        b.addData(sbb_private.build());
-        if (ca_builder != null)
+        catch (Exception e)
         {
-            b.addData(ca_builder.build());
+            throw new PkiException(e);
         }
+    }
 
-        PKCS12PfxPdu pfx = b.build(new BcPKCS12MacCalculatorBuilder(), pfxPassword.toCharArray());
-        pfxFile = pfx.getEncoded();
+    public void writeTrustPfxToFile(String path, String password)
+    {
+        try
+        {
+            KeyStore ks = KeyStore.getInstance("JKS");
+            ks.load(null, null);
+
+            Certificate ca = new JcaX509CertificateConverter().getCertificate(this.authorityCertificate);
+
+            ks.setCertificateEntry("JQM-CA", ca);
+
+            FileOutputStream fos = new FileOutputStream(path);
+            ks.store(fos, password.toCharArray());
+            fos.close();
+        }
+        catch (Exception e)
+        {
+            throw new PkiException(e);
+        }
     }
 
     private void generateKeyPair() throws NoSuchAlgorithmException, NoSuchProviderException
@@ -334,7 +328,6 @@ public class CertificateRequest
 
         // Go
         holder = gen.build(signer);
-
     }
 
     // Data that can be accessed
@@ -346,11 +339,6 @@ public class CertificateRequest
     public OutputStream getPemPrivateFile()
     {
         return pemPrivateFile;
-    }
-
-    public byte[] getPfxFile()
-    {
-        return pfxFile;
     }
 
     public X509CertificateHolder getHolder()

@@ -1,4 +1,4 @@
-package org.jqm.pki;
+package com.enioka.jqm.pki;
 
 final class Constants
 {

@@ -1,4 +1,4 @@
-package org.jqm.pki;
+package com.enioka.jqm.pki;
 
 /**
  * Hello world!
@@ -16,7 +16,6 @@ public class App
         // Console debug
         System.out.println(re.pemPublicFile);
         System.out.println(re.pemPrivateFile);
-        System.out.println(re.pfxFile);
 
         // File debug
         re.writePemPrivateToFile("C:/temp/ca.key");
@@ -25,7 +24,7 @@ public class App
 
         // Client
         CertificateRequest re2 = new CertificateRequest();
-        re2.generateClientCert("JQM-CLIENT", re.holder, re.privateKey);
+        re2.generateClientCert("JQM-CLIENT", re.holder, re.privateKey, "CN=testuser");
         re2.writePemPublicToFile("C:/temp/client.cer");
         re2.writePfxToFile("c:/temp/client.pfx", Constants.PFX_PASSWORD);
 

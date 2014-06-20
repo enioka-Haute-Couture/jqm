@@ -8,14 +8,18 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.ssl.SslSocketConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.FragmentConfiguration;
 import org.eclipse.jetty.webapp.MetaInfConfiguration;
@@ -25,6 +29,7 @@ import org.eclipse.jetty.webapp.WebInfConfiguration;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
 
 import com.enioka.jqm.jpamodel.Node;
+import com.enioka.jqm.pki.JpaCa;
 
 /**
  * Every engine has an embedded Jetty engine that serves the servlet API ({@link ServletFile}, {@link ServletStatus}, {@link ServletEnqueue}
@@ -37,9 +42,39 @@ class JettyServer
     private Server server = null;
     private HandlerCollection h = new HandlerCollection();
 
-    void start(Node node)
+    void start(Node node, EntityManager em)
     {
+        boolean useSsl = Boolean.parseBoolean(Helpers.getParameter("useSsl", "true", em));
+        boolean useInternalPki = Boolean.parseBoolean(Helpers.getParameter("useInternalPki", "true", em));
+        String pfxPassword = Helpers.getParameter("pfxPassword", "SuperPassword", em);
+
         server = new Server();
+
+        SslContextFactory scf = null;
+        if (useSsl)
+        {
+            jqmlogger.info("JQM will use SSL for all HTTP communications as parameter useSsl is 'true'");
+            if (useInternalPki)
+            {
+                jqmlogger.info("JQM will use its internal PKI for all certificates as parameter useInternalPki is 'true'");
+                JpaCa.prepareWebServerStores(em, "CN=" + node.getDns(), "./conf/keystore.pfx", "./conf/trusted.jks", pfxPassword,
+                        node.getDns(), "./conf/server.cer", "./conf/ca.cer");
+            }
+            scf = new SslContextFactory("./conf/keystore.pfx");
+            scf.setKeyStorePassword(pfxPassword);
+            scf.setKeyStoreType("PKCS12");
+
+            scf.setTrustStore("./conf/trusted.jks");
+            scf.setTrustStorePassword(pfxPassword);
+            scf.setTrustStoreType("JKS");
+
+            scf.setWantClientAuth(true);
+            // scf.setNeedClientAuth(true);
+        }
+        else
+        {
+            jqmlogger.info("JQM will use plain HTTP for all communications (no SSL)");
+        }
 
         // Connectors.
         List<Connector> ls = new ArrayList<Connector>();
@@ -50,7 +85,15 @@ class JettyServer
             {
                 if (s instanceof Inet4Address)
                 {
-                    Connector connector = new SelectChannelConnector();
+                    Connector connector = null;
+                    if (useSsl)
+                    {
+                        connector = new SslSocketConnector(scf);
+                    }
+                    else
+                    {
+                        connector = new SelectChannelConnector();
+                    }
                     connector.setHost(s.getHostAddress());
                     connector.setPort(node.getPort());
                     ls.add(connector);

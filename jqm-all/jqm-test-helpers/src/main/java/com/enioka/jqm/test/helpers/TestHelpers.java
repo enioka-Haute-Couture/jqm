@@ -18,6 +18,8 @@
 
 package com.enioka.jqm.test.helpers;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
@@ -25,6 +27,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
@@ -63,6 +66,8 @@ public class TestHelpers
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("internalPollingPeriodMs", "10000", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("aliveSignalMs", "60000", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenSettingsCL", "META-INF/settings.xml", em);
+        TestHelpers.gpCentral = CreationTools.createGlobalParameter("noHttp", "true", em);
+        TestHelpers.gpCentral = CreationTools.createGlobalParameter("useSsl", "false", em);
 
         TestHelpers.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42, em, true);
         TestHelpers.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, em);
@@ -116,7 +121,18 @@ public class TestHelpers
         em.createQuery("DELETE JndiObjectResourceParameter WHERE 1=1").executeUpdate();
         em.createQuery("DELETE JndiObjectResource WHERE 1=1").executeUpdate();
         em.createQuery("DELETE DatabaseProp WHERE 1=1").executeUpdate();
+        em.createQuery("DELETE PKI WHERE 1=1").executeUpdate();
         em.getTransaction().commit();
+
+        try
+        {
+            FileUtils.deleteDirectory(new File("./conf"));
+            FileUtils.deleteDirectory(new File("./logs"));
+        }
+        catch (IOException e)
+        {
+            // Nothing to do
+        }
     }
 
     public static void printHistoryTable(EntityManager em)

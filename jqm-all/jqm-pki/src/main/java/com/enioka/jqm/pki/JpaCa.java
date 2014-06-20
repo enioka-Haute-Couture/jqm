@@ -1,4 +1,4 @@
-package org.jqm.pki;
+package com.enioka.jqm.pki;
 
 import java.io.File;
 import java.io.StringReader;
@@ -80,7 +80,6 @@ public class JpaCa
             KeyFactory keyFactory = KeyFactory.getInstance(Constants.KEY_ALGORITHM);
             PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(encodedPrivateKey);
             cr.privateKey = keyFactory.generatePrivate(privateKeySpec);
-            cr.publicKey = keyFactory.generatePublic(privateKeySpec);
         }
         catch (Exception e)
         {
@@ -91,7 +90,28 @@ public class JpaCa
         return cr;
     }
 
-    public static void prepareWebServerStores(EntityManager em, String subject, String pfxPath, String prettyName, String cerPath)
+    public static void prepareWebServerStores(EntityManager em, String subject, String serverPfxPath, String trustPfxPath,
+            String pfxPassword, String serverCertPrettyName, String serverCerPath, String caCerPath)
+    {
+        File pfx = new File(serverPfxPath);
+
+        if (pfx.canRead())
+        {
+            return;
+        }
+
+        CertificateRequest ca = initCa(em);
+        ca.writePemPublicToFile(caCerPath);
+
+        CertificateRequest srv = new CertificateRequest();
+        srv.generateServerCert(serverCertPrettyName, ca.holder, ca.privateKey, subject);
+        srv.writePfxToFile(serverPfxPath, pfxPassword);
+        srv.writePemPublicToFile(serverCerPath);
+        srv.writeTrustPfxToFile(trustPfxPath, pfxPassword);
+    }
+
+    public static void prepareClientStore(EntityManager em, String subject, String pfxPath, String pfxPassword, String prettyName,
+            String cerPath)
     {
         File pfx = new File(pfxPath);
 
@@ -103,8 +123,8 @@ public class JpaCa
         CertificateRequest ca = initCa(em);
 
         CertificateRequest srv = new CertificateRequest();
-        srv.generateServerCert(prettyName, ca.holder, ca.privateKey, subject);
-        srv.writePfxToFile(pfxPath, Constants.PFX_PASSWORD);
+        srv.generateClientCert(prettyName, ca.holder, ca.privateKey, subject);
+        srv.writePfxToFile(pfxPath, pfxPassword);
         srv.writePemPublicToFile(cerPath);
     }
 

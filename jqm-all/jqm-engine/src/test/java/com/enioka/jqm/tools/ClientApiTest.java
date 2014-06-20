@@ -429,6 +429,7 @@ public class ClientApiTest extends JqmBaseTest
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
+        Helpers.setSingleParam("noHttp", "false", em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
@@ -491,6 +492,7 @@ public class ClientApiTest extends JqmBaseTest
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
+        Helpers.setSingleParam("noHttp", "false", em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);

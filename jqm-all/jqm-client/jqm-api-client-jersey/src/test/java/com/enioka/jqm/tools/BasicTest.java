@@ -68,6 +68,7 @@ public class BasicTest
         em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
+        Helpers.setSingleParam("noHttp", "false", em);
 
         em.getTransaction().begin();
         Node n = em.find(Node.class, TestHelpers.node.getId());

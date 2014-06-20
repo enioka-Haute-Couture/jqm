@@ -30,6 +30,7 @@ public class DeliverableTest extends JqmBaseTest
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
+        Helpers.setSingleParam("noHttp", "false", em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", TestHelpers.node.getDlRepo(), em);
@@ -66,6 +67,7 @@ public class DeliverableTest extends JqmBaseTest
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
+        Helpers.setSingleParam("noHttp", "false", em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", TestHelpers.node.getDlRepo(), em);

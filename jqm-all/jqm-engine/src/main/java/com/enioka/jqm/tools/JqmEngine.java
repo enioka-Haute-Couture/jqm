@@ -135,15 +135,18 @@ class JqmEngine implements JqmEngineMBean
         }
 
         // Jetty
-        this.server = new JettyServer();
-        this.server.start(node);
-        if (node.getPort() == 0)
+        boolean startJetty = !Boolean.parseBoolean(Helpers.getParameter("noHttp", "false", em));
+        if (startJetty)
         {
-            // During tests, we use a random port (0) so we must update configuration.
-            // New nodes are also created with a non-assigned port.
-            em.getTransaction().begin();
-            node.setPort(server.getActualPort());
-            em.getTransaction().commit();
+            this.server = new JettyServer();
+            this.server.start(node, em);
+            if (node.getPort() == 0)
+            {
+                // New nodes are created with a non-assigned port.
+                em.getTransaction().begin();
+                node.setPort(server.getActualPort());
+                em.getTransaction().commit();
+            }
         }
 
         // JMX
@@ -266,7 +269,10 @@ class JqmEngine implements JqmEngineMBean
         hasEnded = true;
 
         // If here, all pollers are down. Stop Jetty too
-        this.server.stop();
+        if (this.server != null)
+        {
+            this.server.stop();
+        }
 
         // Also stop the internal poller
         this.intPoller.stop();

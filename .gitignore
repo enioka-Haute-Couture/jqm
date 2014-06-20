@@ -25,3 +25,6 @@ release.properties
 /JobQueueAPI/build/
 /JobQueueAPI/dist/
 serious/JobBaseAPI/nullnull
+**/conf/*.cer
+**/conf/*.pfx
+**/conf/*.jks
