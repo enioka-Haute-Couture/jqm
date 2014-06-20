@@ -52,6 +52,10 @@ public class App extends JobBase
             prms.put("stop", "1");
             enQueue(getApplicationName(), null, null, null, null, null, null, null, null, prms);
         }
+        else
+        {
+            System.out.println(getParameters().get("stop"));
+        }
         log.info("End of payload");
     }
 }

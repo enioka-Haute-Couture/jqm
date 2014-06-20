@@ -1,0 +1,25 @@
+<jqm>
+	<jar>
+		<path>jqm-tests/jqm-test-emplusapi/target/test.jar</path>
+		<jobdefinitions>
+			<jobDefinition>
+				<name>jqm-test-emplusapi</name>
+				<description>test</description>
+				<canBeRestarted>true</canBeRestarted>
+				<javaClassName>App</javaClassName>
+				<application>ApplicationTest</application>
+				<module>TestModuleRATONLAVEUR</module>
+				<keyword1>vdjvkdv</keyword1>
+				<keyword2>sgfbgg</keyword2>
+				<keyword3>jvhkdfl</keyword3>
+				<highlander>false</highlander>
+				<parameters>
+					<parameter>
+						<key>stop</key>
+						<value>1</value>
+					</parameter>					
+				</parameters>
+			</jobDefinition>
+		</jobdefinitions>
+	</jar>
+</jqm>

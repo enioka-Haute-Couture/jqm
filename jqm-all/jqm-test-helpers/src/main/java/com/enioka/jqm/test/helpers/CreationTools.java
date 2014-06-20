@@ -355,6 +355,7 @@ public class CreationTools
     public static JndiObjectResource createJndiObjectResource(EntityManager em, String jndiAlias, String className, String factoryClass,
             String description, boolean singleton, HashMap<String, String> parameters)
     {
+        em.getTransaction().begin();
         JndiObjectResource res = new JndiObjectResource();
         res.setAuth(null);
         res.setDescription(description);
@@ -373,6 +374,7 @@ public class CreationTools
             res.getParameters().add(prm);
             prm.setResource(res);
         }
+        em.getTransaction().commit();
 
         return res;
     }
