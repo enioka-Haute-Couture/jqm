@@ -1,6 +1,6 @@
 'use strict';
 
-var jqmControllers = angular.module('jqmControllers', [ 'jqmConstants', 'jqmServices' ]);
+var jqmControllers = angular.module('jqmControllers', [ 'jqmConstants', 'jqmServices', 'ui.bootstrap' ]);
 
 jqmControllers.controller('µNodeListCtrl', function($scope, $http, µNodeDto)
 {

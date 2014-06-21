@@ -1,0 +1,151 @@
+<div class="container-fluid modal-dialog">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">Identification</div>
+                <div class="panel-body">
+                    <div class='row'>
+                        <strong class='col-xs-6'>ID</strong>
+                        <div class='col-xs-6'>{{ji.id}}</div>
+                    </div>
+                    <div class='row'>
+                        <strong class='col-xs-6'>Parent job</strong>
+                        <div class='col-xs-6'>{{ji.parent}}</div>
+                    </div>
+                    <div class='row'>
+                        <strong class='col-xs-6'>Application</strong>
+                        <div class='col-xs-6'>{{ji.applicationName}}</div>
+                    </div>
+                    <div class='row'>
+                        <strong class='col-xs-6'>Session ID</strong>
+                        <div class='col-xs-6'>{{ji.sessionID}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">Queues</div>
+                <div class="panel-body">
+                    <div class='row'>
+                        <strong class='col-xs-6'>Queue</strong>
+                        <div class='col-xs-6'>{{ji.queue.name}}</div>
+                    </div>
+                    <div class='row'>
+                        <strong class='col-xs-6'>Position</strong>
+                        <div class='col-xs-6'>{{ji.position}}</div>
+                    </div>
+                    <div class='row'>
+                        <strong class='col-xs-6'>Affected to server</strong>
+                        <div class='col-xs-6'>{{ji.nodeName}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">Progress</div>
+                <div class="panel-body">
+                    <div class='row'>
+                        <strong class='col-xs-6'>Status</strong>
+                        <div class='col-xs-6'>{{ji.state}}</div>
+                    </div>
+                    <div class='row'>
+                        <strong class='col-xs-6'>Progress%</strong>
+                        <div class='col-xs-6'>{{ji.progress}}</div>
+                    </div>
+
+                    <div class='row'>
+                        <strong class='col-xs-6'>Enqueue time</strong>
+                        <div class='col-xs-6'>{{ji.enqueueDate | date : "dd/MM HH:mm:ss"}}</div>
+                    </div>
+                    <div class='row'>
+                        <strong class='col-xs-6'>Start time</strong>
+                        <div class='col-xs-6'>{{ji.beganRunningDate | date : "dd/MM HH:mm:ss"}}</div>
+                    </div>
+                    <div class='row'>
+                        <strong class='col-xs-6'>End time</strong>
+                        <div class='col-xs-6'>{{ji.endDate | date : "dd/MM HH:mm:ss"}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">Log files</div>
+                <div class="panel-body">
+                    <a href='{{ "./ws/client/ji/" + ji.id + "/stdout"}}' class='col-sm-12'>Log stdout</a> <a
+                        href='{{ "./ws/client/ji/" + ji.id + "/stderr"}}' class='col-sm-12'
+                    >Log stderr</a>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">Optional tags</div>
+                <div class="panel-body">
+                    <div class='row'>
+                        <strong class='col-sm-6'>Software</strong>
+                        <div class='col-sm-6'>{{ji.application}}</div>
+                    </div>
+                    <div class='row'>
+                        <strong class='col-xs-6'>Keyword 1</strong>
+                        <div class='col-xs-6'>{{ji.keyword1}}</div>
+                    </div>
+                    <div class='row'>
+                        <strong class='col-xs-6'>Keyword 2</strong>
+                        <div class='col-xs-6'>{{ji.keyword2}}</div>
+                    </div>
+                    <div class='row'>
+                        <strong class='col-xs-6'>Keyword 3</strong>
+                        <div class='col-xs-6'>{{ji.keyword3}}</div>
+                    </div>
+                    <div class='row'>
+                        <strong class='col-xs-6'>Module</strong>
+                        <div class='col-xs-6'>{{ji.module}}</div>
+                    </div>
+                    <div class='row'>
+                        <strong class='col-xs-6'>User</strong>
+                        <div class='col-xs-6'>{{ji.user}}</div>
+                    </div>
+                    <div class='row'>
+                        <strong class='col-xs-6'>User e-mail</strong>
+                        <div class='col-xs-6'>{{ji.email}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">Parameters</div>
+                <div class="panel-body">
+                    <div ng-repeat="p in ji.parameters  | orderBy:'key'" class='row'>
+                        <strong class='col-xs-6'>{{p.key}}</strong>
+                        <div class='col-xs-6'>{{p.value}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">User messages</div>
+                <div class="panel-body">
+                    <div ng-repeat="m in ji.messages" class='row'>
+                        <div class='col-sm-12'>{{m}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">Files created</div>
+                <div class="panel-body">
+                    <div ng-repeat="d in dels" class='row'>
+                        <div class='col-sm-2'>ID</div>
+                        <div class='col-sm-2'>{{d.id}}</div>
+                        <div class='col-sm-8'>
+                            <a href="{{'./ws/client/ji/files/' + d.id}}">{{d.fileFamily}}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

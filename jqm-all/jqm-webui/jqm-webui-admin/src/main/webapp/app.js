@@ -34,6 +34,9 @@ jqmApp.config([ '$routeProvider', function($routeProvider)
     }).when('/role', {
         templateUrl : 'template/role_list.html',
         controller : 'µRoleListCtrl'
+    }).when('/history', {
+        templateUrl : 'template/history.html',
+        controller : 'µHistoryCtrl'
     }).otherwise({
         redirectTo : '/home'
     });
@@ -79,6 +82,10 @@ function TabsCtrl($scope, $location, $http)
         link : '#/role',
         label : 'Roles',
         permission : 'role:read',
+    }, {
+        link : '#/history',
+        label : 'History',
+        permission : 'history:read',
     }, ];
 
     $scope.selectedTab = $scope.tabs[0];

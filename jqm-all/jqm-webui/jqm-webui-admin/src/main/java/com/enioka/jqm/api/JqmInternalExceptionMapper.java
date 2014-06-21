@@ -1,6 +1,8 @@
 package com.enioka.jqm.api;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
@@ -10,6 +12,7 @@ public class JqmInternalExceptionMapper implements ExceptionMapper<JqmClientExce
     @Override
     public Response toResponse(JqmClientException exception)
     {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(exception.getMessage()).build();
+        ErrorDto d = new ErrorDto(exception.getMessage(), 500, exception, Status.INTERNAL_SERVER_ERROR);
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(d).type(MediaType.APPLICATION_JSON).build();
     }
 }

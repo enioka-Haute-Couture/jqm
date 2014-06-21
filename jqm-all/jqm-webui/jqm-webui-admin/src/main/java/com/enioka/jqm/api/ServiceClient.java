@@ -2,6 +2,7 @@ package com.enioka.jqm.api;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Properties;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -13,16 +14,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.log4j.Logger;
-
-import com.enioka.jqm.api.Deliverable;
-import com.enioka.jqm.api.JobDef;
-import com.enioka.jqm.api.JobInstance;
-import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.api.JqmClient;
-import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.api.Query;
-import com.enioka.jqm.api.Queue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The main web service class. Interface {@link JqmClient} is implemented, but it is not compulsory at all. (done for completion sake & and
@@ -31,7 +24,14 @@ import com.enioka.jqm.api.Queue;
 @Path("/client")
 public class ServiceClient implements JqmClient
 {
-    static Logger log = Logger.getLogger(ServiceClient.class);
+    static Logger log = LoggerFactory.getLogger(ServiceClient.class);
+
+    static
+    {
+        Properties p = new Properties();
+        p.put("javax.persistence.nonJtaDataSource", "java:/comp/env/jdbc/jqm");
+        JqmClientFactory.setProperties(p);
+    }
 
     // Not directly mapped: returning an integer would be weird. See enqueue_object.
     public int enqueue(JobRequest jd)
@@ -42,8 +42,8 @@ public class ServiceClient implements JqmClient
 
     @POST
     @Path("ji")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
+    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public JobInstance enqueue_object(JobRequest jd)
     {
         log.debug("calling WS enqueue_object");
@@ -121,7 +121,7 @@ public class ServiceClient implements JqmClient
     }
 
     @Path("ji/crashed/{jobId}")
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @DELETE
     public JobInstance restartCrashedJob_object(@PathParam("jobId") int jobId)
     {
@@ -158,7 +158,7 @@ public class ServiceClient implements JqmClient
 
     @Override
     @GET
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Path("ji/{jobId}")
     public JobInstance getJob(@PathParam("jobId") int jobId)
     {
@@ -168,7 +168,7 @@ public class ServiceClient implements JqmClient
 
     @Override
     @GET
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Path("ji")
     public List<JobInstance> getJobs()
     {
@@ -179,7 +179,7 @@ public class ServiceClient implements JqmClient
     @Override
     @GET
     @Path("ji/active")
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public List<JobInstance> getActiveJobs()
     {
         log.debug("calling WS getActiveJobs");
@@ -188,7 +188,7 @@ public class ServiceClient implements JqmClient
 
     @Override
     @Path("user/{username}/ji")
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @GET
     public List<JobInstance> getUserActiveJobs(@PathParam("username") String userName)
     {
@@ -205,9 +205,9 @@ public class ServiceClient implements JqmClient
     }
 
     @Path("ji/query")
-    @Consumes(MediaType.APPLICATION_XML)
+    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @POST
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public Query getJobsQuery(Query query)
     {
         log.debug("calling WS getJobsQuery");
@@ -218,7 +218,7 @@ public class ServiceClient implements JqmClient
     @Override
     @Path("ji/{jobId}/messages")
     @GET
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public List<String> getJobMessages(@PathParam("jobId") int jobId)
     {
         log.debug("calling WS getJobMessages");
@@ -236,7 +236,7 @@ public class ServiceClient implements JqmClient
     @Override
     @Path("ji/{jobId}/files")
     @GET
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public List<Deliverable> getJobDeliverables(@PathParam("jobId") int jobId)
     {
         log.debug("calling WS getJobDeliverables");
@@ -254,13 +254,23 @@ public class ServiceClient implements JqmClient
 
     @Override
     @Path("ji/files")
-    @Consumes(MediaType.APPLICATION_XML)
+    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Produces("application/octet-stream")
     @POST
     public InputStream getDeliverableContent(Deliverable file)
     {
         log.debug("calling WS getDeliverableContent");
         return JqmClientFactory.getClient().getDeliverableContent(file);
+    }
+    
+    @Override
+    @Path("ji/files/{id}")    
+    @Produces("application/octet-stream")
+    @GET
+    public InputStream getDeliverableContent(@PathParam("id") int delId)
+    {
+        log.debug("calling WS getDeliverableContent");
+        return JqmClientFactory.getClient().getDeliverableContent(delId);
     }
 
     @Override
@@ -286,7 +296,7 @@ public class ServiceClient implements JqmClient
     @Override
     @Path("q")
     @GET
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public List<Queue> getQueues()
     {
         log.debug("calling WS getQueues");
@@ -320,7 +330,7 @@ public class ServiceClient implements JqmClient
 
     @Path("jd")
     @GET
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Override
     public List<JobDef> getJobDefinitions()
     {
@@ -330,7 +340,7 @@ public class ServiceClient implements JqmClient
 
     @Path("jd/{applicationName}")
     @GET
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Override
     public List<JobDef> getJobDefinitions(@PathParam("applicationName") String application)
     {
@@ -340,7 +350,7 @@ public class ServiceClient implements JqmClient
 
     @Path("ji/query")
     @GET
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public Query getEmptyQuery()
     {
         return Query.create();
@@ -348,7 +358,7 @@ public class ServiceClient implements JqmClient
 
     @Path("jr")
     @GET
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public JobRequest getEmptyJobRequest()
     {
         return new JobRequest("appName", "rsapi user");
