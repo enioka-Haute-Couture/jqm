@@ -481,6 +481,23 @@ final class JerseyClient implements JqmClient
     }
 
     @Override
+    public InputStream getDeliverableContent(int d)
+    {
+        try
+        {
+            return target.path("ji/files/" + d).request().get(InputStream.class);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    @Override
     public InputStream getJobLogStdErr(int jobId)
     {
         try

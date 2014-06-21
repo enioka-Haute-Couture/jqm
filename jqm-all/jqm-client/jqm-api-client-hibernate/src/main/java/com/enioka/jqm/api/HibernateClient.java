@@ -1346,6 +1346,12 @@ final class HibernateClient implements JqmClient
 
     @Override
     public InputStream getDeliverableContent(com.enioka.jqm.api.Deliverable d)
+    {        
+        return getDeliverableContent(d.getId());
+    }
+    
+    @Override
+    public InputStream getDeliverableContent(int delId)
     {
         EntityManager em = null;
         Deliverable deliverable = null;
@@ -1353,7 +1359,7 @@ final class HibernateClient implements JqmClient
         try
         {
             em = getEm();
-            deliverable = em.find(Deliverable.class, d.getId());
+            deliverable = em.find(Deliverable.class, delId);
         }
         catch (Exception e)
         {

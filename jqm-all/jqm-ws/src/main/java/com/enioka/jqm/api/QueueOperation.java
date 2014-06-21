@@ -255,6 +255,16 @@ public class QueueOperation implements JqmClient
     }
 
     @Override
+    @Path("ji/files/{id}")
+    @Produces("application/octet-stream")
+    @POST
+    public InputStream getDeliverableContent(@PathParam("id") int delId)
+    {
+        log.debug("calling WS getDeliverableContent");
+        return JqmClientFactory.getClient().getDeliverableContent(delId);
+    }
+
+    @Override
     @Path("ji/{jobId}/stderr")
     @Produces("application/octet-stream")
     @GET
