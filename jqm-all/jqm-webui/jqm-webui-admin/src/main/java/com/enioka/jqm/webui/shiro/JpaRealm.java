@@ -16,7 +16,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 
-import com.enioka.jqm.api.AdminService;
+import com.enioka.jqm.api.ServiceAdmin;
 import com.enioka.jqm.jpamodel.RPermission;
 import com.enioka.jqm.jpamodel.RRole;
 import com.enioka.jqm.jpamodel.RUser;
@@ -49,7 +49,7 @@ public class JpaRealm extends AuthorizingRealm
 
     private SimpleAccount getUser(String login)
     {
-        EntityManager em = AdminService.getEm();
+        EntityManager em = ServiceAdmin.getEm();
         System.out.println(login);
         try
         {

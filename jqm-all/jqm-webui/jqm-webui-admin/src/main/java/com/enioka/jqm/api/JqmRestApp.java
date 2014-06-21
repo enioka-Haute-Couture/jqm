@@ -13,7 +13,13 @@ public class JqmRestApp extends ResourceConfig
     {
         this.property(MarshallerProperties.JSON_WRAPPER_AS_ARRAY_NAME, true);
         this.property(UnmarshallerProperties.JSON_WRAPPER_AS_ARRAY_NAME, true);
-        packages("com.enioka.jqm.api");
+
+        this.register(ServiceAdmin.class);
+        this.register(ServiceClient.class);
+        this.register(JqmExceptionMapper.class);
+        this.register(JqmInternalExceptionMapper.class);
+        this.register(ErrorHandler.class);
+
     }
 
 }
