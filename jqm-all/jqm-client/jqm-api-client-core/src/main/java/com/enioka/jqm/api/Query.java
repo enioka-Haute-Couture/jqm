@@ -92,6 +92,8 @@ public final class Query
     /**
      * Internal description of a sorting operation
      */
+    @XmlRootElement
+    @XmlAccessorType(XmlAccessType.FIELD)
     static class SortSpec
     {
         SortOrder order = SortOrder.ASCENDING;

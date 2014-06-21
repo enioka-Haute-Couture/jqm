@@ -1010,7 +1010,7 @@ final class HibernateClient implements JqmClient
             // Integer
             wh += getIntPredicate("parentId", query.getParentId(), prms);
             wh += getIntPredicate("id", query.getJobInstanceId(), prms);
-            wh += getIntPredicate("queue.id", query.getQueueName() == null ? null : query.getQueueId(), prms);
+            wh += getIntPredicate("queue.id", query.getQueueId() == null ? null : query.getQueueId(), prms);
 
             // Now, run queries...
             List<com.enioka.jqm.api.JobInstance> res2 = new ArrayList<com.enioka.jqm.api.JobInstance>();
