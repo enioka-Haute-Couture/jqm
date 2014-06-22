@@ -977,7 +977,7 @@ final class HibernateClient implements JqmClient
     @Override
     public List<com.enioka.jqm.api.JobInstance> getJobs(Query query)
     {
-        if ((query.getFirstRow() != null || query.getPageSize() != null) && query.isQueryLiveInstances())
+        if ((query.getFirstRow() != null || query.getPageSize() != null) && query.isQueryLiveInstances() && query.isQueryHistoryInstances())
         {
             throw new JqmInvalidRequestException("cannot use paging on live instances");
         }
@@ -1053,6 +1053,23 @@ final class HibernateClient implements JqmClient
                 for (Map.Entry<String, Object> entry : prms2.entrySet())
                 {
                     q2.setParameter(entry.getKey(), entry.getValue());
+                }
+                if (query.getFirstRow() != null)
+                {
+                    q2.setFirstResult(query.getFirstRow());
+                }
+                if (query.getPageSize() != null)
+                {
+                    q2.setMaxResults(query.getPageSize());
+                }
+                if (query.getFirstRow() != null || query.getPageSize() != null)
+                {
+                    TypedQuery<Long> qCount = em.createQuery("SELECT COUNT(h) FROM JobInstance h " + wh, Long.class);
+                    for (Map.Entry<String, Object> entry : prms.entrySet())
+                    {
+                        qCount.setParameter(entry.getKey(), entry.getValue());
+                    }
+                    query.setResultSize(new BigDecimal(qCount.getSingleResult()).intValueExact());
                 }
 
                 for (JobInstance ji : q2.getResultList())
@@ -1346,10 +1363,10 @@ final class HibernateClient implements JqmClient
 
     @Override
     public InputStream getDeliverableContent(com.enioka.jqm.api.Deliverable d)
-    {        
+    {
         return getDeliverableContent(d.getId());
     }
-    
+
     @Override
     public InputStream getDeliverableContent(int delId)
     {
