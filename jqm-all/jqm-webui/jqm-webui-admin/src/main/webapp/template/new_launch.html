@@ -1,0 +1,69 @@
+<div class="container-fluid modal-dialog">
+    <div class="form-horizontal modal-body" style="max-width: 750px;">
+        <div class="form-group">
+            <label for="ddJd" class="col-sm-5 control-label">Application to launch</label>
+            <div class="col-sm-7">
+                <select id="ddJd" ng-cell-input ng-model="request.applicationName" ng-options="jd.applicationName as jd.applicationName for jd in jds"
+                    ng-change="onJd()"
+                ></select>
+                <span class="help-block">Name of the batch process to launch.</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="txtUser" class="col-sm-5 control-label">Username</label>
+            <div class="col-sm-7">
+                <input id="txtUser" class="form-control" type="text" ng-model="request.user" /> <span class="help-block">Name that will appear
+                    in the history</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="txtUser" class="col-sm-5 control-label">Session ID</label>
+            <div class="col-sm-7">
+                <input id="txtUser" class="form-control" type="text" ng-model="request.sessionID" /> <span class="help-block">Optional data
+                    that will appear in the history</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="txtUser" class="col-sm-5 control-label">Default parameters</label>
+            <div class="col-sm-7">
+                <div ng-repeat="p in selectedJd.parameters | orderBy:'key'">
+                    <div class="col-xs-6">{{p.key}}</div>
+                    <div class="col-xs-6">{{p.value}}</div>
+                </div>
+                <span class="help-block">Can be overridden below</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="txtUser" class="col-sm-5 control-label">Override or new parameters</label>
+            <div class="col-sm-7">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <input id="txtKey" class="form-control" type="text" ng-model="data.newKey" />
+                    </div>
+                    <div class="col-xs-4">
+                        <input id="txtValue" class="form-control" type="text" ng-model="data.newValue" />
+                    </div>
+                    <div class="col-xs-4">
+                        <button ng-click="addPrm()">Add</button>
+                    </div>
+                </div>
+                <span class="help-block">Enter here additional key/values pairs</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="txtUser" class="col-sm-5 control-label"></label>
+            <div class="col-sm-7">
+                <div ng-repeat="p in request.parameters | orderBy:'key'" class="row">
+                    <div class="col-xs-6">{{p.key}}</div>
+                    <div class="col-xs-6">{{p.value}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">OK</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+</div>

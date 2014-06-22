@@ -210,6 +210,24 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
         });
     };
 
+    $scope.newLaunch = function()
+    {
+        var modalInstance = $modal.open({
+            templateUrl : './template/new_launch.html',
+            controller : 'jiNew',
+            size : 'lg',
+        });
+
+        modalInstance.result.then(function()
+        {
+            $scope.target = "active";
+        }, function()
+        {
+            $scope.getDataAsync();
+        });
+
+    };
+
     $scope.relaunch = function()
     {
         var ji = $scope.selected[0];
@@ -237,4 +255,60 @@ jqmApp.controller('historyDetail', function($scope, $http, ji)
     };
 
     $scope.getdel();
+});
+
+jqmApp.controller('jiNew', function($scope, µUserJdDto, $modalInstance, $http)
+{
+    $scope.jds = µUserJdDto.query();
+    $scope.data = {
+        selectedJd : null,
+        newKey : null,
+        newValue : null
+    };
+
+    $scope.request = {
+        user : 'webuser',
+        sessionID : 0,
+        parameters : [],
+    };
+
+    $scope.meuh = function()
+    {
+        console.debug($scope.selectedJd);
+    };
+
+    $scope.onJd = function()
+    {
+        var l = $scope.jds.length;
+        for ( var i = 0; i < l; i++)
+        {
+            if ($scope.request.applicationName === $scope.jds[i].applicationName)
+            {
+                $scope.selectedJd = $scope.jds[i];
+            }
+        }
+    };
+
+    $scope.addPrm = function()
+    {
+        var np = {};
+        np.key = $scope.data.newKey;
+        np.value = $scope.data.newValue;
+        $scope.request.parameters.push(np);
+    };
+
+    $scope.postOk = function()
+    {
+        $modalInstance.close();
+    };
+
+    $scope.ok = function()
+    {
+        $http.post("ws/client/ji", $scope.request).success($scope.postOk);
+    };
+
+    $scope.cancel = function()
+    {
+        $modalInstance.dismiss('cancel');
+    };
 });

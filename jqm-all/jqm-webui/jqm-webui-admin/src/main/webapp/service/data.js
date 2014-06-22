@@ -112,3 +112,10 @@ jqmServices.factory('µUserPerms', function($resource)
         },
     });
 });
+
+jqmServices.factory('µUserJdDto', function($resource)
+{
+    return $resource('ws/client/jd/:id', {
+        id : ''
+    });
+});
