@@ -8,8 +8,9 @@
     <button class="btn btn-default" ng-click="latest(1)">Enqueued last hour</button>
     <button class="btn btn-default" ng-click="latest(24)">Enqueued last day</button>
     <button class="btn btn-default" ng-click="query = {}; getDataAsync();">Reset filters</button>
-    <div class='gridClass' ng-grid='gridOptions' style="width: 100%;"></div>
 
-    <button class="btn btn-default" ng-click="showDetail()">Details</button>
+    <div class='gridClass' ng-grid='gridOptions' style="width: 100%;" ng-dblclick="showDetail()"></div>
+
+    <div class="small">Double-click on a line to get job details, files produced and logs</div>
 </div>
 
