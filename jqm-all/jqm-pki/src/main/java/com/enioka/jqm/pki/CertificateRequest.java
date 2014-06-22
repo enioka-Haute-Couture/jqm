@@ -23,7 +23,9 @@ import java.security.cert.Certificate;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
@@ -32,11 +34,14 @@ import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509ExtensionUtils;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.DigestCalculator;
+import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.util.BigIntegers;
 
@@ -298,8 +303,10 @@ public class CertificateRequest
                 : authorityCertificate.getSubject(), BigIntegers.createRandomInRange(BigInteger.ZERO, BigInteger.valueOf(Long.MAX_VALUE),
                 random), new Date(), endValidity.getTime(), dnName, publicKeyInfo);
 
-        // ExtensionsGenerator eg = new ExtensionsGenerator();
-        gen.addExtension(Extension.subjectKeyIdentifier, false, publicKeyInfo);
+        // Public key ID
+        DigestCalculator digCalc = new BcDigestCalculatorProvider().get(new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1));
+        X509ExtensionUtils x509ExtensionUtils = new X509ExtensionUtils(digCalc);
+        gen.addExtension(Extension.subjectKeyIdentifier, false, x509ExtensionUtils.createSubjectKeyIdentifier(publicKeyInfo));
 
         // EKU
         gen.addExtension(Extension.extendedKeyUsage, false, new ExtendedKeyUsage(EKU));
