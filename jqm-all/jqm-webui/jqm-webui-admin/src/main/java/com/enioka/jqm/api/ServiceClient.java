@@ -60,12 +60,13 @@ public class ServiceClient implements JqmClient
         throw new NotSupportedException();
     }
 
-    // Not exposed. Client side work.
     @Override
-    public int enqueueFromHistory(int jobIdToCopy)
+    @Path("ji/{id}")
+    @POST
+    public int enqueueFromHistory(@PathParam("id") int jobIdToCopy)
     {
         log.debug("calling WS enqueueFromHistory");
-        throw new NotSupportedException();
+        return JqmClientFactory.getClient().enqueueFromHistory(jobIdToCopy);
     }
 
     @Override
@@ -262,9 +263,9 @@ public class ServiceClient implements JqmClient
         log.debug("calling WS getDeliverableContent");
         return JqmClientFactory.getClient().getDeliverableContent(file);
     }
-    
+
     @Override
-    @Path("ji/files/{id}")    
+    @Path("ji/files/{id}")
     @Produces("application/octet-stream")
     @GET
     public InputStream getDeliverableContent(@PathParam("id") int delId)

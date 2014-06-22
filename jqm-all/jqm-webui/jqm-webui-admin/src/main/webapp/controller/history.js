@@ -190,6 +190,12 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
         });
     };
 
+    $scope.relaunch = function()
+    {
+        var ji = $scope.selected[0];
+        $http.post("ws/client/ji/" + ji.id).success($scope.getDataAsync);
+    };
+
     // Init data
     $scope.getDataAsync();
 });
