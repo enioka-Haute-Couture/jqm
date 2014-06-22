@@ -1636,6 +1636,12 @@ final class HibernateClient implements JqmClient
         res.setModule(jd.getModule());
         res.setQueue(getQueue(jd.getQueue()));
         res.setId(jd.getId());
+
+        for (JobDefParameter jdf : jd.getParameters())
+        {
+            res.addParameter(jdf.getKey(), jdf.getValue());
+        }
+
         return res;
     }
 }
