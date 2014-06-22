@@ -8,6 +8,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
     $scope.selected = [];
     $scope.query = {};
     $scope.queues = µQueueDto.query();
+    $scope.target = "hist";
 
     $scope.refresh = function()
     {
@@ -26,6 +27,18 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
         // Paging options
         $scope.query.firstRow = ($scope.pagingOptions.currentPage - 1) * $scope.pagingOptions.pageSize;
         $scope.query.pageSize = $scope.pagingOptions.pageSize;
+
+        // History or queues?
+        if ($scope.target === "hist")
+        {
+            $scope.query.queryLiveInstances = false;
+            $scope.query.queryHistoryInstances = true;
+        }
+        else
+        {
+            $scope.query.queryLiveInstances = true;
+            $scope.query.queryHistoryInstances = false;
+        }
 
         // Sort options
         $scope.query.sortby = [];
@@ -160,6 +173,13 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
         }
     }, true);
     $scope.$watch('sortInfo', function(newVal, oldVal)
+    {
+        if (newVal !== oldVal)
+        {
+            $scope.getDataAsync();
+        }
+    }, true);
+    $scope.$watch('target', function(newVal, oldVal)
     {
         if (newVal !== oldVal)
         {
