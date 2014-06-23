@@ -3,13 +3,10 @@ var jqmServices = angular.module('jqmServices', [ 'ngResource' ]);
 jqmServices.factory('µNodeDto', [ '$resource', function($resource)
 {
     return $resource('ws/admin/node/:id', {}, {
-        query : {
-            method : 'GET',
-            params : {
-                nodeId : ''
-            },
+        saveAll : {
+            method : 'PUT',
             isArray : true
-        }
+        },
     });
 } ]);
 

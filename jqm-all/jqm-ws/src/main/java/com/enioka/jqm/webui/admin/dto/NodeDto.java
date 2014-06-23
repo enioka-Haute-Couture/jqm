@@ -17,6 +17,7 @@ public class NodeDto
     private Calendar lastSeenAlive;
     private Integer jmxRegistryPort;
     private Integer jmxServerPort;
+    private Boolean stop = false;
 
     public Integer getId()
     {
@@ -116,5 +117,15 @@ public class NodeDto
     public void setJmxServerPort(Integer jmxServerPort)
     {
         this.jmxServerPort = jmxServerPort;
+    }
+
+    public Boolean getStop()
+    {
+        return stop;
+    }
+
+    public void setStop(Boolean stop)
+    {
+        this.stop = stop;
     }
 }

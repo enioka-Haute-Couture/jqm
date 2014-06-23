@@ -201,6 +201,22 @@ public class ServiceAdmin
         return getDto(Node.class, id);
     }
 
+    @PUT
+    @Path("node")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setNodes(List<NodeDto> dtos)
+    {
+        setItems(Node.class, dtos);
+    }
+
+    @POST
+    @Path("node")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setNode(NodeDto dto)
+    {
+        setItem(dto);
+    }
+
     // ////////////////////////////////////////////////////////////////////////
     // Queues
     // ////////////////////////////////////////////////////////////////////////

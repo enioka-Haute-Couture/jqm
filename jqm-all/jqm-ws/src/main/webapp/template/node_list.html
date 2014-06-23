@@ -4,15 +4,20 @@
     <h5>
         Nodes can only be created through the command line
         <code>jqm.sh createnode [ nodename ]</code>
+        . Only nodes switched off for more than 10 minutes can be removed.
     </h5>
-    <h5>Node detail can be consulted by clicking on tjhe node name. Nodes switched off for more than 10 minutes can also be removed.</h5>
-    <h5>The list of existing nodes is:</h5>
-    Search: <input ng-model="query" />
+    Search: <input ng-model="filterOptions.filterText" />
     <div>
         <div ng-repeat="node in nodes  | filter:query | orderBy:'name'">
             <a href="#/node/{{node.id}}"> {{node.name}}</a>
         </div>
     </div>
 
+    <div class='gridClass' ng-grid='gridOptions' style='width: 100%;'></div>
+
+    <button class="btn btn-default" ng-click="refresh()">Refresh</button>
+    <button class="btn btn-default" ng-click="stop()" jqm-permission="node:create" ng-disabled="selected.length === 0">Send stop order</button>
+    <button class="btn btn-default" ng-click="save()" jqm-permission="node:create">Save nodes</button>
+    <button class="btn btn-default" ng-click="remove()" ng-disabled="selected.length === 0" jqm-permission="jd:delete">Delete selected</button>
 </div>
 

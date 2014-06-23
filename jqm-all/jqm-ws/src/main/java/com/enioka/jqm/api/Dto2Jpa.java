@@ -24,6 +24,7 @@ import com.enioka.jqm.jpamodel.RUser;
 import com.enioka.jqm.webui.admin.dto.GlobalParameterDto;
 import com.enioka.jqm.webui.admin.dto.JndiObjectResourceDto;
 import com.enioka.jqm.webui.admin.dto.JobDefDto;
+import com.enioka.jqm.webui.admin.dto.NodeDto;
 import com.enioka.jqm.webui.admin.dto.ParameterDto;
 import com.enioka.jqm.webui.admin.dto.QueueDto;
 import com.enioka.jqm.webui.admin.dto.QueueMappingDto;
@@ -68,7 +69,42 @@ class Dto2Jpa
         {
             return (J) setJpa(em, (RRoleDto) dto);
         }
+        else if (dto instanceof NodeDto)
+        {
+            return (J) setJpa(em, (NodeDto) dto);
+        }
         return null;
+    }
+
+    private static Node setJpa(EntityManager em, NodeDto dto)
+    {
+        Node n = null;
+
+        if (dto.getId() == null)
+        {
+            n = new Node();
+        }
+        else
+        {
+            n = em.find(Node.class, dto.getId());
+        }
+
+        // Update or set fields
+        n.setDns(dto.getDns());
+        n.setDlRepo(dto.getOutputDirectory());
+        n.setJmxRegistryPort(dto.getJmxRegistryPort());
+        n.setJmxServerPort(dto.getJmxServerPort());
+        n.setName(dto.getName());
+        n.setPort(dto.getPort());
+        n.setRepo(dto.getJobRepoDirectory());
+        n.setRootLogLevel(dto.getRootLogLevel());
+        n.setStop(dto.getStop());
+
+        // save
+        n = em.merge(n);
+
+        // Done
+        return n;
     }
 
     private static GlobalParameter setJpa(EntityManager em, GlobalParameterDto dto)
