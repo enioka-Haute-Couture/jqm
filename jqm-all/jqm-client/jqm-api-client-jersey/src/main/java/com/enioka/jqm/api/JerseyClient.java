@@ -32,6 +32,8 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+
 /**
  * Main JQM client API entry point.
  */
@@ -86,8 +88,16 @@ final class JerseyClient implements JqmClient
             }
         }
 
+        // Basic Authentication
+        if (this.p.containsKey("com.enioka.jqm.ws.login") && this.p.containsKey("com.enioka.jqm.ws.password"))
+        {
+            HttpAuthenticationFeature auth = HttpAuthenticationFeature.basic(this.p.getProperty("com.enioka.jqm.ws.login"),
+                    this.p.getProperty("com.enioka.jqm.ws.password"));
+            client.register(auth);
+        }
+
         // Set properties
-        this.target = client.target(this.p.getProperty("com.enioka.ws.url", "http://localhost:1789/api/ws"));
+        this.target = client.target(this.p.getProperty("com.enioka.jqm.ws.url", "http://localhost:1789/api/ws"));
     }
 
     @Override

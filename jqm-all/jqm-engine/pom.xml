@@ -233,6 +233,11 @@
 			<artifactId>jqm-pki</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-web</artifactId>
+			<version>1.2.3</version>
+		</dependency>
 
 		<!-- JQM APIs -->
 		<dependency>

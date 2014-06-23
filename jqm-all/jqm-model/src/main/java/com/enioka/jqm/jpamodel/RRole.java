@@ -47,7 +47,7 @@ public class RRole implements Serializable
     private String description;
 
     @ManyToMany()
-    private List<RUser> users;
+    private List<RUser> users = new ArrayList<RUser>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
     private List<RPermission> permissions = new ArrayList<RPermission>();

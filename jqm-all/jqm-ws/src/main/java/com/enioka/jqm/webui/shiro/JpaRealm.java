@@ -49,10 +49,10 @@ public class JpaRealm extends AuthorizingRealm
 
     private SimpleAccount getUser(String login)
     {
-        EntityManager em = ServiceAdmin.getEm();
-        System.out.println(login);
+        EntityManager em = null;
         try
         {
+            em = ServiceAdmin.getEm();
             RUser user = em
                     .createQuery(
                             "SELECT u FROM RUser u WHERE UPPER(u.login) = UPPER(:l) AND NOT (u.password IS NULL AND u.certificateThumbprint IS NULL)",
@@ -96,6 +96,11 @@ public class JpaRealm extends AuthorizingRealm
         {
             // No such user in realm
             return null;
+        }
+        catch (RuntimeException e)
+        {
+            e.printStackTrace();
+            throw e;
         }
         finally
         {

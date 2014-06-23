@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -44,18 +42,19 @@ import com.enioka.jqm.webui.admin.dto.RUserDto;
 @Path("/admin")
 public class ServiceAdmin
 {
-    private static EntityManagerFactory emf;
-
-    public synchronized static EntityManager getEm()
+    // Small hack: instead of creating an EMF, we take the one from the JPA client
+    private static HibernateClient c = null;
+    static
     {
-        if (emf == null)
-        {
-            Properties p = new Properties();
-            p.put("javax.persistence.nonJtaDataSource", "java:/comp/env/jdbc/jqm");
-            emf = Persistence.createEntityManagerFactory("jobqueue-api-pu", p);
-        }
+        Properties p = new Properties();
+        p.put("javax.persistence.nonJtaDataSource", "jdbc/jqm");
+        JqmClientFactory.setProperties(p);
+        c = (HibernateClient) JqmClientFactory.getClient();
+    }
 
-        return emf.createEntityManager();
+    public static EntityManager getEm()
+    {
+        return c.getEm();
     }
 
     // ////////////////////////////////////////////////////////////////////////

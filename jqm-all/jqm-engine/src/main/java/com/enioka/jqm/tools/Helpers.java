@@ -20,6 +20,7 @@ package com.enioka.jqm.tools;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Properties;
@@ -34,6 +35,9 @@ import javax.persistence.Persistence;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.crypto.hash.Sha512Hash;
+import org.apache.shiro.util.ByteSource;
 
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
@@ -47,6 +51,9 @@ import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.MessageJi;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.jpamodel.RPermission;
+import com.enioka.jqm.jpamodel.RRole;
+import com.enioka.jqm.jpamodel.RUser;
 import com.enioka.jqm.jpamodel.State;
 
 /**
@@ -377,9 +384,80 @@ final class Helpers
             jqmlogger.info("This node is configured to take jobs from at least one queue");
         }
 
+        // Roles
+        RRole adminr = createRoleIfMissing(em, "administrator", "all permissions without exception", "*:*");
+        createRoleIfMissing(em, "config admin", "can read and write all configuration, except security configuration", "node:*", "queue:*",
+                "qmapping:*", "jndi:*", "prm:*", "jd:*");
+        createRoleIfMissing(em, "config viewer", "can read all configuration except for security configuration", "node:read", "queue:read",
+                "qmapping:read", "jndi:read", "prm:read", "jd:read");
+        createRoleIfMissing(em, "client", "can use the full client API except reading logs and altering position", "node:read",
+                "queue:read", "job_instance:*", "jd:read");
+        createRoleIfMissing(em, "client power user", "can use the full client API", "node:read", "queue:read", "job_instance:*", "jd:read",
+                "logs:read", "queue_position:create");
+
+        // Users
+        createUserIfMissing(em, "admin", "all powerfull user", adminr);
+
         // Done
         em.getTransaction().commit();
         return n;
+    }
+
+    private static RRole createRoleIfMissing(EntityManager em, String roleName, String description, String... permissions)
+    {
+        try
+        {
+            return em.createQuery("SELECT rr from RRole rr WHERE rr.name = :r", RRole.class).setParameter("r", roleName).getSingleResult();
+        }
+        catch (NoResultException e)
+        {
+            RRole r = new RRole();
+            r.setName(roleName);
+            r.setDescription(description);
+            em.persist(r);
+
+            for (String s : permissions)
+            {
+                RPermission p = new RPermission();
+                p.setName(s);
+                p.setRole(r);
+                em.persist(p);
+                r.getPermissions().add(p);
+            }
+            return r;
+        }
+    }
+
+    private static RUser createUserIfMissing(EntityManager em, String login, String description, RRole... roles)
+    {
+        try
+        {
+            return em.createQuery("SELECT r from RUser r WHERE r.login = :l", RUser.class).setParameter("l", login).getSingleResult();
+        }
+        catch (NoResultException e)
+        {
+            RUser u = new RUser();
+            u.setFreeText("default administrator account");
+            u.setLocked(false);
+            u.setLogin("admin");
+            u.setPassword((String.valueOf((new SecureRandom()).nextInt())));
+            encodePassword(u);
+            em.persist(u);
+
+            for (RRole r : roles)
+            {
+                u.getRoles().add(r);
+                r.getUsers().add(u);
+            }
+            return u;
+        }
+    }
+
+    static void encodePassword(RUser user)
+    {
+        ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
+        user.setPassword(new Sha512Hash(user.getPassword(), salt, 100000).toHex());
+        user.setHashSalt(salt.toHex());
     }
 
     /**

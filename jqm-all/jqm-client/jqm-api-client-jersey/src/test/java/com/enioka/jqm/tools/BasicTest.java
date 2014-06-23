@@ -27,6 +27,9 @@ import com.enioka.jqm.api.Query;
 import com.enioka.jqm.api.Queue;
 import com.enioka.jqm.api.State;
 import com.enioka.jqm.jpamodel.Node;
+import com.enioka.jqm.jpamodel.RPermission;
+import com.enioka.jqm.jpamodel.RRole;
+import com.enioka.jqm.jpamodel.RUser;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -64,7 +67,8 @@ public class BasicTest
     public void before() throws Exception
     {
         jqmlogger.debug("********* TEST INIT");
-        FileUtils.copyFileToDirectory(new File("../../jqm-ws/target/jqm-ws.war"), new File("./webapp"));
+        File jar = FileUtils.listFiles(new File("../../jqm-ws/target/"), new String[] { "war" }, false).iterator().next();
+        FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war"));
         em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
@@ -75,15 +79,22 @@ public class BasicTest
         em.createQuery("UPDATE GlobalParameter gp set gp.value='true' WHERE gp.key = 'logFilePerLaunch'").executeUpdate();
         n.setRepo("./../..");
         n.setDlRepo("./target");
+
         em.getTransaction().commit();
 
         engine1 = new JqmEngine();
         engine1.start("localhost");
 
+        // Test user
+        RRole r = em.createQuery("SELECT rr from RRole rr WHERE rr.name = :r", RRole.class).setParameter("r", "client power user").getSingleResult();
+        CreationTools.createUser(em, "test", "test", r);
+
         Properties p = new Properties();
         em.refresh(n);
         System.out.println(n.getPort());
-        p.put("com.enioka.ws.url", "http://" + n.getDns() + ":" + n.getPort() + "/api/ws");
+        p.put("com.enioka.jqm.ws.url", "http://" + n.getDns() + ":" + n.getPort() + "/ws/client");
+        p.put("com.enioka.jqm.ws.login", "test");
+        p.put("com.enioka.jqm.ws.password", "test");
         JqmClientFactory.setProperties(p);
     }
 
@@ -173,7 +184,7 @@ public class BasicTest
         i = JqmClientFactory.getClient().enqueue(j);
         Thread.sleep(1000);
         Assert.assertEquals(1, JqmClientFactory.getClient().getUserActiveJobs("TEST2").size());
-        Assert.assertTrue(JqmClientFactory.getClient().getJob(i).getState().equals(State.SUBMITTED));
+        Assert.assertEquals(State.SUBMITTED, JqmClientFactory.getClient().getJob(i).getState());
 
         JqmClientFactory.getClient().setJobQueuePosition(i, 12);
         JqmClientFactory.getClient().cancelJob(i);
@@ -188,11 +199,12 @@ public class BasicTest
             if (q.getName().equals("VIPQueue"))
             {
                 newQueue = q;
+                break;
             }
         }
         JqmClientFactory.getClient().setJobQueue(i, newQueue);
-        Thread.sleep(1000);
-        Assert.assertTrue(JqmClientFactory.getClient().getJob(i).getState().equals(State.RUNNING));
+        Thread.sleep(500);
+        Assert.assertEquals(State.RUNNING, JqmClientFactory.getClient().getJob(i).getState());
         JqmClientFactory.getClient().killJob(i);
         Assert.assertTrue(JqmClientFactory.getClient().getJob(i).getState().equals(State.KILLED));
 

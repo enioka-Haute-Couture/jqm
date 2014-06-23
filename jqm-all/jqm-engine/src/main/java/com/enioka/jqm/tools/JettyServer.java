@@ -177,7 +177,7 @@ class JettyServer
         jqmlogger.info("Jetty will now load the web service application war");
 
         // Load web application.
-        WebAppContext webAppContext = new WebAppContext(war.getPath(), "/api");
+        WebAppContext webAppContext = new WebAppContext(war.getPath(), "/");
         webAppContext.setDisplayName("JqmWebServices");
 
         // Hide server classes from the web app

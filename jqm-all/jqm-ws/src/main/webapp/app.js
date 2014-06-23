@@ -85,7 +85,7 @@ function TabsCtrl($scope, $location, $http)
     }, {
         link : '#/history',
         label : 'History',
-        permission : 'history:read',
+        permission : 'job_instance:read',
     }, ];
 
     $scope.selectedTab = $scope.tabs[0];

@@ -15,7 +15,7 @@ public class BasicHttpAuthenticationFilter extends org.apache.shiro.web.filter.a
         HttpServletRequest httpRequest = WebUtils.toHttp(request);
         String appHeader = httpRequest.getHeader("X-Requested-With");
 
-        if (appHeader == null)
+        if (!"XMLHttpRequest".equals(appHeader))
         {
             // If not from an interactive application, return the classic 401/Basic authentication challenge
             return super.sendChallenge(request, response);

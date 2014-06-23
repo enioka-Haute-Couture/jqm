@@ -29,12 +29,16 @@ import javax.persistence.TypedQuery;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.crypto.hash.Sha512Hash;
+import org.apache.shiro.util.ByteSource;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JndiObjectResource;
 import com.enioka.jqm.jpamodel.Node;
+import com.enioka.jqm.jpamodel.RUser;
 
 public class TestHelpers
 {
@@ -122,6 +126,10 @@ public class TestHelpers
         em.createQuery("DELETE JndiObjectResource WHERE 1=1").executeUpdate();
         em.createQuery("DELETE DatabaseProp WHERE 1=1").executeUpdate();
         em.createQuery("DELETE PKI WHERE 1=1").executeUpdate();
+        em.createQuery("DELETE RPermission WHERE 1=1").executeUpdate();
+        em.createQuery("DELETE RRole WHERE 1=1").executeUpdate();
+        em.createQuery("DELETE RUser WHERE 1=1").executeUpdate();
+        
         em.getTransaction().commit();
 
         try
@@ -167,5 +175,12 @@ public class TestHelpers
             {
             }
         }
+    }
+
+    public static void encodePassword(RUser user)
+    {
+        ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
+        user.setPassword(new Sha512Hash(user.getPassword(), salt, 100000).toHex());
+        user.setHashSalt(salt.toHex());
     }
 }

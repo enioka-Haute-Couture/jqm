@@ -44,6 +44,9 @@ import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.jpamodel.RPermission;
+import com.enioka.jqm.jpamodel.RRole;
+import com.enioka.jqm.jpamodel.RUser;
 import com.enioka.jqm.jpamodel.State;
 
 /**
@@ -456,6 +459,43 @@ public class CreationTools
         HashMap<String, String> prms = new HashMap<String, String>();
         prms.put("URL", url);
         return createJndiObjectResource(em, jndiAlias, "java.io.URL", "com.enioka.jqm.providers.UrlFactory", description, true, prms);
+    }
+
+    public static RRole createRole(EntityManager em, String roleName, String description, String... permissions)
+    {
+        em.getTransaction().begin();
+        RRole r = new RRole();
+        r.setName(roleName);
+        r.setDescription(description);
+        em.persist(r);
+
+        for (String s : permissions)
+        {
+            RPermission p = new RPermission();
+            p.setName(s);
+            p.setRole(r);
+            r.getPermissions().add(p);
+        }
+        em.getTransaction().commit();
+        return r;
+    }
+
+    public static RUser createUser(EntityManager em, String login, String password, RRole... roles)
+    {
+        em.getTransaction().begin();
+        RUser u = new RUser();
+        u.setLogin(login);
+        u.setPassword(password);
+        TestHelpers.encodePassword(u);
+        em.persist(u);
+
+        for (RRole r : roles)
+        {
+            u.getRoles().add(r);
+            r.getUsers().add(u);
+        }
+        em.getTransaction().commit();
+        return u;
     }
 
 }
