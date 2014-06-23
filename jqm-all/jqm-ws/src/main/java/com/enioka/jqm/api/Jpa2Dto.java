@@ -17,9 +17,9 @@ import com.enioka.jqm.webui.admin.dto.GlobalParameterDto;
 import com.enioka.jqm.webui.admin.dto.JndiObjectResourceDto;
 import com.enioka.jqm.webui.admin.dto.ParameterDto;
 import com.enioka.jqm.webui.admin.dto.JobDefDto;
-import com.enioka.jqm.webui.admin.dto.NodeDTO;
-import com.enioka.jqm.webui.admin.dto.QueueDTO;
-import com.enioka.jqm.webui.admin.dto.QueueMappingDTO;
+import com.enioka.jqm.webui.admin.dto.NodeDto;
+import com.enioka.jqm.webui.admin.dto.QueueDto;
+import com.enioka.jqm.webui.admin.dto.QueueMappingDto;
 import com.enioka.jqm.webui.admin.dto.RRoleDto;
 import com.enioka.jqm.webui.admin.dto.RUserDto;
 
@@ -64,9 +64,9 @@ public class Jpa2Dto
         return null;
     }
 
-    private static NodeDTO getDTO(Node n)
+    private static NodeDto getDTO(Node n)
     {
-        NodeDTO res = new NodeDTO();
+        NodeDto res = new NodeDto();
         res.setDns(n.getDns());
         res.setId(n.getId());
         res.setJmxRegistryPort(n.getJmxRegistryPort());
@@ -81,9 +81,9 @@ public class Jpa2Dto
         return res;
     }
 
-    private static QueueDTO getDTO(Queue q)
+    private static QueueDto getDTO(Queue q)
     {
-        QueueDTO res = new QueueDTO();
+        QueueDto res = new QueueDto();
         res.setDefaultQueue(q.isDefaultQueue());
         res.setDescription(q.getDescription());
         res.setId(q.getId());
@@ -92,9 +92,9 @@ public class Jpa2Dto
         return res;
     }
 
-    private static QueueMappingDTO getDTO(DeploymentParameter s)
+    private static QueueMappingDto getDTO(DeploymentParameter s)
     {
-        QueueMappingDTO res = new QueueMappingDTO();
+        QueueMappingDto res = new QueueMappingDto();
         res.setId(s.getId());
         res.setNbThread(s.getNbThread());
         res.setNodeId(s.getNode().getId());

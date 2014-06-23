@@ -5,7 +5,7 @@ import java.util.Calendar;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class NodeDTO
+public class NodeDto
 {
     private Integer id;
     private String name;

@@ -25,8 +25,8 @@ import com.enioka.jqm.webui.admin.dto.GlobalParameterDto;
 import com.enioka.jqm.webui.admin.dto.JndiObjectResourceDto;
 import com.enioka.jqm.webui.admin.dto.JobDefDto;
 import com.enioka.jqm.webui.admin.dto.ParameterDto;
-import com.enioka.jqm.webui.admin.dto.QueueDTO;
-import com.enioka.jqm.webui.admin.dto.QueueMappingDTO;
+import com.enioka.jqm.webui.admin.dto.QueueDto;
+import com.enioka.jqm.webui.admin.dto.QueueMappingDto;
 import com.enioka.jqm.webui.admin.dto.RRoleDto;
 import com.enioka.jqm.webui.admin.dto.RUserDto;
 
@@ -52,13 +52,13 @@ class Dto2Jpa
         {
             return (J) setJpa(em, (JndiObjectResourceDto) dto);
         }
-        else if (dto instanceof QueueMappingDTO)
+        else if (dto instanceof QueueMappingDto)
         {
-            return (J) setJpa(em, (QueueMappingDTO) dto);
+            return (J) setJpa(em, (QueueMappingDto) dto);
         }
-        else if (dto instanceof QueueDTO)
+        else if (dto instanceof QueueDto)
         {
-            return (J) setJpa(em, (QueueDTO) dto);
+            return (J) setJpa(em, (QueueDto) dto);
         }
         else if (dto instanceof RUserDto)
         {
@@ -239,7 +239,7 @@ class Dto2Jpa
         return jpa;
     }
 
-    private static DeploymentParameter setJpa(EntityManager em, QueueMappingDTO dto)
+    private static DeploymentParameter setJpa(EntityManager em, QueueMappingDto dto)
     {
         DeploymentParameter jpa = null;
 
@@ -265,7 +265,7 @@ class Dto2Jpa
         return jpa;
     }
 
-    private static Queue setJpa(EntityManager em, QueueDTO dto)
+    private static Queue setJpa(EntityManager em, QueueDto dto)
     {
         Queue jpa = null;
 

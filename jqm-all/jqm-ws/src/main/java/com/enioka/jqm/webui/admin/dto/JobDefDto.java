@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class JobDefDto extends BaseDto implements Serializable
+public class JobDefDto implements Serializable
 {
     private static final long serialVersionUID = 4934352148555212325L;
 

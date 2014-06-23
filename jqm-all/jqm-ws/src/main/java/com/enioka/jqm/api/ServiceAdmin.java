@@ -32,10 +32,10 @@ import com.enioka.jqm.jpamodel.RUser;
 import com.enioka.jqm.webui.admin.dto.GlobalParameterDto;
 import com.enioka.jqm.webui.admin.dto.JndiObjectResourceDto;
 import com.enioka.jqm.webui.admin.dto.JobDefDto;
-import com.enioka.jqm.webui.admin.dto.NodeDTO;
+import com.enioka.jqm.webui.admin.dto.NodeDto;
 import com.enioka.jqm.webui.admin.dto.PemissionsBagDto;
-import com.enioka.jqm.webui.admin.dto.QueueDTO;
-import com.enioka.jqm.webui.admin.dto.QueueMappingDTO;
+import com.enioka.jqm.webui.admin.dto.QueueDto;
+import com.enioka.jqm.webui.admin.dto.QueueMappingDto;
 import com.enioka.jqm.webui.admin.dto.RRoleDto;
 import com.enioka.jqm.webui.admin.dto.RUserDto;
 
@@ -187,7 +187,7 @@ public class ServiceAdmin
     @GET
     @Path("node")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<NodeDTO> getNodes()
+    public List<NodeDto> getNodes()
     {
         return getDtoList(Node.class);
     }
@@ -195,7 +195,7 @@ public class ServiceAdmin
     @GET
     @Path("node/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public NodeDTO getNode(@PathParam("id") int id)
+    public NodeDto getNode(@PathParam("id") int id)
     {
         System.out.println(SecurityUtils.getSubject().getPrincipal());
         return getDto(Node.class, id);
@@ -208,7 +208,7 @@ public class ServiceAdmin
     @GET
     @Path("q")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<QueueDTO> getQueues()
+    public List<QueueDto> getQueues()
     {
         return getDtoList(Queue.class);
     }
@@ -216,7 +216,7 @@ public class ServiceAdmin
     @PUT
     @Path("q")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setQueues(List<QueueDTO> dtos)
+    public void setQueues(List<QueueDto> dtos)
     {
         setItems(Queue.class, dtos);
     }
@@ -224,7 +224,7 @@ public class ServiceAdmin
     @GET
     @Path("q/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public QueueDTO getQueue(@PathParam("id") int id)
+    public QueueDto getQueue(@PathParam("id") int id)
     {
         return getDto(Queue.class, id);
     }
@@ -232,7 +232,7 @@ public class ServiceAdmin
     @PUT
     @Path("q/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setQueue(@PathParam("id") Integer id, QueueDTO dto)
+    public void setQueue(@PathParam("id") Integer id, QueueDto dto)
     {
         dto.setId(id);
         setItem(dto);
@@ -241,7 +241,7 @@ public class ServiceAdmin
     @POST
     @Path("q")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setQueue(QueueDTO dto)
+    public void setQueue(QueueDto dto)
     {
         setItem(dto);
     }
@@ -260,7 +260,7 @@ public class ServiceAdmin
     @GET
     @Path("qmapping")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<QueueMappingDTO> getQueueMappings()
+    public List<QueueMappingDto> getQueueMappings()
     {
         return getDtoList(DeploymentParameter.class);
     }
@@ -268,7 +268,7 @@ public class ServiceAdmin
     @PUT
     @Path("qmapping")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setQueueMappings(List<QueueMappingDTO> dtos)
+    public void setQueueMappings(List<QueueMappingDto> dtos)
     {
         setItems(DeploymentParameter.class, dtos);
     }
@@ -276,7 +276,7 @@ public class ServiceAdmin
     @GET
     @Path("qmapping/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public QueueMappingDTO getQueueMapping(@PathParam("id") int id)
+    public QueueMappingDto getQueueMapping(@PathParam("id") int id)
     {
         return getDto(DeploymentParameter.class, id);
     }
@@ -284,7 +284,7 @@ public class ServiceAdmin
     @PUT
     @Path("qmapping/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setQueueMapping(@PathParam("id") Integer id, QueueMappingDTO dto)
+    public void setQueueMapping(@PathParam("id") Integer id, QueueMappingDto dto)
     {
         dto.setId(id);
         setItem(dto);
@@ -293,7 +293,7 @@ public class ServiceAdmin
     @POST
     @Path("qmapping")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setQueueMapping(QueueMappingDTO dto)
+    public void setQueueMapping(QueueMappingDto dto)
     {
         setItem(dto);
     }

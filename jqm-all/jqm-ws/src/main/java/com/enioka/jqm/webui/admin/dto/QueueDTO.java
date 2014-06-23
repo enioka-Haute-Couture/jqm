@@ -5,7 +5,7 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class QueueDTO implements Serializable
+public class QueueDto implements Serializable
 {
     private static final long serialVersionUID = 4677043929807285233L;
 
