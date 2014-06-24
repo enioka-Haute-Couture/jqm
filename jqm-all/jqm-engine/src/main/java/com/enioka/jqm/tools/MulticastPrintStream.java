@@ -1,6 +1,7 @@
 package com.enioka.jqm.tools;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -20,7 +21,7 @@ import com.enioka.jqm.jpamodel.GlobalParameter;
  * The goal of this Stream is to provide a replacement for stdout/err in which every running job instance has its own personal flow. This is
  * basically flow multiplexing, with the multiplexing key being the caller Thread object. Used by default, can be disabled with a
  * {@link GlobalParameter}. <br>
- * Should a payload crate a new thread, its stdout would go to the global log as the multiplexing key is the Thread. But is not a big deal
+ * Should a payload create a new thread, its stdout would go to the global log as the multiplexing key is the Thread. But is not a big deal
  * as creating threads inside an app server is not a good idea anyway.
  */
 class MulticastPrintStream extends PrintStream
@@ -36,6 +37,12 @@ class MulticastPrintStream extends PrintStream
         super(out);
         this.original = new BufferedWriter(new OutputStreamWriter(out));
         this.rootLogDir = rootLogDir;
+
+        File d = new File(this.rootLogDir);
+        if (!d.isDirectory() && !d.mkdir())
+        {
+            throw new JqmInitError("could not create log dir " + this.rootLogDir);
+        }
     }
 
     synchronized void registerThread(String fileName)
