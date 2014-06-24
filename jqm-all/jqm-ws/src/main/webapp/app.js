@@ -109,8 +109,7 @@ function TabsCtrl($scope, $location, $http)
         if ($scope.selectedTab == tab)
         {
             return "active";
-        }
-        else
+        } else
         {
             return "";
         }
@@ -265,7 +264,8 @@ jqmApp.factory('httpBuffer', [ '$injector', function($injector)
 
     return {
         /**
-         * Appends HTTP request configuration object with deferred response attached to buffer.
+         * Appends HTTP request configuration object with deferred response
+         * attached to buffer.
          */
         append : function(config, deferred)
         {
@@ -282,7 +282,7 @@ jqmApp.factory('httpBuffer', [ '$injector', function($injector)
         {
             if (reason)
             {
-                for ( var i = 0; i < buffer.length; ++i)
+                for (var i = 0; i < buffer.length; ++i)
                 {
                     buffer[i].deferred.reject(reason);
                 }
@@ -295,7 +295,7 @@ jqmApp.factory('httpBuffer', [ '$injector', function($injector)
          */
         retryAll : function(updater)
         {
-            for ( var i = 0; i < buffer.length; ++i)
+            for (var i = 0; i < buffer.length; ++i)
             {
                 retryHttpRequest(updater(buffer[i].config), buffer[i].deferred);
             }
@@ -318,10 +318,10 @@ jqmApp.directive('jqmPermission', function(µPermManager)
 
             var shouldDisplay = function()
             {
-                // If the control does not ask for a particular permission, always enable it.
+                // If the control does not ask for a particular permission,
+                // always enable it.
                 if (scope.jqmPermission === "" || scope.jqmPermission === undefined)
                 {
-                    console.debug("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
                     return true;
                 }
 
@@ -360,13 +360,11 @@ jqmApp.directive('jqmPermission', function(µPermManager)
                     if (element.prop("tagName") === "BUTTON")
                     {
                         element.prop('disabled', true);
-                    }
-                    else
+                    } else
                     {
                         element.hide();
                     }
-                }
-                else
+                } else
                 {
                     element.show();
                     element.prop('disabled', false);

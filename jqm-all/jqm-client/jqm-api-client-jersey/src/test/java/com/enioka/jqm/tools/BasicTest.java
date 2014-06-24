@@ -27,9 +27,7 @@ import com.enioka.jqm.api.Query;
 import com.enioka.jqm.api.Queue;
 import com.enioka.jqm.api.State;
 import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.RPermission;
 import com.enioka.jqm.jpamodel.RRole;
-import com.enioka.jqm.jpamodel.RUser;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -86,7 +84,8 @@ public class BasicTest
         engine1.start("localhost");
 
         // Test user
-        RRole r = em.createQuery("SELECT rr from RRole rr WHERE rr.name = :r", RRole.class).setParameter("r", "client power user").getSingleResult();
+        RRole r = em.createQuery("SELECT rr from RRole rr WHERE rr.name = :r", RRole.class).setParameter("r", "client power user")
+                .getSingleResult();
         CreationTools.createUser(em, "test", "test", r);
 
         Properties p = new Properties();
