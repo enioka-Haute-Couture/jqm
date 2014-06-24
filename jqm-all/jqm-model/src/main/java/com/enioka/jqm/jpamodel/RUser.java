@@ -47,9 +47,6 @@ public class RUser implements Serializable
     @Column(length = 254, name = "password")
     private String password;
 
-    @Column(length = 254, name = "certificate")
-    private String certificateThumbprint;
-
     @Column(length = 254, name = "hashSalt")
     private String hashSalt;
 
@@ -98,16 +95,6 @@ public class RUser implements Serializable
     public void setPassword(String password)
     {
         this.password = password;
-    }
-
-    public String getCertificateThumbprint()
-    {
-        return certificateThumbprint;
-    }
-
-    public void setCertificateThumbprint(String certificateThumbprint)
-    {
-        this.certificateThumbprint = certificateThumbprint;
     }
 
     public List<RRole> getRoles()

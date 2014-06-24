@@ -164,7 +164,6 @@ public class Jpa2Dto
     private static RUserDto getDTO(RUser d)
     {
         RUserDto res = new RUserDto();
-        res.setCertificateThumbprint(d.getCertificateThumbprint());
         res.setCreationDate(d.getCreationDate());
         res.setExpirationDate(d.getExpirationDate());
         res.setId(d.getId());

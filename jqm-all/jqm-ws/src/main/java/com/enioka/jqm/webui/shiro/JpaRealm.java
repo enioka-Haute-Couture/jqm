@@ -53,10 +53,8 @@ public class JpaRealm extends AuthorizingRealm
         try
         {
             em = ServiceAdmin.getEm();
-            RUser user = em
-                    .createQuery(
-                            "SELECT u FROM RUser u WHERE UPPER(u.login) = UPPER(:l) AND NOT (u.password IS NULL AND u.certificateThumbprint IS NULL)",
-                            RUser.class).setParameter("l", login).getSingleResult();
+            RUser user = em.createQuery("SELECT u FROM RUser u WHERE UPPER(u.login) = UPPER(:l)", RUser.class).setParameter("l", login)
+                    .getSingleResult();
 
             // Credential is a password - in token, it is as a char array
             SimpleAccount res = new SimpleAccount(user.getLogin(), user.getPassword(), getName());

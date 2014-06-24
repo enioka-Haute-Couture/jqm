@@ -340,7 +340,6 @@ class Dto2Jpa
             jpa = em.find(RUser.class, dto.getId());
         }
 
-        jpa.setCertificateThumbprint(dto.getCertificateThumbprint());
         jpa.setEmail(dto.getEmail());
         jpa.setExpirationDate(dto.getExpirationDate());
         jpa.setFreeText(dto.getFreeText());
