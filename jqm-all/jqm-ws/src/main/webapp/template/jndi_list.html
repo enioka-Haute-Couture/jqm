@@ -27,12 +27,20 @@
                 <button ng-click="newurl()">New URL</button>
                 <button ng-click="newgeneric()">New generic resource</button>
             </div>
-            <button ng-click="removealias()" ng-show="selected.length !== 0">Remove selected alias</button>
-            <button ng-click="savealias()" ng-show="selected.length !== 0">Save selected alias</button>
         </td>
         <td ng-show="selected.length !== 0" style="vertical-align: top;">
-            <button ng-click="addprm()">Add new parameter</button>
-            <button ng-click="removeprms()" ng-show="selected2.length !== 0">Remove selected parameters</button>
+            <div>
+                <button ng-click="addprm()">Add new parameter</button>
+                <button ng-click="removeprms()" ng-show="selected2.length !== 0">Remove selected parameters</button>
+            </div>
+            <div>
+                <button ng-click="savealias()" ng-show="selected.length !== 0">
+                    Save selected alias <span style="color: green;" class="glyphicon glyphicon-ok">
+                </button>
+                <button ng-click="removealias()" ng-show="selected.length !== 0">
+                    Remove selected alias <span style="color: red;" class="glyphicon glyphicon-remove">
+                </button>
+            </div>
         </td>
     </tr>
 </table>
