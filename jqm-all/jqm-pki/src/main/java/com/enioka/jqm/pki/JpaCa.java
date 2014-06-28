@@ -1,9 +1,15 @@
 package com.enioka.jqm.pki;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.security.KeyFactory;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -105,7 +111,16 @@ public class JpaCa
 
         CertificateRequest srv = new CertificateRequest();
         srv.generateServerCert(serverCertPrettyName, ca.holder, ca.privateKey, subject);
-        srv.writePfxToFile(serverPfxPath, pfxPassword);
+        try
+        {
+            FileOutputStream pfxStore = new FileOutputStream(serverPfxPath);
+            srv.writePfxToFile(pfxStore, pfxPassword);
+            pfxStore.close();
+        }
+        catch (Exception e)
+        {
+            throw new PkiException(e);
+        }
         srv.writePemPublicToFile(serverCerPath);
         srv.writeTrustPfxToFile(trustPfxPath, pfxPassword);
     }
@@ -124,8 +139,44 @@ public class JpaCa
 
         CertificateRequest srv = new CertificateRequest();
         srv.generateClientCert(prettyName, ca.holder, ca.privateKey, subject);
-        srv.writePfxToFile(pfxPath, pfxPassword);
+        try
+        {
+            FileOutputStream pfxStore = new FileOutputStream(pfxPath);
+            srv.writePfxToFile(pfxStore, pfxPassword);
+            pfxStore.close();
+        }
+        catch (Exception e)
+        {
+            throw new PkiException(e);
+        }
         srv.writePemPublicToFile(cerPath);
+    }
+
+    public static InputStream getClientData(EntityManager em, String userName) throws Exception
+    {
+        ByteArrayOutputStream sink = new ByteArrayOutputStream();
+        ZipOutputStream zos = new ZipOutputStream(sink);
+
+        CertificateRequest ca = JpaCa.initCa(em);
+        CertificateRequest cl = new CertificateRequest();
+        cl.generateClientCert("JQM authentication certificate", ca.holder, ca.privateKey, "CN=" + userName);
+
+        zos.putNextEntry(new ZipEntry("ca.cer"));
+        zos.write(((ByteArrayOutputStream) ca.getPemPublicFile()).toByteArray());
+        zos.closeEntry();
+
+        zos.putNextEntry(new ZipEntry("client.cer"));
+        zos.write(((ByteArrayOutputStream) cl.getPemPublicFile()).toByteArray());
+        zos.closeEntry();
+
+        zos.putNextEntry(new ZipEntry("client.pfx"));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        cl.writePfxToFile(os, "SuperPassword");
+        zos.write(os.toByteArray());
+        zos.closeEntry();
+
+        zos.close();
+        return new ByteArrayInputStream(sink.toByteArray());
     }
 
 }

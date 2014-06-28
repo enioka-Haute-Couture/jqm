@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
@@ -207,24 +206,31 @@ public class CertificateRequest
         }
     }
 
-    private void generatePem() throws IOException
+    private void generatePem()
     {
-        // PEM public key
-        pemPublicFile = new ByteArrayOutputStream();
-        Writer osw = new OutputStreamWriter(pemPublicFile);
-        PEMWriter wr = new PEMWriter(osw);
-        wr.writeObject(holder);
-        wr.close();
+        try
+        {
+            // PEM public key
+            pemPublicFile = new ByteArrayOutputStream();
+            Writer osw = new OutputStreamWriter(pemPublicFile);
+            PEMWriter wr = new PEMWriter(osw);
+            wr.writeObject(holder);
+            wr.close();
 
-        // PEM private key
-        pemPrivateFile = new ByteArrayOutputStream();
-        osw = new OutputStreamWriter(pemPrivateFile);
-        wr = new PEMWriter(osw);
-        wr.writeObject(privateKey);
-        wr.close();
+            // PEM private key
+            pemPrivateFile = new ByteArrayOutputStream();
+            osw = new OutputStreamWriter(pemPrivateFile);
+            wr = new PEMWriter(osw);
+            wr.writeObject(privateKey);
+            wr.close();
+        }
+        catch (Exception e)
+        {
+            throw new PkiException(e);
+        }
     }
 
-    void writePfxToFile(String path, String password)
+    void writePfxToFile(OutputStream out, String password)
     {
         try
         {
@@ -246,9 +252,7 @@ public class CertificateRequest
 
             ks.setKeyEntry("private key for " + this.prettyName, privateKey, password.toCharArray(), chain);
 
-            FileOutputStream fos = new FileOutputStream(path);
-            ks.store(fos, password.toCharArray());
-            fos.close();
+            ks.store(out, password.toCharArray());
         }
         catch (Exception e)
         {
@@ -340,11 +344,19 @@ public class CertificateRequest
     // Data that can be accessed
     public OutputStream getPemPublicFile()
     {
+        if (pemPublicFile == null)
+        {
+            generatePem();
+        }
         return pemPublicFile;
     }
 
     public OutputStream getPemPrivateFile()
     {
+        if (pemPrivateFile == null)
+        {
+            generatePem();
+        }
         return pemPrivateFile;
     }
 

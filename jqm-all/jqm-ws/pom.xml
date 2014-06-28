@@ -53,6 +53,11 @@
 			<artifactId>shiro-web</artifactId>
 			<version>1.2.3</version>
 		</dependency>
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-pki</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- For the client API -->
 		<dependency>
@@ -83,6 +88,13 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
+		</dependency>
+
+		<!-- Stupid java IO APIs solution -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
 		</dependency>
 
 		<!-- Tests -->

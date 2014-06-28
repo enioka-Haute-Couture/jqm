@@ -1,5 +1,6 @@
 package com.enioka.jqm.api;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -29,6 +30,7 @@ import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.RPermission;
 import com.enioka.jqm.jpamodel.RRole;
 import com.enioka.jqm.jpamodel.RUser;
+import com.enioka.jqm.pki.JpaCa;
 import com.enioka.jqm.webui.admin.dto.GlobalParameterDto;
 import com.enioka.jqm.webui.admin.dto.JndiObjectResourceDto;
 import com.enioka.jqm.webui.admin.dto.JobDefDto;
@@ -609,5 +611,27 @@ public class ServiceAdmin
         PemissionsBagDto b = new PemissionsBagDto();
         b.permissions = res;
         return b;
+    }
+
+    @Path("user/{id}/certificate")
+    @Produces("application/zip")
+    @GET
+    public InputStream getNewCertificate(@PathParam("id") int userIds)
+    {
+        EntityManager em = null;
+        try
+        {
+            em = getEm();
+            RUser u = em.find(RUser.class, userIds);
+            return JpaCa.getClientData(em, u.getLogin());
+        }
+        catch (Exception e)
+        {
+            throw new ErrorDto("could not create certificate", 1, e, Status.INTERNAL_SERVER_ERROR);
+        }
+        finally
+        {
+            em.close();
+        }
     }
 }
