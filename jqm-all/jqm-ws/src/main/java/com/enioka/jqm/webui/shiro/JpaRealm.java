@@ -8,6 +8,7 @@ import javax.persistence.NoResultException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -29,9 +30,23 @@ public class JpaRealm extends AuthorizingRealm
     }
 
     @Override
+    protected void assertCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) throws AuthenticationException
+    {
+        if (token instanceof CertificateToken)
+        {
+            if (!((CertificateToken) token).getUserName().equals(info.getPrincipals().getPrimaryPrincipal()))
+            {
+                throw new IncorrectCredentialsException("certificate presented did not match the awaited username");
+            }
+            return;
+        }
+        super.assertCredentialsMatch(token, info);
+    }
+
+    @Override
     public boolean supports(AuthenticationToken token)
     {
-        return token instanceof UsernamePasswordToken;
+        return (token instanceof UsernamePasswordToken) || (token instanceof CertificateToken);
     }
 
     @Override
@@ -43,6 +58,10 @@ public class JpaRealm extends AuthorizingRealm
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException
     {
+        if (token instanceof CertificateToken)
+        {
+            return getUser(((CertificateToken) token).getUserName());
+        }
         UsernamePasswordToken t = (UsernamePasswordToken) token;
         return getUser(t.getUsername());
     }
@@ -87,7 +106,6 @@ public class JpaRealm extends AuthorizingRealm
                     res.addStringPermission(p.getName());
                 }
             }
-
             return res;
         }
         catch (NoResultException e)

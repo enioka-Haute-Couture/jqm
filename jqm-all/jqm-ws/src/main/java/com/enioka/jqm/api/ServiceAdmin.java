@@ -588,8 +588,6 @@ public class ServiceAdmin
     @Path("me")
     public PemissionsBagDto getMyself(@Context HttpServletRequest req)
     {
-        System.out.println("RRRRRRRRRRRR");
-        System.out.println(req.getUserPrincipal().getName());
         EntityManager em = getEm();
         List<String> res = new ArrayList<String>();
         RUser memyselfandi = em.createQuery("SELECT u FROM RUser u WHERE u.login = :l", RUser.class)
@@ -602,11 +600,7 @@ public class ServiceAdmin
                 res.add(p.getName());
             }
         }
-
-        System.out.println(res);
-
         em.close();
-        System.out.println("end....");
 
         PemissionsBagDto b = new PemissionsBagDto();
         b.permissions = res;

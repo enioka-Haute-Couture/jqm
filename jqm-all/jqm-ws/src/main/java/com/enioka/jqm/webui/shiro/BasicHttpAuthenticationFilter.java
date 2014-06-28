@@ -1,14 +1,45 @@
 package com.enioka.jqm.webui.shiro;
 
+import java.security.cert.X509Certificate;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.util.WebUtils;
 
 public class BasicHttpAuthenticationFilter extends org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter
 {
+
+    @Override
+    protected boolean isLoginAttempt(ServletRequest request, ServletResponse response)
+    {
+        final X509Certificate[] clientCertificateChain = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+        if (clientCertificateChain != null && clientCertificateChain.length > 0)
+        {
+            return true;
+        }
+        else
+        {
+            return super.isLoginAttempt(request, response);
+        }
+    }
+
+    @Override
+    protected AuthenticationToken createToken(ServletRequest request, ServletResponse response)
+    {
+        final X509Certificate[] clientCertificateChain = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+        if (clientCertificateChain != null && clientCertificateChain.length > 0)
+        {
+            return new CertificateToken(clientCertificateChain[0]);
+        }
+        else
+        {
+            return super.createToken(request, response);
+        }
+    }
+
     @Override
     protected boolean sendChallenge(ServletRequest request, ServletResponse response)
     {

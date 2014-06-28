@@ -83,6 +83,7 @@
                                 Delete user {{usr.id}} <span style="color: red;" class="glyphicon glyphicon-remove"></span>
                             </button>
                             (Created: <label id="txtCreation" class="form-label">{{usr.creationDate | date: 'dd/MM/yyyy HH:mm'}}</label>)
+                            <a href="./ws/admin/user/{{usr.id}}/certificate" download="user.zip" target="_blank">New certificate</a>
                         </div>
                     </div>
                 </div>

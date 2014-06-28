@@ -2,7 +2,7 @@
 
 var jqmApp = angular.module('jqmApp', [ 'ngRoute', 'ngCookies', 'jqmControllers', 'ngGrid', 'jqmServices', 'ui.bootstrap', ]);
 
-jqmApp.config([ '$routeProvider', function($routeProvider)
+jqmApp.config([ '$routeProvider', function($routeProvider, µPermManager)
 {
     $routeProvider.when('/home', {
         templateUrl : 'template/home.html',
@@ -42,7 +42,7 @@ jqmApp.config([ '$routeProvider', function($routeProvider)
     });
 } ]);
 
-function TabsCtrl($scope, $location, $http)
+function TabsCtrl($scope, $location, $http, µPermManager)
 {
     $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
@@ -109,11 +109,14 @@ function TabsCtrl($scope, $location, $http)
         if ($scope.selectedTab == tab)
         {
             return "active";
-        } else
+        }
+        else
         {
             return "";
         }
     };
+
+    µPermManager.refresh();
 }
 
 Date.prototype.addDays = function(days)
@@ -127,7 +130,7 @@ Date.prototype.addDays = function(days)
 // Login & permissions handling
 // ///////////////////////////////////////////////////////////////////
 
-jqmApp.service('µPermManager', function(µUserPerms, $http, $cookieStore, $rootScope, httpBuffer)
+jqmApp.service('µPermManager', function(µUserPerms, $cookieStore, $rootScope, $http, httpBuffer)
 {
     this.perms = [];
     var scope = this;
@@ -135,6 +138,11 @@ jqmApp.service('µPermManager', function(µUserPerms, $http, $cookieStore, $root
     this.init = function(login, password)
     {
         $http.defaults.headers.common['Authorization'] = "Basic " + btoa(login + ":" + password);
+        this.refresh();
+    };
+
+    this.refresh = function()
+    {
         scope.perms = µUserPerms.get(null, this.permsok, this.permsko);
     };
 
@@ -231,8 +239,11 @@ jqmApp.directive('loginDialog', function($modal)
 
             scope.$on('event:auth-loginConfirmed', function()
             {
-                a.close();
-                a = null;
+                if (a)
+                {
+                    a.close();
+                    a = null;
+                }
             });
         }
     };
@@ -264,8 +275,7 @@ jqmApp.factory('httpBuffer', [ '$injector', function($injector)
 
     return {
         /**
-         * Appends HTTP request configuration object with deferred response
-         * attached to buffer.
+         * Appends HTTP request configuration object with deferred response attached to buffer.
          */
         append : function(config, deferred)
         {
@@ -282,7 +292,7 @@ jqmApp.factory('httpBuffer', [ '$injector', function($injector)
         {
             if (reason)
             {
-                for (var i = 0; i < buffer.length; ++i)
+                for ( var i = 0; i < buffer.length; ++i)
                 {
                     buffer[i].deferred.reject(reason);
                 }
@@ -295,7 +305,7 @@ jqmApp.factory('httpBuffer', [ '$injector', function($injector)
          */
         retryAll : function(updater)
         {
-            for (var i = 0; i < buffer.length; ++i)
+            for ( var i = 0; i < buffer.length; ++i)
             {
                 retryHttpRequest(updater(buffer[i].config), buffer[i].deferred);
             }
@@ -360,11 +370,13 @@ jqmApp.directive('jqmPermission', function(µPermManager)
                     if (element.prop("tagName") === "BUTTON")
                     {
                         element.prop('disabled', true);
-                    } else
+                    }
+                    else
                     {
                         element.hide();
                     }
-                } else
+                }
+                else
                 {
                     element.show();
                     element.prop('disabled', false);
@@ -387,6 +399,6 @@ jqmApp.controller('µHomeController', function($scope, µUserPerms, µPermManage
     $scope.login = function()
     {
         µPermManager.logout();
-        µUserPerms.get();
+        µPermManager.refresh();
     };
 });
