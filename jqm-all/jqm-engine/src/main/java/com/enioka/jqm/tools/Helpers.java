@@ -396,14 +396,14 @@ final class Helpers
                 "logs:read", "queue_position:create");
 
         // Users
-        createUserIfMissing(em, "admin", "all powerfull user", adminr);
+        createUserIfMissing(em, "root", "all powerfull user", adminr);
 
         // Done
         em.getTransaction().commit();
         return n;
     }
 
-    private static RRole createRoleIfMissing(EntityManager em, String roleName, String description, String... permissions)
+    static RRole createRoleIfMissing(EntityManager em, String roleName, String description, String... permissions)
     {
         try
         {
@@ -428,7 +428,7 @@ final class Helpers
         }
     }
 
-    private static RUser createUserIfMissing(EntityManager em, String login, String description, RRole... roles)
+    static RUser createUserIfMissing(EntityManager em, String login, String description, RRole... roles)
     {
         try
         {
@@ -437,9 +437,9 @@ final class Helpers
         catch (NoResultException e)
         {
             RUser u = new RUser();
-            u.setFreeText("default administrator account");
+            u.setFreeText(description);
             u.setLocked(false);
-            u.setLogin("admin");
+            u.setLogin(login);
             u.setPassword((String.valueOf((new SecureRandom()).nextInt())));
             encodePassword(u);
             em.persist(u);

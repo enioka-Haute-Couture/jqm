@@ -32,6 +32,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.jpamodel.RRole;
+import com.enioka.jqm.jpamodel.RUser;
 
 /**
  * Starter class & parameter parsing
@@ -99,6 +101,8 @@ public class Main
         Option o81 = OptionBuilder.withDescription("upgrade JQM database").withLongOpt("upgrade").create("u");
         Option o91 = OptionBuilder.withArgName("jobInstanceId").hasArg().withDescription("get job instance status by ID").isRequired()
                 .withLongOpt("getstatus").create("g");
+        Option o101 = OptionBuilder.withArgName("password").hasArg().withDescription("creates or resets root admin account password")
+                .isRequired().withLongOpt("root").create("r");
 
         Options options = new Options();
         OptionGroup og1 = new OptionGroup();
@@ -113,6 +117,7 @@ public class Main
         og1.addOption(o71);
         og1.addOption(o81);
         og1.addOption(o91);
+        og1.addOption(o101);
         options.addOptionGroup(og1);
 
         HelpFormatter formatter = new HelpFormatter();
@@ -176,6 +181,11 @@ public class Main
             else if (line.hasOption(o71.getOpt()))
             {
                 jqmlogger.info("Engine version: " + Helpers.getMavenVersion());
+            }
+            // Root password
+            else if (line.hasOption(o101.getOpt()))
+            {
+                root(line.getOptionValue(o101.getOpt()));
             }
         }
         catch (ParseException exp)
@@ -296,6 +306,33 @@ public class Main
         {
             em = Helpers.getNewEm();
             XmlQueueParser.parse(xmlPath, em);
+        }
+        catch (Exception ex)
+        {
+            jqmlogger.fatal("Could not parse and import the file", ex);
+        }
+        finally
+        {
+            Helpers.closeQuietly(em);
+        }
+    }
+
+    private static void root(String password)
+    {
+        EntityManager em = null;
+        try
+        {
+            em = Helpers.getNewEm();
+            em.getTransaction().begin();
+            RRole r = Helpers.createRoleIfMissing(em, "config admin",
+                    "can read and write all configuration, except security configuration", "node:*", "queue:*", "qmapping:*", "jndi:*",
+                    "prm:*", "jd:*");
+
+            RUser u = Helpers.createUserIfMissing(em, "root", "all powerfull user", r);
+            u.setPassword(password);
+            Helpers.encodePassword(u);
+
+            em.getTransaction().commit();
         }
         catch (Exception ex)
         {
