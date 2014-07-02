@@ -65,6 +65,9 @@ public class JndiObjectResource implements Serializable
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "resource")
     private Collection<JndiObjectResourceParameter> parameters = new ArrayList<JndiObjectResourceParameter>();
 
+    @Column(nullable = true, length = 50, name = "template")
+    private String template = null;
+
     private Boolean singleton = false;
 
     /**
@@ -193,5 +196,21 @@ public class JndiObjectResource implements Serializable
     public void setParameters(final Collection<JndiObjectResourceParameter> parameters)
     {
         this.parameters = parameters;
+    }
+
+    /**
+     * This is an optional tag to be used by user interfaces so as to identify how to display the resource
+     */
+    public String getTemplate()
+    {
+        return template;
+    }
+
+    /**
+     * See {@link #getTemplate()}
+     */
+    public void setTemplate(String template)
+    {
+        this.template = template;
     }
 }

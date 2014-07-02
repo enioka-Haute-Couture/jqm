@@ -116,6 +116,7 @@ public class Jpa2Dto
         res.setName(s.getName());
         res.setSingleton(s.getSingleton());
         res.setType(s.getType());
+        res.setTemplate(s.getTemplate());
 
         res.setParameters(new ArrayList<ParameterDto>());
         for (JndiObjectResourceParameter p : s.getParameters())

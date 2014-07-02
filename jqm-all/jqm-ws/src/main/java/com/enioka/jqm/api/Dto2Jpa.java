@@ -225,6 +225,7 @@ class Dto2Jpa
         jpa.setName(dto.getName());
         jpa.setSingleton(dto.getSingleton());
         jpa.setType(dto.getType());
+        jpa.setTemplate(dto.getTemplate());
 
         jpa = em.merge(jpa);
 

@@ -19,6 +19,7 @@ public class JndiObjectResourceDto implements Serializable
     private String factory;
     private String description;
     private Boolean singleton = false;
+    private String template = null;
 
     @XmlElementWrapper(name = "parameters")
     @XmlElement(name = "parameter", type = ParameterDto.class)
@@ -102,5 +103,15 @@ public class JndiObjectResourceDto implements Serializable
     public List<ParameterDto> getParameters()
     {
         return parameters;
+    }
+
+    public String getTemplate()
+    {
+        return template;
+    }
+
+    public void setTemplate(String template)
+    {
+        this.template = template;
     }
 }
