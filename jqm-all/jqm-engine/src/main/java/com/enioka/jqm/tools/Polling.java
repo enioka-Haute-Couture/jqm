@@ -44,7 +44,7 @@ class Polling implements Runnable, PollingMBean
     private DeploymentParameter dp = null;
     private Queue queue = null;
     private EntityManager em = null;
-    private ThreadPool tp = null;
+    private LibraryCache cache = null;
     private boolean run = true;
     private Integer actualNbThread;
     private JqmEngine engine;
@@ -73,7 +73,7 @@ class Polling implements Runnable, PollingMBean
                         DeploymentParameter.class).setParameter("l", dp.getId()).getSingleResult();
         this.queue = dp.getQueue();
         this.actualNbThread = 0;
-        this.tp = new ThreadPool(queue, dp.getNbThread(), cache);
+        this.cache = cache;
         this.engine = engine;
 
         try
@@ -209,7 +209,7 @@ class Polling implements Runnable, PollingMBean
                 em.getTransaction().commit();
 
                 // Run it
-                tp.run(ji, this);
+                (new Thread(new Loader(ji, cache, this))).start();
 
                 // Check if there is another job to run (does nothing - no db query - if queue is full so this is not expensive)
                 ji = dequeue();
@@ -218,7 +218,6 @@ class Polling implements Runnable, PollingMBean
         jqmlogger.info("Poller loop on queue " + this.queue.getName() + " is stopping [engine " + this.dp.getNode().getName() + "]");
         waitForAllThreads(60 * 1000);
         em.close();
-        this.tp.stop();
         this.hasStopped = true;
         jqmlogger.info("Poller on queue " + dp.getQueue().getName() + " has ended");
 
