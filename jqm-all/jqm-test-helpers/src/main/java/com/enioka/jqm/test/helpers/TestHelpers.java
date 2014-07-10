@@ -156,7 +156,8 @@ public class TestHelpers
                 FileUtils.deleteDirectory(new File("./webapp"));
             }
             // Where files created by payloads are stored
-            if ((new File(TestHelpers.node.getDlRepo())).isDirectory())
+            File f = TestHelpers.node == null ? null : new File(TestHelpers.node.getDlRepo());
+            if (f != null && f.isDirectory())
             {
                 FileUtils.cleanDirectory(new File(TestHelpers.node.getDlRepo()));
             }
