@@ -13,12 +13,11 @@ import javax.persistence.EntityManager;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.server.ssl.SslSocketConnector;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.FragmentConfiguration;
@@ -41,9 +40,12 @@ class JettyServer
 
     private Server server = null;
     private HandlerCollection h = new HandlerCollection();
+    private Node node;
+    WebAppContext webAppContext = null;
 
     void start(Node node, EntityManager em)
     {
+        this.node = node;
         boolean useSsl = Boolean.parseBoolean(Helpers.getParameter("useSsl", "true", em));
         boolean useInternalPki = Boolean.parseBoolean(Helpers.getParameter("useInternalPki", "true", em));
         String pfxPassword = Helpers.getParameter("pfxPassword", "SuperPassword", em);
@@ -115,16 +117,15 @@ class JettyServer
         server.setHandler(h);
 
         // Servlets (basic script API + files)
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-
-        context.addServlet(new ServletHolder(new ServletFile()), "/getfile");
-        context.addServlet(new ServletHolder(new ServletEnqueue()), "/enqueue");
-        context.addServlet(new ServletHolder(new ServletStatus()), "/status");
-        context.addServlet(new ServletHolder(new ServletLog()), "/log");
-
-        h.addHandler(context);
-
+        /*
+         * ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS); context.setContextPath("/");
+         * 
+         * context.addServlet(new ServletHolder(new ServletFile()), "/getfile"); context.addServlet(new ServletHolder(new ServletEnqueue()),
+         * "/enqueue"); context.addServlet(new ServletHolder(new ServletStatus()), "/status"); context.addServlet(new ServletHolder(new
+         * ServletLog()), "/log");
+         * 
+         * h.addHandler(context);
+         */
         // Potentially add a webapp context
         loadWar();
 
@@ -157,13 +158,30 @@ class JettyServer
         jqmlogger.trace("Jetty will now stop");
         try
         {
+            for (Handler ha : server.getHandlers())
+            {
+                ha.stop();
+                ha.destroy();
+                h.removeHandler(ha);
+                /*
+                 * ha.getSecurityHandler().stop(); ha.getSessionHandler().stop(); ha.getSecurityHandler().destroy();
+                 * ha.getSessionHandler().destroy();
+                 */
+            }
+            /*
+             * for (Connector c : this.server.getConnectors()) { if (c!= null) { c.close(); } server.removeConnector(c); }
+             */
+
+            // h.stop();
+            // h.destroy();
             this.server.stop();
             this.server.join();
+            this.server.destroy();
             jqmlogger.info("Jetty has stopped");
         }
         catch (Exception e)
         {
-            // Who cares, we are dying.
+            jqmlogger.error("OUPS", e);
         }
     }
 
@@ -177,11 +195,11 @@ class JettyServer
         jqmlogger.info("Jetty will now load the web service application war");
 
         // Load web application.
-        WebAppContext webAppContext = new WebAppContext(war.getPath(), "/");
+        webAppContext = new WebAppContext(war.getPath(), "/");
         webAppContext.setDisplayName("JqmWebServices");
 
         // Hide server classes from the web app
-        final int nbEx = 4;
+        final int nbEx = 5;
         String[] defExcl = webAppContext.getDefaultServerClasses();
         String[] exclusions = new String[defExcl.length + nbEx];
         for (int i = nbEx; i <= defExcl.length; i++)
@@ -192,10 +210,13 @@ class JettyServer
         exclusions[1] = "org.slf4j.";
         exclusions[2] = "org.apache.log4j.";
         exclusions[3] = "org.glassfish."; // Jersey
+        // exclusions[4] = "org.hibernate."; // Hib
         webAppContext.setServerClasses(exclusions);
 
         // JQM configuration should be on the class path
         webAppContext.setExtraClasspath("conf/jqm.properties");
+        webAppContext.setInitParameter("jqmnode", node.getName());
+        webAppContext.setInitParameter("jqmnodeid", node.getId().toString());
 
         // Set configurations (order is important: need to unpack war before reading web.xml)
         webAppContext.setConfigurations(new Configuration[] { new WebInfConfiguration(), new WebXmlConfiguration(),

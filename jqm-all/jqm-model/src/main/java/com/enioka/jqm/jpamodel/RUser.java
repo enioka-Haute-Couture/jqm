@@ -67,6 +67,8 @@ public class RUser implements Serializable
     @ManyToMany(mappedBy = "users")
     private List<RRole> roles = new ArrayList<RRole>();
 
+    private Boolean internal = false;
+
     public Integer getId()
     {
         return id;
@@ -165,5 +167,15 @@ public class RUser implements Serializable
     public void setFreeText(String freeText)
     {
         this.freeText = freeText;
+    }
+
+    public Boolean getInternal()
+    {
+        return internal;
+    }
+
+    public void setInternal(Boolean internal)
+    {
+        this.internal = internal;
     }
 }

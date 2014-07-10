@@ -26,13 +26,6 @@ public class ServiceClient implements JqmClient
 {
     static Logger log = LoggerFactory.getLogger(ServiceClient.class);
 
-    static
-    {
-        Properties p = new Properties();
-        p.put("javax.persistence.nonJtaDataSource", "jdbc/jqm");
-        JqmClientFactory.setProperties(p);
-    }
-
     // Not directly mapped: returning an integer would be weird. See enqueue_object.
     public int enqueue(JobRequest jd)
     {

@@ -9,7 +9,7 @@
 
 	<filter>
 		<filter-name>ShiroFilter</filter-name>
-		<filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+		<filter-class>com.enioka.jqm.webui.shiro.ShiroFilter</filter-class>
 	</filter>
 
 	<filter-mapping>

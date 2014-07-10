@@ -18,8 +18,10 @@
 
 package com.enioka.jqm.api;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -46,8 +48,16 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Root;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpStatus;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,7 +140,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            IOUtils.closeQuietly(fis);
+            closeQuietly(fis);
         }
 
         EntityManagerFactory newEmf = null;
@@ -211,9 +221,25 @@ final class HibernateClient implements JqmClient
         }
     }
 
+    private void closeQuietly(Closeable closeable)
+    {
+        try
+        {
+            if (closeable != null)
+            {
+                closeable.close();
+            }
+        }
+        catch (IOException ioe)
+        {
+            // ignore
+        }
+    }
+
     @Override
     public void dispose()
     {
+        SimpleApiSecurity.dispose();
         try
         {
             this.emf.close();
@@ -1395,7 +1421,6 @@ final class HibernateClient implements JqmClient
     {
         EntityManager em = getEm();
         URL url = null;
-        File file = null;
         History h = null;
 
         try
@@ -1410,12 +1435,10 @@ final class HibernateClient implements JqmClient
             throw new JqmInvalidRequestException("No ended job found with the deliverable ID", e);
         }
 
-        String destDir = System.getProperty("java.io.tmpdir");
-        jqmlogger.trace("File will be copied into " + destDir);
-
         try
         {
-            url = new URL("http://" + h.getNode().getDns() + ":" + h.getNode().getPort() + "/getfile?file=" + deliverable.getRandomId());
+            url = new URL("http://" + h.getNode().getDns() + ":" + h.getNode().getPort() + "/ws/simple/file?id="
+                    + deliverable.getRandomId());
             jqmlogger.trace("URL: " + url.toString());
         }
         catch (MalformedURLException e)
@@ -1423,10 +1446,47 @@ final class HibernateClient implements JqmClient
             throw new JqmClientException("URL is not valid " + url, e);
         }
 
+        return getFile(url.toString());
+    }
+
+    private InputStream getFile(String url)
+    {
+        EntityManager em = getEm();
+        File file = null;
+        FileOutputStream fos = null;
+        CloseableHttpClient cl = null;
+        CloseableHttpResponse rs = null;
+
+        File destDir = new File(System.getProperty("java.io.tmpdir") + "/jqm");
+        if (!destDir.isDirectory() && !destDir.mkdir())
+        {
+            throw new JqmClientException("could not create temp directory " + destDir.getAbsolutePath());
+        }
+        jqmlogger.trace("File will be copied into " + destDir);
+
         try
         {
-            file = new File(destDir + "/" + UUID.randomUUID().toString() + deliverable.getOriginalFileName());
-            FileUtils.copyURLToFile(url, file);
+            file = new File(destDir + "/" + UUID.randomUUID().toString());
+
+            CredentialsProvider credsProvider = null;
+            if (SimpleApiSecurity.getId(em).usr != null)
+            {
+                credsProvider = new BasicCredentialsProvider();
+                credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(SimpleApiSecurity.getId(em).usr,
+                        SimpleApiSecurity.getId(em).pass));
+            }
+            cl = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+
+            HttpUriRequest rq = new HttpGet(url.toString());
+            rs = cl.execute(rq);
+            if (rs.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
+            {
+                throw new JqmClientException("Could not retrieve file from JQM node. It may be unreachable. HTTP code was: "
+                        + rs.getStatusLine().getStatusCode());
+            }
+
+            fos = new FileOutputStream(file);
+            rs.getEntity().writeTo(fos);
             jqmlogger.trace("File was downloaded to " + file.getAbsolutePath());
         }
         catch (IOException e)
@@ -1436,6 +1496,9 @@ final class HibernateClient implements JqmClient
         finally
         {
             closeQuietly(em);
+            closeQuietly(fos);
+            closeQuietly(rs);
+            closeQuietly(cl);
         }
 
         FileInputStream res = null;
@@ -1453,13 +1516,13 @@ final class HibernateClient implements JqmClient
     @Override
     public InputStream getJobLogStdOut(int jobId)
     {
-        return getJobLog(jobId, ".stdout", "out");
+        return getJobLog(jobId, ".stdout", "stdout");
     }
 
     @Override
     public InputStream getJobLogStdErr(int jobId)
     {
-        return getJobLog(jobId, ".stderr", "err");
+        return getJobLog(jobId, ".stderr", "stderr");
     }
 
     private InputStream getJobLog(int jobId, String extension, String param)
@@ -1490,7 +1553,7 @@ final class HibernateClient implements JqmClient
         URL url = null;
         try
         {
-            url = new URL("http://" + h.getNode().getDns() + ":" + h.getNode().getPort() + "/log?" + param + "=" + jobId);
+            url = new URL("http://" + h.getNode().getDns() + ":" + h.getNode().getPort() + "/ws/simple/" + param + "?id=" + jobId);
             jqmlogger.trace("URL: " + url.toString());
         }
         catch (MalformedURLException e)
@@ -1498,31 +1561,7 @@ final class HibernateClient implements JqmClient
             throw new JqmClientException("URL is not valid " + url, e);
         }
 
-        // 3: copy file locally
-        File file = null;
-        String destDir = System.getProperty("java.io.tmpdir");
-        try
-        {
-            file = new File(destDir + "/" + UUID.randomUUID().toString() + jobId + extension);
-            FileUtils.copyURLToFile(url, file);
-            jqmlogger.trace("File was downloaded to " + file.getAbsolutePath());
-        }
-        catch (IOException e)
-        {
-            throw new JqmClientException("Could not create a webserver-local copy of the file", e);
-        }
-
-        // 4: wrap the local copy inside a self destructable stream so that we won't fill the file system
-        FileInputStream res = null;
-        try
-        {
-            res = new SelfDestructFileStream(file);
-        }
-        catch (IOException e)
-        {
-            throw new JqmClientException("File seems not to be present where it should have been downloaded", e);
-        }
-        return res;
+        return getFile(url.toString());
     }
 
     // /////////////////////////////////////////////////////////////////////

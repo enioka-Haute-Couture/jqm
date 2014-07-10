@@ -72,6 +72,7 @@ public class TestHelpers
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenSettingsCL", "META-INF/settings.xml", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("noHttp", "true", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("useSsl", "false", em);
+        TestHelpers.gpCentral = CreationTools.createGlobalParameter("useAuth", "true", em);
 
         TestHelpers.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42, em, true);
         TestHelpers.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, em);
@@ -85,11 +86,11 @@ public class TestHelpers
         TestHelpers.qNormal3 = CreationTools.initQueue("NormalQueue3", "Queue for the ordinary job3", 7, em);
         TestHelpers.qSlow3 = CreationTools.initQueue("SlowQueue3", "Queue for the bad guys3", 3, em);
 
-        TestHelpers.node = CreationTools.createNode("localhost", 0, "./target/payloads/", "./../", em);
-        TestHelpers.node2 = CreationTools.createNode("localhost2", 0, "./target/payloads/", "./../", em);
-        TestHelpers.node3 = CreationTools.createNode("localhost3", 0, "./target/payloads/", "./../", em);
-        TestHelpers.nodeMix = CreationTools.createNode("localhost4", 0, "./target/payloads/", "./../", em);
-        TestHelpers.nodeMix2 = CreationTools.createNode("localhost5", 0, "./target/payloads/", "./../", em);
+        TestHelpers.node = CreationTools.createNode("localhost", 0, "./target/outputfiles/", "./../", em);
+        TestHelpers.node2 = CreationTools.createNode("localhost2", 0, "./target/outputfiles/", "./../", em);
+        TestHelpers.node3 = CreationTools.createNode("localhost3", 0, "./target/outputfiles/", "./../", em);
+        TestHelpers.nodeMix = CreationTools.createNode("localhost4", 0, "./target/outputfiles/", "./../", em);
+        TestHelpers.nodeMix2 = CreationTools.createNode("localhost5", 0, "./target/outputfiles/", "./../", em);
 
         TestHelpers.dpVip = CreationTools.createDeploymentParameter(node, 40, 1, qVip, em);
         TestHelpers.dpVipMix = CreationTools.createDeploymentParameter(nodeMix, 3, 1, qVip, em);
@@ -104,6 +105,11 @@ public class TestHelpers
         TestHelpers.dpVip3 = CreationTools.createDeploymentParameter(node3, 3, 100, qVip3, em);
         TestHelpers.dpNormal3 = CreationTools.createDeploymentParameter(node3, 2, 300, qNormal3, em);
         TestHelpers.dpSlow3 = CreationTools.createDeploymentParameter(node3, 1, 1000, qSlow3, em);
+
+        if (!(new File(TestHelpers.node.getDlRepo())).isDirectory() && !(new File(TestHelpers.node.getDlRepo())).mkdir())
+        {
+            throw new RuntimeException("could not create output directory");
+        }
     }
 
     public static void cleanup(EntityManager em)
@@ -129,13 +135,36 @@ public class TestHelpers
         em.createQuery("DELETE RPermission WHERE 1=1").executeUpdate();
         em.createQuery("DELETE RRole WHERE 1=1").executeUpdate();
         em.createQuery("DELETE RUser WHERE 1=1").executeUpdate();
-        
+
         em.getTransaction().commit();
 
         try
         {
-            FileUtils.deleteDirectory(new File("./conf"));
-            FileUtils.deleteDirectory(new File("./logs"));
+            // Conf dir may contain certificates and certificate stores
+            if ((new File("./conf")).isDirectory())
+            {
+                FileUtils.deleteDirectory(new File("./conf"));
+            }
+            // All logs
+            if ((new File("./logs")).isDirectory())
+            {
+                FileUtils.deleteDirectory(new File("./logs"));
+            }
+            // The war...
+            if ((new File("./webapp")).isDirectory())
+            {
+                FileUtils.deleteDirectory(new File("./webapp"));
+            }
+            // Where files created by payloads are stored
+            if ((new File(TestHelpers.node.getDlRepo())).isDirectory())
+            {
+                FileUtils.cleanDirectory(new File(TestHelpers.node.getDlRepo()));
+            }
+            // Temp dir where files downloaded by the API are stored (supposed to be self-destructible file but anyway)
+            if ((new File(System.getProperty("java.io.tmpdir") + "/jqm")).isDirectory())
+            {
+                FileUtils.cleanDirectory(new File(System.getProperty("java.io.tmpdir") + "/jqm"));
+            }
         }
         catch (IOException e)
         {

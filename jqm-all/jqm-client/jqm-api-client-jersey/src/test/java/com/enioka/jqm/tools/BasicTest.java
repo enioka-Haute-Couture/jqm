@@ -71,6 +71,8 @@ public class BasicTest
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
         Helpers.setSingleParam("noHttp", "false", em);
+        Helpers.setSingleParam("useAuth", "true", em);
+        Helpers.setSingleParam("useSsl", "false", em);
 
         em.getTransaction().begin();
         Node n = em.find(Node.class, TestHelpers.node.getId());
@@ -78,6 +80,9 @@ public class BasicTest
         n.setRepo("./../..");
         n.setDlRepo("./target");
 
+        TestHelpers.node.setLoadApiAdmin(true);
+        TestHelpers.node.setLoadApiClient(true);
+        TestHelpers.node.setLoapApiSimple(true);
         em.getTransaction().commit();
 
         engine1 = new JqmEngine();
@@ -100,9 +105,16 @@ public class BasicTest
     @After
     public void after()
     {
+        jqmlogger.debug("********* TEST CLEANUP");
         engine1.stop();
         em.close();
         JqmClientFactory.resetClient();
+
+        System.runFinalization();
+        System.gc();
+        System.runFinalization();
+        System.gc();
+        System.gc();
     }
 
     @Test
