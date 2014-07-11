@@ -78,7 +78,6 @@ public class BasicTest
         Node n = em.find(Node.class, TestHelpers.node.getId());
         em.createQuery("UPDATE GlobalParameter gp set gp.value='true' WHERE gp.key = 'logFilePerLaunch'").executeUpdate();
         n.setRepo("./../..");
-        n.setDlRepo("./target");
 
         TestHelpers.node.setLoadApiAdmin(true);
         TestHelpers.node.setLoadApiClient(true);
