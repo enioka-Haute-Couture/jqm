@@ -257,19 +257,13 @@ public class MiscTest extends JqmBaseTest
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
-
-        em.getTransaction().begin();
-        GlobalParameter gp = em.createQuery("SELECT n from GlobalParameter n WHERE n.key = 'internalPollingPeriodMs'",
-                GlobalParameter.class).getSingleResult();
-        gp.setValue("50");
-        gp = em.createQuery("SELECT n from GlobalParameter n WHERE n.key = 'aliveSignalMs'", GlobalParameter.class).getSingleResult();
-        gp.setValue("50");
-        em.getTransaction().commit();
+        Helpers.setSingleParam("internalPollingPeriodMs", "200", em);
+        Helpers.setSingleParam("aliveSignalMs", "200", em);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(200);
+        Thread.sleep(600);
 
         JqmEngine engine2 = new JqmEngine();
 
