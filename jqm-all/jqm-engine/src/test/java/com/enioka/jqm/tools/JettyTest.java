@@ -136,10 +136,7 @@ public class JettyTest extends JqmBaseTest
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testSslClientCert");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
+        
         Helpers.setSingleParam("useSsl", "true", em);
         Helpers.setSingleParam("noHttp", "false", em);
         Helpers.setSingleParam("useAuth", "false", em);
