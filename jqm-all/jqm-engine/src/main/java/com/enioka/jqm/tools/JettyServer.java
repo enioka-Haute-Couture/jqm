@@ -53,6 +53,13 @@ class JettyServer
             return;
         }
 
+        // Only load Jetty if at least one application should start
+        if (!node.getLoadApiAdmin() && !node.getLoadApiClient() && !node.getLoapApiSimple())
+        {
+            jqmlogger.info("Jetty will not start - all web APIs are deactivated on this node");
+            return;
+        }
+
         this.node = node;
         boolean useSsl = Boolean.parseBoolean(Helpers.getParameter("useSsl", "true", em));
         boolean useInternalPki = Boolean.parseBoolean(Helpers.getParameter("useInternalPki", "true", em));
