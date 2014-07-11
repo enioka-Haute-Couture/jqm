@@ -16,24 +16,24 @@
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-api-client-hibernate</artifactId>
 			<type>jar</type>
-			<version>1.1.7-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-api</artifactId>
 			<type>jar</type>
-			<version>1.1.7-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
-			<version>4.2.8.Final</version>
+			<version>${hibernate.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.5</version>
+			<version>${slf4j.version}</version>
 		</dependency>
 	</dependencies>
 </project>

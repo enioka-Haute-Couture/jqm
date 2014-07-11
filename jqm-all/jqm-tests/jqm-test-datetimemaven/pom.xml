@@ -11,6 +11,7 @@
 	<url>http://jqm.readthedocs.org</url>
 
 	<dependencies>
+	<!-- This is the oldest supported Hibenrate version. Test it here. Do not replace with ${hibernate.version} ! -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
@@ -19,28 +20,25 @@
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>2.3.0</version>
+			<version>${hsqldb.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-api</artifactId>
-			<type>jar</type>
-			<version>1.1.7-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-api-client-hibernate</artifactId>
-			<type>jar</type>
-			<version>1.1.7-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 			<version>2.3</version>
-			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 

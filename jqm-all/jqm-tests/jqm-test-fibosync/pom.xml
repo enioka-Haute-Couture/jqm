@@ -14,9 +14,8 @@
 		<!-- JQM server API as well as client API as we use enqueue in this test -->
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-api</artifactId>
-			<type>jar</type>
-			<version>1.1.7-SNAPSHOT</version>
+			<artifactId>jqm-api</artifactId>			
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 </project>

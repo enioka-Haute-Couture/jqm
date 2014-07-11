@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.enioka.jqm</groupId>
@@ -21,7 +22,8 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- Jersey 2.x JAX-RS implementation, running inside a servlet, with a JSON mapper -->
+		<!-- Jersey 2.x JAX-RS implementation, running inside a servlet, with a 
+			JSON mapper -->
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-servlet</artifactId>
@@ -36,12 +38,19 @@
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-moxy</artifactId>
 			<version>${jersey-version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.eclipse.persistence</groupId>
+					<artifactId>org.eclipse.persistence.moxy</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-		<!-- We impose a newer version of Moxy to avoid nasty bug 411001 (2.5.0 -> 2.5.1) -->
+		<!-- We impose a newer version of Moxy to avoid nasty bug 411001 (2.5.0 
+			-> 2.5.1) -->
 		<dependency>
 			<groupId>org.eclipse.persistence</groupId>
 			<artifactId>org.eclipse.persistence.moxy</artifactId>
-			<version>2.5.1</version>
+			<version>2.5.2</version>
 		</dependency>
 
 		<!-- Security -->
@@ -105,13 +114,6 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>9.3-1101-jdbc41</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

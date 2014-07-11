@@ -16,18 +16,13 @@
  * limitations under the License.
  */
 
-import org.apache.log4j.Logger;
-
 import com.enioka.jqm.api.JobBase;
 
 public class App extends JobBase
 {
-    private static final Logger LOG = Logger.getLogger(App.class);
-
     @Override
     public void start()
     {
-        LOG.warn("WARN test");
         throw new Error("test error");
     }
 }

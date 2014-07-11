@@ -19,21 +19,19 @@
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>2.3.0</version>
+			<version>${hsqldb.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-api</artifactId>
-			<type>jar</type>
-			<version>1.1.7-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-api-client-hibernate</artifactId>
-			<type>jar</type>
-			<version>1.1.7-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
