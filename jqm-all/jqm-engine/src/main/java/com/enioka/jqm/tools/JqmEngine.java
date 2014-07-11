@@ -49,16 +49,24 @@ import com.enioka.jqm.jpamodel.State;
  */
 class JqmEngine implements JqmEngineMBean
 {
+    private static Logger jqmlogger = Logger.getLogger(JqmEngine.class);
+
+    // Sync data for stopping the engine
+    private Semaphore ended = new Semaphore(0);
+    private boolean hasEnded = false;
+
+    // Parameters and parameter cache
     private List<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
-    private List<Polling> pollers = new ArrayList<Polling>();
-    private InternalPoller intPoller = null;
     private Node node = null;
     private LibraryCache cache = new LibraryCache();
-    private JettyServer server = null;
-    private static Logger jqmlogger = Logger.getLogger(JqmEngine.class);
-    private Semaphore ended = new Semaphore(0);
     private ObjectName name;
-    private boolean hasEnded = false;
+
+    // Threads that together constitute the engine
+    private List<Polling> pollers = new ArrayList<Polling>();
+    private InternalPoller intPoller = null;
+    private JettyServer server = null;
+
+    // Misc data
     private Calendar startTime = Calendar.getInstance();
     private Thread killHook = null;
 
@@ -100,6 +108,11 @@ class JqmEngine implements JqmEngineMBean
             throw new JqmInitErrorTooSoon("Another engine named " + nodeName + " was running no less than " + r / 1000
                     + " seconds ago. Either stop the other node, or if it already stopped, please wait " + (toWait - r) / 1000 + " seconds");
         }
+
+        // Prevent very quick multiple starts by immediately setting the keep-alive
+        em.getTransaction().begin();
+        node.setLastSeenAlive(Calendar.getInstance());
+        em.getTransaction().commit();
 
         // Log level
         try
