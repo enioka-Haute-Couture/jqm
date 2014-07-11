@@ -65,14 +65,15 @@ public class BasicTest
     public void before() throws Exception
     {
         jqmlogger.debug("********* TEST INIT");
-        File jar = FileUtils.listFiles(new File("../../jqm-ws/target/"), new String[] { "war" }, false).iterator().next();
-        FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war"));
+
         em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
         Helpers.setSingleParam("noHttp", "false", em);
         Helpers.setSingleParam("useAuth", "true", em);
         Helpers.setSingleParam("useSsl", "false", em);
+        File jar = FileUtils.listFiles(new File("../../jqm-ws/target/"), new String[] { "war" }, false).iterator().next();
+        FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war"));
 
         em.getTransaction().begin();
         Node n = em.find(Node.class, TestHelpers.node.getId());
