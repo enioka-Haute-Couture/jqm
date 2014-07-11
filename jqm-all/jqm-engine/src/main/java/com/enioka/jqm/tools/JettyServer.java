@@ -45,6 +45,14 @@ class JettyServer
 
     void start(Node node, EntityManager em)
     {
+        // Only load Jetty if at least one war is present...
+        File war = new File("./webapp/jqm-ws.war");
+        if (!war.exists() || !war.isFile())
+        {
+            jqmlogger.info("Jetty will not start - there are no web applications to load inside the webapp directory");
+            return;
+        }
+
         this.node = node;
         boolean useSsl = Boolean.parseBoolean(Helpers.getParameter("useSsl", "true", em));
         boolean useInternalPki = Boolean.parseBoolean(Helpers.getParameter("useInternalPki", "true", em));
@@ -71,7 +79,6 @@ class JettyServer
             scf.setTrustStoreType("JKS");
 
             scf.setWantClientAuth(true);
-            // scf.setNeedClientAuth(true);
         }
         else
         {
@@ -116,17 +123,7 @@ class JettyServer
         // Collection handler
         server.setHandler(h);
 
-        // Servlets (basic script API + files)
-        /*
-         * ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS); context.setContextPath("/");
-         * 
-         * context.addServlet(new ServletHolder(new ServletFile()), "/getfile"); context.addServlet(new ServletHolder(new ServletEnqueue()),
-         * "/enqueue"); context.addServlet(new ServletHolder(new ServletStatus()), "/status"); context.addServlet(new ServletHolder(new
-         * ServletLog()), "/log");
-         * 
-         * h.addHandler(context);
-         */
-        // Potentially add a webapp context
+        // Load the webapp context
         loadWar();
 
         // Start the server
@@ -163,17 +160,8 @@ class JettyServer
                 ha.stop();
                 ha.destroy();
                 h.removeHandler(ha);
-                /*
-                 * ha.getSecurityHandler().stop(); ha.getSessionHandler().stop(); ha.getSecurityHandler().destroy();
-                 * ha.getSessionHandler().destroy();
-                 */
             }
-            /*
-             * for (Connector c : this.server.getConnectors()) { if (c!= null) { c.close(); } server.removeConnector(c); }
-             */
 
-            // h.stop();
-            // h.destroy();
             this.server.stop();
             this.server.join();
             this.server.destroy();
@@ -181,7 +169,9 @@ class JettyServer
         }
         catch (Exception e)
         {
-            jqmlogger.error("OUPS", e);
+            jqmlogger
+                    .error("An error occured during Jetty stop. It is not an issue if it happens during JQM node shutdown, but one during restart (memeory leak).",
+                            e);
         }
     }
 
