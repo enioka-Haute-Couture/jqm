@@ -2,11 +2,13 @@ package com.enioka.jqm.tools;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.security.KeyStore;
 
 import javax.net.ssl.SSLContext;
 import javax.persistence.EntityManager;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -14,6 +16,9 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
@@ -24,17 +29,51 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class JettyTest extends JqmBaseTest
 {
+    EntityManager em;
+
+    @Before
+    public void before() throws IOException
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Test prepare");
+
+        em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        File jar = FileUtils.listFiles(new File("../jqm-ws/target/"), new String[] { "war" }, false).iterator().next();
+        FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war"));
+
+        // We need to reset credentials used inside the client
+        JqmClientFactory.resetClient(null);
+    }
+
+    @After
+    public void after()
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Test cleanup");
+
+        em.close();
+
+        // Java 6 GC being rather inefficient, we must run it multiple times to correctly collect Jetty-created class loaders and avoid
+        // permgen issues
+        System.runFinalization();
+        System.gc();
+        System.runFinalization();
+        System.gc();
+        System.gc();
+    }
+
     @Test
     public void testSslStartup()
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testSslStartup");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
 
         Helpers.setSingleParam("useSsl", "true", em);
         Helpers.setSingleParam("noHttp", "false", em);
+        Helpers.setSingleParam("useAuth", "false", em);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -47,12 +86,10 @@ public class JettyTest extends JqmBaseTest
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testSslServices");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
 
         Helpers.setSingleParam("useSsl", "true", em);
         Helpers.setSingleParam("noHttp", "false", em);
+        Helpers.setSingleParam("useAuth", "false", em);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -84,9 +121,10 @@ public class JettyTest extends JqmBaseTest
 
         int port = em.createQuery("SELECT q.port FROM Node q WHERE q.id = :i", Integer.class).setParameter("i", TestHelpers.node.getId())
                 .getSingleResult();
-        HttpUriRequest rq = new HttpGet("https://" + TestHelpers.node.getDns() + ":" + port + "/status?id=" + i);
+        HttpUriRequest rq = new HttpGet("https://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + i);
         jqmlogger.debug(rq.getURI());
         CloseableHttpResponse rs = cl.execute(rq);
+        Assert.assertEquals(200, rs.getStatusLine().getStatusCode());
 
         rs.close();
         cl.close();
@@ -104,6 +142,7 @@ public class JettyTest extends JqmBaseTest
 
         Helpers.setSingleParam("useSsl", "true", em);
         Helpers.setSingleParam("noHttp", "false", em);
+        Helpers.setSingleParam("useAuth", "false", em);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -149,8 +188,9 @@ public class JettyTest extends JqmBaseTest
 
         int port = em.createQuery("SELECT q.port FROM Node q WHERE q.id = :i", Integer.class).setParameter("i", TestHelpers.node.getId())
                 .getSingleResult();
-        HttpUriRequest rq = new HttpGet("https://" + TestHelpers.node.getDns() + ":" + port + "/status?id=" + i);
+        HttpUriRequest rq = new HttpGet("https://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + i);
         CloseableHttpResponse rs = cl.execute(rq);
+        Assert.assertEquals(200, rs.getStatusLine().getStatusCode());
 
         rs.close();
         cl.close();
