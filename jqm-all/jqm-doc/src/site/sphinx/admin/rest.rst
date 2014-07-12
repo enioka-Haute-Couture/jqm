@@ -1,26 +1,31 @@
 Administration web services
 ##################################
 
+.. warning:: the admin REST web service is a **private** JQM API. It should never be accessed directly. Either use the web administration console or the future 
+	CLI. The service is only described here for reference and as a private specification.
+
 The web console is actually only an HTML5 client built on top of some generic administration web services - it has no priviledged access
 to any resources that could not be accessed to in any other ways. 
 
-These services are REST-style services and are a standard JQM API. It is deployed along with the client web services and the console (in the same war file).
+These services are REST-style services. It is deployed along with the client web services and the console (in the same war file). 
+In accordance to the most used REST convention, the HTTP verbs are used this way:
 
-They also offer the different verbs:
++---------+-------------------------------------------------------------------------------------------+----------------------------------------------------------------------+                    
+| Verb    | Action on container URLs                                                                  | Action on item URLs                                                  |
++=========+===========================================================================================+======================================================================+
+| GET     | obtain a list of instances                                                                | get the instance                                                     |
++---------+-------------------------------------------------------------------------------------------+----------------------------------------------------------------------+
+| POST    | add an instance or update it if there is already an instance with                         | Not used                                                             |
+|         | the same ID (null ID means create an object)                                              |                                                                      |
++---------+-------------------------------------------------------------------------------------------+----------------------------------------------------------------------+
+| PUT     | replace the whole collection. Objects that are not in the POST part                       | create or update the instance (null ID means create an object)       |
+|         | of the request are dropped, other are created or updated (null ID means create an object) |                                                                      |
++---------+-------------------------------------------------------------------------------------------+----------------------------------------------------------------------+
+| DELETE  | Not used                                                                                  | removes the object for ever                                          |
++---------+-------------------------------------------------------------------------------------------+----------------------------------------------------------------------+
 
-For container URLs:
-
-* GET = obtain an instance (on /container/id URL) or a list of instances (on /container URL)
-* POST = add an instance or update it if there is already an instance with the same ID (null ID means create an object)
-* PUT = replace the whole collection. Objects that are not in the POST part of the request are dropped, other are created or updated (null ID means create an object)
-
-For element URLs:
-
-* GET = get the instance
-* PUT = create or update the instance (null ID means create an object)
-* DELETE = removes the object for ever
-
-.. note:: the API never returns anything on POST/PUT/DELETE operations. On GET, it will output JSON (application/json). By setting the "accept" header in the request, it is also possible to obtain application/xml.
+.. note:: the API never returns anything on POST/PUT/DELETE operations. On GET, it will output JSON (application/json). By setting the "accept" header in the request, it is 
+	also possible to obtain application/xml.
 
 +-----------------------+-----+------+-----+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------+
 | URL                   | GET | POST | PUT | DELETE | Description                                                                                                                                           |
@@ -57,14 +62,14 @@ For element URLs:
 +-----------------------+-----+------+-----+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------+
 | /prm/{id}             | X   |      | X   | X      | Cluster parameter                                                                                                                                     |
 +-----------------------+-----+------+-----+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------+
-| /node                 | X   |      |     |        | Cluster nodes (JQM engines)   ::                                                                                                                      |
+| /node                 | X   | X    | X   |        | Cluster nodes (JQM engines)   ::                                                                                                                      |
 |                       |     |      |     |        |                                                                                                                                                       |
 |                       |     |      |     |        |     [{"dns":"localhost","id":1,"jmxRegistryPort":0,"jmxServerPort":0,"jobRepoDirectory":"C:\\TEMP\\jqm-1.1.4-SNAPSHOT/jobs/","name":"JEUX",           |
 |                       |     |      |     |        |     "outputDirectory":"C:\\TEMP\\jqm-1.1.4-SNAPSHOT/outputfiles/","port":63821,"rootLogLevel":"INFO"}]                                                |
 +-----------------------+-----+------+-----+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------+
 | /node/{id}            | X   |      |     |        | A cluster node (a JQM engine). Creation should be done by running the createnode command line at service setup.                                       |
 +-----------------------+-----+------+-----+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------+
-| /jd                   | X   |  X   | X   |        | Job Defintions.  Sample GET result::                                                                                                                  |
+| /jd                   | X   |  X   | X   |        | Job Definitions.  Sample GET result::                                                                                                                 |
 |                       |     |      |     |        |                                                                                                                                                       |
 |                       |     |      |     |        |     [{"type":"jobDefDto","parameters":[{"id":11,"key":"p1","value":"1"},{"id":12,"key":"p2","value":"2"}],"application":"JQM",                        |
 |                       |     |      |     |        |     "applicationName":"DemoFibo1","canBeRestarted":true,"description":"Demonstrates the use of parameters and engine API (computes the Fibonacci      |
@@ -73,7 +78,7 @@ For element URLs:
 +-----------------------+-----+------+-----+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------+ 
 | /jd/{id}              | X   |      | X   | X      |                                                                                                                                                       |
 +-----------------------+-----+------+-----+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------+
-| /user                 | X   |  X   | X   |        | User (as in REST services/GUI user                                                                                                                    |
+| /user                 | X   |  X   | X   |        | User (as in REST services/GUI user)                                                                                                                   |
 |                       |     |      |     |        |                                                                                                                                                       |
 +-----------------------+-----+------+-----+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------+ 
 | /user/{id}            | X   |      | X   | X      |                                                                                                                                                       |
@@ -82,6 +87,10 @@ For element URLs:
 |                       |     |      |     |        |                                                                                                                                                       |
 +-----------------------+-----+------+-----+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------+ 
 | /role/{id}            | X   |      | X   | X      |                                                                                                                                                       |
++-----------------------+-----+------+-----+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------+
+| /me                   | X   |      |     |        |  All the permissions (a list of strings in the object:verb format) of the currently authenticated user (404 if not authenticated)                     |
++-----------------------+-----+------+-----+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------+
+| /user/{id}/certificate| X   |      |     |        |  A zip file containing a new set of certificates allowing the deignated user to authantify. Only used when internal PKI is used.                      |
 +-----------------------+-----+------+-----+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. note:: queues and job definitions are also available through the client API. However, the client version is different with less data exposed and no

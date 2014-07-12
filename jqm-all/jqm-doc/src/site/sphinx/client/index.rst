@@ -3,10 +3,10 @@
 
 .. toctree::
 	:numbered:
-	:titlesonly:
 	:maxdepth: 2
+	:includehidden:
 
-	client
-	hibernateclient
-	webservice
-	query
+	intro
+	minimal
+	client	
+	cli
