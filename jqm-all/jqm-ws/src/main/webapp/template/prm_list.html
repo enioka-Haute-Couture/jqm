@@ -1,4 +1,20 @@
 <div>
+    <h5>
+        <span class="glyphicon glyphicon-question-sign" ng-click="isCollapsed = !isCollapsed"></span> These parameters apply to every node inside the
+        cluster.
+    </h5>
+    <div collapse="!isCollapsed">
+        <div class="well well-lg">
+            <h5>On this page, one may change the global cluster parameters. Please see the full documentation for the different available
+                parameters. The necessity to reboot after a change depends on the parameter.</h5>
+            <dl class="dl-horizontal">
+                <dt>Name</dt>
+                <dd>The parameter key. Not necessarily unique.</dd>
+                <dt>Value</dt>
+                <dd>The value of the parameter</dd>
+            </dl>
+        </div>
+    </div>
     <div class='gridClass' ng-grid='gridOptions'></div>
     <button class="btn btn-default" ng-click="newprm()" jqm-permission="prm:create">New parameter</button>
     <button class="btn btn-default" ng-click="remove()" ng-disabled="selected.length === 0" jqm-permission="prm:delete">Delete selected</button>

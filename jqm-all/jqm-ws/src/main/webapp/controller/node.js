@@ -51,11 +51,6 @@ jqmControllers.controller('µNodeListCtrl', function($scope, $http, µNodeDto)
 
         columnDefs : [
                 {
-                    field : 'id',
-                    displayName : 'ID',
-                    width : '*',
-                },
-                {
                     field : 'name',
                     displayName : 'Name',
                     width : '**',

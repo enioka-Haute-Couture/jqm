@@ -1,4 +1,25 @@
 <div>
+    <h5>
+        <span class="glyphicon glyphicon-question-sign" ng-click="isCollapsed = !isCollapsed"></span> Mappings specify which nodes will poll which
+        queues. They are basically nodes subscribing to queues.
+    </h5>
+    <div collapse="!isCollapsed">
+        <div class="well well-lg">
+            <h5>On this page, one may associate nodes with queues. Changes on one node mapping require rebooting this node afterwards.</h5>
+            <dl class="dl-horizontal">
+                <dt>Node</dt>
+                <dd>The node which will poll the queue/dd>
+                <dt>Queue</dt>
+                <dd>The queue to poll</dd>
+                <dt>Polling interval</dt>
+                <dd>The polling interval, in milliseconds. Never go below one seconds.</dd>
+                <dt>Max concurrent</dt>
+                <dd>The maximum number of parallel executions the node will allow for this queue. (this translates directly as a max number of
+                    threads inside the engine).</dd>
+            </dl>
+        </div>
+    </div>
+
     <div class='gridClass' ng-grid='gridOptions'></div>
 
     <button class="btn btn-default" ng-click="newmapping()" ng-disabled="bDbBusy" jqm-permission="qmapping:create">New mapping</button>

@@ -1,4 +1,34 @@
 <table>
+    <h5>
+        <span class="glyphicon glyphicon-question-sign" ng-click="isCollapsed = !isCollapsed"></span> Resources are Java objects that can be requested
+        by jobs through a JNDI lookup and created by the engine.
+    </h5>
+    <div collapse="!isCollapsed">
+        <div class="well well-lg">
+            <h5>
+                On this page, one may create or change resources. Creating a new resource does not require any reboot. Altering an already used <strong>singleton</strong>
+                resource does require rebooting the nodes using it, as singleton resources are cached. Altering a non-singleton resource does not
+                require reboots.
+            </h5>
+            <dl class="dl-horizontal">
+                <dt>JNDI alias</dt>
+                <dd>The name that will be used by payloads during resource lookup.</dd>
+                <dt>Type</dt>
+                <dd>The fully qualified name of the resource class. E.g. java.io.File.File</dd>
+                <dt>Factory</dt>
+                <dd>The fully qualified name of the resource factory class. E.g. com.enioka.jqm.providers.FileFactory</dd>
+                <dt>Description</dt>
+                <dd>Free text to remember what the resource is for.</dd>
+                <dt>S</dt>
+                <dd>Tick for singleton resource. Differing from standard JNDI resource, a lookup on a singleton resource will always return the
+                    same instance (standard JNDI is: an instance is created on each lookup). This is most helpful for connection pools, for which it
+                    is stupid to create a new instance on each call...</dd>
+            </dl>
+            <h5>Please note that for a non-singleton resource, its class and factory class must be accessible to the payload: either in
+                JQM_ROOT/ext or inside the payload's own dependencies. For a singleton resource, the classes must be inside ext (as they must be
+                available to the engine itself, not only to the payload).</h5>
+        </div>
+    </div>
     <tr>
         <td style="width: 1px;">
             <div class='gridClass' style="width: 65em;" ng-grid='gridOptions'></div>

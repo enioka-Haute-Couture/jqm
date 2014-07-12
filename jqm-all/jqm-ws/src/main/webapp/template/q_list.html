@@ -1,4 +1,23 @@
 <div>
+    <h5>
+        <span class="glyphicon glyphicon-question-sign" ng-click="isCollapsed = !isCollapsed"></span> These are FIFO (First In First Out) queues in
+        which batch job execution requests will wait.
+    </h5>
+    <div collapse="!isCollapsed">
+        <div class="well well-lg">
+            <h5>On this page, one may change the characteristics of queues. Changes on this page do not require node reboots.</h5>
+            <dl class="dl-horizontal">
+                <dt>Name</dt>
+                <dd>The name of the queue. This name is very important, as it the key used to designate the queue in the different APIs (for
+                    example, when submitting an execution request, one may specify by name a queue in which the request will wait). However, it can
+                    still be changed - internally, JQM uses an ID, not this name - the impact is only on the clients' side.</dd>
+                <dt>Description</dt>
+                <dd>A free text description that appears in reports</dd>
+                <dt>is default</dt>
+                <dd>The queue used when none is specified. There can only be one default queue.</dd>
+            </dl>
+        </div>
+    </div>
     <div class='gridClass' ng-grid='gridOptions'></div>
     <button class="btn btn-default" ng-click="newqueue()" jqm-permission="prm:create">New Queue</button>
     <button class=" btn btn-default" ng-click="save()" jqm-permission="prm:create">Save queues</button>

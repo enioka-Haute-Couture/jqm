@@ -2,10 +2,56 @@
 
 
     <h5>
-        Nodes can only be created through the command line
+        <span class="glyphicon glyphicon-question-sign" ng-click="isCollapsed = !isCollapsed"></span> Nodes can only be created through the command
+        line
         <code>jqm.sh createnode [ nodename ]</code>
         . Only nodes switched off for more than 10 minutes can be removed.
     </h5>
+
+
+    <div collapse="!isCollapsed">
+        <div class="well well-lg">
+            <h5>
+                On this page, one may change the characteristics of nodes (i.e. JVM, i.e. members of the JQM cluster). <strong>Beware: any
+                    parameter change on a node requires a node reboot.</strong>
+            </h5>
+            <dl class="dl-horizontal">
+                <dt>Name</dt>
+                <dd>The name of the node inside the JQM cluster. It has no link whatsoever to hostname, DNS names and whatnot. It is simply the
+                    name given as a parameter to the node when starting. It is unique throughout the cluster. Default is server hostname in Windows,
+                    user name in Unix.</dd>
+                <dt>DNS to bind to</dt>
+                <dd>The web APIs will bind on all interfaces that answer to a reverse DNS call of this name. Default is localhost, i.e.
+                    local-only binding.</dd>
+                <dt>HTTP port</dt>
+                <dd>The web APIs will bind on this port. Default is a random free port.</dd>
+                <dt>File produced storage</dt>
+                <dd>Should batch jobs produce files, they would be stored in sub-directories of this directory. Absolute path strongly
+                    recommended, relative path are relative to JQM install directory.</dd>
+                <dt>Jar directory</dt>
+                <dd>The root directory containing all the jobs (payload jars). Absolute path strongly recommended, relative path are relative to
+                    JQM install directory.</dd>
+                <dt>Log level</dt>
+                <dd>Verbosity of the main log file. Valid values are TRACE, DEBUG, INFO, WARN, ERROR, FATAL. See full documentation for the
+                    signification of these levels. In case of erroneous value, default value INFO is assumed.</dd>
+                <dt>JMX registry TCP port</dt>
+                <dd>If 0, remote JMX is disabled. Default is 0.</dd>
+                <dt>JMX server TCP port</dt>
+                <dd>If 0, remote JMX is disabled. Default is 0.</dd>
+                <dt>JMX server TCP port</dt>
+                <dd>If 0, remote JMX is disabled. Default is 0.</dd>
+                <dt>Simple API</dt>
+                <dd>It ticked, the simple web API will start. This API governs script interactions (execution request through wget & co, etc.)
+                    and file retrieval (logs, files created by batch jobs executions)</dd>
+                <dt>Client API</dt>
+                <dd>It ticked, the client web API will start. This API exposes the full JqmClient API - see full documentation.</dd>
+                <dt>Admin API</dt>
+                <dd>It ticked, the administration web API will start. This API is only used by this web administration console and is an internal
+                    JQM API, not a public one. Disabling it disables this web console.</dd>
+                <h5>Disabling the three web APIs will fully disable the internal web server of a node, which in turn is a huge memory gain.</h5>
+            </dl>
+        </div>
+    </div>
 
     <div class='gridClass' ng-grid='gridOptions' style='width: 100%;'></div>
 
