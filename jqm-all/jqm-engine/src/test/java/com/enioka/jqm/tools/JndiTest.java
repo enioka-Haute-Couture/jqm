@@ -112,11 +112,9 @@ public class JndiTest extends JqmBaseTest
         JqmClientFactory.getClient().enqueue(form);
 
         // Create JMS JNDI references for use by the test jar
-        em.getTransaction().begin();
         CreationTools.createJndiQueueActiveMQ(em, "jms/testqueue", "test queue", "Q.TEST", null);
         CreationTools.createJndiQcfActiveMQ(em, "jms/qcf", "test QCF", "vm:broker:(tcp://localhost:1234)?persistent=false&useJmx=false",
                 null);
-        em.getTransaction().commit();
 
         // Start the engine
         JqmEngine engine1 = new JqmEngine();
@@ -160,11 +158,9 @@ public class JndiTest extends JqmBaseTest
         JqmClientFactory.getClient().enqueue(form);
 
         // Create JMS JNDI references for use by the test jar
-        em.getTransaction().begin();
         CreationTools.createJndiQueueActiveMQ(em, "jms/testqueue", "test queue", "Q.TEST", null);
         CreationTools.createJndiQcfActiveMQ(em, "jms/qcf2", "test QCF", "vm:broker:(tcp://localhost:1234)?persistent=false&useJmx=false",
                 null);
-        em.getTransaction().commit();
 
         // Start the engine
         JqmEngine engine1 = new JqmEngine();
@@ -239,9 +235,7 @@ public class JndiTest extends JqmBaseTest
 
         // Create JMS JNDI references for use by the test jar
         String path = "./testdir";
-        em.getTransaction().begin();
         CreationTools.createJndiFile(em, "fs/testdirectory", "test directory", path);
-        em.getTransaction().commit();
 
         // Create the directory...
         (new File(path)).mkdir();
@@ -270,9 +264,7 @@ public class JndiTest extends JqmBaseTest
 
         // Create JMS JNDI references for use by the test jar
         String url = "http://www.marsupilami.com";
-        em.getTransaction().begin();
         CreationTools.createJndiUrl(em, "url/testurl", "test directory", url);
-        em.getTransaction().commit();
 
         try
         {
@@ -304,9 +296,7 @@ public class JndiTest extends JqmBaseTest
         JqmClientFactory.getClient().enqueue(form);
 
         // Create JMS JNDI references for use by the test jar
-        em.getTransaction().begin();
         CreationTools.createJndiFile(em, "fs/test", "test resource", "/tmp");
-        em.getTransaction().commit();
 
         // Start the engine
         JqmEngine engine1 = new JqmEngine();
