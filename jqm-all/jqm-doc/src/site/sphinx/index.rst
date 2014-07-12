@@ -1,9 +1,6 @@
 ﻿JQM - Java Job Queue Manager
 ##################################
 
-Introduction
-*****************
-
 JQM (short for Job Queue Manager) is a middleware allowing to run arbitrary Java code asynchronously on a distributed network of servers.
 It was designed as an application server specifically tailored for making it easier to run (Java) batch jobs asynchronously, removing all the hassle of configuring
 libraries, throttling executions, handling logs, forking new processes & monitoring them, dealing with created files, and much more... It should be considered
@@ -26,8 +23,6 @@ to send messages and other advancement notices... Also of note, JQM is pure Java
 Interacting with JQM is also easy: an API, with two different implementations (JPA & REST web service, which can be used from a non-Java world) for different needs, 
 is offered to do every imaginable operation (new execution request, querying the state of a request, retrieving files created by a job instance, ...).
 
-Documentation
-******************
 
 .. toctree::
 	:numbered:
