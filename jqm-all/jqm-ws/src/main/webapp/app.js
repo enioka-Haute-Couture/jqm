@@ -84,7 +84,7 @@ function TabsCtrl($scope, $location, $http, µPermManager)
         permission : 'role:read',
     }, {
         link : '#/history',
-        label : 'History',
+        label : 'Runs',
         permission : 'job_instance:read',
     }, ];
 
