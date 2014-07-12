@@ -2,10 +2,11 @@
 
 var jqmControllers = angular.module('jqmControllers');
 
-jqmControllers.controller('µJdListCtrl', function($scope, $http, µJdDto)
+jqmControllers.controller('µJdListCtrl', function($scope, $http, µJdDto, µQueueDto)
 {
     $scope.jds = null;
     $scope.selected = [];
+    $scope.queues =
 
     $scope.newitem = function()
     {
@@ -31,6 +32,7 @@ jqmControllers.controller('µJdListCtrl', function($scope, $http, µJdDto)
     {
         $scope.selected.length = 0;
         $scope.jds = µJdDto.query();
+        $scope.queues = µQueueDto.query();
     };
 
     // Only remove from list - save() will sync the list with the server so no need to delete it from server now
@@ -90,9 +92,15 @@ jqmControllers.controller('µJdListCtrl', function($scope, $http, µJdDto)
                     cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()">'
                             + ' <input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
                     width : 25,
-                }, {
+                },
+                {
                     field : 'queueId',
-                    displayName : 'queueId'
+                    displayName : 'Queue',
+                    cellTemplate : '<div class="ngCellText" ng-class="col.colIndex()">'
+                            + '<span ng-cell-text>{{ (row.getProperty("queueId") | getByProperty:"id":queues).name }}</span></div>',
+                    editableCellTemplate : '<select ng-cell-input ng-input="COL_FIELD" ng-model="COL_FIELD" '
+                            + 'ng-options="q.id as q.name for q in queues"></select>'
+
                 }, {
                     field : 'application',
                     displayName : 'Application'

@@ -1,7 +1,7 @@
 <div>
     <h5>
         <span class="glyphicon glyphicon-question-sign" ng-click="isCollapsed = !isCollapsed"></span> A Job Definition is made of all the metadata
-        required to launch a payload: path to the jar, class to tun, etc.
+        required to launch a payload: path to the jar file, class to launch, etc.
     </h5>
     <div collapse="!isCollapsed">
         <div class="well well-lg">
@@ -18,7 +18,7 @@
                 <dd>The fully qualified name of the class to run. (it must either have a main function, or implement Runnable, or inherit from
                     JobBase).</dd>
                 <dt>Path to the jar</dt>
-                <dd>The relative path to the jar containing the class to run. It is relative to the "directory containg jars" parameter of the
+                <dd>The relative path to the jar containing the class to run. It is relative to the "directory containing jars" parameter of the
                     different nodes</dd>
                 <dt>R</dt>
                 <dd>Whether it is restartable or not</dd>
@@ -26,14 +26,14 @@
                 <dd>Tick for Highlander mode. In this mode, there can never be more than one instance of the Job Definition running at the same
                     time, as well as no more than one waiting in any queue.</dd>
                 <dt>Queue</dt>
-                <dd>The queue which will be used when submitting execution requests ()if no specific queue is given at request time)</dd>
+                <dd>The queue which will be used when submitting execution requests (if no specific queue is given at request time)</dd>
                 <dt>Other fields</dt>
                 <dd>These fields are merely tags that can be used for many uses. They are not used by the engine itself.</dd>
             </dl>
         </div>
     </div>
 
-    <div class='gridClass' ng-grid='gridOptions' style='width: 1350px;'></div>
+    <div class='gridClass' ng-grid='gridOptions' style='width: 100%;'></div>
     <button class="btn btn-default" ng-click="newitem()" jqm-permission="jd:create">New definition</button>
     <button class="btn btn-default" ng-click="remove()" ng-disabled="selected.length === 0" jqm-permission="jd:delete">Delete selected</button>
     <button class="btn btn-default" ng-click="refresh()">Refresh</button>
