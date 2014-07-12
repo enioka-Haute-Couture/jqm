@@ -189,6 +189,52 @@ public class DeliverableTest extends JqmBaseTest
 
         tmp.close();
     }
+    
+    /**
+     * Retrieve a remote file with authentication, with SSL.
+     */
+    @Test
+    public void testGetOneDeliverableWithAuthWithSsl() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testGetOneDeliverableWithAuthWithSsl");
+        Helpers.setSingleParam("noHttp", "false", em);
+        Helpers.setSingleParam("useAuth", "true", em);
+        Helpers.setSingleParam("useSsl", "true", em);
+
+        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", TestHelpers.node.getDlRepo(), em);
+        JobDefParameter jdp2 = CreationTools.createJobDefParameter("fileName", "jqm-test-deliverable2.txt", em);
+        jdargs.add(jdp);
+        jdargs.add(jdp2);
+
+        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-deliverable/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+
+        JobRequest j = new JobRequest("MarsuApplication", "Franquin");
+
+        int jobId = JqmClientFactory.getClient().enqueue(j);
+
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+
+        TestHelpers.waitFor(1, 10000, em);
+
+        File f = new File(TestHelpers.node.getDlRepo() + "jqm-test-deliverable2.txt");
+        Assert.assertEquals(false, f.exists()); // file should have been moved
+
+        List<com.enioka.jqm.api.Deliverable> files = JqmClientFactory.getClient().getJobDeliverables(jobId);
+        Assert.assertEquals(1, files.size());
+
+        InputStream tmp = JqmClientFactory.getClient().getDeliverableContent(files.get(0));
+        engine1.stop();
+
+        Assert.assertTrue(tmp.available() > 0);
+        String res = IOUtils.toString(tmp);
+        Assert.assertTrue(res.startsWith("Hello World!"));
+
+        tmp.close();
+    }
 
     /**
      * This test is DB only - no simple service use

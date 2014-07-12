@@ -27,6 +27,8 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -37,6 +39,7 @@ import java.util.Properties;
 import java.util.UUID;
 
 import javax.naming.NameNotFoundException;
+import javax.net.ssl.SSLContext;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.LockModeType;
@@ -55,6 +58,8 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -63,6 +68,7 @@ import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.api.Query.SortSpec;
 import com.enioka.jqm.jpamodel.Deliverable;
+import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
@@ -82,6 +88,7 @@ final class HibernateClient implements JqmClient
     private static Logger jqmlogger = LoggerFactory.getLogger(HibernateClient.class);
     private static final String PERSISTENCE_UNIT = "jobqueue-api-pu";
     private EntityManagerFactory emf = null;
+    private String protocol = null;
     Properties p;
 
     // /////////////////////////////////////////////////////////////////////
@@ -1437,7 +1444,7 @@ final class HibernateClient implements JqmClient
 
         try
         {
-            url = new URL("http://" + h.getNode().getDns() + ":" + h.getNode().getPort() + "/ws/simple/file?id="
+            url = new URL(getFileProtocol(em) + h.getNode().getDns() + ":" + h.getNode().getPort() + "/ws/simple/file?id="
                     + deliverable.getRandomId());
             jqmlogger.trace("URL: " + url.toString());
         }
@@ -1447,6 +1454,28 @@ final class HibernateClient implements JqmClient
         }
 
         return getFile(url.toString());
+    }
+
+    private String getFileProtocol(EntityManager em)
+    {
+        if (protocol == null)
+        {
+            protocol = "http://";
+            try
+            {
+                GlobalParameter gp = em.createQuery("SELECT gp from GlobalParameter gp WHERE gp.key = 'useSsl'", GlobalParameter.class)
+                        .getSingleResult();
+                if (Boolean.parseBoolean(gp.getValue()))
+                {
+                    protocol = "https://";
+                }
+            }
+            catch (NoResultException e)
+            {
+                protocol = "http://";
+            }
+        }
+        return protocol;
     }
 
     private InputStream getFile(String url)
@@ -1475,7 +1504,28 @@ final class HibernateClient implements JqmClient
                 credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(SimpleApiSecurity.getId(em).usr,
                         SimpleApiSecurity.getId(em).pass));
             }
-            cl = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+            SSLContext ctx = null;
+            if (getFileProtocol(em).equals("https://"))
+            {
+                try
+                {
+                    ctx = SSLContexts.custom().loadTrustMaterial(null, new TrustStrategy()
+                    {
+                        @Override
+                        public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException
+                        {
+                            // Do not check if certificate should be trusted or not
+                            return true;
+                        }
+                    }).build();
+                }
+                catch (Exception e)
+                {
+                    // Cannot happen - not trust store is actually loaded!
+                    jqmlogger.error("An supposedly impossible error has happened. Downloading files through the API may not work.", e);
+                }
+            }
+            cl = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setSslcontext(ctx).build();
 
             HttpUriRequest rq = new HttpGet(url.toString());
             rs = cl.execute(rq);
@@ -1553,7 +1603,7 @@ final class HibernateClient implements JqmClient
         URL url = null;
         try
         {
-            url = new URL("http://" + h.getNode().getDns() + ":" + h.getNode().getPort() + "/ws/simple/" + param + "?id=" + jobId);
+            url = new URL(getFileProtocol(em) + h.getNode().getDns() + ":" + h.getNode().getPort() + "/ws/simple/" + param + "?id=" + jobId);
             jqmlogger.trace("URL: " + url.toString());
         }
         catch (MalformedURLException e)
