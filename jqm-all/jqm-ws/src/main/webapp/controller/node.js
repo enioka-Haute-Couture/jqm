@@ -49,40 +49,70 @@ jqmControllers.controller('µNodeListCtrl', function($scope, $http, µNodeDto)
         showGroupPanel : false,
         filterOptions : $scope.filterOptions,
 
-        columnDefs : [ {
-            field : 'id',
-            displayName : 'ID',
-            width : '*',
-        }, {
-            field : 'name',
-            displayName : 'Name',
-            width : '**',
-        }, {
-            field : 'dns',
-            displayName : 'DNS to bind to',
-            width : '**',
-        }, {
-            field : 'port',
-            displayName : 'HTTP port',
-            width : '*',
-        }, {
-            field : 'outputDirectory',
-            displayName : 'File produced storage',
-            width : '***',
-        }, {
-            field : 'jobRepoDirectory',
-            displayName : 'Directory containing jars',
-            width : '***',
-        }, {
-            field : 'rootLogLevel',
-            displayName : 'Log level',
-        }, {
-            field : 'jmxRegistryPort',
-            displayName : 'jmxRegistryPort',
-        }, {
-            field : 'jmxServerPort',
-            displayName : 'jmxServerPort',
-        }, ]
+        columnDefs : [
+                {
+                    field : 'id',
+                    displayName : 'ID',
+                    width : '*',
+                },
+                {
+                    field : 'name',
+                    displayName : 'Name',
+                    width : '**',
+                },
+                {
+                    field : 'dns',
+                    displayName : 'DNS to bind to',
+                    width : '**',
+                },
+                {
+                    field : 'port',
+                    displayName : 'HTTP port',
+                    width : '*',
+                },
+                {
+                    field : 'outputDirectory',
+                    displayName : 'File produced storage',
+                    width : '***',
+                },
+                {
+                    field : 'jobRepoDirectory',
+                    displayName : 'Directory containing jars',
+                    width : '***',
+                },
+                {
+                    field : 'rootLogLevel',
+                    displayName : 'Log level',
+                },
+                {
+                    field : 'jmxRegistryPort',
+                    displayName : 'jmxRegistryPort',
+                },
+                {
+                    field : 'jmxServerPort',
+                    displayName : 'jmxServerPort',
+                },
+                {
+                    field : 'loapApiSimple',
+                    displayName : 'Simple API',
+                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()">'
+                            + ' <input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
+                    width : '*',
+                },
+                {
+                    field : 'loadApiClient',
+                    displayName : 'Client API',
+                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()">'
+                            + ' <input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
+                    width : '*',
+                },
+                {
+                    field : 'loadApiAdmin',
+                    displayName : 'Admin API',
+                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()">'
+                            + ' <input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
+                    width : '*',
+                }, ]
     };
 
     $scope.stop = function()

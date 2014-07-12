@@ -26,7 +26,7 @@ import com.enioka.jqm.webui.admin.dto.RUserDto;
 @SuppressWarnings("unchecked")
 public class Jpa2Dto
 {
-    public static <D> D getDTO(Object o)
+    static <D> D getDTO(Object o)
     {
         if (o instanceof JobDef)
         {
@@ -77,6 +77,9 @@ public class Jpa2Dto
         res.setOutputDirectory(n.getDlRepo());
         res.setPort(n.getPort());
         res.setRootLogLevel(n.getRootLogLevel());
+        res.setLoadApiAdmin(n.getLoadApiAdmin());
+        res.setLoadApiClient(n.getLoadApiClient());
+        res.setLoapApiSimple(n.getLoapApiSimple());
 
         return res;
     }

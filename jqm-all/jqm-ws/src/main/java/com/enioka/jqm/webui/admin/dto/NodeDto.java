@@ -1,12 +1,15 @@
 package com.enioka.jqm.webui.admin.dto;
 
+import java.io.Serializable;
 import java.util.Calendar;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class NodeDto
+public class NodeDto implements Serializable
 {
+    private static final long serialVersionUID = -3592156944832541035L;
+
     private Integer id;
     private String name;
     private String dns;
@@ -18,6 +21,7 @@ public class NodeDto
     private Integer jmxRegistryPort;
     private Integer jmxServerPort;
     private Boolean stop = false;
+    private Boolean loapApiSimple, loadApiClient, loadApiAdmin;
 
     public Integer getId()
     {
@@ -127,5 +131,35 @@ public class NodeDto
     public void setStop(Boolean stop)
     {
         this.stop = stop;
+    }
+
+    public Boolean getLoapApiSimple()
+    {
+        return loapApiSimple;
+    }
+
+    public void setLoapApiSimple(Boolean loapApiSimple)
+    {
+        this.loapApiSimple = loapApiSimple;
+    }
+
+    public Boolean getLoadApiClient()
+    {
+        return loadApiClient;
+    }
+
+    public void setLoadApiClient(Boolean loadApiClient)
+    {
+        this.loadApiClient = loadApiClient;
+    }
+
+    public Boolean getLoadApiAdmin()
+    {
+        return loadApiAdmin;
+    }
+
+    public void setLoadApiAdmin(Boolean loadApiAdmin)
+    {
+        this.loadApiAdmin = loadApiAdmin;
     }
 }

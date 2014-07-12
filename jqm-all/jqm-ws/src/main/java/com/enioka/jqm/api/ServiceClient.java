@@ -2,7 +2,6 @@ package com.enioka.jqm.api;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.Properties;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;

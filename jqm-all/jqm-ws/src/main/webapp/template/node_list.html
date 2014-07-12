@@ -6,12 +6,6 @@
         <code>jqm.sh createnode [ nodename ]</code>
         . Only nodes switched off for more than 10 minutes can be removed.
     </h5>
-    Search: <input ng-model="filterOptions.filterText" />
-    <div>
-        <div ng-repeat="node in nodes  | filter:query | orderBy:'name'">
-            <a href="#/node/{{node.id}}"> {{node.name}}</a>
-        </div>
-    </div>
 
     <div class='gridClass' ng-grid='gridOptions' style='width: 100%;'></div>
 

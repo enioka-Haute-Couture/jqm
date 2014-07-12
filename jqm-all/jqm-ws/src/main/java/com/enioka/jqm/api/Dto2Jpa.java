@@ -99,6 +99,9 @@ class Dto2Jpa
         n.setRepo(dto.getJobRepoDirectory());
         n.setRootLogLevel(dto.getRootLogLevel());
         n.setStop(dto.getStop());
+        n.setLoadApiAdmin(dto.getLoadApiAdmin());
+        n.setLoadApiClient(dto.getLoadApiClient());
+        n.setLoapApiSimple(dto.getLoapApiSimple());
 
         // save
         n = em.merge(n);
