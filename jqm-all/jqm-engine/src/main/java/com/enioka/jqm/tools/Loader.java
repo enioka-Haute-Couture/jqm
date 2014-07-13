@@ -60,13 +60,13 @@ class Loader implements Runnable, LoaderMBean
     private JobInstance job = null;
     private Node node = null;
 
-    private Polling p = null;
+    private QueuePoller p = null;
     private LibraryCache cache = null;
 
     private ObjectName name = null;
     private ClassLoader contextClassLoader = null;
 
-    Loader(JobInstance job, LibraryCache cache, Polling p)
+    Loader(JobInstance job, LibraryCache cache, QueuePoller p)
     {
         this.cache = cache;
         this.p = p;

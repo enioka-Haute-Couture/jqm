@@ -62,7 +62,7 @@ class JqmEngine implements JqmEngineMBean
     private ObjectName name;
 
     // Threads that together constitute the engine
-    private List<Polling> pollers = new ArrayList<Polling>();
+    private List<QueuePoller> pollers = new ArrayList<QueuePoller>();
     private InternalPoller intPoller = null;
     private JettyServer server = null;
 
@@ -192,7 +192,7 @@ class JqmEngine implements JqmEngineMBean
         // Pollers
         for (DeploymentParameter i : dps)
         {
-            Polling p = new Polling(i, cache, this);
+            QueuePoller p = new QueuePoller(i, cache, this);
             pollers.add(p);
             Thread t = new Thread(p);
             t.start();
@@ -240,7 +240,7 @@ class JqmEngine implements JqmEngineMBean
         }
 
         // Stop pollers
-        for (Polling p : pollers)
+        for (QueuePoller p : pollers)
         {
             p.stop();
         }
@@ -267,7 +267,7 @@ class JqmEngine implements JqmEngineMBean
     synchronized void checkEngineEnd()
     {
         jqmlogger.trace("Checking if engine should end with the latest poller");
-        for (Polling poller : pollers)
+        for (QueuePoller poller : pollers)
         {
             if (poller.isRunning())
             {
@@ -384,7 +384,7 @@ class JqmEngine implements JqmEngineMBean
     @Override
     public boolean isAllPollersPolling()
     {
-        for (Polling p : this.pollers)
+        for (QueuePoller p : this.pollers)
         {
             if (!p.isActuallyPolling())
             {
@@ -397,7 +397,7 @@ class JqmEngine implements JqmEngineMBean
     @Override
     public boolean isFull()
     {
-        for (Polling p : this.pollers)
+        for (QueuePoller p : this.pollers)
         {
             if (p.isFull())
             {
