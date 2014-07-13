@@ -42,7 +42,7 @@ public class BasicTest
     @BeforeClass
     public static void testInit() throws Exception
     {
-        JndiContextFactory.createJndiContext();
+        JndiContext.createJndiContext();
         s = new org.hsqldb.Server();
         s.setDatabaseName(0, "testdbengine");
         s.setDatabasePath(0, "mem:testdbengine");

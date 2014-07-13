@@ -156,7 +156,7 @@ final class Helpers
     {
         try
         {
-            JndiContextFactory.createJndiContext();
+            JndiContext.createJndiContext();
             jqmlogger.debug("JNDI context was registered");
         }
         catch (NamingException e)

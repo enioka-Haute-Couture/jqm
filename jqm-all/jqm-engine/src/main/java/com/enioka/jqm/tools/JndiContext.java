@@ -44,6 +44,7 @@ import javax.naming.NameParser;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 import javax.naming.spi.InitialContextFactoryBuilder;
+import javax.naming.spi.NamingManager;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -60,6 +61,37 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
     private List<ObjectName> jmxNames = new ArrayList<ObjectName>();
     private Registry r = null;
     private ClassLoader extResources;
+
+    /**
+     * Will create a JNDI Context and register it as the initial context factory builder
+     * 
+     * @return the context
+     * @throws NamingException
+     *             on any issue during initial context factory builder registration
+     */
+    static JndiContext createJndiContext() throws NamingException
+    {
+        try
+        {
+            if (!NamingManager.hasInitialContextFactoryBuilder())
+            {
+                JndiContext ctx = new JndiContext();
+                NamingManager.setInitialContextFactoryBuilder(ctx);
+                return ctx;
+            }
+            else
+            {
+                return (JndiContext) NamingManager.getInitialContext(null);
+            }
+        }
+        catch (Exception e)
+        {
+            jqmlogger.error("Could not create JNDI context: " + e.getMessage());
+            NamingException ex = new NamingException("could not init Jndi Context");
+            ex.setRootCause(e);
+            throw ex;
+        }
+    }
 
     /**
      * Create a new Context

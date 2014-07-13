@@ -18,7 +18,7 @@ public class JqmBaseTest
     @BeforeClass
     public static void testInit() throws Exception
     {
-        JndiContextFactory.createJndiContext();
+        JndiContext.createJndiContext();
         s = new Server();
         s.setDatabaseName(0, "testdbengine");
         s.setDatabasePath(0, "mem:testdbengine");
