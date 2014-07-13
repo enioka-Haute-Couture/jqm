@@ -377,4 +377,63 @@ public class MiscTest extends JqmBaseTest
 
         Assert.assertEquals(5, Query.create().addStatusFilter(com.enioka.jqm.api.State.KILLED).run().size());
     }
+
+    // Does the poller take multiple JI on each loop?
+    @Test
+    public void testQueuePollWidth() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testQueuePollWidth");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-kill/target/test.jar", TestHelpers.qVip, 42,
+                "jqm-test-kill", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+
+        // Only 3 threads, one poll every hour
+        em.getTransaction().begin();
+        TestHelpers.dpVip.setNbThread(3);
+        TestHelpers.dpVip.setPollingInterval(3600000);
+        em.getTransaction().commit();
+
+        int i1 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+        int i2 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+        int i3 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+        int i4 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+        int i5 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+
+        // Scenario is: 5 jobs in queue. 3 should run. 2 are then killed - 3 should still run.
+        Thread.sleep(3000);
+
+        Assert.assertEquals(3,
+                Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
+                        .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run().size());
+        Assert.assertEquals(
+                2,
+                Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
+                        .addStatusFilter(com.enioka.jqm.api.State.SUBMITTED).run().size());
+
+        JqmClientFactory.getClient().killJob(i1);
+        JqmClientFactory.getClient().killJob(i2);
+
+        Thread.sleep(2000);
+
+        Assert.assertEquals(1,
+                Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
+                        .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run().size());
+        Assert.assertEquals(
+                2,
+                Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
+                        .addStatusFilter(com.enioka.jqm.api.State.SUBMITTED).run().size());
+
+        JqmClientFactory.getClient().killJob(i3);
+
+        TestHelpers.waitFor(3, 10000, em);
+        engine1.stop();
+
+        Assert.assertEquals(3, Query.create().addStatusFilter(com.enioka.jqm.api.State.KILLED).run().size());
+    }
 }

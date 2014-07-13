@@ -170,30 +170,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
         while (true)
         {
             lastLoop = Calendar.getInstance();
-
-            // Reset the em on each loop.
-            // TODO: why is this necessary? Only for dp refresh? Cache size?
-            if (em != null)
-            {
-                em.close();
-            }
             em = Helpers.getNewEm();
-
-            // Wait according to the deploymentParameter
-            try
-            {
-                Thread.sleep(dp.getPollingInterval());
-            }
-            catch (InterruptedException e)
-            {
-                run = false;
-            }
-
-            // Exit if asked to
-            if (!run)
-            {
-                break;
-            }
 
             // Get a JI to run
             JobInstance ji = dequeue();
@@ -214,10 +191,31 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 // Check if there is another job to run (does nothing - no db query - if queue is full so this is not expensive)
                 ji = dequeue();
             }
+
+            // Reset the em on each loop.
+            if (em != null)
+            {
+                em.close();
+            }
+
+            // Wait according to the deploymentParameter
+            try
+            {
+                Thread.sleep(dp.getPollingInterval());
+            }
+            catch (InterruptedException e)
+            {
+                run = false;
+            }
+
+            // Exit if asked to
+            if (!run)
+            {
+                break;
+            }
         }
         jqmlogger.info("Poller loop on queue " + this.queue.getName() + " is stopping [engine " + this.dp.getNode().getName() + "]");
         waitForAllThreads(60 * 1000);
-        em.close();
         this.hasStopped = true;
         jqmlogger.info("Poller on queue " + dp.getQueue().getName() + " has ended");
 
@@ -262,20 +260,16 @@ class QueuePoller implements Runnable, QueuePollerMBean
         long stepMs = 1000;
         while (timeWaitedMs <= timeOutMs)
         {
-            Long nbRunning = (Long) em
-                    .createQuery(
-                            "SELECT COUNT(j) FROM JobInstance j WHERE j.node = :node AND j.queue = :queue AND (j.state = 'ATTRIBUTED' OR j.state = 'RUNNING')")
-                    .setParameter("node", this.dp.getNode()).setParameter("queue", this.dp.getQueue()).getSingleResult();
-            jqmlogger.trace("Waiting the end of " + nbRunning + " job(s)");
+            jqmlogger.trace("Waiting the end of " + actualNbThread + " job(s)");
 
-            if (nbRunning == 0)
+            if (actualNbThread == 0)
             {
                 break;
             }
             if (timeWaitedMs == 0)
             {
-                jqmlogger.info("Waiting for the end of " + nbRunning + " jobs on queue " + this.dp.getQueue().getName() + " - timeout is "
-                        + timeOutMs + "ms");
+                jqmlogger.info("Waiting for the end of " + actualNbThread + " jobs on queue " + this.dp.getQueue().getName()
+                        + " - timeout is " + timeOutMs + "ms");
             }
             try
             {
