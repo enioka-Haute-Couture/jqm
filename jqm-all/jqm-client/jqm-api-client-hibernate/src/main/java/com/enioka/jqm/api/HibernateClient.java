@@ -316,12 +316,19 @@ final class HibernateClient implements JqmClient
 
         try
         {
+            Queue q = job.getQueue();
+            if (jd.getQueueName() != null)
+            {
+                q = em.createQuery("SELECT q FROM Queue q where q.name = :n", Queue.class).setParameter("n", jd.getQueueName())
+                        .getSingleResult();
+            }
+
             JobInstance ji = new JobInstance();
             ji.setJd(job);
             ji.setSessionID(jd.getSessionID());
             ji.setUserName(jd.getUser());
             ji.setState(State.SUBMITTED);
-            ji.setQueue(job.getQueue());
+            ji.setQueue(q);
             ji.setNode(null);
             // Can be null (if no email is asked for)
             ji.setEmail(jd.getEmail());
@@ -344,6 +351,10 @@ final class HibernateClient implements JqmClient
 
             em.getTransaction().commit();
             return ji.getId();
+        }
+        catch (NoResultException e)
+        {
+            throw new JqmInvalidRequestException("An entity specified in the execution request does not exist", e);
         }
         catch (Exception e)
         {

@@ -18,6 +18,7 @@
 
 package com.enioka.jqm.api;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,8 +29,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  * consumed by {@link JqmClient#enqueue(JobRequest)}
  */
 @XmlRootElement
-public class JobRequest
+public class JobRequest implements Serializable
 {
+    private static final long serialVersionUID = -2289375352629706591L;
+
     private String applicationName;
     private String sessionID;
     private String application;
@@ -39,6 +42,7 @@ public class JobRequest
     private String keyword2;
     private String keyword3;
     private String email = null;
+    private String queueName = null;
     private Integer parentJobId = null;
     private Map<String, String> parameters = new HashMap<String, String>();
 
@@ -348,5 +352,31 @@ public class JobRequest
     public void setParentID(Integer parentJobId)
     {
         this.parentJobId = parentJobId;
+    }
+
+    /**
+     * <strong>Optional</strong><br>
+     * The (FIFO) queue inside which the job request should wait for a free execution slot inside an engine. If null, the queue designated
+     * as the default queue for this "application name" will be used.<br>
+     * <strong>Most of the time, this should be left to null.</strong> This parameter is only provided to avoid doing two API calls for a
+     * single execution request (first enqueue, then change queue) when it is certain a specific queue will have to be used.<br>
+     * If there is no queue of this name, the enqueue method will throw a <code>JqmInvalidRequestException</code>.
+     */
+    public String getQueueName()
+    {
+        return queueName;
+    }
+
+    /**
+     * <strong>Optional</strong><br>
+     * The (FIFO) queue inside which the job request should wait for a free execution slot inside an engine. If null, the queue designated
+     * as the default queue for this "application name" will be used.<br>
+     * <strong>Most of the time, this should be left to null.</strong> This parameter is only provided to avoid doing two API calls for a
+     * single execution request (first enqueue, then change queue) when it is certain a specific queue will have to be used.<br>
+     * If there is no queue of this name, the enqueue method will throw a <code>JqmInvalidRequestException</code>.
+     */
+    public void setQueueName(String queueName)
+    {
+        this.queueName = queueName;
     }
 }

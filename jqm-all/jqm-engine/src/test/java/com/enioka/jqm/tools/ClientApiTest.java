@@ -408,8 +408,6 @@ public class ClientApiTest extends JqmBaseTest
         Assert.assertEquals(0, js.size());
     }
 
-    
-
     @Test
     public void testResume() throws Exception
     {
@@ -450,4 +448,29 @@ public class ClientApiTest extends JqmBaseTest
         Assert.assertEquals(State.ENDED, res.get(1).getState());
     }
 
+    @Test
+    public void testEnqueueWithQueue() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testEnqueueWithQueue");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
+        j.setQueueName(TestHelpers.qNormal.getName());
+
+        int i = JqmClientFactory.getClient().enqueue(j);
+
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        TestHelpers.waitFor(1, 10000, em);
+        engine1.stop();
+
+        com.enioka.jqm.api.JobInstance ji = JqmClientFactory.getClient().getJob(i);
+        Assert.assertEquals(TestHelpers.qNormal.getName(), ji.getQueue().getName());
+    }
 }
