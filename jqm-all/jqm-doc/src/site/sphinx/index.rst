@@ -26,8 +26,8 @@ is offered to do every imaginable operation (new execution request, querying the
 
 .. toctree::
 	:numbered:
+	:maxdepth: 3
 	:titlesonly:
-	:maxdepth: 2
 
 	archi
 	quickstart
