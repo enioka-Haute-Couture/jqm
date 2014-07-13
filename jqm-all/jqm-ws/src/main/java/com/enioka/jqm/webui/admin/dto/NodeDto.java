@@ -14,7 +14,7 @@ public class NodeDto implements Serializable
     private String name;
     private String dns;
     private Integer port;
-    private String outputDirectory;
+    private String outputDirectory, tmpDirectory;
     private String jobRepoDirectory;
     private String rootLogLevel;
     private Calendar lastSeenAlive;
@@ -161,5 +161,15 @@ public class NodeDto implements Serializable
     public void setLoadApiAdmin(Boolean loadApiAdmin)
     {
         this.loadApiAdmin = loadApiAdmin;
+    }
+
+    public String getTmpDirectory()
+    {
+        return tmpDirectory;
+    }
+
+    public void setTmpDirectory(String tmpDirectory)
+    {
+        this.tmpDirectory = tmpDirectory;
     }
 }

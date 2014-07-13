@@ -319,9 +319,18 @@ class Loader implements Runnable, LoaderMBean
         }
 
         // Clean temp dir (if it exists)
-        if (FileUtils.deleteQuietly(new File(FilenameUtils.concat(node.getDlRepo(), "" + job.getId()))))
+        File tmpDir = new File(FilenameUtils.concat(node.getTmpDirectory(), "" + job.getId()));
+        if (tmpDir.isDirectory())
         {
-            jqmlogger.trace("temp directory was removed");
+            if (FileUtils.deleteQuietly(tmpDir))
+            {
+                jqmlogger.trace("temp directory was removed");
+            }
+            else
+            {
+                jqmlogger.warn("Could not remove temp directory " + tmpDir.getAbsolutePath()
+                        + "for this job instance. There may be open handlers remaining open.");
+            }
         }
 
         // Unregister MBean

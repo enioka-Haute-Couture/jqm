@@ -45,6 +45,7 @@
 		<module>jqm-test-jndifile</module>
 		<module>jqm-test-waitall</module>
 		<module>jqm-test-emplusapi</module>
+		<module>jqm-test-tmpdir</module>
 	</modules>
 
 	<profiles>

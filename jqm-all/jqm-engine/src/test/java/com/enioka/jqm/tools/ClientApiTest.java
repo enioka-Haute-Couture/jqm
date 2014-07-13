@@ -18,6 +18,7 @@
 
 package com.enioka.jqm.tools;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import org.apache.commons.io.FilenameUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -472,5 +474,35 @@ public class ClientApiTest extends JqmBaseTest
 
         com.enioka.jqm.api.JobInstance ji = JqmClientFactory.getClient().getJob(i);
         Assert.assertEquals(TestHelpers.qNormal.getName(), ji.getQueue().getName());
+    }
+
+    @Test
+    public void testTempDir() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testTempDir");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        JobDef jd = CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-tmpdir/target/test.jar", TestHelpers.qVip, 42,
+                "jqm-test-tmpdir", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+
+        JobRequest j = new JobRequest("jqm-test-tmpdir", "MAG");
+        int i = JqmClientFactory.getClient().enqueue(j);
+
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        TestHelpers.waitFor(1, 10000, em);
+        engine1.stop();
+
+        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)
+                .setParameter("myId", jd.getId()).getResultList();
+
+        Assert.assertEquals(1, ji.size());
+        Assert.assertEquals(State.ENDED, ji.get(0).getState());
+
+        File tmpDir = new File(FilenameUtils.concat(TestHelpers.node.getTmpDirectory(), "" + i));
+        Assert.assertFalse(tmpDir.isDirectory());
     }
 }

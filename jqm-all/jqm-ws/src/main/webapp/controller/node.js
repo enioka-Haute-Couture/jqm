@@ -76,6 +76,11 @@ jqmControllers.controller('µNodeListCtrl', function($scope, $http, µNodeDto)
                     width : '***',
                 },
                 {
+                    field : 'tmpDirectory',
+                    displayName : 'Temporary directory',
+                    width : '**',
+                },
+                {
                     field : 'rootLogLevel',
                     displayName : 'Log level',
                 },

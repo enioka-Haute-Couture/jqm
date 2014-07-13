@@ -102,6 +102,7 @@ class Dto2Jpa
         n.setLoadApiAdmin(dto.getLoadApiAdmin());
         n.setLoadApiClient(dto.getLoadApiClient());
         n.setLoapApiSimple(dto.getLoapApiSimple());
+        n.setTmpDirectory(dto.getTmpDirectory());
 
         // save
         n = em.merge(n);

@@ -315,6 +315,7 @@ final class Helpers
             n.setName(nodeName);
             n.setPort(0);
             n.setRepo(System.getProperty("user.dir") + "/jobs/");
+            n.setTmpDirectory(System.getProperty("user.dir") + "/tmp/");
             n.setRootLogLevel("INFO");
             em.persist(n);
         }

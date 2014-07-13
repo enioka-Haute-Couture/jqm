@@ -350,10 +350,17 @@ class JobManagerHandler implements InvocationHandler
 
     private File getWorkDir()
     {
-        File f = new File(FilenameUtils.concat(node.getDlRepo(), "" + this.ji.getId()));
-        if (!f.isDirectory() && !f.mkdir())
+        File f = new File(FilenameUtils.concat(node.getTmpDirectory(), "" + this.ji.getId()));
+        if (!f.isDirectory())
         {
-            throw new JqmRuntimeException("Could not create work directory");
+            try
+            {
+                FileUtils.forceMkdir(f);
+            }
+            catch (Exception e)
+            {
+                throw new JqmRuntimeException("Could not create work directory", e);
+            }
         }
         return f;
     }

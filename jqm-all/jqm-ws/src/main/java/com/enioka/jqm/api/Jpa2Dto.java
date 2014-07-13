@@ -80,6 +80,7 @@ public class Jpa2Dto
         res.setLoadApiAdmin(n.getLoadApiAdmin());
         res.setLoadApiClient(n.getLoadApiClient());
         res.setLoapApiSimple(n.getLoapApiSimple());
+        res.setTmpDirectory(n.getTmpDirectory());
 
         return res;
     }

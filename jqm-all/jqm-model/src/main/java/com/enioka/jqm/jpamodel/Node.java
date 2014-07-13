@@ -58,6 +58,9 @@ public class Node
     @Column(nullable = false, name = "dlRepo", length = 1024)
     private String dlRepo;
 
+    @Column(nullable = true, name = "tmpDirectory", length = 1024)
+    private String tmpDirectory;
+
     @Column(nullable = false, name = "repo", length = 1024)
     private String repo;
 
@@ -187,7 +190,7 @@ public class Node
     }
 
     /**
-     * See {@link #getRootLogLevel()
+     * See {@link #getRootLogLevel()}
      */
     public void setRootLogLevel(String rootLogLevel)
     {
@@ -283,6 +286,9 @@ public class Node
         return loapApiSimple;
     }
 
+    /**
+     * See {@link #getLoapApiSimple()}
+     */
     public void setLoapApiSimple(Boolean loapApiSimple)
     {
         this.loapApiSimple = loapApiSimple;
@@ -296,6 +302,9 @@ public class Node
         return loadApiClient;
     }
 
+    /**
+     * See {@link #getLoadApiClient()}
+     */
     public void setLoadApiClient(Boolean loadApiClient)
     {
         this.loadApiClient = loadApiClient;
@@ -309,8 +318,27 @@ public class Node
         return loadApiAdmin;
     }
 
+    /**
+     * See {@link #getLoadApiAdmin()}
+     */
     public void setLoadApiAdmin(Boolean loadApiAdmin)
     {
         this.loadApiAdmin = loadApiAdmin;
+    }
+
+    /**
+     * The root directory inside which temporary files will be created (see JobManager.getWorkDir).
+     */
+    public String getTmpDirectory()
+    {
+        return tmpDirectory;
+    }
+
+    /**
+     * See {@link #getTmpDirectory()}
+     */
+    public void setTmpDirectory(String tmpDirectory)
+    {
+        this.tmpDirectory = tmpDirectory;
     }
 }
