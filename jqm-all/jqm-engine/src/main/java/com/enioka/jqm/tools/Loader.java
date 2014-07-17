@@ -240,12 +240,12 @@ class Loader implements Runnable, LoaderMBean
         }
         catch (JqmKillException e)
         {
-            jqmlogger.debug("Job instance  " + job.getId() + " has been killed.");
+            jqmlogger.info("Job instance  " + job.getId() + " has been killed.");
             resultStatus = State.KILLED;
         }
         catch (Exception e)
         {
-            jqmlogger.debug("Job instance " + job.getId() + " has crashed. Exception was:", e);
+            jqmlogger.info("Job instance " + job.getId() + " has crashed. Exception was:", e);
             resultStatus = State.CRASHED;
         }
 
