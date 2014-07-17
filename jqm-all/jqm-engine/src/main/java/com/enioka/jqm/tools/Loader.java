@@ -39,6 +39,7 @@ import javax.persistence.LockModeType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.api.JqmClientFactory;
@@ -118,6 +119,7 @@ class Loader implements Runnable, LoaderMBean
 
         // Log
         State resultStatus = State.SUBMITTED;
+        String endMessage = null;
         jqmlogger.debug("A loader/runner thread has just started for Job Instance " + job.getId() + " with " + job.getParameters().size()
                 + " parameters. Jar is: " + job.getJd().getJarPath() + " - class is: " + job.getJd().getJavaClassName());
 
@@ -247,12 +249,16 @@ class Loader implements Runnable, LoaderMBean
         {
             jqmlogger.info("Job instance " + job.getId() + " has crashed. Exception was:", e);
             resultStatus = State.CRASHED;
+            endMessage = "Status updated: " + resultStatus + ". Exception was (give this to support): " + e.getMessage() + "\n";
+            endMessage = endMessage
+                    + ExceptionUtils.getStackTrace(e).substring(0,
+                            Math.min(ExceptionUtils.getStackTrace(e).length() - 1, 999 - endMessage.length()));
         }
 
         // Job instance has now ended its run
         try
         {
-            endOfRun(resultStatus);
+            endOfRun(resultStatus, endMessage);
         }
         catch (Exception e)
         {
@@ -263,6 +269,11 @@ class Loader implements Runnable, LoaderMBean
     }
 
     private void endOfRun(State status)
+    {
+        endOfRun(status, null);
+    }
+
+    private void endOfRun(State status, String endMessage)
     {
         p.decreaseNbThread();
         EntityManager em = Helpers.getNewEm();
@@ -286,9 +297,13 @@ class Loader implements Runnable, LoaderMBean
         jqmlogger.trace("An History was just created for job instance " + h.getId());
 
         // A last message (directly created on History, not JI)
+        if (endMessage == null)
+        {
+            endMessage = "Status updated: " + status;
+        }
         Message m = new Message();
         m.setHistory(h);
-        m.setTextMessage("Status updated: " + status);
+        m.setTextMessage(endMessage);
         em.persist(m);
 
         // Purge the JI (using query, not em - more efficient + avoid cache issues on MessageJI which are not up to date here)
