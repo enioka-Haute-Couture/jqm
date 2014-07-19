@@ -332,11 +332,15 @@ class JqmEngine implements JqmEngineMBean
                 .createQuery("SELECT ji FROM JobInstance ji WHERE ji.node = :node AND (ji.state = 'SUBMITTED' OR ji.state = 'RUNNING')",
                         JobInstance.class).setParameter("node", node).getResultList())
         {
-            History h = Helpers.createHistory(ji, em, State.CRASHED, Calendar.getInstance());
-            Message m = new Message();
-            m.setHistory(h);
-            m.setTextMessage("Job was supposed to be running at server startup - usually means it was killed along a server by an admin or a crash");
-            em.persist(m);
+            History h = em.find(History.class, ji.getId());
+            if (h == null)
+            {
+                h = Helpers.createHistory(ji, em, State.CRASHED, Calendar.getInstance());
+                Message m = new Message();
+                m.setHistory(h);
+                m.setTextMessage("Job was supposed to be running at server startup - usually means it was killed along a server by an admin or a crash");
+                em.persist(m);
+            }
 
             em.createQuery("DELETE FROM MessageJi WHERE jobInstance = :i").setParameter("i", ji).executeUpdate();
             em.createQuery("DELETE FROM JobParameter WHERE jobInstance = :i").setParameter("i", ji).executeUpdate();
