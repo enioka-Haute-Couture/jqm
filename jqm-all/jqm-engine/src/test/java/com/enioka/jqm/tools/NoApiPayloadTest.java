@@ -18,11 +18,14 @@
 
 package com.enioka.jqm.tools;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -185,5 +188,34 @@ public class NoApiPayloadTest extends JqmBaseTest
 
         Assert.assertEquals(4, ji.get(0).getMessages().size()); // 3 auto messages + 1 message per run.
         Assert.assertEquals(100, (int) ji.get(0).getProgress());
+    }
+
+    @Test
+    public void testProvidedApi() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testProvidedApi");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-providedapi/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+
+        // Create an empty lib directory just to be sure no dependencies will be resolved.
+        FileUtils.forceMkdir(new File("../jqm-tests/jqm-test-providedapi/target/lib"));
+
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
+        JqmClientFactory.getClient().enqueue(j);
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        TestHelpers.waitFor(1, 10000, em);
+        engine1.stop();
+
+        TypedQuery<History> query = em.createQuery("SELECT j FROM History j", History.class);
+        ArrayList<History> res = (ArrayList<History>) query.getResultList();
+
+        Assert.assertEquals(1, res.size());
+        Assert.assertEquals(State.ENDED, res.get(0).getState());
     }
 }
