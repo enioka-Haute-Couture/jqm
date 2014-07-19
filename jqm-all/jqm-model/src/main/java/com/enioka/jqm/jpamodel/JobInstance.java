@@ -20,7 +20,6 @@ package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
 import java.util.Calendar;
-import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -34,7 +33,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -119,9 +117,6 @@ public class JobInstance implements Serializable
     @Column(length = 50, name = "keyword3")
     private String instanceKeyword3;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST }, mappedBy = "jobInstance")
-    private List<JobParameter> parameters;
-
     /**
      * The place inside the queue, i.e. the number of job requests that will be run before this one can be run.
      */
@@ -148,10 +143,10 @@ public class JobInstance implements Serializable
      *            value of the parameter to create
      * @return the newly created parameter
      */
-    public JobParameter addParameter(String key, String value)
+    public RuntimeParameter addParameter(String key, String value)
     {
-        JobParameter jp = new JobParameter();
-        jp.setJobinstance(this);
+        RuntimeParameter jp = new RuntimeParameter();
+        jp.setJi(this.getId());
         jp.setKey(key);
         jp.setValue(value);
         return jp;
@@ -244,22 +239,6 @@ public class JobInstance implements Serializable
     public void setQueue(final Queue queue)
     {
         this.queue = queue;
-    }
-
-    /**
-     * The actual list of parameters that will be passed to the payload.
-     */
-    public List<JobParameter> getParameters()
-    {
-        return parameters;
-    }
-
-    /**
-     * See {@link #getParameters()}
-     */
-    public void setParameters(final List<JobParameter> parameters)
-    {
-        this.parameters = parameters;
     }
 
     /**

@@ -51,17 +51,6 @@ public class JobDefParameter implements Serializable
     private String value;
 
     /**
-     * Converts the current object to a TP {@link JobParameter} that will be used for an execution.
-     */
-    public JobParameter jDPtoJP()
-    {
-        final JobParameter jp = new JobParameter();
-        jp.setKey(this.getKey());
-        jp.setValue(this.getValue());
-        return jp;
-    }
-
-    /**
      * The name of the parameter.<br>
      * Max length is 50.
      */

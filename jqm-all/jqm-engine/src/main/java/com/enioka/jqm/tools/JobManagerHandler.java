@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -27,7 +26,6 @@ import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.State;
 
@@ -45,7 +43,7 @@ class JobManagerHandler implements InvocationHandler
     private String defaultCon = null, application = null, sessionId = null;
     private Node node = null;
 
-    JobManagerHandler(JobInstance ji)
+    JobManagerHandler(JobInstance ji, Map<String, String> prms)
     {
 
         p = new Properties();
@@ -53,11 +51,7 @@ class JobManagerHandler implements InvocationHandler
 
         EntityManager em = Helpers.getNewEm();
         this.ji = em.find(JobInstance.class, ji.getId());
-        params = new HashMap<String, String>();
-        for (JobParameter p : this.ji.getParameters())
-        {
-            params.put(p.getKey(), p.getValue());
-        }
+        params = prms;
 
         defaultCon = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = 'defaultConnection'", String.class)
                 .getSingleResult();

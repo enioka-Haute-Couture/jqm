@@ -21,7 +21,6 @@ package com.enioka.jqm.test.helpers;
 import java.io.FileNotFoundException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -33,20 +32,17 @@ import org.hsqldb.Server;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JndiObjectResource;
 import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
-import com.enioka.jqm.jpamodel.JobHistoryParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.JobParameter;
-import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.RPermission;
 import com.enioka.jqm.jpamodel.RRole;
 import com.enioka.jqm.jpamodel.RUser;
+import com.enioka.jqm.jpamodel.RuntimeParameter;
 import com.enioka.jqm.jpamodel.State;
 
 /**
@@ -208,15 +204,12 @@ public class CreationTools
 
     // ------------------ JOBINSTANCE --------------------------
 
-    public static JobInstance createJobInstance(JobDef jd, List<JobParameter> jps, String user, String sessionID, State state,
+    public static JobInstance createJobInstance(JobDef jd, List<RuntimeParameter> jps, String user, String sessionID, State state,
             Integer position, Queue queue, Node node, EntityManager em)
     {
         JobInstance j = new JobInstance();
         jqmlogger.debug("Creating JobInstance with " + jps.size() + " parameters");
-        for (JobParameter jp : jps)
-        {
-            jqmlogger.debug("Parameter: " + jp.getKey() + " - " + jp.getValue());
-        }
+
         j.setJd(jd);
         j.setSessionID(sessionID);
         j.setUserName(user);
@@ -226,16 +219,22 @@ public class CreationTools
 
         em.persist(j);
         j.setInternalPosition(position);
-        j.setParameters(jps);
+
+        for (RuntimeParameter jp : jps)
+        {
+            jqmlogger.debug("Parameter: " + jp.getKey() + " - " + jp.getValue());
+            jp.setJi(j.getId());
+            em.persist(jp);
+        }
 
         return j;
     }
 
-    // ------------------ JOBPARAMETER -------------------------
+    // ------------------ RuntimeParameter -------------------------
 
-    public static JobParameter createJobParameter(String key, String value, EntityManager em)
+    public static RuntimeParameter createJobParameter(String key, String value, EntityManager em)
     {
-        JobParameter j = new JobParameter();
+        RuntimeParameter j = new RuntimeParameter();
 
         j.setKey(key);
         j.setValue(value);

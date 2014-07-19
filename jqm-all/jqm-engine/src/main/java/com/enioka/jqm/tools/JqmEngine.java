@@ -342,7 +342,6 @@ class JqmEngine implements JqmEngineMBean
                 em.persist(m);
             }
 
-            em.createQuery("DELETE FROM JobParameter WHERE jobInstance = :i").setParameter("i", ji).executeUpdate();
             em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", ji.getId()).executeUpdate();
         }
         em.getTransaction().commit();

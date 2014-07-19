@@ -20,9 +20,7 @@ package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
 import java.util.Calendar;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -31,7 +29,6 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -64,10 +61,6 @@ public class History implements Serializable
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Node.class)
     @JoinColumn(name = "node_id")
     private Node node;
-
-    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)
-    @JoinColumn(name = "history_id")
-    private List<JobHistoryParameter> parameters;
 
     @Column(name = "highlander")
     private boolean highlander = false;
@@ -233,15 +226,6 @@ public class History implements Serializable
     }
 
     /**
-     * List of all the parameters that were used for the execution. These are the actual parameters that were used, i.e. the combination of
-     * the parameters defined inside {@link JobDef} and those given inside the execution request (which may overload the former).
-     */
-    public List<JobHistoryParameter> getParameters()
-    {
-        return parameters;
-    }
-
-    /**
      * The {@link Queue} on which the {@link JobInstance} run took place. the actual queue, not necessarily the one defined inside
      * {@link JobDef} as it can be overloaded in the execution request)
      */
@@ -304,14 +288,6 @@ public class History implements Serializable
     public void setSessionId(final String sessionId)
     {
         this.sessionId = sessionId;
-    }
-
-    /**
-     * See {@link #getParameters()}
-     */
-    public void setParameters(List<JobHistoryParameter> parameters)
-    {
-        this.parameters = parameters;
     }
 
     /**

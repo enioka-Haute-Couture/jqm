@@ -29,12 +29,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.JobParameter;
 
 /**
  * The {@link URLClassLoader} that will load everything related to a payload (the payload jar and all its dependencies).<br>
@@ -44,6 +45,8 @@ import com.enioka.jqm.jpamodel.JobParameter;
 class JarClassLoader extends URLClassLoader
 {
     private static Logger jqmlogger = Logger.getLogger(JarClassLoader.class);
+
+    private Map<String, String> prms = new HashMap<String, String>();
 
     private static URL[] addUrls(URL url, URL[] libs)
     {
@@ -72,8 +75,10 @@ class JarClassLoader extends URLClassLoader
         return false;
     }
 
-    void launchJar(JobInstance job) throws JqmEngineException
+    void launchJar(JobInstance job, Map<String, String> parameters) throws JqmEngineException
     {
+        this.prms = parameters;
+
         // 1st: load the class
         String classQualifiedName = job.getJd().getJavaClassName();
         jqmlogger.debug("Will now load class: " + classQualifiedName);
@@ -230,19 +235,20 @@ class JarClassLoader extends URLClassLoader
         inject(c, null, job);
 
         // Parameters
-        String[] params = new String[job.getParameters().size()];
-        Collections.sort(job.getParameters(), new Comparator<JobParameter>()
+        String[] params = new String[this.prms.size()];
+        List<String> keys = new ArrayList<String>(this.prms.keySet());
+        Collections.sort(keys, new Comparator<String>()
         {
             @Override
-            public int compare(JobParameter o1, JobParameter o2)
+            public int compare(String o1, String o2)
             {
-                return o1.getKey().compareTo(o2.getKey());
+                return o1.compareTo(o2);
             }
         });
         int i = 0;
-        for (JobParameter p : job.getParameters())
+        for (String p : keys)
         {
-            params[i] = p.getValue();
+            params[i] = this.prms.get(p);
             i++;
         }
 
@@ -301,7 +307,7 @@ class JarClassLoader extends URLClassLoader
             return;
         }
 
-        JobManagerHandler h = new JobManagerHandler(job);
+        JobManagerHandler h = new JobManagerHandler(job, prms);
         Class injInt = null;
         Object proxy = null;
         try

@@ -72,11 +72,10 @@ import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
-import com.enioka.jqm.jpamodel.JobHistoryParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.jpamodel.RuntimeParameter;
 import com.enioka.jqm.jpamodel.State;
 
 /**
@@ -287,7 +286,7 @@ final class HibernateClient implements JqmClient
 
         jqmlogger.trace("Job to enqueue is from JobDef " + job.getId());
         Integer hl = null;
-        List<JobParameter> jps = overrideParameter(job, jd, em);
+        List<RuntimeParameter> jps = overrideParameter(job, jd, em);
 
         // Begin transaction (that will hold a lock in case of Highlander)
         try
@@ -337,11 +336,10 @@ final class HibernateClient implements JqmClient
                 ji.setParentId(jd.getParentID());
             }
             ji.setProgress(0);
-            ji.setParameters(new ArrayList<JobParameter>());
             em.persist(ji);
             ji.setInternalPosition(ji.getId());
 
-            for (JobParameter jp : jps)
+            for (RuntimeParameter jp : jps)
             {
                 jqmlogger.trace("Parameter: " + jp.getKey() + " - " + jp.getValue());
                 em.persist(ji.addParameter(jp.getKey(), jp.getValue()));
@@ -380,7 +378,7 @@ final class HibernateClient implements JqmClient
         {
             em = getEm();
             h = em.find(History.class, jobIdToCopy);
-            return enqueue(getJobRequest(h));
+            return enqueue(getJobRequest(h, em));
         }
         catch (NoResultException e)
         {
@@ -393,9 +391,9 @@ final class HibernateClient implements JqmClient
     }
 
     // Helper
-    private List<JobParameter> overrideParameter(JobDef jdef, JobRequest jdefinition, EntityManager em)
+    private List<RuntimeParameter> overrideParameter(JobDef jdef, JobRequest jdefinition, EntityManager em)
     {
-        List<JobParameter> res = new ArrayList<JobParameter>();
+        List<RuntimeParameter> res = new ArrayList<RuntimeParameter>();
         Map<String, String> resm = new HashMap<String, String>();
 
         // 1st: default parameters
@@ -407,7 +405,7 @@ final class HibernateClient implements JqmClient
         // 2nd: overloads inside the user enqueue form.
         resm.putAll(jdefinition.getParameters());
 
-        // 3rd: create the JobParameter objects
+        // 3rd: create the RuntimeParameter objects
         for (Entry<String, String> e : resm.entrySet())
         {
             res.add(createJobParameter(e.getKey(), e.getValue(), em));
@@ -446,7 +444,7 @@ final class HibernateClient implements JqmClient
     }
 
     // Helper
-    private JobRequest getJobRequest(History h)
+    private JobRequest getJobRequest(History h, EntityManager em)
     {
         JobRequest jd = new JobRequest();
         jd.setApplication(h.getApplication());
@@ -460,7 +458,8 @@ final class HibernateClient implements JqmClient
         jd.setSessionID(h.getSessionId());
         jd.setUser(h.getUserName());
 
-        for (JobHistoryParameter p : h.getParameters())
+        for (RuntimeParameter p : em.createQuery("SELECT p FROM RuntimeParameter p WHERE p.ji = :i", RuntimeParameter.class)
+                .setParameter("i", h.getId()).getResultList())
         {
             jd.addParameter(p.getKey(), p.getValue());
         }
@@ -516,12 +515,10 @@ final class HibernateClient implements JqmClient
             h.setKeyword2(ji.getKeyword2());
             h.setKeyword3(ji.getKeyword3());
             h.setProgress(ji.getProgress());
-            h.setParameters(new ArrayList<JobHistoryParameter>());
             h.setStatus(State.CANCELLED);
             h.setNode(ji.getNode());
             em.persist(h);
 
-            em.createQuery("DELETE FROM JobParameter WHERE jobInstance = :i").setParameter("i", ji).executeUpdate();
             em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", ji.getId()).executeUpdate();
             em.getTransaction().commit();
         }
@@ -563,7 +560,7 @@ final class HibernateClient implements JqmClient
 
             em.getTransaction().begin();
             em.createQuery("DELETE FROM Message WHERE ji = :i").setParameter("i", job.getId()).executeUpdate();
-            em.createQuery("DELETE FROM JobParameter WHERE jobInstance = :i").setParameter("i", job).executeUpdate();
+            em.createQuery("DELETE FROM RuntimeParameter WHERE ji = :i").setParameter("i", job.getId()).executeUpdate();
             em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", job.getId()).executeUpdate();
             em.getTransaction().commit();
         }
@@ -712,7 +709,7 @@ final class HibernateClient implements JqmClient
             em.getTransaction().begin();
             em.remove(h);
             em.getTransaction().commit();
-            return enqueue(getJobRequest(h));
+            return enqueue(getJobRequest(h, em));
         }
         catch (Exception e)
         {
@@ -876,7 +873,8 @@ final class HibernateClient implements JqmClient
         ji.setState(com.enioka.jqm.api.State.valueOf(h.getState().toString()));
         ji.setUser(h.getUserName());
         ji.setProgress(h.getProgress());
-        for (JobParameter p : h.getParameters())
+        for (RuntimeParameter p : em.createQuery("SELECT m from RuntimeParameter m where m.ji = :i", RuntimeParameter.class)
+                .setParameter("i", h.getId()).getResultList())
         {
             ji.getParameters().put(p.getKey(), p.getValue());
         }
@@ -914,7 +912,8 @@ final class HibernateClient implements JqmClient
         ji.setState(com.enioka.jqm.api.State.valueOf(h.getStatus().toString()));
         ji.setUser(h.getUserName());
         ji.setProgress(h.getProgress());
-        for (JobHistoryParameter p : h.getParameters())
+        for (RuntimeParameter p : em.createQuery("SELECT m from RuntimeParameter m where m.ji = :i", RuntimeParameter.class)
+                .setParameter("i", h.getId()).getResultList())
         {
             ji.getParameters().put(p.getKey(), p.getValue());
         }
@@ -1666,9 +1665,9 @@ final class HibernateClient implements JqmClient
         return q;
     }
 
-    private static JobParameter createJobParameter(String key, String value, EntityManager em)
+    private static RuntimeParameter createJobParameter(String key, String value, EntityManager em)
     {
-        JobParameter j = new JobParameter();
+        RuntimeParameter j = new RuntimeParameter();
 
         j.setKey(key);
         j.setValue(value);

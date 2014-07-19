@@ -21,7 +21,6 @@ package com.enioka.jqm.tools;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Properties;
 import java.util.UUID;
@@ -44,9 +43,7 @@ import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobHistoryParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
@@ -487,20 +484,10 @@ final class Helpers
         h.setKeyword2(job.getKeyword2());
         h.setKeyword3(job.getKeyword3());
         h.setProgress(job.getProgress());
-        h.setParameters(new ArrayList<JobHistoryParameter>());
         h.setStatus(finalState);
         h.setNode(job.getNode());
 
         em.persist(h);
-
-        for (JobParameter j : job.getParameters())
-        {
-            JobHistoryParameter jp = new JobHistoryParameter();
-            jp.setKey(j.getKey());
-            jp.setValue(j.getValue());
-            em.persist(jp);
-            h.getParameters().add(jp);
-        }
 
         return h;
     }

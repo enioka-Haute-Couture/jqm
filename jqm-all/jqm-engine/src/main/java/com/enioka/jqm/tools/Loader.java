@@ -26,7 +26,9 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.management.MBeanServer;
@@ -45,9 +47,9 @@ import org.apache.log4j.Logger;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
+import com.enioka.jqm.jpamodel.RuntimeParameter;
 import com.enioka.jqm.jpamodel.State;
 
 /**
@@ -120,8 +122,8 @@ class Loader implements Runnable, LoaderMBean
         // Log
         State resultStatus = State.SUBMITTED;
         String endMessage = null;
-        jqmlogger.debug("A loader/runner thread has just started for Job Instance " + job.getId() + " with " + job.getParameters().size()
-                + " parameters. Jar is: " + job.getJd().getJarPath() + " - class is: " + job.getJd().getJavaClassName());
+        jqmlogger.debug("A loader/runner thread has just started for Job Instance " + job.getId() + ". Jar is: " + job.getJd().getJarPath()
+                + " - class is: " + job.getJd().getJavaClassName());
 
         // Check file paths
         File jarFile = new File(FilenameUtils.concat(new File(node.getRepo()).getAbsolutePath(), job.getJd().getJarPath()));
@@ -187,10 +189,13 @@ class Loader implements Runnable, LoaderMBean
             return;
         }
 
-        // Trace
-        for (JobParameter jp : this.job.getParameters())
+        // Parameters
+        Map<String, String> params = new HashMap<String, String>();
+        for (RuntimeParameter jp : em.createQuery("SELECT p FROM RuntimeParameter p WHERE p.ji = :i", RuntimeParameter.class)
+                .setParameter("i", job.getId()).getResultList())
         {
             jqmlogger.trace("Parameter " + jp.getKey() + " - " + jp.getValue());
+            params.put(jp.getKey(), jp.getValue());
         }
 
         // No need anymore for the EM.
@@ -237,7 +242,7 @@ class Loader implements Runnable, LoaderMBean
         // Go! (launches the main function in the startup class designated in the manifest)
         try
         {
-            jobClassLoader.launchJar(job);
+            jobClassLoader.launchJar(job, params);
             resultStatus = State.ENDED;
         }
         catch (JqmKillException e)
@@ -306,13 +311,8 @@ class Loader implements Runnable, LoaderMBean
         m.setTextMessage(endMessage);
         em.persist(m);
 
-        // Purge the JI (using query, not em - more efficient + avoid cache issues on Message which are not up to date here)
-        em.getTransaction().commit();
-        em.getTransaction().begin();
-        em.createQuery("DELETE FROM JobParameter WHERE jobInstance = :i").setParameter("i", job).executeUpdate();
-        em.getTransaction().commit();
-
         // Other transaction for purging the JI (deadlock power - beware of Message)
+        em.getTransaction().commit();
         em.getTransaction().begin();
         em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", job.getId()).executeUpdate();
         em.getTransaction().commit();
