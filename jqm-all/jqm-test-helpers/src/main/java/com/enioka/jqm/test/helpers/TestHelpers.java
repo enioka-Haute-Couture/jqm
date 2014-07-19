@@ -128,7 +128,6 @@ public class TestHelpers
         em.createQuery("DELETE Queue WHERE 1=1").executeUpdate();
         em.createQuery("DELETE JndiObjectResourceParameter WHERE 1=1").executeUpdate();
         em.createQuery("DELETE JndiObjectResource WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE DatabaseProp WHERE 1=1").executeUpdate();
         em.createQuery("DELETE PKI WHERE 1=1").executeUpdate();
         em.createQuery("DELETE RPermission WHERE 1=1").executeUpdate();
         em.createQuery("DELETE RRole WHERE 1=1").executeUpdate();

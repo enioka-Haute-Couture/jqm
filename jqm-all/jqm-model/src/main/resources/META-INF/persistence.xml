@@ -18,7 +18,6 @@
 		<class>com.enioka.jqm.jpamodel.DeploymentParameter</class>
 		<class>com.enioka.jqm.jpamodel.Node</class>
 		<class>com.enioka.jqm.jpamodel.Queue</class>
-		<class>com.enioka.jqm.jpamodel.DatabaseProp</class>
 		<class>com.enioka.jqm.jpamodel.JndiObjectResource</class>
 		<class>com.enioka.jqm.jpamodel.JndiObjectResourceParameter</class>
 		<class>com.enioka.jqm.jpamodel.GlobalParameter</class>
