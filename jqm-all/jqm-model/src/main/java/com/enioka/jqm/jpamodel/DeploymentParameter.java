@@ -27,6 +27,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
@@ -34,7 +35,7 @@ import javax.persistence.Table;
  * interval.
  */
 @Entity
-@Table(name = "DeploymentParameter")
+@Table(name = "DeploymentParameter", uniqueConstraints = { @UniqueConstraint(columnNames = { "queue", "node" }) })
 public class DeploymentParameter
 {
     @Id

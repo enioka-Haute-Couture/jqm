@@ -13,6 +13,7 @@ jqmControllers
                     $scope.sortvar = 'nId';
                     $scope.selected = [];
                     $scope.bDbBusy = false;
+                    $scope.error = null;
 
                     $scope.newmapping = function()
                     {
@@ -92,6 +93,34 @@ jqmControllers
                                     editableCellTemplate : '<input ng-cell-input ng-input="COL_FIELD" ng-model="COL_FIELD" type="number" min="1" max="1000" ng-required="true" ng-pattern="/^\\d+$/"  />',
                                 }, ]
                     };
+
+                    $scope.$watch('mappings', function(newMappings)
+                    {
+                        var q = null;
+                        var nodes = {};
+                        for ( var i = 0; i < newMappings.length; i++)
+                        {
+                            q = newMappings[i];
+                            if (!(q.nodeId in nodes))
+                            {
+                                nodes[q.nodeId] = [];
+                            }
+                            var nodeMappings = nodes[q.nodeId];
+
+                            if (nodeMappings.indexOf(q.queueId) != -1)
+                            {
+                                $scope.error = {
+                                    "userReadableMessage" : "Cannot have two mappings for the same queue inside a single node",
+                                    "errorCode" : null,
+                                };
+                                return;
+                            }
+                            nodeMappings.push(q.queueId);
+                        }
+
+                        // If here, no duplicates
+                        $scope.error = null;
+                    }, true);
 
                     $scope.refresh();
                 });
