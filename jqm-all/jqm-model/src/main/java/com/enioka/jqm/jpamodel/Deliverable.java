@@ -91,7 +91,7 @@ public class Deliverable implements Serializable
     }
 
     /**
-     * Absolute path of the file where it can be retrieved
+     * Path of the file where it can be retrieved. It is relative to {@link Node#getDlRepo()}
      */
     public String getFilePath()
     {

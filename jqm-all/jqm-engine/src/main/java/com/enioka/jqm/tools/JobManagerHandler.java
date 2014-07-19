@@ -338,14 +338,14 @@ class JobManagerHandler implements InvocationHandler
 
             String outputRoot = this.ji.getNode().getDlRepo();
             String ext = FilenameUtils.getExtension(path);
-            String destPath = FilenameUtils.concat(outputRoot,
-                    "" + ji.getJd().getApplicationName() + "/" + ji.getId() + "/" + UUID.randomUUID() + "." + ext);
+            String relDestPath = "" + ji.getJd().getApplicationName() + "/" + ji.getId() + "/" + UUID.randomUUID() + "." + ext;
+            String absDestPath = FilenameUtils.concat(outputRoot, relDestPath);
             String fileName = FilenameUtils.getName(path);
-            FileUtils.moveFile(new File(path), new File(destPath));
-            jqmlogger.debug("A deliverable is added. Stored as " + destPath + ". Initial name: " + fileName);
+            FileUtils.moveFile(new File(path), new File(absDestPath));
+            jqmlogger.debug("A deliverable is added. Stored as " + absDestPath + ". Initial name: " + fileName);
 
             em.getTransaction().begin();
-            d = Helpers.createDeliverable(destPath, fileName, fileLabel, this.ji.getId(), em);
+            d = Helpers.createDeliverable(relDestPath, fileName, fileLabel, this.ji.getId(), em);
             em.getTransaction().commit();
         }
         finally

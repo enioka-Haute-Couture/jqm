@@ -6,6 +6,7 @@ import java.io.InputStream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -25,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.jpamodel.Deliverable;
+import com.enioka.jqm.jpamodel.Node;
 
 /**
  * A minimal API designed to interact well with CLI tools such as schedulers. Some of its methods (file retrieval) are also used by the two
@@ -40,6 +42,33 @@ public class ServiceSimple
     HttpServletResponse res;
     private @Context
     SecurityContext security;
+    private Node n = null;
+
+    // ///////////////////////////////////////////////////////////
+    // Constructor: determine if running on top of JQM or not
+    // ///////////////////////////////////////////////////////////
+
+    public ServiceSimple(@Context ServletContext context)
+    {
+        if (context.getInitParameter("jqmnodeid") != null)
+        {
+            EntityManager em = null;
+            try
+            {
+                em = Helpers.getEm();
+
+                n = em.find(Node.class, Integer.parseInt(context.getInitParameter("jqmnodeid")));
+                if (n == null)
+                {
+                    throw new RuntimeException("invalid configuration: no node of ID " + context.getInitParameter("jqmnodeid"));
+                }
+            }
+            finally
+            {
+                Helpers.closeQuietly(em);
+            }
+        }
+    }
 
     // ///////////////////////////////////////////////////////////
     // The one and only really simple API
@@ -78,6 +107,11 @@ public class ServiceSimple
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public InputStream getDeliverableStream(@QueryParam("id") String randomId)
     {
+        if (n == null)
+        {
+            throw new ErrorDto("can only retrieve a file when the web app runs on top of JQM", "", 9875, Status.BAD_REQUEST);
+        }
+
         Deliverable d = null;
         EntityManager em = null;
         try
@@ -104,7 +138,7 @@ public class ServiceSimple
 
         String ext = FilenameUtils.getExtension(d.getOriginalFileName());
         res.setHeader("Content-Disposition", "attachment; filename=" + d.getFileFamily() + ext);
-        return getFile(d.getFilePath());
+        return getFile(FilenameUtils.concat(n.getDlRepo(), d.getFilePath()));
     }
 
     public InputStream getFile(String path)
