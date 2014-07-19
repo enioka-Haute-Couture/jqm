@@ -1,0 +1,37 @@
+<div class="container-fluid modal-dialog">
+    <div class="form-horizontal modal-body">
+
+        <div class="form-group">
+            <label for="txtUser" class="col-sm-5 control-label">Existing parameters (order unimportant)</label>
+            <div class="col-sm-7">
+                <div ng-repeat="p in selectedJd.parameters | orderBy:'key'" class="row">
+                    <div class="col-xs-5">{{p.key}}</div>
+                    <div class="col-xs-5">{{p.value}}</div>
+                    <a class="col-xs-2" href="" ng-click="delPrm(p)"><span style="color: red;" class="glyphicon glyphicon-remove"></span></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="txtUser" class="col-sm-5 control-label">Add a parameter</label>
+            <div class="col-sm-7">
+                <div class="row">
+                    <div class="col-xs-5">
+                        <input id="txtKey" class="form-control" type="text" ng-model="data.newKey" />
+                    </div>
+                    <div class="col-xs-5">
+                        <input id="txtValue" class="form-control" type="text" ng-model="data.newValue" />
+                    </div>
+                    <div class="col-xs-2">
+                        <button class="btn btn-info btn-sm" ng-click="addPrm()">Add</button>
+                    </div>
+                </div>
+                <span class="help-block">Enter here an additional key/values pair and press "Add"</span>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">OK</button>
+    </div>
+</div>

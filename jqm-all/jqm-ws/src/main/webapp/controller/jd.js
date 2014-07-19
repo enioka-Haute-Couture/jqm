@@ -2,7 +2,7 @@
 
 var jqmControllers = angular.module('jqmControllers');
 
-jqmControllers.controller('µJdListCtrl', function($scope, $http, µJdDto, µQueueDto)
+jqmControllers.controller('µJdListCtrl', function($scope, $http, $modal, µJdDto, µQueueDto)
 {
     $scope.jds = null;
     $scope.selected = [];
@@ -17,6 +17,7 @@ jqmControllers.controller('µJdListCtrl', function($scope, $http, µJdDto, µQue
             canBeRestarted : true,
             highlander : false,
             jarPath : '/path/to/file.jar',
+            parameters : [],
         });
         $scope.jds.push(t);
         $scope.selected.push(t);
@@ -119,5 +120,47 @@ jqmControllers.controller('µJdListCtrl', function($scope, $http, µJdDto, µQue
                 }, ]
     };
 
+    $scope.prms = function()
+    {
+        $modal.open({
+            templateUrl : './template/jd_prms.html',
+            controller : 'jdPrms',
+            size : 'lg',
+            resolve : {
+                jd : function()
+                {
+                    return $scope.selected[0];
+                }
+            },
+        });
+
+    };
     $scope.refresh();
+});
+
+jqmApp.controller('jdPrms', function($scope, $modalInstance, jd)
+{
+    $scope.selectedJd = jd;
+    $scope.data = {
+        newKey : null,
+        newValue : null
+    };
+
+    $scope.addPrm = function()
+    {
+        var np = {};
+        np.key = $scope.data.newKey;
+        np.value = $scope.data.newValue;
+        $scope.selectedJd.parameters.push(np);
+    };
+
+    $scope.delPrm = function(prm)
+    {
+        $scope.selectedJd.parameters.splice($scope.selectedJd.parameters.indexOf(prm), 1);
+    };
+
+    $scope.ok = function()
+    {
+        $modalInstance.close();
+    };
 });

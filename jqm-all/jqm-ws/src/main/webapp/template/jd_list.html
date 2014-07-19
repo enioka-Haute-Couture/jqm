@@ -36,6 +36,7 @@
     <div class='gridClass' ng-grid='gridOptions' style='width: 100%;'></div>
     <button class="btn btn-default" ng-click="newitem()" jqm-permission="jd:create">New definition</button>
     <button class="btn btn-default" ng-click="remove()" ng-disabled="selected.length === 0" jqm-permission="jd:delete">Delete selected</button>
+    <button class="btn btn-default" ng-click="prms()" ng-disabled="selected.length !== 1">Default parameters</button>
     <button class="btn btn-default" ng-click="refresh()">Refresh</button>
     <button class="btn btn-default" ng-click="save()" jqm-permission="jd:create">Save definitions</button>
 </div>
