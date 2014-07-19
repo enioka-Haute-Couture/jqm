@@ -279,13 +279,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>${httpclient.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-test-helpers</artifactId>
 			<version>${project.version}</version>

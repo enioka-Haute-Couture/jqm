@@ -203,11 +203,11 @@ class JettyServer
         {
             exclusions[i] = defExcl[i - nbEx];
         }
-        exclusions[0] = "com.enioka.";
-        exclusions[1] = "org.slf4j.";
-        exclusions[2] = "org.apache.log4j.";
-        exclusions[3] = "org.glassfish."; // Jersey
-        // exclusions[4] = "org.hibernate."; // Hib
+        exclusions[0] = "com.enioka.jqm.tools.";
+        exclusions[1] = "com.enioka.jqm.api.";
+        exclusions[2] = "org.slf4j.";
+        // exclusions[3] = "org.apache.log4j.";
+        exclusions[4] = "org.glassfish."; // Jersey
         webAppContext.setServerClasses(exclusions);
 
         // JQM configuration should be on the class path
