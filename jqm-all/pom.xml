@@ -98,8 +98,8 @@
 	</modules>
 
 	<scm>
-		<developerConnection>scm:git:ssh://git@git.enioka.com/jqm.git</developerConnection>
-		<connection>scm:git:ssh://git@git.enioka.com/jqm.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com:enioka/jqm.git</developerConnection>
+		<connection>scm:git:https://github.com/enioka/jqm.git</connection>
 		<url>https://github.com/enioka/jqm/</url>
 		<tag>HEAD</tag>
 	</scm>
