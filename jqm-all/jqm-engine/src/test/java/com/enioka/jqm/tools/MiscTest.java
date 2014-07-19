@@ -421,19 +421,21 @@ public class MiscTest extends JqmBaseTest
 
         Thread.sleep(2000);
 
-        Assert.assertEquals(1,
+        Assert.assertEquals(3,
                 Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
                         .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run().size());
         Assert.assertEquals(
-                2,
+                0,
                 Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
                         .addStatusFilter(com.enioka.jqm.api.State.SUBMITTED).run().size());
 
         JqmClientFactory.getClient().killJob(i3);
+        JqmClientFactory.getClient().killJob(i4);
+        JqmClientFactory.getClient().killJob(i5);
 
-        TestHelpers.waitFor(3, 10000, em);
+        TestHelpers.waitFor(5, 10000, em);
         engine1.stop();
 
-        Assert.assertEquals(3, Query.create().addStatusFilter(com.enioka.jqm.api.State.KILLED).run().size());
+        Assert.assertEquals(5, Query.create().addStatusFilter(com.enioka.jqm.api.State.KILLED).run().size());
     }
 }

@@ -21,6 +21,8 @@ package com.enioka.jqm.tools;
 import java.lang.management.ManagementFactory;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -52,6 +54,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     private ObjectName name = null;
     private Calendar lastLoop = null;
     private Thread localThread = null;
+    private Semaphore loop = new Semaphore(0);
 
     @Override
     public void stop()
@@ -199,9 +202,10 @@ class QueuePoller implements Runnable, QueuePollerMBean
             }
 
             // Wait according to the deploymentParameter
+
             try
             {
-                Thread.sleep(dp.getPollingInterval());
+                loop.tryAcquire(dp.getPollingInterval(), TimeUnit.MILLISECONDS);
             }
             catch (InterruptedException e)
             {
@@ -239,9 +243,13 @@ class QueuePoller implements Runnable, QueuePollerMBean
         return actualNbThread;
     }
 
+    /**
+     * Called when a payload thread has ended. This notifies the poller to free a slot and poll once again.
+     */
     synchronized void decreaseNbThread()
     {
         this.actualNbThread--;
+        loop.release(1);
     }
 
     public DeploymentParameter getDp()
