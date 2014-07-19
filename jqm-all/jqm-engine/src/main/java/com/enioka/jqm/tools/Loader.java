@@ -302,20 +302,17 @@ class Loader implements Runnable, LoaderMBean
             endMessage = "Status updated: " + status;
         }
         Message m = new Message();
-        m.setHistory(h);
+        m.setJi(job.getId());
         m.setTextMessage(endMessage);
         em.persist(m);
 
-        // Purge the JI (using query, not em - more efficient + avoid cache issues on MessageJI which are not up to date here)
-        em.getTransaction().commit();
-        em.getTransaction().begin();
-        em.createQuery("DELETE FROM MessageJi WHERE jobInstance = :i").setParameter("i", job).executeUpdate();
+        // Purge the JI (using query, not em - more efficient + avoid cache issues on Message which are not up to date here)
         em.getTransaction().commit();
         em.getTransaction().begin();
         em.createQuery("DELETE FROM JobParameter WHERE jobInstance = :i").setParameter("i", job).executeUpdate();
         em.getTransaction().commit();
 
-        // Other transaction for purging the JI (deadlock power - beware of MessageJi)
+        // Other transaction for purging the JI (deadlock power - beware of Message)
         em.getTransaction().begin();
         em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", job.getId()).executeUpdate();
         em.getTransaction().commit();

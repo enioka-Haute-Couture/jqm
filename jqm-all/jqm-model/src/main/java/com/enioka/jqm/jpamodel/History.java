@@ -82,9 +82,6 @@ public class History implements Serializable
     @Column(name = "return_code")
     private Integer returnedValue;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "history")
-    private List<Message> messages;
-
     @Column
     private Integer progress;
 
@@ -242,23 +239,6 @@ public class History implements Serializable
     public List<JobHistoryParameter> getParameters()
     {
         return parameters;
-    }
-
-    /**
-     * The informative messages emitted by the running payload (i.e. user code) or by the engine state-machine to give a glimpse of the
-     * execution progress.
-     */
-    public List<Message> getMessages()
-    {
-        return messages;
-    }
-
-    /**
-     * See {@link #getMessages()}
-     */
-    public void setMessages(final List<Message> messages)
-    {
-        this.messages = messages;
     }
 
     /**

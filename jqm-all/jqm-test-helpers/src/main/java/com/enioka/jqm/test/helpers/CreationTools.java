@@ -206,30 +206,6 @@ public class CreationTools
         return dp;
     }
 
-    // ------------------ HISTORY ------------------------------
-
-    public static History createhistory(Calendar jobDate, JobDef JobDefId, String sessionId, Queue queue, String msg,
-            List<Message> messages, JobInstance jobInstance, Calendar enqueueDate, Calendar executionDate, Calendar endDate,
-            String userName, Node node, List<JobHistoryParameter> jhp, EntityManager em)
-    {
-        History h = new History();
-
-        h.setJd(JobDefId);
-        h.setSessionId(sessionId);
-        h.setQueue(queue);
-        h.setMessages(messages);
-        h.setId(jobInstance.getId());
-        h.setEnqueueDate(enqueueDate);
-        h.setExecutionDate(executionDate);
-        h.setEndDate(endDate);
-        h.setUserName(userName);
-        h.setNode(node);
-        h.setParameters(jhp);
-
-        em.persist(h);
-        return h;
-    }
-
     // ------------------ JOBINSTANCE --------------------------
 
     public static JobInstance createJobInstance(JobDef jd, List<JobParameter> jps, String user, String sessionID, State state,

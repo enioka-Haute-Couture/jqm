@@ -111,7 +111,7 @@ public class NoApiPayloadTest extends JqmBaseTest
 
         JobRequest j = new JobRequest("jqm-test-runnable-inject", "MAG");
         j.setSessionID("123X");
-        JqmClientFactory.getClient().enqueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -125,7 +125,7 @@ public class NoApiPayloadTest extends JqmBaseTest
         Assert.assertEquals(State.ENDED, ji.get(0).getState());
         Assert.assertEquals(State.ENDED, ji.get(1).getState());
 
-        Assert.assertEquals(4, ji.get(0).getMessages().size()); // 3 auto messages + 1 message per run.
+        Assert.assertEquals(4, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 3 auto messages + 1 message per run.
         Assert.assertEquals(100, (int) ji.get(0).getProgress());
     }
 
@@ -172,7 +172,7 @@ public class NoApiPayloadTest extends JqmBaseTest
 
         JobRequest j = new JobRequest("jqm-test-main-inject", "MAG");
         j.setSessionID("123X");
-        JqmClientFactory.getClient().enqueue(j);
+        int i = JqmClientFactory.getClient().enqueue(j);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -186,7 +186,7 @@ public class NoApiPayloadTest extends JqmBaseTest
         Assert.assertEquals(State.ENDED, ji.get(0).getState());
         Assert.assertEquals(State.ENDED, ji.get(1).getState());
 
-        Assert.assertEquals(4, ji.get(0).getMessages().size()); // 3 auto messages + 1 message per run.
+        Assert.assertEquals(4, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 3 auto messages + 1 message per run.
         Assert.assertEquals(100, (int) ji.get(0).getProgress());
     }
 

@@ -76,7 +76,6 @@ import com.enioka.jqm.jpamodel.JobHistoryParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
-import com.enioka.jqm.jpamodel.MessageJi;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.State;
 
@@ -507,7 +506,6 @@ final class HibernateClient implements JqmClient
             h.setJd(ji.getJd());
             h.setSessionId(ji.getSessionID());
             h.setQueue(ji.getQueue());
-            h.setMessages(new ArrayList<Message>());
             h.setEnqueueDate(ji.getCreationDate());
             h.setUserName(ji.getUserName());
             h.setEmail(ji.getEmail());
@@ -523,7 +521,6 @@ final class HibernateClient implements JqmClient
             h.setNode(ji.getNode());
             em.persist(h);
 
-            em.createQuery("DELETE FROM MessageJi WHERE jobInstance = :i").setParameter("i", ji).executeUpdate();
             em.createQuery("DELETE FROM JobParameter WHERE jobInstance = :i").setParameter("i", ji).executeUpdate();
             em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", ji.getId()).executeUpdate();
             em.getTransaction().commit();
@@ -565,7 +562,7 @@ final class HibernateClient implements JqmClient
             }
 
             em.getTransaction().begin();
-            em.createQuery("DELETE FROM MessageJi WHERE jobInstance = :i").setParameter("i", job).executeUpdate();
+            em.createQuery("DELETE FROM Message WHERE ji = :i").setParameter("i", job.getId()).executeUpdate();
             em.createQuery("DELETE FROM JobParameter WHERE jobInstance = :i").setParameter("i", job).executeUpdate();
             em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", job.getId()).executeUpdate();
             em.getTransaction().commit();
@@ -597,8 +594,8 @@ final class HibernateClient implements JqmClient
 
             j.setState(State.KILLED);
 
-            MessageJi m = new MessageJi();
-            m.setJobInstance(j);
+            Message m = new Message();
+            m.setJi(idJob);
             m.setTextMessage("Kill attempt on the job");
             em.persist(m);
             em.getTransaction().commit();
@@ -867,7 +864,7 @@ final class HibernateClient implements JqmClient
     // /////////////////////////////////////////////////////////////////////
 
     // Helper
-    private com.enioka.jqm.api.JobInstance getJob(JobInstance h)
+    private com.enioka.jqm.api.JobInstance getJob(JobInstance h, EntityManager em)
     {
         com.enioka.jqm.api.JobInstance ji = new com.enioka.jqm.api.JobInstance();
         ji.setId(h.getId());
@@ -883,7 +880,8 @@ final class HibernateClient implements JqmClient
         {
             ji.getParameters().put(p.getKey(), p.getValue());
         }
-        for (MessageJi m : h.getMessages())
+        for (Message m : em.createQuery("SELECT m from Message m where m.ji = :i", Message.class).setParameter("i", h.getId())
+                .getResultList())
         {
             ji.getMessages().add(m.getTextMessage());
         }
@@ -904,7 +902,7 @@ final class HibernateClient implements JqmClient
     }
 
     // Helper
-    private com.enioka.jqm.api.JobInstance getJob(History h)
+    private com.enioka.jqm.api.JobInstance getJob(History h, EntityManager em)
     {
         com.enioka.jqm.api.JobInstance ji = new com.enioka.jqm.api.JobInstance();
         ji.setId(h.getId());
@@ -920,7 +918,8 @@ final class HibernateClient implements JqmClient
         {
             ji.getParameters().put(p.getKey(), p.getValue());
         }
-        for (Message m : h.getMessages())
+        for (Message m : em.createQuery("SELECT m from Message m where m.ji = :i", Message.class).setParameter("i", h.getId())
+                .getResultList())
         {
             ji.getMessages().add(m.getTextMessage());
         }
@@ -1118,7 +1117,7 @@ final class HibernateClient implements JqmClient
 
                 for (JobInstance ji : q2.getResultList())
                 {
-                    res2.add(getJob(ji));
+                    res2.add(getJob(ji, em));
                 }
             }
 
@@ -1179,7 +1178,7 @@ final class HibernateClient implements JqmClient
 
                 for (History ji : q1.getResultList())
                 {
-                    res2.add(getJob(ji));
+                    res2.add(getJob(ji, em));
                 }
             }
 
@@ -1207,14 +1206,14 @@ final class HibernateClient implements JqmClient
             com.enioka.jqm.api.JobInstance res = null;
             if (h != null)
             {
-                res = getJob(h);
+                res = getJob(h, em);
             }
             else
             {
                 JobInstance ji = em.find(JobInstance.class, idJob);
                 if (ji != null)
                 {
-                    res = getJob(ji);
+                    res = getJob(ji, em);
                 }
                 else
                 {
@@ -1248,11 +1247,11 @@ final class HibernateClient implements JqmClient
             em = getEm();
             for (JobInstance h : em.createQuery("SELECT j FROM JobInstance j ORDER BY j.id", JobInstance.class).getResultList())
             {
-                jobs.add(getJob(h));
+                jobs.add(getJob(h, em));
             }
             for (History h : em.createQuery("SELECT j FROM History j ORDER BY j.id", History.class).getResultList())
             {
-                jobs.add(getJob(h));
+                jobs.add(getJob(h, em));
             }
         }
         catch (Exception e)
@@ -1277,7 +1276,7 @@ final class HibernateClient implements JqmClient
             em = getEm();
             for (JobInstance h : em.createQuery("SELECT j FROM JobInstance j ORDER BY j.id", JobInstance.class).getResultList())
             {
-                jobs.add(getJob(h));
+                jobs.add(getJob(h, em));
             }
         }
         catch (Exception e)
@@ -1307,12 +1306,12 @@ final class HibernateClient implements JqmClient
             for (JobInstance h : em.createQuery("SELECT j FROM JobInstance j WHERE j.userName = :u ORDER BY j.id", JobInstance.class)
                     .setParameter("u", user).getResultList())
             {
-                jobs.add(getJob(h));
+                jobs.add(getJob(h, em));
             }
             for (History h : em.createQuery("SELECT j FROM History j WHERE j.userName = :u ORDER BY j.id", History.class)
                     .setParameter("u", user).getResultList())
             {
-                jobs.add(getJob(h));
+                jobs.add(getJob(h, em));
             }
         }
         catch (Exception e)

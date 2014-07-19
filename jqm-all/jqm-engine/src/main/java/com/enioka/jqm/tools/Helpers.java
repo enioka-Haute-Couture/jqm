@@ -48,7 +48,6 @@ import com.enioka.jqm.jpamodel.JobHistoryParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
 import com.enioka.jqm.jpamodel.Message;
-import com.enioka.jqm.jpamodel.MessageJi;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.RPermission;
@@ -186,11 +185,11 @@ final class Helpers
      * @param em
      * @return the JPA message created
      */
-    static MessageJi createMessage(String textMessage, JobInstance jobInstance, EntityManager em)
+    static Message createMessage(String textMessage, JobInstance jobInstance, EntityManager em)
     {
-        MessageJi m = new MessageJi();
+        Message m = new Message();
         m.setTextMessage(textMessage);
-        m.setJobInstance(jobInstance);
+        m.setJi(jobInstance.getId());
         em.persist(m);
         return m;
     }
@@ -475,7 +474,6 @@ final class Helpers
         h.setJd(job.getJd());
         h.setSessionId(job.getSessionID());
         h.setQueue(job.getQueue());
-        h.setMessages(new ArrayList<Message>());
         h.setEnqueueDate(job.getCreationDate());
         h.setEndDate(endDate);
         h.setAttributionDate(job.getAttributionDate());
@@ -502,13 +500,6 @@ final class Helpers
             jp.setValue(j.getValue());
             em.persist(jp);
             h.getParameters().add(jp);
-        }
-        for (MessageJi p : job.getMessages())
-        {
-            Message m = new Message();
-            m.setHistory(h);
-            m.setTextMessage(p.getTextMessage());
-            em.persist(m);
         }
 
         return h;

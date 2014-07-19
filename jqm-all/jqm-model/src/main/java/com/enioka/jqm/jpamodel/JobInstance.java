@@ -122,9 +122,6 @@ public class JobInstance implements Serializable
     @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST }, mappedBy = "jobInstance")
     private List<JobParameter> parameters;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST }, mappedBy = "jobInstance")
-    private List<MessageJi> messages;
-
     /**
      * The place inside the queue, i.e. the number of job requests that will be run before this one can be run.
      */
@@ -439,23 +436,6 @@ public class JobInstance implements Serializable
     public void setKeyword3(String keyword3)
     {
         this.instanceKeyword3 = keyword3;
-    }
-
-    /**
-     * The informative messages emitted by the running payload (i.e. user code) or by the engine state-machine to give a glimpse of the
-     * execution progress. Null until the status is RUNNING.
-     */
-    public List<MessageJi> getMessages()
-    {
-        return messages;
-    }
-
-    /**
-     * See {@link #getMessages()}
-     */
-    public void setMessages(List<MessageJi> messages)
-    {
-        this.messages = messages;
     }
 
     void setId(Integer id)

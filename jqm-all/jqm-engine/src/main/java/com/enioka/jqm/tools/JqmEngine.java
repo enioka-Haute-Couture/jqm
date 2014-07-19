@@ -337,12 +337,11 @@ class JqmEngine implements JqmEngineMBean
             {
                 h = Helpers.createHistory(ji, em, State.CRASHED, Calendar.getInstance());
                 Message m = new Message();
-                m.setHistory(h);
+                m.setJi(ji.getId());
                 m.setTextMessage("Job was supposed to be running at server startup - usually means it was killed along a server by an admin or a crash");
                 em.persist(m);
             }
 
-            em.createQuery("DELETE FROM MessageJi WHERE jobInstance = :i").setParameter("i", ji).executeUpdate();
             em.createQuery("DELETE FROM JobParameter WHERE jobInstance = :i").setParameter("i", ji).executeUpdate();
             em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", ji.getId()).executeUpdate();
         }

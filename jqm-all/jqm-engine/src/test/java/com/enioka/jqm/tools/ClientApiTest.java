@@ -195,7 +195,7 @@ public class ClientApiTest extends JqmBaseTest
         ArrayList<String> ress = (ArrayList<String>) JqmClientFactory.getClient().getJobMessages(i);
 
         @SuppressWarnings("unused")
-        ArrayList<Message> m = (ArrayList<Message>) em.createQuery("SELECT m FROM Message m WHERE m.history.id = :i", Message.class)
+        ArrayList<Message> m = (ArrayList<Message>) em.createQuery("SELECT m FROM Message m WHERE m.ji = :i", Message.class)
                 .setParameter("i", i).getResultList();
 
         Assert.assertEquals(1, res.size());

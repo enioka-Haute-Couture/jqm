@@ -120,7 +120,6 @@ public class TestHelpers
         em.createQuery("DELETE DeploymentParameter WHERE 1=1").executeUpdate();
         em.createQuery("DELETE JobHistoryParameter WHERE 1=1").executeUpdate();
         em.createQuery("DELETE Message WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE MessageJi WHERE 1=1").executeUpdate();
         em.createQuery("DELETE History WHERE 1=1").executeUpdate();
         em.createQuery("DELETE JobDefParameter WHERE 1=1").executeUpdate();
         em.createQuery("DELETE JobParameter WHERE 1=1").executeUpdate();
