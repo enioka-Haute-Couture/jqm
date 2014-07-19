@@ -184,4 +184,32 @@ public class EngineApiTest extends JqmBaseTest
         }
     }
 
+    @Test
+    public void testGetChildrenStatus() throws Exception
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test testGetChildrenStatus");
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-apienginestatus/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+
+        JobRequest j = new JobRequest("MarsuApplication", "MAG");
+        JqmClientFactory.getClient().enqueue(j);
+
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        TestHelpers.waitFor(3, 10000, em);
+        engine1.stop();
+
+        List<History> ji = Helpers.getNewEm()
+                .createQuery("SELECT j FROM History j WHERE j.status = 'ENDED' ORDER BY j.id ASC", History.class).getResultList();
+        Assert.assertEquals(2, ji.size());
+        ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.status = 'CRASHED' ORDER BY j.id ASC", History.class)
+                .getResultList();
+        Assert.assertEquals(1, ji.size());
+    }
+
 }

@@ -47,6 +47,7 @@
 		<module>jqm-test-emplusapi</module>
 		<module>jqm-test-tmpdir</module>
 		<module>jqm-test-providedapi</module>
+		<module>jqm-test-apienginestatus</module>
 	</modules>
 
 	<profiles>

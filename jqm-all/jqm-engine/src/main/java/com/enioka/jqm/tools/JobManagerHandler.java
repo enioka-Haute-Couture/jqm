@@ -24,6 +24,7 @@ import com.enioka.jqm.api.JqmClient;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
 import com.enioka.jqm.jpamodel.Deliverable;
+import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.JobParameter;
@@ -187,6 +188,18 @@ class JobManagerHandler implements InvocationHandler
         {
             waitChild((Integer) args[0]);
             return null;
+        }
+        else if ("hasEnded".equals(methodName) && classes.length == 1 && (args[0] instanceof Integer))
+        {
+            return hasEnded((Integer) args[0]);
+        }
+        else if ("hasSucceeded".equals(methodName) && classes.length == 1 && (args[0] instanceof Integer))
+        {
+            return hasSucceeded((Integer) args[0]);
+        }
+        else if ("hasFailed".equals(methodName) && classes.length == 1 && (args[0] instanceof Integer))
+        {
+            return hasFailed((Integer) args[0]);
         }
 
         throw new NoSuchMethodException(methodName);
@@ -371,5 +384,78 @@ class JobManagerHandler implements InvocationHandler
         DataSource q = (DataSource) dso;
 
         return q;
+    }
+
+    private JobInstance getRunningJI(int jobId)
+    {
+        EntityManager em = Helpers.getNewEm();
+        JobInstance ji = null;
+        try
+        {
+            ji = em.find(JobInstance.class, jobId);
+        }
+        catch (Exception e)
+        {
+            throw new JqmRuntimeException("Could not query job instance", e);
+        }
+        finally
+        {
+            em.close();
+        }
+        return ji;
+    }
+
+    private History getEndedJI(int jobId)
+    {
+        EntityManager em = Helpers.getNewEm();
+        History ji = null;
+        try
+        {
+            ji = em.find(History.class, jobId);
+        }
+        catch (Exception e)
+        {
+            throw new JqmRuntimeException("Could not query history", e);
+        }
+        finally
+        {
+            em.close();
+        }
+        return ji;
+    }
+
+    private boolean hasEnded(int jobId)
+    {
+        return getRunningJI(jobId) == null;
+    }
+
+    private Boolean hasSucceeded(int requestId)
+    {
+        History h = getEndedJI(requestId);
+        if (h == null)
+        {
+            return null;
+        }
+        if (h.getState().equals(State.ENDED))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private Boolean hasFailed(int requestId)
+    {
+        Boolean b = hasSucceeded(requestId);
+        if (b == null)
+        {
+            return b;
+        }
+        else
+        {
+            return !b;
+        }
     }
 }

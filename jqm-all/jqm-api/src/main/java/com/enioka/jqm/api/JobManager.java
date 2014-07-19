@@ -227,4 +227,34 @@ public interface JobManager
      * relationship so this method will wait for at least the requests created through the JobManager APIs.
      */
     void waitChildren();
+
+    /**
+     * This methods checks if a job request was processed by an engine. It returns true if it has (be it with a gracious exit or a failure)
+     * 
+     * @param requestId
+     *            the ID as returned by {@link #enqueue} and variants.
+     * @return true if ended, false otherwise
+     * @see {@link hasSucceeded} and {@link hasFailed}: these methods also allow to check for end with the added value of getting the
+     *      status.
+     */
+    boolean hasEnded(int requestId);
+
+    /**
+     * This method checks if a job request was processed by an engine and ended in success. If the job is still running, null is returned.
+     * 
+     * @param requestId
+     *            the ID as returned by {@link #enqueue} and variants.
+     * @return true if ended correctly, false if crashed, null if still waiting in queue or running.
+     */
+    Boolean hasSucceeded(int requestId);
+
+    /**
+     * This method checks if a job request was processed by an engine and ended in failure. If the job is still running, null is returned.
+     * 
+     * @param requestId
+     *            the ID as returned by {@link #enqueue} and variants.
+     * @return true if ended with an exception being raised (CRASHED status) or if was killed, false if ended correctly, null if still
+     *         waiting in queue or running.
+     */
+    Boolean hasFailed(int requestId);
 }
