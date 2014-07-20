@@ -177,9 +177,6 @@ final class Helpers
     /**
      * Create a text message that will be stored in the database. Must be called inside a JPA transaction.
      * 
-     * @param textMessage
-     * @param history
-     * @param em
      * @return the JPA message created
      */
     static Message createMessage(String textMessage, JobInstance jobInstance, EntityManager em)
@@ -194,19 +191,16 @@ final class Helpers
     /**
      * Create a Deliverable inside the database that will track a file created by a JobInstance Must be called from inside a JPA transaction
      * 
-     * @param fp
+     * @param path
      *            FilePath (relative to a root directory - cf. Node)
-     * @param fn
+     * @param originalFileName
      *            FileName
-     * @param hp
-     *            HashPath
-     * @param ff
+     * @param fileFamily
      *            File family (may be null). E.g.: "daily report"
      * @param jobId
      *            Job Instance ID
      * @param em
      *            the EM to use.
-     * @return
      */
     static Deliverable createDeliverable(String path, String originalFileName, String fileFamily, Integer jobId, EntityManager em)
     {
@@ -228,7 +222,6 @@ final class Helpers
      * @param key
      * @param defaultValue
      * @param em
-     * @return
      */
     static String getParameter(String key, String defaultValue, EntityManager em)
     {
@@ -460,9 +453,6 @@ final class Helpers
     /**
      * Transaction is not opened nor committed here but needed.
      * 
-     * @param ji
-     * @param em
-     * @return
      */
     static History createHistory(JobInstance job, EntityManager em, State finalState, Calendar endDate)
     {

@@ -45,7 +45,7 @@ import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.State;
 
 /**
- * This is the implementation behind the proxy described in {@link JobManager}.
+ * This is the implementation behind the proxy described in the <code>JobManager</code> interface inside the jqm-api artifact.
  */
 class JobManagerHandler implements InvocationHandler
 {

@@ -32,7 +32,7 @@ import org.hibernate.annotations.Index;
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
  * JPA persistence class for storing the parameters of a {@link JobInstance}, and once archived of a {@link History}, Parameters are
- * key/value pairs that are passed to payloads at runtime. When a {@link JobDef} is instantiated, {@link JobParameter}s are created from
+ * key/value pairs that are passed to payloads at runtime. When a {@link JobDef} is instantiated, {@link RuntimeParameter}s are created from
  * {@link JobDefParameter}s as well as parameters specified inside the execution request and associated to the {@link JobInstance}.
  */
 @Entity

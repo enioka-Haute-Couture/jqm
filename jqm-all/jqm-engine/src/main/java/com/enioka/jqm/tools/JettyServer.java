@@ -46,8 +46,7 @@ import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.pki.JpaCa;
 
 /**
- * Every engine has an embedded Jetty engine that serves the servlet API ({@link ServletFile}, {@link ServletStatus}, {@link ServletEnqueue}
- * ). It may also serve the REST API.
+ * Every engine has an embedded Jetty engine that serves the different web service APIs.
  */
 class JettyServer
 {

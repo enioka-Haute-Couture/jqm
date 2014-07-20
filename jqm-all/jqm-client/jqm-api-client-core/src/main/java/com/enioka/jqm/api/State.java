@@ -16,8 +16,7 @@
 package com.enioka.jqm.api;
 
 /**
- * The different status a {@link JobInstance} (and therefore an {@link History}, which is simply an archive created from a JobInstance) can
- * take.
+ * The different status a {@link JobInstance} can take.
  */
 public enum State {
     /** The job requests was just created. The {@link JobInstance} is waiting in queue. **/

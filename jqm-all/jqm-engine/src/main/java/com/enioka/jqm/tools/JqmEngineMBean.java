@@ -27,20 +27,17 @@ public interface JqmEngineMBean
 
     /**
      * The total number of job instances that were run on this node since the last history purge.
-     * 
-     * @return
      */
     long getCumulativeJobInstancesCount();
 
     /**
-     * @return
+     * The number of job instances that ended in the last minute divided by 60. A better method is to call
+     * {@link #getCumulativeJobInstancesCount()} and compute deltas between calls.
      */
     float getJobsFinishedPerSecondLastMinute();
 
     /**
      * The number of currently running job instances
-     * 
-     * @return
      */
     long getCurrentlyRunningJobCount();
 

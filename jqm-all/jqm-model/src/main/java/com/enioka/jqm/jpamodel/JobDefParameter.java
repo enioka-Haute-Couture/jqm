@@ -31,9 +31,9 @@ import javax.persistence.Table;
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
  * JPA persistence class for storing the default parameters of a {@link JobDef}, i.e. key/value pairs that should be present for all
  * instances created from a JobDef (and may be overloaded).<br>
- * When a {@link JobDef} is instantiated, {@link JobParameter}s are created from {@link JobDefParameter}s as well as parameters specified
- * inside the execution request a,d associated to the {@link JobInstance}. Therefore, this table is purely metadata and is never used in TP
- * processing.
+ * When a {@link JobDef} is instantiated, {@link RuntimeParameter}s are created from {@link JobDefParameter}s as well as parameters
+ * specified inside the execution request a,d associated to the {@link JobInstance}. Therefore, this table is purely metadata and is never
+ * used in TP processing.
  */
 @Entity
 @Table(name = "JobDefParameter")

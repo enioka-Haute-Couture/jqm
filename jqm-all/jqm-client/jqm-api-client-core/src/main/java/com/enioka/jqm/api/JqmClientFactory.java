@@ -144,7 +144,6 @@ public final class JqmClientFactory
      *            a set of properties. Implementation specific. Unknown properties are silently ignored.
      * @param cached
      *            if false, the client will not be cached and subsequent calls with the same name will return different objects.
-     * @return
      */
     public static JqmClient getClient(String name, Properties p, boolean cached)
     {
@@ -166,8 +165,8 @@ public final class JqmClientFactory
     }
 
     /**
-     * Remove the client of the given name from the static cache. Next time {@link #getClient(String)} is called, initialization cost will
-     * have to be paid once again.<br>
+     * Remove the client of the given name from the static cache. Next time {@link #getClient(String, Properties, boolean)} is called,
+     * initialization cost will have to be paid once again.<br>
      * Use <code>null</code> to reset the default client.<br>
      * This method is mostly useful for tests when databases are reset and therefore clients become invalid as they hold connections to
      * them.<br>
@@ -186,7 +185,7 @@ public final class JqmClientFactory
     }
 
     /**
-     * @see {@link #resetClient(String)} with name = null.
+     * This is {@link #resetClient(String)} with name = null.
      */
     public static void resetClient()
     {

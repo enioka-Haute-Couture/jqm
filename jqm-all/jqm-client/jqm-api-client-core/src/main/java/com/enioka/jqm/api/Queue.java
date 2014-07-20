@@ -41,8 +41,6 @@ public class Queue implements Serializable
 
     /**
      * Each queue has a unique ID
-     * 
-     * @return
      */
     public int getId()
     {
@@ -56,8 +54,6 @@ public class Queue implements Serializable
 
     /**
      * Name of the queue, usually descriptive.
-     * 
-     * @return
      */
     public String getName()
     {
@@ -71,8 +67,6 @@ public class Queue implements Serializable
 
     /**
      * Queue description.
-     * 
-     * @return
      */
     public String getDescription()
     {

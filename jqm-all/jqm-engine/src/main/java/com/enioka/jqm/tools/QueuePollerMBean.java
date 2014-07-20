@@ -22,8 +22,6 @@ public interface QueuePollerMBean
 {
     /**
      * The number of currently running job instances. Thread safe.
-     * 
-     * @return
      */
     Integer getCurrentActiveThreadCount();
 
@@ -34,34 +32,27 @@ public interface QueuePollerMBean
 
     /**
      * Number of seconds between two database checks for new job instance to run.
-     * 
-     * @return
      */
     Integer getPollingIntervalMilliseconds();
 
     /**
      * Max number of simultaneously running job instances on this queue on this engine
-     * 
-     * @return
      */
     Integer getMaxConcurrentJobInstanceCount();
 
     /**
      * The total number of job instances that were run on this node/queue since the last history purge.
-     * 
-     * @return
      */
     long getCumulativeJobInstancesCount();
 
     /**
-     * @return
+     * The number of job instances that ended in the last minute divided by 60. A better method is to call
+     * {@link #getCumulativeJobInstancesCount()} and compute deltas between calls.
      */
     float getJobsFinishedPerSecondLastMinute();
 
     /**
      * The number of currently running job instances
-     * 
-     * @return
      */
     long getCurrentlyRunningJobCount();
 

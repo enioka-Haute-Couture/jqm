@@ -259,8 +259,6 @@ public class JobRequest implements Serializable
 
     /**
      * Get the Map of all parameters
-     * 
-     * @return
      */
     public Map<String, String> getParameters()
     {

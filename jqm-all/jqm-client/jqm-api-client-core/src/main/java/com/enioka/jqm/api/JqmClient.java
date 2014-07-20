@@ -101,8 +101,9 @@ public interface JqmClient
      * This only works if the job instance is not already running: one cannot cancel a request that was already accepted. (throws exception
      * in that case)
      * 
-     * @param idJob
-     * @see {@link #cancelJob(int)} for the more conventional way of removing job requests.
+     * @param jobId
+     *            the id of the job to delete
+     * @see #cancelJob(int) the more conventional way of removing job requests.
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job already done, job does not exist)
      * @throws JqmClientException
@@ -115,6 +116,7 @@ public interface JqmClient
      * cannot be killed.
      * 
      * @param jobId
+     *            the id of the job to kill
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job already done, job does not exist)
      * @throws JqmClientException
@@ -131,7 +133,7 @@ public interface JqmClient
      * 
      * @param jobId
      *            id of the job instance to pause
-     * @see {@link #resumeJob(int)} for resuming the paused request.
+     * @see #resumeJob(int) resuming the paused request.
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job already run, job does not exist)
      * @throws JqmClientException
@@ -144,7 +146,7 @@ public interface JqmClient
      * 
      * @param jobId
      *            id of the job instance to resume
-     * @see {@link #pauseQueuedJob(int)} for the reverse operation.
+     * @see #pauseQueuedJob(int) pause a job instance.
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job already run, job does not exist...)
      * @throws JqmClientException
@@ -307,7 +309,6 @@ public interface JqmClient
      * Return all metadata concerning the (potential) files created by the job instance.
      * 
      * @param jobId
-     * @return
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job does not exist)
      * @throws JqmClientException

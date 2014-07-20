@@ -33,8 +33,12 @@ import javax.sql.DataSource;
 public interface JobManager
 {
     /**
+     * The unique ID of the application/Job definition (a <code>JobInstance<code> is one run of a <code>JobDefinition</code>)<br>
+     * <br>
+     * <strong>This is not the instance ID but the definition ID</strong>. See {@link #jobInstanceID()} for the instance (and not the
+     * definition) ID
+     * 
      * @return The unique ID of the application/Job definition (a <code>JobInstance<code> is one run of a <code>JobDefinition</code>)
-     * @see {@link #jobInstanceID()} for the instance (and not the definition) ID
      */
     Integer jobApplicationId();
 
@@ -44,8 +48,12 @@ public interface JobManager
     Integer parentID();
 
     /**
+     * The unique ID of the currently running job instance.<br>
+     * <br>
+     * <strong>This is the instance, not the application/jobdefinition ID</strong>. Use {@link #jobApplicationId()} for the job definition
+     * (and not instance) ID.
+     * 
      * @return The unique ID of the currently running job instance.
-     * @see {@link #jobDefId()} for the job definition (and not instance) ID.
      */
     Integer jobInstanceID();
 
@@ -151,8 +159,7 @@ public interface JobManager
      * @param parameters
      *            <strong>nullable</strong>
      * @return the ID of the new request
-     * @see {@link #enqueueSync(String, String, String, String, String, String, String, String, String, Integer, Map) sync enqueue} for a
-     *      synchronous variant
+     * @see #enqueueSync sync enqueue for a synchronous variant
      */
     Integer enqueue(String applicationName, String user, String mail, String sessionId, String application, String module, String keyword1,
             String keyword2, String keyword3, Map<String, String> parameters);
@@ -161,8 +168,7 @@ public interface JobManager
      * Enqueues a new execution request and waits for the execution to end.
      * 
      * @return the ID of the new request
-     * @see {@link #enqueue(String, String, String, String, String, String, String, String, String, Integer, Map) async enqueue} for the
-     *      description of parameters
+     * @see #enqueue the synchronous variant for the description of parameters
      */
     Integer enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module,
             String keyword1, String keyword2, String keyword3, Map<String, String> parameters);
@@ -174,7 +180,7 @@ public interface JobManager
      * @param message
      *            the message to send. At most 1000 characters.
      * 
-     * @see {@link #sendProgress(Integer)} for sending a progress percentage (or other numeric advancement) instead of a string
+     * @see #sendProgress sendProgress for sending a progress percentage (or other numeric advancement) instead of a string
      */
     void sendMsg(String message);
 
@@ -185,7 +191,7 @@ public interface JobManager
      * @param progress
      *            the advancement
      * 
-     * @see {@link #sendProgress(Integer)} for sending a progress percentage (or other numeric advancement) instead of a string
+     * @see #sendProgress sendProgressfor sending a progress percentage (or other numeric advancement) instead of a string
      */
     void sendProgress(Integer progress);
 
@@ -244,13 +250,13 @@ public interface JobManager
     void waitChildren();
 
     /**
-     * This methods checks if a job request was processed by an engine. It returns true if it has (be it with a gracious exit or a failure)
+     * This methods checks if a job request was processed by an engine. It returns true if it has (be it with a gracious exit or a failure) <br>
+     * Also see {@link #hasSucceeded} and {@link #hasFailed}: these methods also allow to check for end with the added value of getting the
+     * status.
      * 
      * @param requestId
      *            the ID as returned by {@link #enqueue} and variants.
      * @return true if ended, false otherwise
-     * @see {@link hasSucceeded} and {@link hasFailed}: these methods also allow to check for end with the added value of getting the
-     *      status.
      */
     boolean hasEnded(int requestId);
 

@@ -80,7 +80,6 @@ class LibraryCache
      *            the JobDefinition that should be resolved
      * @param em
      *            an EM that will be used only if not in cache, to fetch the Maven repository list from the database.
-     * @return
      * @throws JqmPayloadException
      */
     synchronized URL[] getLibraries(Node n, JobDef jd, EntityManager em) throws JqmPayloadException
@@ -95,8 +94,6 @@ class LibraryCache
     /**
      * Returns true if the libraries should be loaded in cache. Two cases: never loaded and should be reloaded (jar is more recent than
      * cache)
-     * 
-     * @return
      */
     private boolean shouldLoad(Node node, JobDef jd)
     {

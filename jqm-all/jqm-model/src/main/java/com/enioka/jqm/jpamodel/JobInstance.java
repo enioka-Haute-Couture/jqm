@@ -314,7 +314,7 @@ public class JobInstance implements Serializable
     }
 
     /**
-     * See {@link #getParameters()}
+     * See {@link #getParentId()}
      */
     public void setParentId(Integer parentId)
     {

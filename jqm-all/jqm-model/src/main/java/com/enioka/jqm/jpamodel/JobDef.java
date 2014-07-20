@@ -295,7 +295,6 @@ public class JobDef implements Serializable
      * Max length is 1024.
      * 
      * @deprecated jarPath contains the full path.
-     * @return
      */
     public String getFilePath()
     {
@@ -306,7 +305,6 @@ public class JobDef implements Serializable
      * Used to contain the path to the directory containing the jar file.
      * 
      * @deprecated jarPath contains the full path.
-     * @return
      */
     public void setFilePath(final String filePath)
     {
