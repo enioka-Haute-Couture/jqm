@@ -19,7 +19,11 @@ then
 	JQM_NODE=$USER
 fi
 
-JAVA=${JAVA_HOME:-/usr/java6_64/jre/}/bin/java
+# Java extra options that can be used to customise memory settings
+JAVA_OPTS=${JAVA_OPTS:--Xms160m -Xmx512m -XX:MaxPermSize=128m}
+
+
+JAVA="${JAVA_HOME:-/usr/java6_64/jre/}/bin/java $JAVA_OPTS"
 $JAVA -version  > /dev/null 2>&1
 if [[ $? -ne 0 ]]
 then
