@@ -21,14 +21,15 @@ package com.enioka.jqm.api;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -59,7 +60,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ssl.SSLContexts;
-import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -1518,15 +1518,57 @@ final class HibernateClient implements JqmClient
             {
                 try
                 {
-                    ctx = SSLContexts.custom().loadTrustMaterial(null, new TrustStrategy()
+                    if (p.containsKey("com.enioka.jqm.ws.truststoreFile"))
                     {
-                        @Override
-                        public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException
+                        KeyStore trust = null;
+                        InputStream trustIs = null;
+
+                        try
                         {
-                            // Do not check if certificate should be trusted or not
-                            return true;
+                            trust = KeyStore.getInstance(this.p.getProperty("com.enioka.jqm.ws.truststoreType", "JKS"));
                         }
-                    }).build();
+                        catch (KeyStoreException e)
+                        {
+                            throw new JqmInvalidRequestException("Specified trust store type ["
+                                    + this.p.getProperty("com.enioka.jqm.ws.truststoreType", "JKS") + "] is invalid", e);
+                        }
+
+                        try
+                        {
+                            trustIs = new FileInputStream(this.p.getProperty("com.enioka.jqm.ws.truststoreFile"));
+                        }
+                        catch (FileNotFoundException e)
+                        {
+                            throw new JqmInvalidRequestException("Trust store file ["
+                                    + this.p.getProperty("com.enioka.jqm.ws.truststoreFile") + "] cannot be found", e);
+                        }
+
+                        String trustp = this.p.getProperty("com.enioka.jqm.ws.truststorePass", null);
+                        try
+                        {
+                            trust.load(trustIs, (trustp == null ? null : trustp.toCharArray()));
+                        }
+                        catch (Exception e)
+                        {
+                            throw new JqmInvalidRequestException("Could not load the trust store file", e);
+                        }
+                        finally
+                        {
+                            try
+                            {
+                                trustIs.close();
+                            }
+                            catch (IOException e)
+                            {
+                                // Nothing to do.
+                            }
+                        }
+                        ctx = SSLContexts.custom().loadTrustMaterial(trust).build();
+                    }
+                    else
+                    {
+                        ctx = SSLContexts.createSystemDefault();
+                    }
                 }
                 catch (Exception e)
                 {

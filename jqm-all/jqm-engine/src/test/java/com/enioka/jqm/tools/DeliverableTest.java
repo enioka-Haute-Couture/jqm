@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.persistence.EntityManager;
 
@@ -216,6 +217,12 @@ public class DeliverableTest extends JqmBaseTest
         Helpers.setSingleParam("disableWsApi", "false", em);
         Helpers.setSingleParam("enableWsApiAuth", "true", em);
         Helpers.setSingleParam("enableWsApiSsl", "true", em);
+
+        JqmClientFactory.resetClient(null);
+        Properties p = new Properties();
+        p.put("com.enioka.jqm.ws.truststoreFile", "./conf/trusted.jks");
+        p.put("com.enioka.jqm.ws.truststorePass", "SuperPassword");
+        JqmClientFactory.setProperties(p);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", TestHelpers.node.getDlRepo(), em);
