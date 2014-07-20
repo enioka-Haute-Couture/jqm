@@ -40,8 +40,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.State;
@@ -113,8 +113,10 @@ public class ApiSimpleTest extends JqmBaseTest
         nvps.add(new BasicNameValuePair("applicationname", "Marsu-Application"));
         nvps.add(new BasicNameValuePair("user", "testuser"));
         nvps.add(new BasicNameValuePair("module", "testuser"));
-        nvps.add(new BasicNameValuePair("param_1", "arg"));
-        nvps.add(new BasicNameValuePair("paramvalue_1", "newvalue"));
+        nvps.add(new BasicNameValuePair("parameterNames", "arg"));
+        nvps.add(new BasicNameValuePair("parameterValues", "overridevalue"));
+        nvps.add(new BasicNameValuePair("parameterNames", "arg2"));
+        nvps.add(new BasicNameValuePair("parameterValues", "newvalue2"));
         post.setEntity(new UrlEncodedFormEntity(nvps));
 
         HttpClient client = HttpClients.createDefault();
@@ -141,10 +143,12 @@ public class ApiSimpleTest extends JqmBaseTest
 
         TestHelpers.waitFor(1, 10000, em);
 
-        // Check run is OK
-        History h = em.createQuery("SELECT j FROM History j", History.class).getSingleResult();
-        Assert.assertEquals(State.ENDED, h.getStatus());
-        Assert.assertEquals(jid, h.getId());
+        // Check run is OK & parameters have been correctly processed
+        JobInstance ji = JqmClientFactory.getClient().getJob(jid);
+        Assert.assertEquals(com.enioka.jqm.api.State.ENDED, ji.getState());
+        Assert.assertEquals(2, ji.getParameters().size());
+        Assert.assertEquals("newvalue2", ji.getParameters().get("arg2"));
+        Assert.assertEquals("overridevalue", ji.getParameters().get("arg"));
     }
 
     @Test

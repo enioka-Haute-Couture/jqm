@@ -18,6 +18,7 @@ package com.enioka.jqm.api;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -90,6 +91,7 @@ public class ServiceSimple
     // ///////////////////////////////////////////////////////////
     @GET
     @Path("status")
+    @Produces(MediaType.TEXT_PLAIN)
     public String getStatus(@QueryParam("id") int id)
     {
         return JqmClientFactory.getClient().getJob(id).getState().toString();
@@ -188,10 +190,12 @@ public class ServiceSimple
     @POST
     @Path("ji")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.TEXT_PLAIN)
     public String enqueue(@FormParam("applicationname") String applicationName, @FormParam("module") String module,
             @FormParam("mail") String mail, @FormParam("keyword1") String keyword1, @FormParam("keyword2") String keyword2,
             @FormParam("keyword3") String keyword3, @FormParam("parentid") Integer parentId, @FormParam("user") String user,
-            @FormParam("sessionid") String sessionId)
+            @FormParam("sessionid") String sessionId, @FormParam("parameterNames") List<String> prmNames,
+            @FormParam("parameterValues") List<String> prmValues)
     {
         if (user == null && security != null && security.getUserPrincipal() != null)
         {
@@ -208,13 +212,23 @@ public class ServiceSimple
         jd.setParentID(parentId);
         jd.setSessionID(sessionId);
 
-        /*
-         * int j = 0; while (req.getParameter("param_" + j) != null) { j++; jd.addParameter(req.getParameter("param_" + j),
-         * req.getParameter("paramvalue_" + j)); }
-         */
+        for (int i = 0; i < prmNames.size(); i++)
+        {
+            String name = prmNames.get(i);
+            String value = null;
+            try
+            {
+                value = prmValues.get(i);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                throw new ErrorDto("There should be as many parameter names as parameter values", 12, e, Status.BAD_REQUEST);
+            }
+            jd.addParameter(name, value);
+            log.trace("Adding a parameter: " + name + " - " + value);
+        }
 
         Integer i = JqmClientFactory.getClient().enqueue(jd);
-
         return i.toString();
     }
 }
