@@ -68,9 +68,9 @@ public class SslTest
         // Start in SSL mode with web services
         File jar = FileUtils.listFiles(new File("../../jqm-ws/target/"), new String[] { "war" }, false).iterator().next();
         FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war"));
-        Helpers.setSingleParam("noHttp", "false", em);
-        Helpers.setSingleParam("useAuth", "true", em);
-        Helpers.setSingleParam("useSsl", "true", em);
+        Helpers.setSingleParam("disableWsApi", "false", em);
+        Helpers.setSingleParam("enableWsApiAuth", "true", em);
+        Helpers.setSingleParam("enableWsApiSsl", "true", em);
 
         em.getTransaction().begin();
         TestHelpers.node.setLoadApiAdmin(true);

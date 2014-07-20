@@ -68,31 +68,48 @@ These parameters are set inside the JQM database table named GLOBALPARAMETER. Th
 have to be altered directly inside the database with your tool of choice.
 
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| Name                       | Description                                                                                         | Default            | Restart | Null            |
+| Name                       | Description                                                                                         | Default            | Restart | Nullable        |
 +============================+=====================================================================================================+====================+=========+=================+
 | mavenRepo                  | A Maven repository to use for dependency resolution                                                 | Maven Central      | No      | At least one    |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| mailSmtpServer             | SMTP server to send end-of-job notifications                                                        | none               | No      | Yes             |
+| mavenSettingsCL            | an alternate Maven settings.xml to use. If absent, the usual file inside ~/.m2 is used.             | NULL               | No      | Yes             |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| mailFrom                   | the "from" field of notification mails                                                              | jqm@noreply.com    | No      | ?               |
+| mailSmtpServer             | SMTP server to send end-of-job notifications                                                        | NULL               | No      | Yes             |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| mailSmtpUser               | if SMTP with authentication                                                                         | NULL               | No      | ?               |
+| mailFrom                   | the "from" field of notification mails                                                              | jqm@noreply.com    | No      | No              |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| mailSmtpPassword           | if SMTP with authentication                                                                         | NULL               | No      | ?               |
+| mailSmtpUser               | if SMTP with authentication                                                                         | NULL               | No      | Yes             |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| mailUseTls                 | if SMTP with authentication. true of false                                                          | NULL               | No      | No              |
+| mailSmtpPassword           | if SMTP with authentication                                                                         | NULL               | No      | Yes             |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| defaultConnection          | don't use this...                                                                                   | jdbc/jqm           | No      | No              |
+| mailUseTls                 | if SMTP with authentication. true of false                                                          | NULL               | No      | Yes             |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| deadline                   | ???                                                                                                 | ?                  | ?       | ?               |
+| defaultConnection          | the JNDI alias returned by the engine API getDefaultConnection method.                              | jdbc/jqm           | No      | No              |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
 | logFilePerLaunch           | if true, one log file will be created per launch. Otherwise, everything ends in the main log.       | true               | Yes     | No              |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| internalPollingPeriodMs    | Period in ms for checking stop orders                                                               | ?                  | ?       | ?               |
+| internalPollingPeriodMs    | Period in ms for checking stop orders                                                               | 10000              | Yes     | No              |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| aliveSignalMs              | Must be a multiple of internalPollingPeriodMs. Perdiod at which the "I'm a alive" signal is sent    | ?                  | ?       | ?               |
+| aliveSignalMs              | Must be a multiple of internalPollingPeriodMs. Perdiod at which the "I'm a alive" signal is sent    | 60000              | Yes     | No              |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-
+| disableWsApi               | Disable all HTTP interfaces on all nodes. This takes precedence over node per node settings.        | false              | Yes     | Yes             |
+|                            | Absent means false, i.e. not forbidden.                                                             |                    |         |                 |
++----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
+| enableWsApiSsl             | All HTTP communications will be HTTPS and not HTTP.                                                 | false              | Yes     | No              |
++----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
+| enableWsApiAuth            | Use HTTP basic authentication plus RBAC backend for all WS APIs                                     | true               | Yes     | No              |
++----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
+| disableWsApiSimple         | Forbids the simple API from loading on any node. This takes precedence over node per node settings. | NULL               | Yes     | Yes             |
+|                            | Absent means false, i.e. not forbidden.                                                             |                    |         |                 |
++----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
+| disableWsApiClient         | Forbids the client API from loading on any node. This takes precedence over node per node settings. | NULL               | Yes     | Yes             |
+|                            | Absent means false, i.e. not forbidden.                                                             |                    |         |                 |
++----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
+| disableWsApiAdmin          | Forbids the admin API from loading on any node. This takes precedence over node per node settings.  | NULL               | Yes     | Yes             |
+|                            | Absent means false, i.e. not forbidden.                                                             |                    |         |                 |
++----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
+| enableInternalPki          | Use the internal (database-backed) PKI for issuing certificates and trusting presented certificates | true               | Yes     | No              |
++----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
 
 Here, nullable means the parameter can be absent from the table.
 

@@ -63,8 +63,8 @@ public class ApiSimpleTest extends JqmBaseTest
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
 
-        Helpers.setSingleParam("noHttp", "false", em);
-        Helpers.setSingleParam("useAuth", "false", em);
+        Helpers.setSingleParam("disableWsApi", "false", em);
+        Helpers.setSingleParam("enableWsApiAuth", "false", em);
 
         File jar = FileUtils.listFiles(new File("../jqm-ws/target/"), new String[] { "war" }, false).iterator().next();
         FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war"));

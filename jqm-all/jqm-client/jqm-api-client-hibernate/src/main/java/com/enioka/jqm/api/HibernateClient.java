@@ -1472,8 +1472,8 @@ final class HibernateClient implements JqmClient
             protocol = "http://";
             try
             {
-                GlobalParameter gp = em.createQuery("SELECT gp from GlobalParameter gp WHERE gp.key = 'useSsl'", GlobalParameter.class)
-                        .getSingleResult();
+                GlobalParameter gp = em.createQuery("SELECT gp from GlobalParameter gp WHERE gp.key = 'enableWsApiSsl'",
+                        GlobalParameter.class).getSingleResult();
                 if (Boolean.parseBoolean(gp.getValue()))
                 {
                     protocol = "https://";

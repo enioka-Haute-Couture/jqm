@@ -75,8 +75,8 @@ class JettyServer
         }
 
         this.node = node;
-        boolean useSsl = Boolean.parseBoolean(Helpers.getParameter("useSsl", "true", em));
-        boolean useInternalPki = Boolean.parseBoolean(Helpers.getParameter("useInternalPki", "true", em));
+        boolean useSsl = Boolean.parseBoolean(Helpers.getParameter("enableWsApiSsl", "true", em));
+        boolean useInternalPki = Boolean.parseBoolean(Helpers.getParameter("enableInternalPki", "true", em));
         String pfxPassword = Helpers.getParameter("pfxPassword", "SuperPassword", em);
 
         server = new Server();
@@ -84,10 +84,10 @@ class JettyServer
         SslContextFactory scf = null;
         if (useSsl)
         {
-            jqmlogger.info("JQM will use SSL for all HTTP communications as parameter useSsl is 'true'");
+            jqmlogger.info("JQM will use SSL for all HTTP communications as parameter enableWsApiSsl is 'true'");
             if (useInternalPki)
             {
-                jqmlogger.info("JQM will use its internal PKI for all certificates as parameter useInternalPki is 'true'");
+                jqmlogger.info("JQM will use its internal PKI for all certificates as parameter enableInternalPki is 'true'");
                 JpaCa.prepareWebServerStores(em, "CN=" + node.getDns(), "./conf/keystore.pfx", "./conf/trusted.jks", pfxPassword,
                         node.getDns(), "./conf/server.cer", "./conf/ca.cer");
             }

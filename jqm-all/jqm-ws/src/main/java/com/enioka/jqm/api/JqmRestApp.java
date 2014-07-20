@@ -48,9 +48,9 @@ public class JqmRestApp extends ResourceConfig
             {
                 throw new RuntimeException("invalid configuration: no node of ID " + context.getInitParameter("jqmnodeid"));
             }
-            loadApiSimple = !Boolean.parseBoolean(Helpers.getParameter("disableApiSimple", "false", em));
-            loadApiClient = !Boolean.parseBoolean(Helpers.getParameter("disableApiClient", "false", em));
-            loadApiAdmin = !Boolean.parseBoolean(Helpers.getParameter("disableApiAdmin", "false", em));
+            loadApiSimple = !Boolean.parseBoolean(Helpers.getParameter("disableWsApiSimple", "false", em));
+            loadApiClient = !Boolean.parseBoolean(Helpers.getParameter("disableWsApiClient", "false", em));
+            loadApiAdmin = !Boolean.parseBoolean(Helpers.getParameter("disableWsApiAdmin", "false", em));
 
             loadApiAdmin = loadApiAdmin && (n.getLoadApiAdmin() == null ? false : n.getLoadApiAdmin());
             loadApiClient = loadApiClient && (n.getLoadApiClient() == null ? false : n.getLoadApiClient());

@@ -86,9 +86,9 @@ public class JettyTest extends JqmBaseTest
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testSslStartup");
 
-        Helpers.setSingleParam("useSsl", "true", em);
-        Helpers.setSingleParam("noHttp", "false", em);
-        Helpers.setSingleParam("useAuth", "false", em);
+        Helpers.setSingleParam("enableWsApiSsl", "true", em);
+        Helpers.setSingleParam("disableWsApi", "false", em);
+        Helpers.setSingleParam("enableWsApiAuth", "false", em);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -102,9 +102,9 @@ public class JettyTest extends JqmBaseTest
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testSslServices");
 
-        Helpers.setSingleParam("useSsl", "true", em);
-        Helpers.setSingleParam("noHttp", "false", em);
-        Helpers.setSingleParam("useAuth", "false", em);
+        Helpers.setSingleParam("enableWsApiSsl", "true", em);
+        Helpers.setSingleParam("disableWsApi", "false", em);
+        Helpers.setSingleParam("enableWsApiAuth", "false", em);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -151,10 +151,10 @@ public class JettyTest extends JqmBaseTest
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testSslClientCert");
-        
-        Helpers.setSingleParam("useSsl", "true", em);
-        Helpers.setSingleParam("noHttp", "false", em);
-        Helpers.setSingleParam("useAuth", "false", em);
+
+        Helpers.setSingleParam("enableWsApiSsl", "true", em);
+        Helpers.setSingleParam("disableWsApi", "false", em);
+        Helpers.setSingleParam("enableWsApiAuth", "false", em);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");

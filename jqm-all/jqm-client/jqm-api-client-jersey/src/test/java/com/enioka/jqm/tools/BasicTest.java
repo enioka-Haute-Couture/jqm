@@ -84,9 +84,9 @@ public class BasicTest
         em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createLocalNode(em);
-        Helpers.setSingleParam("noHttp", "false", em);
-        Helpers.setSingleParam("useAuth", "true", em);
-        Helpers.setSingleParam("useSsl", "false", em);
+        Helpers.setSingleParam("disableWsApi", "false", em);
+        Helpers.setSingleParam("enableWsApiAuth", "true", em);
+        Helpers.setSingleParam("enableWsApiSsl", "false", em);
         File jar = FileUtils.listFiles(new File("../../jqm-ws/target/"), new String[] { "war" }, false).iterator().next();
         FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war"));
 

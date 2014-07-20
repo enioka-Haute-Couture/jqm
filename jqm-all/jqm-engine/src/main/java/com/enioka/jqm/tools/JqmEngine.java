@@ -148,7 +148,7 @@ class JqmEngine implements JqmEngineMBean
         }
 
         // Jetty
-        boolean startJetty = !Boolean.parseBoolean(Helpers.getParameter("noHttp", "false", em));
+        boolean startJetty = !Boolean.parseBoolean(Helpers.getParameter("disableWsApi", "false", em));
         if (startJetty)
         {
             this.server = new JettyServer();

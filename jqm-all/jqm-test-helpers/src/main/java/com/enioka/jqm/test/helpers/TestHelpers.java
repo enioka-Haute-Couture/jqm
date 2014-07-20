@@ -65,14 +65,13 @@ public class TestHelpers
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("mailSmtpPassword", "marsu1952", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("mailUseTls", "true", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("defaultConnection", "jdbc/marsu", em);
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("deadline", "10", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("logFilePerLaunch", "false", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("internalPollingPeriodMs", "10000", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("aliveSignalMs", "60000", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenSettingsCL", "META-INF/settings.xml", em);
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("noHttp", "true", em);
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("useSsl", "false", em);
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("useAuth", "true", em);
+        TestHelpers.gpCentral = CreationTools.createGlobalParameter("disableWsApi", "true", em);
+        TestHelpers.gpCentral = CreationTools.createGlobalParameter("enableWsApiSsl", "false", em);
+        TestHelpers.gpCentral = CreationTools.createGlobalParameter("enableWsApiAuth", "true", em);
 
         TestHelpers.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42, em, true);
         TestHelpers.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, em);

@@ -66,8 +66,8 @@ final class SimpleApiSecurity
         {
             try
             {
-                GlobalParameter gp = em.createQuery("SELECT gp from GlobalParameter gp WHERE gp.key = 'useAuth'", GlobalParameter.class)
-                        .getSingleResult();
+                GlobalParameter gp = em.createQuery("SELECT gp from GlobalParameter gp WHERE gp.key = 'enableWsApiAuth'",
+                        GlobalParameter.class).getSingleResult();
                 useAuth = Boolean.parseBoolean(gp.getValue());
             }
             catch (NoResultException e)

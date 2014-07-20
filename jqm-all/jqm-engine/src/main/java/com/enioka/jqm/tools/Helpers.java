@@ -349,11 +349,15 @@ final class Helpers
 
         // Global parameters
         initSingleParam("mavenRepo", "http://repo1.maven.org/maven2/", em);
+        initSingleParam("mailFrom", "jqm@noreply.com", em);
         initSingleParam(Constants.GP_DEFAULT_CONNECTION_KEY, Constants.GP_JQM_CONNECTION_ALIAS, em);
-        initSingleParam("deadline", "10", em);
         initSingleParam("logFilePerLaunch", "true", em);
         initSingleParam("internalPollingPeriodMs", "10000", em);
         initSingleParam("aliveSignalMs", "60000", em);
+        initSingleParam("disableWsApi", "false", em);
+        initSingleParam("enableWsApiSsl", "false", em);
+        initSingleParam("enableWsApiAuth", "true", em);
+        initSingleParam("enableInternalPki", "true", em);
 
         // Deployment parameters
         DeploymentParameter dp = null;

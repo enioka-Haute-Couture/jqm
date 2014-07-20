@@ -82,9 +82,9 @@ public class DeliverableTest extends JqmBaseTest
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testGetDeliverables");
-        Helpers.setSingleParam("noHttp", "false", em);
-        Helpers.setSingleParam("useAuth", "true", em);
-        Helpers.setSingleParam("useSsl", "false", em);
+        Helpers.setSingleParam("disableWsApi", "false", em);
+        Helpers.setSingleParam("enableWsApiAuth", "true", em);
+        Helpers.setSingleParam("enableWsApiSsl", "false", em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", TestHelpers.node.getDlRepo(), em);
@@ -121,9 +121,9 @@ public class DeliverableTest extends JqmBaseTest
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testGetOneDeliverableWithAuth");
-        Helpers.setSingleParam("noHttp", "false", em);
-        Helpers.setSingleParam("useAuth", "true", em);
-        Helpers.setSingleParam("useSsl", "false", em);
+        Helpers.setSingleParam("disableWsApi", "false", em);
+        Helpers.setSingleParam("enableWsApiAuth", "true", em);
+        Helpers.setSingleParam("enableWsApiSsl", "false", em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", TestHelpers.node.getDlRepo(), em);
@@ -167,9 +167,9 @@ public class DeliverableTest extends JqmBaseTest
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testGetOneDeliverableWithoutAuth");
-        Helpers.setSingleParam("noHttp", "false", em);
-        Helpers.setSingleParam("useAuth", "false", em);
-        Helpers.setSingleParam("useSsl", "false", em);
+        Helpers.setSingleParam("disableWsApi", "false", em);
+        Helpers.setSingleParam("enableWsApiAuth", "false", em);
+        Helpers.setSingleParam("enableWsApiSsl", "false", em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", TestHelpers.node.getDlRepo(), em);
@@ -204,7 +204,7 @@ public class DeliverableTest extends JqmBaseTest
 
         tmp.close();
     }
-    
+
     /**
      * Retrieve a remote file with authentication, with SSL.
      */
@@ -213,9 +213,9 @@ public class DeliverableTest extends JqmBaseTest
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testGetOneDeliverableWithAuthWithSsl");
-        Helpers.setSingleParam("noHttp", "false", em);
-        Helpers.setSingleParam("useAuth", "true", em);
-        Helpers.setSingleParam("useSsl", "true", em);
+        Helpers.setSingleParam("disableWsApi", "false", em);
+        Helpers.setSingleParam("enableWsApiAuth", "true", em);
+        Helpers.setSingleParam("enableWsApiSsl", "true", em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", TestHelpers.node.getDlRepo(), em);

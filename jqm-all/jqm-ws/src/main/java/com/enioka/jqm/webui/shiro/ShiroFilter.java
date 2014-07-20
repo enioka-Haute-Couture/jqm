@@ -42,7 +42,7 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter
         boolean load = true;
         try
         {
-            load = Boolean.parseBoolean(Helpers.getParameter("useAuth", "true", em));
+            load = Boolean.parseBoolean(Helpers.getParameter("enableWsApiAuth", "true", em));
         }
         finally
         {

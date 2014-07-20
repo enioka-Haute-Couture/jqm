@@ -279,7 +279,7 @@ public class Node
     }
 
     /**
-     * If true, the basic REST services will start. Ignored if the GlobalParameter 'disableApiSimple' is true.
+     * If true, the basic REST services will start. Ignored if the GlobalParameter 'disableWsApiSimple' is true.
      */
     public Boolean getLoapApiSimple()
     {
@@ -295,7 +295,7 @@ public class Node
     }
 
     /**
-     * If true, the client REST services will start. Ignored if the GlobalParameter 'disableApiClient' is true.
+     * If true, the client REST services will start. Ignored if the GlobalParameter 'disableWsApiClient' is true.
      */
     public Boolean getLoadApiClient()
     {
@@ -311,7 +311,7 @@ public class Node
     }
 
     /**
-     * If true, the administration REST services will start. Ignored if the GlobalParameter 'disableApiAdmin' is true.
+     * If true, the administration REST services will start. Ignored if the GlobalParameter 'disableWsApiAdmin' is true.
      */
     public Boolean getLoadApiAdmin()
     {
