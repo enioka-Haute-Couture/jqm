@@ -9,7 +9,7 @@
 	install
 	cli
 	jmx
-	console
+	gui
 	logs
 	operations
 	parameters

@@ -43,7 +43,7 @@ following reasons:
 * Many resources are actually to be shared between payloads, such as a connection pool
 * Very often, the payload will expect to be returned the same resource when making multiple JNDI lookups, not a different one on each call. Once again, 
   one would expect to be returned the same connection pool on each call, and definitiely not to have a new pool created on each call!
-* Some resources are dangerous to create inside the payload's context. As stated in :doc:`writing_payloads`, loading a JDBC driver creates
+* Some resources are dangerous to create inside the payload's context. As stated in :doc:`../jobs/writing_payloads`, loading a JDBC driver creates
   memory leaks (actually, classloader leaks). By delegating this to the engine, the issue disappears.
 
 Singleton resources are created the first time they are looked up, and kept forever afterwards.

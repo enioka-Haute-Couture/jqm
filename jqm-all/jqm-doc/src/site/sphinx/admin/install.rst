@@ -9,7 +9,7 @@ Binary install
 ***************
 
 Windows
-------------------
+====================
 
 Prerequisites:
 
@@ -37,7 +37,7 @@ Then create a service (adapt user and password)::
 And it's done, a JQM service node is now running.
 
 Linux / Unix
--------------
+====================
 
 Prerequisites:
 
@@ -65,7 +65,7 @@ And it's done, a JQM service node is now running.
 
 
 Testing
--------------
+====================
 
 The following will import the definition of three test jobs included in the distribution, then launch one. (no admin rights necessary nor variables).
 
@@ -131,16 +131,16 @@ Linux / Unix::
 	./jqm.sh enqueue DemoEcho
 
 Database support
-++++++++++++++++++++
+====================
 
 Oracle
-----------
+------------------
 
 Oracle 10gR2 & 11gR2 are supported. No specific configuration is required in JQM: no options inside jqm.properties (or absent file). No specific database configuration is required.
 
 
 PostgreSQL
---------------
+------------------
 
 PostgreSQL 9 is supported (tested with PostgreSQL 9.3). It is the recommanded open source database to work with JQM.
 No specific configuration is required in JQM: no options inside jqm.properties (or absent file). No specific database configuration is required. 
@@ -159,7 +159,7 @@ Here's a quickstart to setup a test database. As postgres user::
 
 
 MySQL
------------
+------------------
 
 MySQL 5.x is supported with InnoDB (the default). No specific configuration is required in JQM: no options inside jqm.properties (or absent file).
 
@@ -175,7 +175,7 @@ An example of script is (adapt the db name & path)::
 
 
 HSQLDB
-----------
+------------------
 
 HSQLDB 2.3.x is supported in test environments only.
 
