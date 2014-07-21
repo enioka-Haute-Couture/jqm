@@ -90,6 +90,10 @@ class QueuePoller implements Runnable, QueuePollerMBean
         {
             throw new JqmInitError("Could not create JMX beans", e);
         }
+        finally
+        {
+            em.close();
+        }
     }
 
     protected JobInstance dequeue()
