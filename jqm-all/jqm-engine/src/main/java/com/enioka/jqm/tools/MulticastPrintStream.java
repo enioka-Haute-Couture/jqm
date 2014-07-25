@@ -24,8 +24,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
@@ -44,7 +42,13 @@ class MulticastPrintStream extends PrintStream
     private static Logger jqmlogger = Logger.getLogger(MulticastPrintStream.class);
 
     private BufferedWriter original = null;
-    private Map<Thread, BufferedWriter> loggers = new HashMap<Thread, BufferedWriter>();
+    private ThreadLocal<BufferedWriter> logger = new ThreadLocal<BufferedWriter>()
+    {
+        protected BufferedWriter initialValue()
+        {
+            return original;
+        };
+    };
     private String rootLogDir;
 
     MulticastPrintStream(OutputStream out, String rootLogDir)
@@ -60,12 +64,12 @@ class MulticastPrintStream extends PrintStream
         }
     }
 
-    synchronized void registerThread(String fileName)
+    void registerThread(String fileName)
     {
         try
         {
             Writer w = new FileWriter(FilenameUtils.concat(rootLogDir, fileName), true);
-            loggers.put(Thread.currentThread(), new BufferedWriter(w));
+            logger.set(new BufferedWriter(w));
         }
         catch (IOException e)
         {
@@ -74,32 +78,19 @@ class MulticastPrintStream extends PrintStream
         }
     }
 
-    synchronized void unregisterThread()
+    void unregisterThread()
     {
         try
         {
-            BufferedWriter bf = getThreadWriter();
-            if (bf != null)
-            {
-                loggers.get(Thread.currentThread()).close();
-            }
+            BufferedWriter bf = logger.get();
+            bf.close();
+            logger.remove();
         }
         catch (IOException e)
         {
             // A PrintStream is supposed to never throw IOException
             jqmlogger.warn("could not close log file", e);
         }
-        loggers.remove(Thread.currentThread());
-    }
-
-    private BufferedWriter getThreadWriter()
-    {
-        BufferedWriter textOut = loggers.get(Thread.currentThread());
-        if (textOut == null)
-        {
-            textOut = original;
-        }
-        return textOut;
     }
 
     /** Check to make sure that the stream has not been closed */
@@ -118,19 +109,16 @@ class MulticastPrintStream extends PrintStream
 
     private void write(String s, boolean newLine)
     {
-        BufferedWriter textOut = getThreadWriter();
+        BufferedWriter textOut = logger.get();
         try
         {
-            synchronized (textOut)
+            ensureOpen();
+            textOut.write(s);
+            if (newLine)
             {
-                ensureOpen();
-                textOut.write(s);
-                if (newLine)
-                {
-                    textOut.newLine();
-                }
-                textOut.flush();
+                textOut.newLine();
             }
+            textOut.flush();
         }
         catch (InterruptedIOException x)
         {
