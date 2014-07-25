@@ -126,17 +126,6 @@ final class HibernateClient implements JqmClient
                 p.load(fis);
                 jqmlogger.trace("A jqm.properties file was found");
             }
-
-            fis = this.getClass().getClassLoader().getResourceAsStream("db.properties");
-            if (fis == null)
-            {
-                jqmlogger.trace("No db.properties file found.");
-            }
-            else
-            {
-                p.load(fis);
-                jqmlogger.trace("A db.properties file was found");
-            }
         }
         catch (IOException e)
         {
