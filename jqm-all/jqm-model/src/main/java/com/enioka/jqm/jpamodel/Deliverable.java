@@ -27,6 +27,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
+
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
  * JPA persistence class for storing pointers towards files created by {@link JobInstance}.
@@ -47,10 +49,11 @@ public class Deliverable implements Serializable
     @Column(length = 100, name = "file_family")
     protected String fileFamily;
 
+    @Index(name = "fk_jobinstance")
     @Column(nullable = false, name = "jobId")
     private Integer jobId;
 
-    @Column(name = "randomId", length = 200)
+    @Column(name = "randomId", length = 200, unique = true)
     private String randomId;
 
     @Column(name = "originalFileName", length = 1024)

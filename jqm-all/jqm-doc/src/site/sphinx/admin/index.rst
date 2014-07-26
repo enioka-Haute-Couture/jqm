@@ -15,5 +15,6 @@
 	parameters
 	queues
 	resources
-	security
+	history
+	security	
 	rest

@@ -29,6 +29,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
+
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
  * JPA persistence class for storing the parameters of the JNDI object resources from the {@link JndiObjectResource} table. Parameters are
@@ -52,6 +54,7 @@ public class JndiObjectResourceParameter implements Serializable
 
     @ManyToOne
     @JoinColumn(name = "resource_id")
+    @Index(name = "fk_resource")
     private JndiObjectResource resource;
 
     /**
