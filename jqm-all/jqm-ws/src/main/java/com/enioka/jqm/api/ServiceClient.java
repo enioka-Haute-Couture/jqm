@@ -168,6 +168,7 @@ public class ServiceClient implements JqmClient
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Path("ji/{jobId}")
+    @HttpCache("public, max-age=60")
     public JobInstance getJob(@PathParam("jobId") int jobId)
     {
         log.debug("calling WS getJob");
@@ -178,6 +179,7 @@ public class ServiceClient implements JqmClient
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Path("ji")
+    @HttpCache("public, max-age=60")
     public List<JobInstance> getJobs()
     {
         log.debug("calling WS getJobs");
@@ -188,6 +190,7 @@ public class ServiceClient implements JqmClient
     @GET
     @Path("ji/active")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @HttpCache("public, max-age=60")
     public List<JobInstance> getActiveJobs()
     {
         log.debug("calling WS getActiveJobs");
@@ -198,6 +201,7 @@ public class ServiceClient implements JqmClient
     @Path("user/{username}/ji")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @GET
+    @HttpCache("public, max-age=60")
     public List<JobInstance> getUserActiveJobs(@PathParam("username") String userName)
     {
         log.debug("calling WS getUserActiveJobs");
@@ -227,6 +231,7 @@ public class ServiceClient implements JqmClient
     @Path("ji/{jobId}/messages")
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @HttpCache("public, max-age=60")
     public List<String> getJobMessages(@PathParam("jobId") int jobId)
     {
         log.debug("calling WS getJobMessages");
@@ -245,6 +250,7 @@ public class ServiceClient implements JqmClient
     @Path("ji/{jobId}/files")
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @HttpCache("public, max-age=60")
     public List<Deliverable> getJobDeliverables(@PathParam("jobId") int jobId)
     {
         log.debug("calling WS getJobDeliverables");
@@ -305,6 +311,7 @@ public class ServiceClient implements JqmClient
     @Path("q")
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @HttpCache("public, max-age=60")
     public List<Queue> getQueues()
     {
         log.debug("calling WS getQueues");
@@ -340,6 +347,7 @@ public class ServiceClient implements JqmClient
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Override
+    @HttpCache("public, max-age=60")
     public List<JobDef> getJobDefinitions()
     {
         log.debug("calling WS getJobDefinitions-no args");
@@ -350,6 +358,7 @@ public class ServiceClient implements JqmClient
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Override
+    @HttpCache("public, max-age=60")
     public List<JobDef> getJobDefinitions(@PathParam("applicationName") String application)
     {
         log.debug("calling WS getJobDefinitions-app");
@@ -359,6 +368,7 @@ public class ServiceClient implements JqmClient
     @Path("ji/query")
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @HttpCache("public, max-age=3600")
     public Query getEmptyQuery()
     {
         return Query.create();
@@ -367,6 +377,7 @@ public class ServiceClient implements JqmClient
     @Path("jr")
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @HttpCache("public, max-age=3600")
     public JobRequest getEmptyJobRequest()
     {
         return new JobRequest("appName", "rsapi user");

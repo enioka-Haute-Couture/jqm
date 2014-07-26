@@ -204,6 +204,7 @@ public class ServiceAdmin
     @GET
     @Path("node")
     @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache("public, max-age=60")
     public List<NodeDto> getNodes()
     {
         return getDtoList(Node.class);
@@ -212,6 +213,7 @@ public class ServiceAdmin
     @GET
     @Path("node/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache("public, max-age=60")
     public NodeDto getNode(@PathParam("id") int id)
     {
         System.out.println(SecurityUtils.getSubject().getPrincipal());
@@ -241,6 +243,7 @@ public class ServiceAdmin
     @GET
     @Path("q")
     @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
     public List<QueueDto> getQueues()
     {
         return getDtoList(Queue.class);
@@ -249,6 +252,7 @@ public class ServiceAdmin
     @PUT
     @Path("q")
     @Consumes(MediaType.APPLICATION_JSON)
+    @HttpCache
     public void setQueues(List<QueueDto> dtos)
     {
         setItems(Queue.class, dtos);
@@ -257,6 +261,7 @@ public class ServiceAdmin
     @GET
     @Path("q/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
     public QueueDto getQueue(@PathParam("id") int id)
     {
         return getDto(Queue.class, id);
@@ -293,6 +298,7 @@ public class ServiceAdmin
     @GET
     @Path("qmapping")
     @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
     public List<QueueMappingDto> getQueueMappings()
     {
         return getDtoList(DeploymentParameter.class);
@@ -309,6 +315,7 @@ public class ServiceAdmin
     @GET
     @Path("qmapping/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
     public QueueMappingDto getQueueMapping(@PathParam("id") int id)
     {
         return getDto(DeploymentParameter.class, id);
@@ -345,6 +352,7 @@ public class ServiceAdmin
     @GET
     @Path("jndi")
     @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
     public List<JndiObjectResourceDto> getJndiResources()
     {
         return getDtoList(JndiObjectResource.class);
@@ -361,6 +369,7 @@ public class ServiceAdmin
     @GET
     @Path("jndi/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
     public JndiObjectResourceDto getJndiResource(@PathParam("id") Integer id)
     {
         return getDto(JndiObjectResource.class, id);
@@ -397,6 +406,7 @@ public class ServiceAdmin
     @GET
     @Path("prm")
     @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
     public List<GlobalParameterDto> getGlobalParameters()
     {
         return getDtoList(GlobalParameter.class);
@@ -413,6 +423,7 @@ public class ServiceAdmin
     @GET
     @Path("prm/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
     public GlobalParameterDto getGlobalParameter(@PathParam("id") int id)
     {
         return getDto(GlobalParameter.class, id);
@@ -449,6 +460,7 @@ public class ServiceAdmin
     @GET
     @Path("jd")
     @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
     public List<JobDefDto> getJobDefs()
     {
         return getDtoList(JobDef.class);
@@ -465,6 +477,7 @@ public class ServiceAdmin
     @GET
     @Path("jd/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
     public JobDefDto getJobDef(@PathParam("id") int id)
     {
         return getDto(JobDef.class, id);
@@ -501,6 +514,7 @@ public class ServiceAdmin
     @GET
     @Path("user")
     @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
     public List<RUserDto> getUsers()
     {
         return getDtoList(RUser.class);
@@ -517,6 +531,7 @@ public class ServiceAdmin
     @GET
     @Path("user/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
     public RUserDto getUser(@PathParam("id") int id)
     {
         return getDto(RUser.class, id);
@@ -553,6 +568,7 @@ public class ServiceAdmin
     @GET
     @Path("role")
     @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
     public List<RRoleDto> getRoles()
     {
         return getDtoList(RRole.class);
@@ -569,6 +585,7 @@ public class ServiceAdmin
     @GET
     @Path("role/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
     public RRoleDto getRole(@PathParam("id") int id)
     {
         return getDto(RRole.class, id);
@@ -601,6 +618,7 @@ public class ServiceAdmin
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
     @Path("me")
+    @HttpCache("private, max-age=36000")
     public PemissionsBagDto getMyself(@Context HttpServletRequest req)
     {
         EntityManager em = getEm();
