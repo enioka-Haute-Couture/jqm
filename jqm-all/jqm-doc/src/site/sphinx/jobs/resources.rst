@@ -17,7 +17,7 @@ All these approaches can be used with JQM since JQM runs all JSE code.
 Yet, Java has standardized `JNDI <http://en.wikipedia.org/wiki/Java_Naming_and_Directory_Interface>`_ as a way to retrieve these resources, and JQM provides a limited JNDI directory implementation that can be used by 
 the :term:`payloads<payload>`.
 
-JQM JNDI can be used for:
+JQM JNDI directory can be used for:
 
 * JDBC connections
 * JMS resources
@@ -30,40 +30,43 @@ JQM JNDI can be used for:
 	manualy looked up.
 
 .. note:: An object returned by a JNDI lookup (in JQM or elsewhere) is just a description. The JNDI system has not checked if the object existed, if
-	all parameters are present, etc. It also means that it is the client's respsonsbility to open files, database connections... and close them
-	in the end.
+	all parameters are present, etc. It also means that it is the client's respsonsbility to open files, database connections... and **close them
+	in the end**.
 
 The JNDI system is totally independent from the JQM API described in :ref:`accessing_jqm_api`. It is always
 present, whatever type your payload is and even if the jqm-api jar is not present.
 
+By 'limited', we mean the directory only provides a single root JNDI context. Basically, all JNDI lookups are given to the
+same JNDI context and are looked up inside the JQM database by name exactly as they are given (case-sensitive).
 
 To define resources, see :doc:`/admin/resources`.
 
-Below, some samples for various cases.
+Below are some samples & details for various cases.
+
+.. _jobs_resource_jdbc:
 
 JDBC
 *****
-Connection pools to databases through JDBC is provided by an ObjectFactory embedded with JQM named tomcat-jdbc.
-Connection pools should always be singletons.
 
 ::
 
-        DataSource ds = (DataSource) NamingManager.getInitialContext(null).lookup("jdbc/superalias");
+        DataSource ds = InitialContext.doLookup("jdbc/superalias");
 
-Please note the "null" for the context lookup: JQM only uses a root context. See below for details.
+Please note the use of InitialContext for the context lookup: as noted above, JQM only uses the root context.
 
 It is interesting to note that the JQM NamingManager is standard - it can be used from wherever is needed, such as a JPA provider configuration:
-in a persistence.xml, it is perfectly valid to use <non-jta-datasource>jdbc/superalias</non-jta-datasource>.
+in a persistence.xml, it is perfectly valid to use ``<non-jta-datasource>jdbc/superalias</non-jta-datasource>``.
 
 If all programs running inside a JQM cluster always use the same database, it is possible to define a JDBC alias as the "default 
-connection" (cf. :doc:`../admin/parameters`). It can then be retrieved directly through the getDefaultConnection method of the JQM API.
-(this is the only JNDI-related element that requires the API).
+connection" (cf. :doc:`../admin/parameters`). It can then be retrieved directly through the :meth:`JobManager.getDefaultConnection` 
+method of the JQM engine API. (this is the only JNDI-related element that requires the API).
 
 JMS
 *******
+
 Connecting to a JMS broker to send or receive messages, such as ActiveMQ or MQSeries, requires 
 first a QueueConnectionFactory, then a Queue object. The implementation of these interfaces
-changes with brokers, and are not provided by JQM - they must be provided with the payload or put inside ext.
+changes with brokers, and are not provided by JQM - they must be provided with the payload or put inside the ext directory.
 
 ::
 
@@ -121,23 +124,16 @@ changes with brokers, and are not provided by JQM - they must be provided with t
         }
 
 
-        Provided by the engine - these resources must therefore always be singletons.
-
 Files
 ************
-Provided by the engine - these resources must therefore always be singletons.
-
 ::
 
-        File f = (File) NamingManager.getInitialContext(null).lookup("fs/superalias");
+        File f = InitialContext.doLookup("fs/superalias");
 
-        Provided by the engine - these resources must therefore always be singletons.
 
 URL
 ***************
-Provided by the engine - these resources must therefore always be singletons.
-
 ::
 
-        URL f = (URL) NamingManager.getInitialContext(null).lookup("url/testurl");
+        URL f = InitialContext.doLookup("url/testurl");
 

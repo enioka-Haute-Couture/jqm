@@ -4,9 +4,10 @@
 JQM is able to load :term:`payloads<payload>` from jar files (in case your code is actually inside a war, it is possible to simply rename the file), which gives
 a clear guidance as to how the code should be packaged. However, there are also other elements that JQM needs to run the code.
 
-For exemple, when a client requests the :term:`payload` to run, it must be able to refer to the code unambiguously, therefore JQM must know
+For example, when a client requests the :term:`payload` to run, it must be able to refer to the code unambiguously, therefore JQM must know
 an "application name" corresponding to the code. This name, with other data, is to be put inside an XML file that will be imported
-by JQM. A code can only run if its XML has been imported (or the corresponding values manually entered inside the database, a fully 
+by JQM - it's a deployment descriptor, akin to a web.xml or an ejb-jar.xml.
+A code can only run if its XML has been imported (or the corresponding values manually entered inside the database, a fully 
 unsupported alternative way to do it).
 
 Should some terms prove to be obscure, please refer to the :doc:`../glossary`.
@@ -25,11 +26,12 @@ Maven POM
 ++++++++++++++++
 
 A jar created with Maven always contains the pom.xml hidden inside META-INF. JQM will extract it, read it and download the dependencies,
-putting them on the payload's class path. (the repositories used can be parameterized)
+putting them on the payload's class path.
 
 It is also possible to put a pom.xml file in the same directory as the jar, in which case it will have priority over the one inside the jar.
 
-JQM uses the Maven 3 engine internally, so the pom resolution should be exactly similar to one done with the command line.
+JQM uses the Maven 3 engine internally, so the pom resolution should be exactly similar to one done with the command line. It includes using
+your settings.xml. There a few :doc:`/admin/parameters` that can tweak that behaviour.
 
 Conclusion: in that case, no packaging to do.
 
@@ -51,10 +53,10 @@ Shared libraries
 *******************
 
 It is possible to copy jars inside the JQM_ROOT/ext directory. In that case, these resources will be loaded by a
-classloader common to all libraries and will therefore be available to all payloads. 
+classloader common to all libraries and will be available to all payloads. 
 
 This should only be used very rarely, and is not to be considered in packaging. This exists mostly for shared JNDI resources
-such as JDBC connection pools. Note that a lib in ext has priority over one provided by the payload (through Maven or lib directory).
+such as JDBC connection pools. Note that a library in ext has priority over one provided by the payload (through Maven or lib directory).
 
 .. note:: JQM actually makes use of this priority to always provide the latest version of the jqm-api to payloads. The APIs can
 	therefore be referenced as "provided" dependencies if using Maven.

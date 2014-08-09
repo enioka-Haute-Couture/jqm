@@ -17,7 +17,7 @@ Copy files
 Place the two files inside JQM_DIR/jobs/xxxxx where xxxxx is a directory of your choice.
 Please note that the name of this directory must be the same as the one inside the "filePath" tag from the XML.
 
-If there have libraries to copy (pom.xml is not used), they must be placed inside a directory named "lib".
+If there are libraries to copy (pom.xml is not used), they must be placed inside a directory named "lib": JQM_DIR/jobs/xxxxx.
 
 Example (with explicit libraries)::
 

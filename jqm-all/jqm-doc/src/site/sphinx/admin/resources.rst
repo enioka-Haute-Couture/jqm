@@ -42,25 +42,26 @@ following reasons:
 
 * Many resources are actually to be shared between payloads, such as a connection pool
 * Very often, the payload will expect to be returned the same resource when making multiple JNDI lookups, not a different one on each call. Once again, 
-  one would expect to be returned the same connection pool on each call, and definitiely not to have a new pool created on each call!
+  one would expect to be returned the same connection pool on each call, and definitely not to have a new pool created on each call!
 * Some resources are dangerous to create inside the payload's context. As stated in :doc:`../jobs/writing_payloads`, loading a JDBC driver creates
-  memory leaks (actually, classloader leaks). By delegating this to the engine, the issue disappears.
+  memory leaks (actually, class loader leaks). By delegating this to the engine, the issue disappears.
 
 Singleton resources are created the first time they are looked up, and kept forever afterwards.
 
-As singleton resources are created by the engine, the jar files containing resource & resource factory must be available to its classloader.
+As singleton resources are created by the engine, the jar files containing resource & resource factory must be available to the engine class loader.
 For this reason, the jar files must be placed manually inside the $JQM_ROOT/ext directory (and they do not need to be placed inside the 
 dependencies of the payload, even if it does not hurt to have them there). For a resource which provider is within the payload, being
 a singleton is impossible - the engine class context has no access to the payload class context.
 
-By default, the $JQM_ROOT/ext directory contains the following providers, ready to be used as singleton resources:
+By default, the $JQM_ROOT/ext directory contains the following providers, ready to be used as singleton (or not) resources:
 
 * the File provider and URl provider inside a single jar named jqm-provider
 * the JDBC pool, inside two jars (tomcat-jdbc and tomcat-juli)
 * the HSQLDB driver
 
 Besides the HSQLDB driver, which can be removed if another database is used, the provided jars should never be removed. Jars added
-later (custom resources, other JDBC drivers, ...) can of course be removed.
+later (custom resources, other JDBC drivers, ...) can of course be removed. 
+Also of note: it is not because a jar is inside 'ext' that the corresponding resources can only be singletons. They can be standard as well.
 
 
 Examples
@@ -70,8 +71,12 @@ Below, some examples of resources definition. To see how to actually use them in
 JDBC
 +++++++++++++
 
-
 .. note:: the recommended naming pattern for JDBC aliases is jdbc/name
+
+Connection pools to databases through JDBC is provided by an ObjectFactory embedded with JQM named tomcat-jdbc.
+
+As noted above, JDBC pool resources should always be singletons: it is stupid to create a new pool on each call AND it would
+create class loader leaks otherwise.
 
 +-----------------------------------------+-------------------------------------------------+
 | Classname                               | Factory class name                              |
@@ -95,14 +100,14 @@ JDBC
 | password       | password for the database account       |
 +----------------+-----------------------------------------+
 
-There are many options, detailed in the `Tomcat JDBC documentation <https://tomcat.apache.org/tomcat-7.0-doc/jdbc-pool.html>`_.
+There are many other options, detailed in the `Tomcat JDBC documentation <https://tomcat.apache.org/tomcat-7.0-doc/jdbc-pool.html>`_.
 
 JMS
 ++++++++++++
 
 .. note:: the recommended naming pattern for JMS aliases is jms/name
 
-*Exemple for MQ Series QueueConnectionFactory:*
+*Parameters for MQ Series QueueConnectionFactory:*
 
 +-----------------------------------------+-------------------------------------------------+
 | Classname                               | Factory class name                              |
@@ -124,7 +129,7 @@ JMS
 | TRAN           | always 1 (means CLIENT transmission)    |
 +----------------+-----------------------------------------+
 
-*Exemple for MQ Series Queue:*
+*Parameters for MQ Series Queue:*
 
 +------------------------+-------------------------------+
 | Classname              | Factory class name            |
@@ -138,7 +143,7 @@ JMS
 | QU             | queue name       |
 +----------------+------------------+
 
-*Exemple for ActiveMQ QueueConnexionFactory:*
+*Parameters for ActiveMQ QueueConnexionFactory:*
 
 +-----------------------------------------------+-----------------------------------------------+
 | Classname                                     | Factory class name                            |
@@ -152,7 +157,7 @@ JMS
 | brokerURL      | broker URL (see ActiveMQ site) |
 +----------------+--------------------------------+
 
-*Exemple for ActiveMQ Queue:*
+*Parameters for ActiveMQ Queue:*
 
 +-------------------------------------------+-----------------------------------------------+
 | Classname                                 | Factory class name                            |
@@ -168,7 +173,6 @@ JMS
 
 Files
 +++++++++++
-
 
 .. note:: the recommended naming pattern for files is fs/name
 
@@ -187,7 +191,6 @@ Files
 
 URL
 +++++++++
-
 
 .. note:: the recommended naming pattern for URL is url/name
 
