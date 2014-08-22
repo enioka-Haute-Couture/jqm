@@ -12,6 +12,7 @@ test.txt
 *.releaseBackup
 *.war
 *.ear
+*.jar
 release.properties
 
 /jqm-all/jqm-engine/compile.sh

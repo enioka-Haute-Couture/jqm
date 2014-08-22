@@ -134,7 +134,7 @@ public class MiscTest extends JqmBaseTest
 
         CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", em,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
-        CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbengine", "SA", "", em,
+        CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip, 42,
