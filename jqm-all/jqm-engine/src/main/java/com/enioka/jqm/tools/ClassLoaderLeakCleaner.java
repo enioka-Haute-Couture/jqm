@@ -1,5 +1,6 @@
 package com.enioka.jqm.tools;
 
+import java.beans.Introspector;
 import java.lang.management.ManagementFactory;
 
 import javax.management.MBeanServer;
@@ -39,5 +40,8 @@ public class ClassLoaderLeakCleaner
                 jqmlogger.info("Failed to clean JMX MBean " + mbean.getCanonicalName(), e);
             }
         }
+
+        // Bean cache
+        Introspector.flushCaches();
     }
 }
