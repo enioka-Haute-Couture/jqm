@@ -41,6 +41,7 @@
 		<module>jqm-test-legacyinheritance</module>
 		<module>jqm-test-missingapi</module>
 		<module>jqm-test-jndifile</module>
+		<module>jqm-test-jmxleak</module>
 	</modules>
 
 	<profiles>
