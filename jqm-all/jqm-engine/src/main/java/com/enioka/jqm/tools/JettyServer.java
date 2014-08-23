@@ -124,10 +124,21 @@ class JettyServer
                     {
                         connector = new SelectChannelConnector();
                     }
-                    connector.setHost(s.getHostAddress());
-                    connector.setPort(node.getPort());
-                    ls.add(connector);
-                    jqmlogger.debug("Jetty will bind on " + s.getHostAddress() + ":" + node.getPort());
+
+                    if (s.isLoopbackAddress() || node.getDns().equals("localhost"))
+                    {
+                        connector.setHost("localhost");
+                        connector.setPort(node.getPort());
+                        ls.add(connector);
+                        jqmlogger.debug("Jetty will bind on localhost:" + node.getPort());
+                    }
+                    else
+                    {
+                        connector.setHost(s.getHostAddress());
+                        connector.setPort(node.getPort());
+                        ls.add(connector);
+                        jqmlogger.debug("Jetty will bind on " + s.getHostAddress() + ":" + node.getPort());
+                    }
                 }
             }
         }
