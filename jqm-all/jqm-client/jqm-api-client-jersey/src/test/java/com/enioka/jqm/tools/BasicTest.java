@@ -182,6 +182,8 @@ public class BasicTest
 
         // Change queue
         i = JqmClientFactory.getClient().enqueue(j);
+        Thread.sleep(2000);
+        Assert.assertEquals(State.SUBMITTED, JqmClientFactory.getClient().getJob(i).getState());
         List<Queue> queues = JqmClientFactory.getClient().getQueues();
         Queue newQueue = null;
         for (Queue q : queues)
@@ -193,7 +195,7 @@ public class BasicTest
             }
         }
         JqmClientFactory.getClient().setJobQueue(i, newQueue);
-        Thread.sleep(500);
+        Thread.sleep(4000);
         Assert.assertEquals(State.RUNNING, JqmClientFactory.getClient().getJob(i).getState());
         JqmClientFactory.getClient().killJob(i);
         Assert.assertEquals(State.KILLED, JqmClientFactory.getClient().getJob(i).getState());
