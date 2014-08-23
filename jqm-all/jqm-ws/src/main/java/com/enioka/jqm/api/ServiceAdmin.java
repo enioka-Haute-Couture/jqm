@@ -623,14 +623,23 @@ public class ServiceAdmin
     {
         EntityManager em = getEm();
         List<String> res = new ArrayList<String>();
-        RUser memyselfandi = em.createQuery("SELECT u FROM RUser u WHERE u.login = :l", RUser.class)
-                .setParameter("l", req.getUserPrincipal().getName()).getSingleResult();
-
-        for (RRole r : memyselfandi.getRoles())
+        String auth = em.createQuery("SELECT gp From GlobalParameter gp where gp.key = 'enableWsApiAuth'", GlobalParameter.class)
+                .getSingleResult().getValue();
+        if (auth.equals("false"))
         {
-            for (RPermission p : r.getPermissions())
+            res.add("*:*");
+        }
+        else
+        {
+            RUser memyselfandi = em.createQuery("SELECT u FROM RUser u WHERE u.login = :l", RUser.class)
+                    .setParameter("l", req.getUserPrincipal().getName()).getSingleResult();
+
+            for (RRole r : memyselfandi.getRoles())
             {
-                res.add(p.getName());
+                for (RPermission p : r.getPermissions())
+                {
+                    res.add(p.getName());
+                }
             }
         }
         em.close();
