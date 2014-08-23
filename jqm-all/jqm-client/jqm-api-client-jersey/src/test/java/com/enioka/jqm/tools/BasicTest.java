@@ -174,7 +174,7 @@ public class BasicTest
         i = JqmClientFactory.getClient().enqueue(j);
         Thread.sleep(1000);
         Assert.assertEquals(1, JqmClientFactory.getClient().getUserActiveJobs("TEST2").size());
-        Assert.assertTrue(JqmClientFactory.getClient().getJob(i).getState().equals(State.SUBMITTED));
+        Assert.assertEquals(State.SUBMITTED, JqmClientFactory.getClient().getJob(i).getState());
 
         JqmClientFactory.getClient().setJobQueuePosition(i, 12);
         JqmClientFactory.getClient().cancelJob(i);
@@ -189,13 +189,14 @@ public class BasicTest
             if (q.getName().equals("VIPQueue"))
             {
                 newQueue = q;
+                break;
             }
         }
         JqmClientFactory.getClient().setJobQueue(i, newQueue);
-        Thread.sleep(1000);
-        Assert.assertTrue(JqmClientFactory.getClient().getJob(i).getState().equals(State.RUNNING));
+        Thread.sleep(500);
+        Assert.assertEquals(State.RUNNING, JqmClientFactory.getClient().getJob(i).getState());
         JqmClientFactory.getClient().killJob(i);
-        Assert.assertTrue(JqmClientFactory.getClient().getJob(i).getState().equals(State.KILLED));
+        Assert.assertEquals(State.KILLED, JqmClientFactory.getClient().getJob(i).getState());
 
         // Get messages too
         Assert.assertEquals(3, JqmClientFactory.getClient().getJobMessages(i).size());
