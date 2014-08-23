@@ -199,7 +199,7 @@ public class BasicTest
         Assert.assertEquals(State.RUNNING, JqmClientFactory.getClient().getJob(i).getState());
         JqmClientFactory.getClient().killJob(i);
         Assert.assertEquals(State.KILLED, JqmClientFactory.getClient().getJob(i).getState());
-        Thread.sleep(500);
+        Thread.sleep(4000);
 
         // Get messages too
         Assert.assertEquals(4, JqmClientFactory.getClient().getJobMessages(i).size());
