@@ -199,9 +199,10 @@ public class BasicTest
         Assert.assertEquals(State.RUNNING, JqmClientFactory.getClient().getJob(i).getState());
         JqmClientFactory.getClient().killJob(i);
         Assert.assertEquals(State.KILLED, JqmClientFactory.getClient().getJob(i).getState());
+        Thread.sleep(500);
 
         // Get messages too
-        Assert.assertEquals(3, JqmClientFactory.getClient().getJobMessages(i).size());
+        Assert.assertEquals(4, JqmClientFactory.getClient().getJobMessages(i).size());
 
         // Finally, a query
         Assert.assertEquals(1, Query.create().setApplicationName("MarsuApplication").run().size());
