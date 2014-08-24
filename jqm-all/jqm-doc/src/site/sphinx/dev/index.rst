@@ -5,11 +5,12 @@ This chapter is only useful for JQM developers. For would-be contributors, it is
 Otherwise, it can be skipepd without remorse.
 
 .. toctree::
-	:numbered:
-	:titlesonly:
-	:maxdepth: 2
+    :numbered:
+    :titlesonly:
+    :maxdepth: 2
 
-	contrib
-	build
-	../release_notes
-	classloaders
+    contrib
+    build
+    ../release_notes
+    classloaders
+    tests

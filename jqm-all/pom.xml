@@ -164,6 +164,44 @@
 				</plugins>
 			</build>
 		</profile>
+
+		<profile>
+			<!-- Disabled by default. Runs Selenium tests on the admin GUI. -->
+			<id>selenium</id>
+			<activation>
+				<!-- Activate if Travis-like variables are set. Or force it inside settings.xml 
+					for development environments if needed. -->
+				<property>
+					<name>env.SAUCE_ACCESS_KEY</name>
+				</property>
+			</activation>
+			<modules>
+				<module>jqm-wstst</module>
+			</modules>
+			<properties>
+				<!-- These are default values. They should always be overridden either 
+					in settings.xml or in environment variables -->
+				<SAUCE_USERNAME>${env.SAUCE_USERNAME}</SAUCE_USERNAME>
+				<SAUCE_ACCESS_KEY>${env.SAUCE_ACCESS_KEY}</SAUCE_ACCESS_KEY>
+				<SAUCE_URL>localhost:4445/wd/hub</SAUCE_URL>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${surefire.version}</version>
+						<configuration>
+							<systemPropertyVariables>
+								<SAUCE_URL>${SAUCE_URL}</SAUCE_URL>
+								<SAUCE_ACCESS_KEY>${SAUCE_ACCESS_KEY}</SAUCE_ACCESS_KEY>
+								<SAUCE_USERNAME>${SAUCE_USERNAME}</SAUCE_USERNAME>
+							</systemPropertyVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 
 	<build>

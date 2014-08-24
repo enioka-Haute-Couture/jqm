@@ -5,6 +5,16 @@
 
 This is the procedure that should be followed for making an official JQM release.
 
+Environment
+++++++++++++++++
+
+The release environment must have:
+
+* PGP & the release private key
+* The Selenium setup (see :doc:`tests`)
+* Internet access
+* Login & password to Sonatype OSSRH.
+
 Update release notes
 +++++++++++++++++++++++++
 
@@ -20,7 +30,7 @@ Full build & tests
 
 There is no distinction between tests & integration tests in JQM so this will run all tests. ::
 
-	mvn clean install
+	mvn clean install -Pselenium
 
 Sonar snapshot
 ++++++++++++++++++
@@ -36,7 +46,7 @@ Once done, take a snaphot in Sonar.
 Release test
 +++++++++++++
 
-The release plugin is (inside the pom.xml) parametered to use a local git repository, so as to allow mistakes. 
+The release plug-in is (inside the pom.xml) parametrized to use a local git repository, so as to allow mistakes. 
 During that step, all packages are bumped in version number, even if they were not modified. ::
 
 	mvn release:prepare -Darguments='-DskipTests'
@@ -47,24 +57,14 @@ Then the test package must be test-deployed in a two-node configuration.
 Release
 +++++++++++++
 
-This will upload the packages to the Nexus defined in the "internal" profile. Note that "soon" this should be replaced by a Central-synced repository. ::
+This will upload the packages to the OSSRH staging repository.::
 
-	mvn release:perform -Pinternal -Darguments='-DskipTests'
+	mvn release:perform -Darguments='-DskipTests'
 
-GitHub upload
-++++++++++++++++
+OSSRH validation
+********************
 
-Create a release inside GitHub and upload the following artifacts:
-
-* jqm-engine
-* jqm-webui
-* jqm-ws
-
-And, as long as JMQ is not on Central:
-
-* jqm-api-client-core
-* jqm-api-client-hibernate
-* jqm-api-client-jersey
+Go to https://oss.sonatype.org/ and unstage the release. This will in time allow synchronization with Maven Central.
 
 Git push
 +++++++++++++
@@ -76,4 +76,9 @@ At this step, the release is done and the local git modifications can be pushed 
 ::
 
 	git push origin --tags
+
+GitHub upload
+++++++++++++++++
+
+Create a release inside GitHub and upload the zip and tar.gz produced by the jqm-engine project.
 

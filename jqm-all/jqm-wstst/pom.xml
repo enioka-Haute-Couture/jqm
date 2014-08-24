@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>jqm-all</artifactId>
+		<groupId>com.enioka.jqm</groupId>
+		<version>1.1.7-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>jqm-wstst</artifactId>
+	<packaging>jar</packaging>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>Selenium tests for jqm-ws (admin UI and web services)</description>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${surefire.version}</version>
+				<configuration>
+					<trimStackTrace>false</trimStackTrace>
+					<argLine>-XX:MaxPermSize=128m -Xms150m -Xmx256m</argLine>
+				</configuration>
+			</plugin>
+
+			<!-- Create ext directory for tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<skip>false</skip>
+				</configuration>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>process-test-classes</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.hsqldb</groupId>
+									<artifactId>hsqldb</artifactId>
+									<version>${hsqldb.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.apache.tomcat</groupId>
+									<artifactId>tomcat-jdbc</artifactId>
+									<version>${pool.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.apache.tomcat</groupId>
+									<artifactId>tomcat-juli</artifactId>
+									<version>${pool.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.enioka.jqm</groupId>
+									<artifactId>jqm-providers</artifactId>
+									<version>${project.version}</version>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.basedir}/ext</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>LATEST</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.saucelabs</groupId>
+			<artifactId>sauce_junit</artifactId>
+			<version>[1.0.0,)</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-test-helpers</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jdbc</artifactId>
+			<version>${pool.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-providers</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>${hsqldb.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-engine</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>saucelabs-repository</id>
+			<url>http://repository-saucelabs.forge.cloudbees.com/release</url>
+			<releases>
+			</releases>
+			<snapshots>
+			</snapshots>
+		</repository>
+	</repositories>
+
+</project>

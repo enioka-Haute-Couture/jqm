@@ -6,3 +6,9 @@ jdk:
   - oraclejdk7
   - openjdk6
   - openjdk7
+env:
+  global:
+  - secure: ZI6QQDf1rjLK+ZiYh8SPuVlvTJ3nq/JgbFJsFz4pqpEVr30UjcBpICdwauktgPa7dakIfaCbZzBB5SwAayg9CLQ5eOcoiEjUVOVlLvMiUesKIY6B50QE9E/r/MDJddDlLlVbwBnMdovYh9+Cwu7ny7tbS6ueU9D7pKX+FfCkEns=
+  - secure: dbcqjCXTsiNqPW0sSqA1DfYgzRAD6MK+lkCmBocTl0InimKFlM211j4rDt80talVl7HGPkS910S/twV2VfTUexYy5oZcqVvzfRST6ShLwnBmVz2rm78r/W+te3KmGY8w+RucLSM+M0DCfN74JnY7EI0dLCd1IberLkzCecxXOxw=
+addons:
+  sauce_connect: true
