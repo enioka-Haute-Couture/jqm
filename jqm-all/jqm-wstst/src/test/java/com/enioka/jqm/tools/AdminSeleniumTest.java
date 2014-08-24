@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,6 +43,11 @@ public class AdminSeleniumTest implements SauceOnDemandSessionIdProvider
     // Authentication uses values from system or environment variables
     public SauceOnDemandAuthentication authentication = new SauceOnDemandAuthentication();
     public String seleniumBaseUrl = System.getProperty("SAUCE_URL");
+    public String tunnelId = System.getenv("TRAVIS_JOB_NUMBER");
+    public String travisBuildNumber = System.getenv("TRAVIS_BUILD_NUMBER");
+    public String travisBranch = System.getenv("TRAVIS_BRANCH");
+    public String travisCommit = System.getenv("TRAVIS_COMMIT");
+    public String travisJdk = System.getenv("TRAVIS_JDK_VERSION");
 
     @Rule
     public SauceOnDemandTestWatcher resultReportingTestWatcher = new SauceOnDemandTestWatcher(this, authentication);
@@ -164,14 +170,51 @@ public class AdminSeleniumTest implements SauceOnDemandSessionIdProvider
     public void setUp() throws Exception
     {
         DesiredCapabilities capabilities = new DesiredCapabilities();
+
+        // Classic Selenium capabilities
         capabilities.setCapability(CapabilityType.BROWSER_NAME, browser);
         if (version != null)
         {
             capabilities.setCapability(CapabilityType.VERSION, version);
         }
         capabilities.setCapability(CapabilityType.PLATFORM, os);
+
+        // Sauce tags
         capabilities.setCapability("name", testName.getMethodName());
-        // ondemand.saucelabs.com:80/wd/hub
+        if (tunnelId != null)
+        {
+            capabilities.setCapability("tunnel-identifier", tunnelId);
+        }
+        if (travisBuildNumber != null)
+        {
+            capabilities.setCapability("build", travisBuildNumber);
+        }
+
+        List<String> tags = new ArrayList<String>();
+        if (travisJdk != null)
+        {
+            tags.add("CI");
+            tags.add(travisJdk);
+        }
+        else
+        {
+            tags.add("MANUAL");
+        }
+        tags.add(Helpers.getMavenVersion());
+        if (travisBranch != null)
+        {
+            tags.add(travisBranch);
+        }
+        /*
+         * if (travisCommit != null) { tags.add(travisCommit); }
+         */
+
+        if (tags.size() > 0)
+        {
+            capabilities.setCapability("tags", tags.toArray());
+        }
+
+        // Connection
         this.driver = new RemoteWebDriver(new URL("http://" + authentication.getUsername() + ":" + authentication.getAccessKey() + "@"
                 + seleniumBaseUrl), capabilities);
         this.sauceJobId = (((RemoteWebDriver) driver).getSessionId()).toString();
