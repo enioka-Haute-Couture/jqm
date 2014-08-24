@@ -3,16 +3,19 @@ package com.enioka.jqm.tools;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 import javax.persistence.EntityManager;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -40,6 +43,8 @@ import com.saucelabs.junit.SauceOnDemandTestWatcher;
 @RunWith(ConcurrentParameterized.class)
 public class AdminSeleniumTest implements SauceOnDemandSessionIdProvider
 {
+    private static Logger jqmlogger = Logger.getLogger(AdminSeleniumTest.class);
+
     // Authentication uses values from system or environment variables
     public SauceOnDemandAuthentication authentication = new SauceOnDemandAuthentication();
     public String seleniumBaseUrl = System.getProperty("SAUCE_URL");
@@ -77,6 +82,24 @@ public class AdminSeleniumTest implements SauceOnDemandSessionIdProvider
         browsers.add(new String[] { "Windows 8.1", "11", "internet explorer" });
         browsers.add(new String[] { "OSX 10.8", "6", "safari" });
         return browsers;
+    }
+
+    static String getMavenVersion()
+    {
+        String res = "";
+        InputStream is = Main.class.getResourceAsStream("/META-INF/maven/com.enioka.jqm/jqm-wstst/pom.properties");
+        Properties p = new Properties();
+        try
+        {
+            p.load(is);
+            res = p.getProperty("version");
+        }
+        catch (Exception e)
+        {
+            res = "maven version not found";
+            jqmlogger.warn("maven version not found", e);
+        }
+        return res;
     }
 
     /**
@@ -200,7 +223,7 @@ public class AdminSeleniumTest implements SauceOnDemandSessionIdProvider
         {
             tags.add("MANUAL");
         }
-        tags.add(Helpers.getMavenVersion());
+        tags.add(getMavenVersion());
         if (travisBranch != null)
         {
             tags.add(travisBranch);
