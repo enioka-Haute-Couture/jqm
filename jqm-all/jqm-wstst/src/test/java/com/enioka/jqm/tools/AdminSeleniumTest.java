@@ -87,7 +87,7 @@ public class AdminSeleniumTest implements SauceOnDemandSessionIdProvider
     static String getMavenVersion()
     {
         String res = "";
-        InputStream is = Main.class.getResourceAsStream("/META-INF/maven/com.enioka.jqm/jqm-wstst/pom.properties");
+        InputStream is = AdminSeleniumTest.class.getResourceAsStream("/META-INF/maven/com.enioka.jqm/jqm-wstst/pom.properties");
         Properties p = new Properties();
         try
         {
