@@ -275,6 +275,7 @@ public class MiscTest extends JqmBaseTest
         TestHelpers.createLocalNode(em);
         Helpers.setSingleParam("internalPollingPeriodMs", "200", em);
         Helpers.setSingleParam("aliveSignalMs", "200", em);
+        Helpers.setSingleParam("disableVerboseStartup", "false", em);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");

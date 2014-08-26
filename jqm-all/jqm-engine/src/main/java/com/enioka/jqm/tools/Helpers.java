@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.SecureRandom;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -153,7 +154,6 @@ final class Helpers
         try
         {
             JndiContext.createJndiContext();
-            jqmlogger.debug("JNDI context was registered");
         }
         catch (NamingException e)
         {
@@ -312,7 +312,6 @@ final class Helpers
         // Default queue
         Queue q = null;
         long i = (Long) em.createQuery("SELECT COUNT(qu) FROM Queue qu").getSingleResult();
-        jqmlogger.info("There are " + i + " queues defined in the database");
         if (i == 0L)
         {
             q = new Queue();
@@ -372,10 +371,6 @@ final class Helpers
             dp.setQueue(q);
             em.persist(dp);
             jqmlogger.info("This node will poll from the default queue with default parameters");
-        }
-        else
-        {
-            jqmlogger.info("This node is configured to take jobs from at least one queue");
         }
 
         // Roles
@@ -526,6 +521,45 @@ final class Helpers
         catch (NoResultException ex)
         {
             return null;
+        }
+    }
+
+    static void dumpParameters(EntityManager em, Node n)
+    {
+        String terse = getParameter("disableVerboseStartup", "false", em);
+        if ("false".equals(terse))
+        {
+            jqmlogger.info("Global cluster parameters are as follow:");
+            List<GlobalParameter> prms = em.createQuery("SELECT gp FROM GlobalParameter gp", GlobalParameter.class).getResultList();
+            for (GlobalParameter prm : prms)
+            {
+                jqmlogger.info(String.format("\t%1$s = %2$s", prm.getKey(), prm.getValue()));
+            }
+
+            jqmlogger.info("Node parameters are as follow:");
+            jqmlogger.info("\tfile produced storage directory: " + n.getDlRepo());
+            jqmlogger.info("\tHTTP listening interface: " + n.getDns());
+            jqmlogger.info("\tlooks for payloads inside: " + n.getRepo());
+            jqmlogger.info("\tlog level: " + n.getRootLogLevel());
+            jqmlogger.info("\ttemp files will be created inside: " + n.getTmpDirectory());
+            jqmlogger.info("\tJMX registry port: " + n.getJmxRegistryPort());
+            jqmlogger.info("\tJMX server port: " + n.getJmxServerPort());
+            jqmlogger.info("\tHTTP listening port: " + n.getPort());
+            jqmlogger.info("\tAPI admin enabled: " + n.getLoadApiAdmin());
+            jqmlogger.info("\tAPI client enabled: " + n.getLoadApiClient());
+            jqmlogger.info("\tAPI simple enabled: " + n.getLoapApiSimple());
+
+            jqmlogger.info("Node polling parameters are as follow:");
+            List<DeploymentParameter> dps = em
+                    .createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
+                    .setParameter("n", n.getId()).getResultList();
+
+            // Pollers
+            for (DeploymentParameter dp : dps)
+            {
+                jqmlogger.info("\t" + dp.getQueue().getName() + " - every " + dp.getPollingInterval() + "ms - maximum " + dp.getNbThread()
+                        + " concurrent threads");
+            }
         }
     }
 }

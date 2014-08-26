@@ -99,6 +99,9 @@ class JqmEngine implements JqmEngineMBean
         // Node configuration is in the database
         node = Helpers.checkAndUpdateNodeConfiguration(nodeName, em);
 
+        // Log parameters
+        Helpers.dumpParameters(em, node);
+
         // Check if double-start
         long toWait = (long) (2 * Long.parseLong(Helpers.getParameter("aliveSignalMs", "60000", em)));
         if (node.getLastSeenAlive() != null

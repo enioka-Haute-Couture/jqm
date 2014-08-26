@@ -72,6 +72,7 @@ public class TestHelpers
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("disableWsApi", "true", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("enableWsApiSsl", "false", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("enableWsApiAuth", "true", em);
+        TestHelpers.gpCentral = CreationTools.createGlobalParameter("disableVerboseStartup", "true", em);
 
         TestHelpers.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42, em, true);
         TestHelpers.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, em);
