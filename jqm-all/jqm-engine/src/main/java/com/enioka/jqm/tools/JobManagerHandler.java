@@ -292,7 +292,10 @@ class JobManagerHandler implements InvocationHandler
         jr.setKeyword2(keyword2);
         jr.setKeyword3(keyword3);
         jr.setParentID(this.ji.getId());
-        jr.setParameters(parameters);
+        if (parameters != null)
+        {
+            jr.setParameters(parameters);
+        }
 
         return getJqmClient().enqueue(jr);
     }
