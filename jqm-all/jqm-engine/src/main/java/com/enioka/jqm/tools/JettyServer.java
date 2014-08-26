@@ -179,6 +179,10 @@ class JettyServer
 
     int getActualPort()
     {
+        if (server == null)
+        {
+            return 0;
+        }
         return server.getConnectors()[0].getLocalPort();
     }
 
