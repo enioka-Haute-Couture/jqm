@@ -59,7 +59,6 @@ class LibraryCache
 
     static
     {
-        jqmlogger.debug("init logger for SWR");
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
     }
