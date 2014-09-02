@@ -43,7 +43,7 @@ public class ClLeakTest extends JqmBaseTest
         // Start the engine
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-        Thread.sleep(2000);
+        Thread.sleep(5000);
 
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName name = new ObjectName("com.test:type=Node,name=test");
@@ -52,7 +52,7 @@ public class ClLeakTest extends JqmBaseTest
 
         // Stop the job. Its MBean(s) should be cleaned up by the engine.
         JqmClientFactory.getClient().killJob(i);
-        Thread.sleep(2000);
+        Thread.sleep(5000);
 
         // Check the bean is really dead
         try
