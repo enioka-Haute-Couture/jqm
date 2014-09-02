@@ -47,6 +47,7 @@
 		<module>jqm-test-tmpdir</module>
 		<module>jqm-test-providedapi</module>
 		<module>jqm-test-apienginestatus</module>
+		<module>jqm-test-jmxleak</module>
 	</modules>
 
 	<profiles>

@@ -283,6 +283,9 @@ class Loader implements Runnable, LoaderMBean
         p.decreaseNbThread();
         EntityManager em = Helpers.getNewEm();
 
+        // Clean class loader
+        ClassLoaderLeakCleaner.clean(Thread.currentThread().getContextClassLoader());
+
         // Restore class loader
         if (this.contextClassLoader != null)
         {
