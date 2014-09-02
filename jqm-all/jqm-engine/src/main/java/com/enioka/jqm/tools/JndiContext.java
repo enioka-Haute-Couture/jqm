@@ -199,12 +199,19 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
                 if ("org.apache.tomcat.jdbc.pool.DataSourceFactory".equals(d.getFactoryClassName())
                         && (d.get("jmxEnabled") == null ? true : Boolean.parseBoolean((String) d.get("jmxEnabled").getContent())))
                 {
-                    MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-                    ObjectName jmxname = new ObjectName("com.enioka.jqm:type=JdbcPool,name=" + name);
-                    mbs.registerMBean(
-                            res.getClass().getMethod("getPool").invoke(res).getClass().getMethod("getJmxPool")
-                                    .invoke(res.getClass().getMethod("getPool").invoke(res)), jmxname);
-                    jmxNames.add(jmxname);
+                    try
+                    {
+                        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                        ObjectName jmxname = new ObjectName("com.enioka.jqm:type=JdbcPool,name=" + name);
+                        mbs.registerMBean(
+                                res.getClass().getMethod("getPool").invoke(res).getClass().getMethod("getJmxPool")
+                                        .invoke(res.getClass().getMethod("getPool").invoke(res)), jmxname);
+                        jmxNames.add(jmxname);
+                    }
+                    catch (Exception e)
+                    {
+                        jqmlogger.warn("Could not register JMX MBean for resource.", e);
+                    }
                 }
             }
             return res;
