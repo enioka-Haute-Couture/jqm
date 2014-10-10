@@ -177,7 +177,70 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
         // Retrieve the resource description from the database or the XML file
         JndiResourceDescriptor d = ResourceParser.getDescriptor(name);
 
-        // Create the resource
+        // Singleton handling is synchronized to avoid double creation
+        if (d.isSingleton())
+        {
+            synchronized (singletons)
+            {
+                if (singletons.containsKey(name))
+                {
+                    return singletons.get(name);
+                }
+
+                // We use the current thread loader to find the resource and resource factory class - ext is inside that CL.
+                // This is done only for payload CL - engine only need ext, not its own CL (as its own CL does NOT include ext).
+                Object res = null;
+                try
+                {
+                    ResourceFactory rf = new ResourceFactory(
+                            Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.tools.JarClassLoader ? Thread
+                                    .currentThread().getContextClassLoader() : extResources);
+                    res = rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
+                }
+                catch (Exception e)
+                {
+                    jqmlogger.warn("Could not instanciate singleton JNDI object resource " + name, e);
+                    NamingException ex = new NamingException(e.getMessage());
+                    ex.initCause(e);
+                    throw ex;
+                }
+
+                // Cache result
+                if ((res.getClass().getClassLoader() instanceof JarClassLoader))
+                {
+                    jqmlogger
+                            .warn("A JNDI resource was defined as singleton but was loaded by a payload class loader - it won't be cached to avoid class loader leaks");
+                }
+                else
+                {
+                    singletons.put(name, res);
+
+                    // Pool JMX registration (only if cached - avoids leaks)
+                    if ("org.apache.tomcat.jdbc.pool.DataSourceFactory".equals(d.getFactoryClassName())
+                            && (d.get("jmxEnabled") == null ? true : Boolean.parseBoolean((String) d.get("jmxEnabled").getContent())))
+                    {
+                        try
+                        {
+                            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                            ObjectName jmxname = new ObjectName("com.enioka.jqm:type=JdbcPool,name=" + name);
+                            mbs.registerMBean(
+                                    res.getClass().getMethod("getPool").invoke(res).getClass().getMethod("getJmxPool")
+                                            .invoke(res.getClass().getMethod("getPool").invoke(res)), jmxname);
+                            jmxNames.add(jmxname);
+                        }
+                        catch (Exception e)
+                        {
+                            jqmlogger.warn("Could not register JMX MBean for resource.", e);
+                        }
+                    }
+                }
+
+                // Done
+                return res;
+            }
+        }
+
+        // Non singleton
         try
         {
             // We use the current thread loader to find the resource and resource factory class - ext is inside that CL.
@@ -185,36 +248,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
             ResourceFactory rf = new ResourceFactory(
                     Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.tools.JarClassLoader ? Thread.currentThread()
                             .getContextClassLoader() : extResources);
-            Object res = rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
-            if (d.isSingleton() && (res.getClass().getClassLoader() instanceof JarClassLoader))
-            {
-                jqmlogger
-                        .warn("A JNDI resource was defined as singleton but was loaded by a payload class loader - it won't be cached to avoid class loader leaks");
-            }
-            else if (d.isSingleton() && !(res.getClass().getClassLoader() instanceof JarClassLoader))
-            {
-                singletons.put(name, res);
-
-                // Pool JMX registration
-                if ("org.apache.tomcat.jdbc.pool.DataSourceFactory".equals(d.getFactoryClassName())
-                        && (d.get("jmxEnabled") == null ? true : Boolean.parseBoolean((String) d.get("jmxEnabled").getContent())))
-                {
-                    try
-                    {
-                        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-                        ObjectName jmxname = new ObjectName("com.enioka.jqm:type=JdbcPool,name=" + name);
-                        mbs.registerMBean(
-                                res.getClass().getMethod("getPool").invoke(res).getClass().getMethod("getJmxPool")
-                                        .invoke(res.getClass().getMethod("getPool").invoke(res)), jmxname);
-                        jmxNames.add(jmxname);
-                    }
-                    catch (Exception e)
-                    {
-                        jqmlogger.warn("Could not register JMX MBean for resource.", e);
-                    }
-                }
-            }
-            return res;
+            return rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
         }
         catch (Exception e)
         {
