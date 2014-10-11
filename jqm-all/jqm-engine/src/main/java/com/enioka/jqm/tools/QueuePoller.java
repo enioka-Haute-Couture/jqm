@@ -49,7 +49,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     private LibraryCache cache = null;
     private boolean run = true;
     private Integer actualNbThread;
-    private JqmEngine engine;
+    JqmEngine engine;
     private boolean hasStopped = false;
     private ObjectName name = null;
     private Calendar lastLoop = null;
@@ -81,10 +81,13 @@ class QueuePoller implements Runnable, QueuePollerMBean
 
         try
         {
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            name = new ObjectName("com.enioka.jqm:type=Node.Queue,Node=" + this.dp.getNode().getName() + ",name="
-                    + this.dp.getQueue().getName());
-            mbs.registerMBean(this, name);
+            if (this.engine.loadJmxBeans)
+            {
+                MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                name = new ObjectName("com.enioka.jqm:type=Node.Queue,Node=" + this.dp.getNode().getName() + ",name="
+                        + this.dp.getQueue().getName());
+                mbs.registerMBean(this, name);
+            }
         }
         catch (Exception e)
         {
@@ -231,13 +234,16 @@ class QueuePoller implements Runnable, QueuePollerMBean
         this.engine.checkEngineEnd();
 
         // JMX
-        try
+        if (this.engine.loadJmxBeans)
         {
-            ManagementFactory.getPlatformMBeanServer().unregisterMBean(name);
-        }
-        catch (Exception e)
-        {
-            jqmlogger.error("Could not create JMX beans", e);
+            try
+            {
+                ManagementFactory.getPlatformMBeanServer().unregisterMBean(name);
+            }
+            catch (Exception e)
+            {
+                jqmlogger.error("Could not unregister JMX beans", e);
+            }
         }
     }
 

@@ -76,16 +76,19 @@ class Loader implements Runnable, LoaderMBean
         this.job = job;
 
         // JMX
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        try
+        if (p.engine.loadJmxBeans)
         {
-            name = new ObjectName("com.enioka.jqm:type=Node.Queue.JobInstance,Node=" + this.job.getNode().getName() + ",Queue="
-                    + this.job.getQueue().getName() + ",name=" + this.job.getId());
-            mbs.registerMBean(this, name);
-        }
-        catch (Exception e)
-        {
-            throw new JqmInitError("Could not create JMX bean for running job instance", e);
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            try
+            {
+                name = new ObjectName("com.enioka.jqm:type=Node.Queue.JobInstance,Node=" + this.job.getNode().getName() + ",Queue="
+                        + this.job.getQueue().getName() + ",name=" + this.job.getId());
+                mbs.registerMBean(this, name);
+            }
+            catch (Exception e)
+            {
+                throw new JqmInitError("Could not create JMX bean for running job instance", e);
+            }
         }
     }
 
@@ -350,14 +353,17 @@ class Loader implements Runnable, LoaderMBean
         }
 
         // Unregister MBean
-        try
+        if (this.p.engine.loadJmxBeans)
         {
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            mbs.unregisterMBean(name);
-        }
-        catch (Exception e)
-        {
-            jqmlogger.error("Could not unregister JobInstance JMX bean", e);
+            try
+            {
+                MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                mbs.unregisterMBean(name);
+            }
+            catch (Exception e)
+            {
+                jqmlogger.error("Could not unregister JobInstance JMX bean", e);
+            }
         }
 
         // Unregister logger

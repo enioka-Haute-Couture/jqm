@@ -69,6 +69,7 @@ class JqmEngine implements JqmEngineMBean
     // Misc data
     private Calendar startTime = Calendar.getInstance();
     private Thread killHook = null;
+    boolean loadJmxBeans = true;
 
     /**
      * Starts the engine
@@ -149,6 +150,11 @@ class JqmEngine implements JqmEngineMBean
         {
             JmxAgent.registerAgent(node.getJmxRegistryPort(), node.getJmxServerPort(), node.getDns());
         }
+        else
+        {
+            jqmlogger
+                    .info("JMX remote listener will not be started as JMX registry port and JMX server port parameters are not both defined");
+        }
 
         // Jetty
         boolean startJetty = !Boolean.parseBoolean(Helpers.getParameter("disableWsApi", "false", em));
@@ -166,17 +172,25 @@ class JqmEngine implements JqmEngineMBean
         }
 
         // JMX
-        try
+        if (node.getJmxServerPort() != null && node.getJmxServerPort() > 0)
         {
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            name = new ObjectName("com.enioka.jqm:type=Node,name=" + this.node.getName());
-            mbs.registerMBean(this, name);
+            try
+            {
+                MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                name = new ObjectName("com.enioka.jqm:type=Node,name=" + this.node.getName());
+                mbs.registerMBean(this, name);
+            }
+            catch (Exception e)
+            {
+                throw new JqmInitError("Could not create JMX beans", e);
+            }
+            jqmlogger.info("JMX management bean for the engine was registered");
         }
-        catch (Exception e)
+        else
         {
-            throw new JqmInitError("Could not create JMX beans", e);
+            loadJmxBeans = false;
+            jqmlogger.info("JMX management beans will not be loaded as JMX server port is null or zero");
         }
-        jqmlogger.trace("JMX management bean for the engine was registered");
 
         // Security
         if (System.getSecurityManager() == null)
@@ -311,16 +325,20 @@ class JqmEngine implements JqmEngineMBean
         em.close();
 
         // JMX
-        try
+        if (loadJmxBeans)
         {
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            mbs.unregisterMBean(name);
-            jqmlogger.trace("unregistered bean " + name);
+            try
+            {
+                MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                mbs.unregisterMBean(name);
+                jqmlogger.trace("unregistered bean " + name);
+            }
+            catch (Exception e)
+            {
+                jqmlogger.error("Could not unregister engine JMX bean", e);
+            }
         }
-        catch (Exception e)
-        {
-            jqmlogger.error("Could not unregister engine JMX bean", e);
-        }
+
         // Note: if present, the JMX listener is not stopped as it is JVM-global, like the JNDI context
 
         // Done
