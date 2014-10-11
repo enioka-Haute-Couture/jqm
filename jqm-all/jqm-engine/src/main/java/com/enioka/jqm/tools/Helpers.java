@@ -639,13 +639,9 @@ final class Helpers
             transportZ.getMethod("send", messageZ).invoke(null, msg);
             jqmlogger.trace("Mail was sent");
         }
-        catch (ReflectiveOperationException e)
-        {
-            throw new MessagingException("could not load or use classes needed for sending mails", e);
-        }
         catch (Exception e)
         {
-            throw new MessagingException("an exception occurred during mail sending");
+            throw new MessagingException("an exception occurred during mail sending", e);
         }
         finally
         {
