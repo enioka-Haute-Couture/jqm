@@ -79,6 +79,7 @@
 		<httpclient.version>4.3.4</httpclient.version>
 		<pool.version>7.0.54</pool.version>
 		<bc.version>1.50</bc.version>
+		<mail.version>1.5.2</mail.version>
 		<sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
 	</properties>
 

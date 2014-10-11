@@ -63,8 +63,7 @@ public class MiscTest extends JqmBaseTest
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
-
-        TestHelpers.waitFor(2, 7000, em); // Need time for async mail sending.
+        TestHelpers.waitFor(1, 20000, em); // Need time for async mail sending.
         engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);

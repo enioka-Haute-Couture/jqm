@@ -345,6 +345,22 @@ public class CreationTools
                 "connection for " + user, true, prms);
     }
 
+    // ------------------ DATABASEPROP --------------------------------
+
+    public static JndiObjectResource createMailSession(EntityManager em, String name, String hostname, int port, boolean useTls,
+            String username, String password)
+    {
+        HashMap<String, String> prms = new HashMap<String, String>();
+        prms.put("smtpServerHost", hostname);
+        prms.put("smtpServerPort", String.valueOf(port));
+        prms.put("smtpUser", username);
+        prms.put("smtpPassword", password);
+        prms.put("useTls", String.valueOf(useTls));
+
+        return createJndiObjectResource(em, name, "javax.mail.Session", "com.enioka.jqm.providers.MailSessionFactory",
+                "mail SMTP server used for sending notification mails", true, prms);
+    }
+
     // ------------------ JNDI FOR JMS & co --------------------------------
     public static JndiObjectResource createJndiObjectResource(EntityManager em, String jndiAlias, String className, String factoryClass,
             String description, boolean singleton, HashMap<String, String> parameters)

@@ -110,6 +110,8 @@ public class TestHelpers
         {
             throw new RuntimeException("could not create output directory");
         }
+
+        CreationTools.createMailSession(em, "mail/default", "smtp.gmail.com", 587, true, "jqm.noreply@gmail.com", "marsu1952");
     }
 
     public static void cleanup(EntityManager em)

@@ -280,6 +280,20 @@ class Loader implements Runnable, LoaderMBean
 
     private void endOfRun(State status, String endMessage)
     {
+        // Send e-mail before releasing the slot - it may be long
+        if (job.getEmail() != null)
+        {
+            try
+            {
+                Helpers.sendEndMessage(job);
+            }
+            catch (Exception e)
+            {
+                jqmlogger.warn("An e-mail could not be sent. No impact on the engine.", e);
+            }
+        }
+
+        // Release the slot
         p.decreaseNbThread();
         EntityManager em = Helpers.getNewEm();
 
@@ -319,19 +333,6 @@ class Loader implements Runnable, LoaderMBean
         em.getTransaction().begin();
         em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", job.getId()).executeUpdate();
         em.getTransaction().commit();
-
-        // Send e-mail
-        if (job.getEmail() != null)
-        {
-            try
-            {
-                Mail.send(job, em);
-            }
-            catch (Exception e)
-            {
-                jqmlogger.warn("An e-mail could not be sent. No impact on the engine.", e);
-            }
-        }
 
         // Clean temp dir (if it exists)
         File tmpDir = new File(FilenameUtils.concat(node.getTmpDirectory(), "" + job.getId()));

@@ -125,6 +125,8 @@
 				<include>org.apache.tomcat:tomcat-juli</include>
 				<include>com.enioka.jqm:jqm-providers</include>
 				<include>com.enioka.jqm:jqm-api</include>
+				<include>com.sun.mail:javax.mail</include>
+				<include>com.sun.mail:smtp</include>
 			</includes>
 			<scope>test</scope>
 		</dependencySet>

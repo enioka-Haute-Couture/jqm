@@ -22,11 +22,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.SecureRandom;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
+import javax.mail.MessagingException;
+import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.naming.spi.NamingManager;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
@@ -43,6 +47,8 @@ import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
+import com.enioka.jqm.jpamodel.JndiObjectResource;
+import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
@@ -387,6 +393,31 @@ final class Helpers
         // Users
         createUserIfMissing(em, "root", "all powerfull user", adminr);
 
+        // Mail session
+        i = (Long) em.createQuery("SELECT COUNT(r) FROM JndiObjectResource r WHERE r.name = :nn").setParameter("nn", "mail/default")
+                .getSingleResult();
+        if (i == 0)
+        {
+            HashMap<String, String> prms = new HashMap<String, String>();
+            prms.put("smtpServerHost", "smtp.gmail.com");
+
+            JndiObjectResource res = new JndiObjectResource();
+            res.setAuth(null);
+            res.setDescription("default parameters used to send e-mails");
+            res.setFactory("com.enioka.jqm.providers.MailSessionFactory");
+            res.setName("mail/default");
+            res.setType("javax.mail.Session");
+            res.setSingleton(true);
+            em.persist(res);
+
+            JndiObjectResourceParameter prm = new JndiObjectResourceParameter();
+            prm.setKey("smtpServerHost");
+            prm.setValue("smtp.gmail.com");
+            em.persist(prm);
+            res.getParameters().add(prm);
+            prm.setResource(res);
+        }
+
         // Done
         em.getTransaction().commit();
         return n;
@@ -560,6 +591,94 @@ final class Helpers
                 jqmlogger.info("\t" + dp.getQueue().getName() + " - every " + dp.getPollingInterval() + "ms - maximum " + dp.getNbThread()
                         + " concurrent threads");
             }
+        }
+    }
+
+    /**
+     * Send a mail message using a JNDI resource.<br>
+     * As JNDI resource providers are inside the EXT class loader, this uses reflection. This method is basically a bonus on top of the
+     * MailSessionFactory offered to payloads, making it accessible also to the engine.
+     * 
+     * @param to
+     * @param subject
+     * @param body
+     * @param mailSessionJndiAlias
+     * @throws MessagingException
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    static void sendMessage(String to, String subject, String body, String mailSessionJndiAlias) throws MessagingException
+    {
+        jqmlogger.debug("sending mail to " + to + " - subject is " + subject);
+        ClassLoader extLoader = getExtClassLoader();
+        ClassLoader old = Thread.currentThread().getContextClassLoader();
+        Object mailSession = null;
+
+        try
+        {
+            mailSession = InitialContext.doLookup(mailSessionJndiAlias);
+        }
+        catch (NamingException e)
+        {
+            throw new MessagingException("could not find mail session description", e);
+        }
+
+        try
+        {
+            Thread.currentThread().setContextClassLoader(extLoader);
+            Class transportZ = extLoader.loadClass("javax.mail.Transport");
+            Class sessionZ = extLoader.loadClass("javax.mail.Session");
+            Class mimeMessageZ = extLoader.loadClass("javax.mail.internet.MimeMessage");
+            Class messageZ = extLoader.loadClass("javax.mail.Message");
+            Class recipientTypeZ = extLoader.loadClass("javax.mail.Message$RecipientType");
+            Object msg = mimeMessageZ.getConstructor(sessionZ).newInstance(mailSession);
+
+            mimeMessageZ.getMethod("setRecipients", recipientTypeZ, String.class).invoke(msg, recipientTypeZ.getField("TO").get(null), to);
+            mimeMessageZ.getMethod("setSubject", String.class).invoke(msg, subject);
+            mimeMessageZ.getMethod("setText", String.class).invoke(msg, body);
+
+            transportZ.getMethod("send", messageZ).invoke(null, msg);
+            jqmlogger.trace("Mail was sent");
+        }
+        catch (ReflectiveOperationException e)
+        {
+            throw new MessagingException("could not load or use classes needed for sending mails", e);
+        }
+        catch (Exception e)
+        {
+            throw new MessagingException("an exception occurred during mail sending");
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader(old);
+        }
+    }
+
+    static void sendEndMessage(JobInstance ji)
+    {
+        try
+        {
+            String message = "The Job number " + ji.getId() + " finished correctly\n\n" + "Job description:\n" + "- Job definition: "
+                    + ji.getJd().getApplicationName() + "\n" + "- Parent: " + ji.getParentId() + "\n" + "- User name: " + ji.getUserName()
+                    + "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "- Queue: " + ji.getQueue().getName() + "\n" + "- Node: "
+                    + ji.getNode().getName() + "\n" + "Best regards,\n";
+            sendMessage(ji.getEmail(), "[JQM] Job: " + ji.getId() + " ENDED", message, "mail/default");
+        }
+        catch (Exception e)
+        {
+            jqmlogger.warn("Could not send email. Job has nevertheless run correctly", e);
+        }
+    }
+
+    static ClassLoader getExtClassLoader()
+    {
+        try
+        {
+            return ((JndiContext) NamingManager.getInitialContext(null)).getExtCl();
+        }
+        catch (NamingException e)
+        {
+            // Don't do anything - this actually cannot happen. Death to checked exceptions.
+            return null;
         }
     }
 }
