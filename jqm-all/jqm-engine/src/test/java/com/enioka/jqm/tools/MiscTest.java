@@ -56,10 +56,7 @@ public class MiscTest extends JqmBaseTest
         JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
                 TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
-        JobRequest j = new JobRequest("MarsuApplication", "MAG", "jqm.noreply@gmail.com");
-
-        @SuppressWarnings("unused")
-        int i = JqmClientFactory.getClient().enqueue(j);
+        JobRequest.create("MarsuApplication", "MAG").setEmail("jqm.noreply@gmail.com").submit();
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");

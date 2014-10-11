@@ -67,6 +67,20 @@ public class JobRequest implements Serializable
     }
 
     /**
+     * Public constructor for fluid API.
+     * 
+     * @param applicationName
+     *            name (key) of the job to launch
+     * @param user
+     *            name of the human user that is at the origin of the request. If no user (e.g. inside an automated system), the application
+     *            module name should be used.
+     */
+    public static JobRequest create(String applicationName, String user)
+    {
+        return new JobRequest(applicationName, user);
+    }
+
+    /**
      * Public constructor
      * 
      * @param applicationName
@@ -84,6 +98,18 @@ public class JobRequest implements Serializable
     }
 
     /**
+     * Shortcut to submit the request to the JQM cluster. Equivalent to doing<br>
+     * <code>JqmClientFactory.getClient().enqueue(this)</code><br>
+     * See {@link JqmClient#enqueue(JobRequest)} for details on exceptions.
+     * 
+     * @return the ID of the job instance.
+     */
+    public Integer submit()
+    {
+        return JqmClientFactory.getClient().enqueue(this);
+    }
+
+    /**
      * Parameters are <key,value> pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
      * job itself.
      * 
@@ -92,9 +118,10 @@ public class JobRequest implements Serializable
      * @param value
      *            max length is 1000
      */
-    public void addParameter(String key, String value)
+    public JobRequest addParameter(String key, String value)
     {
         parameters.put(key, value);
+        return this;
     }
 
     /**
@@ -124,9 +151,10 @@ public class JobRequest implements Serializable
      * @param applicationName
      *            max length is 100
      */
-    public void setApplicationName(String applicationName)
+    public JobRequest setApplicationName(String applicationName)
     {
         this.applicationName = applicationName;
+        return this;
     }
 
     /**
@@ -147,9 +175,10 @@ public class JobRequest implements Serializable
      * @param sessionID
      *            max length is 100
      */
-    public void setSessionID(String sessionID)
+    public JobRequest setSessionID(String sessionID)
     {
         this.sessionID = sessionID;
+        return this;
     }
 
     /**
@@ -168,9 +197,10 @@ public class JobRequest implements Serializable
      * @param application
      *            max length is 50
      */
-    public void setApplication(String application)
+    public JobRequest setApplication(String application)
     {
         this.application = application;
+        return this;
     }
 
     /**
@@ -189,9 +219,10 @@ public class JobRequest implements Serializable
      * @param module
      *            max length is 50
      */
-    public void setModule(String module)
+    public JobRequest setModule(String module)
     {
         this.module = module;
+        return this;
     }
 
     /**
@@ -210,9 +241,10 @@ public class JobRequest implements Serializable
      * @param keyword1
      *            max length is 50
      */
-    public void setKeyword1(String keyword1)
+    public JobRequest setKeyword1(String keyword1)
     {
         this.keyword1 = keyword1;
+        return this;
     }
 
     /**
@@ -231,9 +263,10 @@ public class JobRequest implements Serializable
      * @param keyword2
      *            max length is 50
      */
-    public void setKeyword2(String keyword2)
+    public JobRequest setKeyword2(String keyword2)
     {
         this.keyword2 = keyword2;
+        return this;
     }
 
     /**
@@ -252,9 +285,10 @@ public class JobRequest implements Serializable
      * @param keyword3
      *            max length is 50
      */
-    public void setKeyword3(String keyword3)
+    public JobRequest setKeyword3(String keyword3)
     {
         this.keyword3 = keyword3;
+        return this;
     }
 
     /**
@@ -265,9 +299,10 @@ public class JobRequest implements Serializable
         return parameters;
     }
 
-    public void setParameters(Map<String, String> parameters)
+    public JobRequest setParameters(Map<String, String> parameters)
     {
         this.parameters = parameters;
+        return this;
     }
 
     /**
@@ -286,9 +321,10 @@ public class JobRequest implements Serializable
      * @param user
      *            max length is 50
      */
-    public void setUser(String user)
+    public JobRequest setUser(String user)
     {
         this.user = user;
+        return this;
     }
 
     /**
@@ -307,9 +343,10 @@ public class JobRequest implements Serializable
      * @param email
      *            max length is 100
      */
-    public void setEmail(String email)
+    public JobRequest setEmail(String email)
     {
         this.email = email;
+        return this;
     }
 
     /**
@@ -327,9 +364,10 @@ public class JobRequest implements Serializable
      * A job instance can be the child of another job instance. This allows you to set the ID of that parent. It should be left null if
      * there is no parent.
      */
-    public void setParentJobId(String parentJobId)
+    public JobRequest setParentJobId(String parentJobId)
     {
         this.parentJobId = Integer.parseInt(parentJobId);
+        return this;
     }
 
     /**
@@ -347,9 +385,10 @@ public class JobRequest implements Serializable
      * A job instance can be the child of another job instance. This allows you to set the ID of that parent. It should be left null if
      * there is no parent.
      */
-    public void setParentID(Integer parentJobId)
+    public JobRequest setParentID(Integer parentJobId)
     {
         this.parentJobId = parentJobId;
+        return this;
     }
 
     /**
@@ -373,8 +412,9 @@ public class JobRequest implements Serializable
      * single execution request (first enqueue, then change queue) when it is certain a specific queue will have to be used.<br>
      * If there is no queue of this name, the enqueue method will throw a <code>JqmInvalidRequestException</code>.
      */
-    public void setQueueName(String queueName)
+    public JobRequest setQueueName(String queueName)
     {
         this.queueName = queueName;
+        return this;
     }
 }
