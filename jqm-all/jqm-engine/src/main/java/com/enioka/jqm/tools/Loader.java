@@ -47,7 +47,6 @@ import org.apache.log4j.Logger;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.RuntimeParameter;
 import com.enioka.jqm.jpamodel.State;
@@ -178,9 +177,6 @@ class Loader implements Runnable, LoaderMBean
                         .setParameter("i", job.getId()).executeUpdate();
             }
 
-            // Add a message
-            Helpers.createMessage("Status updated: RUNNING", job, em);
-
             em.getTransaction().commit();
         }
         catch (Exception e)
@@ -266,7 +262,7 @@ class Loader implements Runnable, LoaderMBean
         // Job instance has now ended its run
         try
         {
-            endOfRun(resultStatus, endMessage);
+            endOfRun(resultStatus);
         }
         catch (Exception e)
         {
@@ -277,11 +273,6 @@ class Loader implements Runnable, LoaderMBean
     }
 
     private void endOfRun(State status)
-    {
-        endOfRun(status, null);
-    }
-
-    private void endOfRun(State status, String endMessage)
     {
         // Send e-mail before releasing the slot - it may be long
         if (job.getEmail() != null)
@@ -320,16 +311,6 @@ class Loader implements Runnable, LoaderMBean
         em.getTransaction().begin();
         History h = Helpers.createHistory(job, em, status, endDate);
         jqmlogger.trace("An History was just created for job instance " + h.getId());
-
-        // A last message (directly created on History, not JI)
-        if (endMessage == null)
-        {
-            endMessage = "Status updated: " + status;
-        }
-        Message m = new Message();
-        m.setJi(job.getId());
-        m.setTextMessage(endMessage);
-        em.persist(m);
 
         // Other transaction for purging the JI (deadlock power - beware of Message)
         em.getTransaction().commit();

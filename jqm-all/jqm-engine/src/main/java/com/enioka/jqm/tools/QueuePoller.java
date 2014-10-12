@@ -191,10 +191,6 @@ class QueuePoller implements Runnable, QueuePollerMBean
                         + dp.getNbThread() + " on " + this.queue.getName() + ")");
                 actualNbThread++;
 
-                em.getTransaction().begin();
-                Helpers.createMessage("Status updated: ATTRIBUTED", ji, em);
-                em.getTransaction().commit();
-
                 // Run it
                 (new Thread(new Loader(ji, cache, this))).start();
 

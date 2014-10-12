@@ -55,7 +55,7 @@ public class MultiNodeTest extends JqmBaseTest
         TestHelpers.waitFor(40, 30000, em);
         Thread.sleep(2000); // to ensure there are no additional runs
 
-        Assert.assertEquals(160, em.createQuery("SELECT j FROM Message j", Message.class).getResultList().size());
+        Assert.assertEquals(40, em.createQuery("SELECT j FROM Message j", Message.class).getResultList().size());
         Assert.assertEquals(40, TestHelpers.getOkCount(em));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
 
@@ -91,7 +91,7 @@ public class MultiNodeTest extends JqmBaseTest
         TestHelpers.waitFor(40, 10000, em);
         Thread.sleep(2000); // to ensure there are no additional runs
 
-        Assert.assertEquals(160, em.createQuery("SELECT j FROM Message j", Message.class).getResultList().size());
+        Assert.assertEquals(40, em.createQuery("SELECT j FROM Message j", Message.class).getResultList().size());
         Assert.assertEquals(40, TestHelpers.getOkCount(em));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
 
@@ -133,7 +133,7 @@ public class MultiNodeTest extends JqmBaseTest
         TestHelpers.waitFor(80, 10000, em);
         Thread.sleep(2000); // to ensure there are no additional runs
 
-        Assert.assertEquals(320, em.createQuery("SELECT j FROM Message j", Message.class).getResultList().size());
+        Assert.assertEquals(80, em.createQuery("SELECT j FROM Message j", Message.class).getResultList().size());
         Assert.assertEquals(80, TestHelpers.getOkCount(em));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
 
@@ -213,7 +213,7 @@ public class MultiNodeTest extends JqmBaseTest
         TestHelpers.waitFor(72, 10000, em);
         Thread.sleep(2000); // to ensure there are no additional runs
 
-        Assert.assertEquals(288, em.createQuery("SELECT j FROM Message j", Message.class).getResultList().size());
+        Assert.assertEquals(72, em.createQuery("SELECT j FROM Message j", Message.class).getResultList().size());
         Assert.assertEquals(72, TestHelpers.getOkCount(em));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
 

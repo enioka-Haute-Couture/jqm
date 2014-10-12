@@ -134,8 +134,8 @@ public class ClientApiTest extends JqmBaseTest
         List<Message> m = em.createQuery("SELECT m FROM Message m WHERE m.ji = :i", Message.class).setParameter("i", i).getResultList();
 
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals(6, ress.size());
-        Assert.assertEquals(6, m.size());
+        Assert.assertEquals(3, ress.size());
+        Assert.assertEquals(3, m.size());
         Assert.assertEquals(State.ENDED, res.get(0).getState());
 
         for (int k = 0; k < ress.size(); k++)

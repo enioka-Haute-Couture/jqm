@@ -77,7 +77,7 @@ public class NoApiPayloadTest extends JqmBaseTest
 
         Assert.assertEquals(3, TestHelpers.getOkCount(em));
         List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
-        Assert.assertEquals(4, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 3 auto messages + 1 message per run.
+        Assert.assertEquals(1, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 3 auto messages + 1 message per run.
         Assert.assertEquals(100, (int) ji.get(0).getProgress());
     }
 
@@ -111,7 +111,7 @@ public class NoApiPayloadTest extends JqmBaseTest
         Assert.assertEquals(State.ENDED, ji.get(0).getState());
         Assert.assertEquals(State.ENDED, ji.get(1).getState());
 
-        Assert.assertEquals(4, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 3 auto messages + 1 message per run.
+        Assert.assertEquals(1, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 3 auto messages + 1 message per run.
         Assert.assertEquals(100, (int) ji.get(0).getProgress());
     }
 

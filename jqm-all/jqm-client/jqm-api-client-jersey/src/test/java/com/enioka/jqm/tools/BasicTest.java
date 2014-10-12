@@ -236,7 +236,7 @@ public class BasicTest
         Thread.sleep(500);
 
         // Get messages too
-        Assert.assertEquals(4, JqmClientFactory.getClient().getJobMessages(i).size());
+        Assert.assertEquals(1, JqmClientFactory.getClient().getJobMessages(i).size());
 
         // Finally, a query
         Assert.assertEquals(1, Query.create().setApplicationName("MarsuApplication").run().size());
