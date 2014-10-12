@@ -188,6 +188,10 @@ class JettyServer
 
     void stop()
     {
+        if (server == null)
+        {
+            return;
+        }
         jqmlogger.trace("Jetty will now stop");
         try
         {
