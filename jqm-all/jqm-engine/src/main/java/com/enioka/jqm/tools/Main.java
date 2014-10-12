@@ -103,6 +103,9 @@ public class Main
                 .withLongOpt("getstatus").create("g");
         Option o101 = OptionBuilder.withArgName("password").hasArg().withDescription("creates or resets root admin account password")
                 .isRequired().withLongOpt("root").create("r");
+        Option o111 = OptionBuilder.withArgName("option").hasArg()
+                .withDescription("ws handling. Possible values are: enable, disable, ssl, nossl, internalpki, externalapi").isRequired()
+                .withLongOpt("gui").create("w");
 
         Options options = new Options();
         OptionGroup og1 = new OptionGroup();
@@ -118,6 +121,7 @@ public class Main
         og1.addOption(o81);
         og1.addOption(o91);
         og1.addOption(o101);
+        og1.addOption(o111);
         options.addOptionGroup(og1);
 
         HelpFormatter formatter = new HelpFormatter();
@@ -186,6 +190,11 @@ public class Main
             else if (line.hasOption(o101.getOpt()))
             {
                 root(line.getOptionValue(o101.getOpt()));
+            }
+            // Web options
+            else if (line.hasOption(o111.getOpt()))
+            {
+                ws(line.getOptionValue(o111.getOpt()));
             }
         }
         catch (ParseException exp)
@@ -344,4 +353,56 @@ public class Main
         }
     }
 
+    private static void ws(String option)
+    {
+        if ("enable".equals(option))
+        {
+            EntityManager em = Helpers.getNewEm();
+            Helpers.setSingleParam("disableWsApi", "false", em);
+            Helpers.setSingleParam("enableWsApiSsl", "false", em);
+            Helpers.setSingleParam("enableWsApiAuth", "true", em);
+            Helpers.setSingleParam("disableWsApiSimple", "false", em);
+            Helpers.setSingleParam("disableWsApiClient", "false", em);
+            Helpers.setSingleParam("disableWsApiAdmin", "false", em);
+            Helpers.setSingleParam("enableInternalPki", "true", em);
+
+            em.getTransaction().begin();
+            em.createQuery("UPDATE Node n set n.loapApiSimple = true, n.loadApiClient = true, n.loadApiAdmin = true").executeUpdate();
+            em.getTransaction().commit();
+            em.close();
+        }
+        else if ("disable".equals(option))
+        {
+            EntityManager em = Helpers.getNewEm();
+            em.getTransaction().begin();
+            em.createQuery("UPDATE Node n set n.loadApiClient = false, n.loadApiAdmin = false").executeUpdate();
+            em.getTransaction().commit();
+            em.close();
+        }
+        if ("ssl".equals(option))
+        {
+            EntityManager em = Helpers.getNewEm();
+            Helpers.setSingleParam("enableWsApiSsl", "true", em);
+            Helpers.setSingleParam("enableWsApiAuth", "true", em);
+            em.close();
+        }
+        if ("nossl".equals(option))
+        {
+            EntityManager em = Helpers.getNewEm();
+            Helpers.setSingleParam("enableWsApiSsl", "false", em);
+            em.close();
+        }
+        if ("internalpki".equals(option))
+        {
+            EntityManager em = Helpers.getNewEm();
+            Helpers.setSingleParam("enableInternalPki", "true", em);
+            em.close();
+        }
+        if ("externalpki".equals(option))
+        {
+            EntityManager em = Helpers.getNewEm();
+            Helpers.setSingleParam("enableInternalPki", "false", em);
+            em.close();
+        }
+    }
 }
