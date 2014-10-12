@@ -15,20 +15,38 @@
  */
 package com.enioka.jqm.tools;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
+import javax.persistence.EntityManager;
 
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class JqmBaseTest
 {
     public static Logger jqmlogger = Logger.getLogger(JqmBaseTest.class);
     public static Server s;
+    public Map<String, JqmEngine> engines = new HashMap<String, JqmEngine>();
+    public List<EntityManager> ems = new ArrayList<EntityManager>();
+
+    protected EntityManager em;
+
+    @Rule
+    public TestName testName = new TestName();
 
     @BeforeClass
     public static void testInit() throws Exception
@@ -50,5 +68,69 @@ public class JqmBaseTest
         ((JndiContext) NamingManager.getInitialContext(null)).resetSingletons();
         s.shutdown();
         s.stop();
+    }
+
+    @Before
+    public void beforeTest()
+    {
+        jqmlogger.debug("**********************************************************");
+        jqmlogger.debug("Starting test " + testName.getMethodName());
+
+        em = getNewEm();
+        JqmClientFactory.resetClient(null);
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+    }
+
+    @After
+    public void afterTest()
+    {
+        jqmlogger.debug("*** Cleaning after test " + testName.getMethodName());
+        for (String k : engines.keySet())
+        {
+            JqmEngine e = engines.get(k);
+            e.stop();
+        }
+        engines.clear();
+        for (EntityManager em : ems)
+        {
+            Helpers.closeQuietly(em);
+        }
+        ems.clear();
+
+        // Java 6 GC being rather inefficient, we must run it multiple times to correctly collect Jetty-created class loaders and avoid
+        // permgen issues
+        System.runFinalization();
+        System.gc();
+        System.runFinalization();
+        System.gc();
+        System.gc();
+    }
+
+    protected JqmEngine addAndStartEngine()
+    {
+        return addAndStartEngine("localhost");
+    }
+
+    protected JqmEngine addAndStartEngine(String nodeName)
+    {
+        JqmEngine e = new JqmEngine();
+        engines.put(nodeName, e);
+        e.start(nodeName);
+        return e;
+    }
+
+    protected void stopAndRemoveEngine(String nodeName)
+    {
+        JqmEngine e = engines.get(nodeName);
+        e.stop();
+        engines.remove(nodeName);
+    }
+
+    protected EntityManager getNewEm()
+    {
+        EntityManager em = Helpers.getNewEm();
+        ems.add(em);
+        return em;
     }
 }

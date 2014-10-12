@@ -19,15 +19,12 @@
 package com.enioka.jqm.tools;
 
 import java.util.ArrayList;
-
-import javax.persistence.EntityManager;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -37,96 +34,58 @@ public class ParameterTest extends JqmBaseTest
     @Test
     public void testMixParameters() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testMixParameters");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
+        List<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDefParameter jdp = CreationTools.createJobDefParameter("arg1", "argument1", em);
         JobDefParameter jdp2 = CreationTools.createJobDefParameter("arg2", "Franquin", em);
         jdargs.add(jdp);
         jdargs.add(jdp2);
+        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-checkargs/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobRequest.create("MarsuApplication", "TestUser").addParameter("arg2", "argument2").submit();
 
-        @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-checkargs/target/test.jar",
-                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-
-        JobRequest j = new JobRequest("MarsuApplication", "MAG");
-        j.addParameter("arg2", "argument2");
-
-        JqmClientFactory.getClient().enqueue(j);
-
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
+        addAndStartEngine();
         TestHelpers.waitFor(1, 10000, em);
-        engine1.stop();
 
-        Assert.assertEquals(true, true);
+        Assert.assertEquals(1, TestHelpers.getOkCount(em));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
     }
 
     @Test
     public void testDefaultParameters() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testDefaultParameters");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDefParameter jdp = CreationTools.createJobDefParameter("arg1", "argument1", em);
         JobDefParameter jdp2 = CreationTools.createJobDefParameter("arg2", "argument2", em);
         jdargs.add(jdp);
         jdargs.add(jdp2);
+        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-checkargs/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobRequest.create("MarsuApplication", "TestUser").submit();
 
-        @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-checkargs/target/test.jar",
-                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-
-        JobRequest j = new JobRequest("MarsuApplication", "MAG");
-
-        JqmClientFactory.getClient().enqueue(j);
-
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
+        addAndStartEngine();
         TestHelpers.waitFor(1, 10000, em);
-        engine1.stop();
 
-        Assert.assertEquals(true, true);
+        Assert.assertEquals(1, TestHelpers.getOkCount(em));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
     }
 
     @Test
-    public void testOverrideParmeters() throws Exception
+    public void testOverrideAllParmeters() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testOverrideParameters");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDefParameter jdp = CreationTools.createJobDefParameter("arg1", "Gaston Lagaffe", em);
         JobDefParameter jdp2 = CreationTools.createJobDefParameter("arg2", "Franquin", em);
         jdargs.add(jdp);
         jdargs.add(jdp2);
 
-        @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-checkargs/target/test.jar",
-                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-checkargs/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobRequest.create("MarsuApplication", "TestUser").addParameter("arg1", "argument1").addParameter("arg2", "argument2").submit();
 
-        JobRequest j = new JobRequest("MarsuApplication", "MAG");
-        j.addParameter("arg1", "argument1");
-        j.addParameter("arg2", "argument2");
-
-        JqmClientFactory.getClient().enqueue(j);
-
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
+        addAndStartEngine();
         TestHelpers.waitFor(1, 10000, em);
-        engine1.stop();
 
-        Assert.assertEquals(true, true);
+        Assert.assertEquals(1, TestHelpers.getOkCount(em));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
     }
 }

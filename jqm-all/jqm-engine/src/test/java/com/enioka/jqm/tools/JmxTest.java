@@ -25,7 +25,6 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
-import javax.persistence.EntityManager;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,13 +37,6 @@ public class JmxTest extends JqmBaseTest
     @Test
     public void jmxRemoteTest() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test jmxRemoteTest");
-
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
         CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
                 TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42, "Geo", null,
@@ -66,10 +58,7 @@ public class JmxTest extends JqmBaseTest
         TestHelpers.node.setJmxServerPort(port2);
         em.getTransaction().commit();
 
-        em.close();
-
-        JqmEngine e1 = new JqmEngine();
-        e1.start("localhost");
+        addAndStartEngine();
 
         JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://" + hn + ":" + port1 + "/jndi/rmi://" + hn + ":" + port2 + "/jmxrmi");
         JMXConnector cntor = JMXConnectorFactory.connect(url, null);
@@ -89,9 +78,6 @@ public class JmxTest extends JqmBaseTest
         }
 
         cntor.close();
-
-        e1.stop();
-
         Assert.assertEquals(5, mbeans.size());
     }
 

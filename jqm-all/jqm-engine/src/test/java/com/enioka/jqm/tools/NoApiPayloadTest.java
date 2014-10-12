@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import org.apache.commons.io.FileUtils;
@@ -32,8 +31,6 @@ import org.junit.Test;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -43,88 +40,43 @@ public class NoApiPayloadTest extends JqmBaseTest
     @Test
     public void testClassicPayload() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testClassicPayload");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
+                "jqm-test-datetimemaven", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobRequest.create("jqm-test-datetimemaven", "TestUser").submit();
 
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
-                TestHelpers.qVip, 42, "jqm-test-datetimemaven", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-
-        JobRequest j = new JobRequest("jqm-test-datetimemaven", "MAG");
-        JqmClientFactory.getClient().enqueue(j);
-
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
+        addAndStartEngine();
         TestHelpers.waitFor(1, 10000, em);
-        engine1.stop();
 
-        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)
-                .setParameter("myId", jd.getId()).getResultList();
-
-        Assert.assertEquals(1, ji.size());
-        Assert.assertEquals(State.ENDED, ji.get(0).getState());
+        Assert.assertEquals(1, TestHelpers.getOkCount(em));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
     }
 
     @Test
     public void testRunnable() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testRunnable");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-runnable/target/test.jar", TestHelpers.qVip, 42,
+                "jqm-test-runnable", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobRequest.create("jqm-test-runnable", "TestUser").submit();
 
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-runnable/target/test.jar", TestHelpers.qVip,
-                42, "jqm-test-runnable", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-
-        JobRequest j = new JobRequest("jqm-test-runnable", "MAG");
-        JqmClientFactory.getClient().enqueue(j);
-
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
+        addAndStartEngine();
         TestHelpers.waitFor(1, 10000, em);
-        engine1.stop();
 
-        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)
-                .setParameter("myId", jd.getId()).getResultList();
-
-        Assert.assertEquals(1, ji.size());
-        Assert.assertEquals(State.ENDED, ji.get(0).getState());
+        Assert.assertEquals(1, TestHelpers.getOkCount(em));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
     }
 
     @Test
     public void testRunnableInject() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testRunnable");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
+        CreationTools.createJobDef("super app", true, "App", null, "jqm-tests/jqm-test-runnable-inject/target/test.jar", TestHelpers.qVip,
+                42, "jqm-test-runnable-inject", "testapp", "Franquin", "ModuleMachin", "other", "other", false, em);
+        int i = JobRequest.create("jqm-test-runnable-inject", "TestUser").submit();
 
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDef jd = CreationTools.createJobDef("super app", true, "App", jdargs, "jqm-tests/jqm-test-runnable-inject/target/test.jar",
-                TestHelpers.qVip, 42, "jqm-test-runnable-inject", "testapp", "Franquin", "ModuleMachin", "other", "other", false, em);
-
-        JobRequest j = new JobRequest("jqm-test-runnable-inject", "MAG");
-        j.setSessionID("123X");
-        int i = JqmClientFactory.getClient().enqueue(j);
-
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
+        addAndStartEngine();
         TestHelpers.waitFor(3, 10000, em);
-        engine1.stop();
 
-        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)
-                .setParameter("myId", jd.getId()).getResultList();
-
-        Assert.assertEquals(3, ji.size());
-        Assert.assertEquals(State.ENDED, ji.get(0).getState());
-        Assert.assertEquals(State.ENDED, ji.get(1).getState());
-
+        Assert.assertEquals(3, TestHelpers.getOkCount(em));
+        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
         Assert.assertEquals(4, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 3 auto messages + 1 message per run.
         Assert.assertEquals(100, (int) ji.get(0).getProgress());
     }
@@ -132,55 +84,28 @@ public class NoApiPayloadTest extends JqmBaseTest
     @Test
     public void testMainType() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testMainType");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDef jd = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-main/target/test.jar", TestHelpers.qVip, 42,
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-main/target/test.jar", TestHelpers.qVip, 42,
                 "jqm-test-main", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobRequest.create("jqm-test-main", "TestUser").submit();
 
-        JobRequest j = new JobRequest("jqm-test-main", "MAG");
-        JqmClientFactory.getClient().enqueue(j);
-
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
+        addAndStartEngine();
         TestHelpers.waitFor(1, 10000, em);
-        engine1.stop();
 
-        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)
-                .setParameter("myId", jd.getId()).getResultList();
-
-        Assert.assertEquals(1, ji.size());
-        Assert.assertEquals(State.ENDED, ji.get(0).getState());
+        Assert.assertEquals(1, TestHelpers.getOkCount(em));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
     }
 
     @Test
     public void testMainTypeInject() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testMainTypeInject");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
+        CreationTools.createJobDef("super app", true, "App", null, "jqm-tests/jqm-test-main-inject/target/test.jar", TestHelpers.qVip, 42,
+                "jqm-test-main-inject", "testapp", "Franquin", "ModuleMachin", "other", "other", false, em);
+        int i = JobRequest.create("jqm-test-main-inject", "TestUser").setSessionID("123X").submit();
 
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDef jd = CreationTools.createJobDef("super app", true, "App", jdargs, "jqm-tests/jqm-test-main-inject/target/test.jar",
-                TestHelpers.qVip, 42, "jqm-test-main-inject", "testapp", "Franquin", "ModuleMachin", "other", "other", false, em);
-
-        JobRequest j = new JobRequest("jqm-test-main-inject", "MAG");
-        j.setSessionID("123X");
-        int i = JqmClientFactory.getClient().enqueue(j);
-
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
+        addAndStartEngine();
         TestHelpers.waitFor(3, 10000, em);
-        engine1.stop();
 
-        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.jd.id = :myId order by id asc", History.class)
-                .setParameter("myId", jd.getId()).getResultList();
+        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
 
         Assert.assertEquals(3, ji.size());
         Assert.assertEquals(State.ENDED, ji.get(0).getState());
@@ -193,24 +118,17 @@ public class NoApiPayloadTest extends JqmBaseTest
     @Test
     public void testProvidedApi() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testProvidedApi");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-providedapi/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         // Create an empty lib directory just to be sure no dependencies will be resolved.
         FileUtils.forceMkdir(new File("../jqm-tests/jqm-test-providedapi/target/lib"));
 
-        JobRequest j = new JobRequest("MarsuApplication", "MAG");
+        JobRequest j = new JobRequest("MarsuApplication", "TestUser");
         JqmClientFactory.getClient().enqueue(j);
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
+
+        addAndStartEngine();
         TestHelpers.waitFor(1, 10000, em);
-        engine1.stop();
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j", History.class);
         ArrayList<History> res = (ArrayList<History>) query.getResultList();

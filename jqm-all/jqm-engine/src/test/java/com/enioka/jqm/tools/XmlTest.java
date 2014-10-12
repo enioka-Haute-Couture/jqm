@@ -19,13 +19,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -35,21 +32,11 @@ public class XmlTest extends JqmBaseTest
     @Test
     public void testExportQueue() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testExportQueue");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-        jdargs.add(jdp);
-
-        CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-tests/jqm-test-fibo/target/test.jar",
+        CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
                 TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
-        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42, "Geo", null,
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42, "Geo", null,
                 "Franquin", "ModuleMachin", "other1", "other2", false, em);
-        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
                 "DateTime", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         ArrayList<String> tmp = new ArrayList<String>();
@@ -79,21 +66,11 @@ public class XmlTest extends JqmBaseTest
     @Test
     public void testExportQueueAll() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testExportQueueAll");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-        jdargs.add(jdp);
-
-        CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-tests/jqm-test-fibo/target/test.jar",
+        CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
                 TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
-        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42, "Geo", null,
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42, "Geo", null,
                 "Franquin", "ModuleMachin", "other1", "other2", false, em);
-        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
                 "DateTime", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         XmlQueueExporter.export(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml", em);
@@ -119,12 +96,6 @@ public class XmlTest extends JqmBaseTest
     @Test
     public void testXmlParser()
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testXmlParser");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
         // Init the default queue (don't start the engine!)
         Helpers.checkAndUpdateNodeConfiguration("marsu", em);
 
@@ -147,12 +118,6 @@ public class XmlTest extends JqmBaseTest
     @Test
     public void testImportJobdefWithQueue()
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testImportJobdefWithQueue");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
         // Init the default queue (don't start the engine!)
         Helpers.checkAndUpdateNodeConfiguration("marsu", em);
 
@@ -171,19 +136,11 @@ public class XmlTest extends JqmBaseTest
     @Test
     public void testImportQueue() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testImportQueue");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-
-        CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-tests/jqm-test-fibo/target/test.jar",
+        CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
                 TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
-        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42, "Geo", null,
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42, "Geo", null,
                 "Franquin", "ModuleMachin", "other1", "other2", false, em);
-        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
                 "DateTime", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         XmlQueueParser.parse("target/payloads/jqm-test-xml/xmlqueuetest.xml", em);
@@ -198,5 +155,4 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals("XmlQueue2",
                 em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
     }
-
 }

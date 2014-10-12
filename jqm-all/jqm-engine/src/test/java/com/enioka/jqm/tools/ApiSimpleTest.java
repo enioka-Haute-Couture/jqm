@@ -22,8 +22,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -35,76 +33,34 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class ApiSimpleTest extends JqmBaseTest
 {
-    EntityManager em;
-    JqmEngine engine1 = null;
-
     @Before
     public void before() throws IOException
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Test prepare");
-
-        em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
         Helpers.setSingleParam("disableWsApi", "false", em);
         Helpers.setSingleParam("enableWsApiAuth", "false", em);
 
         File jar = FileUtils.listFiles(new File("../jqm-ws/target/"), new String[] { "war" }, false).iterator().next();
         FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war"));
 
-        // We need to reset credentials used inside the client
-        JqmClientFactory.resetClient(null);
-
-        // Start the engine
-        engine1 = new JqmEngine();
-        engine1.start("localhost");
-    }
-
-    @After
-    public void after()
-    {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Test cleanup");
-
-        em.close();
-        engine1.stop();
-
-        // Java 6 GC being rather inefficient, we must run it multiple times to correctly collect Jetty-created class loaders and avoid
-        // permgen issues
-        System.runFinalization();
-        System.gc();
-        System.runFinalization();
-        System.gc();
-        System.gc();
+        addAndStartEngine();
     }
 
     @Test
     public void testHttpEnqueue() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testHttpEnqueue");
-
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-        jdargs.add(jdp);
-        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-sendmsg/target/test.jar", TestHelpers.qVip, 42,
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-sendmsg/target/test.jar", TestHelpers.qVip, 42,
                 "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         em.refresh(TestHelpers.node);
@@ -154,16 +110,8 @@ public class ApiSimpleTest extends JqmBaseTest
     @Test
     public void testHttpStatus() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testHttpStatus");
-
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-        jdargs.add(jdp);
-
-        @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-sendmsg/target/test.jar",
-                TestHelpers.qVip, 42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-sendmsg/target/test.jar", TestHelpers.qVip, 42,
+                "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         em.refresh(TestHelpers.node);
         HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + TestHelpers.node.getPort() + "/ws/simple/ji");

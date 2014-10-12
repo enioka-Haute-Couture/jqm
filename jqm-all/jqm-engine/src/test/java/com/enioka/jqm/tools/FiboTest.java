@@ -18,20 +18,13 @@
 
 package com.enioka.jqm.tools;
 
-import java.util.ArrayList;
-
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobDefParameter;
-import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -40,72 +33,49 @@ public class FiboTest extends JqmBaseTest
     @Test
     public void testFibo() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testFibo");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
-
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-        jdargs.add(jdp);
-
-        @SuppressWarnings("unused")
-        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs, "jqm-tests/jqm-test-fibo/target/test.jar",
+        CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
                 TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+        JobRequest.create("Fibo", "TestUser").addParameter("p1", "1").addParameter("p2", "2").submit();
 
-        JobRequest form = new JobRequest("Fibo", "MAG");
-        form.addParameter("p1", "1");
-        form.addParameter("p2", "2");
-        JqmClientFactory.getClient().enqueue(form);
+        // Start one engine
+        addAndStartEngine();
 
-        // Start the engine
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
-
+        // 1: (1,2) - 2: (2,3) - 3: (3,5) - 4: (5,8) - 5: (8,13) - 6: (13,21) - 7: (21,34) - 8: (34,55) - 9: (55,89) - 10: (89,144) -
+        // 11: (134,233)
         TestHelpers.waitFor(11, 15000, em);
-        engine1.stop();
 
-        long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
-        Assert.assertEquals(11, i);
+        Assert.assertEquals(11, TestHelpers.getOkCount(em));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
     }
 
     @Test
     public void testenqueueSynchronously() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testenqueueSynchronously");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
+        CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibosync/target/test.jar",
+                TestHelpers.qVip, 42, "FiboSync", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobRequest.create("FiboSync", "TestUser").addParameter("p1", "34").addParameter("p2", "55").submit();
 
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-        jdargs.add(jdp);
+        // Start one engine
+        addAndStartEngine();
 
-        @SuppressWarnings("unused")
-        JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs,
-                "jqm-tests/jqm-test-fibosync/target/test.jar", TestHelpers.qVip, 42, "FiboSync", null, "Franquin", "ModuleMachin", "other",
-                "other", false, em);
+        TestHelpers.waitFor(4, 30000, em);
 
-        JobRequest j = new JobRequest("FiboSync", "MAG");
-        j.addParameter("p1", "1");
-        j.addParameter("p2", "2");
-        int i = JqmClientFactory.getClient().enqueue(j);
+        Assert.assertEquals(4, TestHelpers.getOkCount(em));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
 
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
-        TestHelpers.waitFor(11, 30000, em);
-
-        engine1.stop();
-        long ii = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
-        Assert.assertEquals(11, ii);
-        TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.endDate ASC", History.class);
-        ArrayList<History> res = (ArrayList<History>) query.getResultList();
-        for (History history : res)
+        List<History> res = em.createQuery("SELECT j FROM History j ORDER BY j.id", History.class).getResultList();
+        History h1, h2 = null;
+        for (History h : res)
         {
-            Assert.assertEquals(State.ENDED, history.getState());
+            h1 = h2;
+            h2 = h;
+            if (h1 == null)
+            {
+                continue;
+            }
+            Assert.assertEquals(h2.getParentJobId(), h1.getId());
+            Assert.assertTrue(h2.getEndDate().compareTo(h1.getEndDate()) <= 0);
+            Assert.assertTrue(h2.getEndDate().compareTo(h1.getExecutionDate()) > 0);
         }
-        Assert.assertEquals(i, (int) res.get(res.size() - 1).getId());
     }
 }

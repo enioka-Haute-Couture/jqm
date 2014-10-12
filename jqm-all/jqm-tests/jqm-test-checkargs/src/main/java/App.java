@@ -24,7 +24,9 @@ public class App extends JobBase
     @Override
     public void start()
     {
-        System.out.println((this.getParameters().containsValue("argument1")) ? true : false);
-        System.out.println((this.getParameters().containsValue("argument2")) ? true : false);
+        if ((!this.getParameters().containsValue("argument1")) || (!this.getParameters().containsValue("argument2")))
+        {
+            throw new RuntimeException("arguments did not contain expected values");
+        }
     }
 }

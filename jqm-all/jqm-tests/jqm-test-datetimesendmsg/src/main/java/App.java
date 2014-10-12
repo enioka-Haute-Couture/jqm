@@ -27,8 +27,7 @@ public class App extends JobBase
     public void start()
     {
         DateTime d = DateTime.now();
-        sendMsg("DateTime will be printed");
-        System.out.println("Date GENERATED: " + d);
+        sendMsg("DateTime is " + d.toString());
     }
 
 }

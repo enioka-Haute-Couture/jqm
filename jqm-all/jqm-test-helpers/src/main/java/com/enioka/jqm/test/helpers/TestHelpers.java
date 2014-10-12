@@ -206,6 +206,36 @@ public class TestHelpers
         }
     }
 
+    public static int getHistoryAllCount(EntityManager em)
+    {
+        TypedQuery<Long> q = em.createQuery("SELECT COUNT(h) FROM History h", Long.class);
+        return q.getSingleResult().intValue();
+    }
+
+    public static int getQueueAllCount(EntityManager em)
+    {
+        TypedQuery<Long> q = em.createQuery("SELECT COUNT(h) FROM JobInstance h", Long.class);
+        return q.getSingleResult().intValue();
+    }
+
+    public static int getOkCount(EntityManager em)
+    {
+        TypedQuery<Long> q = em.createQuery("SELECT COUNT(h) FROM History h WHERE h.status = 'ENDED'", Long.class);
+        return q.getSingleResult().intValue();
+    }
+
+    public static int getNonOkCount(EntityManager em)
+    {
+        TypedQuery<Long> q = em.createQuery("SELECT COUNT(h) FROM History h WHERE h.status != 'ENDED'", Long.class);
+        return q.getSingleResult().intValue();
+    }
+
+    public static boolean testOkCount(long theoreticalOkCount, EntityManager em)
+    {
+        TypedQuery<Long> q = em.createQuery("SELECT COUNT(h) FROM History h WHERE h.status = 'ENDED'", Long.class);
+        return q.getSingleResult() == theoreticalOkCount;
+    }
+
     public static void encodePassword(RUser user)
     {
         ByteSource salt = new SecureRandomNumberGenerator().nextBytes();

@@ -18,17 +18,10 @@
 
 package com.enioka.jqm.tools;
 
-import java.util.ArrayList;
-
-import javax.persistence.EntityManager;
-
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -37,34 +30,14 @@ public class FiboHibTest extends JqmBaseTest
     @Test
     public void testFiboHib() throws Exception
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testFiboHib");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
+        CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibohib/target/test.jar",
+                TestHelpers.qVip, 42, "FiboHib", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+        JobRequest.create("FiboHib", "TestUser").addParameter("p1", "1").addParameter("p2", "2").submit();
 
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);
-        jdargs.add(jdp);
-
-        @SuppressWarnings("unused")
-        JobDef jd = CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", jdargs,
-                "jqm-tests/jqm-test-fibohib/target/test.jar", TestHelpers.qVip, 42, "FiboHib", null, "Franquin", "ModuleMachin", "other1",
-                "other2", false, em);
-
-        JobRequest form = new JobRequest("FiboHib", "MAG");
-        form.addParameter("p1", "1");
-        form.addParameter("p2", "2");
-        JqmClientFactory.getClient().enqueue(form);
-
-        // Start the engine
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
-
+        addAndStartEngine();
         TestHelpers.waitFor(11, 30000, em);
-        engine1.stop();
 
-        long i = (Long) em.createQuery("SELECT COUNT(h) FROM History h").getSingleResult();
-        Assert.assertTrue(i > 2);
+        Assert.assertEquals(11, TestHelpers.getOkCount(em));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
     }
 }
