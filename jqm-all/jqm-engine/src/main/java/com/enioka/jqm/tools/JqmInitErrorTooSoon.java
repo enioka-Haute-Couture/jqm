@@ -26,9 +26,4 @@ class JqmInitErrorTooSoon extends JqmInitError
     {
         super(msg);
     }
-
-    JqmInitErrorTooSoon(String msg, Exception e)
-    {
-        super(msg, e);
-    }
 }

@@ -135,7 +135,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
                 public URLClassLoader run()
                 {
                     return new URLClassLoader(aUrls, null);
-                };
+                }
             });
         }
         else
@@ -206,7 +206,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
                 }
 
                 // Cache result
-                if ((res.getClass().getClassLoader() instanceof JarClassLoader))
+                if (res.getClass().getClassLoader() instanceof JarClassLoader)
                 {
                     jqmlogger
                             .warn("A JNDI resource was defined as singleton but was loaded by a payload class loader - it won't be cached to avoid class loader leaks");

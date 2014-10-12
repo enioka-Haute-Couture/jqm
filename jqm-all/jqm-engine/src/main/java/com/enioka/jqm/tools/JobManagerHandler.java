@@ -313,7 +313,7 @@ class JobManagerHandler implements InvocationHandler
         JqmClient c = getJqmClient();
         Query q = Query.create().setQueryHistoryInstances(false).setQueryLiveInstances(true).setJobInstanceId(id);
 
-        while (c.getJobs(q).size() > 0)
+        while (!c.getJobs(q).isEmpty())
         {
             try
             {
@@ -332,7 +332,7 @@ class JobManagerHandler implements InvocationHandler
         JqmClient c = getJqmClient();
         Query q = Query.create().setQueryHistoryInstances(false).setQueryLiveInstances(true).setParentId(ji.getId());
 
-        while (c.getJobs(q).size() > 0)
+        while (!c.getJobs(q).isEmpty())
         {
             try
             {
@@ -401,10 +401,10 @@ class JobManagerHandler implements InvocationHandler
     private JobInstance getRunningJI(int jobId)
     {
         EntityManager em = Helpers.getNewEm();
-        JobInstance ji = null;
+        JobInstance jj = null;
         try
         {
-            ji = em.find(JobInstance.class, jobId);
+            jj = em.find(JobInstance.class, jobId);
         }
         catch (Exception e)
         {
@@ -414,16 +414,16 @@ class JobManagerHandler implements InvocationHandler
         {
             em.close();
         }
-        return ji;
+        return jj;
     }
 
     private History getEndedJI(int jobId)
     {
         EntityManager em = Helpers.getNewEm();
-        History ji = null;
+        History h = null;
         try
         {
-            ji = em.find(History.class, jobId);
+            h = em.find(History.class, jobId);
         }
         catch (Exception e)
         {
@@ -433,7 +433,7 @@ class JobManagerHandler implements InvocationHandler
         {
             em.close();
         }
-        return ji;
+        return h;
     }
 
     private boolean hasEnded(int jobId)
@@ -448,14 +448,7 @@ class JobManagerHandler implements InvocationHandler
         {
             return null;
         }
-        if (h.getState().equals(State.ENDED))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return h.getState().equals(State.ENDED);
     }
 
     private Boolean hasFailed(int requestId)

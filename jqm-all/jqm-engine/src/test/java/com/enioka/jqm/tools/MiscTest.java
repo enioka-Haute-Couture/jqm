@@ -15,9 +15,12 @@
  */
 package com.enioka.jqm.tools;
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -320,5 +323,23 @@ public class MiscTest extends JqmBaseTest
 
         TestHelpers.waitFor(5, 10000, em);
         Assert.assertEquals(5, Query.create().addStatusFilter(com.enioka.jqm.api.State.KILLED).run().size());
+    }
+
+    @Test
+    public void testMultiLog() throws Exception
+    {
+        Helpers.setSingleParam("logFilePerLaunch", "true", em);
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+        int i = JobRequest.create("MarsuApplication", "TestUser").submit();
+        addAndStartEngine();
+        TestHelpers.waitFor(1, 20000, em);
+
+        String fileName = StringUtils.leftPad("" + i, 10, "0") + ".stdout.log";
+        File f = new File(FilenameUtils.concat(((MulticastPrintStream) System.out).rootLogDir, fileName));
+
+        Assert.assertEquals(1, TestHelpers.getOkCount(em));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertTrue(f.exists());
     }
 }

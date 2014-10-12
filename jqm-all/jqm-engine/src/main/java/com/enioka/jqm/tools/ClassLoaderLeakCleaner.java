@@ -8,9 +8,14 @@ import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 
-public class ClassLoaderLeakCleaner
+class ClassLoaderLeakCleaner
 {
     private static Logger jqmlogger = Logger.getLogger(ClassLoaderLeakCleaner.class);
+
+    private ClassLoaderLeakCleaner()
+    {
+        // Helper class only.
+    }
 
     static void clean(ClassLoader cl)
     {

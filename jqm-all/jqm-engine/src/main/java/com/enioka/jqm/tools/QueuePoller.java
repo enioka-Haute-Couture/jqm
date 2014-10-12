@@ -310,10 +310,10 @@ class QueuePoller implements Runnable, QueuePollerMBean
     @Override
     public long getCumulativeJobInstancesCount()
     {
-        EntityManager em = Helpers.getNewEm();
-        Long nb = em.createQuery("SELECT COUNT(i) From History i WHERE i.node = :n AND i.queue = :q", Long.class)
+        EntityManager em2 = Helpers.getNewEm();
+        Long nb = em2.createQuery("SELECT COUNT(i) From History i WHERE i.node = :n AND i.queue = :q", Long.class)
                 .setParameter("n", this.dp.getNode()).setParameter("q", this.dp.getQueue()).getSingleResult();
-        em.close();
+        em2.close();
         return nb;
     }
 

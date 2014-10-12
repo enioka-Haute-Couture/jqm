@@ -30,9 +30,4 @@ class JqmKillException extends RuntimeException
     {
         super(msg);
     }
-
-    JqmKillException(String msg, Exception e)
-    {
-        super(msg, e);
-    }
 }

@@ -263,7 +263,7 @@ class LibraryCache
             boolean withCentral = false;
             String withCustomSettings = null;
             String withCustomSettingsFile = null;
-            if (settings.size() == 1 && settingFiles.size() == 0)
+            if (settings.size() == 1 && settingFiles.isEmpty())
             {
                 jqmlogger.trace("Custom settings file will be used: " + settings.get(0).getValue());
                 withCustomSettings = settings.get(0).getValue();

@@ -20,9 +20,9 @@ package com.enioka.jqm.tools;
  */
 class Constants
 {
-    Constants()
+    private Constants()
     {
-
+        // Helper class.
     }
 
     static final String GP_JQM_CONNECTION_ALIAS = "jdbc/jqm";

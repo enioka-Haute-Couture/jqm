@@ -41,7 +41,6 @@ import javax.persistence.LockModeType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.api.JqmClientFactory;
@@ -123,7 +122,6 @@ class Loader implements Runnable, LoaderMBean
 
         // Log
         State resultStatus = State.SUBMITTED;
-        String endMessage = null;
         jqmlogger.debug("A loader/runner thread has just started for Job Instance " + job.getId() + ". Jar is: " + job.getJd().getJarPath()
                 + " - class is: " + job.getJd().getJavaClassName());
 
@@ -253,10 +251,6 @@ class Loader implements Runnable, LoaderMBean
         {
             jqmlogger.info("Job instance " + job.getId() + " has crashed. Exception was:", e);
             resultStatus = State.CRASHED;
-            endMessage = "Status updated: " + resultStatus + ". Exception was (give this to support): " + e.getMessage() + "\n";
-            endMessage = endMessage
-                    + ExceptionUtils.getStackTrace(e).substring(0,
-                            Math.min(ExceptionUtils.getStackTrace(e).length() - 1, 999 - endMessage.length()));
         }
 
         // Job instance has now ended its run
@@ -429,6 +423,16 @@ class Loader implements Runnable, LoaderMBean
     @Override
     public Long getRunTimeSeconds()
     {
+        if (this.job.getExecutionDate() == null)
+        {
+            EntityManager em2 = Helpers.getNewEm();
+            this.job.setExecutionDate(em2.find(JobInstance.class, this.job.getId()).getExecutionDate());
+            em2.close();
+        }
+        if (this.job.getExecutionDate() == null)
+        {
+            return 0L;
+        }
         return (Calendar.getInstance().getTimeInMillis() - this.job.getExecutionDate().getTimeInMillis()) / 1000;
     }
 }

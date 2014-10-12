@@ -460,7 +460,7 @@ final class Helpers
             u.setFreeText(description);
             u.setLocked(false);
             u.setLogin(login);
-            u.setPassword((String.valueOf((new SecureRandom()).nextInt())));
+            u.setPassword(String.valueOf((new SecureRandom()).nextInt()));
             encodePassword(u);
             em.persist(u);
 

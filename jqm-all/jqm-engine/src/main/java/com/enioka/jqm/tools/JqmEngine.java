@@ -56,7 +56,6 @@ class JqmEngine implements JqmEngineMBean
     private boolean hasEnded = false;
 
     // Parameters and parameter cache
-    private List<DeploymentParameter> dps = new ArrayList<DeploymentParameter>();
     private Node node = null;
     private LibraryCache cache = new LibraryCache();
     private ObjectName name;
@@ -203,7 +202,8 @@ class JqmEngine implements JqmEngineMBean
         purgeDeadJobInstances(em, this.node);
 
         // Get queues to listen to
-        dps = em.createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
+        List<DeploymentParameter> dps = em
+                .createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
                 .setParameter("n", node.getId()).getResultList();
 
         // Pollers

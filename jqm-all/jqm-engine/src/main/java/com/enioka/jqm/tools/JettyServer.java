@@ -125,7 +125,7 @@ class JettyServer
                         connector = new SelectChannelConnector();
                     }
 
-                    if (s.isLoopbackAddress() || node.getDns().equals("localhost"))
+                    if (s.isLoopbackAddress() || "localhost".equals(node.getDns()))
                     {
                         connector.setHost("localhost");
                         connector.setPort(node.getPort());

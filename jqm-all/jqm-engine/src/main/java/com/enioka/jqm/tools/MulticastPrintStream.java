@@ -47,9 +47,9 @@ class MulticastPrintStream extends PrintStream
         protected BufferedWriter initialValue()
         {
             return original;
-        };
+        }
     };
-    private String rootLogDir;
+    String rootLogDir;
 
     MulticastPrintStream(OutputStream out, String rootLogDir)
     {

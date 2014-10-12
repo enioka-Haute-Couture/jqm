@@ -25,11 +25,10 @@ public class ClLeakTest extends JqmBaseTest
 
         // Start the engine
         addAndStartEngine();
-        Thread.sleep(3000);
+        Thread.sleep(5000);
 
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName name = new ObjectName("com.test:type=Node,name=test");
-
         mbs.getAttribute(name, "One");
 
         // Stop the job. Its MBean(s) should be cleaned up by the engine.

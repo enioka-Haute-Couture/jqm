@@ -13,6 +13,7 @@
 
 	<properties>
 		<modelJarName>./lib/jqm-model-${project.version}.jar</modelJarName>
+		<argLine>-Xms256m -Xmx1024m -XX:MaxPermSize=512m</argLine>
 	</properties>
 
 	<build>
@@ -95,17 +96,6 @@
 				</executions>
 			</plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>${surefire.version}</version>
-				<configuration>
-					<trimStackTrace>false</trimStackTrace>
-					<argLine>-Xms256m -Xmx1024m -XX:MaxPermSize=512m
-						-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=C:\Temp</argLine>
-				</configuration>
-			</plugin>
-
 			<!-- Create ext directory for tests -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -167,6 +157,44 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<!-- Jacoco hates argLine - we must have a specific profile removing it. -->
+	<profiles>
+		<profile>
+			<id>coverage</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${surefire.version}</version>
+						<configuration>
+							<trimStackTrace>false</trimStackTrace>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>standard</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${surefire.version}</version>
+						<configuration>
+							<trimStackTrace>false</trimStackTrace>
+							<argLine>${argLine}</argLine>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<dependencies>
 		<!-- We need an actual JPA2 implementation here. JPA-API is implied -->
