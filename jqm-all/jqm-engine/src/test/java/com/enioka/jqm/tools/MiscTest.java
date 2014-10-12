@@ -16,6 +16,7 @@
 package com.enioka.jqm.tools;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.Calendar;
 import java.util.List;
 
@@ -328,6 +329,9 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testMultiLog() throws Exception
     {
+        PrintStream out_ini = System.out;
+        PrintStream err_ini = System.err;
+
         Helpers.setSingleParam("logFilePerLaunch", "true", em);
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
@@ -341,5 +345,8 @@ public class MiscTest extends JqmBaseTest
         Assert.assertEquals(1, TestHelpers.getOkCount(em));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
         Assert.assertTrue(f.exists());
+
+        System.setErr(err_ini);
+        System.setOut(out_ini);
     }
 }
