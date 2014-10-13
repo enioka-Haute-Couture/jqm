@@ -167,6 +167,10 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
                 throw e1;
             }
         }
+        if (name.endsWith("serverName"))
+        {
+            return JqmEngine.latestNodeStartedName;
+        }
 
         // If in cache...
         if (singletons.containsKey(name))

@@ -21,6 +21,7 @@ package com.enioka.jqm.tools;
 import java.io.File;
 import java.net.URL;
 
+import javax.naming.InitialContext;
 import javax.naming.spi.NamingManager;
 
 import org.junit.Assert;
@@ -176,5 +177,14 @@ public class JndiTest extends JqmBaseTest
 
         Assert.assertEquals(1, TestHelpers.getOkCount(em));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+    }
+
+    @Test
+    public void testJndiServerName() throws Exception
+    {
+        addAndStartEngine();
+
+        String s = (String) InitialContext.doLookup("serverName");
+        Assert.assertEquals("localhost", s);
     }
 }

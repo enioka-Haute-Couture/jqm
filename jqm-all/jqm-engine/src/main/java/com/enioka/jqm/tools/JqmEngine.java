@@ -50,6 +50,7 @@ import com.enioka.jqm.jpamodel.State;
 class JqmEngine implements JqmEngineMBean
 {
     private static Logger jqmlogger = Logger.getLogger(JqmEngine.class);
+    static String latestNodeStartedName = "";
 
     // Sync data for stopping the engine
     private Semaphore ended = new Semaphore(0);
@@ -228,6 +229,7 @@ class JqmEngine implements JqmEngineMBean
         // Done
         em.close();
         em = null;
+        latestNodeStartedName = node.getName();
         jqmlogger.info("End of JQM engine initialization");
     }
 
