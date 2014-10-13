@@ -83,7 +83,7 @@ public class BasicTest
 
         em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
+        TestHelpers.createTestData(em);
         Helpers.setSingleParam("disableWsApi", "false", em);
         Helpers.setSingleParam("enableWsApiAuth", "true", em);
         Helpers.setSingleParam("enableWsApiSsl", "false", em);

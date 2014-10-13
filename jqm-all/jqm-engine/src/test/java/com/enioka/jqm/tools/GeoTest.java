@@ -18,7 +18,11 @@
 
 package com.enioka.jqm.tools;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
@@ -27,6 +31,19 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class GeoTest extends JqmBaseTest
 {
+    @Before
+    public void b()
+    {
+        TestHelpers.setNodesLogLevel("INFO", em);
+    }
+
+    @After
+    public void a()
+    {
+        Logger.getRootLogger().setLevel(Level.toLevel("DEBUG"));
+        Logger.getLogger("com.enioka").setLevel(Level.toLevel("DEBUG"));
+    }
+
     @Test
     public void testGeo() throws Exception
     {

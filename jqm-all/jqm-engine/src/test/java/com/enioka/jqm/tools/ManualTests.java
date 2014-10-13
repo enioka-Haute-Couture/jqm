@@ -37,7 +37,7 @@ public class ManualTests extends JqmBaseTest
     {
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
+        TestHelpers.createTestData(em);
 
         CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
                 TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
