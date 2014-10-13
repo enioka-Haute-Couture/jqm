@@ -90,6 +90,11 @@
 			<destName>jqm.jar</destName>
 		</file>
 
+		<file>
+			<source>${project.parent.basedir}/jqm-ws/target/jqm-ws-${project.version}.war</source>
+			<outputDirectory>/webapp</outputDirectory>
+			<destName>jqm-ws.war</destName>
+		</file>
 	</files>
 
 	<dependencySets>
