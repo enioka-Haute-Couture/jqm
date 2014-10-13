@@ -86,20 +86,7 @@ public class AdminSeleniumTest implements SauceOnDemandSessionIdProvider
 
     static String getMavenVersion()
     {
-        String res = "";
-        InputStream is = AdminSeleniumTest.class.getResourceAsStream("/META-INF/maven/com.enioka.jqm/jqm-wstst/pom.properties");
-        Properties p = new Properties();
-        try
-        {
-            p.load(is);
-            res = p.getProperty("version");
-        }
-        catch (Exception e)
-        {
-            res = "maven version not found";
-            jqmlogger.warn("maven version not found", e);
-        }
-        return res;
+        return System.getProperty("mavenVersion");
     }
 
     /**
