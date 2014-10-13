@@ -92,7 +92,7 @@
 		<module>jqm-client</module>
 		<module>jqm-test-helpers</module>
 		<module>jqm-engine</module>
-		<module>jqm-webui</module>
+		<module>jqm-jsfsample</module>
 		<module>jqm-providers</module>
 		<module>jqm-pki</module>
 	</modules>
