@@ -74,16 +74,6 @@ have to be altered directly inside the database with your tool of choice.
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
 | mavenSettingsCL            | an alternate Maven settings.xml to use. If absent, the usual file inside ~/.m2 is used.             | NULL               | No      | Yes             |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| mailSmtpServer             | SMTP server to send end-of-job notifications                                                        | NULL               | No      | Yes             |
-+----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| mailFrom                   | the "from" field of notification mails                                                              | jqm@noreply.com    | No      | No              |
-+----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| mailSmtpUser               | if SMTP with authentication                                                                         | NULL               | No      | Yes             |
-+----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| mailSmtpPassword           | if SMTP with authentication                                                                         | NULL               | No      | Yes             |
-+----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| mailUseTls                 | if SMTP with authentication. true of false                                                          | NULL               | No      | Yes             |
-+----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
 | defaultConnection          | the JNDI alias returned by the engine API getDefaultConnection method.                              | jdbc/jqm           | No      | No              |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
 | logFilePerLaunch           | if true, one log file will be created per launch. Otherwise, everything ends in the main log.       | true               | Yes     | No              |
@@ -117,4 +107,7 @@ Parameter name is case-sensitive.
 
 .. note:: the mavenRepo is the only parameter that can be specified multiple times. There must be at least one repository specified.
 	If using Maven central, please specify 'http://repo1.maven.org/maven2/' and not one the numerous other aliases that exist.
-	Maven Central is only used if explicitely specified (which is the default).
+	Maven Central is only used if explicitly specified (which is the default).
+
+Also, as a side note, mail notifications use the JNDI resource named mail/default, which is created on node startup if it does not exist. 
+See resource documentation to set it up.
