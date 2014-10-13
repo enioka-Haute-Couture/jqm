@@ -92,6 +92,12 @@ public class JobDef implements Serializable
     @Column(name = "jarPath", length = 1024)
     private String jarPath;
 
+    @Column(name = "java_opts", length = 200)
+    private String javaOpts;
+
+    @Column(name = "external", nullable = false)
+    private boolean external = false;
+
     @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "JobDefId")
     private List<JobDefParameter> parameters = new ArrayList<JobDefParameter>();
@@ -362,5 +368,39 @@ public class JobDef implements Serializable
     public void setDescription(String description)
     {
         this.description = description;
+    }
+
+    /**
+     * The options passed to the JVM when launching this job definition. Only used if {@link #isExternal()} is <code>true</code>
+     */
+    public String getJavaOpts()
+    {
+        return javaOpts;
+    }
+
+    /**
+     * See {@link #getJavaOpts()}
+     */
+    public void setJavaOpts(String javaOpts)
+    {
+        this.javaOpts = javaOpts;
+    }
+
+    /**
+     * If true, the instances created from this JobDef will be run inside a dedicated JVM instead of simply being a thread inside an engine.
+     * Default is <code>false</code>.<br>
+     * If using this, JVM options specific to this JobDef may be set through {@link #getJavaOpts()}.
+     */
+    public boolean isExternal()
+    {
+        return external;
+    }
+
+    /**
+     * See {@link #isExternal()}
+     */
+    public void setExternal(boolean external)
+    {
+        this.external = external;
     }
 }
