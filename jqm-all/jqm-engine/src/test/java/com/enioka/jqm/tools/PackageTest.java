@@ -116,7 +116,7 @@ public class PackageTest extends JqmBaseTest
         jqmlogger.debug("Starting test testIncompleteClass");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
+        TestHelpers.createTestData(em);
 
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-missingapi/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
@@ -145,7 +145,7 @@ public class PackageTest extends JqmBaseTest
         jqmlogger.debug("Starting test testLibInJarReload");
         EntityManager em = Helpers.getNewEm();
         TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
+        TestHelpers.createTestData(em);
 
         ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
         JobDefParameter jdp = CreationTools.createJobDefParameter("arg", "POUPETTE", em);

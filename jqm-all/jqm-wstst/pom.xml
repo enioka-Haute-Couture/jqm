@@ -22,6 +22,12 @@
 				<configuration>
 					<trimStackTrace>false</trimStackTrace>
 					<argLine>-XX:MaxPermSize=128m -Xms150m -Xmx256m</argLine>
+					<systemProperties>
+						<property>
+							<name>mavenVersion</name>
+							<value>${project.version}</value>
+						</property>
+					</systemProperties>
 				</configuration>
 			</plugin>
 

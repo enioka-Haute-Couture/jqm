@@ -20,14 +20,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.NamingException;
-import javax.naming.spi.NamingManager;
 import javax.persistence.EntityManager;
 
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -51,23 +48,16 @@ public class JqmBaseTest
     @BeforeClass
     public static void testInit() throws Exception
     {
-        JndiContext.createJndiContext();
-        s = new Server();
-        s.setDatabaseName(0, "testdbengine");
-        s.setDatabasePath(0, "mem:testdbengine");
-        s.setLogWriter(null);
-        s.setSilent(true);
-        s.start();
-    }
-
-    @AfterClass
-    public static void stop() throws NamingException
-    {
-        JqmClientFactory.resetClient(null);
-        Helpers.resetEmf();
-        ((JndiContext) NamingManager.getInitialContext(null)).resetSingletons();
-        s.shutdown();
-        s.stop();
+        if (s == null)
+        {
+            JndiContext.createJndiContext();
+            s = new Server();
+            s.setDatabaseName(0, "testdbengine");
+            s.setDatabasePath(0, "mem:testdbengine");
+            s.setLogWriter(null);
+            s.setSilent(true);
+            s.start();
+        }
     }
 
     @Before
@@ -79,7 +69,7 @@ public class JqmBaseTest
         em = getNewEm();
         JqmClientFactory.resetClient(null);
         TestHelpers.cleanup(em);
-        TestHelpers.createLocalNode(em);
+        TestHelpers.createTestData(em);
     }
 
     @After

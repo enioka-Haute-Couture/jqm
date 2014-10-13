@@ -52,7 +52,7 @@ public class TestHelpers
 
     public static GlobalParameter gpCentral, gpEclipse;
 
-    public static void createLocalNode(EntityManager em)
+    public static void createTestData(EntityManager em)
     {
         db = CreationTools.createDatabaseProp("jdbc/marsu", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb", "SA", "", em,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
@@ -186,6 +186,17 @@ public class TestHelpers
                     + " | end: " + format.format(h.getEndDate().getTime()));
         }
         jqmlogger.debug("==========================================================================================");
+    }
+
+    public static void setNodesLogLevel(String level, EntityManager em)
+    {
+        em.getTransaction().begin();
+        node.setRootLogLevel(level);
+        node2.setRootLogLevel(level);
+        node3.setRootLogLevel(level);
+        nodeMix.setRootLogLevel(level);
+        nodeMix2.setRootLogLevel(level);
+        em.getTransaction().commit();
     }
 
     public static void waitFor(long nbHistories, int timeoutMs, EntityManager em)
