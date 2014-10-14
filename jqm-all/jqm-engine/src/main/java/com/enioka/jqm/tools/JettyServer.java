@@ -37,7 +37,6 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.FragmentConfiguration;
 import org.eclipse.jetty.webapp.MetaInfConfiguration;
-import org.eclipse.jetty.webapp.TagLibConfiguration;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.webapp.WebInfConfiguration;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
@@ -250,7 +249,7 @@ class JettyServer
 
         // Set configurations (order is important: need to unpack war before reading web.xml)
         webAppContext.setConfigurations(new Configuration[] { new WebInfConfiguration(), new WebXmlConfiguration(),
-                new MetaInfConfiguration(), new FragmentConfiguration(), new AnnotationConfiguration(), new TagLibConfiguration() });
+                new MetaInfConfiguration(), new FragmentConfiguration(), new AnnotationConfiguration() });
 
         h.addHandler(webAppContext);
     }
