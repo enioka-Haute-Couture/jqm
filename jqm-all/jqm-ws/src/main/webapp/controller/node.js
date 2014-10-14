@@ -48,7 +48,7 @@ jqmControllers.controller('µNodeListCtrl', function($scope, $http, µNodeDto)
         selectedItems : $scope.selected,
         showGroupPanel : false,
         filterOptions : $scope.filterOptions,
-
+        plugins :  [new ngGridFlexibleHeightPlugin()],
         columnDefs : [
                 {
                     field : 'name',

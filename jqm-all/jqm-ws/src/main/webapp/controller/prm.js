@@ -50,7 +50,7 @@ jqmControllers.controller('µPrmListCtrl', function($scope, $http, µPrmDto)
         showSelectionCheckbox : true,
         selectWithCheckboxOnly : true,
         selectedItems : $scope.selected,
-
+        plugins :  [new ngGridFlexibleHeightPlugin()],
         columnDefs : [ {
             field : 'key',
             displayName : 'Name'

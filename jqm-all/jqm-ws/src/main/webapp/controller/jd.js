@@ -58,7 +58,7 @@ jqmControllers.controller('µJdListCtrl', function($scope, $http, $modal, µJdDt
         selectWithCheckboxOnly : true,
         selectedItems : $scope.selected,
         showGroupPanel : true,
-
+        plugins :  [new ngGridFlexibleHeightPlugin()],
         columnDefs : [
                 {
                     field : 'applicationName',

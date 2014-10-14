@@ -13,6 +13,7 @@
 <script src="libs/angular-resource.js"></script>
 <script src="libs/ui-bootstrap-tpls-0.11.0.js"></script>
 <script src="libs/ng-grid-2.0.11.js"></script>
+<script src="libs/ng-grid-flexible-height.js"></script>
 <script src="app.js"></script>
 <script src="controller/node.js"></script>
 <script src="controller/q.js"></script>
@@ -28,24 +29,20 @@
 </head>
 
 <body>
-    <div id="wrap">
-
-        <ul class="nav nav-tabs" ng-controller="TabsCtrl">
+  <div class="container-fluid">
+        <ul class="nav nav-tabs" role="tablist" ng-controller="TabsCtrl">
             <li ng-repeat="tab in tabs" ng-class="tabClass(tab)" jqm-permission="{{tab.permission}}"><a href="{{tab.link}}"
                 ng-click="setSelectedTab(tab)"
             >{{tab.label}}</a></li>
         </ul>
         <div ng-view></div>
 
-
-        <div id="push"></div>
-    </div>
-
+    <br/><br/>
     <div id="footer">
         JQM administration, (C) 2014
         <login-dialog></login-dialog>
     </div>
-
+  </div>
 </body>
 
 </html>
