@@ -2,156 +2,92 @@
     <div class="row">
         <!--First column-->
         <div class="col-sm-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">Identification</div>
-                <div class="panel-body">
-                    <div class='row'>
-                        <strong class='col-xs-6'>ID</strong>
-                        <div class='col-xs-6'>{{ji.id}}</div>
-                    </div>
-                    <div class='row'>
-                        <strong class='col-xs-6'>Parent job</strong>
-                        <div class='col-xs-6'>{{ji.parent}}</div>
-                    </div>
-                    <div class='row'>
-                        <strong class='col-xs-6'>Application</strong>
-                        <div class='col-xs-6'>{{ji.applicationName}}</div>
-                    </div>
-                    <div class='row'>
-                        <strong class='col-xs-6'>Session ID</strong>
-                        <div class='col-xs-6'>{{ji.sessionID}}</div>
-                    </div>
-                </div>
-            </div>
+            <table class='table table-condensed table-striped table-hover'>
+                <caption><strong>Identification</strong></caption>
+                <tr>
+                    <th>ID</th>
+                    <th>{{ji.id}}</th>
+                </tr>
+                <tr>
+                    <td>Parent job</td>
+                    <td>{{ji.parent}}</td>
+                </tr>
+                <tr>
+                    <td>Application</td>
+                    <td>{{ji.applicationName}}</td>
+                </tr>
+                <tr>
+                    <td>Session ID</td>
+                    <td>{{ji.sessionID}}</td>
+            </table>
 
-            <div class="panel panel-default">
-                <div class="panel-heading">Parameters</div>
-                <div class="panel-body">
-                    <div ng-repeat="p in ji.parameters  | orderBy:'key'" class='row'>
-                        <strong class='col-xs-6'>{{p.key}}</strong>
-                        <div class='col-xs-6'>{{p.value}}</div>
-                    </div>
-                </div>
-            </div>
+            <table class='table table-condensed table-striped table-hover'>
+                <caption><strong>parameters</strong></caption>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+                <tr ng-repeat="p in ji.parameters  | orderBy:'key'">
+                    <td>{{p.key}}</td>
+                    <td>{{p.value}}</td>
+                </tr>
+            </table>
             
-            <div class="panel panel-default">
-                <div class="panel-heading">Log files</div>
-                <div class="panel-body">
-                    <a href='{{ "./ws/client/ji/" + ji.id + "/stdout"}}' class='col-sm-12'>Log stdout</a> <a
-                        href='{{ "./ws/client/ji/" + ji.id + "/stderr"}}' class='col-sm-12'
-                    >Log stderr</a>
-                </div>
-            </div>
+            <table class='table table-condensed table-striped table-hover'>
+                <caption><strong>Log files</strong></caption>
+                <tr><td><a href='{{ "./ws/client/ji/" + ji.id + "/stdout"}}'>Log stdout</a></td></tr>
+                <tr><td><a  href='{{ "./ws/client/ji/" + ji.id + "/stderr"}}'>Log stderr</a></td></tr>
+            </table>
+
         </div>
         
         <!--Second column-->
         <div class="col-sm-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">Queues</div>
-                <div class="panel-body">
-                    <div class='row'>
-                        <strong class='col-xs-6'>Queue</strong>
-                        <div class='col-xs-6'>{{ji.queue.name}}</div>
-                    </div>
-                    <div class='row'>
-                        <strong class='col-xs-6'>Position</strong>
-                        <div class='col-xs-6'>{{ji.position}}</div>
-                    </div>
-                    <div class='row'>
-                        <strong class='col-xs-6'>Affected to server</strong>
-                        <div class='col-xs-6'>{{ji.nodeName}}</div>
-                    </div>
-                </div>
-            </div>
+            <table class='table table-condensed table-striped table-hover'>
+                <caption><strong>Queue</strong></caption>
+                <tr><td>Name</td><td>{{ji.queue.name}}</td></tr>
+                <tr><td>Position</td><td>{{ji.position}}</td></tr>
+                <tr><td>Affected to server</td><td>{{ji.nodeName}}</td></tr>
+            </table>
 
-            <div class="panel panel-default">
-                <div class="panel-heading">User messages</div>
-                <div class="panel-body">
-                    <div ng-repeat="m in ji.messages" class='row'>
-                        <div class='col-sm-12'>{{m}}</div>
-                    </div>
-                </div>
-            </div>
+            <table class='table table-condensed table-striped table-hover'>
+                <caption><strong>User messages</strong></caption>
+                <tr ng-repeat="m in ji.messages"><td>{{m}}</td></tr>
+            </table>
             
-           <div class="panel panel-default">
-                <div class="panel-heading">Files created</div>
-                <div class="panel-body">
-                    <div ng-repeat="d in dels" class='row'>
-                        <div class='col-sm-2'>ID</div>
-                        <div class='col-sm-2'>{{d.id}}</div>
-                        <div class='col-sm-8'>
-                            <a href="{{'./ws/client/ji/files/' + d.id}}">{{d.fileFamily}}</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
+           <table class='table table-condensed table-striped table-hover'>
+                <caption><strong>Files created</strong></caption>
+                <tr ng-repeat="d in dels">
+                    <td>ID</td>
+                    <td>{{d.id}}</td>
+                    <td><a href="{{'./ws/client/ji/files/' + d.id}}">{{d.fileFamily}}</a></td>
+            </table>
         </div>
         
         <!--Third column-->
         <div class="col-sm-4">
         
-            <div class="panel panel-default">
-                <div class="panel-heading">Progress</div>
-                <div class="panel-body">
-                    <div class='row'>
-                        <strong class='col-xs-6'>Status</strong>
-                        <div class='col-xs-6'>{{ji.state}}</div>
-                    </div>
-                    <div class='row'>
-                        <strong class='col-xs-6'>Progress%</strong>
-                        <div class='col-xs-6'>{{ji.progress}}</div>
-                    </div>
+            <table class='table table-condensed table-striped table-hover'>
+                <caption><strong>Progress</strong></caption>
+                <tr><td>Status</td><td>{{ji.state}}</td></tr>
+                <tr><td>Progress%</td><td>{{ji.progress}}</td></tr>
+                <tr><td>Enqueue time</td><td>{{ji.enqueueDate | date : "dd/MM HH:mm:ss"}}</td></tr>
+                <tr><td>Start time</td><td>{{ji.beganRunningDate | date : "dd/MM HH:mm:ss"}}</td></tr>
+                <tr><td>End time</td><td>{{ji.endDate | date : "dd/MM HH:mm:ss"}}</td></tr>
+            </table>
 
-                    <div class='row'>
-                        <strong class='col-xs-6'>Enqueue time</strong>
-                        <div class='col-xs-6'>{{ji.enqueueDate | date : "dd/MM HH:mm:ss"}}</div>
+            <table class='table table-condensed table-striped table-hover'>
+                <caption><strong>optionnal flags</strong></caption>
+                    <tr><td>Software</td><td>{{ji.application}}</div>
                     </div>
                     <div class='row'>
-                        <strong class='col-xs-6'>Start time</strong>
-                        <div class='col-xs-6'>{{ji.beganRunningDate | date : "dd/MM HH:mm:ss"}}</div>
-                    </div>
-                    <div class='row'>
-                        <strong class='col-xs-6'>End time</strong>
-                        <div class='col-xs-6'>{{ji.endDate | date : "dd/MM HH:mm:ss"}}</div>
-                    </div>
-                </div>
-            </div>
+                        <tr><td>Keyword 1</td><td>{{ji.keyword1}}</td></tr>
+                        <tr><td>Keyword 2</td><td>{{ji.keyword2}}</td></tr>
+                        <tr><td>Keyword 3</td><td>{{ji.keyword3}}</td></tr>
+                        <tr><td>Module</td><td>{{ji.module}}</td></tr>
+                        <tr><td>User</td><td>{{ji.user}}</td></tr>
+                        <tr><td>User e-mail</td><td>{{ji.email}}</td></tr>
+            </table>
         
-        
-            <div class="panel panel-default">
-                <div class="panel-heading">Optional tags</div>
-                <div class="panel-body">
-                    <div class='row'>
-                        <strong class='col-sm-6'>Software</strong>
-                        <div class='col-sm-6'>{{ji.application}}</div>
-                    </div>
-                    <div class='row'>
-                        <strong class='col-xs-6'>Keyword 1</strong>
-                        <div class='col-xs-6'>{{ji.keyword1}}</div>
-                    </div>
-                    <div class='row'>
-                        <strong class='col-xs-6'>Keyword 2</strong>
-                        <div class='col-xs-6'>{{ji.keyword2}}</div>
-                    </div>
-                    <div class='row'>
-                        <strong class='col-xs-6'>Keyword 3</strong>
-                        <div class='col-xs-6'>{{ji.keyword3}}</div>
-                    </div>
-                    <div class='row'>
-                        <strong class='col-xs-6'>Module</strong>
-                        <div class='col-xs-6'>{{ji.module}}</div>
-                    </div>
-                    <div class='row'>
-                        <strong class='col-xs-6'>User</strong>
-                        <div class='col-xs-6'>{{ji.user}}</div>
-                    </div>
-                    <div class='row'>
-                        <strong class='col-xs-6'>User e-mail</strong>
-                        <div class='col-xs-6'>{{ji.email}}</div>
-                    </div>
-                </div>
-            </div>
-
         </div>
 </div>
