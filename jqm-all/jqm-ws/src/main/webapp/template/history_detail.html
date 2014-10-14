@@ -1,6 +1,7 @@
 <div class="container-fluid modal-dialog">
     <div class="row">
-        <div class="col-sm-6">
+        <!--First column-->
+        <div class="col-sm-4">
             <div class="panel panel-default">
                 <div class="panel-heading">Identification</div>
                 <div class="panel-body">
@@ -24,6 +25,28 @@
             </div>
 
             <div class="panel panel-default">
+                <div class="panel-heading">Parameters</div>
+                <div class="panel-body">
+                    <div ng-repeat="p in ji.parameters  | orderBy:'key'" class='row'>
+                        <strong class='col-xs-6'>{{p.key}}</strong>
+                        <div class='col-xs-6'>{{p.value}}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel panel-default">
+                <div class="panel-heading">Log files</div>
+                <div class="panel-body">
+                    <a href='{{ "./ws/client/ji/" + ji.id + "/stdout"}}' class='col-sm-12'>Log stdout</a> <a
+                        href='{{ "./ws/client/ji/" + ji.id + "/stderr"}}' class='col-sm-12'
+                    >Log stderr</a>
+                </div>
+            </div>
+        </div>
+        
+        <!--Second column-->
+        <div class="col-sm-4">
+            <div class="panel panel-default">
                 <div class="panel-heading">Queues</div>
                 <div class="panel-body">
                     <div class='row'>
@@ -41,6 +64,33 @@
                 </div>
             </div>
 
+            <div class="panel panel-default">
+                <div class="panel-heading">User messages</div>
+                <div class="panel-body">
+                    <div ng-repeat="m in ji.messages" class='row'>
+                        <div class='col-sm-12'>{{m}}</div>
+                    </div>
+                </div>
+            </div>
+            
+           <div class="panel panel-default">
+                <div class="panel-heading">Files created</div>
+                <div class="panel-body">
+                    <div ng-repeat="d in dels" class='row'>
+                        <div class='col-sm-2'>ID</div>
+                        <div class='col-sm-2'>{{d.id}}</div>
+                        <div class='col-sm-8'>
+                            <a href="{{'./ws/client/ji/files/' + d.id}}">{{d.fileFamily}}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!--Third column-->
+        <div class="col-sm-4">
+        
             <div class="panel panel-default">
                 <div class="panel-heading">Progress</div>
                 <div class="panel-body">
@@ -67,19 +117,8 @@
                     </div>
                 </div>
             </div>
-
-            <div class="panel panel-default">
-                <div class="panel-heading">Log files</div>
-                <div class="panel-body">
-                    <a href='{{ "./ws/client/ji/" + ji.id + "/stdout"}}' class='col-sm-12'>Log stdout</a> <a
-                        href='{{ "./ws/client/ji/" + ji.id + "/stderr"}}' class='col-sm-12'
-                    >Log stderr</a>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-sm-6">
+        
+        
             <div class="panel panel-default">
                 <div class="panel-heading">Optional tags</div>
                 <div class="panel-body">
@@ -114,38 +153,5 @@
                 </div>
             </div>
 
-            <div class="panel panel-default">
-                <div class="panel-heading">Parameters</div>
-                <div class="panel-body">
-                    <div ng-repeat="p in ji.parameters  | orderBy:'key'" class='row'>
-                        <strong class='col-xs-6'>{{p.key}}</strong>
-                        <div class='col-xs-6'>{{p.value}}</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel panel-default">
-                <div class="panel-heading">User messages</div>
-                <div class="panel-body">
-                    <div ng-repeat="m in ji.messages" class='row'>
-                        <div class='col-sm-12'>{{m}}</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel panel-default">
-                <div class="panel-heading">Files created</div>
-                <div class="panel-body">
-                    <div ng-repeat="d in dels" class='row'>
-                        <div class='col-sm-2'>ID</div>
-                        <div class='col-sm-2'>{{d.id}}</div>
-                        <div class='col-sm-8'>
-                            <a href="{{'./ws/client/ji/files/' + d.id}}">{{d.fileFamily}}</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
-
-    </div>
 </div>
