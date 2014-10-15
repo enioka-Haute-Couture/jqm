@@ -42,7 +42,7 @@
         <br/>
         
           <div class="btn-group">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Database <span class="caret"></span></button>
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-book"></span> Database <span class="caret"></span></button>
               <ul class="dropdown-menu" role="menu">
                 <li><a ng-click="neworaclepool()">New Oracle Pool</a></li>
                 <li><a ng-click="newmysqlpool()">New MySQL Pool</a></li>
@@ -53,7 +53,7 @@
           </div>
           
           <div class="btn-group">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Message QCF <span class="caret"></span></button>
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-envelope"></span> Message QCF <span class="caret"></span></button>
               <ul class="dropdown-menu" role="menu">
                 <li><a ng-click="newmqqcf()">New MQSeries QCF</a></li>
                 <li><a ng-click="newmqq()">New MQSeries Q</a></li>
@@ -62,23 +62,19 @@
               </ul>
           </div>
           
-          <button class="btn btn-default" ng-click="newfile()">New File</button>
-          <button class="btn btn-default" ng-click="newurl()">New URL</button>
-          <button class="btn btn-default" ng-click="newgeneric()">New generic resource</button>
+          <button class="btn btn-default" ng-click="newfile()"><span class="glyphicon glyphicon-file"></span> New File</button>
+          <button class="btn btn-default" ng-click="newurl()"><span class="glyphicon glyphicon-link"></span> New URL</button>
+          <button class="btn btn-default" ng-click="newgeneric()"><span class="glyphicon glyphicon-cog"></span> New generic resource</button>
 
         </td>
         <td ng-show="selected.length !== 0" style="vertical-align: top;">
             <div>
-                <button ng-click="addprm()">Add new parameter</button>
-                <button ng-click="removeprms()" ng-show="selected2.length !== 0">Remove selected parameters</button>
+                <button class="btn btn-default" ng-click="addprm()"><span class="glyphicon glyphicon-plus"></span> Add new parameter</button>
+                <button class="btn btn-default" ng-click="removeprms()" ng-show="selected2.length !== 0"><span class="glyphicon glyphicon-remove"></span> Remove selected parameters</button>
             </div>
             <div>
-                <button ng-click="savealias()" ng-show="selected.length !== 0">
-                    Save selected alias <span style="color: green;" class="glyphicon glyphicon-ok">
-                </button>
-                <button ng-click="removealias()" ng-show="selected.length !== 0">
-                    Remove selected alias <span style="color: red;" class="glyphicon glyphicon-remove">
-                </button>
+                <button class="btn btn-default" ng-click="savealias()" ng-show="selected.length !== 0"><span class="glyphicon glyphicon-floppy-save"></span> Save selected alias</button>
+                <button class="btn btn-default"  ng-click="removealias()" ng-show="selected.length !== 0"><span class="glyphicon glyphicon-remove"></span> Remove selected alias</button>
             </div>
         </td>
     </tr>
