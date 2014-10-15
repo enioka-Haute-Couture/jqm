@@ -2,8 +2,8 @@
     <br/>
     <span>View: </span>
     <div class="btn-group">
-        <label class="btn btn-default active" ng-model="target" btn-radio="'hist'" uncheckable>ended</label>
-        <label class="btn btn-default" ng-model="target" btn-radio="'queues'" uncheckable>active</label>
+        <label class="btn btn-default active" ng-model="target" btn-radio="'hist'" uncheckable><span class="glyphicon glyphicon-off"></span> ended</label>
+        <label class="btn btn-default" ng-model="target" btn-radio="'queues'" uncheckable><span class="glyphicon glyphicon-road"></span> active</label>
     </div>
     <span>Application: </span>
     <input ng-model="query.applicationName" ng-change="getDataAsync()" ng-required="true" />
@@ -15,16 +15,16 @@
     <input ng-model="query.parentId" ng-change="getDataAsync();" ng-required="true" style="width: 3em;" /><span>Queue: </span>
     <select ng-cell-input ng-model="query.queueId" ng-options="q.id as q.name for q in queues" ng-change="getDataAsync();"></select>
     <div class="btn-group">
-      <button class="btn btn-default" ng-click="latest(1)">Last hour</button>
-      <button class="btn btn-default" ng-click="latest(24)">Last day</button>
-      <button class="btn btn-default" ng-click="query = {}; getDataAsync();">Reset filters</button>
+      <button class="btn btn-default" ng-click="latest(1)"><span class="glyphicon glyphicon-calendar"></span> Last hour</button>
+      <button class="btn btn-default" ng-click="latest(24)"><span class="glyphicon glyphicon-calendar"></span> Last day</button>
+      <button class="btn btn-default" ng-click="query = {}; getDataAsync();"><span class="glyphicon glyphicon-ban-circle"></span> Reset filters</button>
     </div>
     <br/><br/>
     <div ng-grid='gridOptions' ng-dblclick="showDetail()"></div>
     
     <div class="small">Double-click on a line to get job details, files produced and logs. Use % as wildcard is search filters.</div>
-    <button class="btn btn-default" ng-click="relaunch()" ng-disabled="selected.length === 0">Relaunch</button>
-    <button class="btn btn-default" ng-click="getDataAsync()">Refresh</button>
-    <button class="btn btn-default" ng-click="newLaunch()">New launch form</button>
+    <button class="btn btn-default" ng-click="relaunch()" ng-disabled="selected.length === 0"><span class="glyphicon glyphicon-repeat"></span> Relaunch</button>
+    <button class="btn btn-default" ng-click="getDataAsync()"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+    <button class="btn btn-default" ng-click="newLaunch()"><span class="glyphicon glyphicon-plus"></span> New launch form</button>
 </div>
 

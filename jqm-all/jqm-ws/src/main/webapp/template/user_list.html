@@ -7,8 +7,8 @@
                     ng-options="o as o.login for o in users| filter: queryStr  | orderBy: login"
                 ></select>
                 <br />
-                <button class="btn btn-default" ng-click="newitem()">New user</button>
-                <button class="btn btn-default" ng-click="refresh()">Refresh</button>
+                <button class="btn btn-default" ng-click="newitem()"><span class="glyphicon glyphicon-plus"></span> New user</button>
+                <button class="btn btn-default" ng-click="refresh()"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
             </td>
             <td>
                 <div class="form-horizontal" style="max-width: 750px;" ng-show="usr">
@@ -76,12 +76,8 @@
 
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10">
-                            <button class="btn btn-default" ng-click="saveitem()">
-                                Save user {{usr.id}} <span style="color: green;" class="glyphicon glyphicon-ok">
-                            </button>
-                            <button class="btn btn-default" ng-click="deleteitem()">
-                                Delete user {{usr.id}} <span style="color: red;" class="glyphicon glyphicon-remove"></span>
-                            </button>
+                            <button class="btn btn-default" ng-click="saveitem()"><span class="glyphicon glyphicon-floppy-save"></span> Save user {{usr.login}}</button>
+                            <button class="btn btn-default" ng-click="deleteitem()"><span class="glyphicon glyphicon-remove"></span> Delete user {{usr.login}}</button>
                             (Created: <label id="txtCreation" class="form-label">{{usr.creationDate | date: 'dd/MM/yyyy HH:mm'}}</label>)
                             <a href="./ws/admin/user/{{usr.id}}/certificate" download="user.zip" target="_blank">New certificate</a>
                         </div>

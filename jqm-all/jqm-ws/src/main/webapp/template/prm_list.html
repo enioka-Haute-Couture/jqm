@@ -15,10 +15,11 @@
             </dl>
         </div>
     </div>
-    <div class='gridClass' ng-grid='gridOptions'></div>
-    <button class="btn btn-default" ng-click="newprm()" jqm-permission="prm:create">New parameter</button>
-    <button class="btn btn-default" ng-click="remove()" ng-disabled="selected.length === 0" jqm-permission="prm:delete">Delete selected</button>
-    <button class="btn btn-default" ng-click="refresh()" jqm-permission="prm:read">Refresh</button>
-    <button class="btn btn-default" ng-click="save()" jqm-permission="prm:create">Save parameters</button>
+    <div ng-grid='gridOptions'></div>
+    <br/>
+    <button class="btn btn-default" ng-click="newprm()" jqm-permission="prm:create"><span class="glyphicon glyphicon-plus"></span> New parameter</button>
+    <button class="btn btn-default" ng-click="remove()" ng-disabled="selected.length === 0" jqm-permission="prm:delete"><span class="glyphicon glyphicon-remove"></span> Delete selected</button>
+    <button class="btn btn-default" ng-click="refresh()" jqm-permission="prm:read"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+    <button class="btn btn-default" ng-click="save()" jqm-permission="prm:create"><span class="glyphicon glyphicon-floppy-save"></span> Save parameters</button>
 </div>
 

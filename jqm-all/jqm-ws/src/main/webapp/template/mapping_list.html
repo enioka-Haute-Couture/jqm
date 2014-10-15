@@ -21,12 +21,11 @@
         </div>
     </div>
 
-    <div class='gridClass' ng-grid='gridOptions'></div>
-
-    <button class="btn btn-default" ng-click="newmapping()" ng-disabled="bDbBusy" jqm-permission="qmapping:create">New mapping</button>
-    <button class="btn btn-default" ng-click="save()" ng-disabled="bDbBusy" jqm-permission="qmapping:create" ng-hide="error">Save mappings</button>
-    <button class="btn btn-default" ng-click="refresh()" ng-disabled="bDbBusy" jqm-permission="qmapping:read">Refresh</button>
-    <button class="btn btn-default" ng-click="remove()" ng-disabled="bDbBusy || selected.length === 0" jqm-permission="qmapping:delete">Delete
-        selected</button>
+    <div ng-grid='gridOptions'></div>
+    <br/>
+    <button class="btn btn-default" ng-click="newmapping()" ng-disabled="bDbBusy" jqm-permission="qmapping:create"><span class="glyphicon glyphicon-plus"></span> New mapping</button>
+    <button class="btn btn-default" ng-click="save()" ng-disabled="bDbBusy" jqm-permission="qmapping:create" ng-hide="error"><span class="glyphicon glyphicon-floppy-save"></span> Save mappings</button>
+    <button class="btn btn-default" ng-click="refresh()" ng-disabled="bDbBusy" jqm-permission="qmapping:read"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+    <button class="btn btn-default" ng-click="remove()" ng-disabled="bDbBusy || selected.length === 0" jqm-permission="qmapping:delete"><span class="glyphicon glyphicon-remove"></span> Delete selected</button>
 </div>
 

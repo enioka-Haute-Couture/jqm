@@ -55,9 +55,9 @@
 
     <div class='gridClass' ng-grid='gridOptions' style='width: 100%;'></div>
 
-    <button class="btn btn-default" ng-click="refresh()">Refresh</button>
-    <button class="btn btn-default" ng-click="stop()" jqm-permission="node:create" ng-disabled="selected.length === 0">Send stop order</button>
-    <button class="btn btn-default" ng-click="save()" jqm-permission="node:create">Save nodes</button>
-    <button class="btn btn-default" ng-click="remove()" ng-disabled="selected.length === 0" jqm-permission="jd:delete">Delete selected</button>
+    <button class="btn btn-default" ng-click="refresh()"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+    <button class="btn btn-default" ng-click="stop()" jqm-permission="node:create" ng-disabled="selected.length === 0"><span class="glyphicon glyphicon-minus-sign"></span> Send stop order</button>
+    <button class="btn btn-default" ng-click="save()" jqm-permission="node:create"><span class="glyphicon glyphicon-floppy-save"></span> Save nodes</button>
+    <button class="btn btn-default" ng-click="remove()" ng-disabled="selected.length === 0" jqm-permission="jd:delete"><span class="glyphicon glyphicon-remove"></span> Delete selected</button>
 </div>
 

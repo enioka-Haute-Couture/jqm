@@ -44,7 +44,7 @@
                         <input id="txtValue" class="form-control" type="text" ng-model="data.newValue" />
                     </div>
                     <div class="col-xs-4">
-                        <button ng-click="addPrm()">Add</button>
+                        <button class="btn btn-default" ng-click="addPrm()"><span class="glyphicon glyphicon-plus"></span> Add</button>
                     </div>
                 </div>
                 <span class="help-block">Enter here additional key/values pairs</span>
@@ -63,7 +63,7 @@
     </div>
 
     <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="ok()">OK</button>
-        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-default" ng-click="ok()"><span class="glyphicon glyphicon-ok"></span> OK</button>
+        <button class="btn btn-default" ng-click="cancel()"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
     </div>
 </div>
