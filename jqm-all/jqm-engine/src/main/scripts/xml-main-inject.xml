@@ -1,6 +1,6 @@
 ﻿<jqm>
 	<jar>
-		<path>jqm-test-main/jqm-test-main-inject.jar</path>
+		<path>jqm-test-main-inject/jqm-test-main-inject.jar</path>
 		<jobdefinitions>
 			<jobDefinition>
 				<name>DemoApi</name>
