@@ -24,10 +24,14 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class JqmInternalExceptionMapper implements ExceptionMapper<JqmClientException>
 {
+    // @Context
+    // private HttpHeaders headers;
+
     @Override
     public Response toResponse(JqmClientException exception)
     {
-        ErrorDto d = new ErrorDto(exception.getMessage(), 500, exception, Status.INTERNAL_SERVER_ERROR);
+        // String type = headers.getMediaType() == null ? MediaType.APPLICATION_JSON : headers.getMediaType().getType();
+        ErrorDto d = new ErrorDto(exception.getMessage(), 9, exception, Status.INTERNAL_SERVER_ERROR);
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(d).type(MediaType.APPLICATION_JSON).build();
     }
 }

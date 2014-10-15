@@ -23,9 +23,13 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class ErrorHandler implements ExceptionMapper<ErrorDto>
 {
+    // @Context
+    // private HttpServletResponse headers;
+
     @Override
     public Response toResponse(ErrorDto e)
     {
+        // String type = headers.getContentType() == null ? MediaType.APPLICATION_JSON : headers.getContentType();
         return Response.status(e.httpStatus).entity(e).type(MediaType.APPLICATION_JSON).build();
     }
 }

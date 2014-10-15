@@ -663,7 +663,7 @@ public class ServiceAdmin
         }
         catch (Exception e)
         {
-            throw new ErrorDto("could not create certificate", 1, e, Status.INTERNAL_SERVER_ERROR);
+            throw new ErrorDto("could not create certificate", 5, e, Status.INTERNAL_SERVER_ERROR);
         }
         finally
         {

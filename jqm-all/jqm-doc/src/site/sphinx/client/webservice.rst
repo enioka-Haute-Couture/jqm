@@ -43,17 +43,31 @@ and then using the API::
 
 As with any client (see the JavaDoc) clients are cached by the API, so it is not necessary to cache them yourself.
 
-Interrogating the API is then also exactly the same as with any other client. For exemple, to list all running jobs::
+Interrogating the API is then also exactly the same as with any other client. For example, to list all running jobs::
 
 	JqmClientFactory.getClient().getJobs()
 
 The specific parameters are:
 
-+-------------------+------------+---------------------------------+------------------------------+
-| Name              | Compulsory | Description                     | Example                      |
-+===================+============+=================================+==============================+
-| com.enioka.ws.url | YES        | The base URL of the web service | http://localhost:1789/api/ws |
-+-------------------+------------+---------------------------------+------------------------------+
++----------------------------------+------------+----------------------------------------------+------------------------------+
+| Name                             | Compulsory | Description                                  | Example                      |
++==================================+============+==============================================+==============================+
+| com.enioka.ws.url                | YES        | The base URL of the web service              | http://localhost:1789/api/ws |
++----------------------------------+------------+----------------------------------------------+------------------------------+
+| com.enioka.jqm.ws.login          |            | If auth is used only.                        | mylogin                      |
++----------------------------------+------------+----------------------------------------------+------------------------------+
+| com.enioka.jqm.ws.password       | if login   |                                              | password                     |
++----------------------------------+------------+----------------------------------------------+------------------------------+
+| com.enioka.jqm.ws.keystoreFile   | if CSA     | Store for client certificates authentication | ./conf/client.pfx            |
++----------------------------------+------------+----------------------------------------------+------------------------------+
+| com.enioka.jqm.ws.keystoreType   |            | Type of the previous store                   | PKCS12                       |
++----------------------------------+------------+----------------------------------------------+------------------------------+
+| com.enioka.jqm.ws.keystorePass   |            | Password of the store                        | MyPassword                   |
++----------------------------------+------------+----------------------------------------------+------------------------------+
+| com.enioka.jqm.ws.truststoreFile | if SSL     | Trust roots for server certificates          | ./conf/client.pfx            |
++----------------------------------+------------+----------------------------------------------+------------------------------+
+| com.enioka.jqm.ws.truststorePass |            | Password of the store                        | NoPassword                   |
++----------------------------------+------------+----------------------------------------------+------------------------------+
 
 and can be set:
 
@@ -173,6 +187,20 @@ Used HTTP error codes are:
 * 500 when it hangs on the server (unexpected error)
 
 On the full Java client side, these are respectively translated to :class:`JqmInvalidRequestException` and :class:`JqmClientException`.
+
+The body of the response contains an XML or JSON item giving details on the error.::
+
+    1	404	GET on absent object
+    2	500	
+    3	404	DELETE on absent object
+    4	400	Update user with absent role
+    5	500	Could not create certificate
+    6	400	Invalid enqueue parameters
+    7	400	Simple API  is only available when the application runs on top of JQM itself and not a web application server.
+    8	400	File does not exist
+    9	500	Generic internal exception
+    10	400	Generic bad request
+
 
 Script sample
 ****************

@@ -147,7 +147,7 @@ public class ServiceClient implements JqmClient
         JqmClientFactory.getClient().setJobQueue(jobId, queueId);
     }
 
-    // No need to expose. CLient side work.
+    // No need to expose. Client side work.
     @Override
     public void setJobQueue(int jobId, Queue queue)
     {

@@ -126,7 +126,7 @@ public class ServiceSimple
     {
         if (n == null)
         {
-            throw new ErrorDto("can only retrieve a file when the web app runs on top of JQM", "", 9875, Status.BAD_REQUEST);
+            throw new ErrorDto("can only retrieve a file when the web app runs on top of JQM", "", 7, Status.BAD_REQUEST);
         }
 
         Deliverable d = null;
@@ -139,11 +139,11 @@ public class ServiceSimple
         }
         catch (NoResultException e)
         {
-            throw new ErrorDto("Deliverable does not exist", 905, e, Status.BAD_REQUEST);
+            throw new ErrorDto("Deliverable does not exist", 8, e, Status.BAD_REQUEST);
         }
         catch (Exception e)
         {
-            throw new ErrorDto("Could not retrieve Deliverable metadata from database", 906, e, Status.INTERNAL_SERVER_ERROR);
+            throw new ErrorDto("Could not retrieve Deliverable metadata from database", 9, e, Status.INTERNAL_SERVER_ERROR);
         }
         finally
         {
@@ -167,7 +167,7 @@ public class ServiceSimple
         }
         catch (FileNotFoundException e)
         {
-            throw new ErrorDto("Could not find the desired file", 901, e, Status.NO_CONTENT);
+            throw new ErrorDto("Could not find the desired file", 8, e, Status.NO_CONTENT);
         }
     }
 
@@ -222,7 +222,7 @@ public class ServiceSimple
             }
             catch (IndexOutOfBoundsException e)
             {
-                throw new ErrorDto("There should be as many parameter names as parameter values", 12, e, Status.BAD_REQUEST);
+                throw new ErrorDto("There should be as many parameter names as parameter values", 6, e, Status.BAD_REQUEST);
             }
             jd.addParameter(name, value);
             log.trace("Adding a parameter: " + name + " - " + value);

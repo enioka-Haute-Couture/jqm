@@ -15,16 +15,23 @@
  */
 package com.enioka.jqm.api;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 @Provider
 public class JqmExceptionMapper implements ExceptionMapper<JqmInvalidRequestException>
 {
+    // @Context
+    // private HttpHeaders headers;
+
     @Override
     public Response toResponse(JqmInvalidRequestException exception)
     {
-        return Response.status(Response.Status.BAD_REQUEST).entity(exception.getMessage()).build();
+        // String type = headers.getMediaType() == null ? MediaType.APPLICATION_JSON : headers.getMediaType().getType();
+        ErrorDto d = new ErrorDto(exception.getMessage(), 10, exception, Status.BAD_REQUEST);
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(d).type(MediaType.APPLICATION_JSON).build();
     }
 }
