@@ -1,4 +1,5 @@
-<table>
+<div clas="row">
+  <div class="col-md-12">
     <h5>
         <span class="glyphicon glyphicon-question-sign" ng-click="isCollapsed = !isCollapsed"></span> Resources are Java objects that can be requested
         by jobs through a JNDI lookup and created by the engine.
@@ -29,53 +30,55 @@
                 available to the engine itself, not only to the payload).</h5>
         </div>
     </div>
-    <tr>
-        <td style="width: 1px;">
-            <div class='gridClass' style="width: 65em;" ng-grid='gridOptions'></div>
-        </td>
-        <td ng-show="selected.length !== 0">
-            <div class='gridClass' style="width: 35em; margin-left: 10px;" ng-grid='gridOptions2'></div>
-        </td>
-    </tr>
-    <tr>
-        <td>
-        <br/>
-        
-          <div class="btn-group">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-book"></span> Database <span class="caret"></span></button>
-              <ul class="dropdown-menu" role="menu">
-                <li><a ng-click="neworaclepool()">New Oracle Pool</a></li>
-                <li><a ng-click="newmysqlpool()">New MySQL Pool</a></li>
-                <li><a ng-click="newpspool()">New PostgreSQL Pool</a></li>
-                <li><a ng-click="newhsqldbpool()">New HSQLDB Pool</a></li>
-                <li><a ng-click="newotherpool()">New JDBC Pool (other databases)</a></li>
-              </ul>
-          </div>
-          
-          <div class="btn-group">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-envelope"></span> Message QCF <span class="caret"></span></button>
-              <ul class="dropdown-menu" role="menu">
-                <li><a ng-click="newmqqcf()">New MQSeries QCF</a></li>
-                <li><a ng-click="newmqq()">New MQSeries Q</a></li>
-                <li><a ng-click="newamqqcf()">New AMQ QCF</a></li>
-                <li><a ng-click="newamqq()">New AMQ Q</a></li>
-              </ul>
-          </div>
-          
-          <button class="btn btn-default" ng-click="newfile()"><span class="glyphicon glyphicon-file"></span> New File</button>
-          <button class="btn btn-default" ng-click="newurl()"><span class="glyphicon glyphicon-link"></span> New URL</button>
-          <button class="btn btn-default" ng-click="newgeneric()"><span class="glyphicon glyphicon-cog"></span> New generic resource</button>
 
-        </td>
-        <td ng-show="selected.length !== 0" style="vertical-align: top;">
-            <div>
-                <button class="btn btn-default" ng-click="addprm()"><span class="glyphicon glyphicon-plus"></span> Add new parameter</button>
-                <button class="btn btn-default" ng-click="removeprms()" ng-show="selected2.length !== 0"><span class="glyphicon glyphicon-remove"></span> Remove selected parameters</button>
+  </div>
+</div>
+
+<div clas="row">
+        <div class="col-md-8">
+            <div ng-grid='gridOptions'></div>
+            <br/>
+        
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-book"></span> Database <span class="caret"></span></button>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a ng-click="neworaclepool()">New Oracle Pool</a></li>
+                  <li><a ng-click="newmysqlpool()">New MySQL Pool</a></li>
+                  <li><a ng-click="newpspool()">New PostgreSQL Pool</a></li>
+                  <li><a ng-click="newhsqldbpool()">New HSQLDB Pool</a></li>
+                  <li><a ng-click="newotherpool()">New JDBC Pool (other databases)</a></li>
+                </ul>
             </div>
-            <div>
-                <button class="btn btn-default" ng-click="savealias()" ng-show="selected.length !== 0"><span class="glyphicon glyphicon-floppy-save"></span> Save selected alias</button>
-                <button class="btn btn-default"  ng-click="removealias()" ng-show="selected.length !== 0"><span class="glyphicon glyphicon-remove"></span> Remove selected alias</button>
+            
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-envelope"></span> Message QCF <span class="caret"></span></button>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a ng-click="newmqqcf()">New MQSeries QCF</a></li>
+                  <li><a ng-click="newmqq()">New MQSeries Q</a></li>
+                  <li><a ng-click="newamqqcf()">New AMQ QCF</a></li>
+                  <li><a ng-click="newamqq()">New AMQ Q</a></li>
+                </ul>
             </div>
-        </td>
-    </tr>
-</table>
+            
+            <button class="btn btn-default" ng-click="newfile()"><span class="glyphicon glyphicon-file"></span> New File</button>
+            <button class="btn btn-default" ng-click="newurl()"><span class="glyphicon glyphicon-link"></span> New URL</button>
+            <button class="btn btn-default" ng-click="newgeneric()"><span class="glyphicon glyphicon-cog"></span> New generic resource</button>
+            
+            <br/><br/>
+            <button class="btn btn-default" ng-click="savealias()" ng-show="selected.length !== 0"><span class="glyphicon glyphicon-floppy-save"></span> Save selected alias</button>
+            <button class="btn btn-default"  ng-click="removealias()" ng-show="selected.length !== 0"><span class="glyphicon glyphicon-remove"></span> Remove selected alias</button>
+
+
+        </div>
+            
+        <div class="col-md-4" ng-show="selected.length !== 0">
+            <div ng-grid='gridOptions2'></div>
+            <div ng-show="selected.length !== 0">
+              <button class="btn btn-default" ng-click="addprm()"><span class="glyphicon glyphicon-plus"></span> Add new parameter</button>
+              <button class="btn btn-default" ng-click="removeprms()" ng-show="selected2.length !== 0"><span class="glyphicon glyphicon-remove"></span> Remove selected parameters</button>
+            </div>
+        </div>
+</div>
+<div class="clearfix"></div>
+
+        
