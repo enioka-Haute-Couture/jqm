@@ -1632,11 +1632,8 @@ final class HibernateClient implements JqmClient
         catch (Exception e)
         {
             h = null;
-            throw new JqmInvalidRequestException("No ended job found with the deliverable ID " + jobId, e);
-        }
-        finally
-        {
             closeQuietly(em);
+            throw new JqmInvalidRequestException("No ended job found with the deliverable ID " + jobId, e);
         }
 
         // 2: build URL
@@ -1649,6 +1646,10 @@ final class HibernateClient implements JqmClient
         catch (MalformedURLException e)
         {
             throw new JqmClientException("URL is not valid " + url, e);
+        }
+        finally
+        {
+            em.close();
         }
 
         return getFile(url.toString());
