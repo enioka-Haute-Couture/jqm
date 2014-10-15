@@ -1450,6 +1450,10 @@ final class HibernateClient implements JqmClient
         {
             throw new JqmClientException("URL is not valid " + url, e);
         }
+        finally
+        {
+            em.close();
+        }
 
         return getFile(url.toString());
     }
