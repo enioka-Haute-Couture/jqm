@@ -18,6 +18,7 @@ package com.enioka.jqm.api;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -26,6 +27,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
@@ -39,6 +41,9 @@ import org.slf4j.LoggerFactory;
 public class ServiceClient implements JqmClient
 {
     static Logger log = LoggerFactory.getLogger(ServiceClient.class);
+
+    private @Context
+    HttpServletResponse res;
 
     // Not directly mapped: returning an integer would be weird. See enqueue_object.
     public int enqueue(JobRequest jd)
@@ -294,6 +299,7 @@ public class ServiceClient implements JqmClient
     public InputStream getJobLogStdErr(@PathParam("jobId") int jobId)
     {
         log.debug("calling WS getJobLogStdErr");
+        res.setHeader("Content-Disposition", "attachment; filename=" + jobId + ".stderr.txt");
         return JqmClientFactory.getClient().getJobLogStdErr(jobId);
     }
 
@@ -304,6 +310,7 @@ public class ServiceClient implements JqmClient
     public InputStream getJobLogStdOut(@PathParam("jobId") int jobId)
     {
         log.debug("calling WS getJobLogStdOut");
+        res.setHeader("Content-Disposition", "attachment; filename=" + jobId + ".stdout.txt");
         return JqmClientFactory.getClient().getJobLogStdOut(jobId);
     }
 
