@@ -39,24 +39,33 @@
     </tr>
     <tr>
         <td>
-            <div>
-                <button ng-click="neworaclepool()">New Oracle Pool</button>
-                <button ng-click="newmysqlpool()">New MySQL Pool</button>
-                <button ng-click="newpspool()">New PostgreSQL Pool</button>
-                <button ng-click="newhsqldbpool()">New HSQLDB Pool</button>
-                <button ng-click="newotherpool()">New JDBC Pool (other databases)</button>
-            </div>
-            <div>
-                <button ng-click="newmqqcf()">New MQSeries QCF</button>
-                <button ng-click="newmqq()">New MQSeries Q</button>
-                <button ng-click="newamqqcf()">New AMQ QCF</button>
-                <button ng-click="newamqq()">New AMQ Q</button>
-            </div>
-            <div>
-                <button ng-click="newfile()">New File</button>
-                <button ng-click="newurl()">New URL</button>
-                <button ng-click="newgeneric()">New generic resource</button>
-            </div>
+        <br/>
+        
+          <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Database <span class="caret"></span></button>
+              <ul class="dropdown-menu" role="menu">
+                <li><a ng-click="neworaclepool()">New Oracle Pool</a></li>
+                <li><a ng-click="newmysqlpool()">New MySQL Pool</a></li>
+                <li><a ng-click="newpspool()">New PostgreSQL Pool</a></li>
+                <li><a ng-click="newhsqldbpool()">New HSQLDB Pool</a></li>
+                <li><a ng-click="newotherpool()">New JDBC Pool (other databases)</a></li>
+              </ul>
+          </div>
+          
+          <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Message QCF <span class="caret"></span></button>
+              <ul class="dropdown-menu" role="menu">
+                <li><a ng-click="newmqqcf()">New MQSeries QCF</a></li>
+                <li><a ng-click="newmqq()">New MQSeries Q</a></li>
+                <li><a ng-click="newamqqcf()">New AMQ QCF</a></li>
+                <li><a ng-click="newamqq()">New AMQ Q</a></li>
+              </ul>
+          </div>
+          
+          <button class="btn btn-default" ng-click="newfile()">New File</button>
+          <button class="btn btn-default" ng-click="newurl()">New URL</button>
+          <button class="btn btn-default" ng-click="newgeneric()">New generic resource</button>
+
         </td>
         <td ng-show="selected.length !== 0" style="vertical-align: top;">
             <div>
