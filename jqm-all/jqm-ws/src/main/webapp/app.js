@@ -1,6 +1,6 @@
 'use strict';
 
-var jqmApp = angular.module('jqmApp', [ 'ngRoute', 'ngCookies', 'jqmControllers', 'ngGrid', 'jqmServices', 'ui.bootstrap', ]);
+var jqmApp = angular.module('jqmApp', [ 'ngRoute', 'ngCookies', 'jqmControllers', 'ngGrid', 'jqmServices', 'ui.bootstrap', 'ngSanitize']);
 
 jqmApp.config([ '$routeProvider', function($routeProvider, µPermManager)
 {
@@ -48,43 +48,43 @@ function TabsCtrl($scope, $location, $http, µPermManager)
 
     $scope.tabs = [ {
         link : '#/home',
-        label : 'Home',
+        label : '<span class="glyphicon glyphicon-home"></span> Home',
         permission : '',
     }, {
         link : '#/node',
-        label : 'Nodes',
+        label : '<span class="glyphicon glyphicon-tower"></span> Nodes',
         permission : 'node:read',
     }, {
         link : '#/q',
-        label : 'Queues',
+        label : '<span class="glyphicon glyphicon-th-list"></span> Queues',
         permission : 'queue:read',
     }, {
         link : '#/qmapping',
-        label : 'Queue Mappings',
+        label : '<span class="glyphicon glyphicon-transfer"></span> Queue Mappings',
         permission : 'qmapping:read',
     }, {
         link : '#/jndi',
-        label : 'JNDI Resources',
+        label : '<span class="glyphicon glyphicon-cog"></span> JNDI Resources',
         permission : 'jndi:read',
     }, {
         link : '#/prm',
-        label : 'Cluster-wide parameters',
+        label : '<span class="glyphicon glyphicon-wrench"></span> Cluster-wide parameters',
         permission : 'prm:read',
     }, {
         link : '#/jd',
-        label : 'Job definitions',
+        label : '<span class="glyphicon glyphicon-list-alt"></span> Job definitions',
         permission : 'jd:read',
     }, {
         link : '#/user',
-        label : 'Users',
+        label : '<span class="glyphicon glyphicon-user"></span> Users',
         permission : 'user:read',
     }, {
         link : '#/role',
-        label : 'Roles',
+        label : '<span class="glyphicon glyphicon-lock"></span> Roles',
         permission : 'role:read',
     }, {
         link : '#/history',
-        label : 'Runs',
+        label : '<span class="glyphicon glyphicon-eye-open"></span> Runs',
         permission : 'job_instance:read',
     }, ];
 
