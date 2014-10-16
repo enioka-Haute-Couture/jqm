@@ -5,14 +5,12 @@
         <label class="btn btn-default active" ng-model="target" btn-radio="'hist'" uncheckable><span class="glyphicon glyphicon-off"></span> ended</label>
         <label class="btn btn-default" ng-model="target" btn-radio="'queues'" uncheckable><span class="glyphicon glyphicon-road"></span> active</label>
     </div>
-    <span>Application: </span>
-    <input ng-model="query.applicationName" ng-change="getDataAsync()" ng-required="true" />
-    <span>User: </span>
-    <input ng-model="query.user" ng-change="getDataAsync()" ng-required="true"/>
-    <span>ID: </span>
-    <input ng-model="query.jobInstanceId" ng-change="getDataAsync();" ng-required="true" style="width: 3em;" />
-    <span>Parent ID: </span>
-    <input ng-model="query.parentId" ng-change="getDataAsync();" ng-required="true" style="width: 3em;" /><span>Queue: </span>
+    <span>Filter: </span>
+    <input ng-model="query.applicationName" placeholder="application" type="text" ng-change="getDataAsync()" ng-required="true" popover="Use % as wildcard" popover-trigger="mouseenter" />
+    <input ng-model="query.user" placeholder="user" type="text" ng-change="getDataAsync()" ng-required="true" popover="Use % as wildcard" popover-trigger="mouseenter" />
+    <input ng-model="query.jobInstanceId" placeholder="id" type="text" ng-change="getDataAsync();" ng-required="true" style="width: 4em;" popover="Give exact ID" popover-trigger="mouseenter" />
+    <input ng-model="query.parentId" placeholder="par id" type="text" ng-change="getDataAsync();" ng-required="true" style="width: 4em;" popover="Give exact ID" popover-trigger="mouseenter" />
+    <span>Queue: </span>
     <select ng-cell-input ng-model="query.queueId" ng-options="q.id as q.name for q in queues" ng-change="getDataAsync();"></select>
     <div class="btn-group">
       <button class="btn btn-default" ng-click="latest(1)"><span class="glyphicon glyphicon-calendar"></span> Last hour</button>
@@ -22,7 +20,7 @@
     <br/><br/>
     <div ng-grid='gridOptions' ng-dblclick="showDetail()"></div>
     
-    <div class="small">Double-click on a line to get job details, files produced and logs. Use % as wildcard is search filters.</div>
+    <div class="small">Double-click on a line to get job details, files produced and logs.</div>
     <button class="btn btn-default" ng-click="relaunch()" ng-disabled="selected.length === 0"><span class="glyphicon glyphicon-repeat"></span> Relaunch</button>
     <button class="btn btn-default" ng-click="getDataAsync()"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
     <button class="btn btn-default" ng-click="newLaunch()"><span class="glyphicon glyphicon-plus"></span> New launch form</button>

@@ -19,7 +19,6 @@ html,body {
 
 /* Prevent some browser (like firefox) to add a red border on required input */
 [required] {
-    color:red;
     box-shadow: none;
 }
 
