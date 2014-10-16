@@ -1,8 +1,9 @@
 <div>
+<br/>
     <table>
         <tr>
             <td style="padding-right: 10px; vertical-align: top;">
-                Search: <input ng-model="queryStr" />
+                <input ng-model="queryStr" type="text" placeholder="filter user..." />
                 <select class="form-control" style="overflow: auto; width: 200px;" ng-model="usr" size="25"
                     ng-options="o as o.login for o in users| filter: queryStr  | orderBy: login"
                 ></select>

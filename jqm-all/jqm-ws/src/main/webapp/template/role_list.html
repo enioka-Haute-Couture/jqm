@@ -1,8 +1,7 @@
-<div class="container-fluid">
+<br/>
     <div class="row">
         <div class="col-xs-2">
-            Search:
-            <input ng-model="queryStr" />
+            <input ng-model="queryStr" type="text" placeholder="filter role..."  />
             <select class="form-control" style="overflow: auto; height: 100%;" ng-model="role" size="25"
                 ng-options="o as o.name for o in roles | filter: queryStr  | orderBy: name"
             ></select>
@@ -77,5 +76,4 @@
             
         </div>
     </div>
-</div>
 
