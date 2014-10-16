@@ -1,10 +1,10 @@
 <div>
     <h5>
-        <span class="glyphicon glyphicon-question-sign" ng-click="isCollapsed = !isCollapsed"></span> These are FIFO (First In First Out) queues in
-        which batch job execution requests will wait.
+        <span ng-click="isCollapsed = !isCollapsed"><span popover="Click to display help" popover-trigger="mouseenter" popover-placement="right" class="glyphicon glyphicon-question-sign"></span></span>
     </h5>
     <div collapse="!isCollapsed">
         <div class="well well-lg">
+            <h4>These are FIFO (First In First Out) queues in which batch job execution requests will wait.</h4>
             <h5>On this page, one may change the characteristics of queues. Changes on this page do not require node reboots.</h5>
             <dl class="dl-horizontal">
                 <dt>Name</dt>

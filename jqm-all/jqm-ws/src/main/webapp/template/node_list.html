@@ -2,19 +2,17 @@
 
 
     <h5>
-        <span class="glyphicon glyphicon-question-sign" ng-click="isCollapsed = !isCollapsed"></span> Nodes can only be created through the command
-        line
-        <code>jqm.sh createnode [ nodename ]</code>
-        . Only nodes switched off for more than 10 minutes can be removed.
+        <span ng-click="isCollapsed = !isCollapsed"><span popover="Click to display help" popover-trigger="mouseenter" popover-placement="right" class="glyphicon glyphicon-question-sign"></span></span>
     </h5>
-
 
     <div collapse="!isCollapsed">
         <div class="well well-lg">
+            <h4>Nodes can only be created through the command line <code>jqm.sh createnode [ nodename ]</code>. Only nodes switched off for more than 10 minutes can be removed.</h4>
             <h5>
                 On this page, one may change the characteristics of nodes (i.e. JVM, i.e. members of the JQM cluster). <strong>Beware: any
                     parameter change on a node requires a node reboot.</strong>
             </h5>
+            
             <dl class="dl-horizontal">
                 <dt>Name</dt>
                 <dd>The name of the node inside the JQM cluster. It has no link whatsoever to hostname, DNS names and whatnot. It is simply the
