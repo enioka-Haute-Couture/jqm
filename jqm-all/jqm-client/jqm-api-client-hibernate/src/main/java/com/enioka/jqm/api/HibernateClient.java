@@ -277,13 +277,19 @@ final class HibernateClient implements JqmClient
         {
             JobInstance ji = new JobInstance();
             ji.setJd(job);
+            ji.setQueue(job.getQueue());
+            ji.setState(State.SUBMITTED);
+            ji.setNode(null);
+            ji.setApplication(jd.getApplication());
+            ji.setEmail(jd.getEmail());
+            ji.setKeyword1(jd.getKeyword1());
+            ji.setKeyword2(jd.getKeyword2());
+            ji.setKeyword3(jd.getKeyword3());
+            ji.setModule(jd.getModule());
+            ji.setProgress(0);
             ji.setSessionID(jd.getSessionID());
             ji.setUserName(jd.getUser());
-            ji.setState(State.SUBMITTED);
-            ji.setQueue(job.getQueue());
-            ji.setNode(null);
-            // Can be null (if no email is asked for)
-            ji.setEmail(jd.getEmail());
+
             ji.setCreationDate(Calendar.getInstance());
             if (jd.getParentID() != null)
             {

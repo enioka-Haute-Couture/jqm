@@ -592,4 +592,29 @@ public class ClientApiTest extends JqmBaseTest
         Assert.assertEquals(State.ENDED, res.get(1).getState());
     }
 
+    @Test
+    public void testTags() throws Exception
+    {
+        EntityManager em = Helpers.getNewEm();
+        TestHelpers.cleanup(em);
+        TestHelpers.createLocalNode(em);
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobRequest j = new JobRequest("MarsuApplication", "TestUser");
+        j.setKeyword1("Houba");
+        j.setKeyword3("Meuh");
+        JqmClientFactory.getClient().enqueue(j);
+
+        JqmEngine engine1 = new JqmEngine();
+        engine1.start("localhost");
+        TestHelpers.waitFor(1, 10000, em);
+        engine1.stop();
+
+        History h = Helpers.getNewEm().createQuery("SELECT j FROM History j", History.class).getSingleResult();
+
+        Assert.assertEquals("Houba", h.getInstanceKeyword1());
+        Assert.assertEquals(null, h.getInstanceKeyword2());
+        Assert.assertEquals("Meuh", h.getInstanceKeyword3());
+    }
+
 }

@@ -338,7 +338,6 @@ public final class Helpers
         h.setJd(job.getJd());
         h.setSessionId(job.getSessionID());
         h.setQueue(job.getQueue());
-        h.setMessages(new ArrayList<Message>());
         h.setEnqueueDate(job.getCreationDate());
         h.setEndDate(endDate);
         h.setAttributionDate(job.getAttributionDate());
@@ -346,15 +345,20 @@ public final class Helpers
         h.setUserName(job.getUserName());
         h.setEmail(job.getEmail());
         h.setParentJobId(job.getParentId());
-        h.setApplication(job.getApplication());
-        h.setModule(job.getModule());
-        h.setKeyword1(job.getKeyword1());
-        h.setKeyword2(job.getKeyword2());
-        h.setKeyword3(job.getKeyword3());
+        h.setApplication(job.getJd().getApplication());
+        h.setModule(job.getJd().getModule());
+        h.setKeyword1(job.getJd().getKeyword1());
+        h.setKeyword2(job.getJd().getKeyword2());
+        h.setKeyword3(job.getJd().getKeyword3());
+        h.setInstanceApplication(job.getApplication());
+        h.setInstanceKeyword1(job.getKeyword1());
+        h.setInstanceKeyword2(job.getKeyword2());
+        h.setInstanceKeyword3(job.getKeyword3());
+        h.setInstanceModule(job.getModule());
         h.setProgress(job.getProgress());
-        h.setParameters(new ArrayList<JobHistoryParameter>());
         h.setStatus(finalState);
         h.setNode(job.getNode());
+        h.setParameters(new ArrayList<JobHistoryParameter>());
 
         em.persist(h);
 
