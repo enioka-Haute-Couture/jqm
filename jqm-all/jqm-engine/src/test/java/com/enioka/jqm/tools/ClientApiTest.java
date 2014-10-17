@@ -299,4 +299,23 @@ public class ClientApiTest extends JqmBaseTest
         File tmpDir = new File(FilenameUtils.concat(TestHelpers.node.getTmpDirectory(), "" + i));
         Assert.assertFalse(tmpDir.isDirectory());
     }
+
+    @Test
+    public void testTags() throws Exception
+    {
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        JobRequest.create("MarsuApplication", "TestUser").setKeyword1("Houba").setKeyword3("Meuh").submit();
+
+        addAndStartEngine();
+        TestHelpers.waitFor(1, 10000, em);
+
+        Assert.assertEquals(1, TestHelpers.getOkCount(em));
+
+        History h = Helpers.getNewEm().createQuery("SELECT j FROM History j", History.class).getSingleResult();
+
+        Assert.assertEquals("Houba", h.getInstanceKeyword1());
+        Assert.assertEquals(null, h.getInstanceKeyword2());
+        Assert.assertEquals("Meuh", h.getInstanceKeyword3());
+    }
 }
