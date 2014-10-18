@@ -247,11 +247,13 @@
 				<configuration>
 					<filesets>
 						<fileset>
-							<directory>ext</directory>
-							<directory>webapp</directory>
-							<directory>logs</directory>
-							<!-- <directory>testprojects</directory> -->
-							<followSymlinks>false</followSymlinks>
+							<directory>ext</directory>							
+						</fileset>
+						<fileset>
+							<directory>webapp</directory>							
+						</fileset>
+						<fileset>
+							<directory>logs</directory>							
 						</fileset>
 					</filesets>
 				</configuration>
