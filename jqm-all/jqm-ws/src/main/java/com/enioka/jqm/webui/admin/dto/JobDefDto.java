@@ -39,7 +39,7 @@ public class JobDefDto implements Serializable
     private String keyword1;
     private String keyword2;
     private String keyword3;
-    private boolean highlander;
+    private boolean highlander, enabled;
     private String jarPath;
 
     @XmlElementWrapper(name = "parameters")
@@ -184,5 +184,15 @@ public class JobDefDto implements Serializable
     public void setParameters(List<ParameterDto> parameters)
     {
         this.parameters = parameters;
+    }
+
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
     }
 }

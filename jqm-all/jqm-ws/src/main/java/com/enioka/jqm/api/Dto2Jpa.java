@@ -167,6 +167,7 @@ class Dto2Jpa
         jpa.setApplicationName(dto.getApplicationName());
         jpa.setCanBeRestarted(dto.isCanBeRestarted());
         jpa.setDescription(dto.getDescription());
+        jpa.setEnabled(dto.isEnabled());
         jpa.setHighlander(dto.isHighlander());
         jpa.setJarPath(dto.getJarPath());
         jpa.setJavaClassName(dto.getJavaClassName());

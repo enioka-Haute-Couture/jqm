@@ -31,6 +31,7 @@ import org.junit.Test;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.History;
+import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -135,5 +136,26 @@ public class NoApiPayloadTest extends JqmBaseTest
 
         Assert.assertEquals(1, res.size());
         Assert.assertEquals(State.ENDED, res.get(0).getState());
+    }
+
+    @Test
+    public void testDisabledPayload() throws Exception
+    {
+        JobDef jd = CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+        em.getTransaction().begin();
+        jd.setEnabled(false);
+        em.getTransaction().commit();
+        JobRequest.create("MarsuApplication", "TestUser").submit();
+
+        addAndStartEngine();
+        TestHelpers.waitFor(1, 10000, em);
+
+        Assert.assertEquals(1, TestHelpers.getOkCount(em));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+
+        History h = em.createQuery("SELECT j FROM History j", History.class).getSingleResult();
+
+        Assert.assertEquals(-1, (int) h.getProgress());
     }
 }

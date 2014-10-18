@@ -164,6 +164,7 @@ public class Jpa2Dto
         res.setApplicationName(d.getApplicationName());
         res.setCanBeRestarted(d.isCanBeRestarted());
         res.setDescription(d.getDescription());
+        res.setEnabled(d.isEnabled());
         res.setHighlander(d.isHighlander());
         res.setJarPath(d.getJarPath());
         res.setJavaClassName(d.getJavaClassName());

@@ -205,7 +205,6 @@ class QueuePoller implements Runnable, QueuePollerMBean
             }
 
             // Wait according to the deploymentParameter
-
             try
             {
                 loop.tryAcquire(dp.getPollingInterval(), TimeUnit.MILLISECONDS);

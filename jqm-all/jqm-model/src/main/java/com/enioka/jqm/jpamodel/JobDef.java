@@ -92,6 +92,9 @@ public class JobDef implements Serializable
     @Column(name = "jarPath", length = 1024)
     private String jarPath;
 
+    @Column(name = "enabled", nullable = false)
+    private boolean enabled = true;
+
     @Column(name = "java_opts", length = 200)
     private String javaOpts;
 
@@ -402,5 +405,22 @@ public class JobDef implements Serializable
     public void setExternal(boolean external)
     {
         this.external = external;
+    }
+
+    /**
+     * If <code>false</code>, the instances created from this JobDef won't actually run: the engine will simply fake a successful run.<br>
+     * Default is <code>true</code>
+     */
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+
+    /**
+     * See {@link #isEnabled()}
+     */
+    public void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
     }
 }

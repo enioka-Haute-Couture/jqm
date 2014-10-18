@@ -125,6 +125,18 @@ class Loader implements Runnable, LoaderMBean
         jqmlogger.debug("A loader/runner thread has just started for Job Instance " + job.getId() + ". Jar is: " + job.getJd().getJarPath()
                 + " - class is: " + job.getJd().getJavaClassName());
 
+        // Disabled
+        if (!this.job.getJd().isEnabled())
+        {
+            jqmlogger.info("Job Instance " + job.getId() + " will actually not truly run as its Job Definition is disabled");
+            em.getTransaction().begin();
+            this.job.setProgress(-1);
+            em.getTransaction().commit();
+            endOfRun(State.ENDED);
+            em.close();
+            return;
+        }
+
         // Check file paths
         File jarFile = new File(FilenameUtils.concat(new File(node.getRepo()).getAbsolutePath(), job.getJd().getJarPath()));
         if (!jarFile.canRead())
