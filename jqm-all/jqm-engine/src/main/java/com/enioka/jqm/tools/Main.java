@@ -31,6 +31,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 
+import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.RRole;
 import com.enioka.jqm.jpamodel.RUser;
@@ -106,6 +107,8 @@ public class Main
         Option o111 = OptionBuilder.withArgName("option").hasArg()
                 .withDescription("ws handling. Possible values are: enable, disable, ssl, nossl, internalpki, externalapi").isRequired()
                 .withLongOpt("gui").create("w");
+        Option o121 = OptionBuilder.withArgName("id[,logfilepath]").hasArg().withDescription("single launch mode").isRequired()
+                .withLongOpt("gui").create("s");
 
         Options options = new Options();
         OptionGroup og1 = new OptionGroup();
@@ -122,6 +125,7 @@ public class Main
         og1.addOption(o91);
         og1.addOption(o101);
         og1.addOption(o111);
+        og1.addOption(o121);
         options.addOptionGroup(og1);
 
         HelpFormatter formatter = new HelpFormatter();
@@ -195,6 +199,11 @@ public class Main
             else if (line.hasOption(o111.getOpt()))
             {
                 ws(line.getOptionValue(o111.getOpt()));
+            }
+            // Web options
+            else if (line.hasOption(o121.getOpt()))
+            {
+                single(line.getOptionValue(o121.getOpt()));
             }
         }
         catch (ParseException exp)
@@ -404,5 +413,18 @@ public class Main
             Helpers.setSingleParam("enableInternalPki", "false", em);
             em.close();
         }
+    }
+
+    private static void single(String option)
+    {
+        String[] ops = option.split(",");
+        int id = Integer.parseInt(ops[0]);
+        String logFilePath = null;
+        if (ops.length > 1)
+        {
+            logFilePath = ops[1];
+        }
+        JobInstance res = JqmSingleRunner.run(id, logFilePath);
+        jqmlogger.info(res.getState());
     }
 }

@@ -74,7 +74,7 @@ class Loader implements Runnable, LoaderMBean
         this.job = job;
 
         // JMX
-        if (p.engine.loadJmxBeans)
+        if (p != null && p.engine.loadJmxBeans)
         {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             try
@@ -118,7 +118,7 @@ class Loader implements Runnable, LoaderMBean
         Thread.currentThread().setName(this.job.getJd().getApplicationName() + ";payload;" + this.job.getId());
         EntityManager em = Helpers.getNewEm();
         this.job = em.find(JobInstance.class, job.getId());
-        this.node = em.find(Node.class, p.getDp().getNode().getId());
+        this.node = em.find(Node.class, job.getNode().getId());
 
         // Log
         State resultStatus = State.SUBMITTED;
@@ -294,7 +294,10 @@ class Loader implements Runnable, LoaderMBean
         }
 
         // Release the slot
-        p.decreaseNbThread();
+        if (p != null)
+        {
+            p.decreaseNbThread();
+        }
         EntityManager em = Helpers.getNewEm();
 
         // Clean class loader
@@ -340,7 +343,7 @@ class Loader implements Runnable, LoaderMBean
         }
 
         // Unregister MBean
-        if (this.p.engine.loadJmxBeans)
+        if (p != null && this.p.engine.loadJmxBeans)
         {
             try
             {
