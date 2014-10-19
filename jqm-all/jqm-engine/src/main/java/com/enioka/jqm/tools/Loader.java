@@ -138,9 +138,10 @@ class Loader implements Runnable, LoaderMBean
             return;
         }
 
-        // Check file paths
+        // Check file paths (unless it is /dev/null, which means no jar file)
+        final boolean noLibLoading = "/dev/null".equals(job.getJd().getJarPath());
         File jarFile = new File(FilenameUtils.concat(new File(node.getRepo()).getAbsolutePath(), job.getJd().getJarPath()));
-        if (!jarFile.canRead())
+        if (!noLibLoading && !jarFile.canRead())
         {
             jqmlogger.warn("Cannot read file at " + jarFile.getAbsolutePath()
                     + ". Job instance will crash. Check job definition or permissions on file.");
@@ -165,7 +166,15 @@ class Loader implements Runnable, LoaderMBean
         final URL[] classpath;
         try
         {
-            classpath = cache.getLibraries(node, job.getJd(), em);
+            if (!noLibLoading)
+            {
+                classpath = cache.getLibraries(node, job.getJd(), em);
+            }
+            else
+            {
+                classpath = null;
+            }
+
         }
         catch (Exception e1)
         {
@@ -233,7 +242,14 @@ class Loader implements Runnable, LoaderMBean
                     {
                         jqmlogger.warn("could not find ext directory class loader. No parent classloader will be used", e);
                     }
-                    return new JarClassLoader(jarUrl, classpath, extLoader);
+                    if (!noLibLoading)
+                    {
+                        return new JarClassLoader(jarUrl, classpath, extLoader);
+                    }
+                    else
+                    {
+                        return new JarClassLoader(Thread.currentThread().getContextClassLoader());
+                    }
                 }
             });
 

@@ -1,6 +1,7 @@
 package com.enioka.jqm.tools;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 import org.apache.log4j.Logger;
 
@@ -169,5 +170,14 @@ public class JqmSingleRunner
 
         // Get result
         return JqmClientFactory.getClient().getJob(job.getId());
+    }
+
+    /**
+     * <strong>Not part of any API - for JQM internal tests only</strong><br>
+     * Sets the connection that will be used by the engine and its APIs.
+     */
+    public static void setConnection(EntityManagerFactory emf)
+    {
+        Helpers.setEmf(emf);
     }
 }

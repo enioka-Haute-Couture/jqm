@@ -88,6 +88,11 @@ final class Helpers
         return emf.createEntityManager();
     }
 
+    static void setEmf(EntityManagerFactory newEmf)
+    {
+        emf = newEmf;
+    }
+
     static EntityManagerFactory getEmf()
     {
         if (emf == null)

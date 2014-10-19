@@ -49,6 +49,7 @@
 		<module>jqm-test-providedapi</module>
 		<module>jqm-test-apienginestatus</module>
 		<module>jqm-test-jmxleak</module>
+		<module>jqm-test-embeddedtest</module>
 	</modules>
 
 	<profiles>
