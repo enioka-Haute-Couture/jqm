@@ -1,14 +1,8 @@
 package com.enioka.jqm.tools;
 
-import java.io.IOException;
-
 import javax.persistence.EntityManager;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
@@ -28,7 +22,7 @@ public class JqmSingleRunner
         // Static class
     }
 
-    public static JobInstance run(int jobInstanceId, String logFile)
+    public static JobInstance run(int jobInstanceId)
     {
         jqmlogger.debug("Single runner was asked to start with ID " + jobInstanceId);
         EntityManager em = Helpers.getNewEm();
@@ -38,7 +32,7 @@ public class JqmSingleRunner
         {
             throw new IllegalArgumentException("There is no JobRequest by ID " + jobInstanceId);
         }
-        return run(jr, logFile);
+        return run(jr);
     }
 
     /**
@@ -49,7 +43,7 @@ public class JqmSingleRunner
      *            the file to which output the run log. if null, only stdout will be used.
      * @return the result of the run
      */
-    public static JobInstance run(com.enioka.jqm.jpamodel.JobInstance job, String logFile)
+    public static JobInstance run(com.enioka.jqm.jpamodel.JobInstance job)
     {
         if (job == null)
         {
@@ -70,24 +64,6 @@ public class JqmSingleRunner
         // Parameters
         final int poll = Integer.parseInt(Helpers.getParameter("internalPollingPeriodMs", "10000", em));
         final int jobId = job.getId();
-
-        // Logs & log level
-        PatternLayout layout = new PatternLayout("%d{dd/MM HH:mm:ss.SSS}|%-5p|%-40.40t|%-17.17c{1}|%x%m%n");
-        if (logFile != null)
-        {
-            // In this case, redirect everything (not only JQM-related) to the given file. Don't restore at the end - one shot JVM use case.
-            Logger.getRootLogger().setLevel(Level.toLevel(job.getNode().getRootLogLevel()));
-            Logger.getRootLogger().removeAllAppenders();
-            Logger.getRootLogger().addAppender(new ConsoleAppender(layout));
-            try
-            {
-                Logger.getRootLogger().addAppender(new FileAppender(layout, logFile));
-            }
-            catch (IOException e)
-            {
-                throw new IllegalArgumentException("Log file " + logFile + " cannot be created", e);
-            }
-        }
 
         // Security
         if (System.getSecurityManager() == null)

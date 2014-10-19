@@ -417,14 +417,8 @@ public class Main
 
     private static void single(String option)
     {
-        String[] ops = option.split(",");
-        int id = Integer.parseInt(ops[0]);
-        String logFilePath = null;
-        if (ops.length > 1)
-        {
-            logFilePath = ops[1];
-        }
-        JobInstance res = JqmSingleRunner.run(id, logFilePath);
+        int id = Integer.parseInt(option);
+        JobInstance res = JqmSingleRunner.run(id);
         jqmlogger.info(res.getState());
     }
 }

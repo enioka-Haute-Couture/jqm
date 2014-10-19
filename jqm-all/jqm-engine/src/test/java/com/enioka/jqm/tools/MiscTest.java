@@ -362,14 +362,11 @@ public class MiscTest extends JqmBaseTest
         em.createQuery("UPDATE JobInstance ji set ji.node = :n").setParameter("n", TestHelpers.node).executeUpdate();
         em.getTransaction().commit();
 
-        Main.main(new String[] { "-s", String.valueOf(i) + ",./target/testsingle.log" });
+        Main.main(new String[] { "-s", String.valueOf(i) });
 
         // This is not really a one shot JVM, so let's reset log4j
         LogManager.resetConfiguration();
         PropertyConfigurator.configure("target/classes/log4j.properties");
-
-        File f = new File("./target/testsingle.log");
-        Assert.assertTrue(f.exists());
 
         Assert.assertEquals(1, TestHelpers.getOkCount(em));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
