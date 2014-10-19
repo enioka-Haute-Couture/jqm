@@ -374,4 +374,41 @@ public class MiscTest extends JqmBaseTest
         Assert.assertEquals(1, TestHelpers.getOkCount(em));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
     }
+
+    @Test
+    public void testExternalLaunch() throws Exception
+    {
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+        em.getTransaction().begin();
+        em.createQuery("UPDATE JobDef ji set ji.external = true").executeUpdate();
+        em.getTransaction().commit();
+        JobRequest.create("MarsuApplication", "TestUser").submit();
+
+        addAndStartEngine();
+        TestHelpers.waitFor(1, 20000, em);
+
+        Assert.assertEquals(1, TestHelpers.getOkCount(em));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+    }
+
+    @Test
+    public void testExternalKill() throws Exception
+    {
+        Helpers.setSingleParam("internalPollingPeriodMs", "100", em);
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-kill2/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+        em.getTransaction().begin();
+        em.createQuery("UPDATE JobDef ji set ji.external = true").executeUpdate();
+        em.getTransaction().commit();
+        int i = JobRequest.create("MarsuApplication", "TestUser").submit();
+
+        addAndStartEngine();
+        TestHelpers.waitForRunning(1, 5000, em);
+
+        JqmClientFactory.getClient().killJob(i);
+        TestHelpers.waitFor(1, 20000, em);
+        Assert.assertEquals(0, TestHelpers.getOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(em));
+    }
 }

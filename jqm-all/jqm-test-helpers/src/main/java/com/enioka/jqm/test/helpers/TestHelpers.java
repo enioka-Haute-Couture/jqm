@@ -217,6 +217,23 @@ public class TestHelpers
         }
     }
 
+    public static void waitForRunning(long nbJobInstances, int timeoutMs, EntityManager em)
+    {
+        TypedQuery<Long> q = em.createQuery("SELECT COUNT(ji) FROM JobInstance ji WHERE ji.state = 'RUNNING'", Long.class);
+
+        Calendar start = Calendar.getInstance();
+        while (q.getSingleResult() != nbJobInstances && Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis() <= timeoutMs)
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+            }
+        }
+    }
+
     public static int getHistoryAllCount(EntityManager em)
     {
         TypedQuery<Long> q = em.createQuery("SELECT COUNT(h) FROM History h", Long.class);

@@ -12,6 +12,7 @@ import org.apache.log4j.PatternLayout;
 
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.JqmInvalidRequestException;
 
 /**
  * This is a dumbed down version of the JQM engine that, instead of checking jobs from a database, will run at once a specified job
@@ -20,6 +21,7 @@ import com.enioka.jqm.api.JqmClientFactory;
 public class JqmSingleRunner
 {
     private static LibraryCache cache = new LibraryCache();
+    private final static Logger jqmlogger = Logger.getLogger(JqmSingleRunner.class);
 
     private JqmSingleRunner()
     {
@@ -28,6 +30,7 @@ public class JqmSingleRunner
 
     public static JobInstance run(int jobInstanceId, String logFile)
     {
+        jqmlogger.debug("Single runner was asked to start with ID " + jobInstanceId);
         EntityManager em = Helpers.getNewEm();
         com.enioka.jqm.jpamodel.JobInstance jr = em.find(com.enioka.jqm.jpamodel.JobInstance.class, jobInstanceId);
         em.close();
@@ -52,16 +55,21 @@ public class JqmSingleRunner
         {
             throw new IllegalArgumentException("Argument jr cannot be null");
         }
+        jqmlogger.info("Starting single runner for payload " + job.getId());
+
+        // Set thread name - used in audits
+        Thread.currentThread().setName("JQM single runner;;" + job.getId());
+
+        // JNDI first - the engine itself uses JNDI to fetch its connections!
+        Helpers.registerJndiIfNeeded();
 
         // Get a copy of the instance, to be sure to get a non detached item.
         EntityManager em = Helpers.getNewEm();
         job = em.find(com.enioka.jqm.jpamodel.JobInstance.class, job.getId());
 
-        // Set thread name - used in audits
-        Thread.currentThread().setName("JQM single runner;" + job.getId() + ";");
-
-        // JNDI first - the engine itself uses JNDI to fetch its connections!
-        Helpers.registerJndiIfNeeded();
+        // Parameters
+        final int poll = Integer.parseInt(Helpers.getParameter("internalPollingPeriodMs", "10000", em));
+        final int jobId = job.getId();
 
         // Logs & log level
         PatternLayout layout = new PatternLayout("%d{dd/MM HH:mm:ss.SSS}|%-5p|%-40.40t|%-17.17c{1}|%x%m%n");
@@ -87,12 +95,101 @@ public class JqmSingleRunner
             System.setSecurityManager(new SecurityManagerPayload());
         }
 
+        // Create run container
+        final Loader l = new Loader(job, cache, null);
+
+        // Kill signal handler
+        final Thread mainT = Thread.currentThread();
+        Thread shutHook = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                Thread.currentThread().setName("JQM single runner;stophook;" + jobId);
+                jqmlogger.info("Shutting down the single runner before its normal end (kill order)");
+
+                // The stop order may come from SIGTERM or SIGINT - in which case, the payload is not aware it should stop.
+                try
+                {
+                    JqmClientFactory.getClient().killJob(jobId);
+                }
+                catch (JqmInvalidRequestException e)
+                {
+                    // Ignore - the job has already finished.
+                }
+
+                // To speed up payload learning its coming demise
+                mainT.interrupt();
+
+                // Give one second for graceful payload stop
+                try
+                {
+                    Thread.sleep(1000);
+                }
+                catch (InterruptedException e)
+                {
+                    // Nothing to do
+                }
+
+                // Shut down the process if needed
+                if (!l.isDone)
+                {
+                    // Timeout! Violently halt the JVM.
+                    jqmlogger.info("Job has not finished gracefully and will be stopped abruptly");
+                    l.endOfRun(com.enioka.jqm.jpamodel.State.KILLED);
+                    Runtime.getRuntime().halt(0);
+                }
+                else
+                {
+                    jqmlogger.debug("Stop order was handled gracefully");
+                }
+            }
+        };
+        Runtime.getRuntime().addShutdownHook(shutHook);
+
+        // Kill order (from database) handler
+        Thread stopper = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                Thread.currentThread().setName("JQM single runner;killerloop;" + jobId);
+                EntityManager em2 = null;
+
+                while (!Thread.interrupted())
+                {
+                    em2 = Helpers.getNewEm();
+                    com.enioka.jqm.jpamodel.JobInstance job = em2.find(com.enioka.jqm.jpamodel.JobInstance.class, jobId);
+                    em2.close();
+
+                    if (job != null && job.getState().equals(com.enioka.jqm.jpamodel.State.KILLED))
+                    {
+                        jqmlogger.debug("Job " + jobId
+                                + " has received a kill order. It's JVM will be killed after a grace shutdown period");
+                        System.exit(1); // Launch the exit hook.
+                        break;
+                    }
+
+                    try
+                    {
+                        Thread.sleep(poll);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        break;
+                    }
+                }
+            }
+        };
+        stopper.start();
+
         // Go.
-        Loader l = new Loader(job, cache, null);
         l.run();
 
         // Free resources
+        Runtime.getRuntime().removeShutdownHook(shutHook);
         em.close();
+        stopper.interrupt();
 
         // Get result
         return JqmClientFactory.getClient().getJob(job.getId());

@@ -66,6 +66,7 @@ class Loader implements Runnable, LoaderMBean
 
     private ObjectName name = null;
     private ClassLoader contextClassLoader = null;
+    Boolean isDone = false;
 
     Loader(JobInstance job, LibraryCache cache, QueuePoller p)
     {
@@ -278,8 +279,21 @@ class Loader implements Runnable, LoaderMBean
         jqmlogger.debug("End of loader for JobInstance " + this.job.getId() + ". Thread will now end");
     }
 
-    private void endOfRun(State status)
+    void endOfRun(State status)
     {
+        // This block is needed for external payloads, as the single runner may forcefully call endOfRun.
+        synchronized (isDone)
+        {
+            if (!isDone)
+            {
+                isDone = true;
+            }
+            else
+            {
+                return;
+            }
+        }
+
         // Send e-mail before releasing the slot - it may be long
         if (job.getEmail() != null)
         {

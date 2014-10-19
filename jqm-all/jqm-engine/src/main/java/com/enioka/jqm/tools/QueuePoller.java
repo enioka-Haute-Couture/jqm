@@ -192,7 +192,14 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 actualNbThread++;
 
                 // Run it
-                (new Thread(new Loader(ji, cache, this))).start();
+                if (!ji.getJd().isExternal())
+                {
+                    (new Thread(new Loader(ji, cache, this))).start();
+                }
+                else
+                {
+                    (new Thread(new LoaderExternal(em, ji, this))).start();
+                }
 
                 // Check if there is another job to run (does nothing - no db query - if queue is full so this is not expensive)
                 ji = dequeue();
