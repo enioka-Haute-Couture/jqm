@@ -359,5 +359,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-ws</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 </project>
