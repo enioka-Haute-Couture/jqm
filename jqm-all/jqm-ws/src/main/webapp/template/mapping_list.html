@@ -1,11 +1,11 @@
 <div>
     <ng-include src="'template/error_detail.html'"></ng-include>
     <h5>
-        <span class="glyphicon glyphicon-question-sign" ng-click="isCollapsed = !isCollapsed"></span> Mappings specify which nodes will poll which
-        queues. They are basically nodes subscribing to queues.
+        <span ng-click="isCollapsed = !isCollapsed"><span popover="Click to display help" popover-trigger="mouseenter" popover-placement="right" class="glyphicon glyphicon-question-sign"></span></span>
     </h5>
     <div collapse="!isCollapsed">
         <div class="well well-lg">
+              <h4>Mappings specify which nodes will poll which queues. They are basically nodes subscribing to queues.</h4>
             <h5>On this page, one may associate nodes with queues. Changes on one node mapping require rebooting this node afterwards.</h5>
             <dl class="dl-horizontal">
                 <dt>Node</dt>
@@ -21,12 +21,11 @@
         </div>
     </div>
 
-    <div class='gridClass' ng-grid='gridOptions'></div>
-
-    <button class="btn btn-default" ng-click="newmapping()" ng-disabled="bDbBusy" jqm-permission="qmapping:create">New mapping</button>
-    <button class="btn btn-default" ng-click="save()" ng-disabled="bDbBusy" jqm-permission="qmapping:create" ng-hide="error">Save mappings</button>
-    <button class="btn btn-default" ng-click="refresh()" ng-disabled="bDbBusy" jqm-permission="qmapping:read">Refresh</button>
-    <button class="btn btn-default" ng-click="remove()" ng-disabled="bDbBusy || selected.length === 0" jqm-permission="qmapping:delete">Delete
-        selected</button>
+    <div ng-grid='gridOptions'></div>
+    <br/>
+    <button class="btn btn-default" ng-click="newmapping()" ng-disabled="bDbBusy" jqm-permission="qmapping:create"><span class="glyphicon glyphicon-plus"></span> New mapping</button>
+    <button class="btn btn-default" ng-click="save()" ng-disabled="bDbBusy" jqm-permission="qmapping:create" ng-hide="error"><span class="glyphicon glyphicon-floppy-save"></span> Save mappings</button>
+    <button class="btn btn-default" ng-click="refresh()" ng-disabled="bDbBusy" jqm-permission="qmapping:read"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+    <button class="btn btn-default" ng-click="remove()" ng-disabled="bDbBusy || selected.length === 0" jqm-permission="qmapping:delete"><span class="glyphicon glyphicon-remove"></span> Delete selected</button>
 </div>
 

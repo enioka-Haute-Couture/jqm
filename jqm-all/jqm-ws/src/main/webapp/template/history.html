@@ -1,24 +1,70 @@
 <div>
-    <span>View: </span>
-    <div class="btn-group">
-        <label class="btn btn-info" ng-model="target" btn-radio="'hist'" uncheckable>ended</label> <label class="btn btn-info" ng-model="target"
-            btn-radio="'queues'" uncheckable
-        >active</label>
+    <br/>
+  <div class="row">
+  
+    <div class="col-sm-4 col-md-2">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">State filter</h3>
+        </div>
+        <div class="panel-body">
+          <div class="btn-group">
+            <label class="btn btn-default active" ng-model="target" btn-radio="'hist'" uncheckable><span class="glyphicon glyphicon-off"></span> ended</label>
+            <label class="btn btn-default" ng-model="target" btn-radio="'queues'" uncheckable><span class="glyphicon glyphicon-road"></span> active</label>
+          </div>
+        </div>
+      </div>
     </div>
-    <span>Application: </span><input ng-model="query.applicationName" ng-change="getDataAsync()" ng-required="true" /> <span>User: </span><input
-        ng-model="query.user" ng-change="getDataAsync()" ng-required="true"
-    /><span>ID: </span><input ng-model="query.jobInstanceId" ng-change="getDataAsync();" ng-required="true" style="width: 3em;" /> <span>Parent
-        ID: </span><input ng-model="query.parentId" ng-change="getDataAsync();" ng-required="true" style="width: 3em;" /><span>Queue: </span>
-    <select ng-cell-input ng-model="query.queueId" ng-options="q.id as q.name for q in queues" ng-change="getDataAsync();"></select>
-    <button class="btn btn-default" ng-click="latest(1)">Last hour</button>
-    <button class="btn btn-default" ng-click="latest(24)">Last day</button>
-    <button class="btn btn-default" ng-click="query = {}; getDataAsync();">Reset filters</button>
-
-    <div class='gridClass' ng-grid='gridOptions' style="width: 100%;" ng-dblclick="showDetail()"></div>
-
-    <div class="small">Double-click on a line to get job details, files produced and logs. Use % as wildcard is search filters.</div>
-    <button class="btn btn-default" ng-click="relaunch()" ng-disabled="selected.length === 0">Relaunch</button>
-    <button class="btn btn-default" ng-click="getDataAsync()">Refresh</button>
-    <button class="btn btn-default" ng-click="newLaunch()">New launch form</button>
+    
+    <div class="col-sm-8 col-md-5">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Name and ID filters</h3>
+        </div>
+        <div class="panel-body">
+           <input ng-model="query.applicationName" placeholder="application" type="text" ng-change="getDataAsync()" ng-required="true" popover="Use % as wildcard" popover-trigger="mouseenter" />
+          <input ng-model="query.user" placeholder="user" type="text" ng-change="getDataAsync()" ng-required="true" popover="Use % as wildcard" popover-trigger="mouseenter" />
+          <input ng-model="query.jobInstanceId" placeholder="id" type="text" ng-change="getDataAsync();" ng-required="true" style="width: 4em;" popover="Give exact ID" popover-trigger="mouseenter" />
+          <input ng-model="query.parentId" placeholder="par id" type="text" ng-change="getDataAsync();" ng-required="true" style="width: 4em;" popover="Give exact ID" popover-trigger="mouseenter" />
+        </div>
+      </div>
+    </div>
+    
+    <div class="visible-sm-block clearfix"></div>
+    
+    <div class="col-sm-4 col-md-2">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Queue Filter</h3>
+        </div>
+        <div class="panel-body">
+          <select ng-cell-input ng-model="query.queueId" ng-options="q.id as q.name for q in queues" ng-change="getDataAsync();"></select>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-sm-8 col-md-3">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Time Filter</h3>
+        </div>
+        <div class="panel-body">
+          <div class="btn-group">
+            <button class="btn btn-default" ng-click="latest(1)"><span class="glyphicon glyphicon-calendar"></span> Last hour</button>
+            <button class="btn btn-default" ng-click="latest(24)"><span class="glyphicon glyphicon-calendar"></span> Last day</button>
+            <button class="btn btn-default" ng-click="query = {}; getDataAsync();"><span class="glyphicon glyphicon-ban-circle"></span> Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+  </div> <!-- end of filter row -->
+    
+    <div ng-grid='gridOptions' ng-dblclick="showDetail()"></div>
+    
+    <div class="small">Double-click on a line to get job details, files produced and logs.</div>
+    <button class="btn btn-default" ng-click="relaunch()" ng-disabled="selected.length === 0"><span class="glyphicon glyphicon-repeat"></span> Relaunch</button>
+    <button class="btn btn-default" ng-click="getDataAsync()"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+    <button class="btn btn-default" ng-click="newLaunch()"><span class="glyphicon glyphicon-plus"></span> New launch form</button>
 </div>
 

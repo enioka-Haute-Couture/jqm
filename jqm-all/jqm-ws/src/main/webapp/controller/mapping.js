@@ -68,7 +68,7 @@ jqmControllers
                         showSelectionCheckbox : true,
                         selectWithCheckboxOnly : true,
                         selectedItems : $scope.selected,
-
+                        plugins :  [new ngGridFlexibleHeightPlugin()],
                         columnDefs : [
                                 {
                                     field : 'nodeId',

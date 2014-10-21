@@ -132,7 +132,7 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
         selectWithCheckboxOnly : false,
         selectedItems : $scope.selected,
         showGroupPanel : true,
-
+        plugins :  [new ngGridFlexibleHeightPlugin()],
         columnDefs : [ {
             field : 'name',
             displayName : 'JNDI alias',
@@ -163,7 +163,7 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
         showSelectionCheckbox : true,
         selectWithCheckboxOnly : true,
         selectedItems : $scope.selected2,
-
+        plugins :  [new ngGridFlexibleHeightPlugin()],
         columnDefs : [ {
             field : 'key',
             displayName : 'Resource parameter',

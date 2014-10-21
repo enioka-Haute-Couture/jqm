@@ -1,10 +1,10 @@
 <div>
     <h5>
-        <span class="glyphicon glyphicon-question-sign" ng-click="isCollapsed = !isCollapsed"></span> A Job Definition is made of all the metadata
-        required to launch a payload: path to the jar file, class to launch, etc.
+        <span ng-click="isCollapsed = !isCollapsed"><span popover="Click to display help" popover-trigger="mouseenter" popover-placement="right" class="glyphicon glyphicon-question-sign"></span></span>
     </h5>
     <div collapse="!isCollapsed">
         <div class="well well-lg">
+            <h4>A Job Definition is made of all the metadata required to launch a payload: path to the jar file, class to launch, etc.</h4>
             <h5>On this page, one may change the characteristics of Job Definitions. Changes on this page do not require any node reboot.
                 Changing the payload jars on the server does not require reboots either.</h5>
             <dl class="dl-horizontal">
@@ -33,11 +33,12 @@
         </div>
     </div>
 
-    <div class='gridClass' ng-grid='gridOptions' style='width: 100%;'></div>
-    <button class="btn btn-default" ng-click="newitem()" jqm-permission="jd:create">New definition</button>
-    <button class="btn btn-default" ng-click="remove()" ng-disabled="selected.length === 0" jqm-permission="jd:delete">Delete selected</button>
-    <button class="btn btn-default" ng-click="prms()" ng-disabled="selected.length !== 1">Default parameters</button>
-    <button class="btn btn-default" ng-click="refresh()">Refresh</button>
-    <button class="btn btn-default" ng-click="save()" jqm-permission="jd:create">Save definitions</button>
+    <div ng-grid='gridOptions'></div>
+    <br/>
+    <button class="btn btn-default" ng-click="newitem()" jqm-permission="jd:create"><span class="glyphicon glyphicon-plus"></span> New definition</button>
+    <button class="btn btn-default" ng-click="remove()" ng-disabled="selected.length === 0" jqm-permission="jd:delete"><span class="glyphicon glyphicon-remove"></span> Delete selected</button>
+    <button class="btn btn-default" ng-click="prms()" ng-disabled="selected.length !== 1"><span class="glyphicon glyphicon-edit"></span> Default parameters</button>
+    <button class="btn btn-default" ng-click="refresh()"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+    <button class="btn btn-default" ng-click="save()" jqm-permission="jd:create"><span class="glyphicon glyphicon-floppy-save"></span> Save definitions</button>
 </div>
 

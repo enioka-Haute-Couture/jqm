@@ -3,16 +3,19 @@
 <head>
 <meta charset="utf-8">
 <title>JQM administration</title>
-<link rel="stylesheet" href="css/app.css">
 <link rel="stylesheet" href="css/bootstrap.css">
 <link rel="stylesheet" href="css/ng-grid.css">
+<link rel="stylesheet" href="css/app.css">
 <script src="libs/jquery-1.11.1.js"></script>
+<script src="libs/bootstrap.js"></script>
 <script src="libs/angular.js"></script>
 <script src="libs/angular-route.js"></script>
 <script src="libs/angular-cookies.js"></script>
 <script src="libs/angular-resource.js"></script>
 <script src="libs/ui-bootstrap-tpls-0.11.0.js"></script>
 <script src="libs/ng-grid-2.0.11.js"></script>
+<script src="libs/ng-grid-flexible-height.js"></script>
+<script src="libs/angular-sanitize.js"></script>
 <script src="app.js"></script>
 <script src="controller/node.js"></script>
 <script src="controller/q.js"></script>
@@ -28,24 +31,20 @@
 </head>
 
 <body>
-    <div id="wrap">
-
-        <ul class="nav nav-tabs" ng-controller="TabsCtrl">
-            <li ng-repeat="tab in tabs" ng-class="tabClass(tab)" jqm-permission="{{tab.permission}}"><a href="{{tab.link}}"
-                ng-click="setSelectedTab(tab)"
-            >{{tab.label}}</a></li>
+  <div class="container-fluid" style="margin-top: 5px;">
+        <ul class="nav nav-tabs" role="tablist" ng-controller="TabsCtrl">
+            <li ng-repeat="tab in tabs" ng-class="tabClass(tab)" jqm-permission="{{tab.permission}}">
+              <a href="{{tab.link}}" ng-click="setSelectedTab(tab)"><div ng-bind-html="tab.label"></div></a>
+            </li>
         </ul>
         <div ng-view></div>
 
-
-        <div id="push"></div>
-    </div>
-
+    <br/><br/>
     <div id="footer">
         JQM administration, (C) 2014
         <login-dialog></login-dialog>
     </div>
-
+  </div>
 </body>
 
 </html>

@@ -56,7 +56,7 @@ jqmControllers.controller('µQueueListCtrl', function($scope, $http, µQueueDto)
         showSelectionCheckbox : true,
         selectWithCheckboxOnly : true,
         selectedItems : $scope.selected,
-
+        plugins :  [new ngGridFlexibleHeightPlugin()],
         columnDefs : [ {
             field : 'name',
             displayName : 'Name'
