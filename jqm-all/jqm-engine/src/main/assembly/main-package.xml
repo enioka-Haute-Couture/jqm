@@ -24,7 +24,7 @@
 			<directory>${project.basedir}/src/main/scripts</directory>
 			<outputDirectory>/</outputDirectory>
 			<includes>
-				<include>*.sh</include>
+				<include>jqm.sh</include>
 				<include>*.ps1</include>
 				<include>*.bat</include>
 			</includes>
@@ -49,6 +49,7 @@
 			<outputDirectory>/bin</outputDirectory>
 			<includes>
 				<include>*.exe</include>
+                <include>permissions.sh</include>
 			</includes>
 			<fileMode>0755</fileMode>
 		</fileSet>
