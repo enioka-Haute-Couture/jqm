@@ -217,8 +217,6 @@ jqmApp.controller('µCredentialsController', function($scope, µPermManager, $lo
 jqmApp.directive('loginDialog', function($modal)
 {
     return {
-        // templateUrl : './template/login.html',
-        template : '<button ng-click="logmeout()">Logout</button>',
         restrict : 'E',
         replace : true,
         controller : 'µCredentialsController',

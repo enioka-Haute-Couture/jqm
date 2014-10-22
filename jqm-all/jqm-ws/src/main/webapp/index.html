@@ -31,21 +31,15 @@
 </head>
 
 <body>
-  <div class="container-fluid" style="margin-top: 5px;">
+  <div class="container-fluid" style="margin-top: 3px; padding: 3px;">
         <ul class="nav nav-tabs" role="tablist" ng-controller="TabsCtrl">
             <li ng-repeat="tab in tabs" ng-class="tabClass(tab)" jqm-permission="{{tab.permission}}">
               <a href="{{tab.link}}" ng-click="setSelectedTab(tab)"><div ng-bind-html="tab.label"></div></a>
             </li>
         </ul>
         <div ng-view></div>
-
-    <br/><br/>
-    <div id="footer">
-        JQM administration, (C) 2014
-        <login-dialog></login-dialog>
-    </div>
+        <login-dialog></login-dialog>    
   </div>
 </body>
 
 </html>
-
