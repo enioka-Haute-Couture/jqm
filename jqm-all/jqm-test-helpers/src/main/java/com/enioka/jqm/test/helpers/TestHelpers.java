@@ -201,8 +201,7 @@ public class TestHelpers
 
     public static void waitFor(long nbHistories, int timeoutMs, EntityManager em)
     {
-        TypedQuery<Long> q = em.createQuery(
-                "SELECT COUNT(h) FROM History h WHERE h.status = 'ENDED' OR h.status = 'CRASHED'  OR h.status = 'KILLED'", Long.class);
+        TypedQuery<Long> q = em.createQuery("SELECT COUNT(h) FROM History h", Long.class);
 
         Calendar start = Calendar.getInstance();
         while (q.getSingleResult() != nbHistories && Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis() <= timeoutMs)

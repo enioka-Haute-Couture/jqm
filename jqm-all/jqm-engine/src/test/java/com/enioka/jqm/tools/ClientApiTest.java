@@ -211,7 +211,7 @@ public class ClientApiTest extends JqmBaseTest
         JobRequest.create("MarsuApplication", "TestUser").submit();
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 5000, em);
+        TestHelpers.waitFor(2, 5000, em);
 
         TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
