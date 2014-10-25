@@ -32,7 +32,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 
-import com.enioka.jqm.api.ServiceAdmin;
+import com.enioka.jqm.api.Helpers;
 import com.enioka.jqm.jpamodel.RPermission;
 import com.enioka.jqm.jpamodel.RRole;
 import com.enioka.jqm.jpamodel.RUser;
@@ -86,7 +86,7 @@ public class JpaRealm extends AuthorizingRealm
         EntityManager em = null;
         try
         {
-            em = ServiceAdmin.getEm();
+            em = Helpers.getEm();
             RUser user = em.createQuery("SELECT u FROM RUser u WHERE UPPER(u.login) = UPPER(:l)", RUser.class).setParameter("l", login)
                     .getSingleResult();
 

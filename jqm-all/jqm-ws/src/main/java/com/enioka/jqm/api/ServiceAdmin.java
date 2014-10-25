@@ -18,7 +18,6 @@ package com.enioka.jqm.api;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
@@ -59,21 +58,6 @@ import com.enioka.jqm.webui.admin.dto.RUserDto;
 @Path("/admin")
 public class ServiceAdmin
 {
-    // Small hack: instead of creating an EMF, we take the one from the JPA client
-    private static HibernateClient c = null;
-    static
-    {
-        Properties p = new Properties();
-        p.put("javax.persistence.nonJtaDataSource", "jdbc/jqm");
-        JqmClientFactory.setProperties(p);
-        c = (HibernateClient) JqmClientFactory.getClient();
-    }
-
-    public static EntityManager getEm()
-    {
-        return c.getEm();
-    }
-
     // ////////////////////////////////////////////////////////////////////////
     // Common methods
     // ////////////////////////////////////////////////////////////////////////
@@ -81,7 +65,7 @@ public class ServiceAdmin
     private <J, D> List<D> getDtoList(Class<J> jpaClass)
     {
         List<D> res = new ArrayList<D>();
-        EntityManager em = getEm();
+        EntityManager em = Helpers.getEm();
 
         try
         {
@@ -105,7 +89,7 @@ public class ServiceAdmin
 
     private <J, D> D getDto(Class<J> jpaClass, int id)
     {
-        EntityManager em = getEm();
+        EntityManager em = Helpers.getEm();
         try
         {
             D res = Jpa2Dto.<D> getDTO(em.find(jpaClass, id));
@@ -124,7 +108,7 @@ public class ServiceAdmin
 
     private <J> void deleteItem(Class<J> jpaClass, Integer id)
     {
-        EntityManager em = getEm();
+        EntityManager em = Helpers.getEm();
         Object j = null;
         try
         {
@@ -146,7 +130,7 @@ public class ServiceAdmin
 
     private <D> void setItem(D dto)
     {
-        EntityManager em = getEm();
+        EntityManager em = Helpers.getEm();
         try
         {
             em.getTransaction().begin();
@@ -161,7 +145,7 @@ public class ServiceAdmin
 
     public <D, J> void setItems(Class<J> jpaClass, List<D> dtos)
     {
-        EntityManager em = getEm();
+        EntityManager em = Helpers.getEm();
         try
         {
             List<J> existBefore = em.createQuery("SELECT n FROM " + jpaClass.getSimpleName() + " n", jpaClass).getResultList();
@@ -621,7 +605,7 @@ public class ServiceAdmin
     @HttpCache("private, max-age=36000")
     public PemissionsBagDto getMyself(@Context HttpServletRequest req)
     {
-        EntityManager em = getEm();
+        EntityManager em = Helpers.getEm();
         List<String> res = new ArrayList<String>();
         String auth = em.createQuery("SELECT gp From GlobalParameter gp where gp.key = 'enableWsApiAuth'", GlobalParameter.class)
                 .getSingleResult().getValue();
@@ -657,7 +641,7 @@ public class ServiceAdmin
         EntityManager em = null;
         try
         {
-            em = getEm();
+            em = Helpers.getEm();
             RUser u = em.find(RUser.class, userIds);
             return JpaCa.getClientData(em, u.getLogin());
         }
