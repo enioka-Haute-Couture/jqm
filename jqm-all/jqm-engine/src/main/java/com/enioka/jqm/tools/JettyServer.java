@@ -237,7 +237,7 @@ class JettyServer
         }
         exclusions[0] = "com.enioka.jqm.tools.";
         exclusions[1] = "com.enioka.jqm.api.";
-        exclusions[2] = "org.slf4j.";
+        // exclusions[2] = "org.slf4j.";
         // exclusions[3] = "org.apache.log4j.";
         exclusions[4] = "org.glassfish."; // Jersey
         webAppContext.setServerClasses(exclusions);

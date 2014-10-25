@@ -11,7 +11,6 @@
 		<filter-name>ShiroFilter</filter-name>
 		<filter-class>com.enioka.jqm.webui.shiro.ShiroFilter</filter-class>
 	</filter>
-
 	<filter-mapping>
 		<filter-name>ShiroFilter</filter-name>
 		<url-pattern>/*</url-pattern>
@@ -19,6 +18,15 @@
 		<dispatcher>FORWARD</dispatcher>
 		<dispatcher>INCLUDE</dispatcher>
 		<dispatcher>ERROR</dispatcher>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>LogFilter</filter-name>
+		<filter-class>com.enioka.jqm.api.LogFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>LogFilter</filter-name>
+		<url-pattern>/ws/*</url-pattern>
 	</filter-mapping>
 
 </web-app>

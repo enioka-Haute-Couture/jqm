@@ -48,7 +48,6 @@ public class ServiceClient implements JqmClient
     // Not directly mapped: returning an integer would be weird. See enqueue_object.
     public int enqueue(JobRequest jd)
     {
-        log.debug("calling WS enqueue");
         throw new NotSupportedException();
     }
 
@@ -58,7 +57,6 @@ public class ServiceClient implements JqmClient
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public JobInstance enqueue_object(JobRequest jd)
     {
-        log.debug("calling WS enqueue_object");
         int i = JqmClientFactory.getClient().enqueue(jd);
 
         return getJi(jd, i);
@@ -68,7 +66,6 @@ public class ServiceClient implements JqmClient
     @Override
     public int enqueue(String applicationName, String userName)
     {
-        log.debug("calling WS enqueue");
         throw new NotSupportedException();
     }
 
@@ -77,7 +74,6 @@ public class ServiceClient implements JqmClient
     @POST
     public int enqueueFromHistory(@PathParam("id") int jobIdToCopy)
     {
-        log.debug("calling WS enqueueFromHistory");
         return JqmClientFactory.getClient().enqueueFromHistory(jobIdToCopy);
     }
 
@@ -86,7 +82,6 @@ public class ServiceClient implements JqmClient
     @POST
     public void cancelJob(@PathParam("jobId") int jobId)
     {
-        log.debug("calling WS cancelJob");
         JqmClientFactory.getClient().cancelJob(jobId);
     }
 
@@ -95,7 +90,6 @@ public class ServiceClient implements JqmClient
     @DELETE
     public void deleteJob(@PathParam("jobId") int jobId)
     {
-        log.debug("calling WS deleteJob");
         JqmClientFactory.getClient().deleteJob(jobId);
     }
 
@@ -104,7 +98,6 @@ public class ServiceClient implements JqmClient
     @POST
     public void killJob(@PathParam("jobId") int jobId)
     {
-        log.debug("calling WS killJob");
         JqmClientFactory.getClient().killJob(jobId);
     }
 
@@ -113,7 +106,6 @@ public class ServiceClient implements JqmClient
     @POST
     public void pauseQueuedJob(@PathParam("jobId") int jobId)
     {
-        log.debug("calling WS pauseQueuedJob");
         JqmClientFactory.getClient().pauseQueuedJob(jobId);
     }
 
@@ -122,14 +114,12 @@ public class ServiceClient implements JqmClient
     @DELETE
     public void resumeJob(@PathParam("jobId") int jobId)
     {
-        log.debug("calling WS resumeJob");
         JqmClientFactory.getClient().resumeJob(jobId);
     }
 
     // Not exposed directly - we prefer objects to primitive types
     public int restartCrashedJob(int jobId)
     {
-        log.debug("calling WS restartCrashedJob");
         return 0;
     }
 
@@ -138,7 +128,6 @@ public class ServiceClient implements JqmClient
     @DELETE
     public JobInstance restartCrashedJob_object(@PathParam("jobId") int jobId)
     {
-        log.debug("calling WS restartCrashedJob_object");
         int i = JqmClientFactory.getClient().restartCrashedJob(jobId);
         return getJob(i);
     }
@@ -148,7 +137,6 @@ public class ServiceClient implements JqmClient
     @POST
     public void setJobQueue(@PathParam("jobId") int jobId, @PathParam("queueId") int queueId)
     {
-        log.debug("calling WS setJobQueue");
         JqmClientFactory.getClient().setJobQueue(jobId, queueId);
     }
 
@@ -156,7 +144,6 @@ public class ServiceClient implements JqmClient
     @Override
     public void setJobQueue(int jobId, Queue queue)
     {
-        log.debug("calling WS setJobQueue");
         JqmClientFactory.getClient().setJobQueue(jobId, queue);
     }
 
@@ -165,7 +152,6 @@ public class ServiceClient implements JqmClient
     @Path("ji/{jobId}/position/{newPosition}")
     public void setJobQueuePosition(@PathParam("jobId") int jobId, @PathParam("newPosition") int newPosition)
     {
-        log.debug("calling WS setJobQueuePosition");
         JqmClientFactory.getClient().setJobQueuePosition(jobId, newPosition);
     }
 
@@ -176,7 +162,6 @@ public class ServiceClient implements JqmClient
     @HttpCache("public, max-age=60")
     public JobInstance getJob(@PathParam("jobId") int jobId)
     {
-        log.debug("calling WS getJob");
         return JqmClientFactory.getClient().getJob(jobId);
     }
 
@@ -187,7 +172,6 @@ public class ServiceClient implements JqmClient
     @HttpCache("public, max-age=60")
     public List<JobInstance> getJobs()
     {
-        log.debug("calling WS getJobs");
         return JqmClientFactory.getClient().getJobs();
     }
 
@@ -198,7 +182,6 @@ public class ServiceClient implements JqmClient
     @HttpCache("public, max-age=60")
     public List<JobInstance> getActiveJobs()
     {
-        log.debug("calling WS getActiveJobs");
         return JqmClientFactory.getClient().getActiveJobs();
     }
 
@@ -209,7 +192,6 @@ public class ServiceClient implements JqmClient
     @HttpCache("public, max-age=60")
     public List<JobInstance> getUserActiveJobs(@PathParam("username") String userName)
     {
-        log.debug("calling WS getUserActiveJobs");
         return JqmClientFactory.getClient().getUserActiveJobs(userName);
     }
 
@@ -217,7 +199,6 @@ public class ServiceClient implements JqmClient
     @Override
     public List<JobInstance> getJobs(Query query)
     {
-        log.debug("calling WS getJobs_Query");
         return JqmClientFactory.getClient().getJobs(query);
     }
 
@@ -227,7 +208,6 @@ public class ServiceClient implements JqmClient
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public Query getJobsQuery(Query query)
     {
-        log.debug("calling WS getJobsQuery");
         query.run();
         return query;
     }
@@ -239,7 +219,6 @@ public class ServiceClient implements JqmClient
     @HttpCache("public, max-age=60")
     public List<String> getJobMessages(@PathParam("jobId") int jobId)
     {
-        log.debug("calling WS getJobMessages");
         return JqmClientFactory.getClient().getJobMessages(jobId);
     }
 
@@ -247,7 +226,6 @@ public class ServiceClient implements JqmClient
     @Override
     public int getJobProgress(int jobId)
     {
-        log.debug("calling WS getJobProgress");
         throw new NotSupportedException();
     }
 
@@ -258,7 +236,6 @@ public class ServiceClient implements JqmClient
     @HttpCache("public, max-age=60")
     public List<Deliverable> getJobDeliverables(@PathParam("jobId") int jobId)
     {
-        log.debug("calling WS getJobDeliverables");
         List<Deliverable> res = JqmClientFactory.getClient().getJobDeliverables(jobId);
         return res;
     }
@@ -267,7 +244,6 @@ public class ServiceClient implements JqmClient
     @Override
     public List<InputStream> getJobDeliverablesContent(int jobId)
     {
-        log.debug("calling WS getJobDeliverablesContent");
         throw new NotSupportedException();
     }
 
@@ -278,7 +254,6 @@ public class ServiceClient implements JqmClient
     @POST
     public InputStream getDeliverableContent(Deliverable file)
     {
-        log.debug("calling WS getDeliverableContent");
         return JqmClientFactory.getClient().getDeliverableContent(file);
     }
 
@@ -288,7 +263,6 @@ public class ServiceClient implements JqmClient
     @GET
     public InputStream getDeliverableContent(@PathParam("id") int delId)
     {
-        log.debug("calling WS getDeliverableContent");
         return JqmClientFactory.getClient().getDeliverableContent(delId);
     }
 
@@ -298,7 +272,6 @@ public class ServiceClient implements JqmClient
     @GET
     public InputStream getJobLogStdErr(@PathParam("jobId") int jobId)
     {
-        log.debug("calling WS getJobLogStdErr");
         res.setHeader("Content-Disposition", "attachment; filename=" + jobId + ".stderr.txt");
         return JqmClientFactory.getClient().getJobLogStdErr(jobId);
     }
@@ -309,7 +282,6 @@ public class ServiceClient implements JqmClient
     @GET
     public InputStream getJobLogStdOut(@PathParam("jobId") int jobId)
     {
-        log.debug("calling WS getJobLogStdOut");
         res.setHeader("Content-Disposition", "attachment; filename=" + jobId + ".stdout.txt");
         return JqmClientFactory.getClient().getJobLogStdOut(jobId);
     }
@@ -321,7 +293,6 @@ public class ServiceClient implements JqmClient
     @HttpCache("public, max-age=60")
     public List<Queue> getQueues()
     {
-        log.debug("calling WS getQueues");
         return JqmClientFactory.getClient().getQueues();
     }
 
@@ -357,7 +328,6 @@ public class ServiceClient implements JqmClient
     @HttpCache("public, max-age=60")
     public List<JobDef> getJobDefinitions()
     {
-        log.debug("calling WS getJobDefinitions-no args");
         return JqmClientFactory.getClient().getJobDefinitions();
     }
 
@@ -368,7 +338,6 @@ public class ServiceClient implements JqmClient
     @HttpCache("public, max-age=60")
     public List<JobDef> getJobDefinitions(@PathParam("applicationName") String application)
     {
-        log.debug("calling WS getJobDefinitions-app");
         return JqmClientFactory.getClient().getJobDefinitions(application);
     }
 
