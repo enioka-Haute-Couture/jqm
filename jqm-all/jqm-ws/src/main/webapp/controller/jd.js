@@ -17,6 +17,7 @@ jqmControllers.controller('µJdListCtrl', function($scope, $http, $modal, µJdDt
             canBeRestarted : true,
             highlander : false,
             jarPath : '/path/to/file.jar',
+            enabled : true,
             parameters : [],
         });
         $scope.jds.push(t);
@@ -58,7 +59,7 @@ jqmControllers.controller('µJdListCtrl', function($scope, $http, $modal, µJdDt
         selectWithCheckboxOnly : true,
         selectedItems : $scope.selected,
         showGroupPanel : true,
-        plugins :  [new ngGridFlexibleHeightPlugin()],
+        plugins : [ new ngGridFlexibleHeightPlugin() ],
         columnDefs : [
                 {
                     field : 'applicationName',
@@ -102,21 +103,33 @@ jqmControllers.controller('µJdListCtrl', function($scope, $http, $modal, µJdDt
                     editableCellTemplate : '<select ng-cell-input ng-input="COL_FIELD" ng-model="COL_FIELD" '
                             + 'ng-options="q.id as q.name for q in queues"></select>'
 
-                }, {
+                },
+                {
                     field : 'application',
                     displayName : 'Application'
-                }, {
+                },
+                {
                     field : 'module',
                     displayName : 'Module'
-                }, {
+                },
+                {
                     field : 'keyword1',
                     displayName : 'Keyword1'
-                }, {
+                },
+                {
                     field : 'keyword2',
                     displayName : 'Keyword2'
-                }, {
+                },
+                {
                     field : 'keyword3',
                     displayName : 'Keyword3'
+                },
+                {
+                    field : 'enabled',
+                    displayName : 'E',
+                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"> '
+                            + '<input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
+                    width : 25,
                 }, ]
     };
 
