@@ -28,11 +28,25 @@ import com.enioka.jqm.tools.JqmSingleRunner;
  * Limitations:
  * <ul>
  * <li>The job will actually run inside the current class loader (in the full engine, each job instance has its own class loader)</li>
+ * <li>This for testing one job only. Only one job instance will run! If the test itself enqueues new launch request, they will be ignored.
+ * For testing interactions between job instances, integration tests on an embedded JQM engine are required.</li>
  * <li>If using resources (JNDI), they must be put inside a resource.xml file at the root of classloader search.</li>
- * <li>Resource providers must be put inside testing class path (for example by putting them inside pom.xml with a <code>test</code> scope)</li>
- * <li>To ease tests, the launch is synchronous</li>
+ * <li>Resource providers and corresponding drivers must be put inside testing class path (for example by putting them inside pom.xml with a
+ * <code>test</code> scope)</li>
+ * <li>To ease tests, the launch is synchronous. Obviously, real life instances are asynchronous. To test asynchronous launches, use an
+ * embedded engine (integration test).</li>
  * <li>If files are created by the payload, they are stored inside a temporary directory that is not removed at the end of the run.</li>
  * </ul>
+ * <br>
+ * For example, a simple Junit test could be:
+ * 
+ * <pre>
+ * {@code public void testOne()
+ * {
+ *     JobInstance res = JqmTester.create("com.enioka.jqm.test.Payload1").run();
+ *     Assert.assertEquals(State.ENDED, res.getState());
+ * }
+ * </pre>
  */
 public class JqmTester
 {
