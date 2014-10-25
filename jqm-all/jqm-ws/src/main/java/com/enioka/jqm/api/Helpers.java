@@ -15,6 +15,8 @@
  */
 package com.enioka.jqm.api;
 
+import java.util.Properties;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 
@@ -22,6 +24,14 @@ import com.enioka.jqm.jpamodel.GlobalParameter;
 
 public final class Helpers
 {
+    static
+    {
+        Properties p = new Properties();
+        p.put("javax.persistence.nonJtaDataSource", "jdbc/jqm");
+        // p.put("hibernate.show_sql", "true");
+        JqmClientFactory.setProperties(p);
+    }
+
     private Helpers()
     {
         // helper class

@@ -898,6 +898,11 @@ final class HibernateClient implements JqmClient
     // Helper
     private com.enioka.jqm.api.JobInstance getJob(History h, EntityManager em)
     {
+        return getJob(h, em, null, null);
+    }
+
+    private com.enioka.jqm.api.JobInstance getJob(History h, EntityManager em, List<RuntimeParameter> rps, List<Message> msgs)
+    {
         com.enioka.jqm.api.JobInstance ji = new com.enioka.jqm.api.JobInstance();
         ji.setId(h.getId());
         ji.setApplicationName(h.getJd().getApplicationName());
@@ -908,16 +913,6 @@ final class HibernateClient implements JqmClient
         ji.setState(com.enioka.jqm.api.State.valueOf(h.getStatus().toString()));
         ji.setUser(h.getUserName());
         ji.setProgress(h.getProgress());
-        for (RuntimeParameter p : em.createQuery("SELECT m from RuntimeParameter m where m.ji = :i", RuntimeParameter.class)
-                .setParameter("i", h.getId()).getResultList())
-        {
-            ji.getParameters().put(p.getKey(), p.getValue());
-        }
-        for (Message m : em.createQuery("SELECT m from Message m where m.ji = :i", Message.class).setParameter("i", h.getId())
-                .getResultList())
-        {
-            ji.getMessages().add(m.getTextMessage());
-        }
         ji.setKeyword1(h.getKeyword1());
         ji.setKeyword2(h.getKeyword2());
         ji.setKeyword3(h.getKeyword3());
@@ -927,9 +922,48 @@ final class HibernateClient implements JqmClient
         ji.setEnqueueDate(h.getEnqueueDate());
         ji.setBeganRunningDate(h.getExecutionDate());
         ji.setEndDate(h.getEndDate());
+
         if (h.getNode() != null)
         {
             ji.setNodeName(h.getNode().getName());
+        }
+
+        if (rps == null)
+        {
+            for (RuntimeParameter p : em.createQuery("SELECT m from RuntimeParameter m where m.ji = :i", RuntimeParameter.class)
+                    .setParameter("i", h.getId()).getResultList())
+            {
+                ji.getParameters().put(p.getKey(), p.getValue());
+            }
+        }
+        else
+        {
+            for (RuntimeParameter rp : rps)
+            {
+                if (rp.getJi() == h.getId())
+                {
+                    ji.getParameters().put(rp.getKey(), rp.getValue());
+                }
+            }
+        }
+
+        if (msgs == null)
+        {
+            for (Message m : em.createQuery("SELECT m from Message m where m.ji = :i", Message.class).setParameter("i", h.getId())
+                    .getResultList())
+            {
+                ji.getMessages().add(m.getTextMessage());
+            }
+        }
+        else
+        {
+            for (Message msg : msgs)
+            {
+                if (msg.getJi() == h.getId())
+                {
+                    ji.getMessages().add(msg.getTextMessage());
+                }
+            }
         }
 
         return ji;
@@ -962,11 +996,11 @@ final class HibernateClient implements JqmClient
                     prms.put(prmName, filterValue);
                     if (filterValue.contains("%"))
                     {
-                        res += String.format("(%s LIKE :%s) OR ", fieldName, prmName);
+                        res += String.format("(h.%s LIKE :%s) OR ", fieldName, prmName);
                     }
                     else
                     {
-                        res += String.format("(%s = :%s) OR ", fieldName, prmName);
+                        res += String.format("(h.%s = :%s) OR ", fieldName, prmName);
                     }
                 }
                 else
@@ -991,7 +1025,7 @@ final class HibernateClient implements JqmClient
             {
                 String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1];
                 prms.put(prmName, filterValue);
-                return String.format("AND (%s = :%s) ", fieldName, prmName);
+                return String.format("AND (h.%s = :%s) ", fieldName, prmName);
             }
             else
             {
@@ -1007,7 +1041,7 @@ final class HibernateClient implements JqmClient
         {
             String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1] + Math.abs(comparison.hashCode());
             prms.put(prmName, filterValue);
-            return String.format("AND (%s %s :%s) ", fieldName, comparison, prmName);
+            return String.format("AND (h.%s %s :%s) ", fieldName, comparison, prmName);
         }
         else
         {
@@ -1022,7 +1056,7 @@ final class HibernateClient implements JqmClient
             return "";
         }
 
-        String res = String.format("AND ( %s IN ( ", fieldName);
+        String res = String.format("AND ( h.%s IN ( ", fieldName);
 
         for (com.enioka.jqm.api.State s : status)
         {
@@ -1170,7 +1204,9 @@ final class HibernateClient implements JqmClient
                     sort = " ORDER BY " + sort.substring(1);
                 }
 
-                TypedQuery<History> q1 = em.createQuery("SELECT h FROM History h " + wh + sort, History.class);
+                TypedQuery<History> q1 = em.createQuery(
+                        "SELECT h FROM History h LEFT JOIN FETCH h.jd LEFT JOIN FETCH h.node LEFT JOIN FETCH h.queue " + wh + sort,
+                        History.class);
                 for (Map.Entry<String, Object> entry : prms.entrySet())
                 {
                     q1.setParameter(entry.getKey(), entry.getValue());
@@ -1193,9 +1229,25 @@ final class HibernateClient implements JqmClient
                     query.setResultSize(new BigDecimal(qCount.getSingleResult()).intValueExact());
                 }
 
-                for (History ji : q1.getResultList())
+                // Optimization: fetch messages and parameters in one go.
+                List<History> results = q1.getResultList();
+                List<Integer> ids = new ArrayList<Integer>();
+                for (History ji : results)
                 {
-                    res2.add(getJob(ji, em));
+                    ids.add(ji.getId());
+                }
+                if (!ids.isEmpty())
+                {
+                    List<RuntimeParameter> rps = em
+                            .createQuery("SELECT rp FROM RuntimeParameter rp WHERE rp.ji IN (:p)", RuntimeParameter.class)
+                            .setParameter("p", ids).getResultList();
+                    List<Message> msgs = em.createQuery("SELECT rp FROM Message rp WHERE rp.ji IN (:p)", Message.class)
+                            .setParameter("p", ids).getResultList();
+
+                    for (History ji : results)
+                    {
+                        res2.add(getJob(ji, em, rps, msgs));
+                    }
                 }
             }
 

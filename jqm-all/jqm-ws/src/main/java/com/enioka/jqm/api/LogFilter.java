@@ -2,7 +2,6 @@ package com.enioka.jqm.api;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Calendar;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -37,7 +36,7 @@ public class LogFilter implements Filter
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
     {
-        Calendar c = Calendar.getInstance();
+        long t1 = System.nanoTime();
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
@@ -84,7 +83,7 @@ public class LogFilter implements Filter
         finally
         {
             log.info("\"" + req.getMethod() + " " + req.getRequestURI() + " " + req.getProtocol() + "\" " + res.getStatus() + " - "
-                    + (Calendar.getInstance().getTimeInMillis() - c.getTimeInMillis()));
+                    + ((System.nanoTime() - t1) / 1000000));
             MDC.clear();
         }
     }
