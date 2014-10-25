@@ -231,7 +231,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
 
         modalInstance.result.then(function()
         {
-            $scope.target = "active";
+            $scope.target = "queues";
         }, function()
         {
             $scope.getDataAsync();
