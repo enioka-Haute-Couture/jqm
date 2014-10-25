@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -31,7 +32,8 @@ class LoaderExternal implements Runnable
     {
         this.jobId = job.getId();
         this.qp = qp;
-        opts = Helpers.getParameter("defaultExternalOpts", "-Xms32m -Xmx128m -XX:MaxPermSize=64m", em);
+        opts = job.getJd().getJavaOpts() == null ? Helpers.getParameter("defaultExternalOpts", "-Xms32m -Xmx128m -XX:MaxPermSize=64m", em)
+                : job.getJd().getJavaOpts();
         killCheckPeriodMs = Integer.parseInt(Helpers.getParameter("internalPollingPeriodMs", "1000", em));
 
         RollingFileAppender a = (RollingFileAppender) Logger.getRootLogger().getAppender("rollingfile");
@@ -47,6 +49,7 @@ class LoaderExternal implements Runnable
         List<String> args = new ArrayList<String>();
 
         args.add(java_path);
+        args.addAll(Arrays.asList(opts.split(" ")));
         args.add("com.enioka.jqm.tools.Main");
         args.add("-s");
         args.add("" + this.jobId);
@@ -58,7 +61,6 @@ class LoaderExternal implements Runnable
         Process p = null;
         try
         {
-            System.out.println(args);
             jqmlogger.debug("Starting external JVM for ID " + jobId);
             p = pb.start();
         }

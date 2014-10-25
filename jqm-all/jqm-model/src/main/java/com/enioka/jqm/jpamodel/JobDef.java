@@ -374,7 +374,10 @@ public class JobDef implements Serializable
     }
 
     /**
-     * The options passed to the JVM when launching this job definition. Only used if {@link #isExternal()} is <code>true</code>
+     * The options passed to the JVM when launching this job definition. Only used if {@link #isExternal()} is <code>true</code>.<br>
+     * These options are split on spaces and passed individually to the JVM.<br>
+     * If <code>null</code>, the global parameter <code>defaultExternalOpts</code> is used. It this parameter is null too, default values
+     * are used.
      */
     public String getJavaOpts()
     {
