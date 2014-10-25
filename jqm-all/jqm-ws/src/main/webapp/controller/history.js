@@ -60,6 +60,12 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
                 order : way
             });
         }
+        
+        // Lists
+        if ($scope.query.applicationName && $scope.query.applicationName.indexOf(',') > -1)
+    	{
+        	$scope.query.applicationName = $scope.query.applicationName.split(',');
+    	}
 
         // Go
         $http.post("ws/client/ji/query", $scope.query).success($scope.getDataOk);

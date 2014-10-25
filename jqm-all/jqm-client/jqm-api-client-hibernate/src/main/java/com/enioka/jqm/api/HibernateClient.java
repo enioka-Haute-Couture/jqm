@@ -31,6 +31,7 @@ import java.net.URL;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -934,27 +935,49 @@ final class HibernateClient implements JqmClient
         return ji;
     }
 
-    // GetJob helper - String predicates are all created the same way, so this factors some code.
     private String getStringPredicate(String fieldName, String filterValue, Map<String, Object> prms)
     {
-        if (filterValue != null)
+        if (filterValue == null)
         {
-            if (!filterValue.isEmpty())
+            return "";
+        }
+        return getStringPredicate(fieldName, Arrays.asList(filterValue), prms);
+    }
+
+    // GetJob helper - String predicates are all created the same way, so this factors some code.
+    private String getStringPredicate(String fieldName, List<String> filterValues, Map<String, Object> prms)
+    {
+        if (filterValues != null && !filterValues.isEmpty())
+        {
+            String res = "";
+            for (String filterValue : filterValues)
             {
-                String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1] + Math.abs(fieldName.hashCode());
-                prms.put(prmName, filterValue);
-                if (filterValue.contains("%"))
+                if (filterValue == null)
                 {
-                    return String.format("AND (%s LIKE :%s) ", fieldName, prmName);
+                    continue;
+                }
+                if (!filterValue.isEmpty())
+                {
+                    String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1] + System.identityHashCode(filterValue);
+                    prms.put(prmName, filterValue);
+                    if (filterValue.contains("%"))
+                    {
+                        res += String.format("(%s LIKE :%s) OR ", fieldName, prmName);
+                    }
+                    else
+                    {
+                        res += String.format("(%s = :%s) OR ", fieldName, prmName);
+                    }
                 }
                 else
                 {
-                    return String.format("AND (%s = :%s) ", fieldName, prmName);
+                    res += String.format("(h.%s IS NULL OR h.%s = '') OR ", fieldName, fieldName);
                 }
             }
-            else
+            if (!res.isEmpty())
             {
-                return String.format("AND (h.%s IS NULL OR h.%s = '') ", fieldName, fieldName);
+                res = "AND (" + res.substring(0, res.length() - 4) + ") ";
+                return res;
             }
         }
         return "";

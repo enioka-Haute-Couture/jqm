@@ -40,7 +40,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public final class Query
 {
     private Integer jobInstanceId, parentId;
-    private String applicationName;
+    private List<String> applicationName = new ArrayList<String>();
     private String user, sessionId;
     private String jobDefKeyword1, jobDefKeyword2, jobDefKeyword3, jobDefModule, jobDefApplication;
     private String instanceKeyword1, instanceKeyword2, instanceKeyword3, instanceModule, instanceApplication;
@@ -171,7 +171,7 @@ public final class Query
 
     public Query(String applicationName, String instanceKeyword1)
     {
-        this.applicationName = applicationName;
+        this.setApplicationName(applicationName);
         this.instanceKeyword1 = instanceKeyword1;
     }
 
@@ -275,20 +275,35 @@ public final class Query
         return this;
     }
 
-    String getApplicationName()
+    List<String> getApplicationName()
     {
         return applicationName;
     }
 
     /**
-     * The application name is the name of the job definition - the same name that is given in the Job definition XML. This allows to query
-     * all job instances for a given job definition.
+     * The application name is the name of the job definition - the same name that is given in the Job Definition XML. This allows to query
+     * all job instances for given job definitions. If the list contains multiple names, an OR query takes place.
      * 
      * @param applicationName
      */
-    public Query setApplicationName(String applicationName)
+    public Query setApplicationName(List<String> applicationName)
     {
         this.applicationName = applicationName;
+        return this;
+    }
+
+    /**
+     * The application name is the name of the job definition - the same name that is given in the Job Definition XML. This allows to query
+     * all job instances for a single given job definition. If other names were given previously (e.g. with
+     * {@link #setApplicationName(List)} , they are removed by this method.
+     * 
+     * @param applicationName
+     * @return
+     */
+    public Query setApplicationName(String applicationName)
+    {
+        this.applicationName.clear();
+        this.applicationName.add(applicationName);
         return this;
     }
 
