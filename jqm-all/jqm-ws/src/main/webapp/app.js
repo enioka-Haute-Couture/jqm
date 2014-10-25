@@ -1,6 +1,6 @@
 'use strict';
 
-var jqmApp = angular.module('jqmApp', [ 'ngRoute', 'ngCookies', 'jqmControllers', 'ngGrid', 'jqmServices', 'ui.bootstrap', 'ngSanitize']);
+var jqmApp = angular.module('jqmApp', [ 'ngRoute', 'ngCookies', 'jqmControllers', 'ngGrid', 'jqmServices', 'ui.bootstrap', 'ngSanitize' ]);
 
 jqmApp.config([ '$routeProvider', function($routeProvider, µPermManager)
 {
@@ -42,7 +42,7 @@ jqmApp.config([ '$routeProvider', function($routeProvider, µPermManager)
     });
 } ]);
 
-function TabsCtrl($scope, $location, $http, µPermManager)
+jqmApp.controller('TabsCtrl', function TabsCtrl($scope, $location, $http, µPermManager)
 {
     $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
@@ -117,7 +117,7 @@ function TabsCtrl($scope, $location, $http, µPermManager)
     };
 
     µPermManager.refresh();
-}
+});
 
 Date.prototype.addDays = function(days)
 {
