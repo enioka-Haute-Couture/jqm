@@ -3,7 +3,7 @@
 var jqmControllers = angular.module('jqmControllers');
 
 jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOracle, jndiFile, jndiUrl, jndiPs, jndiHsqlDb, jndiMySql, jndiMqQcf, jndiMqQ, jndiAmqQcf, jndiAmqQ,
-        jndiGeneric, jndiOtherDb)
+        jndiGeneric, jndiOtherDb, jndiString, jndiMail)
 {
     $scope.resources = null;
     $scope.selected = [];
@@ -63,6 +63,16 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
     $scope.newamqq = function()
     {
         $scope.newResourceTemplate(jndiAmqQ);
+    };
+    
+    $scope.newstring = function()
+    {
+        $scope.newResourceTemplate(jndiString);
+    };
+    
+    $scope.newmail = function()
+    {
+        $scope.newResourceTemplate(jndiMail);
     };
 
     $scope.newgeneric = function()

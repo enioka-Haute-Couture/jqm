@@ -421,6 +421,41 @@ jqmConstants.value("jndiAmqQ", {
     }, ],
 });
 
+jqmConstants.value("jndiString", {
+    name : 'string/new_string',
+    auth : 'CONTAINER',
+    type : 'java.lang.String',
+    factory : 'com.enioka.jqm.providers.StringFactory',
+    description : 'A simple String',
+    singleton : false,
+    parameters : [ {
+        key : 'STRING',
+        value : "string value"
+    }, ],
+});
+
+jqmConstants.value("jndiMail", {
+    name : 'mail/newsession',
+    auth : 'CONTAINER',
+    type : 'javax.mail.Session',
+    factory : 'com.enioka.jqm.providers.MailSessionFactory',
+    description : 'smtp mail session',
+    singleton : true,
+    parameters : [ {
+        key : 'smtpServerHost',
+        value : "1.2.3.4"
+    }, {
+        key : 'smtpServerPort',
+        value : "25"
+    }, {
+        key : 'useTls',
+        value : "false"
+    }, {
+        key : 'fromAddress',
+        value : "noreply@jobs.org"
+    }, ],
+});
+
 jqmConstants.value("jndiGeneric", {
     name : 'domain/name',
     auth : 'CONTAINER',

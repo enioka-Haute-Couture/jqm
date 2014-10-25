@@ -52,7 +52,7 @@
             </div>
             
             <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-envelope"></span> Messages Q & QCF  <span class="caret"></span></button>
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-transfer"></span> Messages Q & QCF  <span class="caret"></span></button>
                 <ul class="dropdown-menu" role="menu">
                   <li><a ng-click="newmqqcf()">New MQSeries QCF</a></li>
                   <li><a ng-click="newmqq()">New MQSeries Q</a></li>
@@ -61,8 +61,16 @@
                 </ul>
             </div>
             
-            <button class="btn btn-default" ng-click="newfile()"><span class="glyphicon glyphicon-file"></span> New File</button>
-            <button class="btn btn-default" ng-click="newurl()"><span class="glyphicon glyphicon-link"></span> New URL</button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-file"></span> Locators  <span class="caret"></span></button>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a ng-click="newfile()">New File</a></li>
+                  <li><a ng-click="newurl()">New URL</a></li>
+                  <li><a ng-click="newstring()">New String</a></li>
+                </ul>
+            </div>
+            
+            <button class="btn btn-default" ng-click="newmail()"><span class="glyphicon glyphicon-envelope"></span> New SMTP server</button>
             <button class="btn btn-default" ng-click="newgeneric()"><span class="glyphicon glyphicon-cog"></span> New generic resource</button>
             
             <br/><br/>
