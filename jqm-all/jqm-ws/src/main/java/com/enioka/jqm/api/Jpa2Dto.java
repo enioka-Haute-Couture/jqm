@@ -193,6 +193,7 @@ public class Jpa2Dto
         res.setNewPassword(null);
         res.setFreeText(d.getFreeText());
         res.setEmail(d.getEmail());
+        res.setInternal(d.getInternal());
 
         for (RRole r : d.getRoles())
         {

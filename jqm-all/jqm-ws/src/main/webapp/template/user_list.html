@@ -5,7 +5,7 @@
             <td style="padding-right: 10px; vertical-align: top;">
                 <input ng-model="queryStr" type="text" placeholder="filter user..." />
                 <select class="form-control" style="overflow: auto; width: 200px;" ng-model="usr" size="25"
-                    ng-options="o as o.login for o in users| filter: queryStr  | orderBy: login"
+                    ng-options="o as o.login for o in users| filter: queryStr | filter: {internal:false} | orderBy: login"
                 ></select>
                 <br />
                 <button class="btn btn-default" ng-click="newitem()"><span class="glyphicon glyphicon-plus"></span> New user</button>

@@ -33,7 +33,7 @@ public class RUserDto implements Serializable
     private String login;
     private String newPassword;
     private String certificateThumbprint;
-    private Boolean locked;
+    private Boolean locked, internal;
     private Calendar expirationDate;
     private Calendar creationDate = Calendar.getInstance();
     private String freeText;
@@ -141,5 +141,15 @@ public class RUserDto implements Serializable
     void setRoles(List<Integer> roles)
     {
         this.roles = roles;
+    }
+
+    public Boolean getInternal()
+    {
+        return internal;
+    }
+
+    public void setInternal(Boolean internal)
+    {
+        this.internal = internal;
     }
 }
