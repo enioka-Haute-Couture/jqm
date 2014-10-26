@@ -75,3 +75,20 @@ Windows::
 
 In both cases, it is strictly equivalent to stopping and then starting again manually (including the two-minutes timeout).
 
+Backup
+************
+
+Elements to backup are:
+
+* the database (unless the history is not precious)
+* files created
+
+Standard tools can be used, there is nothing JQM specific here.
+
+Purges
+************
+
+The logs of the engine are automatically purged. Job instance logs and created files, however, are not.
+
+The History table should be purged too - see :doc:`history`.
+

@@ -23,6 +23,8 @@ JQM JNDI directory can be used for:
 * JMS resources
 * Files
 * URLs
+* Simple Strings
+* Mail session (outgoing SMTP only)
 * every ObjectFactory provided by the payloads
 
 .. warning:: JNDI is actually part of JEE, not JSE, but it is so useful in the context of JQM use cases that it was implemented. The fact

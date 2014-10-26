@@ -8,7 +8,7 @@ before this chapter, as it gives the definition of many terms used here as well 
 JQM is very database-centric, with (nearly) all communications going through the database. It was therefore
 logical for the first client implementation to be a direct to database API, using the same ORM named Hibernate as in the engine.
 
-.. note:: actually, even if this API uses a direct connection to the database for nearly everythong, there is one API method 
+.. note:: actually, even if this API uses a direct connection to the database for nearly everything, there is one API method 
 	which does not work that way: file retrieval.
 	Files produced by job instances (business files or simply logs) are stored locally on each node - therefore retrieving these files requires
 	connecting directly (HTTP GET) to the nodes. Therefore, talk of HTTP connection parameters should not come as a surprise.
@@ -32,11 +32,11 @@ It is possible to overload persistence unit properties either:
 
 The different properties possible are JPA2 properties (http://download.oracle.com/otndocs/jcp/persistence-2.0-fr-eval-oth-JSpec/) and 
 Hibernate properties (http://docs.jboss.org/hibernate/orm/4.2/manual/en-US/html/ch03.html#configuration-optional). 
-The preceding exemple changed (or set in the first place) the <non-jta-datasource\> to some JNDI alias. Dafault is jdbc/jqm.
+The preceding example changed (or set in the first place) the <non-jta-datasource\> to some JNDI alias. Dafault is jdbc/jqm.
 
 If the file retrieval abilities are used, some connection data may also be provided through the same systems when SSL is used:
 
-* com.enioka.jqm.ws.truststoreFile: in case SSL is used, this will be the trustStore to use. Default is: system trustore (inside Java installation).
+* com.enioka.jqm.ws.truststoreFile: in case SSL is used, this will be the trustStore to use. Default is: system trust store (inside Java installation).
 * com.enioka.jqm.ws.truststoreType: same as above - type of the store. Default is JKS.
 * com.enioka.jqm.ws.truststorePass: same as above. Default is empty.
 
@@ -46,7 +46,7 @@ There is no need to specify user/passwords/certificate even if API authenticatio
 Libraries
 ***********************
 
-In Maven termes, only one library is needed::
+In Maven terms, only one library is needed::
 
 	<dependency>
 		<groupId>com.enioka.jqm</groupId>

@@ -12,9 +12,9 @@ the management part. For great frameworks created for making batch jobs easier t
 As long as the required libraries are provided, JQM can run :term:`payloads<payload>` based on all these frameworks.
 
 **This section aims at giving all the keys to developers in order to create great batch jobs for JQM**. This may seem in contradiction with 
-what was just said: why have "develop for JQM" chapter if JQM runs any Java code?
+what was just said: why have a "develop for JQM" chapter if JQM runs any Java code?
 
-* First, as all application server containers, there a a few guidelines to respect, such as packaging rules.
+* First, as in all application server containers, there a a few guidelines to respect, such as packaging rules.
 * Then, as an option, JQM provides a few APIs that can be of help to batch jobs, such as getting the ID of the run or the caller name.
 
 But this document must insist: unless there is a need to use the APIs, there is no need to develop specifically for JQM. **JQM
@@ -128,9 +128,14 @@ The dependency is::
         <groupId>com.enioka.jqm</groupId>
         <artifactId>jqm-api</artifactId>
         <version>${jqm.version}</version>
+        <scope>provided</scope>
     </dependency>
 
 For more details, please read :doc:`engineapi`.
+
+.. note:: the scope given here is provided. It means it will be presnet for compilation but not at runtime. Indeed, JQM always provides the jqm-api.jar to
+   its payloads without them needing to package it. That being said, packaging it (default 'compile' scope) is harmless as it will be ignored at runtime in
+   favour of the engine-provided one.
     
 Creating files
 ******************
@@ -148,7 +153,7 @@ It is then be made available to clients through a small HTTP GET that is leverag
 The method to do so is :meth:`JobManager.addDeliverable` from the :doc:`engineapi`.
 
 .. note:: work directories are obtained through :meth:`JobManager.getWorkDir`. These are purged after execution. Use of temporary Java 
-    files is strongly discouraged - these are purged only on JVM exit - which on the whole never happens inside an application server.
+    files is strongly discouraged - these are purged only on JVM exit, which on the whole never happens inside an application server.
 
 Example::
 
@@ -185,7 +190,7 @@ Going to the culling
 
 Payloads are run inside a thread by the JQM engine. Alas, Java threads have one caveat: they cannot be cleanly killed. 
 Therefore, there is no obvious way to allow a user to kill a job instance that has gone haywire. To provide some measure
-of relief, the engine API provides a method called *yield* that, when called, will do nothing but give briefly control
+of relief, the :doc:`engineapi` provides a method called :meth:`JobManager.yield` that, when called, will do nothing but give briefly control
 of the job's thread to the engine. This allows the engine to check if the job should be killed (it throws an exception
 as well as sets the thread's interruption status to do so). Now, if the job instance really has entered an infinite loop where 
 yield is not called nor is the interruption status read, it won't help much. It is more to allow killing instances that 

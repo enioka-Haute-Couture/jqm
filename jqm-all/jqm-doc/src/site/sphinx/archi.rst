@@ -8,15 +8,15 @@ The goal of JQM is to launch :term:`payloads<payload>`, i.e. Java code doing som
 a shell program launcher, a Spring batch, really anything that works with Java SE and libraries provided with the code.
 
 The payload is described inside a :term:`job definition` - so that JQM knows things like the class to load, the path of the jar file, etc.
-It is usually contained inside an XML file. The job definition is actually a deployment descriptor - the batch equivalent for a web.xml or an ejb-jar.xml.
+It is usually contained within an XML file. The job definition is actually a deployment descriptor - the batch equivalent for a web.xml or an ejb-jar.xml.
 
 A running payload is called a :term:`job instance` (the "instance of a job definition"). These instances wait in queues to be 
 run, then are run and finally archived.
-To create a job instance, a :term:`job request` is posted by a client. It contains things such as parameters values, and specifically point to 
+To create a job instance, a :term:`job request` is posted by a client. It contains things such as parameters values, and specifically points to 
 a job definition so that JQM will know what to run.
 
 Job instances are run by one or many engines called :term:`JQM nodes<JQM node>`. These are simply Java processes that poll the different queues 
-in which job instances are waiting.
+in which job instances are waiting. Runs take place within threads.
 
 Full definitions are given inside the :doc:`glossary`.
 
@@ -31,8 +31,8 @@ On this picture, JQM elements are in green while non-JQM elements are in blue.
 JQM works like this:
 
 * an application (for example, a J2EE web application but it could be anything as long as it can use a Java SE library) needs to launch an asynchronous job
-* it imports the JQM client (one of the two - web service or direct-to-database. There are two dotted lines representing this option on the diagram)
-* it uses the enqueue method of the client, passing it a job request with the name of the job definition to launch (and potentially parameters, tags, ...)
+* it imports the JQM client (one of the two - web service or direct-to-database. There are two dotted lines representing this choice on the diagram)
+* it uses the 'enqueue' method of the client, passing it a job request with the name of the job definition to launch (and potentially parameters, tags, ...)
 * a job instance is created inside the database
 * engines are polling the database (see below). One of them with free resources takes the job instance
 * it creates a dedicated class loader for this job instance, imports the correct libraries with it, launches the payload inside a thread
@@ -42,11 +42,11 @@ JQM works like this:
 It should be noted that clients never speak directly to a JQM engine - it all goes through the database. 
 
 .. note:: There is one exception to this:
-	when job instances create files that should be retrieved by the requester, the the 'direct to database' client will 
-	download the files through a direct HTTP GET call to
-	the engine. This avoids creating and maintaining a central file repository. The 'web service' client does not have this issue as it always uses web 
+    when job instances create files that should be retrieved by the requester, the the 'direct to database' client will 
+    download the files through a direct HTTP GET call to
+    the engine. This avoids creating and maintaining a central file repository. The 'web service' client does not have this issue as it always uses web 
     services for all methods.
-   
+
 
 Nodes, queues and polling
 ****************************
@@ -67,6 +67,15 @@ It is possible at job request submission, or later once the job instance waits i
 
 By default, when creating the first engine, one queue is created and is tagged as the default queue (meaning all jobdef that do not have a specific queue
 will end on that one).
+
+An example:
+
+.. image:: /media/queues.png
+
+Here, there three queues and three engine nodes inside the JQM cluster. Queue 1 is only polled by engine 1. Queue 3 is only polled by engine 3.
+But queue 2 is polled both by engine 1 and engine 2 at different frequencies. Engine 2 may have been added because there was too much wait time on queue 2
+(indeed, engine 1 only will never run more than one job instance at the same time for queue 2 as it has only one slot. Engine 2 has 100 so with both engines
+at most 101 instances will run for queue 2).
 
 Job Instance life-cycle
 **************************

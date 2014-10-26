@@ -72,7 +72,7 @@ Enqueue & retrieve jobs
     Enqueues a new execution request. This is asynchronous - it returns as soon as the request was posted.
     
     Equivalent to :meth:`JqmClient.enqueue`, but where the parameters are given directly instead of using a :class:`JobRequest` instance. 
-    This is due to the class loader proxying magic.
+    This is a little ugly but necessary due to the underlying class loader proxying magic.
     
     
 .. method:: JobManager.enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module, String keyword1, String keyword2, String keyword3, Map<String, String> parameters) -> int

@@ -1,6 +1,9 @@
 #!/bin/sh
 # SRE - 2014
 
+# Go to JQM DIR. This is needed as JQM builds its path from its starting dir
+cd $(dirname $0)
+
 ##############################
 ##### SUDO                ####
 ##############################
@@ -23,9 +26,6 @@ fi
 ##############################
 
 ACTION=$1
-
-# Go to JQM DIR. This is needed as JQM builds its path from its starting dir
-cd $(dirname $0)
 
 JQM_JAR="jqm.jar"  # Name of JQM Java archive file
 WAITING_TIME=70    # Seconds to wait for JQM to shutdown gracefully

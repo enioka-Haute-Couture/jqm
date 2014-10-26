@@ -1,13 +1,55 @@
 Release notes
 ######################
 
+1.2.1
+************
+
+Release goal
+++++++++++++++++++
+
+The main goal of this release was to simplify the use of JQM. First for people who dislike command line interfaces, by adding a graphical user interface both for administration and for daily use (enqueue, check job status, etc). Second, for payload developers by adding a few improvements concerning testing and reporting.
+
+Upgrade notes
++++++++++++++++++++
+
+All APIs have been upgraded and **do not contain any breaking change**. Please note that the only version that will work with engine and database in version 1.2.1 is API version 1.2.1: upgrade is compulsory.
+
+Database must be rebuilt for version 1.2.1, this means History purge.
+
+Major
++++++++++++++++++
+
+* Client API: Added a fluid version of the JobRequest API
+* GUI: Added an administration web console (present in the standard package but disabled by default)
+* All APIs: Added an authentication system for all web services, with an RBAC back-end and compatible with HTTP authentication as well as SSL certificate authentication
+* Tests: Added a payload unit tester
+* General: Added mail session JNDI resource type
+
+Minor
+++++++++++++++++
+
+* Client API: Client APIs file retrieval will now set a file name hint inside an attachment header
+* Client API: Added an IN option for applicationName in Query API
+* Client API: Query API optimization
+* Engine: Unix/Linux launch script is now more complete and robust (restart works!)
+* Engine: JAVA_OPTS environment variable is now used by the engine launch script
+* Engine: Added special "serverName" JNDI String resource
+* Engine: All automatic messages (was enqueued, has begun...) were removed as they provided no information that wasn't already available
+* Engine: In case of crash, a job instance now creates a message containing "Status changed: CRASHED due to " + first characters of the stacktrace
+* Engine: Log levels and content were slightly reviewed (e.g.: stacktrace of a failing payload is now INFO instead of DEBUG)
+* Engine API: Added more methods to the engine API (JobManager)
+* Tests: Refactored all engine tests
+* Documentation: clarified class loading structure
+* Documentation: general update. Please read the doc. Thanks!
+* General: Jobs can now easily be disabled
+
 1.1.6
 ***********
 
 Release goal
 ++++++++++++++++++
 
-This release was aimed at making JQM easier to intagrate in production environments, with new features like
+This release was aimed at making JQM easier to integrate in production environments, with new features like
 JMX monitoring, better log file handling, JDBC connection pooling, etc.
 
 A very few developer features slipped inside the release.

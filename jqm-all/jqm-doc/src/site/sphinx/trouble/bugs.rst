@@ -9,5 +9,6 @@ feel free to mail the maintainer at mag@enioka.com.
 The minimum to join to a bug report:
 
 * the logs in TRACE mode
-* if possible, your jobdef XMLs
+* if possible, your jobdef XMLs 
+* if possible, a database dump
 * if concerning a payload API issue, the code in question

@@ -15,9 +15,11 @@ referenced inside the central database.
 
 For the GUI basic functions to work, the admin web service API must be enabled. See :doc:`security` for this. For full functionality the three WS APIs must be enabled.
 
-<TODO: a CLI option is being added. Ticket #134>
+A CLI shortcut is offered to enable all what is needed to use the GUI::
 
-The root user must have been initialized (should be done during initial node installation).
+    ./jqm.sh enablegui <rootpassword>
+    ./jqm.sh restart
+
 
 First connection
 *******************

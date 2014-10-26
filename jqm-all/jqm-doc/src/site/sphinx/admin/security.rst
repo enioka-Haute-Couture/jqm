@@ -4,7 +4,7 @@ Data security
 JQM tries to be as simple as possible and to "just work". Therefore, things (like many security mechanisms)
 that require compulsory configuration or which always fail on the first tries are disabled by default. 
 
-**Therefore, out of the box, JQM is not as secure as it can be**.
+**Therefore, out of the box, JQM is not as secure as it can be** (but still reasonably secure).
 
 This does not mean that nothing can be done. The rest of this
 chapter discusses the attack surface and remediation options.
@@ -25,7 +25,7 @@ tell the structure of the network).
 
 *Integrity* need: high (as security mechanisms can be disabled here)
 
-*Confidentiality* need: low (as data is public anyway. Exception: if the internal PKI isued, the root certificate is here. But this certificate actually protects... the central configuration so its ot a real issue)
+*Confidentiality* need: low (as data is public anyway. Exception: if the internal PKI isued, the root certificate is here. But this certificate actually protects... the central configuration so its not a real issue)
 
 *Stored in*: central database
 
@@ -131,7 +131,7 @@ Web services
 SSL
 --------
 
-All communications can be forced inside a SSL channel that will garantee both confidentiality and integrity, provided
+All communications can be forced inside a SSL channel that will guarantee both confidentiality and integrity, provided
 certificate chains are correctly set.
 
 JQM provided its own Private Key Infrastructure (PKI), which allows it to start without need for any certificate configuration.
@@ -170,12 +170,12 @@ Clients use of SSL and authentication
 
 JQM comes with two "ready to use" client libraries - one directly connecting to the central database, the other to the client web service API.
 
-The web service client has a straightforwards use of SSL and authentication - it must be provided a truststore, and either a user/password or a client certificate store.
+The web service client has a straightforward use of SSL and authentication - it must be provided a trust store, and either a user/password or a client certificate store.
 
 The direct to database client does not use authentication - it has after all access to the whole database, so it would be rather ridiculous.
 It has however a gotcha: file retrieval (log files as well as business files created by jobs) can only be done through the
 simple web service API. Therefore, the client also needs auth data. As it has access to the database, it will create a temporary user with 24 hours validity
-for this use on its own. As far as SSL is concerned, it must be provided a trustore too (or else will use system default stores). **This is only necessary if the
+for this use on its own. As far as SSL is concerned, it must be provided a trust store too (or else will use system default stores). **This is only necessary if the
 file retrieval abilities are to be used inside a SSL environment** - otherwise, this client library does not use the web services API at all.
 
 File retrieval specific protection
@@ -222,10 +222,12 @@ Remote JMX is disabled by default. Once enabled, it is accessible without authen
 
 This is a huge security risk, as JMX allows to run arbitrary code. Firewalling is necessary in this case.
 
-**Remediation**: using local JMX (through SSH for exemple) or using firewall rules.
+**Remediation**: using local JMX (through SSH for example) or using firewall rules.
 
 
 Tracing
 ***************
 
 To come. Feature request tickets already open. The goal will be to trace in a simple form all configuration modification and access to client APIs.
+
+Currently, an access log lists all calls to the web services, but there is no equivalent for the JPA API (and logs are not centralized in any way).

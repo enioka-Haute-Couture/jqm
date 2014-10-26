@@ -7,7 +7,7 @@ before this chapter, as it gives the definition of many terms used here as well 
 
 The main client API is the Hibernate Client API, which runs directly against the JQM central database. As JQM is database centric,
 finding jobs to run by polling the database, this is most efficient. However, this API has a serious drawback: it forces the user of the API to
-use Hibernate. This can be a huge problem in EE6 applications, as most containers (Websphere, Glassfish, JBoss...) offer their own implementation
+use Hibernate. This can be a huge problem in EE6 applications, as most containers (WebSphere, Glassfish, JBoss...) offer their own implementation
 of the JPA standard which is not compatible with Hibernate and cannot coexist with it (there must be only one JPA implementation at the same time,
 and a database created for Hibernate is very difficult to reuse in another JPA provider). Moreover, even outside the EE6 field,
 the client may already have chosen a JPA implementation that is not Hibernate. This is why JQM also offers an optional **REST Web Service Client API**.
@@ -108,28 +108,24 @@ When using Java, the recommended approach is to **use the provided client**. Thi
 The only situations when it is recommended to build your own WS client are:
 
 * when using another language
-* when you don't want or can't place the WS client library Jersey on your classpath. For exemple, in an EE6 server that provides JAX-RS 1 and
+* when you don't want or can't place the WS client library Jersey on your classpath. For example, in an EE6 server that provides JAX-RS 1 and
   just don't want to work with version 2.
 
 Server side
 ********************
 
-The web service is not active by default. To activate it, you must drop the file jqm-ws.war inside a directory (that you must create) named "webapp".
-This directory should be inside the JQM engine root (alongside conf, lib, ....) and the OS account running the JQM service should have full permissions on it.
-JQM node must then be restarted.
+The web service is not active on any engine by default. To activate it, see the administration guide.
 
 It is not necessary to enable the service on all JQM nodes. It is actually recommended to dedicate a node that will not host jobs (or few) to the WS.
 Moreover, it is a standard web application with purely stateless sessions,
 so the standard mechanisms for load balancing or high availability apply if you want them.
-
-.. warning:: currently, there is no authentication mechanism implemented. See `ticket #9 <https://github.com/enioka/jqm/issues/9>`_ for the implementation of this function.
 
 .. _web_service_ref:
 
 Service reference
 ***********************
 
-All objects are serialized to XML. The service is a REST-style web service, so no need for SOAP and other bubbly things.
+All objects are serialized to XML by default or to JSON if required. The service is a REST-style web service, so no need for SOAP and other bubbly things.
 
 +-----------------------+--------+-----------------------+---------------------+---------------------+----------------------+----------------------------------------------------------------+
 | URL pattern           | Method | Non-URL arguments     | Return type         | Return MIME         | Interface equivalent | Description                                                    |
@@ -206,27 +202,25 @@ Script sample
 ****************
 
 PowerShell script. Logics is the same in any language, script or compiled.::
-
-	# Ask for an empty JobRequest (avoids creating the XML from scratch, which is of course also possible)
-	$request = Invoke-RestMethod -Uri http://localhost:50813/api/ws/jr
-
-	# We decide to enqueue a request for the second existing JobDef.. Usually, one would know this name without having to query for it.
-	$appName = (Invoke-RestMethod -Uri http://localhost:50813/api/ws/jd).jobDefs.jobDef[1].applicationName
-
-	# Enqueue it
-	$request.jobRequest.applicationName = $appName
-	$request.jobRequest.user = $env:USERNAME
-	$ji = Invoke-RestMethod -Uri http://localhost:50813/api/ws/ji -Method Post -Body $request -ContentType "application/xml"
-
-	# Check the status of the job instance - one just has to refresh the JI for this.
-	$ji = Invoke-RestMethod -Uri http://localhost:50813/api/ws/ji/$($ji.jobInstance.id)
-	$ji.jobInstance | select id, applicationName, state -ExpandProperty messages
-
-	# We could also do a query instead of doing the previous explicit "lookup by id" API. The following line will create an empty query.
-	$query = Invoke-RestMethod -Uri http://localhost:50813/api/ws/ji/query
-	# As the query is empty, it has no usefull attributes (JAXB does not translate null as an empty tag but removes them). We must explicitely add them.
-	$query.query.AppendChild($query.CreateElement("jobInstanceId"))
-	$query.query.jobInstanceId = $ji.jobInstance.id
-	$res = Invoke-RestMethod -Uri http://localhost:50813/api/ws/ji/query -Method Post -Body $query -ContentType "application/xml"
-	# Display the status of the one instance returned (only one result, so no need for index)
-	$res.query.instances.instance
+    
+    # Note: we use JSON as a demonstration of how to use it over the default XML. Obviously, PowerShell deals with XML very well and does not need this.
+    
+    # Authentication?
+    $cred = Get-Credential root
+    
+    #################################
+    ## Enqueue demonstration
+    #################################
+    
+    $request = @{applicationName="DemoApi"; user=$env:USERNAME} | ConvertTo-Json
+    $jobInstance = Invoke-RestMethod http://localhost:62948/ws/client/ji -Method Post -Body $request -Credential $cred -ContentType "application/json" -Headers @{Accept="application/json"}
+    $jobInstance.id
+    
+    
+    #################################
+    ## Query demonstration
+    #################################
+    
+    $query = @{applicationName="DemoApi"} | ConvertTo-Json
+    $res = Invoke-RestMethod http://localhost:62948/ws/client/ji/query -Method Post -Body $query -Credential $cred -ContentType "application/json" -Headers @{Accept="application/json"}
+    $res.instances | Format-Table -AutoSize	

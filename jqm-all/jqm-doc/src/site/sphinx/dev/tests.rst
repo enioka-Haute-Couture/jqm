@@ -78,35 +78,6 @@ Please do not commit these modifications.
 
 .. warning:: you must ensure the src/test/webapp/META-INF directory is inside the "deployment assembly" inside Eclipse's project properties.
 
-Then the following libs must be copied from the "lib" directory of your JQM node to the the lib directory of Tomcat::
-
-    commons-lang-*.jar
-    jboss-logging-*.jar
-    antlr-*.jar
-    dom4j-*.jar
-    jboss-transaction-api_*.jar
-    log4j-*.jar
-    javassist-*.jar
-    commons-logging-*.jar
-    commons-codec-*.jar
-    hibernate-jpa-2.0-api-*.jar
-    hibernate-commons-annotations-*.jar
-    tomcat-jdbc.jar
-    websocket-api.jar
-    ecj-*.jar
-    hibernate-entitymanager-*.jar
-    hibernate-core-*.jar
-    postgresql-9.3-1101.jdbc4.jar
-    shiro-web-*.jar
-    commons-beanutils-*.jar
-    shiro-core-*.jar
-    httpcore-*.jar
-    httpclient-*.jar
-    slf4j-api-*.jar
-    slf4j-log4j12-*.jar
-    jqm-model-*.jar
-    jqm-pki-*.jar
-    
-.. note:: if your database is not postgresql, also copy its driver here.
+Then the database driver to the the lib directory of Tomcat
 
 Everything is ready - the project can now be "run on server". The URL will be http://localhost:8080/jqm-ws

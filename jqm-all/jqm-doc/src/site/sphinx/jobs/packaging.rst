@@ -18,9 +18,9 @@ Libraries handling
 JQM itself is hidden from the payloads - payloads cannot see any of its internal classes and resources. So JQM itself does not provide anything to 
 payloads in terms of libraries (with the exception of libraries explicitly added to the ext directory, see below).
 
-But there are two ways, each with two variants, to make sure that required libraires are present at runtime.
+But there are two ways, each with two variants, to make sure that required libraries are present at runtime.
 
-.. note:: All the four variants are exclusive. **Only one libray source it used at the same time**.
+.. note:: All the four variants are exclusive. **Only one library source it used at the same time**.
 
 Maven POM
 ++++++++++++++++
@@ -35,7 +35,7 @@ your settings.xml. There a few :doc:`/admin/parameters` that can tweak that beha
 
 Conclusion: in that case, no packaging to do.
 
-.. warning:: using this means the pom is fully resolvable from the engine server. This includes every parent pom.xml used.
+.. warning:: using this means the pom is fully resolvable from the engine server (repository access, etc). This includes every parent pom used.
 
 lib directory
 +++++++++++++++++
@@ -58,8 +58,8 @@ classloader common to all libraries and will be available to all payloads.
 This should only be used very rarely, and is not to be considered in packaging. This exists mostly for shared JNDI resources
 such as JDBC connection pools. Note that a library in ext has priority over one provided by the payload (through Maven or lib directory).
 
-.. note:: JQM actually makes use of this priority to always provide the latest version of the jqm-api to payloads. The APIs can
-	therefore be referenced as "provided" dependencies if using Maven.
+.. note:: JQM actually makes use of this priority to always provide the latest version of the jqm-api to payloads. The API can
+	therefore be referenced as a "provided" dependency if using Maven.
 
 Creating a JobDef
 *********************
