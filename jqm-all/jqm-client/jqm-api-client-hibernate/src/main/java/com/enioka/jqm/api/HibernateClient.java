@@ -53,6 +53,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Root;
 
+import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -1568,6 +1569,7 @@ final class HibernateClient implements JqmClient
         FileOutputStream fos = null;
         CloseableHttpClient cl = null;
         CloseableHttpResponse rs = null;
+        String nameHint = null;
 
         File destDir = new File(System.getProperty("java.io.tmpdir") + "/jqm");
         if (!destDir.isDirectory() && !destDir.mkdir())
@@ -1652,6 +1654,7 @@ final class HibernateClient implements JqmClient
             }
             cl = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setSslcontext(ctx).build();
 
+            // Run HTTP request
             HttpUriRequest rq = new HttpGet(url.toString());
             rs = cl.execute(rq);
             if (rs.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
@@ -1660,6 +1663,18 @@ final class HibernateClient implements JqmClient
                         + rs.getStatusLine().getStatusCode());
             }
 
+            // There may be a filename hint inside the response
+            Header[] hs = rs.getHeaders("Content-Disposition");
+            if (hs.length == 1)
+            {
+                Header h = hs[0];
+                if (h.getValue().contains("filename="))
+                {
+                    nameHint = h.getValue().split("=")[1];
+                }
+            }
+
+            // Save the file to a temp local file
             fos = new FileOutputStream(file);
             rs.getEntity().writeTo(fos);
             jqmlogger.trace("File was downloaded to " + file.getAbsolutePath());
@@ -1676,7 +1691,7 @@ final class HibernateClient implements JqmClient
             closeQuietly(cl);
         }
 
-        FileInputStream res = null;
+        SelfDestructFileStream res = null;
         try
         {
             res = new SelfDestructFileStream(file);
@@ -1685,6 +1700,7 @@ final class HibernateClient implements JqmClient
         {
             throw new JqmClientException("File seems not to be present where it should have been downloaded", e);
         }
+        res.nameHint = nameHint;
         return res;
     }
 

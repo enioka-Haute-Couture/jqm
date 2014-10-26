@@ -254,7 +254,9 @@ public class ServiceClient implements JqmClient
     @POST
     public InputStream getDeliverableContent(Deliverable file)
     {
-        return JqmClientFactory.getClient().getDeliverableContent(file);
+        SelfDestructFileStream fs = (SelfDestructFileStream) JqmClientFactory.getClient().getDeliverableContent(file);
+        res.setHeader("Content-Disposition", "attachment; filename=" + fs.nameHint);
+        return fs;
     }
 
     @Override
@@ -263,7 +265,9 @@ public class ServiceClient implements JqmClient
     @GET
     public InputStream getDeliverableContent(@PathParam("id") int delId)
     {
-        return JqmClientFactory.getClient().getDeliverableContent(delId);
+        SelfDestructFileStream fs = (SelfDestructFileStream) JqmClientFactory.getClient().getDeliverableContent(delId);
+        res.setHeader("Content-Disposition", "attachment; filename=" + fs.nameHint);
+        return fs;
     }
 
     @Override
@@ -272,8 +276,9 @@ public class ServiceClient implements JqmClient
     @GET
     public InputStream getJobLogStdErr(@PathParam("jobId") int jobId)
     {
-        res.setHeader("Content-Disposition", "attachment; filename=" + jobId + ".stderr.txt");
-        return JqmClientFactory.getClient().getJobLogStdErr(jobId);
+        SelfDestructFileStream fs = (SelfDestructFileStream) JqmClientFactory.getClient().getJobLogStdErr(jobId);
+        res.setHeader("Content-Disposition", "attachment; filename=" + fs.nameHint);
+        return fs;
     }
 
     @Override
@@ -282,8 +287,9 @@ public class ServiceClient implements JqmClient
     @GET
     public InputStream getJobLogStdOut(@PathParam("jobId") int jobId)
     {
-        res.setHeader("Content-Disposition", "attachment; filename=" + jobId + ".stdout.txt");
-        return JqmClientFactory.getClient().getJobLogStdOut(jobId);
+        SelfDestructFileStream fs = (SelfDestructFileStream) JqmClientFactory.getClient().getJobLogStdOut(jobId);
+        res.setHeader("Content-Disposition", "attachment; filename=" + fs.nameHint);
+        return fs;
     }
 
     @Override

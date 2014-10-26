@@ -154,7 +154,7 @@ public class ServiceSimple
         }
 
         String ext = FilenameUtils.getExtension(d.getOriginalFileName());
-        res.setHeader("Content-Disposition", "attachment; filename=" + d.getFileFamily() + ext);
+        res.setHeader("Content-Disposition", "attachment; filename=" + d.getFileFamily() + "." + d.getId() + "." + ext);
         return getFile(FilenameUtils.concat(n.getDlRepo(), d.getFilePath()));
     }
 

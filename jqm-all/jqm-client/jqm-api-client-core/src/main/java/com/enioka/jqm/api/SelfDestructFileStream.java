@@ -23,6 +23,7 @@ import java.io.IOException;
 class SelfDestructFileStream extends FileInputStream
 {
     File f = null;
+    String nameHint = null;
 
     SelfDestructFileStream(File file) throws FileNotFoundException
     {
