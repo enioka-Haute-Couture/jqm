@@ -115,20 +115,18 @@ final class SimpleApiSecurity
                     ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
                     user.setPassword(new Sha512Hash(secret, salt, 100000).toHex());
                     user.setHashSalt(salt.toHex());
+                    em.persist(user);
 
                     logindata = new Duet();
                     logindata.pass = secret;
                     logindata.usr = user.getLogin();
 
                     RRole r = em.createQuery("SELECT r from RRole r where r.name = 'administrator'", RRole.class).getSingleResult();
-                    user.getRoles().add(r);
                     r.getUsers().add(user);
 
-                    em.persist(user);
-
                     // Purge all old internal accounts
-                    em.createQuery("DELETE FROM RUser u WHERE u.expirationDate < :n").setParameter("n", Calendar.getInstance())
-                            .executeUpdate();
+                    em.createQuery("DELETE FROM RUser u WHERE u.internal = true AND u.expirationDate < :n")
+                            .setParameter("n", Calendar.getInstance()).executeUpdate();
 
                     em.getTransaction().commit();
                 }
