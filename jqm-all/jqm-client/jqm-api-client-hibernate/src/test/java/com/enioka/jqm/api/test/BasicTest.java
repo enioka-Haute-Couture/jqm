@@ -159,9 +159,9 @@ public class BasicTest
     @Test
     public void testSortJi()
     {
-        Query.create().setQueryLiveInstances(true).setUser("test").addSortAsc(Sort.APPLICATIONNAME).addSortDesc(Sort.DATEATTRIBUTION)
-                .addSortAsc(Sort.DATEEND).addSortDesc(Sort.DATEENQUEUE).addSortAsc(Sort.ID).addSortDesc(Sort.QUEUENAME)
-                .addSortAsc(Sort.STATUS).addSortDesc(Sort.USERNAME).addSortAsc(Sort.PARENTID).run();
+        Query.create().setQueryHistoryInstances(false).setQueryLiveInstances(true).setUser("test").addSortAsc(Sort.APPLICATIONNAME)
+                .addSortDesc(Sort.DATEATTRIBUTION).addSortAsc(Sort.DATEEND).addSortDesc(Sort.DATEENQUEUE).addSortAsc(Sort.ID)
+                .addSortDesc(Sort.QUEUENAME).addSortAsc(Sort.STATUS).addSortDesc(Sort.USERNAME).addSortAsc(Sort.PARENTID).run();
     }
 
     @Test

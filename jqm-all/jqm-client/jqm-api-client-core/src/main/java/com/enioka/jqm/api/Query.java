@@ -69,8 +69,9 @@ public final class Query
      * The different fields that can be used in sorting.
      */
     public static enum Sort {
-        ID("id"), APPLICATIONNAME("jd.applicationName"), QUEUENAME("queue.name"), STATUS("status", "state"), DATEENQUEUE("enqueueDate"), DATEATTRIBUTION(
-                "attributionDate"), DATEEXECUTION("executionDate"), DATEEND("endDate", null), USERNAME("userName"), PARENTID("parentId");
+        ID("id"), APPLICATIONNAME("jd.applicationName"), QUEUENAME("queue.name"), STATUS("status", "state"), DATEENQUEUE("enqueueDate",
+                "creationDate"), DATEATTRIBUTION("attributionDate"), DATEEXECUTION("executionDate"), DATEEND("endDate", null), USERNAME(
+                "userName"), PARENTID("parentId");
 
         private String historyField, jiField;
 

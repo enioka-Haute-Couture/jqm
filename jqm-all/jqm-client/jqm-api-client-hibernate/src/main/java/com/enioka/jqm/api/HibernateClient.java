@@ -1076,6 +1076,10 @@ final class HibernateClient implements JqmClient
         {
             throw new JqmInvalidRequestException("cannot use paging on live instances");
         }
+        if (query.isQueryLiveInstances() && query.isQueryHistoryInstances() && query.getSorts().size() > 0)
+        {
+            throw new JqmInvalidRequestException("cannot use sorting when querying both live and historical instances");
+        }
 
         EntityManager em = null;
         try
@@ -1144,7 +1148,7 @@ final class HibernateClient implements JqmClient
                     wh2 = " WHERE " + wh2.substring(3);
                 }
 
-                TypedQuery<JobInstance> q2 = em.createQuery("SELECT h FROM JobInstance h " + wh2, JobInstance.class);
+                TypedQuery<JobInstance> q2 = em.createQuery("SELECT h FROM JobInstance h " + wh2 + sort, JobInstance.class);
                 for (Map.Entry<String, Object> entry : prms2.entrySet())
                 {
                     q2.setParameter(entry.getKey(), entry.getValue());
