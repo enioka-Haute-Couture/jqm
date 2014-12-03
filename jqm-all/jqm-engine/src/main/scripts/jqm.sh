@@ -109,7 +109,7 @@ jqm_start() {
  # We can go on...
  if [ "$1" = "console" ]
  then
-  truss $JAVA -jar $JQM_JAR -startnode $JQM_NODE
+  $JAVA -jar $JQM_JAR -startnode $JQM_NODE
  else
   remove_npipes
   mknod $STDOUT_NPIPE p
