@@ -67,6 +67,13 @@
 				<exclude>*</exclude>
 			</excludes>
 		</fileSet>
+        <fileSet>
+			<directory>${project.basedir}/src/main/scripts/empty</directory>
+			<outputDirectory>tmp</outputDirectory>
+			<excludes>
+				<exclude>*</exclude>
+			</excludes>
+		</fileSet>
 		<fileSet>
 			<directory>${project.basedir}/src/main/scripts/empty</directory>
 			<outputDirectory>db</outputDirectory>
