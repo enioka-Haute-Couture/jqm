@@ -29,15 +29,25 @@ public class UrlFactory implements ObjectFactory
     @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment) throws Exception
     {
-        Reference resource = (Reference) obj;
-        if (resource.get("URL") != null)
+        String url = null;
+        if (obj instanceof Reference)
         {
-            String url = (String) resource.get("URL").getContent();
-            return new URL(url);
+            Reference resource = (Reference) obj;
+            if (resource.get("URL") != null)
+            {
+                url = (String) resource.get("URL").getContent();
+            }
         }
-        else
+        else if (environment.containsKey("URL"))
+        {
+            url = (String) environment.get("URL");
+        }
+
+        if (url == null)
         {
             throw new NamingException("Resource does not have a valid URL parameter");
         }
+
+        return new URL(url);
     }
 }
