@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.enioka.jqm</groupId>
@@ -14,19 +15,15 @@
 	<url>http://jqm.readthedocs.org</url>
 
 	<modules>
-		<module>jqm-test-fibo</module>
 		<module>jqm-test-fibohib</module>
-		<module>jqm-test-fibosync</module>
 		<module>jqm-test-datetimemaven</module>
 		<module>jqm-test-datetimemaven2</module>
 		<module>jqm-test-datetimemavennopom</module>
 		<module>jqm-test-datetimemavennopomlib</module>
 		<module>jqm-test-datetimemavenjarinlib</module>
 		<module>jqm-test-datetimemavennolibdef</module>
-		<module>jqm-test-deliverable</module>
 		<module>jqm-test-geo</module>
 		<module>jqm-test-jndijms-amq</module>
-		<module>jqm-test-checkargs</module>
 		<module>jqm-test-defcon</module>
 		<module>jqm-test-sendmsg</module>
 		<module>jqm-test-sendprogress</module>
@@ -47,15 +44,17 @@
 		<module>jqm-test-emplusapi</module>
 		<module>jqm-test-tmpdir</module>
 		<module>jqm-test-providedapi</module>
-		<module>jqm-test-apienginestatus</module>
 		<module>jqm-test-jmxleak</module>
 		<module>jqm-test-embeddedtest</module>
+		<module>jqm-test-pyl</module>
 	</modules>
 
 	<profiles>
-		<!-- Tests should produce a "test.jar" file - not a traditionally-named jar - to ease their use inside the engine auto tests. The dependency 
-			plugin creates that test.jar (by copying the artifact). (We do not actually rename the artifacts, as this would be contrary to Maven Central 
-			rules.) Renaming is inside a profile to avoid running it on the parent (pom-packaged) project -->
+		<!-- Tests should produce a "test.jar" file - not a traditionally-named 
+			jar - to ease their use inside the engine auto tests. The dependency plugin 
+			creates that test.jar (by copying the artifact). (We do not actually rename 
+			the artifacts, as this would be contrary to Maven Central rules.) Renaming 
+			is inside a profile to avoid running it on the parent (pom-packaged) project -->
 		<profile>
 			<activation>
 				<file>

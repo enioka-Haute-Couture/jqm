@@ -131,18 +131,6 @@ public class EngineApiTest extends JqmBaseTest
     @Test
     public void testGetChildrenStatus() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-apienginestatus/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        JobRequest.create("MarsuApplication", "TestUser").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(3, 10000, em);
-
-        List<History> ji = Helpers.getNewEm()
-                .createQuery("SELECT j FROM History j WHERE j.status = 'ENDED' ORDER BY j.id ASC", History.class).getResultList();
-        Assert.assertEquals(2, ji.size());
-        ji = Helpers.getNewEm().createQuery("SELECT j FROM History j WHERE j.status = 'CRASHED' ORDER BY j.id ASC", History.class)
-                .getResultList();
-        Assert.assertEquals(1, ji.size());
+        JqmSimpleTest.create(em, "pyl.EngineApiGetStatus").expectNonOk(1).expectOk(2).run(this);
     }
 }

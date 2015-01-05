@@ -16,17 +16,34 @@
  * limitations under the License.
  */
 
-import com.enioka.jqm.api.JobBase;
+package pyl;
 
-public class App extends JobBase
+import java.io.FileWriter;
+import java.io.PrintWriter;
+
+import com.enioka.jqm.api.JobManager;
+
+public class EngineApiSendDeliverable implements Runnable
 {
+    JobManager jm;
 
     @Override
-    public void start()
+    public void run()
     {
-        if ((!this.getParameters().containsValue("argument1")) || (!this.getParameters().containsValue("argument2")))
+        String file = jm.parameters().get("filepath");
+        String fileName = jm.parameters().get("fileName");
+        System.out.println("FILENAME: " + fileName);
+        try
         {
-            throw new RuntimeException("arguments did not contain expected values");
+            PrintWriter out = new PrintWriter(new FileWriter(file + fileName));
+            out.println("Hello World!");
+            out.close();
+
+            jm.addDeliverable(file + fileName, "JobGenADeliverableFamily");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 }

@@ -18,7 +18,6 @@ package com.enioka.jqm.tools;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -28,10 +27,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.jpamodel.JobDefParameter;
-import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class DeliverableTest extends JqmBaseTest
@@ -53,24 +49,10 @@ public class DeliverableTest extends JqmBaseTest
         Helpers.setSingleParam("enableWsApiAuth", "true", em);
         Helpers.setSingleParam("enableWsApiSsl", "false", em);
 
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", TestHelpers.node.getDlRepo(), em);
-        JobDefParameter jdp2 = CreationTools.createJobDefParameter("fileName", "jqm-test-deliverable1.txt", em);
-        jdargs.add(jdp);
-        jdargs.add(jdp2);
-
-        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-deliverable/target/test.jar", TestHelpers.qVip, 42,
-                "getDeliverables", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-
-        JobRequest j = new JobRequest("getDeliverables", "TestUser");
-        int id = JqmClientFactory.getClient().enqueue(j);
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        int id = JqmSimpleTest.create(em, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
+                .addDefParameter("fileName", "jqm-test-deliverable1.txt").run(this);
 
         List<InputStream> tmp = JqmClientFactory.getClient().getJobDeliverablesContent(id);
-        Assert.assertEquals(1, tmp.size());
-
         // Assert.assertTrue(tmp.get(0).available() > 0);
         String res = IOUtils.toString(tmp.get(0));
         Assert.assertTrue(res.startsWith("Hello World!"));
@@ -88,18 +70,8 @@ public class DeliverableTest extends JqmBaseTest
         Helpers.setSingleParam("enableWsApiAuth", "true", em);
         Helpers.setSingleParam("enableWsApiSsl", "false", em);
 
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", TestHelpers.node.getDlRepo(), em);
-        JobDefParameter jdp2 = CreationTools.createJobDefParameter("fileName", "jqm-test-deliverable2.txt", em);
-        jdargs.add(jdp);
-        jdargs.add(jdp2);
-
-        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-deliverable/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        int jobId = JobRequest.create("MarsuApplication", "Franquin").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        int jobId = JqmSimpleTest.create(em, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
+                .addDefParameter("fileName", "jqm-test-deliverable2.txt").run(this);
 
         File f = new File(TestHelpers.node.getDlRepo() + "jqm-test-deliverable2.txt");
         Assert.assertEquals(false, f.exists()); // file should have been moved
@@ -126,20 +98,10 @@ public class DeliverableTest extends JqmBaseTest
         Helpers.setSingleParam("enableWsApiAuth", "false", em);
         Helpers.setSingleParam("enableWsApiSsl", "false", em);
 
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", TestHelpers.node.getDlRepo(), em);
-        JobDefParameter jdp2 = CreationTools.createJobDefParameter("fileName", "jqm-test-deliverable3.txt", em);
-        jdargs.add(jdp);
-        jdargs.add(jdp2);
+        int jobId = JqmSimpleTest.create(em, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
+                .addDefParameter("fileName", "jqm-test-deliverable3.txt").run(this);
 
-        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-deliverable/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        int jobId = JobRequest.create("MarsuApplication", "Franquin").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
-
-        File f = new File(TestHelpers.node.getDlRepo() + "jqm-test-deliverable2.txt");
+        File f = new File(TestHelpers.node.getDlRepo() + "jqm-test-deliverable3.txt");
         Assert.assertEquals(false, f.exists()); // file should have been moved
 
         List<com.enioka.jqm.api.Deliverable> files = JqmClientFactory.getClient().getJobDeliverables(jobId);
@@ -169,20 +131,10 @@ public class DeliverableTest extends JqmBaseTest
         p.put("com.enioka.jqm.ws.truststorePass", "SuperPassword");
         JqmClientFactory.setProperties(p);
 
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", TestHelpers.node.getDlRepo(), em);
-        JobDefParameter jdp2 = CreationTools.createJobDefParameter("fileName", "jqm-test-deliverable2.txt", em);
-        jdargs.add(jdp);
-        jdargs.add(jdp2);
+        int jobId = JqmSimpleTest.create(em, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
+                .addDefParameter("fileName", "jqm-test-deliverable4.txt").run(this);
 
-        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-deliverable/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        int jobId = JobRequest.create("MarsuApplication", "Franquin").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
-
-        File f = new File(TestHelpers.node.getDlRepo() + "jqm-test-deliverable2.txt");
+        File f = new File(TestHelpers.node.getDlRepo() + "jqm-test-deliverable4.txt");
         Assert.assertEquals(false, f.exists()); // file should have been moved
 
         List<com.enioka.jqm.api.Deliverable> files = JqmClientFactory.getClient().getJobDeliverables(jobId);
@@ -202,18 +154,8 @@ public class DeliverableTest extends JqmBaseTest
     @Test
     public void testGetAllDeliverables() throws Exception
     {
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("filepath", TestHelpers.node.getDlRepo(), em);
-        JobDefParameter jdp2 = CreationTools.createJobDefParameter("fileName", "jqm-test-deliverable4.txt", em);
-        jdargs.add(jdp);
-        jdargs.add(jdp2);
-
-        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-deliverable/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        int jobId = JobRequest.create("MarsuApplication", "Franquin").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        int jobId = JqmSimpleTest.create(em, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
+                .addDefParameter("fileName", "jqm-test-deliverable5.txt").run(this);
 
         List<com.enioka.jqm.api.Deliverable> tmp = JqmClientFactory.getClient().getJobDeliverables(jobId);
         Assert.assertEquals(1, tmp.size());

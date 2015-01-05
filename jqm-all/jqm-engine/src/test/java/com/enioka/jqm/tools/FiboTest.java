@@ -27,9 +27,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class FiboTest extends JqmBaseTest
@@ -50,35 +48,16 @@ public class FiboTest extends JqmBaseTest
     @Test
     public void testFibo() throws Exception
     {
-        CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
-                TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
-        JobRequest.create("Fibo", "TestUser").addParameter("p1", "1").addParameter("p2", "2").submit();
-
-        // Start one engine
-        addAndStartEngine();
-
+        JqmSimpleTest.create(em, "pyl.StressFibo").addRuntimeParameter("p1", "1").addRuntimeParameter("p2", "2").expectOk(11).run(this);
         // 1: (1,2) - 2: (2,3) - 3: (3,5) - 4: (5,8) - 5: (8,13) - 6: (13,21) - 7: (21,34) - 8: (34,55) - 9: (55,89) - 10: (89,144) -
         // 11: (134,233)
-        TestHelpers.waitFor(11, 15000, em);
-
-        Assert.assertEquals(11, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
     }
 
     @Test
-    public void testenqueueSynchronously() throws Exception
+    public void testEnqueueSynchronously() throws Exception
     {
-        CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibosync/target/test.jar",
-                TestHelpers.qVip, 42, "FiboSync", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        JobRequest.create("FiboSync", "TestUser").addParameter("p1", "34").addParameter("p2", "55").submit();
-
-        // Start one engine
-        addAndStartEngine();
-
-        TestHelpers.waitFor(4, 30000, em);
-
-        Assert.assertEquals(4, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        JqmSimpleTest.create(em, "pyl.StressFiboSync").addRuntimeParameter("p1", "34").addRuntimeParameter("p2", "55").expectOk(4)
+                .run(this);
 
         List<History> res = em.createQuery("SELECT j FROM History j ORDER BY j.id", History.class).getResultList();
         History h1, h2 = null;
@@ -94,5 +73,12 @@ public class FiboTest extends JqmBaseTest
             Assert.assertTrue(h2.getEndDate().compareTo(h1.getEndDate()) <= 0);
             Assert.assertTrue(h2.getEndDate().compareTo(h1.getExecutionDate()) > 0);
         }
+    }
+
+    @Test
+    public void testFiboHib() throws Exception
+    {
+        JqmSimpleTest.create(em, "com.enioka.jqm.tests.App", "jqm-test-fibohib").addRuntimeParameter("p1", "1")
+                .addRuntimeParameter("p2", "2").expectOk(11).run(this);
     }
 }

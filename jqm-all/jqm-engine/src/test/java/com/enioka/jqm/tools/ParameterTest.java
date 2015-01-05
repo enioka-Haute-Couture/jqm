@@ -18,74 +18,36 @@
 
 package com.enioka.jqm.tools;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Assert;
 import org.junit.Test;
-
-import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.jpamodel.JobDefParameter;
-import com.enioka.jqm.test.helpers.CreationTools;
-import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class ParameterTest extends JqmBaseTest
 {
+    // Sanity check test
+    @Test
+    public void testParameterValue() throws Exception
+    {
+        JqmSimpleTest.create(em, "pyl.JobBaseGetParam").addDefParameter("arg1", "Gaston Lagaffe").addDefParameter("arg2", "Franquin")
+                .expectNonOk(1).expectOk(0).run(this);
+    }
+
     @Test
     public void testMixParameters() throws Exception
     {
-        List<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("arg1", "argument1", em);
-        JobDefParameter jdp2 = CreationTools.createJobDefParameter("arg2", "Franquin", em);
-        jdargs.add(jdp);
-        jdargs.add(jdp2);
-        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-checkargs/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        JobRequest.create("MarsuApplication", "TestUser").addParameter("arg2", "argument2").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
-
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        JqmSimpleTest.create(em, "pyl.JobBaseGetParam").addDefParameter("arg1", "argument1").addDefParameter("arg2", "Franquin")
+                .addRuntimeParameter("arg2", "argument2").run(this);
     }
 
     @Test
     public void testDefaultParameters() throws Exception
     {
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("arg1", "argument1", em);
-        JobDefParameter jdp2 = CreationTools.createJobDefParameter("arg2", "argument2", em);
-        jdargs.add(jdp);
-        jdargs.add(jdp2);
-        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-checkargs/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        JobRequest.create("MarsuApplication", "TestUser").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
-
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        JqmSimpleTest.create(em, "pyl.JobBaseGetParam").addDefParameter("arg1", "argument1").addDefParameter("arg2", "argument2").run(this);
     }
 
     @Test
     public void testOverrideAllParmeters() throws Exception
     {
-        ArrayList<JobDefParameter> jdargs = new ArrayList<JobDefParameter>();
-        JobDefParameter jdp = CreationTools.createJobDefParameter("arg1", "Gaston Lagaffe", em);
-        JobDefParameter jdp2 = CreationTools.createJobDefParameter("arg2", "Franquin", em);
-        jdargs.add(jdp);
-        jdargs.add(jdp2);
-
-        CreationTools.createJobDef(null, true, "App", jdargs, "jqm-tests/jqm-test-checkargs/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        JobRequest.create("MarsuApplication", "TestUser").addParameter("arg1", "argument1").addParameter("arg2", "argument2").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
-
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        JqmSimpleTest.create(em, "pyl.JobBaseGetParam").addDefParameter("arg1", "Gaston Lagaffe").addDefParameter("arg2", "Franquin")
+                .addRuntimeParameter("arg1", "argument1").addRuntimeParameter("arg2", "argument2").run(this);
     }
+
 }

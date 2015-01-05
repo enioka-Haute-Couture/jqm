@@ -16,30 +16,21 @@
  * limitations under the License.
  */
 
-import java.io.FileWriter;
-import java.io.PrintWriter;
+package pyl;
 
 import com.enioka.jqm.api.JobBase;
 
-public class App extends JobBase
+/**
+ * Simple call to getParameters and check value is as expected.
+ */
+public class JobBaseGetParam extends JobBase
 {
     @Override
     public void start()
     {
-        String file = this.getParameters().get("filepath");
-        String fileName = this.getParameters().get("fileName");
-        System.out.println("FILENAME: " + fileName);
-        try
+        if ((!this.getParameters().containsValue("argument1")) || (!this.getParameters().containsValue("argument2")))
         {
-            PrintWriter out = new PrintWriter(new FileWriter(file + fileName));
-            out.println("Hello World!");
-            out.close();
-
-            addDeliverable(file + fileName, "JobGenADeliverableFamily");
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+            throw new RuntimeException("arguments did not contain expected values");
         }
     }
 }

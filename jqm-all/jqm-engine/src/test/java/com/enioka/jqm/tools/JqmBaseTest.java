@@ -25,12 +25,15 @@ import javax.persistence.EntityManager;
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
+import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class JqmBaseTest

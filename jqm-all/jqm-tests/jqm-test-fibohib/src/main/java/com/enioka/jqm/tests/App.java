@@ -30,7 +30,7 @@ public class App extends JobBase
     {
         System.out.println("PARAMETRE FIBO 2: " + this.getParameters().get("p2"));
 
-        JobRequest jd = new JobRequest("FiboHib", "Jean Paul");
+        JobRequest jd = new JobRequest(this.getApplicationName(), "Jean Paul");
 
         jd.addParameter("p1", this.getParameters().get("p2"));
         jd.addParameter("p2", (Integer.parseInt(this.getParameters().get("p1")) + Integer.parseInt(this.getParameters().get("p2")) + ""));
