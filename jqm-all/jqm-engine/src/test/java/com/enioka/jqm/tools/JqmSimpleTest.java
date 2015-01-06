@@ -2,6 +2,7 @@ package com.enioka.jqm.tools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
@@ -19,6 +20,7 @@ public class JqmSimpleTest
     private EntityManager em;
     private JobDef jd = null;
     private Map<String, String> runtimePrms = new HashMap<String, String>();
+    private List<String> nodeNames = new ArrayList<String>();
 
     private int expectedOk = 1, expectedNonOk = 0;
 
@@ -28,6 +30,7 @@ public class JqmSimpleTest
         this.jd = CreationTools.createJobDef(null, true, className, new ArrayList<JobDefParameter>(), "jqm-tests/" + artifactName
                 + "/target/test.jar", TestHelpers.qVip, -1, "TestJqmApplication", "appFreeName", "TestModule", "kw1", "kw2", "kw3", false,
                 em);
+        nodeNames.add("localhost");
     }
 
     public static JqmSimpleTest create(EntityManager em, String className)
@@ -55,6 +58,12 @@ public class JqmSimpleTest
         return this;
     }
 
+    public JqmSimpleTest addEngine(String nodeName)
+    {
+        nodeNames.add(nodeName);
+        return this;
+    }
+
     public JqmSimpleTest expectOk(int expected)
     {
         this.expectedOk = expected;
@@ -69,10 +78,14 @@ public class JqmSimpleTest
 
     public Integer run(JqmBaseTest test)
     {
-        Integer i = JobRequest.create("TestJqmApplication", "TestUser").setParameters(runtimePrms).submit();
+        int nbExpected = expectedNonOk + expectedOk;
 
-        test.addAndStartEngine();
-        TestHelpers.waitFor(expectedOk + expectedNonOk, 10000, em);
+        for (String nodeName : nodeNames)
+        {
+            test.addAndStartEngine(nodeName);
+        }
+        Integer i = JobRequest.create("TestJqmApplication", "TestUser").setParameters(runtimePrms).submit();
+        TestHelpers.waitFor(nbExpected, 9000 + nbExpected * 1000, em);
 
         Assert.assertEquals(expectedOk, TestHelpers.getOkCount(em));
         Assert.assertEquals(expectedNonOk, TestHelpers.getNonOkCount(em));

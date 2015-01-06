@@ -16,12 +16,14 @@
  * limitations under the License.
  */
 
+package pyl;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import com.enioka.jqm.api.JobManager;
 
-public class App implements Runnable
+public class StressGeo implements Runnable
 {
     JobManager jm;
 

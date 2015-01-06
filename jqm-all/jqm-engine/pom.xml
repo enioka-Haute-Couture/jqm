@@ -329,7 +329,7 @@
 		<!-- Test files that will be included in the package -->
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-test-fibo</artifactId>
+			<artifactId>jqm-test-pyl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -348,12 +348,6 @@
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-test-main</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-test-kill</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

@@ -21,12 +21,9 @@ package com.enioka.jqm.tools;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class GeoTest extends JqmBaseTest
@@ -35,6 +32,11 @@ public class GeoTest extends JqmBaseTest
     public void b()
     {
         TestHelpers.setNodesLogLevel("INFO", em);
+        em.getTransaction().begin();
+        TestHelpers.node.setRootLogLevel("INFO");
+        TestHelpers.nodeMix.setRootLogLevel("INFO");
+        TestHelpers.nodeMix2.setRootLogLevel("INFO");
+        em.getTransaction().commit();
     }
 
     @After
@@ -47,22 +49,7 @@ public class GeoTest extends JqmBaseTest
     @Test
     public void testGeo() throws Exception
     {
-        em.getTransaction().begin();
-        TestHelpers.node.setRootLogLevel("INFO");
-        TestHelpers.nodeMix.setRootLogLevel("INFO");
-        TestHelpers.nodeMix2.setRootLogLevel("INFO");
-        em.getTransaction().commit();
-
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42, "Geo", null,
-                "Franquin", "ModuleMachin", "other1", "other2", false, em);
-        JobRequest.create("Geo", "TestUser").addParameter("nbJob", "1").submit();
-
-        addAndStartEngine();
-        addAndStartEngine("localhost2");
-        addAndStartEngine("localhost3");
-        TestHelpers.waitFor(511, 60000, em);
-
-        Assert.assertEquals(511, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        JqmSimpleTest.create(em, "pyl.StressGeo").addEngine("localhost2").addEngine("localhost3").addRuntimeParameter("nbJob", "1")
+                .expectOk(511).run(this);
     }
 }
