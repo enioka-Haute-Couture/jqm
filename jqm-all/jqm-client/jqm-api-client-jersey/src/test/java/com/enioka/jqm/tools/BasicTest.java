@@ -145,8 +145,8 @@ public class BasicTest
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testWsGetDeliverable");
 
-        CreationTools.createJobDef("super app", true, "App", null, "jqm-tests/jqm-test-runnable-inject/target/test.jar", TestHelpers.qVip,
-                42, "jqm-test-runnable-inject", "testapp", "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef("super app", true, "pyl.EngineApiInjectThread", null, "jqm-tests/jqm-test-pyl/target/test.jar",
+                TestHelpers.qVip, 42, "jqm-test-runnable-inject", "testapp", "Franquin", "ModuleMachin", "other", "other", false, em);
         JobRequest j = new JobRequest("jqm-test-runnable-inject", "MAG");
         int i = JqmClientFactory.getClient().enqueue(j);
         TestHelpers.waitFor(3, 10000, em);

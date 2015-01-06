@@ -21,6 +21,7 @@ public class JqmSimpleTest
     private JobDef jd = null;
     private Map<String, String> runtimePrms = new HashMap<String, String>();
     private List<String> nodeNames = new ArrayList<String>();
+    private String sessionId = null;
 
     private int expectedOk = 1, expectedNonOk = 0;
 
@@ -76,6 +77,20 @@ public class JqmSimpleTest
         return this;
     }
 
+    public JqmSimpleTest setSessionId(String id)
+    {
+        this.sessionId = id;
+        return this;
+    }
+
+    public JqmSimpleTest setExternal()
+    {
+        em.getTransaction().begin();
+        this.jd.setExternal(true);
+        em.getTransaction().commit();
+        return this;
+    }
+
     public Integer run(JqmBaseTest test)
     {
         int nbExpected = expectedNonOk + expectedOk;
@@ -84,7 +99,7 @@ public class JqmSimpleTest
         {
             test.addAndStartEngine(nodeName);
         }
-        Integer i = JobRequest.create("TestJqmApplication", "TestUser").setParameters(runtimePrms).submit();
+        Integer i = JobRequest.create("TestJqmApplication", "TestUser").setSessionID(sessionId).setParameters(runtimePrms).submit();
         TestHelpers.waitFor(nbExpected, 9000 + nbExpected * 1000, em);
 
         Assert.assertEquals(expectedOk, TestHelpers.getOkCount(em));

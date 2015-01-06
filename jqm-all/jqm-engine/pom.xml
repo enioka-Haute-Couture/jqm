@@ -335,18 +335,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-test-geo</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-test-main-inject</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-test-main</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>

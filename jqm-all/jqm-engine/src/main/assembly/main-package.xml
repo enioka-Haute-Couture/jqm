@@ -127,9 +127,7 @@
 			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
 			<includes>
 				<include>com.enioka.jqm:jqm-test-pyl:jar</include>
-				<include>com.enioka.jqm:jqm-test-geo:jar</include>
 				<include>com.enioka.jqm:jqm-test-main:jar</include>
-				<include>com.enioka.jqm:jqm-test-main-inject:jar</include>
 			</includes>
 			<scope>test</scope>
 		</dependencySet>

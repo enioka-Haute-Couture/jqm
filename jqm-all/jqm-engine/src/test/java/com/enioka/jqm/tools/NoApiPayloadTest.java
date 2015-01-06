@@ -69,16 +69,10 @@ public class NoApiPayloadTest extends JqmBaseTest
     @Test
     public void testRunnableInject() throws Exception
     {
-        CreationTools.createJobDef("super app", true, "App", null, "jqm-tests/jqm-test-runnable-inject/target/test.jar", TestHelpers.qVip,
-                42, "jqm-test-runnable-inject", "testapp", "Franquin", "ModuleMachin", "other", "other", false, em);
-        int i = JobRequest.create("jqm-test-runnable-inject", "TestUser").submit();
+        int i = JqmSimpleTest.create(em, "pyl.EngineApiInjectThread").expectOk(3).run(this);
 
-        addAndStartEngine();
-        TestHelpers.waitFor(3, 10000, em);
-
-        Assert.assertEquals(3, TestHelpers.getOkCount(em));
         List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
-        Assert.assertEquals(1, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 3 auto messages + 1 message per run.
+        Assert.assertEquals(1, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 1 message per run.
         Assert.assertEquals(100, (int) ji.get(0).getProgress());
     }
 
@@ -99,20 +93,11 @@ public class NoApiPayloadTest extends JqmBaseTest
     @Test
     public void testMainTypeInject() throws Exception
     {
-        CreationTools.createJobDef("super app", true, "App", null, "jqm-tests/jqm-test-main-inject/target/test.jar", TestHelpers.qVip, 42,
-                "jqm-test-main-inject", "testapp", "Franquin", "ModuleMachin", "other", "other", false, em);
-        int i = JobRequest.create("jqm-test-main-inject", "TestUser").setSessionID("123X").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(3, 10000, em);
+        int i = JqmSimpleTest.create(em, "pyl.EngineApiInject").setSessionId("123X").expectOk(3).run(this);
 
         List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
 
-        Assert.assertEquals(3, ji.size());
-        Assert.assertEquals(State.ENDED, ji.get(0).getState());
-        Assert.assertEquals(State.ENDED, ji.get(1).getState());
-
-        Assert.assertEquals(1, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 3 auto messages + 1 message per run.
+        Assert.assertEquals(1, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 1 message per run created by payload
         Assert.assertEquals(100, (int) ji.get(0).getProgress());
     }
 

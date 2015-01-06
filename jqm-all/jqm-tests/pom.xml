@@ -32,10 +32,7 @@
 		<module>jqm-test-exit</module>
 		<module>jqm-test-runnable</module>
 		<module>jqm-test-main</module>
-		<module>jqm-test-main-inject</module>
-		<module>jqm-test-runnable-inject</module>
 		<module>jqm-test-kill</module>
-		<module>jqm-test-kill2</module>
 		<module>jqm-test-legacyinheritance</module>
 		<module>jqm-test-missingapi</module>
 		<module>jqm-test-jndifile</module>

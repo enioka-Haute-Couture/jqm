@@ -97,19 +97,12 @@ public class ClientApiTest extends JqmBaseTest
     @Test
     public void testKillJob() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-kill/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        int i = JobRequest.create("MarsuApplication", "TestUser").submit();
-
-        addAndStartEngine();
-        Thread.sleep(3000);
+        int i = JqmSimpleTest.create(em, "pyl.KillMe").expectOk(0).run(this);
 
         JqmClientFactory.getClient().killJob(i);
-        Thread.sleep(3000);
+        TestHelpers.waitFor(1, 3000, em);
 
-        TypedQuery<History> query = Helpers.getNewEm().createQuery("SELECT j FROM History j", History.class);
-        ArrayList<History> res = (ArrayList<History>) query.getResultList();
-
+        List<History> res = em.createQuery("SELECT j FROM History j", History.class).getResultList();
         Assert.assertEquals(1, res.size());
         Assert.assertEquals(State.KILLED, res.get(0).getState());
     }

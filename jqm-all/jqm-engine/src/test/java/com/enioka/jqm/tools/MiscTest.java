@@ -393,16 +393,8 @@ public class MiscTest extends JqmBaseTest
     public void testExternalKill() throws Exception
     {
         Helpers.setSingleParam("internalPollingPeriodMs", "100", em);
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-kill2/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
-        em.getTransaction().begin();
-        em.createQuery("UPDATE JobDef ji set ji.external = true").executeUpdate();
-        em.getTransaction().commit();
-        int i = JobRequest.create("MarsuApplication", "TestUser").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitForRunning(1, 5000, em);
-
+        int i = JqmSimpleTest.create(em, "pyl.KillMeNot").setExternal().expectNonOk(0).expectOk(0).run(this);
+                
         JqmClientFactory.getClient().killJob(i);
         TestHelpers.waitFor(1, 20000, em);
         Assert.assertEquals(0, TestHelpers.getOkCount(em));
