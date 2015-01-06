@@ -76,6 +76,7 @@ import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
+import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.RuntimeParameter;
 import com.enioka.jqm.jpamodel.State;
@@ -1724,28 +1725,39 @@ final class HibernateClient implements JqmClient
     {
         // 1: retrieve node to address
         EntityManager em = null;
-        History h = null;
+        Node n = null;
         try
         {
             em = getEm();
-            h = em.find(History.class, jobId);
-            if (h == null)
+            History h = em.find(History.class, jobId);
+            if (h != null)
             {
-                throw new NoResultException("No history for this jobId. perhaps the job isn't ended yet");
+                n = h.getNode();
+            }
+            else
+            {
+                JobInstance ji = em.find(JobInstance.class, jobId);
+                if (ji != null)
+                {
+                    n = ji.getNode();
+                }
+                else
+                {
+                    throw new NoResultException("No history or running instance for this jobId.");
+                }
             }
         }
         catch (Exception e)
         {
-            h = null;
             closeQuietly(em);
-            throw new JqmInvalidRequestException("No ended job found with the deliverable ID " + jobId, e);
+            throw new JqmInvalidRequestException("No job found with the job ID " + jobId, e);
         }
 
         // 2: build URL
         URL url = null;
         try
         {
-            url = new URL(getFileProtocol(em) + h.getNode().getDns() + ":" + h.getNode().getPort() + "/ws/simple/" + param + "?id=" + jobId);
+            url = new URL(getFileProtocol(em) + n.getDns() + ":" + n.getPort() + "/ws/simple/" + param + "?id=" + jobId);
             jqmlogger.trace("URL: " + url.toString());
         }
         catch (MalformedURLException e)
