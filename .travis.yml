@@ -1,4 +1,5 @@
 language: java
+sudo: false
 before_install:
   - cd jqm-all
   - export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"
