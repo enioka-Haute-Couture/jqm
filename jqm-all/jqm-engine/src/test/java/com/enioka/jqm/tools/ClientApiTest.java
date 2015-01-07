@@ -114,22 +114,13 @@ public class ClientApiTest extends JqmBaseTest
         boolean success2 = false;
         boolean success3 = false;
 
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-sendmsg/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+        int i = JqmSimpleTest.create(em, "pyl.EngineApiSend3Msg").run(this);
 
-        int i = JobRequest.create("MarsuApplication", "TestUser").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
-
-        List<History> res = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class).getResultList();
         List<String> ress = JqmClientFactory.getClient().getJobMessages(i);
         List<Message> m = em.createQuery("SELECT m FROM Message m WHERE m.ji = :i", Message.class).setParameter("i", i).getResultList();
 
-        Assert.assertEquals(1, res.size());
         Assert.assertEquals(3, ress.size());
         Assert.assertEquals(3, m.size());
-        Assert.assertEquals(State.ENDED, res.get(0).getState());
 
         for (int k = 0; k < ress.size(); k++)
         {
@@ -155,20 +146,8 @@ public class ClientApiTest extends JqmBaseTest
     @Test
     public void testGetProgress() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-sendprogress/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
-        int i = JobRequest.create("MarsuApplication", "TestUser").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
-
-        TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
-        ArrayList<History> res = (ArrayList<History>) query.getResultList();
-
+        int i = JqmSimpleTest.create(em, "pyl.EngineApiProgress").addWaitMargin(10000).run(this);
         Integer k = JqmClientFactory.getClient().getJobProgress(i);
-
-        Assert.assertEquals(1, res.size());
-        Assert.assertEquals(State.ENDED, res.get(0).getState());
         Assert.assertEquals((Integer) 50, k);
     }
 
@@ -278,17 +257,14 @@ public class ClientApiTest extends JqmBaseTest
         Assert.assertEquals(TestHelpers.qNormal.getName(), ji.getQueue().getName());
     }
 
+    /**
+     * Temp dir should be removed after run
+     */
     @Test
     public void testTempDir() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-tmpdir/target/test.jar", TestHelpers.qVip, 42, "TestBatch",
-                null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        int i = JobRequest.create("TestBatch", "TestUser").submit();
+        int i = JqmSimpleTest.create(em, "pyl.EngineApiTmpDir").run(this);
 
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
-
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
         File tmpDir = new File(FilenameUtils.concat(TestHelpers.node.getTmpDirectory(), "" + i));
         Assert.assertFalse(tmpDir.isDirectory());
     }

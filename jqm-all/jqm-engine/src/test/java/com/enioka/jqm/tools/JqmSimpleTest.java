@@ -24,7 +24,7 @@ public class JqmSimpleTest
     private String sessionId = null;
 
     private int expectedOk = 1, expectedNonOk = 0;
-    private int waitMsMin = 0;
+    private int waitMsMin = 0, waitMarginMs = 0;
 
     private JqmSimpleTest(EntityManager em, String className, String artifactName)
     {
@@ -92,7 +92,19 @@ public class JqmSimpleTest
         return this;
     }
 
+    /**
+     * Time always waited (even if jobs have ended)
+     */
     public JqmSimpleTest addWaitTime(int ms)
+    {
+        this.waitMsMin = ms;
+        return this;
+    }
+
+    /**
+     * Time added to the 9000ms time "waiting for job end".
+     */
+    public JqmSimpleTest addWaitMargin(int ms)
     {
         this.waitMsMin = ms;
         return this;
@@ -107,7 +119,7 @@ public class JqmSimpleTest
             test.addAndStartEngine(nodeName);
         }
         Integer i = JobRequest.create("TestJqmApplication", "TestUser").setSessionID(sessionId).setParameters(runtimePrms).submit();
-        TestHelpers.waitFor(nbExpected, 9000 + nbExpected * 1000, em);
+        TestHelpers.waitFor(nbExpected, 9000 + waitMarginMs + nbExpected * 1000, em);
         if (waitMsMin > 0)
         {
             try

@@ -109,15 +109,7 @@ public class JndiTest extends JqmBaseTest
     @Test
     public void testDefCon() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-defcon/target/test.jar", TestHelpers.qVip, 42, "Jms", null,
-                "Franquin", "ModuleMachin", "other1", "other2", false, em);
-        JobRequest.create("Jms", "TestUser").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
-
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        JqmSimpleTest.create(em, "pyl.EngineApiDefCon").run(this);
     }
 
     @Test
@@ -164,19 +156,10 @@ public class JndiTest extends JqmBaseTest
     @Test
     public void testJndiFile() throws Exception
     {
-        CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", null,
-                "jqm-tests/jqm-test-jndifile/target/test.jar", TestHelpers.qVip, 42, "TestBatch", null, "Franquin", "ModuleMachin",
-                "other1", "other2", false, em);
-        JobRequest.create("TestBatch", "TestUser").submit();
-
         // Create JMS JNDI references for use by the test jar
         CreationTools.createJndiFile(em, "fs/test", "test resource", "/tmp");
 
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
-
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        JqmSimpleTest.create(em, "pyl.JndiFile", "jqm-test-pyl-nodep").run(this);
     }
 
     @Test

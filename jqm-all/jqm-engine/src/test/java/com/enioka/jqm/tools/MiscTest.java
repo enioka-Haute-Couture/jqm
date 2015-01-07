@@ -74,15 +74,7 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testJobWithSystemExit() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-exit/target/test.jar", TestHelpers.qVip, 42,
-                "jqm-test-exit", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        JobRequest.create("jqm-test-exit", "TestUser").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
-
-        Assert.assertEquals(0, TestHelpers.getOkCount(em));
-        Assert.assertEquals(1, TestHelpers.getNonOkCount(em));
+        JqmSimpleTest.create(em, "pyl.SecExit", "jqm-test-pyl-nodep").expectOk(0).expectNonOk(1).run(this);
     }
 
     @Test

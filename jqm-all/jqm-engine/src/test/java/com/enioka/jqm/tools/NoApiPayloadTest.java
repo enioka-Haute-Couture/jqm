@@ -55,15 +55,7 @@ public class NoApiPayloadTest extends JqmBaseTest
     @Test
     public void testRunnable() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-runnable/target/test.jar", TestHelpers.qVip, 42,
-                "jqm-test-runnable", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        JobRequest.create("jqm-test-runnable", "TestUser").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
-
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        JqmSimpleTest.create(em, "pyl.PckRunnable", "jqm-test-pyl-nodep").run(this);
     }
 
     @Test
@@ -79,15 +71,7 @@ public class NoApiPayloadTest extends JqmBaseTest
     @Test
     public void testMainType() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-main/target/test.jar", TestHelpers.qVip, 42,
-                "jqm-test-main", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        JobRequest.create("jqm-test-main", "TestUser").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
-
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        JqmSimpleTest.create(em, "pyl.PckMain", "jqm-test-pyl-nodep").run(this);
     }
 
     @Test

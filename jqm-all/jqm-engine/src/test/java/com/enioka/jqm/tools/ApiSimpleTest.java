@@ -60,8 +60,8 @@ public class ApiSimpleTest extends JqmBaseTest
     @Test
     public void testHttpEnqueue() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-sendmsg/target/test.jar", TestHelpers.qVip, 42,
-                "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSend3Msg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip,
+                42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         em.refresh(TestHelpers.node);
         HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + TestHelpers.node.getPort() + "/ws/simple/ji");
@@ -110,8 +110,8 @@ public class ApiSimpleTest extends JqmBaseTest
     @Test
     public void testHttpStatus() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-sendmsg/target/test.jar", TestHelpers.qVip, 42,
-                "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSend3Msg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip,
+                42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         em.refresh(TestHelpers.node);
         HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + TestHelpers.node.getPort() + "/ws/simple/ji");

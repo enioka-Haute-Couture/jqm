@@ -21,12 +21,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.Message;
-import com.enioka.jqm.jpamodel.State;
-import com.enioka.jqm.test.helpers.CreationTools;
-import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class EngineApiTest extends JqmBaseTest
 {
@@ -37,19 +33,9 @@ public class EngineApiTest extends JqmBaseTest
         boolean success2 = false;
         boolean success3 = false;
 
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-sendmsg/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
-        int i = JobRequest.create("MarsuApplication", "TestUser").submit();
+        int i = JqmSimpleTest.create(em, "pyl.EngineApiSend3Msg").run(this);
 
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
-
-        List<History> res = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class).getResultList();
         List<Message> m = em.createQuery("SELECT m FROM Message m WHERE m.ji = :i", Message.class).setParameter("i", i).getResultList();
-
-        Assert.assertEquals(1, res.size());
-        Assert.assertEquals(State.ENDED, res.get(0).getState());
-
         for (Message msg : m)
         {
             if (msg.getTextMessage().equals("Les marsus sont nos amis, il faut les aimer aussi!"))
@@ -74,16 +60,9 @@ public class EngineApiTest extends JqmBaseTest
     @Test
     public void testSendProgress() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-sendprogress/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
-        JobRequest.create("MarsuApplication", "TestUser").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 20000, em);
+        JqmSimpleTest.create(em, "pyl.EngineApiProgress").addWaitMargin(10000).run(this);
 
         List<History> res = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class).getResultList();
-        Assert.assertEquals(1, res.size());
-        Assert.assertEquals(State.ENDED, res.get(0).getState());
         Assert.assertEquals((Integer) 50, res.get(0).getProgress());
     }
 
@@ -93,15 +72,7 @@ public class EngineApiTest extends JqmBaseTest
     @Test
     public void testThrowable() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-throwable/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        JobRequest.create("MarsuApplication", "TestUser").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
-
-        History ji1 = em.createQuery("SELECT j FROM History j", History.class).getSingleResult();
-        Assert.assertEquals(State.CRASHED, ji1.getState());
+        JqmSimpleTest.create(em, "pyl.SecThrow").expectOk(0).expectNonOk(1).run(this);
     }
 
     /**
@@ -110,16 +81,10 @@ public class EngineApiTest extends JqmBaseTest
     @Test
     public void testWaitChildren() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-waitall/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        JobRequest.create("MarsuApplication", "TestUser").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(6, 10000, em);
+        JqmSimpleTest.create(em, "pyl.EngineApiWaitAll").expectOk(6).run(this);
 
         List<History> ji = Helpers.getNewEm()
                 .createQuery("SELECT j FROM History j WHERE j.status = 'ENDED' ORDER BY j.id ASC", History.class).getResultList();
-        Assert.assertEquals(6, ji.size());
 
         Calendar parentEnd = ji.get(0).getEndDate();
         for (int i = 1; i < 6; i++)

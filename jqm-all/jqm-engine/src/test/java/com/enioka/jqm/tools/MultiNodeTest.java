@@ -49,8 +49,8 @@ public class MultiNodeTest extends JqmBaseTest
     @Test
     public void testOneQueueTwoNodes() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qVip, 42,
-                "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip,
+                42, "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
         JobRequest j11 = new JobRequest("AppliNode1-1", "TestUser");
         for (int i = 0; i < 10; i++)
         {
@@ -85,8 +85,8 @@ public class MultiNodeTest extends JqmBaseTest
     @Test
     public void testOneQueueThreeNodes() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qVip, 42,
-                "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip,
+                42, "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
         JobRequest j11 = new JobRequest("AppliNode1-1", "TestUser");
         for (int i = 0; i < 10; i++)
         {
@@ -122,10 +122,10 @@ public class MultiNodeTest extends JqmBaseTest
     @Test
     public void testTwoNodesTwoQueues() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qVip, 42,
-                "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qVip2, 42,
-                "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip,
+                42, "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip2,
+                42, "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
         JobRequest j11 = new JobRequest("AppliNode1-1", "TestUser");
         JobRequest j21 = new JobRequest("AppliNode2-1", "TestUser");
 
@@ -163,24 +163,24 @@ public class MultiNodeTest extends JqmBaseTest
     @Test
     public void testThreeNodesThreeQueues() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qVip, 42,
-                "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qNormal, 42,
-                "AppliNode1-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qSlow, 42,
-                "AppliNode1-3", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qVip2, 42,
-                "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qNormal2, 42,
-                "AppliNode2-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qSlow2, 42,
-                "AppliNode2-3", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qVip3, 42,
-                "AppliNode3-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qNormal3, 42,
-                "AppliNode3-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qSlow3, 42,
-                "AppliNode3-3", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip,
+                42, "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qNormal,
+                42, "AppliNode1-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qSlow,
+                42, "AppliNode1-3", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip2,
+                42, "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar",
+                TestHelpers.qNormal2, 42, "AppliNode2-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qSlow2,
+                42, "AppliNode2-3", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip3,
+                42, "AppliNode3-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar",
+                TestHelpers.qNormal3, 42, "AppliNode3-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qSlow3,
+                42, "AppliNode3-3", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j11 = new JobRequest("AppliNode1-1", "TestUser");
         JobRequest j12 = new JobRequest("AppliNode1-2", "TestUser");
@@ -246,10 +246,10 @@ public class MultiNodeTest extends JqmBaseTest
     {
         Helpers.setSingleParam("internalPollingPeriodMs", "10", em);
 
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qVip, 42,
-                "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimesendmsg/target/test.jar", TestHelpers.qNormal, 42,
-                "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip,
+                42, "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qNormal,
+                42, "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         JobRequest j11 = new JobRequest("AppliNode1-1", "TestUser");
         JobRequest j21 = new JobRequest("AppliNode2-1", "TestUser");
