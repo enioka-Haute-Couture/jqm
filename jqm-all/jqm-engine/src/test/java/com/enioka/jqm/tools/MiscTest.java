@@ -226,7 +226,7 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testQueueWidth() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-kill/target/test.jar", TestHelpers.qVip, 42,
+        CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
                 "jqm-test-kill", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         // Only 3 threads
@@ -279,7 +279,7 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testQueuePollWidth() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-kill/target/test.jar", TestHelpers.qVip, 42,
+        CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
                 "jqm-test-kill", null, "Franquin", "ModuleMachin", "other", "other", false, em);
 
         // Only 3 threads, one poll every hour
@@ -393,8 +393,8 @@ public class MiscTest extends JqmBaseTest
     public void testExternalKill() throws Exception
     {
         Helpers.setSingleParam("internalPollingPeriodMs", "100", em);
-        int i = JqmSimpleTest.create(em, "pyl.KillMeNot").setExternal().expectNonOk(0).expectOk(0).run(this);
-                
+        int i = JqmSimpleTest.create(em, "pyl.KillMeNot").setExternal().addWaitTime(3000).expectNonOk(0).expectOk(0).run(this);
+
         JqmClientFactory.getClient().killJob(i);
         TestHelpers.waitFor(1, 20000, em);
         Assert.assertEquals(0, TestHelpers.getOkCount(em));

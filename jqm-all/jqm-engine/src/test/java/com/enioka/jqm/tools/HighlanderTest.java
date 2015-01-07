@@ -98,8 +98,8 @@ public class HighlanderTest extends JqmBaseTest
     {
         // This test launches an infinite loop as Highlander, checks if no other job can launch. Job is killed at the end - which allows a
         // second one to run, which also has to be killed.
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-kill/target/test.jar", TestHelpers.qVip, 42, "kill", null,
-                "Franquin", "ModuleMachin", "other", "other", true, em);
+        CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42, "kill",
+                null, "Franquin", "ModuleMachin", "other", "other", true, em);
 
         addAndStartEngine();
 

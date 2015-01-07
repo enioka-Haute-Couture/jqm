@@ -97,7 +97,7 @@ public class ClientApiTest extends JqmBaseTest
     @Test
     public void testKillJob() throws Exception
     {
-        int i = JqmSimpleTest.create(em, "pyl.KillMe").expectOk(0).run(this);
+        int i = JqmSimpleTest.create(em, "pyl.KillMe").expectOk(0).addWaitTime(3000).run(this);
 
         JqmClientFactory.getClient().killJob(i);
         TestHelpers.waitFor(1, 3000, em);

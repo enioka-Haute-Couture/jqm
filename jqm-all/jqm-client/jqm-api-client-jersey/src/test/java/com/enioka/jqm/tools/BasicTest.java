@@ -193,8 +193,8 @@ public class BasicTest
         Assert.assertEquals(1, JqmClientFactory.getClient().getUserActiveJobs("MAG").size());
 
         // Kill test
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-kill/target/test.jar", TestHelpers.qVip, 42, "KillMe",
-                null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
+                "KillMe", null, "Franquin", "ModuleMachin", "other", "other", false, em);
         j = new JobRequest("KillMe", "MAG");
         i = JqmClientFactory.getClient().enqueue(j);
         Assert.assertEquals(2, JqmClientFactory.getClient().getUserActiveJobs("MAG").size());
@@ -204,8 +204,8 @@ public class BasicTest
         Assert.assertTrue(JqmClientFactory.getClient().getJob(i).getState().equals(State.KILLED));
 
         // Change position and cancel test
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-kill/target/test.jar", TestHelpers.qNormal3, 42, "KillMe2",
-                null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qNormal3, 42,
+                "KillMe2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
         j = new JobRequest("KillMe2", "TEST2");
         i = JqmClientFactory.getClient().enqueue(j);
         Thread.sleep(1000);

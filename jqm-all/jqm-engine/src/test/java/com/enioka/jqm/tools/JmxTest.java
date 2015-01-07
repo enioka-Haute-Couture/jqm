@@ -39,8 +39,8 @@ public class JmxTest extends JqmBaseTest
     @Test
     public void jmxRemoteTest() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-kill/target/test.jar", TestHelpers.qVip, 42, "KillApp",
-                null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
+                "KillApp", null, "Franquin", "ModuleMachin", "other", "other", false, em);
         int i = JobRequest.create("KillApp", "TestUser").submit();
 
         // Get free ports

@@ -24,6 +24,7 @@ public class JqmSimpleTest
     private String sessionId = null;
 
     private int expectedOk = 1, expectedNonOk = 0;
+    private int waitMsMin = 0;
 
     private JqmSimpleTest(EntityManager em, String className, String artifactName)
     {
@@ -91,6 +92,12 @@ public class JqmSimpleTest
         return this;
     }
 
+    public JqmSimpleTest addWaitTime(int ms)
+    {
+        this.waitMsMin = ms;
+        return this;
+    }
+
     public Integer run(JqmBaseTest test)
     {
         int nbExpected = expectedNonOk + expectedOk;
@@ -101,6 +108,17 @@ public class JqmSimpleTest
         }
         Integer i = JobRequest.create("TestJqmApplication", "TestUser").setSessionID(sessionId).setParameters(runtimePrms).submit();
         TestHelpers.waitFor(nbExpected, 9000 + nbExpected * 1000, em);
+        if (waitMsMin > 0)
+        {
+            try
+            {
+                Thread.sleep(waitMsMin);
+            }
+            catch (InterruptedException e)
+            {
+                // not an issue during tests.
+            }
+        }
 
         Assert.assertEquals(expectedOk, TestHelpers.getOkCount(em));
         Assert.assertEquals(expectedNonOk, TestHelpers.getNonOkCount(em));
