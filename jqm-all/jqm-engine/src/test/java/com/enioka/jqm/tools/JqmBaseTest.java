@@ -25,15 +25,12 @@ import javax.persistence.EntityManager;
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
-import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class JqmBaseTest
@@ -125,5 +122,30 @@ public class JqmBaseTest
         EntityManager em = Helpers.getNewEm();
         ems.add(em);
         return em;
+    }
+
+    protected void sleep(int s)
+    {
+        this.sleepms(1000 * s);
+    }
+
+    protected void sleepms(int ms)
+    {
+        try
+        {
+            Thread.sleep(ms);
+        }
+        catch (InterruptedException e)
+        {
+            // not an issue in tests
+        }
+    }
+
+    protected void waitDbStop()
+    {
+        while (s.getState() != 16)
+        {
+            this.sleepms(1);
+        }
     }
 }

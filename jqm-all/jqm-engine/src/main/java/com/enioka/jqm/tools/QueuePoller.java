@@ -29,8 +29,11 @@ import javax.management.ObjectName;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.LockModeType;
+import javax.persistence.PersistenceException;
 
 import org.apache.log4j.Logger;
+import org.hibernate.TransactionException;
+import org.hibernate.exception.JDBCConnectionException;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
@@ -45,16 +48,15 @@ class QueuePoller implements Runnable, QueuePollerMBean
     private static Logger jqmlogger = Logger.getLogger(QueuePoller.class);
     private DeploymentParameter dp = null;
     private Queue queue = null;
-    private EntityManager em = null;
     private LibraryCache cache = null;
     private boolean run = true;
     private Integer actualNbThread;
     JqmEngine engine;
-    private boolean hasStopped = false;
+    private boolean hasStopped = true;
     private ObjectName name = null;
     private Calendar lastLoop = null;
     private Thread localThread = null;
-    private Semaphore loop = new Semaphore(0);
+    private Semaphore loop;
 
     @Override
     public void stop()
@@ -66,16 +68,32 @@ class QueuePoller implements Runnable, QueuePollerMBean
         }
     }
 
+    /**
+     * Will make the thread ready to run once again after it has stopped.
+     */
+    void reset()
+    {
+        if (!hasStopped)
+        {
+            throw new IllegalStateException("cannot reset a non stopped queue poller");
+        }
+        hasStopped = false;
+        run = true;
+        actualNbThread = 0;
+        lastLoop = null;
+        loop = new Semaphore(0);
+    }
+
     QueuePoller(DeploymentParameter dp, LibraryCache cache, JqmEngine engine)
     {
         jqmlogger.info("Engine " + engine.getNode().getName() + " will poll JobInstances on queue " + dp.getQueue().getName() + " every "
                 + dp.getPollingInterval() / 1000 + "s with " + dp.getNbThread() + " threads for concurrent instances");
-        em = Helpers.getNewEm();
+        reset();
+        EntityManager em = Helpers.getNewEm();
         this.dp = em
                 .createQuery("SELECT dp FROM DeploymentParameter dp LEFT JOIN FETCH dp.queue LEFT JOIN FETCH dp.node WHERE dp.id = :l",
                         DeploymentParameter.class).setParameter("l", dp.getId()).getSingleResult();
         this.queue = dp.getQueue();
-        this.actualNbThread = 0;
         this.cache = cache;
         this.engine = engine;
 
@@ -99,7 +117,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
         }
     }
 
-    protected JobInstance dequeue()
+    protected JobInstance dequeue(EntityManager em)
     {
         // Free room?
         if (actualNbThread >= dp.getNbThread())
@@ -177,38 +195,55 @@ class QueuePoller implements Runnable, QueuePollerMBean
     {
         this.localThread = Thread.currentThread();
         this.localThread.setName("QUEUE_POLLER;polling;" + this.dp.getQueue().getName());
+        EntityManager em = null;
         while (true)
         {
             lastLoop = Calendar.getInstance();
-            em = Helpers.getNewEm();
 
-            // Get a JI to run
-            JobInstance ji = dequeue();
-            while (ji != null)
+            try
             {
-                // We will run this JI!
-                jqmlogger.trace("JI number " + ji.getId() + " will be run by this poller this loop (already " + actualNbThread + "/"
-                        + dp.getNbThread() + " on " + this.queue.getName() + ")");
-                actualNbThread++;
-
-                // Run it
-                if (!ji.getJd().isExternal())
+                // Get a JI to run
+                em = Helpers.getNewEm();
+                JobInstance ji = dequeue(em);
+                while (ji != null)
                 {
-                    (new Thread(new Loader(ji, cache, this))).start();
+                    // We will run this JI!
+                    jqmlogger.trace("JI number " + ji.getId() + " will be run by this poller this loop (already " + actualNbThread + "/"
+                            + dp.getNbThread() + " on " + this.queue.getName() + ")");
+                    actualNbThread++;
+
+                    // Run it
+                    if (!ji.getJd().isExternal())
+                    {
+                        (new Thread(new Loader(ji, cache, this))).start();
+                    }
+                    else
+                    {
+                        (new Thread(new LoaderExternal(em, ji, this))).start();
+                    }
+
+                    // Check if there is another job to run (does nothing - no db query - if queue is full so this is not expensive)
+                    ji = dequeue(em);
+                }
+            }
+            catch (PersistenceException e)
+            {
+                if (e.getCause() instanceof JDBCConnectionException || e.getCause() instanceof TransactionException)
+                {
+                    jqmlogger.error("connection to database lost - stopping poller");
+                    jqmlogger.trace("connection error was:", e.getCause());
+                    this.engine.pollerRestartNeeded(this);
+                    break;
                 }
                 else
                 {
-                    (new Thread(new LoaderExternal(em, ji, this))).start();
+                    throw e;
                 }
-
-                // Check if there is another job to run (does nothing - no db query - if queue is full so this is not expensive)
-                ji = dequeue();
             }
-
-            // Reset the em on each loop.
-            if (em != null)
+            finally
             {
-                em.close();
+                // Reset the em on each loop.
+                Helpers.closeQuietly(em);
             }
 
             // Wait according to the deploymentParameter
@@ -227,13 +262,25 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 break;
             }
         }
-        jqmlogger.info("Poller loop on queue " + this.queue.getName() + " is stopping [engine " + this.dp.getNode().getName() + "]");
-        waitForAllThreads(60 * 1000);
-        this.hasStopped = true;
-        jqmlogger.info("Poller on queue " + dp.getQueue().getName() + " has ended");
 
-        // Let the engine decide if it should stop completely
-        this.engine.checkEngineEnd();
+        if (!run)
+        {
+            // Run is true only if the loop has exited abnormally, in which case the engine should try to restart the poller
+            // So only do the graceful shutdown procedure if normal shutdown.
+
+            jqmlogger.info("Poller loop on queue " + this.queue.getName() + " is stopping [engine " + this.dp.getNode().getName() + "]");
+            waitForAllThreads(60 * 1000);
+            jqmlogger.info("Poller on queue " + dp.getQueue().getName() + " has ended normally");
+
+            // Let the engine decide if it should stop completely
+            this.hasStopped = true; // BEFORE check
+            this.engine.checkEngineEnd();
+        }
+        else
+        {
+            this.run = false;
+            this.hasStopped = true;
+        }
 
         // JMX
         if (this.engine.loadJmxBeans)

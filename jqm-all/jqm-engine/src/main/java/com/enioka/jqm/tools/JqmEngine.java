@@ -23,6 +23,7 @@ import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
 import javax.management.MBeanServer;
@@ -35,6 +36,7 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.RollingFileAppender;
+import org.eclipse.jetty.util.ArrayQueue;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
@@ -70,6 +72,10 @@ class JqmEngine implements JqmEngineMBean
     private Calendar startTime = Calendar.getInstance();
     private Thread killHook = null;
     boolean loadJmxBeans = true;
+
+    // DB connection resilience data
+    volatile Queue<QueuePoller> qpToRestart = new ArrayQueue<QueuePoller>();
+    volatile Thread qpRestarter = null;
 
     /**
      * Starts the engine
@@ -290,6 +296,8 @@ class JqmEngine implements JqmEngineMBean
         {
             if (poller.isRunning())
             {
+                jqmlogger.trace("At least the poller on queue " + poller.getDp().getQueue().getName()
+                        + " is still running and prevents shutdown");
                 return;
             }
         }
@@ -368,6 +376,81 @@ class JqmEngine implements JqmEngineMBean
             em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", ji.getId()).executeUpdate();
         }
         em.getTransaction().commit();
+    }
+
+    synchronized void pollerRestartNeeded(QueuePoller qp)
+    {
+        // Poller has crashed - add it to the queue of pollers to restart
+        qpToRestart.add(qp);
+
+        // On first alert, start the thread which will check connection restoration and relaunch the pollers.
+        if (qpRestarter != null)
+        {
+            return;
+        }
+
+        final JqmEngine ee = this;
+        qpRestarter = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                // Test if the DB is back and wait for it if not
+                jqmlogger.warn("The engine will now indefinitely try to restore connection to the database");
+                EntityManager em = null;
+                boolean back = false;
+                int timeToWait = 1;
+                while (!back)
+                {
+                    try
+                    {
+                        em = Helpers.getNewEm();
+                        em.find(Node.class, 1);
+                        back = true;
+                        jqmlogger.warn("connection to database was restored");
+                    }
+                    catch (Exception e)
+                    {
+                        // The db is not back yet
+                        try
+                        {
+                            jqmlogger.debug("waiting for db...");
+                            Thread.sleep(1000 * timeToWait);
+                            timeToWait = Math.min(timeToWait + 1, 120);
+                        }
+                        catch (InterruptedException e1)
+                        {
+                            // Not an issue here.
+                        }
+                    }
+                    finally
+                    {
+                        Helpers.closeQuietly(em);
+                    }
+                }
+
+                // Restart pollers
+                QueuePoller qp = qpToRestart.poll();
+                while (qp != null)
+                {
+                    jqmlogger.warn("resetting poller on queue " + qp.getDp().getQueue().getName());
+                    qp.reset();
+                    Thread t = new Thread(qp);
+                    t.start();
+                    qp = qpToRestart.poll();
+                }
+
+                // Always restart internal poller
+                intPoller.stop();
+                ee.intPoller = new InternalPoller(ee);
+                Thread t = new Thread(ee.intPoller);
+                t.start();
+
+                // Done - reset the relauncher itself and let the thread end.
+                ee.qpRestarter = null;
+            }
+        };
+        qpRestarter.start();
     }
 
     // //////////////////////////////////////////////////////////////////////////
