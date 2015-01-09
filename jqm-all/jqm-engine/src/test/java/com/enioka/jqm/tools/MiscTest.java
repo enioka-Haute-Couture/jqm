@@ -188,7 +188,7 @@ public class MiscTest extends JqmBaseTest
     }
 
     @Test
-    public void testStartupCleanup() throws Exception
+    public void testStartupCleanupRunning() throws Exception
     {
         JobDef jd = CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip, 42,
                 "jqm-test-em", null, "Franquin", "ModuleMachin", "other", "other", false, em);
@@ -205,6 +205,34 @@ public class MiscTest extends JqmBaseTest
         ji.setNode(TestHelpers.node);
         ji.setQueue(TestHelpers.qVip);
         ji.setState(State.RUNNING);
+        em.persist(ji);
+        em.getTransaction().commit();
+
+        addAndStartEngine();
+
+        Assert.assertEquals(0, em.createQuery("SELECT ji FROM JobInstance ji", JobInstance.class).getResultList().size());
+        Assert.assertEquals(1, em.createQuery("SELECT ji FROM History ji", History.class).getResultList().size());
+        Assert.assertEquals(State.CRASHED, em.createQuery("SELECT ji FROM History ji", History.class).getResultList().get(0).getState());
+    }
+
+    @Test
+    public void testStartupCleanupAttr() throws Exception
+    {
+        JobDef jd = CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip, 42,
+                "jqm-test-em", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+
+        // Create a running job that should be cleaned at startup
+        em.getTransaction().begin();
+        JobInstance ji = new JobInstance();
+        ji.setApplication("marsu");
+        ji.setAttributionDate(Calendar.getInstance());
+        ji.setCreationDate(Calendar.getInstance());
+        ji.setExecutionDate(Calendar.getInstance());
+        ji.setInternalPosition(0);
+        ji.setJd(jd);
+        ji.setNode(TestHelpers.node);
+        ji.setQueue(TestHelpers.qVip);
+        ji.setState(State.ATTRIBUTED);
         em.persist(ji);
         em.getTransaction().commit();
 
