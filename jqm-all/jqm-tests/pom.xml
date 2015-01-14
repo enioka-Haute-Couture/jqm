@@ -17,7 +17,6 @@
 	<modules>
 		<module>jqm-test-fibohib</module>
 		<module>jqm-test-datetimemaven</module>
-		<module>jqm-test-datetimemaven2</module>
 		<module>jqm-test-datetimemavennopom</module>
 		<module>jqm-test-datetimemavennopomlib</module>
 		<module>jqm-test-datetimemavenjarinlib</module>
