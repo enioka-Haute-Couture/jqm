@@ -9,9 +9,7 @@ import javax.management.ObjectName;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class ClLeakTest extends JqmBaseTest
@@ -19,13 +17,7 @@ public class ClLeakTest extends JqmBaseTest
     @Test
     public void testJmxLeak() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-jmxleak/target/test.jar", TestHelpers.qVip, 42, "Test",
-                null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
-        int i = JobRequest.create("Test", "TestUser").submit();
-
-        // Start the engine
-        addAndStartEngine();
-        Thread.sleep(5000);
+        int i = JqmSimpleTest.create(em, "pyl.EngineJmxLeak").addWaitTime(5000).expectOk(0).run(this);
 
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName name = new ObjectName("com.test:type=Node,name=test");
@@ -33,7 +25,7 @@ public class ClLeakTest extends JqmBaseTest
 
         // Stop the job. Its MBean(s) should be cleaned up by the engine.
         JqmClientFactory.getClient().killJob(i);
-        Thread.sleep(3000);
+        TestHelpers.waitFor(1, 3000, em);
 
         // Check the bean is really dead
         try

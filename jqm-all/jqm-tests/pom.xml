@@ -23,11 +23,9 @@
 		<module>jqm-test-datetimemavennolibdef</module>
 		<module>jqm-test-jndijms-amq</module>
 		<module>jqm-test-em</module>
-		<module>jqm-test-legacyinheritance</module>
 		<module>jqm-test-missingapi</module>
 		<module>jqm-test-emplusapi</module>
 		<module>jqm-test-providedapi</module>
-		<module>jqm-test-jmxleak</module>
 		<module>jqm-test-pyl</module>
         <module>jqm-test-pyl-nodep</module>
 	</modules>

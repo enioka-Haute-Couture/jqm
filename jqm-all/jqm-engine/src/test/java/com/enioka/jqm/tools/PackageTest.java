@@ -98,15 +98,7 @@ public class PackageTest extends JqmBaseTest
     @Test
     public void testInheritedLegacyPayload() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-legacyinheritance/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
-        JobRequest.create("MarsuApplication", "TestUser").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
-
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        JqmSimpleTest.create(em, "pyl.PckJBInheritance").run(this);
     }
 
     // @Test // Commented. API is now always present.

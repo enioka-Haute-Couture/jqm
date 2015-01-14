@@ -1,7 +1,10 @@
+package pyl;
+
 /**
  * Excellent management bean.
  */
-public interface AppMBean
+
+public interface EngineJmxLeakMBean
 {
     /**
      * Super test
