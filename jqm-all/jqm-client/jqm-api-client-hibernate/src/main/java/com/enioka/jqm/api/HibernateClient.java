@@ -406,6 +406,10 @@ final class HibernateClient implements JqmClient
         // 3rd: create the RuntimeParameter objects
         for (Entry<String, String> e : resm.entrySet())
         {
+            if (e.getValue() == null)
+            {
+                throw new JqmInvalidRequestException("Parameter " + e.getKey() + " is null which is forbidden");
+            }
             res.add(createJobParameter(e.getKey(), e.getValue(), em));
         }
 
