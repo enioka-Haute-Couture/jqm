@@ -1164,7 +1164,7 @@ final class HibernateClient implements JqmClient
                 }
                 if (query.getFirstRow() != null || query.getPageSize() != null)
                 {
-                    TypedQuery<Long> qCount = em.createQuery("SELECT COUNT(h) FROM JobInstance h " + wh, Long.class);
+                    TypedQuery<Long> qCount = em.createQuery("SELECT COUNT(h) FROM JobInstance h " + wh2, Long.class);
                     for (Map.Entry<String, Object> entry : prms.entrySet())
                     {
                         qCount.setParameter(entry.getKey(), entry.getValue());

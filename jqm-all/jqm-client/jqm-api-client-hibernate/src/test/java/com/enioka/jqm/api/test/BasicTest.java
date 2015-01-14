@@ -169,4 +169,11 @@ public class BasicTest
     {
         Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false).setUser("test").run();
     }
+
+    @Test
+    public void testBug159()
+    {
+        Query.create().setJobInstanceId(1234).setQueryLiveInstances(true).setQueryHistoryInstances(false).setPageSize(15).setFirstRow(0)
+                .run();
+    }
 }
