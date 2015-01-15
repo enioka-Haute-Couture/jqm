@@ -1,0 +1,74 @@
+digraph G 
+{
+	fontname = "Courier";
+	fontsize = 25;
+	concentrate = false;
+	label = "com.enioka.jqm.model";
+
+	node 
+	[
+		fontname = "Sans"
+		fontsize = 12
+		shape = "record"
+	]
+
+	edge 
+	[
+		fontname = "Courier"
+		fontsize = 12
+	]
+
+
+    Deliverable [label = "{Deliverable\n|id: int\lfileFamily: String\lfilePath: String\ljobId: int\loriginalFileName: String\lrandomId: String\l|\l|\l}" ];
+    
+    DeploymentParameter [label = "{DeploymentParameter\n|id: int\lnbThread: int\lpollingInterval: int\l|\l|node: Node\lqueue: Queue\l}" ];
+    
+    GlobalParameter [label= "{GlobalParameter\n|id: int\lkey: String\lvalue: String\l|\l|\l}" ];
+    
+    History [label = "{History\n|id: int\l...\l||jd: JobDef\lqueue: Queue\lnode: Node\l}" ];
+    
+    JndiObjectResource [label = "{JndiObjectResource\n|id: int\lauth: String\ldescription: String\lfactory: String\lname: String\lsingleton: bool\ltemplate: String\ltype: String\l|\l|parameters: List\<JndiObjectResourceParameter\>\l}" ];
+    
+    JndiObjectResourceParameter [label = "{JndiObjectResourceParameter\n|id: int\lkey: String\lvalue: String\l|\l|resource: JndiObjectResource\l}" ];
+    
+    JobDef [label = "{JobDef\n|id: int\lapplication: String\lapplicationName: String\lcanBeRestarted: bool\ldescription: String\lenabled: bool\lexternal: bool\lfilePath: String\lhighlander: bool\ljarPath: String\ljavaClassName: String\ljavaOpts: String\lkeyword1: String\lkeyword2: String\lkeyword3: String\lmaxTimeRunning: depr\lmodule: String\l|\l|parameters: List JobDefParameter\lqueue: Queue\l}" ];
+    
+    JobDefParameter [label = "{JobDefParameter\n|id: int\lkey: String\lvalue: String\l|\l|\l}" ];
+    
+    JobInstance [label = "{JobInstance\n|id: int\l...\l|\l|jd: JobDef\lqueue: Queue\lnode: Node\l}" ];
+    
+    Message [label = "{Message\n|id: int\lji: int\ltextMessage: String\l|\l|\l}" ];
+    
+    Noode [label = "{Node\n|id: int\ldlRepo: String\ldns: String\lexportRepo: String\ljmxRegistryPort: int\ljmxServerPort: int\llasteSeenAlive: datetime\lloadApiAdmin: bool\lloadApiClient: bool\lloadApiSimple: bool\lname: String\lport: int\lrepo: String\lrootLogLevel: String\lstop: bool\ltmpDirectory: String\l|\l|\l}" ];
+    
+    PKI [label = "{PKI\n|pemCert: String\lpemPK: String\lprettyName: String\l}" ];
+    
+    Queue [label = "{Queue\n|id: int\lname: String\ldescription: String\ldefaultQueue: bool\l|\l|jobdefs: List\<JobDef\>\l}" ];
+    
+    RuntimeParameter [label = "{RuntimeParameter\n|id: int\lkey: String\lvalue: String\lji: int\l|\l|\l}" ];
+    
+    DeploymentParameter -> Noode;
+    DeploymentParameter -> Queue;
+    
+    Deliverable  -> JobInstance [style=dotted];
+    Deliverable -> History [style=dotted];
+    
+    History -> JobDef [headlabel = 1, taillabel = n];
+    History -> Queue ;
+    History -> Noode ;
+    
+    RuntimeParameter -> JobInstance [style=dotted];
+    RuntimeParameter -> History [style=dotted];
+    
+    JndiObjectResourceParameter -> JndiObjectResource [arrowhead=odiamond];
+    
+    JobDefParameter -> JobDef [arrowhead=odiamond];
+    JobDef -> Queue;
+    
+    JobInstance -> JobDef;
+    JobInstance -> Queue ;
+    JobInstance -> Noode ;
+    
+    Message -> History [style=dotted];
+    Message -> JobInstance [style=dotted];
+}
