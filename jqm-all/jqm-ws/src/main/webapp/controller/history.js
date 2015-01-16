@@ -244,9 +244,6 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
         var ji = $scope.selected[0];
         $http.post("ws/client/ji/" + ji.id).success($scope.getDataAsync);
     };
-
-    // Init data
-    $scope.getDataAsync();
 });
 
 jqmApp.controller('historyDetail', function($scope, $http, ji)
