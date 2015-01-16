@@ -193,6 +193,7 @@ class XmlJobDefParser
                     {
                         em.remove(jdp);
                     }
+                    jd.getParameters().clear();
                     NodeList prmList = jdElement.getElementsByTagName("parameter");
                     for (int prmIndex = 0; prmIndex < prmList.getLength(); prmIndex++)
                     {

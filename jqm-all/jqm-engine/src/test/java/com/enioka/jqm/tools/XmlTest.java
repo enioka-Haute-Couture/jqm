@@ -116,6 +116,30 @@ public class XmlTest extends JqmBaseTest
     }
 
     @Test
+    public void testImportThenReimportJobDefWithPrms()
+    {
+        // Init the default queue (don't start the engine!)
+        Helpers.checkAndUpdateNodeConfiguration("marsu", em);
+
+        // First import
+        Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest.xml" });
+
+        List<JobDef> jd = em.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
+        Assert.assertEquals(2, jd.size());
+        Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
+        Assert.assertEquals("1", jd.get(0).getParameters().get(0).getValue());
+
+        // Second import - parameters are different, note 3 instead of 1
+        Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest_np.xml" });
+
+        jd = this.getNewEm().createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
+        Assert.assertEquals(2, jd.size());
+        Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
+        Assert.assertEquals("3", jd.get(0).getParameters().get(0).getValue());
+
+    }
+
+    @Test
     public void testImportJobdefWithQueue()
     {
         // Init the default queue (don't start the engine!)
