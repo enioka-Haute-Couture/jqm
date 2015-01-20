@@ -297,6 +297,9 @@ class Loader implements Runnable, LoaderMBean
 
     void endOfRun(State status)
     {
+        // Register end date as soon as possible to be as exact as possible (sending mails may take time for example)
+        Calendar endDate = GregorianCalendar.getInstance(Locale.getDefault());
+
         // This block is needed for external payloads, as the single runner may forcefully call endOfRun.
         synchronized (isDone)
         {
@@ -308,6 +311,12 @@ class Loader implements Runnable, LoaderMBean
             {
                 return;
             }
+        }
+
+        // Release the slot so as to allow other job instances to run (first op!)
+        if (p != null)
+        {
+            p.decreaseNbThread();
         }
 
         // Send e-mail before releasing the slot - it may be long
@@ -323,13 +332,6 @@ class Loader implements Runnable, LoaderMBean
             }
         }
 
-        // Release the slot
-        if (p != null)
-        {
-            p.decreaseNbThread();
-        }
-        EntityManager em = Helpers.getNewEm();
-
         // Clean class loader
         ClassLoaderLeakCleaner.clean(Thread.currentThread().getContextClassLoader());
 
@@ -339,23 +341,6 @@ class Loader implements Runnable, LoaderMBean
             Thread.currentThread().setContextClassLoader(contextClassLoader);
             jqmlogger.trace("Class Loader was correctly restored");
         }
-
-        // Retrieve the object to update
-        job = em.find(JobInstance.class, this.job.getId());
-
-        // Update end date
-        Calendar endDate = GregorianCalendar.getInstance(Locale.getDefault());
-
-        // Done: put inside history & remove instance from queue.
-        em.getTransaction().begin();
-        History h = Helpers.createHistory(job, em, status, endDate);
-        jqmlogger.trace("An History was just created for job instance " + h.getId());
-
-        // Other transaction for purging the JI (deadlock power - beware of Message)
-        em.getTransaction().commit();
-        em.getTransaction().begin();
-        em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", job.getId()).executeUpdate();
-        em.getTransaction().commit();
 
         // Clean temp dir (if it exists)
         File tmpDir = new File(FilenameUtils.concat(node.getTmpDirectory(), "" + job.getId()));
@@ -395,8 +380,32 @@ class Loader implements Runnable, LoaderMBean
             mps.unregisterThread();
         }
 
-        // Done
-        em.close();
+        endOfRunDb(status, endDate);
+    }
+
+    /**
+     * Part of the endOfRun process that needs the database. May be deferred if the database is not available.
+     */
+    void endOfRunDb(State status, Calendar endDate)
+    {
+        EntityManager em = Helpers.getNewEm();
+
+        try
+        {
+            // Retrieve the object to update
+            job = em.find(JobInstance.class, this.job.getId());
+
+            // Done: put inside history & remove instance from queue.
+            em.getTransaction().begin();
+            History h = Helpers.createHistory(job, em, status, endDate);
+            jqmlogger.trace("An History was just created for job instance " + h.getId());
+            em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", job.getId()).executeUpdate();
+            em.getTransaction().commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(em);
+        }
     }
 
     // ////////////////////////////////////////////////////////////
