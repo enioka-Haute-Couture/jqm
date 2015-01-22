@@ -194,6 +194,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
     {
         if (newVal !== oldVal)
         {
+            $scope.selected.length = 0;
             $scope.getDataAsync();
         }
     }, true);
@@ -244,6 +245,13 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
         var ji = $scope.selected[0];
         $http.post("ws/client/ji/" + ji.id).success($scope.getDataAsync);
     };
+    
+    $scope.kill = function()
+    {
+        var ji = $scope.selected[0];
+        $http.post("ws/client/ji/killed/" + ji.id).success($scope.getDataAsync);
+    };
+
 });
 
 jqmApp.controller('historyDetail', function($scope, $http, ji)
