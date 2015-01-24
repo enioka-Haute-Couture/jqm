@@ -119,7 +119,7 @@ public class JqmSimpleTest
             test.addAndStartEngine(nodeName);
         }
         Integer i = JobRequest.create("TestJqmApplication", "TestUser").setSessionID(sessionId).setParameters(runtimePrms).submit();
-        TestHelpers.waitFor(nbExpected, 9000 + waitMarginMs + nbExpected * 1000, em);
+        TestHelpers.waitFor(nbExpected, 9000 + waitMarginMs + nbExpected * 2000, em);
         if (waitMsMin > 0)
         {
             try

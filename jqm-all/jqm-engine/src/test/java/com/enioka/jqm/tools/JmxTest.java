@@ -105,7 +105,7 @@ public class JmxTest extends JqmBaseTest
 
         // Kill it though JMX
         proxy.kill();
-        Thread.sleep(1000);
+        Thread.sleep(4000);
 
         // //////////////////
         // Engine bean
