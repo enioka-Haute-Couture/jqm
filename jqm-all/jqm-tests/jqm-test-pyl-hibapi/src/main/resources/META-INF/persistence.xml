@@ -4,17 +4,6 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
 	version="2.0">
 
-	<persistence-unit name="jobqueue-api-pu">
-		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<non-jta-data-source>jdbc/jqm2</non-jta-data-source>
-
-		<jar-file>../jqm-model/target/jqm-model-${project.version}.jar</jar-file>
-
-		<properties>
-			<property name="javax.persistence.validation.mode" value="none" />
-		</properties>
-	</persistence-unit>
-
 	<persistence-unit name="marsu-pu">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<non-jta-data-source>jdbc/test</non-jta-data-source>

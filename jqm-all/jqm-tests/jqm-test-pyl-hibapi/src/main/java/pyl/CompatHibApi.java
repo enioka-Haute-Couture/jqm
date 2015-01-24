@@ -1,3 +1,5 @@
+package pyl;
+
 /**
  * Copyright © 2013 enioka. All rights reserved
  * Authors: Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
@@ -28,14 +30,15 @@ import jpa.Entity;
 
 import org.apache.log4j.Logger;
 
-import com.enioka.jqm.api.JobBase;
+import com.enioka.jqm.api.JobManager;
 
-public class App extends JobBase
+public class CompatHibApi implements Runnable
 {
-    private static final Logger log = Logger.getLogger(App.class);
+    private static final Logger log = Logger.getLogger(CompatHibApi.class);
+    private JobManager jm;
 
     @Override
-    public void start()
+    public void run()
     {
         log.info("Starting payload");
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("marsu-pu");
@@ -45,16 +48,16 @@ public class App extends JobBase
         List<Entity> res = em.createQuery("SELECT e from Entity e", Entity.class).getResultList();
         log.info(res.size());
 
-        if (this.getParameters().size() == 0)
+        if (jm.parameters().size() == 0)
         {
             log.info("Queuing again - with parameter and through the JM API");
             Map<String, String> prms = new HashMap<String, String>();
             prms.put("stop", "1");
-            enQueue(getApplicationName(), null, null, null, null, null, null, null, null, prms);
+            jm.enqueue(jm.applicationName(), null, null, null, null, null, null, null, null, prms);
         }
         else
         {
-            System.out.println(getParameters().get("stop"));
+            System.out.println(jm.parameters().get("stop"));
         }
         log.info("End of payload");
     }

@@ -19,7 +19,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 
 import org.jboss.shrinkwrap.resolver.api.NoResolvedResultException;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
@@ -30,10 +29,8 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
-import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -99,34 +96,6 @@ public class PackageTest extends JqmBaseTest
     public void testInheritedLegacyPayload() throws Exception
     {
         JqmSimpleTest.create(em, "pyl.PckJBInheritance").run(this);
-    }
-
-    // @Test // Commented. API is now always present.
-    public void testIncompleteClass() throws Exception
-    {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testIncompleteClass");
-        EntityManager em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createTestData(em);
-
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-missingapi/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
-
-        JobRequest j = new JobRequest("MarsuApplication", "TestUser");
-
-        JqmClientFactory.getClient().enqueue(j);
-
-        JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
-        TestHelpers.waitFor(1, 10000, em);
-        engine1.stop();
-
-        TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
-        ArrayList<History> res = (ArrayList<History>) query.getResultList();
-
-        Assert.assertEquals(1, res.size());
-        Assert.assertEquals(State.CRASHED, res.get(0).getState());
     }
 
     // Can't work with Java6: http://bugs.java.com/view_bug.do?bug_id=4950148 (2003!)

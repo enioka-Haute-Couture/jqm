@@ -25,8 +25,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 /**
- * 
- * @author Pierre COPPEE <pierre.coppee@enioka.com>
+ * @deprecated Use {@link JobManager} instead.
  */
 public class JobBase
 {

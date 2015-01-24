@@ -103,20 +103,7 @@ public class MiscTest extends JqmBaseTest
     {
         CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", em,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
-        CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em,
-                "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
-
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-emplusapi/target/test.jar", TestHelpers.qVip, 42,
-                "jqm-test-emplusapi", null, "Franquin", "ModuleMachin", "other", "other", true, em);
-        JobRequest.create("jqm-test-emplusapi", "TestUser").submit();
-
-        addAndStartEngine();
-        TestHelpers.waitFor(2, 10000, em);
-
-        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
-        Assert.assertEquals(2, ji.size());
-        Assert.assertEquals(State.ENDED, ji.get(0).getState());
-        Assert.assertEquals(State.ENDED, ji.get(1).getState());
+        JqmSimpleTest.create(em, "pyl.CompatHibApi", "jqm-test-pyl-hibapi").expectOk(2).run(this);
     }
 
     @Test
@@ -129,7 +116,7 @@ public class MiscTest extends JqmBaseTest
 
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmlstop.xml" });
 
-        JobRequest j = new JobRequest("jqm-test-emplusapi", "TestUser");
+        JobRequest j = new JobRequest("CompatHibApi", "TestUser");
         JqmClientFactory.getClient().enqueue(j);
 
         addAndStartEngine();
@@ -137,7 +124,7 @@ public class MiscTest extends JqmBaseTest
 
         List<History> ji = Helpers.getNewEm()
                 .createQuery("SELECT j FROM History j WHERE j.jd.applicationName = :myId order by id asc", History.class)
-                .setParameter("myId", "jqm-test-emplusapi").getResultList();
+                .setParameter("myId", "CompatHibApi").getResultList();
         Assert.assertEquals(1, ji.size());
         Assert.assertEquals(State.ENDED, ji.get(0).getState());
     }

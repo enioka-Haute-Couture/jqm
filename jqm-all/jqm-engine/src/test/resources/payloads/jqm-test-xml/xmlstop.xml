@@ -1,12 +1,12 @@
 <jqm>
 	<jar>
-		<path>jqm-tests/jqm-test-emplusapi/target/test.jar</path>
+		<path>jqm-tests/jqm-test-pyl-hibapi/target/test.jar</path>
 		<jobdefinitions>
 			<jobDefinition>
-				<name>jqm-test-emplusapi</name>
+				<name>CompatHibApi</name>
 				<description>test</description>
 				<canBeRestarted>true</canBeRestarted>
-				<javaClassName>App</javaClassName>
+				<javaClassName>pyl.CompatHibApi</javaClassName>
 				<application>ApplicationTest</application>
 				<module>TestModuleRATONLAVEUR</module>
 				<keyword1>vdjvkdv</keyword1>

@@ -78,7 +78,7 @@ public class FiboTest extends JqmBaseTest
     @Test
     public void testFiboHib() throws Exception
     {
-        JqmSimpleTest.create(em, "com.enioka.jqm.tests.App", "jqm-test-fibohib").addRuntimeParameter("p1", "1")
-                .addRuntimeParameter("p2", "2").expectOk(11).run(this);
+        JqmSimpleTest.create(em, "pyl.StressFiboHib", "jqm-test-pyl-hibapi").addRuntimeParameter("p1", "1").addRuntimeParameter("p2", "2")
+                .expectOk(11).run(this);
     }
 }
