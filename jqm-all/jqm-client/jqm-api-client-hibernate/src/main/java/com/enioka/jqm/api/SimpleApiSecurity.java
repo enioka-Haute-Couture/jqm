@@ -125,8 +125,17 @@ final class SimpleApiSecurity
                     r.getUsers().add(user);
 
                     // Purge all old internal accounts
-                    em.createQuery("DELETE FROM RUser u WHERE u.internal = true AND u.expirationDate < :n")
-                            .setParameter("n", Calendar.getInstance()).executeUpdate();
+                    for (RUser ru : em.createQuery("SELECT u FROM RUser u WHERE u.internal = true AND u.expirationDate < :n", RUser.class)
+                            .setParameter("n", Calendar.getInstance()).getResultList())
+                    {
+                        // Not using DELETE query but a remove in a loop because two-ways M2M relationship are stupid in JPA.
+                        for (RRole rr : ru.getRoles())
+                        {
+                            rr.getUsers().remove(ru);
+                        }
+                        ru.getRoles().clear();
+                        em.remove(ru);
+                    }
 
                     em.getTransaction().commit();
                 }
