@@ -112,6 +112,10 @@ public class TestHelpers
         }
 
         CreationTools.createMailSession(em, "mail/default", "smtp.gmail.com", 587, true, "jqm.noreply@gmail.com", "marsu1952");
+
+        CreationTools.createRole(em, "administrator", "super admin", "*:*");
+        CreationTools.createRole(em, "client power user", "can use the full client API", "node:read", "queue:read", "job_instance:*",
+                "jd:read", "logs:read", "queue_position:create");
     }
 
     public static void cleanup(EntityManager em)

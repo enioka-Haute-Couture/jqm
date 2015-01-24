@@ -97,7 +97,8 @@ public class Main
         Option o51 = OptionBuilder.withArgName("xmlpath").hasArg().withDescription("import all queue definitions from an XML file")
                 .isRequired().create("importqueuefile");
         Option o61 = OptionBuilder.withArgName("nodeName").hasArg()
-                .withDescription("create a JQM node of this name (init the database if needed").isRequired().create("createnode");
+                .withDescription("creates a JQM node of this name, or updates it if it exists. Implies -u.").isRequired()
+                .create("createnode");
         Option o71 = OptionBuilder.withDescription("display JQM engine version").withLongOpt("version").create("v");
         Option o81 = OptionBuilder.withDescription("upgrade JQM database").withLongOpt("upgrade").create("u");
         Option o91 = OptionBuilder.withArgName("jobInstanceId").hasArg().withDescription("get job instance status by ID").isRequired()
@@ -263,7 +264,8 @@ public class Main
         }
         catch (Exception e)
         {
-            jqmlogger.fatal("Could not launch the engine - have you created the node? (this also creates tables in the database)", e);
+            jqmlogger.fatal("Could not launch the engine named " + nodeName
+                    + ". This may be because no node with this name was declared (with command line option createnode).", e);
         }
     }
 
@@ -274,7 +276,8 @@ public class Main
             Helpers.allowCreateSchema();
             jqmlogger.info("Creating engine node " + nodeName);
             EntityManager em = Helpers.getNewEm();
-            Helpers.checkAndUpdateNodeConfiguration(nodeName, em);
+            Helpers.updateConfiguration(em);
+            Helpers.updateNodeConfiguration(nodeName, em);
             em.close();
         }
         catch (Exception e)
@@ -288,9 +291,9 @@ public class Main
         try
         {
             Helpers.allowCreateSchema();
-            jqmlogger.info("Upgrading");
+            jqmlogger.info("Upgrading database and shared metadata");
             EntityManager em = Helpers.getNewEm();
-            Helpers.getParameter("none", "", em);
+            Helpers.updateConfiguration(em);
             em.close();
         }
         catch (Exception e)

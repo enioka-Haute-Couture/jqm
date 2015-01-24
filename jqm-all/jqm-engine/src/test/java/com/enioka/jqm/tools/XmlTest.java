@@ -97,7 +97,7 @@ public class XmlTest extends JqmBaseTest
     public void testXmlParser()
     {
         // Init the default queue (don't start the engine!)
-        Helpers.checkAndUpdateNodeConfiguration("marsu", em);
+        Helpers.updateConfiguration(em);
 
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest.xml" });
 
@@ -119,7 +119,7 @@ public class XmlTest extends JqmBaseTest
     public void testImportThenReimportJobDefWithPrms()
     {
         // Init the default queue (don't start the engine!)
-        Helpers.checkAndUpdateNodeConfiguration("marsu", em);
+        Helpers.updateConfiguration(em);
 
         // First import
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest.xml" });
@@ -143,7 +143,7 @@ public class XmlTest extends JqmBaseTest
     public void testImportJobdefWithQueue()
     {
         // Init the default queue (don't start the engine!)
-        Helpers.checkAndUpdateNodeConfiguration("marsu", em);
+        Helpers.updateConfiguration(em);
 
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltestnewqueue.xml" });
 

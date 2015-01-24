@@ -104,7 +104,8 @@ class JqmEngine implements JqmEngineMBean
         EntityManager em = Helpers.getNewEm();
 
         // Node configuration is in the database
-        node = Helpers.checkAndUpdateNodeConfiguration(nodeName, em);
+        Helpers.checkConfiguration(nodeName, em);
+        node = em.createQuery("SELECT n FROM Node n WHERE n.name = :l", Node.class).setParameter("l", nodeName).getSingleResult();
 
         // Log parameters
         Helpers.dumpParameters(em, node);

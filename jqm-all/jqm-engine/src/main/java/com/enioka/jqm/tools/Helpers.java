@@ -297,9 +297,66 @@ final class Helpers
         }
     }
 
-    static Node checkAndUpdateNodeConfiguration(String nodeName, EntityManager em)
+    static void checkConfiguration(String nodeName, EntityManager em)
     {
-        em.getTransaction().begin();
+        // Node
+        long n = em.createQuery("SELECT COUNT(n) FROM Node n WHERE n.name = :l", Long.class).setParameter("l", nodeName).getSingleResult();
+        if (n == 0L)
+        {
+            throw new JqmInitError("The node does not exist. It must be referenced (CLI option createnode) before it can be used");
+        }
+
+        // Default queue
+        long i = (Long) em.createQuery("SELECT COUNT(qu) FROM Queue qu where qu.defaultQueue = true").getSingleResult();
+        if (i == 0L)
+        {
+            throw new JqmInitError("There is no default queue. Correct this (for example with CLI option -u, or with the web admin)");
+        }
+        if (i > 1L)
+        {
+            throw new JqmInitError(
+                    "There is more than one default queue. Correct this (for example with CLI option -u, or with the web admin)");
+        }
+
+        // Deployment parameters
+        i = (Long) em.createQuery("SELECT COUNT(dp) FROM DeploymentParameter dp WHERE dp.node.name = :localnode", Long.class)
+                .setParameter("localnode", nodeName).getSingleResult();
+        if (i == 0L)
+        {
+            jqmlogger
+                    .warn("This node is not bound to any queue. Either use the GUI to bind it or use CLI option -u to bind it to the default queue");
+        }
+
+        // Roles
+        i = em.createQuery("SELECT count(rr) from RRole rr WHERE rr.name = :rr", Long.class).setParameter("rr", "administrator")
+                .getSingleResult();
+        if (i == 0L)
+        {
+            throw new JqmInitError("The 'administrator' role does not exist. It is needed for the APIs. Run CLI option -u to create it.");
+        }
+
+        // Mail session
+        i = (Long) em.createQuery("SELECT COUNT(r) FROM JndiObjectResource r WHERE r.name = :nn").setParameter("nn", "mail/default")
+                .getSingleResult();
+        if (i == 0L)
+        {
+            throw new JqmInitError("Mail session named mail/default does not exist but is required for the engine to run"
+                    + ". Use CLI option -u to create an empty one or use the admin web GUI to create it.");
+        }
+    }
+
+    /**
+     * Creates or updates a node.<br>
+     * This method makes the assumption metadata is valid. e.g. there MUST be a single default queue.<br>
+     * Call {@link #updateConfiguration(EntityManager)} before to be sure if necessary.
+     * 
+     * @param nodeName
+     *            name of the node that should be created or updated (if incompletely defined only)
+     * @param em
+     *            an EntityManager on which a transaction will be opened.
+     */
+    static void updateNodeConfiguration(String nodeName, EntityManager em)
+    {
 
         // Node
         Node n = null;
@@ -310,6 +367,8 @@ final class Helpers
         catch (NoResultException e)
         {
             jqmlogger.info("Node " + nodeName + " does not exist in the configuration and will be created with default values");
+            em.getTransaction().begin();
+
             n = new Node();
             n.setDlRepo(System.getProperty("user.dir") + "/outputfiles/");
             n.setName(nodeName);
@@ -318,7 +377,36 @@ final class Helpers
             n.setTmpDirectory(System.getProperty("user.dir") + "/tmp/");
             n.setRootLogLevel("INFO");
             em.persist(n);
+            em.getTransaction().commit();
         }
+
+        // Deployment parameters
+        DeploymentParameter dp = null;
+        long i = (Long) em.createQuery("SELECT COUNT(dp) FROM DeploymentParameter dp WHERE dp.node = :localnode")
+                .setParameter("localnode", n).getSingleResult();
+        if (i == 0)
+        {
+            jqmlogger.info("As this node is not bound to any queue, it will be set to poll from the default queue with default parameters");
+            Queue q = em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true", Queue.class).getSingleResult();
+            em.getTransaction().begin();
+            dp = new DeploymentParameter();
+            dp.setNbThread(5);
+            dp.setNode(n);
+            dp.setPollingInterval(1000);
+            dp.setQueue(q);
+            em.persist(dp);
+
+            em.getTransaction().commit();
+        }
+    }
+
+    /**
+     * Creates or updates metadata common to all nodes: default queue, global parameters, roles...<br>
+     * It is idempotent. It also has the effect of making broken metadata viable again.
+     */
+    static void updateConfiguration(EntityManager em)
+    {
+        em.getTransaction().begin();
 
         // Default queue
         Queue q = null;
@@ -369,21 +457,6 @@ final class Helpers
         initSingleParam("enableWsApiAuth", "true", em);
         initSingleParam("enableInternalPki", "true", em);
 
-        // Deployment parameters
-        DeploymentParameter dp = null;
-        i = (Long) em.createQuery("SELECT COUNT(dp) FROM DeploymentParameter dp WHERE dp.node = :localnode").setParameter("localnode", n)
-                .getSingleResult();
-        if (i == 0)
-        {
-            dp = new DeploymentParameter();
-            dp.setNbThread(5);
-            dp.setNode(n);
-            dp.setPollingInterval(1000);
-            dp.setQueue(q);
-            em.persist(dp);
-            jqmlogger.info("This node will poll from the default queue with default parameters");
-        }
-
         // Roles
         RRole adminr = createRoleIfMissing(em, "administrator", "all permissions without exception", "*:*");
         createRoleIfMissing(em, "config admin", "can read and write all configuration, except security configuration", "node:*", "queue:*",
@@ -425,7 +498,6 @@ final class Helpers
 
         // Done
         em.getTransaction().commit();
-        return n;
     }
 
     static RRole createRoleIfMissing(EntityManager em, String roleName, String description, String... permissions)
