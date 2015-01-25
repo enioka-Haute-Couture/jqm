@@ -3,9 +3,15 @@
         <div class="form-group">
             <label for="ddJd" class="col-sm-5 control-label">Application to launch</label>
             <div class="col-sm-7">
-                <select id="ddJd" ng-cell-input ng-model="request.applicationName" ng-options="jd.applicationName as jd.applicationName for jd in jds"
-                    ng-change="onJd()"
-                ></select>
+                <ui-select id="ddJd" theme='bootstrap' ng-model="$parent.selectedJd" ng-disabled="disabled">
+                   
+                   <ui-select-match placeholder="Enter an application name...">{{$select.selected.applicationName}}</ui-select-match>
+                
+	               <ui-select-choices repeat="item in jds | filter: $select.search">
+                        <div ng-bind-html="item.applicationName | highlight: $select.search"></div>
+                   </ui-select-choices>
+                    
+                </ui-select>
                 <span class="help-block">Name of the batch process to launch.</span>
             </div>
         </div>
@@ -63,7 +69,7 @@
     </div>
 
     <div class="modal-footer">
-        <button class="btn btn-default" ng-click="ok()"><span class="glyphicon glyphicon-ok"></span> OK</button>
+        <button class="btn btn-default" ng-click="ok()" ng-disabled="!selectedJd || !request.user"><span class="glyphicon glyphicon-ok"></span> OK</button>
         <button class="btn btn-default" ng-click="cancel()"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
     </div>
 </div>

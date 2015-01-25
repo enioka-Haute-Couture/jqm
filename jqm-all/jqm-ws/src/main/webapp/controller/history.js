@@ -276,6 +276,8 @@ jqmApp.controller('historyDetail', function($scope, $http, ji)
 jqmApp.controller('jiNew', function($scope, µUserJdDto, $modalInstance, $http)
 {
     $scope.jds = µUserJdDto.query();
+    $scope.selectedJd = null;
+    
     $scope.data = {
         selectedJd : null,
         newKey : null,
@@ -286,23 +288,6 @@ jqmApp.controller('jiNew', function($scope, µUserJdDto, $modalInstance, $http)
         user : 'webuser',
         sessionID : 0,
         parameters : [],
-    };
-
-    $scope.meuh = function()
-    {
-        console.debug($scope.selectedJd);
-    };
-
-    $scope.onJd = function()
-    {
-        var l = $scope.jds.length;
-        for ( var i = 0; i < l; i++)
-        {
-            if ($scope.request.applicationName === $scope.jds[i].applicationName)
-            {
-                $scope.selectedJd = $scope.jds[i];
-            }
-        }
     };
 
     $scope.addPrm = function()
@@ -320,6 +305,7 @@ jqmApp.controller('jiNew', function($scope, µUserJdDto, $modalInstance, $http)
 
     $scope.ok = function()
     {
+        $scope.request.applicationName = $scope.selectedJd.applicationName;
         $http.post("ws/client/ji", $scope.request).success($scope.postOk);
     };
 
