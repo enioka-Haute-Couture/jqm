@@ -74,8 +74,9 @@ class JqmEngine implements JqmEngineMBean
     boolean loadJmxBeans = true;
 
     // DB connection resilience data
-    volatile Queue<QueuePoller> qpToRestart = new ArrayQueue<QueuePoller>();
-    volatile Thread qpRestarter = null;
+    private volatile Queue<QueuePoller> qpToRestart = new ArrayQueue<QueuePoller>();
+    private volatile Queue<Loader> loaderToFinalize = new ArrayQueue<Loader>();
+    private volatile Thread qpRestarter = null;
 
     /**
      * Starts the engine
@@ -379,11 +380,25 @@ class JqmEngine implements JqmEngineMBean
         em.getTransaction().commit();
     }
 
-    synchronized void pollerRestartNeeded(QueuePoller qp)
+    /**
+     * A poller should call this method when it encounters a database connection issue, and then should stop.<br>
+     * This will ensure the poller is restarted when database connectivity is restored.<br>
+     * Only pollers which have called this method are restarted, other are deemed not to have crashed.
+     */
+    void pollerRestartNeeded(QueuePoller qp)
     {
-        // Poller has crashed - add it to the queue of pollers to restart
         qpToRestart.add(qp);
+        startDbRestarter();
+    }
 
+    void loaderFinalizationNeeded(Loader l)
+    {
+        loaderToFinalize.add(l);
+        startDbRestarter();
+    }
+
+    private synchronized void startDbRestarter()
+    {
         // On first alert, start the thread which will check connection restoration and relaunch the pollers.
         if (qpRestarter != null)
         {
@@ -446,6 +461,15 @@ class JqmEngine implements JqmEngineMBean
                 ee.intPoller = new InternalPoller(ee);
                 Thread t = new Thread(ee.intPoller);
                 t.start();
+
+                // Finalize loaders that could not store their result inside the database
+                Loader l = loaderToFinalize.poll();
+                while (l != null)
+                {
+                    jqmlogger.warn("storing delayed results for loader " + l.getId());
+                    l.endOfRunDb();
+                    l = loaderToFinalize.poll();
+                }
 
                 // Done - reset the relauncher itself and let the thread end.
                 ee.qpRestarter = null;

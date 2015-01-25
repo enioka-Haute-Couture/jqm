@@ -37,11 +37,14 @@ import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import javax.persistence.PersistenceException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.hibernate.TransactionException;
+import org.hibernate.exception.JDBCConnectionException;
 
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.History;
@@ -56,7 +59,7 @@ import com.enioka.jqm.jpamodel.State;
  */
 class Loader implements Runnable, LoaderMBean
 {
-    private Logger jqmlogger = Logger.getLogger(this.getClass());
+    private Logger jqmlogger = Logger.getLogger(Loader.class);
 
     private JobInstance job = null;
     private Node node = null;
@@ -67,6 +70,10 @@ class Loader implements Runnable, LoaderMBean
     private ObjectName name = null;
     private ClassLoader contextClassLoader = null;
     Boolean isDone = false;
+
+    // These two fields are instance-level in order to allow an easy endOfRunDb external call
+    private Calendar endDate = null;
+    private State resultStatus = State.ATTRIBUTED;
 
     Loader(JobInstance job, LibraryCache cache, QueuePoller p)
     {
@@ -122,7 +129,7 @@ class Loader implements Runnable, LoaderMBean
         this.node = em.find(Node.class, job.getNode().getId());
 
         // Log
-        State resultStatus = State.SUBMITTED;
+        this.resultStatus = State.SUBMITTED;
         jqmlogger.debug("A loader/runner thread has just started for Job Instance " + job.getId() + ". Jar is: " + job.getJd().getJarPath()
                 + " - class is: " + job.getJd().getJavaClassName());
 
@@ -133,7 +140,8 @@ class Loader implements Runnable, LoaderMBean
             em.getTransaction().begin();
             this.job.setProgress(-1);
             em.getTransaction().commit();
-            endOfRun(State.ENDED);
+            resultStatus = State.ENDED;
+            endOfRun();
             em.close();
             return;
         }
@@ -145,7 +153,8 @@ class Loader implements Runnable, LoaderMBean
         {
             jqmlogger.warn("Cannot read file at " + jarFile.getAbsolutePath()
                     + ". Job instance will crash. Check job definition or permissions on file.");
-            endOfRun(State.CRASHED);
+            resultStatus = State.CRASHED;
+            endOfRun();
             em.close();
             return;
         }
@@ -157,7 +166,8 @@ class Loader implements Runnable, LoaderMBean
         catch (MalformedURLException ex)
         {
             jqmlogger.warn("The JAR file path specified in Job Definition is incorrect " + job.getJd().getApplicationName(), ex);
-            endOfRun(State.CRASHED);
+            resultStatus = State.CRASHED;
+            endOfRun();
             em.close();
             return;
         }
@@ -179,7 +189,8 @@ class Loader implements Runnable, LoaderMBean
         catch (Exception e1)
         {
             jqmlogger.warn("Could not resolve CLASSPATH for job " + job.getJd().getApplicationName(), e1);
-            endOfRun(State.CRASHED);
+            resultStatus = State.CRASHED;
+            endOfRun();
             em.close();
             return;
         }
@@ -204,7 +215,8 @@ class Loader implements Runnable, LoaderMBean
             jqmlogger.error("Could not update internal elements", e);
             em.getTransaction().rollback();
             em.close();
-            endOfRun(State.CRASHED);
+            resultStatus = State.CRASHED;
+            endOfRun();
             return;
         }
 
@@ -261,7 +273,8 @@ class Loader implements Runnable, LoaderMBean
         catch (Exception e)
         {
             jqmlogger.error("Could not switch classloaders", e);
-            endOfRun(State.CRASHED);
+            resultStatus = State.CRASHED;
+            endOfRun();
             return;
         }
 
@@ -285,7 +298,7 @@ class Loader implements Runnable, LoaderMBean
         // Job instance has now ended its run
         try
         {
-            endOfRun(resultStatus);
+            endOfRun();
         }
         catch (Exception e)
         {
@@ -295,10 +308,16 @@ class Loader implements Runnable, LoaderMBean
         jqmlogger.debug("End of loader for JobInstance " + this.job.getId() + ". Thread will now end");
     }
 
-    void endOfRun(State status)
+    void endOfRun(State s)
+    {
+        this.resultStatus = s;
+        endOfRun();
+    }
+
+    private void endOfRun()
     {
         // Register end date as soon as possible to be as exact as possible (sending mails may take time for example)
-        Calendar endDate = GregorianCalendar.getInstance(Locale.getDefault());
+        endDate = GregorianCalendar.getInstance(Locale.getDefault());
 
         // This block is needed for external payloads, as the single runner may forcefully call endOfRun.
         synchronized (isDone)
@@ -380,13 +399,13 @@ class Loader implements Runnable, LoaderMBean
             mps.unregisterThread();
         }
 
-        endOfRunDb(status, endDate);
+        endOfRunDb();
     }
 
     /**
      * Part of the endOfRun process that needs the database. May be deferred if the database is not available.
      */
-    void endOfRunDb(State status, Calendar endDate)
+    void endOfRunDb()
     {
         EntityManager em = Helpers.getNewEm();
 
@@ -397,10 +416,23 @@ class Loader implements Runnable, LoaderMBean
 
             // Done: put inside history & remove instance from queue.
             em.getTransaction().begin();
-            History h = Helpers.createHistory(job, em, status, endDate);
+            History h = Helpers.createHistory(job, em, this.resultStatus, endDate);
             jqmlogger.trace("An History was just created for job instance " + h.getId());
             em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", job.getId()).executeUpdate();
             em.getTransaction().commit();
+        }
+        catch (PersistenceException e)
+        {
+            if (e.getCause() instanceof JDBCConnectionException || e.getCause() instanceof TransactionException)
+            {
+                jqmlogger.error("connection to database lost - loader " + this.getId() + " will need delayed finalization");
+                jqmlogger.trace("connection error was:", e.getCause());
+                this.p.engine.loaderFinalizationNeeded(this);
+            }
+            else
+            {
+                throw e;
+            }
         }
         finally
         {
