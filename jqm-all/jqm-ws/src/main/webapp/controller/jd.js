@@ -16,7 +16,7 @@ jqmControllers.controller('µJdListCtrl', function($scope, $http, $modal, µJdDt
             javaClassName : 'com.company.product.ClassName',
             canBeRestarted : true,
             highlander : false,
-            jarPath : '/path/to/file.jar',
+            jarPath : 'relativepath/to/file.jar',
             enabled : true,
             parameters : [],
         });
@@ -48,18 +48,25 @@ jqmControllers.controller('µJdListCtrl', function($scope, $http, $modal, µJdDt
         }
         $scope.selected.length = 0;
     };
+    
+    $scope.filterOptions = {
+            filterText : '',
+        };
 
     $scope.gridOptions = {
         data : 'jds',
         enableCellSelection : true,
         enableRowSelection : true,
         enableCellEditOnFocus : true,
+        enableColumnResize : true,
+        enableColumnReordering : false,
         multiSelect : true,
         showSelectionCheckbox : true,
         selectWithCheckboxOnly : true,
         selectedItems : $scope.selected,
-        showGroupPanel : true,
+        virtualizationThreshold: 10,
         plugins : [ new ngGridFlexibleHeightPlugin() ],
+        filterOptions : $scope.filterOptions,
         columnDefs : [
                 {
                     field : 'applicationName',
@@ -84,15 +91,15 @@ jqmControllers.controller('µJdListCtrl', function($scope, $http, $modal, µJdDt
                 {
                     field : 'canBeRestarted',
                     displayName : 'R',
-                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"> '
-                            + '<input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
+                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><span class="glyphicon {{ row.entity[col.field] ? \'glyphicon-ok\' : \'glyphicon-remove\' }}"></span></div>',
+                    editableCellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
                     width : 25,
                 },
                 {
                     field : 'highlander',
                     displayName : 'H',
-                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()">'
-                            + ' <input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
+                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><span class="glyphicon {{ row.entity[col.field] ? \'glyphicon-ok\' : \'glyphicon-remove\' }}"></span></div>',
+                    editableCellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
                     width : 25,
                 },
                 {
@@ -127,8 +134,8 @@ jqmControllers.controller('µJdListCtrl', function($scope, $http, $modal, µJdDt
                 {
                     field : 'enabled',
                     displayName : 'E',
-                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"> '
-                            + '<input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
+                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><span class="glyphicon {{ row.entity[col.field] ? \'glyphicon-ok\' : \'glyphicon-remove\' }}"></span></div>',
+                    editableCellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
                     width : 25,
                 }, ]
     };

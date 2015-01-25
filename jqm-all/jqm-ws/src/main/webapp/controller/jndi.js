@@ -142,7 +142,7 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
         selectWithCheckboxOnly : false,
         selectedItems : $scope.selected,
         showGroupPanel : true,
-        plugins :  [new ngGridFlexibleHeightPlugin()],
+        plugins :  [new ngGridFlexibleHeightPlugin({yMargin: 200})],
         columnDefs : [ {
             field : 'name',
             displayName : 'JNDI alias',
@@ -160,7 +160,8 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
             field : 'singleton',
             displayName : 'S',
             width : 50,
-            cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
+            cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><span class="glyphicon {{ row.entity[col.field] ? \'glyphicon-ok\' : \'glyphicon-remove\' }}"></span></div>',
+            editableCellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
         }, ]
     };
 
@@ -173,7 +174,6 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
         showSelectionCheckbox : true,
         selectWithCheckboxOnly : true,
         selectedItems : $scope.selected2,
-        plugins :  [new ngGridFlexibleHeightPlugin()],
         columnDefs : [ {
             field : 'key',
             displayName : 'Resource parameter',

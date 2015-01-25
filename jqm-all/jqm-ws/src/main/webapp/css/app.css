@@ -32,3 +32,8 @@ html,body {
 		padding-right: 20px;
 	}
 }
+
+/* Hack for ng-grid which always displays horiz scrollbar when vert appears */
+.ngViewport.ng-scope {
+	overflow-x: hidden;
+}

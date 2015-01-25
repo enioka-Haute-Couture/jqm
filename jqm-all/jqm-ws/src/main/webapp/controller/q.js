@@ -59,12 +59,18 @@ jqmControllers.controller('µQueueListCtrl', function($scope, $http, µQueueDto)
         plugins :  [new ngGridFlexibleHeightPlugin()],
         columnDefs : [ {
             field : 'name',
-            displayName : 'Name'
+            displayName : 'Name',
+            width : '**',
         }, {
-            field : 'description'
+            field : 'description',
+            displayName  :'Description',
+            width : '*****',
         }, {
             field : 'defaultQueue',
-            displayName : 'is default'
+            displayName : 'Is default',
+            cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><span class="glyphicon {{ row.entity[col.field] ? \'glyphicon-ok\' : \'glyphicon-remove\' }}"></span></div>',
+            editableCellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
+            width : '*',
         } ]
     };
 

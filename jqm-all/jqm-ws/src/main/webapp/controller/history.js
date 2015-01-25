@@ -103,7 +103,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
         enablePaging : true,
         showFooter : true,
         totalServerItems : 'totalServerItems',
-        plugins :  [new ngGridFlexibleHeightPlugin()],
+        plugins :  [new ngGridFlexibleHeightPlugin({yMargin: 260})],
         columnDefs : [ {
             field : 'id',
             displayName : 'ID',

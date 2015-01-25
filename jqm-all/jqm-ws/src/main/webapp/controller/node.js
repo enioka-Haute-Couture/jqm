@@ -95,22 +95,22 @@ jqmControllers.controller('µNodeListCtrl', function($scope, $http, µNodeDto)
                 {
                     field : 'loapApiSimple',
                     displayName : 'Simple API',
-                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()">'
-                            + ' <input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
+                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><span class="glyphicon {{ row.entity[col.field] ? \'glyphicon-ok\' : \'glyphicon-remove\' }}"></span></div>',
+                    editableCellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
                     width : '*',
                 },
                 {
                     field : 'loadApiClient',
                     displayName : 'Client API',
-                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()">'
-                            + ' <input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
+                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><span class="glyphicon {{ row.entity[col.field] ? \'glyphicon-ok\' : \'glyphicon-remove\' }}"></span></div>',
+                    editableCellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
                     width : '*',
                 },
                 {
                     field : 'loadApiAdmin',
                     displayName : 'Admin API',
-                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()">'
-                            + ' <input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
+                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><span class="glyphicon {{ row.entity[col.field] ? \'glyphicon-ok\' : \'glyphicon-remove\' }}"></span></div>',
+                    editableCellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
                     width : '*',
                 }, ]
     };

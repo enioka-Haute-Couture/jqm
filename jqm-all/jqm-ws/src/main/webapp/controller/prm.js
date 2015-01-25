@@ -53,10 +53,11 @@ jqmControllers.controller('µPrmListCtrl', function($scope, $http, µPrmDto)
         plugins :  [new ngGridFlexibleHeightPlugin()],
         columnDefs : [ {
             field : 'key',
-            displayName : 'Name'
+            displayName : 'Name',
+            width: '30%',
         }, {
             field : 'value',
-            displayName : 'Value'
+            displayName : 'Value',
         } ]
     };
 
