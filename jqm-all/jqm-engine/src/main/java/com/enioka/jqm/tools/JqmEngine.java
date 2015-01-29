@@ -362,7 +362,8 @@ class JqmEngine implements JqmEngineMBean
     {
         em.getTransaction().begin();
         for (JobInstance ji : em
-                .createQuery("SELECT ji FROM JobInstance ji WHERE ji.node = :node AND (ji.state = 'ATTRIBUTED' OR ji.state = 'RUNNING')",
+                .createQuery(
+                        "SELECT ji FROM JobInstance ji WHERE ji.node = :node AND (ji.state = 'ATTRIBUTED' OR ji.state = 'RUNNING' OR ji.state = 'KILLED')",
                         JobInstance.class).setParameter("node", node).getResultList())
         {
             History h = em.find(History.class, ji.getId());
