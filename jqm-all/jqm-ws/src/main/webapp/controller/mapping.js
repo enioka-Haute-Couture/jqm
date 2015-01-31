@@ -59,6 +59,10 @@ jqmControllers
                         $scope.selected.length = 0;
                     };
 
+                    $scope.filterOptions = {
+                        filterText : '',
+                    };
+
                     $scope.gridOptions = {
                         data : 'mappings',
                         enableCellSelection : true,
@@ -68,7 +72,8 @@ jqmControllers
                         showSelectionCheckbox : true,
                         selectWithCheckboxOnly : true,
                         selectedItems : $scope.selected,
-                        plugins :  [new ngGridFlexibleHeightPlugin()],
+                        filterOptions : $scope.filterOptions,
+                        plugins : [ new ngGridFlexibleHeightPlugin() ],
                         columnDefs : [
                                 {
                                     field : 'nodeId',

@@ -41,6 +41,10 @@ jqmControllers.controller('µPrmListCtrl', function($scope, $http, µPrmDto)
         $scope.selected.length = 0;
     };
 
+    $scope.filterOptions = {
+        filterText : '',
+    };
+
     $scope.gridOptions = {
         data : 'prms',
         enableCellSelection : true,
@@ -50,11 +54,12 @@ jqmControllers.controller('µPrmListCtrl', function($scope, $http, µPrmDto)
         showSelectionCheckbox : true,
         selectWithCheckboxOnly : true,
         selectedItems : $scope.selected,
-        plugins :  [new ngGridFlexibleHeightPlugin()],
+        filterOptions : $scope.filterOptions,
+        plugins : [ new ngGridFlexibleHeightPlugin() ],
         columnDefs : [ {
             field : 'key',
             displayName : 'Name',
-            width: '30%',
+            width : '30%',
         }, {
             field : 'value',
             displayName : 'Value',

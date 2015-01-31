@@ -29,6 +29,10 @@ jqmControllers.controller('µQueueListCtrl', function($scope, $http, µQueueDto)
         $scope.selected.length = 0;
         $scope.queues = µQueueDto.query();
     };
+    
+    $scope.filterOptions = {
+            filterText : '',
+    };
 
     $scope.remove = function()
     {
@@ -56,6 +60,7 @@ jqmControllers.controller('µQueueListCtrl', function($scope, $http, µQueueDto)
         showSelectionCheckbox : true,
         selectWithCheckboxOnly : true,
         selectedItems : $scope.selected,
+        filterOptions : $scope.filterOptions,
         plugins :  [new ngGridFlexibleHeightPlugin()],
         columnDefs : [ {
             field : 'name',
