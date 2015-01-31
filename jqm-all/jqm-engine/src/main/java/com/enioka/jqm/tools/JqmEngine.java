@@ -94,6 +94,7 @@ class JqmEngine implements JqmEngineMBean
 
         // Set thread name - used in audits
         Thread.currentThread().setName("JQM engine;;" + nodeName);
+        Helpers.setLogFileName(nodeName);
 
         // Log: we are starting...
         jqmlogger.info("JQM engine for node " + nodeName + " is starting");

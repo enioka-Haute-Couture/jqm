@@ -38,7 +38,9 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.Persistence;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
+import org.apache.log4j.RollingFileAppender;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.util.ByteSource;
@@ -186,6 +188,18 @@ final class Helpers
             emf.close();
             emf = null;
         }
+    }
+
+    static void setLogFileName(String name)
+    {
+        Appender a = Logger.getRootLogger().getAppender("rollingfile");
+        if (a == null)
+        {
+            return;
+        }
+        RollingFileAppender r = (RollingFileAppender) a;
+        r.setFile("./logs/jqm-" + name + ".log");
+        r.activateOptions();
     }
 
     /**

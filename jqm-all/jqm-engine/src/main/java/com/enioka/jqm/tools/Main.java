@@ -81,6 +81,7 @@ public class Main
     @SuppressWarnings("static-access")
     public static void main(String[] args)
     {
+        Helpers.setLogFileName("cli");
         Option o00 = OptionBuilder.withArgName("nodeName").hasArg().withDescription("name of the JQM node to start").isRequired()
                 .create("startnode");
         Option o01 = OptionBuilder.withDescription("display help").withLongOpt("help").create("h");
