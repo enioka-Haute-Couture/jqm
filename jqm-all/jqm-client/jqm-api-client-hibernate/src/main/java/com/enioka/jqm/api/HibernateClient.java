@@ -760,7 +760,7 @@ final class HibernateClient implements JqmClient
         {
             em.getTransaction().begin();
             ji = em.find(JobInstance.class, idJob, LockModeType.PESSIMISTIC_WRITE);
-            if (!ji.getState().equals(State.SUBMITTED))
+            if (ji == null || !ji.getState().equals(State.SUBMITTED))
             {
                 throw new NoResultException();
             }

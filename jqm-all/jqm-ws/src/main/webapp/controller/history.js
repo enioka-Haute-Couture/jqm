@@ -251,7 +251,12 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
         var ji = $scope.selected[0];
         $http.post("ws/client/ji/killed/" + ji.id).success($scope.getDataAsync);
     };
-
+    
+    $scope.changeQueue = function(newqueueid)
+    {
+        var ji = $scope.selected[0];
+        $http.post("ws/client/q/" + newqueueid + "/" + ji.id).success($scope.getDataAsync);
+    };
 });
 
 jqmApp.controller('historyDetail', function($scope, $http, ji)
