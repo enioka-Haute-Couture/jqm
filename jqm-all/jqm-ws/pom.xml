@@ -51,6 +51,27 @@
 					<name>m2e.version</name>
 				</property>
 			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<version>2.6</version>
+						<configuration>
+							<webResources combine.children="append">
+								<resource>
+									<directory>src/test/webapp</directory>
+									<filtering>false</filtering>
+									<includes>
+										<include>**</include>
+									</includes>
+								</resource>
+							</webResources>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+
 			<dependencies>
 				<dependency>
 					<groupId>org.apache.shiro</groupId>
