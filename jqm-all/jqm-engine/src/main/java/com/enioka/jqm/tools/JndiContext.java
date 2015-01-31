@@ -87,7 +87,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
         catch (Exception e)
         {
             jqmlogger.error("Could not create JNDI context: " + e.getMessage());
-            NamingException ex = new NamingException("could not init Jndi Context");
+            NamingException ex = new NamingException("Could not initialize JNDI Context");
             ex.setRootCause(e);
             throw ex;
         }
@@ -98,7 +98,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
      * 
      * @throws NamingException
      */
-    JndiContext() throws NamingException
+    private JndiContext() throws NamingException
     {
         super();
 

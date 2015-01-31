@@ -110,6 +110,8 @@ public class Main
                 .withLongOpt("gui").create("w");
         Option o121 = OptionBuilder.withArgName("id[,logfilepath]").hasArg().withDescription("single launch mode").isRequired()
                 .withLongOpt("gui").create("s");
+        Option o131 = OptionBuilder.withArgName("resourcefile").hasArg()
+                .withDescription("resource parameter file to use. Default is resources.xml").withLongOpt("resources").create("p");
 
         Options options = new Options();
         OptionGroup og1 = new OptionGroup();
@@ -128,6 +130,9 @@ public class Main
         og1.addOption(o111);
         og1.addOption(o121);
         options.addOptionGroup(og1);
+        OptionGroup og2 = new OptionGroup();
+        og2.addOption(o131);
+        options.addOptionGroup(og2);
 
         HelpFormatter formatter = new HelpFormatter();
         formatter.setWidth(160);
@@ -137,6 +142,13 @@ public class Main
             // Parse arguments
             CommandLineParser parser = new BasicParser();
             CommandLine line = parser.parse(options, args);
+
+            // Other db connection?
+            if (line.getOptionValue(o131.getOpt()) != null)
+            {
+                jqmlogger.info("Using resource XML file " + line.getOptionValue(o131.getOpt()));
+                Helpers.resourceFile = line.getOptionValue(o131.getOpt());
+            }
 
             // Set db connection
             Helpers.registerJndiIfNeeded();

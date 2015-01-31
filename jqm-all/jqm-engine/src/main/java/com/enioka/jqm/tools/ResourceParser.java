@@ -116,7 +116,7 @@ final class ResourceParser
 
     private static void importXml() throws NamingException
     {
-        InputStream is = ResourceParser.class.getClassLoader().getResourceAsStream("resources.xml");
+        InputStream is = ResourceParser.class.getClassLoader().getResourceAsStream(Helpers.resourceFile);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 
         try

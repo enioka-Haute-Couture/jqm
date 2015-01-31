@@ -72,6 +72,9 @@ final class Helpers
     private static Properties props = new Properties();
     private static EntityManagerFactory emf;
 
+    // Resource file contains at least the jqm jdbc connection definition. Static because JNDI root context is common to the whole JVM.
+    static String resourceFile = "resources.xml";
+
     private Helpers()
     {
 
