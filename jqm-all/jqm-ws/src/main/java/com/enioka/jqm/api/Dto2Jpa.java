@@ -16,6 +16,7 @@
 package com.enioka.jqm.api;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -430,5 +431,55 @@ class Dto2Jpa
 
         // Done
         return jpa;
+    }
+
+    static <J> void clean(J jpa, EntityManager em)
+    {
+        if (jpa instanceof JobDef)
+        {
+            if (0 != em.createQuery("SELECT COUNT(ji) FROM JobInstance ji WHERE ji.jd = :j", Long.class).setParameter("j", jpa)
+                    .getSingleResult())
+            {
+                throw new JqmInvalidRequestException("Cannot remove a job definition used in currently queued or running job instances");
+            }
+            em.createQuery("UPDATE History h set h.jd = NULL where h.jd = :j").setParameter("j", jpa).executeUpdate();
+        }
+        else if (jpa instanceof Queue)
+        {
+            if (0 != em.createQuery("SELECT COUNT(jd) FROM JobDef jd WHERE jd.queue = :q", Long.class).setParameter("q", jpa)
+                    .getSingleResult())
+            {
+                throw new JqmInvalidRequestException("Cannot remove a queue used in Job Definitions");
+            }
+            if (0 != em.createQuery("SELECT COUNT(ji) FROM JobInstance ji WHERE ji.queue = :q", Long.class).setParameter("q", jpa)
+                    .getSingleResult())
+            {
+                throw new JqmInvalidRequestException("Cannot remove a queue used in currently queued or running job instance");
+            }
+
+            em.createQuery("UPDATE History h set h.queue = NULL where h.queue = :q").setParameter("q", jpa).executeUpdate();
+            em.createQuery("DELETE FROM DeploymentParameter dp WHERE dp.queue = :q").setParameter("q", jpa).executeUpdate();
+        }
+        else if (jpa instanceof Node)
+        {
+            if (0 != em.createQuery("SELECT COUNT(ji) FROM JobInstance ji WHERE ji.node = :j", Long.class).setParameter("j", jpa)
+                    .getSingleResult())
+            {
+                throw new JqmInvalidRequestException("Cannot remove a node used in currently running job instance");
+            }
+            Node n = (Node) jpa;
+            Calendar limit = Calendar.getInstance();
+            limit.add(Calendar.MINUTE, -10);
+            if (n.getLastSeenAlive() != null && n.getLastSeenAlive().after(limit))
+            {
+                throw new JqmInvalidRequestException(
+                        "Can only remove a node either properly shut down or that has crashed more than 10 minutes ago.");
+            }
+
+            em.createQuery("UPDATE History h set h.node = NULL where h.node = :n").setParameter("n", n).executeUpdate();
+            em.createQuery("DELETE FROM DeploymentParameter dp where dp.node = :n").setParameter("n", n).executeUpdate();
+        }
+
+        // Other types do not have relationships needing cleaning up.
     }
 }

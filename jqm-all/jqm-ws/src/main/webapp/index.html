@@ -39,6 +39,36 @@
               <a href="{{tab.link}}" ng-click="setSelectedTab(tab)"><div ng-bind-html="tab.label"></div></a>
             </li>
         </ul>
+        
+        <div ng-controller="AlertCtrl" ng-hide="!alert.data.userReadableMessage">
+            <alert type="danger" close="closeAlert()">
+                <div class="dl-horizontal">
+                    <dt>Error</dt>
+                    <dd>{{alert.data.userReadableMessage}}</dd>
+                </div>
+                <div class="dl-horizontal">
+                    <dt>Error code</dt>
+                    <dd>{{alert.data.errorCode}}</dd>
+                </div>
+                
+                <div class="dl-horizontal" collapse="! isCollapsed">
+                    <dt></dt>
+                    <dd><button class="btn btn-default" ng-click="toggle()">Show advanced data</button></dd>
+                </div>
+                
+                <div collapse="isCollapsed">
+                    <div class="dl-horizontal">
+                        <dt>Detailed message</dt>
+                        <dd>{{alert.data.developerMessage}}</dd>
+                    </div>
+                    <div class="dl-horizontal">
+                        <dt>Stacktrace</dt>
+                        <dd ng-bind-html="alert.data.stacktrace | j2h"/></dd>
+                    </div>
+                </div>
+            </alert>
+        </div>
+        
         <div ng-view></div>
         <login-dialog></login-dialog>    
   </div>

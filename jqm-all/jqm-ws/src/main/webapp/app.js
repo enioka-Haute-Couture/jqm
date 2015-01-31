@@ -1,6 +1,7 @@
 'use strict';
 
-var jqmApp = angular.module('jqmApp', [ 'ngRoute', 'ngCookies', 'jqmControllers', 'ngGrid', 'jqmServices', 'ui.bootstrap', 'ngSanitize','ui.select' ]);
+var jqmApp = angular.module('jqmApp',
+        [ 'ngRoute', 'ngCookies', 'jqmControllers', 'ngGrid', 'jqmServices', 'ui.bootstrap', 'ngSanitize', 'ui.select' ]);
 
 jqmApp.config([ '$routeProvider', function($routeProvider, µPermManager)
 {
@@ -126,9 +127,87 @@ Date.prototype.addDays = function(days)
     return dat;
 };
 
+
+///////////////////////////////////////////////////////////////////////
+// Error message pipe stuff
+///////////////////////////////////////////////////////////////////////
+
+jqmApp.filter('j2h', function()
+{
+    return function(text)
+    {
+        if (! text)
+        {
+            return null;
+        }
+        return text.replace(/\r\n/g, '<br/>').replace(/\n/g, '<br/>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
+    };
+});
+
+jqmApp.factory('µAlertSrv', function($rootScope)
+{
+    var µAlertSrv = {};
+
+    µAlertSrv.alert = {};
+
+    µAlertSrv.show = function(msg)
+    {
+        µAlertSrv.alert.data = msg;
+    };
+
+    µAlertSrv.dismiss = function()
+    {
+        µAlertSrv.alert.data = null;
+    };
+    
+    µAlertSrv.showSimpleMessage = function(msg)
+    {
+        µAlertSrv.dismiss();
+        µAlertSrv.alert.data = {};
+        µAlertSrv.alert.data.userReadableMessage = msg;
+    };
+
+    return µAlertSrv;
+});
+
+jqmApp.controller('AlertCtrl', function($scope, $sanitize, µAlertSrv)
+{
+    $scope.alert = µAlertSrv.alert;
+    $scope.isCollapsed = true;
+    
+    $scope.closeAlert = function()
+    {
+        $scope.isCollapsed = true;
+        µAlertSrv.dismiss();
+    };
+    
+    $scope.toggle = function()
+    {
+        $scope.isCollapsed = ! $scope.isCollapsed;
+    };
+});
+
+jqmApp.config(function($httpProvider)
+{
+    $httpProvider.interceptors.push(function($q, µAlertSrv)
+    {
+        return {
+            'responseError' : function(rejection)
+            {
+                if (rejection.status === 400 || rejection.status === 500)
+                {
+                    µAlertSrv.show(rejection.data);
+                }
+                return $q.reject(rejection);
+            },
+        };
+    });
+});
+
+
 // /////////////////////////////////////////////////////////////////////
 // Login & permissions handling
-// ///////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////
 
 jqmApp.service('µPermManager', function(µUserPerms, $cookieStore, $rootScope, $http, httpBuffer)
 {

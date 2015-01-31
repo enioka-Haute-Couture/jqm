@@ -113,7 +113,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
             displayName : 'Application',
             width : '***',
         }, {
-            field : 'queue.name',
+            field : 'queueName',
             displayName : 'Queue',
             width : '**',
             sortField : 'QUEUENAME',
@@ -267,7 +267,6 @@ jqmApp.controller('historyDetail', function($scope, $http, ji)
     $scope.getdelOk = function(data, status, headers, config)
     {
         $scope.dels = data;
-        console.debug(data);
     };
 
     $scope.getdel();

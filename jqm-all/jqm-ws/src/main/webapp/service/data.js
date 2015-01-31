@@ -1,3 +1,5 @@
+'use strict';
+
 var jqmServices = angular.module('jqmServices', [ 'ngResource' ]);
 
 jqmServices.factory('µNodeDto', [ '$resource', function($resource)

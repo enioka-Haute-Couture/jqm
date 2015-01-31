@@ -566,8 +566,10 @@ final class Helpers
         History h = new History();
         h.setId(job.getId());
         h.setJd(job.getJd());
+        h.setApplicationName(job.getJd().getApplicationName());
         h.setSessionId(job.getSessionID());
         h.setQueue(job.getQueue());
+        h.setQueueName(job.getQueue().getName());
         h.setEnqueueDate(job.getCreationDate());
         h.setEndDate(endDate);
         h.setAttributionDate(job.getAttributionDate());
@@ -588,6 +590,7 @@ final class Helpers
         h.setProgress(job.getProgress());
         h.setStatus(finalState);
         h.setNode(job.getNode());
+        h.setNodeName(job.getNode().getName());
 
         em.persist(h);
 

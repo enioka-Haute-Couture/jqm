@@ -54,13 +54,23 @@ public class History implements Serializable
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.JobDef.class)
     private JobDef jd;
 
+    @Column(nullable = false, name = "applicationName", length = 100)
+    private String applicationName;
+
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.Queue.class)
     @JoinColumn(name = "queue_id")
     private Queue queue;
 
+    @Column(nullable = false, length = 50, name = "name")
+    private String queueName;
+
     @ManyToOne(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Node.class)
     @JoinColumn(name = "node_id")
     private Node node;
+
+    // null if cancelled before running
+    @Column(nullable = true, length = 100, name = "nodeName")
+    private String nodeName;
 
     @Column(name = "highlander")
     private boolean highlander = false;
@@ -570,5 +580,56 @@ public class History implements Serializable
     public void setAttributionDate(Calendar attributionDate)
     {
         this.attributionDate = attributionDate;
+    }
+
+    /**
+     * The applicative key of the {@link JobDef} that has run. {@link JobDef} are always retrieved through this name.<br>
+     * Max length is 100.
+     */
+    public String getApplicationName()
+    {
+        return this.applicationName;
+    }
+
+    /**
+     * See {@link #getApplicationName()}
+     */
+    public void setApplicationName(String applicationName)
+    {
+        this.applicationName = applicationName;
+    }
+
+    /**
+     * Functional key. Queues are specified by name inside all APIs. Must be unique.<br>
+     * Max length is 50.
+     */
+    public String getQueueName()
+    {
+        return queueName;
+    }
+
+    /**
+     * See {@link #getQueueName()}
+     */
+    public void setQueueName(String queueName)
+    {
+        this.queueName = queueName;
+    }
+
+    /**
+     * The functional key of the node. It is unique.<br>
+     * Max length is 100.
+     */
+    public String getNodeName()
+    {
+        return nodeName;
+    }
+
+    /**
+     * See {@link #getName()}
+     */
+    public void setNodeName(final String nodeName)
+    {
+        this.nodeName = nodeName;
     }
 }

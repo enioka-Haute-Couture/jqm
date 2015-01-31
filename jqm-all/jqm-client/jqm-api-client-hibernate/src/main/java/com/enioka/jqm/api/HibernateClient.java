@@ -450,7 +450,7 @@ final class HibernateClient implements JqmClient
     {
         JobRequest jd = new JobRequest();
         jd.setApplication(h.getApplication());
-        jd.setApplicationName(h.getJd().getApplicationName());
+        jd.setApplicationName(h.getApplicationName());
         jd.setEmail(h.getEmail());
         jd.setKeyword1(h.getKeyword1());
         jd.setKeyword2(h.getKeyword2());
@@ -505,8 +505,10 @@ final class HibernateClient implements JqmClient
             History h = new History();
             h.setId(ji.getId());
             h.setJd(ji.getJd());
+            h.setApplicationName(ji.getJd().getApplicationName());
             h.setSessionId(ji.getSessionID());
             h.setQueue(ji.getQueue());
+            h.setQueueName(ji.getQueue().getName());
             h.setEnqueueDate(ji.getCreationDate());
             h.setUserName(ji.getUserName());
             h.setEmail(ji.getEmail());
@@ -519,6 +521,10 @@ final class HibernateClient implements JqmClient
             h.setProgress(ji.getProgress());
             h.setStatus(State.CANCELLED);
             h.setNode(ji.getNode());
+            if (ji.getNode() != null)
+            {
+                h.setNodeName(ji.getNode().getName());
+            }
             em.persist(h);
 
             em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", ji.getId()).executeUpdate();
@@ -871,6 +877,7 @@ final class HibernateClient implements JqmClient
         ji.setParameters(new HashMap<String, String>());
         ji.setParent(h.getParentId());
         ji.setQueue(getQueue(h.getQueue()));
+        ji.setQueueName(h.getQueue().getName());
         ji.setSessionID(h.getSessionID());
         ji.setState(com.enioka.jqm.api.State.valueOf(h.getState().toString()));
         ji.setUser(h.getUserName());
@@ -911,10 +918,14 @@ final class HibernateClient implements JqmClient
     {
         com.enioka.jqm.api.JobInstance ji = new com.enioka.jqm.api.JobInstance();
         ji.setId(h.getId());
-        ji.setApplicationName(h.getJd().getApplicationName());
+        ji.setApplicationName(h.getApplicationName());
         ji.setParameters(new HashMap<String, String>());
         ji.setParent(h.getParentJobId());
-        ji.setQueue(getQueue(h.getQueue()));
+        if (h.getQueue() != null)
+        {
+            ji.setQueue(getQueue(h.getQueue()));
+        }
+        ji.setQueueName(h.getQueueName());
         ji.setSessionID(h.getSessionId());
         ji.setState(com.enioka.jqm.api.State.valueOf(h.getStatus().toString()));
         ji.setUser(h.getUserName());
@@ -928,11 +939,7 @@ final class HibernateClient implements JqmClient
         ji.setEnqueueDate(h.getEnqueueDate());
         ji.setBeganRunningDate(h.getExecutionDate());
         ji.setEndDate(h.getEndDate());
-
-        if (h.getNode() != null)
-        {
-            ji.setNodeName(h.getNode().getName());
-        }
+        ji.setNodeName(h.getNodeName());
 
         if (rps == null)
         {
@@ -1096,7 +1103,6 @@ final class HibernateClient implements JqmClient
             Map<String, Object> prms = new HashMap<String, Object>();
 
             // String predicates
-            wh += getStringPredicate("jd.applicationName", query.getApplicationName(), prms);
             wh += getStringPredicate("userName", query.getUser(), prms);
             wh += getStringPredicate("sessionId", query.getSessionId(), prms);
             wh += getStringPredicate("instanceKeyword1", query.getInstanceKeyword1(), prms);
@@ -1104,12 +1110,6 @@ final class HibernateClient implements JqmClient
             wh += getStringPredicate("instanceKeyword3", query.getInstanceKeyword3(), prms);
             wh += getStringPredicate("instanceModule", query.getInstanceModule(), prms);
             wh += getStringPredicate("instanceApplication", query.getInstanceApplication(), prms);
-            wh += getStringPredicate("jd.keyword1", query.getJobDefKeyword1(), prms);
-            wh += getStringPredicate("jd.keyword2", query.getJobDefKeyword2(), prms);
-            wh += getStringPredicate("jd.keyword3", query.getJobDefKeyword3(), prms);
-            wh += getStringPredicate("jd.module", query.getJobDefModule(), prms);
-            wh += getStringPredicate("jd.application", query.getJobDefApplication(), prms);
-            wh += getStringPredicate("queue.name", query.getQueueName(), prms);
 
             // Integer
             wh += getIntPredicate("parentId", query.getParentId(), prms);
@@ -1139,10 +1139,21 @@ final class HibernateClient implements JqmClient
                     sort = " ORDER BY " + sort.substring(1);
                 }
 
-                // Calendar fields are specific (no common fields between History and JobInstance)
+                // Finish query string
                 String wh2 = "" + wh;
                 Map<String, Object> prms2 = new HashMap<String, Object>();
                 prms2.putAll(prms);
+                wh2 += getStringPredicate("queue.name", query.getQueueName(), prms2);
+
+                // tag fields should be looked for in linked object for active JI
+                wh2 += getStringPredicate("jd.applicationName", query.getApplicationName(), prms2);
+                wh2 += getStringPredicate("jd.keyword1", query.getJobDefKeyword1(), prms2);
+                wh2 += getStringPredicate("jd.keyword2", query.getJobDefKeyword2(), prms2);
+                wh2 += getStringPredicate("jd.keyword3", query.getJobDefKeyword3(), prms2);
+                wh2 += getStringPredicate("jd.module", query.getJobDefModule(), prms2);
+                wh2 += getStringPredicate("jd.application", query.getJobDefApplication(), prms2);
+
+                // Calendar fields are specific (no common fields between History and JobInstance)
                 wh2 += getCalendarPredicate("creationDate", query.getEnqueuedAfter(), ">=", prms2);
                 wh2 += getCalendarPredicate("creationDate", query.getEnqueuedBefore(), "<=", prms2);
                 wh2 += getCalendarPredicate("executionDate", query.getBeganRunningAfter(), ">=", prms2);
@@ -1186,6 +1197,16 @@ final class HibernateClient implements JqmClient
             // History query
             if (query.isQueryHistoryInstances())
             {
+                wh += getStringPredicate("queueName", query.getQueueName(), prms);
+
+                // tag fields should be looked directly in the denormalized fields for history.
+                wh += getStringPredicate("applicationName", query.getApplicationName(), prms);
+                wh += getStringPredicate("keyword1", query.getJobDefKeyword1(), prms);
+                wh += getStringPredicate("keyword2", query.getJobDefKeyword2(), prms);
+                wh += getStringPredicate("keyword3", query.getJobDefKeyword3(), prms);
+                wh += getStringPredicate("module", query.getJobDefModule(), prms);
+                wh += getStringPredicate("application", query.getJobDefApplication(), prms);
+
                 // Calendar fields are specific (no common fields between History and JobInstance)
                 wh += getCalendarPredicate("enqueueDate", query.getEnqueuedAfter(), ">=", prms);
                 wh += getCalendarPredicate("enqueueDate", query.getEnqueuedBefore(), "<=", prms);
@@ -1531,6 +1552,11 @@ final class HibernateClient implements JqmClient
             throw new JqmInvalidRequestException("No ended job found with the deliverable ID", e);
         }
 
+        if (h.getNode() == null)
+        {
+            throw new JqmInvalidRequestException("cannot retrieve a file from a deleted node");
+        }
+
         try
         {
             url = new URL(getFileProtocol(em) + h.getNode().getDns() + ":" + h.getNode().getPort() + "/ws/simple/file?id="
@@ -1755,6 +1781,11 @@ final class HibernateClient implements JqmClient
         {
             closeQuietly(em);
             throw new JqmInvalidRequestException("No job found with the job ID " + jobId, e);
+        }
+        
+        if (n == null)
+        {
+            throw new JqmInvalidRequestException("cannot retrieve a file from a deleted node");
         }
 
         // 2: build URL

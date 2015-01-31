@@ -119,6 +119,7 @@ public class ServiceAdmin
                         "An attempt was made to DELETE an object that does not exist by a client", 3, Status.NOT_FOUND);
             }
             em.getTransaction().begin();
+            Dto2Jpa.clean(j, em);
             em.remove(j);
             em.getTransaction().commit();
         }
@@ -169,6 +170,7 @@ public class ServiceAdmin
                         continue old;
                     }
                 }
+                Dto2Jpa.clean(before, em);
                 em.remove(before);
             }
 

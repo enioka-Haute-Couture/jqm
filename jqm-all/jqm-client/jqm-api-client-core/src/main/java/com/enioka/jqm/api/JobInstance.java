@@ -48,6 +48,7 @@ public class JobInstance
     private State state;
     private Integer position;
     private Queue queue;
+    private String queueName;
     private String keyword1, keyword2, keyword3, module, email, application;
     private Map<String, String> parameters = new HashMap<String, String>();
     private Integer progress;
@@ -137,7 +138,7 @@ public class JobInstance
     }
 
     /**
-     * The queue in which the job was enqueued.
+     * The queue in which the job was enqueued. Will be null if the queue has been deleted. In that case use {@link #getQueueName()}.
      */
     public Queue getQueue()
     {
@@ -147,6 +148,22 @@ public class JobInstance
     void setQueue(Queue queue)
     {
         this.queue = queue;
+    }
+
+    /**
+     * The queue in which the job was enqueued.
+     */
+    public String getQueueName()
+    {
+        return queueName;
+    }
+
+    /**
+     * See {@link #getQueueName()}
+     */
+    void setQueueName(String queueName)
+    {
+        this.queueName = queueName;
     }
 
     /**
