@@ -49,7 +49,7 @@ Prerequisites:
 The following script will download and copy the binaries (adapt the first two lines). Run as jqmadm ::
 
     JQM_ROOT="/opt/jqm"
-    JQM_VERSION="1.1.6"
+    JQM_VERSION="1.2.2"
     cd $JQM_ROOT
     wget https://github.com/enioka/jqm/releases/download/jqm-all-$JQM_VERSION/jqm-$JQM_VERSION.tar.gz
     tar xvf jqm-*.tar.gz
