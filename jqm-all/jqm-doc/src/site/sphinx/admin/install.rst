@@ -163,8 +163,6 @@ Here's a quickstart to setup a test database. As postgres user::
     CREATE ROLE
     postgres=# grant all privileges on database jqm to jqm;
     GRANT
-    postgres=# grant all privileges on database jqm to jqm;
-    GRANT
 
 
 MySQL
