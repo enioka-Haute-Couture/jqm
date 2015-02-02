@@ -595,6 +595,10 @@ final class HibernateClient implements JqmClient
             em = getEm();
             em.getTransaction().begin();
             JobInstance j = em.find(JobInstance.class, idJob, LockModeType.PESSIMISTIC_READ);
+            if (j == null)
+            {
+                throw new NoResultException("Job instance does not exist or has already finished");
+            }
             jqmlogger.trace("The " + j.getState() + " job (ID: " + idJob + ")" + " will be marked for kill");
 
             j.setState(State.KILLED);
@@ -611,7 +615,7 @@ final class HibernateClient implements JqmClient
         }
         catch (Exception e)
         {
-            throw new JqmClientException("could not kill a job (internal error)", e);
+            throw new JqmClientException("Could not kill a job (internal error)", e);
         }
         finally
         {
@@ -1782,7 +1786,7 @@ final class HibernateClient implements JqmClient
             closeQuietly(em);
             throw new JqmInvalidRequestException("No job found with the job ID " + jobId, e);
         }
-        
+
         if (n == null)
         {
             throw new JqmInvalidRequestException("cannot retrieve a file from a deleted node");
