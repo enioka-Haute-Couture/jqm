@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -53,7 +54,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     JqmEngine engine;
 
     private boolean run = true;
-    private Integer actualNbThread;
+    private AtomicInteger actualNbThread = new AtomicInteger(0);
     private boolean hasStopped = true;
     private Calendar lastLoop = null;
 
@@ -83,7 +84,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
         }
         hasStopped = false;
         run = true;
-        actualNbThread = 0;
+        actualNbThread.set(0);
         lastLoop = null;
         loop = new Semaphore(0);
     }
@@ -124,7 +125,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     protected JobInstance dequeue(EntityManager em)
     {
         // Free room?
-        if (actualNbThread >= dp.getNbThread())
+        if (actualNbThread.get() >= dp.getNbThread())
         {
             return null;
         }
@@ -213,7 +214,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
                     // We will run this JI!
                     jqmlogger.trace("JI number " + ji.getId() + " will be run by this poller this loop (already " + actualNbThread + "/"
                             + dp.getNbThread() + " on " + this.queue.getName() + ")");
-                    actualNbThread++;
+                    actualNbThread.incrementAndGet();
 
                     // Run it
                     if (!ji.getJd().isExternal())
@@ -302,7 +303,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     @Override
     public Integer getCurrentActiveThreadCount()
     {
-        return actualNbThread;
+        return actualNbThread.get();
     }
 
     /**
@@ -310,7 +311,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
      */
     synchronized void decreaseNbThread()
     {
-        this.actualNbThread--;
+        this.actualNbThread.decrementAndGet();
         loop.release(1);
     }
 
@@ -332,7 +333,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
         {
             jqmlogger.trace("Waiting the end of " + actualNbThread + " job(s)");
 
-            if (actualNbThread == 0)
+            if (actualNbThread.get() == 0)
             {
                 break;
             }
@@ -418,6 +419,6 @@ class QueuePoller implements Runnable, QueuePollerMBean
     @Override
     public boolean isFull()
     {
-        return this.actualNbThread >= this.dp.getNbThread();
+        return this.actualNbThread.get() >= this.dp.getNbThread();
     }
 }
