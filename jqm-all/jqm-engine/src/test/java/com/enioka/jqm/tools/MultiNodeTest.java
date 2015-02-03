@@ -18,6 +18,9 @@
 
 package com.enioka.jqm.tools;
 
+import java.util.Calendar;
+import java.util.List;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -28,6 +31,8 @@ import org.junit.Test;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.Message;
+import com.enioka.jqm.jpamodel.Node;
+import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -286,5 +291,72 @@ public class MultiNodeTest extends JqmBaseTest
         Assert.assertEquals(30, TestHelpers.getOkCount(em));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
         Assert.assertEquals(10, TestHelpers.getQueueAllCount(em));
+    }
+
+    @Test
+    public void testMassMulti()
+    {
+        long size = 1000;
+
+        Queue q = CreationTools.initQueue("testqueue", "super test queue", 42, em, false);
+
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", q, 42, "appliname",
+                null, "Franquin", "ModuleMachin", "other", "other", false, em);
+
+        Node n0 = CreationTools.createNode("n0", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
+        Node n1 = CreationTools.createNode("n1", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
+        Node n2 = CreationTools.createNode("n2", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
+        Node n3 = CreationTools.createNode("n3", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
+        Node n4 = CreationTools.createNode("n4", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
+        Node n5 = CreationTools.createNode("n5", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
+        Node n6 = CreationTools.createNode("n6", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
+        Node n7 = CreationTools.createNode("n7", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
+        Node n8 = CreationTools.createNode("n8", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
+        Node n9 = CreationTools.createNode("n9", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
+
+        TestHelpers.setNodesLogLevel("INFO", em);
+
+        CreationTools.createDeploymentParameter(n0, 5, 1, q, em);
+        CreationTools.createDeploymentParameter(n1, 5, 1, q, em);
+        CreationTools.createDeploymentParameter(n2, 5, 1, q, em);
+        CreationTools.createDeploymentParameter(n3, 5, 1, q, em);
+        CreationTools.createDeploymentParameter(n4, 5, 1, q, em);
+        CreationTools.createDeploymentParameter(n5, 5, 1, q, em);
+        CreationTools.createDeploymentParameter(n6, 5, 1, q, em);
+        CreationTools.createDeploymentParameter(n7, 5, 1, q, em);
+        CreationTools.createDeploymentParameter(n8, 5, 1, q, em);
+        CreationTools.createDeploymentParameter(n9, 5, 1, q, em);
+
+        for (int i = 0; i < size; i++)
+        {
+            JobRequest.create("appliname", "user").submit();
+        }
+
+        Calendar c = Calendar.getInstance();
+        this.addAndStartEngine("n0");
+        this.addAndStartEngine("n1");
+        this.addAndStartEngine("n2");
+        this.addAndStartEngine("n3");
+        this.addAndStartEngine("n4");
+        this.addAndStartEngine("n5");
+        this.addAndStartEngine("n6");
+        this.addAndStartEngine("n7");
+        this.addAndStartEngine("n8");
+        this.addAndStartEngine("n9");
+
+        TestHelpers.waitFor(size, 60000, em);
+
+        long msgs = em.createQuery("SELECT COUNT(m) from Message m", Long.class).getSingleResult();
+        Assert.assertEquals(size, msgs);
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> res = em.createQuery("SELECT h.nodeName, COUNT(h) FROM History h GROUP BY h.nodeName").getResultList();
+        for (Object[] o : res)
+        {
+            // Every node must have run at least a few jobs...
+            Assert.assertTrue(((Long) o[1]) > 10L);
+            jqmlogger.info(o[0] + " - " + o[1]);
+        }
+        jqmlogger.info("" + (Calendar.getInstance().getTimeInMillis() - c.getTimeInMillis()) / 1000);
     }
 }

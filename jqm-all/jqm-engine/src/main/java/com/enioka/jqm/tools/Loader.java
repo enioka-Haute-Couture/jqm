@@ -87,8 +87,8 @@ class Loader implements Runnable, LoaderMBean
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             try
             {
-                name = new ObjectName("com.enioka.jqm:type=Node.Queue.JobInstance,Node=" + this.job.getNode().getName() + ",Queue="
-                        + this.job.getQueue().getName() + ",name=" + this.job.getId());
+                name = new ObjectName("com.enioka.jqm:type=Node.Queue.JobInstance,Node=" + this.p.getDp().getNode().getName() + ",Queue="
+                        + this.p.getDp().getQueue().getName() + ",name=" + this.job.getId());
                 mbs.registerMBean(this, name);
             }
             catch (Exception e)

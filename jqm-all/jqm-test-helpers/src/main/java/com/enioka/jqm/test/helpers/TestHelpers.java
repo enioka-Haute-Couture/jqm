@@ -195,11 +195,7 @@ public class TestHelpers
     public static void setNodesLogLevel(String level, EntityManager em)
     {
         em.getTransaction().begin();
-        node.setRootLogLevel(level);
-        node2.setRootLogLevel(level);
-        node3.setRootLogLevel(level);
-        nodeMix.setRootLogLevel(level);
-        nodeMix2.setRootLogLevel(level);
+        em.createQuery("UPDATE Node n set n.rootLogLevel = :l").setParameter("l", level).executeUpdate();
         em.getTransaction().commit();
     }
 

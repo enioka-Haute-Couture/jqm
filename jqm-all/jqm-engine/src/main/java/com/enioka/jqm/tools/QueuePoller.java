@@ -46,15 +46,19 @@ import com.enioka.jqm.jpamodel.State;
 class QueuePoller implements Runnable, QueuePollerMBean
 {
     private static Logger jqmlogger = Logger.getLogger(QueuePoller.class);
+
     private DeploymentParameter dp = null;
     private Queue queue = null;
     private LibraryCache cache = null;
+    JqmEngine engine;
+
     private boolean run = true;
     private Integer actualNbThread;
-    JqmEngine engine;
     private boolean hasStopped = true;
-    private ObjectName name = null;
     private Calendar lastLoop = null;
+
+    private ObjectName name = null;
+
     private Thread localThread = null;
     private Semaphore loop;
 
@@ -129,7 +133,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
         List<JobInstance> availableJobs = em
                 .createQuery(
                         "SELECT j FROM JobInstance j LEFT JOIN FETCH j.jd WHERE j.queue = :q AND j.state = :s ORDER BY j.internalPosition ASC",
-                        JobInstance.class).setParameter("q", queue).setParameter("s", State.SUBMITTED).getResultList();
+                        JobInstance.class).setParameter("q", queue).setParameter("s", State.SUBMITTED).setMaxResults(dp.getNbThread())
+                .getResultList();
 
         em.getTransaction().begin();
         for (JobInstance res : availableJobs)
@@ -164,9 +169,6 @@ class QueuePoller implements Runnable, QueuePollerMBean
 
             // Stop at the first suitable JI. Release the lock & update the JI which has been attributed to us.
             em.getTransaction().commit();
-
-            // Refresh: we have used update queries, so the cached entity is out of date.
-            em.refresh(res);
             return res;
         }
 
@@ -196,6 +198,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
         this.localThread = Thread.currentThread();
         this.localThread.setName("QUEUE_POLLER;polling;" + this.dp.getQueue().getName());
         EntityManager em = null;
+
         while (true)
         {
             lastLoop = Calendar.getInstance();
