@@ -115,7 +115,9 @@ public class TestHelpers
 
         CreationTools.createRole(em, "administrator", "super admin", "*:*");
         CreationTools.createRole(em, "client power user", "can use the full client API", "node:read", "queue:read", "job_instance:*",
-                "jd:read", "logs:read", "queue_position:create");
+                "jd:read", "logs:read", "queue_position:create", "files:read");
+        CreationTools.createRole(em, "client read only", "can query job instances and get their files", "queue:read", "job_instance:read",
+                "logs:read", "files:read");
     }
 
     public static void cleanup(EntityManager em)

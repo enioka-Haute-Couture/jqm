@@ -58,7 +58,7 @@ jqmApp.controller('TabsCtrl', function TabsCtrl($scope, $location, $http, µPerm
     }, {
         link : '#/q',
         label : '<span class="glyphicon glyphicon-th-list"></span> Queues',
-        permission : 'queue:read',
+        permission : 'queue:create',
     }, {
         link : '#/qmapping',
         label : '<span class="glyphicon glyphicon-transfer"></span> Queue Mappings',

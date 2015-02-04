@@ -374,7 +374,6 @@ final class Helpers
      */
     static void updateNodeConfiguration(String nodeName, EntityManager em)
     {
-
         // Node
         Node n = null;
         try
@@ -480,10 +479,12 @@ final class Helpers
                 "qmapping:*", "jndi:*", "prm:*", "jd:*");
         createRoleIfMissing(em, "config viewer", "can read all configuration except for security configuration", "node:read", "queue:read",
                 "qmapping:read", "jndi:read", "prm:read", "jd:read");
-        createRoleIfMissing(em, "client", "can use the full client API except reading logs and altering position", "node:read",
+        createRoleIfMissing(em, "client", "can use the full client API except reading logs, files and altering position", "node:read",
                 "queue:read", "job_instance:*", "jd:read");
         createRoleIfMissing(em, "client power user", "can use the full client API", "node:read", "queue:read", "job_instance:*", "jd:read",
-                "logs:read", "queue_position:create");
+                "logs:read", "queue_position:create", "files:read");
+        createRoleIfMissing(em, "client read only", "can query job instances and get their files", "queue:read", "job_instance:read",
+                "logs:read", "files:read");
 
         // Users
         createUserIfMissing(em, "root", "all powerfull user", adminr);
