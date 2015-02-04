@@ -1,6 +1,39 @@
 Release notes
 ######################
 
+1.2.2
+************
+
+Release goal
+++++++++++++++++++
+
+This is a maintenance release, containing mostly bugfixes and very few new features that could not be included in the previous 
+version (mostly administration GUI tweaks).
+
+Upgrade notes
++++++++++++++++++++
+
+All APIs have been upgraded and **do not contain any breaking change**. 1.2.1 apis will work with 1.2.2 engines. However, as 1.2.2 contains fixes, everyone is strongly encouraged to upgrade.
+
+Database must be rebuilt for version 1.2.2, this means History purge.
+
+Major
++++++++++++++++++
+
+* Engine: can now resist a temporary database failure
+
+Minor
+++++++++++++++++
+
+* Engine: access log now logs failed authentications
+* Engine: various minor bugfix in extreme performance scenarios
+* Engine: there is now one log file per node
+* Client API: various fixes
+* Client API: now support retrieval of running job instance logs
+* GUI: various minor improvements
+* CLI: jobdef reimport fixes
+* Tests: major refactoring with 3x less Maven artifacts
+
 1.2.1
 ************
 
