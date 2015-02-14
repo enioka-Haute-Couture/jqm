@@ -362,10 +362,8 @@ class JqmEngine implements JqmEngineMBean
     private void purgeDeadJobInstances(EntityManager em, Node node)
     {
         em.getTransaction().begin();
-        for (JobInstance ji : em
-                .createQuery(
-                        "SELECT ji FROM JobInstance ji WHERE ji.node = :node AND (ji.state = 'ATTRIBUTED' OR ji.state = 'RUNNING' OR ji.state = 'KILLED')",
-                        JobInstance.class).setParameter("node", node).getResultList())
+        for (JobInstance ji : em.createQuery("SELECT ji FROM JobInstance ji WHERE ji.node = :node", JobInstance.class)
+                .setParameter("node", node).getResultList())
         {
             History h = em.find(History.class, ji.getId());
             if (h == null)
