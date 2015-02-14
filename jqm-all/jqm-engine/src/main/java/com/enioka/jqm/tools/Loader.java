@@ -82,13 +82,13 @@ class Loader implements Runnable, LoaderMBean
         this.job = job;
 
         // JMX
-        if (p != null && p.engine.loadJmxBeans)
+        if (p != null && this.p.getEngine().loadJmxBeans)
         {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             try
             {
-                name = new ObjectName("com.enioka.jqm:type=Node.Queue.JobInstance,Node=" + this.p.getDp().getNode().getName() + ",Queue="
-                        + this.p.getDp().getQueue().getName() + ",name=" + this.job.getId());
+                name = new ObjectName("com.enioka.jqm:type=Node.Queue.JobInstance,Node=" + this.p.getEngine().getNode().getName()
+                        + ",Queue=" + this.p.getQueue().getName() + ",name=" + this.job.getId());
                 mbs.registerMBean(this, name);
             }
             catch (Exception e)
@@ -384,7 +384,7 @@ class Loader implements Runnable, LoaderMBean
         }
 
         // Unregister MBean
-        if (p != null && this.p.engine.loadJmxBeans)
+        if (p != null && this.p.getEngine().loadJmxBeans)
         {
             try
             {
@@ -434,7 +434,7 @@ class Loader implements Runnable, LoaderMBean
             {
                 jqmlogger.error("connection to database lost - loader " + this.getId() + " will need delayed finalization");
                 jqmlogger.trace("connection error was:", e.getCause());
-                this.p.engine.loaderFinalizationNeeded(this);
+                this.p.getEngine().loaderFinalizationNeeded(this);
             }
             else
             {

@@ -20,9 +20,10 @@ package com.enioka.jqm.tools;
 
 import java.io.OutputStreamWriter;
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
@@ -64,7 +65,7 @@ class JqmEngine implements JqmEngineMBean
     private ObjectName name;
 
     // Threads that together constitute the engine
-    private List<QueuePoller> pollers = new ArrayList<QueuePoller>();
+    private Map<Integer, QueuePoller> pollers = new HashMap<Integer, QueuePoller>();
     private InternalPoller intPoller = null;
     private JettyServer server = null;
 
@@ -211,19 +212,8 @@ class JqmEngine implements JqmEngineMBean
         // Cleanup
         purgeDeadJobInstances(em, this.node);
 
-        // Get queues to listen to
-        List<DeploymentParameter> dps = em
-                .createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
-                .setParameter("n", node.getId()).getResultList();
-
         // Pollers
-        for (DeploymentParameter i : dps)
-        {
-            QueuePoller p = new QueuePoller(i, cache, this);
-            pollers.add(p);
-            Thread t = new Thread(p);
-            t.start();
-        }
+        syncPollers(em, this.node);
         jqmlogger.info("All required queues are now polled");
 
         // Internal poller (stop notifications, keepalive)
@@ -243,7 +233,7 @@ class JqmEngine implements JqmEngineMBean
     }
 
     /**
-     * Nicely stop the engine
+     * Gracefully stop the engine
      */
     @Override
     public void stop()
@@ -268,7 +258,7 @@ class JqmEngine implements JqmEngineMBean
         }
 
         // Stop pollers
-        for (QueuePoller p : pollers)
+        for (QueuePoller p : pollers.values())
         {
             p.stop();
         }
@@ -282,7 +272,7 @@ class JqmEngine implements JqmEngineMBean
         }
         catch (InterruptedException e)
         {
-            jqmlogger.error("interrutped", e);
+            jqmlogger.error("interrupted", e);
         }
         jqmlogger.debug("Stop order was correctly handled. Engine for node " + this.node.getName() + " has stopped.");
     }
@@ -292,15 +282,59 @@ class JqmEngine implements JqmEngineMBean
         return this.node;
     }
 
+    void syncPollers(EntityManager em, Node node)
+    {
+        List<DeploymentParameter> dps = em
+                .createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
+                .setParameter("n", node.getId()).getResultList();
+
+        QueuePoller p = null;
+        for (DeploymentParameter i : dps)
+        {
+            if (pollers.containsKey(i.getId()))
+            {
+                p = pollers.get(i.getId());
+                p.setMaxThreads(i.getNbThread());
+                p.setPollingInterval(i.getPollingInterval());
+            }
+            else
+            {
+                p = new QueuePoller(this, i.getQueue(), i.getNbThread(), i.getPollingInterval());
+                pollers.put(i.getId(), p);
+                Thread t = new Thread(p);
+                t.start();
+            }
+        }
+
+        // Remove deleted pollers
+        for (int dp : this.pollers.keySet().toArray(new Integer[0]))
+        {
+            boolean found = false;
+            for (DeploymentParameter ndp : dps)
+            {
+                if (ndp.getId().equals(dp))
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                QueuePoller qp = this.pollers.get(dp);
+                qp.stop();
+                this.pollers.remove(dp);
+            }
+        }
+    }
+
     synchronized void checkEngineEnd()
     {
         jqmlogger.trace("Checking if engine should end with the latest poller");
-        for (QueuePoller poller : pollers)
+        for (QueuePoller poller : pollers.values())
         {
             if (poller.isRunning())
             {
-                jqmlogger.trace("At least the poller on queue " + poller.getDp().getQueue().getName()
-                        + " is still running and prevents shutdown");
+                jqmlogger.trace("At least the poller on queue " + poller.getQueue().getName() + " is still running and prevents shutdown");
                 return;
             }
         }
@@ -321,10 +355,11 @@ class JqmEngine implements JqmEngineMBean
         this.intPoller.stop();
 
         // Reset the stop counter - we may want to restart one day
-        EntityManager em = Helpers.getNewEm();
-        em.getTransaction().begin();
+        EntityManager em = null;
         try
         {
+            em = Helpers.getNewEm();
+            em.getTransaction().begin();
             this.node = em.find(Node.class, this.node.getId(), LockModeType.PESSIMISTIC_WRITE);
             this.node.setStop(false);
             this.node.setLastSeenAlive(null);
@@ -333,9 +368,11 @@ class JqmEngine implements JqmEngineMBean
         catch (Exception e)
         {
             // Shutdown exception is ignored (happens during tests)
-            em.getTransaction().rollback();
         }
-        em.close();
+        finally
+        {
+            Helpers.closeQuietly(em);
+        }
 
         // JMX
         if (loadJmxBeans)
@@ -449,7 +486,7 @@ class JqmEngine implements JqmEngineMBean
                 QueuePoller qp = qpToRestart.poll();
                 while (qp != null)
                 {
-                    jqmlogger.warn("resetting poller on queue " + qp.getDp().getQueue().getName());
+                    jqmlogger.warn("resetting poller on queue " + qp.getQueue().getName());
                     qp.reset();
                     Thread t = new Thread(qp);
                     t.start();
@@ -476,6 +513,11 @@ class JqmEngine implements JqmEngineMBean
             }
         };
         qpRestarter.start();
+    }
+
+    LibraryCache getCache()
+    {
+        return this.cache;
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -517,7 +559,7 @@ class JqmEngine implements JqmEngineMBean
     @Override
     public boolean isAllPollersPolling()
     {
-        for (QueuePoller p : this.pollers)
+        for (QueuePoller p : this.pollers.values())
         {
             if (!p.isActuallyPolling())
             {
@@ -530,7 +572,7 @@ class JqmEngine implements JqmEngineMBean
     @Override
     public boolean isFull()
     {
-        for (QueuePoller p : this.pollers)
+        for (QueuePoller p : this.pollers.values())
         {
             if (p.isFull())
             {

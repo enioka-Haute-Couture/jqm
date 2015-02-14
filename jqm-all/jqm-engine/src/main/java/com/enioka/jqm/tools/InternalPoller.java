@@ -109,7 +109,7 @@ class InternalPoller implements Runnable
                     break;
                 }
 
-                // I am alive signal
+                // I am alive signal (+ queue sync)
                 sinceLatestPing += this.step;
                 if (sinceLatestPing >= this.alive * 0.9)
                 {
@@ -118,6 +118,8 @@ class InternalPoller implements Runnable
                             .setParameter("id", node.getId()).executeUpdate();
                     em.getTransaction().commit();
                     sinceLatestPing = 0;
+
+                    this.engine.syncPollers(em, node);
                 }
             }
             catch (PersistenceException e)

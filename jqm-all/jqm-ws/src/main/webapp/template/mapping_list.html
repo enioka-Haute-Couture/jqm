@@ -7,14 +7,14 @@
     <div collapse="!isCollapsed">
         <div class="well well-lg">
               <h4>Mappings specify which nodes will poll which queues. They are basically nodes subscribing to queues.</h4>
-            <h5>On this page, one may associate nodes with queues. Changes on one node mapping require rebooting this node afterwards.</h5>
+            <h5>On this page, one may associate nodes with queues. Running nodes will (by default) check every minute if there are changes in their mappings.</h5>
             <dl class="dl-horizontal">
                 <dt>Node</dt>
                 <dd>The node which will poll the queue</dd>
                 <dt>Queue</dt>
                 <dd>The queue to poll</dd>
                 <dt>Polling interval</dt>
-                <dd>The polling interval, in milliseconds. Never go below one second.</dd>
+                <dd>The polling interval, in milliseconds. Never go below one second. If updated on an active engine, it is applied to the next loop (not the current one).</dd>
                 <dt>Max concurrent</dt>
                 <dd>The maximum number of parallel executions the node will allow for this queue (this translates directly as a max number of
                     threads inside the engine).</dd>

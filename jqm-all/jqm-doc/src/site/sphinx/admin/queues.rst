@@ -52,7 +52,7 @@ Defining pollers
 Having a queue is enough to enqueue job requests in it but nothing will happen to these requests if no node polls the queue
 to retrieve the requests...
 
-The association between a node and a queue is done inside the JQM database table DEPLOYMENTPARAMETER. It defines the following elements:
+The association between a node and a queue is done inside the JQM database table DEPLOYMENTPARAMETER (or the GUI). It defines the following elements:
 
 * ID: A technical unique ID
 * CLASSID: unused (and nullable)
