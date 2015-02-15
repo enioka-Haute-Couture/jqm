@@ -125,6 +125,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
             cellTemplate: '<div ng-class="{\'bg-success\': row.getProperty(col.field) == \'ENDED\', \
                                            \'bg-info\': row.getProperty(col.field) == \'RUNNING\', \
                                            \'bg-danger\': row.getProperty(col.field) == \'CRASHED\', \
+                                           \'bg-danger\': row.getProperty(col.field) == \'KILLED\', \
                                            \'bg-warning\': row.getProperty(col.field) == \'SUBMITTED\' }"> \
                                            <div class="ngCellText">{{row.getProperty(col.field)}}</div></div>',
         }, {
@@ -250,12 +251,27 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
     {
         var ji = $scope.selected[0];
         $http.post("ws/client/ji/killed/" + ji.id).success($scope.getDataAsync);
+        $scope.selected.length = 0;
     };
     
     $scope.changeQueue = function(newqueueid)
     {
         var ji = $scope.selected[0];
         $http.post("ws/client/q/" + newqueueid + "/" + ji.id).success($scope.getDataAsync);
+    };
+    
+    $scope.pause = function()
+    {
+        var ji = $scope.selected[0];
+        $http.post("ws/client/ji/paused/" + ji.id).success($scope.getDataAsync);
+        $scope.selected.length = 0;
+    };
+    
+    $scope.resume = function()
+    {
+        var ji = $scope.selected[0];
+        $http.delete("ws/client/ji/paused/" + ji.id).success($scope.getDataAsync);
+        $scope.selected.length = 0;
     };
 });
 
