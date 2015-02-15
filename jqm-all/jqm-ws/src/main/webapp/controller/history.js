@@ -196,6 +196,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
         if (newVal !== oldVal)
         {
             $scope.selected.length = 0;
+            $scope.pagingOptions.currentPage = 1;
             $scope.getDataAsync();
         }
     }, true);
