@@ -44,6 +44,7 @@ import org.apache.log4j.RollingFileAppender;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.util.ByteSource;
+import org.apache.shiro.util.StringUtils;
 
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
@@ -321,6 +322,13 @@ final class Helpers
         if (n == 0L)
         {
             throw new JqmInitError("The node does not exist. It must be referenced (CLI option createnode) before it can be used");
+        }
+        Node nn = em.createQuery("SELECT n FROM Node n WHERE n.name = :l", Node.class).setParameter("l", nodeName).getSingleResult();
+
+        if (!StringUtils.hasText(nn.getDlRepo()) || !StringUtils.hasText(nn.getRepo()) || !StringUtils.hasText(nn.getTmpDirectory()))
+        {
+            throw new JqmInitError(
+                    "The node does not have all its paths specified. Check node configuration (or recreate it with the CLI).");
         }
 
         // Default queue
