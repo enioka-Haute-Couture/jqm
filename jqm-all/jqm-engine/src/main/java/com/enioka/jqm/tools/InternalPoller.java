@@ -73,6 +73,7 @@ class InternalPoller implements Runnable
         jqmlogger.info("Start of the internal poller");
         EntityManager em = null;
         this.localThread = Thread.currentThread();
+        String jettyPrmHash = null;
 
         // Launch main loop
         long sinceLatestPing = 0;
@@ -109,17 +110,30 @@ class InternalPoller implements Runnable
                     break;
                 }
 
-                // I am alive signal (+ queue sync)
+                // Slower polls & signals
                 sinceLatestPing += this.step;
                 if (sinceLatestPing >= this.alive * 0.9)
                 {
+                    // I am alive
                     em.getTransaction().begin();
                     em.createQuery("UPDATE Node n SET n.lastSeenAlive = current_timestamp() WHERE n.id = :id")
                             .setParameter("id", node.getId()).executeUpdate();
                     em.getTransaction().commit();
                     sinceLatestPing = 0;
 
+                    // Have queue bindings changed?
                     this.engine.syncPollers(em, node);
+
+                    // Have parameters changed and require a Jetty restart?
+                    String n = node.getDns() + node.getPort() + node.getLoadApiAdmin() + node.getLoadApiClient() + node.getLoapApiSimple()
+                            + Helpers.getParameter("disableWsApi", " ", em) + Helpers.getParameter("enableWsApiSsl", " ", em)
+                            + Helpers.getParameter("enableInternalPki", " ", em) + Helpers.getParameter("pfxPassword", " ", em)
+                            + Helpers.getParameter("enableWsApiAuth", " ", em);
+                    if (jettyPrmHash != null && !jettyPrmHash.equals(n))
+                    {
+                        this.engine.getJetty().start(node, em);
+                    }
+                    jettyPrmHash = n;
                 }
             }
             catch (PersistenceException e)

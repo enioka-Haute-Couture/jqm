@@ -167,19 +167,8 @@ class JqmEngine implements JqmEngineMBean
         }
 
         // Jetty
-        boolean startJetty = !Boolean.parseBoolean(Helpers.getParameter("disableWsApi", "false", em));
-        if (startJetty)
-        {
-            this.server = new JettyServer();
-            this.server.start(node, em);
-            if (node.getPort() == 0)
-            {
-                // New nodes are created with a non-assigned port.
-                em.getTransaction().begin();
-                node.setPort(server.getActualPort());
-                em.getTransaction().commit();
-            }
-        }
+        this.server = new JettyServer();
+        this.server.start(node, em);
 
         // JMX
         if (node.getJmxServerPort() != null && node.getJmxServerPort() > 0)
@@ -346,10 +335,7 @@ class JqmEngine implements JqmEngineMBean
         hasEnded = true;
 
         // If here, all pollers are down. Stop Jetty too
-        if (this.server != null)
-        {
-            this.server.stop();
-        }
+        this.server.stop();
 
         // Also stop the internal poller
         this.intPoller.stop();
@@ -518,6 +504,11 @@ class JqmEngine implements JqmEngineMBean
     LibraryCache getCache()
     {
         return this.cache;
+    }
+
+    JettyServer getJetty()
+    {
+        return this.server;
     }
 
     // //////////////////////////////////////////////////////////////////////////

@@ -58,6 +58,17 @@ class JettyServer
 
     void start(Node node, EntityManager em)
     {
+        // Start is also a restart method
+        this.stop();
+
+        // Only load Jetty if web APIs are allowed in the cluster
+        boolean startJetty = !Boolean.parseBoolean(Helpers.getParameter("disableWsApi", "false", em));
+        if (!startJetty)
+        {
+            jqmlogger.info("Jetty will not start - parameter disableWsApi is set to true");
+            return;
+        }
+
         // Only load Jetty if at least one war is present...
         File war = new File("./webapp/jqm-ws.war");
         if (!war.exists() || !war.isFile())
@@ -69,7 +80,7 @@ class JettyServer
         // Only load Jetty if at least one application should start
         if (!node.getLoadApiAdmin() && !node.getLoadApiClient() && !node.getLoapApiSimple())
         {
-            jqmlogger.info("Jetty will not start - all web APIs are deactivated on this node");
+            jqmlogger.info("Jetty will not start - all web APIs are disabled on this node");
             return;
         }
 
@@ -173,6 +184,17 @@ class JettyServer
         {
             throw new JqmInitError("Could not start web server - not a port issue, but a generic one", e);
         }
+
+        // Save port if it was generated randomly
+        if (node.getPort() == 0)
+        {
+            // New nodes are created with a non-assigned port.
+            em.getTransaction().begin();
+            node.setPort(getActualPort());
+            em.getTransaction().commit();
+        }
+
+        // Done
         jqmlogger.info("Jetty has started on port " + getActualPort());
     }
 
@@ -204,6 +226,7 @@ class JettyServer
             this.server.stop();
             this.server.join();
             this.server.destroy();
+            this.server = null;
             jqmlogger.info("Jetty has stopped");
         }
         catch (Exception e)

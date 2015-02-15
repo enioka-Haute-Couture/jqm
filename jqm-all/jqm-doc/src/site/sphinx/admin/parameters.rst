@@ -36,15 +36,15 @@ production grade) database HSQLDB, in which case the line it contains must be un
 Node parameters
 ++++++++++++++++++
 
-These parameters are set inside the JQM database table named NODE. There is no GUI or CLI to modify these, therefore they
-have to be altered directly inside the database with your tool of choice.
+These parameters are set inside the JQM database table named NODE. They
+have to be altered through the GUI, through the CLI options or directly inside the database with your tool of choice.
 
 +-------------------+------------------------------------------------------------------------------------+-----------------------+----------+------------------+
 | Name              | Description                                                                        | Default               | Nullable | Restart          |
 +===================+====================================================================================+=======================+==========+==================+
-| DNS               | The interface name on which JQM will listen for its network-related functions      | first hostname        | No       | Yes              |
+| DNS               | The interface name on which JQM will listen for its network-related functions      | first hostname        | No       | No               |
 +-------------------+------------------------------------------------------------------------------------+-----------------------+----------+------------------+
-| PORT              | Port for the basic servlet API                                                     | Random free           | No       | Yes              |
+| PORT              | Port for the basic servlet API                                                     | Random free           | No       | No               |
 +-------------------+------------------------------------------------------------------------------------+-----------------------+----------+------------------+
 | dlRepo            | Storage directory for files created by payloads                                    | JQM_ROOT\\outputfiles | No       | Yes              |
 +-------------------+------------------------------------------------------------------------------------+-----------------------+----------+------------------+
@@ -64,8 +64,8 @@ have to be altered directly inside the database with your tool of choice.
 Global parameters
 +++++++++++++++++++++++
 
-These parameters are set inside the JQM database table named GLOBALPARAMETER. There is no GUI or CLI to modify these, therefore they
-have to be altered directly inside the database with your tool of choice.
+These parameters are set inside the JQM database table named GLOBALPARAMETER. There is no CLI to modify these, therefore they
+have to be altered directly inside the database with your tool of choice or through the GUI.
 
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
 | Name                       | Description                                                                                         | Default            | Restart | Nullable        |
@@ -80,14 +80,15 @@ have to be altered directly inside the database with your tool of choice.
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
 | internalPollingPeriodMs    | Period in ms for checking stop orders                                                               | 10000              | Yes     | No              |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| aliveSignalMs              | Must be a multiple of internalPollingPeriodMs. Perdiod at which the "I'm a alive" signal is sent    | 60000              | Yes     | No              |
+| aliveSignalMs              | Must be a multiple of internalPollingPeriodMs. Period at which the "I'm a alive" signal is sent.    | 60000              | Yes     | No              |
+|                            | Also used for checking and applying  parameter modifications (new queues, global prm changes...)    |                    |         |                 |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| disableWsApi               | Disable all HTTP interfaces on all nodes. This takes precedence over node per node settings.        | false              | Yes     | Yes             |
+| disableWsApi               | Disable all HTTP interfaces on all nodes. This takes precedence over node per node settings.        | false              | No      | Yes             |
 |                            | Absent means false, i.e. not forbidden.                                                             |                    |         |                 |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| enableWsApiSsl             | All HTTP communications will be HTTPS and not HTTP.                                                 | false              | Yes     | No              |
+| enableWsApiSsl             | All HTTP communications will be HTTPS and not HTTP.                                                 | false              | No      | No              |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| enableWsApiAuth            | Use HTTP basic authentication plus RBAC backend for all WS APIs                                     | true               | Yes     | No              |
+| enableWsApiAuth            | Use HTTP basic authentication plus RBAC backend for all WS APIs                                     | true               | No      | No              |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
 | disableWsApiSimple         | Forbids the simple API from loading on any node. This takes precedence over node per node settings. | NULL               | Yes     | Yes             |
 |                            | Absent means false, i.e. not forbidden.                                                             |                    |         |                 |
@@ -98,7 +99,9 @@ have to be altered directly inside the database with your tool of choice.
 | disableWsApiAdmin          | Forbids the admin API from loading on any node. This takes precedence over node per node settings.  | NULL               | Yes     | Yes             |
 |                            | Absent means false, i.e. not forbidden.                                                             |                    |         |                 |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
-| enableInternalPki          | Use the internal (database-backed) PKI for issuing certificates and trusting presented certificates | true               | Yes     | No              |
+| enableInternalPki          | Use the internal (database-backed) PKI for issuing certificates and trusting presented certificates | true               | No      | No              |
++----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
+| pfxPassword                | Password of the private key file (if not using internal PKI).                                       | SuperPassword      | No      | Yes             |
 +----------------------------+-----------------------------------------------------------------------------------------------------+--------------------+---------+-----------------+
 
 Here, nullable means the parameter can be absent from the table.
