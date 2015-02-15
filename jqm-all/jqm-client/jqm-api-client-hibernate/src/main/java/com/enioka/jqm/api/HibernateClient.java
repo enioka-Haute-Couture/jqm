@@ -1542,38 +1542,51 @@ final class HibernateClient implements JqmClient
     {
         EntityManager em = getEm();
         URL url = null;
-        History h = null;
+        String dns, protocol;
+        int port;
 
         try
         {
-            h = em.createQuery("SELECT h FROM History h WHERE h.id = :job", History.class).setParameter("job", deliverable.getJobId())
-                    .getSingleResult();
+            History h = em.find(History.class, deliverable.getJobId());
+            if (h == null)
+            {
+                JobInstance ji = em.find(JobInstance.class, deliverable.getJobId());
+                if (ji == null)
+                {
+                    throw new JqmInvalidRequestException("No ended or running job instance found for this file");
+                }
+                dns = ji.getNode().getDns();
+                port = ji.getNode().getPort();
+            }
+            else
+            {
+                if (h.getNode() == null)
+                {
+                    throw new JqmInvalidRequestException("cannot retrieve a file from a deleted node");
+                }
+                dns = h.getNode().getDns();
+                port = h.getNode().getPort();
+            }
+
+            protocol = getFileProtocol(em);
         }
         catch (Exception e)
         {
-            h = null;
-            closeQuietly(em);
-            throw new JqmInvalidRequestException("No ended job found with the deliverable ID", e);
+            throw new JqmClientException("Could not process request", e);
         }
-
-        if (h.getNode() == null)
+        finally
         {
-            throw new JqmInvalidRequestException("cannot retrieve a file from a deleted node");
+            closeQuietly(em);
         }
 
         try
         {
-            url = new URL(getFileProtocol(em) + h.getNode().getDns() + ":" + h.getNode().getPort() + "/ws/simple/file?id="
-                    + deliverable.getRandomId());
+            url = new URL(protocol + dns + ":" + port + "/ws/simple/file?id=" + deliverable.getRandomId());
             jqmlogger.trace("URL: " + url.toString());
         }
         catch (MalformedURLException e)
         {
             throw new JqmClientException("URL is not valid " + url, e);
-        }
-        finally
-        {
-            em.close();
         }
 
         return getFile(url.toString());
