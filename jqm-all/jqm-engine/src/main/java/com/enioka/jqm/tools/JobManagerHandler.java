@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.Calendar;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -57,6 +58,7 @@ class JobManagerHandler implements InvocationHandler
     private Map<String, String> params = null;
     private String defaultCon = null, application = null, sessionId = null;
     private Node node = null;
+    private Calendar lastPeek = null;
 
     JobManagerHandler(JobInstance ji, Map<String, String> prms)
     {
@@ -216,6 +218,12 @@ class JobManagerHandler implements InvocationHandler
 
     private void shouldKill()
     {
+        // Throttle: only peek once every 1 second.
+        if (lastPeek != null && Calendar.getInstance().getTimeInMillis() - lastPeek.getTimeInMillis() < 1000L)
+        {
+            return;
+        }
+
         EntityManager em = Helpers.getNewEm();
         try
         {
@@ -231,6 +239,7 @@ class JobManagerHandler implements InvocationHandler
         finally
         {
             em.close();
+            lastPeek = Calendar.getInstance();
         }
     }
 
