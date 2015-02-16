@@ -41,6 +41,7 @@ jqmControllers.controller('µNodeListCtrl', function($scope, $http, $modal, µNo
         data : 'items',
         enableCellSelection : true,
         enableRowSelection : true,
+        enableColumnResize : true,
         enableCellEditOnFocus : true,
         multiSelect : true,
         showSelectionCheckbox : true,
