@@ -35,8 +35,8 @@
             
             <table class='table table-condensed table-striped table-hover'>
                 <caption><strong>Log files</strong></caption>
-                <tr><td><a href='{{ "./ws/client/ji/" + ji.id + "/stdout"}}'>Log stdout</a></td></tr>
-                <tr><td><a  href='{{ "./ws/client/ji/" + ji.id + "/stderr"}}'>Log stderr</a></td></tr>
+                <tr><td>Log stdout: <a ng-click='showlog("./ws/client/ji/" + ji.id + "/stdout")'>view</a> - <a href='{{ "./ws/client/ji/" + ji.id + "/stdout"}}'>download</a></td></tr>
+                <tr><td>Log stderr: <a ng-click='showlog("./ws/client/ji/" + ji.id + "/stderr")'>view</a> - <a  href='{{ "./ws/client/ji/" + ji.id + "/stderr"}}'>download</a></td></tr>
             </table>
 
         </div>

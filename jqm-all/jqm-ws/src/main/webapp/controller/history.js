@@ -276,7 +276,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
     };
 });
 
-jqmApp.controller('historyDetail', function($scope, $http, ji)
+jqmApp.controller('historyDetail', function($scope, $http, $modal, ji)
 {
     $scope.ji = ji;
     $scope.dels = [];
@@ -289,6 +289,22 @@ jqmApp.controller('historyDetail', function($scope, $http, ji)
     $scope.getdelOk = function(data, status, headers, config)
     {
         $scope.dels = data;
+    };
+    
+    $scope.showlog = function(url)
+    {
+        $modal.open({
+            templateUrl : './template/file_reader.html',
+            controller : 'fileReader',
+            size : 'lg',
+
+            resolve : {
+                url : function()
+                {
+                    return url;
+                }
+            },
+        });
     };
 
     $scope.getdel();
