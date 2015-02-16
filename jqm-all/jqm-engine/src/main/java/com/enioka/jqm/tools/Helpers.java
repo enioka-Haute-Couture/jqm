@@ -39,6 +39,7 @@ import javax.persistence.Persistence;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Appender;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.RollingFileAppender;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
@@ -201,6 +202,20 @@ final class Helpers
         RollingFileAppender r = (RollingFileAppender) a;
         r.setFile("./logs/jqm-" + name + ".log");
         r.activateOptions();
+    }
+
+    static void setLogLevel(String level)
+    {
+        try
+        {
+            Logger.getRootLogger().setLevel(Level.toLevel(level));
+            Logger.getLogger("com.enioka").setLevel(Level.toLevel(level));
+            jqmlogger.info("Setting general log level at " + level + " which translates as log4j level " + Level.toLevel(level));
+        }
+        catch (Exception e)
+        {
+            jqmlogger.warn("Log level could not be set", e);
+        }
     }
 
     /**

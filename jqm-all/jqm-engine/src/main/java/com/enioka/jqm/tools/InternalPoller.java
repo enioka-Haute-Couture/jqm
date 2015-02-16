@@ -37,6 +37,7 @@ class InternalPoller implements Runnable
     private long step = 10000;
     private long alive = 60000;
     private Node node = null;
+    private String logLevel = null;
 
     InternalPoller(JqmEngine e)
     {
@@ -47,6 +48,7 @@ class InternalPoller implements Runnable
         node = em.find(Node.class, this.engine.getNode().getId());
         this.step = Long.parseLong(Helpers.getParameter("internalPollingPeriodMs", String.valueOf(this.step), em));
         this.alive = Long.parseLong(Helpers.getParameter("aliveSignalMs", String.valueOf(this.step), em));
+        this.logLevel = node.getRootLogLevel();
         em.close();
 
     }
@@ -108,6 +110,13 @@ class InternalPoller implements Runnable
                     this.engine.stop();
                     em.close();
                     break;
+                }
+
+                // Change log level?
+                if (!this.logLevel.equals(node.getRootLogLevel()))
+                {
+                    this.logLevel = node.getRootLogLevel();
+                    Helpers.setLogLevel(this.logLevel);
                 }
 
                 // Slower polls & signals

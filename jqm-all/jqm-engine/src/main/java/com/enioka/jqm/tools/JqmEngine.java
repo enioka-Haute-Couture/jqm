@@ -34,7 +34,6 @@ import javax.persistence.LockModeType;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.RollingFileAppender;
 import org.eclipse.jetty.util.ArrayQueue;
@@ -129,17 +128,7 @@ class JqmEngine implements JqmEngineMBean
         em.getTransaction().commit();
 
         // Log level
-        try
-        {
-            Logger.getRootLogger().setLevel(Level.toLevel(node.getRootLogLevel()));
-            Logger.getLogger("com.enioka").setLevel(Level.toLevel(node.getRootLogLevel()));
-            jqmlogger.info("Setting general log level at " + node.getRootLogLevel() + " which translates as log4j level "
-                    + Level.toLevel(node.getRootLogLevel()));
-        }
-        catch (Exception e)
-        {
-            jqmlogger.warn("Log level could not be set", e);
-        }
+        Helpers.setLogLevel(node.getRootLogLevel());
 
         // Log multicasting (& log4j stdout redirect)
         GlobalParameter gp1 = em.createQuery("SELECT g FROM GlobalParameter g WHERE g.key = :k", GlobalParameter.class)
