@@ -1537,6 +1537,37 @@ final class HibernateClient implements JqmClient
         return getDeliverableContent(deliverable);
     }
 
+    InputStream getEngineLog(String nodeName, int latest)
+    {
+        EntityManager em = getEm();
+        URL url = null;
+
+        try
+        {
+            Node h = em.createQuery("SELECT n FROM Node n WHERE n.name = :n", Node.class).setParameter("n", nodeName).getSingleResult();
+            url = new URL(getFileProtocol(em) + h.getDns() + ":" + h.getPort() + "/ws/simple/enginelog?latest=" + latest);
+            jqmlogger.trace("Will invoke engine log URL: " + url.toString());
+        }
+        catch (MalformedURLException e)
+        {
+            throw new JqmInvalidRequestException("URL is not valid " + url);
+        }
+        catch (NoResultException e)
+        {
+            throw new JqmInvalidRequestException("Node with name " + nodeName + " does not exist");
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("Could not process request", e);
+        }
+        finally
+        {
+            closeQuietly(em);
+        }
+
+        return getFile(url.toString());
+    }
+
     // Helper
     private InputStream getDeliverableContent(Deliverable deliverable)
     {
@@ -1733,7 +1764,7 @@ final class HibernateClient implements JqmClient
         }
         catch (IOException e)
         {
-            throw new JqmClientException("Could not create a webserver-local copy of the file", e);
+            throw new JqmClientException("Could not create a webserver-local copy of the file. The remote node may be down.", e);
         }
         finally
         {

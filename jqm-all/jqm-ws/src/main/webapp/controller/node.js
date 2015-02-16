@@ -2,7 +2,7 @@
 
 var jqmControllers = angular.module('jqmControllers', [ 'jqmConstants', 'jqmServices', 'ui.bootstrap' ]);
 
-jqmControllers.controller('µNodeListCtrl', function($scope, $http, µNodeDto)
+jqmControllers.controller('µNodeListCtrl', function($scope, $http, $modal, µNodeDto)
 {
     $scope.items = null;
     $scope.selected = [];
@@ -112,7 +112,14 @@ jqmControllers.controller('µNodeListCtrl', function($scope, $http, µNodeDto)
                     cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><span class="glyphicon {{ row.entity[col.field] ? \'glyphicon-ok\' : \'glyphicon-remove\' }}"></span></div>',
                     editableCellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
                     width : '*',
-                }, ]
+                }, 
+                {
+                    field : 'id',
+                    enableCellEdit : false,
+                    displayName : '',
+                    cellTemplate : '<div class="ngCellText"><a ng-click="showlog(row.entity.name)">log</a></div>',
+                    width :'*',
+                }]
     };
 
     $scope.stop = function()
@@ -124,6 +131,22 @@ jqmControllers.controller('µNodeListCtrl', function($scope, $http, µNodeDto)
             q.stop = true;
             q.$save();
         }
+    };
+    
+    $scope.showlog = function(nodeName)
+    {
+        $modal.open({
+            templateUrl : './template/file_reader.html',
+            controller : 'fileReader',
+            size : 'lg',
+
+            resolve : {
+                url : function()
+                {
+                    return "ws/admin/node/" + nodeName + "/log?latest=" + 200;
+                }
+            },
+        });
     };
 
     $scope.refresh();

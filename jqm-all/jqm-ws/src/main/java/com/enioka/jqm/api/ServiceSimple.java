@@ -15,6 +15,7 @@
  */
 package com.enioka.jqm.api;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -37,6 +38,8 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +62,8 @@ public class ServiceSimple
     private @Context
     SecurityContext security;
     private Node n = null;
+    @Context
+    private ServletContext context;
 
     // ///////////////////////////////////////////////////////////
     // Constructor: determine if running on top of JQM or not
@@ -168,6 +173,44 @@ public class ServiceSimple
         catch (FileNotFoundException e)
         {
             throw new ErrorDto("Could not find the desired file", 8, e, Status.NO_CONTENT);
+        }
+    }
+
+    @GET
+    @Path("enginelog")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getEngineLog(@QueryParam("latest") int latest)
+    {
+        // Failsafe
+        if (latest > 10000)
+        {
+            latest = 10000;
+        }
+
+        ReversedLinesFileReader r = null;
+        try
+        {
+            File f = new File(FilenameUtils.concat("./logs/", "jqm-" + context.getInitParameter("jqmnode") + ".log"));
+            r = new ReversedLinesFileReader(f);
+            StringBuilder sb = new StringBuilder(latest);
+            String buf = r.readLine();
+            int i = 1;
+            while (buf != null && i <= latest)
+            {
+                sb.append(buf);
+                sb.append(System.getProperty("line.separator"));
+                i++;
+                buf = r.readLine();
+            }
+            return sb.toString();
+        }
+        catch (Exception e)
+        {
+            throw new ErrorDto("Could not return the desired file", 8, e, Status.NO_CONTENT);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(r);
         }
     }
 
