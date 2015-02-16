@@ -74,7 +74,7 @@ public class ServiceAdmin
             List<J> r = em.createQuery("SELECT n FROM " + jpaClass.getSimpleName() + " n", jpaClass).getResultList();
             for (J n : r)
             {
-                res.add(Jpa2Dto.<D> getDTO(n));
+                res.add(Jpa2Dto.<D> getDTO(n, em));
             }
             return res;
         }
@@ -94,7 +94,7 @@ public class ServiceAdmin
         EntityManager em = Helpers.getEm();
         try
         {
-            D res = Jpa2Dto.<D> getDTO(em.find(jpaClass, id));
+            D res = Jpa2Dto.<D> getDTO(em.find(jpaClass, id), em);
             if (res == null)
             {
                 throw new ErrorDto("There is no object of type " + jpaClass.getSimpleName() + " in the database with ID " + id + ".",

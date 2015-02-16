@@ -55,6 +55,8 @@ jqmControllers.controller('µNodeListCtrl', function($scope, $http, $modal, µNo
                     field : 'name',
                     displayName : 'Name',
                     width : '**',
+                    cellTemplate: '<div ng-class="{\'bg-success\': row.getProperty(\'reportsRunning\') === true, \'bg-danger\': row.getProperty(\'reportsRunning\') === false}"> \
+                        <div class="ngCellText">{{row.getProperty(col.field)}}</div></div>'
                 },
                 {
                     field : 'dns',

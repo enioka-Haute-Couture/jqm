@@ -37,6 +37,7 @@ public class NodeDto implements Serializable
     private Integer jmxServerPort;
     private Boolean stop = false;
     private Boolean loapApiSimple, loadApiClient, loadApiAdmin;
+    private Boolean reportsRunning;
 
     public Integer getId()
     {
@@ -186,5 +187,15 @@ public class NodeDto implements Serializable
     public void setTmpDirectory(String tmpDirectory)
     {
         this.tmpDirectory = tmpDirectory;
+    }
+
+    public Boolean getReportsRunning()
+    {
+        return reportsRunning;
+    }
+
+    public void setReportsRunning(Boolean reportsRunning)
+    {
+        this.reportsRunning = reportsRunning;
     }
 }

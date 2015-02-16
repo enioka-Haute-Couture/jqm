@@ -16,6 +16,9 @@
 package com.enioka.jqm.api;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+
+import javax.persistence.EntityManager;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
@@ -41,7 +44,7 @@ import com.enioka.jqm.webui.admin.dto.RUserDto;
 @SuppressWarnings("unchecked")
 public class Jpa2Dto
 {
-    static <D> D getDTO(Object o)
+    static <D> D getDTO(Object o, EntityManager em)
     {
         if (o instanceof JobDef)
         {
@@ -53,7 +56,9 @@ public class Jpa2Dto
         }
         else if (o instanceof Node)
         {
-            return (D) getDTO((Node) o);
+            Calendar limit = Calendar.getInstance();
+            limit.add(Calendar.MILLISECOND, 0 - Integer.parseInt(Helpers.getParameter("aliveSignalMs", "60000", em)));
+            return (D) getDTO((Node) o, limit);
         }
         else if (o instanceof Queue)
         {
@@ -79,7 +84,7 @@ public class Jpa2Dto
         return null;
     }
 
-    private static NodeDto getDTO(Node n)
+    private static NodeDto getDTO(Node n, Calendar limit)
     {
         NodeDto res = new NodeDto();
         res.setDns(n.getDns());
@@ -96,6 +101,7 @@ public class Jpa2Dto
         res.setLoadApiClient(n.getLoadApiClient());
         res.setLoapApiSimple(n.getLoapApiSimple());
         res.setTmpDirectory(n.getTmpDirectory());
+        res.setReportsRunning(n.getLastSeenAlive() == null ? false : n.getLastSeenAlive().after(limit));
 
         return res;
     }
