@@ -409,7 +409,7 @@ class JqmEngine implements JqmEngineMBean
         startDbRestarter();
     }
 
-    private synchronized void startDbRestarter()
+    synchronized void startDbRestarter()
     {
         // On first alert, start the thread which will check connection restoration and relaunch the pollers.
         if (qpRestarter != null)

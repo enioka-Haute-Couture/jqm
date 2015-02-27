@@ -152,6 +152,7 @@ class InternalPoller implements Runnable
                     jqmlogger.error("connection to database lost - stopping internal poller");
                     jqmlogger.trace("connection error was:", e.getCause());
                     run = false;
+                    this.engine.startDbRestarter();
                     break;
                 }
                 else
