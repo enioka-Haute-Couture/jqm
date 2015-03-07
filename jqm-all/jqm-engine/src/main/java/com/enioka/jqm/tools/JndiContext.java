@@ -175,11 +175,13 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
         // If in cache...
         if (singletons.containsKey(name))
         {
+            jqmlogger.trace("JNDI element named " + name + " found in cache.");
             return singletons.get(name);
         }
 
         // Retrieve the resource description from the database or the XML file
         JndiResourceDescriptor d = ResourceParser.getDescriptor(name);
+        jqmlogger.trace("JNDI element named " + name + " not found in cache. Will be created. Singleton status: " + d.isSingleton());
 
         // Singleton handling is synchronized to avoid double creation
         if (d.isSingleton())
@@ -263,11 +265,9 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
         }
     }
 
-    /**
-     * This is a test method only.
-     */
     void resetSingletons()
     {
+        jqmlogger.info("Resetting singleton JNDI resource cache");
         this.singletons = new HashMap<String, Object>();
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         for (ObjectName n : this.jmxNames)
@@ -279,7 +279,6 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
             catch (Exception e)
             {
                 jqmlogger.error("could not unregister bean", e);
-                // Yet continue - this is a method only used in tests
             }
         }
         this.jmxNames = new ArrayList<ObjectName>();
