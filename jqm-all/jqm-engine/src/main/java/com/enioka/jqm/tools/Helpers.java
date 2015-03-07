@@ -639,7 +639,12 @@ final class Helpers
 
     static String getMavenVersion()
     {
-        String res = "";
+        String res = System.getProperty("mavenVersion");
+        if (res != null)
+        {
+            return res;
+        }
+
         InputStream is = Main.class.getResourceAsStream("/META-INF/maven/com.enioka.jqm/jqm-engine/pom.properties");
         Properties p = new Properties();
         try

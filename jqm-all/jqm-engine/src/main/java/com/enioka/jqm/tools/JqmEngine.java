@@ -97,7 +97,7 @@ class JqmEngine implements JqmEngineMBean
         Helpers.setLogFileName(nodeName);
 
         // Log: we are starting...
-        jqmlogger.info("JQM engine for node " + nodeName + " is starting");
+        jqmlogger.info("JQM engine version " + this.getVersion() + " for node " + nodeName + " is starting");
 
         // JNDI first - the engine itself uses JNDI to fetch its connections!
         Helpers.registerJndiIfNeeded();

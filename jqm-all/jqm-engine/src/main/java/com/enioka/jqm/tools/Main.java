@@ -271,8 +271,6 @@ public class Main
         try
         {
             engine = new JqmEngine();
-            jqmlogger.info("Engine version is: " + Helpers.getMavenVersion());
-            jqmlogger.info("Starting engine node " + nodeName);
             engine.start(nodeName);
         }
         catch (Exception e)
