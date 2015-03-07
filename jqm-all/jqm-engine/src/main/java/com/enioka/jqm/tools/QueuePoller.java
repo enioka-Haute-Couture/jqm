@@ -66,6 +66,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     @Override
     public void stop()
     {
+        jqmlogger.info("Poller has received a stop order");
         run = false;
         if (localThread != null)
         {
@@ -93,14 +94,19 @@ class QueuePoller implements Runnable, QueuePollerMBean
     {
         jqmlogger.info("Engine " + engine.getNode().getName() + " will poll JobInstances on queue " + q.getName() + " every " + interval
                 / 1000 + "s with " + nbThreads + " threads for concurrent instances");
-        reset();
         EntityManager em = Helpers.getNewEm();
 
         this.engine = engine;
         this.queue = q;
         this.pollingInterval = interval;
         this.maxNbThread = nbThreads;
+        em.close();
+        reset();
+        registerMBean();
+    }
 
+    private void registerMBean()
+    {
         try
         {
             if (this.engine.loadJmxBeans)
@@ -114,10 +120,6 @@ class QueuePoller implements Runnable, QueuePollerMBean
         catch (Exception e)
         {
             throw new JqmInitError("Could not create JMX beans", e);
-        }
-        finally
-        {
-            em.close();
         }
     }
 
@@ -276,27 +278,28 @@ class QueuePoller implements Runnable, QueuePollerMBean
             waitForAllThreads(60 * 1000);
             jqmlogger.info("Poller on queue " + this.queue.getName() + " has ended normally");
 
+            // JMX
+            if (this.engine.loadJmxBeans)
+            {
+                try
+                {
+                    ManagementFactory.getPlatformMBeanServer().unregisterMBean(name);
+                }
+                catch (Exception e)
+                {
+                    jqmlogger.error("Could not unregister JMX beans", e);
+                }
+            }
+
             // Let the engine decide if it should stop completely
             this.hasStopped = true; // BEFORE check
             this.engine.checkEngineEnd();
         }
         else
         {
+            // else => Abnormal stop. Set booleans to reflect this.
             this.run = false;
             this.hasStopped = true;
-        }
-
-        // JMX
-        if (this.engine.loadJmxBeans)
-        {
-            try
-            {
-                ManagementFactory.getPlatformMBeanServer().unregisterMBean(name);
-            }
-            catch (Exception e)
-            {
-                jqmlogger.error("Could not unregister JMX beans", e);
-            }
         }
     }
 
