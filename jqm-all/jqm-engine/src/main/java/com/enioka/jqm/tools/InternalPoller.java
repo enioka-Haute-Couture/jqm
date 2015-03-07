@@ -139,7 +139,6 @@ class InternalPoller implements Runnable
 
                 // Jetty restart. Conditions are:
                 // * some parameters (such as security parameters) have changed
-                // * user password change => should clear user cache, i.e. restart Jetty as we use a very simple cache
                 // * node parameter change such as start or stop an API.
                 Calendar bflkpm = Calendar.getInstance();
                 String np = node.getDns() + node.getPort() + node.getLoadApiAdmin() + node.getLoadApiClient() + node.getLoapApiSimple();
@@ -152,9 +151,7 @@ class InternalPoller implements Runnable
                                 "SELECT COUNT(gp) from GlobalParameter gp WHERE gp.lastModified > :lm "
                                         + "AND key IN ('disableWsApi', 'enableWsApiSsl', 'enableInternalPki', "
                                         + "'pfxPassword', 'enableWsApiAuth')", Long.class).setParameter("lm", latestJettyRestart)
-                        .getSingleResult()
-                        + em.createQuery("SELECT COUNT(gp) from RUser gp WHERE gp.lastModified > :lm", Long.class)
-                                .setParameter("lm", latestJettyRestart).getSingleResult();
+                        .getSingleResult();
                 if (i > 0L || !np.equals(nodePrms))
                 {
                     this.engine.getJetty().start(node, em);
