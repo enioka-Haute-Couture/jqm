@@ -118,7 +118,7 @@ final class Helpers
             fis = Helpers.class.getClassLoader().getResourceAsStream("jqm.properties");
             if (fis != null)
             {
-                jqmlogger.debug("A jqm.properties file was found");
+                jqmlogger.trace("A jqm.properties file was found");
                 p.load(fis);
                 IOUtils.closeQuietly(fis);
                 props.putAll(p);
