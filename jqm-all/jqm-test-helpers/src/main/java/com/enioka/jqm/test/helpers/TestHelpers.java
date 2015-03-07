@@ -66,8 +66,7 @@ public class TestHelpers
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("mailUseTls", "true", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("defaultConnection", "jdbc/marsu", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("logFilePerLaunch", "false", em);
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("internalPollingPeriodMs", "10000", em);
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("aliveSignalMs", "60000", em);
+        TestHelpers.gpCentral = CreationTools.createGlobalParameter("internalPollingPeriodMs", "60000", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenSettingsCL", "META-INF/settings.xml", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("disableWsApi", "true", em);
         TestHelpers.gpCentral = CreationTools.createGlobalParameter("enableWsApiSsl", "false", em);

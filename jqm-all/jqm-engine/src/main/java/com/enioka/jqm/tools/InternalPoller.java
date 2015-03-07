@@ -37,8 +37,7 @@ class InternalPoller implements Runnable
     private boolean run = true;
     private JqmEngine engine = null;
     private Thread localThread = null;
-    private long step = 10000;
-    private long alive = 60000;
+    private long step;
     private Node node = null;
     private String logLevel = null;
 
@@ -49,11 +48,9 @@ class InternalPoller implements Runnable
 
         // Get configuration data
         node = em.find(Node.class, this.engine.getNode().getId());
-        this.step = Long.parseLong(Helpers.getParameter("internalPollingPeriodMs", String.valueOf(this.step), em));
-        this.alive = Long.parseLong(Helpers.getParameter("aliveSignalMs", String.valueOf(this.step), em));
+        this.step = Long.parseLong(Helpers.getParameter("internalPollingPeriodMs", "60000", em));
         this.logLevel = node.getRootLogLevel();
         em.close();
-
     }
 
     void stop()
@@ -82,7 +79,6 @@ class InternalPoller implements Runnable
         String nodePrms = null;
 
         // Launch main loop
-        long sinceLatestPing = 0;
         while (true)
         {
             try
@@ -123,62 +119,56 @@ class InternalPoller implements Runnable
                     Helpers.setLogLevel(this.logLevel);
                 }
 
-                // Slower polls & signals
-                sinceLatestPing += this.step;
-                if (sinceLatestPing >= this.alive * 0.9)
+                // I am alive
+                em.getTransaction().begin();
+                em.createQuery("UPDATE Node n SET n.lastSeenAlive = current_timestamp() WHERE n.id = :id").setParameter("id", node.getId())
+                        .executeUpdate();
+                em.getTransaction().commit();
+
+                // Have queue bindings changed?
+                this.engine.syncPollers(em, node);
+
+                // Jetty restart. Conditions are:
+                // * some parameters (such as security parameters) have changed
+                // * user password change => should clear user cache, i.e. restart Jetty as we use a very simple cache
+                // * node parameter change such as start or stop an API.
+                Calendar bflkpm = Calendar.getInstance();
+                String np = node.getDns() + node.getPort() + node.getLoadApiAdmin() + node.getLoadApiClient() + node.getLoapApiSimple();
+                if (nodePrms == null)
                 {
-                    // I am alive
-                    em.getTransaction().begin();
-                    em.createQuery("UPDATE Node n SET n.lastSeenAlive = current_timestamp() WHERE n.id = :id")
-                            .setParameter("id", node.getId()).executeUpdate();
-                    em.getTransaction().commit();
-                    sinceLatestPing = 0;
+                    nodePrms = np;
+                }
+                Long i = em
+                        .createQuery(
+                                "SELECT COUNT(gp) from GlobalParameter gp WHERE gp.lastModified > :lm "
+                                        + "AND key IN ('disableWsApi', 'enableWsApiSsl', 'enableInternalPki', "
+                                        + "'pfxPassword', 'enableWsApiAuth')", Long.class).setParameter("lm", latestJettyRestart)
+                        .getSingleResult()
+                        + em.createQuery("SELECT COUNT(gp) from RUser gp WHERE gp.lastModified > :lm", Long.class)
+                                .setParameter("lm", latestJettyRestart).getSingleResult();
+                if (i > 0L || !np.equals(nodePrms))
+                {
+                    this.engine.getJetty().start(node, em);
+                    latestJettyRestart = bflkpm;
+                    nodePrms = np;
+                }
 
-                    // Have queue bindings changed?
-                    this.engine.syncPollers(em, node);
-
-                    // Jetty restart. Conditions are:
-                    // * some parameters (such as security parameters) have changed
-                    // * user password change => should clear user cache, i.e. restart Jetty as we use a very simple cache
-                    // * node parameter change such as start or stop an API.
-                    Calendar bflkpm = Calendar.getInstance();
-                    String np = node.getDns() + node.getPort() + node.getLoadApiAdmin() + node.getLoadApiClient() + node.getLoapApiSimple();
-                    if (nodePrms == null)
+                // Should JNDI cache be purged?
+                i = em.createQuery(
+                        "SELECT COUNT(p) FROM JndiObjectResourceParameter p WHERE p.lastModified > :lm OR p.resource.lastModified > :lm",
+                        Long.class).setParameter("lm", lastJndiPurge).getSingleResult();
+                if (i > 0L)
+                {
+                    try
                     {
-                        nodePrms = np;
+                        ((JndiContext) NamingManager.getInitialContext(null)).resetSingletons();
+                        lastJndiPurge = bflkpm;
                     }
-                    Long i = em
-                            .createQuery(
-                                    "SELECT COUNT(gp) from GlobalParameter gp WHERE gp.lastModified > :lm "
-                                            + "AND key IN ('disableWsApi', 'enableWsApiSsl', 'enableInternalPki', "
-                                            + "'pfxPassword', 'enableWsApiAuth')", Long.class).setParameter("lm", latestJettyRestart)
-                            .getSingleResult()
-                            + em.createQuery("SELECT COUNT(gp) from RUser gp WHERE gp.lastModified > :lm", Long.class)
-                                    .setParameter("lm", latestJettyRestart).getSingleResult();
-                    if (i > 0L || !np.equals(nodePrms))
+                    catch (Exception e)
                     {
-                        this.engine.getJetty().start(node, em);
-                        latestJettyRestart = bflkpm;
-                        nodePrms = np;
-                    }
-
-                    // Should JNDI cache be purged?
-                    i = em.createQuery(
-                            "SELECT COUNT(p) FROM JndiObjectResourceParameter p WHERE p.lastModified > :lm OR p.resource.lastModified > :lm",
-                            Long.class).setParameter("lm", lastJndiPurge).getSingleResult();
-                    if (i > 0L)
-                    {
-                        try
-                        {
-                            ((JndiContext) NamingManager.getInitialContext(null)).resetSingletons();
-                            lastJndiPurge = bflkpm;
-                        }
-                        catch (Exception e)
-                        {
-                            jqmlogger
-                                    .warn("Could not reset JNDI singleton resources. New parameters won't be used. Restart engine to update them.",
-                                            e);
-                        }
+                        jqmlogger
+                                .warn("Could not reset JNDI singleton resources. New parameters won't be used. Restart engine to update them.",
+                                        e);
                     }
                 }
             }

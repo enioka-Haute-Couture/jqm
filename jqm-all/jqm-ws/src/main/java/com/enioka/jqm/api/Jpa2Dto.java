@@ -57,7 +57,7 @@ public class Jpa2Dto
         else if (o instanceof Node)
         {
             Calendar limit = Calendar.getInstance();
-            limit.add(Calendar.MILLISECOND, 0 - Integer.parseInt(Helpers.getParameter("aliveSignalMs", "60000", em)));
+            limit.add(Calendar.MILLISECOND, 0 - Integer.parseInt(Helpers.getParameter("internalPollingPeriodMs", "60000", em)));
             return (D) getDTO((Node) o, limit);
         }
         else if (o instanceof Queue)

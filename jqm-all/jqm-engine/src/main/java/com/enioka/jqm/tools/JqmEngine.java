@@ -113,12 +113,12 @@ class JqmEngine implements JqmEngineMBean
         Helpers.dumpParameters(em, node);
 
         // Check if double-start
-        long toWait = (long) (2 * Long.parseLong(Helpers.getParameter("aliveSignalMs", "60000", em)));
+        long toWait = (long) (1.1 * Long.parseLong(Helpers.getParameter("internalPollingPeriodMs", "60000", em)));
         if (node.getLastSeenAlive() != null
                 && Calendar.getInstance().getTimeInMillis() - node.getLastSeenAlive().getTimeInMillis() <= toWait)
         {
             long r = Calendar.getInstance().getTimeInMillis() - node.getLastSeenAlive().getTimeInMillis();
-            throw new JqmInitErrorTooSoon("Another engine named " + nodeName + " was running no less than " + r / 1000
+            throw new JqmInitErrorTooSoon("Another engine named " + nodeName + " was running less than " + r / 1000
                     + " seconds ago. Either stop the other node, or if it already stopped, please wait " + (toWait - r) / 1000 + " seconds");
         }
 
