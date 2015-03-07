@@ -119,6 +119,7 @@ class Dto2Jpa
         n.setLoadApiClient(dto.getLoadApiClient());
         n.setLoapApiSimple(dto.getLoapApiSimple());
         n.setTmpDirectory(dto.getTmpDirectory());
+        n.setEnabled(dto.getEnabled());
 
         // save
         n = em.merge(n);
@@ -315,6 +316,7 @@ class Dto2Jpa
         jpa.setNode(em.find(Node.class, dto.getNodeId()));
         jpa.setPollingInterval(dto.getPollingInterval());
         jpa.setQueue(em.find(Queue.class, dto.getQueueId()));
+        jpa.setEnabled(dto.getEnabled());
 
         // Save
         jpa = em.merge(jpa);

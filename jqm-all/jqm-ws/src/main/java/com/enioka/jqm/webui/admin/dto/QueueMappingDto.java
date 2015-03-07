@@ -30,6 +30,7 @@ public class QueueMappingDto implements Serializable
     private Integer pollingInterval;
     private Integer queueId;
     private String nodeName, queueName;
+    private Boolean enabled = true;
 
     public Integer getId()
     {
@@ -99,5 +100,15 @@ public class QueueMappingDto implements Serializable
     public void setQueueName(String queueName)
     {
         this.queueName = queueName;
+    }
+
+    public Boolean getEnabled()
+    {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled)
+    {
+        this.enabled = enabled;
     }
 }

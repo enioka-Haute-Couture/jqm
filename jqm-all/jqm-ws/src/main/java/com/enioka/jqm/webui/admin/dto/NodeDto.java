@@ -35,7 +35,7 @@ public class NodeDto implements Serializable
     private Calendar lastSeenAlive;
     private Integer jmxRegistryPort;
     private Integer jmxServerPort;
-    private Boolean stop = false;
+    private Boolean stop = false, enabled = true;
     private Boolean loapApiSimple, loadApiClient, loadApiAdmin;
     private Boolean reportsRunning;
 
@@ -197,5 +197,15 @@ public class NodeDto implements Serializable
     public void setReportsRunning(Boolean reportsRunning)
     {
         this.reportsRunning = reportsRunning;
+    }
+
+    public Boolean getEnabled()
+    {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled)
+    {
+        this.enabled = enabled;
     }
 }

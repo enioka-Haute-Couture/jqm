@@ -58,6 +58,7 @@ public class DeploymentParameter
     @ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Queue.class)
     @JoinColumn(name = "queue", nullable = false)
     private Queue queue;
+    private Boolean enabled = true;
 
     @Version
     @Temporal(TemporalType.TIMESTAMP)
@@ -177,5 +178,22 @@ public class DeploymentParameter
     protected void setLastModified(Calendar lastModified)
     {
         this.lastModified = lastModified;
+    }
+
+    /**
+     * Disabled means the binding still exists but no job instances are polled (poller is paused, with already running job instances going
+     * on normally).
+     */
+    public Boolean getEnabled()
+    {
+        return enabled;
+    }
+
+    /**
+     * See {@link #getEnabled()}
+     */
+    public void setEnabled(Boolean enabled)
+    {
+        this.enabled = enabled;
     }
 }

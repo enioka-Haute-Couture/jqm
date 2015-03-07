@@ -102,6 +102,7 @@ public class Jpa2Dto
         res.setLoapApiSimple(n.getLoapApiSimple());
         res.setTmpDirectory(n.getTmpDirectory());
         res.setReportsRunning(n.getLastSeenAlive() == null ? false : n.getLastSeenAlive().after(limit));
+        res.setEnabled(n.getEnabled());
 
         return res;
     }
@@ -127,6 +128,7 @@ public class Jpa2Dto
         res.setQueueId(s.getQueue().getId());
         res.setQueueName(s.getQueue().getName());
         res.setNodeName(s.getNode().getName());
+        res.setEnabled(s.getEnabled());
 
         return res;
     }

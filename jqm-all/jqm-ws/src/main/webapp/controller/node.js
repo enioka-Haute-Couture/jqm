@@ -96,6 +96,13 @@ jqmControllers.controller('µNodeListCtrl', function($scope, $http, $modal, µNo
                     displayName : 'jmxServerPort',
                 },
                 {
+                    field : 'enabled',
+                    displayName : 'Enabled',
+                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><span class="glyphicon {{ row.entity[col.field] ? \'glyphicon-ok\' : \'glyphicon-remove\' }}"></span></div>',
+                    editableCellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
+                    width : '*',
+                },
+                {
                     field : 'loapApiSimple',
                     displayName : 'Simple API',
                     cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><span class="glyphicon {{ row.entity[col.field] ? \'glyphicon-ok\' : \'glyphicon-remove\' }}"></span></div>',

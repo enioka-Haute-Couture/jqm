@@ -262,45 +262,64 @@ class JqmEngine implements JqmEngineMBean
 
     synchronized void syncPollers(EntityManager em, Node node)
     {
-        List<DeploymentParameter> dps = em
-                .createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
-                .setParameter("n", node.getId()).getResultList();
-
-        QueuePoller p = null;
-        for (DeploymentParameter i : dps)
+        if (node.getEnabled())
         {
-            if (pollers.containsKey(i.getId()))
-            {
-                p = pollers.get(i.getId());
-                p.setMaxThreads(i.getNbThread());
-                p.setPollingInterval(i.getPollingInterval());
-            }
-            else
-            {
-                p = new QueuePoller(this, i.getQueue(), i.getNbThread(), i.getPollingInterval());
-                pollers.put(i.getId(), p);
-                Thread t = new Thread(p);
-                t.start();
-            }
-        }
+            List<DeploymentParameter> dps = em
+                    .createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
+                    .setParameter("n", node.getId()).getResultList();
 
-        // Remove deleted pollers
-        for (int dp : this.pollers.keySet().toArray(new Integer[0]))
-        {
-            boolean found = false;
-            for (DeploymentParameter ndp : dps)
+            QueuePoller p = null;
+            for (DeploymentParameter i : dps)
             {
-                if (ndp.getId().equals(dp))
+                if (pollers.containsKey(i.getId()))
                 {
-                    found = true;
-                    break;
+                    p = pollers.get(i.getId());
+                    p.setPollingInterval(i.getPollingInterval());
+
+                    if (i.getEnabled())
+                    {
+                        p.setMaxThreads(i.getNbThread());
+                    }
+                    else
+                    {
+                        p.setMaxThreads(0);
+                    }
+                }
+                else
+                {
+                    p = new QueuePoller(this, i.getQueue(), (i.getEnabled() ? i.getNbThread() : 0), i.getPollingInterval());
+                    pollers.put(i.getId(), p);
+                    Thread t = new Thread(p);
+                    t.start();
                 }
             }
-            if (!found)
+
+            // Remove deleted pollers
+            for (int dp : this.pollers.keySet().toArray(new Integer[0]))
             {
-                QueuePoller qp = this.pollers.get(dp);
-                qp.stop();
-                this.pollers.remove(dp);
+                boolean found = false;
+                for (DeploymentParameter ndp : dps)
+                {
+                    if (ndp.getId().equals(dp))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    QueuePoller qp = this.pollers.get(dp);
+                    qp.stop();
+                    this.pollers.remove(dp);
+                }
+            }
+        }
+        else
+        {
+            // Pause all pollers
+            for (QueuePoller qp : this.pollers.values())
+            {
+                qp.setMaxThreads(0);
             }
         }
     }
@@ -572,5 +591,33 @@ class JqmEngine implements JqmEngineMBean
     public String getVersion()
     {
         return Helpers.getMavenVersion();
+    }
+
+    @Override
+    public void pause()
+    {
+        EntityManager em = Helpers.getNewEm();
+        em.getTransaction().begin();
+        em.createQuery("UPDATE Node n SET n.enabled = false WHERE n.id = :id").setParameter("id", node.getId()).executeUpdate();
+        em.getTransaction().commit();
+        em.close();
+        refreshConfiguration();
+    }
+
+    @Override
+    public void resume()
+    {
+        EntityManager em = Helpers.getNewEm();
+        em.getTransaction().begin();
+        em.createQuery("UPDATE Node n SET n.enabled = true WHERE n.id = :id").setParameter("id", node.getId()).executeUpdate();
+        em.getTransaction().commit();
+        em.close();
+        refreshConfiguration();
+    }
+
+    @Override
+    public void refreshConfiguration()
+    {
+        this.intPoller.forceLoop();
     }
 }

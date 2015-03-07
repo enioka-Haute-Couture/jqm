@@ -16,6 +16,8 @@
 package com.enioka.jqm.tools;
 
 import java.util.Calendar;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import javax.naming.spi.NamingManager;
 import javax.persistence.EntityManager;
@@ -40,6 +42,7 @@ class InternalPoller implements Runnable
     private long step;
     private Node node = null;
     private String logLevel = null;
+    private Semaphore loop = new Semaphore(0);
 
     InternalPoller(JqmEngine e)
     {
@@ -68,6 +71,11 @@ class InternalPoller implements Runnable
         }
     }
 
+    void forceLoop()
+    {
+        this.loop.release(1);
+    }
+
     @Override
     public void run()
     {
@@ -83,7 +91,7 @@ class InternalPoller implements Runnable
         {
             try
             {
-                Thread.sleep(this.step);
+                loop.tryAcquire(this.step, TimeUnit.MILLISECONDS);
             }
             catch (InterruptedException e)
             {
@@ -125,7 +133,8 @@ class InternalPoller implements Runnable
                         .executeUpdate();
                 em.getTransaction().commit();
 
-                // Have queue bindings changed?
+                // Have queue bindings changed, or is engine disabled?
+
                 this.engine.syncPollers(em, node);
 
                 // Jetty restart. Conditions are:

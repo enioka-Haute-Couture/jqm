@@ -370,6 +370,14 @@ class QueuePoller implements Runnable, QueuePollerMBean
 
     void setMaxThreads(int max)
     {
+        if (this.maxNbThread > 0 && max == 0)
+        {
+            jqmlogger.info("Poller is being paused - it won't fetch any new job instances until it is resumed.");
+        }
+        else if (this.maxNbThread == 0 && max > 0)
+        {
+            jqmlogger.info("Poller is being resumed");
+        }
         this.maxNbThread = max;
     }
 

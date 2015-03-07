@@ -15,15 +15,33 @@
  */
 package com.enioka.jqm.tools;
 
+import com.enioka.jqm.jpamodel.GlobalParameter;
+
 /**
  * Monitoring interface for the Engine
  */
 public interface JqmEngineMBean
 {
     /**
-     * Stops the engine. It cannot be restarted aftewards.
+     * Stops the engine. It cannot be restarted afterwards.
      */
     void stop();
+
+    /**
+     * Pauses the engine. It will not take any new job instances after this, but already running instance will continue as before.
+     */
+    void pause();
+
+    /**
+     * Un-pauses the engine. See {@link #pause()}.
+     */
+    void resume();
+
+    /**
+     * Forces a full refresh of base configuration (HTTP port, log level, ...). Usually configuration is updated automatically every
+     * <code>internalPollingPeriodMs</code> (a {@link GlobalParameter}) milliseconds. This triggers the same refresh method.
+     */
+    void refreshConfiguration();
 
     /**
      * The total number of job instances that were run on this node since the last history purge.
@@ -47,7 +65,7 @@ public interface JqmEngineMBean
     boolean isAllPollersPolling();
 
     /**
-     * True if at least one queue is full
+     * True if at least one queue is full.
      */
     boolean isFull();
 

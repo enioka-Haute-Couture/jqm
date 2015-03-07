@@ -96,7 +96,14 @@ jqmControllers
                                     field : 'nbThread',
                                     displayName : 'Max concurrent running instances',
                                     editableCellTemplate : '<input ng-cell-input ng-input="COL_FIELD" ng-model="COL_FIELD" type="number" min="1" max="1000" ng-required="true" ng-pattern="/^\\d+$/"  />',
-                                }, ]
+                                },
+                                {
+                                    field : 'enabled',
+                                    displayName : 'Enabled',
+                                    cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><span class="glyphicon {{ row.entity[col.field] ? \'glyphicon-ok\' : \'glyphicon-remove\' }}"></span></div>',
+                                    editableCellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
+                                    width : '*',
+                                },]
                     };
 
                     $scope.$watch('mappings', function(newMappings)
