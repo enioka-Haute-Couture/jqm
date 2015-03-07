@@ -15,6 +15,9 @@
  */
 package com.enioka.jqm.tools;
 
+import java.util.Calendar;
+
+import javax.naming.spi.NamingManager;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
@@ -75,7 +78,8 @@ class InternalPoller implements Runnable
         jqmlogger.info("Start of the internal poller");
         EntityManager em = null;
         this.localThread = Thread.currentThread();
-        String jettyPrmHash = null;
+        Calendar latestJettyRestart = Calendar.getInstance(), lastJndiPurge = latestJettyRestart;
+        String nodePrms = null;
 
         // Launch main loop
         long sinceLatestPing = 0;
@@ -133,16 +137,49 @@ class InternalPoller implements Runnable
                     // Have queue bindings changed?
                     this.engine.syncPollers(em, node);
 
-                    // Have parameters changed and require a Jetty restart?
-                    String n = node.getDns() + node.getPort() + node.getLoadApiAdmin() + node.getLoadApiClient() + node.getLoapApiSimple()
-                            + Helpers.getParameter("disableWsApi", " ", em) + Helpers.getParameter("enableWsApiSsl", " ", em)
-                            + Helpers.getParameter("enableInternalPki", " ", em) + Helpers.getParameter("pfxPassword", " ", em)
-                            + Helpers.getParameter("enableWsApiAuth", " ", em);
-                    if (jettyPrmHash != null && !jettyPrmHash.equals(n))
+                    // Jetty restart. Conditions are:
+                    // * some parameters (such as security parameters) have changed
+                    // * user password change => should clear user cache, i.e. restart Jetty as we use a very simple cache
+                    // * node parameter change such as start or stop an API.
+                    Calendar bflkpm = Calendar.getInstance();
+                    String np = node.getDns() + node.getPort() + node.getLoadApiAdmin() + node.getLoadApiClient() + node.getLoapApiSimple();
+                    if (nodePrms == null)
+                    {
+                        nodePrms = np;
+                    }
+                    Long i = em
+                            .createQuery(
+                                    "SELECT COUNT(gp) from GlobalParameter gp WHERE gp.lastModified > :lm "
+                                            + "AND key IN ('disableWsApi', 'enableWsApiSsl', 'enableInternalPki', "
+                                            + "'pfxPassword', 'enableWsApiAuth')", Long.class).setParameter("lm", latestJettyRestart)
+                            .getSingleResult()
+                            + em.createQuery("SELECT COUNT(gp) from RUser gp WHERE gp.lastModified > :lm", Long.class)
+                                    .setParameter("lm", latestJettyRestart).getSingleResult();
+                    if (i > 0L || !np.equals(nodePrms))
                     {
                         this.engine.getJetty().start(node, em);
+                        latestJettyRestart = bflkpm;
+                        nodePrms = np;
                     }
-                    jettyPrmHash = n;
+
+                    // Should JNDI cache be purged?
+                    i = em.createQuery(
+                            "SELECT COUNT(p) FROM JndiObjectResourceParameter p WHERE p.lastModified > :lm OR p.resource.lastModified > :lm",
+                            Long.class).setParameter("lm", lastJndiPurge).getSingleResult();
+                    if (i > 0L)
+                    {
+                        try
+                        {
+                            ((JndiContext) NamingManager.getInitialContext(null)).resetSingletons();
+                            lastJndiPurge = bflkpm;
+                        }
+                        catch (Exception e)
+                        {
+                            jqmlogger
+                                    .warn("Could not reset JNDI singleton resources. New parameters won't be used. Restart engine to update them.",
+                                            e);
+                        }
+                    }
                 }
             }
             catch (PersistenceException e)

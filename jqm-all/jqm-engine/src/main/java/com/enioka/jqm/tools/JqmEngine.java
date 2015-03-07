@@ -260,7 +260,7 @@ class JqmEngine implements JqmEngineMBean
         return this.node;
     }
 
-    void syncPollers(EntityManager em, Node node)
+    synchronized void syncPollers(EntityManager em, Node node)
     {
         List<DeploymentParameter> dps = em
                 .createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)

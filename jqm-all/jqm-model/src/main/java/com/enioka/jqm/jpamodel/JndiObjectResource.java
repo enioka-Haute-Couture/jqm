@@ -20,6 +20,7 @@ package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 
 import javax.naming.spi.ObjectFactory;
@@ -32,6 +33,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Version;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
@@ -69,6 +73,10 @@ public class JndiObjectResource implements Serializable
     private String template = null;
 
     private Boolean singleton = false;
+
+    @Version
+    @Temporal(TemporalType.TIMESTAMP)
+    private Calendar lastModified;
 
     /**
      * If true: loaded by the engine CL and cached. If not, loaded by payload CL and created on each lookup call.
@@ -212,5 +220,21 @@ public class JndiObjectResource implements Serializable
     public void setTemplate(String template)
     {
         this.template = template;
+    }
+
+    /**
+     * When the object was last modified. Read only.
+     */
+    public Calendar getLastModified()
+    {
+        return lastModified;
+    }
+
+    /**
+     * See {@link #getLastModified()}
+     */
+    protected void setLastModified(Calendar lastModified)
+    {
+        this.lastModified = lastModified;
     }
 }

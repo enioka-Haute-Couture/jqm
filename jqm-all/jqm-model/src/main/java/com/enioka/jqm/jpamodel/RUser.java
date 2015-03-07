@@ -31,6 +31,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Version;
 
 @Entity
 public class RUser implements Serializable
@@ -66,6 +67,10 @@ public class RUser implements Serializable
 
     @ManyToMany(mappedBy = "users")
     private List<RRole> roles = new ArrayList<RRole>();
+
+    @Version
+    @Temporal(TemporalType.TIMESTAMP)
+    private Calendar lastModified;
 
     private Boolean internal = false;
 
@@ -177,5 +182,21 @@ public class RUser implements Serializable
     public void setInternal(Boolean internal)
     {
         this.internal = internal;
+    }
+
+    /**
+     * When the object was last modified. Read only.
+     */
+    public Calendar getLastModified()
+    {
+        return lastModified;
+    }
+
+    /**
+     * See {@link #getLastModified()}
+     */
+    protected void setLastModified(Calendar lastModified)
+    {
+        this.lastModified = lastModified;
     }
 }

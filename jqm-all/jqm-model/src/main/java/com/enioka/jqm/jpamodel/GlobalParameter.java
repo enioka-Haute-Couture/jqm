@@ -19,6 +19,7 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.util.Calendar;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,6 +27,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Version;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
@@ -46,6 +50,10 @@ public class GlobalParameter implements Serializable
     private String key;
     @Column(length = 1000, name = "value")
     private String value;
+
+    @Version
+    @Temporal(TemporalType.TIMESTAMP)
+    private Calendar lastModified;
 
     /**
      * The key (name) of the parameter. Most parameter keys are unique, but not all so there is no unique constraint inside the database.
@@ -88,5 +96,21 @@ public class GlobalParameter implements Serializable
     public Integer getId()
     {
         return id;
+    }
+
+    /**
+     * When the object was last modified. Read only.
+     */
+    public Calendar getLastModified()
+    {
+        return lastModified;
+    }
+
+    /**
+     * See {@link #getLastModified()}
+     */
+    protected void setLastModified(Calendar lastModified)
+    {
+        this.lastModified = lastModified;
     }
 }

@@ -134,6 +134,21 @@
 				<parameters>					
 				</parameters>
 			</jobDefinition>
+            
+            <jobDefinition>
+				<name>DemoJdbcCon</name>
+				<description>Demonstrates the use of JNDI to retrieve a DB Connection named jdbc/test (which must exist before launch!). Displays a DB column count.</description>
+				<canBeRestarted>true</canBeRestarted>
+				<javaClassName>pyl.JndiDb</javaClassName>
+				<application>JQM</application>
+				<module>Demos</module>
+				<keyword1>Payload</keyword1>
+				<keyword2>Main</keyword2>
+				<keyword3>JNDI</keyword3>
+				<highlander>false</highlander>
+				<parameters>					
+				</parameters>
+			</jobDefinition>
 		</jobdefinitions>
 	</jar>
 </jqm>
