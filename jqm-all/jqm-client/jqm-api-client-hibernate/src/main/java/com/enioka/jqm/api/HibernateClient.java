@@ -1742,8 +1742,9 @@ final class HibernateClient implements JqmClient
             rs = cl.execute(rq);
             if (rs.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
             {
-                throw new JqmClientException("Could not retrieve file from JQM node. It may be unreachable. HTTP code was: "
-                        + rs.getStatusLine().getStatusCode());
+                throw new JqmClientException(
+                        "Could not retrieve file from JQM node. The file may have been purged, or the node may be unreachable. HTTP code was: "
+                                + rs.getStatusLine().getStatusCode());
             }
 
             // There may be a filename hint inside the response
