@@ -112,6 +112,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
         useExternalSorting : true,
         enablePaging : true,
         showFooter : true,
+        enableColumnResize : true,
         totalServerItems : 'totalServerItems',
         plugins :  [new ngGridFlexibleHeightPlugin({yMargin: 260})],
         columnDefs : [ {
