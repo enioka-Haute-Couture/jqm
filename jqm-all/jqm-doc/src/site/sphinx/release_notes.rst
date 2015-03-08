@@ -1,6 +1,42 @@
 Release notes
 ######################
 
+
+1.3.1
+************
+
+Release goal
+++++++++++++++++++
+
+This release had one goal: reducing the need for engine restart. Other administration usability tweaks are also included.
+
+Upgrade notes
++++++++++++++++++++
+
+All APIs have been upgraded and **do not contain any breaking change**. 1.2.1 & 1.2.2 apis will work with 1.3.1 engines. However, as 1.2.2 contains fixes and 1.3.1 new functionalities, everyone is strongly encouraged to upgrade.
+
+Database must be rebuilt for version 1.3.1, this means History purge.
+
+Major
++++++++++++++++++
+
+* Engine: will automatically reload some parameters when they change, reducing the need for engine restarts
+* Engine: now resists better database failures
+* Engine API: shouldKill method is now throttled, reducing the database hammering (as this method is called by all other methods)
+* Admin API: added a method to retrieve the engine logs
+* Client API & GUI: can now download files created by a job instance even if it has not finished yet
+
+Minor
+++++++++++++++++
+
+* Engine: added sample purge job
+* GUI: added an online log viewer for job instance logs (no need to download log files anymore)
+* GUI: added an online log viewer for engine logs (which were not retrievable through the GUI before)
+* GUI: allowed column resize on History panel
+* GUI: added an option to view only KO job instances
+* Engine: small code refactor
+
+
 1.2.2
 ************
 
