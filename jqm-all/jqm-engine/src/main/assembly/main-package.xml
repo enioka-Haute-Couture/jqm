@@ -39,7 +39,7 @@
 		</fileSet>
 		<fileSet>
 			<directory>${project.basedir}/src/main/scripts</directory>
-			<outputDirectory>/jobs/xml</outputDirectory>
+			<outputDirectory>/jobs/jqm-demo/xml</outputDirectory>
 			<includes>
 				<include>*.xml</include>
 			</includes>
@@ -83,7 +83,7 @@
 		</fileSet>
 		<fileSet>
 			<directory>${project.basedir}/src/main/scripts/empty</directory>
-			<outputDirectory>jobs/jqm-test-pyl-nodep/lib</outputDirectory>
+			<outputDirectory>jobs/jqm-demo/jqm-test-pyl-nodep/lib</outputDirectory>
 			<excludes>
 				<exclude>*</exclude>
 			</excludes>
@@ -113,13 +113,14 @@
 		</dependencySet>
 
 		<dependencySet>
-			<outputDirectory>/jobs/${artifact.artifactId}</outputDirectory>
+			<outputDirectory>/jobs/jqm-demo/${artifact.artifactId}</outputDirectory>
 			<useProjectArtifact>false</useProjectArtifact>
 			<unpack>false</unpack>
 			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
 			<includes>
 				<include>com.enioka.jqm:jqm-test-pyl:jar</include>
 				<include>com.enioka.jqm:jqm-test-pyl-nodep:jar</include>
+				<include>com.enioka.jqm:jqm-test-pyl-hibapi:jar</include>
 			</includes>
 			<scope>test</scope>
 		</dependencySet>

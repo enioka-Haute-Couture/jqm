@@ -1,11 +1,12 @@
 <jqm>
 	<jar>
-		<path>jqm-test-pyl/jqm-test-pyl.jar</path>
-		
+		<path>jqm-demo/jqm-test-pyl/jqm-test-pyl.jar</path>
+
 		<jobdefinitions>
 			<jobDefinition>
 				<name>DemoFibo1</name>
-				<description>Demonstrates the use of parameters and engine API (computes the Fibonacci suite).</description>
+				<description>Demonstrates the use of parameters and engine API
+					(computes the Fibonacci suite).</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>pyl.StressFibo</javaClassName>
 				<application>JQM</application>
@@ -25,10 +26,11 @@
 					</parameter>
 				</parameters>
 			</jobDefinition>
-			
+
 			<jobDefinition>
 				<name>DemoFibo2</name>
-				<description>Demonstrates the possibility to define multiple payloads on the same jar/class with different parameters.
+				<description>Demonstrates the possibility to define multiple
+					payloads on the same jar/class with different parameters.
 				</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>pyl.StressFibo</javaClassName>
@@ -52,7 +54,8 @@
 
 			<jobDefinition>
 				<name>DemoKill</name>
-				<description>Demonstrates the use of yield - this waits eternally to be killed.</description>
+				<description>Demonstrates the use of yield - this waits eternally to
+					be killed.</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>pyl.KillMe</javaClassName>
 				<application>JQM</application>
@@ -67,7 +70,8 @@
 
 			<jobDefinition>
 				<name>DemoLog</name>
-				<description>Demonstrates the use of stdout - this waits eternally to be killed.</description>
+				<description>Demonstrates the use of stdout - this waits eternally
+					to be killed.</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>pyl.EngineApiWriteLog</javaClassName>
 				<application>JQM</application>
@@ -79,10 +83,11 @@
 				<parameters>
 				</parameters>
 			</jobDefinition>
-			
+
 			<jobDefinition>
 				<name>DemoGeo</name>
-				<description>Demonstrates the use of the engine API, the use of parameters and creates load (geometric suite).</description>
+				<description>Demonstrates the use of the engine API, the use of
+					parameters and creates load (geometric suite).</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>pyl.StressGeo</javaClassName>
 				<application>JQM</application>
@@ -98,10 +103,12 @@
 					</parameter>
 				</parameters>
 			</jobDefinition>
-			
+
 			<jobDefinition>
 				<name>DemoApi</name>
-				<description>Demonstrates the use of a jar with a main function. It then uses the injected engine API (nearly every method of it).</description>
+				<description>Demonstrates the use of a jar with a main function. It
+					then uses the injected engine API (nearly every method of it).
+				</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>pyl.EngineApiInject</javaClassName>
 				<application>JQM</application>
@@ -110,19 +117,21 @@
 				<keyword2>Main</keyword2>
 				<keyword3>EngineAPI</keyword3>
 				<highlander>false</highlander>
-				<parameters>					
+				<parameters>
 				</parameters>
 			</jobDefinition>
-			
+
 		</jobdefinitions>
 	</jar>
-	
+
 	<jar>
-		<path>jqm-test-pyl-nodep/jqm-test-pyl-nodep.jar</path>
+		<path>jqm-demo/jqm-test-pyl-nodep/jqm-test-pyl-nodep.jar</path>
 		<jobdefinitions>
 			<jobDefinition>
 				<name>DemoEcho</name>
-				<description>Demonstrates the direct reuse of a jar with a main function without any libs. Simply writes a line on stdout.</description>
+				<description>Demonstrates the direct reuse of a jar with a main
+					function without any libs. Simply writes a line on stdout.
+				</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>pyl.PckMain</javaClassName>
 				<application>JQM</application>
@@ -131,13 +140,15 @@
 				<keyword2>Main</keyword2>
 				<keyword3></keyword3>
 				<highlander>false</highlander>
-				<parameters>					
+				<parameters>
 				</parameters>
 			</jobDefinition>
-            
-            <jobDefinition>
+
+			<jobDefinition>
 				<name>DemoJdbcCon</name>
-				<description>Demonstrates the use of JNDI to retrieve a DB Connection named jdbc/test (which must exist before launch!). Displays a DB column count.</description>
+				<description>Demonstrates the use of JNDI to retrieve a DB
+					Connection named jdbc/test (which must exist before launch!).
+					Displays a DB column count.</description>
 				<canBeRestarted>true</canBeRestarted>
 				<javaClassName>pyl.JndiDb</javaClassName>
 				<application>JQM</application>
@@ -146,9 +157,42 @@
 				<keyword2>Main</keyword2>
 				<keyword3>JNDI</keyword3>
 				<highlander>false</highlander>
-				<parameters>					
+				<parameters>
 				</parameters>
 			</jobDefinition>
 		</jobdefinitions>
 	</jar>
+
+	<jar>
+		<path>jqm-demo/jqm-test-pyl-hibapi/jqm-test-pyl-hibapi.jar</path>
+		<jobdefinitions>
+			<jobDefinition>
+				<name>JqmHistoryPurge</name>
+				<description>A very naive History purge.</description>
+				<canBeRestarted>true</canBeRestarted>
+				<javaClassName>pyl.HistoryPurge</javaClassName>
+				<application>JQM</application>
+				<module>Demos</module>
+				<keyword1>Payload</keyword1>
+				<keyword2>Main</keyword2>
+				<keyword3>Purge</keyword3>
+				<highlander>false</highlander>
+				<parameters>
+					<parameter>
+						<key>purgeDeletedNodes</key>
+						<value>true</value>
+					</parameter>
+					<parameter>
+						<key>purgeDeletedQueues</key>
+						<value>true</value>
+					</parameter>
+					<parameter>
+						<key>historyRetentionInDays</key>
+						<value>10</value>
+					</parameter>
+				</parameters>
+			</jobDefinition>
+		</jobdefinitions>
+	</jar>
+
 </jqm>
