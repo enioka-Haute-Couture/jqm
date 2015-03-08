@@ -2,30 +2,31 @@
     <br/>
   <div class="row">
   
-    <div class="col-sm-4 col-md-2">
+    <div class="col-sm-5 col-md-3">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title">State filter</h3>
+          <h3 class="panel-title">Status filter</h3>
         </div>
         <div class="panel-body">
-          <div class="btn-group">
+          <div class="btn-group ">
             <label class="btn btn-default active" ng-model="target" btn-radio="'hist'" uncheckable><span class="glyphicon glyphicon-off"></span> ended</label>
             <label class="btn btn-default" ng-model="target" btn-radio="'queues'" uncheckable><span class="glyphicon glyphicon-road"></span> active</label>
           </div>
+          <label ng-show="target === 'hist'"><input type="checkbox" ng-model="ko"> KO only</label>
         </div>
       </div>
     </div>
     
-    <div class="col-sm-8 col-md-5">
+    <div class="col-sm-7 col-md-4">
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title">Name and ID filters</h3>
         </div>
         <div class="panel-body">
-           <input ng-model="query.applicationName" placeholder="application" type="text" ng-change="getDataAsync()" ng-required="true" popover="Use % as wildcard" popover-trigger="mouseenter" />
-          <input ng-model="query.user" placeholder="user" type="text" ng-change="getDataAsync()" ng-required="true" popover="Use % as wildcard" popover-trigger="mouseenter" />
+           <input ng-model="query.applicationName" placeholder="application" type="text" ng-change="getDataAsync()" ng-required="true" style="width: 10em;" popover="Use % as wildcard" popover-trigger="mouseenter" />
+          <input ng-model="query.user" placeholder="user" type="text" ng-change="getDataAsync()" ng-required="true" style="width: 8em;" popover="Use % as wildcard" popover-trigger="mouseenter" />
           <input ng-model="query.jobInstanceId" placeholder="id" type="text" ng-change="getDataAsync();" ng-required="true" style="width: 4em;" popover="Give exact ID" popover-trigger="mouseenter" />
-          <input ng-model="query.parentId" placeholder="par id" type="text" ng-change="getDataAsync();" ng-required="true" style="width: 4em;" popover="Give exact ID" popover-trigger="mouseenter" />
+          <input ng-model="query.parentId" placeholder="parentid" type="text" ng-change="getDataAsync();" ng-required="true" style="width: 4em;" popover="Give exact ID" popover-trigger="mouseenter" />
         </div>
       </div>
     </div>

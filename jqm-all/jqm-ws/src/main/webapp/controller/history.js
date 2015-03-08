@@ -39,6 +39,16 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
             $scope.query.queryLiveInstances = true;
             $scope.query.queryHistoryInstances = false;
         }
+        
+        // KO only?
+        if ($scope.target === "hist" && $scope.ko)
+        {
+            $scope.query.statuses = ['CRASHED', 'KILLED',];
+        }
+        else
+        {
+            $scope.query.statuses = [];
+        }
 
         // Sort options
         $scope.query.sortby = [];
@@ -190,7 +200,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
             $scope.getDataAsync();
         }
     }, true);
-    $scope.$watch('target', function(newVal, oldVal)
+    $scope.$watchCollection('[target, ko]', function(newVal, oldVal)
     {
         if (newVal !== oldVal)
         {
@@ -301,7 +311,7 @@ jqmApp.controller('historyDetail', function($scope, $http, $modal, ji)
                 url : function()
                 {
                     return url;
-                }
+                },
             },
         });
     };
