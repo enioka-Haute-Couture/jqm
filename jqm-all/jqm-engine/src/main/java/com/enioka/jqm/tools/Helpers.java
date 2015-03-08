@@ -486,7 +486,6 @@ final class Helpers
 
         // Global parameters
         initSingleParam("mavenRepo", "http://repo1.maven.org/maven2/", em);
-        initSingleParam("mailFrom", "jqm@noreply.com", em);
         initSingleParam(Constants.GP_DEFAULT_CONNECTION_KEY, Constants.GP_JQM_CONNECTION_ALIAS, em);
         initSingleParam("logFilePerLaunch", "true", em);
         initSingleParam("internalPollingPeriodMs", "60000", em);
