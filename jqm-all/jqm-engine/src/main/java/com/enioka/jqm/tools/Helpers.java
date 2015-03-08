@@ -21,6 +21,7 @@ package com.enioka.jqm.tools;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.SecureRandom;
+import java.sql.SQLTransientException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.util.ByteSource;
 import org.apache.shiro.util.StringUtils;
+import org.hibernate.exception.JDBCConnectionException;
 
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
@@ -805,5 +807,16 @@ final class Helpers
             // Don't do anything - this actually cannot happen. Death to checked exceptions.
             return null;
         }
+    }
+
+    static boolean testDbFailure(Exception e)
+    {
+        return e instanceof JDBCConnectionException
+                || e.getCause() instanceof JDBCConnectionException
+                || (e.getCause() != null && e.getCause().getCause() instanceof JDBCConnectionException)
+                || e.getCause() instanceof SQLTransientException
+                || (e.getCause() != null && e.getCause().getCause() instanceof SQLTransientException)
+                || (e.getCause().getCause() != null && e.getCause().getCause().getCause() instanceof SQLTransientException)
+                || (e.getCause().getCause().getCause() != null && e.getCause().getCause().getCause().getCause() instanceof SQLTransientException);
     }
 }

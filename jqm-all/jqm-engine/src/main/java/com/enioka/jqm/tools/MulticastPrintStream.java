@@ -68,6 +68,7 @@ class MulticastPrintStream extends PrintStream
     {
         try
         {
+            unregisterThread();
             Writer w = new FileWriter(FilenameUtils.concat(rootLogDir, fileName), true);
             logger.set(new BufferedWriter(w));
         }
@@ -83,7 +84,10 @@ class MulticastPrintStream extends PrintStream
         try
         {
             BufferedWriter bf = logger.get();
-            bf.close();
+            if (bf != null)
+            {
+                bf.close();
+            }
             logger.remove();
         }
         catch (IOException e)

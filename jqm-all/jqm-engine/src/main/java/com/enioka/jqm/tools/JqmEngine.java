@@ -76,6 +76,7 @@ class JqmEngine implements JqmEngineMBean
     // DB connection resilience data
     private volatile Queue<QueuePoller> qpToRestart = new ArrayQueue<QueuePoller>();
     private volatile Queue<Loader> loaderToFinalize = new ArrayQueue<Loader>();
+    private volatile Queue<Loader> loaderToRestart = new ArrayQueue<Loader>();
     private volatile Thread qpRestarter = null;
 
     /**
@@ -428,6 +429,12 @@ class JqmEngine implements JqmEngineMBean
         startDbRestarter();
     }
 
+    void loaderRestartNeeded(Loader l)
+    {
+        loaderToRestart.add(l);
+        startDbRestarter();
+    }
+
     synchronized void startDbRestarter()
     {
         // On first alert, start the thread which will check connection restoration and relaunch the pollers.
@@ -500,6 +507,15 @@ class JqmEngine implements JqmEngineMBean
                     jqmlogger.warn("storing delayed results for loader " + l.getId());
                     l.endOfRunDb();
                     l = loaderToFinalize.poll();
+                }
+
+                // Restart loaders that have failed during initialization
+                l = loaderToRestart.poll();
+                while (l != null)
+                {
+                    jqmlogger.warn("restarting (after db failure during initialization) loader " + l.getId());
+                    (new Thread(l)).start();
+                    l = loaderToRestart.poll();
                 }
 
                 // Done - reset the relauncher itself and let the thread end.

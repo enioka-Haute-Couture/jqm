@@ -21,10 +21,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.naming.spi.NamingManager;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceException;
 
 import org.apache.log4j.Logger;
-import org.hibernate.exception.JDBCConnectionException;
 
 import com.enioka.jqm.jpamodel.Node;
 
@@ -178,9 +176,9 @@ class InternalPoller implements Runnable
                     }
                 }
             }
-            catch (PersistenceException e)
+            catch (RuntimeException e)
             {
-                if (e.getCause() instanceof JDBCConnectionException)
+                if (Helpers.testDbFailure(e))
                 {
                     jqmlogger.error("connection to database lost - stopping internal poller");
                     jqmlogger.trace("connection error was:", e.getCause());

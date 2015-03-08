@@ -30,11 +30,8 @@ import javax.management.ObjectName;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.LockModeType;
-import javax.persistence.PersistenceException;
 
 import org.apache.log4j.Logger;
-import org.hibernate.TransactionException;
-import org.hibernate.exception.JDBCConnectionException;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
@@ -85,7 +82,6 @@ class QueuePoller implements Runnable, QueuePollerMBean
         }
         hasStopped = false;
         run = true;
-        actualNbThread.set(0);
         lastLoop = null;
         loop = new Semaphore(0);
     }
@@ -231,9 +227,9 @@ class QueuePoller implements Runnable, QueuePollerMBean
                     ji = dequeue(em);
                 }
             }
-            catch (PersistenceException e)
+            catch (RuntimeException e)
             {
-                if (e.getCause() instanceof JDBCConnectionException || e.getCause() instanceof TransactionException)
+                if (Helpers.testDbFailure(e))
                 {
                     jqmlogger.error("connection to database lost - stopping poller");
                     jqmlogger.trace("connection error was:", e.getCause());

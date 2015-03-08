@@ -3,6 +3,9 @@ package com.enioka.jqm.tools;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class DbFailTest extends JqmBaseTest
@@ -96,5 +99,40 @@ public class DbFailTest extends JqmBaseTest
         TestHelpers.waitFor(1, 10000, this.getNewEm());
 
         Assert.assertEquals(1, TestHelpers.getNonOkCount(this.getNewEm()));
+    }
+
+    // Many jobs starting & running during failure
+    @Test
+    public void testDbFailureUnderLoad() throws Exception
+    {
+        // Many starting jobs simultaneously
+        em.getTransaction().begin();
+        em.createQuery("UPDATE DeploymentParameter dp SET dp.nbThread = 50 WHERE dp.queue = :q").setParameter("q", TestHelpers.qVip)
+                .executeUpdate();
+        em.getTransaction().commit();
+        TestHelpers.setNodesLogLevel("INFO", em);
+
+        CreationTools.createJobDef(null, true, "pyl.Nothing", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", TestHelpers.qVip, -1,
+                "TestJqmApplication", "appFreeName", "TestModule", "kw1", "kw2", "kw3", false, em);
+
+        JobRequest j = new JobRequest("TestJqmApplication", "TestUser");
+        for (int i = 0; i < 1000; i++)
+        {
+            JqmClientFactory.getClient().enqueue(j);
+        }
+
+        addAndStartEngine();
+
+        this.sleep(2);
+        jqmlogger.info("Stopping db");
+        s.stop();
+        this.waitDbStop();
+        this.sleep(1);
+        jqmlogger.info("Restarting DB");
+        s.start();
+        TestHelpers.waitFor(1000, 60000, this.getNewEm());
+
+        Assert.assertEquals(1000, TestHelpers.getOkCount(this.getNewEm()));
+        Assert.assertTrue(this.engines.get("localhost").isAllPollersPolling());
     }
 }

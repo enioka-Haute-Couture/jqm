@@ -37,14 +37,11 @@ import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
-import javax.persistence.PersistenceException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.hibernate.TransactionException;
-import org.hibernate.exception.JDBCConnectionException;
 
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.History;
@@ -113,6 +110,7 @@ class Loader implements Runnable, LoaderMBean
 
     private void runPayload()
     {
+        // One log per launch?
         if (System.out instanceof MulticastPrintStream)
         {
             String fileName = StringUtils.leftPad("" + this.job.getId(), 10, "0");
@@ -122,60 +120,66 @@ class Loader implements Runnable, LoaderMBean
             mps.registerThread(String.valueOf(fileName + ".stderr.log"));
         }
 
-        // Var init
-        Thread.currentThread().setName(this.job.getJd().getApplicationName() + ";payload;" + this.job.getId());
-        EntityManager em = Helpers.getNewEm();
-        this.job = em.find(JobInstance.class, job.getId());
-        this.node = em.find(Node.class, job.getNode().getId());
-
-        // Log
-        this.resultStatus = State.SUBMITTED;
-        jqmlogger.debug("A loader/runner thread has just started for Job Instance " + job.getId() + ". Jar is: " + job.getJd().getJarPath()
-                + " - class is: " + job.getJd().getJavaClassName());
-
-        // Disabled
-        if (!this.job.getJd().isEnabled())
-        {
-            jqmlogger.info("Job Instance " + job.getId() + " will actually not truly run as its Job Definition is disabled");
-            em.getTransaction().begin();
-            this.job.setProgress(-1);
-            em.getTransaction().commit();
-            resultStatus = State.ENDED;
-            endOfRun();
-            em.close();
-            return;
-        }
-
-        // Check file paths (unless it is /dev/null, which means no jar file)
-        final boolean noLibLoading = "/dev/null".equals(job.getJd().getJarPath());
-        File jarFile = new File(FilenameUtils.concat(new File(node.getRepo()).getAbsolutePath(), job.getJd().getJarPath()));
-        if (!noLibLoading && !jarFile.canRead())
-        {
-            jqmlogger.warn("Cannot read file at " + jarFile.getAbsolutePath()
-                    + ". Job instance will crash. Check job definition or permissions on file.");
-            resultStatus = State.CRASHED;
-            endOfRun();
-            em.close();
-            return;
-        }
+        EntityManager em = null;
+        final boolean noLibLoading;
         final URL jarUrl;
-        try
-        {
-            jarUrl = jarFile.toURI().toURL();
-        }
-        catch (MalformedURLException ex)
-        {
-            jqmlogger.warn("The JAR file path specified in Job Definition is incorrect " + job.getJd().getApplicationName(), ex);
-            resultStatus = State.CRASHED;
-            endOfRun();
-            em.close();
-            return;
-        }
-
-        // Create the CLASSPATH for our classloader (if not already in cache)
         final URL[] classpath;
+        final Map<String, String> params;
+
+        // Block needing the database
         try
         {
+            em = Helpers.getNewEm();
+
+            // Set thread name
+            Thread.currentThread().setName(this.job.getJd().getApplicationName() + ";payload;" + this.job.getId());
+
+            // Refresh entities from the current EM
+            this.job = em.find(JobInstance.class, job.getId());
+            this.node = em.find(Node.class, job.getNode().getId());
+
+            // Log
+            this.resultStatus = State.SUBMITTED;
+            jqmlogger.debug("A loader/runner thread has just started for Job Instance " + job.getId() + ". Jar is: "
+                    + job.getJd().getJarPath() + " - class is: " + job.getJd().getJavaClassName());
+
+            // Disabled
+            if (!this.job.getJd().isEnabled())
+            {
+                jqmlogger.info("Job Instance " + job.getId() + " will actually not truly run as its Job Definition is disabled");
+                em.getTransaction().begin();
+                this.job.setProgress(-1);
+                em.getTransaction().commit();
+                resultStatus = State.ENDED;
+                endOfRun();
+                return;
+            }
+
+            // Check file paths (unless it is /dev/null, which means no jar file)
+            noLibLoading = "/dev/null".equals(job.getJd().getJarPath());
+            File jarFile = new File(FilenameUtils.concat(new File(node.getRepo()).getAbsolutePath(), job.getJd().getJarPath()));
+            if (!noLibLoading && !jarFile.canRead())
+            {
+                jqmlogger.warn("Cannot read file at " + jarFile.getAbsolutePath()
+                        + ". Job instance will crash. Check job definition or permissions on file.");
+                resultStatus = State.CRASHED;
+                endOfRun();
+                return;
+            }
+
+            try
+            {
+                jarUrl = jarFile.toURI().toURL();
+            }
+            catch (MalformedURLException ex)
+            {
+                jqmlogger.warn("The JAR file path specified in Job Definition is incorrect " + job.getJd().getApplicationName(), ex);
+                resultStatus = State.CRASHED;
+                endOfRun();
+                return;
+            }
+
+            // Create the CLASSPATH for our classloader (if not already in cache)
             if (!noLibLoading)
             {
                 classpath = cache.getLibraries(node, job.getJd(), em);
@@ -185,52 +189,42 @@ class Loader implements Runnable, LoaderMBean
                 classpath = null;
             }
 
-        }
-        catch (Exception e1)
-        {
-            jqmlogger.warn("Could not resolve CLASSPATH for job " + job.getJd().getApplicationName(), e1);
-            resultStatus = State.CRASHED;
-            endOfRun();
-            em.close();
-            return;
-        }
+            // Parameters
+            params = new HashMap<String, String>();
+            for (RuntimeParameter jp : em.createQuery("SELECT p FROM RuntimeParameter p WHERE p.ji = :i", RuntimeParameter.class)
+                    .setParameter("i", job.getId()).getResultList())
+            {
+                jqmlogger.trace("Parameter " + jp.getKey() + " - " + jp.getValue());
+                params.put(jp.getKey(), jp.getValue());
+            }
 
-        // Update of the job status, dates & co
-        try
-        {
+            // Update of the job status, dates & co
             em.getTransaction().begin();
             em.refresh(job, LockModeType.PESSIMISTIC_WRITE);
-
             if (!job.getState().equals(State.KILLED))
             {
                 // Use a query to avoid locks on FK checks (with setters, every field is updated!)
                 em.createQuery("UPDATE JobInstance j SET j.executionDate = current_timestamp(), state = 'RUNNING' WHERE j.id = :i")
                         .setParameter("i", job.getId()).executeUpdate();
             }
-
             em.getTransaction().commit();
         }
-        catch (Exception e)
+        catch (RuntimeException e)
         {
-            jqmlogger.error("Could not update internal elements", e);
-            em.getTransaction().rollback();
-            em.close();
+            firstBlockDbFailureAnalysis(e);
+            return;
+        }
+        catch (JqmPayloadException e)
+        {
+            jqmlogger.warn("Could not resolve CLASSPATH for job " + job.getJd().getApplicationName(), e);
             resultStatus = State.CRASHED;
             endOfRun();
             return;
         }
-
-        // Parameters
-        Map<String, String> params = new HashMap<String, String>();
-        for (RuntimeParameter jp : em.createQuery("SELECT p FROM RuntimeParameter p WHERE p.ji = :i", RuntimeParameter.class)
-                .setParameter("i", job.getId()).getResultList())
+        finally
         {
-            jqmlogger.trace("Parameter " + jp.getKey() + " - " + jp.getValue());
-            params.put(jp.getKey(), jp.getValue());
+            Helpers.closeQuietly(em);
         }
-
-        // No need anymore for the EM.
-        em.close();
 
         // Class loader switch
         JarClassLoader jobClassLoader = null;
@@ -273,7 +267,7 @@ class Loader implements Runnable, LoaderMBean
         catch (Exception e)
         {
             jqmlogger.error("Could not switch classloaders", e);
-            resultStatus = State.CRASHED;
+            this.resultStatus = State.CRASHED;
             endOfRun();
             return;
         }
@@ -282,17 +276,17 @@ class Loader implements Runnable, LoaderMBean
         try
         {
             jobClassLoader.launchJar(job, params);
-            resultStatus = State.ENDED;
+            this.resultStatus = State.ENDED;
         }
         catch (JqmKillException e)
         {
             jqmlogger.info("Job instance  " + job.getId() + " has been killed.");
-            resultStatus = State.KILLED;
+            this.resultStatus = State.KILLED;
         }
         catch (Exception e)
         {
             jqmlogger.info("Job instance " + job.getId() + " has crashed. Exception was:", e);
-            resultStatus = State.CRASHED;
+            this.resultStatus = State.CRASHED;
         }
 
         // Job instance has now ended its run
@@ -398,6 +392,14 @@ class Loader implements Runnable, LoaderMBean
         }
 
         // Unregister logger
+        unregisterLogger();
+
+        // Part needing DB connection with specific failure handling code.
+        endOfRunDb();
+    }
+
+    private void unregisterLogger()
+    {
         if (System.out instanceof MulticastPrintStream)
         {
             MulticastPrintStream mps = (MulticastPrintStream) System.out;
@@ -405,8 +407,6 @@ class Loader implements Runnable, LoaderMBean
             mps = (MulticastPrintStream) System.err;
             mps.unregisterThread();
         }
-
-        endOfRunDb();
     }
 
     /**
@@ -428,22 +428,47 @@ class Loader implements Runnable, LoaderMBean
             em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", job.getId()).executeUpdate();
             em.getTransaction().commit();
         }
-        catch (PersistenceException e)
+        catch (RuntimeException e)
         {
-            if (e.getCause() instanceof JDBCConnectionException || e.getCause() instanceof TransactionException)
-            {
-                jqmlogger.error("connection to database lost - loader " + this.getId() + " will need delayed finalization");
-                jqmlogger.trace("connection error was:", e.getCause());
-                this.p.getEngine().loaderFinalizationNeeded(this);
-            }
-            else
-            {
-                throw e;
-            }
+            endBlockDbFailureAnalysis(e);
         }
         finally
         {
             Helpers.closeQuietly(em);
+        }
+    }
+
+    private void firstBlockDbFailureAnalysis(Exception e)
+    {
+        if (Helpers.testDbFailure(e))
+        {
+            jqmlogger.error("connection to database lost - loader " + this.getId() + " will be restarted later");
+            jqmlogger.trace("connection error was:", e.getCause());
+            this.p.getEngine().loaderRestartNeeded(this);
+            unregisterLogger();
+            return;
+        }
+        else
+        {
+            jqmlogger.error("a database related operation has failed and cannot be recovered", e);
+            resultStatus = State.CRASHED;
+            endOfRun();
+            return;
+        }
+    }
+
+    private void endBlockDbFailureAnalysis(RuntimeException e)
+    {
+        if (Helpers.testDbFailure(e))
+        {
+            jqmlogger.error("connection to database lost - loader " + this.getId() + " will need delayed finalization");
+            jqmlogger.trace("connection error was:", e.getCause());
+            this.p.getEngine().loaderFinalizationNeeded(this);
+        }
+        else
+        {
+            jqmlogger.error("a database related operation has failed and cannot be recovered");
+            throw e;
         }
     }
 
