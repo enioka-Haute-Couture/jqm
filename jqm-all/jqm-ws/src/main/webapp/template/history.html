@@ -63,16 +63,16 @@
     <div ng-grid='gridOptions' ng-dblclick="showDetail()"></div>
     
     <div class="small">Double-click on a line to get job details, files produced and logs.</div>
-    <button class="btn btn-default" ng-click="relaunch()" ng-disabled="selected.length === 0 || (selected[0].state !== 'ENDED' && selected[0].state !== 'CRASHED'  && selected[0].state !== 'KILLED')"><span class="glyphicon glyphicon-repeat"></span> Relaunch</button>
     <button class="btn btn-default" ng-click="getDataAsync()"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
-    <button class="btn btn-default" ng-click="kill()" ng-disabled="selected.length === 0 || target === 'hist' || selected[0].state !== 'RUNNING'"><span class="glyphicon glyphicon-stop"></span> Kill</button>
-    <button class="btn btn-default" ng-click="newLaunch()" jqm-permission="ji:create"><span class="glyphicon glyphicon-plus"></span> New launch form</button>
+    <button class="btn btn-default" ng-click="relaunch()" jqm-permission="job_instance:create" ng-disabled="selected.length === 0 || (selected[0].state !== 'ENDED' && selected[0].state !== 'CRASHED' && selected[0].state !== 'KILLED')"><span class="glyphicon glyphicon-repeat"></span> Relaunch</button>
+    <button class="btn btn-default" ng-click="kill()" jqm-permission="job_instance:create" ng-disabled="selected.length === 0 || target === 'hist' || selected[0].state !== 'RUNNING'"><span class="glyphicon glyphicon-stop"></span> Kill</button>
+    <button class="btn btn-default" ng-click="newLaunch()" jqm-permission="job_instance:create"><span class="glyphicon glyphicon-plus"></span> New launch form</button>
     
     <span ng-hide="selected.length === 0 || target === 'hist' || selected[0].state !== 'SUBMITTED'">
-        <button class="btn btn-default" ng-click="changeQueue(newqueueid)"><span class="glyphicon glyphicon-sort-by-order"></span> Switch to queue</button>
+        <button class="btn btn-default" ng-click="changeQueue(newqueueid)" jqm-permission="queue_position:create"><span class="glyphicon glyphicon-sort-by-order"></span> Switch to queue</button>
         <select ng-cell-input ng-model="newqueueid" ng-options="q.id as q.name for q in queues"></select>
-        <button class="btn btn-default" ng-click="pause()"><span class="glyphicon glyphicon-pause"></span> Pause</button>
+        <button class="btn btn-default" ng-click="pause()" jqm-permission="job_instance:create"><span class="glyphicon glyphicon-pause"></span> Pause</button>
     </span>
-    <button class="btn btn-default" ng-click="resume()" ng-hide="selected.length === 0 || target === 'hist' || selected[0].state !== 'HOLDED'"><span class="glyphicon glyphicon-play"></span> Resume</button>
+    <button class="btn btn-default" ng-click="resume()" jqm-permission="job_instance:create" ng-hide="selected.length === 0 || target === 'hist' || selected[0].state !== 'HOLDED'"><span class="glyphicon glyphicon-play"></span> Resume</button>
 </div>
 
