@@ -1,7 +1,7 @@
 'use strict';
 
 var jqmApp = angular.module('jqmApp',
-        [ 'ngRoute', 'ngCookies', 'jqmControllers', 'ngGrid', 'jqmServices', 'ui.bootstrap', 'ngSanitize', 'ui.select' ]);
+        [ 'ngRoute', 'ngCookies', 'jqmControllers', 'ngGrid', 'jqmServices', 'ui.bootstrap', 'ngSanitize', 'ui.select', 'ngBusy' ]);
 
 jqmApp.config([ '$routeProvider', function($routeProvider, µPermManager)
 {

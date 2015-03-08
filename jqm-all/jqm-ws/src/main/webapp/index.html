@@ -10,6 +10,7 @@
 <script src="libs/jquery-1.11.1.js"></script>
 <script src="libs/bootstrap.js"></script>
 <script src="libs/angular-1.3.9.js"></script>
+<script src="libs/angular-busy.min.js"></script>
 <script src="libs/angular-route.js"></script>
 <script src="libs/angular-cookies.js"></script>
 <script src="libs/angular-resource.js"></script>
@@ -39,6 +40,7 @@
             <li ng-repeat="tab in tabs" ng-class="tabClass(tab)" jqm-permission="{{tab.permission}}">
               <a href="{{tab.link}}" ng-click="setSelectedTab(tab)"><div ng-bind-html="tab.label"></div></a>
             </li>
+            <li style="right:5px; vertical-align:center; position: absolute; height: 42px; font-style: italic; font-weight: bolder;" busy="Busy..."> </li>
         </ul>
         
         <div ng-controller="AlertCtrl" ng-hide="!alert.data.userReadableMessage">
