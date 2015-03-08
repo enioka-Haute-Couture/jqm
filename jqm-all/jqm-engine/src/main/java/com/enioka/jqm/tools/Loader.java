@@ -67,6 +67,7 @@ class Loader implements Runnable, LoaderMBean
     private ObjectName name = null;
     private ClassLoader contextClassLoader = null;
     Boolean isDone = false;
+    private String threadName;
 
     // These two fields are instance-level in order to allow an easy endOfRunDb external call
     private Calendar endDate = null;
@@ -77,6 +78,7 @@ class Loader implements Runnable, LoaderMBean
         this.cache = cache;
         this.p = p;
         this.job = job;
+        this.threadName = this.job.getJd().getApplicationName() + ";payload;" + this.job.getId();
 
         // JMX
         if (p != null && this.p.getEngine().loadJmxBeans)
@@ -110,6 +112,9 @@ class Loader implements Runnable, LoaderMBean
 
     private void runPayload()
     {
+        // Set thread name
+        Thread.currentThread().setName(threadName);
+
         // One log per launch?
         if (System.out instanceof MulticastPrintStream)
         {
@@ -130,9 +135,6 @@ class Loader implements Runnable, LoaderMBean
         try
         {
             em = Helpers.getNewEm();
-
-            // Set thread name
-            Thread.currentThread().setName(this.job.getJd().getApplicationName() + ";payload;" + this.job.getId());
 
             // Refresh entities from the current EM
             this.job = em.find(JobInstance.class, job.getId());
@@ -443,7 +445,7 @@ class Loader implements Runnable, LoaderMBean
         if (Helpers.testDbFailure(e))
         {
             jqmlogger.error("connection to database lost - loader " + this.getId() + " will be restarted later");
-            jqmlogger.trace("connection error was:", e.getCause());
+            jqmlogger.trace("connection error was:", e);
             this.p.getEngine().loaderRestartNeeded(this);
             unregisterLogger();
             return;
