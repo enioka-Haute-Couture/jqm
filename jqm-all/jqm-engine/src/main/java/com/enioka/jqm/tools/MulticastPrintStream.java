@@ -84,11 +84,11 @@ class MulticastPrintStream extends PrintStream
         try
         {
             BufferedWriter bf = logger.get();
-            if (bf != null)
+            if (bf != original)
             {
                 bf.close();
+                logger.remove();
             }
-            logger.remove();
         }
         catch (IOException e)
         {

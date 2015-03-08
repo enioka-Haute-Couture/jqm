@@ -47,6 +47,7 @@ import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.util.ByteSource;
 import org.apache.shiro.util.StringUtils;
+import org.hibernate.LazyInitializationException;
 import org.hibernate.exception.JDBCConnectionException;
 
 import com.enioka.jqm.jpamodel.Deliverable;
@@ -811,12 +812,14 @@ final class Helpers
 
     static boolean testDbFailure(Exception e)
     {
-        return e instanceof JDBCConnectionException
-                || e.getCause() instanceof JDBCConnectionException
+        return (e instanceof LazyInitializationException)
+                || (e instanceof JDBCConnectionException)
+                || (e.getCause() instanceof JDBCConnectionException)
                 || (e.getCause() != null && e.getCause().getCause() instanceof JDBCConnectionException)
-                || e.getCause() instanceof SQLTransientException
+                || (e.getCause() instanceof SQLTransientException)
                 || (e.getCause() != null && e.getCause().getCause() instanceof SQLTransientException)
-                || (e.getCause().getCause() != null && e.getCause().getCause().getCause() instanceof SQLTransientException)
-                || (e.getCause().getCause().getCause() != null && e.getCause().getCause().getCause().getCause() instanceof SQLTransientException);
+                || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() instanceof SQLTransientException)
+                || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() != null && e.getCause()
+                        .getCause().getCause().getCause() instanceof SQLTransientException);
     }
 }
