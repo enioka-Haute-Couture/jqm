@@ -112,7 +112,6 @@ public class JmxTest extends JqmBaseTest
         ObjectName engine = new ObjectName("com.enioka.jqm:type=Node,name=" + TestHelpers.node.getName());
         JqmEngineMBean proxyEngine = JMX.newMBeanProxy(mbsc, engine, JqmEngineMBean.class);
         Assert.assertEquals(1, proxyEngine.getCumulativeJobInstancesCount() + proxyEngine.getCurrentlyRunningJobCount());
-        proxyEngine.getJobsFinishedPerSecondLastMinute();
         Assert.assertTrue(proxyEngine.getUptime() > 0);
         proxyEngine.getVersion();
         Assert.assertTrue(proxyEngine.isAllPollersPolling());

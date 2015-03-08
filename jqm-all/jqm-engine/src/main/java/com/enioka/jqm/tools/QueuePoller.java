@@ -312,6 +312,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     {
         this.actualNbThread.decrementAndGet();
         loop.release(1);
+        this.engine.signalEndOfRun();
     }
 
     boolean isRunning()

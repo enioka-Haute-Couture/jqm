@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -72,6 +73,7 @@ class JqmEngine implements JqmEngineMBean
     private Calendar startTime = Calendar.getInstance();
     private Thread killHook = null;
     boolean loadJmxBeans = true;
+    private AtomicLong endedInstances = new AtomicLong(0);
 
     // DB connection resilience data
     private volatile Queue<QueuePoller> qpToRestart = new ArrayQueue<QueuePoller>();
@@ -535,6 +537,11 @@ class JqmEngine implements JqmEngineMBean
         return this.server;
     }
 
+    void signalEndOfRun()
+    {
+        this.endedInstances.incrementAndGet();
+    }
+
     // //////////////////////////////////////////////////////////////////////////
     // JMX stat methods (they get their own EM to be thread safe)
     // //////////////////////////////////////////////////////////////////////////
@@ -542,32 +549,17 @@ class JqmEngine implements JqmEngineMBean
     @Override
     public long getCumulativeJobInstancesCount()
     {
-        EntityManager em = Helpers.getNewEm();
-        Long nb = em.createQuery("SELECT COUNT(i) From History i WHERE i.node = :n", Long.class).setParameter("n", this.node)
-                .getSingleResult();
-        em.close();
-        return nb;
-    }
-
-    @Override
-    public float getJobsFinishedPerSecondLastMinute()
-    {
-        EntityManager em = Helpers.getNewEm();
-        Calendar minusOneMinute = Calendar.getInstance();
-        minusOneMinute.add(Calendar.MINUTE, -1);
-        Float nb = em.createQuery("SELECT COUNT(i) From History i WHERE i.endDate >= :d and i.node = :n", Long.class)
-                .setParameter("d", minusOneMinute).setParameter("n", this.node).getSingleResult() / 60f;
-        em.close();
-        return nb;
+        return this.endedInstances.get();
     }
 
     @Override
     public long getCurrentlyRunningJobCount()
     {
-        EntityManager em = Helpers.getNewEm();
-        Long nb = em.createQuery("SELECT COUNT(i) From JobInstance i WHERE i.node = :n", Long.class).setParameter("n", this.node)
-                .getSingleResult();
-        em.close();
+        Long nb = 0L;
+        for (QueuePoller p : this.pollers.values())
+        {
+            nb += p.getCurrentlyRunningJobCount();
+        }
         return nb;
     }
 
