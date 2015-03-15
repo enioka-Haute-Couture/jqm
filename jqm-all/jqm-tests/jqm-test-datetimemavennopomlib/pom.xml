@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.enioka.jqm</groupId>
 		<artifactId>jqm-tests</artifactId>
-		<version>1.3.1-SNAPSHOT</version>
+		<version>1.3.1</version>
 	</parent>
 
 	<artifactId>jqm-test-datetimemavennopomlib</artifactId>
