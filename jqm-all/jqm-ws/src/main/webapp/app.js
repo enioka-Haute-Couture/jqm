@@ -1,7 +1,7 @@
 'use strict';
 
-var jqmApp = angular.module('jqmApp',
-        [ 'ngRoute', 'ngCookies', 'jqmControllers', 'ngGrid', 'jqmServices', 'ui.bootstrap', 'ngSanitize', 'ui.select', 'ngBusy' ]);
+var jqmApp = angular.module('jqmApp', [ 'ngRoute', 'ngCookies', 'jqmControllers', 'ngGrid', 'jqmServices', 'ui.bootstrap', 'ngSanitize', 'ui.select',
+        'ngBusy' ]);
 
 jqmApp.config([ '$routeProvider', function($routeProvider, µPermManager)
 {
@@ -127,16 +127,15 @@ Date.prototype.addDays = function(days)
     return dat;
 };
 
-
-///////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////
 // Error message pipe stuff
-///////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////
 
 jqmApp.filter('j2h', function()
 {
     return function(text)
     {
-        if (! text)
+        if (!text)
         {
             return null;
         }
@@ -159,7 +158,7 @@ jqmApp.factory('µAlertSrv', function($rootScope)
     {
         µAlertSrv.alert.data = null;
     };
-    
+
     µAlertSrv.showSimpleMessage = function(msg)
     {
         µAlertSrv.dismiss();
@@ -174,16 +173,16 @@ jqmApp.controller('AlertCtrl', function($scope, $sanitize, µAlertSrv)
 {
     $scope.alert = µAlertSrv.alert;
     $scope.isCollapsed = true;
-    
+
     $scope.closeAlert = function()
     {
         $scope.isCollapsed = true;
         µAlertSrv.dismiss();
     };
-    
+
     $scope.toggle = function()
     {
-        $scope.isCollapsed = ! $scope.isCollapsed;
+        $scope.isCollapsed = !$scope.isCollapsed;
     };
 });
 
@@ -203,7 +202,6 @@ jqmApp.config(function($httpProvider)
         };
     });
 });
-
 
 // /////////////////////////////////////////////////////////////////////
 // Login & permissions handling
@@ -279,6 +277,7 @@ jqmApp.controller('µCredentialsController', function($scope, µPermManager, $lo
     $scope.data = {
         login : null,
         password : null,
+        error : null,
     };
 
     $scope.logmeout = function()
@@ -289,7 +288,15 @@ jqmApp.controller('µCredentialsController', function($scope, µPermManager, $lo
 
     $scope.logmein = function()
     {
-        µPermManager.init($scope.data.login, $scope.data.password);
+        if ($scope.data.login && $scope.data.password)
+        {
+            $scope.data.error = null;
+            µPermManager.init($scope.data.login, $scope.data.password);
+        }
+        else
+        {
+            $scope.data.error = "cannot login with null login or password";
+        }
     };
 });
 
