@@ -75,6 +75,19 @@ Windows::
 
 In both cases, it is strictly equivalent to stopping and then starting again manually (including the two-minutes timeout).
 
+Pausing and resuming
+***********************
+
+An engine in pause runs normally but does not take new job instances anymore. Job instances already running at the time of pause go on normally.
+
+Pausing and resuming methods are available at two levels:
+
+* per node (pause all queues for an engine)
+* per binding (pause only one queue for an engine)
+
+These methods are available through JMX and though the database (in which case modifications are only applied after at most 
+parameter internalPollingPeriodMs). The database method is also exposed by the admin GUI.
+
 Backup
 ************
 
