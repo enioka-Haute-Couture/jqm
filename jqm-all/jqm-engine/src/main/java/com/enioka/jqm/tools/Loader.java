@@ -316,7 +316,7 @@ class Loader implements Runnable, LoaderMBean
         endDate = GregorianCalendar.getInstance(Locale.getDefault());
 
         // This block is needed for external payloads, as the single runner may forcefully call endOfRun.
-        synchronized (isDone)
+        synchronized (this)
         {
             if (!isDone)
             {
