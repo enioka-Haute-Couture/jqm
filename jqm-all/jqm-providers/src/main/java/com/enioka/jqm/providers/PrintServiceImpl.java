@@ -40,22 +40,22 @@ class PrintServiceImpl implements PrintService
     @Override
     public void print(String printQueueName, String jobName, InputStream data) throws PrintException
     {
-        print(printQueueName, "houba", data, DocFlavor.INPUT_STREAM.AUTOSENSE);
+        print(printQueueName, jobName, data, DocFlavor.INPUT_STREAM.AUTOSENSE);
     }
 
     @Override
     public void print(String printQueueName, String jobName, byte[] data) throws PrintException
     {
-        print(printQueueName, "houba", data, DocFlavor.BYTE_ARRAY.AUTOSENSE);
+        print(printQueueName, jobName, data, DocFlavor.BYTE_ARRAY.AUTOSENSE);
     }
 
     @Override
     public void print(String printQueueName, String jobName, Object data, DocFlavor flavor) throws PrintException
     {
         // Arguments tests
-        if (printQueueName == null)
+        if (printQueueName == null || printQueueName.isEmpty())
         {
-            throw new IllegalArgumentException("printQueueName must be non null");
+            throw new IllegalArgumentException("printQueueName must be non null and non empty");
         }
         if (data == null)
         {
@@ -65,9 +65,9 @@ class PrintServiceImpl implements PrintService
         {
             throw new IllegalArgumentException("flavor must be non null");
         }
-        if (jobName == null)
+        if (jobName == null || jobName.isEmpty())
         {
-            throw new IllegalArgumentException("job name must be non null");
+            throw new IllegalArgumentException("job name must be non null and non empty");
         }
 
         // Find the queue
