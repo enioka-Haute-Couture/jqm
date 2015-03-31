@@ -29,6 +29,7 @@ import javax.print.attribute.HashPrintServiceAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.standard.JobName;
 import javax.print.attribute.standard.PrinterName;
+import javax.print.attribute.standard.RequestingUserName;
 
 class PrintServiceImpl implements PrintService
 {
@@ -40,17 +41,35 @@ class PrintServiceImpl implements PrintService
     @Override
     public void print(String printQueueName, String jobName, InputStream data) throws PrintException
     {
-        print(printQueueName, jobName, data, DocFlavor.INPUT_STREAM.AUTOSENSE);
+        print(printQueueName, jobName, data, (String) null);
+    }
+
+    @Override
+    public void print(String printQueueName, String jobName, InputStream data, String endUserName) throws PrintException
+    {
+        print(printQueueName, jobName, data, DocFlavor.INPUT_STREAM.AUTOSENSE, endUserName);
     }
 
     @Override
     public void print(String printQueueName, String jobName, byte[] data) throws PrintException
     {
-        print(printQueueName, jobName, data, DocFlavor.BYTE_ARRAY.AUTOSENSE);
+        print(printQueueName, jobName, data, (String) null);
+    }
+
+    @Override
+    public void print(String printQueueName, String jobName, byte[] data, String endUserName) throws PrintException
+    {
+        print(printQueueName, jobName, data, DocFlavor.BYTE_ARRAY.AUTOSENSE, endUserName);
     }
 
     @Override
     public void print(String printQueueName, String jobName, Object data, DocFlavor flavor) throws PrintException
+    {
+        print(printQueueName, jobName, data, flavor, null);
+    }
+
+    @Override
+    public void print(String printQueueName, String jobName, Object data, DocFlavor flavor, String endUserName) throws PrintException
     {
         // Arguments tests
         if (printQueueName == null || printQueueName.isEmpty())
@@ -69,6 +88,10 @@ class PrintServiceImpl implements PrintService
         {
             throw new IllegalArgumentException("job name must be non null and non empty");
         }
+        if (endUserName != null && endUserName.isEmpty())
+        {
+            throw new IllegalArgumentException("endUserName can be null but cannot be empty is specified");
+        }
 
         // Find the queue
         AttributeSet set = new HashPrintServiceAttributeSet();
@@ -86,6 +109,10 @@ class PrintServiceImpl implements PrintService
         DocPrintJob job = queue.createPrintJob();
         PrintRequestAttributeSet jobAttrs = new HashPrintRequestAttributeSet();
         jobAttrs.add(new JobName(jobName, null));
+        if (endUserName != null && queue.isAttributeCategorySupported(RequestingUserName.class))
+        {
+            jobAttrs.add(new RequestingUserName(endUserName, null));
+        }
 
         // Create payload
         Doc doc = new SimpleDoc(data, flavor, null);
