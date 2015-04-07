@@ -1305,6 +1305,13 @@ final class HibernateClient implements JqmClient
         EntityManager em = null;
         try
         {
+            // Three steps: first, query History as:
+            // * this is supposed to be the most frequent query.
+            // * we try to avoid hitting the queues if possible
+            // Second, query live queues
+            // Third, query history again (because a JI may have ended between the first two queries, so we may miss a JI)
+            // Outside this case, this third query will be very rare, as the method is always called with an ID that cannot be
+            // guessed as its only parameter, so the existence of the JI is nearly always a given.
             em = getEm();
             History h = em.find(History.class, idJob);
             com.enioka.jqm.api.JobInstance res = null;
@@ -1321,7 +1328,15 @@ final class HibernateClient implements JqmClient
                 }
                 else
                 {
-                    throw new JqmInvalidRequestException("No job instance of ID " + idJob);
+                    h = em.find(History.class, idJob);
+                    if (h != null)
+                    {
+                        res = getJob(h, em);
+                    }
+                    else
+                    {
+                        throw new JqmInvalidRequestException("No job instance of ID " + idJob);
+                    }
                 }
             }
             return res;
