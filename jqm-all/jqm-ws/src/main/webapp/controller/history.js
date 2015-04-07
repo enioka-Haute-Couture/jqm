@@ -135,7 +135,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
             sortField : 'STATUS',
             cellTemplate: '<div ng-class="{\'bg-success\': row.getProperty(col.field) == \'ENDED\', \
                                            \'bg-info\': row.getProperty(col.field) == \'RUNNING\', \
-                                           \'bg-danger\': row.getProperty(col.field) == \'CRASHED\' || row.getProperty(col.field) == \'KILLED\', \
+                                           \'bg-danger\': row.getProperty(col.field) == \'CRASHED\' || row.getProperty(col.field) == \'KILLED\' || row.getProperty(col.field) == \'CANCELLED\',\
                                            \'bg-warning\': row.getProperty(col.field) == \'SUBMITTED\' }"> \
                                            <div class="ngCellText">{{row.getProperty(col.field)}}</div></div>',
         }, {

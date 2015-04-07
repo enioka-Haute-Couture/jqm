@@ -589,6 +589,17 @@ final class HibernateClient implements JqmClient
     @Override
     public void killJob(int idJob)
     {
+        // First try to cancel the JI (works if it is not already running)
+        try
+        {
+            cancelJob(idJob);
+            return;
+        }
+        catch (JqmClientException e)
+        {
+            // Nothing to do - this is thrown if already running. Just go on, this is a standard kill.
+        }
+
         EntityManager em = null;
         try
         {
