@@ -2,6 +2,7 @@ package com.enioka.jqm.tools;
 
 import java.beans.Introspector;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Method;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -48,5 +49,30 @@ class ClassLoaderLeakCleaner
 
         // Bean cache
         Introspector.flushCaches();
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    static void cleanJdbc(Thread t)
+    {
+        try
+        {
+            Class c = t.getContextClassLoader().loadClass("com.enioka.jqm.providers.PayloadInterceptor");
+            Method m = c.getMethod("forceCleanup", Thread.class);
+            int i = (Integer) m.invoke(null, t);
+            if (i > 0)
+            {
+                jqmlogger.warn("Thread " + t.getName() + " has leaked " + i
+                        + " JDBC connections! Contact the payload developer and have him close his connections correctly");
+            }
+        }
+        catch (ClassNotFoundException e)
+        {
+            // This happens if the resource providers are not present. Not an issue.
+            return;
+        }
+        catch (Exception e)
+        {
+            jqmlogger.warn("An error occured during JDBC connections cleanup - connections may leak", e);
+        }
     }
 }

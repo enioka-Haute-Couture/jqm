@@ -19,8 +19,11 @@
 package com.enioka.jqm.tools;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
 import java.net.URL;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.naming.InitialContext;
 import javax.naming.spi.NamingManager;
 
@@ -29,6 +32,8 @@ import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.jpamodel.History;
+import com.enioka.jqm.jpamodel.JndiObjectResource;
+import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
 import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -169,5 +174,93 @@ public class JndiTest extends JqmBaseTest
 
         String s = (String) InitialContext.doLookup("serverName");
         Assert.assertEquals("localhost", s);
+    }
+
+    @Test
+    public void testJndiJdbcPool() throws Exception
+    {
+        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", em,
+                "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
+        em.getTransaction().begin();
+        em.createQuery("UPDATE JndiObjectResourceParameter p SET value='true' WHERE key='jmxEnabled'").executeUpdate();
+        em.getTransaction().commit();
+
+        addAndStartEngine();
+
+        CreationTools.createJobDef(null, true, "pyl.JndiDb", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", TestHelpers.qVip, 42,
+                "TestApp", null, "Test", "ModuleTest", "other", "other", false, em);
+        JobRequest.create("TestApp", "TestUser").submit();
+        TestHelpers.waitFor(1, 5000, em);
+
+        TestHelpers.testOkCount(1, em);
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        int nb = (Integer) mbs.getAttribute(new ObjectName("com.enioka.jqm:type=JdbcPool,name=jdbc/test"), "Active");
+        Assert.assertEquals(0, nb);
+    }
+
+    @Test
+    public void testJndiJdbcPoolLeakWithoutHunter() throws Exception
+    {
+        // Sanity check - our test DOES leak connections
+        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", em,
+                "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
+        em.getTransaction().begin();
+        em.createQuery("UPDATE JndiObjectResourceParameter p SET value='true' WHERE key='jmxEnabled'").executeUpdate();
+        em.getTransaction().commit();
+
+        addAndStartEngine();
+
+        // Run the payload, it should leave an open conn at the end
+        CreationTools.createJobDef(null, true, "pyl.JndiDbLeak", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", TestHelpers.qVip,
+                42, "TestApp", null, "Test", "ModuleTest", "other", "other", false, em);
+        JobRequest.create("TestApp", "TestUser").submit();
+        TestHelpers.waitFor(1, 5000, em);
+
+        TestHelpers.testOkCount(1, em);
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        int nb = (Integer) mbs.getAttribute(new ObjectName("com.enioka.jqm:type=JdbcPool,name=jdbc/test"), "Active");
+        Assert.assertEquals(1, nb);
+
+        // Clean the pool forcefully so as not to impact other tests
+        JndiContext.createJndiContext().resetSingletons();
+    }
+
+    @Test
+    public void testJndiJdbcPoolLeakWithHunter() throws Exception
+    {
+        // Create a connection with our custom interceptor
+        JndiObjectResource j = CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA",
+                "", em, "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
+        em.getTransaction().begin();
+        JndiObjectResourceParameter p = new JndiObjectResourceParameter();
+        p.setKey("jdbcInterceptors");
+        p.setValue("com.enioka.jqm.providers.PayloadInterceptor");
+        p.setResource(j);
+        em.persist(p);
+        em.createQuery("UPDATE JndiObjectResourceParameter p SET value='true' WHERE key='jmxEnabled'").executeUpdate();
+        em.getTransaction().commit();
+
+        addAndStartEngine();
+
+        // Sanity check: the leak hunter does not harm normal payloads.
+        CreationTools.createJobDef(null, true, "pyl.JndiDb", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", TestHelpers.qVip, 42,
+                "TestApp", null, "Test", "ModuleTest", "other", "other", false, em);
+        JobRequest.create("TestApp", "TestUser").submit();
+        TestHelpers.waitFor(1, 5000, em);
+        TestHelpers.testOkCount(1, em);
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        int nb = (Integer) mbs.getAttribute(new ObjectName("com.enioka.jqm:type=JdbcPool,name=jdbc/test"), "Active");
+        Assert.assertEquals(0, nb);
+
+        // Run the payload, it should leave an open conn that should be forcibly closed.
+        CreationTools.createJobDef(null, true, "pyl.JndiDbLeak", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", TestHelpers.qVip,
+                42, "TestApp2", null, "Test", "ModuleTest", "other", "other", false, em);
+        JobRequest.create("TestApp2", "TestUser").submit();
+        TestHelpers.waitFor(1, 5000, em);
+
+        // Test
+        TestHelpers.testOkCount(2, em);
+        nb = (Integer) mbs.getAttribute(new ObjectName("com.enioka.jqm:type=JdbcPool,name=jdbc/test"), "Active");
+        Assert.assertEquals(0, nb);
     }
 }
