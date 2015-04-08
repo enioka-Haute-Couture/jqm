@@ -268,7 +268,6 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
     void resetSingletons()
     {
         jqmlogger.info("Resetting singleton JNDI resource cache");
-        this.singletons = new HashMap<String, Object>();
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         for (ObjectName n : this.jmxNames)
         {
@@ -282,6 +281,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
             }
         }
         this.jmxNames = new ArrayList<ObjectName>();
+        this.singletons = new HashMap<String, Object>();
     }
 
     @Override
