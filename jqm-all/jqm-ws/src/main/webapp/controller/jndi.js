@@ -100,8 +100,8 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
 
     $scope.refresh = function()
     {
-        console.debug('init');
         $scope.resources = µJndiDto.query();
+        $scope.selected.length = 0;
     };
 
     $scope.removealias = function()
@@ -174,6 +174,7 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
         showSelectionCheckbox : true,
         selectWithCheckboxOnly : true,
         selectedItems : $scope.selected2,
+        plugins :  [new ngGridFlexibleHeightPlugin({yMargin: 150})],
         columnDefs : [ {
             field : 'key',
             displayName : 'Resource parameter',
