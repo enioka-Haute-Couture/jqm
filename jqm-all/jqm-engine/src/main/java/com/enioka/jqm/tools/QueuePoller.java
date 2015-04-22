@@ -25,6 +25,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.persistence.EntityManager;
@@ -110,6 +111,18 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
                 name = new ObjectName("com.enioka.jqm:type=Node.Queue,Node=" + this.engine.getNode().getName() + ",name="
                         + this.queue.getName());
+
+                // Unregister MBean if it already exists. This may happen during frequent DP modifications.
+                try
+                {
+                    mbs.getMBeanInfo(name);
+                    mbs.unregisterMBean(name);
+                }
+                catch (InstanceNotFoundException e)
+                {
+                    // Nothing to do, this should be the normal case.
+                }
+
                 mbs.registerMBean(this, name);
             }
         }
