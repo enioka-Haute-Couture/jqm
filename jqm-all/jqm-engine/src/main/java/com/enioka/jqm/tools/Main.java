@@ -19,6 +19,7 @@
 package com.enioka.jqm.tools;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -113,6 +114,8 @@ public class Main
                 .withLongOpt("gui").create("s");
         Option o131 = OptionBuilder.withArgName("resourcefile").hasArg()
                 .withDescription("resource parameter file to use. Default is resources.xml").withLongOpt("resources").create("p");
+        Option o141 = OptionBuilder.withArgName("login,password,role1,role2,...").hasArgs(Option.UNLIMITED_VALUES).withValueSeparator(',')
+                .withDescription("Create or update a JQM account. Roles must exist beforehand.").create("U");
 
         Options options = new Options();
         OptionGroup og1 = new OptionGroup();
@@ -130,6 +133,7 @@ public class Main
         og1.addOption(o101);
         og1.addOption(o111);
         og1.addOption(o121);
+        og1.addOption(o141);
         options.addOptionGroup(og1);
         OptionGroup og2 = new OptionGroup();
         og2.addOption(o131);
@@ -218,6 +222,11 @@ public class Main
             else if (line.hasOption(o121.getOpt()))
             {
                 single(line.getOptionValue(o121.getOpt()));
+            }
+            // User handling
+            else if (line.hasOption(o141.getOpt()))
+            {
+                user(line.getOptionValues(o141.getOpt()));
             }
         }
         catch (ParseException exp)
@@ -426,6 +435,44 @@ public class Main
             EntityManager em = Helpers.getNewEm();
             Helpers.setSingleParam("enableInternalPki", "false", em);
             em.close();
+        }
+    }
+
+    private static void user(String[] options)
+    {
+        if (options.length < 3)
+        {
+            throw new IllegalArgumentException("-U option requires one login, one password and at least one role (in this order)");
+        }
+
+        EntityManager em = null;
+        try
+        {
+            em = Helpers.getNewEm();
+
+            RRole[] roles = new RRole[options.length - 2];
+            for (int i = 2; i < options.length; i++)
+            {
+                try
+                {
+                    roles[i - 2] = em.createQuery("SELECT r FROM RRole r WHERE r.name=:l", RRole.class).setParameter("l", options[i])
+                            .getSingleResult();
+                }
+                catch (NoResultException ex)
+                {
+                    throw new IllegalArgumentException("Role " + options[i] + " does not exist");
+                }
+            }
+
+            em.getTransaction().begin();
+            RUser u = Helpers.createUserIfMissing(em, options[0], "created through CLI", roles);
+            u.setPassword(options[1]);
+            Helpers.encodePassword(u);
+            em.getTransaction().commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(em);
         }
     }
 

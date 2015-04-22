@@ -569,27 +569,33 @@ final class Helpers
 
     static RUser createUserIfMissing(EntityManager em, String login, String description, RRole... roles)
     {
+        RUser res = null;
         try
         {
-            return em.createQuery("SELECT r from RUser r WHERE r.login = :l", RUser.class).setParameter("l", login).getSingleResult();
+            res = em.createQuery("SELECT r from RUser r WHERE r.login = :l", RUser.class).setParameter("l", login).getSingleResult();
         }
         catch (NoResultException e)
         {
-            RUser u = new RUser();
-            u.setFreeText(description);
-            u.setLocked(false);
-            u.setLogin(login);
-            u.setPassword(String.valueOf((new SecureRandom()).nextInt()));
-            encodePassword(u);
-            em.persist(u);
-
-            for (RRole r : roles)
-            {
-                u.getRoles().add(r);
-                r.getUsers().add(u);
-            }
-            return u;
+            res = new RUser();
+            res.setFreeText(description);
+            res.setLogin(login);
+            res.setPassword(String.valueOf((new SecureRandom()).nextInt()));
+            encodePassword(res);
+            em.persist(res);
         }
+        res.setLocked(false);
+        for (RRole r : res.getRoles())
+        {
+            r.getUsers().remove(res);
+        }
+        res.getRoles().clear();
+        for (RRole r : roles)
+        {
+            res.getRoles().add(r);
+            r.getUsers().add(res);
+        }
+
+        return res;
     }
 
     static void encodePassword(RUser user)

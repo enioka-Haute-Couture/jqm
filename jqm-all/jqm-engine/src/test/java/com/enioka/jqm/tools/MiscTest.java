@@ -33,6 +33,8 @@ import com.enioka.jqm.api.Query;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.RRole;
+import com.enioka.jqm.jpamodel.RUser;
 import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -405,5 +407,37 @@ public class MiscTest extends JqmBaseTest
         TestHelpers.waitFor(1, 20000, em);
         Assert.assertEquals(0, TestHelpers.getOkCount(em));
         Assert.assertEquals(1, TestHelpers.getNonOkCount(em));
+    }
+
+    @Test
+    public void testCliChangeUser()
+    {
+        Helpers.updateConfiguration(em);
+        Main.main(new String[] { "-U", "myuser", "mypassword", "administrator", "client" });
+
+        RUser u = em.createQuery("SELECT u FROM RUser u WHERE u.login = :l", RUser.class).setParameter("l", "myuser").getSingleResult();
+
+        Assert.assertEquals(2, u.getRoles().size());
+        boolean admin = false, client = false;
+        for (RRole r : u.getRoles())
+        {
+            if (r.getName().equals("administrator"))
+            {
+                admin = true;
+            }
+            if (r.getName().equals("client"))
+            {
+                client = true;
+            }
+        }
+        Assert.assertTrue(client && admin);
+
+        Main.main(new String[] { "-U", "myuser", "mypassword", "administrator" });
+        em.refresh(u);
+        Assert.assertEquals(1, u.getRoles().size());
+
+        Main.main(new String[] { "-U", "myuser,mypassword,administrator,config admin" });
+        em.refresh(u);
+        Assert.assertEquals(2, u.getRoles().size());
     }
 }
