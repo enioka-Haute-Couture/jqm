@@ -1,6 +1,35 @@
 Release notes
 ######################
 
+1.3.2
+************
+
+Release goal
+++++++++++++++++++
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+All APIs have been upgraded and **do not contain any breaking change**. 1.2.1 & 1.2.2 and 1.3.1 apis will work with 1.3.2 engines. However, as 1.2.2 contains fixes and 1.3.1 new functionalities, everyone is strongly encouraged to upgrade.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Major
++++++++++++++++++
+
+Nothing.
+
+Minor
+++++++++++++++++
+
+* Engine: added a JDBC connection leak hunter to prevent some leak cases
+* CLI: added a CLI option to modify an administration JQM user
+* GUI: fixed randomly hidden JNDI resource parameters
+* Client API: fixed hedge case in which a job instance may not be found by getJob()
+* Providers: fixed print job name and added option to specify requesting user name
+
 
 1.3.1
 ************
