@@ -39,6 +39,7 @@ fi
 # Java extra options that can be used to customise memory settings
 JAVA_OPTS=${JAVA_OPTS:--Xms160m -Xmx512m -XX:MaxPermSize=128m}
 
+JAVA="false"
 if [ ! "x${JAVA_HOME}" = "x" ]
 then
  JAVA=${JAVA_HOME}/bin/java
@@ -49,12 +50,24 @@ else
   JAVA="/usr/java6_64/jre/bin/java"
  fi
 fi
-JAVA="${JAVA} ${JAVA_OPTS}"
-$JAVA -version  > /dev/null 2>&1
+$JAVA -version > /dev/null 2>&1
 if [ $? -ne 0 ]
 then
         echo "No java found. Please define JAVA_HOME or put java inside PATH"
         exit 1
+fi
+
+OOM=${JAVA_OOM_ACTION:-""}
+if [ "x${OOM}" = "x" ]
+then
+	if [ "$(uname)" = "AIX" ]
+	then
+		OOM='-Xdump:tool:events=throw,filter=java/lang/OutOfMemoryError,exec=kill -9 $PPID'
+	fi
+	if [ "$(uname)" = "Linux" ]
+	then
+		OOM='-XX:OnOutOfMemoryError="kill -9 $PPID"'
+	fi
 fi
 
 JQM_PID_FILE=tmp/jqm_${JQM_NODE}.pid
@@ -109,7 +122,7 @@ jqm_start() {
  # We can go on...
  if [ "$1" = "console" ]
  then
-  $JAVA -jar $JQM_JAR -startnode $JQM_NODE
+  $JAVA $JAVA_OPTS "$OOM" -jar $JQM_JAR -startnode $JQM_NODE
  else
   remove_npipes
   mknod $STDOUT_NPIPE p
@@ -118,7 +131,7 @@ jqm_start() {
   log_rotate <$STDERR_NPIPE $JQM_LOG_ERR_FILE &
   exec 1> $STDOUT_NPIPE
   exec 2> $STDERR_NPIPE
-  nohup $JAVA -jar $JQM_JAR -startnode $JQM_NODE &
+  nohup $JAVA $JAVA_OPTS "$OOM" -jar $JQM_JAR -startnode $JQM_NODE &
   JQM_PID=$!
   echo $JQM_PID > ${JQM_PID_FILE}
   echo "JQM Started with pid ${JQM_PID}"
