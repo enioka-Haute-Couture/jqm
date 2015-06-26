@@ -63,6 +63,7 @@ public class HighlanderTest extends JqmBaseTest
 
         Assert.assertEquals(State.ENDED, res.get(0).getState());
         Assert.assertEquals(State.ENDED, res.get(1).getState());
+        Assert.assertEquals(true, res.get(0).isHighlander());
 
         Calendar prevEnd = null;
         for (History h : res)

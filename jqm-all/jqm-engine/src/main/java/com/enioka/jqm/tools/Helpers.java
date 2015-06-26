@@ -639,6 +639,7 @@ final class Helpers
         h.setStatus(finalState);
         h.setNode(job.getNode());
         h.setNodeName(job.getNode().getName());
+        h.setHighlander(job.getJd().isHighlander());
 
         em.persist(h);
 
