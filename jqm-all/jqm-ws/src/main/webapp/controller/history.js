@@ -49,6 +49,12 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
         {
             $scope.query.statuses = [];
         }
+        
+        // Running only?
+        if ($scope.target === "queues" && $scope.running)
+        {
+            $scope.query.statuses = ['RUNNING',];
+        }
 
         // Sort options
         $scope.query.sortby = [];
@@ -201,7 +207,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
             $scope.getDataAsync();
         }
     }, true);
-    $scope.$watchCollection('[target, ko]', function(newVal, oldVal)
+    $scope.$watchCollection('[target, ko, running]', function(newVal, oldVal)
     {
         if (newVal !== oldVal)
         {
