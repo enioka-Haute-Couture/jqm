@@ -49,9 +49,9 @@ jqmControllers.controller('µRoleListCtrl', function($scope, $http, µRoleDto)
         }
         if ($scope.role.id != undefined)
         {
-            $scope.role.$remove();
+            $scope.role.$remove({id : $scope.role.id});
         }
-        $scope.roles.splice($scope.roles.indexOf($scope.usr), 1);
+        $scope.roles.splice($scope.roles.indexOf($scope.role), 1);
         $scope.role = null;
     };
 

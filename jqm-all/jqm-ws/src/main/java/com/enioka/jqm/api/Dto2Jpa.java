@@ -481,6 +481,22 @@ class Dto2Jpa
             em.createQuery("UPDATE History h set h.node = NULL where h.node = :n").setParameter("n", n).executeUpdate();
             em.createQuery("DELETE FROM DeploymentParameter dp where dp.node = :n").setParameter("n", n).executeUpdate();
         }
+        else if (jpa instanceof RUser)
+        {
+            for (RRole r : em.createQuery("SELECT r FROM RRole r WHERE :u MEMBER OF r.users", RRole.class).setParameter("u", jpa)
+                    .getResultList())
+            {
+                r.getUsers().remove(jpa);
+            }
+        }
+        else if (jpa instanceof RRole)
+        {
+            if (0 != em.createQuery("SELECT COUNT(u) FROM RUser u WHERE :r MEMBER OF u.roles", Long.class).setParameter("r", jpa)
+                    .getSingleResult())
+            {
+                throw new JqmInvalidRequestException("Cannot remove a role currently assigned to a user");
+            }
+        }
 
         // Other types do not have relationships needing cleaning up.
     }

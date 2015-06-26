@@ -25,7 +25,6 @@ jqmControllers.controller('µUserListCtrl', function($scope, $http, µUserDto, �
 
     $scope.saveitem = function()
     {
-        console.debug($scope.usr);
         $scope.usr.$save($scope.refresh);
     };
 
@@ -42,7 +41,7 @@ jqmControllers.controller('µUserListCtrl', function($scope, $http, µUserDto, �
             });
         }
         $scope.users.splice($scope.users.indexOf($scope.usr), 1);
-        $scope.usr = null;
+        $scope.usr = $scope.users[0];
     };
 
     $scope.save = function()
