@@ -24,10 +24,10 @@
           <h3 class="panel-title">Name and ID filters</h3>
         </div>
         <div class="panel-body">
-           <input ng-model="query.applicationName" placeholder="application" type="text" ng-change="getDataAsync()" ng-required="true" style="width: 10em;" popover="Use % as wildcard" popover-trigger="mouseenter" />
-          <input ng-model="query.user" placeholder="user" type="text" ng-change="getDataAsync()" ng-required="true" style="width: 8em;" popover="Use % as wildcard" popover-trigger="mouseenter" />
-          <input ng-model="query.jobInstanceId" placeholder="id" type="text" ng-change="getDataAsync();" ng-required="true" style="width: 4em;" popover="Give exact ID" popover-trigger="mouseenter" />
-          <input ng-model="query.parentId" placeholder="parentid" type="text" ng-change="getDataAsync();" ng-required="true" style="width: 4em;" popover="Give exact ID" popover-trigger="mouseenter" />
+          <input ng-model="query.applicationName" placeholder="application" type="text" ng-change="getDataAsync()" ng-required="true" style="width: 10em;" popover="Use % as wildcard" popover-trigger="mouseenter" ng-model-options='{debounce: 200}'/>
+          <input ng-model="query.user" placeholder="user" type="text" ng-change="getDataAsync()" ng-required="true" style="width: 8em;" popover="Use % as wildcard" popover-trigger="mouseenter" ng-model-options='{debounce: 200}' />
+          <input ng-model="query.jobInstanceId" placeholder="id" type="text" ng-change="getDataAsync();" ng-required="true" style="width: 4em;" popover="Give exact ID" popover-trigger="mouseenter" ng-model-options='{debounce: 200}' />
+          <input ng-model="query.parentId" placeholder="parentid" type="text" ng-change="getDataAsync();" ng-required="true" style="width: 4em;" popover="Give exact ID" popover-trigger="mouseenter" ng-model-options='{debounce: 200}' />
         </div>
       </div>
     </div>
@@ -41,27 +41,38 @@
         </div>
         <div class="panel-body">
           <select ng-cell-input ng-model="query.queueId" ng-options="q.id as q.name for q in queues" ng-change="getDataAsync();"></select>
+          <button class="btn btn-default" ng-click="query = {}; getDataAsync();"><span class="glyphicon glyphicon-ban-circle"></span> Reset</button>
         </div>
       </div>
     </div>
-    
-    <div class="col-sm-8 col-md-3">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h3 class="panel-title">Time Filter</h3>
-        </div>
-        <div class="panel-body">
-          <div class="btn-group">
-            <button class="btn btn-default" ng-click="latest(1)"><span class="glyphicon glyphicon-calendar"></span> Last hour</button>
-            <button class="btn btn-default" ng-click="latest(24)"><span class="glyphicon glyphicon-calendar"></span> Last day</button>
-            <button class="btn btn-default" ng-click="query = {}; getDataAsync();"><span class="glyphicon glyphicon-ban-circle"></span> Reset</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  
   </div> <!-- end of filter row -->
     
+    <div>
+    	<div>
+    		Full slider bar is last
+    		<div class="btn-group ">
+	            <label style="padding: 0px; padding-left: 1px; padding-right: 1px;" class="btn btn-default active" ng-model="scale" btn-radio="86400000" uncheckable>day</label>
+	            <label style="padding: 0px; padding-left: 1px; padding-right: 1px;" class="btn btn-default" ng-model="scale" btn-radio="604800000" uncheckable>week</label>
+	            <label style="padding: 0px; padding-left: 1px; padding-right: 1px;" class="btn btn-default" ng-model="scale" btn-radio="2678400000" uncheckable>month</label>
+	            <label style="padding: 0px; padding-left: 1px; padding-right: 1px;" class="btn btn-default" ng-model="scale" btn-radio="31622400000" uncheckable>year</label>
+	          </div>
+    		<span style="position: fixed; right: 5px;" >From
+    			<span>{{datemin | epoch2date | date:'dd/MM HH:mm'}}</span>
+    			to
+    			<span ng-show="datemax!==daterangemax">{{datemax | epoch2date | date:'dd/MM HH:mm'}}</span>
+    			<span ng-show="datemax===daterangemax">now</span>
+   			</span>
+   		</div>
+    	<div 	range-slider min="daterangemin" 
+    			max="daterangemax" 
+    			model-min="datemin" 
+    			model-max="datemax" 
+    			prevent-equal-min-max="true" 
+    			step="step" 
+    			attach-handle-values="false" 
+    			show-values="false"
+    			filter="epoch2dateString"></div>
+    </div>
     <div ng-grid='gridOptions' ng-dblclick="showDetail()"></div>
     
     <div class="small">Double-click on a line to get job details, files produced and logs.</div>

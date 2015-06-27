@@ -1,7 +1,7 @@
 'use strict';
 
 var jqmApp = angular.module('jqmApp', [ 'ngRoute', 'ngCookies', 'jqmControllers', 'ngGrid', 'jqmServices', 'ui.bootstrap', 'ngSanitize', 'ui.select',
-        'ngBusy' ]);
+        'ngBusy', 'ui-rangeSlider' ]);
 
 jqmApp.config([ '$routeProvider', function($routeProvider, µPermManager)
 {

@@ -2,6 +2,14 @@
 
 var jqmControllers = angular.module('jqmControllers');
 
+jqmControllers.filter('epoch2date', function() 
+{
+	return function(epochms)
+	{
+		return new Date(epochms);
+	};
+});
+
 jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQueueDto)
 {
     $scope.data = null;
@@ -9,6 +17,15 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
     $scope.query = {};
     $scope.queues = µQueueDto.query();
     $scope.target = "hist";
+    
+    // Default range is three hours from now
+    $scope.now = (new Date()).getTime();
+    $scope.daterangemin = $scope.now - 36000000;
+    $scope.daterangemax = $scope.now;
+    $scope.datemin = $scope.now - 3600000 * 3;
+    $scope.datemax = $scope.now;
+    $scope.step = 600000;
+    $scope.scale = 86400000;
 
     $scope.refresh = function()
     {
@@ -20,6 +37,16 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
     {
         $scope.data = data.instances;
         $scope.totalServerItems = data.resultSize;
+        
+        // Reset the time slider to avoid time drift.
+        if ($scope.now < (new Date()).getTime() -30000)
+    	{
+	        $scope.now = (new Date()).getTime();
+	        if ($scope.datemax === $scope.daterangemax)
+	        	$scope.datemax = $scope.now;
+	        $scope.daterangemax = $scope.now;
+	        scale($scope.scale);
+    	}
     };
 
     $scope.getDataAsync = function()
@@ -76,6 +103,17 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
                 order : way
             });
         }
+        
+        // Time filters
+        if ($scope.datemax !== $scope.daterangemax)
+    	{
+        	$scope.query.enqueuedBefore = new Date($scope.datemax);
+    	}
+        else
+    	{
+        	delete $scope.query.enqueuedBefore;
+    	}
+        $scope.query.enqueuedAfter = new Date($scope.datemin);
         
         // Lists
         if ($scope.query.applicationName && $scope.query.applicationName.indexOf(',') > -1)
@@ -186,28 +224,30 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
     };
 
     // Option modif => query again
-    $scope.$watch('pagingOptions', function(newVal, oldVal)
+    $scope.$watchCollection('[pagingOptions, sortInfo]', function(newVal, oldVal)
     {
         if (newVal !== oldVal)
         {
             $scope.getDataAsync();
         }
-    }, true);
-    $scope.$watch('filterOptions', function(newVal, oldVal)
+    }, true); 
+    function scale(s)
     {
-        if (newVal !== oldVal)
-        {
-            $scope.getDataAsync();
-        }
-    }, true);
-    $scope.$watch('sortInfo', function(newVal, oldVal)
-    {
-        if (newVal !== oldVal)
-        {
-            $scope.getDataAsync();
-        }
-    }, true);
-    $scope.$watchCollection('[target, ko, running]', function(newVal, oldVal)
+    	$scope.daterangemin = $scope.now - s;
+    	if ($scope.datemax < $scope.daterangemin)
+		{
+    		$scope.datemax = $scope.daterangemax;
+		}
+    	if ($scope.datemin < $scope.daterangemin)
+		{
+    		$scope.datemin = $scope.daterangemin;
+		}
+    }
+    $scope.$watch('scale', function(newVal, oldVal)
+	{
+    	scale(newVal);
+	});
+    $scope.$watchCollection('[target, ko, running, filterOptions,]', function(newVal, oldVal)
     {
         if (newVal !== oldVal)
         {
@@ -216,13 +256,34 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
             $scope.getDataAsync();
         }
     }, true);
-
-    $scope.latest = function(hours)
+    $scope.$watch('datemin', function(newVal, oldVal)
     {
-        $scope.query.enqueuedAfter = new Date();
-        $scope.query.enqueuedAfter.setHours($scope.query.enqueuedAfter.getHours() - hours);
-        $scope.getDataAsync();
-    };
+    	// Different watch - this one is debounced manually, as the slider does not support ng-model-options
+        setTimeout(function()
+		{
+        	if (newVal === $scope.datemin)
+    		{
+        		// Has not changed in the past xx milliseconds => do the query.
+        		$scope.selected.length = 0;
+                $scope.pagingOptions.currentPage = 1;
+                $scope.getDataAsync();
+    		}
+		}, 100);
+    }, true);
+    $scope.$watch('datemax', function(newVal, oldVal)
+    {
+    	// Different watch - this one is debounced manually, as the slider does not support ng-model-options
+        setTimeout(function()
+		{
+        	if (newVal === $scope.datemax)
+    		{
+        		// Has not changed in the past xx milliseconds => do the query.
+        		$scope.selected.length = 0;
+                $scope.pagingOptions.currentPage = 1;
+                $scope.getDataAsync();
+    		}
+		}, 100);
+    }, true);
 
     $scope.showDetail = function()
     {
@@ -258,6 +319,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
 
     };
 
+    // Buttons
     $scope.relaunch = function()
     {
         var ji = $scope.selected[0];

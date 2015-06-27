@@ -37,3 +37,9 @@ html,body {
 .ngViewport.ng-scope {
 	overflow-x: hidden;
 }
+
+/* overloads for slider */
+.ngrs-range-slider {
+	margin-bottom: 3px;
+	margin-top: 3px;
+}
