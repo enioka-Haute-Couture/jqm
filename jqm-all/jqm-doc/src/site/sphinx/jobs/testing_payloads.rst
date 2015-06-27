@@ -9,10 +9,11 @@ Unit testing
 By unit testing, we mean here running a single payload inside a JUnit test or any other form of test (including a 'main' Java program) without
 needing a full JQM engine.
 
-JQM provides a library named jqm-tst which allows tests that will run a **single job instance** in a stripped-down version of an embedded JQM engine requiring no configuration.
+JQM provides a library named jqm-tst which allows tests that will run a **single job instance** in a stripped-down synchronous version of an embedded JQM engine requiring no configuration.
 The engine is destroyed immediately after the run.
+Single job instance also has for consequence that if your job enqueues new execution requests these will be ignored.
 
-An example taken from JQM owns unit tests::
+An example taken from JQM's own unit tests::
 
     @Test
     public void testOne()
@@ -29,7 +30,7 @@ Integration tests
 ************************
 
 If you have to test interactions between jobs (for example, one job instance queueing another), it may be necessary to use a full JQM engine. This gives the basics on how to do it
-(there are no embedded way to do it yet).
+(there are no supported embedded way to do it yet).
 
 Prepare package
 +++++++++++++++++++++++++++
