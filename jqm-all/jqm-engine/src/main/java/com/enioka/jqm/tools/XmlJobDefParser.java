@@ -23,8 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -79,20 +84,17 @@ class XmlJobDefParser
         JobDef jd = null;
         Queue queue = null;
 
-        // Schema validation
-        // SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        // Schema schema = null;
-        // schema = factory.newSchema(new File("./lib/res.xsd"));
-        // Validator validator = schema.newValidator();
-        // DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        // Document document = parser.parse(f);
-        // validator.validate(new DOMSource(document));
-
         try
         {
             em.getTransaction().begin();
             dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(f);
+
+            // Schema validation
+            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = factory.newSchema(new File("./lib/res.xsd"));
+            Validator validator = schema.newValidator();
+            validator.validate(new DOMSource(doc));
 
             doc.getDocumentElement().normalize();
 

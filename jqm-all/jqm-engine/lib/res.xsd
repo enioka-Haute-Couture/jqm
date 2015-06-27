@@ -1,60 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 	<xs:element name="jqm">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="jar" />
+				<xs:element minOccurs="1" maxOccurs="unbounded" ref="jar" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="jar">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="path" />
-				<xs:element ref="filePath" />
-				<xs:element ref="jobdefinitions" />
+				<xs:element name="path" type="xs:string" />
+				<xs:element name="filePath" type="xs:string" minOccurs="0" maxOccurs="1"/>  <!-- Deprecated -->
+                <xs:element name="jobdefinitions">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" ref="jobDefinition" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="path" type="xs:string" />
-	<xs:element name="filePath" type="xs:string" />
-	<xs:element name="jobdefinitions">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element minOccurs="1" maxOccurs="unbounded" ref="jobDefinition" />
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
+	
 	<xs:element name="jobDefinition">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="name" />
-				<xs:element ref="description" />
-				<xs:element ref="canBeRestarted" />
-				<xs:element ref="javaClassName" />
-				<xs:element ref="maxTimeRunning" />
-				<xs:element ref="application" />
-				<xs:element ref="module" />
-				<xs:element ref="keyword1" />
-				<xs:element ref="keyword2" />
-				<xs:element ref="keyword3" />
-				<xs:element ref="highlander" />
+				<xs:element name="name" type="xs:string" />
+                <xs:element name="queue" type="xs:string" minOccurs="0" maxOccurs="1" />
+				<xs:element name="description" type="xs:string" />
+				<xs:element name="canBeRestarted" type="xs:boolean" />
+                <xs:element name="javaClassName" type="xs:string" />
+                <xs:element name="maxTimeRunning" type="xs:integer" minOccurs="0" maxOccurs="1" />   <!-- Deprecated -->
+                <xs:element name="application" type="xs:string" />
+                <xs:element name="module" type="xs:string" />
+                <xs:element name="keyword1" type="xs:string" />
+                <xs:element name="keyword2" type="xs:string" />
+                <xs:element name="keyword3" type="xs:string" />
+                <xs:element name="highlander" type="xs:boolean" />
 				<xs:element ref="parameters" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="name" type="xs:string" />
-	<xs:element name="description" type="xs:string" />
-	<xs:element name="canBeRestarted" type="xs:boolean" />
-	<xs:element name="javaClassName" type="xs:string" />
-	<xs:element name="maxTimeRunning" type="xs:integer" />
-	<xs:element name="application" type="xs:string" />
-	<xs:element name="module" type="xs:string" />
-	<xs:element name="keyword1" type="xs:string" />
-	<xs:element name="keyword2" type="xs:string" />
-	<xs:element name="keyword3" type="xs:string" />
-	<xs:element name="highlander" type="xs:boolean" />
+	
 	<xs:element name="parameters">
 		<xs:complexType>
 			<xs:sequence>
@@ -65,11 +53,9 @@
 	<xs:element name="parameter">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="key" />
-				<xs:element ref="value" />
+				<xs:element name="key" type="xs:string" />
+				<xs:element name="value" type="xs:string" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="key" type="xs:string" />
-	<xs:element name="value" type="xs:string" />
 </xs:schema>
