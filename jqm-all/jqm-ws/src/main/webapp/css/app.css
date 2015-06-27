@@ -42,4 +42,9 @@ html,body {
 .ngrs-range-slider {
 	margin-bottom: 3px;
 	margin-top: 3px;
+	border: none;
+	background-color: #ECEDED;
+	margin: 0px;
+	padding: 0px;
+	box-shadow: none;
 }
