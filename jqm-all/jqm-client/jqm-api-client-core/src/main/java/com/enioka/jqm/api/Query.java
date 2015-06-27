@@ -44,7 +44,7 @@ public final class Query
     private String user, sessionId;
     private String jobDefKeyword1, jobDefKeyword2, jobDefKeyword3, jobDefModule, jobDefApplication;
     private String instanceKeyword1, instanceKeyword2, instanceKeyword3, instanceModule, instanceApplication;
-    private String queueName;
+    private String queueName, nodeName;
     private Integer queueId;
     private Calendar enqueuedBefore, enqueuedAfter, beganRunningBefore, beganRunningAfter, endedBefore, endedAfter;
 
@@ -706,5 +706,18 @@ public final class Query
     {
         this.queueId = queueId;
         return this;
+    }
+
+    /**
+     * For querying jobs that have run or are running on a specific JQM node.
+     */
+    public void setNodeName(String nodeName)
+    {
+        this.nodeName = nodeName;
+    }
+
+    String getNodeName()
+    {
+        return nodeName;
     }
 }

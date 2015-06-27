@@ -1167,6 +1167,7 @@ final class HibernateClient implements JqmClient
                 wh2 += getStringPredicate("jd.keyword3", query.getJobDefKeyword3(), prms2);
                 wh2 += getStringPredicate("jd.module", query.getJobDefModule(), prms2);
                 wh2 += getStringPredicate("jd.application", query.getJobDefApplication(), prms2);
+                wh2 += getStringPredicate("node.name", query.getNodeName(), prms2);
 
                 // Calendar fields are specific (no common fields between History and JobInstance)
                 wh2 += getCalendarPredicate("creationDate", query.getEnqueuedAfter(), ">=", prms2);
@@ -1221,6 +1222,7 @@ final class HibernateClient implements JqmClient
                 wh += getStringPredicate("keyword3", query.getJobDefKeyword3(), prms);
                 wh += getStringPredicate("module", query.getJobDefModule(), prms);
                 wh += getStringPredicate("application", query.getJobDefApplication(), prms);
+                wh += getStringPredicate("nodeName", query.getNodeName(), prms);
 
                 // Calendar fields are specific (no common fields between History and JobInstance)
                 wh += getCalendarPredicate("enqueueDate", query.getEnqueuedAfter(), ">=", prms);

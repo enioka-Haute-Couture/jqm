@@ -35,6 +35,9 @@
                             <input ng-model="query.parentId" placeholder="parent id" type="text" ng-change="getDataAsync();"
                                 ng-required="true" style="width: 5em;" popover="Give exact ID" popover-trigger="mouseenter"
                                 ng-model-options='{debounce: 200}' />
+                            <input ng-model="query.nodeName" placeholder="node name" type="text" ng-change="getDataAsync();"
+                                ng-required="true" style="width: 8em;" popover="Use % as wildcard" popover-trigger="mouseenter"
+                                ng-model-options='{debounce: 200}' />
                             <select ng-cell-input ng-model="query.queueId" placeholder="parent id"
                                 ng-options="q.id as q.name for q in queues" ng-change="getDataAsync();" popover="filter by queue"
                                 popover-trigger="mouseenter"></select>
