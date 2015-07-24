@@ -44,6 +44,13 @@
 				<include>*.xml</include>
 			</includes>
 		</fileSet>
+        <fileSet>
+			<directory>${project.basedir}/lib/</directory>
+			<outputDirectory>/lib</outputDirectory>
+			<includes>
+				<include>*.xsd</include>
+			</includes>
+		</fileSet>
 		<fileSet>
 			<directory>${project.basedir}/src/main/scripts</directory>
 			<outputDirectory>/bin</outputDirectory>
