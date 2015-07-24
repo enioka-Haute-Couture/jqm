@@ -77,6 +77,7 @@ class XmlJobDefParser
 
         // Create parsers
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        dbFactory.setNamespaceAware(true);
         DocumentBuilder dBuilder;
 
         // Result fields
