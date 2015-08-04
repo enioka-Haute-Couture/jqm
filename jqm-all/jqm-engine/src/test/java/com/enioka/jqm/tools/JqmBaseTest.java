@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.naming.NamingException;
+import javax.naming.spi.NamingManager;
 import javax.persistence.EntityManager;
 
 import org.apache.log4j.Logger;
@@ -66,8 +68,16 @@ public class JqmBaseTest
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test " + testName.getMethodName());
 
-        em = getNewEm();
+        try
+        {
+            ((JndiContext) NamingManager.getInitialContext(null)).resetSingletons();
+        }
+        catch (NamingException e)
+        {
+            jqmlogger.warn("Could not purge test JNDI context", e);
+        }
         JqmClientFactory.resetClient(null);
+        em = getNewEm();
         TestHelpers.cleanup(em);
         TestHelpers.createTestData(em);
     }
