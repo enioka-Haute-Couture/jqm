@@ -1,6 +1,35 @@
 Release notes
 ######################
 
+1.3.3
+************
+
+Release goal
+++++++++++++++++++
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+All APIs have been upgraded and **do not contain any breaking change**. 1.2.x and 1.3.x APIs will work with 1.3.3 engines. However, everyone is strongly encouraged to upgrade.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Major
++++++++++++++++++
+
+* Admin UI: the history page was enhanced with more filters including date filters.
+* Engine: the Unix/Linux startup script was modified so as to kill automatically the engine when an OutOfMemoryError occurs. This can be overridden with environment variables.
+
+Minor
+++++++++++++++++
+
+* CLI: XML schema of deployment descriptors is now validated on installations (was disabled previously due to issues on IBM J9 JVM).
+* Client API: files downloaded are now briefly stored in the system temp directory instead of a subdirectory. This makes it easier to have multiple JQM engines running with different accounts on the same server.
+* Client API: can now filter by node name.
+* Engine: highlander status is now correctly archived in the history table (used to be always false).
+
 1.3.2
 ************
 
