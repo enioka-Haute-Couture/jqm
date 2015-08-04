@@ -1682,7 +1682,7 @@ final class HibernateClient implements JqmClient
         CloseableHttpResponse rs = null;
         String nameHint = null;
 
-        File destDir = new File(System.getProperty("java.io.tmpdir") + "/jqm");
+        File destDir = new File(System.getProperty("java.io.tmpdir"));
         if (!destDir.isDirectory() && !destDir.mkdir())
         {
             throw new JqmClientException("could not create temp directory " + destDir.getAbsolutePath());
