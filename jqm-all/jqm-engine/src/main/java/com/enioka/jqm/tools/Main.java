@@ -270,8 +270,7 @@ public class Main
         }
         catch (Exception e)
         {
-            jqmlogger.fatal("Could not import file", e);
-            return;
+            throw new JqmRuntimeException("Could not import file", e);
         }
     }
 
@@ -286,6 +285,7 @@ public class Main
         {
             jqmlogger.fatal("Could not launch the engine named " + nodeName
                     + ". This may be because no node with this name was declared (with command line option createnode).", e);
+            throw new JqmRuntimeException("Could not start the engine", e);
         }
     }
 
@@ -302,7 +302,7 @@ public class Main
         }
         catch (Exception e)
         {
-            jqmlogger.fatal("Could not create the engine", e);
+            throw new JqmRuntimeException("Could not create the engine", e);
         }
     }
 
@@ -318,7 +318,7 @@ public class Main
         }
         catch (Exception e)
         {
-            jqmlogger.fatal("Could not upgrade", e);
+            throw new JqmRuntimeException("Could not upgrade", e);
         }
     }
 
@@ -332,7 +332,7 @@ public class Main
         }
         catch (Exception ex)
         {
-            jqmlogger.fatal("Could not create the file", ex);
+            throw new JqmRuntimeException("Could not create the export file", ex);
         }
         finally
         {
@@ -350,7 +350,7 @@ public class Main
         }
         catch (Exception ex)
         {
-            jqmlogger.fatal("Could not parse and import the file", ex);
+            throw new JqmRuntimeException("Could not parse and import the file", ex);
         }
         finally
         {
