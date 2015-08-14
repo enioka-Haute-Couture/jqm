@@ -16,7 +16,7 @@ To create a job instance, a :term:`job request` is posted by a client. It contai
 a job definition so that JQM will know what to run.
 
 Job instances are run by one or many engines called :term:`JQM nodes<JQM node>`. These are simply Java processes that poll the different queues 
-in which job instances are waiting. Runs take place within threads.
+in which job instances are waiting. Runs take place within threads, each with a dedicated class loader so as to fully isolate them from each others.
 
 Full definitions are given inside the :doc:`glossary`.
 
@@ -34,7 +34,7 @@ JQM works like this:
 * it imports the JQM client (one of the two - web service or direct-to-database. There are two dotted lines representing this choice on the diagram)
 * it uses the 'enqueue' method of the client, passing it a job request with the name of the job definition to launch (and potentially parameters, tags, ...)
 * a job instance is created inside the database
-* engines are polling the database (see below). One of them with free resources takes the job instance
+* engines are polling the database (see below). One of them with enough free resources takes the job instance
 * it creates a dedicated class loader for this job instance, imports the correct libraries with it, launches the payload inside a thread
 * during the run, the application that was at the origin of the request can use other methods of the client API to retrieve the status, the advancement, etc. of the job instance
 * at the end of the run, the JQM engine updates the database and is ready to accept new jobs. The client can still query the history of executions.
@@ -42,7 +42,7 @@ JQM works like this:
 It should be noted that clients never speak directly to a JQM engine - it all goes through the database. 
 
 .. note:: There is one exception to this:
-    when job instances create files that should be retrieved by the requester, the the 'direct to database' client will 
+    when job instances create files that should be retrieved by the requester, the 'direct to database' client will 
     download the files through a direct HTTP GET call to
     the engine. This avoids creating and maintaining a central file repository. The 'web service' client does not have this issue as it always uses web 
     services for all methods.
@@ -58,7 +58,7 @@ The polling frequency is defined per node/queue association: it is possible to h
 another polls slowly the same queue (minimum period is 1s to avoid killing the database). Also, the number of slots is defined at the same level: 
 one engine may be able to run 10 jobs for a queue in parallel while another, on a more powerful server, may run 50 for the same queue. 
 When all slots of all nodes polling a given queue are filled, job instances stay in the queue, waiting for a slot
-to be freed. Note that it also allows some queues to be defined only on some nodes and not others, therefore giving some control over where payloads are
+to be freed somewhere. Note that it also allows some queues to be defined only on some nodes and not others, therefore giving some control over where payloads are
 actually run.
 
 A :term:`Job Definition` has a default queue: all job requests pertaining to a job definition are created (unless otherwise specified) inside this queue. 

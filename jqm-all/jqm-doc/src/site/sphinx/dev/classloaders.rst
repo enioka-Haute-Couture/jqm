@@ -36,7 +36,7 @@ The general idea is:
 * Every payload launch has its own classloader, **totally independent from the engine classloader**. 
   This classloader is garbage collected at the end of the run.
 * JNDI resources in singleton mode (see :doc:`../jobs/resources`) must be kept cached by the engine, so they cannot be loaded through 
-  the transcient payload classloader itself. Also, the loaded resources must be understandable by the payloads - and therefore there must be a
+  the transient payload classloader itself. Also, the loaded resources must be understandable by the payloads - and therefore there must be a
   shared classloader here. The JNDI classloader is therefore the parent of the payload classloaders. The JNDI classloader itself has no parent (save 
   obviously the bootstrap CL), so the payloads won't be polluted by anything foreign.  
 
@@ -45,9 +45,9 @@ Advantages:
 * The engine is totally transparent to payloads, as the engine libraries are inside a classloader which is not accessible to payloads.
 * It allows to have multiple incompatible versions of the same library running simultaneously in different payloads.
 * It still allows for the exposition to the payload of an API implemented inside the engine through the use of a proxy class, a 
-  pattern designed explicitely for that use case.
+  pattern designed explicitly for that use case.
 * Easily allows for hot swap of libs and payloads.
-* Avoids having to administer complex classloader hierarchies and keeps payloads independant from one another.
+* Avoids having to administer complex classloader hierarchies and keeps payloads independent from one another.
 
 Cons:
 
@@ -63,7 +63,7 @@ Cons:
 
 All in all, this solution is not perfect (the classloader leak is a permanent threat) but has so many benefits in terms of simplicity that
 it was chosen. This way, there is no need to wonder if a payload can run alongside another - the answer is always yes. There is no need
-to deal with libraries - they are either in libs ir in ext, and it just works. The engine is invisible - payloads can consider it as a pure JVM,
+to deal with libraries - they are either in libs or in ext, and it just works. The engine is invisible - payloads can consider it as a pure JVM,
 so no specific development is required.
 
 The result is also robust, as payloads have virtually no access to the engine and can't set it off tracks.

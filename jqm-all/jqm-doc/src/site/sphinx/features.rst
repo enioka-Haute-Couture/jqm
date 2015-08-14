@@ -7,30 +7,42 @@ JQM features
   at contact@enioka.com or at any other firm open to doing maintenance on the tool.
 * Fully documented
 
-Batch code
+Batch code is easy to create:
 
-* Possible but not required to use a specific framework (Spring batch, etc.)
 * Runs existing Java 1.6 code, without need for programming specifically for JQM
-* Many samples for all features (inside JQM's integration tests)
+* Possible (but not required) to use a specific framework of your choice (Spring batch, etc.)
+* Many samples for all features (inside JQM's own integration tests)
 * Specific API to handle file creation and easy retrieval (a file can be created on any server and retrieved from another in a single call)
+* Embedded standard JNDI directory with JDBC connection pooling for jobs needing database connectivity
+* Jobs can be tested as if they were running inside a JQM node thanks to a test library which can be 
+  used in jQuery tests.
+* Can easily report an advancement status to users or administrators
+* All (always optional) JQM artefacts are published on Maven Central and therefore easily integrate with most build systems
 
-Batch interactions
+Interacting with batch jobs is simple:
 
 * Query API enabling to easily create client applications (with two full samples included in the distribution), such as 
   web pages listing all the jobs for given user, for a given module, etc.
-* Feature rich API 
+* Feature rich API with provided Java clients, which can be used out of the box for launching jobs,
+  cancelling them, changing their priorities
 
-Batch packaging
+Batch packaging: just use your own
 
 * Full Maven 3 support: as a Maven-created jar contains its pom.xml, JQM is able to retrieve all the dependencies, simplifying packaging libraries.
-* More classic packaging also supported
+* More classic packaging also supported (library directory, or putting all libraries inside the jar)
 
-Administration
+Administration is a breathe:
 
 * Both command line and web-based graphic user interface for administration
 * Can run as a Windows service or a Linux /etc/init.d script
 * Fully ready to run out of the box without complicated configuration
-* supported on most OSes and databases
-* log files can be accessed easily through a central web GUI
-* easy definition of class of service through queues
-* easy integration with schedulers and CLI
+* Supported on most OSes and databases
+* Log files can be accessed easily through a central web GUI
+* Easy definition of service classes (VIP jobs, standard jobs, ...) through queues
+* Easy integration with schedulers and CLI
+* Most configuration change are hot-applied, with little to no need for server restarts
+* Resists most environment failures (database failure, network failure, ...)
+* Maintenance jobs are integrated (mostly purged)
+* Can be fully monitored through JMX (a Zabbix template is provided)
+* Authentication and permissions handling is fully in-box, including an optional PKI to create
+  client certificates.

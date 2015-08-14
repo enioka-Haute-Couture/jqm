@@ -18,9 +18,9 @@ Prerequisites:
 The following script will download and copy the binaries (adapt the first two lines). ::
 
 	$JQM_ROOT = "C:\TEMP\jqm" ## Change this
-	$JQM_VERSION = "1.2.2"  ## Change this
+	$JQM_VERSION = "1.3.3"  ## Change this
 	mkdir -Force $JQM_ROOT; cd $JQM_ROOT
-	Invoke-RestMethod https://github.com/enioka/jqm/releases/jqm-all-$JQM_VERSION/jqm-$JQM_VERSION.zip -OutFile jqm.zip
+	Invoke-RestMethod https://github.com/enioka/jqm/releases/download/jqm-all-$JQM_VERSION/jqm-$JQM_VERSION.zip -OutFile jqm.zip
 	$shell = new-object -com shell.application
 	$zip = $shell.NameSpace((Resolve-Path .\jqm.zip).Path)
 	foreach($item in $zip.items()) { $shell.Namespace($JQM_ROOT).copyhere($item) }
@@ -28,7 +28,7 @@ The following script will download and copy the binaries (adapt the first two li
 
 The following script will create a database and reference the test jobs (i.e. :term:`payloads<payload>`) inside a test database::
 
-	./jqm.ps1 createnode
+	./jqm.ps1 createnode # This will create a new node named after the computer name
 	./jqm.ps1 allxml  # This will import all the test job definitions
     
 The following script will enable the web console with account root/test (do not use this in production!)::
@@ -46,7 +46,8 @@ Finally this will start an engine inside the console.::
 Just check the JQM_ROOT/logs directory - a numbered log file should have appeared, containing the log of the test job.
 
 The log inside the console should give you an indication "Jetty has started on port <PORT>". You can now use your preferred browser
-to go to localhost:port and browse the administration console.
+to go to localhost:port and browse the administration console. Use Ctrl+C inside the PowerShell console to stop the engine.
+
 
 Linux / Unix
 ************
@@ -54,20 +55,24 @@ Linux / Unix
 Prerequisites:
 
 * A directory where JQM will be installed, named JQM_ROOT afterwards.
-* An account with full permissions in JQM_ROOT. Not need for administrative or special rights.
+* An account with full permissions in JQM_ROOT. Not need for administrative or special permissions.
 
 The following script will download and install the binaries (adapt the first two lines). ::
 
-        wget  https://github.com/enioka/jqm/releases/jqm-all-1.2.2/jqm-1.2.2.tar.gz # For 1.2.2 release. Adapt it to the one you want.
-        tar xvf jqm-1.2.2.tar.gz
+        wget  https://github.com/enioka/jqm/releases/download/jqm-all-1.3.3/jqm-1.3.3.tar.gz # For 1.3.3 release. Adapt it to the one you want.
+        tar xvf jqm-1.3.3.tar.gz
 
 
 The following script will create a database and reference the test jobs (i.e. :term:`payloads<payload>`) inside a test database::
 
-        cd jqm-1.2.2
+        cd jqm-1.3.3
         ./jqm.sh createnode
         ./jqm.sh allxml  # This will import all the test job definitions
 
+The following script will enable the web console with account root/test (do not use this in production!)::
+
+        ./jqm.ps1 enablegui -RootPassword test
+    
 The following script will :term:`enqueue` an execution request for one of the test jobs::
 
         ./jqm.sh enqueue DemoEcho

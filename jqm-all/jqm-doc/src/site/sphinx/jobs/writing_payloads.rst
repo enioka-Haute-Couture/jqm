@@ -133,7 +133,7 @@ The dependency is::
 
 For more details, please read :doc:`engineapi`.
 
-.. note:: the scope given here is provided. It means it will be presnet for compilation but not at runtime. Indeed, JQM always provides the jqm-api.jar to
+.. note:: the scope given here is provided. It means it will be present for compilation but not at runtime. Indeed, JQM always provides the jqm-api.jar to
    its payloads without them needing to package it. That being said, packaging it (default 'compile' scope) is harmless as it will be ignored at runtime in
    favour of the engine-provided one.
     
@@ -152,7 +152,7 @@ It is then be made available to clients through a small HTTP GET that is leverag
 
 The method to do so is :meth:`JobManager.addDeliverable` from the :doc:`engineapi`.
 
-.. note:: work directories are obtained through :meth:`JobManager.getWorkDir`. These are purged after execution. Use of temporary Java 
+.. note:: Work/temp directories are obtained through :meth:`JobManager.getWorkDir`. These are purged after execution. Use of temporary Java 
     files is strongly discouraged - these are purged only on JVM exit, which on the whole never happens inside an application server.
 
 Example::
@@ -309,14 +309,14 @@ Nearly all JSE Java code can run inside JQM, with the following limitations:
 Staying reasonable
 ***********************
 
-JQM is some sort of light application server - therefore the same guidelines apply.
+JQM is some sort of light application server - therefore the same type of guidelines apply.
 
-* Don't play (too much) with classloaders. This is allowed because some frameworks require them (such as Hibernate)
+* Don't play (too much) with class loaders. Creating and swapping them is allowed because some frameworks require them (such as Hibernate)
   and we wouldn't want existing code using these frameworks to fail just because we are being too strict.
 * Don't create threads. A thread is an unmanageable object in Java - if it blocks for whatever reason, the whole application server
-  has to be restarted, impacting other jobs/users. They are only allowed for the same reason as for creating classloaders.
-* Be wary of bootstrap static contexts. Using static elements is all-right as long as the static context is from your classloader (in our case, it means 
+  has to be restarted, impacting other jobs/users. They are only allowed for the same reason as for creating class loaders.
+* Be wary of bootstrap static contexts. Using static elements is all-right as long as the static context is from your class loader (in our case, it means 
   classes from your own code or dependencies). Messing with
-  static elements from the bootstrap classloader is opening the door to weird interactions between jobs running in parallel. For example, loading a JDBC
-  driver does store such static elements, and should be frowned upon.
+  static elements from the bootstrap class loader is opening the door to weird interactions between jobs running in parallel. For example, loading a JDBC
+  driver does store such static elements, and should be frowned upon (use a shared JNDI JDBC resource for this).
 * Don't redefine System.setOut and System.setErr - if you do so, you will loose the log created by JQM from your console output. See :doc:`logging`.

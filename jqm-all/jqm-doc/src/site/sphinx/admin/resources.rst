@@ -10,6 +10,7 @@ By 'resource' JNDI means an object that can be created through a (provided)
 files & URLs which are detailed below. Moreover, the :term:`payload` may provide whatever factories it needs, such as a JMS driver (example also below).
 
 The main JNDI directory table is named :class:`JndiObjectResource` and the object parameters belong to the table :class:`JndiObjectResourceParameter`.
+Resources can be edited through the administration console.
 
 The following elements are needed for every resource, and are defined in the main table:
 

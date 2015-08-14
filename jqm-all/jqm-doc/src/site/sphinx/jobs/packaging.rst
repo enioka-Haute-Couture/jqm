@@ -7,8 +7,8 @@ a clear guidance as to how the code should be packaged. However, there are also 
 For example, when a client requests the :term:`payload` to run, it must be able to refer to the code unambiguously, therefore JQM must know
 an "application name" corresponding to the code. This name, with other data, is to be put inside an XML file that will be imported
 by JQM - it's a deployment descriptor, akin to a web.xml or an ejb-jar.xml.
-A code can only run if its XML has been imported (or the corresponding values manually entered inside the database, a fully 
-unsupported alternative way to do it).
+A code can only run if its XML has been imported (or the corresponding values manually entered though the web administration console,
+or manually written inside the database, which by the way is a fully unsupported way to do it).
 
 Should some terms prove to be obscure, please refer to the :doc:`../glossary`.
 

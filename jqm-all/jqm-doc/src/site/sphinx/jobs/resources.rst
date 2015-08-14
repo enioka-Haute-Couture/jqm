@@ -41,7 +41,7 @@ present, whatever type your payload is and even if the jqm-api jar is not presen
 By 'limited', we mean the directory only provides a single root JNDI context. Basically, all JNDI lookups are given to the
 same JNDI context and are looked up inside the JQM database by name exactly as they are given (case-sensitive).
 
-To define resources, see :doc:`/admin/resources`.
+This chapter focusses on using them inside payloads. To define resources, see :doc:`/admin/resources`.
 
 Below are some samples & details for various cases.
 

@@ -61,7 +61,7 @@ Pausing and restarting jobs
     
     .. method:: JqmClient.pauseQueuedJob(int id) -> void
     
-        When called on a job execution request it is ignored by engines and stayus forever in queue.
+        When called on a job execution request it is ignored by engines and status forever in queue.
         
     .. method:: JqmClient.resumeJob(int id) -> void
     
@@ -88,7 +88,7 @@ the method which is the mst specific to your needs, as it may have optimizations
         
     .. method:: JqmClient.getActiveJobs() -> List<JobInstance>
     
-        Lists all waiting or runing job instances.
+        Lists all waiting or running job instances.
         
     .. method:: JqmClient.getUserActiveJobs(String username) -> List<JobInstance>
     
@@ -139,7 +139,7 @@ Files & logs retrieval
         
         **This method, in all implementations, uses a direct HTTP(S) connection to the engine that has run the job instance.**
         
-        **The responsibility to close the stream lies on the API user**
+        **The responsibility to close the returned stream lies on the API user**
         
     .. method:: JqmClient.getJobLogStdErr(int jobId) -> InputStream
     
@@ -178,7 +178,7 @@ Queue
     All the metadata describing a :term:`queue`. Read only element.
     
     Please note there is another queue class that exists within JQM, inside the com.enioka.jqm.jpa packages.
-    The JPA one is an internal JQM class and should not be confused with the API one, which is a DTO and therefore a stable interface.
+    The JPA one is an internal JQM class and should not be confused with the API one, which is a stable interface.
     
 JobDef
 +++++++++++
@@ -188,7 +188,7 @@ JobDef
     All the metadata describing a :term:`job definition`. Read-only element.
     
     Please note there is another class with this name that exists within JQM, inside the com.enioka.jqm.jpa packages.
-    The JPA one is an internal JQM class and should not be confused with the API one, which is a DTO and therefore a stable interface.
+    The JPA one is an internal JQM class and should not be confused with the API one, which is a stable interface.
     
     
 Example
