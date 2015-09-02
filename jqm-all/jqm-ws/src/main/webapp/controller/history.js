@@ -159,6 +159,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
         enableColumnResize : true,
         totalServerItems : 'totalServerItems',
         plugins :  [new ngGridFlexibleHeightPlugin({yMargin: 220})],
+        rowTemplate: "<div ng-dblclick='showDetail(row)' ng-style='{\"cursor\": row.cursor, \"z-index\": col.zIndex() }' ng-repeat='col in renderedColumns' ng-class='col.colIndex()' class='ngCell {{col.cellClass}}' ng-cell></div>",
         columnDefs : [ {
             field : 'id',
             displayName : 'ID',
