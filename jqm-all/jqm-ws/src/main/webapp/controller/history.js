@@ -224,7 +224,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
     };
 
     // Option modif => query again
-    $scope.$watchCollection('[pagingOptions, sortInfo]', function(newVal, oldVal)
+    $scope.$watch('[pagingOptions,sortInfo]', function (newVal, oldVal)
     {
         if (newVal !== oldVal)
         {
@@ -247,7 +247,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
 	{
     	scale(newVal);
 	});
-    $scope.$watchCollection('[target, ko, running, filterOptions,]', function(newVal, oldVal)
+    $scope.$watch('[target, ko, running, filterOptions,]', function(newVal, oldVal)
     {
         if (newVal !== oldVal)
         {
@@ -258,7 +258,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
     }, true);
     $scope.$watch('datemin', function(newVal, oldVal)
     {
-    	// Different watch - this one is debounced manually, as the slider does not support ng-model-options
+        // Different watch - this one is debounced manually, as the slider does not support ng-model-options
         setTimeout(function()
 		{
         	if (newVal === $scope.datemin)
@@ -272,7 +272,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
     }, true);
     $scope.$watch('datemax', function(newVal, oldVal)
     {
-    	// Different watch - this one is debounced manually, as the slider does not support ng-model-options
+        // Different watch - this one is debounced manually, as the slider does not support ng-model-options
         setTimeout(function()
 		{
         	if (newVal === $scope.datemax)
