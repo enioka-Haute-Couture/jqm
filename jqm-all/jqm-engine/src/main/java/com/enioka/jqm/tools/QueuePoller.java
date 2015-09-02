@@ -132,7 +132,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
         }
     }
 
-    protected JobInstance dequeue(EntityManager em)
+    protected JobInstance dequeue(EntityManager em, int additionalSlots)
     {
         // Free room?
         if (actualNbThread.get() >= maxNbThread)
@@ -144,10 +144,11 @@ class QueuePoller implements Runnable, QueuePollerMBean
         List<JobInstance> availableJobs = em
                 .createQuery(
                         "SELECT j FROM JobInstance j LEFT JOIN FETCH j.jd WHERE j.queue = :q AND j.state = :s ORDER BY j.internalPosition ASC",
-                        JobInstance.class).setParameter("q", queue).setParameter("s", State.SUBMITTED).setMaxResults(maxNbThread)
+                        JobInstance.class).setParameter("q", queue).setParameter("s", State.SUBMITTED).setMaxResults(maxNbThread+additionalSlots)
                 .getResultList();
 
         em.getTransaction().begin();
+        int rejectedCauseHighlander = 0;
         for (JobInstance res : availableJobs)
         {
             // Lock is given when object is read, not during select... stupid.
@@ -170,6 +171,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
             // Highlander?
             if (res.getJd().isHighlander() && !highlanderPollingMode(res, em))
             {
+                rejectedCauseHighlander++;
                 continue;
             }
 
@@ -185,6 +187,10 @@ class QueuePoller implements Runnable, QueuePollerMBean
 
         // If here, no suitable JI is available
         em.getTransaction().rollback();
+        if (rejectedCauseHighlander > additionalSlots)
+        {
+            return dequeue(em, rejectedCauseHighlander);
+        }
         return null;
     }
 
@@ -218,7 +224,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
             {
                 // Get a JI to run
                 em = Helpers.getNewEm();
-                JobInstance ji = dequeue(em);
+                JobInstance ji = dequeue(em, 0);
                 while (ji != null)
                 {
                     // We will run this JI!
@@ -237,7 +243,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
                     }
 
                     // Check if there is another job to run (does nothing - no db query - if queue is full so this is not expensive)
-                    ji = dequeue(em);
+                    ji = dequeue(em, 0);
                 }
             }
             catch (RuntimeException e)
