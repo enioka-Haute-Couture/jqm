@@ -439,12 +439,15 @@ class JqmEngine implements JqmEngineMBean
         startDbRestarter();
     }
 
-    synchronized void startDbRestarter()
+    void startDbRestarter()
     {
         // On first alert, start the thread which will check connection restoration and relaunch the pollers.
-        if (qpRestarter != null)
+        synchronized (this)
         {
-            return;
+            if (qpRestarter != null)
+            {
+                return;
+            }
         }
 
         final JqmEngine ee = this;
@@ -462,10 +465,14 @@ class JqmEngine implements JqmEngineMBean
                 {
                     try
                     {
-                        em = Helpers.getNewEm();
-                        em.find(Node.class, 1);
-                        back = true;
-                        jqmlogger.warn("connection to database was restored");
+                        synchronized (ee)
+                        {
+                            em = Helpers.getNewEm();
+                            em.find(Node.class, 1);
+                            back = true;
+                            ee.qpRestarter = null;
+                            jqmlogger.warn("connection to database was restored");
+                        }
                     }
                     catch (Exception e)
                     {
@@ -522,8 +529,7 @@ class JqmEngine implements JqmEngineMBean
                     l = loaderToRestart.poll();
                 }
 
-                // Done - reset the relauncher itself and let the thread end.
-                ee.qpRestarter = null;
+                // Done - let the thread end.
             }
         };
         qpRestarter.start();
