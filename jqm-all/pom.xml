@@ -173,7 +173,7 @@
 				<!-- Activate if Travis-like variables are set. Or force it inside settings.xml 
 					for development environments if needed. -->
 				<property>
-					<name>env.SAUCE_ACCESS_KEY</name>
+					<name>env.SAUCE_ACCESS_KEYDISABLED</name>
 				</property>
 			</activation>
 			<modules>
