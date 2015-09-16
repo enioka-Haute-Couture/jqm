@@ -160,7 +160,11 @@ class QueuePoller implements Runnable, QueuePollerMBean
             catch (EntityNotFoundException e)
             {
                 // It has already been eaten and finished by another engine
-                continue;
+                // JPA2 dictates that in this case, the transaction is marked as rollback only.
+                // But beware, rollback detaches all entities from the session! So we simply give up and retry.
+                // As this is a very rare case, this is acceptable performance-wise.
+                em.getTransaction().rollback();  
+                return dequeue(em, rejectedCauseHighlander);  
             }
             if (!res.getState().equals(State.SUBMITTED))
             {
