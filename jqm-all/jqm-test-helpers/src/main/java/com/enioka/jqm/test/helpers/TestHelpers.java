@@ -199,7 +199,7 @@ public class TestHelpers
         TypedQuery<Long> q = em.createQuery("SELECT COUNT(h) FROM History h", Long.class);
 
         Calendar start = Calendar.getInstance();
-        while (q.getSingleResult() != nbHistories && Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis() <= timeoutMs)
+        while (q.getSingleResult() < nbHistories && Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis() <= timeoutMs)
         {
             try
             {
@@ -216,7 +216,7 @@ public class TestHelpers
         TypedQuery<Long> q = em.createQuery("SELECT COUNT(ji) FROM JobInstance ji WHERE ji.state = 'RUNNING'", Long.class);
 
         Calendar start = Calendar.getInstance();
-        while (q.getSingleResult() != nbJobInstances && Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis() <= timeoutMs)
+        while (q.getSingleResult() < nbJobInstances && Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis() <= timeoutMs)
         {
             try
             {
