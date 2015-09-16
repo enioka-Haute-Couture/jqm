@@ -109,11 +109,7 @@ class JqmEngine implements JqmEngineMBean
         EntityManager em = Helpers.getNewEm();
 
         // Node configuration is in the database
-        Helpers.checkConfiguration(nodeName, em);
         node = em.createQuery("SELECT n FROM Node n WHERE n.name = :l", Node.class).setParameter("l", nodeName).getSingleResult();
-
-        // Log parameters
-        Helpers.dumpParameters(em, node);
 
         // Check if double-start
         long toWait = (long) (1.1 * Long.parseLong(Helpers.getParameter("internalPollingPeriodMs", "60000", em)));
@@ -129,6 +125,12 @@ class JqmEngine implements JqmEngineMBean
         em.getTransaction().begin();
         node.setLastSeenAlive(Calendar.getInstance());
         em.getTransaction().commit();
+
+        // Only start if the node configuration seems OK
+        Helpers.checkConfiguration(nodeName, em);
+
+        // Log parameters
+        Helpers.dumpParameters(em, node);
 
         // Log level
         Helpers.setLogLevel(node.getRootLogLevel());

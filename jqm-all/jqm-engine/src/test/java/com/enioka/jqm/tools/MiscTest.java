@@ -150,16 +150,13 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testNoDoubleStart() throws Exception
     {
-        Helpers.setSingleParam("internalPollingPeriodMs", "200", em);
+        Helpers.setSingleParam("internalPollingPeriodMs", "500", em);
         Helpers.setSingleParam("disableVerboseStartup", "false", em);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
 
-        Thread.sleep(600);
-
         JqmEngine engine2 = new JqmEngine();
-
         try
         {
             engine2.start("localhost");
