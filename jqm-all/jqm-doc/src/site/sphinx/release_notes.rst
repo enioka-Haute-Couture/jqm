@@ -1,6 +1,34 @@
 Release notes
 ######################
 
+1.3.4
+************
+
+Release goal
+++++++++++++++++++
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API change (APIs version 1.3.4 are the same as version 1.3.3). 1.2.x and 1.3.x APIs will work with 1.3.4 engines. However, everyone is strongly encouraged to upgrade to the latest version.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Major
++++++++++++++++++
+
+* Engine: in some situations, highlander job execution requests could clog a queue. This has been fixed.
+
+Minor
+++++++++++++++++
+
+* Engine: A nagging transaction bug that only showed up in automated Travis builds has finally been squashed.
+* GUI: double-clicking on "next page" in history screen will no longer open a detail window.
+* GUI: a regression from 1.3.3 has been fixed - pagination no longer worked in history screen. (the refresh button had to be pressed after clicking the next page button)
+* Test: Selenium is no longer used in the automated build.
+
 1.3.3
 ************
 
