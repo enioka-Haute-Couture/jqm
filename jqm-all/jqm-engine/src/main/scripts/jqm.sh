@@ -211,7 +211,7 @@ jqm_import_xml() {
 }
 
 jqm_import_all_xml() {
- $JAVA -jar $JQM_JAR -importjobdef $(find jobs -name "*xml" -type f | tr "\\n" ",")
+ $JAVA -jar $JQM_JAR -importjobdef $(find jobs -name "*xml" -type f | grep -v pom.xml | tr "\\n" ",")
 }
 
 jqm_enable_gui() {
