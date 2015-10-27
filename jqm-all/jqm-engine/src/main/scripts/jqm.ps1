@@ -9,12 +9,12 @@
     Moreover, the script will also take into account environment variable OPT_ARGS if present. (default is: max heap 512MB, permsize maximum 128MB)
 
     The different possible actions are:
-       * start: will start the Windows service for the given node. Admin permissions required (can be changed later).
-       * stop: will stop the Windows service for the given node. Admin permissions required (can be changed later).
+       * start: will start the Windows service for the given node. Admin permissions required, service must be already installed (with action installservice).
+       * stop: will stop the Windows service for the given node. Admin permissions required.
        * startconsole: will start the engine for the given node inside the console (no Windows service needed, nor admin rights). Use Ctrl+C to exit.
        * createnode: will register a new node of NodeName name inside the JQM central database. Idempotent - existing nodes are left untouched.
-       * status: will retrieve the status of the Windows service for a given node name. Admin permissions required (can be changed later).
-       * allxml: will recursively look for all XML files inside JQM_ROOT/jobs and import them as job definitions into the central database
+       * status: will retrieve the status of the Windows service for a given node name. Admin permissions required.
+       * allxml: will recursively look for all XML files inside JQM_ROOT/jobs and import them as job definitions into the central database.
        * installservice: will create a new service for the designated node. createnode is implied by this command. Admin permissions compulsory.
        * removeservice: remove the designated service node (but not the node from the central database). Implies stop. Admin permissions compulsory.
     
@@ -24,7 +24,7 @@
     .NOTES
     Service name is "JQM_" followed by the NodeName parameter.
 
-    In case you are not admin for an operation that require this role an UAC elevation prompt will be shown.
+    In case you are not admin for an operation that requires this role (or you do not use an elevated command prompt) an UAC elevation prompt will be shown.
 
     .EXAMPLE
     jqm.ps1 createnode
@@ -89,8 +89,9 @@ else
 
 if (! (Test-Path env:/JAVA_OPTS))
 {
-    $env:JAVA_OPTS = "-Xms160m -Xmx512m -XX:MaxPermSize=128m"
+    $env:JAVA_OPTS = "-Xms128m -Xmx512m -XX:MaxPermSize=128m"
 }
+$JAVA_OOM_ACTION="-XX:OnOutOfMemoryError=powershell.exe -NonInteractive -Command Stop-Process -Force  -Id (gwmi -Class Win32_Process -Filter `"processid=`$pid`").parentprocessid"
 
 ## Helper functions
 function New-JqmService
@@ -98,7 +99,7 @@ function New-JqmService
     if (-not (Get-Service $ServiceName -ErrorAction SilentlyContinue))
     { 
         Register-JqmNode
-        & .\bin\jqmservice-64.exe //IS//$ServiceName --Description="Job Queue Manager node $NodeName" --Startup="auto" --ServiceUser="$ServiceUser" --ServicePassword="$ServicePassword" --StartMode="jvm" --StopMode="jvm" --StartPath=$PSScriptRoot ++StartParams="--startnode;$NodeName" --StartClass="com.enioka.jqm.tools.Main" --StopClass="com.enioka.jqm.tools.Main" --StartMethod="start" --StopMethod="stop" --LogPath="$PSScriptRoot\logs" --StdOutput="auto" --StdError="auto" --Classpath="$PSScriptRoot\jqm.jar" ++JvmOptions=$($env:JAVA_OPTS.Replace(" ", ";"))
+        & .\bin\jqmservice-64.exe //IS//$ServiceName --Description="Job Queue Manager node $NodeName" --Startup="auto" --ServiceUser="$ServiceUser" --ServicePassword="$ServicePassword" --StartMode="jvm" --StopMode="jvm" --StartPath=$PSScriptRoot ++StartParams="--startnode;$NodeName" --StartClass="com.enioka.jqm.tools.Main" --StopClass="com.enioka.jqm.tools.Main" --StartMethod="start" --StopMethod="stop" --LogPath="$PSScriptRoot\logs" --StdOutput="auto" --StdError="auto" --Classpath="$PSScriptRoot\jqm.jar" ++JvmOptions="$($env:JAVA_OPTS.Replace(' ', ';'));$JAVA_OOM_ACTION"
         if (!$?)
         {
             throw "could not create service $ServiceName"
@@ -121,7 +122,7 @@ function Remove-JqmService
 function Import-AllXml
 {
     cd $PSScriptRoot
-    & $java -jar jqm.jar -importjobdef ((ls $PSScriptRoot -Recurse -Filter *.xml |% FullName) -join ',')
+    & $java -jar jqm.jar -importjobdef ((ls $PSScriptRoot/jobs -Recurse -Filter *.xml |% FullName) -join ',')
 }
 
 function Register-JqmNode
@@ -133,7 +134,7 @@ function Register-JqmNode
 function Submit-JqmRequest([ValidateNotNullOrEmpty()]$JobDef)
 {    
     cd $PSScriptRoot
-    & $java -jar jqm.jar -enqueue $Enqueue
+    & $java -jar jqm.jar -enqueue $JobDef
 }
 
 function Reset-RootPassword([ValidateNotNullOrEmpty()]$RootPassword)
@@ -159,12 +160,12 @@ switch($Command)
     "start" { & .\bin\jqmservice-64.exe //ES//$ServiceName }
     "stop" { & .\bin\jqmservice-64.exe //SS//$ServiceName }
     "status" { (Get-Service $ServiceName).Status}
-    "startconsole" { cd $PSScriptRoot;& $java $env:JAVA_OPTS.split(" ") -jar jqm.jar -startnode $NodeName } 
+    "startconsole" { cd $PSScriptRoot;& $java $env:JAVA_OPTS.split(" ") $JAVA_OOM_ACTION -jar jqm.jar -startnode $NodeName } 
     "createnode" { Register-JqmNode } 
     "allxml" { Import-AllXml}
     "installservice" { New-JqmService }
     "removeservice" { Remove-JqmService }
-    "enqueue" { Submit-JqmRequest }
+    "enqueue" { Submit-JqmRequest -JobDef $JobDef }
     "resetpassword" {Reset-RootPassword $RootPassword}
     "enablegui" {Enable-Gui}
 }
