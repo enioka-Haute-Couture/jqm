@@ -217,7 +217,8 @@ class XmlJobDefParser
         }
         catch (Exception e)
         {
-            throw new JqmEngineException("an error occured while parsing the XML file. No changes were done to the configuration.", e);
+            throw new JqmEngineException("an error occured while parsing the XML file " + path
+                    + ". No changes were done to the configuration.", e);
         }
     }
 }
