@@ -160,6 +160,22 @@
 				<parameters>
 				</parameters>
 			</jobDefinition>
+
+			<jobDefinition>
+				<name>DemoMemLeak</name>
+				<description>Demonstrates the suicide of a JQM engine when an
+					OutOfMemoryError occurs.</description>
+				<canBeRestarted>true</canBeRestarted>
+				<javaClassName>pyl.MemoryLeak</javaClassName>
+				<application>JQM</application>
+				<module>Demos</module>
+				<keyword1>Payload</keyword1>
+				<keyword2>Main</keyword2>
+				<keyword3>Technical</keyword3>
+				<highlander>false</highlander>
+				<parameters>
+				</parameters>
+			</jobDefinition>
 		</jobdefinitions>
 	</jar>
 
