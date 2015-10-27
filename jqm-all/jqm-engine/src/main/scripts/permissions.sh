@@ -85,6 +85,7 @@ find jobs -type f -exec chmod 640 {} \;
 # lib is the engine and its dependencies
 chmod 750 lib
 chmod 640 lib/*.jar
+chmod 640 lib/*.xsd
 
 # logs contains both engine logs and payload logs. May contain sensitive data
 chmod 770 logs

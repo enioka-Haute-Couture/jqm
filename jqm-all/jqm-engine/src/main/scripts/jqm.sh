@@ -37,7 +37,7 @@ then
 fi
 
 # Java extra options that can be used to customise memory settings
-JAVA_OPTS=${JAVA_OPTS:--Xms160m -Xmx512m -XX:MaxPermSize=128m}
+JAVA_OPTS=${JAVA_OPTS:--Xms128m -Xmx512m -XX:MaxPermSize=128m}
 
 JAVA="false"
 if [ ! "x${JAVA_HOME}" = "x" ]
@@ -66,7 +66,9 @@ then
 	fi
 	if [ "$(uname)" = "Linux" ]
 	then
-		OOM='-XX:OnOutOfMemoryError="kill -9 $PPID"'
+        # Note that OOM action can fail on Linux if not enough system memory is available at the time of crash
+        # See https://bugs.openjdk.java.net/browse/JDK-8027434
+        OOM='-XX:OnOutOfMemoryError=kill -9 $PPID'
 	fi
 fi
 
