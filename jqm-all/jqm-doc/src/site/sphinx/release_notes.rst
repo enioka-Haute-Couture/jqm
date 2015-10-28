@@ -1,6 +1,36 @@
 Release notes
 ######################
 
+1.3.5
+************
+
+Release goal
+++++++++++++++++++
+
+Maintenance release for the integration scripts (jqm.sh and jqm.ps1).
+
+Upgrade notes
++++++++++++++++++++
+
+No API change (APIs version 1.3.5 are the same as version 1.3.3). 1.2.x and 1.3.x APIs will work with 1.3.4 engines. 
+However, everyone is strongly encouraged to upgrade to the latest version.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Major
++++++++++++++++++
+
+Nothing.
+
+Minor
+++++++++++++++++
+
+* Scripts: The automatic kill on OutOfMemoryError now works on more Linux variants and on Windows.
+* Scripts: JAVA_OPTS is now used in the Linux script in all commands (used to be used only on startup commands).
+* Engine: fixed a case that had jobs with end date < start date (now everything uses the time of the central DB).
+* Engine: better error message on Job Definition XML import error.
+* Simplified Travis builds.
+
 1.3.4
 ************
 
