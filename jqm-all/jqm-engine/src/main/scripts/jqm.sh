@@ -56,6 +56,7 @@ then
         echo "No java found. Please define JAVA_HOME or put java inside PATH"
         exit 1
 fi
+JAVA="$JAVA $JAVA_OPTS "
 
 OOM=${JAVA_OOM_ACTION:-""}
 if [ "x${OOM}" = "x" ]
@@ -124,7 +125,7 @@ jqm_start() {
  # We can go on...
  if [ "$1" = "console" ]
  then
-  $JAVA $JAVA_OPTS "$OOM" -jar $JQM_JAR -startnode $JQM_NODE
+  $JAVA "$OOM" -jar $JQM_JAR -startnode $JQM_NODE
  else
   remove_npipes
   mknod $STDOUT_NPIPE p
@@ -133,7 +134,7 @@ jqm_start() {
   log_rotate <$STDERR_NPIPE $JQM_LOG_ERR_FILE &
   exec 1> $STDOUT_NPIPE
   exec 2> $STDERR_NPIPE
-  nohup $JAVA $JAVA_OPTS "$OOM" -jar $JQM_JAR -startnode $JQM_NODE &
+  nohup $JAVA "$OOM" -jar $JQM_JAR -startnode $JQM_NODE &
   JQM_PID=$!
   echo $JQM_PID > ${JQM_PID_FILE}
   echo "JQM Started with pid ${JQM_PID}"
