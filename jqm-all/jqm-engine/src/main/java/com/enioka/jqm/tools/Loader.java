@@ -25,6 +25,7 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
@@ -66,7 +67,7 @@ class Loader implements Runnable, LoaderMBean
 
     private ObjectName name = null;
     private ClassLoader contextClassLoader = null;
-    Boolean isDone = false;
+    Boolean isDone = false, isDelayed = false;
     private String threadName;
 
     // These two fields are instance-level in order to allow an easy endOfRunDb external call
@@ -426,6 +427,16 @@ class Loader implements Runnable, LoaderMBean
             // Retrieve the object to update
             job = em.find(JobInstance.class, this.job.getId());
 
+            // Which end time should we use? Default is always use DB time to avoid time lips between servers.
+            Date dbTimeTmp = em.createQuery("SELECT current_timestamp() AS A from GlobalParameter", Date.class).getSingleResult();
+            Calendar dbTime = Calendar.getInstance();
+            dbTime.setTime(dbTimeTmp);
+            if (!this.isDelayed)
+            {
+                // In case of delayed finalization, use the stored time instead of db time.
+                this.endDate = dbTime;
+            }
+
             // Done: put inside history & remove instance from queue.
             em.getTransaction().begin();
             History h = Helpers.createHistory(job, em, this.resultStatus, endDate);
@@ -469,6 +480,7 @@ class Loader implements Runnable, LoaderMBean
             jqmlogger.error("connection to database lost - loader " + this.getId() + " will need delayed finalization");
             jqmlogger.trace("connection error was:", e.getCause());
             this.p.getEngine().loaderFinalizationNeeded(this);
+            this.isDelayed = true;
         }
         else
         {
