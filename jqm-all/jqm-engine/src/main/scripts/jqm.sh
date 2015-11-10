@@ -128,8 +128,8 @@ jqm_start() {
   $JAVA "$OOM" -jar $JQM_JAR -startnode $JQM_NODE
  else
   remove_npipes
-  mknod $STDOUT_NPIPE p
-  mknod $STDERR_NPIPE p
+  mkfifo $STDOUT_NPIPE
+  mkfifo $STDERR_NPIPE
   log_rotate <$STDOUT_NPIPE $JQM_LOG_OUT_FILE &
   log_rotate <$STDERR_NPIPE $JQM_LOG_ERR_FILE &
   exec 1> $STDOUT_NPIPE
