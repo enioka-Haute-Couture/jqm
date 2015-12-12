@@ -18,9 +18,9 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.tomdz.maven</groupId>
+				<groupId>kr.motd.maven</groupId>
 				<artifactId>sphinx-maven-plugin</artifactId>
-				<version>1.0.3</version>
+				<version>1.2.0.Final</version>
 				<configuration>
 					<outputDirectory>${project.build.directory}/docs</outputDirectory>
 				</configuration>
