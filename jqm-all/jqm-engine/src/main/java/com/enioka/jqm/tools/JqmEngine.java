@@ -198,6 +198,9 @@ class JqmEngine implements JqmEngineMBean
         // Cleanup
         purgeDeadJobInstances(em, this.node);
 
+        // Force Message EMF load
+        em.createQuery("SELECT m FROM Message m WHERE 1=0", Message.class).getResultList();
+
         // Pollers
         syncPollers(em, this.node);
         jqmlogger.info("All required queues are now polled");

@@ -127,4 +127,16 @@ public class NoApiPayloadTest extends JqmBaseTest
 
         Assert.assertEquals(-1, (int) h.getProgress());
     }
+
+    @Test
+    public void testMainTypeInjectWithFullApi() throws Exception
+    {
+        // Here, engine API + full API mix.
+        int i = JqmSimpleTest.create(em, "pyl.EngineApiInject", "jqm-test-pyl-hibapi").setSessionId("123X").expectOk(3).run(this);
+
+        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
+
+        Assert.assertEquals(1, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 1 message per run created by payload
+        Assert.assertEquals(100, (int) ji.get(0).getProgress());
+    }
 }
