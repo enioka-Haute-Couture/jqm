@@ -40,10 +40,11 @@ final class SimpleApiSecurity
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(SimpleApiSecurity.class);
 
-    private static RUser user;
-    private static String secret;
-    private static Duet logindata;
+    private static volatile RUser user;
+    private static volatile String secret;
+    private static volatile Duet logindata;
     private static Boolean useAuth = null;
+    private static volatile Object lock = new Object();
 
     static class Duet
     {
@@ -95,7 +96,7 @@ final class SimpleApiSecurity
 
         if (user == null || user.getExpirationDate().before(Calendar.getInstance()))
         {
-            synchronized (SimpleApiSecurity.class)
+            synchronized (lock)
             {
                 if (user == null || user.getExpirationDate().before(Calendar.getInstance()))
                 {
