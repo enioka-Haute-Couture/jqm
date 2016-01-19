@@ -108,6 +108,27 @@ public interface JobManager
      * @return the third keyword that was given at enqueue time, null if none.
      */
     String keyword3();
+    
+    /**
+     * Optional arbitrary user classification
+     * 
+     * @return the first keyword that was given inside the job definition, null if none.
+     */
+    String definitionKeyword1();
+
+    /**
+     * Optional arbitrary user classification
+     * 
+     * @return the second keyword that was given inside the job definition, null if none.
+     */
+    String definitionKeyword2();
+
+    /**
+     * Optional arbitrary user classification
+     * 
+     * @return the third keyword that was given inside the job definition, null if none.
+     */
+	String definitionKeyword3();
 
     /**
      * Optional arbitrary user classification

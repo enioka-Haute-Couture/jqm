@@ -272,8 +272,8 @@ public class ClientApiTest extends JqmBaseTest
     @Test
     public void testTags() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiTags", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "keyword1", null, "keyword3", false, em);
         JobRequest.create("MarsuApplication", "TestUser").setKeyword1("Houba").setKeyword3("Meuh").submit();
 
         addAndStartEngine();
@@ -286,5 +286,9 @@ public class ClientApiTest extends JqmBaseTest
         Assert.assertEquals("Houba", h.getInstanceKeyword1());
         Assert.assertEquals(null, h.getInstanceKeyword2());
         Assert.assertEquals("Meuh", h.getInstanceKeyword3());
+        
+        Assert.assertEquals("keyword1", h.getKeyword1());
+        Assert.assertEquals(null, h.getKeyword2());
+        Assert.assertEquals("keyword3", h.getKeyword3());
     }
 }

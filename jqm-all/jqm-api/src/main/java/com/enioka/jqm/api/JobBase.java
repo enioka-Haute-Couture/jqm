@@ -119,6 +119,21 @@ public class JobBase
     {
         return jm.keyword3();
     }
+    
+    public String getDefinitionKeyword1()
+    {
+        return jm.definitionKeyword1();
+    }
+    
+    public String getDefinitionKeyword2()
+    {
+        return jm.definitionKeyword2();
+    }
+    
+    public String getDefinitionKeyword3()
+    {
+        return jm.definitionKeyword3();
+    }
 
     public Map<String, String> getParameters()
     {

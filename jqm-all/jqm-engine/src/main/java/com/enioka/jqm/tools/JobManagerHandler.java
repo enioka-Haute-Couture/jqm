@@ -131,13 +131,25 @@ class JobManagerHandler implements InvocationHandler
             }
             else if ("keyword1".equals(methodName))
             {
-                return jd.getKeyword1();
+                return ji.getKeyword1();
             }
             else if ("keyword2".equals(methodName))
             {
-                return jd.getKeyword2();
+                return ji.getKeyword2();
             }
             else if ("keyword3".equals(methodName))
+            {
+                return ji.getKeyword3();
+            }
+            else if ("definitionKeyword1".equals(methodName))
+            {
+                return jd.getKeyword1();
+            }
+            else if ("definitionKeyword2".equals(methodName))
+            {
+                return jd.getKeyword2();
+            }
+            else if ("definitionKeyword3".equals(methodName))
             {
                 return jd.getKeyword3();
             }
@@ -470,6 +482,6 @@ class JobManagerHandler implements InvocationHandler
         else
         {
             return !b;
-        }
-    }
+		}
+	}
 }
