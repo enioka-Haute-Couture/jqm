@@ -20,7 +20,10 @@ package com.enioka.jqm.tools;
 
 import java.lang.management.ManagementFactory;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -56,6 +59,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     private AtomicInteger actualNbThread = new AtomicInteger(0);
     private boolean hasStopped = true;
     private Calendar lastLoop = null;
+    private Map<Integer, Date> peremption = new HashMap<Integer, Date>();
 
     private ObjectName name = null;
 
@@ -237,6 +241,10 @@ class QueuePoller implements Runnable, QueuePollerMBean
                     jqmlogger.trace("JI number " + ji.getId() + " will be run by this poller this loop (already " + actualNbThread + "/" + maxNbThread + " on "
                             + this.queue.getName() + ")");
                     actualNbThread.incrementAndGet();
+                    if (ji.getJd().getMaxTimeRunning() != null)
+                    {                    
+                    	this.peremption.put(ji.getId(), new Date((new Date()).getTime() + ji.getJd().getMaxTimeRunning() * 60 * 1000  ));
+                    }
 
                     // Run it
                     if (!ji.getJd().isExternal())
@@ -332,8 +340,12 @@ class QueuePoller implements Runnable, QueuePollerMBean
     /**
      * Called when a payload thread has ended. This notifies the poller to free a slot and poll once again.
      */
-    void decreaseNbThread()
+    void decreaseNbThread(int jobId)
     {
+    	if (this.peremption.containsKey(jobId))
+    	{
+    		this.peremption.remove(jobId);
+    	}
         this.actualNbThread.decrementAndGet();
         loop.release(1);
         this.engine.signalEndOfRun();
@@ -461,5 +473,20 @@ class QueuePoller implements Runnable, QueuePollerMBean
     public boolean isFull()
     {
         return this.actualNbThread.get() >= maxNbThread;
+    }
+    
+    @Override
+    public int getLateJobs()
+    {
+    	int i = 0;
+    	Date now = new Date();
+    	for (Date d : this.peremption.values())
+    	{
+    		if (now.after(d))
+    		{
+    			i++;
+    		}
+    	}
+    	return i;
     }
 }

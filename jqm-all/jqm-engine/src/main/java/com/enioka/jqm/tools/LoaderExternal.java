@@ -67,7 +67,7 @@ class LoaderExternal implements Runnable
         catch (IOException e)
         {
             jqmlogger.error("Could not launch an external payload", e);
-            qp.decreaseNbThread();
+            qp.decreaseNbThread(this.jobId);
             return;
         }
 
@@ -123,7 +123,7 @@ class LoaderExternal implements Runnable
             IOUtils.closeQuietly(f);
             IOUtils.closeQuietly(isr);
 
-            qp.decreaseNbThread();
+            qp.decreaseNbThread(this.jobId);
         }
 
         if (res != 0)

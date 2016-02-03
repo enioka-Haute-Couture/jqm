@@ -72,4 +72,9 @@ public interface JqmEngineMBean
      * The package version, in x.x.x form.
      */
     String getVersion();
+    
+    /**
+     * The count, for all pollers, of running jobs that have run for more than their maxTimeRunning time.
+     */
+    int getLateJobs();
 }

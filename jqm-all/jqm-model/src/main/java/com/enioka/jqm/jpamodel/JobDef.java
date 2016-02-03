@@ -147,7 +147,7 @@ public class JobDef implements Serializable
     }
 
     /**
-     * @deprecated was never used and never will be (this would be impossible to implement in a predictable fashion).
+     * An optional hint giving the run time after which an alert should be raised. In minutes.
      */
     public Integer getMaxTimeRunning()
     {
@@ -155,7 +155,7 @@ public class JobDef implements Serializable
     }
 
     /**
-     * @deprecated was never used and never will be (this would be impossible to implement in a predictable fashion).
+     * See {@link #getMaxTimeRunning()}
      */
     public void setMaxTimeRunning(final Integer maxTimeRunning)
     {

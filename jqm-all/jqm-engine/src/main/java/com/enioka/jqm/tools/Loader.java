@@ -332,7 +332,7 @@ class Loader implements Runnable, LoaderMBean
         // Release the slot so as to allow other job instances to run (first op!)
         if (p != null)
         {
-            p.decreaseNbThread();
+            p.decreaseNbThread(this.job.getId());
         }
 
         // Send e-mail before releasing the slot - it may be long

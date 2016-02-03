@@ -132,12 +132,18 @@ jqmControllers.controller('µJdListCtrl', function($scope, $http, $modal, µJdDt
                     displayName : 'Keyword3'
                 },
                 {
+                	field: 'reasonableRuntimeLimitMinute',
+                	displayName: 'AlertMn',
+                	editableCellTemplate : '<input type="number" ng-class="\'colt\' + col.index" ng-input="COL_FIELD" ng-model="COL_FIELD" min="1" max="1440" />'
+                },
+                {
                     field : 'enabled',
                     displayName : 'E',
                     cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><span class="glyphicon {{ row.entity[col.field] ? \'glyphicon-ok\' : \'glyphicon-remove\' }}"></span></div>',
                     editableCellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
                     width : 25,
-                }, ]
+                },
+                ]
     };
 
     $scope.prms = function()

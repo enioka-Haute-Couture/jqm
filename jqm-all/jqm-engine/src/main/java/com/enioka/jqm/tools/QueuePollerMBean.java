@@ -65,4 +65,9 @@ public interface QueuePollerMBean
      * True if running count equals max job number
      */
     boolean isFull();
+    
+    /**
+     * The count of running jobs that have run for more than their maxTimeRunning time.
+     */
+    int getLateJobs();
 }

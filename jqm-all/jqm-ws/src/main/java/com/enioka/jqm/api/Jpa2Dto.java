@@ -181,6 +181,7 @@ public class Jpa2Dto
         res.setKeyword3(d.getKeyword3());
         res.setModule(d.getModule());
         res.setQueueId(d.getQueue().getId());
+        res.setReasonableRuntimeLimitMinute(d.getMaxTimeRunning());
 
         for (JobDefParameter p : d.getParameters())
         {

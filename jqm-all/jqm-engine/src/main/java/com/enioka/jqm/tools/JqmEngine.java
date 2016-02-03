@@ -602,6 +602,17 @@ class JqmEngine implements JqmEngineMBean
         }
         return false;
     }
+    
+    @Override
+    public int getLateJobs()
+    {
+    	int res = 0;
+        for (QueuePoller p : this.pollers.values())
+        {
+            res += p.getLateJobs();
+        }
+        return res;
+    }
 
     @Override
     public long getUptime()

@@ -190,6 +190,12 @@ class XmlJobDefParser
                     {
                         jd.setKeyword3(jdElement.getElementsByTagName("keyword3").item(0).getTextContent());
                     }
+                    
+                    // Alert time
+                    if (jdElement.getElementsByTagName("reasonableRuntimeLimitMinute").getLength() > 0)
+                    {
+                    	jd.setMaxTimeRunning(Integer.parseInt(jdElement.getElementsByTagName("reasonableRuntimeLimitMinute").item(0).getTextContent()));
+                    }
 
                     // Parameters
                     for (JobDefParameter jdp : jd.getParameters())

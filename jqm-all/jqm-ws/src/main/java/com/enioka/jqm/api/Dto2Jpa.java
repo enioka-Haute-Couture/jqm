@@ -178,6 +178,7 @@ class Dto2Jpa
         jpa.setKeyword3(dto.getKeyword3());
         jpa.setModule(dto.getModule());
         jpa.setQueue(em.find(Queue.class, dto.getQueueId()));
+        jpa.setMaxTimeRunning(dto.getReasonableRuntimeLimitMinute());
 
         jpa = em.merge(jpa);
 

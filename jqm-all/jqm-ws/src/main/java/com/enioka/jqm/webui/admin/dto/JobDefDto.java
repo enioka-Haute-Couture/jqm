@@ -41,6 +41,7 @@ public class JobDefDto implements Serializable
     private String keyword3;
     private boolean highlander, enabled;
     private String jarPath;
+    private Integer reasonableRuntimeLimitMinute;
 
     @XmlElementWrapper(name = "parameters")
     @XmlElement(name = "parameter", type = ParameterDto.class)
@@ -195,4 +196,14 @@ public class JobDefDto implements Serializable
     {
         this.enabled = enabled;
     }
+
+	public Integer getReasonableRuntimeLimitMinute() 
+	{
+		return reasonableRuntimeLimitMinute;
+	}
+
+	public void setReasonableRuntimeLimitMinute(Integer reasonableRuntimeLimitMinute) 
+	{
+		this.reasonableRuntimeLimitMinute = reasonableRuntimeLimitMinute;
+	}
 }
