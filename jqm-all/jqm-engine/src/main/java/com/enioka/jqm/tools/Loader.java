@@ -117,12 +117,12 @@ class Loader implements Runnable, LoaderMBean
         Thread.currentThread().setName(threadName);
 
         // One log per launch?
-        if (System.out instanceof MulticastPrintStream)
+        if (System.out instanceof MultiplexPrintStream)
         {
             String fileName = StringUtils.leftPad("" + this.job.getId(), 10, "0");
-            MulticastPrintStream mps = (MulticastPrintStream) System.out;
+            MultiplexPrintStream mps = (MultiplexPrintStream) System.out;
             mps.registerThread(String.valueOf(fileName + ".stdout.log"));
-            mps = (MulticastPrintStream) System.err;
+            mps = (MultiplexPrintStream) System.err;
             mps.registerThread(String.valueOf(fileName + ".stderr.log"));
         }
 
@@ -406,11 +406,11 @@ class Loader implements Runnable, LoaderMBean
 
     private void unregisterLogger()
     {
-        if (System.out instanceof MulticastPrintStream)
+        if (System.out instanceof MultiplexPrintStream)
         {
-            MulticastPrintStream mps = (MulticastPrintStream) System.out;
+            MultiplexPrintStream mps = (MultiplexPrintStream) System.out;
             mps.unregisterThread();
-            mps = (MulticastPrintStream) System.err;
+            mps = (MultiplexPrintStream) System.err;
             mps.unregisterThread();
         }
     }

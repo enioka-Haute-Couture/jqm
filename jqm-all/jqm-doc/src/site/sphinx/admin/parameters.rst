@@ -29,7 +29,7 @@ recommended - the resource would only be available to the local node, while reso
 available to any node.
 
 A second file exists, named JQM_ROOT/conf/jqm.properties. It is not currently used, except if you are using the (not
-production grade) database HSQLDB, in which case the line it contains must be uncommented. It can be safely deleted otherwise.
+production grade) database HSQLDB, in which case the line it contains must be uncommented. It can be - and should be - safely deleted otherwise.
 
 **Changes to bootstrap files require an engine restart**.
 
@@ -76,7 +76,8 @@ have to be altered directly inside the database with your tool of choice or thro
 +-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
 | defaultConnection       | the JNDI alias returned by the engine API getDefaultConnection method.                              | jdbc/jqm      | No      | No           |
 +-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
-| logFilePerLaunch        | if true, one log file will be created per launch. Otherwise, everything ends in the main log.       | true          | Yes     | No           |
+| logFilePerLaunch        | if 'true', one log file will be created per launch. If 'false', job stdout/stderr is lost.          | true          | Yes     | No           |
+|                         | if 'both', one log file will be created per launch PLUS one common file concatening all these files |               |         |              |
 +-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
 | internalPollingPeriodMs | Period in ms for checking stop orders. Also period at which the "I'm a alive" signal is sent.       | 60000         | Yes     | No           |
 |                         | Also used for checking and applying  parameter modifications (new queues, global prm changes...)    |               |         |              |

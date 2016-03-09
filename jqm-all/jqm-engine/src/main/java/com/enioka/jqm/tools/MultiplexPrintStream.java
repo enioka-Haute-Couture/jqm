@@ -37,11 +37,14 @@ import com.enioka.jqm.jpamodel.GlobalParameter;
  * Should a payload create a new thread, its stdout would go to the global log as the multiplexing key is the Thread. But is not a big deal
  * as creating threads inside an app server is not a good idea anyway.
  */
-class MulticastPrintStream extends PrintStream
+class MultiplexPrintStream extends PrintStream
 {
-    private static Logger jqmlogger = Logger.getLogger(MulticastPrintStream.class);
+    private static Logger jqmlogger = Logger.getLogger(MultiplexPrintStream.class);
+    private static Logger alljobslogger = Logger.getLogger("alljobslogger");
+    private static String ls = System.getProperty("line.separator");
 
     private BufferedWriter original = null;
+    private boolean useCommonLogFile = false;
     private ThreadLocal<BufferedWriter> logger = new ThreadLocal<BufferedWriter>()
     {
         protected BufferedWriter initialValue()
@@ -51,9 +54,10 @@ class MulticastPrintStream extends PrintStream
     };
     String rootLogDir;
 
-    MulticastPrintStream(OutputStream out, String rootLogDir)
+    MultiplexPrintStream(OutputStream out, String rootLogDir, boolean alsoWriteToCommonLog)
     {
         super(out);
+        this.useCommonLogFile = alsoWriteToCommonLog;
         this.original = new BufferedWriter(new OutputStreamWriter(out));
         this.rootLogDir = rootLogDir;
 
@@ -123,6 +127,11 @@ class MulticastPrintStream extends PrintStream
                 textOut.newLine();
             }
             textOut.flush();
+
+            if (useCommonLogFile && textOut != original)
+            {
+                alljobslogger.info(s + (newLine ? ls : ""));
+            }
         }
         catch (InterruptedIOException x)
         {

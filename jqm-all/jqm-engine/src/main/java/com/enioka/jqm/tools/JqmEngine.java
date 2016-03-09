@@ -141,13 +141,13 @@ class JqmEngine implements JqmEngineMBean
         // Log multicasting (& log4j stdout redirect)
         GlobalParameter gp1 = em.createQuery("SELECT g FROM GlobalParameter g WHERE g.key = :k", GlobalParameter.class)
                 .setParameter("k", "logFilePerLaunch").getSingleResult();
-        if ("true".equals(gp1.getValue()))
+        if ("true".equals(gp1.getValue()) || "both".equals(gp1.getValue()))
         {
             RollingFileAppender a = (RollingFileAppender) Logger.getRootLogger().getAppender("rollingfile");
-            MulticastPrintStream s = new MulticastPrintStream(System.out, FilenameUtils.getFullPath(a.getFile()));
+            MultiplexPrintStream s = new MultiplexPrintStream(System.out, FilenameUtils.getFullPath(a.getFile()), "both".equals(gp1.getValue()));
             System.setOut(s);
             ((ConsoleAppender) Logger.getRootLogger().getAppender("consoleAppender")).setWriter(new OutputStreamWriter(s));
-            s = new MulticastPrintStream(System.err, FilenameUtils.getFullPath(a.getFile()));
+            s = new MultiplexPrintStream(System.err, FilenameUtils.getFullPath(a.getFile()), "both".equals(gp1.getValue()));
             System.setErr(s);
         }
 

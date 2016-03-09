@@ -347,7 +347,7 @@ public class MiscTest extends JqmBaseTest
         TestHelpers.waitFor(1, 20000, em);
 
         String fileName = StringUtils.leftPad("" + i, 10, "0") + ".stdout.log";
-        File f = new File(FilenameUtils.concat(((MulticastPrintStream) System.out).rootLogDir, fileName));
+        File f = new File(FilenameUtils.concat(((MultiplexPrintStream) System.out).rootLogDir, fileName));
 
         Assert.assertEquals(1, TestHelpers.getOkCount(em));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
