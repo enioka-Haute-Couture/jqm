@@ -76,7 +76,7 @@ $ServiceName = "JQM_$NodeName"
 $java = Get-Command java -ErrorAction SilentlyContinue
 if (-not $java)
 {
-    $java = $env:JAVA_HOME
+    $java = "$env:JAVA_HOME/bin/java.exe"
     if (-not $env:JAVA_HOME)
     {
         throw "Cannot find Java. Check it is in the PATH or set JAVA_HOME"
