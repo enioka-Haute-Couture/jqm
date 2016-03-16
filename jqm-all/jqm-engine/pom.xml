@@ -13,6 +13,7 @@
 
 	<properties>
 		<modelJarName>./lib/jqm-model-${project.version}.jar</modelJarName>
+		<argLine>-Xms256m -Xmx1024m -XX:MaxPermSize=512m</argLine>
 	</properties>
 
 	<build>
@@ -161,7 +162,6 @@
 				<version>${surefire.version}</version>
 				<configuration>
 					<trimStackTrace>false</trimStackTrace>
-					<argLine>${argLine}</argLine>
 					<systemProperties>
 						<property>
 							<name>mavenVersion</name>
