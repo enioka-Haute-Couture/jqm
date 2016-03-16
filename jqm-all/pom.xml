@@ -67,18 +67,18 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<hibernate.version>4.2.19.Final</hibernate.version>
+		<hibernate.version>4.2.21.Final</hibernate.version>
 		<junit.version>4.12</junit.version>
-		<hsqldb.version>2.3.2</hsqldb.version>
+		<hsqldb.version>2.3.3</hsqldb.version>
 		<jersey-version>2.6</jersey-version>
-		<jetty.version>8.1.17.v20150415</jetty.version>
-		<slf4j.version>1.7.12</slf4j.version>
-		<shiro.version>1.2.3</shiro.version>
-		<surefire.version>2.18.1</surefire.version>
+		<jetty.version>8.1.19.v20160209</jetty.version>
+		<slf4j.version>1.7.19</slf4j.version>
+		<shiro.version>1.2.4</shiro.version>
+		<surefire.version>2.19.1</surefire.version>
 		<javadoc.version>2.10.3</javadoc.version>
-		<httpclient.version>4.5</httpclient.version>
-		<pool.version>7.0.62</pool.version>
-		<bc.version>1.51</bc.version>
+		<httpclient.version>4.5.2</httpclient.version>
+		<pool.version>7.0.68</pool.version>
+		<bc.version>1.54</bc.version>
 		<mail.version>1.5.2</mail.version>
 		<sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
 	</properties>

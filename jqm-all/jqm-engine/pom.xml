@@ -227,7 +227,7 @@
 		<dependency>
 			<groupId>org.jboss.shrinkwrap.resolver</groupId>
 			<artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-			<version>2.1.1</version>
+			<version>2.2.2</version>
 		</dependency>
 
 		<!-- LOGGING (we directly use log4j in this project but we need a slf4j 
