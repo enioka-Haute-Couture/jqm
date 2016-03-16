@@ -49,7 +49,7 @@ public class JobInstance
     private Integer position;
     private Queue queue;
     private String queueName;
-    private String keyword1, keyword2, keyword3, module, email, application;
+    private String keyword1, keyword2, keyword3, definitionKeyword1, definitionKeyword2, definitionKeyword3, module, email, application;
     private Map<String, String> parameters = new HashMap<String, String>();
     private Integer progress;
     @XmlElementWrapper(name = "messages")
@@ -181,7 +181,8 @@ public class JobInstance
     }
 
     /**
-     * An optional integer that running user code may update from time to time. Used to give an idea of the progress of the job instance.<br>
+     * An optional integer that running user code may update from time to time. Used to give an idea of the progress of the job instance.
+     * <br>
      * <strong>This is the value retrieved during the latest {@link JqmClient#getJob(int)} call and may not be up to date!</strong>
      */
     public Integer getProgress()
@@ -246,6 +247,45 @@ public class JobInstance
     void setKeyword3(String keyword3)
     {
         this.keyword3 = keyword3;
+    }
+
+    /**
+     * An optional classification tag which can be specified inside the definition of the job (default is NULL).
+     */
+    public String getDefinitionKeyword1()
+    {
+        return definitionKeyword1;
+    }
+
+    void setDefinitionKeyword1(String keyword1)
+    {
+        this.definitionKeyword1 = keyword1;
+    }
+
+    /**
+     * An optional classification tag which can be specified inside the definition of the job (default is NULL).
+     */
+    public String getDefinitionKeyword2()
+    {
+        return definitionKeyword2;
+    }
+
+    void setDefinitionKeyword2(String keyword2)
+    {
+        this.definitionKeyword2 = keyword2;
+    }
+
+    /**
+     * An optional classification tag which can be specified inside the definition of the job (default is NULL).
+     */
+    public String getDefinitionKeyword3()
+    {
+        return definitionKeyword3;
+    }
+
+    void setDefinitionKeyword3(String keyword3)
+    {
+        this.definitionKeyword3 = keyword3;
     }
 
     /**

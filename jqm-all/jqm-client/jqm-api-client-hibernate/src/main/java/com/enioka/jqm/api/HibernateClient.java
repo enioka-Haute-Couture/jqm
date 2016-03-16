@@ -901,6 +901,9 @@ final class HibernateClient implements JqmClient
         ji.setKeyword1(h.getKeyword1());
         ji.setKeyword2(h.getKeyword2());
         ji.setKeyword3(h.getKeyword3());
+        ji.setDefinitionKeyword1(h.getJd().getKeyword1());
+        ji.setDefinitionKeyword2(h.getJd().getKeyword2());
+        ji.setDefinitionKeyword3(h.getJd().getKeyword3());
         ji.setApplication(h.getApplication());
         ji.setModule(h.getModule());
         ji.setEmail(h.getEmail());
@@ -936,9 +939,12 @@ final class HibernateClient implements JqmClient
         ji.setState(com.enioka.jqm.api.State.valueOf(h.getStatus().toString()));
         ji.setUser(h.getUserName());
         ji.setProgress(h.getProgress());
-        ji.setKeyword1(h.getKeyword1());
-        ji.setKeyword2(h.getKeyword2());
-        ji.setKeyword3(h.getKeyword3());
+        ji.setKeyword1(h.getInstanceKeyword1());
+        ji.setKeyword2(h.getInstanceKeyword2());
+        ji.setKeyword3(h.getInstanceKeyword3());
+        ji.setDefinitionKeyword1(h.getKeyword1());
+        ji.setDefinitionKeyword2(h.getKeyword2());
+        ji.setDefinitionKeyword3(h.getKeyword3());
         ji.setApplication(h.getApplication());
         ji.setModule(h.getModule());
         ji.setEmail(h.getEmail());
@@ -1171,7 +1177,8 @@ final class HibernateClient implements JqmClient
                     wh2 = " WHERE " + wh2.substring(3);
                 }
 
-                TypedQuery<JobInstance> q2 = em.createQuery("SELECT h FROM JobInstance h " + wh2 + sort, JobInstance.class);
+                TypedQuery<JobInstance> q2 = em.createQuery(
+                        "SELECT h FROM JobInstance h LEFT JOIN FETCH h.jd LEFT JOIN FETCH h.node " + wh2 + sort, JobInstance.class);
                 for (Map.Entry<String, Object> entry : prms2.entrySet())
                 {
                     q2.setParameter(entry.getKey(), entry.getValue());

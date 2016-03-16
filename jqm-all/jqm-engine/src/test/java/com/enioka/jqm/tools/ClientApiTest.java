@@ -31,6 +31,7 @@ import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.Query;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobInstance;
@@ -70,9 +71,9 @@ public class ClientApiTest extends JqmBaseTest
     public void testHistoryFields() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other2", true, em);
 
-        int i = JobRequest.create("MarsuApplication", "TestUser").setSessionID("session42").submit();
+        int i = JobRequest.create("MarsuApplication", "TestUser").setSessionID("session42").setKeyword1("k1").setKeyword2("k2").submit();
 
         addAndStartEngine();
 
@@ -92,6 +93,14 @@ public class ClientApiTest extends JqmBaseTest
         Assert.assertTrue(h.getExecutionDate() != null);
         Assert.assertTrue(h.getSessionId() != null);
         Assert.assertEquals("session42", h.getSessionId());
+
+        com.enioka.jqm.api.JobInstance ji = Query.create().setApplicationName("MarsuApplication").run().get(0);
+        Assert.assertEquals("ModuleMachin", ji.getDefinitionKeyword1());
+        Assert.assertEquals("other", ji.getDefinitionKeyword2());
+        Assert.assertEquals("other2", ji.getDefinitionKeyword3());
+        Assert.assertEquals("k1", ji.getKeyword1());
+        Assert.assertEquals("k2", ji.getKeyword2());
+        Assert.assertEquals(null, ji.getKeyword3());
     }
 
     @Test
@@ -286,7 +295,7 @@ public class ClientApiTest extends JqmBaseTest
         Assert.assertEquals("Houba", h.getInstanceKeyword1());
         Assert.assertEquals(null, h.getInstanceKeyword2());
         Assert.assertEquals("Meuh", h.getInstanceKeyword3());
-        
+
         Assert.assertEquals("keyword1", h.getKeyword1());
         Assert.assertEquals(null, h.getKeyword2());
         Assert.assertEquals("keyword3", h.getKeyword3());
