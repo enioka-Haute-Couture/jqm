@@ -48,7 +48,8 @@ public class FiboTest extends JqmBaseTest
     @Test
     public void testFibo() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.StressFibo").addRuntimeParameter("p1", "1").addRuntimeParameter("p2", "2").expectOk(11).run(this);
+        JqmSimpleTest.create(em, "pyl.StressFibo").addRuntimeParameter("p1", "1").addRuntimeParameter("p2", "2").addWaitMargin(20000)
+                .expectOk(11).run(this);
         // 1: (1,2) - 2: (2,3) - 3: (3,5) - 4: (5,8) - 5: (8,13) - 6: (13,21) - 7: (21,34) - 8: (34,55) - 9: (55,89) - 10: (89,144) -
         // 11: (134,233)
     }
@@ -79,6 +80,6 @@ public class FiboTest extends JqmBaseTest
     public void testFiboHib() throws Exception
     {
         JqmSimpleTest.create(em, "pyl.StressFiboHib", "jqm-test-pyl-hibapi").addRuntimeParameter("p1", "1").addRuntimeParameter("p2", "2")
-                .expectOk(11).run(this);
+                .addWaitMargin(20000).expectOk(11).run(this);
     }
 }
