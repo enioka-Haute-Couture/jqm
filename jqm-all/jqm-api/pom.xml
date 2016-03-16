@@ -12,14 +12,26 @@
 	<url>http://jqm.readthedocs.org</url>
 
 	<build>
-		<resources>
-			<resource>
-				<directory>${project.build.directory}/../../jqm-engine/lib</directory>
-				<filtering>false</filtering>
-				<includes>
-					<include>*.xsd</include>
-				</includes>
-			</resource>
-		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-xsd</id>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<phase>compile</phase>
+						<configuration>
+							<tasks>
+								<copy file="${project.build.directory}/../../jqm-engine/lib/res.xsd"
+									tofile="${project.build.directory}/classes/res.xsd" />
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
 	</build>
 </project>
