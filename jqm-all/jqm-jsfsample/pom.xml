@@ -11,6 +11,10 @@
 
 	<name>${project.groupId}:${project.artifactId}</name>
 	<url>http://jqm.readthedocs.org</url>
+	
+	<properties>
+		<sonar.skip>true</sonar.skip>
+	</properties>
 
 	<repositories>
 		<repository>

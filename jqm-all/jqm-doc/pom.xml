@@ -12,8 +12,9 @@
 	<url>http://jqm.readthedocs.org</url>
 
 	<properties>
+		<sonar.skip>true</sonar.skip>
 	</properties>
-
+	
 	<build>
 		<plugins>
 			<plugin>

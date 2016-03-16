@@ -26,6 +26,10 @@
 		<module>jqm-test-pyl-nodep</module>
 		<module>jqm-test-pyl-hibapi</module>
 	</modules>
+	
+	<properties>
+		<sonar.skip>true</sonar.skip>
+	</properties>
 
 	<profiles>
 		<!-- Tests should produce a "test.jar" file - not a traditionally-named 
