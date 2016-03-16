@@ -48,10 +48,6 @@ import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.ParameterExpression;
-import javax.persistence.criteria.Root;
 
 import org.apache.http.Header;
 import org.apache.http.HttpStatus;
@@ -261,13 +257,8 @@ final class HibernateClient implements JqmClient
         JobDef job = null;
         try
         {
-            CriteriaBuilder cb = em.getCriteriaBuilder();
-            CriteriaQuery<JobDef> cq = cb.createQuery(JobDef.class);
-            Root<JobDef> j = cq.from(JobDef.class);
-            ParameterExpression<String> prm = cb.parameter(String.class);
-            cq.select(j).where(cb.equal(j.get("applicationName"), prm));
-
-            job = em.createQuery(cq).setParameter(prm, jd.getApplicationName()).getSingleResult();
+            job = em.createNamedQuery("HibApi.findJobDef", JobDef.class).setParameter("applicationName", jd.getApplicationName())
+                    .getSingleResult();
         }
         catch (NoResultException ex)
         {
@@ -309,8 +300,7 @@ final class HibernateClient implements JqmClient
             Queue q = job.getQueue();
             if (jd.getQueueName() != null)
             {
-                q = em.createQuery("SELECT q FROM Queue q where q.name = :n", Queue.class).setParameter("n", jd.getQueueName())
-                        .getSingleResult();
+                q = em.createNamedQuery("HibApi.findQueue", Queue.class).setParameter("name", jd.getQueueName()).getSingleResult();
             }
 
             JobInstance ji = new JobInstance();
@@ -864,8 +854,9 @@ final class HibernateClient implements JqmClient
             else
             {
                 // Normal case: put the JI between the two others.
-                ji.setInternalPosition((currentJobs.get(betweenUp - 1).getInternalPosition() + currentJobs.get(betweenDown - 1)
-                        .getInternalPosition()) / 2);
+                ji.setInternalPosition(
+                        (currentJobs.get(betweenUp - 1).getInternalPosition() + currentJobs.get(betweenDown - 1).getInternalPosition())
+                                / 2);
             }
             em.getTransaction().commit();
         }
@@ -1142,8 +1133,8 @@ final class HibernateClient implements JqmClient
                 String sort = "";
                 for (SortSpec s : query.getSorts())
                 {
-                    sort += s.col.getJiField() == null ? "" : ",h." + s.col.getJiField() + " "
-                            + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
+                    sort += s.col.getJiField() == null ? ""
+                            : ",h." + s.col.getJiField() + " " + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
                 }
                 if (sort.isEmpty())
                 {
@@ -1658,8 +1649,9 @@ final class HibernateClient implements JqmClient
             protocol = "http://";
             try
             {
-                GlobalParameter gp = em.createQuery("SELECT gp from GlobalParameter gp WHERE gp.key = 'enableWsApiSsl'",
-                        GlobalParameter.class).getSingleResult();
+                GlobalParameter gp = em
+                        .createQuery("SELECT gp from GlobalParameter gp WHERE gp.key = 'enableWsApiSsl'", GlobalParameter.class)
+                        .getSingleResult();
                 if (Boolean.parseBoolean(gp.getValue()))
                 {
                     protocol = "https://";
@@ -1697,8 +1689,8 @@ final class HibernateClient implements JqmClient
             if (SimpleApiSecurity.getId(em).usr != null)
             {
                 credsProvider = new BasicCredentialsProvider();
-                credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(SimpleApiSecurity.getId(em).usr,
-                        SimpleApiSecurity.getId(em).pass));
+                credsProvider.setCredentials(AuthScope.ANY,
+                        new UsernamePasswordCredentials(SimpleApiSecurity.getId(em).usr, SimpleApiSecurity.getId(em).pass));
             }
             SSLContext ctx = null;
             if (getFileProtocol(em).equals("https://"))
@@ -1726,8 +1718,8 @@ final class HibernateClient implements JqmClient
                         }
                         catch (FileNotFoundException e)
                         {
-                            throw new JqmInvalidRequestException("Trust store file ["
-                                    + this.p.getProperty("com.enioka.jqm.ws.truststoreFile") + "] cannot be found", e);
+                            throw new JqmInvalidRequestException(
+                                    "Trust store file [" + this.p.getProperty("com.enioka.jqm.ws.truststoreFile") + "] cannot be found", e);
                         }
 
                         String trustp = this.p.getProperty("com.enioka.jqm.ws.truststorePass", null);

@@ -8,6 +8,8 @@
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<non-jta-data-source>jdbc/jqm</non-jta-data-source>
 
+		<mapping-file>META-INF/orm.xml</mapping-file>
+
 		<class>com.enioka.jqm.jpamodel.JobInstance</class>
 		<class>com.enioka.jqm.jpamodel.Deliverable</class>
 		<class>com.enioka.jqm.jpamodel.History</class>

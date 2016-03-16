@@ -62,7 +62,6 @@ class JobManagerHandler implements InvocationHandler
 
     JobManagerHandler(JobInstance ji, Map<String, String> prms)
     {
-
         p = new Properties();
         p.put("emf", Helpers.getEmf());
 
@@ -90,142 +89,152 @@ class JobManagerHandler implements InvocationHandler
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
+        ClassLoader initial = null;
         String methodName = method.getName();
         Class<?>[] classes = method.getParameterTypes();
         jqmlogger.trace("An engine API method was called: " + methodName + " with nb arguments: " + classes.length);
-        shouldKill();
-
-        if (classes.length == 0)
+        try
         {
-            if ("jobApplicationId".equals(methodName))
+            initial = Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+            shouldKill();
+
+            if (classes.length == 0)
             {
-                return jd.getId();
+                if ("jobApplicationId".equals(methodName))
+                {
+                    return jd.getId();
+                }
+                else if ("parentID".equals(methodName))
+                {
+                    return ji.getParentId();
+                }
+                else if ("jobInstanceID".equals(methodName))
+                {
+                    return ji.getId();
+                }
+                else if ("canBeRestarted".equals(methodName))
+                {
+                    return jd.isCanBeRestarted();
+                }
+                else if ("applicationName".equals(methodName))
+                {
+                    return jd.getApplicationName();
+                }
+                else if ("sessionID".equals(methodName))
+                {
+                    return ji.getSessionID();
+                }
+                else if ("application".equals(methodName))
+                {
+                    return application;
+                }
+                else if ("module".equals(methodName))
+                {
+                    return jd.getModule();
+                }
+                else if ("keyword1".equals(methodName))
+                {
+                    return ji.getKeyword1();
+                }
+                else if ("keyword2".equals(methodName))
+                {
+                    return ji.getKeyword2();
+                }
+                else if ("keyword3".equals(methodName))
+                {
+                    return ji.getKeyword3();
+                }
+                else if ("definitionKeyword1".equals(methodName))
+                {
+                    return jd.getKeyword1();
+                }
+                else if ("definitionKeyword2".equals(methodName))
+                {
+                    return jd.getKeyword2();
+                }
+                else if ("definitionKeyword3".equals(methodName))
+                {
+                    return jd.getKeyword3();
+                }
+                else if ("userName".equals(methodName))
+                {
+                    return ji.getUserName();
+                }
+                else if ("parameters".equals(methodName))
+                {
+                    return params;
+                }
+                else if ("defaultConnect".equals(methodName))
+                {
+                    return this.defaultCon;
+                }
+                else if ("getDefaultConnection".equals(methodName))
+                {
+                    return this.getDefaultConnection();
+                }
+                else if ("getWorkDir".equals(methodName))
+                {
+                    return getWorkDir();
+                }
+                else if ("yield".equals(methodName))
+                {
+                    return null;
+                }
+                else if ("waitChildren".equals(methodName))
+                {
+                    waitChildren();
+                    return null;
+                }
             }
-            else if ("parentID".equals(methodName))
+            else if ("sendMsg".equals(methodName) && classes.length == 1 && classes[0] == String.class)
             {
-                return ji.getParentId();
-            }
-            else if ("jobInstanceID".equals(methodName))
-            {
-                return ji.getId();
-            }
-            else if ("canBeRestarted".equals(methodName))
-            {
-                return jd.isCanBeRestarted();
-            }
-            else if ("applicationName".equals(methodName))
-            {
-                return jd.getApplicationName();
-            }
-            else if ("sessionID".equals(methodName))
-            {
-                return ji.getSessionID();
-            }
-            else if ("application".equals(methodName))
-            {
-                return application;
-            }
-            else if ("module".equals(methodName))
-            {
-                return jd.getModule();
-            }
-            else if ("keyword1".equals(methodName))
-            {
-                return ji.getKeyword1();
-            }
-            else if ("keyword2".equals(methodName))
-            {
-                return ji.getKeyword2();
-            }
-            else if ("keyword3".equals(methodName))
-            {
-                return ji.getKeyword3();
-            }
-            else if ("definitionKeyword1".equals(methodName))
-            {
-                return jd.getKeyword1();
-            }
-            else if ("definitionKeyword2".equals(methodName))
-            {
-                return jd.getKeyword2();
-            }
-            else if ("definitionKeyword3".equals(methodName))
-            {
-                return jd.getKeyword3();
-            }
-            else if ("userName".equals(methodName))
-            {
-                return ji.getUserName();
-            }
-            else if ("parameters".equals(methodName))
-            {
-                return params;
-            }
-            else if ("defaultConnect".equals(methodName))
-            {
-                return this.defaultCon;
-            }
-            else if ("getDefaultConnection".equals(methodName))
-            {
-                return this.getDefaultConnection();
-            }
-            else if ("getWorkDir".equals(methodName))
-            {
-                return getWorkDir();
-            }
-            else if ("yield".equals(methodName))
-            {
+                sendMsg((String) args[0]);
                 return null;
             }
-            else if ("waitChildren".equals(methodName))
+            else if ("sendProgress".equals(methodName) && classes.length == 1 && classes[0] == Integer.class)
             {
-                waitChildren();
+                sendProgress((Integer) args[0]);
                 return null;
             }
-        }
-        else if ("sendMsg".equals(methodName) && classes.length == 1 && classes[0] == String.class)
-        {
-            sendMsg((String) args[0]);
-            return null;
-        }
-        else if ("sendProgress".equals(methodName) && classes.length == 1 && classes[0] == Integer.class)
-        {
-            sendProgress((Integer) args[0]);
-            return null;
-        }
-        else if ("enqueue".equals(methodName) && classes.length == 10 && classes[0] == String.class)
-        {
-            return enqueue((String) args[0], (String) args[1], (String) args[2], (String) args[3], (String) args[4], (String) args[5],
-                    (String) args[6], (String) args[7], (String) args[8], (Map<String, String>) args[9]);
-        }
-        else if ("enqueueSync".equals(methodName) && classes.length == 10 && classes[0] == String.class)
-        {
-            return enqueueSync((String) args[0], (String) args[1], (String) args[2], (String) args[3], (String) args[4], (String) args[5],
-                    (String) args[6], (String) args[7], (String) args[8], (Map<String, String>) args[9]);
-        }
-        else if ("addDeliverable".equals(methodName) && classes.length == 2 && classes[0] == String.class && classes[1] == String.class)
-        {
-            return addDeliverable((String) args[0], (String) args[1]);
-        }
-        else if ("waitChild".equals(methodName) && classes.length == 1 && (args[0] instanceof Integer))
-        {
-            waitChild((Integer) args[0]);
-            return null;
-        }
-        else if ("hasEnded".equals(methodName) && classes.length == 1 && (args[0] instanceof Integer))
-        {
-            return hasEnded((Integer) args[0]);
-        }
-        else if ("hasSucceeded".equals(methodName) && classes.length == 1 && (args[0] instanceof Integer))
-        {
-            return hasSucceeded((Integer) args[0]);
-        }
-        else if ("hasFailed".equals(methodName) && classes.length == 1 && (args[0] instanceof Integer))
-        {
-            return hasFailed((Integer) args[0]);
-        }
+            else if ("enqueue".equals(methodName) && classes.length == 10 && classes[0] == String.class)
+            {
+                return enqueue((String) args[0], (String) args[1], (String) args[2], (String) args[3], (String) args[4], (String) args[5],
+                        (String) args[6], (String) args[7], (String) args[8], (Map<String, String>) args[9]);
+            }
+            else if ("enqueueSync".equals(methodName) && classes.length == 10 && classes[0] == String.class)
+            {
+                return enqueueSync((String) args[0], (String) args[1], (String) args[2], (String) args[3], (String) args[4],
+                        (String) args[5], (String) args[6], (String) args[7], (String) args[8], (Map<String, String>) args[9]);
+            }
+            else if ("addDeliverable".equals(methodName) && classes.length == 2 && classes[0] == String.class && classes[1] == String.class)
+            {
+                return addDeliverable((String) args[0], (String) args[1]);
+            }
+            else if ("waitChild".equals(methodName) && classes.length == 1 && (args[0] instanceof Integer))
+            {
+                waitChild((Integer) args[0]);
+                return null;
+            }
+            else if ("hasEnded".equals(methodName) && classes.length == 1 && (args[0] instanceof Integer))
+            {
+                return hasEnded((Integer) args[0]);
+            }
+            else if ("hasSucceeded".equals(methodName) && classes.length == 1 && (args[0] instanceof Integer))
+            {
+                return hasSucceeded((Integer) args[0]);
+            }
+            else if ("hasFailed".equals(methodName) && classes.length == 1 && (args[0] instanceof Integer))
+            {
+                return hasFailed((Integer) args[0]);
+            }
 
-        throw new NoSuchMethodException(methodName);
+            throw new NoSuchMethodException(methodName);
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader(initial);
+        }
     }
 
     private void shouldKill()
@@ -482,6 +491,6 @@ class JobManagerHandler implements InvocationHandler
         else
         {
             return !b;
-		}
-	}
+        }
+    }
 }
