@@ -11,9 +11,11 @@ Environment
 The release environment must have:
 
 * PGP & the release private key
-* The Selenium setup (see :doc:`tests`)
+* Access to a Sonar server with a correctly configured Maven settings.xml
+* The Selenium setup (see :doc:`tests`) - this has been deprecated. It may come back later.
 * Internet access
-* Login & password to Sonatype OSSRH.
+* Login & password to Sonatype OSSRH with permissions on com.enioka.jqm.
+* Login & password to Read the Docs with permissions on com.enioka.jqm.
 
 Update release notes
 +++++++++++++++++++++++++
@@ -30,12 +32,12 @@ Full build & tests
 
 There is no distinction between tests & integration tests in JQM so this will run all tests. ::
 
-	mvn clean install -Pselenium
+	mvn clean install
 
 Sonar snapshot
 ++++++++++++++++++
 
-This will run all tests once again.
+This will create a new Sonar analysis.
 
 ::
 
@@ -75,10 +77,15 @@ At this step, the release is done and the local git modifications can be pushed 
 
 ::
 
-	git push origin --tags
+    git push origin
+    git push origin --tags
 
 GitHub upload
 ++++++++++++++++
 
-Create a release inside GitHub and upload the zip and tar.gz produced by the jqm-engine project.
+Create a release inside GitHub and upload the zip and tar.gz produced by the jqm-engine project. Add a link to the release notes inside.
 
+Documentation
++++++++++++++++
+
+Go to jqm.rtfd.org and change the default branch to the newly created tag.

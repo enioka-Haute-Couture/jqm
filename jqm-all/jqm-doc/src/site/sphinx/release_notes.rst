@@ -1,6 +1,38 @@
 Release notes
 ######################
 
+1.3.6
+************
+
+Release goal
+++++++++++++++++++
+
+Maintenance release with a few optimizations concerning the client API.
+
+Upgrade notes
++++++++++++++++++++
+
+All API changes are backward compatible: 1.2.x and 1.3.x APIs will work with 1.3.6 engines. 
+However, everyone is strongly encouraged to upgrade to the latest version.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Major
++++++++++++++++++
+
+* Engine: a new JMX counter has been added so as to detect jobs longer than desired (a parameter set in the job definition).
+* Engine: added an option to create an additional log file containing all the logs of all jobs. This should ease job log parsing by monitoring tools.
+* Client API: extended QUery API results so as to return all the keywords (those set in the job definition and those set at enqueue time).
+* Client API & Engine API can now cohabit inside a payload for the rare cases when the engine API is not enough.
+
+Minor
+++++++++++++++++
+
+* Client API: the job definition XSD is now included inside the jqm-api artifact to ease validation by payload developers.
+* Client API: enqueue method should now run faster with less memory consumed.
+* Client API: fixed a very rare race condition in file retrieval methods when WS authentication is enabled.
+* Test: migrated to SonarQube+Jacoco & added necessary variables.
+
 1.3.5
 ************
 
