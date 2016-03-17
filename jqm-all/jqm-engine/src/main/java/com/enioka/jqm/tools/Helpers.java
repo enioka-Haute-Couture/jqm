@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.zip.ZipFile;
 
 import javax.mail.MessagingException;
 import javax.naming.InitialContext;
@@ -162,6 +163,21 @@ final class Helpers
         catch (Exception e)
         {
             // fail silently
+        }
+    }
+
+    static void closeQuietly(ZipFile zf)
+    {
+        try
+        {
+            if (zf != null)
+            {
+                zf.close();
+            }
+        }
+        catch (Exception e)
+        {
+            jqmlogger.warn("could not close jar file", e);
         }
     }
 
@@ -366,8 +382,8 @@ final class Helpers
                 .setParameter("localnode", nodeName).getSingleResult();
         if (i == 0L)
         {
-            jqmlogger
-                    .warn("This node is not bound to any queue. Either use the GUI to bind it or use CLI option -u to bind it to the default queue");
+            jqmlogger.warn(
+                    "This node is not bound to any queue. Either use the GUI to bind it or use CLI option -u to bind it to the default queue");
         }
 
         // Roles
@@ -819,14 +835,14 @@ final class Helpers
 
     static boolean testDbFailure(Exception e)
     {
-        return (e instanceof LazyInitializationException)
-                || (e instanceof JDBCConnectionException)
+        return (e instanceof LazyInitializationException) || (e instanceof JDBCConnectionException)
                 || (e.getCause() instanceof JDBCConnectionException)
                 || (e.getCause() != null && e.getCause().getCause() instanceof JDBCConnectionException)
                 || (e.getCause() instanceof SQLTransientException)
                 || (e.getCause() != null && e.getCause().getCause() instanceof SQLTransientException)
-                || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() instanceof SQLTransientException)
-                || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() != null && e.getCause()
-                        .getCause().getCause().getCause() instanceof SQLTransientException);
+                || (e.getCause() != null && e.getCause().getCause() != null
+                        && e.getCause().getCause().getCause() instanceof SQLTransientException)
+                || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() != null
+                        && e.getCause().getCause().getCause().getCause() instanceof SQLTransientException);
     }
 }

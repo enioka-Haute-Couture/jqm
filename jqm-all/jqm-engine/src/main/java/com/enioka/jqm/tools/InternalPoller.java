@@ -107,9 +107,9 @@ class InternalPoller implements Runnable
 
                 // Check if stop order
                 node = em.find(Node.class, node.getId());
-                if (node.isStop())
+                if (node == null || node.isStop())
                 {
-                    jqmlogger.info("Node has received a stop order from the database");
+                    jqmlogger.info("Node has received a stop order from the database or was removed from the database");
                     jqmlogger.trace("At stop order time, there are " + this.engine.getCurrentlyRunningJobCount()
                             + " jobs running in the node");
                     this.run = false;

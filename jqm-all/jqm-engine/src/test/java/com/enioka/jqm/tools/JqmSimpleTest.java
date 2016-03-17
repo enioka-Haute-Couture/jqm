@@ -106,7 +106,7 @@ public class JqmSimpleTest
      */
     public JqmSimpleTest addWaitMargin(int ms)
     {
-        this.waitMsMin = ms;
+        this.waitMarginMs = ms;
         return this;
     }
 

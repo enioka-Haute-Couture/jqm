@@ -352,6 +352,7 @@ class JobManagerHandler implements InvocationHandler
             }
             catch (InterruptedException e)
             {
+                Thread.currentThread().interrupt();
                 break;
             }
         }
@@ -371,6 +372,7 @@ class JobManagerHandler implements InvocationHandler
             }
             catch (InterruptedException e)
             {
+                Thread.currentThread().interrupt();
                 break;
             }
         }

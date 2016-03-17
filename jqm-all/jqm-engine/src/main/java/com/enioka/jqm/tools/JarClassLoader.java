@@ -93,7 +93,7 @@ class JarClassLoader extends URLClassLoader
         {
             c = loadClass(classQualifiedName);
         }
-        catch (Throwable e)
+        catch (Exception e)
         {
             throw new JqmEngineException("could not load class " + classQualifiedName, e);
         }
@@ -155,8 +155,8 @@ class JarClassLoader extends URLClassLoader
         }
         catch (Exception e)
         {
-            throw new JqmEngineException("Cannot create an instance of class " + c.getCanonicalName()
-                    + ". Does it have an argumentless constructor?", e);
+            throw new JqmEngineException(
+                    "Cannot create an instance of class " + c.getCanonicalName() + ". Does it have an argumentless constructor?", e);
         }
 
         // Injection
@@ -211,7 +211,6 @@ class JarClassLoader extends URLClassLoader
 
     private void launchMain(Class c, JobInstance job) throws JqmEngineException
     {
-        boolean withArgs = false;
         Method start = null;
         try
         {
@@ -224,7 +223,6 @@ class JarClassLoader extends URLClassLoader
         try
         {
             start = c.getMethod("main", String[].class);
-            withArgs = true;
         }
         catch (NoSuchMethodException e)
         {
@@ -260,14 +258,7 @@ class JarClassLoader extends URLClassLoader
         // Start
         try
         {
-            if (withArgs)
-            {
-                start.invoke(null, (Object) params);
-            }
-            else
-            {
-                start.invoke(null);
-            }
+            start.invoke(null, (Object) params);
         }
         catch (InvocationTargetException e)
         {

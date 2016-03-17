@@ -38,6 +38,7 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.RollingFileAppender;
 import org.eclipse.jetty.util.ArrayQueue;
+import org.eclipse.jetty.util.log.Log;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
@@ -101,9 +102,8 @@ class JqmEngine implements JqmEngineMBean
 
         // Log: we are starting...
         jqmlogger.info("JQM engine version " + this.getVersion() + " for node " + nodeName + " is starting");
-        jqmlogger.info(
-                "Java version is " + System.getProperty("java.version") + ". JVM was made by " + System.getProperty("java.vendor") + " as " + System.getProperty("java.vm.name") + 
-                " version " + System.getProperty("java.vm.version"));
+        jqmlogger.info("Java version is " + System.getProperty("java.version") + ". JVM was made by " + System.getProperty("java.vendor")
+                + " as " + System.getProperty("java.vm.name") + " version " + System.getProperty("java.vm.version"));
 
         // JNDI first - the engine itself uses JNDI to fetch its connections!
         Helpers.registerJndiIfNeeded();
@@ -121,7 +121,8 @@ class JqmEngine implements JqmEngineMBean
         {
             long r = Calendar.getInstance().getTimeInMillis() - node.getLastSeenAlive().getTimeInMillis();
             throw new JqmInitErrorTooSoon("Another engine named " + nodeName + " was running less than " + r / 1000
-                    + " seconds ago. Either stop the other node, or if it already stopped, please wait " + (toWait - r) / 1000 + " seconds");
+                    + " seconds ago. Either stop the other node, or if it already stopped, please wait " + (toWait - r) / 1000
+                    + " seconds");
         }
 
         // Prevent very quick multiple starts by immediately setting the keep-alive
@@ -144,7 +145,8 @@ class JqmEngine implements JqmEngineMBean
         if ("true".equals(gp1.getValue()) || "both".equals(gp1.getValue()))
         {
             RollingFileAppender a = (RollingFileAppender) Logger.getRootLogger().getAppender("rollingfile");
-            MultiplexPrintStream s = new MultiplexPrintStream(System.out, FilenameUtils.getFullPath(a.getFile()), "both".equals(gp1.getValue()));
+            MultiplexPrintStream s = new MultiplexPrintStream(System.out, FilenameUtils.getFullPath(a.getFile()),
+                    "both".equals(gp1.getValue()));
             System.setOut(s);
             ((ConsoleAppender) Logger.getRootLogger().getAppender("consoleAppender")).setWriter(new OutputStreamWriter(s));
             s = new MultiplexPrintStream(System.err, FilenameUtils.getFullPath(a.getFile()), "both".equals(gp1.getValue()));
@@ -159,8 +161,8 @@ class JqmEngine implements JqmEngineMBean
         }
         else
         {
-            jqmlogger
-                    .info("JMX remote listener will not be started as JMX registry port and JMX server port parameters are not both defined");
+            jqmlogger.info(
+                    "JMX remote listener will not be started as JMX registry port and JMX server port parameters are not both defined");
         }
 
         // Jetty
@@ -413,7 +415,8 @@ class JqmEngine implements JqmEngineMBean
                 h = Helpers.createHistory(ji, em, State.CRASHED, Calendar.getInstance());
                 Message m = new Message();
                 m.setJi(ji.getId());
-                m.setTextMessage("Job was supposed to be running at server startup - usually means it was killed along a server by an admin or a crash");
+                m.setTextMessage(
+                        "Job was supposed to be running at server startup - usually means it was killed along a server by an admin or a crash");
                 em.persist(m);
             }
 
@@ -466,7 +469,7 @@ class JqmEngine implements JqmEngineMBean
                 jqmlogger.warn("The engine will now indefinitely try to restore connection to the database");
                 EntityManager em = null;
                 boolean back = false;
-                int timeToWait = 1;
+                long timeToWait = 1;
                 while (!back)
                 {
                     try
@@ -492,6 +495,7 @@ class JqmEngine implements JqmEngineMBean
                         catch (InterruptedException e1)
                         {
                             // Not an issue here.
+                            jqmlogger.debug("interrupted wait in db restarter");
                         }
                     }
                     finally
@@ -602,11 +606,11 @@ class JqmEngine implements JqmEngineMBean
         }
         return false;
     }
-    
+
     @Override
     public int getLateJobs()
     {
-    	int res = 0;
+        int res = 0;
         for (QueuePoller p : this.pollers.values())
         {
             res += p.getLateJobs();

@@ -140,10 +140,11 @@ class LibraryCache
             jqmlogger.trace("No pom inside jar directory. Checking for a pom inside the jar file");
             InputStream is = null;
             FileOutputStream os = null;
+            ZipFile zf = null;
 
             try
             {
-                ZipFile zf = new ZipFile(jarFile);
+                zf = new ZipFile(jarFile);
                 Enumeration<? extends ZipEntry> zes = zf.entries();
                 while (zes.hasMoreElements())
                 {
@@ -158,7 +159,6 @@ class LibraryCache
                         break;
                     }
                 }
-                zf.close();
             }
             catch (Exception e)
             {
@@ -168,6 +168,7 @@ class LibraryCache
             {
                 IOUtils.closeQuietly(is);
                 IOUtils.closeQuietly(os);
+                Helpers.closeQuietly(zf);
             }
         }
 
@@ -195,11 +196,9 @@ class LibraryCache
                         }
 
                         is = zf.getInputStream(ze);
-                        os = new FileOutputStream(FilenameUtils.concat(libDirExtracted.getAbsolutePath(),
-                                FilenameUtils.getName(ze.getName())));
+                        os = new FileOutputStream(
+                                FilenameUtils.concat(libDirExtracted.getAbsolutePath(), FilenameUtils.getName(ze.getName())));
                         IOUtils.copy(is, os);
-                        IOUtils.closeQuietly(is);
-                        IOUtils.closeQuietly(os);
                     }
                 }
             }
@@ -211,14 +210,7 @@ class LibraryCache
             {
                 IOUtils.closeQuietly(is);
                 IOUtils.closeQuietly(os);
-                try
-                {
-                    zf.close();
-                }
-                catch (Exception e)
-                {
-                    jqmlogger.warn("could not close jar file", e);
-                }
+                Helpers.closeQuietly(zf);
             }
 
             // If libs were extracted, put in cache and return
@@ -251,8 +243,7 @@ class LibraryCache
             jqmlogger.trace("Reading a pom file");
 
             // Retrieve resolver configuration
-            List<GlobalParameter> repolist = em
-                    .createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
+            List<GlobalParameter> repolist = em.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
                     .setParameter("repo", "mavenRepo").getResultList();
             List<GlobalParameter> settings = em.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :k", GlobalParameter.class)
                     .setParameter("k", "mavenSettingsCL").getResultList();
@@ -291,8 +282,9 @@ class LibraryCache
                 {
                     withCentral = true;
                 }
-                resolver = resolver.withRemoteRepo(MavenRemoteRepositories.createRemoteRepository(gp.getId().toString(), gp.getValue(),
-                        "default").setUpdatePolicy(MavenUpdatePolicy.UPDATE_POLICY_NEVER));
+                resolver = resolver
+                        .withRemoteRepo(MavenRemoteRepositories.createRemoteRepository(gp.getId().toString(), gp.getValue(), "default")
+                                .setUpdatePolicy(MavenUpdatePolicy.UPDATE_POLICY_NEVER));
             }
             resolver.withMavenCentralRepo(withCentral);
 

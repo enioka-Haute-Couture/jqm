@@ -94,8 +94,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
 
     QueuePoller(JqmEngine engine, Queue q, int nbThreads, int interval)
     {
-        jqmlogger.info("Engine " + engine.getNode().getName() + " will poll JobInstances on queue " + q.getName() + " every " + interval / 1000 + "s with " + nbThreads
-                + " threads for concurrent instances");
+        jqmlogger.info("Engine " + engine.getNode().getName() + " will poll JobInstances on queue " + q.getName() + " every "
+                + interval / 1000 + "s with " + nbThreads + " threads for concurrent instances");
         EntityManager em = Helpers.getNewEm();
 
         this.engine = engine;
@@ -114,7 +114,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
             if (this.engine.loadJmxBeans)
             {
                 MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-                name = new ObjectName("com.enioka.jqm:type=Node.Queue,Node=" + this.engine.getNode().getName() + ",name=" + this.queue.getName());
+                name = new ObjectName(
+                        "com.enioka.jqm:type=Node.Queue,Node=" + this.engine.getNode().getName() + ",name=" + this.queue.getName());
 
                 // Unregister MBean if it already exists. This may happen during frequent DP modifications.
                 try
@@ -146,7 +147,9 @@ class QueuePoller implements Runnable, QueuePollerMBean
 
         // Get the list of all jobInstance within the defined queue, ordered by position
         List<JobInstance> availableJobs = em
-                .createQuery("SELECT j FROM JobInstance j LEFT JOIN FETCH j.jd WHERE j.queue = :q AND j.state = :s ORDER BY j.internalPosition ASC", JobInstance.class)
+                .createQuery(
+                        "SELECT j FROM JobInstance j LEFT JOIN FETCH j.jd WHERE j.queue = :q AND j.state = :s ORDER BY j.internalPosition ASC",
+                        JobInstance.class)
                 .setParameter("q", queue).setParameter("s", State.SUBMITTED).setMaxResults(maxNbThread + additionalSlots).getResultList();
 
         em.getTransaction().begin();
@@ -188,8 +191,9 @@ class QueuePoller implements Runnable, QueuePollerMBean
             }
 
             // Reserve the JI for this engine. Use a query rather than setter to avoid updating all fields (and locks when verifying FKs)
-            em.createQuery("UPDATE JobInstance j SET j.state = 'ATTRIBUTED', j.node = :n, j.attributionDate = current_timestamp() WHERE id=:i").setParameter("i", res.getId())
-                    .setParameter("n", this.engine.getNode()).executeUpdate();
+            em.createQuery(
+                    "UPDATE JobInstance j SET j.state = 'ATTRIBUTED', j.node = :n, j.attributionDate = current_timestamp() WHERE id=:i")
+                    .setParameter("i", res.getId()).setParameter("n", this.engine.getNode()).executeUpdate();
 
             // Stop at the first suitable JI. Release the lock & update the JI which has been attributed to us.
             em.getTransaction().commit();
@@ -213,9 +217,9 @@ class QueuePoller implements Runnable, QueuePollerMBean
      */
     protected boolean highlanderPollingMode(JobInstance jobToTest, EntityManager em)
     {
-        List<JobInstance> jobs = em
-                .createQuery("SELECT j FROM JobInstance j WHERE j IS NOT :refid AND j.jd = :jd AND (j.state = 'RUNNING' OR j.state = 'ATTRIBUTED')", JobInstance.class)
-                .setParameter("refid", jobToTest).setParameter("jd", jobToTest.getJd()).getResultList();
+        List<JobInstance> jobs = em.createQuery(
+                "SELECT j FROM JobInstance j WHERE j IS NOT :refid AND j.jd = :jd AND (j.state = 'RUNNING' OR j.state = 'ATTRIBUTED')",
+                JobInstance.class).setParameter("refid", jobToTest).setParameter("jd", jobToTest.getJd()).getResultList();
         return jobs.isEmpty();
     }
 
@@ -238,12 +242,12 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 while (ji != null)
                 {
                     // We will run this JI!
-                    jqmlogger.trace("JI number " + ji.getId() + " will be run by this poller this loop (already " + actualNbThread + "/" + maxNbThread + " on "
-                            + this.queue.getName() + ")");
+                    jqmlogger.trace("JI number " + ji.getId() + " will be run by this poller this loop (already " + actualNbThread + "/"
+                            + maxNbThread + " on " + this.queue.getName() + ")");
                     actualNbThread.incrementAndGet();
                     if (ji.getJd().getMaxTimeRunning() != null)
-                    {                    
-                    	this.peremption.put(ji.getId(), new Date((new Date()).getTime() + ji.getJd().getMaxTimeRunning() * 60 * 1000  ));
+                    {
+                        this.peremption.put(ji.getId(), new Date((new Date()).getTime() + ji.getJd().getMaxTimeRunning() * 60 * 1000));
                     }
 
                     // Run it
@@ -266,6 +270,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 {
                     jqmlogger.error("connection to database lost - stopping poller");
                     jqmlogger.trace("connection error was:", e.getCause());
+                    this.hasStopped = true;
                     this.engine.pollerRestartNeeded(this);
                     break;
                 }
@@ -288,6 +293,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
             catch (InterruptedException e)
             {
                 run = false;
+                break;
             }
 
             // Exit if asked to
@@ -302,8 +308,9 @@ class QueuePoller implements Runnable, QueuePollerMBean
             // Run is true only if the loop has exited abnormally, in which case the engine should try to restart the poller
             // So only do the graceful shutdown procedure if normal shutdown.
 
-            jqmlogger.info("Poller loop on queue " + this.queue.getName() + " is stopping [engine " + this.engine.getNode().getName() + "]");
-            waitForAllThreads(60 * 1000);
+            jqmlogger
+                    .info("Poller loop on queue " + this.queue.getName() + " is stopping [engine " + this.engine.getNode().getName() + "]");
+            waitForAllThreads(60L * 1000);
             jqmlogger.info("Poller on queue " + this.queue.getName() + " has ended normally");
 
             // JMX
@@ -342,10 +349,10 @@ class QueuePoller implements Runnable, QueuePollerMBean
      */
     void decreaseNbThread(int jobId)
     {
-    	if (this.peremption.containsKey(jobId))
-    	{
-    		this.peremption.remove(jobId);
-    	}
+        if (this.peremption.containsKey(jobId))
+        {
+            this.peremption.remove(jobId);
+        }
         this.actualNbThread.decrementAndGet();
         loop.release(1);
         this.engine.signalEndOfRun();
@@ -370,7 +377,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
             }
             if (timeWaitedMs == 0)
             {
-                jqmlogger.info("Waiting for the end of " + actualNbThread + " jobs on queue " + this.queue.getName() + " - timeout is " + timeOutMs + "ms");
+                jqmlogger.info("Waiting for the end of " + actualNbThread + " jobs on queue " + this.queue.getName() + " - timeout is "
+                        + timeOutMs + "ms");
             }
             try
             {
@@ -380,6 +388,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
             {
                 // Interruption => stop right now
                 jqmlogger.warn("Some job instances did not finish in time - wait was interrupted");
+                Thread.currentThread().interrupt();
                 return;
             }
             timeWaitedMs += stepMs;
@@ -426,8 +435,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
     public long getCumulativeJobInstancesCount()
     {
         EntityManager em2 = Helpers.getNewEm();
-        Long nb = em2.createQuery("SELECT COUNT(i) From History i WHERE i.node = :n AND i.queue = :q", Long.class).setParameter("n", this.engine.getNode())
-                .setParameter("q", this.queue).getSingleResult();
+        Long nb = em2.createQuery("SELECT COUNT(i) From History i WHERE i.node = :n AND i.queue = :q", Long.class)
+                .setParameter("n", this.engine.getNode()).setParameter("q", this.queue).getSingleResult();
         em2.close();
         return nb;
     }
@@ -438,8 +447,9 @@ class QueuePoller implements Runnable, QueuePollerMBean
         EntityManager em2 = Helpers.getNewEm();
         Calendar minusOneMinute = Calendar.getInstance();
         minusOneMinute.add(Calendar.MINUTE, -1);
-        Float nb = em2.createQuery("SELECT COUNT(i) From History i WHERE i.endDate >= :d and i.node = :n AND i.queue = :q", Long.class).setParameter("d", minusOneMinute)
-                .setParameter("n", this.engine.getNode()).setParameter("q", this.queue).getSingleResult() / 60f;
+        Float nb = em2.createQuery("SELECT COUNT(i) From History i WHERE i.endDate >= :d and i.node = :n AND i.queue = :q", Long.class)
+                .setParameter("d", minusOneMinute).setParameter("n", this.engine.getNode()).setParameter("q", this.queue).getSingleResult()
+                / 60f;
         em2.close();
         return nb;
     }
@@ -474,19 +484,19 @@ class QueuePoller implements Runnable, QueuePollerMBean
     {
         return this.actualNbThread.get() >= maxNbThread;
     }
-    
+
     @Override
     public int getLateJobs()
     {
-    	int i = 0;
-    	Date now = new Date();
-    	for (Date d : this.peremption.values())
-    	{
-    		if (now.after(d))
-    		{
-    			i++;
-    		}
-    	}
-    	return i;
+        int i = 0;
+        Date now = new Date();
+        for (Date d : this.peremption.values())
+        {
+            if (now.after(d))
+            {
+                i++;
+            }
+        }
+        return i;
     }
 }
