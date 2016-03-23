@@ -210,6 +210,17 @@
 				</plugins>
 			</build>
 		</profile>
+
+		<!-- This will disable DocLint on Java >=8. -->
+		<profile>
+			<id>disable-doclint</id>
+			<activation>
+				<jdk>[1.8,)</jdk>
+			</activation>
+			<properties>
+				<javadoc.opts>-Xdoclint:none</javadoc.opts>
+			</properties>
+		</profile>
 	</profiles>
 
 	<build>
