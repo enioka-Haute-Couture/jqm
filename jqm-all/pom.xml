@@ -166,6 +166,7 @@
 						</executions>
 						<configuration>
 							<show>private</show>
+							<additionalparam>${javadoc.opts}</additionalparam>
 						</configuration>
 					</plugin>
 
