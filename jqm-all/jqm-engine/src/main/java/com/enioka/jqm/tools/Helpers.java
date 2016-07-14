@@ -549,7 +549,6 @@ final class Helpers
             JndiObjectResourceParameter prm = new JndiObjectResourceParameter();
             prm.setKey("smtpServerHost");
             prm.setValue("smtp.gmail.com");
-            em.persist(prm);
             res.getParameters().add(prm);
             prm.setResource(res);
         }
