@@ -399,7 +399,7 @@ public class Main
             Helpers.setSingleParam("enableInternalPki", "true", em);
 
             em.getTransaction().begin();
-            em.createQuery("UPDATE Node n set n.loapApiSimple = true, n.loadApiClient = true, n.loadApiAdmin = true").executeUpdate();
+            em.createQuery("UPDATE Node n set n.loapApiSimple = true, n.loadApiClient = true, n.loadApiAdmin = true, n.dns=:n").setParameter("n", "0.0.0.0").executeUpdate();
             em.getTransaction().commit();
             em.close();
         }
