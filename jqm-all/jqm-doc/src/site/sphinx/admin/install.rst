@@ -95,6 +95,23 @@ Linux / Unix::
 
 Check the JQM_ROOT/logs directory: two log files (stdout, stderr) should have been created (and contain no errors). Success!
 
+Enabling the web interface
+****************************
+
+By default the web interface is disabled. This will enable it (on all network interfaces) and create a user named "root".
+
+The server listens to a random free port shown in the main log. It can be changed later.
+
+Windows
+=========
+
+./jqm.ps1 enablegui -RootPassword mypassword
+
+Linux
+=========
+
+./jqm.sh enablegui mypassword
+
 
 Database configuration
 ************************
@@ -109,7 +126,7 @@ Just edit JQM_ROOT/conf/resources.xml file to reference your own database and de
 It contains by default sample configuration for Oracle, PostgreSQL, HSQLDB and MySQL which are the three supported databases. (HSQLDB is not supported
 in production environments)
 
-.. note:: the database is intended to be shared between all JQM nodes - you should not create a schema/database per node.
+.. note:: the database is intended to be shared by all JQM nodes - you should not create a schema/database per node.
 
 Afterwards, place your JDBC driver inside the "ext" directory.
 
@@ -168,7 +185,7 @@ Here's a quickstart to setup a test database. As postgres user::
 MySQL
 ------------------
 
-MySQL 5.x is supported with InnoDB (the default). No specific configuration is required in JQM: no options inside jqm.properties (or absent file).
+MySQL 5.6+ is supported with InnoDB (the default). No specific configuration is required in JQM: no options inside jqm.properties (or absent file).
 
 With InnoDB, a `startup script <http://dev.mysql.com/doc/refman/5.6/en/server-options.html#option_mysqld_init-file>`_ 
 must be used to reset an auto-increment inside the database (InnoDB behaviour messes up with
@@ -179,6 +196,14 @@ An example of script is (adapt the db name & path)::
 	select concat('ALTER TABLE jqm.JobInstance AUTO_INCREMENT = ',max(ID)+1,';') as alter_stmt into outfile '/tmp/alter_JI_auto_increment.sql' from jqm.History;
 	\. /tmp/alter_JI_auto_increment.sql
 	\! rm -f /tmp/alter_JI_auto_increment.sql
+
+    
+These commands can be used to setup a database.::
+
+    $ mysql -u root -p
+    mysql> create database jqm;
+    mysql> grant all privileges on jqm.* to jqm@'%' identified by 'jqm';
+    mysql> flush privileges;
 
 
 HSQLDB

@@ -71,7 +71,7 @@ The following script will create a database and reference the test jobs (i.e. :t
 
 The following script will enable the web console with account root/test (do not use this in production!)::
 
-        ./jqm.ps1 enablegui -RootPassword test
+        ./jqm.sh enablegui test
     
 The following script will :term:`enqueue` an execution request for one of the test jobs::
 

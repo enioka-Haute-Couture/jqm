@@ -114,7 +114,7 @@
           username="jqm"
           password="jqm"
           driverClassName="com.mysql.jdbc.Driver"
-          url="jdbc:mysql://pic:3306/jqm"
+          url="jdbc:mysql://pic:3306/jqm?useSSL=false"
           singleton="true"/> 
 -->
 </resources>
