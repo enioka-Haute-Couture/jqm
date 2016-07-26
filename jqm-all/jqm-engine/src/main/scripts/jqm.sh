@@ -65,7 +65,7 @@ then
 	then
 		OOM='-Xdump:tool:events=throw,filter=java/lang/OutOfMemoryError,exec=kill -9 $PPID'
 	fi
-	if [ "$(uname)" = "Linux" ]
+	if [ "$(uname)" = "Linux" -o "$(uname)" = "Darwin" ]
 	then
         # Note that OOM action can fail on Linux if not enough system memory is available at the time of crash
         # See https://bugs.openjdk.java.net/browse/JDK-8027434
