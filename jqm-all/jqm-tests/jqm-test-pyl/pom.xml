@@ -17,5 +17,10 @@
 			<artifactId>jqm-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-	</dependencies>
+                <dependency>
+                        <groupId>com.enioka.jqm</groupId>
+                        <artifactId>jqm-test-cl-isolation</artifactId>
+                        <version>${project.version}</version>
+                </dependency>
+        </dependencies>
 </project>
