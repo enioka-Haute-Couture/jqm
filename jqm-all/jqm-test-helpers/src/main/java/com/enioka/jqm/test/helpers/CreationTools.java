@@ -155,9 +155,17 @@ public class CreationTools
         return j;
     }
 
-    public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps,
-            String jp, Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+    public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
+            Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
             String keyword2, String keyword3, boolean highlander, EntityManager em)
+    {
+        return createJobDef(descripton, canBeRestarted, javaClassName, jps, jp, queue, maxTimeRunning, applicationName, application, module,
+                keyword1, keyword2, keyword3, highlander, em, null);
+    }
+
+    public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
+            Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+            String keyword2, String keyword3, boolean highlander, EntityManager em, String specificIsolationContext)
     {
         JobDef j = new JobDef();
         EntityTransaction transac = em.getTransaction();
@@ -178,6 +186,7 @@ public class CreationTools
         j.setKeyword3(keyword3);
         j.setHighlander(highlander);
         j.setJarPath(jp);
+        j.setSpecificIsolationContext(specificIsolationContext);
 
         em.persist(j);
         transac.commit();
@@ -468,7 +477,8 @@ public class CreationTools
     {
         HashMap<String, String> prms = new HashMap<String, String>();
         prms.put("PATH", path);
-        return createJndiObjectResource(em, jndiAlias, "java.io.File.File", "com.enioka.jqm.providers.FileFactory", description, true, prms);
+        return createJndiObjectResource(em, jndiAlias, "java.io.File.File", "com.enioka.jqm.providers.FileFactory", description, true,
+                prms);
     }
 
     public static JndiObjectResource createJndiUrl(EntityManager em, String jndiAlias, String description, String url)

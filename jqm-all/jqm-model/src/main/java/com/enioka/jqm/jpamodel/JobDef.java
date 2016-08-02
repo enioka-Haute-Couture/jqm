@@ -99,6 +99,9 @@ public class JobDef implements Serializable
 
     @Column(name = "external", nullable = false)
     private boolean external = false;
+    
+    @Column(length = 20, name = "specificIsolationContext")
+    private String specificIsolationContext;
 
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "JobDefId")
@@ -389,6 +392,22 @@ public class JobDef implements Serializable
     public void setJavaOpts(String javaOpts)
     {
         this.javaOpts = javaOpts;
+    }
+    
+    /**
+     * All job def with exactly the same specificIsolationContext (case sensitive) share the same CL.     
+     */
+    public String getSpecificIsolationContext()
+    {
+        return specificIsolationContext;
+    }
+
+    /**
+     * See {@link #getSpecificIsolationContext()}
+     */
+    public void setSpecificIsolationContext(String specificIsolationContext)
+    {
+        this.specificIsolationContext = specificIsolationContext;
     }
 
     /**
