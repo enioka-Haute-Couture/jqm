@@ -74,6 +74,10 @@ class Loader implements Runnable, LoaderMBean
     private Calendar endDate = null;
     private State resultStatus = State.ATTRIBUTED;
 
+    private static JarClassLoader sharedClassLoader = null;
+    private static HashMap<URL, JarClassLoader> sharedJarClassLoader = new HashMap<URL, JarClassLoader>();
+    private static HashMap<String, JarClassLoader> specificIsolationContextClassLoader = new HashMap<String, JarClassLoader>();
+
     Loader(JobInstance job, LibraryCache cache, QueuePoller p)
     {
         this.cache = cache;
@@ -236,31 +240,96 @@ class Loader implements Runnable, LoaderMBean
             // Save the current class loader
             contextClassLoader = Thread.currentThread().getContextClassLoader();
 
-            // At this point, the CLASSPATH is always in cache, so just create the CL with it.
-            jobClassLoader = AccessController.doPrivileged(new PrivilegedAction<JarClassLoader>()
+            String specificIsolationContext = this.job.getJd().getSpecificIsolationContext();
+            if (specificIsolationContext != null && specificIsolationContextClassLoader.containsKey(specificIsolationContext))
             {
-                @Override
-                public JarClassLoader run()
+                jqmlogger.info("Using specific isolation context : " + specificIsolationContext);
+                if (!noLibLoading)
                 {
-                    ClassLoader extLoader = null;
-                    try
-                    {
-                        extLoader = ((JndiContext) NamingManager.getInitialContext(null)).getExtCl();
-                    }
-                    catch (NamingException e)
-                    {
-                        jqmlogger.warn("could not find ext directory class loader. No parent classloader will be used", e);
-                    }
+                    specificIsolationContextClassLoader.get(specificIsolationContext).extendUrls(jarUrl, classpath);
+                }
+                jobClassLoader = specificIsolationContextClassLoader.get(specificIsolationContext);
+            }
+            else
+            {
+                String launchIsolationDefault = Helpers.getParameter("launch_isolation_default", "Isolated", Helpers.getNewEm());
+                if ("Shared".equals(launchIsolationDefault) && Loader.sharedClassLoader != null)
+                {
+                    jqmlogger.info("Using sharedClassLoader");
                     if (!noLibLoading)
                     {
-                        return new JarClassLoader(jarUrl, classpath, extLoader);
+                        Loader.sharedClassLoader.extendUrls(jarUrl, classpath);
                     }
-                    else
-                    {
-                        return new JarClassLoader(Thread.currentThread().getContextClassLoader());
-                    }
+                    jobClassLoader = Loader.sharedClassLoader;
                 }
-            });
+                else if (!noLibLoading && "SharedJar".equals(launchIsolationDefault) && sharedJarClassLoader.containsKey(jarUrl))
+                {
+                    // check if jarUrl has already a class loader
+                    jqmlogger.info("Using shared Jar CL");
+                    jobClassLoader = sharedJarClassLoader.get(jarUrl);
+                }
+                else
+                {
+                    // At this point, the CLASSPATH is always in cache, so just create the CL with it.
+                    jobClassLoader = AccessController.doPrivileged(new PrivilegedAction<JarClassLoader>()
+                    {
+                        @Override
+                        public JarClassLoader run()
+                        {
+                            ClassLoader extLoader = null;
+                            try
+                            {
+                                extLoader = ((JndiContext) NamingManager.getInitialContext(null)).getExtCl();
+                            }
+                            catch (NamingException e)
+                            {
+                                jqmlogger.warn("could not find ext directory class loader. No parent classloader will be used", e);
+                            }
+
+                            String launchIsolationDefault = Helpers.getParameter("launch_isolation_default", "Isolated",
+                                    Helpers.getNewEm());
+
+                            if (!noLibLoading)
+                            {
+                                JarClassLoader newCl = new JarClassLoader(jarUrl, classpath, extLoader);
+
+                                if ("Shared".equals(launchIsolationDefault))
+                                {
+                                    jqmlogger.info("Creating sharedClassLoader");
+                                    Loader.sharedClassLoader = newCl;
+                                    return Loader.sharedClassLoader;
+                                }
+                                else if ("SharedJar".equals(launchIsolationDefault))
+                                {
+                                    jqmlogger.info("Creating shared Jar CL");
+                                    sharedJarClassLoader.put(jarUrl, newCl);
+                                    return sharedJarClassLoader.get(jarUrl);
+                                }
+                                else
+                                {
+                                    jqmlogger.info("Using new CL");
+                                    return newCl;
+                                }
+                            }
+                            else
+                            {
+                                return new JarClassLoader(Thread.currentThread().getContextClassLoader());
+                            }
+                        }
+                    });
+                }
+                if (specificIsolationContext != null && !specificIsolationContextClassLoader.containsKey(specificIsolationContext))
+                {
+                    jqmlogger.info("Creating specific isolation context " + specificIsolationContext);
+                    specificIsolationContextClassLoader.put(specificIsolationContext, jobClassLoader);
+                }
+            }
+
+            jqmlogger.debug("CL URLs:");
+            for (URL url : jobClassLoader.getURLs())
+            {
+                jqmlogger.debug("       - " + url.toString());
+            }
 
             // Switch
             jqmlogger.trace("Setting class loader");

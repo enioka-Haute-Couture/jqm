@@ -66,6 +66,16 @@ class JarClassLoader extends URLClassLoader
         super(new URL[0], parent);
     }
 
+    void extendUrls(URL jarUrl, URL[] libs)
+    {
+        super.addURL(jarUrl);
+
+        for (URL url : libs)
+        {
+            super.addURL(url);
+        }
+    }
+
     private boolean isLegacyPayload(Class c)
     {
         Class clazz = c;
