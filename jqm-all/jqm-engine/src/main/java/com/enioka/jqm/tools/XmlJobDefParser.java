@@ -190,6 +190,10 @@ class XmlJobDefParser
                     {
                         jd.setKeyword3(jdElement.getElementsByTagName("keyword3").item(0).getTextContent());
                     }
+                    if (jdElement.getElementsByTagName("specificIsolationContext").getLength() > 0)
+                    {
+                        jd.setSpecificIsolationContext(jdElement.getElementsByTagName("specificIsolationContext").item(0).getTextContent());
+                    }
                     
                     // Alert time
                     if (jdElement.getElementsByTagName("reasonableRuntimeLimitMinute").getLength() > 0)
