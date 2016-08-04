@@ -292,6 +292,7 @@ class Loader implements Runnable, LoaderMBean
                             if (!noLibLoading)
                             {
                                 JarClassLoader newCl = new JarClassLoader(jarUrl, classpath, extLoader);
+                                newCl.setChildFirstClassLoader(job.getJd().isChildFirstClassLoader());
 
                                 if ("Shared".equals(launchIsolationDefault))
                                 {
@@ -314,6 +315,7 @@ class Loader implements Runnable, LoaderMBean
                             else
                             {
                                 return new JarClassLoader(Thread.currentThread().getContextClassLoader());
+                                // ChildFirstClassLoader is useless here, default value is kept
                             }
                         }
                     });

@@ -48,6 +48,8 @@ class JarClassLoader extends URLClassLoader
 
     private Map<String, String> prms = new HashMap<String, String>();
 
+    private boolean childFirstClassLoader = false;
+
     private static URL[] addUrls(URL url, URL[] libs)
     {
         URL[] urls = new URL[libs.length + 1];
@@ -55,7 +57,7 @@ class JarClassLoader extends URLClassLoader
         System.arraycopy(libs, 0, urls, 1, libs.length);
         return urls;
     }
-
+    
     JarClassLoader(URL url, URL[] libs, ClassLoader parent)
     {
         super(addUrls(url, libs), parent);
@@ -343,5 +345,61 @@ class JarClassLoader extends URLClassLoader
         {
             throw new JqmEngineException("Could not inject JQM interface into target payload", e);
         }
+    }
+
+    @Override
+    public Class<?> loadClass(String name) throws ClassNotFoundException
+    {
+        Class<?> c = null;
+
+        if (childFirstClassLoader)
+        {
+            // Check if class was already loaded
+            c = findLoadedClass(name); 
+
+            if (c == null)
+            {
+                // Try to find class from URLClassLoader
+                try
+                {
+                    c = super.findClass(name);
+                }
+                catch (ClassNotFoundException e)
+                {
+                    //
+                }
+                // If nothing was found, try parent class loader
+                if (c == null)
+                {
+                    // jqmlogger.trace("found in parent " + name);
+                    c = loadClass(name, false);
+                }
+                else
+                {
+                    // jqmlogger.trace("found in child " + name);
+                }
+            }
+            else
+            {
+                // jqmlogger.trace("name already loaded");
+            }
+        }
+        else
+        {
+            // Default behavior
+            c = loadClass(name, false);
+        }
+
+        return c;
+    }
+
+    public boolean isChildFirstClassLoader()
+    {
+        return childFirstClassLoader;
+    }
+
+    public void setChildFirstClassLoader(boolean childFirstClassLoader)
+    {
+        this.childFirstClassLoader = childFirstClassLoader;
     }
 }
