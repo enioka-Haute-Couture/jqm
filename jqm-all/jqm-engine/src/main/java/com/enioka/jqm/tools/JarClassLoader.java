@@ -32,6 +32,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -50,6 +52,8 @@ class JarClassLoader extends URLClassLoader
 
     private boolean childFirstClassLoader = false;
 
+    private ArrayList<Pattern> hiddenJavaClassesPatterns = new ArrayList<Pattern>();
+
     private static URL[] addUrls(URL url, URL[] libs)
     {
         URL[] urls = new URL[libs.length + 1];
@@ -57,7 +61,7 @@ class JarClassLoader extends URLClassLoader
         System.arraycopy(libs, 0, urls, 1, libs.length);
         return urls;
     }
-    
+
     JarClassLoader(URL url, URL[] libs, ClassLoader parent)
     {
         super(addUrls(url, libs), parent);
@@ -347,6 +351,21 @@ class JarClassLoader extends URLClassLoader
         }
     }
 
+    private Class<?> loadFromParentCL(String name) throws ClassNotFoundException
+    {
+        for (Pattern pattern : hiddenJavaClassesPatterns)
+        {
+            Matcher matcher = pattern.matcher(name);
+            if (matcher.matches())
+            {
+                jqmlogger.debug("Class " + name + " will not be loaded by parent CL because it matches hiddenJavaClasses parameter");
+                // Invoke findClass in order to find the class.
+                return super.findClass(name);
+            }
+        }
+        return loadClass(name, false);
+    }
+
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException
     {
@@ -355,7 +374,7 @@ class JarClassLoader extends URLClassLoader
         if (childFirstClassLoader)
         {
             // Check if class was already loaded
-            c = findLoadedClass(name); 
+            c = findLoadedClass(name);
 
             if (c == null)
             {
@@ -372,7 +391,7 @@ class JarClassLoader extends URLClassLoader
                 if (c == null)
                 {
                     // jqmlogger.trace("found in parent " + name);
-                    c = loadClass(name, false);
+                    c = loadFromParentCL(name);
                 }
                 else
                 {
@@ -387,7 +406,7 @@ class JarClassLoader extends URLClassLoader
         else
         {
             // Default behavior
-            c = loadClass(name, false);
+            c = loadFromParentCL(name);
         }
 
         return c;
@@ -401,5 +420,29 @@ class JarClassLoader extends URLClassLoader
     public void setChildFirstClassLoader(boolean childFirstClassLoader)
     {
         this.childFirstClassLoader = childFirstClassLoader;
+    }
+
+    public ArrayList<Pattern> gethiddenJavaClassesPatterns()
+    {
+        return hiddenJavaClassesPatterns;
+    }
+
+    public void setHiddenJavaClasses(String hiddenJavaClasses)
+    {
+        if (hiddenJavaClasses == null)
+        {
+            return;
+        }
+        // Add hidden java classes regex patterns to CL
+        for (String regex : hiddenJavaClasses.split(","))
+        {
+            jqmlogger.debug("Adding " + regex + " hiddenJavaClasses regex to CL");
+            this.addHiddenJavaClassesPattern(Pattern.compile(regex));
+        }
+    }
+
+    private void addHiddenJavaClassesPattern(Pattern hiddenJavaClassesPattern)
+    {
+        this.hiddenJavaClassesPatterns.add(hiddenJavaClassesPattern);
     }
 }

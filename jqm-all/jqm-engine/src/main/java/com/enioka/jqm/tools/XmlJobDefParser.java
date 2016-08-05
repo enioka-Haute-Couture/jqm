@@ -198,6 +198,10 @@ class XmlJobDefParser
                     {
                         jd.setChildFirstClassLoader("true".equals(jdElement.getElementsByTagName("childFirstClassLoader").item(0).getTextContent()) ? true : false);
                     }
+                    if (jdElement.getElementsByTagName("hiddenJavaClasses").getLength() > 0)
+                    {
+                        jd.setSpecificIsolationContext(jdElement.getElementsByTagName("hiddenJavaClasses").item(0).getTextContent());
+                    }
                     
                     // Alert time
                     if (jdElement.getElementsByTagName("reasonableRuntimeLimitMinute").getLength() > 0)

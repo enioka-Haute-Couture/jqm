@@ -293,6 +293,7 @@ class Loader implements Runnable, LoaderMBean
                             {
                                 JarClassLoader newCl = new JarClassLoader(jarUrl, classpath, extLoader);
                                 newCl.setChildFirstClassLoader(job.getJd().isChildFirstClassLoader());
+                                newCl.setHiddenJavaClasses(job.getJd().getHiddenJavaClasses());
 
                                 if ("Shared".equals(launchIsolationDefault))
                                 {
@@ -314,8 +315,10 @@ class Loader implements Runnable, LoaderMBean
                             }
                             else
                             {
-                                return new JarClassLoader(Thread.currentThread().getContextClassLoader());
+                                JarClassLoader newCl = new JarClassLoader(Thread.currentThread().getContextClassLoader());
                                 // ChildFirstClassLoader is useless here, default value is kept
+                                newCl.setHiddenJavaClasses(job.getJd().getHiddenJavaClasses());
+                                return newCl;
                             }
                         }
                     });
