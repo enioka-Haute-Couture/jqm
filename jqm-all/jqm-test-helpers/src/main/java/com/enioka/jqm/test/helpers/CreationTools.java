@@ -160,7 +160,7 @@ public class CreationTools
             String keyword2, String keyword3, boolean highlander, EntityManager em)
     {
         return createJobDef(descripton, canBeRestarted, javaClassName, jps, jp, queue, maxTimeRunning, applicationName, application, module,
-                keyword1, keyword2, keyword3, highlander, em, null, false, null);
+                keyword1, keyword2, keyword3, highlander, em, null, false, null, false);
     }
 
     public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
@@ -168,7 +168,7 @@ public class CreationTools
             String keyword2, String keyword3, boolean highlander, EntityManager em, String specificIsolationContext)
     {
         return createJobDef(descripton, canBeRestarted, javaClassName, jps, jp, queue, maxTimeRunning, applicationName, application, module,
-                keyword1, keyword2, keyword3, highlander, em, specificIsolationContext, false, null);
+                keyword1, keyword2, keyword3, highlander, em, specificIsolationContext, false, null, false);
     }
 
     public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
@@ -177,13 +177,22 @@ public class CreationTools
             boolean childFirstClassLoader)
     {
         return createJobDef(descripton, canBeRestarted, javaClassName, jps, jp, queue, maxTimeRunning, applicationName, application, module,
-                keyword1, keyword2, keyword3, highlander, em, specificIsolationContext, childFirstClassLoader, null);
+                keyword1, keyword2, keyword3, highlander, em, specificIsolationContext, childFirstClassLoader, null, false);
     }
 
     public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
             Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
             String keyword2, String keyword3, boolean highlander, EntityManager em, String specificIsolationContext,
             boolean childFirstClassLoader, String hiddenJavaClasses)
+    {
+        return createJobDef(descripton, canBeRestarted, javaClassName, jps, jp, queue, maxTimeRunning, applicationName, application, module,
+                keyword1, keyword2, keyword3, highlander, em, specificIsolationContext, childFirstClassLoader, hiddenJavaClasses, false);
+    }
+
+    public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
+            Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+            String keyword2, String keyword3, boolean highlander, EntityManager em, String specificIsolationContext,
+            boolean childFirstClassLoader, String hiddenJavaClasses, boolean classLoaderTracing)
     {
         JobDef j = new JobDef();
         EntityTransaction transac = em.getTransaction();
@@ -207,6 +216,7 @@ public class CreationTools
         j.setSpecificIsolationContext(specificIsolationContext);
         j.setChildFirstClassLoader(childFirstClassLoader);
         j.setHiddenJavaClasses(hiddenJavaClasses);
+        j.setClassLoaderTracing(classLoaderTracing);
 
         em.persist(j);
         transac.commit();

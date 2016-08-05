@@ -330,6 +330,9 @@ class Loader implements Runnable, LoaderMBean
                 }
             }
 
+            // The class loader tracing changes with each job instance
+            jobClassLoader.setTracing(job.getJd().isClassLoaderTracing());
+            
             jqmlogger.debug("CL URLs:");
             for (URL url : jobClassLoader.getURLs())
             {
