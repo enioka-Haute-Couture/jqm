@@ -135,6 +135,7 @@ class Loader implements Runnable, LoaderMBean
         final URL jarUrl;
         final URL[] classpath;
         final Map<String, String> params;
+        final String launchIsolationDefault;
 
         // Block needing the database
         try
@@ -215,6 +216,9 @@ class Loader implements Runnable, LoaderMBean
                         .setParameter("i", job.getId()).executeUpdate();
             }
             em.getTransaction().commit();
+
+            // Global prms
+            launchIsolationDefault = Helpers.getParameter("launch_isolation_default", "Isolated", em);
         }
         catch (RuntimeException e)
         {
@@ -252,7 +256,6 @@ class Loader implements Runnable, LoaderMBean
             }
             else
             {
-                String launchIsolationDefault = Helpers.getParameter("launch_isolation_default", "Isolated", Helpers.getNewEm());
                 if ("Shared".equals(launchIsolationDefault) && Loader.sharedClassLoader != null)
                 {
                     jqmlogger.info("Using sharedClassLoader");
@@ -285,9 +288,6 @@ class Loader implements Runnable, LoaderMBean
                             {
                                 jqmlogger.warn("could not find ext directory class loader. No parent classloader will be used", e);
                             }
-
-                            String launchIsolationDefault = Helpers.getParameter("launch_isolation_default", "Isolated",
-                                    Helpers.getNewEm());
 
                             if (!noLibLoading)
                             {
@@ -332,7 +332,7 @@ class Loader implements Runnable, LoaderMBean
 
             // The class loader tracing changes with each job instance
             jobClassLoader.setTracing(job.getJd().isClassLoaderTracing());
-            
+
             jqmlogger.debug("CL URLs:");
             for (URL url : jobClassLoader.getURLs())
             {
