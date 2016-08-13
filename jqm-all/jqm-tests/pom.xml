@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.enioka.jqm</groupId>
@@ -14,19 +15,20 @@
 	<url>http://jqm.readthedocs.org</url>
 
 	<modules>
+		<module>jqm-test-cl-isolation</module>
 		<module>jqm-test-datetimemaven</module>
-		<module>jqm-test-datetimemavennopom</module>
-		<module>jqm-test-datetimemavennopomlib</module>
 		<module>jqm-test-datetimemavenjarinlib</module>
 		<module>jqm-test-datetimemavennolibdef</module>
-		<module>jqm-test-jndijms-amq</module>
+		<module>jqm-test-datetimemavennopom</module>
+		<module>jqm-test-datetimemavennopomlib</module>
 		<module>jqm-test-em</module>
+		<module>jqm-test-jndijms-amq</module>
 		<module>jqm-test-providedapi</module>
 		<module>jqm-test-pyl</module>
-		<module>jqm-test-pyl-nodep</module>
 		<module>jqm-test-pyl-hibapi</module>
+		<module>jqm-test-pyl-nodep</module>
 	</modules>
-	
+
 	<properties>
 		<sonar.skip>true</sonar.skip>
 	</properties>
