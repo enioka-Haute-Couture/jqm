@@ -34,6 +34,7 @@ package com.enioka.jqm.test.helpers;
  */
 
 import java.io.FileNotFoundException;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -285,6 +286,15 @@ public class CreationTools
         try
         {
             n.setDns(InetAddress.getLocalHost().getHostName());
+            InetAddress[] adresses = InetAddress.getAllByName(n.getDns());
+            for (InetAddress s : adresses)
+            {
+                if (s.isLoopbackAddress())
+                {
+                    n.setDns("localhost"); // force true loopback in this case. We may have a hostname that resolves on a public interface
+                                           // with a loopback adress...
+                }
+            }
         }
         catch (UnknownHostException e)
         {
