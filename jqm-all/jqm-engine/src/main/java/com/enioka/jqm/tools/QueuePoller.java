@@ -21,9 +21,9 @@ package com.enioka.jqm.tools;
 import java.lang.management.ManagementFactory;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -59,7 +59,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     private AtomicInteger actualNbThread = new AtomicInteger(0);
     private boolean hasStopped = true;
     private Calendar lastLoop = null;
-    private Map<Integer, Date> peremption = new HashMap<Integer, Date>();
+    private Map<Integer, Date> peremption = new ConcurrentHashMap<Integer, Date>();
 
     private ObjectName name = null;
 
@@ -349,10 +349,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
      */
     void decreaseNbThread(int jobId)
     {
-        if (this.peremption.containsKey(jobId))
-        {
-            this.peremption.remove(jobId);
-        }
+        this.peremption.remove(jobId);
         this.actualNbThread.decrementAndGet();
         loop.release(1);
         this.engine.signalEndOfRun();
