@@ -11,7 +11,7 @@ Basically, it is a very lightweight application server specifically tailored for
 
 The rational behind JQM is that there are too many jobs that fall inside that uncomfortable middle ground between 
 "a few seconds" (this could be done synchronously inside a web application server) and "a few hours" (in 
-which case forking a new dedicated JVM is often the most adapted way). 
+which case forking a new dedicated JVM is often the most suitable way). 
 A traditional servlet or J2EE application server should not house this kind of jobs: they are designed to deal 
 with very short running synchronous user requests, not asynchronous long running jobs. For example, creating a thread
 in such a server is dangerous as they offer little control over it, and they do not offer job queuing (which is a basic
@@ -40,8 +40,9 @@ querying the state of a request, retrieving files created by a job instance, ...
 
 It is also of note that JQM was created with compatibility in mind:
 
+* runs any OS that has support for either Java 6, 7 or 8. Always tested on Windows, RHEL, Ubuntu. Also known to work on MacOSX and WSL (for non production use).
 * uses either PostgreSQL, Oracle or HSQLDB (also works with MySQL with a documented quirk)
-* the client API is usable in all application servers and JSE code (tested with WebsSphere 8.x, Glassfish 3.x, Tomcat 7.x)
+* the client API is usable in all application servers and JSE code (tested with WebsSphere 8.x, Glassfish 3.x, Tomcat 7.x, JBoss EAP 6.x)
 * one of the client API implementations is a REST-like API, callable from everywhere, not only Java but also .NET or shell scripts
   (which by the way allows very easy scheduler integration).
 * under an Apache 2 license, which basically allows you to do anything you want with the product and its code in any environment
