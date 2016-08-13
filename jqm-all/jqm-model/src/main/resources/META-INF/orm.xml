@@ -18,5 +18,11 @@
 			SELECT q FROM Queue q where q.name = :name
 		</query>
 	</named-query>
+	
+	<named-query name="HibApi.updateJiWithDbTime">
+		<query>
+			UPDATE JobInstance ji SET ji.creationDate = CURRENT_TIMESTAMP WHERE ji.id=:i
+		</query>
+	</named-query>
 
 </entity-mappings>

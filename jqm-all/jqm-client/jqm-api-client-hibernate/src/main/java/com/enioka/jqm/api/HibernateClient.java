@@ -332,8 +332,11 @@ final class HibernateClient implements JqmClient
                 jqmlogger.trace("Parameter: " + jp.getKey() + " - " + jp.getValue());
                 em.persist(ji.addParameter(jp.getKey(), jp.getValue()));
             }
-            jqmlogger.trace("JI just created: " + ji.getId());
 
+            // There is sadly no portable and easy way to get DB time before insert... so we update afterwards.
+            em.createNamedQuery("HibApi.updateJiWithDbTime").setParameter("i", ji.getId()).executeUpdate();
+
+            jqmlogger.trace("JI just created: " + ji.getId());
             em.getTransaction().commit();
             return ji.getId();
         }
