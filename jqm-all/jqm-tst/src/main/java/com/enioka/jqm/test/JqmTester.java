@@ -14,6 +14,7 @@ import org.hsqldb.Server;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JobDef;
+import com.enioka.jqm.jpamodel.JobDef.PathType;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
@@ -119,6 +120,7 @@ public class JqmTester
         jd = new JobDef();
         jd.setApplicationName("TestApplication");
         jd.setJarPath("/dev/null");
+        jd.setPathType(PathType.MEMORY);
         jd.setJavaClassName(className);
         jd.setQueue(q);
         em.persist(jd);

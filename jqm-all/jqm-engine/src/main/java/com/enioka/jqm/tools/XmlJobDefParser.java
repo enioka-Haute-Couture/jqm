@@ -38,6 +38,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.enioka.jqm.jpamodel.JobDef;
+import com.enioka.jqm.jpamodel.JobDef.PathType;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.Queue;
 
@@ -154,10 +155,12 @@ class XmlJobDefParser
 
                     // Simple jar attributes
                     jd.setJarPath(jarElement.getElementsByTagName("path").item(0).getTextContent());
+                    jd.setPathType(PathType.valueOf(jarElement.getElementsByTagName("pathType").getLength() > 0
+                            ? jarElement.getElementsByTagName("pathType").item(0).getTextContent() : "FS"));
 
                     // Simple JD attributes
-                    jd.setCanBeRestarted("true".equals(jdElement.getElementsByTagName("canBeRestarted").item(0).getTextContent()) ? true
-                            : false);
+                    jd.setCanBeRestarted(
+                            "true".equals(jdElement.getElementsByTagName("canBeRestarted").item(0).getTextContent()) ? true : false);
                     jd.setJavaClassName(jdElement.getElementsByTagName("javaClassName").item(0).getTextContent());
                     jd.setDescription(jdElement.getElementsByTagName("description").item(0).getTextContent());
                     jd.setApplicationName(jdElement.getElementsByTagName("name").item(0).getTextContent());
@@ -196,17 +199,20 @@ class XmlJobDefParser
                     }
                     if (jdElement.getElementsByTagName("childFirstClassLoader").getLength() > 0)
                     {
-                        jd.setChildFirstClassLoader("true".equals(jdElement.getElementsByTagName("childFirstClassLoader").item(0).getTextContent()) ? true : false);
+                        jd.setChildFirstClassLoader(
+                                "true".equals(jdElement.getElementsByTagName("childFirstClassLoader").item(0).getTextContent()) ? true
+                                        : false);
                     }
                     if (jdElement.getElementsByTagName("hiddenJavaClasses").getLength() > 0)
                     {
                         jd.setSpecificIsolationContext(jdElement.getElementsByTagName("hiddenJavaClasses").item(0).getTextContent());
                     }
-                    
+
                     // Alert time
                     if (jdElement.getElementsByTagName("reasonableRuntimeLimitMinute").getLength() > 0)
                     {
-                    	jd.setMaxTimeRunning(Integer.parseInt(jdElement.getElementsByTagName("reasonableRuntimeLimitMinute").item(0).getTextContent()));
+                        jd.setMaxTimeRunning(
+                                Integer.parseInt(jdElement.getElementsByTagName("reasonableRuntimeLimitMinute").item(0).getTextContent()));
                     }
 
                     // Parameters
@@ -235,8 +241,8 @@ class XmlJobDefParser
         }
         catch (Exception e)
         {
-            throw new JqmEngineException("an error occured while parsing the XML file " + path
-                    + ". No changes were done to the configuration.", e);
+            throw new JqmEngineException(
+                    "an error occured while parsing the XML file " + path + ". No changes were done to the configuration.", e);
         }
     }
 }

@@ -25,6 +25,8 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -43,6 +45,21 @@ import javax.persistence.Table;
 public class JobDef implements Serializable
 {
     private static final long serialVersionUID = -3276834475433922990L;
+
+    public enum PathType {
+        /**
+         * The path is a local file system path.
+         */
+        FS,
+        /**
+         * The path is made of a single Maven coordinates set.
+         */
+        MAVEN,
+        /**
+         * The payload is actually already in memory - the path is meaningless.
+         */
+        MEMORY
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -91,6 +108,10 @@ public class JobDef implements Serializable
     @Column(name = "jarPath", length = 1024)
     private String jarPath;
 
+    @Column(name = "pathType", nullable = true)
+    @Enumerated(EnumType.STRING)
+    private PathType pathType;
+
     @Column(name = "enabled", nullable = false)
     private boolean enabled = true;
 
@@ -109,10 +130,10 @@ public class JobDef implements Serializable
 
     @Column(name = "childFirstClassLoader", nullable = false)
     private boolean childFirstClassLoader = false;
-    
+
     @Column(length = 1024, name = "hiddenJavaClasses")
     private String hiddenJavaClasses;
-    
+
     @Column(name = "classLoaderTracing", nullable = false)
     private boolean classLoaderTracing = false;
 
@@ -500,5 +521,21 @@ public class JobDef implements Serializable
     public void setClassLoaderTracing(boolean classLoaderTracing)
     {
         this.classLoaderTracing = classLoaderTracing;
-    }        
+    }
+
+    /**
+     * This specifies how to interpret {@link #getJarPath()}.
+     */
+    public PathType getPathType()
+    {
+        return this.pathType;
+    }
+
+    /**
+     * See {@link #getPathType()}
+     */
+    public void setPathType(PathType type)
+    {
+        this.pathType = type;
+    }
 }

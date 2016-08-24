@@ -61,9 +61,8 @@ class JqmEngine implements JqmEngineMBean
 
     // Parameters and parameter cache
     private Node node = null;
-    private final LibraryCache cache = new LibraryCache();
     private ObjectName name;
-    private final ClassloaderManager clManager = new ClassloaderManager(this.cache);
+    private final ClassloaderManager clManager = new ClassloaderManager();
 
     // Threads that together constitute the engine
     private Map<Integer, QueuePoller> pollers = new HashMap<Integer, QueuePoller>();
@@ -543,11 +542,6 @@ class JqmEngine implements JqmEngineMBean
             }
         };
         qpRestarter.start();
-    }
-
-    LibraryCache getCache()
-    {
-        return this.cache;
     }
 
     ClassloaderManager getClassloaderManager()

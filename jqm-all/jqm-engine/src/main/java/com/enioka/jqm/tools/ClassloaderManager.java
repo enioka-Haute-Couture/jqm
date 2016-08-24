@@ -45,9 +45,10 @@ class ClassloaderManager
      */
     private String launchIsolationDefault = null;
 
-    private final LibraryCache cache;
+    private final LibraryResolverFS fsResolver;
+    private final LibraryResolverMaven mavenResolver;
 
-    ClassloaderManager(LibraryCache cache)
+    ClassloaderManager()
     {
         EntityManager em = null;
         try
@@ -64,10 +65,11 @@ class ClassloaderManager
             Helpers.closeQuietly(em);
         }
 
-        this.cache = cache;
+        this.fsResolver = new LibraryResolverFS();
+        this.mavenResolver = new LibraryResolverMaven();
     }
 
-    JarClassLoader getClassloader(JobInstance ji, boolean noLibLoading, EntityManager em) throws MalformedURLException, JqmPayloadException
+    JarClassLoader getClassloader(JobInstance ji, EntityManager em) throws MalformedURLException, JqmPayloadException
     {
         final JarClassLoader jobClassLoader;
         JobDef jd = ji.getJd();
@@ -77,7 +79,7 @@ class ClassloaderManager
 
         // The parent class loader is normally the CL with EXT on its CL. But if no lib load, user current one (happens for external
         // pyloads)
-        ClassLoader parent = noLibLoading ? Thread.currentThread().getContextClassLoader() : getExtensionCLassloader();
+        ClassLoader parent = getParentClassLoader(ji);
 
         // Priority is:
         // 1 - a specific context
@@ -135,15 +137,7 @@ class ClassloaderManager
         }
 
         // Resolve the libraries and add them to the classpath
-        final URL[] classpath;
-        if (!noLibLoading)
-        {
-            classpath = cache.getLibraries(ji.getNode(), jd, em);
-        }
-        else
-        {
-            classpath = new URL[0];
-        }
+        final URL[] classpath = getClasspath(ji, em);
 
         // Remember to also add the jar file itself... as CL can be shared, there is no telling if it already present or not.
         jobClassLoader.extendUrls(jarFile.toURI().toURL(), classpath);
@@ -179,5 +173,38 @@ class ClassloaderManager
             jqmlogger.warn("could not find ext directory class loader. No parent classloader will be used", e);
         }
         return extLoader;
+    }
+
+    /**
+     * Returns all the URL that should be inside the classpath. This includes the jar itself if any.
+     * 
+     * @throws JqmPayloadException
+     */
+    private URL[] getClasspath(JobInstance ji, EntityManager em) throws JqmPayloadException
+    {
+        switch (ji.getJd().getPathType())
+        {
+        default:
+        case FS:
+            return fsResolver.getLibraries(ji.getNode(), ji.getJd(), em);
+        case MAVEN:
+            return mavenResolver.resolve(ji, em);
+        case MEMORY:
+            return new URL[0];
+        }
+    }
+
+    private ClassLoader getParentClassLoader(JobInstance ji)
+    {
+        switch (ji.getJd().getPathType())
+        {
+        default:
+        case FS:
+            return getExtensionCLassloader();
+        case MAVEN:
+            return getExtensionCLassloader();
+        case MEMORY:
+            return Thread.currentThread().getContextClassLoader();
+        }
     }
 }

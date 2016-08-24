@@ -124,7 +124,6 @@ class Loader implements Runnable, LoaderMBean
         }
 
         EntityManager em = null;
-        final boolean noLibLoading;
         final Map<String, String> params;
         final JarClassLoader jobClassLoader;
 
@@ -154,18 +153,6 @@ class Loader implements Runnable, LoaderMBean
                 return;
             }
 
-            // Check file paths (unless it is /dev/null, which means no jar file)
-            noLibLoading = "/dev/null".equals(job.getJd().getJarPath());
-            File jarFile = new File(FilenameUtils.concat(new File(node.getRepo()).getAbsolutePath(), job.getJd().getJarPath()));
-            if (!noLibLoading && !jarFile.canRead())
-            {
-                jqmlogger.warn("Cannot read file at " + jarFile.getAbsolutePath()
-                        + ". Job instance will crash. Check job definition or permissions on file.");
-                resultStatus = State.CRASHED;
-                endOfRun();
-                return;
-            }
-
             // Parameters
             params = new HashMap<String, String>();
             for (RuntimeParameter jp : em.createQuery("SELECT p FROM RuntimeParameter p WHERE p.ji = :i", RuntimeParameter.class)
@@ -186,12 +173,7 @@ class Loader implements Runnable, LoaderMBean
             }
             em.getTransaction().commit();
 
-            jobClassLoader = this.clm.getClassloader(job, noLibLoading, em);
-        }
-        catch (RuntimeException e)
-        {
-            firstBlockDbFailureAnalysis(e);
-            return;
+            jobClassLoader = this.clm.getClassloader(job, em);
         }
         catch (JqmPayloadException e)
         {
@@ -205,6 +187,11 @@ class Loader implements Runnable, LoaderMBean
             jqmlogger.warn("The JAR file path specified in Job Definition is incorrect " + job.getJd().getApplicationName(), e);
             resultStatus = State.CRASHED;
             endOfRun();
+            return;
+        }
+        catch (RuntimeException e)
+        {
+            firstBlockDbFailureAnalysis(e);
             return;
         }
         finally

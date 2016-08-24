@@ -15,7 +15,6 @@ import com.enioka.jqm.api.JqmInvalidRequestException;
  */
 public class JqmSingleRunner
 {
-    private static LibraryCache cache = new LibraryCache();
     private final static Logger jqmlogger = Logger.getLogger(JqmSingleRunner.class);
 
     private JqmSingleRunner()
@@ -73,7 +72,7 @@ public class JqmSingleRunner
         }
 
         // Create run container
-        final Loader l = new Loader(job, (JqmEngine) null, (QueuePoller) null, new ClassloaderManager(cache));
+        final Loader l = new Loader(job, (JqmEngine) null, (QueuePoller) null, new ClassloaderManager());
 
         // Kill signal handler
         final Thread mainT = Thread.currentThread();

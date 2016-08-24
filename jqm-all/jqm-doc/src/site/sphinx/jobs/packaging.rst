@@ -61,6 +61,18 @@ such as JDBC connection pools. Note that a library in ext has priority over one 
 .. note:: JQM actually makes use of this priority to always provide the latest version of the jqm-api to payloads. The API can
 	therefore be referenced as a "provided" dependency if using Maven.
 
+Pure Maven package
+**************************
+    
+JQM also supports fetching your jobs through Maven. Of course, in that case, it means your artifacts must be published
+to a repository accessible to JQM (Maven Central, a  local Nexus...).
+
+To do this, inside your deployment descriptor, use ``<path>groupid:artifactid:version</path>`` and ``<pathType>MAVEN</pathType>``.
+
+JQM will do a standard Maven3 resolution. That includes using a local cache and the standard refresh policy on SNAPSHOT artifacts.
+See the Maven :doc:`/admin/parameters` to change the standard behaviour.
+
+    
 Creating a JobDef
 *********************
 
@@ -79,6 +91,7 @@ The general XML structure is this::
 	<jqm>
 		<jar>
 			<path>jqm-test-fibo/jqm-test-fibo.jar</path>
+            <pathType>FS</pathType>
 
 			<jobdefinitions>
 				<jobDefinition>
@@ -98,8 +111,10 @@ Jar attributes
 | name       | description                                                                                                 |
 +============+=============================================================================================================+
 | path       | the path to the jar. It must be relative to the "repo" attribute of the nodes. (default is installdir/jobs) |
+|            | If pathType is 'MAVEN', it contains the Maven coordinates of the artifact containgin your payload           |
 +------------+-------------------------------------------------------------------------------------------------------------+
-
+| pathType   | The meaning of the "path" attribute. If abse,nt, defaults to FS. Can be FS or MAVEN.                        |
++------------+-------------------------------------------------------------------------------------------------------------+
 .. versionadded:: 1.1.6
 	There used to be a field named "filePath" that was redundant. It is no longer used and should not be specified in new xmls.
 	For existing files, the field is simply ignored so there is no need to modify the files.

@@ -12,6 +12,7 @@
 			<xs:sequence>
 				<xs:element name="path" type="xs:string" />
 				<xs:element name="filePath" type="xs:string" minOccurs="0" maxOccurs="1"/>  <!-- Deprecated -->
+				<xs:element name="pathType" type="pathTypes" minOccurs="0" maxOccurs="1" />                
                 <xs:element name="jobdefinitions">
                     <xs:complexType>
                         <xs:sequence>
@@ -22,6 +23,14 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
+    
+    <xs:simpleType name="pathTypes">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="FS" />
+            <xs:enumeration value="MAVEN" />
+            <xs:enumeration value="MEMORY" />
+        </xs:restriction>
+    </xs:simpleType>
 	
 	<xs:element name="jobDefinition">
 		<xs:complexType>
@@ -40,6 +49,9 @@
                 <xs:element name="keyword1" type="xs:string" minOccurs="0" maxOccurs="1" />
                 <xs:element name="keyword2" type="xs:string" minOccurs="0" maxOccurs="1" />
                 <xs:element name="keyword3" type="xs:string" minOccurs="0" maxOccurs="1" />
+                <xs:element name="specificIsolationContext" type="xs:string" minOccurs="0" maxOccurs="1" />
+                <xs:element name="childFirstClassLoader" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                <xs:element name="hiddenJavaClasses" type="xs:string" minOccurs="0" maxOccurs="1" />
                 <xs:element name="reasonableRuntimeLimitMinute" type="xs:int" minOccurs="0" maxOccurs="1" />
                 <xs:element name="highlander" type="xs:boolean" />
 				<xs:element ref="parameters" minOccurs="0" maxOccurs="1" />

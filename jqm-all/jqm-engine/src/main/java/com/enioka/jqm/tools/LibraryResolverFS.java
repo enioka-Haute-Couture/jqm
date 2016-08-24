@@ -24,7 +24,6 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -37,12 +36,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.log4j.Logger;
 import org.jboss.shrinkwrap.resolver.api.maven.ConfigurableMavenResolverSystem;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
-import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenRemoteRepositories;
-import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenUpdatePolicy;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.Node;
 
@@ -53,9 +48,9 @@ import com.enioka.jqm.jpamodel.Node;
  * There is one library cache per engine.<br>
  * This object is thread-safe.
  */
-class LibraryCache
+class LibraryResolverFS
 {
-    private static Logger jqmlogger = Logger.getLogger(LibraryCache.class);
+    private static Logger jqmlogger = Logger.getLogger(LibraryResolverFS.class);
 
     static
     {
@@ -69,7 +64,7 @@ class LibraryCache
         Date loadTime;
     }
 
-    private Map<String, JobDefLibrary> cache = new HashMap<String, LibraryCache.JobDefLibrary>();
+    private Map<String, JobDefLibrary> cache = new HashMap<String, LibraryResolverFS.JobDefLibrary>();
 
     /**
      * 
@@ -129,6 +124,13 @@ class LibraryCache
         File libDir = new File(FilenameUtils.concat(jarDir.getAbsolutePath(), "lib"));
         File libDirExtracted = new File(FilenameUtils.concat(jarDir.getAbsolutePath(), "libFromJar"));
         File pomFile = new File(FilenameUtils.concat(jarDir.getAbsolutePath(), "pom.xml"));
+
+        if (!jarFile.canRead())
+        {
+            jqmlogger.warn("Cannot read file at " + jarFile.getAbsolutePath()
+                    + ". Job instance will crash. Check job definition or permissions on file.");
+            throw new JqmPayloadException("File " + jarFile.getAbsolutePath() + " cannot be read");
+        }
 
         // POM file should be deleted if it comes from the jar file. Otherwise, it would stay into place and modifications to the internal
         // pom would be ignored.
@@ -242,51 +244,7 @@ class LibraryCache
         {
             jqmlogger.trace("Reading a pom file");
 
-            // Retrieve resolver configuration
-            List<GlobalParameter> repolist = em.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
-                    .setParameter("repo", "mavenRepo").getResultList();
-            List<GlobalParameter> settings = em.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :k", GlobalParameter.class)
-                    .setParameter("k", "mavenSettingsCL").getResultList();
-            List<GlobalParameter> settingFiles = em
-                    .createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :k", GlobalParameter.class)
-                    .setParameter("k", "mavenSettingsFile").getResultList();
-
-            boolean withCentral = false;
-            String withCustomSettings = null;
-            String withCustomSettingsFile = null;
-            if (settings.size() == 1 && settingFiles.isEmpty())
-            {
-                jqmlogger.trace("Custom settings file will be used: " + settings.get(0).getValue());
-                withCustomSettings = settings.get(0).getValue();
-            }
-            if (settingFiles.size() == 1)
-            {
-                jqmlogger.trace("Custom settings file will be used: " + settingFiles.get(0).getValue());
-                withCustomSettingsFile = settingFiles.get(0).getValue();
-            }
-
-            // Configure resolver
-            ConfigurableMavenResolverSystem resolver = Maven.configureResolver();
-            if (withCustomSettings != null && withCustomSettingsFile == null)
-            {
-                resolver.fromClassloaderResource(withCustomSettings);
-            }
-            if (withCustomSettingsFile != null)
-            {
-                resolver.fromFile(withCustomSettingsFile);
-            }
-
-            for (GlobalParameter gp : repolist)
-            {
-                if (gp.getValue().contains("repo1.maven.org"))
-                {
-                    withCentral = true;
-                }
-                resolver = resolver
-                        .withRemoteRepo(MavenRemoteRepositories.createRemoteRepository(gp.getId().toString(), gp.getValue(), "default")
-                                .setUpdatePolicy(MavenUpdatePolicy.UPDATE_POLICY_NEVER));
-            }
-            resolver.withMavenCentralRepo(withCentral);
+            ConfigurableMavenResolverSystem resolver = LibraryResolverMaven.getMavenResolver(em);
 
             // Resolve
             File[] depFiles = null;
@@ -302,32 +260,7 @@ class LibraryCache
             }
 
             // Extract results
-            int size = 0;
-            for (File artifact : depFiles)
-            {
-                if (!"pom".equals(FilenameUtils.getExtension(artifact.getName())))
-                {
-                    size++;
-                }
-            }
-            URL[] tmp = new URL[size];
-            int i = 0;
-            for (File artifact : depFiles)
-            {
-                if ("pom".equals(FilenameUtils.getExtension(artifact.getName())))
-                {
-                    continue;
-                }
-                try
-                {
-                    tmp[i] = artifact.toURI().toURL();
-                }
-                catch (MalformedURLException e)
-                {
-                    throw new JqmPayloadException("Incorrect dependency in POM file", e);
-                }
-                i++;
-            }
+            URL[] tmp = LibraryResolverMaven.extractMavenResults(depFiles);
 
             // Put in cache
             putInCache(tmp, jd.getApplicationName());
