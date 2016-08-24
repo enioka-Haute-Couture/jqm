@@ -21,9 +21,6 @@ package com.enioka.jqm.tools;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -34,8 +31,6 @@ import java.util.Properties;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.naming.NamingException;
-import javax.naming.spi.NamingManager;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 
@@ -62,11 +57,12 @@ class Loader implements Runnable, LoaderMBean
     private JobInstance job = null;
     private Node node = null;
 
-    private QueuePoller p = null;
-    private LibraryCache cache = null;
+    private final QueuePoller p;
+    private final JqmEngine engine;
+    private final ClassloaderManager clm;
 
     private ObjectName name = null;
-    private ClassLoader contextClassLoader = null;
+    private ClassLoader classLoaderToRestoreAtEnd = null;
     Boolean isDone = false, isDelayed = false;
     private String threadName;
 
@@ -74,14 +70,11 @@ class Loader implements Runnable, LoaderMBean
     private Calendar endDate = null;
     private State resultStatus = State.ATTRIBUTED;
 
-    private static JarClassLoader sharedClassLoader = null;
-    private static HashMap<URL, JarClassLoader> sharedJarClassLoader = new HashMap<URL, JarClassLoader>();
-    private static HashMap<String, JarClassLoader> specificIsolationContextClassLoader = new HashMap<String, JarClassLoader>();
-
-    Loader(JobInstance job, LibraryCache cache, QueuePoller p)
+    Loader(JobInstance job, JqmEngine engine, QueuePoller p, ClassloaderManager clm)
     {
-        this.cache = cache;
         this.p = p;
+        this.engine = engine;
+        this.clm = clm;
         this.job = job;
         this.threadName = this.job.getJd().getApplicationName() + ";payload;" + this.job.getId();
 
@@ -132,10 +125,8 @@ class Loader implements Runnable, LoaderMBean
 
         EntityManager em = null;
         final boolean noLibLoading;
-        final URL jarUrl;
-        final URL[] classpath;
         final Map<String, String> params;
-        final String launchIsolationDefault;
+        final JarClassLoader jobClassLoader;
 
         // Block needing the database
         try
@@ -175,28 +166,6 @@ class Loader implements Runnable, LoaderMBean
                 return;
             }
 
-            try
-            {
-                jarUrl = jarFile.toURI().toURL();
-            }
-            catch (MalformedURLException ex)
-            {
-                jqmlogger.warn("The JAR file path specified in Job Definition is incorrect " + job.getJd().getApplicationName(), ex);
-                resultStatus = State.CRASHED;
-                endOfRun();
-                return;
-            }
-
-            // Create the CLASSPATH for our classloader (if not already in cache)
-            if (!noLibLoading)
-            {
-                classpath = cache.getLibraries(node, job.getJd(), em);
-            }
-            else
-            {
-                classpath = null;
-            }
-
             // Parameters
             params = new HashMap<String, String>();
             for (RuntimeParameter jp : em.createQuery("SELECT p FROM RuntimeParameter p WHERE p.ji = :i", RuntimeParameter.class)
@@ -217,8 +186,7 @@ class Loader implements Runnable, LoaderMBean
             }
             em.getTransaction().commit();
 
-            // Global prms
-            launchIsolationDefault = Helpers.getParameter("launch_isolation_default", "Isolated", em);
+            jobClassLoader = this.clm.getClassloader(job, noLibLoading, em);
         }
         catch (RuntimeException e)
         {
@@ -232,113 +200,22 @@ class Loader implements Runnable, LoaderMBean
             endOfRun();
             return;
         }
+        catch (MalformedURLException e)
+        {
+            jqmlogger.warn("The JAR file path specified in Job Definition is incorrect " + job.getJd().getApplicationName(), e);
+            resultStatus = State.CRASHED;
+            endOfRun();
+            return;
+        }
         finally
         {
             Helpers.closeQuietly(em);
         }
 
         // Class loader switch
-        JarClassLoader jobClassLoader = null;
+        classLoaderToRestoreAtEnd = Thread.currentThread().getContextClassLoader();
         try
         {
-            // Save the current class loader
-            contextClassLoader = Thread.currentThread().getContextClassLoader();
-
-            String specificIsolationContext = this.job.getJd().getSpecificIsolationContext();
-            if (specificIsolationContext != null && specificIsolationContextClassLoader.containsKey(specificIsolationContext))
-            {
-                jqmlogger.info("Using specific isolation context : " + specificIsolationContext);
-                if (!noLibLoading)
-                {
-                    specificIsolationContextClassLoader.get(specificIsolationContext).extendUrls(jarUrl, classpath);
-                }
-                jobClassLoader = specificIsolationContextClassLoader.get(specificIsolationContext);
-            }
-            else
-            {
-                if ("Shared".equals(launchIsolationDefault) && Loader.sharedClassLoader != null)
-                {
-                    jqmlogger.info("Using sharedClassLoader");
-                    if (!noLibLoading)
-                    {
-                        Loader.sharedClassLoader.extendUrls(jarUrl, classpath);
-                    }
-                    jobClassLoader = Loader.sharedClassLoader;
-                }
-                else if (!noLibLoading && "SharedJar".equals(launchIsolationDefault) && sharedJarClassLoader.containsKey(jarUrl))
-                {
-                    // check if jarUrl has already a class loader
-                    jqmlogger.info("Using shared Jar CL");
-                    jobClassLoader = sharedJarClassLoader.get(jarUrl);
-                }
-                else
-                {
-                    // At this point, the CLASSPATH is always in cache, so just create the CL with it.
-                    jobClassLoader = AccessController.doPrivileged(new PrivilegedAction<JarClassLoader>()
-                    {
-                        @Override
-                        public JarClassLoader run()
-                        {
-                            ClassLoader extLoader = null;
-                            try
-                            {
-                                extLoader = ((JndiContext) NamingManager.getInitialContext(null)).getExtCl();
-                            }
-                            catch (NamingException e)
-                            {
-                                jqmlogger.warn("could not find ext directory class loader. No parent classloader will be used", e);
-                            }
-
-                            if (!noLibLoading)
-                            {
-                                JarClassLoader newCl = new JarClassLoader(jarUrl, classpath, extLoader);
-                                newCl.setChildFirstClassLoader(job.getJd().isChildFirstClassLoader());
-                                newCl.setHiddenJavaClasses(job.getJd().getHiddenJavaClasses());
-
-                                if ("Shared".equals(launchIsolationDefault))
-                                {
-                                    jqmlogger.info("Creating sharedClassLoader");
-                                    Loader.sharedClassLoader = newCl;
-                                    return Loader.sharedClassLoader;
-                                }
-                                else if ("SharedJar".equals(launchIsolationDefault))
-                                {
-                                    jqmlogger.info("Creating shared Jar CL");
-                                    sharedJarClassLoader.put(jarUrl, newCl);
-                                    return sharedJarClassLoader.get(jarUrl);
-                                }
-                                else
-                                {
-                                    jqmlogger.info("Using new CL");
-                                    return newCl;
-                                }
-                            }
-                            else
-                            {
-                                JarClassLoader newCl = new JarClassLoader(Thread.currentThread().getContextClassLoader());
-                                // ChildFirstClassLoader is useless here, default value is kept
-                                newCl.setHiddenJavaClasses(job.getJd().getHiddenJavaClasses());
-                                return newCl;
-                            }
-                        }
-                    });
-                }
-                if (specificIsolationContext != null && !specificIsolationContextClassLoader.containsKey(specificIsolationContext))
-                {
-                    jqmlogger.info("Creating specific isolation context " + specificIsolationContext);
-                    specificIsolationContextClassLoader.put(specificIsolationContext, jobClassLoader);
-                }
-            }
-
-            // The class loader tracing changes with each job instance
-            jobClassLoader.setTracing(job.getJd().isClassLoaderTracing());
-
-            jqmlogger.debug("CL URLs:");
-            for (URL url : jobClassLoader.getURLs())
-            {
-                jqmlogger.debug("       - " + url.toString());
-            }
-
             // Switch
             jqmlogger.trace("Setting class loader");
             Thread.currentThread().setContextClassLoader(jobClassLoader);
@@ -382,6 +259,9 @@ class Loader implements Runnable, LoaderMBean
         jqmlogger.debug("End of loader for JobInstance " + this.job.getId() + ". Thread will now end");
     }
 
+    /**
+     * For external payloads. This is used to force the end of run.
+     */
     void endOfRun(State s)
     {
         this.resultStatus = s;
@@ -432,9 +312,9 @@ class Loader implements Runnable, LoaderMBean
         ClassLoaderLeakCleaner.cleanJdbc(Thread.currentThread());
 
         // Restore class loader
-        if (this.contextClassLoader != null)
+        if (this.classLoaderToRestoreAtEnd != null)
         {
-            Thread.currentThread().setContextClassLoader(contextClassLoader);
+            Thread.currentThread().setContextClassLoader(classLoaderToRestoreAtEnd);
             jqmlogger.trace("Class Loader was correctly restored");
         }
 
@@ -537,7 +417,7 @@ class Loader implements Runnable, LoaderMBean
         {
             jqmlogger.error("connection to database lost - loader " + this.getId() + " will be restarted later");
             jqmlogger.trace("connection error was:", e);
-            this.p.getEngine().loaderRestartNeeded(this);
+            this.engine.loaderRestartNeeded(this);
             unregisterLogger();
             return;
         }
@@ -556,7 +436,7 @@ class Loader implements Runnable, LoaderMBean
         {
             jqmlogger.error("connection to database lost - loader " + this.getId() + " will need delayed finalization");
             jqmlogger.trace("connection error was:", e.getCause());
-            this.p.getEngine().loaderFinalizationNeeded(this);
+            this.engine.loaderFinalizationNeeded(this);
             this.isDelayed = true;
         }
         else

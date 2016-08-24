@@ -253,7 +253,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
                     // Run it
                     if (!ji.getJd().isExternal())
                     {
-                        (new Thread(new Loader(ji, this.engine.getCache(), this))).start();
+                        (new Thread(new Loader(ji, this.engine, this, this.engine.getClassloaderManager()))).start();
                     }
                     else
                     {

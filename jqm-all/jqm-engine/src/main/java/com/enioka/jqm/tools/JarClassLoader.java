@@ -53,7 +53,7 @@ class JarClassLoader extends URLClassLoader
     private boolean childFirstClassLoader = false;
 
     private ArrayList<Pattern> hiddenJavaClassesPatterns = new ArrayList<Pattern>();
-    
+
     private boolean tracing = false;
 
     private static URL[] addUrls(URL url, URL[] libs)
@@ -78,9 +78,12 @@ class JarClassLoader extends URLClassLoader
     {
         super.addURL(jarUrl);
 
-        for (URL url : libs)
+        if (libs != null)
         {
-            super.addURL(url);
+            for (URL url : libs)
+            {
+                super.addURL(url);
+            }
         }
     }
 
@@ -372,12 +375,12 @@ class JarClassLoader extends URLClassLoader
     public Class<?> loadClass(String name) throws ClassNotFoundException
     {
         Class<?> c = null;
-        
-        if(tracing)
+
+        if (tracing)
         {
             jqmlogger.debug("Loading : " + name);
         }
-        
+
         if (childFirstClassLoader)
         {
             // Check if class was already loaded

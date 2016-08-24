@@ -38,7 +38,6 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.RollingFileAppender;
 import org.eclipse.jetty.util.ArrayQueue;
-import org.eclipse.jetty.util.log.Log;
 
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
@@ -62,8 +61,9 @@ class JqmEngine implements JqmEngineMBean
 
     // Parameters and parameter cache
     private Node node = null;
-    private LibraryCache cache = new LibraryCache();
+    private final LibraryCache cache = new LibraryCache();
     private ObjectName name;
+    private final ClassloaderManager clManager = new ClassloaderManager(this.cache);
 
     // Threads that together constitute the engine
     private Map<Integer, QueuePoller> pollers = new HashMap<Integer, QueuePoller>();
@@ -548,6 +548,11 @@ class JqmEngine implements JqmEngineMBean
     LibraryCache getCache()
     {
         return this.cache;
+    }
+
+    ClassloaderManager getClassloaderManager()
+    {
+        return this.clManager;
     }
 
     JettyServer getJetty()

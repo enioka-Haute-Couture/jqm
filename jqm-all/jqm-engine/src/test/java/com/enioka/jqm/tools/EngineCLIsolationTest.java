@@ -62,9 +62,8 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testGlobalIsolated() throws Exception
     {
-        addAndStartEngine();
-
         CreationTools.createGlobalParameter("launch_isolation_default", "Isolated", em);
+        addAndStartEngine();
 
         createSubmitSetJob(null);
         TestHelpers.waitFor(1, 10000, em);
@@ -83,9 +82,8 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testGlobalSharedJarSame() throws Exception
     {
-        addAndStartEngine();
-
         CreationTools.createGlobalParameter("launch_isolation_default", "SharedJar", em);
+        addAndStartEngine();
 
         createSubmitSetJob(null);
         TestHelpers.waitFor(1, 10000, em);
@@ -104,9 +102,8 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testGlobalSharedJarDifferent() throws Exception
     {
-        addAndStartEngine();
-
         CreationTools.createGlobalParameter("launch_isolation_default", "SharedJar", em);
+        addAndStartEngine();
 
         createSubmitSetJob(null);
         TestHelpers.waitFor(1, 10000, em);
@@ -129,9 +126,8 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testGlobalSharedSame() throws Exception
     {
-        addAndStartEngine();
-
         CreationTools.createGlobalParameter("launch_isolation_default", "Shared", em);
+        addAndStartEngine();
 
         createSubmitSetJob(null);
         TestHelpers.waitFor(1, 10000, em);
@@ -150,9 +146,8 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testGlobalSharedDifferent() throws Exception
     {
-        addAndStartEngine();
-
         CreationTools.createGlobalParameter("launch_isolation_default", "Shared", em);
+        addAndStartEngine();
 
         createSubmitSetJob(null);
         TestHelpers.waitFor(1, 10000, em);
@@ -216,9 +211,8 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testJobDefSpecificDifferentShared() throws Exception
     {
-        addAndStartEngine();
-
         CreationTools.createGlobalParameter("launch_isolation_default", "Shared", em);
+        addAndStartEngine();
 
         createSubmitSetJob("test1");
         TestHelpers.waitFor(1, 10000, em);

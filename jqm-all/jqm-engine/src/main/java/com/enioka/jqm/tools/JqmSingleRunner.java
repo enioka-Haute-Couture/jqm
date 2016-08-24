@@ -73,7 +73,7 @@ public class JqmSingleRunner
         }
 
         // Create run container
-        final Loader l = new Loader(job, cache, null);
+        final Loader l = new Loader(job, (JqmEngine) null, (QueuePoller) null, new ClassloaderManager(cache));
 
         // Kill signal handler
         final Thread mainT = Thread.currentThread();
@@ -141,8 +141,8 @@ public class JqmSingleRunner
 
                     if (job != null && job.getState().equals(com.enioka.jqm.jpamodel.State.KILLED))
                     {
-                        jqmlogger.debug("Job " + jobId
-                                + " has received a kill order. It's JVM will be killed after a grace shutdown period");
+                        jqmlogger.debug(
+                                "Job " + jobId + " has received a kill order. It's JVM will be killed after a grace shutdown period");
                         System.exit(1); // Launch the exit hook.
                         break;
                     }
