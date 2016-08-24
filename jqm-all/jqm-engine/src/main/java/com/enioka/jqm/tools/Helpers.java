@@ -679,7 +679,7 @@ final class Helpers
         catch (Exception e)
         {
             res = "maven version not found";
-            jqmlogger.warn("maven version not found", e);
+            jqmlogger.warn("maven version not found");
         }
         return res;
     }
