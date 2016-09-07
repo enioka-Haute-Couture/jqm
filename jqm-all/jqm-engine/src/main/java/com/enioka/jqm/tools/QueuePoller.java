@@ -276,6 +276,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 }
                 else
                 {
+                    jqmlogger.error("Queue poller has failed!", e);
                     throw e;
                 }
             }
