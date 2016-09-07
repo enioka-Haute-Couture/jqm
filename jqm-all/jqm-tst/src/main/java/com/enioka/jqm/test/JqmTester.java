@@ -52,7 +52,6 @@ import com.enioka.jqm.tools.JqmSingleRunner;
 public class JqmTester
 {
     private static Server s;
-    private String dbName;
     private EntityManagerFactory emf = null;
     private EntityManager em = null;
     private Node node = null;
@@ -63,22 +62,10 @@ public class JqmTester
 
     private JqmTester(String className)
     {
-        s = new Server();
-        dbName = "testdb_" + className.hashCode() + Math.random();
-        s.setDatabaseName(0, dbName);
-        s.setDatabasePath(0, "mem:" + dbName);
-        s.setLogWriter(null);
-        s.setSilent(true);
+        s = Common.createHsqlServer();
         s.start();
 
-        Properties p = new Properties();
-        p.put("hibernate.hbm2ddl.auto", "update");
-        p.put("hibernate.dialect", "com.enioka.jqm.tools.HSQLDialect7479");
-        p.put("hibernate.pool_size", 5);
-        p.put("javax.persistence.nonJtaDataSource", "");
-        p.put("hibernate.connection.url", "jdbc:hsqldb:hsql://localhost/" + dbName);
-
-        emf = Persistence.createEntityManagerFactory("jobqueue-api-pu", p);
+        emf = Persistence.createEntityManagerFactory("jobqueue-api-pu", Common.jpaProperties(s));
         em = emf.createEntityManager();
         em.getTransaction().begin();
         JqmSingleRunner.setConnection(emf);
@@ -101,7 +88,7 @@ public class JqmTester
         }
 
         // Create node
-        resDirectoryPath = createTempDirectory();
+        resDirectoryPath = Common.createTempDirectory();
         node = new Node();
         node.setDlRepo(resDirectoryPath.getAbsolutePath());
         node.setDns("test");
@@ -142,31 +129,6 @@ public class JqmTester
     public static JqmTester create(String className)
     {
         return new JqmTester(className);
-    }
-
-    private File createTempDirectory()
-    {
-        final File temp;
-        try
-        {
-            temp = File.createTempFile("temp", Long.toString(System.nanoTime()));
-
-            if (!(temp.delete()))
-            {
-                throw new IOException("Could not delete temp file: " + temp.getAbsolutePath());
-            }
-
-            if (!(temp.mkdir()))
-            {
-                throw new IOException("Could not create temp directory: " + temp.getAbsolutePath());
-            }
-        }
-        catch (Exception e)
-        {
-            // Hatred of checked exceptions.
-            throw new RuntimeException(e);
-        }
-        return (temp);
     }
 
     public JqmTester addParameter(String key, String value)

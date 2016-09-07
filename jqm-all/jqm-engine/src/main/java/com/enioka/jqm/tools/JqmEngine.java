@@ -50,7 +50,7 @@ import com.enioka.jqm.jpamodel.State;
 /**
  * The engine itself. Everything starts in this class.
  */
-class JqmEngine implements JqmEngineMBean
+class JqmEngine implements JqmEngineMBean, JqmEngineOperations
 {
     private static Logger jqmlogger = Logger.getLogger(JqmEngine.class);
     static String latestNodeStartedName = "";

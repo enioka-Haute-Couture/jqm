@@ -19,6 +19,7 @@
 package com.enioka.jqm.tools;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 
 import org.apache.commons.cli.BasicParser;
@@ -86,8 +87,8 @@ public class Main
         Option o00 = OptionBuilder.withArgName("nodeName").hasArg().withDescription("name of the JQM node to start").isRequired()
                 .create("startnode");
         Option o01 = OptionBuilder.withDescription("display help").withLongOpt("help").create("h");
-        Option o11 = OptionBuilder.withArgName("applicationname").hasArg().withDescription("name of the application to launch")
-                .isRequired().create("enqueue");
+        Option o11 = OptionBuilder.withArgName("applicationname").hasArg().withDescription("name of the application to launch").isRequired()
+                .create("enqueue");
         Option o21 = OptionBuilder.withArgName("xmlpath").hasArg().withDescription("path of the XML configuration file to import")
                 .isRequired().create("importjobdef");
         Option o31 = OptionBuilder.withArgName("xmlpath").hasArg().withDescription("export all queue definitions into an XML file")
@@ -255,8 +256,8 @@ public class Main
             EntityManager em = Helpers.getNewEm();
             if (em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true").getResultList().size() != 1)
             {
-                jqmlogger
-                        .fatal("Cannot import a Job Definition when there are no queues defined. Create at least an engine first to create one");
+                jqmlogger.fatal(
+                        "Cannot import a Job Definition when there are no queues defined. Create at least an engine first to create one");
                 em.close();
                 return;
             }
@@ -274,12 +275,18 @@ public class Main
         }
     }
 
-    private static void startEngine(String nodeName)
+    public static void setEmf(EntityManagerFactory emf)
+    {
+        Helpers.setEmf(emf);
+    }
+
+    public static JqmEngineOperations startEngine(String nodeName)
     {
         try
         {
             engine = new JqmEngine();
             engine.start(nodeName);
+            return engine;
         }
         catch (Exception e)
         {
@@ -365,9 +372,8 @@ public class Main
         {
             em = Helpers.getNewEm();
             em.getTransaction().begin();
-            RRole r = Helpers.createRoleIfMissing(em, "config admin",
-                    "can read and write all configuration, except security configuration", "node:*", "queue:*", "qmapping:*", "jndi:*",
-                    "prm:*", "jd:*");
+            RRole r = Helpers.createRoleIfMissing(em, "config admin", "can read and write all configuration, except security configuration",
+                    "node:*", "queue:*", "qmapping:*", "jndi:*", "prm:*", "jd:*");
 
             RUser u = Helpers.createUserIfMissing(em, "root", "all powerfull user", r);
             u.setPassword(password);
@@ -399,7 +405,8 @@ public class Main
             Helpers.setSingleParam("enableInternalPki", "true", em);
 
             em.getTransaction().begin();
-            em.createQuery("UPDATE Node n set n.loapApiSimple = true, n.loadApiClient = true, n.loadApiAdmin = true, n.dns=:n").setParameter("n", "0.0.0.0").executeUpdate();
+            em.createQuery("UPDATE Node n set n.loapApiSimple = true, n.loadApiClient = true, n.loadApiAdmin = true, n.dns=:n")
+                    .setParameter("n", "0.0.0.0").executeUpdate();
             em.getTransaction().commit();
             em.close();
         }
