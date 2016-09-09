@@ -42,7 +42,7 @@ import com.enioka.jqm.tools.Main;
  * {@link #getDeliverableContent(Deliverable)} method to compensate. The tester also provides a few helper methods (accelerators) that
  * encapsulate the client API.<br>
  * 
- * If using resources (JNDI), they must be put inside a resource.xml file at the root of classloader search.<br>
+ * If using resources (JNDI), they must be put inside a resource.xml file at the root of class loader search.<br>
  * Note that tester instances are not thread safe.
  */
 public class JqmAsyncTester
