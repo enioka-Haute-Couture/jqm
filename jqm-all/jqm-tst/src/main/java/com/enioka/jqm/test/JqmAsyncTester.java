@@ -1,7 +1,10 @@
 package com.enioka.jqm.test;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,9 +14,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import org.apache.commons.io.FilenameUtils;
 import org.hsqldb.Server;
 
+import com.enioka.jqm.api.Deliverable;
+import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClient;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
 import com.enioka.jqm.api.State;
@@ -26,13 +33,17 @@ import com.enioka.jqm.tools.JqmEngineOperations;
 import com.enioka.jqm.tools.Main;
 
 /**
- * <strong>No one should ever use this class. This is for internal JQM use only and may change without notice</strong> <br>
+ * An asynchronous tester for JQM payloads. It allows to configure and start one or more embedded JQM engines and run payloads against them.
+ * It is most suited for integration tests.<br>
  * <br>
- * An asynchronous tester for JQM payloads.<br>
- * Tester instances are not thread safe.
+ * These are full JQM nodes running on an in-memory embedded database. They are started with all web API disabled.<br>
+ * The user should handle interactions with the nodes through the normal client APIs. See {@link JqmClient} and {@link JqmClientFactory}. As
+ * the web services are not loaded, the file retrieval methods of these APIs will not work, so the tester provides a
+ * {@link #getDeliverableContent(Deliverable)} method to compensate. The tester also provides a few helper methods (accelerators) that
+ * encapsulate the client API.<br>
  * 
  * JNDI resources must be declared in an external XML file.<br>
- *
+ * Note that tester instances are not thread safe.
  */
 public class JqmAsyncTester
 {
@@ -78,6 +89,7 @@ public class JqmAsyncTester
 
         // Needed parameters
         addGlobalParameter("defaultConnection", "");
+        addGlobalParameter("disableWsApi", "true");
     }
 
     public static JqmAsyncTester create()
@@ -441,5 +453,24 @@ public class JqmAsyncTester
     public boolean testKoCount(long expectedKoCount)
     {
         return getNonOkCount() == expectedKoCount;
+    }
+
+    /**
+     * Version of {@link JqmClient#getDeliverableContent(Deliverable)} which does not require the web service APIs to be enabled to work.
+     * Also, returned files do not self-destruct on stream close.<br>
+     * See the javadoc of the original method for details.
+     * 
+     * @throws FileNotFoundException
+     */
+    public InputStream getDeliverableContent(Deliverable file) throws FileNotFoundException
+    {
+        com.enioka.jqm.jpamodel.Deliverable d = em
+                .createQuery("SELECT d FROM Deliverable d WHERE d.id = :i", com.enioka.jqm.jpamodel.Deliverable.class)
+                .setParameter("i", file.getId()).getSingleResult();
+        JobInstance ji = Query.create().setJobInstanceId(d.getJobId()).run().get(0);
+        String nodeName = ji.getNodeName();
+        Node n = nodes.get(nodeName);
+
+        return new FileInputStream(FilenameUtils.concat(n.getDlRepo(), file.getFilePath()));
     }
 }
