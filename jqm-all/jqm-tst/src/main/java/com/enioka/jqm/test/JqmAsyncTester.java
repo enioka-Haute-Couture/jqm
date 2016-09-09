@@ -42,7 +42,7 @@ import com.enioka.jqm.tools.Main;
  * {@link #getDeliverableContent(Deliverable)} method to compensate. The tester also provides a few helper methods (accelerators) that
  * encapsulate the client API.<br>
  * 
- * JNDI resources must be declared in an external XML file.<br>
+ * If using resources (JNDI), they must be put inside a resource.xml file at the root of classloader search.<br>
  * Note that tester instances are not thread safe.
  */
 public class JqmAsyncTester
@@ -56,6 +56,7 @@ public class JqmAsyncTester
     private Server s = null;
 
     private boolean hasStarted = false;
+    private String logLevel = "DEBUG";
 
     ///////////////////////////////////////////////////////////////////////////
     // CONSTRUCTION
@@ -135,13 +136,28 @@ public class JqmAsyncTester
         node.setRepo(".");
         node.setTmpDirectory(resDirectoryPath.getAbsolutePath());
         node.setPort(12);
-        node.setRootLogLevel("TRACE");
+        node.setRootLogLevel(logLevel);
 
         em.getTransaction().begin();
         em.persist(node);
         em.getTransaction().commit();
         nodes.put(nodeName, node);
 
+        return this;
+    }
+
+    /**
+     * Changes the log level of existing and future nodes.
+     * 
+     * @param level
+     *            TRACE, DEBUG, INFO, WARNING, ERROR (or anything, which is interpreted as INFO)
+     */
+    public JqmAsyncTester setNodesLogLevel(String level)
+    {
+        logLevel = level;
+        em.getTransaction().begin();
+        em.createQuery("UPDATE Node n set n.rootLogLevel = :l").setParameter("l", level).executeUpdate();
+        em.getTransaction().commit();
         return this;
     }
 

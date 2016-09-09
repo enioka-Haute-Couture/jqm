@@ -35,11 +35,11 @@ import com.enioka.jqm.tools.JqmSingleRunner;
  * <li>Resource providers and corresponding drivers must be put inside testing class path (for example by putting them inside pom.xml with a
  * <code>test</code> scope)</li>
  * <li>To ease tests, the launch is synchronous. Obviously, real life instances are asynchronous. To test asynchronous launches, use an
- * embedded engine (integration test).</li>
+ * embedded engine (integration test) with the much more complicated {@link JqmAsyncTester}.</li>
  * <li>If files are created by the payload, they are stored inside a temporary directory that is not removed at the end of the run.</li>
  * </ul>
  * <br>
- * For example, a simple Junit test could be:
+ * For example, a simple JUnit test could be:
  * 
  * <pre>
  * {@code public void testOne()

@@ -93,4 +93,17 @@ public class JqmTesterAsyncTest2
         tester.stop();
     }
 
+    // JNDI resource test
+    @Test
+    public void testFive()
+    {
+        JqmAsyncTester tester = JqmAsyncTester.createSingleNodeOneQueue().addSimpleJobDefinitionFromClasspath(Payload3.class).start();
+        tester.enqueue("Payload3");
+
+        tester.waitForResults(1, 10000);
+        Assert.assertTrue(tester.testCounts(1, 0));
+
+        tester.stop();
+    }
+
 }
