@@ -57,6 +57,7 @@ public class JqmAsyncTester
 
     private boolean hasStarted = false;
     private String logLevel = "DEBUG";
+    private boolean oneQueueDeployed = false;
 
     ///////////////////////////////////////////////////////////////////////////
     // CONSTRUCTION
@@ -217,6 +218,7 @@ public class JqmAsyncTester
             em.getTransaction().commit();
         }
 
+        oneQueueDeployed = true;
         return this;
     }
 
@@ -303,6 +305,18 @@ public class JqmAsyncTester
         if (hasStarted)
         {
             throw new IllegalStateException("cannot start twice");
+        }
+        if (nodes.isEmpty())
+        {
+            throw new IllegalStateException("no engines defined");
+        }
+        if (queues.isEmpty())
+        {
+            throw new IllegalStateException("no queues defined");
+        }
+        if (!oneQueueDeployed)
+        {
+            throw new IllegalStateException("no queue was ever deployed to any node");
         }
         hasStarted = true;
         for (Node n : nodes.values())

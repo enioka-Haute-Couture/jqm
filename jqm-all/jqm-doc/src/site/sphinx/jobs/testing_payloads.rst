@@ -1,7 +1,7 @@
 Testing payloads
 #######################
 
-.. highlight:: bash
+.. highlight:: java
 
 Unit testing
 ****************
@@ -29,57 +29,83 @@ Refer to JqmTester javadoc for further details, including how to specify JNDI re
 Integration tests
 ************************
 
-If you have to test interactions between jobs (for example, one job instance queueing another), it may be necessary to use a full JQM engine. This gives the basics on how to do it
-(there are no supported embedded way to do it yet).
+If you have to test interactions between jobs (for example, one job instance queueing another), it may be necessary to use a full JQM engine. JQM provides another embedded 
+tester class to do so. It is inside the same jqm-tst library.
 
-Prepare package
-+++++++++++++++++++++++++++
+These are the steps to follow to launch an integration test: 
 
-Following the previous chapters, you should have:
+* create the tester object
+* add at least on node (engine)
+* add at least one queue
+* deploy a queue on a node (i.e. set a node to poll a queue)
+* start the engines
+* create a job definition (the equivalent of the deployment descriptor XML file, which describes where the class to launch is, its parameters...)
+* launch a new job instance and other normal JQM client interactions using the client API.
+* stop the engines.
 
-* a JAR file containing the payload (potentially with libs)
-* a descriptor XML file containing all the metadata
+When using test frameworks like JUnit, all the node creation stuff is usually inside @BeforeClass methods, like in the following example.::
 
-Morevoer, if you do not have a working engine at your disposal, please read :doc:`/admin/install`.
+    public class MyIntegrationTest
+    {
+        public static JqmAsyncTester tester;
 
-Copy files
-+++++++++++++++++++++++++++++
+        @BeforeClass
+        public static void beforeClass()
+        {
+            // This creates a cluster with two JQM nodes, three queues (queue1 polled by node1, queue2 polled by node2, queue3 polled by both nodes).
+            // The nodes are started at the end of this line.
+            tester = JqmAsyncTester.create().addNode("node1").addNode("node2").addQueue("queue1").addQueue("queue2").addQueue("queue3")
+                    .deployQueueToNode("queue1", 10, 100, "node1").deployQueueToNode("queue2", 10, 100, "node2")
+                    .deployQueueToNode("queue3", 10, 100, "node1", "node2").start();
+        }
 
-Place the two files inside JQM_DIR/jobs/xxxxx where xxxxx is a directory of your choice.
-Please note that the name of this directory must be the same as the one inside the "filePath" tag from the XML.
+        @AfterClass
+        public static void afterClass()
+        {
+            // Only stop the cluster when all tests are done. This means there is no reboot or cleanup between tests if tester.cleanupAllJobDefinitions() is not explicitely called.
+            tester.stop();
+        }
+        
+        @Before
+        public void before()
+        {
+            // A helper method to ensure there is no traces left of previous executions and job definitions from other tests
+             tester.cleanupAllJobDefinitions();
+        }
 
-If there are libraries to copy (pom.xml is not used), they must be placed inside a directory named "lib": JQM_DIR/jobs/xxxxx/lib.
+        @Test
+        public void testOne()
+        {
+            // Quickly create a job definition from a class present in the test class path.
+            tester.addSimpleJobDefinitionFromClasspath(Payload1.class);
 
-Example (with explicit libraries)::
+            // Request a launch of this new job definition. Note we could simply use the JqmClient API.
+            tester.enqueue("Payload1");
+            
+            // Launches are asynchronous, so wait for results (with a timeout).
+            tester.waitForResults(1, 10000);
 
-	$JQM_DIR\
-	$JQM_DIR\jobs\
-	$JQM_DIR\jobs\myjob\myjob.xml
-	$JQM_DIR\jobs\myjob\myjob.jar
-	$JQM_DIR\jobs\myjob\lib\
-	$JQM_DIR\jobs\myjob\lib\mylib1.jar
-	$JQM_DIR\jobs\myjob\lib\mylib2.jar
+            // Actual tests
+            Assert.assertEquals(1, tester.getOkCount());
+            Assert.assertEquals(1, tester.getHistoryAllCount());
+        }
+        
+        @Test
+        public void testTwo()
+        {
+            // Quickly create a job definition from a class present in a jar. This is the way production JQM nodes really work - they load jar stored on the local file system. 
+            tester.addSimpleJobDefinitionFromLibrary("payload1", "App", "../jqm-tests/jqm-test-datetimemaven/target/test.jar")
 
-.. note:: there is no need to restart the engine on any import, jar modification or whatever.
+            tester.enqueue("payload1");
+            tester.waitForResults(1, 10000, 0);
 
-Import the metadata
-+++++++++++++++++++++++++++++
+            Assert.assertTrue(tester.testCounts(1, 0));       
+        }
+    }
 
-.. note:: this only has to be done the first time. Later, this is only necessary if the XML changes.
-	Each time the XML is imported, it overwrites the previous values so it can also be done at will.
+Refer to JqmAsyncTester javadoc for further details, including how to specify JNDI resource and retrieving files created by the job instances.
 
-Open a command line (bash, powershell, ksh...) and run the following commands (adapt JQM_DIR and xxxx)::
+.. note:: the tester outputs logs on stdout using log4j. You can set set log level through a tester method. If you use other loggers, this may result in a mix of different logger outputs.
 
-	cd $JQM_DIR
-	java -jar jqm.jar -importjobdef ./jobs/xxxxx/xxxx.xml
-
-Run the payload
-+++++++++++++++++++++++++++++
-
-This part can be run as many times as needed. (adapt the job name, it is the "name" attribute from the XML) ::
-
-	java -jar jqm.jar -enqueue JOBNAME
-
-The logs are inside JQM_ROOT/logs. The user may want to do "tail -f" (or "cat -Wait" in PowerShell) on these files
-during tests. There are two files per launch: one containing the standard output flow, the other with the
-standard error flow.
+.. warning:: the nodes run inside the current JVM. So if you start too many nodes, or allow too many concurrent jobs to run, you may run out of memory and need to set higher JVM -Xmx parameters.
+    If using Maven, you may for example set the environment variable `export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"`
