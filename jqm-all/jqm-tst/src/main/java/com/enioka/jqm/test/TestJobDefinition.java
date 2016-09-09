@@ -302,7 +302,16 @@ public class TestJobDefinition
 
     String getHiddenJavaClasses()
     {
-        return String.join(",", hiddenJavaClasses);
+        String res = "";
+        for (String s : hiddenJavaClasses)
+        {
+            res += s + ",";
+        }
+        if (hiddenJavaClasses.size() > 0)
+        {
+            return res.substring(0, res.length() - 2);
+        }
+        return "";
     }
 
     /**
