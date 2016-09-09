@@ -36,7 +36,7 @@ import com.enioka.jqm.tools.Main;
  * An asynchronous tester for JQM payloads. It allows to configure and start one or more embedded JQM engines and run payloads against them.
  * It is most suited for integration tests.<br>
  * <br>
- * These are full JQM nodes running on an in-memory embedded database. They are started with all web API disabled.<br>
+ * It starts full JQM nodes running on an in-memory embedded database. They are started with all web API disabled.<br>
  * The user should handle interactions with the nodes through the normal client APIs. See {@link JqmClient} and {@link JqmClientFactory}. As
  * the web services are not loaded, the file retrieval methods of these APIs will not work, so the tester provides a
  * {@link #getDeliverableContent(Deliverable)} method to compensate. The tester also provides a few helper methods (accelerators) that
@@ -92,6 +92,9 @@ public class JqmAsyncTester
         addGlobalParameter("disableWsApi", "true");
     }
 
+    /**
+     * Equivalent to simply calling the constructor. Present for consistency.
+     */
     public static JqmAsyncTester create()
     {
         return new JqmAsyncTester();
@@ -143,7 +146,7 @@ public class JqmAsyncTester
     }
 
     /**
-     * Create a new queue. After creation, it is not polled by any node - see {@link #deployQueueToNode(String, String, int, int)} for
+     * Create a new queue. After creation, it is not polled by any node - see {@link #deployQueueToNode(String, int, int, String...)} for
      * this.<br>
      * The first queue created is considered to be the default queue.<br>
      * This must be called before starting the engines.
@@ -175,6 +178,7 @@ public class JqmAsyncTester
     }
 
     /**
+     * Set one or more nodes to poll a queue for new job instances.<br>
      * This must be called before starting the engines.
      */
     public JqmAsyncTester deployQueueToNode(String queueName, int maxJobsRunning, int pollingIntervallMs, String... nodeName)
@@ -201,7 +205,7 @@ public class JqmAsyncTester
     }
 
     /**
-     * Sets or update a global parameter
+     * Set or update a global parameter.
      */
     public void addGlobalParameter(String key, String value)
     {
@@ -220,7 +224,8 @@ public class JqmAsyncTester
     }
 
     /**
-     * This can be called at any time (even after engine start).
+     * Add a new job definition (see documentation) to the database.<br>
+     * This can be called at any time (even after engine(s) start).
      */
     public JqmAsyncTester addJobDefinition(TestJobDefinition description)
     {
@@ -275,7 +280,7 @@ public class JqmAsyncTester
 
     /**
      * This actually starts the different engines configured with {@link #addNode(String)}.<br>
-     * This can only be called once.
+     * This can usually only be called once (it can actually be called again but only after calling {@link #stop()}).
      */
     public JqmAsyncTester start()
     {
@@ -302,7 +307,7 @@ public class JqmAsyncTester
     }
 
     /**
-     * Wait for a given amount of results (OK or KO).
+     * Wait for a given amount of ended job instances (OK or KO).
      * 
      * @param nbResult
      *            the expected result count
@@ -324,6 +329,20 @@ public class JqmAsyncTester
             throw new RuntimeException("expected result count was not reached in specified timeout");
         }
         sleepms(waitAdditionalMs);
+    }
+
+    /**
+     * Wait for a given amount of ended job instances (OK or KO). Shortcut for {@link #waitForResults(int, int, int)} with 0ms of additional
+     * wait time.
+     * 
+     * @param nbResult
+     *            the expected result count
+     * @param timeoutMs
+     *            give up after this (throws a RuntimeException)
+     */
+    public void waitForResults(int nbResult, int timeoutMs)
+    {
+        waitForResults(nbResult, timeoutMs, 0);
     }
 
     private void sleepms(int ms)
@@ -453,6 +472,15 @@ public class JqmAsyncTester
     public boolean testKoCount(long expectedKoCount)
     {
         return getNonOkCount() == expectedKoCount;
+    }
+
+    /**
+     * Helper method. Tests if {@link #getOkCount()} is equal to the first parameter and if {@link #getNonOkCount()} is equal to the second
+     * parameter.
+     */
+    public boolean testCounts(long expectedOkCount, long expectedKoCount)
+    {
+        return testOkCount(expectedOkCount) && testKoCount(expectedKoCount);
     }
 
     /**

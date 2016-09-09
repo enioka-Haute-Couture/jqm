@@ -5,13 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.enioka.jqm.api.JqmClient;
 import com.enioka.jqm.jpamodel.JobDef.PathType;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 
 /**
- * Helper class to define a new payload. The other way to define a new payload is to import an XML file.<br>
- * Payloads created through this class must be present inside the class path.
- * 
+ * Helper class to define a new payload. This will help create an actual job definition, as if it had been imported from an XML deployment
+ * descriptor.<br>
+ * There are tow possibilities to create a job definition: from a class inside the current class path, or from an external Jar.
  */
 public class TestJobDefinition
 {
@@ -47,6 +48,20 @@ public class TestJobDefinition
     private TestJobDefinition()
     {}
 
+    /**
+     * This creates a job definition from a given class. This class must be present inside the current class path, and will be loaded by the
+     * engine with the current class loader. This means that most specific class loading option (child first, ...) are mostly useless in
+     * this case.
+     * 
+     * @param name
+     *            the name to give the new job definition. This is the name that is later reused in client APIs, such as
+     *            {@link JqmClient#enqueue(String, String)}.
+     * @param description
+     *            a free text describing the job definition
+     * @param testedClass
+     *            the class containing the job to run.
+     * @return the object itself (fluid API)
+     */
     public static TestJobDefinition createFromClassPath(String name, String description, Class<? extends Object> testedClass)
     {
         TestJobDefinition res = new TestJobDefinition();
@@ -58,6 +73,21 @@ public class TestJobDefinition
         return res;
     }
 
+    /**
+     * Create a job definition from a class inside an existing jar file. This creates the exact replica of what happens inside a production
+     * JQM cluster, including taking into account all the various class loading options (child first, external library directory...).
+     * 
+     * @param name
+     *            the name to give the new job definition. This is the name that is later reused in client APIs, such as
+     *            {@link JqmClient#enqueue(String, String)}.
+     * @param description
+     *            a free text describing the job definition
+     * @param testedClassCanonicalName
+     *            the class containing the job to run (full canonical name, i.e. including package name)
+     * @param jarPath
+     *            path to the jar file, relative to the current directory.
+     * @return
+     */
     public static TestJobDefinition createFromJar(String name, String description, String testedClassCanonicalName, String jarPath)
     {
         TestJobDefinition res = new TestJobDefinition();
@@ -272,7 +302,8 @@ public class TestJobDefinition
 
     /**
      * By default jobs run inside a dedicated class loader thrown out after the run. By setting this to a non null value, this job will run
-     * inside a re-sued class loader. All jobs using the same specificIsolationContext share the same class loader.
+     * inside a re-used class loader. All jobs using the same specificIsolationContext share the same class loader. See documentation on
+     * class loading inside JQM.
      * 
      * @param specificIsolationContext
      *            name of the class loader to use or null to use default behaviour.
@@ -290,7 +321,8 @@ public class TestJobDefinition
 
     /**
      * This enables child-first class loading.<br>
-     * Note that if the payload is actually inside your unit test class path, this won't do much.
+     * Note that if the payload is actually inside your unit test class path, this won't do much. See documentation on class loading inside
+     * JQM.
      * 
      * @param childFirstClassLoader
      */
