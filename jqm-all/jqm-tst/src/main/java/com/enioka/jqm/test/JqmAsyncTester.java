@@ -189,19 +189,6 @@ public class JqmAsyncTester
     }
 
     /**
-     * This can be called at any time (even after engine start).
-     */
-    public JqmAsyncTester addJobDefinition(TestJobDefinition description)
-    {
-        JobDef jd = Common.createJobDef(description, queues);
-        em.getTransaction().begin();
-        em.persist(jd);
-        em.getTransaction().commit();
-
-        return this;
-    }
-
-    /**
      * Sets or update a global parameter
      */
     public void addGlobalParameter(String key, String value)
@@ -218,6 +205,56 @@ public class JqmAsyncTester
             em.persist(gp);
         }
         em.getTransaction().commit();
+    }
+
+    /**
+     * This can be called at any time (even after engine start).
+     */
+    public JqmAsyncTester addJobDefinition(TestJobDefinition description)
+    {
+        JobDef jd = Common.createJobDef(description, queues);
+        em.getTransaction().begin();
+        em.persist(jd);
+        em.getTransaction().commit();
+
+        return this;
+    }
+
+    /**
+     * A helper method to create a job definition from a class <strong>which is present inside the current class path</strong>.<br>
+     * The job description and name will be the class name (simple name, not the fully qualified name).<br>
+     * If you need further customisation, directly create your {@link TestJobDefinition} and call
+     * {@link #addJobDefinition(TestJobDefinition)} instead of using this method.
+     * 
+     * @param classToRun
+     *            a class present inside the class path which should be launched by JQM.
+     * @return the tester itself to allow fluid API behaviour.
+     */
+    public JqmAsyncTester addSimpleJobDefinitionFromClasspath(Class<? extends Object> classToRun)
+    {
+        TestJobDefinition jd = TestJobDefinition.createFromClassPath(classToRun.getSimpleName(), "test payload " + classToRun.getName(),
+                classToRun);
+        return this.addJobDefinition(jd);
+    }
+
+    /**
+     * A helper method to create a job definition from a class <strong>which is present inside an existing jar file</strong>.<br>
+     * The job description and name will be identical<br>
+     * If you need further customisation, directly create your {@link TestJobDefinition} and call
+     * {@link #addJobDefinition(TestJobDefinition)} instead of using this method.
+     * 
+     * @param name
+     *            name of the new job definition (as used in the enqueue methods)
+     * @param className
+     *            the full canonical name of the the class to run inside the jar
+     * @param jarPath
+     *            path to the jar. Relative to current directory.
+     * @return the tester itself to allow fluid API behaviour.
+     */
+    public JqmAsyncTester addSimpleJobDefinitionFromLibrary(String name, String className, String jarPath)
+    {
+        TestJobDefinition jd = TestJobDefinition.createFromJar(name, name, className, jarPath);
+        return this.addJobDefinition(jd);
     }
 
     ///////////////////////////////////////////////////////////////////////////

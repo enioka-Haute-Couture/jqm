@@ -30,9 +30,9 @@ public class JqmTesterAsyncTest
     public void testOne()
     {
         tester.cleanupAllJobDefinitions();
-        tester.addJobDefinition(TestJobDefinition.createFromClassPath("payload1", "description", Payload1.class));
+        tester.addSimpleJobDefinitionFromClasspath(Payload1.class);
 
-        tester.enqueue("payload1");
+        tester.enqueue("Payload1");
         tester.waitForResults(1, 10000, 0);
 
         Assert.assertEquals(1, tester.getOkCount());

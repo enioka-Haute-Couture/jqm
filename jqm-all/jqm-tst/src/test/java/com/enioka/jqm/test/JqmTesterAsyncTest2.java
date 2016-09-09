@@ -1,7 +1,5 @@
 package com.enioka.jqm.test;
 
-import java.io.File;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,10 +13,9 @@ public class JqmTesterAsyncTest2
     @Test
     public void testOne()
     {
-        JqmAsyncTester tester = JqmAsyncTester.createSingleNodeOneQueue()
-                .addJobDefinition(TestJobDefinition.createFromClassPath("payload1", "description", Payload1.class)).start();
+        JqmAsyncTester tester = JqmAsyncTester.createSingleNodeOneQueue().addSimpleJobDefinitionFromClasspath(Payload1.class).start();
 
-        tester.enqueue("payload1");
+        tester.enqueue("Payload1");
         tester.waitForResults(1, 10000, 0);
 
         Assert.assertEquals(1, tester.getOkCount());
@@ -31,13 +28,12 @@ public class JqmTesterAsyncTest2
     @Test
     public void testTwo()
     {
-        JqmAsyncTester tester = JqmAsyncTester.createSingleNodeOneQueue()
-                .addJobDefinition(TestJobDefinition.createFromClassPath("payload1", "description", Payload1.class)).start();
+        JqmAsyncTester tester = JqmAsyncTester.createSingleNodeOneQueue().addSimpleJobDefinitionFromClasspath(Payload1.class).start();
 
-        tester.enqueue("payload1");
-        tester.enqueue("payload1");
-        tester.enqueue("payload1");
-        tester.enqueue("payload1");
+        tester.enqueue("Payload1");
+        tester.enqueue("Payload1");
+        tester.enqueue("Payload1");
+        tester.enqueue("Payload1");
         tester.waitForResults(4, 10000, 0);
 
         Assert.assertEquals(4, tester.getOkCount());
@@ -50,11 +46,8 @@ public class JqmTesterAsyncTest2
     @Test
     public void testThree()
     {
-        System.out.println(new File(".").getAbsolutePath());
         JqmAsyncTester tester = JqmAsyncTester.createSingleNodeOneQueue()
-                .addJobDefinition(
-                        TestJobDefinition.createFromJar("payload1", "payload1", "App", "../jqm-tests/jqm-test-datetimemaven/target/test.jar"))
-                .start();
+                .addSimpleJobDefinitionFromLibrary("payload1", "App", "../jqm-tests/jqm-test-datetimemaven/target/test.jar").start();
 
         tester.enqueue("payload1");
         tester.waitForResults(1, 10000, 0);
