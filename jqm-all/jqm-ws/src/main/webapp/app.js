@@ -300,7 +300,7 @@ jqmApp.controller('µCredentialsController', function($scope, µPermManager, $lo
     };
 });
 
-jqmApp.directive('loginDialog', function($modal)
+jqmApp.directive('loginDialog', function($uibModal)
 {
     return {
         restrict : 'E',

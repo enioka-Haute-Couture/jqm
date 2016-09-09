@@ -2,7 +2,7 @@
 
 var jqmControllers = angular.module('jqmControllers');
 
-jqmControllers.controller('µJdListCtrl', function($scope, $http, $modal, µJdDto, µQueueDto)
+jqmControllers.controller('µJdListCtrl', function($scope, $http, $uibModal, µJdDto, µQueueDto)
 {
     $scope.jds = null;
     $scope.selected = [];
@@ -148,7 +148,7 @@ jqmControllers.controller('µJdListCtrl', function($scope, $http, $modal, µJdDt
 
     $scope.prms = function()
     {
-        $modal.open({
+    	$uibModal.open({
             templateUrl : './template/jd_prms.html',
             controller : 'jdPrms',
             size : 'lg',
@@ -164,7 +164,7 @@ jqmControllers.controller('µJdListCtrl', function($scope, $http, $modal, µJdDt
     $scope.refresh();
 });
 
-jqmApp.controller('jdPrms', function($scope, $modalInstance, jd)
+jqmApp.controller('jdPrms', function($scope, $uibModalInstance, jd)
 {
     $scope.selectedJd = jd;
     $scope.data = {
@@ -187,6 +187,6 @@ jqmApp.controller('jdPrms', function($scope, $modalInstance, jd)
 
     $scope.ok = function()
     {
-        $modalInstance.close();
+        $uibModalInstance.close();
     };
 });

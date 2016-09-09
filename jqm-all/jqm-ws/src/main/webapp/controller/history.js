@@ -10,7 +10,7 @@ jqmControllers.filter('epoch2date', function()
 	};
 });
 
-jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQueueDto)
+jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µQueueDto)
 {
     $scope.data = null;
     $scope.selected = [];
@@ -288,7 +288,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
 
     $scope.showDetail = function()
     {
-        $modal.open({
+    	$uibModal.open({
             templateUrl : './template/history_detail.html',
             controller : 'historyDetail',
             size : 'lg',
@@ -304,7 +304,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
 
     $scope.newLaunch = function()
     {
-        var modalInstance = $modal.open({
+        var modalInstance = $uibModal.open({
             templateUrl : './template/new_launch.html',
             controller : 'jiNew',
             size : 'lg',
@@ -355,7 +355,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $modal, µQue
     };
 });
 
-jqmApp.controller('historyDetail', function($scope, $http, $modal, ji)
+jqmApp.controller('historyDetail', function($scope, $http, $uibModal, ji)
 {
     $scope.ji = ji;
     $scope.dels = [];
@@ -372,7 +372,7 @@ jqmApp.controller('historyDetail', function($scope, $http, $modal, ji)
     
     $scope.showlog = function(url)
     {
-        $modal.open({
+    	$uibModal.open({
             templateUrl : './template/file_reader.html',
             controller : 'fileReader',
             size : 'lg',
@@ -389,7 +389,7 @@ jqmApp.controller('historyDetail', function($scope, $http, $modal, ji)
     $scope.getdel();
 });
 
-jqmApp.controller('jiNew', function($scope, µUserJdDto, $modalInstance, $http)
+jqmApp.controller('jiNew', function($scope, µUserJdDto, $uibModalInstance, $http)
 {
     $scope.jds = µUserJdDto.query();
     $scope.selectedJd = null;
@@ -416,7 +416,7 @@ jqmApp.controller('jiNew', function($scope, µUserJdDto, $modalInstance, $http)
 
     $scope.postOk = function()
     {
-        $modalInstance.close();
+        $uibModalInstance.close();
     };
 
     $scope.ok = function()
@@ -427,6 +427,6 @@ jqmApp.controller('jiNew', function($scope, µUserJdDto, $modalInstance, $http)
 
     $scope.cancel = function()
     {
-        $modalInstance.dismiss('cancel');
+        $uibModalInstance.dismiss('cancel');
     };
 });

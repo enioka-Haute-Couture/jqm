@@ -3,24 +3,30 @@
 <head>
 <meta charset="utf-8">
 <title>JQM administration</title>
-<link rel="stylesheet" href="css/bootstrap.css">
+<link rel="stylesheet" href="css/bootstrap-3.3.7.min.css">
 <link rel="stylesheet" href="css/ng-grid.css">
-<link rel="stylesheet" href="css/select.min.css">
-<link rel="stylesheet" href="css/angular.rangeSlider.css">
+<link rel="stylesheet" href="css/select-0.19.4.min.css">
+<link rel="stylesheet" href="css/angular.rangeSlider-0.14.css">
 <link rel="stylesheet" href="css/app.css">
-<script src="libs/jquery-1.11.3.min.js"></script>
-<script src="libs/bootstrap.js"></script>
-<script src="libs/angular-1.3.16.js"></script>
-<script src="libs/angular-busy.min.js"></script>
-<script src="libs/angular-route.js"></script>
-<script src="libs/angular-cookies.js"></script>
-<script src="libs/angular-resource.js"></script>
-<script src="libs/ui-bootstrap-tpls-0.13.0.min.js"></script>
+
+<script src="libs/jquery-3.1.0.min.js"></script>
+<script src="libs/bootstrap-3.3.7.min.js"></script>
+
+<script src="libs/angularjs-1.5.8/angular.min.js"></script>
+<script src="libs/angularjs-1.5.8/angular-resource.min.js"></script>
+<script src="libs/angularjs-1.5.8/angular-route.min.js"></script>
+<script src="libs/angularjs-1.5.8/angular-sanitize.min.js"></script>
+<script src="libs/angularjs-1.5.8/angular-cookies.min.js"></script>
+<script src="libs/angularjs-1.5.8/angular-animate.min.js"></script>
+<script src="libs/angularjs-1.5.8/angular-touch.min.js"></script>
+
+<script src="libs/angular-busy.js"></script>
+<script src="libs/ui-bootstrap-tpls-2.1.3.min.js"></script>
 <script src="libs/ng-grid-2.0.14.js"></script>
 <script src="libs/ng-grid-flexible-height.js"></script>
-<script src="libs/angular-sanitize.js"></script>
-<script src="libs/select.min.js"></script>
-<script src="libs/angular.rangeSlider.js"></script>
+<script src="libs/select-0.19.4.min.js"></script>
+<script src="libs/angular.rangeSlider-0.14.js"></script>
+
 <script src="app.js"></script>
 <script src="controller/node.js"></script>
 <script src="controller/q.js"></script>
@@ -46,7 +52,7 @@
         </ul>
         
         <div ng-controller="AlertCtrl" ng-hide="!alert.data.userReadableMessage">
-            <alert type="danger" close="closeAlert()">
+            <div uib-alert ng-class="'alert-danger'" type="danger" close="closeAlert($index)">
                 <div class="dl-horizontal">
                     <dt>Error</dt>
                     <dd>{{alert.data.userReadableMessage}}</dd>
@@ -56,12 +62,12 @@
                     <dd>{{alert.data.errorCode}}</dd>
                 </div>
                 
-                <div class="dl-horizontal" collapse="! isCollapsed">
+                <div class="dl-horizontal" uib-collapse="!isCollapsed">
                     <dt></dt>
-                    <dd><button class="btn btn-default" ng-click="toggle()">Show advanced data</button></dd>
+                    <dd><button class="btn btn-default" ng-click="toggle()">Show advanced error data</button></dd>
                 </div>
                 
-                <div collapse="isCollapsed">
+                <div uib-collapse="isCollapsed">
                     <div class="dl-horizontal">
                         <dt>Detailed message</dt>
                         <dd>{{alert.data.developerMessage}}</dd>
@@ -71,7 +77,7 @@
                         <dd ng-bind-html="alert.data.stacktrace | j2h"/></dd>
                     </div>
                 </div>
-            </alert>
+            </div>
         </div>
         
         <div ng-view></div>

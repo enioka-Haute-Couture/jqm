@@ -3,7 +3,7 @@
         <span ng-click="isCollapsed = !isCollapsed"><span popover="Click to display help" popover-trigger="mouseenter" popover-placement="right" class="glyphicon glyphicon-question-sign"></span></span>
         <input type="text" ng-model="filterOptions.filterText" style="position:absolute; right: 5px;" />
     </h5>
-    <div collapse="!isCollapsed">
+    <div uib-collapse="!isCollapsed">
         <div class="well well-lg">
               <h4>Mappings specify which nodes will poll which queues. They are basically nodes subscribing to queues.</h4>
             <h5>On this page, one may associate nodes with queues. Running nodes will (by default) check every minute if there are changes in their mappings.</h5>

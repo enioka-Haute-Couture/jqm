@@ -2,7 +2,7 @@
 
 var jqmControllers = angular.module('jqmControllers', [ 'jqmConstants', 'jqmServices', 'ui.bootstrap' ]);
 
-jqmControllers.controller('µNodeListCtrl', function($scope, $http, $modal, µNodeDto)
+jqmControllers.controller('µNodeListCtrl', function($scope, $http, $uibModal, µNodeDto)
 {
     $scope.items = null;
     $scope.selected = [];
@@ -145,7 +145,7 @@ jqmControllers.controller('µNodeListCtrl', function($scope, $http, $modal, µNo
     
     $scope.showlog = function(nodeName)
     {
-        $modal.open({
+        $uibModal.open({
             templateUrl : './template/file_reader.html',
             controller : 'fileReader',
             size : 'lg',

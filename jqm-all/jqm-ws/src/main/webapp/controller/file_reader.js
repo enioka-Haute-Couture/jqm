@@ -2,7 +2,7 @@
 
 var jqmControllers = angular.module('jqmControllers');
 
-jqmControllers.controller('fileReader', function($scope, $http, $modalInstance, url)
+jqmControllers.controller('fileReader', function($scope, $http, $uibModalInstance, url)
 {
     $scope.url = url;
     $scope.data = null;
@@ -19,7 +19,7 @@ jqmControllers.controller('fileReader', function($scope, $http, $modalInstance, 
     
     $scope.getDataKo = function()
     {
-        $modalInstance.dismiss('cancel');
+    	$uibModalInstance.dismiss('cancel');
     };
 
     $scope.getData();
