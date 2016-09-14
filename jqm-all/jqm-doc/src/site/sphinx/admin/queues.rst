@@ -10,6 +10,10 @@ different parameters.
 By default, JQM creates one queue named "default" and every new node will poll that queue every ten seconds.
 This is obviously very limited - this chapter details how to create new queues and set nodes to poll it.
 
+Please read the :doc:`concepts overview<../archi>` chapter before dealing with this paragraph, as it 
+defines the underlying concepts and gives examples.
+
+
 Defining queues
 *****************
 
