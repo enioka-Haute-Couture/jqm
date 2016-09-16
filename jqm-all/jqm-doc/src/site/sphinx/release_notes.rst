@@ -1,6 +1,38 @@
 Release notes
 ######################
 
+
+1.3.7
+************
+
+Release goal
+++++++++++++++++++
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+All API changes are backward compatible: 1.2.x and 1.3.x APIs will work with 1.3.7 engines. 
+However, everyone is strongly encouraged to upgrade to the latest version.
+
+No database modification in this release - upgrade can be done by simply replacing 
+(which means removing them before copying the new files, and not simply overwriting them as some have been renamed) engine files.
+
+Major
++++++++++++++++++
+
+* Engine: fixed a regression precenting the engine to do its first time initialisation on MySQL
+* Tests: Oracle JDK8 is now part of our internal tests (in addition to existing tests on openjdk6, openjdk7, Oracle JDK7)
+
+
+Minor
+++++++++++++++++
+
+* Client API: Fixed a case when end date could be before start date for a job instance
+* Misc: jqm.sh should now work on MacOS. Note that MacOS should not be used as a production platform
+* Doc: some clarifications on architecture
+
 1.3.6
 ************
 
