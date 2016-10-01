@@ -33,11 +33,6 @@ html,body {
 	}
 }
 
-/* Hack for ng-grid which always displays horiz scrollbar when vert appears */
-.ngViewport.ng-scope {
-	overflow-x: hidden;
-}
-
 /* overloads for slider */
 .ngrs-range-slider {
 	margin-bottom: 3px;
@@ -47,4 +42,9 @@ html,body {
 	margin: 0px;
 	padding: 0px;
 	box-shadow: none;
+}
+
+/* grid styling */
+.ui-grid-header-cell {
+	background-color: rgb(240, 240, 238);
 }

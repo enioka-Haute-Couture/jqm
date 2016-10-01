@@ -144,7 +144,7 @@ jqmControllers.filter('getByProperty', function()
         var i = 0, len = collection.length;
         for (; i < len; i++)
         {
-            if (collection[i][propertyName] == +propertyValue)
+            if (collection[i][propertyName] === +propertyValue)
             {
                 return collection[i];
             }

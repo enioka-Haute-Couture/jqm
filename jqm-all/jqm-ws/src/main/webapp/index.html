@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>JQM administration</title>
 <link rel="stylesheet" href="css/bootstrap-3.3.7.min.css">
-<link rel="stylesheet" href="css/ng-grid.css">
+<link rel="stylesheet" href="css/ui-grid-3.2.6.min.css">
 <link rel="stylesheet" href="css/select-0.19.4.min.css">
 <link rel="stylesheet" href="css/angular.rangeSlider-0.14.css">
 <link rel="stylesheet" href="css/app.css">
@@ -22,11 +22,11 @@
 
 <script src="libs/angular-busy.js"></script>
 <script src="libs/ui-bootstrap-tpls-2.1.3.min.js"></script>
-<script src="libs/ng-grid-2.0.14.js"></script>
-<script src="libs/ng-grid-flexible-height.js"></script>
+<script src="libs/ui-grid-3.2.6.min.js"></script>
 <script src="libs/select-0.19.4.min.js"></script>
 <script src="libs/angular.rangeSlider-0.14.js"></script>
 
+<script src="common.js"></script>
 <script src="app.js"></script>
 <script src="controller/node.js"></script>
 <script src="controller/q.js"></script>
@@ -43,7 +43,7 @@
 </head>
 
 <body>
-  <div class="container-fluid" style="padding: 3px;">
+  <div class="container-fluid" style="padding: 3px; height: 100%;">
         <ul class="nav nav-tabs" role="tablist" ng-controller="TabsCtrl">
             <li ng-repeat="tab in tabs" ng-class="tabClass(tab)" jqm-permission="{{tab.permission}}">
               <a href="{{tab.link}}" ng-click="setSelectedTab(tab)"><div ng-bind-html="tab.label"></div></a>
@@ -80,7 +80,7 @@
             </div>
         </div>
         
-        <div ng-view></div>
+        <div ng-view style="height: calc(100% - 50px);"></div>
         <login-dialog></login-dialog>    
   </div>
 </body>
