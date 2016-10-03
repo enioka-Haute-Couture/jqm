@@ -3,7 +3,7 @@
 
     <h5>
         <span ng-click="isCollapsed = !isCollapsed"><span popover="Click to display help" popover-trigger="mouseenter" popover-placement="right" class="glyphicon glyphicon-question-sign"></span></span>
-        <input type="text" ng-model="filterOptions.filterText" style="position:absolute; right: 5px;" />
+        <input type="text" ng-model="filterValue" ng-change="gridApi.grid.refresh()" style="position:absolute; right: 5px;" />
     </h5>
 
     <div uib-collapse="!isCollapsed">
@@ -56,7 +56,7 @@
         </div>
     </div>
 
-    <div class='gridClass' ng-grid='gridOptions' style='width: 100%;'></div>
+    <div ui-grid='gridOptions' ui-grid-edit ui-grid-selection ui-grid-cellNav ui-grid-resize-columns ui-grid-auto-resize style='height: 100%;'></div>
     <br/>
     <button class="btn btn-default" ng-click="refresh()"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
     <button class="btn btn-default" ng-click="stop()" jqm-permission="node:create" ng-disabled="selected.length === 0"><span class="glyphicon glyphicon-minus-sign"></span> Send stop order</button>
