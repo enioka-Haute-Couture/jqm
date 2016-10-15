@@ -3,7 +3,7 @@
 var jqmControllers = angular.module('jqmControllers');
 
 jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOracle, jndiFile, jndiUrl, jndiPs, jndiHsqlDb, jndiMySql, jndiMqQcf, jndiMqQ, jndiAmqQcf, jndiAmqQ,
-        jndiGeneric, jndiOtherDb, jndiString, jndiMail)
+        jndiGeneric, jndiOtherDb, jndiString, jndiMail, jqmCellTemplateBoolean, jqmCellEditorTemplateBoolean, uiGridEditConstants, $interval)
 {
     $scope.resources = null;
     $scope.selected = [];
@@ -84,7 +84,12 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
     {
         var r = {};
         angular.copy(template, r);
-        $scope.resources.push(new µJndiDto(r));
+        var tmp = new µJndiDto(r);
+        $scope.resources.push(tmp);
+        $scope.gridApi.selection.selectRow(tmp);
+        $interval(function() {
+            $scope.gridApi.cellNav.scrollToFocus(tmp, $scope.gridOptions.columnDefs[0]);
+        }, 0, 1);
     };
 
     $scope.save = function()
@@ -94,7 +99,6 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
 
     $scope.savealias = function()
     {
-        console.debug($scope.selected[0]);
         µJndiDto.save({}, $scope.selected[0], $scope.refresh);
     };
 
@@ -109,14 +113,12 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
         var q = $scope.selected[0];
         $scope.resources.splice($scope.resources.indexOf(q), 1);
         $scope.selected.splice($scope.resources.indexOf(q), 1);
-        // $scope.selected2 = [];
-
+        $scope.selected2.length = 0;
     };
 
     $scope.removeprms = function()
     {
         var prm = null;
-        console.debug('eee');
         for (var i = 0; i < $scope.selected2.length; i++)
         {
             prm = $scope.selected2[i];
@@ -131,18 +133,39 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
             'value' : 'value'
         });
     };
-
+    
     $scope.gridOptions = {
-        data : 'resources',
-        enableCellSelection : true,
-        enableRowSelection : true,
-        enableCellEditOnFocus : true,
-        multiSelect : false,
-        showSelectionCheckbox : false,
-        selectWithCheckboxOnly : false,
-        selectedItems : $scope.selected,
-        showGroupPanel : true,
-        plugins :  [new ngGridFlexibleHeightPlugin({yMargin: 200})],
+		data: 'resources',
+		
+		// TODO: re-enable grouping when stable in uigrid library.
+		enableSelectAll : false,
+		enableRowSelection : true,
+		enableRowHeaderSelection : false,
+		enableFullRowSelection : true,
+		enableFooterTotalSelected : false,
+		multiSelect : false,
+		enableSelectionBatchEvent: false,
+		noUnselect: true,
+
+		onRegisterApi : function(gridApi) {
+			$scope.gridApi = gridApi;
+			gridApi.selection.on.rowSelectionChanged($scope, function(rows) {
+				$scope.selected = gridApi.selection.getSelectedRows();
+			});
+			
+			gridApi.cellNav.on.navigate($scope,function(newRowCol, oldRowCol){
+	              if (newRowCol !== oldRowCol)
+            	  {
+	            	  gridApi.selection.selectRow(newRowCol.row.entity); //$scope.gridOptions.data[0]); // $scope.resources[0]
+            	  }
+            });
+		},
+
+		enableColumnMenus : false,
+		enableCellEditOnFocus : true,
+		virtualizationThreshold : 20,
+		enableHorizontalScrollbar : 0,
+
         columnDefs : [ {
             field : 'name',
             displayName : 'JNDI alias',
@@ -160,21 +183,33 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
             field : 'singleton',
             displayName : 'S',
             width : 50,
-            cellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><span class="glyphicon {{ row.entity[col.field] ? \'glyphicon-ok\' : \'glyphicon-remove\' }}"></span></div>',
-            editableCellTemplate : '<div class="ngSelectionCell" ng-class="col.colIndex()"><input type="checkbox" ng-input="COL_FIELD" ng-model="COL_FIELD"/></div>',
+            cellTemplate : jqmCellTemplateBoolean,
+			editableCellTemplate : jqmCellEditorTemplateBoolean,
         }, ]
     };
 
     $scope.gridOptions2 = {
-        data : 'selected[0].parameters',
-        enableCellSelection : true,
-        enableRowSelection : true,
-        enableCellEditOnFocus : true,
-        multiSelect : true,
-        showSelectionCheckbox : true,
-        selectWithCheckboxOnly : true,
-        selectedItems : $scope.selected2,
-        plugins :  [new ngGridFlexibleHeightPlugin({yMargin: 150})],
+		data : 'selected[0].parameters',
+		
+		enableSelectAll : false,
+		enableRowSelection : true,
+		enableRowHeaderSelection : true,
+		enableFullRowSelection : false,
+		enableFooterTotalSelected : false,
+		multiSelect : true,
+
+		onRegisterApi : function(gridApi) {
+			$scope.gridApi2 = gridApi;
+			gridApi.selection.on.rowSelectionChanged($scope, function(rows) {
+				$scope.selected2 = gridApi.selection.getSelectedRows();
+			});
+		},
+
+		enableColumnMenus : false,
+		enableCellEditOnFocus : true,
+		virtualizationThreshold : 20,
+		enableHorizontalScrollbar : 0,
+		
         columnDefs : [ {
             field : 'key',
             displayName : 'Resource parameter',
