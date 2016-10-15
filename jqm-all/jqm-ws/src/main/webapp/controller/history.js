@@ -10,7 +10,7 @@ jqmControllers.filter('epoch2date', function()
 	};
 });
 
-jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µQueueDto)
+jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µQueueDto, epoch2dateFilter)
 {
     $scope.data = null;
     $scope.selected = [];
@@ -35,8 +35,9 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
 
     $scope.getDataOk = function(data, status, headers, config)
     {
+    	console.debug(data);
         $scope.data = data.instances;
-        $scope.totalServerItems = data.resultSize;
+        $scope.gridOptions.totalItems = data.resultSize;
         
         // Reset the time slider to avoid time drift.
         if ($scope.now < (new Date()).getTime() -30000)
@@ -84,25 +85,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
         }
 
         // Sort options
-        $scope.query.sortby = [];
-        var sl = $scope.sortInfo.columns.length;
-        for ( var i = 0; i < sl; i++)
-        {
-            var col = $scope.sortInfo.columns[i];
-            var way = ($scope.sortInfo.directions[i] === "desc" ? "DESCENDING" : "ASCENDING");
-            if (col.colDef.sortField)
-            {
-                col = col.colDef.sortField;
-            }
-            else
-            {
-                col = col.field.toUpperCase();
-            }
-            $scope.query.sortby.push({
-                col : col,
-                order : way
-            });
-        }
+        $scope.query.sortby = $scope.sortInfo;        
         
         // Time filters
         if ($scope.datemax !== $scope.daterangemax)
@@ -115,6 +98,9 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
     	}
         $scope.query.enqueuedAfter = new Date($scope.datemin);
         
+        delete $scope.query.enqueuedBefore;
+        delete $scope.query.enqueuedAfter;
+        
         // Lists
         if ($scope.query.applicationName && $scope.query.applicationName.indexOf(',') > -1)
     	{
@@ -125,49 +111,77 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
         $http.post("ws/client/ji/query", $scope.query).success($scope.getDataOk);
     };
 
-    $scope.filterOptions = {
-        filterText : "",
-        useExternalFilter : true
-    };
-
     $scope.pagingOptions = {
-        pageSizes : [ 10, 15, 20, 30, 40, 50, 100 ],
         pageSize : 15,
         currentPage : 1
     };
 
-    $scope.sortInfo = {
-        fields : [ 'id', ],
-        directions : [ 'desc' ],
-        columns : [],
-    };
+    $scope.sortInfo = [
+    	{
+    		col: 'ID',
+    		order: 'DESCENDING'
+    	}
+    ];
 
     $scope.gridOptions = {
-        data : 'data',
-        enableCellSelection : false,
-        enableRowSelection : true,
-        enableCellEditOnFocus : false,
-        multiSelect : false,
-        selectedItems : $scope.selected,
+		data : 'data',
+		enableSelectAll : false,
+		enableRowSelection : true,
+		enableRowHeaderSelection : false,
+		enableFullRowSelection : true,
+		enableFooterTotalSelected : false,
+		multiSelect : false,
+		enableSelectionBatchEvent: false,
+		noUnselect: true,
 
-        filterOptions : $scope.filterOptions,
-        pagingOptions : $scope.pagingOptions,
-        sortInfo : $scope.sortInfo,
-        useExternalSorting : true,
-        enablePaging : true,
-        showFooter : true,
-        enableColumnResize : true,
-        totalServerItems : 'totalServerItems',
-        plugins :  [new ngGridFlexibleHeightPlugin({yMargin: 220})],
-        rowTemplate: "<div ng-dblclick='showDetail(row)' ng-style='{\"cursor\": row.cursor, \"z-index\": col.zIndex() }' ng-repeat='col in renderedColumns' ng-class='col.colIndex()' class='ngCell {{col.cellClass}}' ng-cell></div>",
+		onRegisterApi : function(gridApi) {
+			$scope.gridApi = gridApi;
+			gridApi.selection.on.rowSelectionChanged($scope, function(rows) {
+				$scope.selected = gridApi.selection.getSelectedRows();
+			});
+			
+			gridApi.core.on.sortChanged($scope, function(grid, sortColumns) {
+				console.debug(sortColumns);
+				$scope.sortInfo.length = 0;
+				
+				$.each(sortColumns, function() {
+					$scope.sortInfo.push({col: this.colDef.sortField, order: this.sort.direction === "desc" ? "DESCENDING" : "ASCENDING"});
+				});
+						        
+		        $scope.getDataAsync();
+	      });
+			
+	      gridApi.pagination.on.paginationChanged($scope, function (newPage, pageSize) {
+	    	  $scope.pagingOptions.currentPage= newPage;
+	    	  $scope.pagingOptions.pageSize = pageSize;
+	        $scope.getDataAsync();
+	      });
+		},
+
+		enableColumnMenus : false,
+		enableCellEditOnFocus : false,
+		virtualizationThreshold : 20,
+		enableHorizontalScrollbar : 0,
+		showFooter : true,
+		
+		paginationPageSizes: [ 10, 15, 20, 30, 40, 50, 100 ],
+		paginationPageSize: 20,		
+		useExternalPagination: true,
+	    useExternalSorting: true,
+		
+        //rowTemplate: "<div ng-dblclick='showDetail(row)' ng-style='{\"cursor\": row.cursor, \"z-index\": col.zIndex() }' ng-repeat='col in renderedColumns' ng-class='col.colIndex()' class='ngCell {{col.cellClass}}' ng-cell></div>",
+        
         columnDefs : [ {
             field : 'id',
             displayName : 'ID',
             width : '*',
+            sortField: 'ID',
+            sort: {direction: "desc"},
         }, {
             field : 'applicationName',
             displayName : 'Application',
             width : '***',
+            sortField : 'APPLICATIONNAME',
         }, {
             field : 'queueName',
             displayName : 'Queue',
@@ -178,11 +192,11 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
             displayName : 'Status',
             width : '*',
             sortField : 'STATUS',
-            cellTemplate: '<div ng-class="{\'bg-success\': row.getProperty(col.field) == \'ENDED\', \
-                                           \'bg-info\': row.getProperty(col.field) == \'RUNNING\', \
-                                           \'bg-danger\': row.getProperty(col.field) == \'CRASHED\' || row.getProperty(col.field) == \'KILLED\' || row.getProperty(col.field) == \'CANCELLED\',\
-                                           \'bg-warning\': row.getProperty(col.field) == \'SUBMITTED\' }"> \
-                                           <div class="ngCellText">{{row.getProperty(col.field)}}</div></div>',
+            cellTemplate: '<div ng-class="{\'bg-success\': row.entity[col.field] == \'ENDED\', \
+                                           \'bg-info\': row.entity[col.field] == \'RUNNING\', \
+                                           \'bg-danger\': row.entity[col.field] == \'CRASHED\' || row.entity[col.field] == \'KILLED\' || row.entity[col.field] == \'CANCELLED\',\
+                                           \'bg-warning\': row.entity[col.field] == \'SUBMITTED\' }"> \
+                                           <div class="ngCellText">{{row.entity[col.field]}}</div></div>',
         }, {
             field : 'enqueueDate',
             displayName : 'Enqueued',

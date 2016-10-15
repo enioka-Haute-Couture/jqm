@@ -1,6 +1,6 @@
 'use strict';
 
-var jqmApp = angular.module('jqmApp', [ 'ngRoute', 'ngCookies', 'jqmControllers', 'ui.grid', 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.cellNav', 'ui.grid.resizeColumns' , 'ui.grid.autoResize', 'jqmServices', 'ui.bootstrap', 'ngSanitize', 'ui.select',
+var jqmApp = angular.module('jqmApp', [ 'ngRoute', 'ngCookies', 'jqmControllers', 'ui.grid', 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.cellNav', 'ui.grid.resizeColumns' , 'ui.grid.autoResize', 'ui.grid.pagination', 'jqmServices', 'ui.bootstrap', 'ngSanitize', 'ui.select',
         'ngBusy', 'ui-rangeSlider' ]);
 
 jqmApp.config([ '$routeProvider', function($routeProvider, µPermManager)
