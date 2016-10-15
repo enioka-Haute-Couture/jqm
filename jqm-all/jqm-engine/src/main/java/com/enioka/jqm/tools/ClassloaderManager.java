@@ -132,7 +132,7 @@ class ClassloaderManager
         else
         {
             // Standard case: all launches are independent. We create a transient CL.
-            jqmlogger.info("Using an isolated CL");
+            jqmlogger.debug("Using an isolated transient CL");
             jobClassLoader = new JarClassLoader(parent);
         }
 

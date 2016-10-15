@@ -123,7 +123,7 @@ The node created in the previous step has serious drawbacks:
 * General low performances and persistence issues inherent to HSQLDB
 
 Just edit JQM_ROOT/conf/resources.xml file to reference your own database and delete or comment JQM_ROOT/conf/db.properties.
-It contains by default sample configuration for Oracle, PostgreSQL, HSQLDB and MySQL which are the three supported databases. (HSQLDB is not supported
+It contains by default sample configuration for Oracle, PostgreSQL, HSQLDB and MySQL which are the four supported databases. (HSQLDB is not supported
 in production environments)
 
 .. note:: the database is intended to be shared by all JQM nodes - you should not create a schema/database per node.
@@ -186,17 +186,6 @@ MySQL
 ------------------
 
 MySQL 5.6+ is supported with InnoDB (the default). No specific configuration is required in JQM: no options inside jqm.properties (or absent file).
-
-With InnoDB, a `startup script <http://dev.mysql.com/doc/refman/5.6/en/server-options.html#option_mysqld_init-file>`_ 
-must be used to reset an auto-increment inside the database (InnoDB behaviour messes up with
-JQM handling of keys, as it resets increment seeds with MAX(ID) on each startup even on empty tables). 
-The idea is to initialize the auto increment for the JobInstance table at the same level as for the History table.
-An example of script is (adapt the db name & path)::
-
-	select concat('ALTER TABLE jqm.JobInstance AUTO_INCREMENT = ',max(ID)+1,';') as alter_stmt into outfile '/tmp/alter_JI_auto_increment.sql' from jqm.History;
-	\. /tmp/alter_JI_auto_increment.sql
-	\! rm -f /tmp/alter_JI_auto_increment.sql
-
     
 These commands can be used to setup a database.::
 
@@ -205,7 +194,8 @@ These commands can be used to setup a database.::
     mysql> grant all privileges on jqm.* to jqm@'%' identified by 'jqm';
     mysql> flush privileges;
 
-
+.. note:: before version 1.4, a startup script was needed to align sequences between tables on database startup. This is no longer needed and if present, this script should be removed.
+    
 HSQLDB
 ------------------
 

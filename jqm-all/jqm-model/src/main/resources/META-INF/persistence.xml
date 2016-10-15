@@ -31,6 +31,7 @@
 			<property name="javax.persistence.validation.mode" value="NONE" />
 			<property name="javax.persistence.lock.timeout" value="10000" />
 			<property name="hibernate.pool_size" value="0" />
+			<property name="hibernate.id.new_generator_mappings" value="true" />
 		</properties>
 	</persistence-unit>
 </persistence>

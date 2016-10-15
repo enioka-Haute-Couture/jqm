@@ -42,7 +42,7 @@ public class App extends JobBase
 
         if (this.getParameters().size() == 0)
         {
-            log.info("Queuing again - with parameter and through he old API");
+            log.info("Queuing again - with parameter and through the full API");
             JobRequest jd = new JobRequest("jqm-test-em", "marsu");
             jd.addParameter("stop", "1");
             JqmClientFactory.getClient().enqueue(jd);

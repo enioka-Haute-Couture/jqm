@@ -93,11 +93,6 @@ final class HibernateClient implements JqmClient
     // /////////////////////////////////////////////////////////////////////
 
     // No public constructor. MUST use factory.
-    HibernateClient()
-    {
-        p = new Properties();
-    }
-
     HibernateClient(Properties p)
     {
         this.p = p;

@@ -39,7 +39,7 @@ querying the state of a request, retrieving files created by a job instance, ...
 
 It is also of note that JQM was created with compatibility in mind:
 
-* uses either PostgreSQL, Oracle or HSQLDB (also works with MySQL with a documented quirk)
+* uses either PostgreSQL, Oracle, MySQL or HSQLDB
 * the client API is usable in all application servers and JSE code (tested with WebsSphere 8.x, Glassfish 3.x, Tomcat 7.x)
 * one of the client API implementations is a REST-like API, callable from everywhere, not only Java but also .NET or shell scripts
   (which by the way allows very easy scheduler integration).
