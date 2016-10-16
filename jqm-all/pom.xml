@@ -73,7 +73,7 @@
 		<jersey-version>2.6</jersey-version>
 		<jetty.version>8.1.19.v20160209</jetty.version>
 		<slf4j.version>1.7.19</slf4j.version>
-		<shiro.version>1.2.4</shiro.version>
+		<shiro.version>1.3.2</shiro.version>
 		<surefire.version>2.19.1</surefire.version>
 		<javadoc.version>2.10.3</javadoc.version>
 		<httpclient.version>4.5.2</httpclient.version>
