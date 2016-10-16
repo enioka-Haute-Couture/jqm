@@ -527,7 +527,7 @@ final class Helpers
                 "logs:read", "files:read");
 
         // Users
-        createUserIfMissing(em, "root", "all powerfull user", adminr);
+        createUserIfMissing(em, "root", "all powerful user", adminr);
 
         // Mail session
         i = (Long) em.createQuery("SELECT COUNT(r) FROM JndiObjectResource r WHERE r.name = :nn").setParameter("nn", "mail/default")

@@ -365,11 +365,9 @@ public class Main
         {
             em = Helpers.getNewEm();
             em.getTransaction().begin();
-            RRole r = Helpers.createRoleIfMissing(em, "config admin",
-                    "can read and write all configuration, except security configuration", "node:*", "queue:*", "qmapping:*", "jndi:*",
-                    "prm:*", "jd:*");
+            RRole r = Helpers.createRoleIfMissing(em, "administrator", "all permissions without exception", "*:*");
 
-            RUser u = Helpers.createUserIfMissing(em, "root", "all powerfull user", r);
+            RUser u = Helpers.createUserIfMissing(em, "root", "all powerful user", r);
             u.setPassword(password);
             Helpers.encodePassword(u);
 
