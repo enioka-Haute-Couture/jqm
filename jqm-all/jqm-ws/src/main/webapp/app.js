@@ -403,6 +403,7 @@ jqmApp.directive('jqmPermission', function(µPermManager)
     return {
         restrict : 'A',
         replace : false,
+        //priority: 11,
         scope : {
             jqmPermission : "@",
         },
@@ -463,7 +464,7 @@ jqmApp.directive('jqmPermission', function(µPermManager)
                 else
                 {
                     element.show();
-                    element.prop('disabled', false);
+                    //element.prop('disabled', false);
                 }
             };
 

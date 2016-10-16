@@ -1,6 +1,7 @@
+<div class="container-fluid" style="height: 100%; padding-left: 0px; padding-right: 0px;">
     <div class="row">
         <div class="col-sm-12">
-            <div class="panel panel-default">
+            <div class="panel panel-default" style="margin-top: 5px;">
                 <div class="panel-body" style="padding: 8px;">
 
                     <div class='row'>
@@ -39,19 +40,23 @@
                             <select ng-cell-input ng-model="query.queueId" placeholder="parent id"
                                 ng-options="q.id as q.name for q in queues" ng-change="getDataAsync();" popover="filter by queue"
                                 popover-trigger="mouseenter"></select>
-                            <div style="display: inline;">
+                            <div ng-show='filterDate' style="display: inline;">
                                 From <span>{{datemin | epoch2date | date:'dd/MM HH:mm'}}</span> to <span
                                     ng-show="datemax!==daterangemax">{{datemax | epoch2date | date:'dd/MM HH:mm'}}</span> <span
                                     ng-show="datemax===daterangemax">now</span>
                             </div>
-                            <button class="btn btn-default" ng-click="query = {}; getDataAsync();"
+                            <button ng-show='!filterDate' class="btn btn-default" ng-click="filterDate=!filterDate;"
+                                popover="displays the dat filters" popover-trigger="mouseenter">
+                                <span class="glyphicon glyphicon-time"></span> Show time filters
+                            </button>
+                            <button class="btn btn-default" ng-click="filterDate = false; query = {}; getDataAsync();"
                                 popover="reset all filters to default" popover-trigger="mouseenter">
                                 <span class="glyphicon glyphicon-ban-circle"></span> Reset
                             </button>
                         </div>
                     </div>
 
-                    <div class='row' style="padding-top: 2px;">
+                    <div ng-show='filterDate' class='row' style="padding-top: 2px;">
                         <div class=col-sm-3>
                             Full time slider bar is last
                             <div class="btn-group ">
@@ -117,3 +122,4 @@
             </button>
         </div>
     </div>
+</div>

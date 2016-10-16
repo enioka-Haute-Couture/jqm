@@ -17,6 +17,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
     $scope.query = {};
     $scope.queues = µQueueDto.query();
     $scope.target = "hist";
+    $scope.filterDate = false;
     
     // Default range is three hours from now
     $scope.now = (new Date()).getTime();
@@ -35,7 +36,6 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
 
     $scope.getDataOk = function(data, status, headers, config)
     {
-    	console.debug(data);
         $scope.data = data.instances;
         $scope.gridOptions.totalItems = data.resultSize;
         
@@ -88,18 +88,20 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
         $scope.query.sortby = $scope.sortInfo;        
         
         // Time filters
-        if ($scope.datemax !== $scope.daterangemax)
-    	{
-        	$scope.query.enqueuedBefore = new Date($scope.datemax);
-    	}
-        else
-    	{
-        	delete $scope.query.enqueuedBefore;
-    	}
-        $scope.query.enqueuedAfter = new Date($scope.datemin);
-        
         delete $scope.query.enqueuedBefore;
         delete $scope.query.enqueuedAfter;
+        if ($scope.filterDate)
+    	{
+	        if ($scope.datemax !== $scope.daterangemax)
+	    	{
+	        	$scope.query.enqueuedBefore = new Date($scope.datemax);
+	    	}
+	        else
+	    	{
+	        	delete $scope.query.enqueuedBefore;
+	    	}
+	        $scope.query.enqueuedAfter = new Date($scope.datemin);
+    	}        
         
         // Lists
         if ($scope.query.applicationName && $scope.query.applicationName.indexOf(',') > -1)
@@ -141,9 +143,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
 			});
 			
 			gridApi.core.on.sortChanged($scope, function(grid, sortColumns) {
-				console.debug(sortColumns);
 				$scope.sortInfo.length = 0;
-				
 				$.each(sortColumns, function() {
 					$scope.sortInfo.push({col: this.colDef.sortField, order: this.sort.direction === "desc" ? "DESCENDING" : "ASCENDING"});
 				});
@@ -169,8 +169,8 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
 		useExternalPagination: true,
 	    useExternalSorting: true,
 		
-        //rowTemplate: "<div ng-dblclick='showDetail(row)' ng-style='{\"cursor\": row.cursor, \"z-index\": col.zIndex() }' ng-repeat='col in renderedColumns' ng-class='col.colIndex()' class='ngCell {{col.cellClass}}' ng-cell></div>",
-        
+        rowTemplate: '<div ng-dblclick="grid.appScope.showDetail(row)" ng-repeat="(colRenderIndex, col) in colContainer.renderedColumns track by col.uid" ui-grid-one-bind-id-grid="rowRenderIndex + \'-\' + col.uid + \'-cell\'" class="ui-grid-cell" ng-class="{ \'ui-grid-row-header-cell\': col.isRowHeader }" role="{{col.isRowHeader ? \'rowheader\' : \'gridcell\'}}" ui-grid-cell> </div>',
+	    
         columnDefs : [ {
             field : 'id',
             displayName : 'ID',
@@ -196,7 +196,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
                                            \'bg-info\': row.entity[col.field] == \'RUNNING\', \
                                            \'bg-danger\': row.entity[col.field] == \'CRASHED\' || row.entity[col.field] == \'KILLED\' || row.entity[col.field] == \'CANCELLED\',\
                                            \'bg-warning\': row.entity[col.field] == \'SUBMITTED\' }"> \
-                                           <div class="ngCellText">{{row.entity[col.field]}}</div></div>',
+                                           <div class="ui-grid-cell-contents">{{row.entity[col.field]}}</div></div>',
         }, {
             field : 'enqueueDate',
             displayName : 'Enqueued',
@@ -238,14 +238,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
         }, ]
     };
 
-    // Option modif => query again
-    $scope.$watch('[pagingOptions,sortInfo]', function (newVal, oldVal)
-    {
-        if (newVal !== oldVal)
-        {
-            $scope.getDataAsync();
-        }
-    }, true); 
+
     function scale(s)
     {
     	$scope.daterangemin = $scope.now - s;
@@ -262,7 +255,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
 	{
     	scale(newVal);
 	});
-    $scope.$watch('[target, ko, running, filterOptions,]', function(newVal, oldVal)
+    $scope.$watch('[target, ko, running, filterOptions, filterDate]', function(newVal, oldVal)
     {
         if (newVal !== oldVal)
         {
@@ -276,7 +269,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
         // Different watch - this one is debounced manually, as the slider does not support ng-model-options
         setTimeout(function()
 		{
-        	if (newVal === $scope.datemin)
+        	if (newVal === $scope.datemin && $scope.filterDate)
     		{
         		// Has not changed in the past xx milliseconds => do the query.
         		$scope.selected.length = 0;
@@ -290,7 +283,7 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
         // Different watch - this one is debounced manually, as the slider does not support ng-model-options
         setTimeout(function()
 		{
-        	if (newVal === $scope.datemax)
+        	if (newVal === $scope.datemax && $scope.filterDate)
     		{
         		// Has not changed in the past xx milliseconds => do the query.
         		$scope.selected.length = 0;
@@ -367,6 +360,8 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
         $http.delete("ws/client/ji/paused/" + ji.id).success($scope.getDataAsync);
         $scope.selected.length = 0;
     };
+    
+    $scope.getDataAsync();
 });
 
 jqmApp.controller('historyDetail', function($scope, $http, $uibModal, ji)
