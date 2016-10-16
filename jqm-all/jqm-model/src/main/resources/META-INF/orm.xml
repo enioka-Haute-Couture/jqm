@@ -21,7 +21,7 @@
 	
 	<named-query name="HibApi.updateJiWithDbTime">
 		<query>
-			UPDATE JobInstance ji SET ji.creationDate = CURRENT_TIMESTAMP WHERE ji.id=:i
+			UPDATE JobInstance ji SET ji.creationDate = CURRENT_TIMESTAMP, ji.internalPosition = ji.id WHERE ji.id=:i
 		</query>
 	</named-query>
 
