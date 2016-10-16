@@ -320,16 +320,16 @@ final class HibernateClient implements JqmClient
                 ji.setParentId(jd.getParentID());
             }
             em.persist(ji);
-            ji.setInternalPosition(ji.getId());
+
+            // There is sadly no portable and easy way to get DB time before insert... so we update afterwards.
+            // Also updates the internal queue position marker (done in update and not setter to avoid full stupid JPA update).
+            em.createNamedQuery("HibApi.updateJiWithDbTime").setParameter("i", ji.getId()).executeUpdate();
 
             for (RuntimeParameter jp : jps)
             {
                 jqmlogger.trace("Parameter: " + jp.getKey() + " - " + jp.getValue());
                 em.persist(ji.addParameter(jp.getKey(), jp.getValue()));
             }
-
-            // There is sadly no portable and easy way to get DB time before insert... so we update afterwards.
-            em.createNamedQuery("HibApi.updateJiWithDbTime").setParameter("i", ji.getId()).executeUpdate();
 
             jqmlogger.trace("JI just created: " + ji.getId());
             em.getTransaction().commit();
