@@ -452,14 +452,15 @@ jqmApp.directive('jqmPermission', function(µPermManager)
             {
                 if (!shouldDisplay())
                 {
-                    if (element.prop("tagName") === "BUTTON")
+                	element.hide();
+                    /*if (element.prop("tagName") === "BUTTON")
                     {
                         element.prop('disabled', true);
                     }
                     else
                     {
                         element.hide();
-                    }
+                    }*/
                 }
                 else
                 {

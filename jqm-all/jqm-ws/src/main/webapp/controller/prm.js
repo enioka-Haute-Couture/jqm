@@ -2,7 +2,7 @@
 
 var jqmControllers = angular.module('jqmControllers');
 
-jqmControllers.controller('µPrmListCtrl', function($scope, $http, µPrmDto)
+jqmControllers.controller('µPrmListCtrl', function($scope, $http, µPrmDto, $interval)
 {
     $scope.prms = null;
     $scope.selected = [];
@@ -14,7 +14,10 @@ jqmControllers.controller('µPrmListCtrl', function($scope, $http, µPrmDto)
             value : 'enter value',
         });
         $scope.prms.push(t);
-        $scope.selected.push(t);
+        $scope.gridApi.selection.selectRow(t);
+        $interval(function() {
+            $scope.gridApi.cellNav.scrollToFocus(t, $scope.gridOptions.columnDefs[0]);
+        }, 0, 1);
     };
 
     $scope.save = function()
@@ -47,19 +50,42 @@ jqmControllers.controller('µPrmListCtrl', function($scope, $http, µPrmDto)
 
     $scope.gridOptions = {
         data : 'prms',
-        enableCellSelection : true,
-        enableRowSelection : true,
-        enableCellEditOnFocus : true,
-        multiSelect : true,
-        showSelectionCheckbox : true,
-        selectWithCheckboxOnly : true,
-        selectedItems : $scope.selected,
-        filterOptions : $scope.filterOptions,
-        plugins : [ new ngGridFlexibleHeightPlugin() ],
-        columnDefs : [ {
+        
+        enableSelectAll : false,
+		enableRowSelection : true,
+		enableRowHeaderSelection : false,
+		enableFullRowSelection : true,
+		enableFooterTotalSelected : false,
+		multiSelect : false,
+		enableSelectionBatchEvent: false,
+		noUnselect: true,
+		
+		enableColumnMenus : false,
+		enableCellEditOnFocus : true,
+		virtualizationThreshold : 20,
+		enableHorizontalScrollbar : 0,
+		
+		onRegisterApi : function(gridApi) {
+			$scope.gridApi = gridApi;
+			gridApi.selection.on.rowSelectionChanged($scope, function(rows) {
+				$scope.selected = gridApi.selection.getSelectedRows();
+			});
+			
+			gridApi.cellNav.on.navigate($scope,function(newRowCol, oldRowCol){
+				if (newRowCol !== oldRowCol)
+				{
+					gridApi.selection.selectRow(newRowCol.row.entity);
+				}
+            });
+			
+			gridApi.grid.registerRowsProcessor(createGlobalFilter($scope, [ 'key', 'value', ]), 200);
+		},
+
+		columnDefs : [ {
             field : 'key',
             displayName : 'Name',
             width : '30%',
+            sort: {direction: "asc"},
         }, {
             field : 'value',
             displayName : 'Value',
