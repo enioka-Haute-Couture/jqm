@@ -430,7 +430,13 @@ final class Helpers
             n = new Node();
             n.setDlRepo(System.getProperty("user.dir") + "/outputfiles/");
             n.setName(nodeName);
-            n.setPort(0);
+
+            Integer wsPortFromProperties = getWsPortFromProperties();
+            if(wsPortFromProperties != null){
+                n.setPort(wsPortFromProperties);
+            } else {
+                n.setPort(0);
+            }
             n.setRepo(System.getProperty("user.dir") + "/jobs/");
             n.setTmpDirectory(System.getProperty("user.dir") + "/tmp/");
             n.setRootLogLevel("INFO");
@@ -843,5 +849,10 @@ final class Helpers
                         && e.getCause().getCause().getCause() instanceof SQLTransientException)
                 || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() != null
                         && e.getCause().getCause().getCause().getCause() instanceof SQLTransientException);
+    }
+
+    static Integer getWsPortFromProperties()
+    {
+        return Integer.getInteger(props.getProperty("jqm.ws.port"));
     }
 }
