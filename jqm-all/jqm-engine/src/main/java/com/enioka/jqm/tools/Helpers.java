@@ -853,6 +853,6 @@ final class Helpers
 
     static Integer getWsPortFromProperties()
     {
-        return Integer.getInteger(props.getProperty("jqm.ws.port"));
+        return Integer.parseInt(props.getProperty("jqm.ws.port"));
     }
 }
