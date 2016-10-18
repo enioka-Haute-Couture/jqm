@@ -432,9 +432,12 @@ final class Helpers
             n.setName(nodeName);
 
             Integer wsPortFromProperties = getWsPortFromProperties();
-            if(wsPortFromProperties != null){
+            if(wsPortFromProperties != null)
+            {
                 n.setPort(wsPortFromProperties);
-            } else {
+            }
+            else
+            {
                 n.setPort(0);
             }
             n.setRepo(System.getProperty("user.dir") + "/jobs/");
@@ -461,6 +464,25 @@ final class Helpers
             em.persist(dp);
 
             em.getTransaction().commit();
+        }
+    }
+
+    static Integer getWsPortFromProperties()
+    {
+        String portProperty = props.getProperty("jqm.ws.port");
+        if(portProperty == null)
+        {
+            jqmlogger.info("Could not find jqm.ws.port in properties");
+            return null;
+        }
+        try
+        {
+            return Integer.parseInt(portProperty);
+        }
+        catch (NumberFormatException e)
+        {
+            jqmlogger.warn("Could not read port from properties ", e);
+            return null;
         }
     }
 
@@ -851,8 +873,4 @@ final class Helpers
                         && e.getCause().getCause().getCause().getCause() instanceof SQLTransientException);
     }
 
-    static Integer getWsPortFromProperties()
-    {
-        return Integer.parseInt(props.getProperty("jqm.ws.port"));
-    }
 }
