@@ -206,6 +206,7 @@ public class CreationTools
         j.setJavaClassName(javaClassName);
         j.setParameters(jps);
         j.setQueue(queue);
+        j.setMaxTimeRunning(maxTimeRunning);
         j.setApplicationName(applicationName);
         j.setApplication(application);
         j.setModule(module);

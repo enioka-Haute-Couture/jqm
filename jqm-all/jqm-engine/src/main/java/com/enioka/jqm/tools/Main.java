@@ -91,6 +91,8 @@ public class Main
                 .create("enqueue");
         Option o21 = OptionBuilder.withArgName("xmlpath").hasArg().withDescription("path of the XML configuration file to import")
                 .isRequired().create("importjobdef");
+        Option o22 = OptionBuilder.withArgName("xmlpath").hasArg().withDescription("Export all jobs definition into an XML file")
+                .isRequired().create("exportjobdef");
         Option o31 = OptionBuilder.withArgName("xmlpath").hasArg().withDescription("export all queue definitions into an XML file")
                 .isRequired().create("exportallqueues");
         OptionBuilder.withArgName("xmlpath").hasArg().withDescription("export some queue definitions into an XML file").isRequired()
@@ -125,6 +127,7 @@ public class Main
         og1.addOption(o01);
         og1.addOption(o11);
         og1.addOption(o21);
+        og1.addOption(o22);
         og1.addOption(o31);
         og1.addOption(o51);
         og1.addOption(o61);
@@ -173,6 +176,11 @@ public class Main
             else if (line.getOptionValue(o21.getOpt()) != null)
             {
                 importJobDef(line.getOptionValue(o21.getOpt()));
+            }
+            // Export job def XML
+            else if (line.getOptionValue(o22.getOpt()) != null)
+            {
+                exportJobDef(line.getOptionValue(o22.getOpt()));
             }
             // Start engine
             else if (line.getOptionValue(o00.getOpt()) != null)
@@ -272,6 +280,24 @@ public class Main
         catch (Exception e)
         {
             throw new JqmRuntimeException("Could not import file", e);
+        }
+    }
+
+    public static void exportJobDef(String xmlPath)
+    {
+        EntityManager em = null;
+        try
+        {
+            em = Helpers.getNewEm();
+            XmlJobDefExporter.export(xmlPath, em);
+        }
+        catch (Exception ex)
+        {
+            throw new JqmRuntimeException("Could not create the export file", ex);
+        }
+        finally
+        {
+            Helpers.closeQuietly(em);
         }
     }
 

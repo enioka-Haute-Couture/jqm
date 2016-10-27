@@ -217,6 +217,10 @@ jqm_import_all_xml() {
  $JAVA -jar $JQM_JAR -importjobdef $(find jobs -name "*xml" -type f | grep -v pom.xml | tr "\\n" ",")
 }
 
+jqm_export_job_def_xml() {
+ $JAVA -jar $JQM_JAR -exportjobdef $1
+}
+
 jqm_enable_gui() {
  $JAVA -jar $JQM_JAR -w enable
  $JAVA -jar $JQM_JAR -r "$1"
@@ -254,6 +258,9 @@ case "$ACTION" in
   ;;
  importallxml|allxml)
   jqm_import_all_xml
+  ;;
+ exportjobdef)
+  jqm_export_job_def_xml $2
   ;;
  enablegui)
   jqm_enable_gui "$2"

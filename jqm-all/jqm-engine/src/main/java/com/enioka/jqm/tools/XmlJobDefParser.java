@@ -164,7 +164,10 @@ class XmlJobDefParser
                     jd.setJavaClassName(jdElement.getElementsByTagName("javaClassName").item(0).getTextContent());
                     jd.setDescription(jdElement.getElementsByTagName("description").item(0).getTextContent());
                     jd.setApplicationName(jdElement.getElementsByTagName("name").item(0).getTextContent());
-                    jd.setApplication(jdElement.getElementsByTagName("application").item(0).getTextContent());
+                    if (jdElement.getElementsByTagName("application").getLength() > 0)
+                    {
+                        jd.setApplication(jdElement.getElementsByTagName("application").item(0).getTextContent());
+                    }
                     jd.setModule(jdElement.getElementsByTagName("module").item(0).getTextContent());
                     jd.setHighlander("true".equals(jdElement.getElementsByTagName("highlander").item(0).getTextContent()) ? true : false);
 
@@ -205,7 +208,7 @@ class XmlJobDefParser
                     }
                     if (jdElement.getElementsByTagName("hiddenJavaClasses").getLength() > 0)
                     {
-                        jd.setSpecificIsolationContext(jdElement.getElementsByTagName("hiddenJavaClasses").item(0).getTextContent());
+                        jd.setHiddenJavaClasses(jdElement.getElementsByTagName("hiddenJavaClasses").item(0).getTextContent());
                     }
 
                     // Alert time
