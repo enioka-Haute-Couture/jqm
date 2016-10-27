@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.enioka.jqm.jpamodel.JobDefParameter;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -113,6 +114,57 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals(false, jd.get(0).isHighlander());
         Assert.assertEquals("1", jd.get(0).getParameters().get(0).getValue());
         Assert.assertEquals("2", jd.get(0).getParameters().get(1).getValue());
+    }
+
+    @Test
+    public void testExportJobDef() throws Exception
+    {
+        List<JobDefParameter> jdp = new ArrayList<JobDefParameter>();
+        jdp.add(CreationTools.createJobDefParameter("test-key", "test-value", em));
+        CreationTools.createJobDef("My Description", true, "com.enioka.jqm.tests.App", jdp, "jqm-tests/jqm-test-fibo/target/test.jar",
+                TestHelpers.qVip, 42, "Fibo", "App", "ModuleMachin", "other1", "other2", null, false, em, "Isolation", true, "HIDDEN");
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42, "Geo", null,
+                "Franquin", "ModuleMachin", "other1", "other2", false, em);
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
+                "DateTime", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
+                "DateTime2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+
+        XmlJobDefExporter.export(TestHelpers.node.getDlRepo() + "xmlexportjobdeftest.xml", em);
+
+        File f = new File(TestHelpers.node.getDlRepo() + "xmlexportjobdeftest.xml");
+        Assert.assertEquals(true, f.exists());
+
+        // -> Delete all entries and try to reimport them from the exported file
+        em.getTransaction().begin();
+        em.createQuery("DELETE JobDefParameter WHERE 1=1)").executeUpdate();
+        em.createQuery("DELETE JobDef WHERE 1=1").executeUpdate();
+        em.getTransaction().commit();
+        XmlJobDefParser.parse(TestHelpers.node.getDlRepo() + "xmlexportjobdeftest.xml", em);
+
+        // test the 4 JobDef were imported
+        long count = (Long) em.createQuery("SELECT COUNT(j) FROM JobDef j WHERE j.applicationName IN ('Fibo', 'Geo', 'DateTime', 'DateTime2')").getSingleResult();
+        Assert.assertEquals(4, count);
+        JobDef fibo = em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = 'Fibo' ", JobDef.class).getSingleResult();
+
+
+        Assert.assertEquals("My Description", fibo.getDescription());
+        Assert.assertEquals("App", fibo.getApplication());
+        Assert.assertEquals("jqm-tests/jqm-test-fibo/target/test.jar", fibo.getJarPath());
+        Assert.assertEquals("FS", fibo.getPathType().toString());
+        Assert.assertEquals("VIPQueue", fibo.getQueue().getName());
+        Assert.assertEquals(true,  fibo.isCanBeRestarted());
+        Assert.assertEquals("com.enioka.jqm.tests.App",  fibo.getJavaClassName());
+        Assert.assertEquals("ModuleMachin",  fibo.getModule());
+        Assert.assertEquals("other1",  fibo.getKeyword1());
+        Assert.assertEquals("other2",  fibo.getKeyword2());
+        Assert.assertEquals(null,  fibo.getKeyword3());
+        Assert.assertEquals(false,  fibo.isHighlander());
+        Assert.assertEquals("Isolation",  fibo.getSpecificIsolationContext());
+        Assert.assertEquals(true,  fibo.isChildFirstClassLoader());
+        Assert.assertEquals("HIDDEN",  fibo.getHiddenJavaClasses());
+
+        f.delete();
     }
 
     @Test
