@@ -56,6 +56,10 @@ class JarClassLoader extends URLClassLoader
 
     private boolean tracing = false;
 
+    private String referenceJobDefName = null;
+
+    private String hiddenJavaClasses = null;
+
     private static URL[] addUrls(URL url, URL[] libs)
     {
         URL[] urls = new URL[libs.length + 1];
@@ -439,6 +443,9 @@ class JarClassLoader extends URLClassLoader
 
     public void setHiddenJavaClasses(String hiddenJavaClasses)
     {
+        // Save String for quick comparaison
+        this.hiddenJavaClasses = hiddenJavaClasses;
+
         if (hiddenJavaClasses == null)
         {
             return;
@@ -464,5 +471,17 @@ class JarClassLoader extends URLClassLoader
     public void setTracing(boolean tracing)
     {
         this.tracing = tracing;
+    }
+
+    public void setReferenceJobDefName(String referenceJobDefName) {
+        this.referenceJobDefName = referenceJobDefName;
+    }
+
+    public String getReferenceJobDefName() {
+        return referenceJobDefName;
+    }
+
+    public String getHiddenJavaClasses() {
+        return hiddenJavaClasses;
     }
 }
