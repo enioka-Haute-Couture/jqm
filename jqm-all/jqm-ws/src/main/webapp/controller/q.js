@@ -48,19 +48,29 @@ jqmControllers.controller('µQueueListCtrl', function($scope, $http, µQueueDto,
 		enableFullRowSelection : false,
 		enableFooterTotalSelected : false,
 		multiSelect : true,
+		enableSelectionBatchEvent: false,
+		noUnselect: false,
+		
+		enableColumnMenus : false,
+		enableCellEditOnFocus : true,
+		virtualizationThreshold : 20,
+		enableHorizontalScrollbar : 0,
 
 		onRegisterApi : function(gridApi) {
 			$scope.gridApi = gridApi;
 			gridApi.selection.on.rowSelectionChanged($scope, function(rows) {
 				$scope.selected = gridApi.selection.getSelectedRows();
 			});
+			
+			/*gridApi.cellNav.on.navigate($scope,function(newRowCol, oldRowCol){
+				if (newRowCol !== oldRowCol)
+				{
+					gridApi.selection.selectRow(newRowCol.row.entity);
+				}
+            });*/
+			
 			$scope.gridApi.grid.registerRowsProcessor(createGlobalFilter($scope, [ 'name', 'description' ]), 200);
 		},
-
-		enableColumnMenus : false,
-		enableCellEditOnFocus : true,
-		virtualizationThreshold : 20,
-		enableHorizontalScrollbar : 0,
 
 		columnDefs : [ {
 			field : 'name',

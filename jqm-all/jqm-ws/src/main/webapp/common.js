@@ -37,9 +37,9 @@ module.directive('jqmGridBooleanEditor', [ 'uiGridConstants', 'uiGridEditConstan
 					// Just change the boolean on edit start
 					$scope.$on(uiGridEditConstants.events.BEGIN_CELL_EDIT, function(evt, triggerEvent) {
 						$($elm[0]).focus();
-						$timeout(function() {
+						/*$timeout(function() {
 							$($elm[0]).click();
-						});
+						});*/ // changing the value on "enter edit mode" event is actually really disturbing for the user. Disabled for now.
 					});
 				}
 			};

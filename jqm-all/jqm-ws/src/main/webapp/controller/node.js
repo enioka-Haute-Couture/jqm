@@ -36,23 +36,33 @@ jqmControllers
 
 						enableSelectAll : false,
 						enableRowSelection : true,
-						enableRowHeaderSelection : true,
-						enableFullRowSelection : false,
+						enableRowHeaderSelection : false,
+						enableFullRowSelection : true,
 						enableFooterTotalSelected : false,
 						multiSelect : false,
+						enableSelectionBatchEvent: false,
+						noUnselect: true,
+						
+						enableColumnMenus : false,
+						enableCellEditOnFocus : true,
+						virtualizationThreshold : 20,
+						enableHorizontalScrollbar : 0,
 
 						onRegisterApi : function(gridApi) {
 							$scope.gridApi = gridApi;
 							gridApi.selection.on.rowSelectionChanged($scope, function(rows) {
 								$scope.selected = gridApi.selection.getSelectedRows();
 							});
+							
+							gridApi.cellNav.on.navigate($scope,function(newRowCol, oldRowCol){
+								if (newRowCol !== oldRowCol)
+								{
+									gridApi.selection.selectRow(newRowCol.row.entity);
+								}
+				            });
+							
 							$scope.gridApi.grid.registerRowsProcessor(createGlobalFilter($scope, [ 'name', 'dns' ]), 200);
 						},
-
-						enableColumnMenus : false,
-						enableCellEditOnFocus : true,
-						virtualizationThreshold : 20,
-						enableHorizontalScrollbar : 0,
 
 						columnDefs : [
 								{

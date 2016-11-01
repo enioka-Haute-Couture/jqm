@@ -72,6 +72,8 @@ jqmControllers
 						enableFullRowSelection : false,
 						enableFooterTotalSelected : false,
 						multiSelect : true,
+						enableSelectionBatchEvent: false,
+						noUnselect: false,
 
 						onRegisterApi : function(gridApi) {
 							$scope.gridApi = gridApi;
