@@ -20,6 +20,7 @@ package com.enioka.jqm.tools;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
 import java.security.SecureRandom;
 import java.sql.SQLTransientException;
 import java.util.Calendar;
@@ -745,6 +746,12 @@ final class Helpers
                 jqmlogger.info("\t" + dp.getQueue().getName() + " - every " + dp.getPollingInterval() + "ms - maximum " + dp.getNbThread()
                         + " concurrent threads");
             }
+
+            // Some technical data from the JVM hosting the node
+            Runtime rt = Runtime.getRuntime();
+            jqmlogger.info("JVM parameters are as follow:");
+            jqmlogger.info("\tMax usable memory reported by Java runtime, MB: " + (int) (rt.maxMemory() / 1024 / 1024));
+            jqmlogger.info("\tJVM arguments are: " + ManagementFactory.getRuntimeMXBean().getInputArguments());
         }
     }
 
