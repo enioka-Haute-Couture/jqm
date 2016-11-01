@@ -80,6 +80,6 @@ public class FiboTest extends JqmBaseTest
     public void testFiboHib() throws Exception
     {
         JqmSimpleTest.create(em, "pyl.StressFiboHib", "jqm-test-pyl-hibapi").addRuntimeParameter("p1", "1").addRuntimeParameter("p2", "2")
-                .addWaitMargin(20000).expectOk(11).run(this);
+                .addWaitMargin(60000).expectOk(11).run(this);
     }
 }

@@ -50,6 +50,6 @@ public class GeoTest extends JqmBaseTest
     public void testGeo() throws Exception
     {
         JqmSimpleTest.create(em, "pyl.StressGeo").addEngine("localhost2").addEngine("localhost3").addRuntimeParameter("nbJob", "1")
-                .expectOk(511).run(this);
+                .addWaitMargin(60000).expectOk(511).run(this);
     }
 }

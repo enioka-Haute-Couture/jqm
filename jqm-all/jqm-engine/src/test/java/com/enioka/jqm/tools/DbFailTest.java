@@ -130,7 +130,7 @@ public class DbFailTest extends JqmBaseTest
         this.sleep(1);
         jqmlogger.info("Restarting DB");
         s.start();
-        TestHelpers.waitFor(1000, 60000, this.getNewEm());
+        TestHelpers.waitFor(1000, 120000, this.getNewEm());
 
         Assert.assertEquals(1000, TestHelpers.getOkCount(this.getNewEm()));
         Assert.assertTrue(this.engines.get("localhost").isAllPollersPolling());
