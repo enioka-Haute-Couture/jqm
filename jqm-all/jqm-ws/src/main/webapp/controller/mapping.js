@@ -90,7 +90,7 @@ jqmControllers
 								{
 									field : 'nodeId',
 									displayName : 'Node',
-									cellTemplate : '<div class="ui-grid-cell-contents"><span ng-cell-text>{{ (row.entity["queueId"] | getByProperty:"id":grid.appScope.nodes).name }}</span></div>',
+									cellTemplate : '<div class="ui-grid-cell-contents"><span ng-cell-text>{{ (row.entity["nodeId"] | getByProperty:"id":grid.appScope.nodes).name }}</span></div>',
 									editableCellTemplate : 'ui-grid/dropdownEditor',
 									editDropdownValueLabel : 'name',
 									editDropdownOptionsArray : $scope.nodes,
@@ -106,12 +106,12 @@ jqmControllers
 								{
 									field : 'pollingInterval',
 									displayName : 'Polling Interval (ms)',
-									editableCellTemplate : '<input ng-cell-input ng-model="MODEL_COL_FIELD" type="number" min="100" max="10000000" ng-required="true" ng-pattern="/^\\d+$/"  />',
+									editableCellTemplate: '<div><form name="inputForm"><input type="number" min="100" max="10000000" ng-required="true" ng-class="\'colt\' + col.uid" ui-grid-editor ng-model="MODEL_COL_FIELD" /></form></div>',
 								},
 								{
 									field : 'nbThread',
 									displayName : 'Max concurrent running instances',
-									editableCellTemplate : '<input ng-cell-input ng-model="MODEL_COL_FIELD" type="number" min="1" max="1000" ng-required="true" ng-pattern="/^\\d+$/"  />',
+									editableCellTemplate: '<div><form name="inputForm"><input type="number" min="1" max="1000" ng-required="true" ng-class="\'colt\' + col.uid" ui-grid-editor ng-model="MODEL_COL_FIELD" /></form></div>',
 								}, {
 									field : 'enabled',
 									displayName : 'Enabled',
