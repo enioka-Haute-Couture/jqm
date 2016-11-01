@@ -19,6 +19,11 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Properties;
+
+import javax.mail.Folder;
+import javax.mail.Session;
+import javax.mail.Store;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -47,13 +52,30 @@ public class MiscTest extends JqmBaseTest
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
-        JobRequest.create("MarsuApplication", "TestUser").setEmail("jqm.noreply@gmail.com").submit();
+        JobRequest.create("MarsuApplication", "TestUser").setEmail("test@jqm.com").submit();
 
         addAndStartEngine();
         TestHelpers.waitFor(1, 20000, em); // Need time for async mail sending.
 
         Assert.assertEquals(1, TestHelpers.getOkCount(em));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+
+        Properties props = new Properties();
+        props.setProperty("mail.store.protocol", "imap");
+        int nbMail = 0;
+        try
+        {
+            Session session = Session.getInstance(props, null);
+            Store store = session.getStore();
+            store.connect("localhost", 10143, "testlogin", "testpassword");
+            Folder inbox = store.getFolder("INBOX");
+            nbMail = inbox.getMessageCount();
+        }
+        catch (Exception mex)
+        {
+            mex.printStackTrace();
+        }
+        Assert.assertEquals(1, nbMail);
     }
 
     @Test

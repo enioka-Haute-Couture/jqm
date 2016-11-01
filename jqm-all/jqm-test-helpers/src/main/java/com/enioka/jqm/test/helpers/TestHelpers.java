@@ -104,7 +104,7 @@ public class TestHelpers
             throw new RuntimeException("could not create output directory");
         }
 
-        CreationTools.createMailSession(em, "mail/default", "smtp.gmail.com", 587, true, "jqm.noreply@gmail.com", "marsu1952");
+        CreationTools.createMailSession(em, "mail/default", "localhost", 10025, false, "testlogin", "testpassword");
 
         CreationTools.createRole(em, "administrator", "super admin", "*:*");
         CreationTools.createRole(em, "client power user", "can use the full client API", "node:read", "queue:read", "job_instance:*",

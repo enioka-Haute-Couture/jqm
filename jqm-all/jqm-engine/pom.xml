@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.enioka.jqm</groupId>
@@ -168,6 +169,47 @@
 						</property>
 					</systemProperties>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.btmatthews.maven.plugins</groupId>
+				<artifactId>emailserver-maven-plugin</artifactId>
+				<version>1.1.1</version>
+
+				<configuration>
+					<monitorKey>emailserver</monitorKey>
+					<monitorPort>11025</monitorPort>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>run-mail</id>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<phase>process-test-classes</phase>
+						<configuration>
+							<daemon>true</daemon>
+							<type>greenmail</type>
+							<portOffset>10000</portOffset>
+							<useSSL>false</useSSL>
+							<mailboxes>
+								<mailbox>
+									<login>testlogin</login>
+									<password>testpassword</password>
+									<email>test@jqm.com</email>
+								</mailbox>
+							</mailboxes>
+						</configuration>
+					</execution>
+					<execution>
+						<id>stop-mail</id>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+						<phase>post-integration-test</phase>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
