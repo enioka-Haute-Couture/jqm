@@ -3,7 +3,7 @@
 var jqmControllers = angular.module('jqmControllers');
 
 jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOracle, jndiFile, jndiUrl, jndiPs, jndiHsqlDb, jndiMySql, jndiMqQcf, jndiMqQ, jndiAmqQcf, jndiAmqQ,
-        jndiGeneric, jndiOtherDb, jndiString, jndiMail, jqmCellTemplateBoolean, jqmCellEditorTemplateBoolean, uiGridEditConstants, $interval)
+        jndiGeneric, jndiOtherDb, jndiString, jndiMail, jqmCellTemplateBoolean, jqmCellEditorTemplateBoolean, uiGridEditConstants,uiGridConstants, $interval)
 {
     $scope.resources = null;
     $scope.selected = [];
@@ -110,10 +110,16 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
 
     $scope.removealias = function()
     {
-        var q = $scope.selected[0];
-        $scope.resources.splice($scope.resources.indexOf(q), 1);
-        $scope.selected.splice($scope.resources.indexOf(q), 1);
-        $scope.selected2.length = 0;
+    	var q = $scope.selected[0];
+    	
+    	q.parameters.length = 0;
+        
+    	$scope.selected2.length = 0;
+    	$interval(function() {
+    		$scope.selected.length = 0;
+        }, 0, 1);
+        
+        $scope.resources.splice($scope.resources.indexOf(q), 1);        
     };
 
     $scope.removeprms = function()
@@ -128,10 +134,15 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
 
     $scope.addprm = function()
     {
-        $scope.selected[0].parameters.push({
+        var t = {
             'key' : 'name',
             'value' : 'value'
-        });
+        };
+        $scope.selected[0].parameters.push(t);
+		$scope.gridApi2.selection.selectRow(t);
+        $interval(function() {
+            $scope.gridApi2.cellNav.scrollToFocus(t, $scope.gridOptions2.columnDefs[0]);
+        }, 0, 1);
     };
     
     $scope.gridOptions = {
@@ -146,6 +157,11 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
 		multiSelect : false,
 		enableSelectionBatchEvent: false,
 		noUnselect: true,
+		
+		enableColumnMenus : false,
+		enableCellEditOnFocus : true,
+		virtualizationThreshold : 20,
+		enableHorizontalScrollbar : 0,
 
 		onRegisterApi : function(gridApi) {
 			$scope.gridApi = gridApi;
@@ -160,11 +176,6 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
             	  }
             });
 		},
-
-		enableColumnMenus : false,
-		enableCellEditOnFocus : true,
-		virtualizationThreshold : 20,
-		enableHorizontalScrollbar : 0,
 
         columnDefs : [ {
             field : 'name',
@@ -197,6 +208,11 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
 		enableFullRowSelection : false,
 		enableFooterTotalSelected : false,
 		multiSelect : true,
+		
+		enableColumnMenus : false,
+		enableCellEditOnFocus : true,
+		virtualizationThreshold : 20,
+		enableHorizontalScrollbar : 0,
 
 		onRegisterApi : function(gridApi) {
 			$scope.gridApi2 = gridApi;
@@ -204,11 +220,6 @@ jqmControllers.controller('µJndiListCtrl', function($scope, µJndiDto, jndiOrac
 				$scope.selected2 = gridApi.selection.getSelectedRows();
 			});
 		},
-
-		enableColumnMenus : false,
-		enableCellEditOnFocus : true,
-		virtualizationThreshold : 20,
-		enableHorizontalScrollbar : 0,
 		
         columnDefs : [ {
             field : 'key',

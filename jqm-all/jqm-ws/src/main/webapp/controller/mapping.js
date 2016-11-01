@@ -5,7 +5,7 @@ var jqmControllers = angular.module('jqmControllers');
 jqmControllers
 		.controller(
 				'µQueueMappingListCtrl',
-				function($scope, $http, µQueueMappingDto, µQueueDto, µNodeDto, jqmCellTemplateBoolean, jqmCellEditorTemplateBoolean, uiGridConstants) {
+				function($scope, $http, µQueueMappingDto, µQueueDto, µNodeDto, jqmCellTemplateBoolean, jqmCellEditorTemplateBoolean, uiGridConstants, $interval) {
 					$scope.mappings = null;
 					$scope.queues = [];
 					$scope.nodes = [];
@@ -14,12 +14,17 @@ jqmControllers
 					$scope.error = null;
 
 					$scope.newmapping = function() {
-						$scope.mappings.push(new µQueueMappingDto({
+						var t = new µQueueMappingDto({
 							nodeId : $scope.nodes[0].id,
 							queueId : $scope.queues[0].id,
 							nbThread : 10,
 							pollingInterval : 60000,
-						}));
+						});
+						$scope.mappings.push(t);
+						$scope.gridApi.selection.selectRow(t);
+				        $interval(function() {
+				            $scope.gridApi.cellNav.scrollToFocus(t, $scope.gridOptions.columnDefs[0]);
+				        }, 0, 1);
 					};
 
 					$scope.save = function() {

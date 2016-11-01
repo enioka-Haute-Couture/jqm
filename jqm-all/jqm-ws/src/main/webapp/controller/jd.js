@@ -5,11 +5,12 @@ var jqmControllers = angular.module('jqmControllers');
 jqmControllers
 		.controller(
 				'µJdListCtrl',
-				function($scope, $http, $uibModal, µJdDto, µQueueDto, jqmCellTemplateBoolean, jqmCellEditorTemplateBoolean) {
+				function($scope, $http, $uibModal, $interval, µJdDto, µQueueDto, jqmCellTemplateBoolean, jqmCellEditorTemplateBoolean) {
 					$scope.jds = null;
 					$scope.selected = [];
 					$scope.queues = [];
 					$scope.gridApi = null;
+					
 					$scope.newitem = function() {
 						var t = new µJdDto({
 							description : 'what the job does',
@@ -20,9 +21,13 @@ jqmControllers
 							jarPath : 'relativepath/to/file.jar',
 							enabled : true,
 							parameters : [],
+							applicationName : "job definition " + ($scope.jds.length + 1),
 						});
 						$scope.jds.push(t);
-						$scope.selected.push(t);
+						$scope.gridApi.selection.selectRow(t);
+				        $interval(function() {
+				            $scope.gridApi.cellNav.scrollToFocus(t, $scope.gridOptions.columnDefs[0]);
+				        }, 0, 1);
 					};
 
 					$scope.save = function() {
@@ -60,25 +65,34 @@ jqmControllers
 
 						enableSelectAll : false,
 						enableRowSelection : true,
-						enableRowHeaderSelection : true,
-						enableFullRowSelection : false,
+						enableRowHeaderSelection : false,
+						enableFullRowSelection : true,
 						enableFooterTotalSelected : false,
 						multiSelect : false,
+						
+						enableColumnMenus : false,
+						enableCellEditOnFocus : true,
+						virtualizationThreshold : 20,
+						enableHorizontalScrollbar : 0,
 
 						onRegisterApi : function(gridApi) {
 							$scope.gridApi = gridApi;
 							gridApi.selection.on.rowSelectionChanged($scope, function(rows) {
 								$scope.selected = gridApi.selection.getSelectedRows();
 							});
+							
+							gridApi.cellNav.on.navigate($scope,function(newRowCol, oldRowCol){
+								if (newRowCol !== oldRowCol)
+								{
+									gridApi.selection.selectRow(newRowCol.row.entity);
+								}
+				            });
+							
 							$scope.gridApi.grid.registerRowsProcessor(createGlobalFilter($scope, [ 'applicationName', 'description', 'module', 'application',
 									'javaClassName' ]), 200);
 						},
 
-						enableColumnMenus : false,
-						enableCellEditOnFocus : true,
-						virtualizationThreshold : 20,
-						enableHorizontalScrollbar : 0,
-
+						
 						columnDefs : [
 								{
 									field : 'applicationName',

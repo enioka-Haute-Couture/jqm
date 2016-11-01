@@ -2,16 +2,21 @@
 
 var jqmControllers = angular.module('jqmControllers');
 
-jqmControllers.controller('µQueueListCtrl', function($scope, $http, µQueueDto, jqmCellTemplateBoolean, jqmCellEditorTemplateBoolean, uiGridConstants) {
+jqmControllers.controller('µQueueListCtrl', function($scope, $http, µQueueDto, jqmCellTemplateBoolean, jqmCellEditorTemplateBoolean, uiGridConstants, $interval) {
 	$scope.queues = null;
 	$scope.selected = [];
 
 	$scope.newqueue = function() {
-		$scope.queues.push(new µQueueDto({
+		var t = new µQueueDto({
 			name : 'new queue',
 			description : 'enter description',
 			defaultQueue : false
-		}));
+		});
+		$scope.queues.push(t);
+		$scope.gridApi.selection.selectRow(t);
+        $interval(function() {
+            $scope.gridApi.cellNav.scrollToFocus(t, $scope.gridOptions.columnDefs[0]);
+        }, 0, 1);
 	};
 
 	$scope.save = function() {
