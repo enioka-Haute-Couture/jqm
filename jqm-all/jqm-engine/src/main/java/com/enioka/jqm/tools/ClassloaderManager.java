@@ -69,7 +69,8 @@ class ClassloaderManager
         this.mavenResolver = new LibraryResolverMaven();
     }
 
-    JarClassLoader getClassloader(JobInstance ji, EntityManager em) throws MalformedURLException, JqmPayloadException, RuntimeException {
+    JarClassLoader getClassloader(JobInstance ji, EntityManager em) throws MalformedURLException, JqmPayloadException, RuntimeException
+    {
         final JarClassLoader jobClassLoader;
         JobDef jd = ji.getJd();
 
