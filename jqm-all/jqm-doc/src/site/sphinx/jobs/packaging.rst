@@ -158,6 +158,14 @@ If a parameter specified inside the request has the same name as one from the :t
 There is an optional parameter named "queue" in which it is possible ot specify the name of the queue to use for all instances created from this job definition. If not
 specified (the default), JQM will use the default queue.
 
+There is also two parameters to configure CL behavior:
+- childFirstClassLoader which offer an option to have child first class loader per job definition
+- hiddenJavaClasses which offer the possibility to hide Java classe from jobs using one or more regex to define class to hide from the parent class loader
+
+There is also an optional parameter named "specificIsolationContext", if set all job def the same name (case sensitive) will share the same CL. If this parameter is set
+you need to ensure all job def with the same specificIsolationContext share the same configuration for childFirstClassLoader and hiddenJavaClasses.
+In the other case only job with the same configuration as the first one executed (with same specific context) will be executed.
+
 XML example
 +++++++++++++++++++
 
