@@ -104,6 +104,9 @@ public class Main
         Option o61 = OptionBuilder.withArgName("nodeName").hasArg()
                 .withDescription("creates a JQM node of this name, or updates it if it exists. Implies -u.").isRequired()
                 .create("createnode");
+        Option o62 = OptionBuilder.withArgName("port").hasArg()
+                .withDescription("Specify the port used by the newly created node.").isRequired()
+                .create("port");
         Option o71 = OptionBuilder.withDescription("display JQM engine version").withLongOpt("version").create("v");
         Option o81 = OptionBuilder.withDescription("upgrade JQM database").withLongOpt("upgrade").create("u");
         Option o91 = OptionBuilder.withArgName("jobInstanceId").hasArg().withDescription("get job instance status by ID").isRequired()
@@ -142,6 +145,9 @@ public class Main
         OptionGroup og2 = new OptionGroup();
         og2.addOption(o131);
         options.addOptionGroup(og2);
+        OptionGroup og3 = new OptionGroup();
+        og3.addOption(o62);
+        options.addOptionGroup(og3);
 
         HelpFormatter formatter = new HelpFormatter();
         formatter.setWidth(160);
@@ -161,6 +167,15 @@ public class Main
 
             // Set db connection
             Helpers.registerJndiIfNeeded();
+
+            // Specific port
+            int port = 0;
+            if (line.getOptionValue(o62.getOpt()) != null)
+            {
+                jqmlogger.info("Using specific port " + line.getOptionValue(o62.getOpt()));
+                port = Integer.parseInt(line.getOptionValue(o62.getOpt()));
+            }
+
 
             // Enqueue
             if (line.getOptionValue(o11.getOpt()) != null)
@@ -200,7 +215,7 @@ public class Main
             // Create node
             else if (line.getOptionValue(o61.getOpt()) != null)
             {
-                createEngine(line.getOptionValue(o61.getOpt()));
+                createEngine(line.getOptionValue(o61.getOpt()), port);
             }
             // Upgrade
             else if (line.hasOption(o81.getOpt()))
@@ -322,7 +337,7 @@ public class Main
         }
     }
 
-    private static void createEngine(String nodeName)
+    private static void createEngine(String nodeName, int port)
     {
         try
         {
@@ -330,7 +345,7 @@ public class Main
             jqmlogger.info("Creating engine node " + nodeName);
             EntityManager em = Helpers.getNewEm();
             Helpers.updateConfiguration(em);
-            Helpers.updateNodeConfiguration(nodeName, em);
+            Helpers.updateNodeConfiguration(nodeName, em, port);
             em.close();
         }
         catch (Exception e)

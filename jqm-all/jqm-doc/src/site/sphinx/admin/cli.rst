@@ -10,11 +10,15 @@ Command Line Interface (CLI)
 
 ::
 
-	java -jar jqm-engine.jar -createnode <nodeName> | -enqueue <applicationname> | -exportallqueues <xmlpath> | -h | -importjobdef <xmlpath> | -importqueuefile <xmlpath> | -startnode <nodeName> | -v
+	java -jar jqm-engine.jar -createnode <nodeName> [-port <portNumber>] | -enqueue <applicationname> | -exportallqueues <xmlpath> | -h | -importjobdef <xmlpath> | -importqueuefile <xmlpath> | -startnode <nodeName> | -v
 
 .. option:: -createnode <nodeName>
 
 	create a JQM node of this name (init the database if needed)
+
+.. option:: -port <portNumber>
+
+	port to use for the newly created node
 
 .. option:: -enqueue <applicationname>   
 	
