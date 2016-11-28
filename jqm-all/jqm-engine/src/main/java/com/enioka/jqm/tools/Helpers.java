@@ -415,7 +415,7 @@ final class Helpers
      * @param em
      *            an EntityManager on which a transaction will be opened.
      */
-    static void updateNodeConfiguration(String nodeName, EntityManager em)
+    static void updateNodeConfiguration(String nodeName, EntityManager em, int port)
     {
         // Node
         Node n = null;
@@ -431,7 +431,7 @@ final class Helpers
             n = new Node();
             n.setDlRepo(System.getProperty("user.dir") + "/outputfiles/");
             n.setName(nodeName);
-            n.setPort(0);
+            n.setPort(port);
             n.setRepo(System.getProperty("user.dir") + "/jobs/");
             n.setTmpDirectory(System.getProperty("user.dir") + "/tmp/");
             n.setRootLogLevel("INFO");
@@ -457,6 +457,11 @@ final class Helpers
 
             em.getTransaction().commit();
         }
+    }
+
+    static void updateNodeConfiguration(String nodeName, EntityManager em)
+    {
+        updateNodeConfiguration(nodeName, em, 0);
     }
 
     /**
