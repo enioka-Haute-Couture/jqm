@@ -84,6 +84,7 @@ final class HibernateClient implements JqmClient
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(HibernateClient.class);
     private static final String PERSISTENCE_UNIT = "jobqueue-api-pu";
+    private static final int IN_CLAUSE_LIMIT = 50;
     private EntityManagerFactory emf = null;
     private String protocol = null;
     Properties p;
@@ -1096,7 +1097,7 @@ final class HibernateClient implements JqmClient
     {
         if ((query.getFirstRow() != null || query.getPageSize() != null) && query.isQueryLiveInstances() && query.isQueryHistoryInstances())
         {
-            throw new JqmInvalidRequestException("cannot use paging on live instances");
+            throw new JqmInvalidRequestException("cannot use paging when querying both live and historical instances");
         }
         if (query.isQueryLiveInstances() && query.isQueryHistoryInstances() && query.getSorts().size() > 0)
         {
@@ -1181,6 +1182,8 @@ final class HibernateClient implements JqmClient
                 {
                     q2.setParameter(entry.getKey(), entry.getValue());
                 }
+
+                // Set pagination parameters
                 if (query.getFirstRow() != null)
                 {
                     q2.setFirstResult(query.getFirstRow());
@@ -1189,7 +1192,16 @@ final class HibernateClient implements JqmClient
                 {
                     q2.setMaxResults(query.getPageSize());
                 }
-                if (query.getFirstRow() != null || query.getPageSize() != null)
+
+                // Run the query
+                for (JobInstance ji : q2.getResultList())
+                {
+                    res2.add(getJob(ji, em));
+                }
+
+                // If needed, fetch the total result count (without pagination). Note that without pagination, the Query object does not
+                // need this indication.
+                if (query.getFirstRow() != null || (query.getPageSize() != null && res2.size() >= query.getPageSize()))
                 {
                     TypedQuery<Long> qCount = em.createQuery("SELECT COUNT(h) FROM JobInstance h " + wh2, Long.class);
                     for (Map.Entry<String, Object> entry : prms2.entrySet())
@@ -1197,11 +1209,6 @@ final class HibernateClient implements JqmClient
                         qCount.setParameter(entry.getKey(), entry.getValue());
                     }
                     query.setResultSize(new BigDecimal(qCount.getSingleResult()).intValueExact());
-                }
-
-                for (JobInstance ji : q2.getResultList())
-                {
-                    res2.add(getJob(ji, em));
                 }
             }
 
@@ -1255,6 +1262,8 @@ final class HibernateClient implements JqmClient
                 {
                     q1.setParameter(entry.getKey(), entry.getValue());
                 }
+
+                // Set pagination parameters
                 if (query.getFirstRow() != null)
                 {
                     q1.setFirstResult(query.getFirstRow());
@@ -1263,7 +1272,13 @@ final class HibernateClient implements JqmClient
                 {
                     q1.setMaxResults(query.getPageSize());
                 }
-                if (query.getFirstRow() != null || query.getPageSize() != null)
+
+                // Actually run the query
+                List<History> results = q1.getResultList();
+
+                // If needed, fetch the total result count (without pagination). Note that without pagination, the Query object does not
+                // need this indication.
+                if (query.getFirstRow() != null || (query.getPageSize() != null && results.size() >= query.getPageSize()))
                 {
                     TypedQuery<Long> qCount = em.createQuery("SELECT COUNT(h) FROM History h " + wh, Long.class);
                     for (Map.Entry<String, Object> entry : prms.entrySet())
@@ -1273,23 +1288,36 @@ final class HibernateClient implements JqmClient
                     query.setResultSize(new BigDecimal(qCount.getSingleResult()).intValueExact());
                 }
 
-                // Optimization: fetch messages and parameters in one go.
-                List<History> results = q1.getResultList();
-                List<Integer> ids = new ArrayList<Integer>();
+                // Optimization: fetch messages and parameters in batches of 50 (limit accepted by most databases for IN clauses).
+                List<List<Integer>> ids = new ArrayList<List<Integer>>();
+                List<Integer> currentList = null;
+                int i = 0;
                 for (History ji : results)
                 {
-                    ids.add(ji.getId());
+                    if (currentList == null || i % IN_CLAUSE_LIMIT == 0)
+                    {
+                        currentList = new ArrayList<Integer>(IN_CLAUSE_LIMIT);
+                        ids.add(currentList);
+                    }
+                    currentList.add(ji.getId());
+                    i++;
                 }
-                if (!ids.isEmpty())
+                if (currentList != null && !currentList.isEmpty())
                 {
-                    List<RuntimeParameter> rps = em
-                            .createQuery("SELECT rp FROM RuntimeParameter rp WHERE rp.ji IN (:p)", RuntimeParameter.class)
-                            .setParameter("p", ids).getResultList();
-                    List<Message> msgs = em.createQuery("SELECT rp FROM Message rp WHERE rp.ji IN (:p)", Message.class)
-                            .setParameter("p", ids).getResultList();
+                    List<RuntimeParameter> rps = new ArrayList<RuntimeParameter>(IN_CLAUSE_LIMIT * ids.size());
+                    List<Message> msgs = new ArrayList<Message>(IN_CLAUSE_LIMIT * ids.size());
+
+                    for (List<Integer> idsBatch : ids)
+                    {
+                        rps.addAll(em.createQuery("SELECT rp FROM RuntimeParameter rp WHERE rp.ji IN (:p)", RuntimeParameter.class)
+                                .setParameter("p", idsBatch).getResultList());
+                        msgs.addAll(em.createQuery("SELECT rp FROM Message rp WHERE rp.ji IN (:p)", Message.class)
+                                .setParameter("p", idsBatch).getResultList());
+                    }
 
                     for (History ji : results)
                     {
+                        // This is the actual JPA -> DTO work.
                         res2.add(getJob(ji, em, rps, msgs));
                     }
                 }

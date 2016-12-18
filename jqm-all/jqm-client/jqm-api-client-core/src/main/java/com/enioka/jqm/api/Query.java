@@ -26,13 +26,17 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Parameters for querying JobInstances. A null parameter (the default) is ignored in the query. To query a null String, specify "" (empty
+ * Parameters for querying {@link JobInstance}s. A null parameter (the default for most query parameters) is ignored in the query. 
+ * To query a null String, specify "" (empty
  * String). To query a null Integer, specify -1. It is not possible to query for null Calendar values, since it is far more efficient to
  * query by status (the different Calendar fields are only null at certain statuses).<br>
  * See individual setters for the signification of query parameters.<br>
  * <br>
- * By default, querying only retrieves instances that have ended. See {@link Query#setQueryLiveInstances(boolean)} for details and how to
- * retrieve living instances.
+ * By default, i.e. by simply using <code>Query.create().run()</code>, the API retrieves the first 50 instances that have ended, ordered by launch ID (i.e. by time). 
+ * See {@link Query#setQueryLiveInstances(boolean)} for details and how to retrieve living instances in addition to ended ones.<br><br>
+ * 
+ * Also please note that queries get more expensive with the result count, so it is <strong>strongly recommended to use pagination</strong> 
+ * ({@link #setFirstRow(Integer)} and {@link #setPageSize(Integer)}).
  * 
  */
 @XmlRootElement
@@ -52,7 +56,7 @@ public final class Query
     @XmlElement(name = "status", type = State.class)
     private List<State> status = new ArrayList<State>();
 
-    private Integer firstRow, pageSize;
+    private Integer firstRow, pageSize = 50;
     private Integer resultSize;
 
     @XmlElementWrapper(name = "instances")
@@ -180,11 +184,17 @@ public final class Query
     // Builder
     // //////////////////////////////////////////
 
+    /**
+     * The start of the fluent Query API. Creates a new Query object.
+     */
     public static Query create()
     {
         return new Query();
     }
 
+    /**
+     * The end of the fluent Query API. It simply executes the query and returns the results.
+     */
     public List<JobInstance> run()
     {
         return JqmClientFactory.getClient().getJobs(this);
@@ -194,19 +204,45 @@ public final class Query
     // Results handling
     // //////////////////////////////////////////
 
+    /**
+     * This sets the maximum returned results count, for pagination purposes.<br>
+     * It is <strong>highly recommended to use pagination</strong> when using the Query API, since queries are expensive. 
+     * @param pageSize the maximal result count, or null for no limit (dangerous!)
+     * @return the Query itself (fluent API - used to chain calls).
+     * @see #setFirstRow(Integer) setFirstRow for the other pagination parameter.
+     */
     public Query setPageSize(Integer pageSize)
     {
         this.pageSize = pageSize;
         return this;
     }
+    
+    /**
+     * This sets the starting row returned by the query, for pagination purposes. Note that even if order is very important for paginated queries 
+     * (to ensure that the pages stay the same between calls for new pages), a default sort is used if none is specified.<br>
+     * It is <strong>highly recommended to use pagination</strong> when using the Query API, since queries are expensive. 
+     * @param firstRow the first row to return. 0 is equivalent to null.
+     * @return the Query itself (fluent API - used to chain calls).
+     * @see #setPageSize(Integer) setPageSize for the other pagination parameter.
+     */
+    public Query setFirstRow(Integer firstRow)
+    {
+        this.firstRow = firstRow;
+        return this;
+    }
 
+    /**
+     * @return the available result count of the query. Available means that it does not take into account pagination. This is mostly used when pagination is used,
+     * so as to be able to set a "total records count" or a "page 2 on 234" indicator. If pagination is not used, this is always equal to 
+     * <code>{@link #getResults()}.size()</code>.
+     */
     public Integer getResultSize()
     {
         if (results == null)
         {
             throw new IllegalStateException("Cannot retrieve the results of a query that was not run");
         }
-        if (this.pageSize != null || this.firstRow != null)
+        if (resultSize != null)
         {
             return resultSize;
         }
@@ -522,6 +558,7 @@ public final class Query
     /**
      * By default, querying only occurs on ended (OK or not) job instances. If this parameter is set to true, it will also include living
      * (waiting, running, ...) job instances.<br>
+     * If you also query on live instances at the same time, this will reset pagination as it is impossible to use pagination with both.<br>
      * <br>
      * Setting this to true has a noticeable performance impact and should be used as little as possible (or should be used when
      * {@link #setQueryHistoryInstances(boolean)} is false, which is not the default)
@@ -529,6 +566,11 @@ public final class Query
     public Query setQueryLiveInstances(boolean queryLiveInstances)
     {
         this.queryLiveInstances = queryLiveInstances;
+        if (this.queryHistoryInstances)
+        {
+            this.pageSize = null;
+            this.firstRow = null;
+        }
         return this;
     }
 
@@ -666,12 +708,6 @@ public final class Query
     Integer getFirstRow()
     {
         return firstRow;
-    }
-
-    public Query setFirstRow(Integer firstRow)
-    {
-        this.firstRow = firstRow;
-        return this;
     }
 
     Integer getPageSize()
