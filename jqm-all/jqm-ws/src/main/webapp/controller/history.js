@@ -229,12 +229,12 @@ jqmControllers.controller('µHistoryCtrl', function($scope, $http, $uibModal, µ
             field : 'progress',
             displayName : 'Progress',
             width : '*',
-            sortable : false,
+            enableSorting : false,
         }, {
             field : 'sessionID',
             displayName : 'Session ID',
             width : '*',
-            sortable : false,
+            enableSorting : false,
         }, ]
     };
 
