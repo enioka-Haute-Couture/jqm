@@ -84,7 +84,7 @@ final class HibernateClient implements JqmClient
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(HibernateClient.class);
     private static final String PERSISTENCE_UNIT = "jobqueue-api-pu";
-    private static final int IN_CLAUSE_LIMIT = 50;
+    private static final int IN_CLAUSE_LIMIT = 500;
     private EntityManagerFactory emf = null;
     private String protocol = null;
     Properties p;
