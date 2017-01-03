@@ -313,7 +313,7 @@ jqmApp.directive('loginDialog', function($uibModal)
             {
                 if (a === null)
                 {
-                    a = $modal.open({
+                    a = $uibModal.open({
                         templateUrl : './template/login.html',
                         controller : 'µCredentialsController',
                         size : 650,
