@@ -1,0 +1,47 @@
+<div class="container-fluid modal-dialog">
+	<div class="modal-header">
+		<h4 class="modal-title">Class Loader Options</h4>
+	</div>
+	<div class="modal-body">
+		<div class="row">
+			<div class="col-xs-12">
+			    <div class="form-horizontal">
+			        <div class="form-group">
+				        <label for="specificIsolationContext" class="col-xs-3 control-label">Specific Isolation Context</label>
+				        <div class="col-xs-9">
+			                <input id="specificIsolationContext" class="form-control" type="text" ng-model="data.specificIsolationContext" />
+			            </div>
+			        </div>
+			        <div class="form-group">
+				        <label for="hiddenJavaClasses" class="col-xs-3 control-label">Hidden Java Classes</label>
+				        <div class="col-xs-9">
+			                <input id="hiddenJavaClasses" class="form-control" type="text" ng-model="data.hiddenJavaClasses" />
+			            </div>
+			        </div>
+			        <div class="form-group">
+				        <label for="childFirstClassLoader" class="col-xs-3 control-label">Child First Class Loader</label>
+				        <div class="col-xs-9">
+				            <input id="childFirstClassLoader" type="checkbox" ng-model="data.childFirstClassLoader" />
+				        </div>
+					</div>
+			    </div>
+		    </div>
+	    </div>
+	    <div class="row">
+	        <div class="col-xs-12">
+	            <dl class="dl">
+                    <dt>Specific Isolation Context</dt>
+                    <dd>If set all job definitions using the same value (case sensitive) will share the same CL. If this parameter is set you need to ensure
+                    all job definitions with the same specificIsolationContext share the same configuration for Child First Class Loader and Hidden Java Classes.</dd>
+                    <dt>Hidden Java Classes</dt>
+                    <dd>Offers the possibility to hide Java classes from jobs using one or more regex to define classes to hide from the parent class loader</dd>
+                    <dt>Child First Class Loader</dt>
+                    <dd>Offers an option to have a child first class loader for this job definition</dd>
+		        </dl>
+	        </div>
+	    </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">OK</button>
+    </div>
+</div>

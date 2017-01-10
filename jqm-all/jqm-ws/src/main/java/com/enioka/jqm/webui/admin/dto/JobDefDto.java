@@ -42,6 +42,9 @@ public class JobDefDto implements Serializable
     private boolean highlander, enabled;
     private String jarPath;
     private Integer reasonableRuntimeLimitMinute;
+    private boolean childFirstClassLoader;
+    private String hiddenJavaClasses;
+    private String specificIsolationContext;
 
     @XmlElementWrapper(name = "parameters")
     @XmlElement(name = "parameter", type = ParameterDto.class)
@@ -205,5 +208,35 @@ public class JobDefDto implements Serializable
 	public void setReasonableRuntimeLimitMinute(Integer reasonableRuntimeLimitMinute) 
 	{
 		this.reasonableRuntimeLimitMinute = reasonableRuntimeLimitMinute;
+	}
+
+	public boolean isChildFirstClassLoader()
+	{
+		return childFirstClassLoader;
+	}
+
+	public void setChildFirstClassLoader(boolean childFirstClassLoader)
+	{
+		this.childFirstClassLoader = childFirstClassLoader;
+	}
+
+	public String getHiddenJavaClasses()
+	{
+		return hiddenJavaClasses;
+	}
+
+	public void setHiddenJavaClasses(String hiddenJavaClasses)
+	{
+		this.hiddenJavaClasses = hiddenJavaClasses;
+	}
+
+	public String getSpecificIsolationContext()
+	{
+		return specificIsolationContext;
+	}
+
+	public void setSpecificIsolationContext(String specificIsolationContext)
+	{
+		this.specificIsolationContext = specificIsolationContext;
 	}
 }

@@ -163,6 +163,18 @@ jqmControllers
 								}, ]
 					};
 
+					$scope.clo  = function() {
+						$uibModal.open({
+							templateUrl : './template/jd_clo.html',
+						controller : 'jdClo',
+						size : 'lg',
+							resolve : {
+								jd : function() {
+									return $scope.selected[0];
+								}
+							},
+						});
+					}
 					$scope.prms = function() {
 						$uibModal.open({
 							templateUrl : './template/jd_prms.html',
@@ -199,6 +211,23 @@ jqmApp.controller('jdPrms', function($scope, $uibModalInstance, jd) {
 	};
 
 	$scope.ok = function() {
+		$uibModalInstance.close();
+	};
+});
+
+jqmApp.controller('jdClo', function($scope, $uibModalInstance, jd) {
+	$scope.selectedJd = jd;
+	$scope.data = {
+		specificIsolationContext : $scope.selectedJd.specificIsolationContext,
+		hiddenJavaClasses : $scope.selectedJd.hiddenJavaClasses,
+		childFirstClassLoader : $scope.selectedJd.childFirstClassLoader,
+
+	};
+
+	$scope.ok = function() {
+		$scope.selectedJd.childFirstClassLoader = $scope.data.childFirstClassLoader;
+		$scope.selectedJd.hiddenJavaClasses = $scope.data.hiddenJavaClasses;
+		$scope.selectedJd.specificIsolationContext = $scope.data.specificIsolationContext;
 		$uibModalInstance.close();
 	};
 });
