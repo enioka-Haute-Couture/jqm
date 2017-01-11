@@ -1,6 +1,51 @@
 Release notes
 ######################
 
+1.4.1
+*************
+
+Release goal
+++++++++++++++++++
+
+This is a feature release aiming at giving more control over the class loaders used by the engine.
+
+Many other features are also included, see details below.
+
+Upgrade notes
++++++++++++++++++++
+
+All API changes are backward compatible: 1.3.x APIs will work with 1.4.1 engines. 
+However, everyone is strongly encouraged to upgrade to the latest version.
+
+There are database structure modifications in this release, so the standard upgrade path must be used (with database drop).
+
+Major
++++++++++++++++++
+
+* Engine: added possibility (at job definition level) to share non-transient class loader with other jobs instances (created from the same job definition or from other job definitions). Default behaviour is still to use one isolated transient class loader per launch.
+* Engine: added possibility (at job definition level) to use a child first or parent first class loader.
+* Engine: added possibility (at job definition level) to trace the classes loaded by a job instance.
+* Engine: added possibility (at job definition level) to hide classes from a job.
+* Engine: added new "Maven" type of job - this type is fetched directly from a Maven repository without any need for local deployment.
+* Engine: MySQL is now fully supported without reserves, and do not need a startup script anymore.
+* GUI: updated to expose the new CL options.
+* GUI: major frameworks upgrade - it should be more reactive.
+* CLI: added option to export job definition XML (the deployment descriptor). This should help developers to create and maintain it.
+* Dev API: added a helper class to embed a full JQM node in the JUnit tests of payloads.
+
+Minor
+++++++++++++++++
+
+* Query API: better handling of pagination.
+* Client API: on enqueue, the job instance creation date now comes from the DB to avoid issues with time differences between servers.
+* CLI: can now specify a port when creating a node.
+* CLI: fixed 'root' account creation which was not in the right profile.
+* GUI: added favicon to prevent browser warnings.
+* Documentation: clarified some notions.
+* Test: the 'send mail on completion' function is now correctly tested.
+* Test: added testing on OpenJDK 8.
+
+
 1.3.6
 ************
 
