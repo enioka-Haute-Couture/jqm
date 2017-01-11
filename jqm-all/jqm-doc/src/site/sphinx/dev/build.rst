@@ -66,7 +66,7 @@ This will upload the packages to the OSSRH staging repository.::
 OSSRH validation
 ********************
 
-Go to https://oss.sonatype.org/ and unstage the release. This will in time allow synchronization with Maven Central.
+Go to https://oss.sonatype.org/ and unstage (which means: close, then release the staged repository) the release. This will in time allow synchronization with Maven Central.
 
 Git push
 +++++++++++++
@@ -77,15 +77,19 @@ At this step, the release is done and the local git modifications can be pushed 
 
 ::
 
-    git push origin
     git push origin --tags
+    git push origin
+
+(push tags before code to help RTD synchronization)
+    
+Documentation
++++++++++++++++
+
+Go to jqm.rtfd.org and change the default branch to the newly created tag.
 
 GitHub upload
 ++++++++++++++++
 
 Create a release inside GitHub and upload the zip and tar.gz produced by the jqm-engine project. Add a link to the release notes inside.
 
-Documentation
-+++++++++++++++
-
-Go to jqm.rtfd.org and change the default branch to the newly created tag.
+.. note:: only do this **after** the documentation is up on ReadTheDocs. Creating a release sends a mail to followers, so any link to the doc would be dead otherwise.
