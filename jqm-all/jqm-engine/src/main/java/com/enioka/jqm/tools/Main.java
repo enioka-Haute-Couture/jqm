@@ -104,9 +104,8 @@ public class Main
         Option o61 = OptionBuilder.withArgName("nodeName").hasArg()
                 .withDescription("creates a JQM node of this name, or updates it if it exists. Implies -u.").isRequired()
                 .create("createnode");
-        Option o62 = OptionBuilder.withArgName("port").hasArg()
-                .withDescription("Specify the port used by the newly created node.").isRequired()
-                .create("port");
+        Option o62 = OptionBuilder.withArgName("port").hasArg().withDescription("Specify the port used by the newly created node.")
+                .isRequired().create("port");
         Option o71 = OptionBuilder.withDescription("display JQM engine version").withLongOpt("version").create("v");
         Option o81 = OptionBuilder.withDescription("upgrade JQM database").withLongOpt("upgrade").create("u");
         Option o91 = OptionBuilder.withArgName("jobInstanceId").hasArg().withDescription("get job instance status by ID").isRequired()
@@ -175,7 +174,6 @@ public class Main
                 jqmlogger.info("Using specific port " + line.getOptionValue(o62.getOpt()));
                 port = Integer.parseInt(line.getOptionValue(o62.getOpt()));
             }
-
 
             // Enqueue
             if (line.getOptionValue(o11.getOpt()) != null)
@@ -328,6 +326,11 @@ public class Main
             engine = new JqmEngine();
             engine.start(nodeName);
             return engine;
+        }
+        catch (JqmRuntimeException e)
+        {
+            jqmlogger.fatal(e.getMessage());
+            return null;
         }
         catch (Exception e)
         {

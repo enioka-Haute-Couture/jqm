@@ -32,6 +32,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import javax.persistence.NoResultException;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.ConsoleAppender;
@@ -111,7 +112,15 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         EntityManager em = Helpers.getNewEm();
 
         // Node configuration is in the database
-        node = em.createQuery("SELECT n FROM Node n WHERE n.name = :l", Node.class).setParameter("l", nodeName).getSingleResult();
+        try
+        {
+            node = em.createQuery("SELECT n FROM Node n WHERE n.name = :l", Node.class).setParameter("l", nodeName).getSingleResult();
+        }
+        catch (NoResultException e)
+        {
+            throw new JqmRuntimeException(
+                    "the specified node name [" + nodeName + "] does not exist in the configuration. Please create this node before starting it", e);
+        }
 
         // Check if double-start
         long toWait = (long) (1.1 * Long.parseLong(Helpers.getParameter("internalPollingPeriodMs", "60000", em)));
