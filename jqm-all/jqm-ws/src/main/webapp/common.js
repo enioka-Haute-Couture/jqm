@@ -56,7 +56,7 @@ function createGlobalFilter($scope, columns) {
 		renderableRows.forEach(function(row) {
 			var match = false;
 			columns.forEach(function(field) {
-				if (row.entity[field].toLowerCase().match(matcher)) {
+				if (row.entity[field] && row.entity[field].toLowerCase().match(matcher)) {
 					match = true;
 				}
 			});
