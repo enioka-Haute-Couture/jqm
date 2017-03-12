@@ -35,7 +35,7 @@ public class ManualTests extends JqmBaseTest
     // @Test
     public void jmxTestEnvt() throws Exception
     {
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
         TestHelpers.cleanup(em);
         TestHelpers.createTestData(em);
 

@@ -96,7 +96,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     {
         jqmlogger.info("Engine " + engine.getNode().getName() + " will poll JobInstances on queue " + q.getName() + " every "
                 + interval / 1000 + "s with " + nbThreads + " threads for concurrent instances");
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
 
         this.engine = engine;
         this.queue = q;
@@ -237,7 +237,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
             try
             {
                 // Get a JI to run
-                em = Helpers.getNewEm();
+                em = Helpers.getNewDbSession();
                 JobInstance ji = dequeue(em, 0);
                 while (ji != null)
                 {
@@ -432,7 +432,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     @Override
     public long getCumulativeJobInstancesCount()
     {
-        EntityManager em2 = Helpers.getNewEm();
+        EntityManager em2 = Helpers.getNewDbSession();
         Long nb = em2.createQuery("SELECT COUNT(i) From History i WHERE i.node = :n AND i.queue = :q", Long.class)
                 .setParameter("n", this.engine.getNode()).setParameter("q", this.queue).getSingleResult();
         em2.close();
@@ -442,7 +442,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     @Override
     public float getJobsFinishedPerSecondLastMinute()
     {
-        EntityManager em2 = Helpers.getNewEm();
+        EntityManager em2 = Helpers.getNewDbSession();
         Calendar minusOneMinute = Calendar.getInstance();
         minusOneMinute.add(Calendar.MINUTE, -1);
         Float nb = em2.createQuery("SELECT COUNT(i) From History i WHERE i.endDate >= :d and i.node = :n AND i.queue = :q", Long.class)

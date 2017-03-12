@@ -18,17 +18,14 @@ package com.enioka.jqm.api;
 import java.util.Calendar;
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.RRole;
 import com.enioka.jqm.jpamodel.RUser;
 
 /**
@@ -61,20 +58,11 @@ final class SimpleApiSecurity
      * Will create (or recreate) if necessary the temporary login data.<br>
      * Will create its own transaction - therefore the given em must not have any active transaction.
      */
-    static Duet getId(EntityManager em)
+    static Duet getId(DbConn cnx)
     {
         if (logindata == null && useAuth == null)
         {
-            try
-            {
-                GlobalParameter gp = em.createQuery("SELECT gp from GlobalParameter gp WHERE gp.key = 'enableWsApiAuth'",
-                        GlobalParameter.class).getSingleResult();
-                useAuth = Boolean.parseBoolean(gp.getValue());
-            }
-            catch (NoResultException e)
-            {
-                useAuth = true;
-            }
+            useAuth = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableWsApiAuth", "true"));
 
             if (!useAuth)
             {
@@ -101,44 +89,28 @@ final class SimpleApiSecurity
                 if (user == null || user.getExpirationDate().before(Calendar.getInstance()))
                 {
                     jqmlogger.debug("The client API will create an internal secret to access the simple API for file downloading");
-                    em.getTransaction().begin();
 
                     // Create new
-                    user = new RUser();
+                    String login = UUID.randomUUID().toString();
+
                     secret = UUID.randomUUID().toString();
+                    ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
+                    String hash = new Sha512Hash(secret, salt, 100000).toHex();
+                    String saltS = salt.toHex();
+
                     Calendar expiration = Calendar.getInstance();
                     expiration.add(Calendar.DAY_OF_YEAR, 1);
-                    user.setExpirationDate(expiration);
-                    user.setInternal(true);
-                    user.setLocked(false);
-                    user.setLogin(UUID.randomUUID().toString());
 
-                    ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
-                    user.setPassword(new Sha512Hash(secret, salt, 100000).toHex());
-                    user.setHashSalt(salt.toHex());
-                    em.persist(user);
+                    RUser.create(cnx, login, hash, saltS, expiration, true, "administrator");
 
                     logindata = new Duet();
                     logindata.pass = secret;
-                    logindata.usr = user.getLogin();
-
-                    RRole r = em.createQuery("SELECT r from RRole r where r.name = 'administrator'", RRole.class).getSingleResult();
-                    r.getUsers().add(user);
+                    logindata.usr = login;
 
                     // Purge all old internal accounts
-                    for (RUser ru : em.createQuery("SELECT u FROM RUser u WHERE u.internal = true AND u.expirationDate < :n", RUser.class)
-                            .setParameter("n", Calendar.getInstance()).getResultList())
-                    {
-                        // Not using DELETE query but a remove in a loop because two-ways M2M relationship are stupid in JPA.
-                        for (RRole rr : ru.getRoles())
-                        {
-                            rr.getUsers().remove(ru);
-                        }
-                        ru.getRoles().clear();
-                        em.remove(ru);
-                    }
+                    cnx.runUpdate("user_delete_expired_internal");
 
-                    em.getTransaction().commit();
+                    cnx.commit();
                 }
             }
         }

@@ -45,7 +45,7 @@ class InternalPoller implements Runnable
     InternalPoller(JqmEngine e)
     {
         this.engine = e;
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
 
         // Get configuration data
         node = em.find(Node.class, this.engine.getNode().getId());
@@ -103,7 +103,7 @@ class InternalPoller implements Runnable
             try
             {
                 // Get session
-                em = Helpers.getNewEm();
+                em = Helpers.getNewDbSession();
 
                 // Check if stop order
                 node = em.find(Node.class, node.getId());

@@ -239,27 +239,27 @@ public class TestHelpers
 
     public static int getHistoryAllCount(DbConn cnx)
     {
-        return cnx.runSelectSingleInt("history_select_count_all");
+        return cnx.runSelectSingle("history_select_count_all", Integer.class);
     }
 
     public static int getQueueAllCount(DbConn cnx)
     {
-        return cnx.runSelectSingleInt("ji_select_count_all");
+        return cnx.runSelectSingle("ji_select_count_all", Integer.class);
     }
 
     public static int getQueueRunningCount(DbConn cnx)
     {
-        return cnx.runSelectSingleInt("ji_select_count_running");
+        return cnx.runSelectSingle("ji_select_count_running", Integer.class);
     }
 
     public static int getOkCount(DbConn cnx)
     {
-        return cnx.runSelectSingleInt("history_select_count_ended");
+        return cnx.runSelectSingle("history_select_count_ended", Integer.class);
     }
 
     public static int getNonOkCount(DbConn cnx)
     {
-        return cnx.runSelectSingleInt("history_select_count_notended");
+        return cnx.runSelectSingle("history_select_count_notended", Integer.class);
     }
 
     public static boolean testOkCount(long theoreticalOkCount, DbConn cnx)

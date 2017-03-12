@@ -82,7 +82,7 @@ public class RUser implements Serializable
 
     public List<RRole> getRoles(DbConn cnx)
     {
-        return RRole.select_roles(cnx, "role_select_all_for_user", this.id);
+        return RRole.select(cnx, "role_select_all_for_user", this.id);
     }
 
     public String getHashSalt()
@@ -196,7 +196,7 @@ public class RUser implements Serializable
         return res;
     }
 
-    public static List<RUser> getUsers(DbConn cnx, String query_key, Object... args)
+    public static List<RUser> select(DbConn cnx, String query_key, Object... args)
     {
         List<RUser> res = new ArrayList<RUser>();
         try
@@ -216,9 +216,25 @@ public class RUser implements Serializable
 
     public static void create(DbConn cnx, String login, String password_hash, String password_salt, String... role_names)
     {
-        QueryResult r = cnx.runUpdate("user_insert", null, null, null, password_hash, false, false, login, password_hash);
+        create(cnx, login, password_hash, password_salt, null, false, role_names);
+    }
+
+    public static void create(DbConn cnx, String login, String password_hash, String password_salt, Calendar expiration, Boolean internal,
+            String... role_names)
+    {
+        QueryResult r = cnx.runUpdate("user_insert", null, expiration, null, password_salt, internal, false, login, password_hash);
         int newId = r.getGeneratedId();
 
+        for (String s : role_names)
+        {
+            cnx.runUpdate("user_add_role_by_name", s, newId);
+        }
+    }
+
+    public static void set_roles(DbConn cnx, String login, String... role_names)
+    {
+        int newId = cnx.runSelectSingle("user_select_by_key", Integer.class, login);
+        cnx.runUpdate("user_remove_all_roles_by_key", login);
         for (String s : role_names)
         {
             cnx.runUpdate("user_add_role_by_name", s, newId);

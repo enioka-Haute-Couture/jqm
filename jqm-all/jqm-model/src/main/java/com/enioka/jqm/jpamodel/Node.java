@@ -18,8 +18,13 @@
 
 package com.enioka.jqm.jpamodel;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
+import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.QueryResult;
 
@@ -357,4 +362,40 @@ public class Node
         return res;
     }
 
+    public static List<Node> select(DbConn cnx, String query_key, Object... args)
+    {
+        List<Node> res = new ArrayList<Node>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key, args);
+            while (rs.next())
+            {
+                Node tmp = new Node();
+
+                tmp.id = rs.getInt(1);
+                tmp.dlRepo = rs.getString(2);
+                tmp.dns = rs.getString(3);
+                tmp.enabled = rs.getBoolean(4);
+                tmp.exportRepo = rs.getString(5);
+                tmp.jmxRegistryPort = rs.getInt(6);
+                tmp.jmxServerPort = rs.getInt(7);
+                tmp.loadApiAdmin = rs.getBoolean(8);
+                tmp.loadApiClient = rs.getBoolean(9);
+                tmp.loapApiSimple = rs.getBoolean(10);
+                tmp.name = rs.getString(11);
+                tmp.port = rs.getInt(12);
+                tmp.repo = rs.getString(13);
+                tmp.rootLogLevel = rs.getString(14);
+                tmp.stop = rs.getBoolean(15);
+                tmp.tmpDirectory = rs.getString(16);
+
+                res.add(tmp);
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
+    }
 }

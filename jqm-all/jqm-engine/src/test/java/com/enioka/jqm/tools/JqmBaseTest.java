@@ -22,10 +22,10 @@ import java.util.Map;
 
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
-import javax.persistence.EntityManager;
 
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
+import org.hsqldb.jdbc.JDBCDataSource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -33,16 +33,19 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.jdbc.Db;
+import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class JqmBaseTest
 {
     public static Logger jqmlogger = Logger.getLogger(JqmBaseTest.class);
     public static Server s;
+    protected static Db db;
     public Map<String, JqmEngine> engines = new HashMap<String, JqmEngine>();
-    public List<EntityManager> ems = new ArrayList<EntityManager>();
+    public List<DbConn> cnxs = new ArrayList<DbConn>();
 
-    protected EntityManager em;
+    protected DbConn cnx;
 
     @Rule
     public TestName testName = new TestName();
@@ -59,6 +62,10 @@ public class JqmBaseTest
             s.setLogWriter(null);
             s.setSilent(true);
             s.start();
+
+            JDBCDataSource ds = new JDBCDataSource();
+            ds.setDatabase("jdbc:hsqldb:mem:testdbengine");
+            db = new Db(ds);
         }
     }
 
@@ -77,9 +84,9 @@ public class JqmBaseTest
             jqmlogger.warn("Could not purge test JNDI context", e);
         }
         JqmClientFactory.resetClient(null);
-        em = getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createTestData(em);
+        cnx = getNewDbSession();
+        TestHelpers.cleanup(cnx);
+        TestHelpers.createTestData(cnx);
     }
 
     @After
@@ -92,11 +99,11 @@ public class JqmBaseTest
             e.stop();
         }
         engines.clear();
-        for (EntityManager em : ems)
+        for (DbConn em : cnxs)
         {
-            Helpers.closeQuietly(em);
+            em.close();
         }
-        ems.clear();
+        cnxs.clear();
 
         // Java 6 GC being rather inefficient, we must run it multiple times to correctly collect Jetty-created class loaders and avoid
         // permgen issues
@@ -127,11 +134,11 @@ public class JqmBaseTest
         engines.remove(nodeName);
     }
 
-    protected EntityManager getNewEm()
+    protected DbConn getNewDbSession()
     {
-        EntityManager em = Helpers.getNewEm();
-        ems.add(em);
-        return em;
+        DbConn cnx = db.getConn();
+        cnxs.add(cnx);
+        return cnx;
     }
 
     protected void sleep(int s)

@@ -130,7 +130,7 @@ class Loader implements Runnable, LoaderMBean
         // Block needing the database
         try
         {
-            em = Helpers.getNewEm();
+            em = Helpers.getNewDbSession();
 
             // Refresh entities from the current EM
             this.job = em.find(JobInstance.class, job.getId());
@@ -364,7 +364,7 @@ class Loader implements Runnable, LoaderMBean
      */
     void endOfRunDb()
     {
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
 
         try
         {
@@ -441,7 +441,7 @@ class Loader implements Runnable, LoaderMBean
     public void kill()
     {
         Properties props = new Properties();
-        props.put("emf", Helpers.getEmf());
+        props.put("emf", Helpers.getDb());
         JqmClientFactory.getClient("uncached", props, false).killJob(this.job.getId());
     }
 
@@ -504,7 +504,7 @@ class Loader implements Runnable, LoaderMBean
     {
         if (this.job.getExecutionDate() == null)
         {
-            EntityManager em2 = Helpers.getNewEm();
+            EntityManager em2 = Helpers.getNewDbSession();
             this.job.setExecutionDate(em2.find(JobInstance.class, this.job.getId()).getExecutionDate());
             em2.close();
         }

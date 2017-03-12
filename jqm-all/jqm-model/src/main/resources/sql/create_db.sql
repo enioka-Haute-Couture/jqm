@@ -13,6 +13,7 @@
 /* TODO: schema migration */
 /* TODO: hunt useless model calsqses - most often a direct  query will be clearer */
 /* Use LONG for some tables' ID */
+/* Hunt applicationName */
 
 /* Deployment infra */
 CREATE MEMORY TABLE NODE

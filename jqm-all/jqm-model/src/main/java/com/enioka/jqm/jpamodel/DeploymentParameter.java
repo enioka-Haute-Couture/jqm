@@ -18,8 +18,13 @@
 
 package com.enioka.jqm.jpamodel;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
+import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.QueryResult;
 
@@ -171,20 +176,57 @@ public class DeploymentParameter
     {
         this.enabled = enabled;
     }
-    
+
+    public static DeploymentParameter create(DbConn cnx, Node node, Integer nbThread, Integer pollingInterval, Queue q)
+    {
+        return create(cnx, node.getId(), nbThread, pollingInterval, q.getId());
+    }
+
     /**
      * Create a new entry in the database. No commit performed.
      */
-    public static DeploymentParameter create(DbConn cnx, Node node, Integer nbThread, Integer pollingInterval, Queue q)
+    public static DeploymentParameter create(DbConn cnx, Integer nodeId, Integer nbThread, Integer pollingInterval, Integer qId)
     {
-        QueryResult r = cnx.runUpdate("dp_insert", true, nbThread, pollingInterval, node.getId(), q.getId());
+        QueryResult r = cnx.runUpdate("dp_insert", true, nbThread, pollingInterval, nodeId, qId);
         DeploymentParameter res = new DeploymentParameter();
         res.id = r.getGeneratedId();
-        res.node = node.getId();
+        res.node = nodeId;
         res.nbThread = nbThread;
         res.pollingInterval = pollingInterval;
-        res.queue = q.getId();
-        
+        res.queue = qId;
+
+        return res;
+    }
+
+    public static List<DeploymentParameter> select(DbConn cnx, String query_key, Object... args)
+    {
+        List<DeploymentParameter> res = new ArrayList<DeploymentParameter>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key, args);
+            while (rs.next())
+            {
+                DeploymentParameter tmp = new DeploymentParameter();
+
+                tmp.id = rs.getInt(1);
+                tmp.enabled = rs.getBoolean(2);
+
+                Calendar c = Calendar.getInstance();
+                c.setTimeInMillis(rs.getTimestamp(3).getTime());
+                tmp.lastModified = c;
+
+                tmp.nbThread = rs.getInt(4);
+                tmp.pollingInterval = rs.getInt(5);
+                tmp.node = rs.getInt(6);
+                tmp.queue = rs.getInt(7);
+
+                res.add(tmp);
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
         return res;
     }
 }

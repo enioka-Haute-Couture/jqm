@@ -274,7 +274,7 @@ public class Main
     {
         try
         {
-            EntityManager em = Helpers.getNewEm();
+            EntityManager em = Helpers.getNewDbSession();
             if (em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true").getResultList().size() != 1)
             {
                 jqmlogger.fatal(
@@ -301,7 +301,7 @@ public class Main
         EntityManager em = null;
         try
         {
-            em = Helpers.getNewEm();
+            em = Helpers.getNewDbSession();
             XmlJobDefExporter.export(xmlPath, em);
         }
         catch (Exception ex)
@@ -346,7 +346,7 @@ public class Main
         {
             Helpers.allowCreateSchema();
             jqmlogger.info("Creating engine node " + nodeName);
-            EntityManager em = Helpers.getNewEm();
+            EntityManager em = Helpers.getNewDbSession();
             Helpers.updateConfiguration(em);
             Helpers.updateNodeConfiguration(nodeName, em, port);
             em.close();
@@ -363,7 +363,7 @@ public class Main
         {
             Helpers.allowCreateSchema();
             jqmlogger.info("Upgrading database and shared metadata");
-            EntityManager em = Helpers.getNewEm();
+            EntityManager em = Helpers.getNewDbSession();
             Helpers.updateConfiguration(em);
             em.close();
         }
@@ -378,7 +378,7 @@ public class Main
         EntityManager em = null;
         try
         {
-            em = Helpers.getNewEm();
+            em = Helpers.getNewDbSession();
             XmlQueueExporter.export(xmlPath, em);
         }
         catch (Exception ex)
@@ -396,7 +396,7 @@ public class Main
         EntityManager em = null;
         try
         {
-            em = Helpers.getNewEm();
+            em = Helpers.getNewDbSession();
             XmlQueueParser.parse(xmlPath, em);
         }
         catch (Exception ex)
@@ -414,7 +414,7 @@ public class Main
         EntityManager em = null;
         try
         {
-            em = Helpers.getNewEm();
+            em = Helpers.getNewDbSession();
             em.getTransaction().begin();
             RRole r = Helpers.createRoleIfMissing(em, "administrator", "all permissions without exception", "*:*");
 
@@ -438,7 +438,7 @@ public class Main
     {
         if ("enable".equals(option))
         {
-            EntityManager em = Helpers.getNewEm();
+            EntityManager em = Helpers.getNewDbSession();
             Helpers.setSingleParam("disableWsApi", "false", em);
             Helpers.setSingleParam("enableWsApiSsl", "false", em);
             Helpers.setSingleParam("enableWsApiAuth", "true", em);
@@ -455,7 +455,7 @@ public class Main
         }
         else if ("disable".equals(option))
         {
-            EntityManager em = Helpers.getNewEm();
+            EntityManager em = Helpers.getNewDbSession();
             em.getTransaction().begin();
             em.createQuery("UPDATE Node n set n.loadApiClient = false, n.loadApiAdmin = false").executeUpdate();
             em.getTransaction().commit();
@@ -463,26 +463,26 @@ public class Main
         }
         if ("ssl".equals(option))
         {
-            EntityManager em = Helpers.getNewEm();
+            EntityManager em = Helpers.getNewDbSession();
             Helpers.setSingleParam("enableWsApiSsl", "true", em);
             Helpers.setSingleParam("enableWsApiAuth", "true", em);
             em.close();
         }
         if ("nossl".equals(option))
         {
-            EntityManager em = Helpers.getNewEm();
+            EntityManager em = Helpers.getNewDbSession();
             Helpers.setSingleParam("enableWsApiSsl", "false", em);
             em.close();
         }
         if ("internalpki".equals(option))
         {
-            EntityManager em = Helpers.getNewEm();
+            EntityManager em = Helpers.getNewDbSession();
             Helpers.setSingleParam("enableInternalPki", "true", em);
             em.close();
         }
         if ("externalpki".equals(option))
         {
-            EntityManager em = Helpers.getNewEm();
+            EntityManager em = Helpers.getNewDbSession();
             Helpers.setSingleParam("enableInternalPki", "false", em);
             em.close();
         }
@@ -498,7 +498,7 @@ public class Main
         EntityManager em = null;
         try
         {
-            em = Helpers.getNewEm();
+            em = Helpers.getNewDbSession();
 
             RRole[] roles = new RRole[options.length - 2];
             for (int i = 2; i < options.length; i++)

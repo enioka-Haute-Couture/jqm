@@ -58,12 +58,12 @@ public class RRole implements Serializable
 
     public List<RUser> getUsers(DbConn cnx)
     {
-        return RUser.getUsers(cnx, "user_select_all_in_role", this.id);
+        return RUser.select(cnx, "user_select_all_in_role", this.id);
     }
 
     public List<RPermission> getPermissions(DbConn cnx)
     {
-        return RPermission.getPermissions(cnx, "perm_select_all_in_role", this.id);
+        return RPermission.select(cnx, "perm_select_all_in_role", this.id);
     }
 
     public String getDescription()
@@ -76,7 +76,7 @@ public class RRole implements Serializable
         this.description = description;
     }
 
-    public static List<RRole> select_roles(DbConn cnx, String query_key, Object... args)
+    public static List<RRole> select(DbConn cnx, String query_key, Object... args)
     {
         List<RRole> res = new ArrayList<RRole>();
         try

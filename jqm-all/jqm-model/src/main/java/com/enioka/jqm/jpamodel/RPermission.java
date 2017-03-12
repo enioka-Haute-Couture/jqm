@@ -66,7 +66,7 @@ public class RPermission implements Serializable
         this.role = role;
     }
 
-    public static List<RPermission> getPermissions(DbConn cnx, String query_key, Object... args)
+    public static List<RPermission> select(DbConn cnx, String query_key, Object... args)
     {
         List<RPermission> res = new ArrayList<RPermission>();
         try

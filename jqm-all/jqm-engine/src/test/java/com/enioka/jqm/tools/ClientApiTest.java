@@ -290,7 +290,7 @@ public class ClientApiTest extends JqmBaseTest
 
         Assert.assertEquals(1, TestHelpers.getOkCount(em));
 
-        History h = Helpers.getNewEm().createQuery("SELECT j FROM History j", History.class).getSingleResult();
+        History h = Helpers.getNewDbSession().createQuery("SELECT j FROM History j", History.class).getSingleResult();
 
         Assert.assertEquals("Houba", h.getInstanceKeyword1());
         Assert.assertEquals(null, h.getInstanceKeyword2());

@@ -109,7 +109,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         Helpers.registerJndiIfNeeded();
 
         // Database connection
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
 
         // Node configuration is in the database
         try
@@ -373,7 +373,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         EntityManager em = null;
         try
         {
-            em = Helpers.getNewEm();
+            em = Helpers.getNewDbSession();
             em.getTransaction().begin();
             this.node = em.find(Node.class, this.node.getId(), LockModeType.PESSIMISTIC_WRITE);
             this.node.setStop(false);
@@ -484,7 +484,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                     {
                         synchronized (ee)
                         {
-                            em = Helpers.getNewEm();
+                            em = Helpers.getNewDbSession();
                             em.find(Node.class, 1);
                             back = true;
                             ee.qpRestarter = null;
@@ -641,7 +641,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     @Override
     public void pause()
     {
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
         em.getTransaction().begin();
         em.createQuery("UPDATE Node n SET n.enabled = false WHERE n.id = :id").setParameter("id", node.getId()).executeUpdate();
         em.getTransaction().commit();
@@ -652,7 +652,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     @Override
     public void resume()
     {
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
         em.getTransaction().begin();
         em.createQuery("UPDATE Node n SET n.enabled = true WHERE n.id = :id").setParameter("id", node.getId()).executeUpdate();
         em.getTransaction().commit();

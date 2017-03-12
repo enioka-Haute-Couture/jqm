@@ -81,7 +81,7 @@ public class BasicTest
     {
         jqmlogger.debug("********* TEST INIT");
 
-        em = Helpers.getNewEm();
+        em = Helpers.getNewDbSession();
         TestHelpers.cleanup(em);
         TestHelpers.createTestData(em);
         Helpers.setSingleParam("disableWsApi", "false", em);

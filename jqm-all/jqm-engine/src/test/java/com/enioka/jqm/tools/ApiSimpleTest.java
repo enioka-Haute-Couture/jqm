@@ -48,8 +48,8 @@ public class ApiSimpleTest extends JqmBaseTest
     @Before
     public void before() throws IOException
     {
-        Helpers.setSingleParam("disableWsApi", "false", em);
-        Helpers.setSingleParam("enableWsApiAuth", "false", em);
+        Helpers.setSingleParam("disableWsApi", "false", cnx);
+        Helpers.setSingleParam("enableWsApiAuth", "false", cnx);
 
         File jar = FileUtils.listFiles(new File("../jqm-ws/target/"), new String[] { "war" }, false).iterator().next();
         FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war"));
@@ -61,9 +61,9 @@ public class ApiSimpleTest extends JqmBaseTest
     public void testHttpEnqueue() throws Exception
     {
         CreationTools.createJobDef(null, true, "pyl.EngineApiSend3Msg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip,
-                42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+                42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
-        em.refresh(TestHelpers.node);
+        // em.refresh(TestHelpers.node);
         HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + TestHelpers.node.getPort() + "/ws/simple/ji");
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("applicationname", "Marsu-Application"));
@@ -97,7 +97,7 @@ public class ApiSimpleTest extends JqmBaseTest
             Assert.fail("result was not an integer " + e.getMessage());
         }
 
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
         // Check run is OK & parameters have been correctly processed
         JobInstance ji = JqmClientFactory.getClient().getJob(jid);
@@ -111,9 +111,9 @@ public class ApiSimpleTest extends JqmBaseTest
     public void testHttpStatus() throws Exception
     {
         CreationTools.createJobDef(null, true, "pyl.EngineApiSend3Msg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip,
-                42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+                42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
-        em.refresh(TestHelpers.node);
+        // em.refresh(TestHelpers.node);
         HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + TestHelpers.node.getPort() + "/ws/simple/ji");
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("applicationname", "Marsu-Application"));
@@ -145,7 +145,7 @@ public class ApiSimpleTest extends JqmBaseTest
             Assert.fail("result was not an integer " + e.getMessage());
         }
 
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
         HttpGet rq = new HttpGet("http://" + TestHelpers.node.getDns() + ":" + TestHelpers.node.getPort() + "/ws/simple/status?id=" + jid);
         res = client.execute(rq);

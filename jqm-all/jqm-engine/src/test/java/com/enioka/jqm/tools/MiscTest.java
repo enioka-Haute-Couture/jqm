@@ -117,7 +117,7 @@ public class MiscTest extends JqmBaseTest
         addAndStartEngine();
         TestHelpers.waitFor(2, 10000, em);
 
-        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
+        List<History> ji = Helpers.getNewDbSession().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
         Assert.assertEquals(2, ji.size());
         Assert.assertEquals(State.ENDED, ji.get(0).getState());
         Assert.assertEquals(State.ENDED, ji.get(1).getState());
@@ -147,7 +147,7 @@ public class MiscTest extends JqmBaseTest
         addAndStartEngine();
         TestHelpers.waitFor(1, 10000, em);
 
-        List<History> ji = Helpers.getNewEm()
+        List<History> ji = Helpers.getNewDbSession()
                 .createQuery("SELECT j FROM History j WHERE j.jd.applicationName = :myId order by id asc", History.class)
                 .setParameter("myId", "CompatHibApi").getResultList();
         Assert.assertEquals(1, ji.size());

@@ -61,7 +61,7 @@ public class SslTest
         jqmlogger.debug("Starting test testSslAuth");
 
         // Test envt
-        em = Helpers.getNewEm();
+        em = Helpers.getNewDbSession();
         TestHelpers.cleanup(em);
         TestHelpers.createTestData(em);
 

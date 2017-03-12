@@ -63,7 +63,7 @@ public class NoApiPayloadTest extends JqmBaseTest
     {
         int i = JqmSimpleTest.create(em, "pyl.EngineApiInjectThread").expectOk(3).run(this);
 
-        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
+        List<History> ji = Helpers.getNewDbSession().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
         Assert.assertEquals(1, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 1 message per run.
         Assert.assertEquals(100, (int) ji.get(0).getProgress());
     }
@@ -79,7 +79,7 @@ public class NoApiPayloadTest extends JqmBaseTest
     {
         int i = JqmSimpleTest.create(em, "pyl.EngineApiInject").setSessionId("123X").expectOk(3).run(this);
 
-        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
+        List<History> ji = Helpers.getNewDbSession().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
 
         Assert.assertEquals(1, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 1 message per run created by payload
         Assert.assertEquals(100, (int) ji.get(0).getProgress());
@@ -134,7 +134,7 @@ public class NoApiPayloadTest extends JqmBaseTest
         // Here, engine API + full API mix.
         int i = JqmSimpleTest.create(em, "pyl.EngineApiInject", "jqm-test-pyl-hibapi").setSessionId("123X").expectOk(3).run(this);
 
-        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
+        List<History> ji = Helpers.getNewDbSession().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
 
         Assert.assertEquals(1, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 1 message per run created by payload
         Assert.assertEquals(100, (int) ji.get(0).getProgress());

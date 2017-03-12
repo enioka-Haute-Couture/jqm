@@ -19,9 +19,15 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
+import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.QueryResult;
 
 /**
@@ -109,5 +115,51 @@ public class GlobalParameter implements Serializable
         res.key = key;
         res.value = value;
         return res;
+    }
+
+    public static List<GlobalParameter> select(DbConn cnx, String query_key, Object... args)
+    {
+        List<GlobalParameter> res = new ArrayList<GlobalParameter>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key, args);
+            while (rs.next())
+            {
+                GlobalParameter tmp = new GlobalParameter();
+
+                tmp.id = rs.getInt(1);
+                tmp.key = rs.getString(2);
+                tmp.value = rs.getString(3);
+                Calendar c = Calendar.getInstance();
+                c.setTimeInMillis(rs.getTimestamp(4).getTime());
+                tmp.lastModified = c;
+
+                res.add(tmp);
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
+    }
+
+    /**
+     * Retrieve the value of a single-valued parameter.
+     * 
+     * @param key
+     * @param defaultValue
+     * @param em
+     */
+    public static String getParameter(DbConn cnx, String key, String defaultValue)
+    {
+        try
+        {
+            return cnx.runSelectSingle("globalprm_select_by_key", 2, String.class, key);
+        }
+        catch (NoResultException e)
+        {
+            return defaultValue;
+        }
     }
 }

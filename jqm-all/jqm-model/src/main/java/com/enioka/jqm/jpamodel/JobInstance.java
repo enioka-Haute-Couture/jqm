@@ -64,7 +64,7 @@ public class JobInstance implements Serializable
     {
         if (this.state.equals(State.SUBMITTED))
         {
-            return conn.runSelectSingleInt("ji_select_current_pos", this.internalPosition) + 1;
+            return conn.runSelectSingle("ji_select_current_pos", Integer.class, this.internalPosition) + 1;
         }
         else
         {

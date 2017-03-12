@@ -19,7 +19,12 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.QueryResult;
 
@@ -129,6 +134,30 @@ public class Queue implements Serializable
         res.id = r.getGeneratedId();
         res.name = name;
         res.description = description;
+        return res;
+    }
+
+    public static List<Queue> select(DbConn cnx, String query_key, Object... args)
+    {
+        List<Queue> res = new ArrayList<Queue>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key, args);
+            while (rs.next())
+            {
+                Queue tmp = new Queue();
+
+                tmp.id = rs.getInt(1);
+                tmp.defaultQueue = rs.getBoolean(2);
+                tmp.description = rs.getString(3);
+
+                res.add(tmp);
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
         return res;
     }
 }

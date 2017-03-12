@@ -77,7 +77,7 @@ final class ResourceParser
         {
             // Using the horrible CriteriaBuilder API instead of a string query. This avoids classloading issues - Hibernate binds
             // the entities at run time with the thread current classloader...
-            em = Helpers.getNewEm();
+            em = Helpers.getNewDbSession();
 
             CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery<JndiObjectResource> q = cb.createQuery(JndiObjectResource.class);

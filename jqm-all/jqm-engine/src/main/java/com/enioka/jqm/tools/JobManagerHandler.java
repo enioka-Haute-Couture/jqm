@@ -63,9 +63,9 @@ class JobManagerHandler implements InvocationHandler
     JobManagerHandler(JobInstance ji, Map<String, String> prms)
     {
         p = new Properties();
-        p.put("emf", Helpers.getEmf());
+        p.put("emf", Helpers.getDb());
 
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
         this.ji = em.find(JobInstance.class, ji.getId());
         params = prms;
 
@@ -245,7 +245,7 @@ class JobManagerHandler implements InvocationHandler
             return;
         }
 
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
         try
         {
             this.ji = em.find(JobInstance.class, this.ji.getId());
@@ -273,7 +273,7 @@ class JobManagerHandler implements InvocationHandler
      */
     private void sendMsg(String msg)
     {
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
         try
         {
             em.getTransaction().begin();
@@ -294,7 +294,7 @@ class JobManagerHandler implements InvocationHandler
      */
     private void sendProgress(Integer msg)
     {
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
         try
         {
             em.getTransaction().begin();
@@ -381,7 +381,7 @@ class JobManagerHandler implements InvocationHandler
     private Integer addDeliverable(String path, String fileLabel) throws IOException
     {
         Deliverable d = null;
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
         try
         {
             this.ji = em.find(JobInstance.class, ji.getId());
@@ -432,7 +432,7 @@ class JobManagerHandler implements InvocationHandler
 
     private JobInstance getRunningJI(int jobId)
     {
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
         JobInstance jj = null;
         try
         {
@@ -451,7 +451,7 @@ class JobManagerHandler implements InvocationHandler
 
     private History getEndedJI(int jobId)
     {
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
         History h = null;
         try
         {

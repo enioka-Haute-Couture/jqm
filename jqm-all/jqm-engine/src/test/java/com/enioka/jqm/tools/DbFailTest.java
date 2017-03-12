@@ -77,9 +77,9 @@ public class DbFailTest extends JqmBaseTest
 
         jqmlogger.info("Restarting DB");
         s.start();
-        TestHelpers.waitFor(1, 10000, this.getNewEm());
+        TestHelpers.waitFor(1, 10000, this.getNewDbSession());
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(this.getNewEm()));
+        Assert.assertEquals(1, TestHelpers.getOkCount(this.getNewDbSession()));
     }
 
     // Job ends KO during db failure.
@@ -96,9 +96,9 @@ public class DbFailTest extends JqmBaseTest
 
         jqmlogger.info("Restarting DB");
         s.start();
-        TestHelpers.waitFor(1, 10000, this.getNewEm());
+        TestHelpers.waitFor(1, 10000, this.getNewDbSession());
 
-        Assert.assertEquals(1, TestHelpers.getNonOkCount(this.getNewEm()));
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(this.getNewDbSession()));
     }
 
     // Many jobs starting & running during failure
@@ -130,9 +130,9 @@ public class DbFailTest extends JqmBaseTest
         this.sleep(1);
         jqmlogger.info("Restarting DB");
         s.start();
-        TestHelpers.waitFor(1000, 120000, this.getNewEm());
+        TestHelpers.waitFor(1000, 120000, this.getNewDbSession());
 
-        Assert.assertEquals(1000, TestHelpers.getOkCount(this.getNewEm()));
+        Assert.assertEquals(1000, TestHelpers.getOkCount(this.getNewDbSession()));
         Assert.assertTrue(this.engines.get("localhost").isAllPollersPolling());
     }
 }

@@ -109,7 +109,13 @@ public class DbConn
         }
     }
 
-    public int runSelectSingleInt(String query_key, Object... params)
+    public <T> T runSelectSingle(String query_key, Class<T> clazz, Object... params)
+    {
+        return runSelectSingle(query_key, 0, clazz, params);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T runSelectSingle(String query_key, int column, Class<T> clazz, Object... params)
     {
         ResultSet rs = runSelect(query_key, params);
         try
@@ -124,18 +130,29 @@ public class DbConn
                 throw new DatabaseException("query was supposed to return an integer - wrong datatype");
             }
 
-            int res;
+            T res;
             if (rs.next())
             {
-                res = rs.getInt(0);
+                if (clazz.equals(Integer.class))
+                {
+                    res = (T) (Integer) rs.getInt(column);
+                }
+                else if (clazz.equals(String.class))
+                {
+                    res = (T) rs.getString(column);
+                }
+                else
+                {
+                    throw new DatabaseException("unsupported single query return type " + clazz.toGenericString());
+                }
             }
             else
             {
-                throw new DatabaseException("query was supposed to return a single row - none returned");
+                throw new NoResultException("query was supposed to return a single row - none returned");
             }
             if (rs.next())
             {
-                throw new DatabaseException("query was supposed to return a single row - multiple returned");
+                throw new NonUniqueResultException("query was supposed to return a single row - multiple returned");
             }
 
             return res;
@@ -151,6 +168,18 @@ public class DbConn
      */
     public void close()
     {
+        if (transac_open)
+        {
+            try
+            {
+                this._cnx.rollback();
+                transac_open = false;
+            }
+            catch (Exception e)
+            {
+                // Ignore.
+            }
+        }
         try
         {
             this._cnx.close();

@@ -83,7 +83,7 @@ public class EngineApiTest extends JqmBaseTest
     {
         JqmSimpleTest.create(em, "pyl.EngineApiWaitAll").expectOk(6).run(this);
 
-        List<History> ji = Helpers.getNewEm()
+        List<History> ji = Helpers.getNewDbSession()
                 .createQuery("SELECT j FROM History j WHERE j.status = 'ENDED' ORDER BY j.id ASC", History.class).getResultList();
 
         Calendar parentEnd = ji.get(0).getEndDate();

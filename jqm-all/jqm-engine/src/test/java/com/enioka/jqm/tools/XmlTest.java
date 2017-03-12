@@ -184,7 +184,7 @@ public class XmlTest extends JqmBaseTest
         // Second import - parameters are different, note 3 instead of 1
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest_np.xml" });
 
-        jd = this.getNewEm().createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
+        jd = this.getNewDbSession().createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
         Assert.assertEquals(2, jd.size());
         Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
         Assert.assertEquals("3", jd.get(0).getParameters().get(0).getValue());

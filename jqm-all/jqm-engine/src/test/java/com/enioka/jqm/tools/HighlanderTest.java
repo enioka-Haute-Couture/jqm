@@ -90,7 +90,7 @@ public class HighlanderTest extends JqmBaseTest
         addAndStartEngine();
         TestHelpers.waitFor(1, 10000, em);
 
-        EntityManager emm = getNewEm();
+        EntityManager emm = getNewDbSession();
         Assert.assertEquals(1, TestHelpers.getOkCount(emm));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(emm));
     }
@@ -135,7 +135,7 @@ public class HighlanderTest extends JqmBaseTest
         addAndStartEngine();
         TestHelpers.waitFor(1, 10000, em);
 
-        EntityManager emm = getNewEm();
+        EntityManager emm = getNewDbSession();
         Assert.assertEquals(1, TestHelpers.getOkCount(emm));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(emm));
     }

@@ -104,7 +104,7 @@ public class PackageTest extends JqmBaseTest
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testLibInJarReload");
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
         TestHelpers.cleanup(em);
         TestHelpers.createTestData(em);
 

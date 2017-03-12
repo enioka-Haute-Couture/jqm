@@ -21,11 +21,11 @@ package com.enioka.jqm.tools;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
-import java.security.SecureRandom;
 import java.sql.SQLTransientException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.zip.ZipFile;
@@ -34,11 +34,6 @@ import javax.mail.MessagingException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
-import javax.persistence.Persistence;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Appender;
@@ -49,26 +44,24 @@ import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.util.ByteSource;
 import org.apache.shiro.util.StringUtils;
-import org.hibernate.LazyInitializationException;
-import org.hibernate.exception.JDBCConnectionException;
-import org.sql2o.Connection;
-import org.sql2o.Sql2o;
 
-import com.enioka.jqm.jpamodel.Deliverable;
+import com.enioka.jqm.jdbc.Db;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.jdbc.NonUniqueResultException;
+import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JndiObjectResource;
-import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Message;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.jpamodel.RPermission;
 import com.enioka.jqm.jpamodel.RRole;
 import com.enioka.jqm.jpamodel.RUser;
 import com.enioka.jqm.jpamodel.State;
+
+// TODO: cnx should be first arg.
 
 /**
  * This is a helper class for internal use only.
@@ -76,12 +69,11 @@ import com.enioka.jqm.jpamodel.State;
  */
 final class Helpers
 {
-    private static final String PERSISTENCE_UNIT = "jobqueue-api-pu";
     private static Logger jqmlogger = Logger.getLogger(Helpers.class);
 
     // The one and only EMF in the engine.
     private static Properties props = new Properties();
-    private static EntityManagerFactory emf;
+    private static Db _db;
 
     // Resource file contains at least the jqm jdbc connection definition. Static because JNDI root context is common to the whole JVM.
     static String resourceFile = "resources.xml";
@@ -96,27 +88,27 @@ final class Helpers
      * 
      * @return an EntityManager
      */
-    static EntityManager getNewEm()
+    static DbConn getNewDbSession()
     {
-        getEmf();
-        return emf.createEntityManager();
+        getDb();
+        return _db.getConn();
     }
 
-    static void setEmf(EntityManagerFactory newEmf)
+    static void setDb(Db db)
     {
-        emf = newEmf;
+        _db = db;
     }
 
-    static EntityManagerFactory getEmf()
+    static Db getDb()
     {
-        if (emf == null)
+        if (_db == null)
         {
-            emf = createFactory();
+            _db = createFactory();
         }
-        return emf;
+        return _db;
     }
 
-    private static EntityManagerFactory createFactory()
+    private static Db createFactory()
     {
         InputStream fis = null;
         try
@@ -130,7 +122,14 @@ final class Helpers
                 IOUtils.closeQuietly(fis);
                 props.putAll(p);
             }
-            return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, props);
+
+            String dsName = "jdbc/jqm";
+            if (p.contains("com.enioka.jqm.jdbc.datasource_name"))
+            {
+                dsName = p.getProperty("com.enioka.jqm.jdbc.datasource_name");
+            }
+
+            return new Db(dsName);
         }
         catch (IOException e)
         {
@@ -147,25 +146,6 @@ final class Helpers
         finally
         {
             IOUtils.closeQuietly(fis);
-        }
-    }
-
-    static void closeQuietly(EntityManager em)
-    {
-        try
-        {
-            if (em != null)
-            {
-                if (em.getTransaction().isActive())
-                {
-                    em.getTransaction().rollback();
-                }
-                em.close();
-            }
-        }
-        catch (Exception e)
-        {
-            // fail silently
         }
     }
 
@@ -203,15 +183,11 @@ final class Helpers
 
     /**
      * For internal test use only <br/>
-     * <bold>WARNING</bold> This will invalidate all open EntityManagers!
+     * <bold>WARNING</bold> This will invalidate all open DB sessions!
      */
-    static void resetEmf()
+    static void resetDb()
     {
-        if (emf != null)
-        {
-            emf.close();
-            emf = null;
-        }
+        _db = null;
     }
 
     static void setLogFileName(String name)
@@ -241,17 +217,11 @@ final class Helpers
     }
 
     /**
-     * Create a text message that will be stored in the database. Must be called inside a JPA transaction.
-     * 
-     * @return the JPA message created
+     * Create a text message that will be stored in the database. Must be called inside a transaction.
      */
-    static Message createMessage(String textMessage, JobInstance jobInstance, EntityManager em)
+    static void createMessage(String textMessage, JobInstance jobInstance, DbConn cnx)
     {
-        Message m = new Message();
-        m.setTextMessage(textMessage);
-        m.setJi(jobInstance.getId());
-        em.persist(m);
-        return m;
+        cnx.runUpdate("message_insert", jobInstance.getId(), textMessage);
     }
 
     /**
@@ -268,69 +238,25 @@ final class Helpers
      * @param em
      *            the EM to use.
      */
-    static Deliverable createDeliverable(String path, String originalFileName, String fileFamily, Integer jobId, EntityManager em)
+    static void createDeliverable(String path, String originalFileName, String fileFamily, Integer jobId, DbConn cnx)
     {
-        Deliverable j = new Deliverable();
-
-        j.setFilePath(path);
-        j.setRandomId(UUID.randomUUID().toString());
-        j.setFileFamily(fileFamily);
-        j.setJobId(jobId);
-        j.setOriginalFileName(originalFileName);
-
-        em.persist(j);
-        return j;
-    }
-
-    /**
-     * Retrieve the value of a single-valued parameter.
-     * 
-     * @param key
-     * @param defaultValue
-     * @param em
-     */
-    static String getParameter(String key, String defaultValue, Sql2o db)
-    {
-        Connection conn = null;
-        try
-        {
-            conn = db.open(); 
-        }
-        finally {
-            conn.close();
-        }
-        
-        
-        try
-        {
-            GlobalParameter gp = em.createQuery("SELECT n from GlobalParameter n WHERE n.key = :key", GlobalParameter.class)
-                    .setParameter("key", key).getSingleResult();
-            return gp.getValue();
-        }
-        catch (NoResultException e)
-        {
-            return defaultValue;
-        }
+        cnx.runUpdate("deliverable_insert", fileFamily, path, jobId, originalFileName, UUID.randomUUID().toString());
     }
 
     /**
      * Checks if a parameter exists. If it exists, it is left untouched. If it doesn't, it is created. Only works for parameters which key
-     * is unique. Must be called from within an open JPA transaction.
+     * is unique. Must be called from within an open transaction.
      */
-    static void initSingleParam(String key, String initValue, EntityManager em)
+    static void initSingleParam(String key, String initValue, DbConn cnx)
     {
         try
         {
-            em.createQuery("SELECT n from GlobalParameter n WHERE n.key = :key", GlobalParameter.class).setParameter("key", key)
-                    .getSingleResult();
+            cnx.runSelectSingle("globalprm_select_by_key", 2, String.class, key);
             return;
         }
         catch (NoResultException e)
         {
-            GlobalParameter gp = new GlobalParameter();
-            gp.setKey(key);
-            gp.setValue(initValue);
-            em.persist(gp);
+            GlobalParameter.create(cnx, key, initValue);
         }
         catch (NonUniqueResultException e)
         {
@@ -342,35 +268,25 @@ final class Helpers
      * Checks if a parameter exists. If it exists, it is updated. If it doesn't, it is created. Only works for parameters which key is
      * unique. Will create a transaction on the given entity manager.
      */
-    static void setSingleParam(String key, String value, EntityManager em)
+    static void setSingleParam(String key, String value, DbConn cnx)
     {
-        try
+        QueryResult r = cnx.runUpdate("globalprm_update_value_by_key", value, key);
+        if (r.nbUpdated == 0)
         {
-            em.getTransaction().begin();
-            GlobalParameter prm = em.createQuery("SELECT n from GlobalParameter n WHERE n.key = :key", GlobalParameter.class)
-                    .setParameter("key", key).getSingleResult();
-            prm.setValue(value);
-            em.getTransaction().commit();
+            cnx.runUpdate("globalprm_insert", key, value);
         }
-        catch (NoResultException e)
-        {
-            GlobalParameter gp = new GlobalParameter();
-            gp.setKey(key);
-            gp.setValue(value);
-            em.persist(gp);
-            em.getTransaction().commit();
-        }
+        cnx.commit();
     }
 
-    static void checkConfiguration(String nodeName, EntityManager em)
+    static void checkConfiguration(String nodeName, DbConn cnx)
     {
         // Node
-        long n = em.createQuery("SELECT COUNT(n) FROM Node n WHERE n.name = :l", Long.class).setParameter("l", nodeName).getSingleResult();
-        if (n == 0L)
+        List<Node> nodes = Node.select(cnx, "node_select_by_name", nodeName);
+        if (nodes.size() == 0)
         {
             throw new JqmInitError("The node does not exist. It must be referenced (CLI option createnode) before it can be used");
         }
-        Node nn = em.createQuery("SELECT n FROM Node n WHERE n.name = :l", Node.class).setParameter("l", nodeName).getSingleResult();
+        Node nn = nodes.get(0);
 
         if (!StringUtils.hasText(nn.getDlRepo()) || !StringUtils.hasText(nn.getRepo()) || !StringUtils.hasText(nn.getTmpDirectory()))
         {
@@ -379,37 +295,34 @@ final class Helpers
         }
 
         // Default queue
-        long i = (Long) em.createQuery("SELECT COUNT(qu) FROM Queue qu where qu.defaultQueue = true").getSingleResult();
-        if (i == 0L)
+        List<Queue> defaultQueues = Queue.select(cnx, "q_select_default");
+        if (defaultQueues.size() == 0)
         {
             throw new JqmInitError("There is no default queue. Correct this (for example with CLI option -u, or with the web admin)");
         }
-        if (i > 1L)
+        if (defaultQueues.size() > 1)
         {
             throw new JqmInitError(
                     "There is more than one default queue. Correct this (for example with CLI option -u, or with the web admin)");
         }
 
         // Deployment parameters
-        i = (Long) em.createQuery("SELECT COUNT(dp) FROM DeploymentParameter dp WHERE dp.node.name = :localnode", Long.class)
-                .setParameter("localnode", nodeName).getSingleResult();
-        if (i == 0L)
+        int i = cnx.runSelectSingle("dp_select_count_for_node", Integer.class, nn.getId());
+        if (i == 0)
         {
             jqmlogger.warn(
                     "This node is not bound to any queue. Either use the GUI to bind it or use CLI option -u to bind it to the default queue");
         }
 
         // Roles
-        i = em.createQuery("SELECT count(rr) from RRole rr WHERE rr.name = :rr", Long.class).setParameter("rr", "administrator")
-                .getSingleResult();
-        if (i == 0L)
+        List<RRole> roles = RRole.select(cnx, "role_select_by_key", "administrator");
+        if (roles.size() != 1)
         {
             throw new JqmInitError("The 'administrator' role does not exist. It is needed for the APIs. Run CLI option -u to create it.");
         }
 
         // Mail session
-        i = (Long) em.createQuery("SELECT COUNT(r) FROM JndiObjectResource r WHERE r.name = :nn").setParameter("nn", "mail/default")
-                .getSingleResult();
+        i = cnx.runSelectSingle("jndi_select_count_for_key", Integer.class, "mail/default");
         if (i == 0L)
         {
             throw new JqmInitError("Mail session named mail/default does not exist but is required for the engine to run"
@@ -427,208 +340,156 @@ final class Helpers
      * @param em
      *            an EntityManager on which a transaction will be opened.
      */
-    static void updateNodeConfiguration(String nodeName, EntityManager em, int port)
+    static void updateNodeConfiguration(String nodeName, DbConn cnx, int port)
     {
         // Node
-        Node n = null;
+        Integer nodeId = null;
         try
         {
-            n = em.createQuery("SELECT n FROM Node n WHERE n.name = :l", Node.class).setParameter("l", nodeName).getSingleResult();
+            nodeId = cnx.runSelectSingle("node_select_by_name", Integer.class, nodeName);
         }
         catch (NoResultException e)
         {
             jqmlogger.info("Node " + nodeName + " does not exist in the configuration and will be created with default values");
-            em.getTransaction().begin();
 
-            n = new Node();
-            n.setDlRepo(System.getProperty("user.dir") + "/outputfiles/");
-            n.setName(nodeName);
-            n.setPort(port);
-            n.setRepo(System.getProperty("user.dir") + "/jobs/");
-            n.setTmpDirectory(System.getProperty("user.dir") + "/tmp/");
-            n.setRootLogLevel("INFO");
-            em.persist(n);
-            em.getTransaction().commit();
+            Node.create(cnx, nodeName, port, System.getProperty("user.dir") + "/jobs/", System.getProperty("user.dir") + "/jobs/",
+                    System.getProperty("user.dir") + "/tmp/", "localhost");
+            cnx.commit();
         }
 
         // Deployment parameters
-        DeploymentParameter dp = null;
-        long i = (Long) em.createQuery("SELECT COUNT(dp) FROM DeploymentParameter dp WHERE dp.node = :localnode")
-                .setParameter("localnode", n).getSingleResult();
-        if (i == 0)
+        long i = cnx.runSelectSingle("dp_select_count_for_node", Integer.class, nodeId);
+        if (i == 0L)
         {
             jqmlogger.info("As this node is not bound to any queue, it will be set to poll from the default queue with default parameters");
-            Queue q = em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true", Queue.class).getSingleResult();
-            em.getTransaction().begin();
-            dp = new DeploymentParameter();
-            dp.setNbThread(5);
-            dp.setNode(n);
-            dp.setPollingInterval(1000);
-            dp.setQueue(q);
-            em.persist(dp);
+            Integer default_queue_id = cnx.runSelectSingle("q_select_default", 1, Integer.class);
+            DeploymentParameter.create(cnx, nodeId, 5, 1000, default_queue_id);
 
-            em.getTransaction().commit();
+            cnx.commit();
         }
     }
 
-    static void updateNodeConfiguration(String nodeName, EntityManager em)
+    static void updateNodeConfiguration(String nodeName, DbConn cnx)
     {
-        updateNodeConfiguration(nodeName, em, 0);
+        updateNodeConfiguration(nodeName, cnx, 0);
     }
 
     /**
      * Creates or updates metadata common to all nodes: default queue, global parameters, roles...<br>
      * It is idempotent. It also has the effect of making broken metadata viable again.
      */
-    static void updateConfiguration(EntityManager em)
+    static void updateConfiguration(DbConn cnx)
     {
-        em.getTransaction().begin();
-
         // Default queue
         Queue q = null;
-        long i = (Long) em.createQuery("SELECT COUNT(qu) FROM Queue qu").getSingleResult();
+        long i = cnx.runSelectSingle("q_select_count_all", Integer.class);
         if (i == 0L)
         {
-            q = new Queue();
-            q.setDefaultQueue(true);
-            q.setDescription("default queue");
-            q.setTimeToLive(1024);
-            q.setName("DEFAULT");
-            em.persist(q);
-
+            Queue.create(cnx, "DEFAULT", "default queue", true);
             jqmlogger.info("A default queue was created in the configuration");
         }
         else
         {
             try
             {
-                q = em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true", Queue.class).getSingleResult();
-                jqmlogger.info("Default queue is named " + q.getName());
+                jqmlogger.info("Default queue is named " + cnx.runSelectSingle("q_select_default", 4, String.class));
             }
             catch (NonUniqueResultException e)
             {
                 // Faulty configuration, but why not
-                q = em.createQuery("SELECT q FROM Queue q", Queue.class).getResultList().get(0);
-                q.setDefaultQueue(true);
-                jqmlogger.info("Queue " + q.getName() + " was modified to become the default queue as there were mutliple default queue");
+                q = Queue.select(cnx, "q_select_all").get(0);
+                cnx.runUpdate("q_update_default_none");
+                cnx.runUpdate("q_update_default_by_id", q.getId());
+                jqmlogger.info("Queue " + q.getName() + " was modified to become the default queue as there were multiple default queues");
             }
             catch (NoResultException e)
             {
                 // Faulty configuration, but why not
-                q = em.createQuery("SELECT q FROM Queue q", Queue.class).getResultList().get(0);
-                q.setDefaultQueue(true);
-                jqmlogger.warn("Queue  " + q.getName() + " was modified to become the default queue as there was no default queue");
+                q = Queue.select(cnx, "q_select_all").get(0);
+                cnx.runUpdate("q_update_default_none");
+                cnx.runUpdate("q_update_default_by_id", q.getId());
+                jqmlogger.info("Queue " + q.getName() + " was modified to become the default queue as there were multiple default queues");
             }
         }
 
         // Global parameters
-        initSingleParam("mavenRepo", "http://repo1.maven.org/maven2/", em);
-        initSingleParam(Constants.GP_DEFAULT_CONNECTION_KEY, Constants.GP_JQM_CONNECTION_ALIAS, em);
-        initSingleParam("logFilePerLaunch", "true", em);
-        initSingleParam("internalPollingPeriodMs", "60000", em);
-        initSingleParam("disableWsApi", "false", em);
-        initSingleParam("enableWsApiSsl", "false", em);
-        initSingleParam("enableWsApiAuth", "true", em);
-        initSingleParam("enableInternalPki", "true", em);
+        initSingleParam("mavenRepo", "http://repo1.maven.org/maven2/", cnx);
+        initSingleParam(Constants.GP_DEFAULT_CONNECTION_KEY, Constants.GP_JQM_CONNECTION_ALIAS, cnx);
+        initSingleParam("logFilePerLaunch", "true", cnx);
+        initSingleParam("internalPollingPeriodMs", "60000", cnx);
+        initSingleParam("disableWsApi", "false", cnx);
+        initSingleParam("enableWsApiSsl", "false", cnx);
+        initSingleParam("enableWsApiAuth", "true", cnx);
+        initSingleParam("enableInternalPki", "true", cnx);
 
         // Roles
-        RRole adminr = createRoleIfMissing(em, "administrator", "all permissions without exception", "*:*");
-        createRoleIfMissing(em, "config admin", "can read and write all configuration, except security configuration", "node:*", "queue:*",
+        RRole adminr = createRoleIfMissing(cnx, "administrator", "all permissions without exception", "*:*");
+        createRoleIfMissing(cnx, "config admin", "can read and write all configuration, except security configuration", "node:*", "queue:*",
                 "qmapping:*", "jndi:*", "prm:*", "jd:*");
-        createRoleIfMissing(em, "config viewer", "can read all configuration except for security configuration", "node:read", "queue:read",
+        createRoleIfMissing(cnx, "config viewer", "can read all configuration except for security configuration", "node:read", "queue:read",
                 "qmapping:read", "jndi:read", "prm:read", "jd:read");
-        createRoleIfMissing(em, "client", "can use the full client API except reading logs, files and altering position", "node:read",
+        createRoleIfMissing(cnx, "client", "can use the full client API except reading logs, files and altering position", "node:read",
                 "queue:read", "job_instance:*", "jd:read");
-        createRoleIfMissing(em, "client power user", "can use the full client API", "node:read", "queue:read", "job_instance:*", "jd:read",
+        createRoleIfMissing(cnx, "client power user", "can use the full client API", "node:read", "queue:read", "job_instance:*", "jd:read",
                 "logs:read", "queue_position:create", "files:read");
-        createRoleIfMissing(em, "client read only", "can query job instances and get their files", "queue:read", "job_instance:read",
+        createRoleIfMissing(cnx, "client read only", "can query job instances and get their files", "queue:read", "job_instance:read",
                 "logs:read", "files:read");
 
         // Users
-        createUserIfMissing(em, "root", "all powerful user", adminr);
+        createUserIfMissing(cnx, "root", new SecureRandomNumberGenerator().nextBytes().toHex(), "all powerful user", adminr.getName());
 
         // Mail session
-        i = (Long) em.createQuery("SELECT COUNT(r) FROM JndiObjectResource r WHERE r.name = :nn").setParameter("nn", "mail/default")
-                .getSingleResult();
+        i = cnx.runSelectSingle("jndi_select_count_for_key", Integer.class, "mail/default");
         if (i == 0)
         {
-            HashMap<String, String> prms = new HashMap<String, String>();
+            Map<String, String> prms = new HashMap<String, String>();
             prms.put("smtpServerHost", "smtp.gmail.com");
 
-            JndiObjectResource res = new JndiObjectResource();
-            res.setAuth(null);
-            res.setDescription("default parameters used to send e-mails");
-            res.setFactory("com.enioka.jqm.providers.MailSessionFactory");
-            res.setName("mail/default");
-            res.setType("javax.mail.Session");
-            res.setSingleton(true);
-            em.persist(res);
-
-            JndiObjectResourceParameter prm = new JndiObjectResourceParameter();
-            prm.setKey("smtpServerHost");
-            prm.setValue("smtp.gmail.com");
-            res.getParameters().add(prm);
-            prm.setResource(res);
+            JndiObjectResource.create(cnx, "mail/default", "javax.mail.Session", "com.enioka.jqm.providers.MailSessionFactory",
+                    "default parameters used to send e-mails", true, prms);
         }
 
         // Done
-        em.getTransaction().commit();
+        cnx.commit();
     }
 
-    static RRole createRoleIfMissing(EntityManager em, String roleName, String description, String... permissions)
+    static RRole createRoleIfMissing(DbConn cnx, String roleName, String description, String... permissions)
     {
-        try
+        List<RRole> rr = RRole.select(cnx, "role_select_by_key", roleName);
+        if (rr.size() == 0)
         {
-            return em.createQuery("SELECT rr from RRole rr WHERE rr.name = :r", RRole.class).setParameter("r", roleName).getSingleResult();
+            RRole.create(cnx, roleName, description, permissions);
+            return RRole.select(cnx, "role_select_by_key", roleName).get(0);
         }
-        catch (NoResultException e)
-        {
-            RRole r = new RRole();
-            r.setName(roleName);
-            r.setDescription(description);
-            em.persist(r);
-
-            for (String s : permissions)
-            {
-                RPermission p = new RPermission();
-                p.setName(s);
-                p.setRole(r);
-                em.persist(p);
-                r.getPermissions().add(p);
-            }
-            return r;
-        }
+        return rr.get(0);
     }
 
-    static RUser createUserIfMissing(EntityManager em, String login, String description, RRole... roles)
+    /**
+     * Creates a new user if does not exist. If it exists, it is unlocked and role are reset (password is untouched).
+     * 
+     * @param cnx
+     * @param login
+     * @param password
+     * @param description
+     * @param roles
+     */
+    static void createUserIfMissing(DbConn cnx, String login, String password, String description, String... roles)
     {
-        RUser res = null;
-        try
-        {
-            res = em.createQuery("SELECT r from RUser r WHERE r.login = :l", RUser.class).setParameter("l", login).getSingleResult();
-        }
-        catch (NoResultException e)
-        {
-            res = new RUser();
-            res.setFreeText(description);
-            res.setLogin(login);
-            res.setPassword(String.valueOf((new SecureRandom()).nextInt()));
-            encodePassword(res);
-            em.persist(res);
-        }
-        res.setLocked(false);
-        for (RRole r : res.getRoles())
-        {
-            r.getUsers().remove(res);
-        }
-        res.getRoles().clear();
-        for (RRole r : roles)
-        {
-            res.getRoles().add(r);
-            r.getUsers().add(res);
-        }
+        int i = cnx.runSelectSingle("user_select_count_by_key", Integer.class, login);
 
-        return res;
+        if (i == 0)
+        {
+            ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
+            String hash = new Sha512Hash(password, salt, 100000).toHex();
+            String saltS = salt.toHex();
+
+            RUser.create(cnx, login, hash, saltS, roles);
+        }
+        else
+        {
+            cnx.runUpdate("user_update_enable_by_key", login);
+            RUser.set_roles(cnx, login, roles);
+        }
     }
 
     static void encodePassword(RUser user)
@@ -642,41 +503,18 @@ final class Helpers
      * Transaction is not opened nor committed here but needed.
      * 
      */
-    static History createHistory(JobInstance job, EntityManager em, State finalState, Calendar endDate)
+    static void createHistory(JobInstance ji, DbConn cnx, State finalState, Calendar endDate)
     {
-        History h = new History();
-        h.setId(job.getId());
-        h.setJd(job.getJd());
-        h.setApplicationName(job.getJd().getApplicationName());
-        h.setSessionId(job.getSessionID());
-        h.setQueue(job.getQueue());
-        h.setQueueName(job.getQueue().getName());
-        h.setEnqueueDate(job.getCreationDate());
-        h.setEndDate(endDate);
-        h.setAttributionDate(job.getAttributionDate());
-        h.setExecutionDate(job.getExecutionDate());
-        h.setUserName(job.getUserName());
-        h.setEmail(job.getEmail());
-        h.setParentJobId(job.getParentId());
-        h.setApplication(job.getJd().getApplication());
-        h.setModule(job.getJd().getModule());
-        h.setKeyword1(job.getJd().getKeyword1());
-        h.setKeyword2(job.getJd().getKeyword2());
-        h.setKeyword3(job.getJd().getKeyword3());
-        h.setInstanceApplication(job.getApplication());
-        h.setInstanceKeyword1(job.getKeyword1());
-        h.setInstanceKeyword2(job.getKeyword2());
-        h.setInstanceKeyword3(job.getKeyword3());
-        h.setInstanceModule(job.getModule());
-        h.setProgress(job.getProgress());
-        h.setStatus(finalState);
-        h.setNode(job.getNode());
-        h.setNodeName(job.getNode().getName());
-        h.setHighlander(job.getJd().isHighlander());
+        JobDef jd = JobDef.select(cnx, "jd_select_by_id", ji.getJd()).get(0);
+        Node n = Node.select(cnx, "node_select_by_id", ji.getNode()).get(0);
+        Queue q = Queue.select(cnx, "q_select_by_id", ji.getQueue()).get(0);
 
-        em.persist(h);
-
-        return h;
+        // TODO: applicationname == instance application => remove one.
+        cnx.runUpdate("history_insert", ji.getId(), jd.getApplication(), jd.getApplication(), ji.getAttributionDate(), ji.getEmail(),
+                endDate, ji.getCreationDate(), ji.getExecutionDate(), jd.isHighlander(), ji.getApplication(), ji.getKeyword1(),
+                ji.getKeyword2(), ji.getKeyword3(), ji.getModule(), jd.getKeyword1(), jd.getKeyword2(), jd.getKeyword3(), jd.getModule(),
+                n.getName(), ji.getParentId(), ji.getProgress(), q.getName(), 0, ji.getSessionID(), finalState, ji.getUserName(),
+                ji.getJd(), ji.getNode(), ji.getQueue());
     }
 
     static String getMavenVersion()
@@ -702,38 +540,33 @@ final class Helpers
         return res;
     }
 
-    static JobDef findJobDef(String applicationName, EntityManager em)
+    static JobDef findJobDef(String applicationName, DbConn cnx)
     {
-        try
-        {
-            return em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = :n", JobDef.class).setParameter("n", applicationName)
-                    .getSingleResult();
-        }
-        catch (NoResultException ex)
+        List<JobDef> jj = JobDef.select(cnx, "jd_select_by_key", applicationName);
+        if (jj.size() == 0)
         {
             return null;
         }
+        return jj.get(0);
     }
 
-    static Queue findQueue(String qName, EntityManager em)
+    static Queue findQueue(String qName, DbConn cnx)
     {
-        try
-        {
-            return em.createQuery("SELECT q FROM Queue q WHERE q.name = :name", Queue.class).setParameter("name", qName).getSingleResult();
-        }
-        catch (NoResultException ex)
+        List<Queue> jj = Queue.select(cnx, "jd_select_by_key", qName);
+        if (jj.size() == 0)
         {
             return null;
         }
+        return jj.get(0);
     }
 
-    static void dumpParameters(EntityManager em, Node n)
+    static void dumpParameters(DbConn cnx, Node n)
     {
-        String terse = getParameter("disableVerboseStartup", "false", em);
+        String terse = GlobalParameter.getParameter(cnx, "disableVerboseStartup", "false");
         if ("false".equals(terse))
         {
             jqmlogger.info("Global cluster parameters are as follow:");
-            List<GlobalParameter> prms = em.createQuery("SELECT gp FROM GlobalParameter gp", GlobalParameter.class).getResultList();
+            List<GlobalParameter> prms = GlobalParameter.select(cnx, "globalprm_select_all");
             for (GlobalParameter prm : prms)
             {
                 jqmlogger.info(String.format("\t%1$s = %2$s", prm.getKey(), prm.getValue()));
@@ -752,16 +585,14 @@ final class Helpers
             jqmlogger.info("\tAPI client enabled: " + n.getLoadApiClient());
             jqmlogger.info("\tAPI simple enabled: " + n.getLoapApiSimple());
 
-            jqmlogger.info("Node polling parameters are as follow:");
-            List<DeploymentParameter> dps = em
-                    .createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
-                    .setParameter("n", n.getId()).getResultList();
-
             // Pollers
+            jqmlogger.info("Node polling parameters are as follow:");
+            List<DeploymentParameter> dps = DeploymentParameter.select(cnx, "sp_select_for_node", n.getId());
             for (DeploymentParameter dp : dps)
             {
-                jqmlogger.info("\t" + dp.getQueue().getName() + " - every " + dp.getPollingInterval() + "ms - maximum " + dp.getNbThread()
-                        + " concurrent threads");
+                String q = cnx.runSelectSingle("q_select_by_id", String.class, dp.getQueue()); // TODO: avoid this query with a join.
+                jqmlogger.info(
+                        "\t" + q + " - every " + dp.getPollingInterval() + "ms - maximum " + dp.getNbThread() + " concurrent threads");
             }
 
             // Some technical data from the JVM hosting the node
@@ -831,10 +662,9 @@ final class Helpers
     {
         try
         {
-            String message = "The Job number " + ji.getId() + " finished correctly\n\n" + "Job description:\n" + "- Job definition: "
-                    + ji.getJd().getApplicationName() + "\n" + "- Parent: " + ji.getParentId() + "\n" + "- User name: " + ji.getUserName()
-                    + "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "- Queue: " + ji.getQueue().getName() + "\n" + "- Node: "
-                    + ji.getNode().getName() + "\n" + "Best regards,\n";
+            String message = "The Job number " + ji.getId() + " finished correctly\n\n" + "Job description:\n" + "\n" + "- Parent: "
+                    + ji.getParentId() + "\n" + "- User name: " + ji.getUserName() + "\n" + "- Session ID: " + ji.getSessionID() + "\n"
+                    + "\n" + "Best regards,\n";
             sendMessage(ji.getEmail(), "[JQM] Job: " + ji.getId() + " ENDED", message, "mail/default");
         }
         catch (Exception e)
@@ -858,14 +688,19 @@ final class Helpers
 
     static boolean testDbFailure(Exception e)
     {
-        return (e instanceof LazyInitializationException) || (e instanceof JDBCConnectionException)
-                || (e.getCause() instanceof JDBCConnectionException)
-                || (e.getCause() != null && e.getCause().getCause() instanceof JDBCConnectionException)
-                || (e.getCause() instanceof SQLTransientException)
+        return (e instanceof SQLTransientException) || (e.getCause() instanceof SQLTransientException)
                 || (e.getCause() != null && e.getCause().getCause() instanceof SQLTransientException)
                 || (e.getCause() != null && e.getCause().getCause() != null
                         && e.getCause().getCause().getCause() instanceof SQLTransientException)
                 || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() != null
                         && e.getCause().getCause().getCause().getCause() instanceof SQLTransientException);
+        /*
+         * return (e instanceof LazyInitializationException) || (e instanceof JDBCConnectionException) || (e.getCause() instanceof
+         * JDBCConnectionException) || (e.getCause() != null && e.getCause().getCause() instanceof JDBCConnectionException) || (e.getCause()
+         * instanceof SQLTransientException) || (e.getCause() != null && e.getCause().getCause() instanceof SQLTransientException) ||
+         * (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() instanceof SQLTransientException)
+         * || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() != null &&
+         * e.getCause().getCause().getCause().getCause() instanceof SQLTransientException);
+         */
     }
 }

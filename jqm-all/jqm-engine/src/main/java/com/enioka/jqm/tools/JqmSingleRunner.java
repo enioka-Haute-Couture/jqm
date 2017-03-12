@@ -25,7 +25,7 @@ public class JqmSingleRunner
     public static JobInstance run(int jobInstanceId)
     {
         jqmlogger.debug("Single runner was asked to start with ID " + jobInstanceId);
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
         com.enioka.jqm.jpamodel.JobInstance jr = em.find(com.enioka.jqm.jpamodel.JobInstance.class, jobInstanceId);
         em.close();
         if (jr == null)
@@ -58,7 +58,7 @@ public class JqmSingleRunner
         Helpers.registerJndiIfNeeded();
 
         // Get a copy of the instance, to be sure to get a non detached item.
-        EntityManager em = Helpers.getNewEm();
+        EntityManager em = Helpers.getNewDbSession();
         job = em.find(com.enioka.jqm.jpamodel.JobInstance.class, job.getId());
 
         // Parameters
@@ -134,7 +134,7 @@ public class JqmSingleRunner
 
                 while (!Thread.interrupted())
                 {
-                    em2 = Helpers.getNewEm();
+                    em2 = Helpers.getNewDbSession();
                     com.enioka.jqm.jpamodel.JobInstance job = em2.find(com.enioka.jqm.jpamodel.JobInstance.class, jobId);
                     em2.close();
 
