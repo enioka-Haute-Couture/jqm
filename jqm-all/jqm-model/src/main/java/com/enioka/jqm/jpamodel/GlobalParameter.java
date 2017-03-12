@@ -21,38 +21,22 @@ package com.enioka.jqm.jpamodel;
 import java.io.Serializable;
 import java.util.Calendar;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Version;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.QueryResult;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
- * JPA persistence class for storing parameters related to the whole JQM cluster (parameters related to a single engine are stored inside
+ * Persistence class for storing parameters related to the whole JQM cluster (parameters related to a single engine are stored inside
  * {@link Node}).<br>
  * Parameters are simple key/value string pairs.
  */
-@Entity
-@Table(name = "GlobalParameter")
 public class GlobalParameter implements Serializable
 {
     private static final long serialVersionUID = 2619971486012565203L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    @Column(length = 50, name = "KEYNAME")
     private String key;
-    @Column(length = 1000, name = "value")
     private String value;
-
-    @Version
-    @Temporal(TemporalType.TIMESTAMP)
     private Calendar lastModified;
 
     /**
@@ -112,5 +96,18 @@ public class GlobalParameter implements Serializable
     protected void setLastModified(Calendar lastModified)
     {
         this.lastModified = lastModified;
+    }
+
+    /**
+     * Create a new GP entry in the database. No commit performed.
+     */
+    public static GlobalParameter create(DbConn cnx, String key, String value)
+    {
+        QueryResult r = cnx.runUpdate("globalprm_insert", key, value);
+        GlobalParameter res = new GlobalParameter();
+        res.id = r.getGeneratedId();
+        res.key = key;
+        res.value = value;
+        return res;
     }
 }

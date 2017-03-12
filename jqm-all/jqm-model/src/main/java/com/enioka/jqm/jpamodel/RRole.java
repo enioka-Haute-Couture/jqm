@@ -19,54 +19,22 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
+import com.enioka.jqm.jdbc.DatabaseException;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.QueryResult;
 
-@Entity
 public class RRole implements Serializable
 {
     private static final long serialVersionUID = 1234354709423603792L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-
-    @Column(length = 100, name = "name", nullable = false, unique = true)
     private String name;
-
-    @Column(length = 254, name = "description", nullable = false)
     private String description;
-
-    @ManyToMany()
-    private List<RUser> users = new ArrayList<RUser>();
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
-    private List<RPermission> permissions = new ArrayList<RPermission>();
-
-    public void addPermission(String perm)
-    {
-        String np = perm.toLowerCase();
-        for (RPermission p : this.getPermissions())
-        {
-            if (p.getName().equals(np))
-            {
-                return;
-            }
-        }
-        RPermission nrp = new RPermission();
-        nrp.setName(np);
-        nrp.setRole(this);
-        this.getPermissions().add(nrp);
-    }
 
     public Integer getId()
     {
@@ -88,24 +56,14 @@ public class RRole implements Serializable
         this.name = name;
     }
 
-    public List<RUser> getUsers()
+    public List<RUser> getUsers(DbConn cnx)
     {
-        return users;
+        return RUser.getUsers(cnx, "user_select_all_in_role", this.id);
     }
 
-    void setUsers(List<RUser> users)
+    public List<RPermission> getPermissions(DbConn cnx)
     {
-        this.users = users;
-    }
-
-    public List<RPermission> getPermissions()
-    {
-        return permissions;
-    }
-
-    void setPermissions(List<RPermission> permissions)
-    {
-        this.permissions = permissions;
+        return RPermission.getPermissions(cnx, "perm_select_all_in_role", this.id);
     }
 
     public String getDescription()
@@ -117,4 +75,40 @@ public class RRole implements Serializable
     {
         this.description = description;
     }
+
+    public static List<RRole> select_roles(DbConn cnx, String query_key, Object... args)
+    {
+        List<RRole> res = new ArrayList<RRole>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key, args);
+            while (rs.next())
+            {
+                RRole tmp = new RRole();
+
+                tmp.id = rs.getInt(0);
+                tmp.name = rs.getString(1);
+                tmp.description = rs.getString(2);
+
+                res.add(tmp);
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
+    }
+
+    public static void create(DbConn cnx, String roleName, String description, String... permissions)
+    {
+        QueryResult r = cnx.runUpdate("role_insert", description, roleName);
+        int newId = r.getGeneratedId();
+
+        for (String s : permissions)
+        {
+            cnx.runUpdate("perm_insert", s, newId);
+        }
+    }
+
 }

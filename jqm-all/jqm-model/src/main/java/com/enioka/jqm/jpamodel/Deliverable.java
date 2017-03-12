@@ -20,43 +20,26 @@ package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.Index;
+import org.sql2o.Connection;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
- * JPA persistence class for storing pointers towards files created by {@link JobInstance}.
+ * Persistence class for storing pointers towards files created by {@link JobInstance}.
  */
-@Entity
-@Table(name = "Deliverable")
 public class Deliverable implements Serializable
 {
     private static final long serialVersionUID = 4803101067798401977L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     protected Integer id;
 
-    @Column(length = 1024, name = "filepath")
     protected String filePath;
 
-    @Column(length = 100, name = "file_family")
     protected String fileFamily;
 
-    @Index(name = "fk_jobinstance")
-    @Column(nullable = false, name = "jobId")
     private Integer jobId;
 
-    @Column(name = "randomId", length = 200, unique = true)
     private String randomId;
 
-    @Column(name = "originalFileName", length = 1024)
     private String originalFileName;
 
     /**
@@ -158,5 +141,40 @@ public class Deliverable implements Serializable
     public void setRandomId(String randomId)
     {
         this.randomId = randomId;
+    }
+
+    public void validate()
+    {
+        if (filePath.length() > 1024)
+        {
+            throw new ValidationException("filePath", "must be shorter than 1024 characters");
+        }
+        if (fileFamily.length() > 100)
+        {
+            throw new ValidationException("fileFamily", "must be shorter than 100 characters");
+        }
+        if (jobId == null)
+        {
+            throw new ValidationException("jobId", "cannot be null");
+        }
+        if (randomId == null)
+        {
+            throw new ValidationException("randomId", "cannot be null");
+        }
+
+    }
+
+    public void insertOrUpdate(Connection conn)
+    {
+        validate();
+        int nbModified = conn
+                .createQuery(
+                        "UPDATE Deliverable SET filePath=:filePath, fileFamily=:fileFamily, jobId=:jobId, randomId=:randomId, originalFileName=:originalFileName WHERE id=:id")
+                .bind(this).executeUpdate().getResult();
+
+        if (nbModified == 0)
+        {
+            this.id = conn.createQuery("INSERT INTO Deliverable(filePath, fileFamily, jobId, randomId, originalFileName) VALUES(:filePath, :fileFamily, :jobId, :randomId, :originalFileName)", true).executeUpdate().getKey(Integer.class);
+        }
     }
 }

@@ -19,63 +19,36 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import javax.naming.spi.ObjectFactory;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Version;
+
+import com.enioka.jqm.jdbc.DatabaseException;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.QueryResult;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
- * JPA persistence class for storing the JNDI object resources. This table is the actual JNDI directory back-end.
+ * Persistence class for storing the JNDI object resources. This table is the actual JNDI directory back-end.
  */
-@Entity
-@Table(name = "JndiObjectResource")
 public class JndiObjectResource implements Serializable
 {
     private static final long serialVersionUID = 5387852232057745693L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-
-    @Column(nullable = false, length = 100, name = "name", unique = true)
     private String name;
-
-    @Column(nullable = true, length = 20, name = "auth")
     private String auth = null;
-
-    @Column(nullable = false, length = 100, name = "type")
     private String type;
-
-    @Column(nullable = false, length = 100, name = "factory")
     private String factory;
-
-    @Column(nullable = true, length = 250, name = "description")
     private String description;
-
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "resource")
-    private Collection<JndiObjectResourceParameter> parameters = new ArrayList<JndiObjectResourceParameter>();
-
-    @Column(nullable = true, length = 50, name = "template")
     private String template = null;
-
     private Boolean singleton = false;
 
-    @Version
-    @Temporal(TemporalType.TIMESTAMP)
     private Calendar lastModified;
 
     /**
@@ -193,17 +166,30 @@ public class JndiObjectResource implements Serializable
      * The parameters. These are specific to each resource type (i.e. each factory as specified inside {@link #getFactory()} has its own
      * parameter needs). E.g. for MQSeries: HOST, PORT, CHAN, TRAN, QMGR, ...
      */
-    public Collection<JndiObjectResourceParameter> getParameters()
+    public Collection<JndiObjectResourceParameter> getParameters(DbConn cnx)
     {
-        return parameters;
-    }
+        ResultSet rs = cnx.runSelect("jndiprm_select_all_in_jndisrc", this.id);
+        List<JndiObjectResourceParameter> res = new ArrayList<JndiObjectResourceParameter>();
+        JndiObjectResourceParameter tmp = null;
+        try
+        {
+            while (rs.next())
+            {
+                tmp = new JndiObjectResourceParameter();
+                tmp.setId(rs.getInt(0));
+                tmp.setKey(rs.getString(1));
+                Calendar tmpc = Calendar.getInstance();
+                tmpc.setTimeInMillis(rs.getTimestamp(2).getTime());
+                tmp.setLastModified(tmpc);
 
-    /**
-     * See {@link #getParameters()}
-     */
-    public void setParameters(final Collection<JndiObjectResourceParameter> parameters)
-    {
-        this.parameters = parameters;
+                res.add(tmp);
+            }
+        }
+        catch (Exception e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
     }
 
     /**
@@ -236,5 +222,17 @@ public class JndiObjectResource implements Serializable
     protected void setLastModified(Calendar lastModified)
     {
         this.lastModified = lastModified;
+    }
+
+    public static void create(DbConn cnx, String jndiAlias, String className, String factoryClass, String description, boolean singleton,
+            Map<String, String> parameters)
+    {
+        QueryResult r = cnx.runUpdate("jndi_insert", description, factoryClass, jndiAlias, singleton, (String) null, className);
+        int newId = r.getGeneratedId();
+
+        for (Map.Entry<String, String> prms : parameters.entrySet())
+        {
+            cnx.runUpdate("jndiprm_insert", prms.getKey(), prms.getValue(), newId);
+        }
     }
 }

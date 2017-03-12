@@ -19,36 +19,32 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import com.enioka.jqm.jdbc.DatabaseException;
+import com.enioka.jqm.jdbc.DbConn;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
- * JPA persistence class for storing the default parameters of a {@link JobDef}, i.e. key/value pairs that should be present for all
- * instances created from a JobDef (and may be overloaded).<br>
+ * Persistence class for storing the default parameters of a {@link JobDef}, i.e. key/value pairs that should be present for all instances
+ * created from a JobDef (and may be overloaded).<br>
  * When a {@link JobDef} is instantiated, {@link RuntimeParameter}s are created from {@link JobDefParameter}s as well as parameters
- * specified inside the execution request a,d associated to the {@link JobInstance}. Therefore, this table is purely metadata and is never
+ * specified inside the execution request and associated to the {@link JobInstance}. Therefore, this table is purely metadata and is never
  * used in TP processing.
  */
-@Entity
-@Table(name = "JobDefParameter")
 public class JobDefParameter implements Serializable
 {
     private static final long serialVersionUID = -5308516206913425230L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+
     private Integer id;
 
-    @Column(nullable = false, length = 50, name = "KEYNAME")
     private String key;
-
-    @Column(nullable = false, length = 1000, name = "VALUE")
     private String value;
+
+    private int jobdef_id;
 
     /**
      * The name of the parameter.<br>
@@ -90,5 +86,30 @@ public class JobDefParameter implements Serializable
     public Integer getId()
     {
         return id;
+    }
+
+    public static List<JobDefParameter> select(DbConn cnx, String query_key, Object... args)
+    {
+        List<JobDefParameter> res = new ArrayList<JobDefParameter>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key, args);
+            while (rs.next())
+            {
+                JobDefParameter tmp = new JobDefParameter();
+
+                tmp.id = rs.getInt(0);
+                tmp.key = rs.getString(1);
+                tmp.value = rs.getString(2);
+                tmp.jobdef_id = rs.getInt(3);
+
+                res.add(tmp);
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
     }
 }

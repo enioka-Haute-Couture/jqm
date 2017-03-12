@@ -20,48 +20,23 @@ package com.enioka.jqm.jpamodel;
 
 import java.util.Calendar;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
-import javax.persistence.Version;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.QueryResult;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
- * JPA persistence class for associating {@link Node} with {@link Queue}, specifying the max number of concurrent instances and polling
+ * Persistence class for associating {@link Node} with {@link Queue}, specifying the max number of concurrent instances and polling
  * interval.
  */
-@Entity
-@Table(name = "DeploymentParameter", uniqueConstraints = { @UniqueConstraint(columnNames = { "queue", "node" }) })
 public class DeploymentParameter
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    @Column(nullable = true, name = "classId")
     private Integer classId;
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.Node.class)
-    @JoinColumn(name = "node", nullable = false)
-    private Node node;
-    @Column(nullable = false, name = "nbThread")
-    private Integer nbThread;
-    @Column(name = "pollingInterval", nullable = false)
-    private Integer pollingInterval;
-    @ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Queue.class)
-    @JoinColumn(name = "queue", nullable = false)
-    private Queue queue;
-    private Boolean enabled = true;
-
-    @Version
-    @Temporal(TemporalType.TIMESTAMP)
+    private int node;
+    private int nbThread;
+    private int pollingInterval;
+    private int queue;
+    private boolean enabled = true;
     private Calendar lastModified;
 
     /**
@@ -117,7 +92,7 @@ public class DeploymentParameter
     /**
      * The {@link Node} that will have to poll the {@link Queue} designated by {@link #getQueue()} for new {@link JobInstance}s to run.
      */
-    public Node getNode()
+    public int getNode()
     {
         return node;
     }
@@ -125,7 +100,7 @@ public class DeploymentParameter
     /**
      * See {@link #setNode(Node)}
      */
-    public void setNode(final Node node)
+    public void setNode(final int node)
     {
         this.node = node;
     }
@@ -151,7 +126,7 @@ public class DeploymentParameter
      * The {@link Queue} that will have to be polled by the {@link Node} designated by {@link #getNode()} for new {@link JobInstance}s to
      * run.
      */
-    public Queue getQueue()
+    public int getQueue()
     {
         return queue;
     }
@@ -159,7 +134,7 @@ public class DeploymentParameter
     /**
      * See {@link #getQueue()}
      */
-    public void setQueue(final Queue queue)
+    public void setQueue(final int queue)
     {
         this.queue = queue;
     }
@@ -195,5 +170,21 @@ public class DeploymentParameter
     public void setEnabled(Boolean enabled)
     {
         this.enabled = enabled;
+    }
+    
+    /**
+     * Create a new entry in the database. No commit performed.
+     */
+    public static DeploymentParameter create(DbConn cnx, Node node, Integer nbThread, Integer pollingInterval, Queue q)
+    {
+        QueryResult r = cnx.runUpdate("dp_insert", true, nbThread, pollingInterval, node.getId(), q.getId());
+        DeploymentParameter res = new DeploymentParameter();
+        res.id = r.getGeneratedId();
+        res.node = node.getId();
+        res.nbThread = nbThread;
+        res.pollingInterval = pollingInterval;
+        res.queue = q.getId();
+        
+        return res;
     }
 }

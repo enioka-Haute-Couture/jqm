@@ -51,6 +51,8 @@ import org.apache.shiro.util.ByteSource;
 import org.apache.shiro.util.StringUtils;
 import org.hibernate.LazyInitializationException;
 import org.hibernate.exception.JDBCConnectionException;
+import org.sql2o.Connection;
+import org.sql2o.Sql2o;
 
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
@@ -287,8 +289,18 @@ final class Helpers
      * @param defaultValue
      * @param em
      */
-    static String getParameter(String key, String defaultValue, EntityManager em)
+    static String getParameter(String key, String defaultValue, Sql2o db)
     {
+        Connection conn = null;
+        try
+        {
+            conn = db.open(); 
+        }
+        finally {
+            conn.close();
+        }
+        
+        
         try
         {
             GlobalParameter gp = em.createQuery("SELECT n from GlobalParameter n WHERE n.key = :key", GlobalParameter.class)

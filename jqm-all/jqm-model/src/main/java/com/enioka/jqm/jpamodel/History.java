@@ -21,137 +21,83 @@ package com.enioka.jqm.jpamodel;
 import java.io.Serializable;
 import java.util.Calendar;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
- * JPA persistence class for storing the execution log. All finished {@link JobInstance}s end up in this table (and are purged from
+ * Persistence class for storing the execution log. All finished {@link JobInstance}s end up in this table (and are purged from
  * {@link JobInstance}).
  */
-@Entity
-@Table(name = "History")
 public class History implements Serializable
 {
     private static final long serialVersionUID = -5249529794213078668L;
 
-    @Id
     private Integer id;
 
     /************/
     /* Identity */
 
-    @JoinColumn(name = "jobdef_id")
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.JobDef.class)
-    private JobDef jd;
-
-    @Column(nullable = false, name = "applicationName", length = 100)
+    private int jd;
     private String applicationName;
 
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = com.enioka.jqm.jpamodel.Queue.class)
-    @JoinColumn(name = "queue_id")
-    private Queue queue;
-
-    @Column(nullable = false, length = 50, name = "name")
+    private int queue_id;
     private String queueName;
 
-    @ManyToOne(fetch = FetchType.EAGER, targetEntity = com.enioka.jqm.jpamodel.Node.class)
-    @JoinColumn(name = "node_id")
-    private Node node;
-
     // null if cancelled before running
-    @Column(nullable = true, length = 100, name = "nodeName")
+    private int node;
     private String nodeName;
 
-    @Column(name = "highlander")
     private boolean highlander = false;
 
     /***********/
     /* RESULTS */
 
-    @Column(length = 20, name = "status")
-    @Enumerated(EnumType.STRING)
     private State status = State.SUBMITTED;
 
-    @Column(name = "return_code")
-    private Integer returnedValue;
+    private Integer return_code;
 
-    @Column
     private Integer progress;
 
     /***********/
     /* TIME */
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "enqueue_date")
-    private Calendar enqueueDate;
+    private Calendar enqueue_Date;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "attributionDate")
     private Calendar attributionDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "execution_date")
-    private Calendar executionDate;
+    private Calendar execution_date;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "end_date", nullable = true)
-    private Calendar endDate;
+    private Calendar end_date;
 
     /***************************/
     /* Instance classification */
 
-    @Column(name = "session_id")
-    private String sessionId;
+    private String session_id;
 
-    @Column(name = "username")
     private String userName;
 
-    @Column(name = "email")
     private String email;
 
-    @Column(name = "parent_job_id")
-    private Integer parentId;
+    private Integer parent_job_id;
 
-    @Column(length = 50, name = "instance_application")
-    private String instanceApplication;
+    private String instance_application;
 
-    @Column(length = 50, name = "instance_module")
-    private String instanceModule;
+    private String instance_module;
 
-    @Column(length = 50, name = "instance_keyword1")
-    private String instanceKeyword1;
+    private String instance_keyword1;
 
-    @Column(length = 50, name = "instance_keyword2")
-    private String instanceKeyword2;
+    private String instance_keyword2;
 
-    @Column(length = 50, name = "instance_keyword3")
-    private String instanceKeyword3;
+    private String instance_keyword3;
 
     /**************************/
     /* Job Def classification */
-    @Column(length = 50, name = "keyword1")
     private String keyword1;
 
-    @Column(length = 50, name = "keyword2")
     private String keyword2;
 
-    @Column(length = 50, name = "keyword3")
     private String keyword3;
 
-    @Column(length = 50, name = "application")
     private String application;
 
-    @Column(length = 50, name = "module")
     private String module;
 
     /**
@@ -172,27 +118,11 @@ public class History implements Serializable
     }
 
     /**
-     * @deprecated was never used.
-     */
-    public Integer getReturnedValue()
-    {
-        return returnedValue;
-    }
-
-    /**
-     * @deprecated was never used.
-     */
-    public void setReturnedValue(final Integer returnedValue)
-    {
-        this.returnedValue = returnedValue;
-    }
-
-    /**
      * Time at which the execution request was committed inside the database.
      */
     public Calendar getEnqueueDate()
     {
-        return enqueueDate;
+        return enqueue_Date;
     }
 
     /**
@@ -200,7 +130,7 @@ public class History implements Serializable
      */
     public void setEnqueueDate(final Calendar enqueueDate)
     {
-        this.enqueueDate = enqueueDate;
+        this.enqueue_Date = enqueueDate;
     }
 
     /**
@@ -208,7 +138,7 @@ public class History implements Serializable
      */
     public Calendar getExecutionDate()
     {
-        return executionDate;
+        return execution_date;
     }
 
     /**
@@ -216,7 +146,7 @@ public class History implements Serializable
      */
     public void setExecutionDate(final Calendar executionDate)
     {
-        this.executionDate = executionDate;
+        this.execution_date = executionDate;
     }
 
     /**
@@ -224,7 +154,7 @@ public class History implements Serializable
      */
     public Calendar getEndDate()
     {
-        return endDate;
+        return end_date;
     }
 
     /**
@@ -232,24 +162,24 @@ public class History implements Serializable
      */
     public void setEndDate(final Calendar endDate)
     {
-        this.endDate = endDate;
+        this.end_date = endDate;
     }
 
     /**
      * The {@link Queue} on which the {@link JobInstance} run took place. the actual queue, not necessarily the one defined inside
      * {@link JobDef} as it can be overloaded in the execution request)
      */
-    public Queue getQueue()
+    public int getQueue()
     {
-        return queue;
+        return queue_id;
     }
 
     /**
      * See {@link #getQueue()}
      */
-    public void setQueue(final Queue queue)
+    public void setQueue(final int queue)
     {
-        this.queue = queue;
+        this.queue_id = queue;
     }
 
     /**
@@ -271,7 +201,7 @@ public class History implements Serializable
     /**
      * The actual {@link Node} (i.e. JQM engine) that has run the {@link JobInstance}.
      */
-    public Node getNode()
+    public int getNode()
     {
         return node;
     }
@@ -279,7 +209,7 @@ public class History implements Serializable
     /**
      * See {@link #getNode()}
      */
-    public void setNode(final Node node)
+    public void setNode(final int node)
     {
         this.node = node;
     }
@@ -289,7 +219,7 @@ public class History implements Serializable
      */
     public String getSessionId()
     {
-        return sessionId;
+        return session_id;
     }
 
     /**
@@ -297,13 +227,13 @@ public class History implements Serializable
      */
     public void setSessionId(final String sessionId)
     {
-        this.sessionId = sessionId;
+        this.session_id = sessionId;
     }
 
     /**
      * The {@link JobDef} that was run (i.e. the {@link JobInstance} is actually an instance of this {@link JobDef}).
      */
-    public JobDef getJd()
+    public int getJd()
     {
         return jd;
     }
@@ -311,7 +241,7 @@ public class History implements Serializable
     /**
      * See {@link #getJd()}
      */
-    public void setJd(JobDef jd)
+    public void setJd(int jd)
     {
         this.jd = jd;
     }
@@ -338,7 +268,7 @@ public class History implements Serializable
      */
     public Integer getParentJobId()
     {
-        return parentId;
+        return parent_job_id;
     }
 
     /**
@@ -346,7 +276,7 @@ public class History implements Serializable
      */
     public void setParentJobId(Integer parentJobId)
     {
-        this.parentId = parentJobId;
+        this.parent_job_id = parentJobId;
     }
 
     /**
@@ -491,7 +421,7 @@ public class History implements Serializable
      */
     public String getInstanceApplication()
     {
-        return instanceApplication;
+        return instance_application;
     }
 
     /**
@@ -499,7 +429,7 @@ public class History implements Serializable
      */
     public void setInstanceApplication(String instanceApplication)
     {
-        this.instanceApplication = instanceApplication;
+        this.instance_application = instanceApplication;
     }
 
     /**
@@ -507,7 +437,7 @@ public class History implements Serializable
      */
     public String getInstanceModule()
     {
-        return instanceModule;
+        return instance_module;
     }
 
     /**
@@ -515,7 +445,7 @@ public class History implements Serializable
      */
     public void setInstanceModule(String instanceModule)
     {
-        this.instanceModule = instanceModule;
+        this.instance_module = instanceModule;
     }
 
     /**
@@ -523,7 +453,7 @@ public class History implements Serializable
      */
     public String getInstanceKeyword1()
     {
-        return instanceKeyword1;
+        return instance_keyword1;
     }
 
     /**
@@ -531,7 +461,7 @@ public class History implements Serializable
      */
     public void setInstanceKeyword1(String instanceKeyword1)
     {
-        this.instanceKeyword1 = instanceKeyword1;
+        this.instance_keyword1 = instanceKeyword1;
     }
 
     /**
@@ -539,7 +469,7 @@ public class History implements Serializable
      */
     public String getInstanceKeyword2()
     {
-        return instanceKeyword2;
+        return instance_keyword2;
     }
 
     /**
@@ -547,7 +477,7 @@ public class History implements Serializable
      */
     public void setInstanceKeyword2(String instanceKeyword2)
     {
-        this.instanceKeyword2 = instanceKeyword2;
+        this.instance_keyword2 = instanceKeyword2;
     }
 
     /**
@@ -555,7 +485,7 @@ public class History implements Serializable
      */
     public String getInstanceKeyword3()
     {
-        return instanceKeyword3;
+        return instance_keyword3;
     }
 
     /**
@@ -563,7 +493,7 @@ public class History implements Serializable
      */
     public void setInstanceKeyword3(String instanceKeyword3)
     {
-        this.instanceKeyword3 = instanceKeyword3;
+        this.instance_keyword3 = instanceKeyword3;
     }
 
     /**

@@ -21,48 +21,22 @@ package com.enioka.jqm.jpamodel;
 import java.io.Serializable;
 import java.util.Calendar;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Version;
-
-import org.hibernate.annotations.Index;
-
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
- * JPA persistence class for storing the parameters of the JNDI object resources from the {@link JndiObjectResource} table. Parameters are
+ * Persistence class for storing the parameters of the JNDI object resources from the {@link JndiObjectResource} table. Parameters are
  * simple key/value String pairs. The meaning of parameters is given by the factory defined in {@link JndiObjectResource#getFactory()}.
  */
-@Entity
-@Table(name = "JndiObjectResourceParameter")
 public class JndiObjectResourceParameter implements Serializable
 {
     private static final long serialVersionUID = -8023896508793524111L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @Column(nullable = false, length = 50, name = "KEYNAME")
     private String key;
-
-    @Column(nullable = false, length = 250, name = "VALUE")
     private String value;
 
-    @ManyToOne
-    @JoinColumn(name = "resource_id")
-    @Index(name = "fk_resource")
-    private JndiObjectResource resource;
+    private int resource;
 
-    @Version
-    @Temporal(TemporalType.TIMESTAMP)
     private Calendar lastModified;
 
     /**
@@ -116,7 +90,7 @@ public class JndiObjectResourceParameter implements Serializable
     /**
      * The JNDI resource to which this parameter belongs.
      */
-    public JndiObjectResource getResource()
+    public int getResource()
     {
         return resource;
     }
@@ -124,7 +98,7 @@ public class JndiObjectResourceParameter implements Serializable
     /**
      * See {@link #getResource()}
      */
-    public void setResource(final JndiObjectResource resource)
+    public void setResource(final int resource)
     {
         this.resource = resource;
     }

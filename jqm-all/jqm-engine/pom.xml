@@ -216,13 +216,6 @@
 
 
 	<dependencies>
-		<!-- We need an actual JPA2 implementation here. JPA-API is implied -->
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-			<version>${hibernate.version}</version>
-		</dependency>
-
 		<!-- CLI parsing -->
 		<dependency>
 			<groupId>commons-cli</groupId>
@@ -347,7 +340,7 @@
 		</dependency>
 
 		<!-- Test files that will be included in the package -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-test-pyl</artifactId>
 			<version>${project.version}</version>
@@ -364,7 +357,7 @@
 			<artifactId>jqm-test-pyl-hibapi</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency> -->
 
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>

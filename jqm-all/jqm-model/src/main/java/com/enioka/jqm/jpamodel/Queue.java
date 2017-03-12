@@ -19,46 +19,22 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.QueryResult;
 
-/**
- * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
- * JPA persistence class for storing the list of queues on which enqueuing job execution requests is possible.
- */
-@Entity
-@Table(name = "Queue")
 public class Queue implements Serializable
 {
     private static final long serialVersionUID = 4677042929807285233L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+
     private int id;
 
-    @Column(nullable = false, length = 50, name = "name", unique = true)
     private String name;
-
-    @Column(nullable = false, length = 1000, name = "description")
     private String description;
 
-    @Column(nullable = false, name = "timeToLive")
     private Integer timeToLive = 0;
 
-    @Column(name = "defaultQueue")
     private boolean defaultQueue;
-
-    @OneToMany(mappedBy = "queue", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<JobDef> jobdefs = new ArrayList<JobDef>();
 
     /**
      * Functional key. Queues are specified by name inside all APIs. Must be unique.<br>
@@ -144,10 +120,15 @@ public class Queue implements Serializable
     }
 
     /**
-     * All the {@link JobDef} that use this {@link Queue} as their default queue.
+     * Create a new entry in the database. No commit performed.
      */
-    public List<JobDef> getJobdefs()
+    public static Queue create(DbConn cnx, String name, String description, boolean defaultQ)
     {
-        return jobdefs;
+        QueryResult r = cnx.runUpdate("q_insert", defaultQ, name, description);
+        Queue res = new Queue();
+        res.id = r.getGeneratedId();
+        res.name = name;
+        res.description = description;
+        return res;
     }
 }

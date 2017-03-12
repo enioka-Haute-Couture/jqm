@@ -19,29 +19,21 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import com.enioka.jqm.jdbc.DatabaseException;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.QueryResult;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
- * JPA persistence class for storing the definition of all the user codes (the payloads) that can be run by the JQM engines. It contains all
- * the metadata needed to create an execution request (a {@link JobInstance}).
+ * Persistence class for storing the definition of all the user codes (the payloads) that can be run by the JQM engines. It contains all the
+ * metadata needed to create an execution request (a {@link JobInstance}).
  */
-@Entity
-@Table(name = "JobDef")
 public class JobDef implements Serializable
 {
     private static final long serialVersionUID = -3276834475433922990L;
@@ -61,80 +53,36 @@ public class JobDef implements Serializable
         MEMORY
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Column(name = "description", length = 1024)
-    private String description;
-
-    @Column(name = "canBeRestarted")
-    private boolean canBeRestarted = true;
-
-    @Column(nullable = false, length = 100, name = "javaClassName")
-    private String javaClassName;
-
-    @Column(length = 1024, name = "filePath")
-    private String filePath;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "queue_id")
-    private Queue queue;
-
-    @Column(name = "maxTimeRunning")
-    private Integer maxTimeRunning;
-
-    @Column(nullable = false, name = "applicationName", unique = true, length = 100)
     private String applicationName;
-
-    @Column(length = 50, name = "application")
-    private String application;
-
-    @Column(length = 50, name = "module")
-    private String module;
-
-    @Column(length = 50, name = "keyword1")
-    private String keyword1;
-
-    @Column(length = 50, name = "keyword2")
-    private String keyword2;
-
-    @Column(length = 50, name = "keyword3")
-    private String keyword3;
-
-    @Column(name = "highlander", nullable = false)
-    private boolean highlander = false;
-
-    @Column(name = "jarPath", length = 1024)
-    private String jarPath;
-
-    @Column(name = "pathType", nullable = true)
-    @Enumerated(EnumType.STRING)
-    private PathType pathType;
-
-    @Column(name = "enabled", nullable = false)
+    private String description;
     private boolean enabled = true;
 
-    @Column(name = "java_opts", length = 200)
+    private String javaClassName;
+
+    private PathType pathType;
+    private String jarPath;
+
+    private int queue_id;
+
+    private boolean canBeRestarted = true;
+    private Integer maxTimeRunning;
+
+    private String application;
+    private String module;
+    private String keyword1;
+    private String keyword2;
+    private String keyword3;
+
+    private boolean highlander = false;
+
+    private boolean external = false;
     private String javaOpts;
 
-    @Column(name = "external", nullable = false)
-    private boolean external = false;
-
-    @Column(length = 20, name = "specificIsolationContext")
     private String specificIsolationContext;
-
-    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)
-    @JoinColumn(name = "JobDefId")
-    private List<JobDefParameter> parameters = new ArrayList<JobDefParameter>();
-
-    @Column(name = "childFirstClassLoader", nullable = false)
     private boolean childFirstClassLoader = false;
-
-    @Column(length = 1024, name = "hiddenJavaClasses")
     private String hiddenJavaClasses;
-
-    @Column(name = "classLoaderTracing", nullable = false)
     private boolean classLoaderTracing = false;
 
     /**
@@ -318,38 +266,17 @@ public class JobDef implements Serializable
      * The {@link Queue} on which the instances created from this {@link JobDef} should run. This is only the "default" queue - it may be
      * overloaded inside the execution request.
      */
-    public Queue getQueue()
+    public int getQueue()
     {
-        return queue;
+        return queue_id;
     }
 
     /**
      * See {@link #getQueue()}
      */
-    public void setQueue(final Queue queue)
+    public void setQueue(final int queue)
     {
-        this.queue = queue;
-    }
-
-    /**
-     * Used to contain the path to the directory containing the jar file.<br>
-     * Max length is 1024.
-     * 
-     * @deprecated jarPath contains the full path.
-     */
-    public String getFilePath()
-    {
-        return filePath;
-    }
-
-    /**
-     * Used to contain the path to the directory containing the jar file.
-     * 
-     * @deprecated jarPath contains the full path.
-     */
-    public void setFilePath(final String filePath)
-    {
-        this.filePath = filePath;
+        this.queue_id = queue;
     }
 
     /**
@@ -375,17 +302,9 @@ public class JobDef implements Serializable
      * These are only the "default" parameters - each parameter may be overloaded inside the execution request (which may even specify
      * parameters which are not present in the default parameters).
      */
-    public List<JobDefParameter> getParameters()
+    public List<JobDefParameter> getParameters(DbConn cnx)
     {
-        return parameters;
-    }
-
-    /**
-     * See {@link #getParameters()}
-     */
-    public void setParameters(final List<JobDefParameter> parameters)
-    {
-        this.parameters = parameters;
+        return JobDefParameter.select(cnx, "jdprm_select_all_for_jd", this.id);
     }
 
     /**
@@ -537,5 +456,65 @@ public class JobDef implements Serializable
     public void setPathType(PathType type)
     {
         this.pathType = type;
+    }
+
+    public static List<JobDef> select(DbConn cnx, String query_key, Object... args)
+    {
+        List<JobDef> res = new ArrayList<JobDef>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key, args);
+            while (rs.next())
+            {
+                JobDef tmp = new JobDef();
+
+                tmp.id = rs.getInt(0);
+                tmp.application = rs.getString(1);
+                tmp.applicationName = rs.getString(2);
+                tmp.canBeRestarted = true;
+                tmp.childFirstClassLoader = rs.getBoolean(3);
+                tmp.classLoaderTracing = rs.getBoolean(4);
+                tmp.description = rs.getString(5);
+                tmp.enabled = rs.getBoolean(6);
+                tmp.external = rs.getBoolean(7);
+                tmp.jarPath = rs.getString(8);
+                tmp.javaClassName = rs.getString(9);
+                tmp.javaOpts = rs.getString(10);
+                tmp.keyword1 = rs.getString(11);
+                tmp.keyword2 = rs.getString(12);
+                tmp.keyword3 = rs.getString(13);
+                tmp.maxTimeRunning = rs.getInt(14);
+                tmp.pathType = PathType.valueOf(rs.getString(15));
+                tmp.specificIsolationContext = rs.getString(16);
+                tmp.queue_id = rs.getInt(17);
+
+                res.add(tmp);
+            }
+
+            // TODO: pre fetch parameters as we always need them.
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
+    }
+
+    public static int create(DbConn cnx, String description, String javaClassName, Map<String, String> parameters, String jarPath,
+            int queue_id, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+            String keyword2, String keyword3, boolean highlander, String specificIsolationContext, boolean childFirstClassLoader,
+            String hiddenJavaClasses, boolean classLoaderTracing, PathType pathType)
+    {
+        QueryResult r = cnx.runUpdate("jd_insert", application, applicationName, childFirstClassLoader, classLoaderTracing, description,
+                true, false, hiddenJavaClasses, highlander, jarPath, javaClassName, null, keyword1, keyword2, keyword3, maxTimeRunning,
+                module, pathType.toString(), specificIsolationContext, queue_id);
+        int newId = r.getGeneratedId();
+
+        for (Map.Entry<String, String> prm : parameters.entrySet())
+        {
+            cnx.runUpdate("jdprm_insert", prm.getKey(), prm.getValue(), newId);
+        }
+
+        return newId;
     }
 }

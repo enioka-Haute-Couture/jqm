@@ -19,30 +19,22 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import com.enioka.jqm.jdbc.DatabaseException;
+import com.enioka.jqm.jdbc.DbConn;
 
-@Entity
 public class RPermission implements Serializable
 {
     private static final long serialVersionUID = 1234354709423603792L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-
-    @Column(length = 254, name = "login", nullable = false)
     private String name;
 
-    @ManyToOne()
-    @JoinColumn(nullable = false)
-    private RRole role;
+    private int role;
 
     public Integer getId()
     {
@@ -64,13 +56,36 @@ public class RPermission implements Serializable
         this.name = name;
     }
 
-    public RRole getRole()
+    public int getRole()
     {
         return role;
     }
 
-    public void setRole(RRole role)
+    public void setRole(int role)
     {
         this.role = role;
+    }
+
+    public static List<RPermission> getPermissions(DbConn cnx, String query_key, Object... args)
+    {
+        List<RPermission> res = new ArrayList<RPermission>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key, args);
+            while (rs.next())
+            {
+                RPermission tmp = new RPermission();
+
+                tmp.id = rs.getInt(0);
+                tmp.name = rs.getString(1);
+                tmp.role = rs.getInt(2);
+                res.add(tmp);
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
     }
 }

@@ -20,33 +20,19 @@ package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.Index;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
- * JPA persistence class for storing short messages that can be created by user code to inform users or systems of its progress. Often, a
+ * Persistence class for storing short messages that can be created by user code to inform users or systems of its progress. Often, a
  * {@link Message} is created for each big step inside the user code.<br>
  * This is used both by queued {@link JobInstance}s and archived {@link History} elements.
  */
-@Entity
-@org.hibernate.annotations.Table(appliesTo = "Message", indexes = { @Index(name = "fk_r_ixd", columnNames = { "ji" }) })
-@Table(name = "Message")
 public class Message implements Serializable
 {
     private static final long serialVersionUID = 1234454709423602792L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Column(length = 1000, name = "text_message")
     private String textMessage;
 
     private int ji;

@@ -19,58 +19,34 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Version;
+import com.enioka.jqm.jdbc.DatabaseException;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.QueryResult;
 
-@Entity
 public class RUser implements Serializable
 {
     private static final long serialVersionUID = 1234354709423603792L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Column(length = 100, name = "login", unique = true)
     private String login;
 
-    @Column(length = 254, name = "password")
     private String password;
-
-    @Column(length = 254, name = "hashSalt")
     private String hashSalt;
 
     private Boolean locked = false;
-
-    @Temporal(TemporalType.TIMESTAMP)
     private Calendar expirationDate;
-
-    @Temporal(TemporalType.TIMESTAMP)
     private Calendar creationDate = Calendar.getInstance();
-
-    @Column(length = 254, nullable = true)
-    private String email;
-
-    @Column(length = 254, nullable = true)
-    private String freeText;
-
-    @ManyToMany(mappedBy = "users")
-    private List<RRole> roles = new ArrayList<RRole>();
-
-    @Version
-    @Temporal(TemporalType.TIMESTAMP)
     private Calendar lastModified;
+
+    private String email;
+    private String freeText;
 
     private Boolean internal = false;
 
@@ -104,14 +80,9 @@ public class RUser implements Serializable
         this.password = password;
     }
 
-    public List<RRole> getRoles()
+    public List<RRole> getRoles(DbConn cnx)
     {
-        return roles;
-    }
-
-    void setRoles(List<RRole> roles)
-    {
-        this.roles = roles;
+        return RRole.select_roles(cnx, "role_select_all_for_user", this.id);
     }
 
     public String getHashSalt()
@@ -198,5 +169,59 @@ public class RUser implements Serializable
     protected void setLastModified(Calendar lastModified)
     {
         this.lastModified = lastModified;
+    }
+
+    private static RUser bind_current(ResultSet rs) throws SQLException
+    {
+        RUser res = new RUser();
+
+        res.id = rs.getInt(0);
+        res.login = rs.getString(1);
+        res.password = rs.getString(2);
+        res.hashSalt = rs.getString(3);
+        res.locked = rs.getBoolean(4);
+
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(rs.getTimestamp(5).getTime());
+        res.expirationDate = c;
+
+        Calendar c2 = Calendar.getInstance();
+        c2.setTimeInMillis(rs.getTimestamp(6).getTime());
+        res.lastModified = c2;
+
+        res.email = rs.getString(7);
+        res.freeText = rs.getString(8);
+        res.internal = rs.getBoolean(9);
+
+        return res;
+    }
+
+    public static List<RUser> getUsers(DbConn cnx, String query_key, Object... args)
+    {
+        List<RUser> res = new ArrayList<RUser>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key, args);
+            while (rs.next())
+            {
+                res.add(RUser.bind_current(rs));
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
+    }
+
+    public static void create(DbConn cnx, String login, String password_hash, String password_salt, String... role_names)
+    {
+        QueryResult r = cnx.runUpdate("user_insert", null, null, null, password_hash, false, false, login, password_hash);
+        int newId = r.getGeneratedId();
+
+        for (String s : role_names)
+        {
+            cnx.runUpdate("user_add_role_by_name", s, newId);
+        }
     }
 }

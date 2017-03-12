@@ -21,112 +21,50 @@ package com.enioka.jqm.jpamodel;
 import java.io.Serializable;
 import java.util.Calendar;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityManager;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import org.hibernate.annotations.Index;
+import com.enioka.jqm.jdbc.DbConn;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
- * JPA persistence class for storing the execution requests. Said otherwise, <strong>this table holds the contents of the execution
+ * Persistence class for storing the execution requests. Said otherwise, <strong>this table holds the contents of the execution
  * queues</strong>.
  */
-@Entity
-@Table(name = "JobInstance")
-@org.hibernate.annotations.Table(indexes = @Index(name = "idx_lock_jobinstance_2", columnNames = { "jd_id", "state" }), appliesTo = "JobInstance")
 public class JobInstance implements Serializable
 {
     private static final long serialVersionUID = -7710486847228806301L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "jd_id")
-    private JobDef jd;
-
-    @Column(name = "parentId")
-    private Integer parentId;
-
-    @Column(length = 50, name = "username")
-    private String userName;
-
-    @Column(name = "sessionId")
-    private String sessionID;
-
-    @Column(length = 50, name = "state")
-    @Enumerated(EnumType.STRING)
-    @Index(name = "idx_lock_jobinstance_1")
+    private int jd_id;
+    private int queue_id;
+    private int node_id;
     private State state;
 
-    @ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Queue.class, fetch = FetchType.LAZY)
-    @JoinColumn(name = "queue_id")
-    @Index(name = "idx_lock_jobinstance_1")
-    private Queue queue;
-
-    @ManyToOne(targetEntity = com.enioka.jqm.jpamodel.Node.class, fetch = FetchType.LAZY)
-    @JoinColumn(name = "node_id")
-    private Node node;
-
-    @Column(name = "sendEmail")
-    private String email;
-
-    @Column(name = "progress")
-    private Integer progress;
-
-    @Column(name = "internalPosition", nullable = false)
     private double internalPosition;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "creationDate")
+    private Integer parentId;
+    private String email;
+    private Integer progress;
+
     private Calendar creationDate;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "attributionDate")
     private Calendar attributionDate;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "executionDate")
     private Calendar executionDate;
 
-    @Column(length = 50, name = "application")
+    private String userName;
+    private String sessionID;
     private String instanceApplication;
-
-    @Column(length = 50, name = "module")
     private String instanceModule;
-
-    @Column(length = 50, name = "keyword1")
     private String instanceKeyword1;
-
-    @Column(length = 50, name = "keyword2")
     private String instanceKeyword2;
-
-    @Column(length = 50, name = "keyword3")
     private String instanceKeyword3;
 
     /**
      * The place inside the queue, i.e. the number of job requests that will be run before this one can be run.
      */
-    public int getCurrentPosition(EntityManager em)
+    public int getCurrentPosition(DbConn conn)
     {
         if (this.state.equals(State.SUBMITTED))
         {
-            return em
-                    .createQuery("SELECT COUNT(ji) FROM JobInstance ji WHERE ji.internalPosition < :p AND ji.state = 'SUBMITTED'",
-                            Long.class).setParameter("p", this.internalPosition).getSingleResult().intValue() + 1;
+            return conn.runSelectSingleInt("ji_select_current_pos", this.internalPosition) + 1;
         }
         else
         {
@@ -179,17 +117,17 @@ public class JobInstance implements Serializable
     /**
      * The {@link JobDef} from which this {@link JobInstance} was instantiated.
      */
-    public JobDef getJd()
+    public int getJd()
     {
-        return jd;
+        return jd_id;
     }
 
     /**
      * See {@link #getJd()}
      */
-    public void setJd(final JobDef jd)
+    public void setJd(final int jd)
     {
-        this.jd = jd;
+        this.jd_id = jd;
     }
 
     /**
@@ -228,33 +166,33 @@ public class JobInstance implements Serializable
      * The {@link Queue} on which is the {@link JobInstance} should wait. Cannot be changed once the status is ATTRIBUTED (i.e. wait is
      * over).
      */
-    public Queue getQueue()
+    public int getQueue()
     {
-        return queue;
+        return queue_id;
     }
 
     /**
      * See {@link #getQueue()}
      */
-    public void setQueue(final Queue queue)
+    public void setQueue(final int queue)
     {
-        this.queue = queue;
+        this.queue_id = queue;
     }
 
     /**
      * The node that is running the {@link JobInstance}. Null until wait is over and status is ATTRIBUTED.
      */
-    public Node getNode()
+    public int getNode()
     {
-        return node;
+        return node_id;
     }
 
     /**
      * See {@link #getNode()}
      */
-    public void setNode(final Node node)
+    public void setNode(final int node)
     {
-        this.node = node;
+        this.node_id = node;
     }
 
     /**

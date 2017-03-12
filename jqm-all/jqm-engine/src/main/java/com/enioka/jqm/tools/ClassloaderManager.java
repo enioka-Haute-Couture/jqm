@@ -8,10 +8,10 @@ import java.util.Map;
 
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
-import javax.persistence.EntityManager;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
+import org.sql2o.Sql2o;
 
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobInstance;
@@ -48,22 +48,9 @@ class ClassloaderManager
     private final LibraryResolverFS fsResolver;
     private final LibraryResolverMaven mavenResolver;
 
-    ClassloaderManager()
+    ClassloaderManager(Sql2o conn)
     {
-        EntityManager em = null;
-        try
-        {
-            em = Helpers.getNewEm();
-            launchIsolationDefault = Helpers.getParameter("launch_isolation_default", "Isolated", em);
-        }
-        catch (Exception e)
-        {
-            throw new JqmInitError("could not find parameter", e);
-        }
-        finally
-        {
-            Helpers.closeQuietly(em);
-        }
+        launchIsolationDefault = Helpers.getParameter("launch_isolation_default", "Isolated", conn);
 
         this.fsResolver = new LibraryResolverFS();
         this.mavenResolver = new LibraryResolverMaven();
@@ -93,11 +80,14 @@ class ClassloaderManager
                 jqmlogger.info("Using specific isolation context : " + specificIsolationContext);
                 jobClassLoader = specificIsolationContextClassLoader.get(specificIsolationContext);
                 // Checking if the specific class loader configuration is exactly the same as this job definition configuration
-                if (jobClassLoader.isChildFirstClassLoader() != jd.isChildFirstClassLoader() ||
-                        (jobClassLoader.getHiddenJavaClasses() == null && jd.getHiddenJavaClasses() != null) ||
-                        (jobClassLoader.getHiddenJavaClasses() != null && !jobClassLoader.getHiddenJavaClasses().equals(jd.getHiddenJavaClasses()))) {
-                    throw new RuntimeException("Specific class loader: " + specificIsolationContext + " for job def ["+ jd.getApplicationName()
-                            +"]have different configuration than the first one loaded ["+ jobClassLoader.getReferenceJobDefName()+"]");
+                if (jobClassLoader.isChildFirstClassLoader() != jd.isChildFirstClassLoader()
+                        || (jobClassLoader.getHiddenJavaClasses() == null && jd.getHiddenJavaClasses() != null)
+                        || (jobClassLoader.getHiddenJavaClasses() != null
+                                && !jobClassLoader.getHiddenJavaClasses().equals(jd.getHiddenJavaClasses())))
+                {
+                    throw new RuntimeException("Specific class loader: " + specificIsolationContext + " for job def ["
+                            + jd.getApplicationName() + "]have different configuration than the first one loaded ["
+                            + jobClassLoader.getReferenceJobDefName() + "]");
                 }
             }
             else
