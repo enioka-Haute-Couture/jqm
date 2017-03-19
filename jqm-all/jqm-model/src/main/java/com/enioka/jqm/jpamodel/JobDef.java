@@ -27,6 +27,7 @@ import java.util.Map;
 
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.QueryResult;
 
 /**
@@ -53,7 +54,7 @@ public class JobDef implements Serializable
         MEMORY
     }
 
-    private Integer id;
+    private Integer id = null;
 
     private String applicationName;
     private String description;
@@ -266,9 +267,19 @@ public class JobDef implements Serializable
      * The {@link Queue} on which the instances created from this {@link JobDef} should run. This is only the "default" queue - it may be
      * overloaded inside the execution request.
      */
-    public int getQueue()
+    public Integer getQueue()
     {
         return queue_id;
+    }
+
+    public Queue getQueue(DbConn cnx)
+    {
+        List<Queue> qq = Queue.select(cnx, "q_select_by_id", this.queue_id);
+        if (qq.size() == 0)
+        {
+            throw new NoResultException("No queue found");
+        }
+        return qq.get(0);
     }
 
     /**
@@ -458,6 +469,45 @@ public class JobDef implements Serializable
         this.pathType = type;
     }
 
+    /**
+     * ResultSet is not modified (no rs.next called).
+     * 
+     * @param rs
+     * @return
+     */
+    static JobDef map(ResultSet rs, int colShift)
+    {
+        JobDef tmp = new JobDef();
+
+        try
+        {
+            tmp.id = rs.getInt(1 + colShift);
+            tmp.application = rs.getString(2 + colShift);
+            tmp.applicationName = rs.getString(3 + colShift);
+            tmp.canBeRestarted = true;
+            tmp.childFirstClassLoader = rs.getBoolean(4 + colShift);
+            tmp.classLoaderTracing = rs.getBoolean(5 + colShift);
+            tmp.description = rs.getString(6 + colShift);
+            tmp.enabled = rs.getBoolean(7 + colShift);
+            tmp.external = rs.getBoolean(8 + colShift);
+            tmp.jarPath = rs.getString(9 + colShift);
+            tmp.javaClassName = rs.getString(10 + colShift);
+            tmp.javaOpts = rs.getString(11 + colShift);
+            tmp.keyword1 = rs.getString(12 + colShift);
+            tmp.keyword2 = rs.getString(13 + colShift);
+            tmp.keyword3 = rs.getString(14 + colShift);
+            tmp.maxTimeRunning = rs.getInt(15 + colShift);
+            tmp.pathType = PathType.valueOf(rs.getString(16 + colShift));
+            tmp.specificIsolationContext = rs.getString(17 + colShift);
+            tmp.queue_id = rs.getInt(18 + colShift);
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return tmp;
+    }
+
     public static List<JobDef> select(DbConn cnx, String query_key, Object... args)
     {
         List<JobDef> res = new ArrayList<JobDef>();
@@ -466,7 +516,7 @@ public class JobDef implements Serializable
             ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
-                JobDef tmp = new JobDef();
+                JobDef tmp = map(rs, 0);
 
                 tmp.id = rs.getInt(0);
                 tmp.application = rs.getString(1);
@@ -516,5 +566,45 @@ public class JobDef implements Serializable
         }
 
         return newId;
+    }
+
+    public static JobDef select_key(DbConn cnx, String name)
+    {
+        List<JobDef> res = select(cnx, "jd_select_by_key", name);
+        if (res.isEmpty())
+        {
+            throw new DatabaseException("no result for query by key for key " + name);
+        }
+        if (res.size() > 1)
+        {
+            throw new DatabaseException("Inconsistent database! Multiple results for query by key for key " + name);
+        }
+        return res.get(0);
+    }
+
+    public void update(DbConn cnx, Map<String, String> parameters)
+    {
+        if (id == null)
+        {
+            this.id = JobDef.create(cnx, description, javaClassName, parameters, jarPath, queue_id, maxTimeRunning, applicationName,
+                    application, module, keyword1, keyword2, keyword3, highlander, specificIsolationContext, childFirstClassLoader,
+                    hiddenJavaClasses, classLoaderTracing, pathType);
+        }
+        else
+        {
+            cnx.runUpdate("jd_update_all_fields_by_id", application, applicationName, childFirstClassLoader, classLoaderTracing,
+                    description, enabled, external, hiddenJavaClasses, highlander, jarPath, javaClassName, javaOpts, keyword1, keyword2,
+                    keyword3, maxTimeRunning, module, pathType, specificIsolationContext, queue_id);
+            cnx.runUpdate("jdprm_select_all_for_jd", this.id);
+            for (Map.Entry<String, String> prm : parameters.entrySet())
+            {
+                cnx.runUpdate("jdprm_insert", prm.getKey(), prm.getValue(), this.id);
+            }
+        }
+    }
+
+    public static void setExternal(DbConn cnx, Integer jdId)
+    {
+        cnx.runUpdate("jd_update_set_external_by_id", jdId);
     }
 }

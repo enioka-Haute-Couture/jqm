@@ -1,5 +1,6 @@
 package com.enioka.jqm.jdbc;
 
+import java.io.Closeable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,7 +10,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 
-public class DbConn
+public class DbConn implements Closeable
 {
 
     private Db parent;
@@ -48,10 +49,11 @@ public class DbConn
         PreparedStatement ps = null;
         try
         {
-            ps = prepare(query_key, params);
+            ps = prepare(query_key, false, params);
             QueryResult qr = new QueryResult();
             qr.nbUpdated = ps.executeUpdate();
             qr.generatedKeys = ps.getGeneratedKeys();
+            System.out.println("Updated rows: " + qr.nbUpdated);
             return qr;
         }
         catch (SQLException e)
@@ -93,10 +95,15 @@ public class DbConn
 
     public ResultSet runSelect(String query_key, Object... params)
     {
+        return runSelect(false, query_key, params);
+    }
+
+    public ResultSet runSelect(boolean for_update, String query_key, Object... params)
+    {
         PreparedStatement ps = null;
         try
         {
-            ps = prepare(query_key, params);
+            ps = prepare(query_key, for_update, params);
             return ps.executeQuery();
         }
         catch (SQLException e)
@@ -111,7 +118,7 @@ public class DbConn
 
     public <T> T runSelectSingle(String query_key, Class<T> clazz, Object... params)
     {
-        return runSelectSingle(query_key, 0, clazz, params);
+        return runSelectSingle(query_key, 1, clazz, params);
     }
 
     @SuppressWarnings("unchecked")
@@ -120,14 +127,10 @@ public class DbConn
         ResultSet rs = runSelect(query_key, params);
         try
         {
-            if (rs.getMetaData().getColumnCount() != 1)
+            if (rs.getMetaData().getColumnCount() < 1)
             {
-                throw new DatabaseException("query was supposed to return a single column - 0 or more than 2 returned.");
-            }
-            if (!(rs.getMetaData().getColumnType(0) == java.sql.Types.INTEGER
-                    || rs.getMetaData().getColumnType(0) != java.sql.Types.SMALLINT))
-            {
-                throw new DatabaseException("query was supposed to return an integer - wrong datatype");
+                throw new DatabaseException("query was supposed to return at least " + (column) + " columns - "
+                        + rs.getMetaData().getColumnCount() + " were returned.");
             }
 
             T res;
@@ -211,7 +214,7 @@ public class DbConn
         }
     }
 
-    private PreparedStatement prepare(String query_key, Object... params)
+    private PreparedStatement prepare(String query_key, boolean for_update, Object... params)
     {
         PreparedStatement ps = null;
         String st = parent.getQuery(query_key);
@@ -235,7 +238,10 @@ public class DbConn
 
         try
         {
-            ps = _cnx.prepareStatement(st, Statement.RETURN_GENERATED_KEYS);
+            if (for_update)
+                ps = _cnx.prepareStatement(st, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
+            else
+                ps = _cnx.prepareStatement(st, new String[] { "ID" });
         }
         catch (SQLException e)
         {

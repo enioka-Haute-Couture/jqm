@@ -6,9 +6,14 @@ public class DatabaseException extends RuntimeException
     {
         super(e);
     }
-    
+
     public DatabaseException(String e)
     {
         super(e);
+    }
+
+    public DatabaseException(String e, Exception ex)
+    {
+        super(e, ex);
     }
 }

@@ -177,9 +177,9 @@ public class DeploymentParameter
         this.enabled = enabled;
     }
 
-    public static DeploymentParameter create(DbConn cnx, Node node, Integer nbThread, Integer pollingInterval, Queue q)
+    public static DeploymentParameter create(DbConn cnx, Node node, Integer nbThread, Integer pollingInterval, Integer queueId)
     {
-        return create(cnx, node.getId(), nbThread, pollingInterval, q.getId());
+        return create(cnx, node.getId(), nbThread, pollingInterval, queueId);
     }
 
     /**

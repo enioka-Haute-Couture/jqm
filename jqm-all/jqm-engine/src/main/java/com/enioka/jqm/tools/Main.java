@@ -18,10 +18,6 @@
 
 package com.enioka.jqm.tools;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
-
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -35,6 +31,9 @@ import org.apache.log4j.Logger;
 
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.jdbc.Db;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jpamodel.RRole;
 import com.enioka.jqm.jpamodel.RUser;
 
@@ -272,37 +271,44 @@ public class Main
 
     private static void importJobDef(String xmlpath)
     {
+        DbConn cnx = null;
         try
         {
-            EntityManager em = Helpers.getNewDbSession();
-            if (em.createQuery("SELECT q FROM Queue q WHERE q.defaultQueue = true").getResultList().size() != 1)
+            cnx = Helpers.getNewDbSession();
+            try
+            {
+                int defaultQueueId = cnx.runSelectSingle("q_select_default", Integer.class);
+            }
+            catch (NoResultException e)
             {
                 jqmlogger.fatal(
-                        "Cannot import a Job Definition when there are no queues defined. Create at least an engine first to create one");
-                em.close();
+                        "Cannot import a Job Definition when there is no default queue defined. To solve, creating an engine will recreate it.");
                 return;
             }
 
             String[] pathes = xmlpath.split(",");
             for (String path : pathes)
             {
-                XmlJobDefParser.parse(path, em);
+                XmlJobDefParser.parse(path, cnx);
             }
-            em.close();
         }
         catch (Exception e)
         {
             throw new JqmRuntimeException("Could not import file", e);
         }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     public static void exportJobDef(String xmlPath)
     {
-        EntityManager em = null;
+        DbConn cnx = null;
         try
         {
-            em = Helpers.getNewDbSession();
-            XmlJobDefExporter.export(xmlPath, em);
+            cnx = Helpers.getNewDbSession();
+            XmlJobDefExporter.export(xmlPath, cnx);
         }
         catch (Exception ex)
         {
@@ -310,13 +316,13 @@ public class Main
         }
         finally
         {
-            Helpers.closeQuietly(em);
+            Helpers.closeQuietly(cnx);
         }
     }
 
-    public static void setEmf(EntityManagerFactory emf)
+    public static void setEmf(Db db)
     {
-        Helpers.setEmf(emf);
+        Helpers.setDb(db);
     }
 
     public static JqmEngineOperations startEngine(String nodeName)
@@ -342,18 +348,21 @@ public class Main
 
     private static void createEngine(String nodeName, int port)
     {
+        DbConn cnx = null;
         try
         {
-            Helpers.allowCreateSchema();
             jqmlogger.info("Creating engine node " + nodeName);
-            EntityManager em = Helpers.getNewDbSession();
-            Helpers.updateConfiguration(em);
-            Helpers.updateNodeConfiguration(nodeName, em, port);
-            em.close();
+            cnx = Helpers.getNewDbSession();
+            Helpers.updateConfiguration(cnx);
+            Helpers.updateNodeConfiguration(nodeName, cnx, port);
         }
         catch (Exception e)
         {
             throw new JqmRuntimeException("Could not create the engine", e);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
         }
     }
 
@@ -361,11 +370,11 @@ public class Main
     {
         try
         {
-            Helpers.allowCreateSchema();
-            jqmlogger.info("Upgrading database and shared metadata");
-            EntityManager em = Helpers.getNewDbSession();
-            Helpers.updateConfiguration(em);
-            em.close();
+            // TODO!
+            // jqmlogger.info("Upgrading database and shared metadata");
+            // EntityManager em = Helpers.getNewDbSession();
+            // Helpers.updateConfiguration(em);
+            // em.close();
         }
         catch (Exception e)
         {
@@ -375,11 +384,11 @@ public class Main
 
     private static void exportAllQueues(String xmlPath)
     {
-        EntityManager em = null;
+        DbConn cnx = null;
         try
         {
-            em = Helpers.getNewDbSession();
-            XmlQueueExporter.export(xmlPath, em);
+            cnx = Helpers.getNewDbSession();
+            XmlQueueExporter.export(xmlPath, cnx);
         }
         catch (Exception ex)
         {
@@ -387,17 +396,17 @@ public class Main
         }
         finally
         {
-            Helpers.closeQuietly(em);
+            Helpers.closeQuietly(cnx);
         }
     }
 
     private static void importQueues(String xmlPath)
     {
-        EntityManager em = null;
+        DbConn cnx = null;
         try
         {
-            em = Helpers.getNewDbSession();
-            XmlQueueParser.parse(xmlPath, em);
+            cnx = Helpers.getNewDbSession();
+            XmlQueueParser.parse(xmlPath, cnx);
         }
         catch (Exception ex)
         {
@@ -405,32 +414,27 @@ public class Main
         }
         finally
         {
-            Helpers.closeQuietly(em);
+            Helpers.closeQuietly(cnx);
         }
     }
 
     private static void root(String password)
     {
-        EntityManager em = null;
+        DbConn cnx = null;
         try
         {
-            em = Helpers.getNewDbSession();
-            em.getTransaction().begin();
-            RRole r = Helpers.createRoleIfMissing(em, "administrator", "all permissions without exception", "*:*");
-
-            RUser u = Helpers.createUserIfMissing(em, "root", "all powerful user", r);
-            u.setPassword(password);
-            Helpers.encodePassword(u);
-
-            em.getTransaction().commit();
+            cnx = Helpers.getNewDbSession();
+            Helpers.createRoleIfMissing(cnx, "administrator", "all permissions without exception", "*:*");
+            Helpers.createUserIfMissing(cnx, "root", password, "all powerful user", "administrator");
+            cnx.commit();
         }
         catch (Exception ex)
         {
-            jqmlogger.fatal("Could not parse and import the file", ex);
+            jqmlogger.fatal("Could not reset the root account", ex);
         }
         finally
         {
-            Helpers.closeQuietly(em);
+            Helpers.closeQuietly(cnx);
         }
     }
 
@@ -438,53 +442,50 @@ public class Main
     {
         if ("enable".equals(option))
         {
-            EntityManager em = Helpers.getNewDbSession();
-            Helpers.setSingleParam("disableWsApi", "false", em);
-            Helpers.setSingleParam("enableWsApiSsl", "false", em);
-            Helpers.setSingleParam("enableWsApiAuth", "true", em);
-            Helpers.setSingleParam("disableWsApiSimple", "false", em);
-            Helpers.setSingleParam("disableWsApiClient", "false", em);
-            Helpers.setSingleParam("disableWsApiAdmin", "false", em);
-            Helpers.setSingleParam("enableInternalPki", "true", em);
+            DbConn cnx = Helpers.getNewDbSession();
+            Helpers.setSingleParam("disableWsApi", "false", cnx);
+            Helpers.setSingleParam("enableWsApiSsl", "false", cnx);
+            Helpers.setSingleParam("enableWsApiAuth", "true", cnx);
+            Helpers.setSingleParam("disableWsApiSimple", "false", cnx);
+            Helpers.setSingleParam("disableWsApiClient", "false", cnx);
+            Helpers.setSingleParam("disableWsApiAdmin", "false", cnx);
+            Helpers.setSingleParam("enableInternalPki", "true", cnx);
 
-            em.getTransaction().begin();
-            em.createQuery("UPDATE Node n set n.loapApiSimple = true, n.loadApiClient = true, n.loadApiAdmin = true, n.dns=:n")
-                    .setParameter("n", "0.0.0.0").executeUpdate();
-            em.getTransaction().commit();
-            em.close();
+            cnx.runUpdate("node_update_all_enable_ws");
+            cnx.commit();
+            cnx.close();
         }
         else if ("disable".equals(option))
         {
-            EntityManager em = Helpers.getNewDbSession();
-            em.getTransaction().begin();
-            em.createQuery("UPDATE Node n set n.loadApiClient = false, n.loadApiAdmin = false").executeUpdate();
-            em.getTransaction().commit();
-            em.close();
+            DbConn cnx = Helpers.getNewDbSession();
+            cnx.runUpdate("node_update_all_disable_ws");
+            cnx.commit();
+            cnx.close();
         }
         if ("ssl".equals(option))
         {
-            EntityManager em = Helpers.getNewDbSession();
-            Helpers.setSingleParam("enableWsApiSsl", "true", em);
-            Helpers.setSingleParam("enableWsApiAuth", "true", em);
-            em.close();
+            DbConn cnx = Helpers.getNewDbSession();
+            Helpers.setSingleParam("enableWsApiSsl", "true", cnx);
+            Helpers.setSingleParam("enableWsApiAuth", "true", cnx);
+            cnx.close();
         }
         if ("nossl".equals(option))
         {
-            EntityManager em = Helpers.getNewDbSession();
-            Helpers.setSingleParam("enableWsApiSsl", "false", em);
-            em.close();
+            DbConn cnx = Helpers.getNewDbSession();
+            Helpers.setSingleParam("enableWsApiSsl", "false", cnx);
+            cnx.close();
         }
         if ("internalpki".equals(option))
         {
-            EntityManager em = Helpers.getNewDbSession();
-            Helpers.setSingleParam("enableInternalPki", "true", em);
-            em.close();
+            DbConn cnx = Helpers.getNewDbSession();
+            Helpers.setSingleParam("enableInternalPki", "true", cnx);
+            cnx.close();
         }
         if ("externalpki".equals(option))
         {
-            EntityManager em = Helpers.getNewDbSession();
-            Helpers.setSingleParam("enableInternalPki", "false", em);
-            em.close();
+            DbConn cnx = Helpers.getNewDbSession();
+            Helpers.setSingleParam("enableInternalPki", "false", cnx);
+            cnx.close();
         }
     }
 
@@ -495,30 +496,19 @@ public class Main
             throw new IllegalArgumentException("-U option requires one login, one password and at least one role (in this order)");
         }
 
-        EntityManager em = null;
+        DbConn em = null;
         try
         {
             em = Helpers.getNewDbSession();
 
-            RRole[] roles = new RRole[options.length - 2];
+            String[] roles = new String[options.length - 2];
             for (int i = 2; i < options.length; i++)
             {
-                try
-                {
-                    roles[i - 2] = em.createQuery("SELECT r FROM RRole r WHERE r.name=:l", RRole.class).setParameter("l", options[i])
-                            .getSingleResult();
-                }
-                catch (NoResultException ex)
-                {
-                    throw new IllegalArgumentException("Role " + options[i] + " does not exist");
-                }
+                roles[i - 2] = options[i];
             }
 
-            em.getTransaction().begin();
-            RUser u = Helpers.createUserIfMissing(em, options[0], "created through CLI", roles);
-            u.setPassword(options[1]);
-            Helpers.encodePassword(u);
-            em.getTransaction().commit();
+            Helpers.createUserIfMissing(em, options[0], options[1], "created through CLI", options);
+            em.commit();
         }
         finally
         {

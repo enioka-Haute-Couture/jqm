@@ -155,7 +155,7 @@ public class GlobalParameter implements Serializable
     {
         try
         {
-            return cnx.runSelectSingle("globalprm_select_by_key", 2, String.class, key);
+            return cnx.runSelectSingle("globalprm_select_by_key", 3, String.class, key);
         }
         catch (NoResultException e)
         {

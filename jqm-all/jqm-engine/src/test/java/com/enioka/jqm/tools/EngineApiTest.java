@@ -33,9 +33,9 @@ public class EngineApiTest extends JqmBaseTest
         boolean success2 = false;
         boolean success3 = false;
 
-        int i = JqmSimpleTest.create(em, "pyl.EngineApiSend3Msg").run(this);
+        int i = JqmSimpleTest.create(cnx, "pyl.EngineApiSend3Msg").run(this);
 
-        List<Message> m = em.createQuery("SELECT m FROM Message m WHERE m.ji = :i", Message.class).setParameter("i", i).getResultList();
+        List<Message> m = cnx.createQuery("SELECT m FROM Message m WHERE m.ji = :i", Message.class).setParameter("i", i).getResultList();
         for (Message msg : m)
         {
             if (msg.getTextMessage().equals("Les marsus sont nos amis, il faut les aimer aussi!"))
@@ -60,9 +60,9 @@ public class EngineApiTest extends JqmBaseTest
     @Test
     public void testSendProgress() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.EngineApiProgress").addWaitMargin(10000).run(this);
+        JqmSimpleTest.create(cnx, "pyl.EngineApiProgress").addWaitMargin(10000).run(this);
 
-        List<History> res = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class).getResultList();
+        List<History> res = cnx.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class).getResultList();
         Assert.assertEquals((Integer) 50, res.get(0).getProgress());
     }
 
@@ -72,7 +72,7 @@ public class EngineApiTest extends JqmBaseTest
     @Test
     public void testThrowable() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.SecThrow").expectOk(0).expectNonOk(1).run(this);
+        JqmSimpleTest.create(cnx, "pyl.SecThrow").expectOk(0).expectNonOk(1).run(this);
     }
 
     /**
@@ -81,7 +81,7 @@ public class EngineApiTest extends JqmBaseTest
     @Test
     public void testWaitChildren() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.EngineApiWaitAll").expectOk(6).run(this);
+        JqmSimpleTest.create(cnx, "pyl.EngineApiWaitAll").expectOk(6).run(this);
 
         List<History> ji = Helpers.getNewDbSession()
                 .createQuery("SELECT j FROM History j WHERE j.status = 'ENDED' ORDER BY j.id ASC", History.class).getResultList();
@@ -96,6 +96,6 @@ public class EngineApiTest extends JqmBaseTest
     @Test
     public void testGetChildrenStatus() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.EngineApiGetStatus").expectNonOk(1).expectOk(2).run(this);
+        JqmSimpleTest.create(cnx, "pyl.EngineApiGetStatus").expectNonOk(1).expectOk(2).run(this);
     }
 }

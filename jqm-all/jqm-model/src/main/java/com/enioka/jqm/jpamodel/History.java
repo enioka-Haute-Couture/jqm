@@ -21,6 +21,8 @@ package com.enioka.jqm.jpamodel;
 import java.io.Serializable;
 import java.util.Calendar;
 
+import com.enioka.jqm.jdbc.DbConn;
+
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
  * Persistence class for storing the execution log. All finished {@link JobInstance}s end up in this table (and are purged from
@@ -561,5 +563,45 @@ public class History implements Serializable
     public void setNodeName(final String nodeName)
     {
         this.nodeName = nodeName;
+    }
+
+    /**
+     * Create an History object from a {@link JobInstance}.
+     * 
+     */
+    public static void create(DbConn cnx, JobInstance ji, State finalState, Calendar endDate)
+    {
+        JobDef jd = ji.getJD();
+        Node n = ji.getNode();
+        Queue q = ji.getQ();
+
+        // TODO: applicationname == instance application => remove one.
+        if (endDate == null)
+        {
+            cnx.runUpdate("history_insert", ji.getId(), jd.getApplication(), jd.getApplication(), ji.getAttributionDate(), ji.getEmail(),
+                    ji.getCreationDate(), ji.getExecutionDate(), jd.isHighlander(), ji.getApplication(), ji.getKeyword1(), ji.getKeyword2(),
+                    ji.getKeyword3(), ji.getModule(), jd.getKeyword1(), jd.getKeyword2(), jd.getKeyword3(), jd.getModule(), n.getName(),
+                    ji.getParentId(), ji.getProgress(), q.getName(), 0, ji.getSessionID(), finalState, ji.getUserName(), ji.getJd(),
+                    ji.getNode(), ji.getQueue());
+        }
+        else
+        {
+            cnx.runUpdate("history_insert_with_end_date", ji.getId(), jd.getApplication(), jd.getApplication(), ji.getAttributionDate(),
+                    ji.getEmail(), endDate, ji.getCreationDate(), ji.getExecutionDate(), jd.isHighlander(), ji.getApplication(),
+                    ji.getKeyword1(), ji.getKeyword2(), ji.getKeyword3(), ji.getModule(), jd.getKeyword1(), jd.getKeyword2(),
+                    jd.getKeyword3(), jd.getModule(), n.getName(), ji.getParentId(), ji.getProgress(), q.getName(), 0, ji.getSessionID(),
+                    finalState, ji.getUserName(), ji.getJd(), ji.getNode(), ji.getQueue());
+        }
+    }
+
+    /**
+     * Create an History object from a {@link JobInstance}. (if it does not exist, exception).
+     * 
+     */
+    public static void create(DbConn cnx, int launchId, State finalState, Calendar endDate)
+    {
+        JobInstance ji = JobInstance.select_id(cnx, launchId);
+        create(cnx, ji, finalState, endDate);
+
     }
 }

@@ -86,9 +86,9 @@ public class RRole implements Serializable
             {
                 RRole tmp = new RRole();
 
-                tmp.id = rs.getInt(0);
-                tmp.name = rs.getString(1);
-                tmp.description = rs.getString(2);
+                tmp.id = rs.getInt(1);
+                tmp.name = rs.getString(2);
+                tmp.description = rs.getString(3);
 
                 res.add(tmp);
             }

@@ -20,6 +20,7 @@ package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -234,5 +235,52 @@ public class JndiObjectResource implements Serializable
         {
             cnx.runUpdate("jndiprm_insert", prms.getKey(), prms.getValue(), newId);
         }
+    }
+
+    public static List<JndiObjectResource> select(DbConn cnx, String query_key, Object... args)
+    {
+        List<JndiObjectResource> res = new ArrayList<JndiObjectResource>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key, args);
+            while (rs.next())
+            {
+                JndiObjectResource tmp = new JndiObjectResource();
+
+                tmp.id = rs.getInt(1);
+                tmp.name = rs.getString(2);
+                tmp.auth = rs.getString(3);
+                tmp.type = rs.getString(4);
+                tmp.factory = rs.getString(5);
+                tmp.description = rs.getString(6);
+                tmp.template = rs.getString(7);
+                tmp.singleton = rs.getBoolean(8);
+
+                Calendar c = Calendar.getInstance();
+                c.setTimeInMillis(rs.getTimestamp(9).getTime());
+                tmp.lastModified = c;
+
+                res.add(tmp);
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
+    }
+
+    public static JndiObjectResource select_alias(DbConn cnx, String alias)
+    {
+        List<JndiObjectResource> res = select(cnx, "jndi_select_by_key", alias);
+        if (res.isEmpty())
+        {
+            throw new DatabaseException("no result for query by key for key " + alias);
+        }
+        if (res.size() > 1)
+        {
+            throw new DatabaseException("Inconsistent database! Multiple results for query by key for key " + alias);
+        }
+        return res.get(0);
     }
 }

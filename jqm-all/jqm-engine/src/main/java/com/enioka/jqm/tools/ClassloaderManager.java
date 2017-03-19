@@ -11,8 +11,9 @@ import javax.naming.spi.NamingManager;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
-import org.sql2o.Sql2o;
 
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobInstance;
 
@@ -48,18 +49,21 @@ class ClassloaderManager
     private final LibraryResolverFS fsResolver;
     private final LibraryResolverMaven mavenResolver;
 
-    ClassloaderManager(Sql2o conn)
+    ClassloaderManager()
     {
-        launchIsolationDefault = Helpers.getParameter("launch_isolation_default", "Isolated", conn);
-
         this.fsResolver = new LibraryResolverFS();
         this.mavenResolver = new LibraryResolverMaven();
     }
 
-    JarClassLoader getClassloader(JobInstance ji, EntityManager em) throws MalformedURLException, JqmPayloadException, RuntimeException
+    void setIsolationDefault(DbConn cnx)
+    {
+        this.launchIsolationDefault = GlobalParameter.getParameter(cnx, "launch_isolation_default", "Isolated");
+    }
+
+    JarClassLoader getClassloader(JobInstance ji, DbConn cnx) throws MalformedURLException, JqmPayloadException, RuntimeException
     {
         final JarClassLoader jobClassLoader;
-        JobDef jd = ji.getJd();
+        JobDef jd = ji.getJD();
 
         // Extract the jar actual path
         File jarFile = new File(FilenameUtils.concat(new File(ji.getNode().getRepo()).getAbsolutePath(), jd.getJarPath()));
@@ -135,7 +139,7 @@ class ClassloaderManager
         }
 
         // Resolve the libraries and add them to the classpath
-        final URL[] classpath = getClasspath(ji, em);
+        final URL[] classpath = getClasspath(ji, cnx);
 
         // Remember to also add the jar file itself... as CL can be shared, there is no telling if it already present or not.
         jobClassLoader.extendUrls(jarFile.toURI().toURL(), classpath);
@@ -178,15 +182,15 @@ class ClassloaderManager
      * 
      * @throws JqmPayloadException
      */
-    private URL[] getClasspath(JobInstance ji, EntityManager em) throws JqmPayloadException
+    private URL[] getClasspath(JobInstance ji, DbConn cnx) throws JqmPayloadException
     {
-        switch (ji.getJd().getPathType())
+        switch (ji.getJD().getPathType())
         {
         default:
         case FS:
-            return fsResolver.getLibraries(ji.getNode(), ji.getJd(), em);
+            return fsResolver.getLibraries(ji.getNode(), ji.getJD(), cnx);
         case MAVEN:
-            return mavenResolver.resolve(ji, em);
+            return mavenResolver.resolve(ji, cnx);
         case MEMORY:
             return new URL[0];
         }
@@ -194,7 +198,7 @@ class ClassloaderManager
 
     private ClassLoader getParentClassLoader(JobInstance ji)
     {
-        switch (ji.getJd().getPathType())
+        switch (ji.getJD().getPathType())
         {
         default:
         case FS:

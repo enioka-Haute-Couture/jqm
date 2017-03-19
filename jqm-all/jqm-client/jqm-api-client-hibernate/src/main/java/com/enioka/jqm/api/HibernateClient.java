@@ -25,29 +25,23 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.UUID;
 
 import javax.naming.NameNotFoundException;
 import javax.net.ssl.SSLContext;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.LockModeType;
-import javax.persistence.NoResultException;
-import javax.persistence.Persistence;
-import javax.persistence.TypedQuery;
 
 import org.apache.http.Header;
 import org.apache.http.HttpStatus;
@@ -64,7 +58,13 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.enioka.jqm.api.Query.SortSpec;
+import com.enioka.jqm.api.Query.Sort;
+import com.enioka.jqm.jdbc.DatabaseException;
+import com.enioka.jqm.jdbc.Db;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.jdbc.NonUniqueResultException;
+import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.History;
@@ -72,7 +72,6 @@ import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
-import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.RuntimeParameter;
 import com.enioka.jqm.jpamodel.State;
@@ -85,7 +84,7 @@ final class HibernateClient implements JqmClient
     private static Logger jqmlogger = LoggerFactory.getLogger(HibernateClient.class);
     private static final String PERSISTENCE_UNIT = "jobqueue-api-pu";
     private static final int IN_CLAUSE_LIMIT = 500;
-    private EntityManagerFactory emf = null;
+    private Db db = null;
     private String protocol = null;
     Properties p;
 
@@ -100,13 +99,13 @@ final class HibernateClient implements JqmClient
         if (p.containsKey("emf"))
         {
             jqmlogger.trace("emf present in properties");
-            emf = (EntityManagerFactory) p.get("emf");
+            db = (Db) p.get("emf");
         }
     }
 
-    private EntityManagerFactory createFactory()
+    private Db createFactory()
     {
-        jqmlogger.debug("Creating connection pool to database");
+        jqmlogger.debug("Creating connection factory to database");
 
         InputStream fis = null;
         try
@@ -132,33 +131,25 @@ final class HibernateClient implements JqmClient
             closeQuietly(fis);
         }
 
-        EntityManagerFactory newEmf = null;
+        Db newDb = null;
         if (p.containsKey("javax.persistence.nonJtaDataSource"))
         {
             // This is a hack. Some containers will use root context as default for JNDI (WebSphere, Glassfish...), other will use
             // java:/comp/env/ (Tomcat...). So if we actually know the required alias, we try both, and the user only has to provide a
             // root JNDI alias that will work in both cases.
+            String dsAlias = (String) p.get("javax.persistence.nonJtaDataSource");
             try
             {
-                newEmf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, p);
-                // Do a stupid query to force EMF initialization
-                EntityManager em = newEmf.createEntityManager();
-                em.createQuery("SELECT n from Node n WHERE 1=0").getResultList().size();
-                em.close();
+                newDb = new Db(dsAlias);
             }
-            catch (RuntimeException e)
+            catch (DatabaseException e)
             {
                 if (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof NameNotFoundException)
                 {
                     jqmlogger.debug("JNDI alias " + p.getProperty("javax.persistence.nonJtaDataSource")
                             + " was not found. Trying with java:/comp/env/ prefix");
-                    p.setProperty("javax.persistence.nonJtaDataSource",
-                            "java:/comp/env/" + p.getProperty("javax.persistence.nonJtaDataSource"));
-                    newEmf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, p);
-                    // Do a stupid query to force EMF initialization
-                    EntityManager em = newEmf.createEntityManager();
-                    em.createQuery("SELECT n from Node n WHERE 1=3").getResultList().size();
-                    em.close();
+                    dsAlias = "java:/comp/env/" + dsAlias;
+                    newDb = new Db(dsAlias);
                 }
                 else
                 {
@@ -168,45 +159,32 @@ final class HibernateClient implements JqmClient
         }
         else
         {
-            newEmf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, p);
+            newDb = new Db(); // use default alias.
         }
-        return newEmf;
+
+        // Do a stupid query to force initialization
+        DbConn c = newDb.getConn();
+        c.runSelect("node_select_by_id", -1);
+        c.close();
+
+        return newDb;
     }
 
-    EntityManager getEm()
+    DbConn getDbSession()
     {
-        if (emf == null)
+        if (db == null)
         {
-            emf = createFactory();
+            db = createFactory();
         }
 
         try
         {
-            return emf.createEntityManager();
+            return db.getConn();
         }
         catch (Exception e)
         {
-            jqmlogger.error("Could not create EM.", e);
-            throw new JqmClientException("Could not create EntityManager", e);
-        }
-    }
-
-    private void closeQuietly(EntityManager em)
-    {
-        try
-        {
-            if (em != null)
-            {
-                if (em.getTransaction().isActive())
-                {
-                    em.getTransaction().rollback();
-                }
-                em.close();
-            }
-        }
-        catch (Exception e)
-        {
-            // fail silently
+            jqmlogger.error("Could not create database session.", e);
+            throw new JqmClientException("Could not create database session", e);
         }
     }
 
@@ -229,15 +207,7 @@ final class HibernateClient implements JqmClient
     public void dispose()
     {
         SimpleApiSecurity.dispose();
-        try
-        {
-            this.emf.close();
-        }
-        catch (Exception e)
-        {
-            // Nothing - dispose function must fail silently.
-        }
-        this.emf = null;
+        this.db = null;
         p = null;
     }
 
@@ -246,95 +216,68 @@ final class HibernateClient implements JqmClient
     // /////////////////////////////////////////////////////////////////////
 
     @Override
-    public int enqueue(JobRequest jd)
+    public int enqueue(JobRequest runRequest)
     {
-        jqmlogger.trace("BEGINING ENQUEUE");
-        EntityManager em = getEm();
-        JobDef job = null;
+        jqmlogger.trace("BEGINING ENQUEUE - request is for application name " + runRequest.getApplicationName());
+        DbConn cnx = getDbSession();
+
+        // First, get the JobDef.
+        JobDef jobDef = null;
+        List<JobDef> jj = JobDef.select(cnx, "jd_select_by_key", runRequest.getApplicationName());
+        if (jj.size() == 0)
+        {
+            jqmlogger.error("Job definition named " + runRequest.getApplicationName() + " does not exist");
+            closeQuietly(cnx);
+            throw new JqmInvalidRequestException("no job definition named " + runRequest.getApplicationName());
+        }
+        if (jj.size() > 1)
+        {
+            jqmlogger.error("There are multiple Job definition named " + runRequest.getApplicationName() + ". Inconsistent configuration.");
+            closeQuietly(cnx);
+            throw new JqmInvalidRequestException("There are multiple Job definition named " + runRequest.getApplicationName());
+        }
+        jobDef = jj.get(0);
+        jqmlogger.trace("Job to enqueue is from JobDef " + jobDef.getId());
+
+        // Then check Highlander.
+        Integer existing = highlanderMode(jobDef, cnx);
+        if (existing != null)
+        {
+            closeQuietly(cnx);
+            jqmlogger.trace("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + existing);
+            return existing;
+        }
+
+        // If here, need to enqueue a new execution request.
+        jqmlogger.trace("Not in highlander mode or no currently enqueued instance");
+
+        // Parameters are both from the JobDef and the execution request.
+        Map<String, String> prms = RuntimeParameter.select_map(cnx, "jdprm_select_all_for_jd", jobDef.getId());
+        prms.putAll(runRequest.getParameters());
+
+        // On which queue?
+        Integer queue_id;
+        if (runRequest.getQueueName() != null)
+        {
+            // use requested key if given.
+            queue_id = cnx.runSelectSingle("q_select_by_key", 1, Integer.class, runRequest.getQueueName());
+        }
+        else
+        {
+            // use default queue otherwise
+            queue_id = jobDef.getQueue();
+        }
+
+        // Now create the JI
         try
         {
-            job = em.createNamedQuery("HibApi.findJobDef", JobDef.class).setParameter("applicationName", jd.getApplicationName())
-                    .getSingleResult();
-        }
-        catch (NoResultException ex)
-        {
-            jqmlogger.error("Job definition named " + jd.getApplicationName() + " does not exist");
-            closeQuietly(em);
-            throw new JqmInvalidRequestException("no job definition named " + jd.getApplicationName());
-        }
+            int id = JobInstance.enqueue(cnx, queue_id, jobDef.getId(), runRequest.getApplication(), runRequest.getParentID(),
+                    runRequest.getModule(), runRequest.getKeyword1(), runRequest.getKeyword2(), runRequest.getKeyword3(),
+                    runRequest.getSessionID(), runRequest.getUser(), runRequest.getEmail(), jobDef.isHighlander(), prms);
 
-        jqmlogger.trace("Job to enqueue is from JobDef " + job.getId());
-        Integer hl = null;
-        List<RuntimeParameter> jps = overrideParameter(job, jd, em);
-
-        // Begin transaction (that will hold a lock in case of Highlander)
-        try
-        {
-            em.getTransaction().begin();
-
-            if (job.isHighlander())
-            {
-                hl = highlanderMode(job, em);
-            }
-
-            if (hl != null)
-            {
-                jqmlogger.trace("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + hl);
-                closeQuietly(em);
-                return hl;
-            }
-            jqmlogger.trace("Not in highlander mode or no currently enqueued instance");
-        }
-        catch (Exception e)
-        {
-            closeQuietly(em);
-            throw new JqmClientException("Could not do highlander analysis", e);
-        }
-
-        try
-        {
-            Queue q = job.getQueue();
-            if (jd.getQueueName() != null)
-            {
-                q = em.createNamedQuery("HibApi.findQueue", Queue.class).setParameter("name", jd.getQueueName()).getSingleResult();
-            }
-
-            JobInstance ji = new JobInstance();
-            ji.setJd(job);
-
-            ji.setState(State.SUBMITTED);
-            ji.setQueue(q);
-            ji.setNode(null);
-            ji.setApplication(jd.getApplication());
-            ji.setEmail(jd.getEmail());
-            ji.setKeyword1(jd.getKeyword1());
-            ji.setKeyword2(jd.getKeyword2());
-            ji.setKeyword3(jd.getKeyword3());
-            ji.setModule(jd.getModule());
-            ji.setProgress(0);
-            ji.setSessionID(jd.getSessionID());
-            ji.setUserName(jd.getUser());
-
-            ji.setCreationDate(Calendar.getInstance());
-            if (jd.getParentID() != null)
-            {
-                ji.setParentId(jd.getParentID());
-            }
-            em.persist(ji);
-
-            // There is sadly no portable and easy way to get DB time before insert... so we update afterwards.
-            // Also updates the internal queue position marker (done in update and not setter to avoid full stupid JPA update).
-            em.createNamedQuery("HibApi.updateJiWithDbTime").setParameter("i", ji.getId()).executeUpdate();
-
-            for (RuntimeParameter jp : jps)
-            {
-                jqmlogger.trace("Parameter: " + jp.getKey() + " - " + jp.getValue());
-                em.persist(ji.addParameter(jp.getKey(), jp.getValue()));
-            }
-
-            jqmlogger.trace("JI just created: " + ji.getId());
-            em.getTransaction().commit();
-            return ji.getId();
+            jqmlogger.trace("JI just created: " + id);
+            cnx.commit();
+            return id;
         }
         catch (NoResultException e)
         {
@@ -346,7 +289,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
         }
     }
 
@@ -359,13 +302,11 @@ final class HibernateClient implements JqmClient
     @Override
     public int enqueueFromHistory(int jobIdToCopy)
     {
-        EntityManager em = null;
-        History h = null;
+        DbConn cnx = null;
         try
         {
-            em = getEm();
-            h = em.find(History.class, jobIdToCopy);
-            return enqueue(getJobRequest(h, em));
+            cnx = getDbSession();
+            return enqueue(getJobRequest(jobIdToCopy, cnx));
         }
         catch (NoResultException e)
         {
@@ -373,86 +314,92 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
         }
     }
 
-    // Helper
-    private List<RuntimeParameter> overrideParameter(JobDef jdef, JobRequest jdefinition, EntityManager em)
+    // Helper. Current transaction is committed in some cases.
+    private Integer highlanderMode(JobDef jd, DbConn cnx)
     {
-        List<RuntimeParameter> res = new ArrayList<RuntimeParameter>();
-        Map<String, String> resm = new HashMap<String, String>();
-
-        // 1st: default parameters
-        for (JobDefParameter jp : jdef.getParameters())
+        if (!jd.isHighlander())
         {
-            resm.put(jp.getKey(), jp.getValue());
+            return null;
         }
 
-        // 2nd: overloads inside the user enqueue form.
-        resm.putAll(jdefinition.getParameters());
-
-        // 3rd: create the RuntimeParameter objects
-        for (Entry<String, String> e : resm.entrySet())
+        try
         {
-            if (e.getValue() == null)
-            {
-                throw new JqmInvalidRequestException("Parameter " + e.getKey() + " is null which is forbidden");
-            }
-            res.add(createJobParameter(e.getKey(), e.getValue(), em));
+            Integer existing = cnx.runSelectSingle("ji_select_existing_highlander", Integer.class, jd.getId());
+            return existing;
+        }
+        catch (NoResultException ex)
+        {
+            // Just continue, this means no existing waiting JI in queue.
         }
 
-        // Done
-        return res;
+        // Now we need to actually synchronize through the database to avoid double posting
+        // TODO: use a dedicated table, not the JobDef one. Will avoid locking the configuration.
+        ResultSet rs = cnx.runSelect(true, "jd_select_by_id", jd.getId());
+
+        // Now we have a lock, just retry - some other client may have created a job instance recently.
+        try
+        {
+            Integer existing = cnx.runSelectSingle("ji_select_existing_highlander", Integer.class, jd.getId());
+            rs.close();
+            cnx.commit(); // Do not keep the lock!
+            return existing;
+        }
+        catch (NoResultException ex)
+        {
+            // Just continue, this means no existing waiting JI in queue.
+        }
+        catch (SQLException e)
+        {
+            // Who cares.
+            jqmlogger.warn("Issue when closing a ResultSet. Transaction or session leak is possible.", e);
+        }
+
+        jqmlogger.trace("Highlander mode analysis is done: nor existing JO, must create a new one. Lock is hold.");
+        return null;
     }
 
-    // Helper. Must be called within an active JPA transaction
-    private Integer highlanderMode(JobDef jd, EntityManager em)
+    /**
+     * Internal helper to create a new execution request from an History row.<br>
+     * To be called for a single row only, not for converting multiple History elements.<br>
+     * Does not create a transaction, and no need for an active transaction.
+     * 
+     * @param launchId
+     *            the ID of the launch (was the ID of the JI, now the ID of the History object)
+     * @param cnx
+     *            an open DB session
+     * @return a new execution request
+     */
+    private JobRequest getJobRequest(int launchId, DbConn cnx)
     {
-        // Synchronization is done through locking the JobDef
-        em.lock(jd, LockModeType.PESSIMISTIC_WRITE);
-
-        // Do the analysis
-        Integer res = null;
-        jqmlogger.trace("Highlander mode analysis is begining");
-        ArrayList<JobInstance> jobs = (ArrayList<JobInstance>) em
-                .createQuery("SELECT j FROM JobInstance j WHERE j.jd = :j AND j.state = :s", JobInstance.class).setParameter("j", jd)
-                .setParameter("s", State.SUBMITTED).getResultList();
-
-        for (JobInstance j : jobs)
-        {
-            jqmlogger.trace("JI seen by highlander: " + j.getId() + j.getState());
-            if (j.getState().equals(State.SUBMITTED))
-            {
-                // HIGHLANDER: only one enqueued job can survive!
-                // current request must be cancelled and enqueue must return the id of the existing submitted JI
-                res = j.getId();
-                break;
-            }
-        }
-        jqmlogger.trace("Highlander mode will return: " + res);
-        return res;
-    }
-
-    // Helper
-    private JobRequest getJobRequest(History h, EntityManager em)
-    {
+        Map<String, String> prms = RuntimeParameter.select_map(cnx, "jiprm_select_by_jd", launchId);
+        ResultSet rs = cnx.runSelect("history_select_reenqueue_by_id", launchId);
         JobRequest jd = new JobRequest();
-        jd.setApplication(h.getApplication());
-        jd.setApplicationName(h.getApplicationName());
-        jd.setEmail(h.getEmail());
-        jd.setKeyword1(h.getKeyword1());
-        jd.setKeyword2(h.getKeyword2());
-        jd.setKeyword3(h.getKeyword3());
-        jd.setModule(h.getModule());
-        jd.setParentID(h.getParentJobId());
-        jd.setSessionID(h.getSessionId());
-        jd.setUser(h.getUserName());
 
-        for (RuntimeParameter p : em.createQuery("SELECT p FROM RuntimeParameter p WHERE p.ji = :i", RuntimeParameter.class)
-                .setParameter("i", h.getId()).getResultList())
+        try
         {
-            jd.addParameter(p.getKey(), p.getValue());
+            jd.setApplication(rs.getString(1));
+            jd.setApplicationName(rs.getString(2));
+            jd.setEmail(rs.getString(3));
+            jd.setKeyword1(rs.getString(4));
+            jd.setKeyword2(rs.getString(5));
+            jd.setKeyword3(rs.getString(6));
+            jd.setModule(rs.getString(7));
+            jd.setParentID(rs.getInt(8));
+            jd.setSessionID(rs.getString(9));
+            jd.setUser(rs.getString(10));
+
+            for (Map.Entry<String, String> p : prms.entrySet())
+            {
+                jd.addParameter(p.getKey(), p.getValue());
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new JqmClientException("Could not extract History data for launch " + launchId, e);
         }
 
         return jd;
@@ -465,105 +412,66 @@ final class HibernateClient implements JqmClient
     @Override
     public void cancelJob(int idJob)
     {
-        EntityManager em = null;
-        JobInstance ji = null;
+        jqmlogger.trace("Job instance number " + idJob + " will be cancelled");
+        DbConn cnx = null;
         try
         {
-            em = getEm();
-            em.getTransaction().begin();
-            ji = em.find(JobInstance.class, idJob, LockModeType.PESSIMISTIC_WRITE);
-            if (ji.getState().equals(State.SUBMITTED))
+            cnx = getDbSession();
+            QueryResult res = cnx.runUpdate("jj_update_cancel_by_id", idJob);
+            if (res.nbUpdated != 1)
             {
-                ji.setState(State.CANCELLED);
+                throw new JqmClientException("the job is already running, has already finished or never existed to begin with");
             }
-            else
-            {
-                throw new NoResultException();
-            }
-            em.getTransaction().commit();
         }
-        catch (NoResultException e)
+        catch (RuntimeException e)
         {
-            closeQuietly(em);
-            throw new JqmClientException("the job is already running, has already finished or never existed to begin with");
+            closeQuietly(cnx);
+            throw e;
         }
 
         try
         {
-            em.getTransaction().begin();
-            History h = new History();
-            h.setId(ji.getId());
-            h.setJd(ji.getJd());
-            h.setApplicationName(ji.getJd().getApplicationName());
-            h.setSessionId(ji.getSessionID());
-            h.setQueue(ji.getQueue());
-            h.setQueueName(ji.getQueue().getName());
-            h.setEnqueueDate(ji.getCreationDate());
-            h.setUserName(ji.getUserName());
-            h.setEmail(ji.getEmail());
-            h.setParentJobId(ji.getParentId());
-            h.setApplication(ji.getApplication());
-            h.setModule(ji.getModule());
-            h.setKeyword1(ji.getKeyword1());
-            h.setKeyword2(ji.getKeyword2());
-            h.setKeyword3(ji.getKeyword3());
-            h.setProgress(ji.getProgress());
-            h.setStatus(State.CANCELLED);
-            h.setNode(ji.getNode());
-            if (ji.getNode() != null)
-            {
-                h.setNodeName(ji.getNode().getName());
-            }
-            em.persist(h);
-
-            em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", ji.getId()).executeUpdate();
-            em.getTransaction().commit();
+            History.create(cnx, idJob, State.CANCELLED, null);
+            JobInstance.delete_id(cnx, idJob);
+            cnx.commit();
         }
         catch (Exception e)
         {
-            throw new JqmClientException("could not cancel job instance", e);
+            throw new JqmClientException("could not historise the job instance after it was cancelled", e);
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
         }
     }
 
     @Override
     public void deleteJob(int idJob)
     {
-        jqmlogger.trace("Job status number " + idJob + " will be deleted");
-        EntityManager em = null;
+        jqmlogger.trace("Job instance number " + idJob + " will be deleted");
+        DbConn cnx = null;
 
         try
         {
-            em = getEm();
+            cnx = getDbSession();
 
             // Two transactions against deadlock.
-            JobInstance job = em.find(JobInstance.class, idJob);
-            em.getTransaction().begin();
-            em.refresh(job, LockModeType.PESSIMISTIC_WRITE);
-            if (job.getState().equals(State.SUBMITTED))
+            QueryResult res = cnx.runUpdate("jj_update_cancel_by_id", idJob);
+            cnx.commit();
+            if (res.nbUpdated != 1)
             {
-                job.setState(State.CANCELLED);
-            }
-            em.getTransaction().commit();
-
-            if (!job.getState().equals(State.CANCELLED))
-            {
-                // Job is not in queue anymore - just return.
-                return;
+                new JqmInvalidRequestException(
+                        "An attempt was made to delete a job instance that either did not exist or was already running");
             }
 
-            em.getTransaction().begin();
-            em.createQuery("DELETE FROM Message WHERE ji = :i").setParameter("i", job.getId()).executeUpdate();
-            em.createQuery("DELETE FROM RuntimeParameter WHERE ji = :i").setParameter("i", job.getId()).executeUpdate();
-            em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", job.getId()).executeUpdate();
-            em.getTransaction().commit();
+            cnx.runUpdate("jiprm_delete_by_ji", idJob);
+            cnx.runUpdate("message_delete_by_ji", idJob);
+            JobInstance.delete_id(cnx, idJob);
+            cnx.commit();
         }
-        catch (NoResultException e)
+        catch (JqmClientException e)
         {
-            throw new JqmInvalidRequestException("An attempt was made to delete a job instance that did not exist.");
+            throw e;
         }
         catch (Exception e)
         {
@@ -571,13 +479,15 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
         }
     }
 
     @Override
     public void killJob(int idJob)
     {
+        jqmlogger.trace("Job instance number " + idJob + " will be killed (if possible)o");
+
         // First try to cancel the JI (works if it is not already running)
         try
         {
@@ -589,29 +499,23 @@ final class HibernateClient implements JqmClient
             // Nothing to do - this is thrown if already running. Just go on, this is a standard kill.
         }
 
-        EntityManager em = null;
+        DbConn cnx = null;
         try
         {
-            em = getEm();
-            em.getTransaction().begin();
-            JobInstance j = em.find(JobInstance.class, idJob, LockModeType.PESSIMISTIC_READ);
-            if (j == null)
+            cnx = getDbSession();
+
+            QueryResult res = cnx.runUpdate("jj_update_kill_by_id", idJob);
+            if (res.nbUpdated != 1)
             {
-                throw new NoResultException("Job instance does not exist or has already finished");
+                throw new JqmInvalidRequestException("Job instance does not exist or has already finished");
             }
-            jqmlogger.trace("The " + j.getState() + " job (ID: " + idJob + ")" + " will be marked for kill");
 
-            j.setState(State.KILLED);
-
-            Message m = new Message();
-            m.setJi(idJob);
-            m.setTextMessage("Kill attempt on the job");
-            em.persist(m);
-            em.getTransaction().commit();
+            Message.create(cnx, "Kill attempt on the job", idJob);
+            cnx.commit();
         }
-        catch (NoResultException e)
+        catch (JqmClientException e)
         {
-            throw new JqmInvalidRequestException("An attempt was made to kill a job instance that did not exist.");
+            throw e;
         }
         catch (Exception e)
         {
@@ -619,7 +523,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
         }
     }
 
@@ -630,19 +534,19 @@ final class HibernateClient implements JqmClient
     @Override
     public void pauseQueuedJob(int idJob)
     {
-        jqmlogger.trace("Job status number " + idJob + " will be set to HOLDED");
-        EntityManager em = null;
+        jqmlogger.trace("Job instance number " + idJob + " status will be set to HOLDED");
+        DbConn cnx = null;
 
         try
         {
-            em = getEm();
-            em.getTransaction().begin();
-            em.createQuery("UPDATE JobInstance j SET j.state = 'HOLDED' WHERE j.id = :idJob").setParameter("idJob", idJob).executeUpdate();
-            em.getTransaction().commit();
-        }
-        catch (NoResultException e)
-        {
-            throw new JqmInvalidRequestException("An attempt was made to pause a job instance that did not exist.");
+            cnx = getDbSession();
+            QueryResult qr = cnx.runUpdate("jj_update_pause_by_id", idJob);
+            if (qr.nbUpdated != 1)
+            {
+                throw new JqmInvalidRequestException(
+                        "An attempt was made to pause a job instance that did not exist or was already running.");
+            }
+            cnx.commit();
         }
         catch (Exception e)
         {
@@ -650,7 +554,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
         }
     }
 
@@ -658,19 +562,17 @@ final class HibernateClient implements JqmClient
     public void resumeJob(int idJob)
     {
         jqmlogger.trace("Job status number " + idJob + " will be resumed");
-        EntityManager em = null;
+        DbConn cnx = null;
 
         try
         {
-            em = getEm();
-            em.getTransaction().begin();
-            em.createQuery("UPDATE JobInstance j SET j.state = 'SUBMITTED' WHERE j.id = :idJob").setParameter("idJob", idJob)
-                    .executeUpdate();
-            em.getTransaction().commit();
-        }
-        catch (NoResultException e)
-        {
-            throw new JqmInvalidRequestException("An attempt was made to resume a job instance that did not exist.");
+            cnx = getDbSession();
+            QueryResult qr = cnx.runUpdate("jj_update_resume_by_id", idJob);
+            if (qr.nbUpdated != 1)
+            {
+                throw new JqmInvalidRequestException("An attempt was made to pause a job instance that did not exist or was not paused.");
+            }
+            cnx.commit();
         }
         catch (Exception e)
         {
@@ -678,58 +580,59 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
         }
     }
 
     public int restartCrashedJob(int idJob)
     {
-        EntityManager em = null;
+        DbConn cnx = null;
 
         // History and Job ID have the same ID.
-        History h = null;
         try
         {
-            em = getEm();
-            h = em.find(History.class, idJob);
+            cnx = getDbSession();
+            ResultSet rs = cnx.runSelect("history_select_reenqueue_by_id", idJob);
+
+            if (!rs.next())
+            {
+                throw new JqmClientException("You cannot restart a job that is not done or which was purged from history");
+            }
+
+            JobRequest jr = new JobRequest();
+            jr.setApplication(rs.getString(1));
+            jr.setApplicationName(rs.getString(2));
+            jr.setEmail(rs.getString(3));
+            jr.setKeyword1(rs.getString(4));
+            jr.setKeyword2(rs.getString(5));
+            jr.setKeyword3(rs.getString(6));
+            jr.setModule(rs.getString(7));
+            jr.setParentID(rs.getInt(8));
+            jr.setSessionID(rs.getString(9));
+            jr.setUser(rs.getString(10));
+
+            State s = State.valueOf(rs.getString(11));
+            if (!s.equals(State.CRASHED))
+            {
+                throw new JqmClientException("You cannot restart a job that has not crashed");
+            }
+
+            int res = enqueue(jr);
+            cnx.runUpdate("history_delete_by_id", idJob);
+            cnx.commit();
+            return res;
         }
-        catch (NoResultException e)
+        catch (JqmClientException e)
         {
-            closeQuietly(em);
-            throw new JqmClientException("You cannot restart a job that is not done or which was purged from history");
+            throw e;
         }
         catch (Exception e)
         {
-            closeQuietly(em);
             throw new JqmClientException("could not restart a job (internal error)", e);
-        }
-
-        if (!h.getState().equals(State.CRASHED))
-        {
-            closeQuietly(em);
-            throw new JqmClientException("You cannot restart a job that has not crashed");
-        }
-
-        if (!h.getJd().isCanBeRestarted())
-        {
-            closeQuietly(em);
-            throw new JqmClientException("This type of job was configured to prevent being restarded");
-        }
-
-        try
-        {
-            em.getTransaction().begin();
-            em.remove(h);
-            em.getTransaction().commit();
-            return enqueue(getJobRequest(h, em));
-        }
-        catch (Exception e)
-        {
-            throw new JqmClientException("could not purge & restart a job (internal error)", e);
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
         }
     }
 
@@ -740,40 +643,25 @@ final class HibernateClient implements JqmClient
     @Override
     public void setJobQueue(int idJob, int idQueue)
     {
-        EntityManager em = null;
-        JobInstance ji = null;
-        Queue q = null;
+        DbConn cnx = null;
 
         try
         {
-            em = getEm();
-            q = em.find(Queue.class, idQueue);
-        }
-        catch (NoResultException e)
-        {
-            closeQuietly(em);
-            throw new JqmClientException("Queue does not exist");
-        }
-        catch (Exception e)
-        {
-            closeQuietly(em);
-            throw new JqmClientException("Cannot retrieve queue", e);
-        }
+            cnx = getDbSession();
+            QueryResult qr = cnx.runUpdate("jj_update_queue_by_id", idQueue, idJob);
 
-        try
-        {
-            em.getTransaction().begin();
-            ji = em.find(JobInstance.class, idJob, LockModeType.PESSIMISTIC_WRITE);
-            if (ji == null || !ji.getState().equals(State.SUBMITTED))
+            if (qr.nbUpdated != 1)
             {
-                throw new NoResultException();
+                throw new JqmClientException("Job instance does not exist or has already started");
             }
-            ji.setQueue(q);
-            em.getTransaction().commit();
+
         }
-        catch (NoResultException e)
+        catch (DatabaseException e)
         {
-            throw new JqmClientException("Job instance does not exist or has already started");
+            if (e.getCause() instanceof SQLIntegrityConstraintViolationException)
+                throw new JqmClientException("Queue does not exist", e);
+            else
+                throw new JqmClientException("could not change the queue of a job (internal error)", e);
         }
         catch (Exception e)
         {
@@ -781,7 +669,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
         }
     }
 
@@ -794,37 +682,30 @@ final class HibernateClient implements JqmClient
     @Override
     public void setJobQueuePosition(int idJob, int position)
     {
-        EntityManager em = null;
-        JobInstance ji = null;
+        DbConn cnx = null;
         try
         {
-            em = getEm();
-            em.getTransaction().begin();
-            ji = em.find(JobInstance.class, idJob, LockModeType.PESSIMISTIC_WRITE);
-        }
-        catch (Exception e)
-        {
-            closeQuietly(em);
-            throw new JqmClientException(
-                    "Could not lock a job by the given ID. It may already have been executed or a timeout may have occurred.", e);
-        }
+            // Step 1 : get the queue of this job.
+            cnx = getDbSession();
+            ResultSet rs1 = cnx.runSelect("ji_select_changequeuepos_by_id", idJob);
+            if (!rs1.next())
+            {
+                throw new JqmInvalidRequestException("Job does not exist or is already running.");
+            }
+            int queue_id = rs1.getInt(1);
+            int internal_id = rs1.getInt(2);
+            rs1.close();
 
-        if (!ji.getState().equals(State.SUBMITTED))
-        {
-            closeQuietly(em);
-            throw new JqmInvalidRequestException("Job is already set for execution. Too late to change its position in the queue");
-        }
+            // Step 2 : get the current rank of the JI.
+            int current = cnx.runSelectSingle("ji_select_current_pos", Integer.class, internal_id, queue_id);
 
-        try
-        {
-            int current = ji.getCurrentPosition(em);
+            // Step 3 : select target position
             int betweenUp = 0;
             int betweenDown = 0;
 
             if (current == position)
             {
                 // Nothing to do
-                em.getTransaction().rollback();
                 return;
             }
             else if (current < position)
@@ -838,26 +719,28 @@ final class HibernateClient implements JqmClient
                 betweenUp = position;
             }
 
-            // No locking - we'll deal with exceptions
-            List<JobInstance> currentJobs = em.createQuery("SELECT ji from JobInstance ji ORDER BY ji.internalPosition", JobInstance.class)
-                    .setMaxResults(betweenUp).getResultList();
-
+            // Step 4 : update the JI.
+            List<JobInstance> currentJobs = JobInstance.select(cnx, "ji_select_by_queue", queue_id);
             if (currentJobs.isEmpty())
             {
-                ji.setInternalPosition(0);
+                cnx.runUpdate("jj_update_rank_by_id", 0, idJob);
             }
             else if (currentJobs.size() < betweenUp)
             {
-                ji.setInternalPosition(currentJobs.get(currentJobs.size() - 1).getInternalPosition() + 0.00001);
+                cnx.runUpdate("jj_update_rank_by_id", currentJobs.get(currentJobs.size() - 1).getInternalPosition() + 0.00001, idJob);
             }
             else
             {
                 // Normal case: put the JI between the two others.
-                ji.setInternalPosition(
-                        (currentJobs.get(betweenUp - 1).getInternalPosition() + currentJobs.get(betweenDown - 1).getInternalPosition())
-                                / 2);
+                QueryResult qr = cnx.runUpdate("jj_update_rank_by_id",
+                        (currentJobs.get(betweenUp - 1).getInternalPosition() + currentJobs.get(betweenDown - 1).getInternalPosition()) / 2,
+                        idJob);
+                if (qr.nbUpdated != 1)
+                {
+                    throw new JqmInvalidRequestException("Job is already running.");
+                }
             }
-            em.getTransaction().commit();
+            cnx.commit();
         }
         catch (Exception e)
         {
@@ -865,133 +748,13 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
         }
     }
 
     // /////////////////////////////////////////////////////////////////////
     // Job queries
     // /////////////////////////////////////////////////////////////////////
-
-    // Helper
-    private com.enioka.jqm.api.JobInstance getJob(JobInstance h, EntityManager em)
-    {
-        com.enioka.jqm.api.JobInstance ji = new com.enioka.jqm.api.JobInstance();
-        ji.setId(h.getId());
-        ji.setApplicationName(h.getJd().getApplicationName());
-        ji.setParameters(new HashMap<String, String>());
-        ji.setParent(h.getParentId());
-        ji.setQueue(getQueue(h.getQueue()));
-        ji.setQueueName(h.getQueue().getName());
-        ji.setSessionID(h.getSessionID());
-        ji.setState(com.enioka.jqm.api.State.valueOf(h.getState().toString()));
-        ji.setUser(h.getUserName());
-        ji.setProgress(h.getProgress());
-        for (RuntimeParameter p : em.createQuery("SELECT m from RuntimeParameter m where m.ji = :i", RuntimeParameter.class)
-                .setParameter("i", h.getId()).getResultList())
-        {
-            ji.getParameters().put(p.getKey(), p.getValue());
-        }
-        for (Message m : em.createQuery("SELECT m from Message m where m.ji = :i", Message.class).setParameter("i", h.getId())
-                .getResultList())
-        {
-            ji.getMessages().add(m.getTextMessage());
-        }
-        ji.setKeyword1(h.getKeyword1());
-        ji.setKeyword2(h.getKeyword2());
-        ji.setKeyword3(h.getKeyword3());
-        ji.setDefinitionKeyword1(h.getJd().getKeyword1());
-        ji.setDefinitionKeyword2(h.getJd().getKeyword2());
-        ji.setDefinitionKeyword3(h.getJd().getKeyword3());
-        ji.setApplication(h.getApplication());
-        ji.setModule(h.getModule());
-        ji.setEmail(h.getEmail());
-        ji.setEnqueueDate(h.getCreationDate());
-        ji.setBeganRunningDate(h.getExecutionDate());
-        if (h.getNode() != null)
-        {
-            ji.setNodeName(h.getNode().getName());
-        }
-
-        return ji;
-    }
-
-    // Helper
-    private com.enioka.jqm.api.JobInstance getJob(History h, EntityManager em)
-    {
-        return getJob(h, em, null, null);
-    }
-
-    private com.enioka.jqm.api.JobInstance getJob(History h, EntityManager em, List<RuntimeParameter> rps, List<Message> msgs)
-    {
-        com.enioka.jqm.api.JobInstance ji = new com.enioka.jqm.api.JobInstance();
-        ji.setId(h.getId());
-        ji.setApplicationName(h.getApplicationName());
-        ji.setParameters(new HashMap<String, String>());
-        ji.setParent(h.getParentJobId());
-        if (h.getQueue() != null)
-        {
-            ji.setQueue(getQueue(h.getQueue()));
-        }
-        ji.setQueueName(h.getQueueName());
-        ji.setSessionID(h.getSessionId());
-        ji.setState(com.enioka.jqm.api.State.valueOf(h.getStatus().toString()));
-        ji.setUser(h.getUserName());
-        ji.setProgress(h.getProgress());
-        ji.setKeyword1(h.getInstanceKeyword1());
-        ji.setKeyword2(h.getInstanceKeyword2());
-        ji.setKeyword3(h.getInstanceKeyword3());
-        ji.setDefinitionKeyword1(h.getKeyword1());
-        ji.setDefinitionKeyword2(h.getKeyword2());
-        ji.setDefinitionKeyword3(h.getKeyword3());
-        ji.setApplication(h.getApplication());
-        ji.setModule(h.getModule());
-        ji.setEmail(h.getEmail());
-        ji.setEnqueueDate(h.getEnqueueDate());
-        ji.setBeganRunningDate(h.getExecutionDate());
-        ji.setEndDate(h.getEndDate());
-        ji.setNodeName(h.getNodeName());
-
-        if (rps == null)
-        {
-            for (RuntimeParameter p : em.createQuery("SELECT m from RuntimeParameter m where m.ji = :i", RuntimeParameter.class)
-                    .setParameter("i", h.getId()).getResultList())
-            {
-                ji.getParameters().put(p.getKey(), p.getValue());
-            }
-        }
-        else
-        {
-            for (RuntimeParameter rp : rps)
-            {
-                if (rp.getJi() == h.getId())
-                {
-                    ji.getParameters().put(rp.getKey(), rp.getValue());
-                }
-            }
-        }
-
-        if (msgs == null)
-        {
-            for (Message m : em.createQuery("SELECT m from Message m where m.ji = :i", Message.class).setParameter("i", h.getId())
-                    .getResultList())
-            {
-                ji.getMessages().add(m.getTextMessage());
-            }
-        }
-        else
-        {
-            for (Message msg : msgs)
-            {
-                if (msg.getJi() == h.getId())
-                {
-                    ji.getMessages().add(msg.getTextMessage());
-                }
-            }
-        }
-
-        return ji;
-    }
 
     private String getStringPredicate(String fieldName, String filterValue, Map<String, Object> prms)
     {
@@ -1095,355 +858,318 @@ final class HibernateClient implements JqmClient
     @Override
     public List<com.enioka.jqm.api.JobInstance> getJobs(Query query)
     {
-        if ((query.getFirstRow() != null || query.getPageSize() != null) && query.isQueryLiveInstances() && query.isQueryHistoryInstances())
-        {
-            throw new JqmInvalidRequestException("cannot use paging when querying both live and historical instances");
-        }
-        if (query.isQueryLiveInstances() && query.isQueryHistoryInstances() && query.getSorts().size() > 0)
-        {
-            throw new JqmInvalidRequestException("cannot use sorting when querying both live and historical instances");
-        }
-
-        EntityManager em = null;
-        try
-        {
-            em = getEm();
-
-            // Not using CriteriaBuilder - too much hassle for too little benefit
-            String wh = "";
-            Map<String, Object> prms = new HashMap<String, Object>();
-
-            // String predicates
-            wh += getStringPredicate("userName", query.getUser(), prms);
-            wh += getStringPredicate("sessionId", query.getSessionId(), prms);
-            wh += getStringPredicate("instanceKeyword1", query.getInstanceKeyword1(), prms);
-            wh += getStringPredicate("instanceKeyword2", query.getInstanceKeyword2(), prms);
-            wh += getStringPredicate("instanceKeyword3", query.getInstanceKeyword3(), prms);
-            wh += getStringPredicate("instanceModule", query.getInstanceModule(), prms);
-            wh += getStringPredicate("instanceApplication", query.getInstanceApplication(), prms);
-
-            // Integer
-            wh += getIntPredicate("parentId", query.getParentId(), prms);
-            wh += getIntPredicate("id", query.getJobInstanceId(), prms);
-            wh += getIntPredicate("queue.id", query.getQueueId() == null ? null : query.getQueueId(), prms);
-
-            // Now, run queries...
-            List<com.enioka.jqm.api.JobInstance> res2 = new ArrayList<com.enioka.jqm.api.JobInstance>();
-
-            // ////////////////////////////////////////
-            // Job Instance query
-            if (query.isQueryLiveInstances())
-            {
-                // Sort
-                String sort = "";
-                for (SortSpec s : query.getSorts())
-                {
-                    sort += s.col.getJiField() == null ? ""
-                            : ",h." + s.col.getJiField() + " " + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
-                }
-                if (sort.isEmpty())
-                {
-                    sort = " ORDER BY h.id";
-                }
-                else
-                {
-                    sort = " ORDER BY " + sort.substring(1);
-                }
-
-                // Finish query string
-                String wh2 = "" + wh;
-                Map<String, Object> prms2 = new HashMap<String, Object>();
-                prms2.putAll(prms);
-                wh2 += getStringPredicate("queue.name", query.getQueueName(), prms2);
-
-                // tag fields should be looked for in linked object for active JI
-                wh2 += getStringPredicate("jd.applicationName", query.getApplicationName(), prms2);
-                wh2 += getStringPredicate("jd.keyword1", query.getJobDefKeyword1(), prms2);
-                wh2 += getStringPredicate("jd.keyword2", query.getJobDefKeyword2(), prms2);
-                wh2 += getStringPredicate("jd.keyword3", query.getJobDefKeyword3(), prms2);
-                wh2 += getStringPredicate("jd.module", query.getJobDefModule(), prms2);
-                wh2 += getStringPredicate("jd.application", query.getJobDefApplication(), prms2);
-                wh2 += getStringPredicate("node.name", query.getNodeName(), prms2);
-
-                // Calendar fields are specific (no common fields between History and JobInstance)
-                wh2 += getCalendarPredicate("creationDate", query.getEnqueuedAfter(), ">=", prms2);
-                wh2 += getCalendarPredicate("creationDate", query.getEnqueuedBefore(), "<=", prms2);
-                wh2 += getCalendarPredicate("executionDate", query.getBeganRunningAfter(), ">=", prms2);
-                wh2 += getCalendarPredicate("executionDate", query.getBeganRunningBefore(), "<=", prms2);
-                wh2 += getStatusPredicate("state", query.getStatus(), prms2);
-                if (wh2.length() >= 3)
-                {
-                    wh2 = " WHERE " + wh2.substring(3);
-                }
-
-                TypedQuery<JobInstance> q2 = em.createQuery(
-                        "SELECT h FROM JobInstance h LEFT JOIN FETCH h.jd LEFT JOIN FETCH h.node " + wh2 + sort, JobInstance.class);
-                for (Map.Entry<String, Object> entry : prms2.entrySet())
-                {
-                    q2.setParameter(entry.getKey(), entry.getValue());
-                }
-
-                // Set pagination parameters
-                if (query.getFirstRow() != null)
-                {
-                    q2.setFirstResult(query.getFirstRow());
-                }
-                if (query.getPageSize() != null)
-                {
-                    q2.setMaxResults(query.getPageSize());
-                }
-
-                // Run the query
-                for (JobInstance ji : q2.getResultList())
-                {
-                    res2.add(getJob(ji, em));
-                }
-
-                // If needed, fetch the total result count (without pagination). Note that without pagination, the Query object does not
-                // need this indication.
-                if (query.getFirstRow() != null || (query.getPageSize() != null && res2.size() >= query.getPageSize()))
-                {
-                    TypedQuery<Long> qCount = em.createQuery("SELECT COUNT(h) FROM JobInstance h " + wh2, Long.class);
-                    for (Map.Entry<String, Object> entry : prms2.entrySet())
-                    {
-                        qCount.setParameter(entry.getKey(), entry.getValue());
-                    }
-                    query.setResultSize(new BigDecimal(qCount.getSingleResult()).intValueExact());
-                }
-            }
-
-            // ////////////////////////////////////////
-            // History query
-            if (query.isQueryHistoryInstances())
-            {
-                wh += getStringPredicate("queueName", query.getQueueName(), prms);
-
-                // tag fields should be looked directly in the denormalized fields for history.
-                wh += getStringPredicate("applicationName", query.getApplicationName(), prms);
-                wh += getStringPredicate("keyword1", query.getJobDefKeyword1(), prms);
-                wh += getStringPredicate("keyword2", query.getJobDefKeyword2(), prms);
-                wh += getStringPredicate("keyword3", query.getJobDefKeyword3(), prms);
-                wh += getStringPredicate("module", query.getJobDefModule(), prms);
-                wh += getStringPredicate("application", query.getJobDefApplication(), prms);
-                wh += getStringPredicate("nodeName", query.getNodeName(), prms);
-
-                // Calendar fields are specific (no common fields between History and JobInstance)
-                wh += getCalendarPredicate("enqueueDate", query.getEnqueuedAfter(), ">=", prms);
-                wh += getCalendarPredicate("enqueueDate", query.getEnqueuedBefore(), "<=", prms);
-                wh += getCalendarPredicate("executionDate", query.getBeganRunningAfter(), ">=", prms);
-                wh += getCalendarPredicate("executionDate", query.getBeganRunningBefore(), "<=", prms);
-                wh += getCalendarPredicate("endDate", query.getEndedAfter(), ">=", prms);
-                wh += getCalendarPredicate("endDate", query.getEndedBefore(), "<=", prms);
-                wh += getStatusPredicate("status", query.getStatus(), prms);
-                if (wh.length() >= 3)
-                {
-                    wh = " WHERE " + wh.substring(3);
-                }
-
-                // Order by
-                String sort = "";
-                for (SortSpec s : query.getSorts())
-                {
-                    sort += ",h." + s.col.getHistoryField() + " " + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
-                }
-                if (sort.isEmpty())
-                {
-                    sort = " ORDER BY h.id";
-                }
-                else
-                {
-                    sort = " ORDER BY " + sort.substring(1);
-                }
-
-                TypedQuery<History> q1 = em.createQuery(
-                        "SELECT h FROM History h LEFT JOIN FETCH h.jd LEFT JOIN FETCH h.node LEFT JOIN FETCH h.queue " + wh + sort,
-                        History.class);
-                for (Map.Entry<String, Object> entry : prms.entrySet())
-                {
-                    q1.setParameter(entry.getKey(), entry.getValue());
-                }
-
-                // Set pagination parameters
-                if (query.getFirstRow() != null)
-                {
-                    q1.setFirstResult(query.getFirstRow());
-                }
-                if (query.getPageSize() != null)
-                {
-                    q1.setMaxResults(query.getPageSize());
-                }
-
-                // Actually run the query
-                List<History> results = q1.getResultList();
-
-                // If needed, fetch the total result count (without pagination). Note that without pagination, the Query object does not
-                // need this indication.
-                if (query.getFirstRow() != null || (query.getPageSize() != null && results.size() >= query.getPageSize()))
-                {
-                    TypedQuery<Long> qCount = em.createQuery("SELECT COUNT(h) FROM History h " + wh, Long.class);
-                    for (Map.Entry<String, Object> entry : prms.entrySet())
-                    {
-                        qCount.setParameter(entry.getKey(), entry.getValue());
-                    }
-                    query.setResultSize(new BigDecimal(qCount.getSingleResult()).intValueExact());
-                }
-
-                // Optimization: fetch messages and parameters in batches of 50 (limit accepted by most databases for IN clauses).
-                List<List<Integer>> ids = new ArrayList<List<Integer>>();
-                List<Integer> currentList = null;
-                int i = 0;
-                for (History ji : results)
-                {
-                    if (currentList == null || i % IN_CLAUSE_LIMIT == 0)
-                    {
-                        currentList = new ArrayList<Integer>(IN_CLAUSE_LIMIT);
-                        ids.add(currentList);
-                    }
-                    currentList.add(ji.getId());
-                    i++;
-                }
-                if (currentList != null && !currentList.isEmpty())
-                {
-                    List<RuntimeParameter> rps = new ArrayList<RuntimeParameter>(IN_CLAUSE_LIMIT * ids.size());
-                    List<Message> msgs = new ArrayList<Message>(IN_CLAUSE_LIMIT * ids.size());
-
-                    for (List<Integer> idsBatch : ids)
-                    {
-                        rps.addAll(em.createQuery("SELECT rp FROM RuntimeParameter rp WHERE rp.ji IN (:p)", RuntimeParameter.class)
-                                .setParameter("p", idsBatch).getResultList());
-                        msgs.addAll(em.createQuery("SELECT rp FROM Message rp WHERE rp.ji IN (:p)", Message.class)
-                                .setParameter("p", idsBatch).getResultList());
-                    }
-
-                    for (History ji : results)
-                    {
-                        // This is the actual JPA -> DTO work.
-                        res2.add(getJob(ji, em, rps, msgs));
-                    }
-                }
-            }
-
-            query.setResults(res2);
-            return res2;
-        }
-        catch (Exception e)
-        {
-            throw new JqmClientException("an error occured during query execution", e);
-        }
-        finally
-        {
-            closeQuietly(em);
-        }
+        return null;
+        // if ((query.getFirstRow() != null || query.getPageSize() != null) && query.isQueryLiveInstances() &&
+        // query.isQueryHistoryInstances())
+        // {
+        // throw new JqmInvalidRequestException("cannot use paging when querying both live and historical instances");
+        // }
+        // if (query.isQueryLiveInstances() && query.isQueryHistoryInstances() && query.getSorts().size() > 0)
+        // {
+        // throw new JqmInvalidRequestException("cannot use sorting when querying both live and historical instances");
+        // }
+        //
+        // DbConn cnx = null;
+        // try
+        // {
+        // cnx = getDbSession();
+        //
+        // // Not using CriteriaBuilder - too much hassle for too little benefit
+        // String wh = "";
+        // Map<String, Object> prms = new HashMap<String, Object>();
+        //
+        // // String predicates
+        // wh += getStringPredicate("userName", query.getUser(), prms);
+        // wh += getStringPredicate("sessionId", query.getSessionId(), prms);
+        // wh += getStringPredicate("instanceKeyword1", query.getInstanceKeyword1(), prms);
+        // wh += getStringPredicate("instanceKeyword2", query.getInstanceKeyword2(), prms);
+        // wh += getStringPredicate("instanceKeyword3", query.getInstanceKeyword3(), prms);
+        // wh += getStringPredicate("instanceModule", query.getInstanceModule(), prms);
+        // wh += getStringPredicate("instanceApplication", query.getInstanceApplication(), prms);
+        //
+        // // Integer
+        // wh += getIntPredicate("parentId", query.getParentId(), prms);
+        // wh += getIntPredicate("id", query.getJobInstanceId(), prms);
+        // wh += getIntPredicate("queue.id", query.getQueueId() == null ? null : query.getQueueId(), prms);
+        //
+        // // Now, run queries...
+        // List<com.enioka.jqm.api.JobInstance> res2 = new ArrayList<com.enioka.jqm.api.JobInstance>();
+        //
+        // // ////////////////////////////////////////
+        // // Job Instance query
+        // if (query.isQueryLiveInstances())
+        // {
+        // // Sort
+        // String sort = "";
+        // for (SortSpec s : query.getSorts())
+        // {
+        // sort += s.col.getJiField() == null ? ""
+        // : ",h." + s.col.getJiField() + " " + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
+        // }
+        // if (sort.isEmpty())
+        // {
+        // sort = " ORDER BY h.id";
+        // }
+        // else
+        // {
+        // sort = " ORDER BY " + sort.substring(1);
+        // }
+        //
+        // // Finish query string
+        // String wh2 = "" + wh;
+        // Map<String, Object> prms2 = new HashMap<String, Object>();
+        // prms2.putAll(prms);
+        // wh2 += getStringPredicate("queue.name", query.getQueueName(), prms2);
+        //
+        // // tag fields should be looked for in linked object for active JI
+        // wh2 += getStringPredicate("jd.applicationName", query.getApplicationName(), prms2);
+        // wh2 += getStringPredicate("jd.keyword1", query.getJobDefKeyword1(), prms2);
+        // wh2 += getStringPredicate("jd.keyword2", query.getJobDefKeyword2(), prms2);
+        // wh2 += getStringPredicate("jd.keyword3", query.getJobDefKeyword3(), prms2);
+        // wh2 += getStringPredicate("jd.module", query.getJobDefModule(), prms2);
+        // wh2 += getStringPredicate("jd.application", query.getJobDefApplication(), prms2);
+        // wh2 += getStringPredicate("node.name", query.getNodeName(), prms2);
+        //
+        // // Calendar fields are specific (no common fields between History and JobInstance)
+        // wh2 += getCalendarPredicate("creationDate", query.getEnqueuedAfter(), ">=", prms2);
+        // wh2 += getCalendarPredicate("creationDate", query.getEnqueuedBefore(), "<=", prms2);
+        // wh2 += getCalendarPredicate("executionDate", query.getBeganRunningAfter(), ">=", prms2);
+        // wh2 += getCalendarPredicate("executionDate", query.getBeganRunningBefore(), "<=", prms2);
+        // wh2 += getStatusPredicate("state", query.getStatus(), prms2);
+        // if (wh2.length() >= 3)
+        // {
+        // wh2 = " WHERE " + wh2.substring(3);
+        // }
+        //
+        // TypedQuery<JobInstance> q2 = em.createQuery(
+        // "SELECT h FROM JobInstance h LEFT JOIN FETCH h.jd LEFT JOIN FETCH h.node " + wh2 + sort, JobInstance.class);
+        // for (Map.Entry<String, Object> entry : prms2.entrySet())
+        // {
+        // q2.setParameter(entry.getKey(), entry.getValue());
+        // }
+        //
+        // // Set pagination parameters
+        // if (query.getFirstRow() != null)
+        // {
+        // q2.setFirstResult(query.getFirstRow());
+        // }
+        // if (query.getPageSize() != null)
+        // {
+        // q2.setMaxResults(query.getPageSize());
+        // }
+        //
+        // // Run the query
+        // for (JobInstance ji : q2.getResultList())
+        // {
+        // res2.add(getJob(ji, em));
+        // }
+        //
+        // // If needed, fetch the total result count (without pagination). Note that without pagination, the Query object does not
+        // // need this indication.
+        // if (query.getFirstRow() != null || (query.getPageSize() != null && res2.size() >= query.getPageSize()))
+        // {
+        // TypedQuery<Long> qCount = em.createQuery("SELECT COUNT(h) FROM JobInstance h " + wh2, Long.class);
+        // for (Map.Entry<String, Object> entry : prms2.entrySet())
+        // {
+        // qCount.setParameter(entry.getKey(), entry.getValue());
+        // }
+        // query.setResultSize(new BigDecimal(qCount.getSingleResult()).intValueExact());
+        // }
+        // }
+        //
+        // // ////////////////////////////////////////
+        // // History query
+        // if (query.isQueryHistoryInstances())
+        // {
+        // wh += getStringPredicate("queueName", query.getQueueName(), prms);
+        //
+        // // tag fields should be looked directly in the denormalized fields for history.
+        // wh += getStringPredicate("applicationName", query.getApplicationName(), prms);
+        // wh += getStringPredicate("keyword1", query.getJobDefKeyword1(), prms);
+        // wh += getStringPredicate("keyword2", query.getJobDefKeyword2(), prms);
+        // wh += getStringPredicate("keyword3", query.getJobDefKeyword3(), prms);
+        // wh += getStringPredicate("module", query.getJobDefModule(), prms);
+        // wh += getStringPredicate("application", query.getJobDefApplication(), prms);
+        // wh += getStringPredicate("nodeName", query.getNodeName(), prms);
+        //
+        // // Calendar fields are specific (no common fields between History and JobInstance)
+        // wh += getCalendarPredicate("enqueueDate", query.getEnqueuedAfter(), ">=", prms);
+        // wh += getCalendarPredicate("enqueueDate", query.getEnqueuedBefore(), "<=", prms);
+        // wh += getCalendarPredicate("executionDate", query.getBeganRunningAfter(), ">=", prms);
+        // wh += getCalendarPredicate("executionDate", query.getBeganRunningBefore(), "<=", prms);
+        // wh += getCalendarPredicate("endDate", query.getEndedAfter(), ">=", prms);
+        // wh += getCalendarPredicate("endDate", query.getEndedBefore(), "<=", prms);
+        // wh += getStatusPredicate("status", query.getStatus(), prms);
+        // if (wh.length() >= 3)
+        // {
+        // wh = " WHERE " + wh.substring(3);
+        // }
+        //
+        // // Order by
+        // String sort = "";
+        // for (SortSpec s : query.getSorts())
+        // {
+        // sort += ",h." + s.col.getHistoryField() + " " + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
+        // }
+        // if (sort.isEmpty())
+        // {
+        // sort = " ORDER BY h.id";
+        // }
+        // else
+        // {
+        // sort = " ORDER BY " + sort.substring(1);
+        // }
+        //
+        // TypedQuery<History> q1 = em.createQuery(
+        // "SELECT h FROM History h LEFT JOIN FETCH h.jd LEFT JOIN FETCH h.node LEFT JOIN FETCH h.queue " + wh + sort,
+        // History.class);
+        // for (Map.Entry<String, Object> entry : prms.entrySet())
+        // {
+        // q1.setParameter(entry.getKey(), entry.getValue());
+        // }
+        //
+        // // Set pagination parameters
+        // if (query.getFirstRow() != null)
+        // {
+        // q1.setFirstResult(query.getFirstRow());
+        // }
+        // if (query.getPageSize() != null)
+        // {
+        // q1.setMaxResults(query.getPageSize());
+        // }
+        //
+        // // Actually run the query
+        // List<History> results = q1.getResultList();
+        //
+        // // If needed, fetch the total result count (without pagination). Note that without pagination, the Query object does not
+        // // need this indication.
+        // if (query.getFirstRow() != null || (query.getPageSize() != null && results.size() >= query.getPageSize()))
+        // {
+        // TypedQuery<Long> qCount = em.createQuery("SELECT COUNT(h) FROM History h " + wh, Long.class);
+        // for (Map.Entry<String, Object> entry : prms.entrySet())
+        // {
+        // qCount.setParameter(entry.getKey(), entry.getValue());
+        // }
+        // query.setResultSize(new BigDecimal(qCount.getSingleResult()).intValueExact());
+        // }
+        //
+        // // Optimization: fetch messages and parameters in batches of 50 (limit accepted by most databases for IN clauses).
+        // List<List<Integer>> ids = new ArrayList<List<Integer>>();
+        // List<Integer> currentList = null;
+        // int i = 0;
+        // for (History ji : results)
+        // {
+        // if (currentList == null || i % IN_CLAUSE_LIMIT == 0)
+        // {
+        // currentList = new ArrayList<Integer>(IN_CLAUSE_LIMIT);
+        // ids.add(currentList);
+        // }
+        // currentList.add(ji.getId());
+        // i++;
+        // }
+        // if (currentList != null && !currentList.isEmpty())
+        // {
+        // List<RuntimeParameter> rps = new ArrayList<RuntimeParameter>(IN_CLAUSE_LIMIT * ids.size());
+        // List<Message> msgs = new ArrayList<Message>(IN_CLAUSE_LIMIT * ids.size());
+        //
+        // for (List<Integer> idsBatch : ids)
+        // {
+        // rps.addAll(em.createQuery("SELECT rp FROM RuntimeParameter rp WHERE rp.ji IN (:p)", RuntimeParameter.class)
+        // .setParameter("p", idsBatch).getResultList());
+        // msgs.addAll(em.createQuery("SELECT rp FROM Message rp WHERE rp.ji IN (:p)", Message.class)
+        // .setParameter("p", idsBatch).getResultList());
+        // }
+        //
+        // for (History ji : results)
+        // {
+        // // This is the actual JPA -> DTO work.
+        // res2.add(getJob(ji, em, rps, msgs));
+        // }
+        // }
+        // }
+        //
+        // query.setResults(res2);
+        // return res2;
+        // }
+        // catch (Exception e)
+        // {
+        // throw new JqmClientException("an error occured during query execution", e);
+        // }
+        // finally
+        // {
+        // closeQuietly(em);
+        // }
     }
 
     @Override
     public com.enioka.jqm.api.JobInstance getJob(int idJob)
     {
-        EntityManager em = null;
-        try
-        {
-            // Three steps: first, query History as:
-            // * this is supposed to be the most frequent query.
-            // * we try to avoid hitting the queues if possible
-            // Second, query live queues
-            // Third, query history again (because a JI may have ended between the first two queries, so we may miss a JI)
-            // Outside this case, this third query will be very rare, as the method is always called with an ID that cannot be
-            // guessed as its only parameter, so the existence of the JI is nearly always a given.
-            em = getEm();
-            History h = em.find(History.class, idJob);
-            com.enioka.jqm.api.JobInstance res = null;
-            if (h != null)
-            {
-                res = getJob(h, em);
-            }
-            else
-            {
-                JobInstance ji = em.find(JobInstance.class, idJob);
-                if (ji != null)
-                {
-                    res = getJob(ji, em);
-                }
-                else
-                {
-                    h = em.find(History.class, idJob);
-                    if (h != null)
-                    {
-                        res = getJob(h, em);
-                    }
-                    else
-                    {
-                        throw new JqmInvalidRequestException("No job instance of ID " + idJob);
-                    }
-                }
-            }
-            return res;
-        }
-        catch (JqmInvalidRequestException e)
-        {
-            throw e;
-        }
-        catch (Exception e)
-        {
-            throw new JqmClientException("an error occured during query execution", e);
-        }
-        finally
-        {
-            closeQuietly(em);
-        }
+        // TODO: after we have common table structures.
+        return null;
+
+        // DbConn cnx = null;
+        // try
+        // {
+        // // Three steps: first, query History as:
+        // // * this is supposed to be the most frequent query.
+        // // * we try to avoid hitting the queues if possible
+        // // Second, query live queues
+        // // Third, query history again (because a JI may have ended between the first two queries, so we may miss a JI)
+        // // Outside this case, this third query will be very rare, as the method is always called with an ID that cannot be
+        // // guessed as its only parameter, so the existence of the JI is nearly always a given.
+        // cnx = getDbSession();
+        // History h = em.find(History.class, idJob);
+        // com.enioka.jqm.api.JobInstance res = null;
+        // if (h != null)
+        // {
+        // res = getJob(h, em);
+        // }
+        // else
+        // {
+        // JobInstance ji = em.find(JobInstance.class, idJob);
+        // if (ji != null)
+        // {
+        // res = getJob(ji, em);
+        // }
+        // else
+        // {
+        // h = em.find(History.class, idJob);
+        // if (h != null)
+        // {
+        // res = getJob(h, em);
+        // }
+        // else
+        // {
+        // throw new JqmInvalidRequestException("No job instance of ID " + idJob);
+        // }
+        // }
+        // }
+        // return res;
+        // }
+        // catch (JqmInvalidRequestException e)
+        // {
+        // throw e;
+        // }
+        // catch (Exception e)
+        // {
+        // throw new JqmClientException("an error occured during query execution", e);
+        // }
+        // finally
+        // {
+        // closeQuietly(em);
+        // }
     }
 
     @Override
     public List<com.enioka.jqm.api.JobInstance> getJobs()
     {
-        ArrayList<com.enioka.jqm.api.JobInstance> jobs = new ArrayList<com.enioka.jqm.api.JobInstance>();
-        EntityManager em = null;
-
-        try
-        {
-            em = getEm();
-            for (JobInstance h : em.createQuery("SELECT j FROM JobInstance j ORDER BY j.id", JobInstance.class).getResultList())
-            {
-                jobs.add(getJob(h, em));
-            }
-            for (History h : em.createQuery("SELECT j FROM History j ORDER BY j.id", History.class).getResultList())
-            {
-                jobs.add(getJob(h, em));
-            }
-        }
-        catch (Exception e)
-        {
-            throw new JqmClientException("Could not query history and queues", e);
-        }
-        finally
-        {
-            closeQuietly(em);
-        }
-        return jobs;
+        return Query.create().setQueryHistoryInstances(true).setQueryLiveInstances(true).run();
     }
 
     @Override
     public List<com.enioka.jqm.api.JobInstance> getActiveJobs()
     {
-        ArrayList<com.enioka.jqm.api.JobInstance> jobs = new ArrayList<com.enioka.jqm.api.JobInstance>();
-        EntityManager em = null;
-
-        try
-        {
-            em = getEm();
-            for (JobInstance h : em.createQuery("SELECT j FROM JobInstance j ORDER BY j.id", JobInstance.class).getResultList())
-            {
-                jobs.add(getJob(h, em));
-            }
-        }
-        catch (Exception e)
-        {
-            throw new JqmClientException("Could not query queues", e);
-        }
-        finally
-        {
-            closeQuietly(em);
-        }
-        return jobs;
+        return Query.create().setQueryHistoryInstances(false).setQueryLiveInstances(true).addSortAsc(Sort.ID).run();
     }
 
     @Override
@@ -1453,32 +1179,8 @@ final class HibernateClient implements JqmClient
         {
             throw new JqmInvalidRequestException("user cannot be null or empty");
         }
-        ArrayList<com.enioka.jqm.api.JobInstance> jobs = new ArrayList<com.enioka.jqm.api.JobInstance>();
-        EntityManager em = null;
 
-        try
-        {
-            em = getEm();
-            for (JobInstance h : em.createQuery("SELECT j FROM JobInstance j WHERE j.userName = :u ORDER BY j.id", JobInstance.class)
-                    .setParameter("u", user).getResultList())
-            {
-                jobs.add(getJob(h, em));
-            }
-            for (History h : em.createQuery("SELECT j FROM History j WHERE j.userName = :u ORDER BY j.id", History.class)
-                    .setParameter("u", user).getResultList())
-            {
-                jobs.add(getJob(h, em));
-            }
-        }
-        catch (Exception e)
-        {
-            throw new JqmClientException("Could not query both queues and history for job instances of user " + user, e);
-        }
-        finally
-        {
-            closeQuietly(em);
-        }
-        return jobs;
+        return Query.create().setUser(user).setQueryHistoryInstances(false).setQueryLiveInstances(true).addSortAsc(Sort.ID).run();
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -1504,47 +1206,42 @@ final class HibernateClient implements JqmClient
     @Override
     public List<com.enioka.jqm.api.Deliverable> getJobDeliverables(int idJob)
     {
-        List<Deliverable> deliverables = null;
-        EntityManager em = null;
+        DbConn cnx = null;
 
         try
         {
-            em = getEm();
-            deliverables = em.createQuery("SELECT d FROM Deliverable d WHERE d.jobId = :idJob", Deliverable.class)
-                    .setParameter("idJob", idJob).getResultList();
+            cnx = getDbSession();
+
+            // TODO: no intermediate entity here: directly SQL => API object.
+            List<Deliverable> deliverables = Deliverable.select(cnx, "deliverable_select_all_for_ji", idJob);
+            List<com.enioka.jqm.api.Deliverable> res = new ArrayList<com.enioka.jqm.api.Deliverable>();
+            for (Deliverable d : deliverables)
+            {
+                res.add(new com.enioka.jqm.api.Deliverable(d.getFilePath(), d.getFileFamily(), d.getId(), d.getOriginalFileName()));
+            }
+
+            return res;
         }
         catch (Exception e)
         {
-            throw new JqmClientException("Deliverables cannot be found", e);
+            throw new JqmClientException("Could not query files for job instance " + idJob, e);
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
         }
-
-        List<com.enioka.jqm.api.Deliverable> res = new ArrayList<com.enioka.jqm.api.Deliverable>();
-        for (Deliverable d : deliverables)
-        {
-            res.add(new com.enioka.jqm.api.Deliverable(d.getFilePath(), d.getFileFamily(), d.getId(), d.getOriginalFileName()));
-        }
-
-        return res;
     }
 
     @Override
     public List<InputStream> getJobDeliverablesContent(int idJob)
     {
-        EntityManager em = null;
+        DbConn cnx = null;
         ArrayList<InputStream> streams = new ArrayList<InputStream>();
-        List<Deliverable> tmp = null;
 
         try
         {
-            em = getEm();
-            tmp = em.createQuery("SELECT d FROM Deliverable d WHERE d.jobId = :idJob", Deliverable.class).setParameter("idJob", idJob)
-                    .getResultList();
-
-            for (Deliverable del : tmp)
+            cnx = getDbSession();
+            for (Deliverable del : Deliverable.select(cnx, "deliverable_select_all_for_ji", idJob))
             {
                 streams.add(getDeliverableContent(del));
             }
@@ -1555,7 +1252,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
         }
         return streams;
     }
@@ -1569,13 +1266,18 @@ final class HibernateClient implements JqmClient
     @Override
     public InputStream getDeliverableContent(int delId)
     {
-        EntityManager em = null;
+        DbConn cnx = null;
         Deliverable deliverable = null;
 
         try
         {
-            em = getEm();
-            deliverable = em.find(Deliverable.class, delId);
+            cnx = getDbSession();
+            List<Deliverable> dd = Deliverable.select(cnx, "deliverable_select_by_id", delId);
+            if (dd.size() == 0)
+            {
+                throw new JqmClientException("There is no deliverable with the given ID - check your ID");
+            }
+            deliverable = dd.get(0);
         }
         catch (Exception e)
         {
@@ -1583,7 +1285,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
         }
 
         return getDeliverableContent(deliverable);
@@ -1591,13 +1293,25 @@ final class HibernateClient implements JqmClient
 
     InputStream getEngineLog(String nodeName, int latest)
     {
-        EntityManager em = getEm();
+        DbConn cnx = getDbSession();
         URL url = null;
 
         try
         {
-            Node h = em.createQuery("SELECT n FROM Node n WHERE n.name = :n", Node.class).setParameter("n", nodeName).getSingleResult();
-            url = new URL(getFileProtocol(em) + h.getDns() + ":" + h.getPort() + "/ws/simple/enginelog?latest=" + latest);
+            ResultSet rs = cnx.runSelect("node_select_connectdata_by_key", nodeName);
+            if (!rs.next())
+            {
+                throw new NoResultException("no node named " + nodeName);
+            }
+            String dns = rs.getString(1);
+            Integer port = rs.getInt(2);
+
+            if (rs.next())
+            {
+                throw new NonUniqueResultException("configuration issue: multiple nodes named " + nodeName);
+            }
+
+            url = new URL(getFileProtocol(cnx) + dns + ":" + port + "/ws/simple/enginelog?latest=" + latest);
             jqmlogger.trace("Will invoke engine log URL: " + url.toString());
         }
         catch (MalformedURLException e)
@@ -1614,7 +1328,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
         }
 
         return getFile(url.toString());
@@ -1623,48 +1337,11 @@ final class HibernateClient implements JqmClient
     // Helper
     private InputStream getDeliverableContent(Deliverable deliverable)
     {
-        EntityManager em = getEm();
         URL url = null;
-        String dns, protocol;
-        int port;
-
         try
         {
-            History h = em.find(History.class, deliverable.getJobId());
-            if (h == null)
-            {
-                JobInstance ji = em.find(JobInstance.class, deliverable.getJobId());
-                if (ji == null)
-                {
-                    throw new JqmInvalidRequestException("No ended or running job instance found for this file");
-                }
-                dns = ji.getNode().getDns();
-                port = ji.getNode().getPort();
-            }
-            else
-            {
-                if (h.getNode() == null)
-                {
-                    throw new JqmInvalidRequestException("cannot retrieve a file from a deleted node");
-                }
-                dns = h.getNode().getDns();
-                port = h.getNode().getPort();
-            }
-
-            protocol = getFileProtocol(em);
-        }
-        catch (Exception e)
-        {
-            throw new JqmClientException("Could not process request", e);
-        }
-        finally
-        {
-            closeQuietly(em);
-        }
-
-        try
-        {
-            url = new URL(protocol + dns + ":" + port + "/ws/simple/file?id=" + deliverable.getRandomId());
+            String uriStart = getHostForLaunch(deliverable.getJobId());
+            url = new URL(uriStart + "/ws/simple/file?id=" + deliverable.getRandomId());
             jqmlogger.trace("URL: " + url.toString());
         }
         catch (MalformedURLException e)
@@ -1675,17 +1352,15 @@ final class HibernateClient implements JqmClient
         return getFile(url.toString());
     }
 
-    private String getFileProtocol(EntityManager em)
+    private String getFileProtocol(DbConn cnx)
     {
         if (protocol == null)
         {
             protocol = "http://";
             try
             {
-                GlobalParameter gp = em
-                        .createQuery("SELECT gp from GlobalParameter gp WHERE gp.key = 'enableWsApiSsl'", GlobalParameter.class)
-                        .getSingleResult();
-                if (Boolean.parseBoolean(gp.getValue()))
+                String prm = GlobalParameter.getParameter(cnx, "enableWsApiSsl", "false");
+                if (Boolean.parseBoolean(prm))
                 {
                     protocol = "https://";
                 }
@@ -1700,7 +1375,7 @@ final class HibernateClient implements JqmClient
 
     private InputStream getFile(String url)
     {
-        EntityManager em = getEm();
+        DbConn cnx = getDbSession();
         File file = null;
         FileOutputStream fos = null;
         CloseableHttpClient cl = null;
@@ -1719,14 +1394,14 @@ final class HibernateClient implements JqmClient
             file = new File(destDir + "/" + UUID.randomUUID().toString());
 
             CredentialsProvider credsProvider = null;
-            if (SimpleApiSecurity.getId(em).usr != null)
+            if (SimpleApiSecurity.getId(cnx).usr != null)
             {
                 credsProvider = new BasicCredentialsProvider();
                 credsProvider.setCredentials(AuthScope.ANY,
-                        new UsernamePasswordCredentials(SimpleApiSecurity.getId(em).usr, SimpleApiSecurity.getId(em).pass));
+                        new UsernamePasswordCredentials(SimpleApiSecurity.getId(cnx).usr, SimpleApiSecurity.getId(cnx).pass));
             }
             SSLContext ctx = null;
-            if (getFileProtocol(em).equals("https://"))
+            if (getFileProtocol(cnx).equals("https://"))
             {
                 try
                 {
@@ -1822,7 +1497,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
             closeQuietly(fos);
             closeQuietly(rs);
             closeQuietly(cl);
@@ -1853,57 +1528,66 @@ final class HibernateClient implements JqmClient
         return getJobLog(jobId, ".stderr", "stderr");
     }
 
-    private InputStream getJobLog(int jobId, String extension, String param)
+    private String getHostForLaunch(int launchId)
     {
-        // 1: retrieve node to address
-        EntityManager em = null;
-        Node n = null;
+        String host;
+        DbConn cnx = null;
         try
         {
-            em = getEm();
-            History h = em.find(History.class, jobId);
-            if (h != null)
+            cnx = getDbSession();
+            try
             {
-                n = h.getNode();
+                host = cnx.runSelectSingle("history_select_cnx_data_by_id", String.class, launchId);
             }
-            else
+            catch (NoResultException e)
             {
-                JobInstance ji = em.find(JobInstance.class, jobId);
-                if (ji != null)
+                try
                 {
-                    n = ji.getNode();
+                    host = cnx.runSelectSingle("ji_select_cnx_data_by_id", String.class, launchId);
                 }
-                else
+                catch (NoResultException r)
                 {
-                    throw new NoResultException("No history or running instance for this jobId.");
+                    throw new JqmInvalidRequestException("No ended or running job instance found for this file");
                 }
             }
+
+            if (host == null || host.isEmpty() || host.split(":")[0].isEmpty())
+            {
+                throw new JqmInvalidRequestException("cannot retrieve a file from a deleted node");
+            }
+
+            protocol = getFileProtocol(cnx);
+            return protocol + "//" + host;
+        }
+        catch (JqmException e)
+        {
+            throw e;
         }
         catch (Exception e)
         {
-            closeQuietly(em);
-            throw new JqmInvalidRequestException("No job found with the job ID " + jobId, e);
+            throw new JqmClientException("Could not process request", e);
         }
-
-        if (n == null)
+        finally
         {
-            throw new JqmInvalidRequestException("cannot retrieve a file from a deleted node");
+            closeQuietly(cnx);
         }
+    }
+
+    private InputStream getJobLog(int jobId, String extension, String param)
+    {
+        // 1: retrieve node to address
+        String uriStart = getHostForLaunch(jobId);
 
         // 2: build URL
         URL url = null;
         try
         {
-            url = new URL(getFileProtocol(em) + n.getDns() + ":" + n.getPort() + "/ws/simple/" + param + "?id=" + jobId);
+            url = new URL(uriStart + "/ws/simple/" + param + "?id=" + jobId);
             jqmlogger.trace("URL: " + url.toString());
         }
         catch (MalformedURLException e)
         {
             throw new JqmClientException("URL is not valid " + url, e);
-        }
-        finally
-        {
-            em.close();
         }
 
         return getFile(url.toString());
@@ -1917,13 +1601,13 @@ final class HibernateClient implements JqmClient
     public List<com.enioka.jqm.api.Queue> getQueues()
     {
         List<com.enioka.jqm.api.Queue> res = new ArrayList<com.enioka.jqm.api.Queue>();
-        EntityManager em = null;
+        DbConn cnx = null;
         com.enioka.jqm.api.Queue tmp = null;
 
         try
         {
-            em = getEm();
-            for (Queue q : em.createQuery("SELECT q FROM Queue q ORDER BY q.name", Queue.class).getResultList())
+            cnx = getDbSession();
+            for (Queue q : Queue.select(cnx, "q_select_all"))
             {
                 tmp = getQueue(q);
                 res.add(tmp);
@@ -1936,7 +1620,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
         }
     }
 
@@ -1951,17 +1635,6 @@ final class HibernateClient implements JqmClient
         return q;
     }
 
-    private static RuntimeParameter createJobParameter(String key, String value, EntityManager em)
-    {
-        RuntimeParameter j = new RuntimeParameter();
-
-        j.setKey(key);
-        j.setValue(value);
-
-        em.persist(j);
-        return j;
-    }
-
     @Override
     public List<com.enioka.jqm.api.JobDef> getJobDefinitions()
     {
@@ -1972,27 +1645,44 @@ final class HibernateClient implements JqmClient
     public List<com.enioka.jqm.api.JobDef> getJobDefinitions(String application)
     {
         List<com.enioka.jqm.api.JobDef> res = new ArrayList<com.enioka.jqm.api.JobDef>();
-        EntityManager em = null;
+        DbConn cnx = null;
         List<JobDef> dbr = null;
 
         try
         {
-            em = getEm();
+            // TODO: remove model objects and go directly from RS to API objects. Also, join to avoid multiple queries.
+
+            cnx = getDbSession();
             if (application == null)
             {
-                dbr = em.createQuery("SELECT jd from JobDef jd ORDER BY jd.application, jd.module, jd.applicationName", JobDef.class)
-                        .getResultList();
+                dbr = JobDef.select(cnx, "jd_select_all");
             }
             else
             {
-                dbr = em.createQuery(
-                        "SELECT jd from JobDef jd WHERE jd.application = :name ORDER BY jd.application, jd.module, jd.applicationName",
-                        JobDef.class).setParameter("name", application).getResultList();
+                dbr = JobDef.select(cnx, "jd_select_by_tag_app", application);
             }
 
             for (JobDef jd : dbr)
             {
-                res.add(getJobDef(jd));
+                com.enioka.jqm.api.JobDef tmp = new com.enioka.jqm.api.JobDef();
+                tmp.setApplication(jd.getApplication());
+                tmp.setApplicationName(jd.getApplicationName());
+                tmp.setCanBeRestarted(jd.isCanBeRestarted());
+                tmp.setDescription(jd.getDescription());
+                tmp.setHighlander(jd.isHighlander());
+                tmp.setKeyword1(jd.getKeyword1());
+                tmp.setKeyword2(jd.getKeyword2());
+                tmp.setKeyword3(jd.getKeyword3());
+                tmp.setModule(jd.getModule());
+                tmp.setQueue(getQueue(jd.getQueue(cnx)));
+                tmp.setId(jd.getId());
+
+                for (JobDefParameter jdf : jd.getParameters(cnx))
+                {
+                    tmp.addParameter(jdf.getKey(), jdf.getValue());
+                }
+
+                res.add(tmp);
             }
             return res;
         }
@@ -2002,30 +1692,7 @@ final class HibernateClient implements JqmClient
         }
         finally
         {
-            closeQuietly(em);
+            closeQuietly(cnx);
         }
-    }
-
-    private static com.enioka.jqm.api.JobDef getJobDef(JobDef jd)
-    {
-        com.enioka.jqm.api.JobDef res = new com.enioka.jqm.api.JobDef();
-        res.setApplication(jd.getApplication());
-        res.setApplicationName(jd.getApplicationName());
-        res.setCanBeRestarted(jd.isCanBeRestarted());
-        res.setDescription(jd.getDescription());
-        res.setHighlander(jd.isHighlander());
-        res.setKeyword1(jd.getKeyword1());
-        res.setKeyword2(jd.getKeyword2());
-        res.setKeyword3(jd.getKeyword3());
-        res.setModule(jd.getModule());
-        res.setQueue(getQueue(jd.getQueue()));
-        res.setId(jd.getId());
-
-        for (JobDefParameter jdf : jd.getParameters())
-        {
-            res.addParameter(jdf.getKey(), jdf.getValue());
-        }
-
-        return res;
     }
 }

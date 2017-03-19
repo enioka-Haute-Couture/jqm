@@ -23,14 +23,14 @@ public class EngineChildFirstCLTest extends JqmBaseTest
         addAndStartEngine();
 
         CreationTools.createJobDef(null, true, "pyl.EngineChildFirstCL", new ArrayList<JobDefParameter>(),
-                "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, -1, "EngineChildFirstCL", null, null, null, null, null, false, em,
+                "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, -1, "EngineChildFirstCL", null, null, null, null, null, false, cnx,
                 null, false); 
         JobRequest.create("EngineChildFirstCL", null).submit();
 
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
     
     /**
@@ -42,13 +42,13 @@ public class EngineChildFirstCLTest extends JqmBaseTest
         addAndStartEngine();
 
         CreationTools.createJobDef(null, true, "pyl.EngineChildFirstCL", new ArrayList<JobDefParameter>(),
-                "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, -1, "EngineChildFirstCL", null, null, null, null, null, false, em,
+                "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, -1, "EngineChildFirstCL", null, null, null, null, null, false, cnx,
                 null, true); 
         JobRequest.create("EngineChildFirstCL", null).submit();
 
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(0, TestHelpers.getOkCount(em));
-        Assert.assertEquals(1, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(0, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
     }
 }

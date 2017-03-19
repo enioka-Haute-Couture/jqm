@@ -48,9 +48,9 @@ public class DbFailTest extends JqmBaseTest
     public void testDbTranscientFailure() throws Exception
     {
         // Set a real polling interval to allow the failure to be unseen by the poller
-        em.getTransaction().begin();
+        cnx.getTransaction().begin();
         TestHelpers.dpVip.setPollingInterval(3000);
-        em.getTransaction().commit();
+        cnx.getTransaction().commit();
 
         this.addAndStartEngine();
         this.sleep(2); // first poller loop
@@ -67,7 +67,7 @@ public class DbFailTest extends JqmBaseTest
     @Test
     public void testDbFailureWithRunningJob() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.Wait", "jqm-test-pyl-nodep").addRuntimeParameter("p1", "4000").expectOk(0).run(this);
+        JqmSimpleTest.create(cnx, "pyl.Wait", "jqm-test-pyl-nodep").addRuntimeParameter("p1", "4000").expectOk(0).run(this);
         this.sleep(2);
 
         jqmlogger.info("Stopping db");
@@ -86,7 +86,7 @@ public class DbFailTest extends JqmBaseTest
     @Test
     public void testDbFailureWithRunningJobKo() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.KillMe").expectOk(0).run(this);
+        JqmSimpleTest.create(cnx, "pyl.KillMe").expectOk(0).run(this);
         this.sleep(2);
 
         jqmlogger.info("Stopping db");
@@ -106,14 +106,14 @@ public class DbFailTest extends JqmBaseTest
     public void testDbFailureUnderLoad() throws Exception
     {
         // Many starting jobs simultaneously
-        em.getTransaction().begin();
-        em.createQuery("UPDATE DeploymentParameter dp SET dp.nbThread = 50 WHERE dp.queue = :q").setParameter("q", TestHelpers.qVip)
+        cnx.getTransaction().begin();
+        cnx.createQuery("UPDATE DeploymentParameter dp SET dp.nbThread = 50 WHERE dp.queue = :q").setParameter("q", TestHelpers.qVip)
                 .executeUpdate();
-        em.getTransaction().commit();
-        TestHelpers.setNodesLogLevel("INFO", em);
+        cnx.getTransaction().commit();
+        TestHelpers.setNodesLogLevel("INFO", cnx);
 
         CreationTools.createJobDef(null, true, "pyl.Nothing", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", TestHelpers.qVip, -1,
-                "TestJqmApplication", "appFreeName", "TestModule", "kw1", "kw2", "kw3", false, em);
+                "TestJqmApplication", "appFreeName", "TestModule", "kw1", "kw2", "kw3", false, cnx);
 
         JobRequest j = new JobRequest("TestJqmApplication", "TestUser");
         for (int i = 0; i < 1000; i++)

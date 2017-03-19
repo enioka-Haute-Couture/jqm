@@ -34,33 +34,33 @@ public class XmlTest extends JqmBaseTest
     public void testExportQueue() throws Exception
     {
         CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
-                TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+                TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, cnx);
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42, "Geo", null,
-                "Franquin", "ModuleMachin", "other1", "other2", false, em);
+                "Franquin", "ModuleMachin", "other1", "other2", false, cnx);
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
-                "DateTime", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "DateTime", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
         ArrayList<String> tmp = new ArrayList<String>();
         tmp.add("VIPQueue");
         tmp.add("NormalQueue");
 
-        XmlQueueExporter.export(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml", em, tmp);
+        XmlQueueExporter.export(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml", cnx, tmp);
 
         File t = new File(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml");
         Assert.assertEquals(true, t.exists());
 
         // --> Test Import
-        XmlQueueParser.parse(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml", em);
+        XmlQueueParser.parse(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml", cnx);
 
-        long ii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'VIPQueue'").getSingleResult();
-        long iii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'NormalQueue'").getSingleResult();
+        long ii = (Long) cnx.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'VIPQueue'").getSingleResult();
+        long iii = (Long) cnx.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'NormalQueue'").getSingleResult();
         Assert.assertEquals(2, ii + iii);
-        Assert.assertEquals("VIPQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Fibo' ", String.class)
+        Assert.assertEquals("VIPQueue", cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Fibo' ", String.class)
                 .getSingleResult());
-        Assert.assertEquals("VIPQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Geo' ", String.class)
+        Assert.assertEquals("VIPQueue", cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Geo' ", String.class)
                 .getSingleResult());
         Assert.assertEquals("NormalQueue",
-                em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
+                cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
         t.delete();
     }
 
@@ -68,29 +68,29 @@ public class XmlTest extends JqmBaseTest
     public void testExportQueueAll() throws Exception
     {
         CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
-                TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+                TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, cnx);
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42, "Geo", null,
-                "Franquin", "ModuleMachin", "other1", "other2", false, em);
+                "Franquin", "ModuleMachin", "other1", "other2", false, cnx);
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
-                "DateTime", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "DateTime", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
-        XmlQueueExporter.export(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml", em);
+        XmlQueueExporter.export(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml", cnx);
 
         File t = new File(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml");
         Assert.assertEquals(true, t.exists());
 
         // --> Test Import
-        XmlQueueParser.parse(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml", em);
+        XmlQueueParser.parse(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml", cnx);
 
-        long ii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'VIPQueue'").getSingleResult();
-        long iii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'NormalQueue'").getSingleResult();
+        long ii = (Long) cnx.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'VIPQueue'").getSingleResult();
+        long iii = (Long) cnx.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'NormalQueue'").getSingleResult();
         Assert.assertEquals(2, ii + iii);
-        Assert.assertEquals("VIPQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Fibo' ", String.class)
+        Assert.assertEquals("VIPQueue", cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Fibo' ", String.class)
                 .getSingleResult());
-        Assert.assertEquals("VIPQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Geo' ", String.class)
+        Assert.assertEquals("VIPQueue", cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Geo' ", String.class)
                 .getSingleResult());
         Assert.assertEquals("NormalQueue",
-                em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
+                cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
         t.delete();
     }
 
@@ -98,11 +98,11 @@ public class XmlTest extends JqmBaseTest
     public void testXmlParser()
     {
         // Init the default queue (don't start the engine!)
-        Helpers.updateConfiguration(em);
+        Helpers.updateConfiguration(cnx);
 
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest.xml" });
 
-        List<JobDef> jd = em.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
+        List<JobDef> jd = cnx.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
 
         Assert.assertEquals(2, jd.size());
         Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
@@ -120,32 +120,32 @@ public class XmlTest extends JqmBaseTest
     public void testExportJobDef() throws Exception
     {
         List<JobDefParameter> jdp = new ArrayList<JobDefParameter>();
-        jdp.add(CreationTools.createJobDefParameter("test-key", "test-value", em));
+        jdp.add(CreationTools.createJobDefParameter("test-key", "test-value", cnx));
         CreationTools.createJobDef("My Description", true, "com.enioka.jqm.tests.App", jdp, "jqm-tests/jqm-test-fibo/target/test.jar",
-                TestHelpers.qVip, 42, "Fibo", "App", "ModuleMachin", "other1", "other2", null, false, em, "Isolation", true, "HIDDEN");
+                TestHelpers.qVip, 42, "Fibo", "App", "ModuleMachin", "other1", "other2", null, false, cnx, "Isolation", true, "HIDDEN");
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42, "Geo", null,
-                "Franquin", "ModuleMachin", "other1", "other2", false, em);
+                "Franquin", "ModuleMachin", "other1", "other2", false, cnx);
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
-                "DateTime", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "DateTime", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
-                "DateTime2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "DateTime2", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
-        XmlJobDefExporter.export(TestHelpers.node.getDlRepo() + "xmlexportjobdeftest.xml", em);
+        XmlJobDefExporter.export(TestHelpers.node.getDlRepo() + "xmlexportjobdeftest.xml", cnx);
 
         File f = new File(TestHelpers.node.getDlRepo() + "xmlexportjobdeftest.xml");
         Assert.assertEquals(true, f.exists());
 
         // -> Delete all entries and try to reimport them from the exported file
-        em.getTransaction().begin();
-        em.createQuery("DELETE JobDefParameter WHERE 1=1)").executeUpdate();
-        em.createQuery("DELETE JobDef WHERE 1=1").executeUpdate();
-        em.getTransaction().commit();
-        XmlJobDefParser.parse(TestHelpers.node.getDlRepo() + "xmlexportjobdeftest.xml", em);
+        cnx.getTransaction().begin();
+        cnx.createQuery("DELETE JobDefParameter WHERE 1=1)").executeUpdate();
+        cnx.createQuery("DELETE JobDef WHERE 1=1").executeUpdate();
+        cnx.getTransaction().commit();
+        XmlJobDefParser.parse(TestHelpers.node.getDlRepo() + "xmlexportjobdeftest.xml", cnx);
 
         // test the 4 JobDef were imported
-        long count = (Long) em.createQuery("SELECT COUNT(j) FROM JobDef j WHERE j.applicationName IN ('Fibo', 'Geo', 'DateTime', 'DateTime2')").getSingleResult();
+        long count = (Long) cnx.createQuery("SELECT COUNT(j) FROM JobDef j WHERE j.applicationName IN ('Fibo', 'Geo', 'DateTime', 'DateTime2')").getSingleResult();
         Assert.assertEquals(4, count);
-        JobDef fibo = em.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = 'Fibo' ", JobDef.class).getSingleResult();
+        JobDef fibo = cnx.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = 'Fibo' ", JobDef.class).getSingleResult();
 
 
         Assert.assertEquals("My Description", fibo.getDescription());
@@ -171,12 +171,12 @@ public class XmlTest extends JqmBaseTest
     public void testImportThenReimportJobDefWithPrms()
     {
         // Init the default queue (don't start the engine!)
-        Helpers.updateConfiguration(em);
+        Helpers.updateConfiguration(cnx);
 
         // First import
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest.xml" });
 
-        List<JobDef> jd = em.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
+        List<JobDef> jd = cnx.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
         Assert.assertEquals(2, jd.size());
         Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
         Assert.assertEquals("1", jd.get(0).getParameters().get(0).getValue());
@@ -195,40 +195,40 @@ public class XmlTest extends JqmBaseTest
     public void testImportJobdefWithQueue()
     {
         // Init the default queue (don't start the engine!)
-        Helpers.updateConfiguration(em);
+        Helpers.updateConfiguration(cnx);
 
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltestnewqueue.xml" });
 
-        List<JobDef> jd = em.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
+        List<JobDef> jd = cnx.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
         Assert.assertEquals(2, jd.size());
 
         // Was the queue created (and only once)?
-        Queue q = em.createQuery("SELECT q from Queue q where q.name = :name", Queue.class).setParameter("name", "NewQueue")
+        Queue q = cnx.createQuery("SELECT q from Queue q where q.name = :name", Queue.class).setParameter("name", "NewQueue")
                 .getSingleResult();
         Assert.assertEquals("Created from a jobdef import. Description should be set later", q.getDescription());
-        em.close();
+        cnx.close();
     }
 
     @Test
     public void testImportQueue() throws Exception
     {
         CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.App", null, "jqm-tests/jqm-test-fibo/target/test.jar",
-                TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, em);
+                TestHelpers.qVip, 42, "Fibo", null, "Franquin", "ModuleMachin", "other1", "other2", false, cnx);
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42, "Geo", null,
-                "Franquin", "ModuleMachin", "other1", "other2", false, em);
+                "Franquin", "ModuleMachin", "other1", "other2", false, cnx);
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
-                "DateTime", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "DateTime", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
-        XmlQueueParser.parse("target/payloads/jqm-test-xml/xmlqueuetest.xml", em);
+        XmlQueueParser.parse("target/payloads/jqm-test-xml/xmlqueuetest.xml", cnx);
 
-        long ii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'XmlQueue'").getSingleResult();
-        long iii = (Long) em.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'XmlQueue2'").getSingleResult();
+        long ii = (Long) cnx.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'XmlQueue'").getSingleResult();
+        long iii = (Long) cnx.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'XmlQueue2'").getSingleResult();
         Assert.assertEquals(2, ii + iii);
-        Assert.assertEquals("XmlQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Fibo' ", String.class)
+        Assert.assertEquals("XmlQueue", cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Fibo' ", String.class)
                 .getSingleResult());
-        Assert.assertEquals("XmlQueue", em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Geo' ", String.class)
+        Assert.assertEquals("XmlQueue", cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Geo' ", String.class)
                 .getSingleResult());
         Assert.assertEquals("XmlQueue2",
-                em.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
+                cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
     }
 }

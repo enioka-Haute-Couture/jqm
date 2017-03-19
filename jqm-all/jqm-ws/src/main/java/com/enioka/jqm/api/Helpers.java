@@ -39,7 +39,7 @@ public final class Helpers
 
     public static EntityManager getEm()
     {
-        return ((HibernateClient) JqmClientFactory.getClient()).getEm();
+        return ((HibernateClient) JqmClientFactory.getClient()).getDbSession();
     }
 
     public static void closeQuietly(EntityManager em)

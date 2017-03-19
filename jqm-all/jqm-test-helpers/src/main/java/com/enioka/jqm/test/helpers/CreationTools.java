@@ -119,20 +119,28 @@ public class CreationTools
 
     // TODO: simplify all these overloads (test impact)
 
-    public static int createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
+    public static int createJobDef(String description, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
+            Integer queueId, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+            String keyword2, String keyword3, boolean highlander, DbConn cnx)
+    {
+        return createJobDef(description, canBeRestarted, javaClassName, jps, jp, queueId, maxTimeRunning, applicationName, application,
+                module, keyword1, keyword2, keyword3, highlander, cnx, null, false, null, false, PathType.FS);
+    }
+
+    public static int createJobDef(String description, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
             Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
             String keyword2, String keyword3, boolean highlander, DbConn cnx)
     {
-        return createJobDef(descripton, canBeRestarted, javaClassName, jps, jp, queue, maxTimeRunning, applicationName, application, module,
-                keyword1, keyword2, keyword3, highlander, cnx, null, false, null, false, PathType.FS);
+        return createJobDef(description, canBeRestarted, javaClassName, jps, jp, queue.getId(), maxTimeRunning, applicationName,
+                application, module, keyword1, keyword2, keyword3, highlander, cnx, null, false, null, false, PathType.FS);
     }
 
     public static int createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
             Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
             String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext)
     {
-        return createJobDef(descripton, canBeRestarted, javaClassName, jps, jp, queue, maxTimeRunning, applicationName, application, module,
-                keyword1, keyword2, keyword3, highlander, cnx, specificIsolationContext, false, null, false, PathType.FS);
+        return createJobDef(descripton, canBeRestarted, javaClassName, jps, jp, queue.getId(), maxTimeRunning, applicationName, application,
+                module, keyword1, keyword2, keyword3, highlander, cnx, specificIsolationContext, false, null, false, PathType.FS);
     }
 
     public static int createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
@@ -140,8 +148,9 @@ public class CreationTools
             String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext,
             boolean childFirstClassLoader)
     {
-        return createJobDef(descripton, canBeRestarted, javaClassName, jps, jp, queue, maxTimeRunning, applicationName, application, module,
-                keyword1, keyword2, keyword3, highlander, cnx, specificIsolationContext, childFirstClassLoader, null, false, PathType.FS);
+        return createJobDef(descripton, canBeRestarted, javaClassName, jps, jp, queue.getId(), maxTimeRunning, applicationName, application,
+                module, keyword1, keyword2, keyword3, highlander, cnx, specificIsolationContext, childFirstClassLoader, null, false,
+                PathType.FS);
     }
 
     public static int createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
@@ -149,13 +158,13 @@ public class CreationTools
             String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext,
             boolean childFirstClassLoader, String hiddenJavaClasses)
     {
-        return createJobDef(descripton, canBeRestarted, javaClassName, jps, jp, queue, maxTimeRunning, applicationName, application, module,
-                keyword1, keyword2, keyword3, highlander, cnx, specificIsolationContext, childFirstClassLoader, hiddenJavaClasses, false,
-                PathType.FS);
+        return createJobDef(descripton, canBeRestarted, javaClassName, jps, jp, queue.getId(), maxTimeRunning, applicationName, application,
+                module, keyword1, keyword2, keyword3, highlander, cnx, specificIsolationContext, childFirstClassLoader, hiddenJavaClasses,
+                false, PathType.FS);
     }
 
     public static int createJobDef(String description, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
-            Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+            Integer queueId, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
             String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext,
             boolean childFirstClassLoader, String hiddenJavaClasses, boolean classLoaderTracing, PathType pathType)
     {
@@ -167,7 +176,7 @@ public class CreationTools
             prms.put(p.getKey(), p.getValue());
         }
 
-        return JobDef.create(cnx, description, javaClassName, prms, jp, queue.getId(), maxTimeRunning, applicationName, application, module,
+        return JobDef.create(cnx, description, javaClassName, prms, jp, queueId, maxTimeRunning, applicationName, application, module,
                 keyword1, keyword2, keyword3, highlander, specificIsolationContext, childFirstClassLoader, hiddenJavaClasses,
                 classLoaderTracing, pathType);
     }

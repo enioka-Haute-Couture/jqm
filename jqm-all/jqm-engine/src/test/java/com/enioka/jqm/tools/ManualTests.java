@@ -17,7 +17,6 @@ package com.enioka.jqm.tools;
 
 import java.net.ServerSocket;
 
-import javax.persistence.EntityManager;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;

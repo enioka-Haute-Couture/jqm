@@ -35,7 +35,7 @@ public class FiboTest extends JqmBaseTest
     @Before
     public void b()
     {
-        TestHelpers.setNodesLogLevel("INFO", em);
+        TestHelpers.setNodesLogLevel("INFO", cnx);
     }
 
     @After
@@ -48,7 +48,7 @@ public class FiboTest extends JqmBaseTest
     @Test
     public void testFibo() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.StressFibo").addRuntimeParameter("p1", "1").addRuntimeParameter("p2", "2").addWaitMargin(20000)
+        JqmSimpleTest.create(cnx, "pyl.StressFibo").addRuntimeParameter("p1", "1").addRuntimeParameter("p2", "2").addWaitMargin(20000)
                 .expectOk(11).run(this);
         // 1: (1,2) - 2: (2,3) - 3: (3,5) - 4: (5,8) - 5: (8,13) - 6: (13,21) - 7: (21,34) - 8: (34,55) - 9: (55,89) - 10: (89,144) -
         // 11: (134,233)
@@ -57,10 +57,10 @@ public class FiboTest extends JqmBaseTest
     @Test
     public void testEnqueueSynchronously() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.StressFiboSync").addRuntimeParameter("p1", "34").addRuntimeParameter("p2", "55").expectOk(4)
+        JqmSimpleTest.create(cnx, "pyl.StressFiboSync").addRuntimeParameter("p1", "34").addRuntimeParameter("p2", "55").expectOk(4)
                 .run(this);
 
-        List<History> res = em.createQuery("SELECT j FROM History j ORDER BY j.id", History.class).getResultList();
+        List<History> res = cnx.createQuery("SELECT j FROM History j ORDER BY j.id", History.class).getResultList();
         History h1, h2 = null;
         for (History h : res)
         {
@@ -79,7 +79,7 @@ public class FiboTest extends JqmBaseTest
     @Test
     public void testFiboHib() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.StressFiboHib", "jqm-test-pyl-hibapi").addRuntimeParameter("p1", "1").addRuntimeParameter("p2", "2")
+        JqmSimpleTest.create(cnx, "pyl.StressFiboHib", "jqm-test-pyl-hibapi").addRuntimeParameter("p1", "1").addRuntimeParameter("p2", "2")
                 .addWaitMargin(60000).expectOk(11).run(this);
     }
 }

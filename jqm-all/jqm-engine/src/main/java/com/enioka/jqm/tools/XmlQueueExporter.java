@@ -19,13 +19,12 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
+import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.Queue;
 
@@ -39,18 +38,18 @@ class XmlQueueExporter
     /**
      * Exports a single queue to an XML file.
      */
-    static void export(String path, String queueName, EntityManager em) throws JqmEngineException
+    static void export(String path, String queueName, DbConn cnx) throws JqmEngineException
     {
         // Argument tests
         if (queueName == null)
         {
             throw new IllegalArgumentException("queue name cannot be null");
         }
-        if (em == null)
+        if (cnx == null)
         {
-            throw new IllegalArgumentException("entity manager name cannot be null");
+            throw new IllegalArgumentException("database connection cannot be null");
         }
-        Queue q = Helpers.findQueue(queueName, em);
+        Queue q = Helpers.findQueue(queueName, cnx);
         if (q == null)
         {
             throw new IllegalArgumentException("there is no queue named " + queueName);
@@ -58,29 +57,29 @@ class XmlQueueExporter
 
         List<Queue> l = new ArrayList<Queue>();
         l.add(q);
-        export(path, l, em);
+        export(path, l, cnx);
     }
 
     /**
      * Exports all available queues to an XML file.
      */
-    static void export(String path, EntityManager em) throws JqmEngineException
+    static void export(String path, DbConn cnx) throws JqmEngineException
     {
-        if (em == null)
+        if (cnx == null)
         {
-            throw new IllegalArgumentException("entity manager name cannot be null");
+            throw new IllegalArgumentException("database connection cannot be null");
         }
-        export(path, em.createQuery("SELECT q FROM Queue q", Queue.class).getResultList(), em);
+        export(path, Queue.select(cnx, "q_select_all"), cnx);
     }
 
     /**
      * Exports all available queues to an XML file.
      */
-    static void export(String path, EntityManager em, List<String> qNames) throws JqmEngineException
+    static void export(String path, DbConn cnx, List<String> qNames) throws JqmEngineException
     {
-        if (em == null)
+        if (cnx == null)
         {
-            throw new IllegalArgumentException("entity manager name cannot be null");
+            throw new IllegalArgumentException("database connection cannot be null");
         }
         if (qNames == null || qNames.isEmpty())
         {
@@ -89,20 +88,20 @@ class XmlQueueExporter
         List<Queue> qList = new ArrayList<Queue>();
         for (String qn : qNames)
         {
-            Queue q = Helpers.findQueue(qn, em);
+            Queue q = Helpers.findQueue(qn, cnx);
             if (q == null)
             {
                 throw new IllegalArgumentException("There is no queue named " + qn);
             }
             qList.add(q);
         }
-        export(path, qList, em);
+        export(path, qList, cnx);
     }
 
     /**
      * Exports several (given) queues to an XML file.
      */
-    static void export(String path, List<Queue> queueList, EntityManager em) throws JqmEngineException
+    static void export(String path, List<Queue> queueList, DbConn cnx) throws JqmEngineException
     {
         // Argument tests
         if (path == null)
@@ -113,9 +112,9 @@ class XmlQueueExporter
         {
             throw new IllegalArgumentException("queue list cannot be null or empty");
         }
-        if (em == null)
+        if (cnx == null)
         {
-            throw new IllegalArgumentException("entity manager name cannot be null");
+            throw new IllegalArgumentException("database connection cannot be null");
         }
 
         // Create XML document
@@ -126,7 +125,7 @@ class XmlQueueExporter
 
         for (Queue q : queueList)
         {
-            Element queue = getQueueElement(q, em);
+            Element queue = getQueueElement(q, cnx);
             queues.addContent(queue);
         }
 
@@ -142,7 +141,7 @@ class XmlQueueExporter
         }
     }
 
-    private static Element getQueueElement(Queue q, EntityManager em)
+    private static Element getQueueElement(Queue q, DbConn cnx)
     {
         Element queue = new Element("queue");
 
@@ -160,9 +159,7 @@ class XmlQueueExporter
         Element jobs = new Element("jobs");
         queue.addContent(jobs);
 
-        ArrayList<JobDef> jds = (ArrayList<JobDef>) em.createQuery("SELECT j FROM JobDef j WHERE j.queue = :q", JobDef.class)
-                .setParameter("q", q).getResultList();
-
+        List<JobDef> jds = JobDef.select(cnx, "jd_select_by_queue", q.getId());
         for (JobDef j : jds)
         {
             Element job = new Element("applicationName");

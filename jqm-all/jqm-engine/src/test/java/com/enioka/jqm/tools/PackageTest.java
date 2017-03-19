@@ -18,8 +18,6 @@ package com.enioka.jqm.tools;
 import java.io.File;
 import java.util.ArrayList;
 
-import javax.persistence.EntityManager;
-
 import org.jboss.shrinkwrap.resolver.api.NoResolvedResultException;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenRemoteRepositories;
@@ -40,62 +38,62 @@ public class PackageTest extends JqmBaseTest
     public void testPomOnlyInJar() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemavennopom/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
         JobRequest.create("MarsuApplication", "TestUser").submit();
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 
     @Test
     public void testNoPomLibDir() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemavennopomlib/target/test.jar", TestHelpers.qVip,
-                42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         JobRequest.create("MarsuApplication", "TestUser").submit();
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 
     @Test
     public void testLibInJar() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemavenjarinlib/target/test.jar", TestHelpers.qVip,
-                42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+                42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
         JobRequest.create("MarsuApplication", "TestUser").submit();
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 
     @Test
     public void testNoDependencyDefinition() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemavennolibdef/target/test.jar", TestHelpers.qVip,
-                42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+                42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
         JobRequest.create("MarsuApplication", "TestUser").submit();
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(0, TestHelpers.getOkCount(em));
-        Assert.assertEquals(1, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(0, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
     }
 
     @Test
     public void testInheritedLegacyPayload() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.PckJBInheritance").run(this);
+        JqmSimpleTest.create(cnx, "pyl.PckJBInheritance").run(this);
     }
 
     // Can't work with Java6: http://bugs.java.com/view_bug.do?bug_id=4950148 (2003!)

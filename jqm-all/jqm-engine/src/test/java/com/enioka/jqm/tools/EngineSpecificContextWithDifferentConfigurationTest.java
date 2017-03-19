@@ -18,20 +18,20 @@ public class EngineSpecificContextWithDifferentConfigurationTest extends JqmBase
         addAndStartEngine();
 
         CreationTools.createJobDef(null, true, "com.enioka.jqm.TestCLIsolation.TestGet", new ArrayList<JobDefParameter>(),
-                "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestGet", null, null, null, null, null, false, em,
+                "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestGet", null, null, null, null, null, false, cnx,
                 "specificContext", false, "");
         JobRequest.create("TestGet", null).submit();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
         CreationTools.createJobDef(null, true, "com.enioka.jqm.TestCLIsolation.TestSet", new ArrayList<JobDefParameter>(),
-                "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestSet", null, null, null, null, null, false, em,
+                "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestSet", null, null, null, null, null, false, cnx,
                 "specificContext", true, "");
         JobRequest.create("TestSet", null).submit();
-        TestHelpers.waitFor(2, 10000, em);
+        TestHelpers.waitFor(2, 10000, cnx);
 
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(1, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
     }
 
     @Test
@@ -40,19 +40,19 @@ public class EngineSpecificContextWithDifferentConfigurationTest extends JqmBase
         addAndStartEngine();
 
         CreationTools.createJobDef(null, true, "com.enioka.jqm.TestCLIsolation.TestGet", new ArrayList<JobDefParameter>(),
-                "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestGet", null, null, null, null, null, false, em,
+                "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestGet", null, null, null, null, null, false, cnx,
                 "specificContext", true, "HIDDEN");
         JobRequest.create("TestGet", null).submit();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
         CreationTools.createJobDef(null, true, "com.enioka.jqm.TestCLIsolation.TestSet", new ArrayList<JobDefParameter>(),
-                "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestSet", null, null, null, null, null, false, em,
+                "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestSet", null, null, null, null, null, false, cnx,
                 "specificContext", true, "hidden");
         JobRequest.create("TestSet", null).submit();
-        TestHelpers.waitFor(2, 10000, em);
+        TestHelpers.waitFor(2, 10000, cnx);
 
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(1, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
     }
 }

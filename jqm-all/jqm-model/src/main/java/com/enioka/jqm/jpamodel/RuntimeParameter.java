@@ -19,6 +19,13 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.enioka.jqm.jdbc.DatabaseException;
+import com.enioka.jqm.jdbc.DbConn;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
@@ -99,4 +106,26 @@ public class RuntimeParameter implements Serializable
         this.ji = ji;
     }
 
+    public static Map<String, String> select_map(DbConn cnx, String query_key, Object... args)
+    {
+        Map<String, String> res = new HashMap<String, String>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key, args);
+            while (rs.next())
+            {
+                res.put(rs.getString(3), rs.getString(4));
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
+    }
+
+    public static void create(DbConn cnx, int jobInstanceId, String keyName, String value)
+    {
+        cnx.runUpdate("jiprm_insert", jobInstanceId, keyName, value);
+    }
 }

@@ -46,18 +46,18 @@ public class JndiTest extends JqmBaseTest
     {
         CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", null,
                 "jqm-tests/jqm-test-jndijms-wmq/target/test.jar", TestHelpers.qVip, 42, "Jms", "Franquin", "ModuleMachin", "other1",
-                "other2", "other3", false, em);
+                "other2", "other3", false, cnx);
         JobRequest.create("Jms", "TestUser").addParameter("p1", "1").addParameter("p2", "2").submit();
 
         // Create JMS JNDI references for use by the test jar
-        CreationTools.createJndiQueueMQSeries(em, "jms/testqueue", "test Queue", "Q.GEO.OUT", null);
-        CreationTools.createJndiQcfMQSeries(em, "jms/qcf", "test QCF", "10.0.1.90", "QM.TEC1", 1414, "WASCHANNEL");
+        CreationTools.createJndiQueueMQSeries(cnx, "jms/testqueue", "test Queue", "Q.GEO.OUT", null);
+        CreationTools.createJndiQcfMQSeries(cnx, "jms/qcf", "test QCF", "10.0.1.90", "QM.TEC1", 1414, "WASCHANNEL");
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em)); // Exception in jar => CRASHED
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx)); // Exception in jar => CRASHED
     }
 
     @Test
@@ -65,19 +65,19 @@ public class JndiTest extends JqmBaseTest
     {
         CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", null,
                 "jqm-tests/jqm-test-jndijms-amq/target/test.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
-                "other2", false, em);
+                "other2", false, cnx);
         JobRequest.create("Jms", "TestUser").submit();
 
         // Create JMS JNDI references for use by the test jar
-        CreationTools.createJndiQueueActiveMQ(em, "jms/testqueue", "test queue", "Q.TEST", null);
-        CreationTools.createJndiQcfActiveMQ(em, "jms/qcf", "test QCF", "vm:broker:(tcp://localhost:1234)?persistent=false&useJmx=false",
+        CreationTools.createJndiQueueActiveMQ(cnx, "jms/testqueue", "test queue", "Q.TEST", null);
+        CreationTools.createJndiQcfActiveMQ(cnx, "jms/qcf", "test QCF", "vm:broker:(tcp://localhost:1234)?persistent=false&useJmx=false",
                 null);
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em)); // Exception in jar => CRASHED
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx)); // Exception in jar => CRASHED
     }
 
     @Test
@@ -85,21 +85,21 @@ public class JndiTest extends JqmBaseTest
     {
         CreationTools.createJobDef(null, true, "com.enioka.jqm.testpackages.SuperTestPayload", null,
                 "jqm-tests/jqm-test-jndijms-amq/target/test.jar", TestHelpers.qVip, 42, "Jms", null, "Franquin", "ModuleMachin", "other1",
-                "other2", false, em);
+                "other2", false, cnx);
         JobRequest.create("Jms", "TestUser").submit();
 
         // Create JMS JNDI references for use by the test jar
-        CreationTools.createJndiQueueActiveMQ(em, "jms/testqueue", "test queue", "Q.TEST", null);
-        CreationTools.createJndiQcfActiveMQ(em, "jms/qcf2", "test QCF", "vm:broker:(tcp://localhost:1234)?persistent=false&useJmx=false",
+        CreationTools.createJndiQueueActiveMQ(cnx, "jms/testqueue", "test queue", "Q.TEST", null);
+        CreationTools.createJndiQcfActiveMQ(cnx, "jms/qcf2", "test QCF", "vm:broker:(tcp://localhost:1234)?persistent=false&useJmx=false",
                 null);
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
         History h = null;
         try
         {
-            h = (History) em.createQuery("SELECT h FROM History h").getSingleResult();
+            h = (History) cnx.createQuery("SELECT h FROM History h").getSingleResult();
         }
         catch (Exception e)
         {
@@ -114,7 +114,7 @@ public class JndiTest extends JqmBaseTest
     @Test
     public void testDefCon() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.EngineApiDefCon").run(this);
+        JqmSimpleTest.create(cnx, "pyl.EngineApiDefCon").run(this);
     }
 
     @Test
@@ -122,7 +122,7 @@ public class JndiTest extends JqmBaseTest
     {
         // Create JMS JNDI references for use by the test jar
         String path = "./testdir";
-        CreationTools.createJndiFile(em, "fs/testdirectory", "test directory", path);
+        CreationTools.createJndiFile(cnx, "fs/testdirectory", "test directory", path);
 
         // Create the directory...
         (new File(path)).mkdir();
@@ -145,7 +145,7 @@ public class JndiTest extends JqmBaseTest
     {
         // Create JMS JNDI references for use by the test jar
         String url = "http://www.marsupilami.com";
-        CreationTools.createJndiUrl(em, "url/testurl", "test directory", url);
+        CreationTools.createJndiUrl(cnx, "url/testurl", "test directory", url);
 
         try
         {
@@ -162,9 +162,9 @@ public class JndiTest extends JqmBaseTest
     public void testJndiFile() throws Exception
     {
         // Create JMS JNDI references for use by the test jar
-        CreationTools.createJndiFile(em, "fs/test", "test resource", "/tmp");
+        CreationTools.createJndiFile(cnx, "fs/test", "test resource", "/tmp");
 
-        JqmSimpleTest.create(em, "pyl.JndiFile", "jqm-test-pyl-nodep").run(this);
+        JqmSimpleTest.create(cnx, "pyl.JndiFile", "jqm-test-pyl-nodep").run(this);
     }
 
     @Test
@@ -179,20 +179,20 @@ public class JndiTest extends JqmBaseTest
     @Test
     public void testJndiJdbcPool() throws Exception
     {
-        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", em,
+        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
-        em.getTransaction().begin();
-        em.createQuery("UPDATE JndiObjectResourceParameter p SET value='true' WHERE key='jmxEnabled'").executeUpdate();
-        em.getTransaction().commit();
+        cnx.getTransaction().begin();
+        cnx.createQuery("UPDATE JndiObjectResourceParameter p SET value='true' WHERE key='jmxEnabled'").executeUpdate();
+        cnx.getTransaction().commit();
 
         addAndStartEngine();
 
         CreationTools.createJobDef(null, true, "pyl.JndiDb", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", TestHelpers.qVip, 42,
-                "TestApp", null, "Test", "ModuleTest", "other", "other", false, em);
+                "TestApp", null, "Test", "ModuleTest", "other", "other", false, cnx);
         JobRequest.create("TestApp", "TestUser").submit();
-        TestHelpers.waitFor(1, 5000, em);
+        TestHelpers.waitFor(1, 5000, cnx);
 
-        TestHelpers.testOkCount(1, em);
+        TestHelpers.testOkCount(1, cnx);
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         int nb = (Integer) mbs.getAttribute(new ObjectName("com.enioka.jqm:type=JdbcPool,name=jdbc/test"), "Active");
         Assert.assertEquals(0, nb);
@@ -202,21 +202,21 @@ public class JndiTest extends JqmBaseTest
     public void testJndiJdbcPoolLeakWithoutHunter() throws Exception
     {
         // Sanity check - our test DOES leak connections
-        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", em,
+        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
-        em.getTransaction().begin();
-        em.createQuery("UPDATE JndiObjectResourceParameter p SET value='true' WHERE key='jmxEnabled'").executeUpdate();
-        em.getTransaction().commit();
+        cnx.getTransaction().begin();
+        cnx.createQuery("UPDATE JndiObjectResourceParameter p SET value='true' WHERE key='jmxEnabled'").executeUpdate();
+        cnx.getTransaction().commit();
 
         addAndStartEngine();
 
         // Run the payload, it should leave an open conn at the end
         CreationTools.createJobDef(null, true, "pyl.JndiDbLeak", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", TestHelpers.qVip,
-                42, "TestApp", null, "Test", "ModuleTest", "other", "other", false, em);
+                42, "TestApp", null, "Test", "ModuleTest", "other", "other", false, cnx);
         JobRequest.create("TestApp", "TestUser").submit();
-        TestHelpers.waitFor(1, 5000, em);
+        TestHelpers.waitFor(1, 5000, cnx);
 
-        TestHelpers.testOkCount(1, em);
+        TestHelpers.testOkCount(1, cnx);
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         int nb = (Integer) mbs.getAttribute(new ObjectName("com.enioka.jqm:type=JdbcPool,name=jdbc/test"), "Active");
         Assert.assertEquals(1, nb);
@@ -230,36 +230,36 @@ public class JndiTest extends JqmBaseTest
     {
         // Create a connection with our custom interceptor
         JndiObjectResource j = CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA",
-                "", em, "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
-        em.getTransaction().begin();
+                "", cnx, "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
+        cnx.getTransaction().begin();
         JndiObjectResourceParameter p = new JndiObjectResourceParameter();
         p.setKey("jdbcInterceptors");
         p.setValue("com.enioka.jqm.providers.PayloadInterceptor");
         p.setResource(j);
-        em.persist(p);
-        em.createQuery("UPDATE JndiObjectResourceParameter p SET value='true' WHERE key='jmxEnabled'").executeUpdate();
-        em.getTransaction().commit();
+        cnx.persist(p);
+        cnx.createQuery("UPDATE JndiObjectResourceParameter p SET value='true' WHERE key='jmxEnabled'").executeUpdate();
+        cnx.getTransaction().commit();
 
         addAndStartEngine();
 
         // Sanity check: the leak hunter does not harm normal payloads.
         CreationTools.createJobDef(null, true, "pyl.JndiDb", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", TestHelpers.qVip, 42,
-                "TestApp", null, "Test", "ModuleTest", "other", "other", false, em);
+                "TestApp", null, "Test", "ModuleTest", "other", "other", false, cnx);
         JobRequest.create("TestApp", "TestUser").submit();
-        TestHelpers.waitFor(1, 5000, em);
-        TestHelpers.testOkCount(1, em);
+        TestHelpers.waitFor(1, 5000, cnx);
+        TestHelpers.testOkCount(1, cnx);
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         int nb = (Integer) mbs.getAttribute(new ObjectName("com.enioka.jqm:type=JdbcPool,name=jdbc/test"), "Active");
         Assert.assertEquals(0, nb);
 
         // Run the payload, it should leave an open conn that should be forcibly closed.
         CreationTools.createJobDef(null, true, "pyl.JndiDbLeak", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", TestHelpers.qVip,
-                42, "TestApp2", null, "Test", "ModuleTest", "other", "other", false, em);
+                42, "TestApp2", null, "Test", "ModuleTest", "other", "other", false, cnx);
         JobRequest.create("TestApp2", "TestUser").submit();
-        TestHelpers.waitFor(1, 5000, em);
+        TestHelpers.waitFor(1, 5000, cnx);
 
         // Test
-        TestHelpers.testOkCount(2, em);
+        TestHelpers.testOkCount(2, cnx);
         nb = (Integer) mbs.getAttribute(new ObjectName("com.enioka.jqm:type=JdbcPool,name=jdbc/test"), "Active");
         Assert.assertEquals(0, nb);
     }

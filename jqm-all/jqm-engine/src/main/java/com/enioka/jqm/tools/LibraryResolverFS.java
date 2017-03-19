@@ -28,8 +28,6 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import javax.persistence.EntityManager;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -38,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.jboss.shrinkwrap.resolver.api.maven.ConfigurableMavenResolverSystem;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.Node;
 
@@ -76,11 +75,11 @@ class LibraryResolverFS
      *            an EM that will be used only if not in cache, to fetch the Maven repository list from the database.
      * @throws JqmPayloadException
      */
-    synchronized URL[] getLibraries(Node n, JobDef jd, EntityManager em) throws JqmPayloadException
+    synchronized URL[] getLibraries(Node n, JobDef jd, DbConn cnx) throws JqmPayloadException
     {
         if (shouldLoad(n, jd))
         {
-            loadCache(n, jd, em);
+            loadCache(n, jd, cnx);
         }
         return cache.get(jd.getApplicationName()).urls;
     }
@@ -115,7 +114,7 @@ class LibraryResolverFS
         return false;
     }
 
-    private void loadCache(Node node, JobDef jd, EntityManager em) throws JqmPayloadException
+    private void loadCache(Node node, JobDef jd, DbConn cnx) throws JqmPayloadException
     {
         jqmlogger.debug("Resolving classpath for job definition " + jd.getApplicationName());
 
@@ -244,7 +243,7 @@ class LibraryResolverFS
         {
             jqmlogger.trace("Reading a pom file");
 
-            ConfigurableMavenResolverSystem resolver = LibraryResolverMaven.getMavenResolver(em);
+            ConfigurableMavenResolverSystem resolver = LibraryResolverMaven.getMavenResolver(cnx);
 
             // Resolve
             File[] depFiles = null;

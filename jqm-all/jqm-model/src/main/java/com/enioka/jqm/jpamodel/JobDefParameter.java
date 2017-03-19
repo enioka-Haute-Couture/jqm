@@ -22,10 +22,13 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.QueryResult;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
@@ -111,5 +114,29 @@ public class JobDefParameter implements Serializable
             throw new DatabaseException(e);
         }
         return res;
+    }
+
+    public static Map<String, String> select_map(DbConn cnx, String query_key, Object... args)
+    {
+        Map<String, String> res = new HashMap<String, String>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key, args);
+            while (rs.next())
+            {
+                res.put(rs.getString(1), rs.getString(2));
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
+    }
+
+    public static int create(DbConn cnx, String key, String value, int jdId)
+    {
+        QueryResult qr = cnx.runUpdate("jdprm_insert", key, value, jdId);
+        return qr.getGeneratedId();
     }
 }

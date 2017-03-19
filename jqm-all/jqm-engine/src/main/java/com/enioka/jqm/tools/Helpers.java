@@ -18,11 +18,11 @@
 
 package com.enioka.jqm.tools;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.sql.SQLTransientException;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +59,6 @@ import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.RRole;
 import com.enioka.jqm.jpamodel.RUser;
-import com.enioka.jqm.jpamodel.State;
 
 // TODO: cnx should be first arg.
 
@@ -149,7 +148,7 @@ final class Helpers
         }
     }
 
-    static void closeQuietly(ZipFile zf)
+    static void closeQuietly(Closeable zf)
     {
         try
         {
@@ -162,11 +161,6 @@ final class Helpers
         {
             jqmlogger.warn("could not close jar file", e);
         }
-    }
-
-    static void allowCreateSchema()
-    {
-        props.put("hibernate.hbm2ddl.auto", "update");
     }
 
     static void registerJndiIfNeeded()
@@ -238,9 +232,10 @@ final class Helpers
      * @param em
      *            the EM to use.
      */
-    static void createDeliverable(String path, String originalFileName, String fileFamily, Integer jobId, DbConn cnx)
+    static int createDeliverable(String path, String originalFileName, String fileFamily, Integer jobId, DbConn cnx)
     {
-        cnx.runUpdate("deliverable_insert", fileFamily, path, jobId, originalFileName, UUID.randomUUID().toString());
+        QueryResult qr = cnx.runUpdate("deliverable_insert", fileFamily, path, jobId, originalFileName, UUID.randomUUID().toString());
+        return qr.getGeneratedId();
     }
 
     /**
@@ -281,7 +276,7 @@ final class Helpers
     static void checkConfiguration(String nodeName, DbConn cnx)
     {
         // Node
-        List<Node> nodes = Node.select(cnx, "node_select_by_name", nodeName);
+        List<Node> nodes = Node.select(cnx, "node_select_by_key", nodeName);
         if (nodes.size() == 0)
         {
             throw new JqmInitError("The node does not exist. It must be referenced (CLI option createnode) before it can be used");
@@ -470,6 +465,7 @@ final class Helpers
      * @param cnx
      * @param login
      * @param password
+     *            the raw password. it will be hashed.
      * @param description
      * @param roles
      */
@@ -497,24 +493,6 @@ final class Helpers
         ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
         user.setPassword(new Sha512Hash(user.getPassword(), salt, 100000).toHex());
         user.setHashSalt(salt.toHex());
-    }
-
-    /**
-     * Transaction is not opened nor committed here but needed.
-     * 
-     */
-    static void createHistory(JobInstance ji, DbConn cnx, State finalState, Calendar endDate)
-    {
-        JobDef jd = JobDef.select(cnx, "jd_select_by_id", ji.getJd()).get(0);
-        Node n = Node.select(cnx, "node_select_by_id", ji.getNode()).get(0);
-        Queue q = Queue.select(cnx, "q_select_by_id", ji.getQueue()).get(0);
-
-        // TODO: applicationname == instance application => remove one.
-        cnx.runUpdate("history_insert", ji.getId(), jd.getApplication(), jd.getApplication(), ji.getAttributionDate(), ji.getEmail(),
-                endDate, ji.getCreationDate(), ji.getExecutionDate(), jd.isHighlander(), ji.getApplication(), ji.getKeyword1(),
-                ji.getKeyword2(), ji.getKeyword3(), ji.getModule(), jd.getKeyword1(), jd.getKeyword2(), jd.getKeyword3(), jd.getModule(),
-                n.getName(), ji.getParentId(), ji.getProgress(), q.getName(), 0, ji.getSessionID(), finalState, ji.getUserName(),
-                ji.getJd(), ji.getNode(), ji.getQueue());
     }
 
     static String getMavenVersion()
@@ -587,7 +565,7 @@ final class Helpers
 
             // Pollers
             jqmlogger.info("Node polling parameters are as follow:");
-            List<DeploymentParameter> dps = DeploymentParameter.select(cnx, "sp_select_for_node", n.getId());
+            List<DeploymentParameter> dps = DeploymentParameter.select(cnx, "dp_select_for_node", n.getId());
             for (DeploymentParameter dp : dps)
             {
                 String q = cnx.runSelectSingle("q_select_by_id", String.class, dp.getQueue()); // TODO: avoid this query with a join.

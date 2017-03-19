@@ -138,7 +138,7 @@ public class ServiceSimple
         EntityManager em = null;
         try
         {
-            em = ((HibernateClient) JqmClientFactory.getClient()).getEm();
+            em = ((HibernateClient) JqmClientFactory.getClient()).getDbSession();
             d = em.createQuery("SELECT d from Deliverable d WHERE d.randomId = :ii", Deliverable.class).setParameter("ii", randomId)
                     .getSingleResult();
         }

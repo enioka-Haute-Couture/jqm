@@ -26,14 +26,13 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.util.io.pem.PemReader;
 
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.PKI;
 
@@ -43,28 +42,20 @@ import com.enioka.jqm.jpamodel.PKI;
  */
 public class JpaCa
 {
-    public static CertificateRequest initCa(EntityManager em)
+    public static CertificateRequest initCa(DbConn cnx)
     {
         // result field
         CertificateRequest cr = new CertificateRequest();
 
         // Get the alias of the private key to use
         String caAlias = null;
-        try
-        {
-            caAlias = em.createQuery("SELECT p FROM GlobalParameter p WHERE p.key = 'keyAlias'", GlobalParameter.class).getSingleResult()
-                    .getValue();
-        }
-        catch (NoResultException e)
-        {
-            caAlias = Constants.CA_DEFAULT_PRETTY_NAME;
-        }
+        caAlias = GlobalParameter.getParameter(cnx, "keyAlias", Constants.CA_DEFAULT_PRETTY_NAME);
 
         // Create the CA if it does not already exist
         PKI pki = null;
         try
         {
-            pki = em.createQuery("SELECT p FROM PKI p WHERE p.prettyName = :pn", PKI.class).setParameter("pn", caAlias).getSingleResult();
+            pki = PKI.select_key(cnx, caAlias);
         }
         catch (NoResultException e)
         {
@@ -73,13 +64,9 @@ public class JpaCa
             cr.generateCA(caAlias);
 
             // Store
-            pki = new PKI();
-            pki.setPemPK(cr.writePemPrivateToString());
-            pki.setPemCert(cr.writePemPublicToString());
-            pki.setPrettyName(caAlias);
-            em.getTransaction().begin();
-            em.persist(pki);
-            em.getTransaction().commit();
+            PKI.create(cnx, caAlias, cr.writePemPrivateToString(), cr.writePemPublicToString());
+            cnx.commit();
+            pki = PKI.select_key(cnx, caAlias);
         }
 
         try
@@ -111,8 +98,8 @@ public class JpaCa
         return cr;
     }
 
-    public static void prepareWebServerStores(EntityManager em, String subject, String serverPfxPath, String trustPfxPath,
-            String pfxPassword, String serverCertPrettyName, String serverCerPath, String caCerPath)
+    public static void prepareWebServerStores(DbConn cnx, String subject, String serverPfxPath, String trustPfxPath, String pfxPassword,
+            String serverCertPrettyName, String serverCerPath, String caCerPath)
     {
         File pfx = new File(serverPfxPath);
 
@@ -121,7 +108,7 @@ public class JpaCa
             return;
         }
 
-        CertificateRequest ca = initCa(em);
+        CertificateRequest ca = initCa(cnx);
         ca.writePemPublicToFile(caCerPath);
 
         CertificateRequest srv = new CertificateRequest();
@@ -140,8 +127,7 @@ public class JpaCa
         srv.writeTrustPfxToFile(trustPfxPath, pfxPassword);
     }
 
-    public static void prepareClientStore(EntityManager em, String subject, String pfxPath, String pfxPassword, String prettyName,
-            String cerPath)
+    public static void prepareClientStore(DbConn cnx, String subject, String pfxPath, String pfxPassword, String prettyName, String cerPath)
     {
         File pfx = new File(pfxPath);
 
@@ -150,7 +136,7 @@ public class JpaCa
             return;
         }
 
-        CertificateRequest ca = initCa(em);
+        CertificateRequest ca = initCa(cnx);
 
         CertificateRequest srv = new CertificateRequest();
         srv.generateClientCert(prettyName, ca.holder, ca.privateKey, subject);
@@ -167,12 +153,12 @@ public class JpaCa
         srv.writePemPublicToFile(cerPath);
     }
 
-    public static InputStream getClientData(EntityManager em, String userName) throws Exception
+    public static InputStream getClientData(DbConn cnx, String userName) throws Exception
     {
         ByteArrayOutputStream sink = new ByteArrayOutputStream();
         ZipOutputStream zos = new ZipOutputStream(sink);
 
-        CertificateRequest ca = JpaCa.initCa(em);
+        CertificateRequest ca = JpaCa.initCa(cnx);
         CertificateRequest cl = new CertificateRequest();
         cl.generateClientCert("JQM authentication certificate", ca.holder, ca.privateKey, "CN=" + userName);
 

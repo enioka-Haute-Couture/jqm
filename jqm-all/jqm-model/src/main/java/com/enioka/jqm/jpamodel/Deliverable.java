@@ -19,8 +19,13 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.sql2o.Connection;
+import com.enioka.jqm.jdbc.DatabaseException;
+import com.enioka.jqm.jdbc.DbConn;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
@@ -164,17 +169,30 @@ public class Deliverable implements Serializable
 
     }
 
-    public void insertOrUpdate(Connection conn)
+    public static List<Deliverable> select(DbConn cnx, String query_key, Object... args)
     {
-        validate();
-        int nbModified = conn
-                .createQuery(
-                        "UPDATE Deliverable SET filePath=:filePath, fileFamily=:fileFamily, jobId=:jobId, randomId=:randomId, originalFileName=:originalFileName WHERE id=:id")
-                .bind(this).executeUpdate().getResult();
-
-        if (nbModified == 0)
+        List<Deliverable> res = new ArrayList<Deliverable>();
+        try
         {
-            this.id = conn.createQuery("INSERT INTO Deliverable(filePath, fileFamily, jobId, randomId, originalFileName) VALUES(:filePath, :fileFamily, :jobId, :randomId, :originalFileName)", true).executeUpdate().getKey(Integer.class);
+            ResultSet rs = cnx.runSelect(query_key, args);
+            while (rs.next())
+            {
+                Deliverable tmp = new Deliverable();
+
+                tmp.id = rs.getInt(1);
+                tmp.fileFamily = rs.getString(2);
+                tmp.filePath = rs.getString(3);
+                tmp.jobId = rs.getInt(4);
+                tmp.originalFileName = rs.getString(5);
+                tmp.randomId = rs.getString(6);
+
+                res.add(tmp);
+            }
         }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
     }
 }

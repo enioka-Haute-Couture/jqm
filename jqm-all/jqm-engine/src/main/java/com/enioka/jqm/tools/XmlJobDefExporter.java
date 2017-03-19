@@ -15,20 +15,19 @@
  */
 package com.enioka.jqm.tools;
 
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobDefParameter;
-import com.enioka.jqm.jpamodel.Queue;
+import java.io.FileOutputStream;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
-import javax.persistence.EntityManager;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jpamodel.JobDef;
+import com.enioka.jqm.jpamodel.JobDefParameter;
 
 class XmlJobDefExporter
 {
@@ -40,19 +39,19 @@ class XmlJobDefExporter
     /**
      * Exports all available queues to an XML file.
      */
-    static void export(String path, EntityManager em) throws JqmEngineException
+    static void export(String path, DbConn cnx) throws JqmEngineException
     {
-        if (em == null)
+        if (cnx == null)
         {
-            throw new IllegalArgumentException("entity manager name cannot be null");
+            throw new IllegalArgumentException("database connection cannot be null");
         }
-        export(path, em.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList(), em);
+        export(path, JobDef.select(cnx, "jd_select_all"), cnx);
     }
 
     /**
      * Exports several (given) job def to an XML file.
      */
-    static void export(String xmlPath, List<JobDef> jobDefList, EntityManager em) throws JqmEngineException
+    static void export(String xmlPath, List<JobDef> jobDefList, DbConn cnx) throws JqmEngineException
     {
         // Argument tests
         if (xmlPath == null)
@@ -63,14 +62,16 @@ class XmlJobDefExporter
         {
             throw new IllegalArgumentException("job def list cannot be null or empty");
         }
-        if (em == null)
+        if (cnx == null)
         {
-            throw new IllegalArgumentException("entity manager name cannot be null");
+            throw new IllegalArgumentException("database connection name cannot be null");
         }
 
-        Collections.sort(jobDefList, new Comparator<JobDef>() {
+        Collections.sort(jobDefList, new Comparator<JobDef>()
+        {
             @Override
-            public int compare(JobDef o1, JobDef o2) {
+            public int compare(JobDef o1, JobDef o2)
+            {
                 return o1.getJarPath().compareTo(o2.getJarPath());
             }
         });
@@ -94,7 +95,7 @@ class XmlJobDefExporter
                 jar.addContent(jobDefinitions);
                 root.addContent(jar);
             }
-            Element jobDefinition = getJobDefinitionElement(j);
+            Element jobDefinition = getJobDefinitionElement(j, cnx);
             jobDefinitions.addContent(jobDefinition);
         }
 
@@ -110,12 +111,12 @@ class XmlJobDefExporter
         }
     }
 
-    private static Element getJobDefinitionElement(JobDef j)
+    private static Element getJobDefinitionElement(JobDef j, DbConn cnx)
     {
         Element jobDefinition = new Element("jobDefinition");
 
         addTextElementToParentElement(jobDefinition, "name", j.getApplicationName());
-        addTextElementToParentElement(jobDefinition, "queue", j.getQueue().getName());
+        addTextElementToParentElement(jobDefinition, "queue", j.getQueue(cnx).getName());
         addTextElementToParentElement(jobDefinition, "description", j.getDescription() == null ? "" : j.getDescription());
         addTextElementToParentElement(jobDefinition, "canBeRestarted", j.isCanBeRestarted() ? "true" : "false");
         addTextElementToParentElement(jobDefinition, "javaClassName", j.getJavaClassName());
@@ -125,14 +126,15 @@ class XmlJobDefExporter
         addTextElementToParentElement(jobDefinition, "keyword2", j.getKeyword2());
         addTextElementToParentElement(jobDefinition, "keyword3", j.getKeyword3());
         addTextElementToParentElement(jobDefinition, "specificIsolationContext", j.getSpecificIsolationContext());
-        addTextElementToParentElement(jobDefinition, "childFirstClassLoader", j.isChildFirstClassLoader() ? "true": "false");
+        addTextElementToParentElement(jobDefinition, "childFirstClassLoader", j.isChildFirstClassLoader() ? "true" : "false");
         addTextElementToParentElement(jobDefinition, "hiddenJavaClasses", j.getHiddenJavaClasses());
         if (j.getMaxTimeRunning() != null)
-            addTextElementToParentElement(jobDefinition, "reasonableRuntimeLimitMinute", j.getMaxTimeRunning()+"");
-        addTextElementToParentElement(jobDefinition, "highlander", j.isHighlander() ? "true": "false");
+            addTextElementToParentElement(jobDefinition, "reasonableRuntimeLimitMinute", j.getMaxTimeRunning() + "");
+        addTextElementToParentElement(jobDefinition, "highlander", j.isHighlander() ? "true" : "false");
 
-        List<JobDefParameter> jobDefParameters = j.getParameters();
-        if (jobDefParameters != null && !jobDefParameters.isEmpty()) {
+        List<JobDefParameter> jobDefParameters = j.getParameters(cnx);
+        if (jobDefParameters != null && !jobDefParameters.isEmpty())
+        {
             Element parameters = new Element("parameters");
             for (JobDefParameter p : jobDefParameters)
             {
@@ -149,7 +151,8 @@ class XmlJobDefExporter
 
     private static void addTextElementToParentElement(Element parent, String elementName, String content)
     {
-        if (content != null) {
+        if (content != null)
+        {
             Element e = new Element(elementName);
             e.setText(content);
             parent.addContent(e);

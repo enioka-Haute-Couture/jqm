@@ -16,6 +16,16 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.enioka.jqm.jdbc.DatabaseException;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.jdbc.NonUniqueResultException;
+import com.enioka.jqm.jdbc.QueryResult;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
@@ -69,5 +79,51 @@ public class PKI implements Serializable
     public void setPemCert(String pemCert)
     {
         this.pemCert = pemCert;
+    }
+
+    public static List<PKI> select(DbConn cnx, String query_key, Object... args)
+    {
+        List<PKI> res = new ArrayList<PKI>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key, args);
+            while (rs.next())
+            {
+                PKI tmp = new PKI();
+
+                tmp.id = rs.getInt(1);
+                tmp.pemCert = rs.getString(2);
+                tmp.pemPK = rs.getString(3);
+                tmp.prettyName = rs.getString(4);
+
+                res.add(tmp);
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
+    }
+
+    public static PKI select_key(DbConn cnx, String key)
+    {
+        List<PKI> pp = select(cnx, "pki_select_by_key", key);
+        if (pp.size() == 0)
+        {
+            throw new NoResultException("No PKI with key " + key);
+        }
+        if (pp.size() > 1)
+        {
+            throw new NonUniqueResultException("Configuration is not valid");
+        }
+
+        return pp.get(0);
+    }
+
+    public static int create(DbConn cnx, String alias, String pemPK, String pemCert)
+    {
+        QueryResult qr = cnx.runUpdate("pki_insert", alias, pemPK, pemCert);
+        return qr.getGeneratedId();
     }
 }

@@ -17,7 +17,7 @@ public class ClLeakTest extends JqmBaseTest
     @Test
     public void testJmxLeak() throws Exception
     {
-        int i = JqmSimpleTest.create(em, "pyl.EngineJmxLeak").addWaitTime(10000).expectOk(0).run(this);
+        int i = JqmSimpleTest.create(cnx, "pyl.EngineJmxLeak").addWaitTime(10000).expectOk(0).run(this);
 
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName name = new ObjectName("com.test:type=Node,name=test");
@@ -25,7 +25,7 @@ public class ClLeakTest extends JqmBaseTest
 
         // Stop the job. Its MBean(s) should be cleaned up by the engine.
         JqmClientFactory.getClient().killJob(i);
-        TestHelpers.waitFor(1, 3000, em);
+        TestHelpers.waitFor(1, 3000, cnx);
 
         // Check the bean is really dead
         try

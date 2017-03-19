@@ -240,4 +240,32 @@ public class RUser implements Serializable
             cnx.runUpdate("user_add_role_by_name", s, newId);
         }
     }
+
+    public static RUser select_id(DbConn cnx, Integer id)
+    {
+        List<RUser> res = select(cnx, "user_select_by_id", id);
+        if (res.isEmpty())
+        {
+            throw new DatabaseException("no result for query by key for key " + id);
+        }
+        if (res.size() > 1)
+        {
+            throw new DatabaseException("Inconsistent database! Multiple results for query by key for key " + id);
+        }
+        return res.get(0);
+    }
+    
+    public static RUser selectlogin(DbConn cnx, String id)
+    {
+        List<RUser> res = select(cnx, "user_select_by_key", id);
+        if (res.isEmpty())
+        {
+            throw new DatabaseException("no result for query by key for key " + id);
+        }
+        if (res.size() > 1)
+        {
+            throw new DatabaseException("Inconsistent database! Multiple results for query by key for key " + id);
+        }
+        return res.get(0);
+    }
 }

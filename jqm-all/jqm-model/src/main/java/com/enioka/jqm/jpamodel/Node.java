@@ -26,6 +26,8 @@ import java.util.List;
 
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.jdbc.NonUniqueResultException;
 import com.enioka.jqm.jdbc.QueryResult;
 
 /**
@@ -362,6 +364,45 @@ public class Node
         return res;
     }
 
+    static Node map(ResultSet rs, int colShift)
+    {
+        try
+        {
+            Node tmp = new Node();
+
+            tmp.id = rs.getInt(1 + colShift);
+            tmp.dlRepo = rs.getString(2 + colShift);
+            tmp.dns = rs.getString(3 + colShift);
+            tmp.enabled = rs.getBoolean(4 + colShift);
+            tmp.exportRepo = rs.getString(5 + colShift);
+            tmp.jmxRegistryPort = rs.getInt(6 + colShift);
+            tmp.jmxServerPort = rs.getInt(7 + colShift);
+            tmp.loadApiAdmin = rs.getBoolean(8 + colShift);
+            tmp.loadApiClient = rs.getBoolean(9 + colShift);
+            tmp.loapApiSimple = rs.getBoolean(10 + colShift);
+            tmp.name = rs.getString(11 + colShift);
+            tmp.port = rs.getInt(12 + colShift);
+            tmp.repo = rs.getString(13 + colShift);
+            tmp.rootLogLevel = rs.getString(14 + colShift);
+            tmp.stop = rs.getBoolean(15 + colShift);
+            tmp.tmpDirectory = rs.getString(16 + colShift);
+
+            Calendar c = null;
+            if (rs.getTimestamp(17 + colShift) != null)
+            {
+                c = Calendar.getInstance();
+                c.setTimeInMillis(rs.getTimestamp(17 + colShift).getTime());
+            }
+            tmp.lastSeenAlive = c;
+
+            return tmp;
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+    }
+
     public static List<Node> select(DbConn cnx, String query_key, Object... args)
     {
         List<Node> res = new ArrayList<Node>();
@@ -370,26 +411,7 @@ public class Node
             ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
-                Node tmp = new Node();
-
-                tmp.id = rs.getInt(1);
-                tmp.dlRepo = rs.getString(2);
-                tmp.dns = rs.getString(3);
-                tmp.enabled = rs.getBoolean(4);
-                tmp.exportRepo = rs.getString(5);
-                tmp.jmxRegistryPort = rs.getInt(6);
-                tmp.jmxServerPort = rs.getInt(7);
-                tmp.loadApiAdmin = rs.getBoolean(8);
-                tmp.loadApiClient = rs.getBoolean(9);
-                tmp.loapApiSimple = rs.getBoolean(10);
-                tmp.name = rs.getString(11);
-                tmp.port = rs.getInt(12);
-                tmp.repo = rs.getString(13);
-                tmp.rootLogLevel = rs.getString(14);
-                tmp.stop = rs.getBoolean(15);
-                tmp.tmpDirectory = rs.getString(16);
-
-                res.add(tmp);
+                res.add(map(rs, 0));
             }
         }
         catch (SQLException e)
@@ -397,5 +419,19 @@ public class Node
             throw new DatabaseException(e);
         }
         return res;
+    }
+
+    public static Node select_single(DbConn cnx, String query_key, Object... args)
+    {
+        List<Node> nn = select(cnx, query_key, args);
+        if (nn.size() == 0)
+        {
+            throw new NoResultException("No node with this ID");
+        }
+        if (nn.size() > 1)
+        {
+            throw new NonUniqueResultException("COnfiguration is broken: multiple nodes with the same ID");
+        }
+        return nn.get(0);
     }
 }

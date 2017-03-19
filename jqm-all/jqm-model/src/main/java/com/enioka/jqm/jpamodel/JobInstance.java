@@ -19,9 +19,16 @@
 package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 
+import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.QueryResult;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
@@ -40,6 +47,7 @@ public class JobInstance implements Serializable
     private State state;
 
     private double internalPosition;
+    private boolean highlander;
 
     private Integer parentId;
     private String email;
@@ -57,20 +65,9 @@ public class JobInstance implements Serializable
     private String instanceKeyword2;
     private String instanceKeyword3;
 
-    /**
-     * The place inside the queue, i.e. the number of job requests that will be run before this one can be run.
-     */
-    public int getCurrentPosition(DbConn conn)
-    {
-        if (this.state.equals(State.SUBMITTED))
-        {
-            return conn.runSelectSingle("ji_select_current_pos", Integer.class, this.internalPosition) + 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
+    private JobDef jd;
+    private Queue q;
+    private Node n;
 
     /**
      * Helper method to add a parameter without having to create it explicitely. The created parameter should be persisted afterwards.
@@ -120,6 +117,16 @@ public class JobInstance implements Serializable
     public int getJd()
     {
         return jd_id;
+    }
+
+    public JobDef getJD()
+    {
+        return jd;
+    }
+
+    public Queue getQ()
+    {
+        return q;
     }
 
     /**
@@ -182,9 +189,9 @@ public class JobInstance implements Serializable
     /**
      * The node that is running the {@link JobInstance}. Null until wait is over and status is ATTRIBUTED.
      */
-    public int getNode()
+    public Node getNode()
     {
-        return node_id;
+        return n;
     }
 
     /**
@@ -390,5 +397,101 @@ public class JobInstance implements Serializable
     public void setAttributionDate(Calendar attributionDate)
     {
         this.attributionDate = attributionDate;
+    }
+
+    public static List<JobInstance> select(DbConn cnx, String query_key, Object... args)
+    {
+        List<JobInstance> res = new ArrayList<JobInstance>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key, args);
+            while (rs.next())
+            {
+                JobInstance tmp = new JobInstance();
+
+                tmp.id = rs.getInt(1);
+
+                Calendar c1 = Calendar.getInstance();
+                c1.setTimeInMillis(rs.getTimestamp(2).getTime());
+                tmp.attributionDate = c1;
+
+                Calendar c2 = Calendar.getInstance();
+                c2.setTimeInMillis(rs.getTimestamp(3).getTime());
+                tmp.creationDate = c2;
+
+                tmp.email = rs.getString(4);
+
+                Calendar c3 = Calendar.getInstance();
+                c3.setTimeInMillis(rs.getTimestamp(5).getTime());
+                tmp.executionDate = c3;
+
+                tmp.instanceApplication = rs.getString(6);
+                tmp.instanceKeyword1 = rs.getString(7);
+                tmp.instanceKeyword2 = rs.getString(8);
+                tmp.instanceKeyword3 = rs.getString(9);
+                tmp.instanceModule = rs.getString(10);
+                tmp.internalPosition = rs.getDouble(11);
+                tmp.parentId = rs.getInt(12);
+                tmp.progress = rs.getInt(13);
+                tmp.sessionID = rs.getString(14);
+                tmp.state = State.valueOf(rs.getString(15));
+                tmp.userName = rs.getString(16);
+                tmp.jd_id = rs.getInt(17);
+                tmp.node_id = rs.getInt(18);
+                tmp.queue_id = rs.getInt(19);
+                tmp.highlander = rs.getBoolean(20);
+
+                tmp.q = Queue.map(rs, 20);
+                tmp.jd = JobDef.map(rs, 24);
+                tmp.n = Node.map(rs, 45);
+
+                res.add(tmp);
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
+    }
+
+    public static JobInstance select_id(DbConn cnx, int id)
+    {
+        List<JobInstance> res = select(cnx, "ji_select_by_id", id);
+        if (res.isEmpty())
+        {
+            throw new DatabaseException("no result for query by ID for ID " + id);
+        }
+        if (res.size() > 1)
+        {
+            throw new DatabaseException("Inconsistent database! Multiple results for query by ID for ID " + id);
+        }
+
+        return res.get(0);
+    }
+
+    public static void delete_id(DbConn cnx, int id)
+    {
+        QueryResult res = cnx.runUpdate("ji_delete_by_id", id);
+        if (res.nbUpdated != 1)
+        {
+            throw new DatabaseException("Delete failed: row does not exist");
+        }
+    }
+
+    public static int enqueue(DbConn cnx, int queue_id, int job_id, String application, Integer parentId, String module, String keyword1,
+            String keyword2, String keyword3, String sessionId, String userName, String email, boolean highlander, Map<String, String> prms)
+    {
+        QueryResult qr = cnx.runUpdate("ji_insert_enqueue", email, application, keyword1, keyword2, keyword3, module, parentId, sessionId,
+                userName, job_id, queue_id);
+
+        int newId = qr.getGeneratedId();
+
+        for (Map.Entry<String, String> prm : prms.entrySet())
+        {
+            RuntimeParameter.create(cnx, newId, prm.getKey(), prm.getValue());
+        }
+
+        return qr.getGeneratedId();
     }
 }

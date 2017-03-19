@@ -112,8 +112,9 @@ public interface JqmClient
     void deleteJob(int jobId);
 
     /**
-     * Kill a running job. Kill is not immediate, and is only possible when a job payload calls some JQM APIs. If none are called, the job
-     * cannot be killed.
+     * Kill a running job. Kill of a running job is not immediate, and is only possible when a job payload calls some JQM APIs. If none are
+     * called, the job cannot be killed.<br>
+     * If the job is still waiting in queue, this is equivalent to calling {@link JqmClient#cancelJob(int)}.
      * 
      * @param jobId
      *            the id of the job to kill

@@ -40,7 +40,7 @@ public class JmxTest extends JqmBaseTest
     public void jmxRemoteTest() throws Exception
     {
         CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
-                "KillApp", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "KillApp", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         int i = JobRequest.create("KillApp", "TestUser").submit();
 
         // Get free ports
@@ -52,10 +52,10 @@ public class JmxTest extends JqmBaseTest
         s2.close();
         String hn = InetAddress.getLocalHost().getHostName();
 
-        em.getTransaction().begin();
+        cnx.getTransaction().begin();
         TestHelpers.node.setJmxRegistryPort(port1);
         TestHelpers.node.setJmxServerPort(port2);
-        em.getTransaction().commit();
+        cnx.getTransaction().commit();
 
         addAndStartEngine();
         Thread.sleep(1000);

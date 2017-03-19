@@ -23,8 +23,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.server.Connector;
@@ -41,6 +39,8 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.webapp.WebInfConfiguration;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
 
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.pki.JpaCa;
 
@@ -56,13 +56,13 @@ class JettyServer
     private Node node;
     WebAppContext webAppContext = null;
 
-    void start(Node node, EntityManager em)
+    void start(Node node, DbConn cnx)
     {
         // Start is also a restart method
         this.stop();
 
         // Only load Jetty if web APIs are allowed in the cluster
-        boolean startJetty = !Boolean.parseBoolean(Helpers.getParameter("disableWsApi", "false", em));
+        boolean startJetty = !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApi", "false"));
         if (!startJetty)
         {
             jqmlogger.info("Jetty will not start - parameter disableWsApi is set to true");
@@ -85,9 +85,9 @@ class JettyServer
         }
 
         this.node = node;
-        boolean useSsl = Boolean.parseBoolean(Helpers.getParameter("enableWsApiSsl", "true", em));
-        boolean useInternalPki = Boolean.parseBoolean(Helpers.getParameter("enableInternalPki", "true", em));
-        String pfxPassword = Helpers.getParameter("pfxPassword", "SuperPassword", em);
+        boolean useSsl = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableWsApiSsl", "true"));
+        boolean useInternalPki = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableInternalPki", "true"));
+        String pfxPassword = GlobalParameter.getParameter(cnx, "pfxPassword", "SuperPassword");
 
         server = new Server();
 
@@ -98,7 +98,7 @@ class JettyServer
             if (useInternalPki)
             {
                 jqmlogger.info("JQM will use its internal PKI for all certificates as parameter enableInternalPki is 'true'");
-                JpaCa.prepareWebServerStores(em, "CN=" + node.getDns(), "./conf/keystore.pfx", "./conf/trusted.jks", pfxPassword,
+                JpaCa.prepareWebServerStores(cnx, "CN=" + node.getDns(), "./conf/keystore.pfx", "./conf/trusted.jks", pfxPassword,
                         node.getDns(), "./conf/server.cer", "./conf/ca.cer");
             }
             scf = new SslContextFactory("./conf/keystore.pfx");
@@ -189,9 +189,8 @@ class JettyServer
         if (node.getPort() == 0)
         {
             // New nodes are created with a non-assigned port.
-            em.getTransaction().begin();
-            node.setPort(getActualPort());
-            em.getTransaction().commit();
+            cnx.runUpdate("node_update_port_by_id", getActualPort(), node.getId());
+            cnx.commit();
         }
 
         // Done
@@ -231,9 +230,9 @@ class JettyServer
         }
         catch (Exception e)
         {
-            jqmlogger
-                    .error("An error occured during Jetty stop. It is not an issue if it happens during JQM node shutdown, but one during restart (memeory leak).",
-                            e);
+            jqmlogger.error(
+                    "An error occured during Jetty stop. It is not an issue if it happens during JQM node shutdown, but one during restart (memeory leak).",
+                    e);
         }
     }
 

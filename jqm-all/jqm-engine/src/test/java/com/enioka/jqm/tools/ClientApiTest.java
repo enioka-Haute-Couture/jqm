@@ -23,8 +23,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.TypedQuery;
-
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,20 +44,20 @@ public class ClientApiTest extends JqmBaseTest
     public void testRestartJob() throws Exception
     {
         JobDef jdDemoMaven = CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
-                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
         int i = JobRequest.create("MarsuApplication", "TestUser").submit();
 
         addAndStartEngine();
 
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
         JqmClientFactory.getClient().enqueueFromHistory(i);
-        TestHelpers.waitFor(2, 10000, em);
+        TestHelpers.waitFor(2, 10000, cnx);
 
-        Assert.assertEquals(2, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(2, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
 
-        TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
+        TypedQuery<History> query = cnx.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
         Assert.assertEquals(2, res.size());
@@ -71,16 +69,16 @@ public class ClientApiTest extends JqmBaseTest
     public void testHistoryFields() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other2", true, em);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other2", true, cnx);
 
         int i = JobRequest.create("MarsuApplication", "TestUser").setSessionID("session42").setKeyword1("k1").setKeyword2("k2").submit();
 
         addAndStartEngine();
 
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        History h = em.createQuery("SELECT h FROM History h WHERE h.id = :i", History.class).setParameter("i", i).getSingleResult();
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        History h = cnx.createQuery("SELECT h FROM History h WHERE h.id = :i", History.class).setParameter("i", i).getSingleResult();
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         jqmlogger.debug("enqueueDate: " + df.format(h.getEnqueueDate().getTime()));
@@ -106,12 +104,12 @@ public class ClientApiTest extends JqmBaseTest
     @Test
     public void testKillJob() throws Exception
     {
-        int i = JqmSimpleTest.create(em, "pyl.KillMe").expectOk(0).addWaitTime(3000).run(this);
+        int i = JqmSimpleTest.create(cnx, "pyl.KillMe").expectOk(0).addWaitTime(3000).run(this);
 
         JqmClientFactory.getClient().killJob(i);
-        TestHelpers.waitFor(1, 3000, em);
+        TestHelpers.waitFor(1, 3000, cnx);
 
-        List<History> res = em.createQuery("SELECT j FROM History j", History.class).getResultList();
+        List<History> res = cnx.createQuery("SELECT j FROM History j", History.class).getResultList();
         Assert.assertEquals(1, res.size());
         Assert.assertEquals(State.KILLED, res.get(0).getState());
     }
@@ -123,10 +121,10 @@ public class ClientApiTest extends JqmBaseTest
         boolean success2 = false;
         boolean success3 = false;
 
-        int i = JqmSimpleTest.create(em, "pyl.EngineApiSend3Msg").run(this);
+        int i = JqmSimpleTest.create(cnx, "pyl.EngineApiSend3Msg").run(this);
 
         List<String> ress = JqmClientFactory.getClient().getJobMessages(i);
-        List<Message> m = em.createQuery("SELECT m FROM Message m WHERE m.ji = :i", Message.class).setParameter("i", i).getResultList();
+        List<Message> m = cnx.createQuery("SELECT m FROM Message m WHERE m.ji = :i", Message.class).setParameter("i", i).getResultList();
 
         Assert.assertEquals(3, ress.size());
         Assert.assertEquals(3, m.size());
@@ -155,7 +153,7 @@ public class ClientApiTest extends JqmBaseTest
     @Test
     public void testGetProgress() throws Exception
     {
-        int i = JqmSimpleTest.create(em, "pyl.EngineApiProgress").addWaitMargin(10000).run(this);
+        int i = JqmSimpleTest.create(cnx, "pyl.EngineApiProgress").addWaitMargin(10000).run(this);
         Integer k = JqmClientFactory.getClient().getJobProgress(i);
         Assert.assertEquals((Integer) 50, k);
     }
@@ -164,16 +162,16 @@ public class ClientApiTest extends JqmBaseTest
     public void testPause() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         int i = JobRequest.create("MarsuApplication", "TestUser").submit();
         JqmClientFactory.getClient().pauseQueuedJob(i);
         JobRequest.create("MarsuApplication", "TestUser").submit();
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 5000, em);
+        TestHelpers.waitFor(1, 5000, cnx);
 
-        List<History> res1 = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class).getResultList();
-        List<JobInstance> res2 = em.createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList();
+        List<History> res1 = cnx.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class).getResultList();
+        List<JobInstance> res2 = cnx.createQuery("SELECT j FROM JobInstance j", JobInstance.class).getResultList();
 
         Assert.assertEquals(1, res1.size());
         Assert.assertEquals(1, res2.size());
@@ -185,16 +183,16 @@ public class ClientApiTest extends JqmBaseTest
     public void testCancelJob() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
         int i = JobRequest.create("MarsuApplication", "TestUser").submit();
         JqmClientFactory.getClient().cancelJob(i);
         JobRequest.create("MarsuApplication", "TestUser").submit();
 
         addAndStartEngine();
-        TestHelpers.waitFor(2, 5000, em);
+        TestHelpers.waitFor(2, 5000, cnx);
 
-        TypedQuery<History> query = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
+        TypedQuery<History> query = cnx.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class);
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
         Assert.assertEquals(2, res.size());
         Assert.assertEquals(State.CANCELLED, res.get(0).getState());
@@ -205,15 +203,15 @@ public class ClientApiTest extends JqmBaseTest
     public void testChangeQueue() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
         int i = JobRequest.create("MarsuApplication", "TestUser").submit();
         JqmClientFactory.getClient().setJobQueue(i, TestHelpers.qSlow.getId());
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        List<History> res = em.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class).getResultList();
+        List<History> res = cnx.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class).getResultList();
         Assert.assertEquals(1, res.size());
         Assert.assertEquals(State.ENDED, res.get(0).getState());
         Assert.assertEquals(TestHelpers.qSlow.getName(), res.get(0).getQueue().getName());
@@ -223,7 +221,7 @@ public class ClientApiTest extends JqmBaseTest
     public void testDelJobInQueue() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
         int i = JobRequest.create("MarsuApplication", "TestUser").submit();
         JqmClientFactory.getClient().deleteJob(i);
@@ -231,36 +229,36 @@ public class ClientApiTest extends JqmBaseTest
         addAndStartEngine();
         Thread.sleep(1000);
 
-        Assert.assertEquals(0, TestHelpers.getHistoryAllCount(em));
-        Assert.assertEquals(0, TestHelpers.getQueueAllCount(em));
+        Assert.assertEquals(0, TestHelpers.getHistoryAllCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getQueueAllCount(cnx));
     }
 
     @Test
     public void testResume() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         int i = JobRequest.create("MarsuApplication", "TestUser").submit();
 
         JqmClientFactory.getClient().pauseQueuedJob(i);
         addAndStartEngine();
         Thread.sleep(3000);
-        Assert.assertEquals(0, TestHelpers.getOkCount(em));
+        Assert.assertEquals(0, TestHelpers.getOkCount(cnx));
         JqmClientFactory.getClient().resumeJob(i);
 
-        TestHelpers.waitFor(1, 5000, em);
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
+        TestHelpers.waitFor(1, 5000, cnx);
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
     }
 
     @Test
     public void testEnqueueWithQueue() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         int i = JobRequest.create("MarsuApplication", "TestUser").setQueueName(TestHelpers.qNormal.getName()).submit();
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
         com.enioka.jqm.api.JobInstance ji = JqmClientFactory.getClient().getJob(i);
         Assert.assertEquals(TestHelpers.qNormal.getName(), ji.getQueue().getName());
@@ -272,7 +270,7 @@ public class ClientApiTest extends JqmBaseTest
     @Test
     public void testTempDir() throws Exception
     {
-        int i = JqmSimpleTest.create(em, "pyl.EngineApiTmpDir").run(this);
+        int i = JqmSimpleTest.create(cnx, "pyl.EngineApiTmpDir").run(this);
 
         File tmpDir = new File(FilenameUtils.concat(TestHelpers.node.getTmpDirectory(), "" + i));
         Assert.assertFalse(tmpDir.isDirectory());
@@ -282,13 +280,13 @@ public class ClientApiTest extends JqmBaseTest
     public void testTags() throws Exception
     {
         CreationTools.createJobDef(null, true, "pyl.EngineApiTags", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "keyword1", null, "keyword3", false, em);
+                "MarsuApplication", null, "Franquin", "keyword1", null, "keyword3", false, cnx);
         JobRequest.create("MarsuApplication", "TestUser").setKeyword1("Houba").setKeyword3("Meuh").submit();
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
 
         History h = Helpers.getNewDbSession().createQuery("SELECT j FROM History j", History.class).getSingleResult();
 

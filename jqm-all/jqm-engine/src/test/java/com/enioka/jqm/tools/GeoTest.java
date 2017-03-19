@@ -31,12 +31,12 @@ public class GeoTest extends JqmBaseTest
     @Before
     public void b()
     {
-        TestHelpers.setNodesLogLevel("INFO", em);
-        em.getTransaction().begin();
+        TestHelpers.setNodesLogLevel("INFO", cnx);
+        cnx.getTransaction().begin();
         TestHelpers.node.setRootLogLevel("INFO");
         TestHelpers.nodeMix.setRootLogLevel("INFO");
         TestHelpers.nodeMix2.setRootLogLevel("INFO");
-        em.getTransaction().commit();
+        cnx.getTransaction().commit();
     }
 
     @After
@@ -49,7 +49,7 @@ public class GeoTest extends JqmBaseTest
     @Test
     public void testGeo() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.StressGeo").addEngine("localhost2").addEngine("localhost3").addRuntimeParameter("nbJob", "1")
+        JqmSimpleTest.create(cnx, "pyl.StressGeo").addEngine("localhost2").addEngine("localhost3").addRuntimeParameter("nbJob", "1")
                 .addWaitMargin(60000).expectOk(511).run(this);
     }
 }

@@ -35,10 +35,12 @@ import org.junit.Test;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
+import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDef.PathType;
 import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.RRole;
 import com.enioka.jqm.jpamodel.RUser;
 import com.enioka.jqm.jpamodel.State;
@@ -51,14 +53,14 @@ public class MiscTest extends JqmBaseTest
     public void testEmail() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
         JobRequest.create("MarsuApplication", "TestUser").setEmail("test@jqm.com").submit();
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 20000, em); // Need time for async mail sending.
+        TestHelpers.waitFor(1, 20000, cnx); // Need time for async mail sending.
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
 
         Properties props = new Properties();
         props.setProperty("mail.store.protocol", "imap");
@@ -83,60 +85,57 @@ public class MiscTest extends JqmBaseTest
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
                 "Marsu-Application-nnnnnnnn-nnnnnn-nnnnnnnnnn-nnNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNnn-nnnnnnnnn", null, "Franquin",
-                "ModuleMachin", "other", "other", true, em);
+                "ModuleMachin", "other", "other", true, cnx);
 
         JobRequest j = new JobRequest("Marsu-Application-nnnnnnnn-nnnnnn-nnnnnnnnnn-nnNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNnn-nnnnnnnnn",
                 "TestUser");
         JqmClientFactory.getClient().enqueue(j);
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 
     @Test
     public void testJobWithSystemExit() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.SecExit", "jqm-test-pyl-nodep").expectOk(0).expectNonOk(1).run(this);
+        JqmSimpleTest.create(cnx, "pyl.SecExit", "jqm-test-pyl-nodep").expectOk(0).expectNonOk(1).run(this);
     }
 
     @Test
     public void testJobWithPersistenceUnit() throws Exception
     {
-        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", em,
+        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
-        CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em,
+        CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
 
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip, 42, "jqm-test-em",
-                null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         JobRequest.create("jqm-test-em", "TestUser").submit();
 
         addAndStartEngine();
-        TestHelpers.waitFor(2, 10000, em);
+        TestHelpers.waitFor(2, 10000, cnx);
 
-        List<History> ji = Helpers.getNewDbSession().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
-        Assert.assertEquals(2, ji.size());
-        Assert.assertEquals(State.ENDED, ji.get(0).getState());
-        Assert.assertEquals(State.ENDED, ji.get(1).getState());
+        Assert.assertEquals(2, TestHelpers.getOkCount(cnx));
     }
 
     @Test
     public void testJobWithPersistenceUnitAndEngineApi() throws Exception
     {
-        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", em,
+        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
-        JqmSimpleTest.create(em, "pyl.CompatHibApi", "jqm-test-pyl-hibapi").expectOk(2).run(this);
+        JqmSimpleTest.create(cnx, "pyl.CompatHibApi", "jqm-test-pyl-hibapi").expectOk(2).run(this);
     }
 
     @Test
     public void testJobWithPersistenceUnitAndEngineApiAndXmlParams() throws Exception
     {
-        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", em,
+        CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
-        CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", em,
+        CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
 
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmlstop.xml" });
@@ -145,27 +144,22 @@ public class MiscTest extends JqmBaseTest
         JqmClientFactory.getClient().enqueue(j);
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        List<History> ji = Helpers.getNewDbSession()
-                .createQuery("SELECT j FROM History j WHERE j.jd.applicationName = :myId order by id asc", History.class)
-                .setParameter("myId", "CompatHibApi").getResultList();
-        Assert.assertEquals(1, ji.size());
-        Assert.assertEquals(State.ENDED, ji.get(0).getState());
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
     }
 
     @Test
     public void testRemoteStop() throws Exception
     {
-        Helpers.setSingleParam("internalPollingPeriodMs", "10", em);
+        Helpers.setSingleParam("internalPollingPeriodMs", "10", cnx);
 
         addAndStartEngine();
 
-        em.getTransaction().begin();
-        TestHelpers.node.setStop(true);
-        em.getTransaction().commit();
+        cnx.runUpdate("node_update_stop_by_id", TestHelpers.node.getId());
+        cnx.commit();
 
-        TestHelpers.waitFor(2, 3000, em);
+        TestHelpers.waitFor(2, 3000, cnx);
         Assert.assertFalse(engines.get("localhost").isAllPollersPolling());
         engines.clear();
     }
@@ -173,8 +167,8 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testNoDoubleStart() throws Exception
     {
-        Helpers.setSingleParam("internalPollingPeriodMs", "500", em);
-        Helpers.setSingleParam("disableVerboseStartup", "false", em);
+        Helpers.setSingleParam("internalPollingPeriodMs", "500", cnx);
+        Helpers.setSingleParam("disableVerboseStartup", "false", cnx);
 
         JqmEngine engine1 = new JqmEngine();
         engine1.start("localhost");
@@ -198,70 +192,49 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testStartupCleanupRunning() throws Exception
     {
-        JobDef jd = CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip, 42,
-                "jqm-test-em", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip, 42, "jqm-test-em",
+                null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
-        // Create a running job that should be cleaned at startup
-        em.getTransaction().begin();
-        JobInstance ji = new JobInstance();
-        ji.setApplication("marsu");
-        ji.setAttributionDate(Calendar.getInstance());
-        ji.setCreationDate(Calendar.getInstance());
-        ji.setExecutionDate(Calendar.getInstance());
-        ji.setInternalPosition(0);
-        ji.setJd(jd);
-        ji.setNode(TestHelpers.node);
-        ji.setQueue(TestHelpers.qVip);
-        ji.setState(State.RUNNING);
-        em.persist(ji);
-        em.getTransaction().commit();
+        /// Create a running job that should be cleaned at startup
+        int i1 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+        cnx.runUpdate("debug_jj_update_status_by_id", State.RUNNING, i1);
+        cnx.commit();
 
         addAndStartEngine();
 
-        Assert.assertEquals(0, em.createQuery("SELECT ji FROM JobInstance ji", JobInstance.class).getResultList().size());
-        Assert.assertEquals(1, em.createQuery("SELECT ji FROM History ji", History.class).getResultList().size());
-        Assert.assertEquals(State.CRASHED, em.createQuery("SELECT ji FROM History ji", History.class).getResultList().get(0).getState());
+        Assert.assertEquals(0, TestHelpers.getQueueAllCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getHistoryAllCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
     }
 
     @Test
     public void testStartupCleanupAttr() throws Exception
     {
-        JobDef jd = CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip, 42,
-                "jqm-test-em", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-em/target/test.jar", TestHelpers.qVip, 42, "jqm-test-em",
+                null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
         // Create a running job that should be cleaned at startup
-        em.getTransaction().begin();
-        JobInstance ji = new JobInstance();
-        ji.setApplication("marsu");
-        ji.setAttributionDate(Calendar.getInstance());
-        ji.setCreationDate(Calendar.getInstance());
-        ji.setExecutionDate(Calendar.getInstance());
-        ji.setInternalPosition(0);
-        ji.setJd(jd);
-        ji.setNode(TestHelpers.node);
-        ji.setQueue(TestHelpers.qVip);
-        ji.setState(State.ATTRIBUTED);
-        em.persist(ji);
-        em.getTransaction().commit();
+        int i1 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+        cnx.runUpdate("debug_jj_update_status_by_id", State.ATTRIBUTED, i1);
+        cnx.commit();
 
         addAndStartEngine();
 
-        Assert.assertEquals(0, em.createQuery("SELECT ji FROM JobInstance ji", JobInstance.class).getResultList().size());
-        Assert.assertEquals(1, em.createQuery("SELECT ji FROM History ji", History.class).getResultList().size());
-        Assert.assertEquals(State.CRASHED, em.createQuery("SELECT ji FROM History ji", History.class).getResultList().get(0).getState());
+        Assert.assertEquals(0, TestHelpers.getQueueAllCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getHistoryAllCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
     }
 
     @Test
     public void testQueueWidth() throws Exception
     {
-        CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
-                "jqm-test-kill", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-
         // Only 3 threads
-        em.getTransaction().begin();
-        TestHelpers.dpVip.setNbThread(3);
-        TestHelpers.dpVip.setPollingInterval(1);
-        em.getTransaction().commit();
+        int qId = Queue.create(cnx, "testqueue", "", false);
+        DeploymentParameter.create(cnx, TestHelpers.node.getId(), 3, 1, qId);
+
+        CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", qId, 42, "jqm-test-kill", null,
+                "Franquin", "ModuleMachin", "other", "other", false, cnx);
+        cnx.commit();
 
         int i1 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
         int i2 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
@@ -293,7 +266,7 @@ public class MiscTest extends JqmBaseTest
         JqmClientFactory.getClient().killJob(i4);
         JqmClientFactory.getClient().killJob(i5);
 
-        TestHelpers.waitFor(5, 10000, em);
+        TestHelpers.waitFor(5, 10000, cnx);
         Assert.assertEquals(5, Query.create().addStatusFilter(com.enioka.jqm.api.State.KILLED).run().size());
     }
 
@@ -301,14 +274,12 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testQueuePollWidth() throws Exception
     {
-        CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
-                "jqm-test-kill", null, "Franquin", "ModuleMachin", "other", "other", false, em);
-
         // Only 3 threads, one poll every hour
-        em.getTransaction().begin();
-        TestHelpers.dpVip.setNbThread(3);
-        TestHelpers.dpVip.setPollingInterval(3600000);
-        em.getTransaction().commit();
+        int qId = Queue.create(cnx, "testqueue", "", false);
+        DeploymentParameter.create(cnx, TestHelpers.node.getId(), 3, 3600000, qId);
+
+        CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", qId, 42, "jqm-test-kill", null,
+                "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
         int i1 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
         int i2 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
@@ -340,7 +311,7 @@ public class MiscTest extends JqmBaseTest
         JqmClientFactory.getClient().killJob(i4);
         JqmClientFactory.getClient().killJob(i5);
 
-        TestHelpers.waitFor(5, 10000, em);
+        TestHelpers.waitFor(5, 10000, cnx);
         Assert.assertEquals(5, Query.create().addStatusFilter(com.enioka.jqm.api.State.KILLED).run().size());
     }
 
@@ -350,18 +321,18 @@ public class MiscTest extends JqmBaseTest
         PrintStream out_ini = System.out;
         PrintStream err_ini = System.err;
 
-        Helpers.setSingleParam("logFilePerLaunch", "true", em);
+        Helpers.setSingleParam("logFilePerLaunch", "true", cnx);
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
         int i = JobRequest.create("MarsuApplication", "TestUser").submit();
         addAndStartEngine();
-        TestHelpers.waitFor(1, 20000, em);
+        TestHelpers.waitFor(1, 20000, cnx);
 
         String fileName = StringUtils.leftPad("" + i, 10, "0") + ".stdout.log";
         File f = new File(FilenameUtils.concat(((MultiplexPrintStream) System.out).rootLogDir, fileName));
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
         Assert.assertTrue(f.exists());
 
         System.setErr(err_ini);
@@ -372,11 +343,10 @@ public class MiscTest extends JqmBaseTest
     public void testSingleLauncher() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
         int i = JobRequest.create("MarsuApplication", "TestUser").submit();
-        em.getTransaction().begin();
-        em.createQuery("UPDATE JobInstance ji set ji.node = :n").setParameter("n", TestHelpers.node).executeUpdate();
-        em.getTransaction().commit();
+        cnx.runUpdate("debug_jj_update_node_by_id", i);
+        cnx.commit();
 
         Main.main(new String[] { "-s", String.valueOf(i) });
 
@@ -384,50 +354,49 @@ public class MiscTest extends JqmBaseTest
         LogManager.resetConfiguration();
         PropertyConfigurator.configure("target/classes/log4j.properties");
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 
     @Test
     public void testExternalLaunch() throws Exception
     {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
-        em.getTransaction().begin();
-        em.createQuery("UPDATE JobDef ji set ji.external = true").executeUpdate();
-        em.getTransaction().commit();
+        int jdId = CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip,
+                42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+        JobDef.setExternal(cnx, jdId);
+        cnx.commit();
         JobRequest.create("MarsuApplication", "TestUser").submit();
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 20000, em);
+        TestHelpers.waitFor(1, 20000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 
     @Test
     public void testExternalKill() throws Exception
     {
-        Helpers.setSingleParam("internalPollingPeriodMs", "100", em);
-        int i = JqmSimpleTest.create(em, "pyl.KillMeNot").setExternal().addWaitTime(3000).expectNonOk(0).expectOk(0).run(this);
+        Helpers.setSingleParam("internalPollingPeriodMs", "100", cnx);
+        int i = JqmSimpleTest.create(cnx, "pyl.KillMeNot").setExternal().addWaitTime(3000).expectNonOk(0).expectOk(0).run(this);
 
         JqmClientFactory.getClient().killJob(i);
-        TestHelpers.waitFor(1, 20000, em);
-        Assert.assertEquals(0, TestHelpers.getOkCount(em));
-        Assert.assertEquals(1, TestHelpers.getNonOkCount(em));
+        TestHelpers.waitFor(1, 20000, cnx);
+        Assert.assertEquals(0, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
     }
 
     @Test
     public void testCliChangeUser()
     {
-        Helpers.updateConfiguration(em);
+        Helpers.updateConfiguration(cnx);
         Main.main(new String[] { "-U", "myuser", "mypassword", "administrator", "client" });
 
-        RUser u = em.createQuery("SELECT u FROM RUser u WHERE u.login = :l", RUser.class).setParameter("l", "myuser").getSingleResult();
+        RUser u = RUser.selectlogin(cnx, "myuser");
 
-        Assert.assertEquals(2, u.getRoles().size());
+        Assert.assertEquals(2, u.getRoles(cnx).size());
         boolean admin = false, client = false;
-        for (RRole r : u.getRoles())
+        for (RRole r : u.getRoles(cnx))
         {
             if (r.getName().equals("administrator"))
             {
@@ -441,24 +410,22 @@ public class MiscTest extends JqmBaseTest
         Assert.assertTrue(client && admin);
 
         Main.main(new String[] { "-U", "myuser", "mypassword", "administrator" });
-        em.refresh(u);
-        Assert.assertEquals(1, u.getRoles().size());
+        Assert.assertEquals(1, u.getRoles(cnx).size());
 
         Main.main(new String[] { "-U", "myuser,mypassword,administrator,config admin" });
-        em.refresh(u);
-        Assert.assertEquals(2, u.getRoles().size());
+        Assert.assertEquals(2, u.getRoles(cnx).size());
     }
 
     @Test
     public void testMavenArtifact()
     {
         CreationTools.createJobDef(null, true, "pyl.Nothing", null, "com.enioka.jqm:jqm-test-pyl-nodep:1.3.2", TestHelpers.qVip, 42,
-                "jqm-test-maven", null, "Franquin", "ModuleMachin", "other", "other", false, em, null, false, null, false, PathType.MAVEN);
+                "jqm-test-maven", null, "Franquin", "ModuleMachin", "other", "other", false, cnx, null, false, null, false, PathType.MAVEN);
         JobRequest.create("jqm-test-maven", null).submit();
         addAndStartEngine();
 
-        TestHelpers.waitFor(1, 10000, em);
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        TestHelpers.waitFor(1, 10000, cnx);
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 }

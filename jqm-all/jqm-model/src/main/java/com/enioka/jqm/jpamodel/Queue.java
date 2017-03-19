@@ -32,7 +32,7 @@ public class Queue implements Serializable
 {
     private static final long serialVersionUID = 4677042929807285233L;
 
-    private int id;
+    private Integer id = null;
 
     private String name;
     private String description;
@@ -127,14 +127,32 @@ public class Queue implements Serializable
     /**
      * Create a new entry in the database. No commit performed.
      */
-    public static Queue create(DbConn cnx, String name, String description, boolean defaultQ)
+    public static Integer create(DbConn cnx, String name, String description, boolean defaultQ)
     {
         QueryResult r = cnx.runUpdate("q_insert", defaultQ, name, description);
         Queue res = new Queue();
         res.id = r.getGeneratedId();
         res.name = name;
         res.description = description;
-        return res;
+        res.defaultQueue = defaultQ;
+        return res.id;
+    }
+
+    static Queue map(ResultSet rs, int colShift)
+    {
+        try
+        {
+            Queue tmp = new Queue();
+            tmp.id = rs.getInt(1 + colShift);
+            tmp.defaultQueue = rs.getBoolean(2 + colShift);
+            tmp.description = rs.getString(3 + colShift);
+            tmp.name = rs.getString(4 + colShift);
+            return tmp;
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
     }
 
     public static List<Queue> select(DbConn cnx, String query_key, Object... args)
@@ -145,12 +163,7 @@ public class Queue implements Serializable
             ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
-                Queue tmp = new Queue();
-
-                tmp.id = rs.getInt(1);
-                tmp.defaultQueue = rs.getBoolean(2);
-                tmp.description = rs.getString(3);
-
+                Queue tmp = map(rs, 0);
                 res.add(tmp);
             }
         }
@@ -159,5 +172,32 @@ public class Queue implements Serializable
             throw new DatabaseException(e);
         }
         return res;
+    }
+
+    public static Queue select_key(DbConn cnx, String name)
+    {
+        List<Queue> res = select(cnx, "q_select_by_key", name);
+        if (res.isEmpty())
+        {
+            throw new DatabaseException("no result for query by key for key " + name);
+        }
+        if (res.size() > 1)
+        {
+            throw new DatabaseException("Inconsistent database! Multiple results for query by key for key " + name);
+        }
+        return res.get(0);
+    }
+
+    public void update(DbConn cnx)
+    {
+        if (this.id == null)
+        {
+            create(cnx, name, description, defaultQueue);
+        }
+        else
+        {
+            cnx.runUpdate("q_update_all_fields_by_id", defaultQueue, description, name, id);
+        }
+
     }
 }

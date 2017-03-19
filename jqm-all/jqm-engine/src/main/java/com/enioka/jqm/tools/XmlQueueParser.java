@@ -20,7 +20,6 @@ package com.enioka.jqm.tools;
 
 import java.io.File;
 
-import javax.persistence.EntityManager;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -29,7 +28,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.enioka.jqm.jpamodel.JobDef;
+import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jpamodel.Queue;
 
 class XmlQueueParser
@@ -41,7 +40,7 @@ class XmlQueueParser
         // Utility class.
     }
 
-    static void parse(String path, EntityManager em) throws JqmEngineException
+    static void parse(String path, DbConn cnx) throws JqmEngineException
     {
         // Argument checks
         jqmlogger.trace(path);
@@ -49,9 +48,9 @@ class XmlQueueParser
         {
             throw new IllegalArgumentException("XML file path cannot be empty");
         }
-        if (em == null)
+        if (cnx == null)
         {
-            throw new IllegalArgumentException("EntityManager cannot be null");
+            throw new IllegalArgumentException("Database connection cannot be null");
         }
         File f = new File(path);
         if (f == null || !f.isFile() || !f.canRead())
@@ -76,11 +75,10 @@ class XmlQueueParser
             for (int qIndex = 0; qIndex < qList.getLength(); qIndex++)
             {
                 Element qElement = (Element) qList.item(qIndex);
-                em.getTransaction().begin();
 
                 // Insert or update?
                 String qName = qElement.getElementsByTagName("name").item(0).getTextContent();
-                q = Helpers.findQueue(qName, em);
+                q = Helpers.findQueue(qName, cnx);
                 if (q == null)
                 {
                     q = new Queue();
@@ -95,24 +93,19 @@ class XmlQueueParser
                 }
 
                 // We now merge & commit - we will need to reference the queue in the next paragraph.
-                q = em.merge(q);
-                em.getTransaction().commit();
+                q.update(cnx);
+                cnx.commit();
 
                 // Applications that should use this queue
-                em.getTransaction().begin();
                 NodeList appList = qElement.getElementsByTagName("applicationName");
                 for (int appIndex = 0; appIndex < appList.getLength(); appIndex++)
                 {
                     Element appElement = (Element) appList.item(appIndex);
-
-                    jqmlogger.debug("Default queue of the job " + appElement.getTextContent() + " must be changed");
-                    JobDef jd = Helpers.findJobDef(appElement.getTextContent(), em);
-                    if (jd != null)
-                    {
-                        jd.setQueue(q);
-                    }
+                    String appName = appElement.getTextContent();
+                    jqmlogger.debug("Default queue of the job " + appName + " must be changed");
+                    cnx.runUpdate("jd_update_set_queue_by_key", q.getId(), appName);
                 }
-                em.getTransaction().commit();
+                cnx.commit();
             }
         }
         catch (Exception e)

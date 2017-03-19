@@ -5,8 +5,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.jboss.shrinkwrap.resolver.api.maven.ConfigurableMavenResolverSystem;
@@ -14,6 +12,7 @@ import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenRemoteRepositories;
 import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenUpdatePolicy;
 
+import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 
@@ -21,13 +20,13 @@ public class LibraryResolverMaven
 {
     private static Logger jqmlogger = Logger.getLogger(LibraryResolverMaven.class);
 
-    URL[] resolve(JobInstance ji, EntityManager em) throws JqmPayloadException
+    URL[] resolve(JobInstance ji, DbConn cnx) throws JqmPayloadException
     {
-        ConfigurableMavenResolverSystem resolver = getMavenResolver(em);
+        ConfigurableMavenResolverSystem resolver = getMavenResolver(cnx);
 
         try
         {
-            return extractMavenResults(resolver.resolve(ji.getJd().getJarPath()).withTransitivity().asFile());
+            return extractMavenResults(resolver.resolve(ji.getJD().getJarPath()).withTransitivity().asFile());
         }
         catch (JqmPayloadException e)
         {
@@ -40,28 +39,25 @@ public class LibraryResolverMaven
 
     }
 
-    static ConfigurableMavenResolverSystem getMavenResolver(EntityManager em)
+    static ConfigurableMavenResolverSystem getMavenResolver(DbConn cnx)
     {
         // Retrieve resolver configuration
-        List<GlobalParameter> repolist = em.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :repo", GlobalParameter.class)
-                .setParameter("repo", "mavenRepo").getResultList();
-        List<GlobalParameter> settings = em.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :k", GlobalParameter.class)
-                .setParameter("k", "mavenSettingsCL").getResultList();
-        List<GlobalParameter> settingFiles = em.createQuery("SELECT gp FROM GlobalParameter gp WHERE gp.key = :k", GlobalParameter.class)
-                .setParameter("k", "mavenSettingsFile").getResultList();
+        List<GlobalParameter> repolist = GlobalParameter.select(cnx, "mavenRepo");
+        String settings = GlobalParameter.getParameter(cnx, "mavenSettingsCL", null);
+        String settingsFile = GlobalParameter.getParameter(cnx, "mavenSettingsFile", null);
 
         boolean withCentral = false;
         String withCustomSettings = null;
         String withCustomSettingsFile = null;
-        if (settings.size() == 1 && settingFiles.isEmpty())
+        if (settings != null && settingsFile == null)
         {
-            jqmlogger.trace("Custom settings file will be used: " + settings.get(0).getValue());
-            withCustomSettings = settings.get(0).getValue();
+            jqmlogger.trace("Custom settings file will be used: " + settings);
+            withCustomSettings = settings;
         }
-        if (settingFiles.size() == 1)
+        if (settingsFile != null)
         {
-            jqmlogger.trace("Custom settings file will be used: " + settingFiles.get(0).getValue());
-            withCustomSettingsFile = settingFiles.get(0).getValue();
+            jqmlogger.trace("Custom settings file will be used: " + settingsFile);
+            withCustomSettingsFile = settingsFile;
         }
 
         // Configure resolver

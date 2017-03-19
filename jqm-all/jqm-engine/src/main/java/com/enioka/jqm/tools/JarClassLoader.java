@@ -110,7 +110,7 @@ class JarClassLoader extends URLClassLoader
         this.prms = parameters;
 
         // 1st: load the class
-        String classQualifiedName = job.getJd().getJavaClassName();
+        String classQualifiedName = job.getJD().getJavaClassName();
         jqmlogger.debug("Will now load class: " + classQualifiedName);
 
         Class c = null;
@@ -473,15 +473,18 @@ class JarClassLoader extends URLClassLoader
         this.tracing = tracing;
     }
 
-    public void setReferenceJobDefName(String referenceJobDefName) {
+    public void setReferenceJobDefName(String referenceJobDefName)
+    {
         this.referenceJobDefName = referenceJobDefName;
     }
 
-    public String getReferenceJobDefName() {
+    public String getReferenceJobDefName()
+    {
         return referenceJobDefName;
     }
 
-    public String getHiddenJavaClasses() {
+    public String getHiddenJavaClasses()
+    {
         return hiddenJavaClasses;
     }
 }

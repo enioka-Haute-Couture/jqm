@@ -20,6 +20,8 @@ package com.enioka.jqm.jpamodel;
 
 import java.io.Serializable;
 
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.QueryResult;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
@@ -84,5 +86,15 @@ public class Message implements Serializable
     public void setJi(int ji)
     {
         this.ji = ji;
+    }
+
+    /**
+     * Create a new entry in the database. No commit performed.
+     */
+    public static int create(DbConn cnx, String textMessage, Integer jobId)
+    {
+        QueryResult r = cnx.runUpdate("message_insert", jobId, textMessage);
+
+        return r.getGeneratedId();
     }
 }

@@ -49,14 +49,35 @@ public class Db
 
     private void initQueries()
     {
-        // TODO: ResourceParser should be used to load the JNDI properties and extract the parameters.
+        Connection tmp = null;
+        String product;
+        try
+        {
+            tmp = _ds.getConnection();
+            product = tmp.getMetaData().getDatabaseProductName().toLowerCase();
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException("Cannot connect to the database", e);
+        }
+        finally
+        {
+            try
+            {
+                tmp.close();
+            }
+            catch (SQLException e)
+            {
+                // Nothing to do.
+            }
+        }
 
-        String cn = this._ds.getClass().getCanonicalName().toLowerCase();
-        if (cn.contains("oracle"))
+        System.out.println(product);
+        if (product.contains("oracle"))
         {
             _queries = DbImplOracle.getQueries();
         }
-        else if (cn.contains("hsqldb"))
+        else if (product.contains("hsql"))
         {
             _queries = DbImplHsql.getQueries();
         }
