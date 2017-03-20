@@ -70,6 +70,7 @@ final class ResourceParser
         DbConn cnx = null;
         try
         {
+            cnx = Helpers.getNewDbSession();
             resource = JndiObjectResource.select_alias(cnx, alias);
 
             JndiResourceDescriptor d = new JndiResourceDescriptor(resource.getType(), resource.getDescription(), null, resource.getAuth(),

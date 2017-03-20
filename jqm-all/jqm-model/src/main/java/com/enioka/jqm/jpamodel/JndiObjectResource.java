@@ -177,11 +177,10 @@ public class JndiObjectResource implements Serializable
             while (rs.next())
             {
                 tmp = new JndiObjectResourceParameter();
-                tmp.setId(rs.getInt(0));
-                tmp.setKey(rs.getString(1));
-                Calendar tmpc = Calendar.getInstance();
-                tmpc.setTimeInMillis(rs.getTimestamp(2).getTime());
-                tmp.setLastModified(tmpc);
+                tmp.setId(rs.getInt(1));
+                tmp.setKey(rs.getString(2));
+                tmp.setLastModified(cnx.getCal(rs, 3));
+                tmp.setValue(rs.getString(4));
 
                 res.add(tmp);
             }
@@ -255,10 +254,7 @@ public class JndiObjectResource implements Serializable
                 tmp.description = rs.getString(6);
                 tmp.template = rs.getString(7);
                 tmp.singleton = rs.getBoolean(8);
-
-                Calendar c = Calendar.getInstance();
-                c.setTimeInMillis(rs.getTimestamp(9).getTime());
-                tmp.lastModified = c;
+                tmp.lastModified = cnx.getCal(rs, 9);
 
                 res.add(tmp);
             }

@@ -173,7 +173,7 @@ public class DbImplBase
         queries.put("jndi_delete_all", "DELETE FROM JNDIOBJECTRESOURCE");
         queries.put("jndi_select_count_for_key", "SELECT COUNT(1) FROM JNDIOBJECTRESOURCE WHERE NAME=?");
         queries.put("jndi_select_count_changed", "SELECT COUNT(1) FROM JNDIOBJECTRESOURCE r RIGHT JOIN JNDIOBJECTRESOURCEPARAMETER p ON p.RESOURCE_ID = r.ID WHERE r.LASTMODIFIED > ? OR p.LASTMODIFIED > ?");
-        queries.put("jndi_select_all", "SELECT ID, NAME, AUTH, TYPE, FACTORY, DESCRIPTION, TEMPLATE, SINGLETON LASTMODIFIED FROM JNDIOBJECTRESOURCE");
+        queries.put("jndi_select_all", "SELECT ID, NAME, AUTH, TYPE, FACTORY, DESCRIPTION, TEMPLATE, SINGLETON, LASTMODIFIED FROM JNDIOBJECTRESOURCE");
         queries.put("jndi_select_by_key", queries.get("jndi_select_all") + " WHERE NAME=?");
         
         // JNDI PRM

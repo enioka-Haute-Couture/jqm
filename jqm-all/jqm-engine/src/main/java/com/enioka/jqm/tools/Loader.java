@@ -163,6 +163,7 @@ class Loader implements Runnable, LoaderMBean
                 // This means the JI has been killed or has disappeared.
                 return;
             }
+            cnx.commit();
 
             jobClassLoader = this.clm.getClassloader(job, cnx);
         }
