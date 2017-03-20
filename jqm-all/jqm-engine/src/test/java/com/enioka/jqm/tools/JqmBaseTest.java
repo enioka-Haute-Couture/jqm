@@ -87,6 +87,7 @@ public class JqmBaseTest
         cnx = getNewDbSession();
         TestHelpers.cleanup(cnx);
         TestHelpers.createTestData(cnx);
+        cnx.commit();
     }
 
     @After

@@ -130,7 +130,7 @@ class Loader implements Runnable, LoaderMBean
         try
         {
             cnx = Helpers.getNewDbSession();
-            this.node = Node.select(cnx, "node_select_by_id", job.getNode()).get(0);
+            this.node = Node.select(cnx, "node_select_by_id", job.getNode().getId()).get(0);
 
             // Log
             this.resultStatus = State.SUBMITTED;

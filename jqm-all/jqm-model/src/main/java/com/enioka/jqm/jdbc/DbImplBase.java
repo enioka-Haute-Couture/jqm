@@ -58,7 +58,7 @@ public class DbImplBase
                 + "CLASSLOADERTRACING, DESCRIPTION, ENABLED, EXTERNAL, HIDDENJAVACLASSES, HIGHLANDER, "
                 + "JARPATH, JAVACLASSNAME, JAVA_OPTS, KEYWORD1, KEYWORD2, KEYWORD3, MAXTIMERUNNING, "
                 + "MODULE, PATHTYPE, SPECIFICISOLATIONCONTEXT, QUEUE_ID) "
-                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
+                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         queries.put("jd_delete_all", "DELETE FROM JOBDEF");
         queries.put("jd_update_all_fields_by_id", "UPDATE JOBDEF SET APPLICATION=?, APPLICATIONNAME=?, CHILDFIRSTCLASSLOADER=?, "
                 + "CLASSLOADERTRACING=?, DESCRIPTION=?, ENABLED=?, EXTERNAL=?, HIDDENJAVACLASSES=?, HIGHLANDER=?, "
@@ -84,8 +84,8 @@ public class DbImplBase
         // JOB INSTANCE
         queries.put("ji_insert_enqueue", "INSERT INTO JOBINSTANCE (CREATIONDATE, SENDEMAIL, APPLICATION, "
                 + "KEYWORD1, KEYWORD2, KEYWORD3, MODULE, INTERNALPOSITION, PARENTID, PROGRESS, SESSIONID, "
-                + "STATE, USERNAME, JD_ID, QUEUE_ID FROM JOBINSTANCE) "
-                + "VALUES(CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, UNIX_MILLIS, ?, 0, ?, 'SUBMITTED', ?, ?, ?)");
+                + "STATE, USERNAME, JD_ID, QUEUE_ID) "
+                + "VALUES(CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, UNIX_MILLIS(), ?, 0, ?, 'SUBMITTED', ?, ?, ?)");
         queries.put("ji_delete_all", "DELETE FROM JOBINSTANCE");
         queries.put("ji_delete_by_id", "DELETE FROM JOBINSTANCE WHERE ID = ?");
         queries.put("jj_update_cancel_by_id", "UPDATE JOBINSTANCE SET STATE='CANCELLED' WHERE ID=? AND STATE='SUBMITTED'");
@@ -101,15 +101,15 @@ public class DbImplBase
         queries.put("ji_select_current_pos", "SELECT COUNT(ji) FROM %1$sJobInstance ji WHERE ji.internalPosition < ? AND ji.state = 'SUBMITTED' AND QUEUE_ID=?");
         queries.put("ji_select_count_all", "SELECT COUNT(1) FROM JobInstance");
         queries.put("ji_select_count_running", "SELECT COUNT(1) FROM JobInstance WHERE STATE='RUNNING'");
-        queries.put("ji_select_all", "SELECT ID, ATTRIBUTIONDATE, CREATIONDATE, SENDEMAIL, EXECUTiONDATE, APPLICATION, KEYWORD1, KEYWORD2, "
-                + "KEYWORD3, MODULE, INTERNALPOSITION, PARENTID, PROGRESS, SESSIONID, STATE, USERNAME, JD_ID, NODE_ID, QUEUE_ID , "
+        queries.put("ji_select_all", "SELECT ID, ATTRIBUTIONDATE, CREATIONDATE, SENDEMAIL, EXECUTIONDATE, APPLICATION, KEYWORD1, KEYWORD2, "
+                + "KEYWORD3, MODULE, INTERNALPOSITION, PARENTID, PROGRESS, SESSIONID, STATE, USERNAME, JD_ID, NODE_ID, QUEUE_ID , HIGHLANDER, "
                 + "q.ID, q.DEFAULTQUEUE, q.DESCRIPTION, q.NAME, "
                 + "jd.ID, jd.APPLICATION, jd.APPLICATIONNAME, jd.CHILDFIRSTCLASSLOADER, "
                 + "jd.CLASSLOADERTRACING, jd.DESCRIPTION, jd.ENABLED, jd.EXTERNAL, jd.HIDDENJAVACLASSES, jd.HIGHLANDER, "
                 + "jd.JARPATH, jd.JAVACLASSNAME, jd.JAVA_OPTS, jd.KEYWORD1, jd.KEYWORD2, jd.KEYWORD3, jd.MAXTIMERUNNING, "
-                + "jd.MODULE, jd.PATHTYPE, jd.SPECIFICISOLATIONCONTEXT, jd.QUEUE_ID "
+                + "jd.MODULE, jd.PATHTYPE, jd.SPECIFICISOLATIONCONTEXT, jd.QUEUE_ID, "
                 + "n.ID, n.DLREPO, n.DNS, n.ENABLED, n.EXPORTREPO, n.JMXREGISTRYPORT, n.JMXSERVERPORT, "
-                + "n.LOADAPIADMIN, n.LOADAPICLIENT, n.LOAPAPISIMPLE, n.NODENAME, n.PORT, n.REPO, n.ROOTLOGLEVEL, n.STOP, n.TMPDIRECTORY "
+                + "n.LOADAPIADMIN, n.LOADAPICLIENT, n.LOAPAPISIMPLE, n.NODENAME, n.PORT, n.REPO, n.ROOTLOGLEVEL, n.STOP, n.TMPDIRECTORY, n.LASTSEENALIVE "
                 + "FROM JOBINSTANCE ji LEFT JOIN QUEUE q ON ji.QUEUE_ID=q.ID LEFT JOIN JOBDEF jd ON ji.JD_ID=jd.ID LEFT JOIN NODE n ON ji.NODE_ID=n.ID ");
         queries.put("ji_select_by_id", queries.get("ji_select_all") + " WHERE ID=?");
         queries.put("ji_select_by_queue", queries.get("ji_select_all") + " WHERE QUEUE_ID=? ORDER BY INTERNALPOSITION");
@@ -123,6 +123,9 @@ public class DbImplBase
         queries.put("ji_update_poll", "UPDATE JOBINSTANCE j1 SET j1.NODE_ID=?, j1.STATE='ATTRIBUTED', ATTRIBUTIONDATE=CURRENT_TIMESTAMP WHERE j1.ID IN "
                 + "(SELECT j2.ID FROM JOBINSTANCE j2 WHERE j2.STATE='SUBMITTED' AND j2.QUEUE_ID=? "
                 + "AND (j2.HIGHLANDER=0 OR (j2.HIGHLANDER=1 AND (SELECT COUNT(1) FROM JOBINSTANCE j3 WHERE j3.STATE IN ('ATTRIBUTED', 'RUNNING') AND j3.JD_ID=j2.JD_ID)=0 )) ORDER BY INTERNALPOSITION LIMIT ?)");
+        queries.put("ji_update_poll", "UPDATE JOBINSTANCE j1 SET j1.NODE_ID=?, j1.STATE='ATTRIBUTED', ATTRIBUTIONDATE=CURRENT_TIMESTAMP WHERE j1.ID IN "
+                + "(SELECT j2.ID FROM JOBINSTANCE j2 WHERE j2.STATE='SUBMITTED' AND j2.QUEUE_ID=? "
+                + " ORDER BY INTERNALPOSITION LIMIT ?)");
         queries.put("ji_select_to_run", queries.get("ji_select_all") + " WHERE NODE_ID = ? AND QUEUE_ID = ? AND STATE='ATTRIBUTED'");
         
         // HISTORY
@@ -131,7 +134,7 @@ public class DbImplBase
                 + "INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, KEYWORD1, KEYWORD2, KEYWORD3, MODULE, "
                 + "NODENAME, PARENT_JOB_ID, PROGRESS, QUEUE_NAME, RETURN_CODE, SESSION_ID, STATUS, USERNAME, JOBDEF_ID, "
                 + "NODE_ID, QUEUE_ID) "
-                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         queries.put("history_insert", queries.get("history_insert_with_end_date").replace("(?, ?, ?, ?, ?, ?",  "(?, ?, ?, ?, ?, CURRENT_TIMESTAMP"));
         
         queries.put("history_delete_all", "DELETE FROM HISTORY");
@@ -154,14 +157,16 @@ public class DbImplBase
         
         // RUNTIME PRM
         queries.put("jiprm_insert", "INSERT INTO RUNTIMEPARAMETER(JI_ID, KEYNAME, VALUE) VALUES(?, ?, ?)");
-        queries.put("jiprm_delete_all", "DELETE FROM RUNTIMEPARAMETER");
+        queries.put("jiprm_delete_all", "DELETE FROM RUNTIMEPARAMETER ");
         queries.put("jiprm_delete_by_ji",queries.get("jiprm_delete_all") + " WHERE JI_ID=?");
-        queries.put("jiprm_select_by_ji", "SELECT ID, JI_ID, KEYNAME, VALUE RUNTIMEPARAMETER WHERE JI_ID=?");
+        queries.put("jiprm_select_by_ji", "SELECT ID, JI_ID, KEYNAME, VALUE FROM RUNTIMEPARAMETER WHERE JI_ID=?");
+        queries.put("jiprm_select_by_ji_list", "SELECT ID, JI_ID, KEYNAME, VALUE FROM RUNTIMEPARAMETER WHERE JI_ID IN (?)");
         
         // MESSAGE
         queries.put("message_insert",  "INSERT INTO MESSAGE(JI, TEXT_MESSAGE) VALUES(?, ?)");
         queries.put("message_delete_all", "DELETE FROM MESSAGE");
         queries.put("message_delete_by_ji",queries.get("message_delete_all") + " WHERE JI=?");
+        queries.put("message_select_by_ji_list","SELECT ID, JI, TEXT_MESSAGE FROM MESSAGE WHERE JI IN (?)");
         
         // JNDI
         queries.put("jndi_insert", "INSERT INTO JNDIOBJECTRESOURCE(AUTH, DESCRIPTION, FACTORY, LASTMODIFIED, NAME, SINGLETON, TEMPLATE, TYPE) VALUES('CONTAINER', ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?)");

@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.Calendar;
 
 public class DbConn implements Closeable
 {
@@ -91,6 +92,30 @@ public class DbConn implements Closeable
             }
         }
 
+    }
+
+    public ResultSet runRawSelect(String rawQuery, Object... params)
+    {
+        PreparedStatement ps = null;
+        try
+        {
+            ps = _cnx.prepareStatement(rawQuery, ResultSet.TYPE_FORWARD_ONLY);
+            int i = 0;
+            for (Object prm : params)
+            {
+                addParameter(prm, ++i, ps);
+            }
+
+            return ps.executeQuery();
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        finally
+        {
+            closeQuietly(ps);
+        }
     }
 
     public ResultSet runSelect(String query_key, Object... params)
@@ -276,10 +301,23 @@ public class DbConn implements Closeable
                 s.setTime(position, (Time) value);
             else if (Boolean.class == value.getClass())
                 s.setBoolean(position, (Boolean) value);
+            else if (value instanceof Calendar)
+                s.setTimestamp(position, new Timestamp(((Calendar) value).getTimeInMillis()));
         }
         catch (SQLException e)
         {
             throw new DatabaseException(e);
         }
+    }
+
+    public Calendar getCal(ResultSet rs, int colIdx) throws SQLException
+    {
+        Calendar c = null;
+        if (rs.getTimestamp(colIdx) != null)
+        {
+            c = Calendar.getInstance();
+            c.setTimeInMillis(rs.getTimestamp(colIdx).getTime());
+        }
+        return c;
     }
 }

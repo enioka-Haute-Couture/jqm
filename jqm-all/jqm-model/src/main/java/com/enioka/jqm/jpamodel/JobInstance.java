@@ -411,20 +411,10 @@ public class JobInstance implements Serializable
 
                 tmp.id = rs.getInt(1);
 
-                Calendar c1 = Calendar.getInstance();
-                c1.setTimeInMillis(rs.getTimestamp(2).getTime());
-                tmp.attributionDate = c1;
-
-                Calendar c2 = Calendar.getInstance();
-                c2.setTimeInMillis(rs.getTimestamp(3).getTime());
-                tmp.creationDate = c2;
-
+                tmp.attributionDate = cnx.getCal(rs, 2);
+                tmp.creationDate = cnx.getCal(rs, 3);
                 tmp.email = rs.getString(4);
-
-                Calendar c3 = Calendar.getInstance();
-                c3.setTimeInMillis(rs.getTimestamp(5).getTime());
-                tmp.executionDate = c3;
-
+                tmp.executionDate = cnx.getCal(rs, 5);
                 tmp.instanceApplication = rs.getString(6);
                 tmp.instanceKeyword1 = rs.getString(7);
                 tmp.instanceKeyword2 = rs.getString(8);
@@ -492,6 +482,6 @@ public class JobInstance implements Serializable
             RuntimeParameter.create(cnx, newId, prm.getKey(), prm.getValue());
         }
 
-        return qr.getGeneratedId();
+        return newId;
     }
 }

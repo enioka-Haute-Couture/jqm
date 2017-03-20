@@ -42,7 +42,7 @@ public class LibraryResolverMaven
     static ConfigurableMavenResolverSystem getMavenResolver(DbConn cnx)
     {
         // Retrieve resolver configuration
-        List<GlobalParameter> repolist = GlobalParameter.select(cnx, "mavenRepo");
+        List<GlobalParameter> repolist = GlobalParameter.select(cnx, "globalprm_select_by_key", "mavenRepo");
         String settings = GlobalParameter.getParameter(cnx, "mavenSettingsCL", null);
         String settingsFile = GlobalParameter.getParameter(cnx, "mavenSettingsFile", null);
 

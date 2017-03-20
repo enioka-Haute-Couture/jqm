@@ -490,16 +490,19 @@ public class JobDef implements Serializable
             tmp.description = rs.getString(6 + colShift);
             tmp.enabled = rs.getBoolean(7 + colShift);
             tmp.external = rs.getBoolean(8 + colShift);
-            tmp.jarPath = rs.getString(9 + colShift);
-            tmp.javaClassName = rs.getString(10 + colShift);
-            tmp.javaOpts = rs.getString(11 + colShift);
-            tmp.keyword1 = rs.getString(12 + colShift);
-            tmp.keyword2 = rs.getString(13 + colShift);
-            tmp.keyword3 = rs.getString(14 + colShift);
-            tmp.maxTimeRunning = rs.getInt(15 + colShift);
-            tmp.pathType = PathType.valueOf(rs.getString(16 + colShift));
-            tmp.specificIsolationContext = rs.getString(17 + colShift);
-            tmp.queue_id = rs.getInt(18 + colShift);
+            tmp.hiddenJavaClasses = rs.getString(9 + colShift);
+            tmp.highlander = rs.getBoolean(10 + colShift);
+            tmp.jarPath = rs.getString(11 + colShift);
+            tmp.javaClassName = rs.getString(12 + colShift);
+            tmp.javaOpts = rs.getString(13 + colShift);
+            tmp.keyword1 = rs.getString(14 + colShift);
+            tmp.keyword2 = rs.getString(15 + colShift);
+            tmp.keyword3 = rs.getString(16 + colShift);
+            tmp.maxTimeRunning = rs.getInt(17 + colShift);
+            tmp.module = rs.getString(18 + colShift);
+            tmp.pathType = PathType.valueOf(rs.getString(19 + colShift));
+            tmp.specificIsolationContext = rs.getString(20 + colShift);
+            tmp.queue_id = rs.getInt(21 + colShift);
         }
         catch (SQLException e)
         {
@@ -517,27 +520,6 @@ public class JobDef implements Serializable
             while (rs.next())
             {
                 JobDef tmp = map(rs, 0);
-
-                tmp.id = rs.getInt(0);
-                tmp.application = rs.getString(1);
-                tmp.applicationName = rs.getString(2);
-                tmp.canBeRestarted = true;
-                tmp.childFirstClassLoader = rs.getBoolean(3);
-                tmp.classLoaderTracing = rs.getBoolean(4);
-                tmp.description = rs.getString(5);
-                tmp.enabled = rs.getBoolean(6);
-                tmp.external = rs.getBoolean(7);
-                tmp.jarPath = rs.getString(8);
-                tmp.javaClassName = rs.getString(9);
-                tmp.javaOpts = rs.getString(10);
-                tmp.keyword1 = rs.getString(11);
-                tmp.keyword2 = rs.getString(12);
-                tmp.keyword3 = rs.getString(13);
-                tmp.maxTimeRunning = rs.getInt(14);
-                tmp.pathType = PathType.valueOf(rs.getString(15));
-                tmp.specificIsolationContext = rs.getString(16);
-                tmp.queue_id = rs.getInt(17);
-
                 res.add(tmp);
             }
 

@@ -575,22 +575,21 @@ public class History implements Serializable
         Node n = ji.getNode();
         Queue q = ji.getQ();
 
-        // TODO: applicationname == instance application => remove one.
         if (endDate == null)
         {
             cnx.runUpdate("history_insert", ji.getId(), jd.getApplication(), jd.getApplication(), ji.getAttributionDate(), ji.getEmail(),
                     ji.getCreationDate(), ji.getExecutionDate(), jd.isHighlander(), ji.getApplication(), ji.getKeyword1(), ji.getKeyword2(),
                     ji.getKeyword3(), ji.getModule(), jd.getKeyword1(), jd.getKeyword2(), jd.getKeyword3(), jd.getModule(), n.getName(),
-                    ji.getParentId(), ji.getProgress(), q.getName(), 0, ji.getSessionID(), finalState, ji.getUserName(), ji.getJd(),
-                    ji.getNode(), ji.getQueue());
+                    ji.getParentId(), ji.getProgress(), q.getName(), 0, ji.getSessionID(), finalState.toString(), ji.getUserName(),
+                    ji.getJd(), ji.getNode().getId(), ji.getQueue());
         }
         else
         {
-            cnx.runUpdate("history_insert_with_end_date", ji.getId(), jd.getApplication(), jd.getApplication(), ji.getAttributionDate(),
+            cnx.runUpdate("history_insert_with_end_date", ji.getId(), jd.getApplication(), jd.getApplicationName(), ji.getAttributionDate(),
                     ji.getEmail(), endDate, ji.getCreationDate(), ji.getExecutionDate(), jd.isHighlander(), ji.getApplication(),
                     ji.getKeyword1(), ji.getKeyword2(), ji.getKeyword3(), ji.getModule(), jd.getKeyword1(), jd.getKeyword2(),
                     jd.getKeyword3(), jd.getModule(), n.getName(), ji.getParentId(), ji.getProgress(), q.getName(), 0, ji.getSessionID(),
-                    finalState, ji.getUserName(), ji.getJd(), ji.getNode(), ji.getQueue());
+                    finalState.toString(), ji.getUserName(), ji.getJd(), ji.getNode().getId(), ji.getQueue());
         }
     }
 

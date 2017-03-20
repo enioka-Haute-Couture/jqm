@@ -171,14 +171,19 @@ public class CreationTools
         // TODO: change the prm list by a string map.
 
         Map<String, String> prms = new HashMap<String, String>();
-        for (JobDefParameter p : jps)
+        if (jps != null)
         {
-            prms.put(p.getKey(), p.getValue());
+            for (JobDefParameter p : jps)
+            {
+                prms.put(p.getKey(), p.getValue());
+            }
         }
 
-        return JobDef.create(cnx, description, javaClassName, prms, jp, queueId, maxTimeRunning, applicationName, application, module,
+        int i = JobDef.create(cnx, description, javaClassName, prms, jp, queueId, maxTimeRunning, applicationName, application, module,
                 keyword1, keyword2, keyword3, highlander, specificIsolationContext, childFirstClassLoader, hiddenJavaClasses,
                 classLoaderTracing, pathType);
+        cnx.commit();
+        return i;
     }
 
     // ------------------ DATABASEPROP --------------------------------

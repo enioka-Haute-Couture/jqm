@@ -35,6 +35,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -59,6 +60,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.api.Query.Sort;
+import com.enioka.jqm.api.Query.SortSpec;
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
@@ -756,7 +758,7 @@ final class HibernateClient implements JqmClient
     // Job queries
     // /////////////////////////////////////////////////////////////////////
 
-    private String getStringPredicate(String fieldName, String filterValue, Map<String, Object> prms)
+    private String getStringPredicate(String fieldName, String filterValue, List<Object> prms)
     {
         if (filterValue == null)
         {
@@ -766,7 +768,7 @@ final class HibernateClient implements JqmClient
     }
 
     // GetJob helper - String predicates are all created the same way, so this factors some code.
-    private String getStringPredicate(String fieldName, List<String> filterValues, Map<String, Object> prms)
+    private String getStringPredicate(String fieldName, List<String> filterValues, List<Object> prms)
     {
         if (filterValues != null && !filterValues.isEmpty())
         {
@@ -780,19 +782,19 @@ final class HibernateClient implements JqmClient
                 if (!filterValue.isEmpty())
                 {
                     String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1] + System.identityHashCode(filterValue);
-                    prms.put(prmName, filterValue);
+                    prms.add(filterValue);
                     if (filterValue.contains("%"))
                     {
-                        res += String.format("(h.%s LIKE :%s) OR ", fieldName, prmName);
+                        res += String.format("(%s LIKE ?) OR ", fieldName);
                     }
                     else
                     {
-                        res += String.format("(h.%s = :%s) OR ", fieldName, prmName);
+                        res += String.format("(%s = ?) OR ", fieldName);
                     }
                 }
                 else
                 {
-                    res += String.format("(h.%s IS NULL OR h.%s = '') OR ", fieldName, fieldName);
+                    res += String.format("(%s IS NULL OR %s = '') OR ", fieldName, fieldName);
                 }
             }
             if (!res.isEmpty())
@@ -804,31 +806,31 @@ final class HibernateClient implements JqmClient
         return "";
     }
 
-    private String getIntPredicate(String fieldName, Integer filterValue, Map<String, Object> prms)
+    private String getIntPredicate(String fieldName, Integer filterValue, List<Object> prms)
     {
         if (filterValue != null)
         {
             if (filterValue != -1)
             {
                 String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1];
-                prms.put(prmName, filterValue);
-                return String.format("AND (h.%s = :%s) ", fieldName, prmName);
+                prms.add(filterValue);
+                return String.format("AND (%s = ?) ", fieldName);
             }
             else
             {
-                return String.format("AND (h.%s IS NULL) ", fieldName);
+                return String.format("AND (%s IS NULL) ", fieldName);
             }
         }
         return "";
     }
 
-    private String getCalendarPredicate(String fieldName, Calendar filterValue, String comparison, Map<String, Object> prms)
+    private String getCalendarPredicate(String fieldName, Calendar filterValue, String comparison, List<Object> prms)
     {
         if (filterValue != null)
         {
             String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1] + Math.abs(comparison.hashCode());
-            prms.put(prmName, filterValue);
-            return String.format("AND (h.%s %s :%s) ", fieldName, comparison, prmName);
+            prms.add(filterValue);
+            return String.format("AND (%s %s ?) ", fieldName, comparison);
         }
         else
         {
@@ -836,20 +838,20 @@ final class HibernateClient implements JqmClient
         }
     }
 
-    private String getStatusPredicate(String fieldName, List<com.enioka.jqm.api.State> status, Map<String, Object> prms)
+    private String getStatusPredicate(String fieldName, List<com.enioka.jqm.api.State> status, List<Object> prms)
     {
         if (status == null || status.isEmpty())
         {
             return "";
         }
 
-        String res = String.format("AND ( h.%s IN ( ", fieldName);
+        String res = String.format("AND ( %s IN ( ", fieldName);
 
         for (com.enioka.jqm.api.State s : status)
         {
             String prmName = "status" + s.hashCode();
             res += " :" + prmName + ",";
-            prms.put(prmName, State.valueOf(s.toString()));
+            prms.add(State.valueOf(s.toString()));
         }
         res = res.substring(0, res.length() - 1) + ")) ";
         return res;
@@ -858,254 +860,300 @@ final class HibernateClient implements JqmClient
     @Override
     public List<com.enioka.jqm.api.JobInstance> getJobs(Query query)
     {
-        return null;
-        // if ((query.getFirstRow() != null || query.getPageSize() != null) && query.isQueryLiveInstances() &&
-        // query.isQueryHistoryInstances())
-        // {
-        // throw new JqmInvalidRequestException("cannot use paging when querying both live and historical instances");
-        // }
-        // if (query.isQueryLiveInstances() && query.isQueryHistoryInstances() && query.getSorts().size() > 0)
-        // {
-        // throw new JqmInvalidRequestException("cannot use sorting when querying both live and historical instances");
-        // }
-        //
-        // DbConn cnx = null;
-        // try
-        // {
-        // cnx = getDbSession();
-        //
-        // // Not using CriteriaBuilder - too much hassle for too little benefit
-        // String wh = "";
-        // Map<String, Object> prms = new HashMap<String, Object>();
-        //
-        // // String predicates
-        // wh += getStringPredicate("userName", query.getUser(), prms);
-        // wh += getStringPredicate("sessionId", query.getSessionId(), prms);
-        // wh += getStringPredicate("instanceKeyword1", query.getInstanceKeyword1(), prms);
-        // wh += getStringPredicate("instanceKeyword2", query.getInstanceKeyword2(), prms);
-        // wh += getStringPredicate("instanceKeyword3", query.getInstanceKeyword3(), prms);
-        // wh += getStringPredicate("instanceModule", query.getInstanceModule(), prms);
-        // wh += getStringPredicate("instanceApplication", query.getInstanceApplication(), prms);
-        //
-        // // Integer
-        // wh += getIntPredicate("parentId", query.getParentId(), prms);
-        // wh += getIntPredicate("id", query.getJobInstanceId(), prms);
-        // wh += getIntPredicate("queue.id", query.getQueueId() == null ? null : query.getQueueId(), prms);
-        //
-        // // Now, run queries...
-        // List<com.enioka.jqm.api.JobInstance> res2 = new ArrayList<com.enioka.jqm.api.JobInstance>();
-        //
-        // // ////////////////////////////////////////
-        // // Job Instance query
-        // if (query.isQueryLiveInstances())
-        // {
-        // // Sort
-        // String sort = "";
-        // for (SortSpec s : query.getSorts())
-        // {
-        // sort += s.col.getJiField() == null ? ""
-        // : ",h." + s.col.getJiField() + " " + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
-        // }
-        // if (sort.isEmpty())
-        // {
-        // sort = " ORDER BY h.id";
-        // }
-        // else
-        // {
-        // sort = " ORDER BY " + sort.substring(1);
-        // }
-        //
-        // // Finish query string
-        // String wh2 = "" + wh;
-        // Map<String, Object> prms2 = new HashMap<String, Object>();
-        // prms2.putAll(prms);
-        // wh2 += getStringPredicate("queue.name", query.getQueueName(), prms2);
-        //
-        // // tag fields should be looked for in linked object for active JI
-        // wh2 += getStringPredicate("jd.applicationName", query.getApplicationName(), prms2);
-        // wh2 += getStringPredicate("jd.keyword1", query.getJobDefKeyword1(), prms2);
-        // wh2 += getStringPredicate("jd.keyword2", query.getJobDefKeyword2(), prms2);
-        // wh2 += getStringPredicate("jd.keyword3", query.getJobDefKeyword3(), prms2);
-        // wh2 += getStringPredicate("jd.module", query.getJobDefModule(), prms2);
-        // wh2 += getStringPredicate("jd.application", query.getJobDefApplication(), prms2);
-        // wh2 += getStringPredicate("node.name", query.getNodeName(), prms2);
-        //
-        // // Calendar fields are specific (no common fields between History and JobInstance)
-        // wh2 += getCalendarPredicate("creationDate", query.getEnqueuedAfter(), ">=", prms2);
-        // wh2 += getCalendarPredicate("creationDate", query.getEnqueuedBefore(), "<=", prms2);
-        // wh2 += getCalendarPredicate("executionDate", query.getBeganRunningAfter(), ">=", prms2);
-        // wh2 += getCalendarPredicate("executionDate", query.getBeganRunningBefore(), "<=", prms2);
-        // wh2 += getStatusPredicate("state", query.getStatus(), prms2);
-        // if (wh2.length() >= 3)
-        // {
-        // wh2 = " WHERE " + wh2.substring(3);
-        // }
-        //
-        // TypedQuery<JobInstance> q2 = em.createQuery(
-        // "SELECT h FROM JobInstance h LEFT JOIN FETCH h.jd LEFT JOIN FETCH h.node " + wh2 + sort, JobInstance.class);
-        // for (Map.Entry<String, Object> entry : prms2.entrySet())
-        // {
-        // q2.setParameter(entry.getKey(), entry.getValue());
-        // }
-        //
-        // // Set pagination parameters
-        // if (query.getFirstRow() != null)
-        // {
-        // q2.setFirstResult(query.getFirstRow());
-        // }
-        // if (query.getPageSize() != null)
-        // {
-        // q2.setMaxResults(query.getPageSize());
-        // }
-        //
-        // // Run the query
-        // for (JobInstance ji : q2.getResultList())
-        // {
-        // res2.add(getJob(ji, em));
-        // }
-        //
-        // // If needed, fetch the total result count (without pagination). Note that without pagination, the Query object does not
-        // // need this indication.
-        // if (query.getFirstRow() != null || (query.getPageSize() != null && res2.size() >= query.getPageSize()))
-        // {
-        // TypedQuery<Long> qCount = em.createQuery("SELECT COUNT(h) FROM JobInstance h " + wh2, Long.class);
-        // for (Map.Entry<String, Object> entry : prms2.entrySet())
-        // {
-        // qCount.setParameter(entry.getKey(), entry.getValue());
-        // }
-        // query.setResultSize(new BigDecimal(qCount.getSingleResult()).intValueExact());
-        // }
-        // }
-        //
-        // // ////////////////////////////////////////
-        // // History query
-        // if (query.isQueryHistoryInstances())
-        // {
-        // wh += getStringPredicate("queueName", query.getQueueName(), prms);
-        //
-        // // tag fields should be looked directly in the denormalized fields for history.
-        // wh += getStringPredicate("applicationName", query.getApplicationName(), prms);
-        // wh += getStringPredicate("keyword1", query.getJobDefKeyword1(), prms);
-        // wh += getStringPredicate("keyword2", query.getJobDefKeyword2(), prms);
-        // wh += getStringPredicate("keyword3", query.getJobDefKeyword3(), prms);
-        // wh += getStringPredicate("module", query.getJobDefModule(), prms);
-        // wh += getStringPredicate("application", query.getJobDefApplication(), prms);
-        // wh += getStringPredicate("nodeName", query.getNodeName(), prms);
-        //
-        // // Calendar fields are specific (no common fields between History and JobInstance)
-        // wh += getCalendarPredicate("enqueueDate", query.getEnqueuedAfter(), ">=", prms);
-        // wh += getCalendarPredicate("enqueueDate", query.getEnqueuedBefore(), "<=", prms);
-        // wh += getCalendarPredicate("executionDate", query.getBeganRunningAfter(), ">=", prms);
-        // wh += getCalendarPredicate("executionDate", query.getBeganRunningBefore(), "<=", prms);
-        // wh += getCalendarPredicate("endDate", query.getEndedAfter(), ">=", prms);
-        // wh += getCalendarPredicate("endDate", query.getEndedBefore(), "<=", prms);
-        // wh += getStatusPredicate("status", query.getStatus(), prms);
-        // if (wh.length() >= 3)
-        // {
-        // wh = " WHERE " + wh.substring(3);
-        // }
-        //
-        // // Order by
-        // String sort = "";
-        // for (SortSpec s : query.getSorts())
-        // {
-        // sort += ",h." + s.col.getHistoryField() + " " + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
-        // }
-        // if (sort.isEmpty())
-        // {
-        // sort = " ORDER BY h.id";
-        // }
-        // else
-        // {
-        // sort = " ORDER BY " + sort.substring(1);
-        // }
-        //
-        // TypedQuery<History> q1 = em.createQuery(
-        // "SELECT h FROM History h LEFT JOIN FETCH h.jd LEFT JOIN FETCH h.node LEFT JOIN FETCH h.queue " + wh + sort,
-        // History.class);
-        // for (Map.Entry<String, Object> entry : prms.entrySet())
-        // {
-        // q1.setParameter(entry.getKey(), entry.getValue());
-        // }
-        //
-        // // Set pagination parameters
-        // if (query.getFirstRow() != null)
-        // {
-        // q1.setFirstResult(query.getFirstRow());
-        // }
-        // if (query.getPageSize() != null)
-        // {
-        // q1.setMaxResults(query.getPageSize());
-        // }
-        //
-        // // Actually run the query
-        // List<History> results = q1.getResultList();
-        //
-        // // If needed, fetch the total result count (without pagination). Note that without pagination, the Query object does not
-        // // need this indication.
-        // if (query.getFirstRow() != null || (query.getPageSize() != null && results.size() >= query.getPageSize()))
-        // {
-        // TypedQuery<Long> qCount = em.createQuery("SELECT COUNT(h) FROM History h " + wh, Long.class);
-        // for (Map.Entry<String, Object> entry : prms.entrySet())
-        // {
-        // qCount.setParameter(entry.getKey(), entry.getValue());
-        // }
-        // query.setResultSize(new BigDecimal(qCount.getSingleResult()).intValueExact());
-        // }
-        //
-        // // Optimization: fetch messages and parameters in batches of 50 (limit accepted by most databases for IN clauses).
-        // List<List<Integer>> ids = new ArrayList<List<Integer>>();
-        // List<Integer> currentList = null;
-        // int i = 0;
-        // for (History ji : results)
-        // {
-        // if (currentList == null || i % IN_CLAUSE_LIMIT == 0)
-        // {
-        // currentList = new ArrayList<Integer>(IN_CLAUSE_LIMIT);
-        // ids.add(currentList);
-        // }
-        // currentList.add(ji.getId());
-        // i++;
-        // }
-        // if (currentList != null && !currentList.isEmpty())
-        // {
-        // List<RuntimeParameter> rps = new ArrayList<RuntimeParameter>(IN_CLAUSE_LIMIT * ids.size());
-        // List<Message> msgs = new ArrayList<Message>(IN_CLAUSE_LIMIT * ids.size());
-        //
-        // for (List<Integer> idsBatch : ids)
-        // {
-        // rps.addAll(em.createQuery("SELECT rp FROM RuntimeParameter rp WHERE rp.ji IN (:p)", RuntimeParameter.class)
-        // .setParameter("p", idsBatch).getResultList());
-        // msgs.addAll(em.createQuery("SELECT rp FROM Message rp WHERE rp.ji IN (:p)", Message.class)
-        // .setParameter("p", idsBatch).getResultList());
-        // }
-        //
-        // for (History ji : results)
-        // {
-        // // This is the actual JPA -> DTO work.
-        // res2.add(getJob(ji, em, rps, msgs));
-        // }
-        // }
-        // }
-        //
-        // query.setResults(res2);
-        // return res2;
-        // }
-        // catch (Exception e)
-        // {
-        // throw new JqmClientException("an error occured during query execution", e);
-        // }
-        // finally
-        // {
-        // closeQuietly(em);
-        // }
+        if ((query.getFirstRow() != null || query.getPageSize() != null) && query.isQueryLiveInstances() && query.isQueryHistoryInstances())
+        {
+            throw new JqmInvalidRequestException("cannot use paging when querying both live and historical instances");
+        }
+        if (query.isQueryLiveInstances() && query.isQueryHistoryInstances() && query.getSorts().size() > 0)
+        {
+            throw new JqmInvalidRequestException("cannot use sorting when querying both live and historical instances");
+        }
+        if (!query.isQueryHistoryInstances() && !query.isQueryLiveInstances())
+        {
+            throw new JqmInvalidRequestException(
+                    "cannot query nothing - either query live instances, historical instances or both, but not nothing");
+        }
+
+        DbConn cnx = null;
+        try
+        {
+            cnx = getDbSession();
+            Map<Integer, com.enioka.jqm.api.JobInstance> res = new HashMap<Integer, com.enioka.jqm.api.JobInstance>();
+
+            String wh = "";
+            List<Object> prms = new ArrayList<Object>();
+
+            String q = "";
+            String filterCountQuery = "SELECT ";
+            String totalCountQuery = "SELECT ";
+
+            // ////////////////////////////////////////
+            // Job Instance query
+            if (query.isQueryLiveInstances())
+            {
+                // WHERE
+                wh += getIntPredicate("ji.ID", query.getJobInstanceId(), prms);
+                wh += getIntPredicate("ji.PARENTID", query.getParentId(), prms);
+                wh += getStringPredicate("ji.APPLICATION", query.getInstanceApplication(), prms);
+                wh += getStringPredicate("ji.MODULE", query.getInstanceModule(), prms);
+                wh += getStringPredicate("ji.KEYWORD1", query.getInstanceKeyword1(), prms);
+                wh += getStringPredicate("ji.KEYWORD2", query.getInstanceKeyword2(), prms);
+                wh += getStringPredicate("ji.KEYWORD3", query.getInstanceKeyword3(), prms);
+                wh += getStringPredicate("ji.USERNAME", query.getUser(), prms);
+                wh += getStringPredicate("ji.SESSIONID", query.getSessionId(), prms);
+                wh += getStatusPredicate("ji.STATE", query.getStatus(), prms);
+
+                wh += getStringPredicate("jd.APPLICATIONNAME", query.getInstanceApplication(), prms);
+                wh += getStringPredicate("jd.APPLICATION", query.getJobDefApplication(), prms);
+                wh += getStringPredicate("jd.MODULE", query.getJobDefModule(), prms);
+                wh += getStringPredicate("jd.KEYWORD1", query.getJobDefKeyword1(), prms);
+                wh += getStringPredicate("jd.KEYWORD2", query.getJobDefKeyword2(), prms);
+                wh += getStringPredicate("jd.KEYWORD3", query.getJobDefKeyword3(), prms);
+
+                wh += getStringPredicate("n.NODENAME", query.getNodeName(), prms);
+
+                wh += getStringPredicate("q.NAME", query.getQueueName(), prms);
+                wh += getIntPredicate("q.ID", query.getQueueId() == null ? null : query.getQueueId(), prms);
+
+                wh += getCalendarPredicate("ji.CREATIONDATE", query.getEnqueuedAfter(), ">=", prms);
+                wh += getCalendarPredicate("ji.CREATIONDATE", query.getEnqueuedBefore(), "<=", prms);
+                wh += getCalendarPredicate("ji.EXECUTIONDATE", query.getBeganRunningAfter(), ">=", prms);
+                wh += getCalendarPredicate("ji.EXECUTIONDATE", query.getBeganRunningBefore(), "<=", prms);
+
+                q = "SELECT ji.ID, jd.APPLICATION AS JD_APPLICATION, jd.APPLICATIONNAME AS APPLICATION_NAME, ji.ATTRIBUTIONDATE, "
+                        + "ji.SENDEMAIL AS EMAIL, NULL AS END_DATE, ji.CREATIONDATE AS ENQUEUE_DATE, ji.EXECUTIONDATE AS EXECUTION_DATE, "
+                        + "ji.HIGHLANDER, ji.APPLICATION AS INSTANCE_APPLICATION, ji.KEYWORD1 AS INSTANCE_KEYWORD1, "
+                        + "ji.KEYWORD2 AS INSTANCE_KEYWORD2, ji.KEYWORD3 AS INSTANCE_KEYWORD3, ji.MODULE AS INSTANCE_MODULE, "
+                        + "jd.KEYWORD1 AS JD_KEYWORD1, jd.KEYWORD2 AS JD_KEYWORD2, jd.KEYWORD3 AS JD_KEYWORD3, jd.MODULE AS JD_MODULE,"
+                        + "n.NODENAME AS NODENAME,ji.PARENTID AS PARENT_JOB_ID, ji.PROGRESS, q.NAME AS QUEUE_NAME, NULL AS RETURN_CODE,"
+                        + "ji.SESSIONID AS SESSION_ID, ji.STATE AS STATUS, ji.USERNAME, ji.JD_ID, ji.NODE_ID, ji.QUEUE_ID, ji.INTERNALPOSITION AS POSITION "
+                        + "FROM JOBINSTANCE ji LEFT JOIN QUEUE q ON ji.QUEUE_ID=q.ID LEFT JOIN JOBDEF jd ON ji.JD_ID=jd.ID LEFT JOIN NODE n ON ji.NODE_ID=n.ID ";
+
+                filterCountQuery += " (SELECT COUNT(1) FROM JOBINSTANCE %s) ,";
+                totalCountQuery += " (SELECT COUNT(1) FROM JOBINSTANCE) ,";
+
+                if (wh.length() > 3)
+                {
+                    q += wh;
+                    filterCountQuery = String.format(filterCountQuery, wh);
+                }
+            }
+
+            /////////////////////////////////////
+            // HISTORY QUERY
+            if (query.isQueryHistoryInstances())
+            {
+                if (q.length() > 3)
+                {
+                    q += " UNION ALL ";
+                }
+                wh = "";
+
+                wh += getIntPredicate("ID", query.getJobInstanceId(), prms);
+                wh += getIntPredicate("PARENT_JOB_ID", query.getParentId(), prms);
+                wh += getStringPredicate("INSTANCE_APPLICATION", query.getInstanceApplication(), prms);
+                wh += getStringPredicate("INSTANCE_MODULE", query.getInstanceModule(), prms);
+                wh += getStringPredicate("INSTANCE_KEYWORD1", query.getInstanceKeyword1(), prms);
+                wh += getStringPredicate("INSTANCE_KEYWORD2", query.getInstanceKeyword2(), prms);
+                wh += getStringPredicate("INSTANCE_KEYWORD3", query.getInstanceKeyword3(), prms);
+                wh += getStringPredicate("USERNAME", query.getUser(), prms);
+                wh += getStringPredicate("SESSION_ID", query.getSessionId(), prms);
+                wh += getStatusPredicate("STATUS", query.getStatus(), prms);
+
+                wh += getStringPredicate("APPLICATIONNAME", query.getInstanceApplication(), prms);
+                wh += getStringPredicate("JD_APPLICATION", query.getJobDefApplication(), prms);
+                wh += getStringPredicate("JD_MODULE", query.getJobDefModule(), prms);
+                wh += getStringPredicate("JD_KEYWORD1", query.getJobDefKeyword1(), prms);
+                wh += getStringPredicate("JD_KEYWORD2", query.getJobDefKeyword2(), prms);
+                wh += getStringPredicate("JD_KEYWORD3", query.getJobDefKeyword3(), prms);
+
+                wh += getStringPredicate("NODENAME", query.getNodeName(), prms);
+
+                wh += getStringPredicate("QUEUE_NAME", query.getQueueName(), prms);
+                wh += getIntPredicate("QUEUE_ID", query.getQueueId() == null ? null : query.getQueueId(), prms);
+
+                wh += getCalendarPredicate("ENQUEUE_DATE", query.getEnqueuedAfter(), ">=", prms);
+                wh += getCalendarPredicate("ENQUEUE_DATE", query.getEnqueuedBefore(), "<=", prms);
+                wh += getCalendarPredicate("EXECUTION_DATE", query.getBeganRunningAfter(), ">=", prms);
+                wh += getCalendarPredicate("EXECUTION_DATE", query.getBeganRunningBefore(), "<=", prms);
+                wh += getCalendarPredicate("END_DATE", query.getEndedAfter(), ">=", prms);
+                wh += getCalendarPredicate("END_DATE", query.getEndedBefore(), "<=", prms);
+
+                q += "SELECT ID, APPLICATION AS JD_APPLICATION, APPLICATIONNAME, ATTRIBUTIONDATE, EMAIL, "
+                        + "END_DATE, ENQUEUE_DATE, EXECUTION_DATE, HIGHLANDER, INSTANCE_APPLICATION, "
+                        + "INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, "
+                        + "KEYWORD1 AS JD_KEYWORD1, KEYWORD2 AS JD_KEYWORD2, KEYWORD3 AS JD_KEYWORD3, "
+                        + "MODULE AS JD_MODULE, NODENAME, PARENT_JOB_ID, PROGRESS, QUEUE_NAME, "
+                        + "RETURN_CODE, SESSION_ID, STATUS, USERNAME, JOBDEF_ID as JD_ID, NODE_ID, QUEUE_ID, 0 as POSITION FROM HISTORY ";
+
+                filterCountQuery += " (SELECT COUNT(1) FROM HISTORY %s) ,";
+                totalCountQuery += " (SELECT COUNT(1) FROM HISTORY) ,";
+
+                if (wh.length() > 3)
+                {
+                    q += wh;
+                }
+            }
+
+            ///////////////////////////////////////////////
+            // Sort (on the union, not the sub queries)
+            String sort = "";
+            for (SortSpec s : query.getSorts())
+            {
+                sort += s.col.getJiField() == null ? ""
+                        : "," + s.col.getHistoryField() + " " + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
+            }
+            if (sort.isEmpty())
+            {
+                sort = " ORDER BY h.id";
+            }
+            else
+            {
+                sort = " ORDER BY " + sort.substring(1);
+            }
+
+            ///////////////////////////////////////////////
+            // Set pagination parameters
+            // TODO: save this.
+            // if (query.getFirstRow() != null)
+            // {
+            // q2.setFirstResult(query.getFirstRow());
+            // }
+            // if (query.getPageSize() != null)
+            // {
+            // q2.setMaxResults(query.getPageSize());
+            // }
+
+            ///////////////////////////////////////////////
+            // Run the query
+            ResultSet rs = cnx.runRawSelect(q, prms);
+            while (rs.next())
+            {
+                com.enioka.jqm.api.JobInstance tmp = getJob(rs);
+                res.put(tmp.getId(), tmp);
+            }
+            rs.close();
+
+            // If needed, fetch the total result count (without pagination). Note that without pagination, the Query object does not
+            // need this indication.
+            if (query.getFirstRow() != null || (query.getPageSize() != null && res.size() >= query.getPageSize()))
+            {
+                ResultSet rs2 = cnx.runRawSelect(filterCountQuery, prms);
+                rs2.next();
+
+                query.setResultSize(rs2.getInt(0));
+            }
+
+            ///////////////////////////////////////////////
+            // Fetch messages and parameters in batch
+
+            // Optimization: fetch messages and parameters in batches of 50 (limit accepted by most databases for IN clauses).
+            List<List<Integer>> ids = new ArrayList<List<Integer>>();
+            List<Integer> currentList = null;
+            int i = 0;
+            for (com.enioka.jqm.api.JobInstance ji : res.values())
+            {
+                if (currentList == null || i % IN_CLAUSE_LIMIT == 0)
+                {
+                    currentList = new ArrayList<Integer>(IN_CLAUSE_LIMIT);
+                    ids.add(currentList);
+                }
+                currentList.add(ji.getId());
+                i++;
+            }
+            if (currentList != null && !currentList.isEmpty())
+            {
+                List<RuntimeParameter> rps = new ArrayList<RuntimeParameter>(IN_CLAUSE_LIMIT * ids.size());
+                List<Message> msgs = new ArrayList<Message>(IN_CLAUSE_LIMIT * ids.size());
+
+                for (List<Integer> idsBatch : ids)
+                {
+                    ResultSet run = cnx.runSelect("jiprm_select_by_ji_list", idsBatch);
+                    while (run.next())
+                    {
+                        res.get(run.getInt(2)).getParameters().put(run.getString(3), run.getString(4));
+                    }
+                    run.close();
+
+                    ResultSet msg = cnx.runSelect("message_select_by_ji_list", idsBatch);
+                    while (msg.next())
+                    {
+                        res.get(run.getInt(2)).getMessages().add(run.getString(3));
+                    }
+                    run.close();
+                }
+            }
+
+            ///////////////////////////////////////////////
+            // DONE AT LAST
+            query.setResults(new ArrayList<com.enioka.jqm.api.JobInstance>(res.values()));
+            return query.getResults();
+        }
+        catch (
+
+        Exception e)
+        {
+            throw new JqmClientException("an error occured during query execution", e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+    }
+
+    private com.enioka.jqm.api.JobInstance getJob(ResultSet rs) throws SQLException
+    {
+        com.enioka.jqm.api.JobInstance res = new com.enioka.jqm.api.JobInstance();
+
+        res.setId(rs.getInt(1));
+        // res.setApplication(rs.getString(2));
+        res.setApplicationName(rs.getString(3));
+        res.setEmail(rs.getString(5));
+        res.setEndDate(getCal(rs, 6));
+        res.setEnqueueDate(getCal(rs, 7));
+        res.setBeganRunningDate(getCal(rs, 8));
+        res.setApplication(rs.getString(10));
+        res.setKeyword1(rs.getString(11));
+        res.setKeyword2(rs.getString(12));
+        res.setKeyword3(rs.getString(13));
+        res.setModule(rs.getString(14));
+        res.setDefinitionKeyword1(rs.getString(15));
+        res.setDefinitionKeyword2(rs.getString(16));
+        res.setDefinitionKeyword3(rs.getString(17));
+        res.setNodeName(rs.getString(19));
+        res.setParent(rs.getInt(20));
+        res.setProgress(rs.getInt(21));
+        res.setQueueName(rs.getString(22));
+        res.setSessionID(rs.getString(24));
+        res.setState(com.enioka.jqm.api.State.valueOf(rs.getString(25)));
+        res.setUser(rs.getString(26));
+
+        com.enioka.jqm.api.Queue q = new com.enioka.jqm.api.Queue();
+        q.setId(rs.getInt(29));
+        q.setName(rs.getString(22));
+        res.setQueue(q);
+
+        res.setPosition(rs.getInt(30));
+
+        return res;
+    }
+
+    private Calendar getCal(ResultSet rs, int colIdx) throws SQLException
+    {
+        Calendar c = null;
+        if (rs.getTimestamp(colIdx) != null)
+        {
+            c = Calendar.getInstance();
+            c.setTimeInMillis(rs.getTimestamp(colIdx).getTime());
+        }
+        return c;
     }
 
     @Override
     public com.enioka.jqm.api.JobInstance getJob(int idJob)
     {
-        // TODO: after we have common table structures.
-        return null;
+        // TODO: direct queries following previous logic, but after we have common table structures.
+        return Query.create().setJobInstanceId(idJob).setQueryHistoryInstances(true).setQueryLiveInstances(true).run().get(0);
 
         // DbConn cnx = null;
         // try

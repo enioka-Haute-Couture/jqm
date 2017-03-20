@@ -19,6 +19,7 @@
 package com.enioka.jqm.tools;
 
 import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -39,7 +40,6 @@ import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.jpamodel.State;
 
 /**
  * A thread that polls a queue according to the parameters defined inside a {@link DeploymentParameter}.
@@ -137,16 +137,24 @@ class QueuePoller implements Runnable, QueuePollerMBean
     protected List<JobInstance> dequeue(DbConn cnx)
     {
         // Free room?
-        int freeSlots = actualNbThread.get();
-        if (freeSlots >= maxNbThread)
+        int usedSlots = actualNbThread.get();
+        if (usedSlots >= maxNbThread)
         {
-            return null;
+            return new ArrayList<JobInstance>();
         }
 
         // Get the list of all jobInstance within the defined queue, ordered by position
-        QueryResult qr = cnx.runUpdate("ji_update_poll", this.engine.getNode().getId(), queue.getId(), freeSlots);
+        QueryResult qr = cnx.runUpdate("ji_update_poll", this.engine.getNode().getId(), queue.getId(), maxNbThread - usedSlots);
         jqmlogger.debug("Poller has found " + qr.nbUpdated + " JI to run");
-        return JobInstance.select(cnx, "ji_select_to_run", this.engine.getNode().getId(), queue.getId());
+        if (qr.nbUpdated > 0)
+        {
+            cnx.commit();
+            return JobInstance.select(cnx, "ji_select_to_run", this.engine.getNode().getId(), queue.getId());
+        }
+        else
+        {
+            return new ArrayList<JobInstance>();
+        }
     }
 
     @Override
