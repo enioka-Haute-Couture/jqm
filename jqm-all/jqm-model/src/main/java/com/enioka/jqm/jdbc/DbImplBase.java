@@ -189,7 +189,7 @@ public class DbImplBase
         // R-ROLE
         queries.put("role_insert", "INSERT INTO RROLE(DESCRIPTION, NAME) VALUES(?, ?)");
         queries.put("role_delete_all", "DELETE FROM RROLE");
-        queries.put("role_select_all_for_user", "SELECT ID, NAME, DESCRIPTION FROM RROLE r RIGHT JOIN RROLE_RUSER a ON a.ROLES_ID = r.ID WHERE a.USERS_ID=?");
+        queries.put("role_select_all_for_user", "SELECT ID, NAME, DESCRIPTION FROM RROLE r RIGHT JOIN RROLE_RUSER a ON a.ROLE_ID = r.ID WHERE a.USER_ID=?");
         queries.put("role_select_by_key", "SELECT ID, NAME, DESCRIPTION FROM RROLE r WHERE NAME=?");
         
         // R-PERMISSION
@@ -198,15 +198,16 @@ public class DbImplBase
         queries.put("perm_select_all_in_role", "SELECT ID, NAME, ROLE FROM RROLE WHERE ROLE=?");
         
         // R-USER
-        queries.put("user_insert", "INSERT INTO RUSER(CREATIONDATE, EMAIL, EXPIRATIONDATE, FREETEXT, HASHSALT, INTERNAL, LASTMODIFIED, LOCKED, LOGIN, PASSWORD) VALUES(CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)");
+        queries.put("user_insert", "INSERT INTO RUSER(CREATION_DATE, EMAIL, EXPIRATION_DATE, FREETEXT, HASHSALT, INTERNAL, LAST_MODIFIED, LOCKED, LOGIN, PASSWORD) VALUES(CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)");
         queries.put("user_delete_all", "DELETE FROM RUSER");
-        queries.put("user_delete_expired_internal", "DELETE FROM RUSER WHERE internal=1 AND EXPIRATIONDATE < CURRENT_TIMESTAMP");
-        queries.put("user_add_role_by_name", "INSERT INTO RROLE_RUSER(ROLE_ID, USER_ID) VALUES(?, (SELECT ID FROM RROLE WHERE NAME=?))");
-        queries.put("user_remove_all_roles_by_key", "DELETE RROLE_RUSER WHERE USER_ID=?");
-        queries.put("user_update_enable_by_key", "UPDATE RROLE SET LOCKED=0 WHERE USER_ID=?");
+        queries.put("user_delete_expired_internal", "DELETE FROM RUSER WHERE internal=1 AND EXPIRATION_DATE < CURRENT_TIMESTAMP");
+        queries.put("user_add_role_by_name", "INSERT INTO RROLE_RUSER(USER_ID, ROLE_ID) VALUES(?, (SELECT r.ID FROM RROLE r WHERE r.NAME=?))");
+        queries.put("user_remove_all_roles_by_key", "DELETE FROM RROLE_RUSER WHERE USER_ID=?");
+        queries.put("user_update_enable_by_id", "UPDATE RUSER SET LOCKED=0 WHERE ID=?");
         queries.put("user_select_all_in_role", "SELECT ID, LOGIN, PASSWORD, HASHSALT, LOCKED, EXPIRATION_DATE, CREATION_DATE, LAST_MODIFIED, EMAIL, FREETEXT, INTERNAL FROM RUSER u RIGHT JOIN RROLE_RUSER a ON a.USER_ID = u.ID WHERE a.ROLE_ID=?");
         queries.put("user_select_by_key",      "SELECT ID, LOGIN, PASSWORD, HASHSALT, LOCKED, EXPIRATION_DATE, CREATION_DATE, LAST_MODIFIED, EMAIL, FREETEXT, INTERNAL FROM RUSER WHERE LOGIN=?");
         queries.put("user_select_count_by_key", "SELECT COUNT(1) FROM RUSER WHERE LOGIN=?");
+        queries.put("user_select_id_by_key", "SELECT ID FROM RUSER WHERE LOGIN=?");
         
         // GLOBAL PRM
         queries.put("globalprm_insert", "INSERT INTO GLOBALPARAMETER(KEYNAME, VALUE, LASTMODIFIED) VALUES(?, ?, CURRENT_TIMESTAMP)");

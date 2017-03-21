@@ -171,31 +171,6 @@ public class RUser implements Serializable
         this.lastModified = lastModified;
     }
 
-    private static RUser bind_current(ResultSet rs) throws SQLException
-    {
-        RUser res = new RUser();
-
-        res.id = rs.getInt(0);
-        res.login = rs.getString(1);
-        res.password = rs.getString(2);
-        res.hashSalt = rs.getString(3);
-        res.locked = rs.getBoolean(4);
-
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(rs.getTimestamp(5).getTime());
-        res.expirationDate = c;
-
-        Calendar c2 = Calendar.getInstance();
-        c2.setTimeInMillis(rs.getTimestamp(6).getTime());
-        res.lastModified = c2;
-
-        res.email = rs.getString(7);
-        res.freeText = rs.getString(8);
-        res.internal = rs.getBoolean(9);
-
-        return res;
-    }
-
     public static List<RUser> select(DbConn cnx, String query_key, Object... args)
     {
         List<RUser> res = new ArrayList<RUser>();
@@ -204,7 +179,20 @@ public class RUser implements Serializable
             ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
-                res.add(RUser.bind_current(rs));
+                RUser tmp = new RUser();
+
+                tmp.id = rs.getInt(1);
+                tmp.login = rs.getString(2);
+                tmp.password = rs.getString(3);
+                tmp.hashSalt = rs.getString(4);
+                tmp.locked = rs.getBoolean(5);
+                tmp.expirationDate = cnx.getCal(rs, 6);
+                tmp.lastModified = cnx.getCal(rs, 7);
+                tmp.email = rs.getString(8);
+                tmp.freeText = rs.getString(9);
+                tmp.internal = rs.getBoolean(10);
+
+                res.add(tmp);
             }
         }
         catch (SQLException e)
@@ -227,17 +215,16 @@ public class RUser implements Serializable
 
         for (String s : role_names)
         {
-            cnx.runUpdate("user_add_role_by_name", s, newId);
+            cnx.runUpdate("user_add_role_by_name", newId, s);
         }
     }
 
-    public static void set_roles(DbConn cnx, String login, String... role_names)
+    public static void set_roles(DbConn cnx, int userId, String... role_names)
     {
-        int newId = cnx.runSelectSingle("user_select_by_key", Integer.class, login);
-        cnx.runUpdate("user_remove_all_roles_by_key", login);
+        cnx.runUpdate("user_remove_all_roles_by_key", userId);
         for (String s : role_names)
         {
-            cnx.runUpdate("user_add_role_by_name", s, newId);
+            cnx.runUpdate("user_add_role_by_name", userId, s);
         }
     }
 
@@ -254,7 +241,7 @@ public class RUser implements Serializable
         }
         return res.get(0);
     }
-    
+
     public static RUser selectlogin(DbConn cnx, String id)
     {
         List<RUser> res = select(cnx, "user_select_by_key", id);

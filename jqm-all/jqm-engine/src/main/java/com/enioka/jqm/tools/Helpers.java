@@ -460,7 +460,7 @@ final class Helpers
     }
 
     /**
-     * Creates a new user if does not exist. If it exists, it is unlocked and role are reset (password is untouched).
+     * Creates a new user if does not exist. If it exists, it is unlocked and roles are reset (password is untouched).
      * 
      * @param cnx
      * @param login
@@ -471,20 +471,19 @@ final class Helpers
      */
     static void createUserIfMissing(DbConn cnx, String login, String password, String description, String... roles)
     {
-        int i = cnx.runSelectSingle("user_select_count_by_key", Integer.class, login);
-
-        if (i == 0)
+        try
+        {
+            int userId = cnx.runSelectSingle("user_select_id_by_key", Integer.class, login);
+            cnx.runUpdate("user_update_enable_by_id", userId);
+            RUser.set_roles(cnx, userId, roles);
+        }
+        catch (NoResultException e)
         {
             ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
             String hash = new Sha512Hash(password, salt, 100000).toHex();
             String saltS = salt.toHex();
 
             RUser.create(cnx, login, hash, saltS, roles);
-        }
-        else
-        {
-            cnx.runUpdate("user_update_enable_by_key", login);
-            RUser.set_roles(cnx, login, roles);
         }
     }
 

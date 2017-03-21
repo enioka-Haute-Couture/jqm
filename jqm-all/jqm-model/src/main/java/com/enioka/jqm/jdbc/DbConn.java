@@ -252,7 +252,7 @@ public class DbConn implements Closeable
         {
             throw new DatabaseException("unknown query key");
         }
-        System.out.println("Running " + st + " with " + params.length + " parameters.");
+        System.out.println("Running " + query_key + " : " + st + " with " + params.length + " parameters.");
         for (Object o : params)
             if (o == null)
             {

@@ -507,7 +507,7 @@ public class Main
                 roles[i - 2] = options[i];
             }
 
-            Helpers.createUserIfMissing(em, options[0], options[1], "created through CLI", options);
+            Helpers.createUserIfMissing(em, options[0], options[1], "created through CLI", roles);
             em.commit();
         }
         finally
