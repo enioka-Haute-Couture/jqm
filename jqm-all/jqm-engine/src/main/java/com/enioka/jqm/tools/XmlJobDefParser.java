@@ -52,7 +52,7 @@ class XmlJobDefParser
     }
 
     /**
-     * Will import all JobDef from an XML file.
+     * Will import all JobDef from an XML file. Creates and commits a transaction.
      * 
      * @param path
      * @param em
@@ -126,7 +126,16 @@ class XmlJobDefParser
                     }
 
                     // Retrieve the Queue on which to run the JobDef
-                    if (jd.getQueue(cnx) == null && jdElement.getElementsByTagName("queue").getLength() != 0)
+                    Queue q = null;
+                    try
+                    {
+                        q = jd.getQueue(cnx);
+                    }
+                    catch (NoResultException e)
+                    {
+                        // Nothing.
+                    }
+                    if (q == null && jdElement.getElementsByTagName("queue").getLength() != 0)
                     {
                         // Specified inside the XML,nothing yet in DB. Does the queue already exist?
                         String qname = jdElement.getElementsByTagName("queue").item(0).getTextContent();
@@ -149,7 +158,7 @@ class XmlJobDefParser
                         }
                         jd.setQueue(queueId);
                     }
-                    else if (jd.getQueue() == null)
+                    else if (q == null)
                     {
                         // Not specified (and no queue specified inside DB) => default queue
                         queueId = cnx.runSelectSingle("q_select_default", Integer.class);

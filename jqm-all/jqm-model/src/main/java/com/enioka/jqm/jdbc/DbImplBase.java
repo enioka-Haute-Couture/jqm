@@ -143,7 +143,7 @@ public class DbImplBase
         queries.put("history_select_count_for_poller", "SELECT COUNT(1) FROM History WHERE QUEUE_ID=? AND NODE_ID=?");
         queries.put("history_select_count_last_mn_for_poller", "SELECT COUNT(1)/60 FROM History WHERE QUEUE_ID=? AND NODE_ID=? AND ENDDATE > CURRENT_TIMESTAMP - INTERVAL OF 1 MINUTE");
         queries.put("history_select_count_ended", "SELECT COUNT(1) FROM History WHERE STATUS='ENDED'");
-        queries.put("history_select_count_notended", "SELECT COUNT(1) FROM History WHERE STATUS!='ENDED'");
+        queries.put("history_select_count_notended", "SELECT COUNT(1) FROM History WHERE STATUS<>'ENDED'");
         queries.put("history_select_reenqueue_by_id", "SELECT APPLICATION, APPLICATIONNAME, EMAIL, INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, PARENT_JOB_ID, SESSION_ID, USERNAME, STATUS FROM HISTORY WHERE ID=?");
         queries.put("history_select_cnx_data_by_id", "SELECT DNS||':'||PORT AS HOST FROM History h LEFT JOIN Node n ON h.NODE_ID = n.ID WHERE h.ID=?");
         queries.put("history_select_state_by_id", "SELECT STATUS FROM HISTORY WHERE ID=?");

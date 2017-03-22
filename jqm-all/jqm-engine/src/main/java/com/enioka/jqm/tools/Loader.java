@@ -161,6 +161,7 @@ class Loader implements Runnable, LoaderMBean
             if (qr.nbUpdated == 0)
             {
                 // This means the JI has been killed or has disappeared.
+                jqmlogger.warn("Loader was asked to run a job which disappeared or is not in ATTRIBUTED state");
                 return;
             }
             cnx.commit();

@@ -846,7 +846,7 @@ final class HibernateClient implements JqmClient
         }
 
         String res = String.format("AND %s IN(UNNEST(?)) ", fieldName);
-        prms.addAll(status);
+        prms.add(status);
         return res;
     }
 
@@ -1019,7 +1019,7 @@ final class HibernateClient implements JqmClient
 
             ///////////////////////////////////////////////
             // Run the query
-            ResultSet rs = cnx.runRawSelect(q, prms);
+            ResultSet rs = cnx.runRawSelect(q, prms.toArray());
             while (rs.next())
             {
                 com.enioka.jqm.api.JobInstance tmp = getJob(rs);

@@ -30,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
@@ -52,6 +53,9 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testEmail() throws Exception
     {
+        // Do not run in Eclipse, as it does not support the SMTP Maven plugin.
+        Assume.assumeTrue(!System.getProperty("java.class.path").contains("eclipse"));
+
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
         JobRequest.create("MarsuApplication", "TestUser").setEmail("test@jqm.com").submit();
@@ -137,6 +141,7 @@ public class MiscTest extends JqmBaseTest
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
         CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
+        cnx.commit();
 
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmlstop.xml" });
 
@@ -196,8 +201,9 @@ public class MiscTest extends JqmBaseTest
                 null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
         /// Create a running job that should be cleaned at startup
-        int i1 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
-        cnx.runUpdate("debug_jj_update_status_by_id", State.RUNNING, i1);
+        int i1 = JqmClientFactory.getClient().enqueue("jqm-test-em", "test");
+        cnx.runUpdate("ji_update_poll", TestHelpers.node.getId(), TestHelpers.qVip, 10);
+        cnx.runUpdate("jj_update_run_by_id", i1);
         cnx.commit();
 
         addAndStartEngine();
@@ -215,7 +221,7 @@ public class MiscTest extends JqmBaseTest
 
         // Create a running job that should be cleaned at startup
         int i1 = JqmClientFactory.getClient().enqueue("jqm-test-em", "test");
-        cnx.runUpdate("debug_jj_update_status_by_id", State.ATTRIBUTED, i1);
+        cnx.runUpdate("ji_update_poll", TestHelpers.node.getId(), TestHelpers.qVip, 10);
         cnx.commit();
 
         addAndStartEngine();
@@ -241,7 +247,7 @@ public class MiscTest extends JqmBaseTest
         jqmlogger.debug("COUNT RUNNING " + cnx.runSelectSingle("ji_select_count_running", Integer.class));
         jqmlogger.debug("COUNT ALL     " + cnx.runSelectSingle("ji_select_count_all", Integer.class));
         Assert.assertEquals(0, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
-                .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run().size());
+                .addStatusFilter(com.enioka.jqm.api.State.RUNNING).addStatusFilter(com.enioka.jqm.api.State.ENDED).run().size());
         Assert.assertEquals(5, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
                 .addStatusFilter(com.enioka.jqm.api.State.SUBMITTED).run().size());
     }
@@ -368,7 +374,8 @@ public class MiscTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
         int i = JobRequest.create("MarsuApplication", "TestUser").submit();
-        cnx.runUpdate("debug_jj_update_node_by_id", i);
+        cnx.runUpdate("ji_update_poll", TestHelpers.node.getId(), TestHelpers.qVip, 10);
+        cnx.runUpdate("debug_jj_update_node_by_id", TestHelpers.node.getId(), i);
         cnx.commit();
 
         Main.main(new String[] { "-s", String.valueOf(i) });

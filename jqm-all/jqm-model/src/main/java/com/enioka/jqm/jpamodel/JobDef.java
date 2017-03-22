@@ -555,7 +555,7 @@ public class JobDef implements Serializable
         List<JobDef> res = select(cnx, "jd_select_by_key", name);
         if (res.isEmpty())
         {
-            throw new DatabaseException("no result for query by key for key " + name);
+            throw new NoResultException("no result for query by key for key " + name);
         }
         if (res.size() > 1)
         {
