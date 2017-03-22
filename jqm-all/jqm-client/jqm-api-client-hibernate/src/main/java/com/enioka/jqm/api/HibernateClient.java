@@ -845,15 +845,8 @@ final class HibernateClient implements JqmClient
             return "";
         }
 
-        String res = String.format("AND ( %s IN ( ", fieldName);
-
-        for (com.enioka.jqm.api.State s : status)
-        {
-            String prmName = "status" + s.hashCode();
-            res += " :" + prmName + ",";
-            prms.add(State.valueOf(s.toString()));
-        }
-        res = res.substring(0, res.length() - 1) + ")) ";
+        String res = String.format("AND %s IN(UNNEST(?)) ", fieldName);
+        prms.addAll(status);
         return res;
     }
 
@@ -934,7 +927,7 @@ final class HibernateClient implements JqmClient
 
                 if (wh.length() > 3)
                 {
-                    q += wh;
+                    q += "WHERE " + wh.substring(3, wh.length() - 1);
                     filterCountQuery = String.format(filterCountQuery, wh);
                 }
             }
@@ -991,7 +984,7 @@ final class HibernateClient implements JqmClient
 
                 if (wh.length() > 3)
                 {
-                    q += wh;
+                    q += "WHERE " + wh.substring(3, wh.length() - 1);
                 }
             }
 
@@ -1033,6 +1026,7 @@ final class HibernateClient implements JqmClient
                 res.put(tmp.getId(), tmp);
             }
             rs.close();
+            jqmlogger.debug("Free query has returned row count " + res.size());
 
             // If needed, fetch the total result count (without pagination). Note that without pagination, the Query object does not
             // need this indication.
@@ -1078,7 +1072,7 @@ final class HibernateClient implements JqmClient
                     ResultSet msg = cnx.runSelect("message_select_by_ji_list", idsBatch);
                     while (msg.next())
                     {
-                        res.get(run.getInt(2)).getMessages().add(run.getString(3));
+                        res.get(msg.getInt(2)).getMessages().add(msg.getString(3));
                     }
                     run.close();
                 }
@@ -1133,7 +1127,7 @@ final class HibernateClient implements JqmClient
         q.setName(rs.getString(22));
         res.setQueue(q);
 
-        res.setPosition(rs.getInt(30));
+        res.setPosition(rs.getLong(30));
 
         return res;
     }

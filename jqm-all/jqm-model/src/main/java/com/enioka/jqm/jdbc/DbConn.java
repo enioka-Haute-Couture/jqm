@@ -1,6 +1,7 @@
 package com.enioka.jqm.jdbc;
 
 import java.io.Closeable;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,9 +11,14 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Calendar;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DbConn implements Closeable
 {
+    private static Logger jqmlogger = LoggerFactory.getLogger(DbConn.class);
 
     private Db parent;
     private Connection _cnx;
@@ -54,7 +60,7 @@ public class DbConn implements Closeable
             QueryResult qr = new QueryResult();
             qr.nbUpdated = ps.executeUpdate();
             qr.generatedKeys = ps.getGeneratedKeys();
-            System.out.println("Updated rows: " + qr.nbUpdated);
+            jqmlogger.debug("Updated rows: {}", qr.nbUpdated);
             return qr;
         }
         catch (SQLException e)
@@ -99,7 +105,18 @@ public class DbConn implements Closeable
         PreparedStatement ps = null;
         try
         {
-            ps = _cnx.prepareStatement(rawQuery, ResultSet.TYPE_FORWARD_ONLY);
+            jqmlogger.debug("Running raw SQL query: {}", rawQuery);
+            for (Object o : params)
+            {
+                if (o == null)
+                {
+                    jqmlogger.debug("     null");
+                }
+                else
+                    jqmlogger.debug("     {} - {}", o.toString(), o.getClass());
+            }
+
+            ps = _cnx.prepareStatement(rawQuery, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
             int i = 0;
             for (Object prm : params)
             {
@@ -252,14 +269,20 @@ public class DbConn implements Closeable
         {
             throw new DatabaseException("unknown query key");
         }
-        System.out.println("Running " + query_key + " : " + st + " with " + params.length + " parameters.");
+
+        // Debug
+        jqmlogger.debug("Running {} : {} with {} parameters.", query_key, st, params.length);
         for (Object o : params)
+        {
             if (o == null)
             {
-                System.out.println("     null");
+                jqmlogger.debug("      null");
             }
             else
-                System.out.println("     " + o.toString() + "         " + o.getClass());
+            {
+                jqmlogger.debug("      {} - {}", o.toString(), o.getClass());
+            }
+        }
 
         try
         {
@@ -303,6 +326,39 @@ public class DbConn implements Closeable
                 s.setBoolean(position, (Boolean) value);
             else if (value instanceof Calendar)
                 s.setTimestamp(position, new Timestamp(((Calendar) value).getTimeInMillis()));
+            else if (value instanceof List<?>)
+            {
+                Array a;
+                List<?> vv = (List<?>) value;
+                if (vv.size() == 0)
+                {
+                    throw new DatabaseException("Cannot do a query whith an empty list parameter");
+                }
+                if (vv.get(0) instanceof Integer)
+                {
+                    a = _cnx.createArrayOf("INTEGER", ((List<?>) value).toArray(new Integer[0]));
+                }
+                else if (vv.get(0) instanceof String)
+                {
+                    a = _cnx.createArrayOf("VARCHAR", ((List<?>) value).toArray(new String[0]));
+                }
+                else
+                {
+                    String[] vvv = new String[vv.size()];
+                    int i = 0;
+                    for (Object o : vv)
+                    {
+                        vvv[i++] = o.toString();
+                    }
+                    a = _cnx.createArrayOf("VARCHAR", vvv);
+                }
+                s.setArray(position, a);
+
+            }
+            else
+            {
+                s.setString(position, value.toString());
+            }
         }
         catch (SQLException e)
         {

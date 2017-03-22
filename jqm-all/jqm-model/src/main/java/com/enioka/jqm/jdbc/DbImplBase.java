@@ -160,13 +160,13 @@ public class DbImplBase
         queries.put("jiprm_delete_all", "DELETE FROM RUNTIMEPARAMETER ");
         queries.put("jiprm_delete_by_ji",queries.get("jiprm_delete_all") + " WHERE JI_ID=?");
         queries.put("jiprm_select_by_ji", "SELECT ID, JI_ID, KEYNAME, VALUE FROM RUNTIMEPARAMETER WHERE JI_ID=?");
-        queries.put("jiprm_select_by_ji_list", "SELECT ID, JI_ID, KEYNAME, VALUE FROM RUNTIMEPARAMETER WHERE JI_ID IN (?)");
+        queries.put("jiprm_select_by_ji_list", "SELECT ID, JI_ID, KEYNAME, VALUE FROM RUNTIMEPARAMETER WHERE JI_ID IN (UNNEST(?))");
         
         // MESSAGE
         queries.put("message_insert",  "INSERT INTO MESSAGE(JI, TEXT_MESSAGE) VALUES(?, ?)");
         queries.put("message_delete_all", "DELETE FROM MESSAGE");
         queries.put("message_delete_by_ji",queries.get("message_delete_all") + " WHERE JI=?");
-        queries.put("message_select_by_ji_list","SELECT ID, JI, TEXT_MESSAGE FROM MESSAGE WHERE JI IN (?)");
+        queries.put("message_select_by_ji_list","SELECT ID, JI, TEXT_MESSAGE FROM MESSAGE WHERE JI IN (UNNEST(?))");
         
         // JNDI
         queries.put("jndi_insert", "INSERT INTO JNDIOBJECTRESOURCE(AUTH, DESCRIPTION, FACTORY, LASTMODIFIED, NAME, SINGLETON, TEMPLATE, TYPE) VALUES('CONTAINER', ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?)");
@@ -215,7 +215,7 @@ public class DbImplBase
         queries.put("globalprm_delete_all", "DELETE FROM GLOBALPARAMETER");
         queries.put("globalprm_select_all", "SELECT ID, KEYNAME, VALUE, LASTMODIFIED FROM GLOBALPARAMETER");
         queries.put("globalprm_select_by_key", queries.get("globalprm_select_all") + " WHERE KEYNAME=?");
-        queries.put("globalprm_select_count_modified_jetty", "SELECT COUNT(1) FROM GLOBALPARAMETER WHERE LASTMODIFIED > ? AND key IN ('disableWsApi', 'enableWsApiSsl', 'enableInternalPki', 'pfxPassword', 'enableWsApiAuth')");
+        queries.put("globalprm_select_count_modified_jetty", "SELECT COUNT(1) FROM GLOBALPARAMETER WHERE LASTMODIFIED > ? AND KEYNAME IN ('disableWsApi', 'enableWsApiSsl', 'enableInternalPki', 'pfxPassword', 'enableWsApiAuth')");
     }
    
 }

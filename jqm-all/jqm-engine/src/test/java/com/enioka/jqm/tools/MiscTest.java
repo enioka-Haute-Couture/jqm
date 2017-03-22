@@ -214,7 +214,7 @@ public class MiscTest extends JqmBaseTest
                 null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
         // Create a running job that should be cleaned at startup
-        int i1 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+        int i1 = JqmClientFactory.getClient().enqueue("jqm-test-em", "test");
         cnx.runUpdate("debug_jj_update_status_by_id", State.ATTRIBUTED, i1);
         cnx.commit();
 
@@ -223,6 +223,27 @@ public class MiscTest extends JqmBaseTest
         Assert.assertEquals(0, TestHelpers.getQueueAllCount(cnx));
         Assert.assertEquals(1, TestHelpers.getHistoryAllCount(cnx));
         Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
+    }
+
+    @Test
+    public void testQuery() throws Exception
+    {
+        CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qNormal, 42,
+                "jqm-test-kill", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+        cnx.commit();
+
+        JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+        JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+        JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+        JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+        JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+
+        jqmlogger.debug("COUNT RUNNING " + cnx.runSelectSingle("ji_select_count_running", Integer.class));
+        jqmlogger.debug("COUNT ALL     " + cnx.runSelectSingle("ji_select_count_all", Integer.class));
+        Assert.assertEquals(0, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
+                .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run().size());
+        Assert.assertEquals(5, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
+                .addStatusFilter(com.enioka.jqm.api.State.SUBMITTED).run().size());
     }
 
     @Test
@@ -247,6 +268,8 @@ public class MiscTest extends JqmBaseTest
         // Scenario is: 5 jobs in queue. 3 should run. 2 are then killed - 3 should still run.
         Thread.sleep(3000);
 
+        jqmlogger.debug("COUNT RUNNING " + cnx.runSelectSingle("ji_select_count_running", Integer.class));
+        jqmlogger.debug("COUNT ALL     " + cnx.runSelectSingle("ji_select_count_all", Integer.class));
         Assert.assertEquals(3, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
                 .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run().size());
         Assert.assertEquals(2, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
