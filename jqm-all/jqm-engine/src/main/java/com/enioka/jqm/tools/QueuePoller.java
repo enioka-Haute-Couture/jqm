@@ -148,8 +148,22 @@ class QueuePoller implements Runnable, QueuePollerMBean
         jqmlogger.debug("Poller has found " + qr.nbUpdated + " JI to run");
         if (qr.nbUpdated > 0)
         {
-            cnx.commit();
-            return JobInstance.select(cnx, "ji_select_to_run", this.engine.getNode().getId(), queue.getId());
+            List<JobInstance> res = JobInstance.select(cnx, "ji_select_to_run", this.engine.getNode().getId(), queue.getId());
+            if (res.size() == qr.nbUpdated)
+            {
+                cnx.commit();
+                return res;
+            }
+            else
+            {
+                // Try again. This means the jobs marked for exec on previous loop have not already started.
+                // So they were still in the SELECT WHERE STATE='ATTRIBUTED'.
+                // Happens when loop interval is too low (ms and not s), so only happens during tests.
+                jqmlogger.info("Polling interval seems too low");
+                cnx.rollback();
+                Thread.yield();
+                return dequeue(cnx);
+            }
         }
         else
         {
@@ -167,6 +181,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
         while (true)
         {
             lastLoop = Calendar.getInstance();
+            jqmlogger.trace("poller loop");
 
             try
             {

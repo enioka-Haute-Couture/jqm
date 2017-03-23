@@ -50,6 +50,19 @@ public class DbConn implements Closeable
         }
     }
 
+    public void rollback()
+    {
+        try
+        {
+            _cnx.rollback();
+            transac_open = false;
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+    }
+
     public QueryResult runUpdate(String query_key, Object... params)
     {
         transac_open = true;
