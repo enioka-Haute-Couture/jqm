@@ -27,7 +27,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.enioka.jqm.jpamodel.History;
+import com.enioka.jqm.api.JobInstance;
+import com.enioka.jqm.api.Query;
+import com.enioka.jqm.api.Query.Sort;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class FiboTest extends JqmBaseTest
@@ -60,9 +62,9 @@ public class FiboTest extends JqmBaseTest
         JqmSimpleTest.create(cnx, "pyl.StressFiboSync").addRuntimeParameter("p1", "34").addRuntimeParameter("p2", "55").expectOk(4)
                 .run(this);
 
-        List<History> res = cnx.createQuery("SELECT j FROM History j ORDER BY j.id", History.class).getResultList();
-        History h1, h2 = null;
-        for (History h : res)
+        List<JobInstance> res = Query.create().addSortAsc(Sort.ID).run();
+        JobInstance h1, h2 = null;
+        for (JobInstance h : res)
         {
             h1 = h2;
             h2 = h;
@@ -70,9 +72,9 @@ public class FiboTest extends JqmBaseTest
             {
                 continue;
             }
-            Assert.assertEquals(h2.getParentJobId(), h1.getId());
+            Assert.assertEquals(h2.getParent(), h1.getId());
             Assert.assertTrue(h2.getEndDate().compareTo(h1.getEndDate()) <= 0);
-            Assert.assertTrue(h2.getEndDate().compareTo(h1.getExecutionDate()) > 0);
+            Assert.assertTrue(h2.getEndDate().compareTo(h1.getBeganRunningDate()) > 0);
         }
     }
 

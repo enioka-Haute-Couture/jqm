@@ -32,11 +32,7 @@ public class GeoTest extends JqmBaseTest
     public void b()
     {
         TestHelpers.setNodesLogLevel("INFO", cnx);
-        cnx.getTransaction().begin();
-        TestHelpers.node.setRootLogLevel("INFO");
-        TestHelpers.nodeMix.setRootLogLevel("INFO");
-        TestHelpers.nodeMix2.setRootLogLevel("INFO");
-        cnx.getTransaction().commit();
+        cnx.commit();
     }
 
     @After
