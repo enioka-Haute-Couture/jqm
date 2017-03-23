@@ -57,6 +57,7 @@ public class JobInstance
     private List<String> messages = new ArrayList<String>();
     private Calendar enqueueDate, beganRunningDate, endDate;
     private String nodeName;
+    private boolean highlander;
 
     /**
      * The Job Instance ID, i.e. the unique identifier of the execution request. This is a key for numerous {@link JqmClient} functions.
@@ -388,5 +389,18 @@ public class JobInstance
     void setNodeName(String nodeName)
     {
         this.nodeName = nodeName;
+    }
+
+    /**
+     * True if the job instance was subject to the Highlander mode rules.
+     */
+    public boolean isHighlander()
+    {
+        return highlander;
+    }
+
+    void setHighlander(boolean h)
+    {
+        this.highlander = h;
     }
 }

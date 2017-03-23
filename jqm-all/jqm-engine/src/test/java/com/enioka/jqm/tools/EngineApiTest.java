@@ -21,8 +21,10 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.jpamodel.Message;
+import com.enioka.jqm.api.JobInstance;
+import com.enioka.jqm.api.Query;
+import com.enioka.jqm.api.Query.Sort;
+import com.enioka.jqm.api.State;
 
 public class EngineApiTest extends JqmBaseTest
 {
@@ -35,18 +37,18 @@ public class EngineApiTest extends JqmBaseTest
 
         int i = JqmSimpleTest.create(cnx, "pyl.EngineApiSend3Msg").run(this);
 
-        List<Message> m = cnx.createQuery("SELECT m FROM Message m WHERE m.ji = :i", Message.class).setParameter("i", i).getResultList();
-        for (Message msg : m)
+        List<String> messages = Query.create().setJobInstanceId(i).run().get(0).getMessages();
+        for (String msg : messages)
         {
-            if (msg.getTextMessage().equals("Les marsus sont nos amis, il faut les aimer aussi!"))
+            if (msg.equals("Les marsus sont nos amis, il faut les aimer aussi!"))
             {
                 success = true;
             }
-            if (msg.getTextMessage().equals("Les marsus sont nos amis, il faut les aimer aussi!2"))
+            if (msg.equals("Les marsus sont nos amis, il faut les aimer aussi!2"))
             {
                 success2 = true;
             }
-            if (msg.getTextMessage().equals("Les marsus sont nos amis, il faut les aimer aussi!3"))
+            if (msg.equals("Les marsus sont nos amis, il faut les aimer aussi!3"))
             {
                 success3 = true;
             }
@@ -62,7 +64,7 @@ public class EngineApiTest extends JqmBaseTest
     {
         JqmSimpleTest.create(cnx, "pyl.EngineApiProgress").addWaitMargin(10000).run(this);
 
-        List<History> res = cnx.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class).getResultList();
+        List<JobInstance> res = Query.create().run();
         Assert.assertEquals((Integer) 50, res.get(0).getProgress());
     }
 
@@ -83,13 +85,11 @@ public class EngineApiTest extends JqmBaseTest
     {
         JqmSimpleTest.create(cnx, "pyl.EngineApiWaitAll").expectOk(6).run(this);
 
-        List<History> ji = Helpers.getNewDbSession()
-                .createQuery("SELECT j FROM History j WHERE j.status = 'ENDED' ORDER BY j.id ASC", History.class).getResultList();
-
-        Calendar parentEnd = ji.get(0).getEndDate();
+        List<JobInstance> jj = Query.create().addSortAsc(Sort.ID).addStatusFilter(State.ENDED).run();
+        Calendar parentEnd = jj.get(0).getEndDate();
         for (int i = 1; i < 6; i++)
         {
-            Assert.assertTrue(parentEnd.after(ji.get(i).getEndDate()));
+            Assert.assertTrue(parentEnd.after(jj.get(i).getEndDate()));
         }
     }
 

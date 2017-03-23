@@ -18,7 +18,6 @@
 
 package com.enioka.jqm.tools;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -27,10 +26,11 @@ import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.api.Query;
+import com.enioka.jqm.api.Query.Sort;
+import com.enioka.jqm.api.State;
+import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -57,18 +57,18 @@ public class HighlanderTest extends JqmBaseTest
         }
         TestHelpers.waitFor(20, 5000, cnx); // Actually wait.
 
-        ArrayList<History> res = (ArrayList<History>) cnx.createQuery("SELECT j FROM History j ORDER BY j.id ASC", History.class)
-                .getResultList();
-        cnx.close();
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+
+        List<com.enioka.jqm.api.JobInstance> res = Query.create().addSortAsc(Sort.ID).run();
 
         Assert.assertEquals(State.ENDED, res.get(0).getState());
         Assert.assertEquals(State.ENDED, res.get(1).getState());
         Assert.assertEquals(true, res.get(0).isHighlander());
 
         Calendar prevEnd = null;
-        for (History h : res)
+        for (com.enioka.jqm.api.JobInstance h : res)
         {
-            if (h.getExecutionDate().before(prevEnd))
+            if (h.getBeganRunningDate().before(prevEnd))
             {
                 Assert.fail("executions were not exclusive");
             }
@@ -89,9 +89,8 @@ public class HighlanderTest extends JqmBaseTest
         addAndStartEngine();
         TestHelpers.waitFor(1, 10000, cnx);
 
-        EntityManager emm = getNewDbSession();
-        Assert.assertEquals(1, TestHelpers.getOkCount(emm));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(emm));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 
     @Test
@@ -110,16 +109,17 @@ public class HighlanderTest extends JqmBaseTest
             JobRequest.create("kill", "TestUser").submit();
         }
         Thread.sleep(3000);
+        Calendar killTime1 = Calendar.getInstance();
         JqmClientFactory.getClient().killJob(firstJob);
         Thread.sleep(3000);
         JqmClientFactory.getClient().killJob(JqmClientFactory.getClient().getUserActiveJobs("TestUser").get(0).getId());
         TestHelpers.waitFor(2, 10000, cnx);
 
-        List<History> res = cnx.createQuery("SELECT j FROM History j ORDER BY j.id ASC", History.class).getResultList();
+        List<com.enioka.jqm.api.JobInstance> res = Query.create().addSortAsc(Sort.ID).run();
         Assert.assertEquals(2, res.size());
         Assert.assertEquals(State.KILLED, res.get(0).getState());
         Assert.assertEquals(State.KILLED, res.get(1).getState());
-        Assert.assertTrue(res.get(0).getAttributionDate().compareTo(res.get(1).getEnqueueDate()) <= 0);
+        Assert.assertTrue(killTime1.compareTo(res.get(1).getBeganRunningDate()) <= 0);
     }
 
     @Test
@@ -134,17 +134,16 @@ public class HighlanderTest extends JqmBaseTest
         addAndStartEngine();
         TestHelpers.waitFor(1, 10000, cnx);
 
-        EntityManager emm = getNewDbSession();
-        Assert.assertEquals(1, TestHelpers.getOkCount(emm));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(emm));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 
     @Test
     public void testHighlanderMultiNodeBug195() throws Exception
     {
-        Queue q = CreationTools.initQueue("q", "", 42, cnx);
-        CreationTools.createDeploymentParameter(TestHelpers.node, 1, 1, q, cnx);
-        CreationTools.createDeploymentParameter(TestHelpers.nodeMix, 1, 1, q, cnx);
+        int q = Queue.create(cnx, "q", "test queue", false);
+        DeploymentParameter.create(cnx, TestHelpers.node.getId(), 1, 1, q);
+        DeploymentParameter.create(cnx, TestHelpers.nodeMix.getId(), 1, 1, q);
 
         CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", q, 42, "WithH", null,
                 "Franquin", "WithH", "other", "other", true, cnx);
@@ -162,12 +161,13 @@ public class HighlanderTest extends JqmBaseTest
         int i3 = JqmClientFactory.getClient().enqueue(new JobRequest("WithoutH", "TestUser"));
         sleep(1);
 
-        List<JobInstance> res = cnx.createQuery("SELECT j FROM JobInstance j ORDER BY j.id ASC", JobInstance.class).getResultList();
+        List<com.enioka.jqm.api.JobInstance> res = Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
+                .addSortAsc(Sort.ID).run();
 
         Assert.assertEquals(State.RUNNING, res.get(0).getState());
         Assert.assertEquals(State.SUBMITTED, res.get(1).getState());
         Assert.assertEquals(State.RUNNING, res.get(2).getState());
-        Assert.assertEquals(true, res.get(0).getJd().isHighlander());
+        Assert.assertEquals(true, res.get(0).isHighlander());
 
         JqmClientFactory.getClient().killJob(i2);
         JqmClientFactory.getClient().killJob(i1);

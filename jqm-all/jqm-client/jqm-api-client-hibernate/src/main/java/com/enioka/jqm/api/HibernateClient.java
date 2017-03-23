@@ -1106,6 +1106,7 @@ final class HibernateClient implements JqmClient
         res.setEndDate(getCal(rs, 6));
         res.setEnqueueDate(getCal(rs, 7));
         res.setBeganRunningDate(getCal(rs, 8));
+        res.setHighlander(rs.getBoolean(9));
         res.setApplication(rs.getString(10));
         res.setKeyword1(rs.getString(11));
         res.setKeyword2(rs.getString(12));

@@ -19,8 +19,8 @@ public class EngineCLIsolationTest extends JqmBaseTest
     void createSubmitSetJob(String specificIsolationContext)
     {
         CreationTools.createJobDef(null, true, "com.enioka.jqm.TestCLIsolation.TestSet", new ArrayList<JobDefParameter>(),
-                "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestSet", null, null, null, null, null, false, cnx,
-                specificIsolationContext);
+                "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestSet", null, null, null, null, null, false,
+                cnx, specificIsolationContext);
         JobRequest.create("TestSet", null).submit();
     }
 
@@ -30,8 +30,8 @@ public class EngineCLIsolationTest extends JqmBaseTest
     void createSubmitGetJob(String specificIsolationContext)
     {
         CreationTools.createJobDef(null, true, "com.enioka.jqm.TestCLIsolation.TestGet", new ArrayList<JobDefParameter>(),
-                "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestGet", null, null, null, null, null, false, cnx,
-                specificIsolationContext);
+                "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestGet", null, null, null, null, null, false,
+                cnx, specificIsolationContext);
         JobRequest.create("TestGet", null).submit();
     }
 
@@ -62,7 +62,9 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testGlobalIsolated() throws Exception
     {
-        CreationTools.createGlobalParameter("launch_isolation_default", "Isolated", cnx);
+        Helpers.setSingleParam("launch_isolation_default", "Isolated", cnx);
+        cnx.commit();
+
         addAndStartEngine();
 
         createSubmitSetJob(null);
@@ -82,7 +84,9 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testGlobalSharedJarSame() throws Exception
     {
-        CreationTools.createGlobalParameter("launch_isolation_default", "SharedJar", cnx);
+        Helpers.setSingleParam("launch_isolation_default", "SharedJar", cnx);
+        cnx.commit();
+
         addAndStartEngine();
 
         createSubmitSetJob(null);
@@ -102,7 +106,9 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testGlobalSharedJarDifferent() throws Exception
     {
-        CreationTools.createGlobalParameter("launch_isolation_default", "SharedJar", cnx);
+        Helpers.setSingleParam("launch_isolation_default", "SharedJar", cnx);
+        cnx.commit();
+
         addAndStartEngine();
 
         createSubmitSetJob(null);
@@ -126,7 +132,9 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testGlobalSharedSame() throws Exception
     {
-        CreationTools.createGlobalParameter("launch_isolation_default", "Shared", cnx);
+        Helpers.setSingleParam("launch_isolation_default", "Shared", cnx);
+        cnx.commit();
+
         addAndStartEngine();
 
         createSubmitSetJob(null);
@@ -146,7 +154,9 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testGlobalSharedDifferent() throws Exception
     {
-        CreationTools.createGlobalParameter("launch_isolation_default", "Shared", cnx);
+        Helpers.setSingleParam("launch_isolation_default", "Shared", cnx);
+        cnx.commit();
+
         addAndStartEngine();
 
         createSubmitSetJob(null);
@@ -211,7 +221,9 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testJobDefSpecificDifferentShared() throws Exception
     {
-        CreationTools.createGlobalParameter("launch_isolation_default", "Shared", cnx);
+        Helpers.setSingleParam("launch_isolation_default", "Shared", cnx);
+        cnx.commit();
+
         addAndStartEngine();
 
         createSubmitSetJob("test1");

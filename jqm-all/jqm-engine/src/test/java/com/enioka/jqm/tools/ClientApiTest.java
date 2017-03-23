@@ -61,8 +61,8 @@ public class ClientApiTest extends JqmBaseTest
         ArrayList<History> res = (ArrayList<History>) query.getResultList();
 
         Assert.assertEquals(2, res.size());
-        Assert.assertEquals(jdDemoMaven.getId(), res.get(0).getJd().getId());
-        Assert.assertEquals(jdDemoMaven.getId(), res.get(1).getJd().getId());
+        Assert.assertEquals(jdDemoMaven.getId(), res.get(0).getJd());
+        Assert.assertEquals(jdDemoMaven.getId(), res.get(1).getJd());
     }
 
     @Test
@@ -214,7 +214,7 @@ public class ClientApiTest extends JqmBaseTest
         List<History> res = cnx.createQuery("SELECT j FROM History j ORDER BY j.enqueueDate ASC", History.class).getResultList();
         Assert.assertEquals(1, res.size());
         Assert.assertEquals(State.ENDED, res.get(0).getState());
-        Assert.assertEquals(TestHelpers.qSlow.getName(), res.get(0).getQueue().getName());
+        Assert.assertEquals(TestHelpers.qSlow.getName(), res.get(0).getQueue(cnx).getName());
     }
 
     @Test

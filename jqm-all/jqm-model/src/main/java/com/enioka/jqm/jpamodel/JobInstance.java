@@ -473,7 +473,7 @@ public class JobInstance implements Serializable
             String keyword2, String keyword3, String sessionId, String userName, String email, boolean highlander, Map<String, String> prms)
     {
         QueryResult qr = cnx.runUpdate("ji_insert_enqueue", email, application, keyword1, keyword2, keyword3, module, parentId, sessionId,
-                userName, job_id, queue_id);
+                userName, job_id, queue_id, highlander);
 
         int newId = qr.getGeneratedId();
 

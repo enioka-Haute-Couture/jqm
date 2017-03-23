@@ -84,8 +84,8 @@ public class DbImplBase
         // JOB INSTANCE
         queries.put("ji_insert_enqueue", "INSERT INTO JOBINSTANCE (CREATIONDATE, SENDEMAIL, APPLICATION, "
                 + "KEYWORD1, KEYWORD2, KEYWORD3, MODULE, INTERNALPOSITION, PARENTID, PROGRESS, SESSIONID, "
-                + "STATE, USERNAME, JD_ID, QUEUE_ID) "
-                + "VALUES(CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, UNIX_MILLIS(), ?, 0, ?, 'SUBMITTED', ?, ?, ?)");
+                + "STATE, USERNAME, JD_ID, QUEUE_ID, HIGHLANDER) "
+                + "VALUES(CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, UNIX_MILLIS(), ?, 0, ?, 'SUBMITTED', ?, ?, ?, ?)");
         queries.put("ji_delete_all", "DELETE FROM JOBINSTANCE");
         queries.put("ji_delete_by_id", "DELETE FROM JOBINSTANCE WHERE ID = ?");
         queries.put("jj_update_cancel_by_id", "UPDATE JOBINSTANCE SET STATE='CANCELLED' WHERE ID=? AND STATE='SUBMITTED'");
@@ -123,9 +123,10 @@ public class DbImplBase
         queries.put("ji_update_poll", "UPDATE JOBINSTANCE j1 SET j1.NODE_ID=?, j1.STATE='ATTRIBUTED', ATTRIBUTIONDATE=CURRENT_TIMESTAMP WHERE j1.ID IN "
                 + "(SELECT j2.ID FROM JOBINSTANCE j2 WHERE j2.STATE='SUBMITTED' AND j2.QUEUE_ID=? "
                 + "AND (j2.HIGHLANDER=0 OR (j2.HIGHLANDER=1 AND (SELECT COUNT(1) FROM JOBINSTANCE j3 WHERE j3.STATE IN ('ATTRIBUTED', 'RUNNING') AND j3.JD_ID=j2.JD_ID)=0 )) ORDER BY INTERNALPOSITION LIMIT ?)");
-        queries.put("ji_update_poll", "UPDATE JOBINSTANCE j1 SET j1.NODE_ID=?, j1.STATE='ATTRIBUTED', ATTRIBUTIONDATE=CURRENT_TIMESTAMP WHERE j1.ID IN "
+        queries.put("ji_update_poll3", "UPDATE JOBINSTANCE j1 SET j1.NODE_ID=?, j1.STATE='ATTRIBUTED', ATTRIBUTIONDATE=CURRENT_TIMESTAMP WHERE j1.ID IN "
                 + "(SELECT j2.ID FROM JOBINSTANCE j2 WHERE j2.STATE='SUBMITTED' AND j2.QUEUE_ID=? "
                 + " ORDER BY INTERNALPOSITION LIMIT ?)");
+
         queries.put("ji_select_to_run", queries.get("ji_select_all") + " WHERE NODE_ID = ? AND QUEUE_ID = ? AND STATE='ATTRIBUTED'");
         
         // HISTORY
@@ -166,7 +167,8 @@ public class DbImplBase
         queries.put("message_insert",  "INSERT INTO MESSAGE(JI, TEXT_MESSAGE) VALUES(?, ?)");
         queries.put("message_delete_all", "DELETE FROM MESSAGE");
         queries.put("message_delete_by_ji",queries.get("message_delete_all") + " WHERE JI=?");
-        queries.put("message_select_by_ji_list","SELECT ID, JI, TEXT_MESSAGE FROM MESSAGE WHERE JI IN (UNNEST(?))");
+        queries.put("message_select_all", "SELECT ID, JI, TEXT_MESSAGE FROM MESSAGE");
+        queries.put("message_select_by_ji_list", queries.get("message_select_all") + " WHERE JI IN (UNNEST(?))");
         
         // JNDI
         queries.put("jndi_insert", "INSERT INTO JNDIOBJECTRESOURCE(AUTH, DESCRIPTION, FACTORY, LASTMODIFIED, NAME, SINGLETON, TEMPLATE, TYPE) VALUES('CONTAINER', ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?)");
