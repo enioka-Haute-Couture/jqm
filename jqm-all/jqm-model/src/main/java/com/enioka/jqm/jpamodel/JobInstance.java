@@ -477,9 +477,12 @@ public class JobInstance implements Serializable
 
         int newId = qr.getGeneratedId();
 
-        for (Map.Entry<String, String> prm : prms.entrySet())
+        if (prms != null)
         {
-            RuntimeParameter.create(cnx, newId, prm.getKey(), prm.getValue());
+            for (Map.Entry<String, String> prm : prms.entrySet())
+            {
+                RuntimeParameter.create(cnx, newId, prm.getKey(), prm.getValue());
+            }
         }
 
         return newId;

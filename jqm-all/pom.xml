@@ -94,11 +94,11 @@
 		<module>jqm-tests</module>
 		<module>jqm-model</module>
 		<module>jqm-api</module>
-		<module>jqm-ws</module>
+		<!--<module>jqm-ws</module>-->
 		<module>jqm-client</module>
 		<module>jqm-test-helpers</module>
 		<module>jqm-engine</module>
-		<module>jqm-jsfsample</module>
+		<!--<module>jqm-jsfsample</module>-->
 		<module>jqm-providers</module>
 		<module>jqm-pki</module>
 		<module>jqm-tst</module>

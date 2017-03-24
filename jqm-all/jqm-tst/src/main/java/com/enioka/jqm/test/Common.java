@@ -6,8 +6,9 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.hsqldb.Server;
+
+import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.Queue;
 
 final class Common
 {
@@ -61,32 +62,12 @@ final class Common
         return p;
     }
 
-    static JobDef createJobDef(TestJobDefinition d, Map<String, Queue> queues)
+    static void createJobDef(DbConn cnx, TestJobDefinition d, Map<String, Integer> queues)
     {
-        JobDef j = new JobDef();
-
-        j.setApplicationName(d.getName());
-        j.setDescription(d.getDescription());
-
-        j.setJavaClassName(d.getJavaClassName());
-        j.setJarPath(d.getPath());
-        j.setPathType(d.getPathType());
-
-        j.setParameters(d.getParameters());
-        j.setQueue(d.getQueueName() != null ? queues.get(d.getQueueName()) : queues.values().iterator().next());
-        j.setHighlander(d.isHighlander());
-
-        j.setApplication(d.getApplication());
-        j.setModule(d.getModule());
-        j.setKeyword1(d.getKeyword1());
-        j.setKeyword2(d.getKeyword2());
-        j.setKeyword3(d.getKeyword3());
-
-        j.setSpecificIsolationContext(d.getSpecificIsolationContext());
-        j.setChildFirstClassLoader(d.isChildFirstClassLoader());
-        j.setHiddenJavaClasses(d.getHiddenJavaClasses());
-        j.setClassLoaderTracing(d.isClassLoaderTracing());
-
-        return j;
+        JobDef.create(cnx, d.getDescription(), d.getJavaClassName(), d.parameters, d.getPath(),
+                d.getQueueName() != null ? queues.get(d.getQueueName()) : queues.values().iterator().next(), 0, d.getName(),
+                d.getApplication(), d.getModule(), d.getKeyword1(), d.getKeyword2(), d.getKeyword3(), d.isHighlander(),
+                d.getSpecificIsolationContext(), d.isChildFirstClassLoader(), d.getHiddenJavaClasses(), d.isClassLoaderTracing(),
+                d.getPathType());
     }
 }

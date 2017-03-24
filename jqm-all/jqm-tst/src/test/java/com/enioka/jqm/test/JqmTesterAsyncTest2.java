@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.enioka.jqm.api.Deliverable;
+import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 
 /**
@@ -71,11 +72,11 @@ public class JqmTesterAsyncTest2
     @Test
     public void testFour() throws IOException
     {
-        JqmAsyncTester tester = JqmAsyncTester.createSingleNodeOneQueue()
+        JqmAsyncTester tester = JqmAsyncTester.createSingleNodeOneQueue().setNodesLogLevel("TRACE")
                 .addSimpleJobDefinitionFromLibrary("payload1", "pyl.EngineApiSendDeliverable", "../jqm-tests/jqm-test-pyl/target/test.jar")
                 .start();
 
-        int jobId = tester.enqueue("payload1");
+        int jobId = JobRequest.create("payload1", "tesuser").addParameter("fileName", "marsu.txt").addParameter("filepath", "./").submit();
         tester.waitForResults(1, 10000, 0);
 
         Assert.assertEquals(0, tester.getNonOkCount());

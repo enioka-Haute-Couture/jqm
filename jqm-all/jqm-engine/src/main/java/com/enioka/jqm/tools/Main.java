@@ -368,17 +368,20 @@ public class Main
 
     private static void upgrade()
     {
+        DbConn cnx = null;
         try
         {
-            // TODO!
-            // jqmlogger.info("Upgrading database and shared metadata");
-            // EntityManager em = Helpers.getNewDbSession();
-            // Helpers.updateConfiguration(em);
-            // em.close();
+            cnx = Helpers.getNewDbSession();
+            Helpers.updateConfiguration(cnx);
+            cnx.commit();
         }
         catch (Exception e)
         {
             throw new JqmRuntimeException("Could not upgrade", e);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
         }
     }
 

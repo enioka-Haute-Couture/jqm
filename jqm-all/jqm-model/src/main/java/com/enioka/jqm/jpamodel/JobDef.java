@@ -542,9 +542,12 @@ public class JobDef implements Serializable
                 module, pathType.toString(), specificIsolationContext, queue_id);
         int newId = r.getGeneratedId();
 
-        for (Map.Entry<String, String> prm : parameters.entrySet())
+        if (parameters != null)
         {
-            cnx.runUpdate("jdprm_insert", prm.getKey(), prm.getValue(), newId);
+            for (Map.Entry<String, String> prm : parameters.entrySet())
+            {
+                cnx.runUpdate("jdprm_insert", prm.getKey(), prm.getValue(), newId);
+            }
         }
 
         return newId;

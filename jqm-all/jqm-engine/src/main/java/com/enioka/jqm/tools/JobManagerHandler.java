@@ -389,7 +389,9 @@ class JobManagerHandler implements InvocationHandler
             jqmlogger.debug("A deliverable is added. Stored as " + absDestPath + ". Initial name: " + fileName);
             FileUtils.moveFile(new File(path), new File(absDestPath));
             cnx.commit();
-            return Helpers.createDeliverable(relDestPath, fileName, fileLabel, this.ji.getId(), cnx);
+            int res = Helpers.createDeliverable(relDestPath, fileName, fileLabel, this.ji.getId(), cnx);
+            cnx.commit();
+            return res;
         }
         finally
         {

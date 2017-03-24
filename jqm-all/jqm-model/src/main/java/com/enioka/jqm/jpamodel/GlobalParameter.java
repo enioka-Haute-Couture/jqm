@@ -162,4 +162,13 @@ public class GlobalParameter implements Serializable
             return defaultValue;
         }
     }
+
+    public static void setParameter(DbConn cnx, String key, String value)
+    {
+        QueryResult qr = cnx.runUpdate("globalprm_update_value_by_key", value, key);
+        if (qr.nbUpdated == 0)
+        {
+            create(cnx, key, value);
+        }
+    }
 }
