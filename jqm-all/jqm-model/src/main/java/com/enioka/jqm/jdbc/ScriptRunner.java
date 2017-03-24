@@ -6,8 +6,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ScriptRunner
 {
+    private static Logger jqmlogger = LoggerFactory.getLogger(ScriptRunner.class);
     private static String nl = System.getProperty("line.separator");
 
     public static void run(DbConn cnx, String classpath)
@@ -40,7 +44,7 @@ public class ScriptRunner
                 if (line.contains(";"))
                 {
                     // End of order - run it.
-                    System.out.println(sb.toString());
+                    jqmlogger.info(sb.toString());
                     cnx.runRawUpdate(sb.toString());
                     sb = new StringBuilder();
                 }

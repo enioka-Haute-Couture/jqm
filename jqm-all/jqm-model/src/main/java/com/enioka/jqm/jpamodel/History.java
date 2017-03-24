@@ -577,11 +577,11 @@ public class History implements Serializable
 
         if (endDate == null)
         {
-            cnx.runUpdate("history_insert", ji.getId(), jd.getApplication(), jd.getApplication(), ji.getAttributionDate(), ji.getEmail(),
-                    ji.getCreationDate(), ji.getExecutionDate(), jd.isHighlander(), ji.getApplication(), ji.getKeyword1(), ji.getKeyword2(),
-                    ji.getKeyword3(), ji.getModule(), jd.getKeyword1(), jd.getKeyword2(), jd.getKeyword3(), jd.getModule(), n.getName(),
-                    ji.getParentId(), ji.getProgress(), q.getName(), 0, ji.getSessionID(), finalState.toString(), ji.getUserName(),
-                    ji.getJd(), ji.getNode().getId(), ji.getQueue());
+            cnx.runUpdate("history_insert", ji.getId(), jd.getApplication(), jd.getApplicationName(), ji.getAttributionDate(),
+                    ji.getEmail(), ji.getCreationDate(), ji.getExecutionDate(), jd.isHighlander(), ji.getApplication(), ji.getKeyword1(),
+                    ji.getKeyword2(), ji.getKeyword3(), ji.getModule(), jd.getKeyword1(), jd.getKeyword2(), jd.getKeyword3(),
+                    jd.getModule(), n == null ? null : n.getName(), ji.getParentId(), ji.getProgress(), q == null ? null : q.getName(), 0,
+                    ji.getSessionID(), finalState.toString(), ji.getUserName(), ji.getJd(), n == null ? null : n.getId(), ji.getQueue());
         }
         else
         {

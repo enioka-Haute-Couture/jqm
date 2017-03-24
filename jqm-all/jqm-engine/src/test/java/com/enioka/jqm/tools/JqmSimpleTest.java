@@ -27,9 +27,8 @@ public class JqmSimpleTest
     private JqmSimpleTest(DbConn cnx, String className, String artifactName)
     {
         this.cnx = cnx;
-        this.jd = CreationTools.createJobDef(null, true, className, new ArrayList<JobDefParameter>(),
-                "jqm-tests/" + artifactName + "/target/test.jar", TestHelpers.qVip, -1, "TestJqmApplication", "appFreeName", "TestModule",
-                "kw1", "kw2", "kw3", false, cnx);
+        this.jd = CreationTools.createJobDef(null, true, className, null, "jqm-tests/" + artifactName + "/target/test.jar",
+                TestHelpers.qVip, -1, "TestJqmApplication", "appFreeName", "TestModule", "kw1", "kw2", "kw3", false, cnx);
         nodeNames.add("localhost");
     }
 

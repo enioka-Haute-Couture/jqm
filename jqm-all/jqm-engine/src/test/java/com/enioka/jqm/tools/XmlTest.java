@@ -17,12 +17,14 @@ package com.enioka.jqm.tools;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import com.enioka.jqm.jpamodel.JobDefParameter;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.test.helpers.CreationTools;
@@ -52,15 +54,24 @@ public class XmlTest extends JqmBaseTest
         // --> Test Import
         XmlQueueParser.parse(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml", cnx);
 
-        long ii = (Long) cnx.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'VIPQueue'").getSingleResult();
-        long iii = (Long) cnx.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'NormalQueue'").getSingleResult();
-        Assert.assertEquals(2, ii + iii);
-        Assert.assertEquals("VIPQueue", cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Fibo' ", String.class)
-                .getSingleResult());
-        Assert.assertEquals("VIPQueue", cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Geo' ", String.class)
-                .getSingleResult());
-        Assert.assertEquals("NormalQueue",
-                cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
+        try
+        {
+            Queue.select(cnx, "q_select_by_key", "VIPQueue");
+            Queue.select(cnx, "q_select_by_key", "NormalQueue");
+
+            JobDef jd1 = JobDef.select_key(cnx, "Fibo");
+            JobDef jd2 = JobDef.select_key(cnx, "Geo");
+            JobDef jd3 = JobDef.select_key(cnx, "DateTime");
+
+            Assert.assertEquals("VIPQueue", jd1.getQueue(cnx).getName());
+            Assert.assertEquals("VIPQueue", jd2.getQueue(cnx).getName());
+            Assert.assertEquals("NormalQueue", jd3.getQueue(cnx).getName());
+        }
+        catch (NoResultException e)
+        {
+            Assert.fail("missing configuration element");
+        }
+
         t.delete();
     }
 
@@ -82,15 +93,24 @@ public class XmlTest extends JqmBaseTest
         // --> Test Import
         XmlQueueParser.parse(TestHelpers.node.getDlRepo() + "xmlexportqueuetest.xml", cnx);
 
-        long ii = (Long) cnx.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'VIPQueue'").getSingleResult();
-        long iii = (Long) cnx.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'NormalQueue'").getSingleResult();
-        Assert.assertEquals(2, ii + iii);
-        Assert.assertEquals("VIPQueue", cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Fibo' ", String.class)
-                .getSingleResult());
-        Assert.assertEquals("VIPQueue", cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Geo' ", String.class)
-                .getSingleResult());
-        Assert.assertEquals("NormalQueue",
-                cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
+        try
+        {
+            Queue.select(cnx, "q_select_by_key", "VIPQueue");
+            Queue.select(cnx, "q_select_by_key", "NormalQueue");
+
+            JobDef jd1 = JobDef.select_key(cnx, "Fibo");
+            JobDef jd2 = JobDef.select_key(cnx, "Geo");
+            JobDef jd3 = JobDef.select_key(cnx, "DateTime");
+
+            Assert.assertEquals("VIPQueue", jd1.getQueue(cnx).getName());
+            Assert.assertEquals("VIPQueue", jd2.getQueue(cnx).getName());
+            Assert.assertEquals("NormalQueue", jd3.getQueue(cnx).getName());
+        }
+        catch (NoResultException e)
+        {
+            Assert.fail("missing configuration element");
+        }
+
         t.delete();
     }
 
@@ -102,7 +122,7 @@ public class XmlTest extends JqmBaseTest
 
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest.xml" });
 
-        List<JobDef> jd = cnx.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
+        List<JobDef> jd = JobDef.select(cnx, "jd_select_all");
 
         Assert.assertEquals(2, jd.size());
         Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
@@ -112,15 +132,15 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals("ApplicationTest", jd.get(0).getApplication());
         Assert.assertEquals("TestModuleRATONLAVEUR", jd.get(0).getModule());
         Assert.assertEquals(false, jd.get(0).isHighlander());
-        Assert.assertEquals("1", jd.get(0).getParameters().get(0).getValue());
-        Assert.assertEquals("2", jd.get(0).getParameters().get(1).getValue());
+        Assert.assertEquals("1", jd.get(0).getParameters(cnx).get(0).getValue());
+        Assert.assertEquals("2", jd.get(0).getParameters(cnx).get(1).getValue());
     }
 
     @Test
     public void testExportJobDef() throws Exception
     {
-        List<JobDefParameter> jdp = new ArrayList<JobDefParameter>();
-        jdp.add(CreationTools.createJobDefParameter("test-key", "test-value", cnx));
+        Map<String, String> jdp = new HashMap<String, String>();
+        jdp.put("test-key", "test-value");
         CreationTools.createJobDef("My Description", true, "com.enioka.jqm.tests.App", jdp, "jqm-tests/jqm-test-fibo/target/test.jar",
                 TestHelpers.qVip, 42, "Fibo", "App", "ModuleMachin", "other1", "other2", null, false, cnx, "Isolation", true, "HIDDEN");
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-geo/target/test.jar", TestHelpers.qVip, 42, "Geo", null,
@@ -136,33 +156,39 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals(true, f.exists());
 
         // -> Delete all entries and try to reimport them from the exported file
-        cnx.getTransaction().begin();
-        cnx.createQuery("DELETE JobDefParameter WHERE 1=1)").executeUpdate();
-        cnx.createQuery("DELETE JobDef WHERE 1=1").executeUpdate();
-        cnx.getTransaction().commit();
+        TestHelpers.cleanup(cnx);
+
         XmlJobDefParser.parse(TestHelpers.node.getDlRepo() + "xmlexportjobdeftest.xml", cnx);
 
         // test the 4 JobDef were imported
-        long count = (Long) cnx.createQuery("SELECT COUNT(j) FROM JobDef j WHERE j.applicationName IN ('Fibo', 'Geo', 'DateTime', 'DateTime2')").getSingleResult();
-        Assert.assertEquals(4, count);
-        JobDef fibo = cnx.createQuery("SELECT j FROM JobDef j WHERE j.applicationName = 'Fibo' ", JobDef.class).getSingleResult();
-
+        JobDef fibo = null;
+        try
+        {
+            fibo = JobDef.select_key(cnx, "Fibo");
+            JobDef.select_key(cnx, "Geo");
+            JobDef.select_key(cnx, "DateTime");
+            JobDef.select_key(cnx, "DateTime2");
+        }
+        catch (NoResultException e)
+        {
+            Assert.fail("missing configuration element");
+        }
 
         Assert.assertEquals("My Description", fibo.getDescription());
         Assert.assertEquals("App", fibo.getApplication());
         Assert.assertEquals("jqm-tests/jqm-test-fibo/target/test.jar", fibo.getJarPath());
         Assert.assertEquals("FS", fibo.getPathType().toString());
-        Assert.assertEquals("VIPQueue", fibo.getQueue().getName());
-        Assert.assertEquals(true,  fibo.isCanBeRestarted());
-        Assert.assertEquals("com.enioka.jqm.tests.App",  fibo.getJavaClassName());
-        Assert.assertEquals("ModuleMachin",  fibo.getModule());
-        Assert.assertEquals("other1",  fibo.getKeyword1());
-        Assert.assertEquals("other2",  fibo.getKeyword2());
-        Assert.assertEquals(null,  fibo.getKeyword3());
-        Assert.assertEquals(false,  fibo.isHighlander());
-        Assert.assertEquals("Isolation",  fibo.getSpecificIsolationContext());
-        Assert.assertEquals(true,  fibo.isChildFirstClassLoader());
-        Assert.assertEquals("HIDDEN",  fibo.getHiddenJavaClasses());
+        Assert.assertEquals("VIPQueue", fibo.getQueue(cnx).getName());
+        Assert.assertEquals(true, fibo.isCanBeRestarted());
+        Assert.assertEquals("com.enioka.jqm.tests.App", fibo.getJavaClassName());
+        Assert.assertEquals("ModuleMachin", fibo.getModule());
+        Assert.assertEquals("other1", fibo.getKeyword1());
+        Assert.assertEquals("other2", fibo.getKeyword2());
+        Assert.assertEquals(null, fibo.getKeyword3());
+        Assert.assertEquals(false, fibo.isHighlander());
+        Assert.assertEquals("Isolation", fibo.getSpecificIsolationContext());
+        Assert.assertEquals(true, fibo.isChildFirstClassLoader());
+        Assert.assertEquals("HIDDEN", fibo.getHiddenJavaClasses());
 
         f.delete();
     }
@@ -176,19 +202,18 @@ public class XmlTest extends JqmBaseTest
         // First import
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest.xml" });
 
-        List<JobDef> jd = cnx.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
+        List<JobDef> jd = JobDef.select(cnx, "jd_select_all");
         Assert.assertEquals(2, jd.size());
         Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
-        Assert.assertEquals("1", jd.get(0).getParameters().get(0).getValue());
+        Assert.assertEquals("1", jd.get(0).getParameters(cnx).get(0).getValue());
 
         // Second import - parameters are different, note 3 instead of 1
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest_np.xml" });
 
-        jd = this.getNewDbSession().createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
+        jd = JobDef.select(cnx, "jd_select_all");
         Assert.assertEquals(2, jd.size());
         Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
-        Assert.assertEquals("3", jd.get(0).getParameters().get(0).getValue());
-
+        Assert.assertEquals("3", jd.get(0).getParameters(cnx).get(0).getValue());
     }
 
     @Test
@@ -199,12 +224,11 @@ public class XmlTest extends JqmBaseTest
 
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltestnewqueue.xml" });
 
-        List<JobDef> jd = cnx.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
+        List<JobDef> jd = JobDef.select(cnx, "jd_select_all");
         Assert.assertEquals(2, jd.size());
 
         // Was the queue created (and only once)?
-        Queue q = cnx.createQuery("SELECT q from Queue q where q.name = :name", Queue.class).setParameter("name", "NewQueue")
-                .getSingleResult();
+        Queue q = Queue.select_key(cnx, "NewQueue");
         Assert.assertEquals("Created from a jobdef import. Description should be set later", q.getDescription());
         cnx.close();
     }
@@ -221,14 +245,22 @@ public class XmlTest extends JqmBaseTest
 
         XmlQueueParser.parse("target/payloads/jqm-test-xml/xmlqueuetest.xml", cnx);
 
-        long ii = (Long) cnx.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'XmlQueue'").getSingleResult();
-        long iii = (Long) cnx.createQuery("SELECT COUNT(q) FROM Queue q WHERE q.name = 'XmlQueue2'").getSingleResult();
-        Assert.assertEquals(2, ii + iii);
-        Assert.assertEquals("XmlQueue", cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Fibo' ", String.class)
-                .getSingleResult());
-        Assert.assertEquals("XmlQueue", cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'Geo' ", String.class)
-                .getSingleResult());
-        Assert.assertEquals("XmlQueue2",
-                cnx.createQuery("SELECT j.queue.name FROM JobDef j WHERE j.applicationName = 'DateTime' ", String.class).getSingleResult());
+        try
+        {
+            Queue.select(cnx, "q_select_by_key", "XmlQueue");
+            Queue.select(cnx, "q_select_by_key", "XmlQueue2");
+
+            JobDef jd1 = JobDef.select_key(cnx, "Fibo");
+            JobDef jd2 = JobDef.select_key(cnx, "Geo");
+            JobDef jd3 = JobDef.select_key(cnx, "DateTime");
+
+            Assert.assertEquals("XmlQueue", jd1.getQueue(cnx).getName());
+            Assert.assertEquals("XmlQueue", jd2.getQueue(cnx).getName());
+            Assert.assertEquals("XmlQueue2", jd3.getQueue(cnx).getName());
+        }
+        catch (NoResultException e)
+        {
+            Assert.fail("missing configuration element");
+        }
     }
 }

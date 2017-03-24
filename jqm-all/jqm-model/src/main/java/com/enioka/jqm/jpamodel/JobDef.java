@@ -576,8 +576,8 @@ public class JobDef implements Serializable
         {
             cnx.runUpdate("jd_update_all_fields_by_id", application, applicationName, childFirstClassLoader, classLoaderTracing,
                     description, enabled, external, hiddenJavaClasses, highlander, jarPath, javaClassName, javaOpts, keyword1, keyword2,
-                    keyword3, maxTimeRunning, module, pathType, specificIsolationContext, queue_id);
-            cnx.runUpdate("jdprm_select_all_for_jd", this.id);
+                    keyword3, maxTimeRunning, module, pathType, specificIsolationContext, queue_id, id);
+            cnx.runUpdate("jdprm_delete_all_for_jd", this.id);
             for (Map.Entry<String, String> prm : parameters.entrySet())
             {
                 cnx.runUpdate("jdprm_insert", prm.getKey(), prm.getValue(), this.id);

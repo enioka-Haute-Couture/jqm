@@ -8,8 +8,13 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Db
 {
+    private static Logger jqmlogger = LoggerFactory.getLogger(Db.class);
+
     private DataSource _ds;
     private Map<String, String> _queries;
 
@@ -44,7 +49,9 @@ public class Db
 
     private void initDb()
     {
+        jqmlogger.warn("Database is being upgraded");
         ScriptRunner.run(getConn(), "/sql/create_db.sql");
+        jqmlogger.warn("Database is now up to date");
     }
 
     private void initQueries()
@@ -72,7 +79,7 @@ public class Db
             }
         }
 
-        System.out.println(product);
+        jqmlogger.info("Using database " + product);
         if (product.contains("oracle"))
         {
             _queries = DbImplOracle.getQueries();

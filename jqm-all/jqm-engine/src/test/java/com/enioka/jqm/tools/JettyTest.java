@@ -32,14 +32,17 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.pki.JpaCa;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
+@Ignore("No jetty for now")
 public class JettyTest extends JqmBaseTest
 {
     @Before
@@ -93,8 +96,7 @@ public class JettyTest extends JqmBaseTest
 
         CloseableHttpClient cl = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 
-        int port = cnx.createQuery("SELECT q.port FROM Node q WHERE q.id = :i", Integer.class).setParameter("i", TestHelpers.node.getId())
-                .getSingleResult();
+        int port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
         HttpUriRequest rq = new HttpGet("https://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + i);
         jqmlogger.debug(rq.getURI());
         CloseableHttpResponse rs = cl.execute(rq);
@@ -152,8 +154,7 @@ public class JettyTest extends JqmBaseTest
 
         CloseableHttpClient cl = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 
-        int port = cnx.createQuery("SELECT q.port FROM Node q WHERE q.id = :i", Integer.class).setParameter("i", TestHelpers.node.getId())
-                .getSingleResult();
+        int port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
         HttpUriRequest rq = new HttpGet("https://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + i);
         CloseableHttpResponse rs = cl.execute(rq);
         Assert.assertEquals(200, rs.getStatusLine().getStatusCode());

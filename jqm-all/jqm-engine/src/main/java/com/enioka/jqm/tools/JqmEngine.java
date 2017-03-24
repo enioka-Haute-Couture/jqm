@@ -457,15 +457,12 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         startDbRestarter();
     }
 
-    void startDbRestarter()
+    synchronized void startDbRestarter()
     {
         // On first alert, start the thread which will check connection restoration and relaunch the pollers.
-        synchronized (this)
+        if (qpRestarter != null)
         {
-            if (qpRestarter != null)
-            {
-                return;
-            }
+            return;
         }
 
         final JqmEngine ee = this;
@@ -647,6 +644,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         {
             cnx = Helpers.getNewDbSession();
             cnx.runUpdate("node_update_enabled_by_id", 0, node.getId());
+            cnx.commit();
         }
         finally
         {
@@ -664,6 +662,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         {
             cnx = Helpers.getNewDbSession();
             cnx.runUpdate("node_update_enabled_by_id", 1, node.getId());
+            cnx.commit();
         }
         finally
         {

@@ -26,16 +26,17 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Parameters for querying {@link JobInstance}s. A null parameter (the default for most query parameters) is ignored in the query. 
- * To query a null String, specify "" (empty
- * String). To query a null Integer, specify -1. It is not possible to query for null Calendar values, since it is far more efficient to
- * query by status (the different Calendar fields are only null at certain statuses).<br>
+ * Parameters for querying {@link JobInstance}s. A null parameter (the default for most query parameters) is ignored in the query. To query
+ * a null String, specify "" (empty String). To query a null Integer, specify -1. It is not possible to query for null Calendar values,
+ * since it is far more efficient to query by status (the different Calendar fields are only null at certain statuses).<br>
  * See individual setters for the signification of query parameters.<br>
  * <br>
- * By default, i.e. by simply using <code>Query.create().run()</code>, the API retrieves the first 50 instances that have ended, ordered by launch ID (i.e. by time). 
- * See {@link Query#setQueryLiveInstances(boolean)} for details and how to retrieve living instances in addition to ended ones.<br><br>
+ * By default, i.e. by simply using <code>Query.create().run()</code>, the API retrieves the first 50 instances that have ended, ordered by
+ * launch ID (i.e. by time). See {@link Query#setQueryLiveInstances(boolean)} for details and how to retrieve living instances in addition
+ * to ended ones.<br>
+ * <br>
  * 
- * Also please note that queries get more expensive with the result count, so it is <strong>strongly recommended to use pagination</strong> 
+ * Also please note that queries get more expensive with the result count, so it is <strong>strongly recommended to use pagination</strong>
  * ({@link #setFirstRow(Integer)} and {@link #setPageSize(Integer)}).
  * 
  */
@@ -73,9 +74,9 @@ public final class Query
      * The different fields that can be used in sorting.
      */
     public static enum Sort {
-        ID("id"), APPLICATIONNAME("jd.applicationName"), QUEUENAME("queue.name"), STATUS("status", "state"), DATEENQUEUE("enqueueDate",
-                "creationDate"), DATEATTRIBUTION("attributionDate"), DATEEXECUTION("executionDate"), DATEEND("endDate", null), USERNAME(
-                "userName"), PARENTID("parentId");
+        ID("id"), APPLICATIONNAME("applicationName"), QUEUENAME("QUEUE_NAME"), STATUS("status", "state"), DATEENQUEUE("ENQUEUE_DATE",
+                "creationDate"), DATEATTRIBUTION("attributionDate"), DATEEXECUTION(
+                        "execution_Date"), DATEEND("END_DATE", null), USERNAME("userName"), PARENTID("PARENT_JOB_ID");
 
         private String historyField, jiField;
 
@@ -206,8 +207,10 @@ public final class Query
 
     /**
      * This sets the maximum returned results count, for pagination purposes.<br>
-     * It is <strong>highly recommended to use pagination</strong> when using the Query API, since queries are expensive. 
-     * @param pageSize the maximal result count, or null for no limit (dangerous!)
+     * It is <strong>highly recommended to use pagination</strong> when using the Query API, since queries are expensive.
+     * 
+     * @param pageSize
+     *            the maximal result count, or null for no limit (dangerous!)
      * @return the Query itself (fluent API - used to chain calls).
      * @see #setFirstRow(Integer) setFirstRow for the other pagination parameter.
      */
@@ -216,12 +219,14 @@ public final class Query
         this.pageSize = pageSize;
         return this;
     }
-    
+
     /**
-     * This sets the starting row returned by the query, for pagination purposes. Note that even if order is very important for paginated queries 
-     * (to ensure that the pages stay the same between calls for new pages), a default sort is used if none is specified.<br>
-     * It is <strong>highly recommended to use pagination</strong> when using the Query API, since queries are expensive. 
-     * @param firstRow the first row to return. 0 is equivalent to null.
+     * This sets the starting row returned by the query, for pagination purposes. Note that even if order is very important for paginated
+     * queries (to ensure that the pages stay the same between calls for new pages), a default sort is used if none is specified.<br>
+     * It is <strong>highly recommended to use pagination</strong> when using the Query API, since queries are expensive.
+     * 
+     * @param firstRow
+     *            the first row to return. 0 is equivalent to null.
      * @return the Query itself (fluent API - used to chain calls).
      * @see #setPageSize(Integer) setPageSize for the other pagination parameter.
      */
@@ -232,9 +237,9 @@ public final class Query
     }
 
     /**
-     * @return the available result count of the query. Available means that it does not take into account pagination. This is mostly used when pagination is used,
-     * so as to be able to set a "total records count" or a "page 2 on 234" indicator. If pagination is not used, this is always equal to 
-     * <code>{@link #getResults()}.size()</code>.
+     * @return the available result count of the query. Available means that it does not take into account pagination. This is mostly used
+     *         when pagination is used, so as to be able to set a "total records count" or a "page 2 on 234" indicator. If pagination is not
+     *         used, this is always equal to <code>{@link #getResults()}.size()</code>.
      */
     public Integer getResultSize()
     {
@@ -453,7 +458,8 @@ public final class Query
 
     /**
      * Optionally, it is possible to specify some classification data inside the Job Definition (usually through the import of a JobDef XML
-     * file). This data exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying. <br>
+     * file). This data exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying.
+     * <br>
      * <strong>This has nothing to so with applicationName, which is the name of the Job Definition !</strong>
      * 
      * @param jobDefApplication
@@ -747,9 +753,10 @@ public final class Query
     /**
      * For querying jobs that have run or are running on a specific JQM node.
      */
-    public void setNodeName(String nodeName)
+    public Query setNodeName(String nodeName)
     {
         this.nodeName = nodeName;
+        return this;
     }
 
     String getNodeName()

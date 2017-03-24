@@ -26,6 +26,7 @@ import java.util.List;
 
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.QueryResult;
 
 public class Queue implements Serializable
@@ -129,7 +130,7 @@ public class Queue implements Serializable
      */
     public static Integer create(DbConn cnx, String name, String description, boolean defaultQ)
     {
-        QueryResult r = cnx.runUpdate("q_insert", defaultQ, name, description);
+        QueryResult r = cnx.runUpdate("q_insert", defaultQ, description, name);
         Queue res = new Queue();
         res.id = r.getGeneratedId();
         res.name = name;
@@ -144,6 +145,10 @@ public class Queue implements Serializable
         {
             Queue tmp = new Queue();
             tmp.id = rs.getInt(1 + colShift);
+            if (tmp.id == 0)
+            {
+                return null;
+            }
             tmp.defaultQueue = rs.getBoolean(2 + colShift);
             tmp.description = rs.getString(3 + colShift);
             tmp.name = rs.getString(4 + colShift);
@@ -179,7 +184,7 @@ public class Queue implements Serializable
         List<Queue> res = select(cnx, "q_select_by_key", name);
         if (res.isEmpty())
         {
-            throw new DatabaseException("no result for query by key for key " + name);
+            throw new NoResultException("no result for query by key for key " + name);
         }
         if (res.size() > 1)
         {
@@ -192,7 +197,7 @@ public class Queue implements Serializable
     {
         if (this.id == null)
         {
-            create(cnx, name, description, defaultQueue);
+            this.id = create(cnx, name, description, defaultQueue);
         }
         else
         {

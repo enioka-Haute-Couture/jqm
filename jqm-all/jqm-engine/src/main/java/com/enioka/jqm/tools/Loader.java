@@ -357,10 +357,12 @@ class Loader implements Runnable, LoaderMBean
      */
     void endOfRunDb()
     {
-        DbConn cnx = Helpers.getNewDbSession();
+        DbConn cnx = null;
 
         try
         {
+            cnx = Helpers.getNewDbSession();
+
             // Retrieve the object to update
             job = JobInstance.select_id(cnx, this.job.getId());
 
@@ -410,7 +412,7 @@ class Loader implements Runnable, LoaderMBean
         }
         else
         {
-            jqmlogger.error("a database related operation has failed and cannot be recovered");
+            jqmlogger.error("a database related operation has failed and cannot be recovered", e);
             throw e;
         }
     }

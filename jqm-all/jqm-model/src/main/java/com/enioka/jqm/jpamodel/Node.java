@@ -41,7 +41,7 @@ import com.enioka.jqm.jdbc.QueryResult;
  */
 public class Node
 {
-    private Integer id;
+    private Integer id = null;
 
     private String name;
 
@@ -371,6 +371,11 @@ public class Node
             Node tmp = new Node();
 
             tmp.id = rs.getInt(1 + colShift);
+            if (tmp.id == 0)
+            {
+                return null;
+            }
+
             tmp.dlRepo = rs.getString(2 + colShift);
             tmp.dns = rs.getString(3 + colShift);
             tmp.enabled = rs.getBoolean(4 + colShift);

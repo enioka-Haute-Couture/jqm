@@ -10,9 +10,8 @@ public class RefreshTest extends JqmBaseTest
     @Test
     public void testPauseResume() throws Exception
     {
-        cnx.getTransaction().begin();
-        TestHelpers.node.setEnabled(false);
-        cnx.getTransaction().commit();
+        cnx.runUpdate("node_update_enabled_by_id", false, TestHelpers.node.getId());
+        cnx.commit();
 
         // Submit request => nothing should happen
         JqmSimpleTest.create(cnx, "pyl.PckMain", "jqm-test-pyl-nodep").addWaitTime(3000).expectNonOk(0).expectOk(0).run(this);

@@ -48,9 +48,8 @@ public class DbFailTest extends JqmBaseTest
     public void testDbTranscientFailure() throws Exception
     {
         // Set a real polling interval to allow the failure to be unseen by the poller
-        cnx.getTransaction().begin();
-        TestHelpers.dpVip.setPollingInterval(3000);
-        cnx.getTransaction().commit();
+        cnx.runUpdate("dp_update_interval_by_id", 3000, TestHelpers.dpVip.getId());
+        cnx.commit();
 
         this.addAndStartEngine();
         this.sleep(2); // first poller loop
@@ -106,10 +105,8 @@ public class DbFailTest extends JqmBaseTest
     public void testDbFailureUnderLoad() throws Exception
     {
         // Many starting jobs simultaneously
-        cnx.getTransaction().begin();
-        cnx.createQuery("UPDATE DeploymentParameter dp SET dp.nbThread = 50 WHERE dp.queue = :q").setParameter("q", TestHelpers.qVip)
-                .executeUpdate();
-        cnx.getTransaction().commit();
+        cnx.runUpdate("dp_update_threads_by_id", 50, TestHelpers.dpVip.getId());
+        cnx.commit();
         TestHelpers.setNodesLogLevel("INFO", cnx);
 
         CreationTools.createJobDef(null, true, "pyl.Nothing", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", TestHelpers.qVip, -1,
@@ -123,7 +120,7 @@ public class DbFailTest extends JqmBaseTest
 
         addAndStartEngine();
 
-        this.sleep(2);
+        this.sleep(1);
         jqmlogger.info("Stopping db");
         s.stop();
         this.waitDbStop();

@@ -101,10 +101,10 @@ public class JobDefParameter implements Serializable
             {
                 JobDefParameter tmp = new JobDefParameter();
 
-                tmp.id = rs.getInt(0);
-                tmp.key = rs.getString(1);
-                tmp.value = rs.getString(2);
-                tmp.jobdef_id = rs.getInt(3);
+                tmp.id = rs.getInt(1);
+                tmp.key = rs.getString(2);
+                tmp.value = rs.getString(3);
+                tmp.jobdef_id = rs.getInt(4);
 
                 res.add(tmp);
             }
@@ -124,7 +124,7 @@ public class JobDefParameter implements Serializable
             ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
-                res.put(rs.getString(1), rs.getString(2));
+                res.put(rs.getString(2), rs.getString(3));
             }
         }
         catch (SQLException e)

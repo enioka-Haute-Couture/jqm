@@ -529,7 +529,7 @@ final class Helpers
 
     static Queue findQueue(String qName, DbConn cnx)
     {
-        List<Queue> jj = Queue.select(cnx, "jd_select_by_key", qName);
+        List<Queue> jj = Queue.select(cnx, "q_select_by_key", qName);
         if (jj.size() == 0)
         {
             return null;

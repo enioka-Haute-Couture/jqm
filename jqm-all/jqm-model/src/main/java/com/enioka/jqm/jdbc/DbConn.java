@@ -199,6 +199,18 @@ public class DbConn implements Closeable
                 {
                     res = (T) rs.getString(column);
                 }
+                else if (clazz.equals(Calendar.class))
+                {
+                    res = (T) getCal(rs, column);
+                }
+                else if (clazz.equals(Long.class))
+                {
+                    res = (T) (Long) rs.getLong(column);
+                }
+                else if (clazz.equals(Float.class))
+                {
+                    res = (T) (Float) rs.getFloat(column);
+                }
                 else
                 {
                     throw new DatabaseException("unsupported single query return type " + clazz.toGenericString());

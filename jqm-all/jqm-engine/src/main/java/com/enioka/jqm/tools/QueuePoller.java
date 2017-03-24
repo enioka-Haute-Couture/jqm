@@ -145,7 +145,10 @@ class QueuePoller implements Runnable, QueuePollerMBean
 
         // Get the list of all jobInstance within the defined queue, ordered by position
         QueryResult qr = cnx.runUpdate("ji_update_poll", this.engine.getNode().getId(), queue.getId(), maxNbThread - usedSlots);
-        jqmlogger.debug("Poller has found " + qr.nbUpdated + " JI to run");
+        if (qr.nbUpdated > 0)
+        {
+            jqmlogger.debug("Poller has found " + qr.nbUpdated + " JI to run");
+        }
         if (qr.nbUpdated > 0)
         {
             List<JobInstance> res = JobInstance.select(cnx, "ji_select_to_run", this.engine.getNode().getId(), queue.getId());

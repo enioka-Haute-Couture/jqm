@@ -17,9 +17,9 @@ package com.enioka.jqm.tools;
 
 import java.net.ServerSocket;
 
-
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -34,7 +34,7 @@ public class ManualTests extends JqmBaseTest
     // @Test
     public void jmxTestEnvt() throws Exception
     {
-        EntityManager em = Helpers.getNewDbSession();
+        DbConn em = Helpers.getNewDbSession();
         TestHelpers.cleanup(em);
         TestHelpers.createTestData(em);
 
@@ -52,11 +52,8 @@ public class ManualTests extends JqmBaseTest
         int port2 = s2.getLocalPort();
         s1.close();
         s2.close();
-        em.getTransaction().begin();
-        TestHelpers.node.setJmxRegistryPort(port1);
-        TestHelpers.node.setJmxServerPort(port2);
-        em.getTransaction().commit();
-        em.close();
+        cnx.runUpdate("node_update_jmx_by_id", port1, port2, TestHelpers.node.getId());
+        cnx.commit();
 
         Main.main(new String[] { "-startnode", "localhost" });
         Main.main(new String[] { "-startnode", "localhost4" });

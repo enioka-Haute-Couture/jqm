@@ -224,7 +224,7 @@ public class JndiObjectResource implements Serializable
         this.lastModified = lastModified;
     }
 
-    public static void create(DbConn cnx, String jndiAlias, String className, String factoryClass, String description, boolean singleton,
+    public static int create(DbConn cnx, String jndiAlias, String className, String factoryClass, String description, boolean singleton,
             Map<String, String> parameters)
     {
         QueryResult r = cnx.runUpdate("jndi_insert", description, factoryClass, jndiAlias, singleton, (String) null, className);
@@ -234,6 +234,7 @@ public class JndiObjectResource implements Serializable
         {
             cnx.runUpdate("jndiprm_insert", prms.getKey(), prms.getValue(), newId);
         }
+        return newId;
     }
 
     public static List<JndiObjectResource> select(DbConn cnx, String query_key, Object... args)

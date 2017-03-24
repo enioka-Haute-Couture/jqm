@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -254,7 +255,7 @@ final class HibernateClient implements JqmClient
         jqmlogger.trace("Not in highlander mode or no currently enqueued instance");
 
         // Parameters are both from the JobDef and the execution request.
-        Map<String, String> prms = RuntimeParameter.select_map(cnx, "jdprm_select_all_for_jd", jobDef.getId());
+        Map<String, String> prms = JobDefParameter.select_map(cnx, "jdprm_select_all_for_jd", jobDef.getId());
         prms.putAll(runRequest.getParameters());
 
         // On which queue?
@@ -377,10 +378,22 @@ final class HibernateClient implements JqmClient
      */
     private JobRequest getJobRequest(int launchId, DbConn cnx)
     {
-        Map<String, String> prms = RuntimeParameter.select_map(cnx, "jiprm_select_by_jd", launchId);
+        Map<String, String> prms = RuntimeParameter.select_map(cnx, "jiprm_select_by_ji", launchId);
         ResultSet rs = cnx.runSelect("history_select_reenqueue_by_id", launchId);
-        JobRequest jd = new JobRequest();
 
+        try
+        {
+            if (!rs.next())
+            {
+                throw new JqmInvalidRequestException("There is no past laucnh iwth ID " + launchId);
+            }
+        }
+        catch (SQLException e1)
+        {
+            throw new JqmClientException("Internal JQM API error", e1);
+        }
+
+        JobRequest jd = new JobRequest();
         try
         {
             jd.setApplication(rs.getString(1));
@@ -656,7 +669,7 @@ final class HibernateClient implements JqmClient
             {
                 throw new JqmClientException("Job instance does not exist or has already started");
             }
-
+            cnx.commit();
         }
         catch (DatabaseException e)
         {
@@ -871,7 +884,7 @@ final class HibernateClient implements JqmClient
         try
         {
             cnx = getDbSession();
-            Map<Integer, com.enioka.jqm.api.JobInstance> res = new HashMap<Integer, com.enioka.jqm.api.JobInstance>();
+            Map<Integer, com.enioka.jqm.api.JobInstance> res = new LinkedHashMap<Integer, com.enioka.jqm.api.JobInstance>();
 
             String wh = "";
             List<Object> prms = new ArrayList<Object>();
@@ -922,13 +935,15 @@ final class HibernateClient implements JqmClient
                         + "ji.SESSIONID AS SESSION_ID, ji.STATE AS STATUS, ji.USERNAME, ji.JD_ID, ji.NODE_ID, ji.QUEUE_ID, ji.INTERNALPOSITION AS POSITION "
                         + "FROM JOBINSTANCE ji LEFT JOIN QUEUE q ON ji.QUEUE_ID=q.ID LEFT JOIN JOBDEF jd ON ji.JD_ID=jd.ID LEFT JOIN NODE n ON ji.NODE_ID=n.ID ";
 
-                filterCountQuery += " (SELECT COUNT(1) FROM JOBINSTANCE %s) ,";
                 totalCountQuery += " (SELECT COUNT(1) FROM JOBINSTANCE) ,";
-
                 if (wh.length() > 3)
                 {
                     q += "WHERE " + wh.substring(3, wh.length() - 1);
-                    filterCountQuery = String.format(filterCountQuery, wh);
+                    filterCountQuery += String.format(" (SELECT COUNT(1) FROM JOBINSTANCE %s) ,", wh);
+                }
+                else
+                {
+                    filterCountQuery += " (SELECT COUNT(1) FROM JOBINSTANCE) ,";
                 }
             }
 
@@ -979,12 +994,15 @@ final class HibernateClient implements JqmClient
                         + "MODULE AS JD_MODULE, NODENAME, PARENT_JOB_ID, PROGRESS, QUEUE_NAME, "
                         + "RETURN_CODE, SESSION_ID, STATUS, USERNAME, JOBDEF_ID as JD_ID, NODE_ID, QUEUE_ID, 0 as POSITION FROM HISTORY ";
 
-                filterCountQuery += " (SELECT COUNT(1) FROM HISTORY %s) ,";
                 totalCountQuery += " (SELECT COUNT(1) FROM HISTORY) ,";
-
                 if (wh.length() > 3)
                 {
                     q += "WHERE " + wh.substring(3, wh.length() - 1);
+                    filterCountQuery += String.format(" (SELECT COUNT(1) FROM HISTORY %s) ,", wh);
+                }
+                else
+                {
+                    filterCountQuery += " (SELECT COUNT(1) FROM HISTORY) ,";
                 }
             }
 
@@ -993,17 +1011,17 @@ final class HibernateClient implements JqmClient
             String sort = "";
             for (SortSpec s : query.getSorts())
             {
-                sort += s.col.getJiField() == null ? ""
-                        : "," + s.col.getHistoryField() + " " + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
+                sort += "," + s.col.getHistoryField() + " " + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
             }
             if (sort.isEmpty())
             {
-                sort = " ORDER BY h.id";
+                sort = " ORDER BY ID";
             }
             else
             {
                 sort = " ORDER BY " + sort.substring(1);
             }
+            q += sort;
 
             ///////////////////////////////////////////////
             // Set pagination parameters
@@ -1032,10 +1050,11 @@ final class HibernateClient implements JqmClient
             // need this indication.
             if (query.getFirstRow() != null || (query.getPageSize() != null && res.size() >= query.getPageSize()))
             {
-                ResultSet rs2 = cnx.runRawSelect(filterCountQuery, prms);
+                ResultSet rs2 = cnx.runRawSelect(filterCountQuery.substring(0, filterCountQuery.length() - 2) + " FROM (VALUES(0))",
+                        prms.toArray());
                 rs2.next();
 
-                query.setResultSize(rs2.getInt(0));
+                query.setResultSize(rs2.getInt(1));
             }
 
             ///////////////////////////////////////////////

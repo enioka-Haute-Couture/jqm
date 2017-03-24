@@ -43,7 +43,7 @@ public class JmxTest extends JqmBaseTest
                 "KillApp", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         int i = JobRequest.create("KillApp", "TestUser").submit();
 
-        // Get free ports
+        // Set JMX server on free ports
         ServerSocket s1 = new ServerSocket(0);
         int port1 = s1.getLocalPort();
         ServerSocket s2 = new ServerSocket(0);
@@ -52,14 +52,14 @@ public class JmxTest extends JqmBaseTest
         s2.close();
         String hn = InetAddress.getLocalHost().getHostName();
 
-        cnx.getTransaction().begin();
-        TestHelpers.node.setJmxRegistryPort(port1);
-        TestHelpers.node.setJmxServerPort(port2);
-        cnx.getTransaction().commit();
+        cnx.runUpdate("node_update_jmx_by_id", port1, port2, TestHelpers.node.getId());
+        cnx.commit();
 
+        // Go
         addAndStartEngine();
         Thread.sleep(1000);
 
+        // Connect to JMX server
         JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://" + hn + ":" + port1 + "/jndi/rmi://" + hn + ":" + port2 + "/jmxrmi");
         JMXConnector cntor = JMXConnectorFactory.connect(url, null);
         MBeanServerConnection mbsc = cntor.getMBeanServerConnection();
@@ -80,8 +80,8 @@ public class JmxTest extends JqmBaseTest
 
         // /////////////////
         // Loader beans
-        ObjectName killBean = new ObjectName("com.enioka.jqm:type=Node.Queue.JobInstance,Node=" + TestHelpers.node.getName() + ",Queue="
-                + TestHelpers.qVip.getName() + ",name=" + i);
+        ObjectName killBean = new ObjectName(
+                "com.enioka.jqm:type=Node.Queue.JobInstance,Node=" + TestHelpers.node.getName() + ",Queue=VIPQueue,name=" + i);
         System.out.println(killBean.toString());
         mbeans = mbsc.queryMBeans(killBean, null);
         if (mbeans.isEmpty())
@@ -119,8 +119,7 @@ public class JmxTest extends JqmBaseTest
 
         // //////////////////
         // Poller bean
-        ObjectName poller = new ObjectName("com.enioka.jqm:type=Node.Queue,Node=" + TestHelpers.node.getName() + ",name="
-                + TestHelpers.qVip.getName());
+        ObjectName poller = new ObjectName("com.enioka.jqm:type=Node.Queue,Node=" + TestHelpers.node.getName() + ",name=VIPQueue");
         QueuePollerMBean proxyPoller = JMX.newMBeanProxy(mbsc, poller, QueuePollerMBean.class);
         Assert.assertEquals(1, proxyPoller.getCumulativeJobInstancesCount() + proxyPoller.getCurrentActiveThreadCount());
         proxyPoller.getCurrentlyRunningJobCount();

@@ -23,6 +23,7 @@ public class DbImplBase
         queries.put("node_update_all_disable_ws", "UPDATE NODE SET LOADAPICLIENT=0, LOADAPIADMIN=0");
         queries.put("node_update_enabled_by_id", "UPDATE NODE SET ENABLED=? WHERE ID=?");
         queries.put("node_update_port_by_id", "UPDATE NODE SET PORT=? WHERE ID=?");
+        queries.put("node_update_jmx_by_id", "UPDATE NODE SET JMXREGISTRYPORT=?, JMXSERVERPORT=? WHERE ID=?");
         queries.put("node_update_alive_by_id", "UPDATE NODE SET LASTSEENALIVE=CURRENT_TIMESTAMP WHERE ID=?");
         queries.put("node_update_has_stopped_by_id", "UPDATE NODE SET LASTSEENALIVE=NULL, STOP=0 WHERE ID=?");
         queries.put("node_update_stop_by_id", "UPDATE NODE SET STOP=1 WHERE ID=?");
@@ -50,6 +51,8 @@ public class DbImplBase
         // DEPLOYMENT
         queries.put("dp_insert", "INSERT INTO DEPLOYMENTPARAMETER(ENABLED, LASTMODIFIED, NBTHREAD, POLLINGINTERVAL, NODE, QUEUE) VALUES(?, CURRENT_TIMESTAMP, ?, ?, ?, ?)");
         queries.put("dp_delete_all", "DELETE FROM DEPLOYMENTPARAMETER");
+        queries.put("dp_update_interval_by_id", "UPDATE DEPLOYMENTPARAMETER SET POLLINGINTERVAL=? WHERE ID=?");
+        queries.put("dp_update_threads_by_id", "UPDATE DEPLOYMENTPARAMETER SET NBTHREAD=? WHERE ID=?");
         queries.put("dp_select_for_node", "SELECT ID, ENABLED, LASTMODIFIED, NBTHREAD, POLLINGINTERVAL, NODE, QUEUE FROM DEPLOYMENTPARAMETER WHERE NODE=?");
         queries.put("dp_select_count_for_node", "SELECT COUNT(1) FROM DEPLOYMENTPARAMETER WHERE NODE=?");
         
@@ -63,9 +66,10 @@ public class DbImplBase
         queries.put("jd_update_all_fields_by_id", "UPDATE JOBDEF SET APPLICATION=?, APPLICATIONNAME=?, CHILDFIRSTCLASSLOADER=?, "
                 + "CLASSLOADERTRACING=?, DESCRIPTION=?, ENABLED=?, EXTERNAL=?, HIDDENJAVACLASSES=?, HIGHLANDER=?, "
                 + "JARPATH=?, JAVACLASSNAME=?, JAVA_OPTS=?, KEYWORD1=?, KEYWORD2=?, KEYWORD3=?, MAXTIMERUNNING=?, "
-                + "MODULE=?, PATHTYPE=?, SPECIFICISOLATIONCONTEXT=?, QUEUE_ID=?) "
+                + "MODULE=?, PATHTYPE=?, SPECIFICISOLATIONCONTEXT=?, QUEUE_ID=? "
                 + "WHERE ID=?");
         queries.put("jd_update_set_external_by_id", "UPDATE JOBDEF SET EXTERNAL=1 WHERE ID=?");
+        queries.put("jd_update_set_enabled_by_id", "UPDATE JOBDEF SET ENABLED=? WHERE ID=?");
         queries.put("jd_update_set_queue_by_key", "UPDATE JOBDEF SET QUEUE_ID=? WHERE APPLICATIONNAME=?");
         queries.put("jd_select_all", "SELECT ID, APPLICATION, APPLICATIONNAME, CHILDFIRSTCLASSLOADER, "
                 + "CLASSLOADERTRACING, DESCRIPTION, ENABLED, EXTERNAL, HIDDENJAVACLASSES, HIGHLANDER, "
@@ -78,6 +82,7 @@ public class DbImplBase
         // JOB DEF PRM
         queries.put("jdprm_insert", "INSERT INTO JOBDEFPARAMETER(KEYNAME, VALUE, JOBDEF_ID) VALUES(?, ?, ?)");
         queries.put("jdprm_delete_all", "DELETE FROM JOBDEFPARAMETER");
+        queries.put("jdprm_delete_all_for_jd", "DELETE FROM JOBDEFPARAMETER WHERE JOBDEF_ID=?");
         queries.put("jdprm_select_all_for_jd", "SELECT ID, KEYNAME, VALUE, JOBDEF_ID FROM JOBDEFPARAMETER WHERE JOBDEF_ID=?");
         queries.put("jdprm_select_all", "SELECT ID, KEYNAME, VALUE, JOBDEF_ID FROM JOBDEFPARAMETER ORDER BY JOBDEF_ID");
         
@@ -117,16 +122,12 @@ public class DbImplBase
         queries.put("ji_select_existing_highlander", "SELECT ID FROM JOBINSTANCE WHERE JD_ID=? AND STATE='SUBMITTED'");
         queries.put("ji_select_changequeuepos_by_id", "SELECT QUEUE_ID, INTERNALPOSITION FROM JOBINSTANCE WHERE ID=? AND STATE='SUBMITTED'");
         queries.put("ji_select_state_by_id", "SELECT STATE FROM JOBINSTANCE WHERE ID=?");
-        queries.put("ji_select_execution_date_by_id", "SELECT EXECUTION_DATE FROM JOBINSTANCE WHERE ID=?");
+        queries.put("ji_select_execution_date_by_id", "SELECT EXECUTIONDATE FROM JOBINSTANCE WHERE ID=?");
         queries.put("ji_select_cnx_data_by_id", "SELECT DNS||':'||PORT AS HOST FROM JobInstance ji LEFT JOIN Node n ON ji.NODE_ID = n.ID WHERE ji.ID=?");
         
         queries.put("ji_update_poll", "UPDATE JOBINSTANCE j1 SET j1.NODE_ID=?, j1.STATE='ATTRIBUTED', ATTRIBUTIONDATE=CURRENT_TIMESTAMP WHERE j1.ID IN "
                 + "(SELECT j2.ID FROM JOBINSTANCE j2 WHERE j2.STATE='SUBMITTED' AND j2.QUEUE_ID=? "
                 + "AND (j2.HIGHLANDER=0 OR (j2.HIGHLANDER=1 AND (SELECT COUNT(1) FROM JOBINSTANCE j3 WHERE j3.STATE IN ('ATTRIBUTED', 'RUNNING') AND j3.JD_ID=j2.JD_ID)=0 )) ORDER BY INTERNALPOSITION LIMIT ?)");
-        queries.put("ji_update_poll3", "UPDATE JOBINSTANCE j1 SET j1.NODE_ID=?, j1.STATE='ATTRIBUTED', ATTRIBUTIONDATE=CURRENT_TIMESTAMP WHERE j1.ID IN "
-                + "(SELECT j2.ID FROM JOBINSTANCE j2 WHERE j2.STATE='SUBMITTED' AND j2.QUEUE_ID=? "
-                + " ORDER BY INTERNALPOSITION LIMIT ?)");
-
         queries.put("ji_select_to_run", queries.get("ji_select_all") + " WHERE NODE_ID = ? AND QUEUE_ID = ? AND STATE='ATTRIBUTED'");
         
         // HISTORY
@@ -142,7 +143,7 @@ public class DbImplBase
         queries.put("history_delete_by_id", "DELETE FROM HISTORY WHERE ID=?");
         queries.put("history_select_count_all", "SELECT COUNT(1) FROM History");
         queries.put("history_select_count_for_poller", "SELECT COUNT(1) FROM History WHERE QUEUE_ID=? AND NODE_ID=?");
-        queries.put("history_select_count_last_mn_for_poller", "SELECT COUNT(1)/60 FROM History WHERE QUEUE_ID=? AND NODE_ID=? AND ENDDATE > CURRENT_TIMESTAMP - INTERVAL OF 1 MINUTE");
+        queries.put("history_select_count_last_mn_for_poller", "SELECT COUNT(1)/60 FROM History WHERE QUEUE_ID=? AND NODE_ID=? AND END_DATE > (CURRENT_TIMESTAMP - 1 MINUTE)");
         queries.put("history_select_count_ended", "SELECT COUNT(1) FROM History WHERE STATUS='ENDED'");
         queries.put("history_select_count_notended", "SELECT COUNT(1) FROM History WHERE STATUS<>'ENDED'");
         queries.put("history_select_reenqueue_by_id", "SELECT APPLICATION, APPLICATIONNAME, EMAIL, INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, PARENT_JOB_ID, SESSION_ID, USERNAME, STATUS FROM HISTORY WHERE ID=?");
@@ -150,9 +151,9 @@ public class DbImplBase
         queries.put("history_select_state_by_id", "SELECT STATUS FROM HISTORY WHERE ID=?");
         
         // DELIVERABLE
-        queries.put("deliverable_insert",  "INSERT INTO DELIVERABLE(FILE_FAMILLY, FILEPATH, JOBID, ORIGINALFILENAME, RANDOMID) VALUES(?, ?, ?, ?, ?)");
+        queries.put("deliverable_insert",  "INSERT INTO DELIVERABLE(FILE_FAMILY, FILEPATH, JOBID, ORIGINALFILENAME, RANDOMID) VALUES(?, ?, ?, ?, ?)");
         queries.put("deliverable_delete_all", "DELETE FROM DELIVERABLE");
-        queries.put("deliverable_select_all",  "SELECT ID, FILE_FAMILLY, FILEPATH, JOBID, ORIGINALFILENAME, RANDOMID FROM DELIVERABLE");
+        queries.put("deliverable_select_all",  "SELECT ID, FILE_FAMILY, FILEPATH, JOBID, ORIGINALFILENAME, RANDOMID FROM DELIVERABLE");
         queries.put("deliverable_select_by_id", queries.get("deliverable_select_all") +  " WHERE ID=?");
         queries.put("deliverable_select_all_for_ji", queries.get("deliverable_select_all") +  " WHERE JOBID=?");
         
@@ -169,6 +170,7 @@ public class DbImplBase
         queries.put("message_delete_by_ji",queries.get("message_delete_all") + " WHERE JI=?");
         queries.put("message_select_all", "SELECT ID, JI, TEXT_MESSAGE FROM MESSAGE");
         queries.put("message_select_by_ji_list", queries.get("message_select_all") + " WHERE JI IN (UNNEST(?))");
+        queries.put("message_select_count_all", "SELECT COUNT(1) FROM MESSAGE");
         
         // JNDI
         queries.put("jndi_insert", "INSERT INTO JNDIOBJECTRESOURCE(AUTH, DESCRIPTION, FACTORY, LASTMODIFIED, NAME, SINGLETON, TEMPLATE, TYPE) VALUES('CONTAINER', ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?)");
@@ -181,6 +183,7 @@ public class DbImplBase
         // JNDI PRM
         queries.put("jndiprm_insert", "INSERT INTO JNDIOBJECTRESOURCEPARAMETER(KEYNAME, LASTMODIFIED, VALUE, RESOURCE_ID) VALUES(?, CURRENT_TIMESTAMP, ?, ?)");
         queries.put("jndiprm_delete_all", "DELETE FROM JNDIOBJECTRESOURCEPARAMETER");
+        queries.put("jndiprm_update_value_by_key", "UPDATE JNDIOBJECTRESOURCEPARAMETER SET VALUE=? WHERE KEYNAME=?");
         queries.put("jndiprm_select_all_in_jndisrc", "SELECT ID, KEYNAME, LASTMODIFIED, VALUE FROM JNDIOBJECTRESOURCEPARAMETER WHERE RESOURCE_ID=?");
         
         // PKI
