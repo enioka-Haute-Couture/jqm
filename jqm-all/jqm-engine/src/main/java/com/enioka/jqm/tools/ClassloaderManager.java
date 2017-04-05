@@ -86,7 +86,7 @@ class ClassloaderManager
         // 2 - general mode (jar or global)
 
         String specificIsolationContext = jd.getSpecificIsolationContext();
-        if (specificIsolationContext != null)
+        if (specificIsolationContext != null && !specificIsolationContext.trim().isEmpty())
         {
             if (specificIsolationContextClassLoader.containsKey(specificIsolationContext))
             {

@@ -164,41 +164,77 @@ class XmlJobDefParser
                     jd.setJavaClassName(jdElement.getElementsByTagName("javaClassName").item(0).getTextContent());
                     jd.setDescription(jdElement.getElementsByTagName("description").item(0).getTextContent());
                     jd.setApplicationName(jdElement.getElementsByTagName("name").item(0).getTextContent());
+                    jd.setModule(jdElement.getElementsByTagName("module").item(0).getTextContent());
+                    jd.setHighlander("true".equals(jdElement.getElementsByTagName("highlander").item(0).getTextContent()) ? true : false);
+
+                    // Classifier
                     if (jdElement.getElementsByTagName("application").getLength() > 0)
                     {
                         jd.setApplication(jdElement.getElementsByTagName("application").item(0).getTextContent());
                     }
-                    jd.setModule(jdElement.getElementsByTagName("module").item(0).getTextContent());
-                    jd.setHighlander("true".equals(jdElement.getElementsByTagName("highlander").item(0).getTextContent()) ? true : false);
-
+                    else
+                    {
+                        jd.setApplication(null);
+                    }
+                    
                     // Keyword used to be called "other". We allow both for ascending compatibility. ("other" is deprecated - don't use)
                     if (jdElement.getElementsByTagName("other1").getLength() > 0)
                     {
                         jd.setKeyword1(jdElement.getElementsByTagName("other1").item(0).getTextContent());
                     }
+                    else
+                    {
+                        jd.setKeyword1(null);
+                    }
                     if (jdElement.getElementsByTagName("keyword1").getLength() > 0)
                     {
                         jd.setKeyword1(jdElement.getElementsByTagName("keyword1").item(0).getTextContent());
+                    }
+                    else
+                    {
+                        jd.setKeyword1(null);
                     }
                     if (jdElement.getElementsByTagName("other2").getLength() > 0)
                     {
                         jd.setKeyword2(jdElement.getElementsByTagName("other2").item(0).getTextContent());
                     }
+                    else
+                    {
+                        jd.setKeyword2(null);
+                    }
                     if (jdElement.getElementsByTagName("keyword2").getLength() > 0)
                     {
                         jd.setKeyword2(jdElement.getElementsByTagName("keyword2").item(0).getTextContent());
+                    }
+                    else
+                    {
+                        jd.setKeyword2(null);
                     }
                     if (jdElement.getElementsByTagName("other3").getLength() > 0)
                     {
                         jd.setKeyword3(jdElement.getElementsByTagName("other3").item(0).getTextContent());
                     }
+                    else
+                    {
+                        jd.setKeyword3(null);
+                    }
                     if (jdElement.getElementsByTagName("keyword3").getLength() > 0)
                     {
                         jd.setKeyword3(jdElement.getElementsByTagName("keyword3").item(0).getTextContent());
                     }
+                    else
+                    {
+                        jd.setKeyword3(null);
+                    }
+                    
+                    // Class loading
                     if (jdElement.getElementsByTagName("specificIsolationContext").getLength() > 0)
                     {
                         jd.setSpecificIsolationContext(jdElement.getElementsByTagName("specificIsolationContext").item(0).getTextContent());
+                    }
+                    else
+                    {
+                        jd.setSpecificIsolationContext(null);
                     }
                     if (jdElement.getElementsByTagName("childFirstClassLoader").getLength() > 0)
                     {
@@ -206,9 +242,17 @@ class XmlJobDefParser
                                 "true".equals(jdElement.getElementsByTagName("childFirstClassLoader").item(0).getTextContent()) ? true
                                         : false);
                     }
+                    else
+                    {
+                        jd.setChildFirstClassLoader(false);
+                    }
                     if (jdElement.getElementsByTagName("hiddenJavaClasses").getLength() > 0)
                     {
                         jd.setHiddenJavaClasses(jdElement.getElementsByTagName("hiddenJavaClasses").item(0).getTextContent());
+                    }
+                    else
+                    {
+                        jd.setHiddenJavaClasses(null);
                     }
 
                     // Alert time
@@ -216,6 +260,10 @@ class XmlJobDefParser
                     {
                         jd.setMaxTimeRunning(
                                 Integer.parseInt(jdElement.getElementsByTagName("reasonableRuntimeLimitMinute").item(0).getTextContent()));
+                    }
+                    else
+                    {
+                        jd.setMaxTimeRunning(null);
                     }
 
                     // Parameters

@@ -115,6 +115,35 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals("1", jd.get(0).getParameters().get(0).getValue());
         Assert.assertEquals("2", jd.get(0).getParameters().get(1).getValue());
     }
+    
+    @Test
+    public void testUpdateJobDef()
+    {
+        // Init the default queue (don't start the engine!)
+        Helpers.updateConfiguration(em);
+
+        Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest.xml" });
+
+        // Sanity check
+        List<JobDef> jd = em.createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
+
+        Assert.assertEquals(2, jd.size());
+        Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
+        Assert.assertEquals("vdjvkdv", jd.get(0).getKeyword1());
+        Assert.assertEquals("sgfbgg", jd.get(0).getKeyword2());
+        Assert.assertEquals("jvhkdfl", jd.get(0).getKeyword3());
+        
+        // Import and therefore update the job definitions.
+        Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest_update.xml" });
+
+        jd = getNewEm().createQuery("SELECT j FROM JobDef j", JobDef.class).getResultList();
+
+        Assert.assertEquals(2, jd.size());
+        Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
+        Assert.assertEquals("NEWVALUE", jd.get(0).getKeyword1());
+        Assert.assertEquals("", jd.get(0).getKeyword2());
+        Assert.assertEquals(null, jd.get(0).getKeyword3());
+    }
 
     @Test
     public void testExportJobDef() throws Exception
