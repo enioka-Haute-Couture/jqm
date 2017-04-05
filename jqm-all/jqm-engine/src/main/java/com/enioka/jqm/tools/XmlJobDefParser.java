@@ -116,7 +116,8 @@ class XmlJobDefParser
                     Element jdElement = (Element) jdList.item(jdIndex);
 
                     // Retrieve existing JobDef (if exists)
-                    jd = Helpers.findJobDef(jdElement.getElementsByTagName("name").item(0).getTextContent(), em);
+                    String name = jdElement.getElementsByTagName("name").item(0).getTextContent().trim();
+                    jd = Helpers.findJobDef(name, em);
                     if (jd == null)
                     {
                         jd = new JobDef();
@@ -126,7 +127,7 @@ class XmlJobDefParser
                     if (jd.getQueue() == null && jdElement.getElementsByTagName("queue").getLength() != 0)
                     {
                         // Specified inside the XML,nothing yet in DB. Does the queue already exist?
-                        String qname = jdElement.getElementsByTagName("queue").item(0).getTextContent();
+                        String qname = jdElement.getElementsByTagName("queue").item(0).getTextContent().trim();
                         queue = Helpers.findQueue(qname, em);
                         if (queue == null)
                         {
@@ -154,18 +155,19 @@ class XmlJobDefParser
                     }
 
                     // Simple jar attributes
-                    jd.setJarPath(jarElement.getElementsByTagName("path").item(0).getTextContent());
+                    jd.setJarPath(jarElement.getElementsByTagName("path").item(0).getTextContent().trim());
                     jd.setPathType(PathType.valueOf(jarElement.getElementsByTagName("pathType").getLength() > 0
-                            ? jarElement.getElementsByTagName("pathType").item(0).getTextContent() : "FS"));
+                            ? jarElement.getElementsByTagName("pathType").item(0).getTextContent().trim() : "FS"));
 
                     // Simple JD attributes
                     jd.setCanBeRestarted(
-                            "true".equals(jdElement.getElementsByTagName("canBeRestarted").item(0).getTextContent()) ? true : false);
-                    jd.setJavaClassName(jdElement.getElementsByTagName("javaClassName").item(0).getTextContent());
+                            "true".equals(jdElement.getElementsByTagName("canBeRestarted").item(0).getTextContent().trim()) ? true : false);
+                    jd.setJavaClassName(jdElement.getElementsByTagName("javaClassName").item(0).getTextContent().trim());
                     jd.setDescription(jdElement.getElementsByTagName("description").item(0).getTextContent());
-                    jd.setApplicationName(jdElement.getElementsByTagName("name").item(0).getTextContent());
+                    jd.setApplicationName(name);
                     jd.setModule(jdElement.getElementsByTagName("module").item(0).getTextContent());
-                    jd.setHighlander("true".equals(jdElement.getElementsByTagName("highlander").item(0).getTextContent()) ? true : false);
+                    jd.setHighlander(
+                            "true".equals(jdElement.getElementsByTagName("highlander").item(0).getTextContent().trim()) ? true : false);
 
                     // Classifier
                     if (jdElement.getElementsByTagName("application").getLength() > 0)
@@ -176,7 +178,7 @@ class XmlJobDefParser
                     {
                         jd.setApplication(null);
                     }
-                    
+
                     // Keyword used to be called "other". We allow both for ascending compatibility. ("other" is deprecated - don't use)
                     if (jdElement.getElementsByTagName("other1").getLength() > 0)
                     {
@@ -226,7 +228,7 @@ class XmlJobDefParser
                     {
                         jd.setKeyword3(null);
                     }
-                    
+
                     // Class loading
                     if (jdElement.getElementsByTagName("specificIsolationContext").getLength() > 0)
                     {
@@ -239,8 +241,8 @@ class XmlJobDefParser
                     if (jdElement.getElementsByTagName("childFirstClassLoader").getLength() > 0)
                     {
                         jd.setChildFirstClassLoader(
-                                "true".equals(jdElement.getElementsByTagName("childFirstClassLoader").item(0).getTextContent()) ? true
-                                        : false);
+                                "true".equals(jdElement.getElementsByTagName("childFirstClassLoader").item(0).getTextContent().trim())
+                                        ? true : false);
                     }
                     else
                     {
