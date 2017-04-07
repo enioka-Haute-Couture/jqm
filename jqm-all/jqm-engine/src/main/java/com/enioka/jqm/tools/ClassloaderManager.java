@@ -93,11 +93,14 @@ class ClassloaderManager
                 jqmlogger.info("Using specific isolation context : " + specificIsolationContext);
                 jobClassLoader = specificIsolationContextClassLoader.get(specificIsolationContext);
                 // Checking if the specific class loader configuration is exactly the same as this job definition configuration
-                if (jobClassLoader.isChildFirstClassLoader() != jd.isChildFirstClassLoader() ||
-                        (jobClassLoader.getHiddenJavaClasses() == null && jd.getHiddenJavaClasses() != null) ||
-                        (jobClassLoader.getHiddenJavaClasses() != null && !jobClassLoader.getHiddenJavaClasses().equals(jd.getHiddenJavaClasses()))) {
-                    throw new RuntimeException("Specific class loader: " + specificIsolationContext + " for job def ["+ jd.getApplicationName()
-                            +"]have different configuration than the first one loaded ["+ jobClassLoader.getReferenceJobDefName()+"]");
+                if (jobClassLoader.isChildFirstClassLoader() != jd.isChildFirstClassLoader()
+                        || (jobClassLoader.getHiddenJavaClasses() == null && jd.getHiddenJavaClasses() != null)
+                        || (jobClassLoader.getHiddenJavaClasses() != null
+                                && !jobClassLoader.getHiddenJavaClasses().equals(jd.getHiddenJavaClasses())))
+                {
+                    throw new RuntimeException("Specific class loader: " + specificIsolationContext + " for job def ["
+                            + jd.getApplicationName() + "]have different configuration than the first one loaded ["
+                            + jobClassLoader.getReferenceJobDefName() + "]");
                 }
             }
             else
@@ -105,6 +108,7 @@ class ClassloaderManager
                 jqmlogger.info("Creating specific isolation context " + specificIsolationContext);
                 jobClassLoader = new JarClassLoader(parent);
                 jobClassLoader.setReferenceJobDefName(jd.getApplicationName());
+                jobClassLoader.mayBeShared(true);
                 specificIsolationContextClassLoader.put(specificIsolationContext, jobClassLoader);
             }
         }

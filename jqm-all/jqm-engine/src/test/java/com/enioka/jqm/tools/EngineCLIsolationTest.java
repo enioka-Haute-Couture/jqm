@@ -222,4 +222,23 @@ public class EngineCLIsolationTest extends JqmBaseTest
         Assert.assertEquals(2, TestHelpers.getOkCount(em));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
     }
+
+    /**
+     * Tests that using a static field for the JobManager API works even with shared CL, but shows a warning.
+     */
+    @Test
+    public void testJobDefSharedWithStaticJobManagerField() throws Exception
+    {
+        CreationTools.createJobDef(null, true, "pyl.EngineApiStaticInjection", new ArrayList<JobDefParameter>(),
+                "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, -1, "TestSet", null, null, null, null, null, false, em,
+                "mycontext");
+
+        JobRequest.create("TestSet", null).submit();
+
+        addAndStartEngine();
+        TestHelpers.waitFor(1, 10000, em);
+
+        Assert.assertEquals(1, TestHelpers.getOkCount(em));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+    }
 }

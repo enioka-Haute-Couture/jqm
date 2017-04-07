@@ -60,6 +60,8 @@ class JarClassLoader extends URLClassLoader
 
     private String hiddenJavaClasses = null;
 
+    private boolean mayBeShared = false;
+
     private static URL[] addUrls(URL url, URL[] libs)
     {
         URL[] urls = new URL[libs.length + 1];
@@ -318,6 +320,13 @@ class JarClassLoader extends URLClassLoader
             if (Constants.API_INTERFACE.equals(f.getType().getName()))
             {
                 jqmlogger.trace("The object should be injected at least on field " + f.getName());
+                if (this.mayBeShared && Modifier.isStatic(f.getModifiers()))
+                {
+                    jqmlogger.warn("Injection done on a static field with shared isolation context - this may "
+                            + "create weird behaviour and crashes of the JobManager API as this field is shared between "
+                            + "all job instances created from this Job Definition. There should always be one instance"
+                            + " of JobManager per running job instance.");
+                }
                 inject = true;
                 break;
             }
@@ -473,15 +482,23 @@ class JarClassLoader extends URLClassLoader
         this.tracing = tracing;
     }
 
-    public void setReferenceJobDefName(String referenceJobDefName) {
+    public void setReferenceJobDefName(String referenceJobDefName)
+    {
         this.referenceJobDefName = referenceJobDefName;
     }
 
-    public String getReferenceJobDefName() {
+    public String getReferenceJobDefName()
+    {
         return referenceJobDefName;
     }
 
-    public String getHiddenJavaClasses() {
+    public String getHiddenJavaClasses()
+    {
         return hiddenJavaClasses;
+    }
+
+    void mayBeShared(boolean val)
+    {
+        this.mayBeShared = val;
     }
 }
