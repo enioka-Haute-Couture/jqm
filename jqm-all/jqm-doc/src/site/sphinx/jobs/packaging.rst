@@ -37,6 +37,13 @@ Conclusion: in that case, no packaging to do.
 
 .. warning:: using this means the pom is fully resolvable from the engine server (repository access, etc). This includes every parent pom used.
 
+.. warning:: if you use a non-Maven system such as Gradle to create "uber jars" that include files from jars created with Maven, you may end up with 
+   a pom.xml inside the META-INF even if you are not using Maven! This would result in a Maven library resolution for a non-Maven jar
+   and fail. To avoid this, exclude pom.xml files from your uber-ification. With Gradle: ::
+   
+      jar { from {configurations.compile.collect { it.isDirectory() ? it : zipTree(it)}} { exclude "META-INF/maven/**" }}
+
+
 lib directory
 +++++++++++++++++
 
