@@ -74,7 +74,7 @@ public final class Query
      * The different fields that can be used in sorting.
      */
     public static enum Sort {
-        ID("id"), APPLICATIONNAME("applicationName"), QUEUENAME("QUEUE_NAME"), STATUS("status", "state"), DATEENQUEUE("ENQUEUE_DATE",
+        ID("id"), APPLICATIONNAME("APPLICATION_NAME"), QUEUENAME("QUEUE_NAME"), STATUS("status", "state"), DATEENQUEUE("ENQUEUE_DATE",
                 "creationDate"), DATEATTRIBUTION("attributionDate"), DATEEXECUTION(
                         "execution_Date"), DATEEND("END_DATE", null), USERNAME("userName"), PARENTID("PARENT_JOB_ID");
 

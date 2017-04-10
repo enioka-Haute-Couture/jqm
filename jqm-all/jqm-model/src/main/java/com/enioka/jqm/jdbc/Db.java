@@ -3,6 +3,7 @@ package com.enioka.jqm.jdbc;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -42,6 +43,48 @@ public class Db
 
     public Db(DataSource ds)
     {
+        this._ds = ds;
+        initQueries();
+        initDb();
+    }
+
+    @SuppressWarnings("unchecked")
+    public Db(Properties props)
+    {
+        if (!props.containsKey("com.enioka.jqm.jdbc.url"))
+        {
+            throw new IllegalArgumentException("No database URL (com.enioka.jqm.jdbc.url) in the database properties");
+        }
+        String url = props.getProperty("com.enioka.jqm.jdbc.url");
+
+        DataSource ds = null;
+        if (url.contains("jdbc:hsqldb"))
+        {
+            Class<? extends DataSource> dsclass;
+            try
+            {
+                dsclass = (Class<? extends DataSource>) Class.forName("org.hsqldb.jdbc.JDBCDataSource");
+            }
+            catch (ClassNotFoundException e)
+            {
+                throw new IllegalStateException("The driver for database HSQLDB was not found in the classpath");
+            }
+
+            try
+            {
+                ds = dsclass.newInstance();
+                dsclass.getMethod("setDatabase", String.class).invoke(ds, "jdbc:hsqldb:mem:testdbengine");
+            }
+            catch (Exception e)
+            {
+                throw new DatabaseException("could not create datasource. See errors below.", e);
+            }
+        }
+        else
+        {
+            throw new IllegalArgumentException("this constructor does not support this database - URL " + url);
+        }
+
         this._ds = ds;
         initQueries();
         initDb();

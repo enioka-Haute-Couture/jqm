@@ -35,7 +35,6 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +84,6 @@ import com.enioka.jqm.jpamodel.State;
 final class HibernateClient implements JqmClient
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(HibernateClient.class);
-    private static final String PERSISTENCE_UNIT = "jobqueue-api-pu";
     private static final int IN_CLAUSE_LIMIT = 500;
     private Db db = null;
     private String protocol = null;
@@ -135,12 +133,14 @@ final class HibernateClient implements JqmClient
         }
 
         Db newDb = null;
-        if (p.containsKey("javax.persistence.nonJtaDataSource"))
+        // nonJTA kept for ascending compatibility.
+        if (p.containsKey("javax.persistence.nonJtaDataSource") || p.containsKey("com.enioka.jqm.jdbc.datasource"))
         {
             // This is a hack. Some containers will use root context as default for JNDI (WebSphere, Glassfish...), other will use
             // java:/comp/env/ (Tomcat...). So if we actually know the required alias, we try both, and the user only has to provide a
             // root JNDI alias that will work in both cases.
-            String dsAlias = (String) p.get("javax.persistence.nonJtaDataSource");
+            String dsAlias = (String) (p.containsKey("javax.persistence.nonJtaDataSource") ? p.get("javax.persistence.nonJtaDataSource")
+                    : p.get("com.enioka.jqm.jdbc.datasource"));
             try
             {
                 newDb = new Db(dsAlias);
@@ -149,8 +149,7 @@ final class HibernateClient implements JqmClient
             {
                 if (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof NameNotFoundException)
                 {
-                    jqmlogger.debug("JNDI alias " + p.getProperty("javax.persistence.nonJtaDataSource")
-                            + " was not found. Trying with java:/comp/env/ prefix");
+                    jqmlogger.debug("JNDI alias " + dsAlias + " was not found. Trying with java:/comp/env/ prefix");
                     dsAlias = "java:/comp/env/" + dsAlias;
                     newDb = new Db(dsAlias);
                 }
@@ -159,6 +158,10 @@ final class HibernateClient implements JqmClient
                     throw e;
                 }
             }
+        }
+        else if (p.containsKey("com.enioka.jqm.jdbc.url"))
+        {
+            newDb = new Db(p);
         }
         else
         {
@@ -827,11 +830,11 @@ final class HibernateClient implements JqmClient
             {
                 String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1];
                 prms.add(filterValue);
-                return String.format("AND (%s = ?) ", fieldName);
+                return String.format("AND %s = ? ", fieldName);
             }
             else
             {
-                return String.format("AND (%s IS NULL) ", fieldName);
+                return String.format("AND %s IS NULL ", fieldName);
             }
         }
         return "";
@@ -872,7 +875,7 @@ final class HibernateClient implements JqmClient
         }
         if (query.isQueryLiveInstances() && query.isQueryHistoryInstances() && query.getSorts().size() > 0)
         {
-            throw new JqmInvalidRequestException("cannot use sorting when querying both live and historical instances");
+            // throw new JqmInvalidRequestException("cannot use sorting when querying both live and historical instances");
         }
         if (!query.isQueryHistoryInstances() && !query.isQueryLiveInstances())
         {
@@ -889,7 +892,7 @@ final class HibernateClient implements JqmClient
             String wh = "";
             List<Object> prms = new ArrayList<Object>();
 
-            String q = "";
+            String q = "", q1 = "", q2 = "";
             String filterCountQuery = "SELECT ";
             String totalCountQuery = "SELECT ";
 
@@ -926,7 +929,7 @@ final class HibernateClient implements JqmClient
                 wh += getCalendarPredicate("ji.EXECUTIONDATE", query.getBeganRunningAfter(), ">=", prms);
                 wh += getCalendarPredicate("ji.EXECUTIONDATE", query.getBeganRunningBefore(), "<=", prms);
 
-                q = "SELECT ji.ID, jd.APPLICATION AS JD_APPLICATION, jd.APPLICATIONNAME AS APPLICATION_NAME, ji.ATTRIBUTIONDATE, "
+                q1 = "SELECT ji.ID, jd.APPLICATION AS JD_APPLICATION, jd.APPLICATIONNAME AS APPLICATION_NAME, ji.ATTRIBUTIONDATE, "
                         + "ji.SENDEMAIL AS EMAIL, NULL AS END_DATE, ji.CREATIONDATE AS ENQUEUE_DATE, ji.EXECUTIONDATE AS EXECUTION_DATE, "
                         + "ji.HIGHLANDER, ji.APPLICATION AS INSTANCE_APPLICATION, ji.KEYWORD1 AS INSTANCE_KEYWORD1, "
                         + "ji.KEYWORD2 AS INSTANCE_KEYWORD2, ji.KEYWORD3 AS INSTANCE_KEYWORD3, ji.MODULE AS INSTANCE_MODULE, "
@@ -938,8 +941,9 @@ final class HibernateClient implements JqmClient
                 totalCountQuery += " (SELECT COUNT(1) FROM JOBINSTANCE) ,";
                 if (wh.length() > 3)
                 {
-                    q += "WHERE " + wh.substring(3, wh.length() - 1);
-                    filterCountQuery += String.format(" (SELECT COUNT(1) FROM JOBINSTANCE %s) ,", wh);
+                    wh = wh.substring(3, wh.length() - 1);
+                    q1 += "WHERE " + wh;
+                    filterCountQuery += String.format(" (SELECT COUNT(1) FROM JOBINSTANCE ji WHERE %s) ,", wh);
                 }
                 else
                 {
@@ -951,10 +955,6 @@ final class HibernateClient implements JqmClient
             // HISTORY QUERY
             if (query.isQueryHistoryInstances())
             {
-                if (q.length() > 3)
-                {
-                    q += " UNION ALL ";
-                }
                 wh = "";
 
                 wh += getIntPredicate("ID", query.getJobInstanceId(), prms);
@@ -971,9 +971,9 @@ final class HibernateClient implements JqmClient
                 wh += getStringPredicate("APPLICATIONNAME", query.getInstanceApplication(), prms);
                 wh += getStringPredicate("JD_APPLICATION", query.getJobDefApplication(), prms);
                 wh += getStringPredicate("JD_MODULE", query.getJobDefModule(), prms);
-                wh += getStringPredicate("JD_KEYWORD1", query.getJobDefKeyword1(), prms);
-                wh += getStringPredicate("JD_KEYWORD2", query.getJobDefKeyword2(), prms);
-                wh += getStringPredicate("JD_KEYWORD3", query.getJobDefKeyword3(), prms);
+                wh += getStringPredicate("KEYWORD1", query.getJobDefKeyword1(), prms);
+                wh += getStringPredicate("KEYWORD2", query.getJobDefKeyword2(), prms);
+                wh += getStringPredicate("KEYWORD3", query.getJobDefKeyword3(), prms);
 
                 wh += getStringPredicate("NODENAME", query.getNodeName(), prms);
 
@@ -987,7 +987,7 @@ final class HibernateClient implements JqmClient
                 wh += getCalendarPredicate("END_DATE", query.getEndedAfter(), ">=", prms);
                 wh += getCalendarPredicate("END_DATE", query.getEndedBefore(), "<=", prms);
 
-                q += "SELECT ID, APPLICATION AS JD_APPLICATION, APPLICATIONNAME, ATTRIBUTIONDATE, EMAIL, "
+                q2 += "SELECT ID, APPLICATION AS JD_APPLICATION, APPLICATIONNAME AS APPLICATION_NAME, ATTRIBUTIONDATE, EMAIL, "
                         + "END_DATE, ENQUEUE_DATE, EXECUTION_DATE, HIGHLANDER, INSTANCE_APPLICATION, "
                         + "INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, "
                         + "KEYWORD1 AS JD_KEYWORD1, KEYWORD2 AS JD_KEYWORD2, KEYWORD3 AS JD_KEYWORD3, "
@@ -997,8 +997,9 @@ final class HibernateClient implements JqmClient
                 totalCountQuery += " (SELECT COUNT(1) FROM HISTORY) ,";
                 if (wh.length() > 3)
                 {
-                    q += "WHERE " + wh.substring(3, wh.length() - 1);
-                    filterCountQuery += String.format(" (SELECT COUNT(1) FROM HISTORY %s) ,", wh);
+                    wh = wh.substring(3, wh.length() - 1);
+                    q2 += "WHERE " + wh;
+                    filterCountQuery += String.format(" (SELECT COUNT(1) FROM HISTORY WHERE %s) ,", wh);
                 }
                 else
                 {
@@ -1007,10 +1008,30 @@ final class HibernateClient implements JqmClient
             }
 
             ///////////////////////////////////////////////
+            // UNION
+            if (q1.isEmpty())
+            {
+                q = q2;
+            }
+            else if (q2.isEmpty())
+            {
+                q = q1;
+            }
+            else
+            {
+                q = String.format("(%s) UNION ALL (%s) ", q1, q2);
+            }
+
+            ///////////////////////////////////////////////
             // Sort (on the union, not the sub queries)
             String sort = "";
             for (SortSpec s : query.getSorts())
             {
+                if (query.isQueryLiveInstances() && !query.isQueryHistoryInstances() && s.col == Sort.DATEEND)
+                {
+                    throw new JqmInvalidRequestException("cannot sort live instances by end date as those instances are still running");
+                }
+
                 sort += "," + s.col.getHistoryField() + " " + (s.order == Query.SortOrder.ASCENDING ? "ASC" : "DESC");
             }
             if (sort.isEmpty())
@@ -1050,7 +1071,7 @@ final class HibernateClient implements JqmClient
             // need this indication.
             if (query.getFirstRow() != null || (query.getPageSize() != null && res.size() >= query.getPageSize()))
             {
-                ResultSet rs2 = cnx.runRawSelect(filterCountQuery.substring(0, filterCountQuery.length() - 2) + " FROM (VALUES(0))",
+                ResultSet rs2 = cnx.runRawSelect(filterCountQuery.substring(0, filterCountQuery.length() - 2) + " AS D FROM (VALUES(0))",
                         prms.toArray());
                 rs2.next();
 
@@ -1102,9 +1123,7 @@ final class HibernateClient implements JqmClient
             query.setResults(new ArrayList<com.enioka.jqm.api.JobInstance>(res.values()));
             return query.getResults();
         }
-        catch (
-
-        Exception e)
+        catch (Exception e)
         {
             throw new JqmClientException("an error occured during query execution", e);
         }

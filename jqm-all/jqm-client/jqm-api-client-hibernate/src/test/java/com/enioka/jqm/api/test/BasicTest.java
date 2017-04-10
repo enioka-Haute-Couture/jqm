@@ -26,7 +26,7 @@ import com.enioka.jqm.api.Query.Sort;
 import com.enioka.jqm.api.State;
 
 /**
- * Simple tests for checking JPA query syntax (no data)
+ * Simple tests for checking query syntax (no data)
  */
 public class BasicTest
 {
@@ -160,8 +160,8 @@ public class BasicTest
     public void testSortJi()
     {
         Query.create().setQueryHistoryInstances(false).setQueryLiveInstances(true).setUser("test").addSortAsc(Sort.APPLICATIONNAME)
-                .addSortDesc(Sort.DATEATTRIBUTION).addSortAsc(Sort.DATEEND).addSortDesc(Sort.DATEENQUEUE).addSortAsc(Sort.ID)
-                .addSortDesc(Sort.QUEUENAME).addSortAsc(Sort.STATUS).addSortDesc(Sort.USERNAME).addSortAsc(Sort.PARENTID).run();
+                .addSortDesc(Sort.DATEATTRIBUTION).addSortDesc(Sort.DATEENQUEUE).addSortAsc(Sort.ID).addSortDesc(Sort.QUEUENAME)
+                .addSortAsc(Sort.STATUS).addSortDesc(Sort.USERNAME).addSortAsc(Sort.PARENTID).run();
     }
 
     @Test
