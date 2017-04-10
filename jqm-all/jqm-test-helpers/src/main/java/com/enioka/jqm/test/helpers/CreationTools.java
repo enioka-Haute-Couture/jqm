@@ -33,7 +33,6 @@ package com.enioka.jqm.test.helpers;
  * limitations under the License.
  */
 
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +40,6 @@ import org.apache.log4j.Logger;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.util.ByteSource;
-import org.hsqldb.Server;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jpamodel.JndiObjectResource;
@@ -58,60 +56,9 @@ import com.enioka.jqm.jpamodel.RUser;
 public class CreationTools
 {
     private static Logger jqmlogger = Logger.getLogger(CreationTools.class);
-    public static Server s;
 
     private CreationTools()
     {}
-
-    public static void reinitHsqldbServer() throws InterruptedException, FileNotFoundException
-    {
-        stopHsqldbServer();
-        jqmlogger.debug("Starting HSQLDB");
-        s = new Server();
-        s.setDatabaseName(0, "testdbengine");
-        s.setDatabasePath(0, "mem:testdbengine");
-        s.setLogWriter(null);
-        s.setSilent(true);
-        s.start();
-
-        while (s.getState() != 1)
-        {
-            try
-            {
-                Thread.sleep(10);
-            }
-            catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        jqmlogger.debug("HSQLDB is now running");
-    }
-
-    public static void stopHsqldbServer()
-    {
-        if (s != null)
-        {
-            jqmlogger.debug("Stopping HSQLDB");
-            s.signalCloseAllServerConnections();
-            s.shutdown();
-            s.stop();
-
-            while (s.getState() != 16)
-            {
-                try
-                {
-                    Thread.sleep(10);
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-            s = null;
-            jqmlogger.debug("HSQLDB is now stopped");
-        }
-    }
 
     // ------------------ JOB DEFINITION ------------------------
 
