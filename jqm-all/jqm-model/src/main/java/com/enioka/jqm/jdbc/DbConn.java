@@ -23,6 +23,7 @@ public class DbConn implements Closeable
     private Db parent;
     private Connection _cnx;
     private boolean transac_open = false;
+    private boolean rollbackOnly = false;
 
     DbConn(Db parent, Connection cnx)
     {
@@ -39,6 +40,10 @@ public class DbConn implements Closeable
 
     public void commit()
     {
+        if (rollbackOnly)
+        {
+            throw new IllegalStateException("cannot commit a rollback only session. Use rollback first.");
+        }
         try
         {
             _cnx.commit();
@@ -56,11 +61,17 @@ public class DbConn implements Closeable
         {
             _cnx.rollback();
             transac_open = false;
+            rollbackOnly = false;
         }
         catch (SQLException e)
         {
             throw new DatabaseException(e);
         }
+    }
+
+    public void setRollbackOnly()
+    {
+        rollbackOnly = true;
     }
 
     public QueryResult runUpdate(String query_key, Object... params)
@@ -169,6 +180,30 @@ public class DbConn implements Closeable
         {
             closeQuietly(ps);
         }
+    }
+
+    public ResultSet runSelectSingleRow(String query_key, Object... params)
+    {
+        ResultSet rs = null;
+        try
+        {
+            rs = runSelect(query_key, params);
+
+            if (!rs.next())
+            {
+                throw new NoResultException("The query returned zero rows when one was expected.");
+            }
+            if (rs.next())
+            {
+                throw new NonUniqueResultException("The query returned more than one row when one was expected");
+            }
+            rs.first();
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return rs;
     }
 
     public <T> T runSelectSingle(String query_key, Class<T> clazz, Object... params)

@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.webui.admin.dto;
+package com.enioka.api.admin;
 
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * A mapping makes a {@link NodeDto} poll a {@link QueueDto}.
+ */
 @XmlRootElement
 public class QueueMappingDto implements Serializable
 {

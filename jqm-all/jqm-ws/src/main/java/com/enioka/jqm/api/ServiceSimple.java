@@ -21,8 +21,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -44,6 +42,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jpamodel.Deliverable;
 import com.enioka.jqm.jpamodel.Node;
 
@@ -57,10 +57,8 @@ public class ServiceSimple
 {
     private static Logger log = LoggerFactory.getLogger(ServiceSimple.class);
 
-    private @Context
-    HttpServletResponse res;
-    private @Context
-    SecurityContext security;
+    private @Context HttpServletResponse res;
+    private @Context SecurityContext security;
     private Node n = null;
     @Context
     private ServletContext context;
@@ -73,13 +71,17 @@ public class ServiceSimple
     {
         if (context.getInitParameter("jqmnodeid") != null)
         {
-            EntityManager em = null;
+            // Running on a JQM node, not a standard servlet container.
+            DbConn em = null;
             try
             {
-                em = Helpers.getEm();
+                em = Helpers.getDbSession();
 
-                n = em.find(Node.class, Integer.parseInt(context.getInitParameter("jqmnodeid")));
-                if (n == null)
+                try
+                {
+                    n = Node.select_single(em, "node_select_by_id", Integer.parseInt(context.getInitParameter("jqmnodeid")));
+                }
+                catch (NoResultException e)
                 {
                     throw new RuntimeException("invalid configuration: no node of ID " + context.getInitParameter("jqmnodeid"));
                 }
@@ -135,12 +137,17 @@ public class ServiceSimple
         }
 
         Deliverable d = null;
-        EntityManager em = null;
+        DbConn em = null;
         try
         {
-            em = ((HibernateClient) JqmClientFactory.getClient()).getDbSession();
-            d = em.createQuery("SELECT d from Deliverable d WHERE d.randomId = :ii", Deliverable.class).setParameter("ii", randomId)
-                    .getSingleResult();
+            em = Helpers.getDbSession();
+            List<Deliverable> dd = Deliverable.select(em, "deliverable_select_by_randomid", randomId);
+            if (dd.isEmpty())
+            {
+                throw new NoResultException("requested file does not exist");
+            }
+
+            d = dd.get(0);
         }
         catch (NoResultException e)
         {
@@ -152,10 +159,7 @@ public class ServiceSimple
         }
         finally
         {
-            if (em != null)
-            {
-                em.close();
-            }
+            Helpers.closeQuietly(em);
         }
 
         String ext = FilenameUtils.getExtension(d.getOriginalFileName());
@@ -181,6 +185,11 @@ public class ServiceSimple
     @Produces(MediaType.TEXT_PLAIN)
     public String getEngineLog(@QueryParam("latest") int latest)
     {
+        if (n == null)
+        {
+            throw new ErrorDto("can only retrieve a file when the web app runs on top of JQM", "", 7, Status.BAD_REQUEST);
+        }
+
         // Failsafe
         if (latest > 10000)
         {

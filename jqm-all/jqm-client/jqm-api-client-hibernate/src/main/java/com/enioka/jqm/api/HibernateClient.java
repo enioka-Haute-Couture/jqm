@@ -147,9 +147,9 @@ final class HibernateClient implements JqmClient
             }
             catch (DatabaseException e)
             {
-                if (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof NameNotFoundException)
+                if (e.getCause() != null && e.getCause() instanceof NameNotFoundException)
                 {
-                    jqmlogger.debug("JNDI alias " + dsAlias + " was not found. Trying with java:/comp/env/ prefix");
+                    jqmlogger.warn("JNDI alias " + dsAlias + " was not found. Trying with java:/comp/env/ prefix");
                     dsAlias = "java:/comp/env/" + dsAlias;
                     newDb = new Db(dsAlias);
                 }

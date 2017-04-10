@@ -15,7 +15,6 @@
  */
 package com.enioka.jqm.api;
 
-import javax.persistence.EntityManager;
 import javax.servlet.ServletContext;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Context;
@@ -24,6 +23,9 @@ import org.eclipse.persistence.jaxb.MarshallerProperties;
 import org.eclipse.persistence.jaxb.UnmarshallerProperties;
 import org.glassfish.jersey.server.ResourceConfig;
 
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.Node;
 
 @ApplicationPath("/ws/*")
@@ -36,21 +38,27 @@ public class JqmRestApp extends ResourceConfig
         this.property(UnmarshallerProperties.JSON_WRAPPER_AS_ARRAY_NAME, true);
 
         // Determine which of the three APIs should be loaded
-        EntityManager em = Helpers.getEm();
+        DbConn cnx = Helpers.getDbSession();
         boolean loadApiSimple;
         boolean loadApiClient;
         boolean loadApiAdmin;
 
         if (context.getInitParameter("jqmnodeid") != null)
         {
-            Node n = em.find(Node.class, Integer.parseInt(context.getInitParameter("jqmnodeid")));
-            if (n == null)
+            // The application is running hosted by a JQM node.
+            Node n = null;
+
+            try
+            {
+                n = Node.select_single(cnx, "node_select_by_id", Integer.parseInt(context.getInitParameter("jqmnodeid")));
+            }
+            catch (NoResultException e)
             {
                 throw new RuntimeException("invalid configuration: no node of ID " + context.getInitParameter("jqmnodeid"));
             }
-            loadApiSimple = !Boolean.parseBoolean(Helpers.getParameter("disableWsApiSimple", "false", em));
-            loadApiClient = !Boolean.parseBoolean(Helpers.getParameter("disableWsApiClient", "false", em));
-            loadApiAdmin = !Boolean.parseBoolean(Helpers.getParameter("disableWsApiAdmin", "false", em));
+            loadApiSimple = !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApiSimple", "false"));
+            loadApiClient = !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApiClient", "false"));
+            loadApiAdmin = !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApiAdmin", "false"));
 
             loadApiAdmin = loadApiAdmin && (n.getLoadApiAdmin() == null ? false : n.getLoadApiAdmin());
             loadApiClient = loadApiClient && (n.getLoadApiClient() == null ? false : n.getLoadApiClient());
@@ -58,13 +66,15 @@ public class JqmRestApp extends ResourceConfig
         }
         else
         {
+            // The application is hosted by some other server (Tomcat, JBoss... but not a JQM node)
+
             // Never load the simple API when not running on JQM's own server. This API relies on files that are local to the JQM server.
             loadApiSimple = false;
             // Always load the two others
             loadApiAdmin = true;
             loadApiClient = true;
         }
-        Helpers.closeQuietly(em);
+        Helpers.closeQuietly(cnx);
 
         // Load the APIs
         if (loadApiAdmin)

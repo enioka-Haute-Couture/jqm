@@ -27,6 +27,8 @@ import java.util.List;
 
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.jdbc.NonUniqueResultException;
 import com.enioka.jqm.jdbc.QueryResult;
 
 public class RUser implements Serializable
@@ -247,11 +249,11 @@ public class RUser implements Serializable
         List<RUser> res = select(cnx, "user_select_by_key", id);
         if (res.isEmpty())
         {
-            throw new DatabaseException("no result for query by key for key " + id);
+            throw new NoResultException("no result for query by key for key " + id);
         }
         if (res.size() > 1)
         {
-            throw new DatabaseException("Inconsistent database! Multiple results for query by key for key " + id);
+            throw new NonUniqueResultException("Inconsistent database! Multiple results for query by key for key " + id);
         }
         return res.get(0);
     }

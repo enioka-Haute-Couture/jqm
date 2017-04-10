@@ -13,24 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.webui.admin.dto;
+package com.enioka.api.admin;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class RRoleDto implements Serializable
+public class QueueDto implements Serializable
 {
-    private static final long serialVersionUID = -3226778067729024400L;
+    private static final long serialVersionUID = 4677043929807285233L;
 
     private Integer id;
     private String name;
     private String description;
-
-    private List<String> permissions = new ArrayList<String>();
+    private boolean defaultQueue;
 
     public Integer getId()
     {
@@ -62,13 +59,13 @@ public class RRoleDto implements Serializable
         this.description = description;
     }
 
-    public List<String> getPermissions()
+    public boolean isDefaultQueue()
     {
-        return permissions;
+        return defaultQueue;
     }
 
-    public void setPermissions(List<String> permissions)
+    public void setDefaultQueue(boolean defaultQueue)
     {
-        this.permissions = permissions;
+        this.defaultQueue = defaultQueue;
     }
 }

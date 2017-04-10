@@ -17,9 +17,6 @@ package com.enioka.jqm.webui.shiro;
 
 import java.util.Calendar;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -33,6 +30,8 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 
 import com.enioka.jqm.api.Helpers;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jpamodel.RPermission;
 import com.enioka.jqm.jpamodel.RRole;
 import com.enioka.jqm.jpamodel.RUser;
@@ -83,12 +82,11 @@ public class JpaRealm extends AuthorizingRealm
 
     private SimpleAccount getUser(String login)
     {
-        EntityManager em = null;
+        DbConn em = null;
         try
         {
-            em = Helpers.getEm();
-            RUser user = em.createQuery("SELECT u FROM RUser u WHERE UPPER(u.login) = UPPER(:l)", RUser.class).setParameter("l", login)
-                    .getSingleResult();
+            em = Helpers.getDbSession();
+            RUser user = RUser.selectlogin(em, login);
 
             // Credential is a password - in token, it is as a char array
             SimpleAccount res = new SimpleAccount(user.getLogin(), user.getPassword(), getName());
@@ -113,10 +111,10 @@ public class JpaRealm extends AuthorizingRealm
             res.setLocked(user.getLocked());
 
             // Roles
-            for (RRole r : user.getRoles())
+            for (RRole r : user.getRoles(em))
             {
                 res.addRole(r.getName());
-                for (RPermission p : r.getPermissions())
+                for (RPermission p : r.getPermissions(em))
                 {
                     res.addStringPermission(p.getName());
                 }

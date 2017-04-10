@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.webui.admin.dto;
+package com.enioka.api.admin;
 
 import java.util.List;
 

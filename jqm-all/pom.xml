@@ -80,6 +80,9 @@
 		<pool.version>7.0.68</pool.version>
 		<bc.version>1.54</bc.version>
 		<mail.version>1.5.2</mail.version>
+		<commons.logging.version>1.2</commons.logging.version>
+		<commons.io.version>2.5</commons.io.version>
+		<commons.lang.version>2.6</commons.lang.version>
 
 		<sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
 
@@ -102,7 +105,8 @@
 		<module>jqm-providers</module>
 		<module>jqm-pki</module>
 		<module>jqm-tst</module>
-	</modules>
+    <module>jqm-admin</module>
+  </modules>
 
 	<scm>
 		<developerConnection>scm:git:ssh://git@github.com:enioka/jqm.git</developerConnection>
@@ -317,7 +321,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore/>
 									</action>
 								</pluginExecution>
 								<pluginExecution>
@@ -336,7 +340,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore/>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>

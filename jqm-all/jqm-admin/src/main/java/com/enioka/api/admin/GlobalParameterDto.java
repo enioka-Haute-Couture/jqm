@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.webui.admin.dto;
+package com.enioka.api.admin;
 
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * Global parameters are shared between all nodes in the JQM cluster and control various aspects of its behaviour: to use SSL or not, which
+ * Maven repositories are allowed, etc.<br>
+ * Allowed keys and values are found inside the documentation.
+ */
 @XmlRootElement
 public class GlobalParameterDto implements Serializable
 {

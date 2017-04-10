@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.webui.admin.dto;
+package com.enioka.api.admin;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * Describes a resource which can be retrieved by the running job instances through the JNDI API.
+ */
 @XmlRootElement
 public class JndiObjectResourceDto implements Serializable
 {
@@ -38,7 +42,7 @@ public class JndiObjectResourceDto implements Serializable
 
     @XmlElementWrapper(name = "parameters")
     @XmlElement(name = "parameter", type = ParameterDto.class)
-    private List<ParameterDto> parameters;
+    private Map<String, String> parameters = new HashMap<String, String>(10);
 
     public Integer getId()
     {
@@ -110,12 +114,17 @@ public class JndiObjectResourceDto implements Serializable
         this.singleton = singleton;
     }
 
-    public void setParameters(List<ParameterDto> parameters)
+    void setParameters(Map<String, String> parameters)
     {
         this.parameters = parameters;
     }
 
-    public List<ParameterDto> getParameters()
+    public void addParameter(String key, String value)
+    {
+        this.parameters.put(key, value);
+    }
+
+    public Map<String, String> getParameters()
     {
         return parameters;
     }
