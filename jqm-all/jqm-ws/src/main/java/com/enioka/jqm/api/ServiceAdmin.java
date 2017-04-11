@@ -40,6 +40,7 @@ import com.enioka.admin.MetaService;
 import com.enioka.api.admin.NodeDto;
 import com.enioka.api.admin.PemissionsBagDto;
 import com.enioka.api.admin.QueueDto;
+import com.enioka.api.admin.QueueMappingDto;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
@@ -239,56 +240,103 @@ public class ServiceAdmin
     // Deployment parameters - queue mappings
     // ////////////////////////////////////////////////////////////////////////
 
-    // @GET
-    // @Path("qmapping")
-    // @Produces(MediaType.APPLICATION_JSON)
-    // @HttpCache
-    // public List<QueueMappingDto> getQueueMappings()
-    // {
-    // return getDtoList(DeploymentParameter.class);
-    // }
-    //
-    // @PUT
-    // @Path("qmapping")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setQueueMappings(List<QueueMappingDto> dtos)
-    // {
-    // setItems(DeploymentParameter.class, dtos);
-    // }
-    //
-    // @GET
-    // @Path("qmapping/{id}")
-    // @Produces(MediaType.APPLICATION_JSON)
-    // @HttpCache
-    // public QueueMappingDto getQueueMapping(@PathParam("id") int id)
-    // {
-    // return getDto(DeploymentParameter.class, id);
-    // }
-    //
-    // @PUT
-    // @Path("qmapping/{id}")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setQueueMapping(@PathParam("id") Integer id, QueueMappingDto dto)
-    // {
-    // dto.setId(id);
-    // setItem(dto);
-    // }
-    //
-    // @POST
-    // @Path("qmapping")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setQueueMapping(QueueMappingDto dto)
-    // {
-    // setItem(dto);
-    // }
-    //
-    // @DELETE
-    // @Path("qmapping/{id}")
-    // public void deleteQueueMapping(@PathParam("id") Integer id)
-    // {
-    // deleteItem(DeploymentParameter.class, id);
-    // }
-    //
+    @GET
+    @Path("qmapping")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
+    public List<QueueMappingDto> getQueueMappings()
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getQueueMappings(cnx);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @GET
+    @Path("qmapping/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
+    public QueueMappingDto getQueueMapping(@PathParam("id") int id)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getQueueMapping(cnx, id);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @PUT
+    @Path("qmapping")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setQueueMappings(List<QueueMappingDto> dtos)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.syncQueueMappings(cnx, dtos);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @PUT
+    @Path("qmapping/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setQueueMapping(@PathParam("id") Integer id, QueueMappingDto dto)
+    {
+        dto.setId(id);
+        setQueueMapping(dto);
+    }
+
+    @POST
+    @Path("qmapping")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setQueueMapping(QueueMappingDto dto)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.upsertQueueMapping(cnx, dto);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @DELETE
+    @Path("qmapping/{id}")
+    public void deleteQueueMapping(@PathParam("id") Integer id)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.deleteQueueMapping(cnx, id);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
     // // ////////////////////////////////////////////////////////////////////////
     // // JNDI
     // // ////////////////////////////////////////////////////////////////////////

@@ -63,8 +63,12 @@ public class DbImplBase
         queries.put("dp_delete_by_id", "DELETE FROM DEPLOYMENTPARAMETER WHERE ID=?");
         queries.put("dp_update_interval_by_id", "UPDATE DEPLOYMENTPARAMETER SET POLLINGINTERVAL=? WHERE ID=?");
         queries.put("dp_update_threads_by_id", "UPDATE DEPLOYMENTPARAMETER SET NBTHREAD=? WHERE ID=?");
+        queries.put("dp_update_changed_by_id", "UPDATE DEPLOYMENTPARAMETER SET ENABLED=?, LASTMODIFIED=CURRENT_TIMESTAMP, NBTHREAD=?, POLLINGINTERVAL=?, NODE=?, QUEUE=? WHERE ID=? AND NOT "
+                + "(ENABLED=? AND NBTHREAD=? AND POLLINGINTERVAL=? AND NODE=? AND QUEUE=?)");
         queries.put("dp_select_for_node", "SELECT ID, ENABLED, LASTMODIFIED, NBTHREAD, POLLINGINTERVAL, NODE, QUEUE FROM DEPLOYMENTPARAMETER WHERE NODE=?");
         queries.put("dp_select_count_for_node", "SELECT COUNT(1) FROM DEPLOYMENTPARAMETER WHERE NODE=?");
+        queries.put("dp_select_all_with_names", "SELECT dp.ID, dp.ENABLED, dp.LASTMODIFIED, dp.NBTHREAD, dp.POLLINGINTERVAL, dp.NODE, dp.QUEUE, n.NODENAME, q.NAME FROM DEPLOYMENTPARAMETER dp LEFT JOIN NODE n ON n.ID=dp.NODE LEFT JOIN QUEUE q ON q.ID=dp.QUEUE ");
+        queries.put("dp_select_with_names_by_id", queries.get("dp_select_all_with_names") + " WHERE ID=?");
         
         // JOB DEF
         queries.put("jd_insert", "INSERT INTO JOBDEF(APPLICATION, APPLICATIONNAME, CHILDFIRSTCLASSLOADER, "

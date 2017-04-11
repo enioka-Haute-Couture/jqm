@@ -15,11 +15,13 @@ import com.enioka.api.admin.GlobalParameterDto;
 import com.enioka.api.admin.JndiObjectResourceDto;
 import com.enioka.api.admin.NodeDto;
 import com.enioka.api.admin.QueueDto;
+import com.enioka.api.admin.QueueMappingDto;
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.NonUniqueResultException;
 import com.enioka.jqm.jdbc.QueryResult;
+import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JndiObjectResource;
 import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
@@ -646,6 +648,112 @@ public class MetaService
         {
             cnx.setRollbackOnly();
             throw new JqmAdminApiUserException("no item with ID " + id);
+        }
+    }
+
+    private static QueueMappingDto mapQueueMapping(ResultSet rs, int colShift)
+    {
+        try
+        {
+            QueueMappingDto tmp = new QueueMappingDto();
+
+            tmp.setId(rs.getInt(1 + colShift));
+            tmp.setEnabled(rs.getBoolean(2 + colShift));
+
+            tmp.setNbThread(rs.getInt(4 + colShift));
+            tmp.setPollingInterval(rs.getInt(5 + colShift));
+            tmp.setNodeId(rs.getInt(6 + colShift));
+            tmp.setQueueId(rs.getInt(7 + colShift));
+            tmp.setNodeName(rs.getString(8 + colShift));
+            tmp.setQueueName(rs.getString(9 + colShift));
+
+            return tmp;
+        }
+        catch (SQLException e)
+        {
+            throw new JqmAdminApiInternalException(e);
+        }
+    }
+
+    public static List<QueueMappingDto> getQueueMappings(DbConn cnx)
+    {
+        List<QueueMappingDto> res = new ArrayList<QueueMappingDto>();
+        try
+        {
+            ResultSet rs = cnx.runSelect("dp_select_all_with_names");
+            while (rs.next())
+            {
+                res.add(mapQueueMapping(rs, 0));
+            }
+            rs.close();
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
+    }
+
+    public static QueueMappingDto getQueueMapping(DbConn cnx, int id)
+    {
+        ResultSet rs = null;
+        try
+        {
+            rs = cnx.runSelect("dp_select_with_names_by_id");
+            if (!rs.next())
+            {
+                throw new JqmAdminApiUserException("no result");
+            }
+
+            return mapQueueMapping(rs, 0);
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+    }
+
+    public static void upsertQueueMapping(DbConn cnx, QueueMappingDto dto)
+    {
+        if (dto.getId() != null)
+        {
+            cnx.runUpdate("dp_update_changed_by_id", dto.getEnabled(), dto.getNbThread(), dto.getPollingInterval(), dto.getNodeId(),
+                    dto.getQueueId(), dto.getId(), dto.getEnabled(), dto.getNbThread(), dto.getPollingInterval(), dto.getNodeId(),
+                    dto.getQueueId());
+        }
+        else
+        {
+            DeploymentParameter.create(cnx, dto.getNodeId(), dto.getNbThread(), dto.getPollingInterval(), dto.getQueueId());
+        }
+    }
+
+    public static void syncQueueMappings(DbConn cnx, List<QueueMappingDto> dtos)
+    {
+        for (QueueMappingDto existing : getQueueMappings(cnx))
+        {
+            boolean foundInNewSet = false;
+            for (QueueMappingDto newdto : dtos)
+            {
+                if (newdto.getId() != null && newdto.getId().equals(existing.getId()))
+                {
+                    foundInNewSet = true;
+                    break;
+                }
+            }
+
+            if (!foundInNewSet)
+            {
+                deleteQueue(cnx, existing.getId());
+            }
+        }
+
+        for (QueueMappingDto dto : dtos)
+        {
+            upsertQueueMapping(cnx, dto);
         }
     }
 
