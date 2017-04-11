@@ -185,6 +185,32 @@ public class MetaService
         return res;
     }
 
+    public static void syncGlobalParameters(DbConn cnx, List<GlobalParameterDto> dtos)
+    {
+        for (GlobalParameterDto existing : getGlobalParameter(cnx))
+        {
+            boolean foundInNewSet = false;
+            for (GlobalParameterDto newdto : dtos)
+            {
+                if (newdto.getId() != null && newdto.getId().equals(existing.getId()))
+                {
+                    foundInNewSet = true;
+                    break;
+                }
+            }
+
+            if (!foundInNewSet)
+            {
+                deleteGlobalParameter(cnx, existing.getId());
+            }
+        }
+
+        for (GlobalParameterDto dto : dtos)
+        {
+            upsertGlobalParameter(cnx, dto);
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // JNDI
     ///////////////////////////////////////////////////////////////////////////
@@ -365,7 +391,7 @@ public class MetaService
 
             if (!foundInNewSet)
             {
-                deleteQueue(cnx, existing.getId());
+                deleteJndiObjectResource(cnx, existing.getId());
             }
         }
 

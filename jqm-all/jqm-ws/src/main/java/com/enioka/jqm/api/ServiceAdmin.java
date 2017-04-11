@@ -37,6 +37,7 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.shiro.SecurityUtils;
 
 import com.enioka.admin.MetaService;
+import com.enioka.api.admin.GlobalParameterDto;
 import com.enioka.api.admin.JndiObjectResourceDto;
 import com.enioka.api.admin.NodeDto;
 import com.enioka.api.admin.PemissionsBagDto;
@@ -440,60 +441,108 @@ public class ServiceAdmin
         }
     }
 
-    // // ////////////////////////////////////////////////////////////////////////
-    // // Global parameters
-    // // ////////////////////////////////////////////////////////////////////////
-    //
-    // @GET
-    // @Path("prm")
-    // @Produces(MediaType.APPLICATION_JSON)
-    // @HttpCache
-    // public List<GlobalParameterDto> getGlobalParameters()
-    // {
-    // return getDtoList(GlobalParameter.class);
-    // }
-    //
-    // @PUT
-    // @Path("prm")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setGlobalParameters(List<GlobalParameterDto> dtos)
-    // {
-    // setItems(GlobalParameter.class, dtos);
-    // }
-    //
-    // @GET
-    // @Path("prm/{id}")
-    // @Produces(MediaType.APPLICATION_JSON)
-    // @HttpCache
-    // public GlobalParameterDto getGlobalParameter(@PathParam("id") int id)
-    // {
-    // return getDto(GlobalParameter.class, id);
-    // }
-    //
-    // @PUT
-    // @Path("prm/{id}")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setGlobalParameter(@PathParam("id") Integer id, GlobalParameterDto dto)
-    // {
-    // dto.setId(id);
-    // setItem(dto);
-    // }
-    //
-    // @POST
-    // @Path("prm")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setGlobalParameter(GlobalParameterDto dto)
-    // {
-    // setItem(dto);
-    // }
-    //
-    // @DELETE
-    // @Path("prm/{id}")
-    // public void deleteGlobalParameter(@PathParam("id") Integer id)
-    // {
-    // deleteItem(GlobalParameter.class, id);
-    // }
-    //
+    //////////////////////////////////////////////////////////////////////////
+    // Global parameters
+    //////////////////////////////////////////////////////////////////////////
+
+    @GET
+    @Path("prm")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
+    public List<GlobalParameterDto> getGlobalParameters()
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getGlobalParameter(cnx);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @PUT
+    @Path("prm")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setGlobalParameters(List<GlobalParameterDto> dtos)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.syncGlobalParameters(cnx, dtos);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @GET
+    @Path("prm/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
+    public GlobalParameterDto getGlobalParameter(@PathParam("id") int id)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getGlobalParameter(cnx, id);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @PUT
+    @Path("prm/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setGlobalParameter(@PathParam("id") Integer id, GlobalParameterDto dto)
+    {
+        dto.setId(id);
+        setGlobalParameter(dto);
+    }
+
+    @POST
+    @Path("prm")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setGlobalParameter(GlobalParameterDto dto)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.upsertGlobalParameter(cnx, dto);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @DELETE
+    @Path("prm/{id}")
+    public void deleteGlobalParameter(@PathParam("id") Integer id)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.deleteGlobalParameter(cnx, id);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
     // // ////////////////////////////////////////////////////////////////////////
     // // JobDef
     // // ////////////////////////////////////////////////////////////////////////
