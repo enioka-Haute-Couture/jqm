@@ -341,14 +341,14 @@ final class Helpers
         Integer nodeId = null;
         try
         {
-            nodeId = cnx.runSelectSingle("node_select_by_name", Integer.class, nodeName);
+            nodeId = cnx.runSelectSingle("node_select_by_key", Integer.class, nodeName);
         }
         catch (NoResultException e)
         {
             jqmlogger.info("Node " + nodeName + " does not exist in the configuration and will be created with default values");
 
-            Node.create(cnx, nodeName, port, System.getProperty("user.dir") + "/jobs/", System.getProperty("user.dir") + "/jobs/",
-                    System.getProperty("user.dir") + "/tmp/", "localhost");
+            nodeId = Node.create(cnx, nodeName, port, System.getProperty("user.dir") + "/jobs/", System.getProperty("user.dir") + "/jobs/",
+                    System.getProperty("user.dir") + "/tmp/", "localhost").getId();
             cnx.commit();
         }
 
