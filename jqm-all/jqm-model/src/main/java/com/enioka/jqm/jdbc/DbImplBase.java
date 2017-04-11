@@ -99,6 +99,7 @@ public class DbImplBase
         queries.put("jdprm_delete_all", "DELETE FROM JOBDEFPARAMETER");
         queries.put("jdprm_delete_all_for_jd", "DELETE FROM JOBDEFPARAMETER WHERE JOBDEF_ID=?");
         queries.put("jdprm_select_all_for_jd", "SELECT ID, KEYNAME, VALUE, JOBDEF_ID FROM JOBDEFPARAMETER WHERE JOBDEF_ID=?");
+        queries.put("jdprm_select_all_for_jd_list", "SELECT ID, KEYNAME, VALUE, JOBDEF_ID FROM JOBDEFPARAMETER WHERE JOBDEF_ID IN(UNNEST(?))");
         queries.put("jdprm_select_all", "SELECT ID, KEYNAME, VALUE, JOBDEF_ID FROM JOBDEFPARAMETER ORDER BY JOBDEF_ID");
         
         // JOB INSTANCE

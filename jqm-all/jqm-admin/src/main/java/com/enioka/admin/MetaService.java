@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.enioka.api.admin.GlobalParameterDto;
 import com.enioka.api.admin.JndiObjectResourceDto;
+import com.enioka.api.admin.JobDefDto;
 import com.enioka.api.admin.NodeDto;
 import com.enioka.api.admin.QueueDto;
 import com.enioka.api.admin.QueueMappingDto;
@@ -25,8 +26,11 @@ import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JndiObjectResource;
 import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
+import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.jpamodel.JobDef.PathType;
+import com.enioka.jqm.jpamodel.JobDefParameter;
 
 /**
  * Set of methods to handle metadata.
@@ -420,6 +424,175 @@ public class MetaService
         {
             cnx.setRollbackOnly();
             throw new JqmAdminApiUserException("no item with ID " + id);
+        }
+    }
+
+    private static JobDefDto mapJobDef(ResultSet rs, int colShift)
+    {
+        JobDefDto tmp = new JobDefDto();
+
+        try
+        {
+            tmp.setId(rs.getInt(1 + colShift));
+            tmp.setApplication(rs.getString(2 + colShift));
+            tmp.setApplicationName(rs.getString(3 + colShift));
+            tmp.setCanBeRestarted(true);
+            tmp.setChildFirstClassLoader(rs.getBoolean(4 + colShift));
+            // tmp.tracing = rs.getBoolean(5 + colShift); // TODO: allow setting CL tracing.
+            tmp.setDescription(rs.getString(6 + colShift));
+            tmp.setEnabled(rs.getBoolean(7 + colShift));
+            // tmp. = rs.getBoolean(8 + colShift); // TODO: external exposure?
+            tmp.setHiddenJavaClasses(rs.getString(9 + colShift));
+            tmp.setHighlander(rs.getBoolean(10 + colShift));
+            tmp.setJarPath(rs.getString(11 + colShift));
+            tmp.setJavaClassName(rs.getString(12 + colShift));
+            // tmp.javaOpts = rs.getString(13 + colShift);
+            tmp.setKeyword1(rs.getString(14 + colShift));
+            tmp.setKeyword2(rs.getString(15 + colShift));
+            tmp.setKeyword3(rs.getString(16 + colShift));
+            tmp.setReasonableRuntimeLimitMinute(rs.getInt(17 + colShift));
+            tmp.setModule(rs.getString(18 + colShift));
+            tmp.setSpecificIsolationContext(rs.getString(20 + colShift));
+            tmp.setQueueId(rs.getInt(21 + colShift));
+        }
+        catch (SQLException e)
+        {
+            throw new JqmAdminApiInternalException(e);
+        }
+        return tmp;
+    }
+
+    private static void addJobDefParametersToDto(DbConn cnx, List<JobDefDto> dtos)
+    {
+        List<Integer> ids = new ArrayList<Integer>();
+        for (JobDefDto dto : dtos)
+        {
+            ids.add(dto.getId());
+        }
+
+        try
+        {
+            ResultSet rs = cnx.runSelect("jdprm_select_all_for_jd_list", ids);
+            while (rs.next())
+            {
+                String key = rs.getString(2);
+                String value = rs.getString(3);
+                int id = rs.getInt(4);
+
+                for (JobDefDto dto : dtos)
+                {
+                    if (dto.getId().equals(id))
+                    {
+                        dto.getParameters().put(key, value);
+                        break;
+                    }
+                }
+            }
+            rs.close();
+        }
+        catch (Exception e)
+        {
+            throw new JqmAdminApiInternalException(e);
+        }
+    }
+
+    public static List<JobDefDto> getJobDef(DbConn cnx)
+    {
+        List<JobDefDto> res = new ArrayList<JobDefDto>();
+        try
+        {
+            ResultSet rs = cnx.runSelect("jd_select_all");
+            while (rs.next())
+            {
+                res.add(mapJobDef(rs, 0));
+            }
+            rs.close();
+
+            addJobDefParametersToDto(cnx, res);
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
+    }
+
+    public static JobDefDto getJobDef(DbConn cnx, int id)
+    {
+        ResultSet rs = null;
+        try
+        {
+            rs = cnx.runSelect("jd_select_by_id");
+            if (!rs.next())
+            {
+                throw new JqmAdminApiUserException("no result");
+            }
+
+            JobDefDto tmp = mapJobDef(rs, 0);
+            List<JobDefDto> tmp2 = new ArrayList<JobDefDto>();
+            tmp2.add(tmp);
+            addJobDefParametersToDto(cnx, tmp2);
+            return tmp;
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+    }
+
+    public static void upsertJobDef(DbConn cnx, JobDefDto dto)
+    {
+        if (dto.getId() != null)
+        {
+            // Job: do it in a brutal way (no date to update here).
+            cnx.runUpdate("jd_update_all_fields_by_id", dto.getApplication(), dto.getApplicationName(), dto.isChildFirstClassLoader(),
+                    false, dto.getDescription(), dto.isEnabled(), false, dto.getHiddenJavaClasses(), dto.isHighlander(), dto.getJarPath(),
+                    dto.getJavaClassName(), null, dto.getKeyword1(), dto.getKeyword2(), dto.getKeyword3(),
+                    dto.getReasonableRuntimeLimitMinute(), dto.getModule(), PathType.FS, dto.getSpecificIsolationContext(),
+                    dto.getQueueId(), dto.getId());
+
+            cnx.runUpdate("jdprm_delete_all_for_jd", dto.getId());
+            for (Map.Entry<String, String> e : dto.getParameters().entrySet())
+            {
+                JobDefParameter.create(cnx, e.getKey(), e.getValue(), dto.getId());
+            }
+        }
+        else
+        {
+            JobDef.create(cnx, dto.getDescription(), dto.getJavaClassName(), dto.getParameters(), dto.getJarPath(), dto.getQueueId(),
+                    dto.getReasonableRuntimeLimitMinute(), dto.getApplicationName(), dto.getApplication(), dto.getModule(),
+                    dto.getKeyword1(), dto.getKeyword2(), dto.getKeyword3(), dto.isHighlander(), dto.getSpecificIsolationContext(),
+                    dto.isChildFirstClassLoader(), dto.getHiddenJavaClasses(), false, PathType.FS);
+        }
+    }
+
+    public static void syncJobDefs(DbConn cnx, List<JobDefDto> dtos)
+    {
+        for (JobDefDto existing : getJobDef(cnx))
+        {
+            boolean foundInNewSet = false;
+            for (JobDefDto newdto : dtos)
+            {
+                if (newdto.getId() != null && newdto.getId().equals(existing.getId()))
+                {
+                    foundInNewSet = true;
+                    break;
+                }
+            }
+
+            if (!foundInNewSet)
+            {
+                deleteJobDef(cnx, existing.getId());
+            }
+        }
+
+        for (JobDefDto dto : dtos)
+        {
+            upsertJobDef(cnx, dto);
         }
     }
 
@@ -874,19 +1047,5 @@ public class MetaService
             throw new JqmAdminApiUserException("no item with ID " + id);
         }
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // UPSERT
-    ///////////////////////////////////////////////////////////////////////////
-
-    ///////////////////////////////////////////////////////////////////////////
-    // SELECT
-    ///////////////////////////////////////////////////////////////////////////
-
-    ///////////////////////////////////
-    // Global parameter
-
-    ///////////////////////////////////
-    // JNDI
 
 }

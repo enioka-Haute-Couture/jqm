@@ -39,6 +39,7 @@ import org.apache.shiro.SecurityUtils;
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.GlobalParameterDto;
 import com.enioka.api.admin.JndiObjectResourceDto;
+import com.enioka.api.admin.JobDefDto;
 import com.enioka.api.admin.NodeDto;
 import com.enioka.api.admin.PemissionsBagDto;
 import com.enioka.api.admin.QueueDto;
@@ -543,60 +544,108 @@ public class ServiceAdmin
         }
     }
 
-    // // ////////////////////////////////////////////////////////////////////////
-    // // JobDef
-    // // ////////////////////////////////////////////////////////////////////////
-    //
-    // @GET
-    // @Path("jd")
-    // @Produces(MediaType.APPLICATION_JSON)
-    // @HttpCache
-    // public List<JobDefDto> getJobDefs()
-    // {
-    // return getDtoList(JobDef.class);
-    // }
-    //
-    // @PUT
-    // @Path("jd")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setJobDefs(List<JobDefDto> dtos)
-    // {
-    // setItems(JobDef.class, dtos);
-    // }
-    //
-    // @GET
-    // @Path("jd/{id}")
-    // @Produces(MediaType.APPLICATION_JSON)
-    // @HttpCache
-    // public JobDefDto getJobDef(@PathParam("id") int id)
-    // {
-    // return getDto(JobDef.class, id);
-    // }
-    //
-    // @PUT
-    // @Path("jd/{id}")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setJobDef(@PathParam("id") Integer id, JobDefDto dto)
-    // {
-    // dto.setId(id);
-    // setItem(dto);
-    // }
-    //
-    // @POST
-    // @Path("jd")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setJobDef(JobDefDto dto)
-    // {
-    // setItem(dto);
-    // }
-    //
-    // @DELETE
-    // @Path("jd/{id}")
-    // public void deleteJobDef(@PathParam("id") Integer id)
-    // {
-    // deleteItem(JobDef.class, id);
-    // }
-    //
+    //////////////////////////////////////////////////////////////////////////
+    // JobDef
+    //////////////////////////////////////////////////////////////////////////
+
+    @GET
+    @Path("jd")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
+    public List<JobDefDto> getJobDefs()
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getJobDef(cnx);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @PUT
+    @Path("jd")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setJobDefs(List<JobDefDto> dtos)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.syncJobDefs(cnx, dtos);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @GET
+    @Path("jd/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
+    public JobDefDto getJobDef(@PathParam("id") int id)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getJobDef(cnx, id);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @PUT
+    @Path("jd/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setJobDef(@PathParam("id") Integer id, JobDefDto dto)
+    {
+        dto.setId(id);
+        setJobDef(dto);
+    }
+
+    @POST
+    @Path("jd")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setJobDef(JobDefDto dto)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.upsertJobDef(cnx, dto);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @DELETE
+    @Path("jd/{id}")
+    public void deleteJobDef(@PathParam("id") Integer id)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.deleteJobDef(cnx, id);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
     // // ////////////////////////////////////////////////////////////////////////
     // // User
     // // ////////////////////////////////////////////////////////////////////////

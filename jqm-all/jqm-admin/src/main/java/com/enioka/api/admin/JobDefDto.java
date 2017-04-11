@@ -16,8 +16,8 @@
 package com.enioka.api.admin;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -47,8 +47,8 @@ public class JobDefDto implements Serializable
     private String specificIsolationContext;
 
     @XmlElementWrapper(name = "parameters")
-    @XmlElement(name = "parameter", type = ParameterDto.class)
-    private List<ParameterDto> parameters = new ArrayList<ParameterDto>();
+    @XmlElement(name = "parameter")
+    private Map<String, String> parameters = new HashMap<String, String>();
 
     public Integer getId()
     {
@@ -180,12 +180,12 @@ public class JobDefDto implements Serializable
         this.jarPath = jarPath;
     }
 
-    public List<ParameterDto> getParameters()
+    public Map<String, String> getParameters()
     {
         return parameters;
     }
 
-    public void setParameters(List<ParameterDto> parameters)
+    public void setParameters(Map<String, String> parameters)
     {
         this.parameters = parameters;
     }
@@ -200,43 +200,43 @@ public class JobDefDto implements Serializable
         this.enabled = enabled;
     }
 
-	public Integer getReasonableRuntimeLimitMinute() 
-	{
-		return reasonableRuntimeLimitMinute;
-	}
+    public Integer getReasonableRuntimeLimitMinute()
+    {
+        return reasonableRuntimeLimitMinute;
+    }
 
-	public void setReasonableRuntimeLimitMinute(Integer reasonableRuntimeLimitMinute) 
-	{
-		this.reasonableRuntimeLimitMinute = reasonableRuntimeLimitMinute;
-	}
+    public void setReasonableRuntimeLimitMinute(Integer reasonableRuntimeLimitMinute)
+    {
+        this.reasonableRuntimeLimitMinute = reasonableRuntimeLimitMinute;
+    }
 
-	public boolean isChildFirstClassLoader()
-	{
-		return childFirstClassLoader;
-	}
+    public boolean isChildFirstClassLoader()
+    {
+        return childFirstClassLoader;
+    }
 
-	public void setChildFirstClassLoader(boolean childFirstClassLoader)
-	{
-		this.childFirstClassLoader = childFirstClassLoader;
-	}
+    public void setChildFirstClassLoader(boolean childFirstClassLoader)
+    {
+        this.childFirstClassLoader = childFirstClassLoader;
+    }
 
-	public String getHiddenJavaClasses()
-	{
-		return hiddenJavaClasses;
-	}
+    public String getHiddenJavaClasses()
+    {
+        return hiddenJavaClasses;
+    }
 
-	public void setHiddenJavaClasses(String hiddenJavaClasses)
-	{
-		this.hiddenJavaClasses = hiddenJavaClasses;
-	}
+    public void setHiddenJavaClasses(String hiddenJavaClasses)
+    {
+        this.hiddenJavaClasses = hiddenJavaClasses;
+    }
 
-	public String getSpecificIsolationContext()
-	{
-		return specificIsolationContext;
-	}
+    public String getSpecificIsolationContext()
+    {
+        return specificIsolationContext;
+    }
 
-	public void setSpecificIsolationContext(String specificIsolationContext)
-	{
-		this.specificIsolationContext = specificIsolationContext;
-	}
+    public void setSpecificIsolationContext(String specificIsolationContext)
+    {
+        this.specificIsolationContext = specificIsolationContext;
+    }
 }
