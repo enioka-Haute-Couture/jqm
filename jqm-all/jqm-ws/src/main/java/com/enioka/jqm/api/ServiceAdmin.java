@@ -794,42 +794,42 @@ public class ServiceAdmin
         b.permissions = res;
         return b;
     }
-    //
-    // @Path("user/{id}/certificate")
-    // @Produces("application/zip")
-    // @GET
-    // public InputStream getNewCertificate(@PathParam("id") int userIds)
-    // {
-    // EntityManager em = null;
-    // try
-    // {
-    // em = Helpers.getDbSession();
-    // RUser u = em.find(RUser.class, userIds);
-    // return JpaCa.getClientData(em, u.getLogin());
-    // }
-    // catch (Exception e)
-    // {
-    // throw new ErrorDto("could not create certificate", 5, e, Status.INTERNAL_SERVER_ERROR);
-    // }
-    // finally
-    // {
-    // em.close();
-    // }
-    // }
-    //
-    // // ////////////////////////////////////////////////////////////////////////
-    // // Engine log
-    // // ////////////////////////////////////////////////////////////////////////
-    //
-    // @Path("node/{nodeName}/log")
-    // @Produces("application/octet-stream")
-    // @GET
-    // public InputStream getNodeLog(@PathParam("nodeName") String nodeName, @QueryParam("latest") int latest,
-    // @Context HttpServletResponse res)
-    // {
-    // SelfDestructFileStream fs = (SelfDestructFileStream) ((HibernateClient) JqmClientFactory.getClient()).getEngineLog(nodeName,
-    // latest);
-    // res.setHeader("Content-Disposition", "attachment; filename=" + nodeName + ".log");
-    // return fs;
-    // }
+
+    @Path("user/{id}/certificate")
+    @Produces("application/zip")
+    @GET
+    public InputStream getNewCertificate(@PathParam("id") int userId)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            RUser u = RUser.select_id(cnx, userId);
+            return JpaCa.getClientData(cnx, u.getLogin());
+        }
+        catch (Exception e)
+        {
+            throw new ErrorDto("could not create certificate", 5, e, Status.INTERNAL_SERVER_ERROR);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    // Engine log
+    //////////////////////////////////////////////////////////////////////////
+
+    @Path("node/{nodeName}/log")
+    @Produces("application/octet-stream")
+    @GET
+    public InputStream getNodeLog(@PathParam("nodeName") String nodeName, @QueryParam("latest") int latest,
+            @Context HttpServletResponse res)
+    {
+        SelfDestructFileStream fs = (SelfDestructFileStream) ((HibernateClient) JqmClientFactory.getClient()).getEngineLog(nodeName,
+                latest);
+        res.setHeader("Content-Disposition", "attachment; filename=" + nodeName + ".log");
+        return fs;
+    }
 }

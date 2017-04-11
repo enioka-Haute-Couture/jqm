@@ -345,7 +345,7 @@ public class Node
      */
     public static Node create(DbConn cnx, String nodeName, Integer port, String dlRepo, String repo, String tmpDir, String dns)
     {
-        QueryResult r = cnx.runUpdate("node_insert", dlRepo, dns, true, null, 0, 0, false, false, false, nodeName, port, repo, "DEBUG",
+        QueryResult r = cnx.runUpdate("node_insert", dlRepo, dns, true, null, 0, 0, false, false, true, nodeName, port, repo, "DEBUG",
                 false, tmpDir);
         Node res = new Node();
         res.id = r.getGeneratedId();
