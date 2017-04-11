@@ -37,6 +37,7 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.shiro.SecurityUtils;
 
 import com.enioka.admin.MetaService;
+import com.enioka.api.admin.JndiObjectResourceDto;
 import com.enioka.api.admin.NodeDto;
 import com.enioka.api.admin.PemissionsBagDto;
 import com.enioka.api.admin.QueueDto;
@@ -57,9 +58,9 @@ import com.enioka.jqm.pki.JpaCa;
 public class ServiceAdmin
 {
 
-    // ////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     // Nodes
-    // ////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
 
     @GET
     @Path("node")
@@ -133,9 +134,9 @@ public class ServiceAdmin
         }
     }
 
-    // ////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     // Queues
-    // ////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
 
     @GET
     @Path("q")
@@ -236,9 +237,9 @@ public class ServiceAdmin
         }
     }
 
-    // ////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     // Deployment parameters - queue mappings
-    // ////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
 
     @GET
     @Path("qmapping")
@@ -337,60 +338,108 @@ public class ServiceAdmin
         }
     }
 
-    // // ////////////////////////////////////////////////////////////////////////
-    // // JNDI
-    // // ////////////////////////////////////////////////////////////////////////
-    //
-    // @GET
-    // @Path("jndi")
-    // @Produces(MediaType.APPLICATION_JSON)
-    // @HttpCache
-    // public List<JndiObjectResourceDto> getJndiResources()
-    // {
-    // return getDtoList(JndiObjectResource.class);
-    // }
-    //
-    // @PUT
-    // @Path("jndi")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setJndiResources(List<JndiObjectResourceDto> dtos)
-    // {
-    // setItems(JndiObjectResourceDto.class, dtos);
-    // }
-    //
-    // @GET
-    // @Path("jndi/{id}")
-    // @Produces(MediaType.APPLICATION_JSON)
-    // @HttpCache
-    // public JndiObjectResourceDto getJndiResource(@PathParam("id") Integer id)
-    // {
-    // return getDto(JndiObjectResource.class, id);
-    // }
-    //
-    // @PUT
-    // @Path("jndi/{id}")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setJndiResource(@PathParam("id") Integer id, JndiObjectResourceDto dto)
-    // {
-    // dto.setId(id);
-    // setItem(dto);
-    // }
-    //
-    // @POST
-    // @Path("jndi")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setJndiResource(JndiObjectResourceDto dto)
-    // {
-    // setItem(dto);
-    // }
-    //
-    // @DELETE
-    // @Path("jndi/{id}")
-    // public void deleteJndiResource(@PathParam("id") Integer id)
-    // {
-    // deleteItem(JndiObjectResource.class, id);
-    // }
-    //
+    //////////////////////////////////////////////////////////////////////////
+    // JNDI
+    //////////////////////////////////////////////////////////////////////////
+
+    @GET
+    @Path("jndi")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
+    public List<JndiObjectResourceDto> getJndiResources()
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getJndiObjectResource(cnx);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @PUT
+    @Path("jndi")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setJndiResources(List<JndiObjectResourceDto> dtos)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.syncJndiObjectResource(cnx, dtos);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @GET
+    @Path("jndi/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
+    public JndiObjectResourceDto getJndiResource(@PathParam("id") Integer id)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getJndiObjectResource(cnx, id);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @PUT
+    @Path("jndi/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setJndiResource(@PathParam("id") Integer id, JndiObjectResourceDto dto)
+    {
+        dto.setId(id);
+        setJndiResource(dto);
+    }
+
+    @POST
+    @Path("jndi")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setJndiResource(JndiObjectResourceDto dto)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.upsertJndiObjectResource(cnx, dto);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @DELETE
+    @Path("jndi/{id}")
+    public void deleteJndiResource(@PathParam("id") Integer id)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.deleteJndiObjectResource(cnx, id);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
     // // ////////////////////////////////////////////////////////////////////////
     // // Global parameters
     // // ////////////////////////////////////////////////////////////////////////

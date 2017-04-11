@@ -311,11 +311,34 @@ public class MetaService
     {
         ResultSet rs = cnx.runSelect("jndi_select_all");
         List<JndiObjectResourceDto> res = new ArrayList<JndiObjectResourceDto>();
+        List<Integer> rscIds = new ArrayList<Integer>();
         try
         {
+            // The resources
             while (rs.next())
             {
-                res.add(mapJndiObjectResource(rs));
+                JndiObjectResourceDto tmp = mapJndiObjectResource(rs);
+                rscIds.add(tmp.getId());
+                res.add(tmp);
+            }
+            rs.close();
+
+            // The parameters
+            rs = cnx.runSelect("jndiprm_select_all_in_jndisrc_list", rscIds);
+            while (rs.next())
+            {
+                String key = rs.getString(2);
+                String value = rs.getString(4);
+                int rid = rs.getInt(5);
+
+                for (JndiObjectResourceDto tmp : res)
+                {
+                    if (tmp.getId().equals(rid))
+                    {
+                        tmp.addParameter(key, value);
+                        break;
+                    }
+                }
             }
             rs.close();
         }
@@ -324,6 +347,32 @@ public class MetaService
             throw new JqmAdminApiInternalException("An error occurred while querying the database", e);
         }
         return res;
+    }
+
+    public static void syncJndiObjectResource(DbConn cnx, List<JndiObjectResourceDto> dtos)
+    {
+        for (JndiObjectResourceDto existing : getJndiObjectResource(cnx))
+        {
+            boolean foundInNewSet = false;
+            for (JndiObjectResourceDto newdto : dtos)
+            {
+                if (newdto.getId() != null && newdto.getId().equals(existing.getId()))
+                {
+                    foundInNewSet = true;
+                    break;
+                }
+            }
+
+            if (!foundInNewSet)
+            {
+                deleteQueue(cnx, existing.getId());
+            }
+        }
+
+        for (JndiObjectResourceDto dto : dtos)
+        {
+            upsertJndiObjectResource(cnx, dto);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

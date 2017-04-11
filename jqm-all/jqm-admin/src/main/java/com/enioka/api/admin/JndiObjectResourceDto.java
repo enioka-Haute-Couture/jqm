@@ -41,7 +41,7 @@ public class JndiObjectResourceDto implements Serializable
     private String template = null;
 
     @XmlElementWrapper(name = "parameters")
-    @XmlElement(name = "parameter", type = ParameterDto.class)
+    @XmlElement(name = "parameter")
     private Map<String, String> parameters = new HashMap<String, String>(10);
 
     public Integer getId()
