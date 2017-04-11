@@ -400,7 +400,7 @@ public class MetaService
             tmp.setJmxRegistryPort(rs.getInt(6 + colShift));
             tmp.setJmxServerPort(rs.getInt(7 + colShift));
             tmp.setLoadApiAdmin(rs.getBoolean(8 + colShift));
-            tmp.setLoapApiSimple(rs.getBoolean(9 + colShift));
+            tmp.setLoadApiClient(rs.getBoolean(9 + colShift));
             tmp.setLoapApiSimple(rs.getBoolean(10 + colShift));
             tmp.setName(rs.getString(11 + colShift));
             tmp.setPort(rs.getInt(12 + colShift));
@@ -469,7 +469,47 @@ public class MetaService
 
     public static void upsertNode(DbConn cnx, NodeDto dto)
     {
+        if (dto.getId() != null)
+        {
+            cnx.runUpdate("node_update_changed_by_id", dto.getOutputDirectory(), dto.getDns(), dto.getEnabled(), dto.getJmxRegistryPort(),
+                    dto.getJmxServerPort(), dto.getLoadApiAdmin(), dto.getLoadApiClient(), dto.getLoapApiSimple(), dto.getName(),
+                    dto.getPort(), dto.getJobRepoDirectory(), dto.getRootLogLevel(), dto.getStop(), dto.getTmpDirectory(), dto.getId(),
+                    dto.getOutputDirectory(), dto.getDns(), dto.getEnabled(), dto.getJmxRegistryPort(), dto.getJmxServerPort(),
+                    dto.getLoadApiAdmin(), dto.getLoadApiClient(), dto.getLoapApiSimple(), dto.getName(), dto.getPort(),
+                    dto.getJobRepoDirectory(), dto.getRootLogLevel(), dto.getStop(), dto.getTmpDirectory());
+        }
+        else
+        {
+            // Should actually never be used... nodes should be created through CLI.
+            Node.create(cnx, dto.getName(), dto.getPort(), dto.getOutputDirectory(), dto.getJobRepoDirectory(), dto.getTmpDirectory(),
+                    dto.getDns());
+        }
+    }
 
+    public static void syncNodes(DbConn cnx, List<NodeDto> dtos)
+    {
+        for (NodeDto existing : getNodes(cnx))
+        {
+            boolean foundInNewSet = false;
+            for (NodeDto newdto : dtos)
+            {
+                if (newdto.getId() != null && newdto.getId().equals(existing.getId()))
+                {
+                    foundInNewSet = true;
+                    break;
+                }
+            }
+
+            if (!foundInNewSet)
+            {
+                deleteQueue(cnx, existing.getId());
+            }
+        }
+
+        for (NodeDto dto : dtos)
+        {
+            upsertNode(cnx, dto);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

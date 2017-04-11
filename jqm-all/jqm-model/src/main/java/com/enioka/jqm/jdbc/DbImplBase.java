@@ -30,6 +30,10 @@ public class DbImplBase
         queries.put("node_update_has_stopped_by_id", "UPDATE NODE SET LASTSEENALIVE=NULL, STOP=0 WHERE ID=?");
         queries.put("node_update_stop_by_id", "UPDATE NODE SET STOP=1 WHERE ID=?");
         queries.put("node_update_all_log_level", "UPDATE NODE SET ROOTLOGLEVEL=?");
+        queries.put("node_update_changed_by_id", "UPDATE NODE SET DLREPO=?, DNS=?, ENABLED=?, JMXREGISTRYPORT=?, JMXSERVERPORT=?, "
+                + "LOADAPIADMIN=?, LOADAPICLIENT=?, LOAPAPISIMPLE=?, NODENAME=?, PORT=?, REPO=?, ROOTLOGLEVEL=?, STOP=?, TMPDIRECTORY=? "
+                + "WHERE ID=? AND NOT (DLREPO=? AND DNS=? AND ENABLED=? AND JMXREGISTRYPORT=? AND JMXSERVERPORT=? AND "
+                + "LOADAPIADMIN=? AND LOADAPICLIENT=? AND LOAPAPISIMPLE=? AND NODENAME=? AND PORT=? AND REPO=? AND ROOTLOGLEVEL=? AND STOP=? AND TMPDIRECTORY=?)");
         queries.put("node_select_all", "SELECT ID, DLREPO, DNS, ENABLED, EXPORTREPO, JMXREGISTRYPORT, JMXSERVERPORT, "
                 + "LOADAPIADMIN, LOADAPICLIENT, LOAPAPISIMPLE, NODENAME, PORT, REPO, ROOTLOGLEVEL, STOP, TMPDIRECTORY, LASTSEENALIVE "
                 + "FROM NODE");

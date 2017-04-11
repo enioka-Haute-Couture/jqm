@@ -96,19 +96,41 @@ public class ServiceAdmin
         }
     }
 
-    /*
-     * @PUT
-     * 
-     * @Path("node")
-     * 
-     * @Consumes(MediaType.APPLICATION_JSON) public void setNodes(List<NodeDto> dtos) { setItems(Node.class, dtos); }
-     * 
-     * @POST
-     * 
-     * @Path("node")
-     * 
-     * @Consumes(MediaType.APPLICATION_JSON) public void setNode(NodeDto dto) { setItem(dto); }
-     */
+    @PUT
+    @Path("node")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setNodes(List<NodeDto> dtos)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.syncNodes(cnx, dtos);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @POST
+    @Path("node")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setNode(NodeDto dto)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.upsertNode(cnx, dto);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
 
     // ////////////////////////////////////////////////////////////////////////
     // Queues
