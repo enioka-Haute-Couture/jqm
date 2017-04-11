@@ -101,7 +101,8 @@ final class SimpleApiSecurity
                     Calendar expiration = Calendar.getInstance();
                     expiration.add(Calendar.DAY_OF_YEAR, 1);
 
-                    RUser.create(cnx, login, hash, saltS, expiration, true, "administrator");
+                    int id = RUser.create(cnx, login, hash, saltS, expiration, true, "administrator");
+                    user = RUser.select_id(cnx, id);
 
                     logindata = new Duet();
                     logindata.pass = secret;

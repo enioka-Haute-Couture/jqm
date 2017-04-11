@@ -189,10 +189,11 @@ public class RUser implements Serializable
                 tmp.hashSalt = rs.getString(4);
                 tmp.locked = rs.getBoolean(5);
                 tmp.expirationDate = cnx.getCal(rs, 6);
-                tmp.lastModified = cnx.getCal(rs, 7);
-                tmp.email = rs.getString(8);
-                tmp.freeText = rs.getString(9);
-                tmp.internal = rs.getBoolean(10);
+                tmp.creationDate = cnx.getCal(rs, 7);
+                tmp.lastModified = cnx.getCal(rs, 8);
+                tmp.email = rs.getString(9);
+                tmp.freeText = rs.getString(10);
+                tmp.internal = rs.getBoolean(11);
 
                 res.add(tmp);
             }
@@ -209,7 +210,7 @@ public class RUser implements Serializable
         create(cnx, login, password_hash, password_salt, null, false, role_names);
     }
 
-    public static void create(DbConn cnx, String login, String password_hash, String password_salt, Calendar expiration, Boolean internal,
+    public static int create(DbConn cnx, String login, String password_hash, String password_salt, Calendar expiration, Boolean internal,
             String... role_names)
     {
         QueryResult r = cnx.runUpdate("user_insert", null, expiration, null, password_salt, internal, false, login, password_hash);
@@ -219,6 +220,7 @@ public class RUser implements Serializable
         {
             cnx.runUpdate("user_add_role_by_name", newId, s);
         }
+        return newId;
     }
 
     public static void set_roles(DbConn cnx, int userId, String... role_names)

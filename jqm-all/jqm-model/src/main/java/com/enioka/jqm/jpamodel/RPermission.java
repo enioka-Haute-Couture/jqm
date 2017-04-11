@@ -76,9 +76,9 @@ public class RPermission implements Serializable
             {
                 RPermission tmp = new RPermission();
 
-                tmp.id = rs.getInt(0);
-                tmp.name = rs.getString(1);
-                tmp.role = rs.getInt(2);
+                tmp.id = rs.getInt(1);
+                tmp.name = rs.getString(2);
+                tmp.role = rs.getInt(3);
                 res.add(tmp);
             }
         }

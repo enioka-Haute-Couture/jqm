@@ -227,7 +227,7 @@ public class DbImplBase
         queries.put("perm_insert", "INSERT INTO RPERMISSION(NAME, ROLE_ID) VALUES(?, ?)");
         queries.put("perm_delete_all", "DELETE FROM RPERMISSION");
         queries.put("perm_delete_for_role", "DELETE FROM RPERMISSION WHERE ROLE_ID=?");
-        queries.put("perm_select_all_in_role", "SELECT ID, NAME, ROLE FROM RROLE WHERE ROLE=?");
+        queries.put("perm_select_all_in_role", "SELECT ID, NAME, ROLE_ID FROM RPERMISSION WHERE ROLE_ID=?");
         
         // R-USER
         queries.put("user_insert", "INSERT INTO RUSER(CREATION_DATE, EMAIL, EXPIRATION_DATE, FREETEXT, HASHSALT, INTERNAL, LAST_MODIFIED, LOCKED, LOGIN, PASSWORD) VALUES(CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)");
@@ -239,7 +239,9 @@ public class DbImplBase
         queries.put("user_remove_role", "DELETE FROM RROLE_RUSER WHERE ROLE_ID=? AND USER_ID=?");
         queries.put("user_update_enable_by_id", "UPDATE RUSER SET LOCKED=0 WHERE ID=?");
         queries.put("user_select_all_in_role", "SELECT ID, LOGIN, PASSWORD, HASHSALT, LOCKED, EXPIRATION_DATE, CREATION_DATE, LAST_MODIFIED, EMAIL, FREETEXT, INTERNAL FROM RUSER u RIGHT JOIN RROLE_RUSER a ON a.USER_ID = u.ID WHERE a.ROLE_ID=?");
-        queries.put("user_select_by_key",      "SELECT ID, LOGIN, PASSWORD, HASHSALT, LOCKED, EXPIRATION_DATE, CREATION_DATE, LAST_MODIFIED, EMAIL, FREETEXT, INTERNAL FROM RUSER WHERE LOGIN=?");
+        queries.put("user_select_all",         "SELECT ID, LOGIN, PASSWORD, HASHSALT, LOCKED, EXPIRATION_DATE, CREATION_DATE, LAST_MODIFIED, EMAIL, FREETEXT, INTERNAL FROM RUSER ");
+        queries.put("user_select_by_key",      queries.get("user_select_all") +  " WHERE LOGIN=?");
+        queries.put("user_select_by_id",       queries.get("user_select_all") +  " WHERE ID=?");
         queries.put("user_select_count_by_key", "SELECT COUNT(1) FROM RUSER WHERE LOGIN=?");
         queries.put("user_select_id_by_key", "SELECT ID FROM RUSER WHERE LOGIN=?");
         queries.put("user_select_count_using_role", "SELECT COUNT(1) FROM RROLE_RUSER WHERE ROLE_ID=?");

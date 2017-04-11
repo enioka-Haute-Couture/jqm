@@ -1638,7 +1638,7 @@ final class HibernateClient implements JqmClient
             }
 
             protocol = getFileProtocol(cnx);
-            return protocol + "//" + host;
+            return protocol + host;
         }
         catch (JqmException e)
         {
