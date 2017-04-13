@@ -25,13 +25,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-@Ignore("No jetty for now")
 public class DeliverableTest extends JqmBaseTest
 {
     @Before

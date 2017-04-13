@@ -123,7 +123,7 @@ public class PKI implements Serializable
 
     public static int create(DbConn cnx, String alias, String pemPK, String pemCert)
     {
-        QueryResult qr = cnx.runUpdate("pki_insert", alias, pemPK, pemCert);
+        QueryResult qr = cnx.runUpdate("pki_insert", pemCert, pemPK, alias);
         return qr.getGeneratedId();
     }
 }
