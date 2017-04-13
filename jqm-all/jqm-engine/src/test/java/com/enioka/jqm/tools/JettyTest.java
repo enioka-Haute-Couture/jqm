@@ -32,7 +32,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
@@ -42,7 +41,6 @@ import com.enioka.jqm.pki.JpaCa;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-@Ignore("No jetty for now")
 public class JettyTest extends JqmBaseTest
 {
     @Before
