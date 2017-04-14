@@ -30,14 +30,12 @@ import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JndiObjectResource;
-import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
 import com.enioka.jqm.jpamodel.JobDef;
+import com.enioka.jqm.jpamodel.JobDef.PathType;
+import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.RRole;
-import com.enioka.jqm.jpamodel.RUser;
-import com.enioka.jqm.jpamodel.JobDef.PathType;
-import com.enioka.jqm.jpamodel.JobDefParameter;
 
 /**
  * Set of methods to handle metadata.

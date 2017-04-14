@@ -105,7 +105,7 @@
 		<module>jqm-providers</module>
 		<module>jqm-pki</module>
 		<module>jqm-tst</module>
-    <module>jqm-admin</module>
+		<module>jqm-admin</module>
   </modules>
 
 	<scm>
