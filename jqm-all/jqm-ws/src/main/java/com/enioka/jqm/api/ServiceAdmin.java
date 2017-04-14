@@ -34,8 +34,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.shiro.SecurityUtils;
-
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.GlobalParameterDto;
 import com.enioka.api.admin.JndiObjectResourceDto;
@@ -44,13 +42,10 @@ import com.enioka.api.admin.NodeDto;
 import com.enioka.api.admin.PemissionsBagDto;
 import com.enioka.api.admin.QueueDto;
 import com.enioka.api.admin.QueueMappingDto;
+import com.enioka.api.admin.RRoleDto;
+import com.enioka.api.admin.RUserDto;
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.JndiObjectResource;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.RPermission;
 import com.enioka.jqm.jpamodel.RRole;
 import com.enioka.jqm.jpamodel.RUser;
@@ -646,114 +641,209 @@ public class ServiceAdmin
         }
     }
 
-    // // ////////////////////////////////////////////////////////////////////////
-    // // User
-    // // ////////////////////////////////////////////////////////////////////////
-    //
-    // @GET
-    // @Path("user")
-    // @Produces(MediaType.APPLICATION_JSON)
-    // @HttpCache
-    // public List<RUserDto> getUsers()
-    // {
-    // return getDtoList(RUser.class);
-    // }
-    //
-    // @PUT
-    // @Path("user")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setUsers(List<RUserDto> dtos)
-    // {
-    // setItems(RUser.class, dtos);
-    // }
-    //
-    // @GET
-    // @Path("user/{id}")
-    // @Produces(MediaType.APPLICATION_JSON)
-    // @HttpCache
-    // public RUserDto getUser(@PathParam("id") int id)
-    // {
-    // return getDto(RUser.class, id);
-    // }
-    //
-    // @PUT
-    // @Path("user/{id}")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setUser(@PathParam("id") Integer id, RUserDto dto)
-    // {
-    // dto.setId(id);
-    // setItem(dto);
-    // }
-    //
-    // @POST
-    // @Path("user")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setUser(RUserDto dto)
-    // {
-    // setItem(dto);
-    // }
-    //
-    // @DELETE
-    // @Path("user/{id}")
-    // public void deleteUser(@PathParam("id") Integer id)
-    // {
-    // deleteItem(RUser.class, id);
-    // }
-    //
-    // // ////////////////////////////////////////////////////////////////////////
-    // // Role
-    // // ////////////////////////////////////////////////////////////////////////
-    //
-    // @GET
-    // @Path("role")
-    // @Produces(MediaType.APPLICATION_JSON)
-    // @HttpCache
-    // public List<RRoleDto> getRoles()
-    // {
-    // return getDtoList(RRole.class);
-    // }
-    //
-    // @PUT
-    // @Path("role")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setRoles(List<RRoleDto> dtos)
-    // {
-    // setItems(RRole.class, dtos);
-    // }
-    //
-    // @GET
-    // @Path("role/{id}")
-    // @Produces(MediaType.APPLICATION_JSON)
-    // @HttpCache
-    // public RRoleDto getRole(@PathParam("id") int id)
-    // {
-    // return getDto(RRole.class, id);
-    // }
-    //
-    // @PUT
-    // @Path("role/{id}")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setRole(@PathParam("id") Integer id, RRoleDto dto)
-    // {
-    // dto.setId(id);
-    // setItem(dto);
-    // }
-    //
-    // @POST
-    // @Path("role")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // public void setRole(RRoleDto dto)
-    // {
-    // setItem(dto);
-    // }
-    //
-    // @DELETE
-    // @Path("role/{id}")
-    // public void deleteRole(@PathParam("id") Integer id)
-    // {
-    // deleteItem(RRole.class, id);
-    // }
-    //
+    //////////////////////////////////////////////////////////////////////////
+    // User
+    //////////////////////////////////////////////////////////////////////////
+
+    @GET
+    @Path("user")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
+    public List<RUserDto> getUsers()
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getUsers(cnx);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @PUT
+    @Path("user")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setUsers(List<RUserDto> dtos)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.syncUsers(cnx, dtos);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @GET
+    @Path("user/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
+    public RUserDto getUser(@PathParam("id") int id)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getUser(cnx, id);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @PUT
+    @Path("user/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setUser(@PathParam("id") Integer id, RUserDto dto)
+    {
+        dto.setId(id);
+        setUser(dto);
+    }
+
+    @POST
+    @Path("user")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setUser(RUserDto dto)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.upsertUser(cnx, dto);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @DELETE
+    @Path("user/{id}")
+    public void deleteUser(@PathParam("id") Integer id)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.deleteUser(cnx, id);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    // ////////////////////////////////////////////////////////////////////////
+    // Role
+    // ////////////////////////////////////////////////////////////////////////
+
+    @GET
+    @Path("role")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
+    public List<RRoleDto> getRoles()
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getRoles(cnx);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @PUT
+    @Path("role")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setRoles(List<RRoleDto> dtos)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.syncRoles(cnx, dtos);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @GET
+    @Path("role/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @HttpCache
+    public RRoleDto getRole(@PathParam("id") int id)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getRole(cnx, id);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @PUT
+    @Path("role/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setRole(@PathParam("id") Integer id, RRoleDto dto)
+    {
+        dto.setId(id);
+        setRole(dto);
+    }
+
+    @POST
+    @Path("role")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setRole(RRoleDto dto)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.upsertRole(cnx, dto);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @DELETE
+    @Path("role/{id}")
+    public void deleteRole(@PathParam("id") Integer id)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.deleteRole(cnx, id, false);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })

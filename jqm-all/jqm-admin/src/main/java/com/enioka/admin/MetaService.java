@@ -8,6 +8,9 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.crypto.hash.Sha512Hash;
+import org.apache.shiro.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +20,8 @@ import com.enioka.api.admin.JobDefDto;
 import com.enioka.api.admin.NodeDto;
 import com.enioka.api.admin.QueueDto;
 import com.enioka.api.admin.QueueMappingDto;
+import com.enioka.api.admin.RRoleDto;
+import com.enioka.api.admin.RUserDto;
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
@@ -29,6 +34,8 @@ import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.jpamodel.RRole;
+import com.enioka.jqm.jpamodel.RUser;
 import com.enioka.jqm.jpamodel.JobDef.PathType;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 
@@ -1034,6 +1041,130 @@ public class MetaService
         }
     }
 
+    private static RRoleDto mapRole(ResultSet rs, int colShift)
+    {
+        try
+        {
+            RRoleDto tmp = new RRoleDto();
+
+            tmp.setId(rs.getInt(1 + colShift));
+            tmp.setName(rs.getString(2 + colShift));
+            tmp.setDescription(rs.getString(3 + colShift));
+
+            return tmp;
+        }
+        catch (SQLException e)
+        {
+            throw new JqmAdminApiInternalException(e);
+        }
+    }
+
+    private static List<RRoleDto> getRoles(DbConn cnx, String query_key, int colShift, Object... args)
+    {
+        List<RRoleDto> res = new ArrayList<RRoleDto>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key, args);
+            RRoleDto tmp = null;
+            while (rs.next())
+            {
+                tmp = mapRole(rs, colShift);
+                res.add(tmp);
+            }
+            rs.close();
+
+            List<Integer> ids = new ArrayList<Integer>();
+            for (RRoleDto dto : res)
+            {
+                ids.add(dto.getId());
+            }
+
+            rs = cnx.runSelect("perm_select_all_in_role_list", ids);
+            while (rs.next())
+            {
+                int role_id = rs.getInt(3);
+                String permName = rs.getString(2);
+
+                for (RRoleDto dto : res)
+                {
+                    if (dto.getId().equals(role_id))
+                    {
+                        dto.addPermission(permName);
+                    }
+                }
+            }
+            rs.close();
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
+    }
+
+    public static List<RRoleDto> getRoles(DbConn cnx)
+    {
+        return getRoles(cnx, "role_select_all", 0);
+    }
+
+    public static RRoleDto getRole(DbConn cnx, int id)
+    {
+        List<RRoleDto> res = getRoles(cnx, "role_select_by_id", 0, id);
+        if (res.size() == 1)
+        {
+            return res.get(0);
+        }
+        else
+        {
+            throw new JqmAdminApiUserException("no result");
+        }
+    }
+
+    public static void upsertRole(DbConn cnx, RRoleDto dto)
+    {
+        if (dto.getId() != null)
+        {
+            cnx.runUpdate("role_update_all_by_id", dto.getName(), dto.getDescription(), dto.getId());
+
+            // Permissions
+            cnx.runUpdate("perm_delete_for_role", dto.getId());
+            for (String i : dto.getPermissions())
+            {
+                cnx.runUpdate("perm_insert", i, dto.getId());
+            }
+        }
+        else
+        {
+            RRole.create(cnx, dto.getName(), dto.getDescription(), dto.getPermissions().toArray(new String[dto.getPermissions().size()]));
+        }
+    }
+
+    public static void syncRoles(DbConn cnx, List<RRoleDto> dtos)
+    {
+        for (RRoleDto existing : getRoles(cnx))
+        {
+            boolean foundInNewSet = false;
+            for (RRoleDto newdto : dtos)
+            {
+                if (newdto.getId() != null && newdto.getId().equals(existing.getId()))
+                {
+                    foundInNewSet = true;
+                    break;
+                }
+            }
+
+            if (!foundInNewSet)
+            {
+                deleteRole(cnx, existing.getId(), false);
+            }
+        }
+
+        for (RRoleDto dto : dtos)
+        {
+            upsertRole(cnx, dto);
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // USER
     ///////////////////////////////////////////////////////////////////////////
@@ -1048,4 +1179,166 @@ public class MetaService
         }
     }
 
+    private static RUserDto mapUser(ResultSet rs, int colShift, DbConn cnx)
+    {
+        try
+        {
+            RUserDto tmp = new RUserDto();
+
+            tmp.setId(rs.getInt(1 + colShift));
+            tmp.setLogin(rs.getString(2 + colShift));
+
+            tmp.setLocked(rs.getBoolean(5 + colShift));
+            tmp.setExpirationDate(cnx.getCal(rs, 6 + colShift));
+            tmp.setCreationDate(cnx.getCal(rs, 7 + colShift));
+
+            tmp.setEmail(rs.getString(9 + colShift));
+            tmp.setFreeText(rs.getString(10 + colShift));
+            tmp.setInternal(rs.getBoolean(11 + colShift));
+
+            return tmp;
+        }
+        catch (SQLException e)
+        {
+            throw new JqmAdminApiInternalException(e);
+        }
+    }
+
+    private static List<RUserDto> getUsers(DbConn cnx, String query_key, int colShift, Object... params)
+    {
+        List<RUserDto> res = new ArrayList<RUserDto>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key);
+            RUserDto tmp = null;
+            while (rs.next())
+            {
+                tmp = mapUser(rs, colShift, cnx);
+                res.add(tmp);
+            }
+            rs.close();
+
+            List<Integer> ids = new ArrayList<Integer>();
+            for (RUserDto dto : res)
+            {
+                ids.add(dto.getId());
+            }
+
+            rs = cnx.runSelect("role_select_id_for_user_list", ids);
+            while (rs.next())
+            {
+                int userId = rs.getInt(2);
+                int roleId = rs.getInt(1);
+
+                for (RUserDto dto : res)
+                {
+                    if (dto.getId().equals(userId))
+                    {
+                        dto.addRole(roleId);
+                    }
+                }
+            }
+            rs.close();
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
+    }
+
+    public static List<RUserDto> getUsers(DbConn cnx)
+    {
+        return getUsers(cnx, "user_select_all", 0);
+    }
+
+    public static RUserDto getUser(DbConn cnx, int id)
+    {
+        List<RUserDto> res = getUsers(cnx, "user_select_by_id", 0, id);
+        if (res.size() == 1)
+        {
+            return res.get(0);
+        }
+        else
+        {
+            throw new JqmAdminApiUserException("no result");
+        }
+    }
+
+    public static void changeUserPassword(DbConn cnx, int userId, String newPassword)
+    {
+        ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
+        String hash = new Sha512Hash(newPassword, salt, 100000).toHex();
+
+        QueryResult qr = cnx.runUpdate("user_update_password_by_id", hash, salt, userId);
+        if (qr.nbUpdated == 0)
+        {
+            throw new JqmAdminApiUserException("user with this ID does not exist");
+        }
+    }
+
+    public static void upsertUser(DbConn cnx, RUserDto dto)
+    {
+        if (dto.getId() != null)
+        {
+            cnx.runUpdate("user_update_changed", dto.getLogin(), dto.getLocked(), dto.getExpirationDate(), dto.getEmail(),
+                    dto.getFreeText(), dto.getId(), dto.getLogin(), dto.getLocked(), dto.getExpirationDate(), dto.getEmail(),
+                    dto.getFreeText());
+
+            // Password
+            if (dto.getNewPassword() != null && !dto.getNewPassword().isEmpty())
+            {
+                changeUserPassword(cnx, dto.getId(), dto.getNewPassword());
+            }
+
+            // Roles
+            cnx.runUpdate("user_remove_all_roles_by_id", dto.getId());
+            for (int i : dto.getRoles())
+            {
+                cnx.runUpdate("user_add_role_by_id", dto.getId(), i);
+            }
+        }
+        else
+        {
+            QueryResult r = cnx.runUpdate("user_insert", dto.getEmail(), dto.getExpirationDate(), dto.getFreeText(), null,
+                    dto.getInternal(), false, dto.getLogin(), null);
+            int newId = r.getGeneratedId();
+
+            if (dto.getNewPassword() != null && !dto.getNewPassword().isEmpty())
+            {
+                changeUserPassword(cnx, newId, dto.getNewPassword());
+            }
+
+            for (int i : dto.getRoles())
+            {
+                cnx.runUpdate("user_add_role_by_id", newId, i);
+            }
+        }
+    }
+
+    public static void syncUsers(DbConn cnx, List<RUserDto> dtos)
+    {
+        for (RUserDto existing : getUsers(cnx))
+        {
+            boolean foundInNewSet = false;
+            for (RUserDto newdto : dtos)
+            {
+                if (newdto.getId() != null && newdto.getId().equals(existing.getId()))
+                {
+                    foundInNewSet = true;
+                    break;
+                }
+            }
+
+            if (!foundInNewSet)
+            {
+                deleteUser(cnx, existing.getId());
+            }
+        }
+
+        for (RUserDto dto : dtos)
+        {
+            upsertUser(cnx, dto);
+        }
+    }
 }

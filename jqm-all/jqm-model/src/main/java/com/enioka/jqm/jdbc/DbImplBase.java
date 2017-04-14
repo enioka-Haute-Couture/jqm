@@ -220,7 +220,10 @@ public class DbImplBase
         queries.put("role_insert", "INSERT INTO RROLE(DESCRIPTION, NAME) VALUES(?, ?)");
         queries.put("role_delete_all", "DELETE FROM RROLE");
         queries.put("role_delete_by_id", "DELETE FROM RROLE WHERE ID=?");
-        queries.put("role_select_all_for_user", "SELECT ID, NAME, DESCRIPTION FROM RROLE r RIGHT JOIN RROLE_RUSER a ON a.ROLE_ID = r.ID WHERE a.USER_ID=?");
+        queries.put("role_update_all_by_id", "UPDATE RROLE SET NAME=?, DESCRIPTION=? WHERE ID=? ");
+        queries.put("role_select_all", "SELECT r.ID, r.NAME, r.DESCRIPTION FROM RROLE r ");
+        queries.put("role_select_all_for_user", "SELECT r.ID, r.NAME, r.DESCRIPTION FROM RROLE r RIGHT JOIN RROLE_RUSER a ON a.ROLE_ID = r.ID WHERE a.USER_ID=?");
+        queries.put("role_select_id_for_user_list", "SELECT a.ROLE_ID, a.USER_ID FROM RROLE_RUSER a WHERE a.USER_ID IN(UNNEST(?))");
         queries.put("role_select_by_key", "SELECT ID, NAME, DESCRIPTION FROM RROLE r WHERE NAME=?");
         
         // R-PERMISSION
@@ -228,6 +231,7 @@ public class DbImplBase
         queries.put("perm_delete_all", "DELETE FROM RPERMISSION");
         queries.put("perm_delete_for_role", "DELETE FROM RPERMISSION WHERE ROLE_ID=?");
         queries.put("perm_select_all_in_role", "SELECT ID, NAME, ROLE_ID FROM RPERMISSION WHERE ROLE_ID=?");
+        queries.put("perm_select_all_in_role_list", "SELECT ID, NAME, ROLE_ID FROM RPERMISSION WHERE ROLE_ID IN(UNNEST(?))");
         
         // R-USER
         queries.put("user_insert", "INSERT INTO RUSER(CREATION_DATE, EMAIL, EXPIRATION_DATE, FREETEXT, HASHSALT, INTERNAL, LAST_MODIFIED, LOCKED, LOGIN, PASSWORD) VALUES(CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)");
@@ -235,9 +239,12 @@ public class DbImplBase
         queries.put("user_delete_by_id", "DELETE FROM RUSER WHERE ID=?");
         queries.put("user_delete_expired_internal", "DELETE FROM RUSER WHERE internal=1 AND EXPIRATION_DATE < CURRENT_TIMESTAMP");
         queries.put("user_add_role_by_name", "INSERT INTO RROLE_RUSER(USER_ID, ROLE_ID) VALUES(?, (SELECT r.ID FROM RROLE r WHERE r.NAME=?))");
-        queries.put("user_remove_all_roles_by_key", "DELETE FROM RROLE_RUSER WHERE USER_ID=?");
+        queries.put("user_add_role_by_id", "INSERT INTO RROLE_RUSER(USER_ID, ROLE_ID) VALUES(?, ?)");
+        queries.put("user_remove_all_roles_by_id", "DELETE FROM RROLE_RUSER WHERE USER_ID=?");
         queries.put("user_remove_role", "DELETE FROM RROLE_RUSER WHERE ROLE_ID=? AND USER_ID=?");
         queries.put("user_update_enable_by_id", "UPDATE RUSER SET LOCKED=0 WHERE ID=?");
+        queries.put("user_update_password_by_id", "UPDATE RUSER SET PASSWORD=?, HASHSALT=? WHERE ID=?");
+        queries.put("user_update_changed", "UPDATE RUSER SET LOGIN=?, LOCKED=?, EXPIRATION_DATE=?, LAST_MODIFIED=CURRENT_TIMESTAMP, EMAIL=?, FREETEXT=? WHERE ID=? AND NOT (LOGIN=? AND LOCKED=? AND EXPIRATION_DATE=? AND EMAIL=? AND FREETEXT=? )");
         queries.put("user_select_all_in_role", "SELECT ID, LOGIN, PASSWORD, HASHSALT, LOCKED, EXPIRATION_DATE, CREATION_DATE, LAST_MODIFIED, EMAIL, FREETEXT, INTERNAL FROM RUSER u RIGHT JOIN RROLE_RUSER a ON a.USER_ID = u.ID WHERE a.ROLE_ID=?");
         queries.put("user_select_all",         "SELECT ID, LOGIN, PASSWORD, HASHSALT, LOCKED, EXPIRATION_DATE, CREATION_DATE, LAST_MODIFIED, EMAIL, FREETEXT, INTERNAL FROM RUSER ");
         queries.put("user_select_by_key",      queries.get("user_select_all") +  " WHERE LOGIN=?");

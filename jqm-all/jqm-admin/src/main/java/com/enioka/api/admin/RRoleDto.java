@@ -71,4 +71,12 @@ public class RRoleDto implements Serializable
     {
         this.permissions = permissions;
     }
+
+    public void addPermission(String permission)
+    {
+        if (!permissions.contains(permission))
+        {
+            permissions.add(permission);
+        }
+    }
 }

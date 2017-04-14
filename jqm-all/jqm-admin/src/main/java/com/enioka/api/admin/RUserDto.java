@@ -138,6 +138,14 @@ public class RUserDto implements Serializable
         return roles;
     }
 
+    public void addRole(int roleId)
+    {
+        if (!this.roles.contains(roleId))
+        {
+            this.roles.add(roleId);
+        }
+    }
+
     void setRoles(List<Integer> roles)
     {
         this.roles = roles;
