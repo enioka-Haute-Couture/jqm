@@ -23,7 +23,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
@@ -225,8 +227,14 @@ public class RUser implements Serializable
 
     public static void set_roles(DbConn cnx, int userId, String... role_names)
     {
-        cnx.runUpdate("user_remove_all_roles_by_key", userId);
+        cnx.runUpdate("user_remove_all_roles_by_id", userId);
+        Set<String> roles = new HashSet<String>();
         for (String s : role_names)
+        {
+            roles.add(s);
+        }
+
+        for (String s : roles)
         {
             cnx.runUpdate("user_add_role_by_name", userId, s);
         }

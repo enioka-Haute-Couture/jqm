@@ -157,6 +157,7 @@ class Loader implements Runnable, LoaderMBean
             }
 
             // Update of the job status, dates & co
+            this.job.setExecutionDate(Calendar.getInstance()); // For use in JMX
             QueryResult qr = cnx.runUpdate("jj_update_run_by_id", job.getId());
             if (qr.nbUpdated == 0)
             {

@@ -1,4 +1,4 @@
-﻿Contributing to JQM
+Contributing to JQM
 #############################
 
 JQM is an Open Source project under the Apache v2 license. We welcome every contribution through GitHub pull requests.
@@ -9,10 +9,9 @@ It also works before opening feature requests.
 
 JQM dev environment:
 
-* Eclipse
-* Maven (CLI, no eclipse plugin) for dependencies, build, tests, packaging
+* Eclipse, latest version (standard for Enioka developers, it is of course possible to successfully use other IDEs or editors)
+* Maven 3.x (CLI, no Eclipse plugin) for dependencies, build, tests, packaging
 * Sonar (through Maven. No public server provided, rules are :download:`here </files/rules_sonar.csv>`)
 * Git
 
-Finally, please respect our coding style - it is C++ style, it's on purpose and we like it like that! An Eclipse formatter configuration file is
-provided :download:`here </files/format_eclipse_modified_java.xml>`. The Sonar rules we use are also included inside that directory.
+Finally, please respect our coding style and conventions: they are described in the :doc:`style` page.

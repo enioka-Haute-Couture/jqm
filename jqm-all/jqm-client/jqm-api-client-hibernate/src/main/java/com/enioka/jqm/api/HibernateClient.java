@@ -902,48 +902,48 @@ final class HibernateClient implements JqmClient
             {
                 // WHERE
                 wh += getIntPredicate("ji.ID", query.getJobInstanceId(), prms);
-                wh += getIntPredicate("ji.PARENTID", query.getParentId(), prms);
+                wh += getIntPredicate("ji.PARENT", query.getParentId(), prms);
                 wh += getStringPredicate("ji.APPLICATION", query.getInstanceApplication(), prms);
                 wh += getStringPredicate("ji.MODULE", query.getInstanceModule(), prms);
                 wh += getStringPredicate("ji.KEYWORD1", query.getInstanceKeyword1(), prms);
                 wh += getStringPredicate("ji.KEYWORD2", query.getInstanceKeyword2(), prms);
                 wh += getStringPredicate("ji.KEYWORD3", query.getInstanceKeyword3(), prms);
                 wh += getStringPredicate("ji.USERNAME", query.getUser(), prms);
-                wh += getStringPredicate("ji.SESSIONID", query.getSessionId(), prms);
-                wh += getStatusPredicate("ji.STATE", query.getStatus(), prms);
+                wh += getStringPredicate("ji.SESSION", query.getSessionId(), prms);
+                wh += getStatusPredicate("ji.STATUS", query.getStatus(), prms);
 
-                wh += getStringPredicate("jd.APPLICATIONNAME", query.getInstanceApplication(), prms);
-                wh += getStringPredicate("jd.APPLICATION", query.getJobDefApplication(), prms);
+                wh += getStringPredicate("jd.JD_KEY", query.getJobDefApplication(), prms);
+                wh += getStringPredicate("jd.APPLICATION", query.getInstanceApplication(), prms);
                 wh += getStringPredicate("jd.MODULE", query.getJobDefModule(), prms);
                 wh += getStringPredicate("jd.KEYWORD1", query.getJobDefKeyword1(), prms);
                 wh += getStringPredicate("jd.KEYWORD2", query.getJobDefKeyword2(), prms);
                 wh += getStringPredicate("jd.KEYWORD3", query.getJobDefKeyword3(), prms);
 
-                wh += getStringPredicate("n.NODENAME", query.getNodeName(), prms);
+                wh += getStringPredicate("n.NAME", query.getNodeName(), prms);
 
                 wh += getStringPredicate("q.NAME", query.getQueueName(), prms);
                 wh += getIntPredicate("q.ID", query.getQueueId() == null ? null : query.getQueueId(), prms);
 
-                wh += getCalendarPredicate("ji.CREATIONDATE", query.getEnqueuedAfter(), ">=", prms);
-                wh += getCalendarPredicate("ji.CREATIONDATE", query.getEnqueuedBefore(), "<=", prms);
-                wh += getCalendarPredicate("ji.EXECUTIONDATE", query.getBeganRunningAfter(), ">=", prms);
-                wh += getCalendarPredicate("ji.EXECUTIONDATE", query.getBeganRunningBefore(), "<=", prms);
+                wh += getCalendarPredicate("ji.DATE_ENQUEUE", query.getEnqueuedAfter(), ">=", prms);
+                wh += getCalendarPredicate("ji.DATE_ENQUEUE", query.getEnqueuedBefore(), "<=", prms);
+                wh += getCalendarPredicate("ji.DATE_START", query.getBeganRunningAfter(), ">=", prms);
+                wh += getCalendarPredicate("ji.DATE_START", query.getBeganRunningBefore(), "<=", prms);
 
-                q1 = "SELECT ji.ID, jd.APPLICATION AS JD_APPLICATION, jd.APPLICATIONNAME AS APPLICATION_NAME, ji.ATTRIBUTIONDATE, "
-                        + "ji.SENDEMAIL AS EMAIL, NULL AS END_DATE, ji.CREATIONDATE AS ENQUEUE_DATE, ji.EXECUTIONDATE AS EXECUTION_DATE, "
+                q1 = "SELECT ji.ID, jd.APPLICATION AS JD_APPLICATION, jd.JD_KEY, ji.DATE_ATTRIBUTION, "
+                        + "ji.EMAIL, NULL AS DATE_END, ji.DATE_ENQUEUE, ji.DATE_START, "
                         + "ji.HIGHLANDER, ji.APPLICATION AS INSTANCE_APPLICATION, ji.KEYWORD1 AS INSTANCE_KEYWORD1, "
                         + "ji.KEYWORD2 AS INSTANCE_KEYWORD2, ji.KEYWORD3 AS INSTANCE_KEYWORD3, ji.MODULE AS INSTANCE_MODULE, "
                         + "jd.KEYWORD1 AS JD_KEYWORD1, jd.KEYWORD2 AS JD_KEYWORD2, jd.KEYWORD3 AS JD_KEYWORD3, jd.MODULE AS JD_MODULE,"
-                        + "n.NODENAME AS NODENAME,ji.PARENTID AS PARENT_JOB_ID, ji.PROGRESS, q.NAME AS QUEUE_NAME, NULL AS RETURN_CODE,"
-                        + "ji.SESSIONID AS SESSION_ID, ji.STATE AS STATUS, ji.USERNAME, ji.JD_ID, ji.NODE_ID, ji.QUEUE_ID, ji.INTERNALPOSITION AS POSITION "
-                        + "FROM JOBINSTANCE ji LEFT JOIN QUEUE q ON ji.QUEUE_ID=q.ID LEFT JOIN JOBDEF jd ON ji.JD_ID=jd.ID LEFT JOIN NODE n ON ji.NODE_ID=n.ID ";
+                        + "n.NAME AS NODE_NAME, ji.PARENT AS PARENT, ji.PROGRESS, q.NAME AS QUEUE_NAME, NULL AS RETURN_CODE,"
+                        + "ji.SESSION AS SESSION, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.INTERNAL_POSITION AS POSITION "
+                        + "FROM JOB_INSTANCE ji LEFT JOIN QUEUE q ON ji.QUEUE=q.ID LEFT JOIN JOB_DEFINITION jd ON ji.JOBDEF=jd.ID LEFT JOIN NODE n ON ji.NODE=n.ID ";
 
-                totalCountQuery += " (SELECT COUNT(1) FROM JOBINSTANCE) ,";
+                totalCountQuery += " (SELECT COUNT(1) FROM JOB_INSTANCE) ,";
                 if (wh.length() > 3)
                 {
                     wh = wh.substring(3, wh.length() - 1);
                     q1 += "WHERE " + wh;
-                    filterCountQuery += String.format(" (SELECT COUNT(1) FROM JOBINSTANCE ji WHERE %s) ,", wh);
+                    filterCountQuery += String.format(" (SELECT COUNT(1) FROM JOB_INSTANCE ji WHERE %s) ,", wh);
                 }
                 else
                 {
@@ -958,41 +958,41 @@ final class HibernateClient implements JqmClient
                 wh = "";
 
                 wh += getIntPredicate("ID", query.getJobInstanceId(), prms);
-                wh += getIntPredicate("PARENT_JOB_ID", query.getParentId(), prms);
+                wh += getIntPredicate("PARENT", query.getParentId(), prms);
                 wh += getStringPredicate("INSTANCE_APPLICATION", query.getInstanceApplication(), prms);
                 wh += getStringPredicate("INSTANCE_MODULE", query.getInstanceModule(), prms);
                 wh += getStringPredicate("INSTANCE_KEYWORD1", query.getInstanceKeyword1(), prms);
                 wh += getStringPredicate("INSTANCE_KEYWORD2", query.getInstanceKeyword2(), prms);
                 wh += getStringPredicate("INSTANCE_KEYWORD3", query.getInstanceKeyword3(), prms);
                 wh += getStringPredicate("USERNAME", query.getUser(), prms);
-                wh += getStringPredicate("SESSION_ID", query.getSessionId(), prms);
+                wh += getStringPredicate("SESSION", query.getSessionId(), prms);
                 wh += getStatusPredicate("STATUS", query.getStatus(), prms);
 
-                wh += getStringPredicate("APPLICATIONNAME", query.getInstanceApplication(), prms);
+                wh += getStringPredicate("JD_KEY", query.getApplicationName(), prms);
                 wh += getStringPredicate("JD_APPLICATION", query.getJobDefApplication(), prms);
                 wh += getStringPredicate("JD_MODULE", query.getJobDefModule(), prms);
-                wh += getStringPredicate("KEYWORD1", query.getJobDefKeyword1(), prms);
-                wh += getStringPredicate("KEYWORD2", query.getJobDefKeyword2(), prms);
-                wh += getStringPredicate("KEYWORD3", query.getJobDefKeyword3(), prms);
+                wh += getStringPredicate("JD_KEYWORD1", query.getJobDefKeyword1(), prms);
+                wh += getStringPredicate("JD_KEYWORD2", query.getJobDefKeyword2(), prms);
+                wh += getStringPredicate("JD_KEYWORD3", query.getJobDefKeyword3(), prms);
 
-                wh += getStringPredicate("NODENAME", query.getNodeName(), prms);
+                wh += getStringPredicate("NODE_NAME", query.getNodeName(), prms);
 
                 wh += getStringPredicate("QUEUE_NAME", query.getQueueName(), prms);
-                wh += getIntPredicate("QUEUE_ID", query.getQueueId() == null ? null : query.getQueueId(), prms);
+                wh += getIntPredicate("QUEUE", query.getQueueId() == null ? null : query.getQueueId(), prms);
 
-                wh += getCalendarPredicate("ENQUEUE_DATE", query.getEnqueuedAfter(), ">=", prms);
-                wh += getCalendarPredicate("ENQUEUE_DATE", query.getEnqueuedBefore(), "<=", prms);
-                wh += getCalendarPredicate("EXECUTION_DATE", query.getBeganRunningAfter(), ">=", prms);
-                wh += getCalendarPredicate("EXECUTION_DATE", query.getBeganRunningBefore(), "<=", prms);
-                wh += getCalendarPredicate("END_DATE", query.getEndedAfter(), ">=", prms);
-                wh += getCalendarPredicate("END_DATE", query.getEndedBefore(), "<=", prms);
+                wh += getCalendarPredicate("DATE_ENQUEUE", query.getEnqueuedAfter(), ">=", prms);
+                wh += getCalendarPredicate("DATE_ENQUEUE", query.getEnqueuedBefore(), "<=", prms);
+                wh += getCalendarPredicate("DATE_START", query.getBeganRunningAfter(), ">=", prms);
+                wh += getCalendarPredicate("DATE_START", query.getBeganRunningBefore(), "<=", prms);
+                wh += getCalendarPredicate("DATE_END", query.getEndedAfter(), ">=", prms);
+                wh += getCalendarPredicate("DATE_END", query.getEndedBefore(), "<=", prms);
 
-                q2 += "SELECT ID, APPLICATION AS JD_APPLICATION, APPLICATIONNAME AS APPLICATION_NAME, ATTRIBUTIONDATE, EMAIL, "
-                        + "END_DATE, ENQUEUE_DATE, EXECUTION_DATE, HIGHLANDER, INSTANCE_APPLICATION, "
+                q2 += "SELECT ID, JD_APPLICATION, JD_KEY, DATE_ATTRIBUTION, EMAIL, "
+                        + "DATE_END, DATE_ENQUEUE, DATE_START, HIGHLANDER, INSTANCE_APPLICATION, "
                         + "INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, "
-                        + "KEYWORD1 AS JD_KEYWORD1, KEYWORD2 AS JD_KEYWORD2, KEYWORD3 AS JD_KEYWORD3, "
-                        + "MODULE AS JD_MODULE, NODENAME, PARENT_JOB_ID, PROGRESS, QUEUE_NAME, "
-                        + "RETURN_CODE, SESSION_ID, STATUS, USERNAME, JOBDEF_ID as JD_ID, NODE_ID, QUEUE_ID, 0 as POSITION FROM HISTORY ";
+                        + "JD_KEYWORD1, JD_KEYWORD2, JD_KEYWORD3, "
+                        + "JD_MODULE, NODE_NAME, PARENT, PROGRESS, QUEUE_NAME, "
+                        + "RETURN_CODE, SESSION, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION FROM HISTORY ";
 
                 totalCountQuery += " (SELECT COUNT(1) FROM HISTORY) ,";
                 if (wh.length() > 3)

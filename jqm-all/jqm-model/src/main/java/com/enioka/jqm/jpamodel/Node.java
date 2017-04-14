@@ -51,7 +51,6 @@ public class Node
     private String dlRepo;
     private String tmpDirectory;
     private String repo;
-    private String exportRepo = "";
 
     private String rootLogLevel = "DEBUG";
     private Calendar lastSeenAlive;
@@ -176,22 +175,6 @@ public class Node
     public void setRootLogLevel(String rootLogLevel)
     {
         this.rootLogLevel = rootLogLevel;
-    }
-
-    /**
-     * @deprecated was never used
-     */
-    public String getExportRepo()
-    {
-        return exportRepo;
-    }
-
-    /**
-     * @deprecated was never used
-     */
-    public void setExportRepo(String exportRepo)
-    {
-        this.exportRepo = exportRepo;
     }
 
     /**
@@ -345,8 +328,8 @@ public class Node
      */
     public static Node create(DbConn cnx, String nodeName, Integer port, String dlRepo, String repo, String tmpDir, String dns)
     {
-        QueryResult r = cnx.runUpdate("node_insert", dlRepo, dns, true, null, 0, 0, false, false, true, nodeName, port, repo, "DEBUG",
-                false, tmpDir);
+        QueryResult r = cnx.runUpdate("node_insert", dlRepo, dns, true, 0, 0, false, false, true, nodeName, port, repo, "DEBUG", false,
+                tmpDir);
         Node res = new Node();
         res.id = r.getGeneratedId();
         res.name = nodeName;
@@ -364,7 +347,7 @@ public class Node
         return res;
     }
 
-    static Node map(ResultSet rs, int colShift)
+    static Node map(DbConn cnx, ResultSet rs, int colShift)
     {
         try
         {
@@ -379,26 +362,18 @@ public class Node
             tmp.dlRepo = rs.getString(2 + colShift);
             tmp.dns = rs.getString(3 + colShift);
             tmp.enabled = rs.getBoolean(4 + colShift);
-            tmp.exportRepo = rs.getString(5 + colShift);
-            tmp.jmxRegistryPort = rs.getInt(6 + colShift);
-            tmp.jmxServerPort = rs.getInt(7 + colShift);
-            tmp.loadApiAdmin = rs.getBoolean(8 + colShift);
-            tmp.loadApiClient = rs.getBoolean(9 + colShift);
-            tmp.loapApiSimple = rs.getBoolean(10 + colShift);
-            tmp.name = rs.getString(11 + colShift);
-            tmp.port = rs.getInt(12 + colShift);
-            tmp.repo = rs.getString(13 + colShift);
-            tmp.rootLogLevel = rs.getString(14 + colShift);
-            tmp.stop = rs.getBoolean(15 + colShift);
-            tmp.tmpDirectory = rs.getString(16 + colShift);
-
-            Calendar c = null;
-            if (rs.getTimestamp(17 + colShift) != null)
-            {
-                c = Calendar.getInstance();
-                c.setTimeInMillis(rs.getTimestamp(17 + colShift).getTime());
-            }
-            tmp.lastSeenAlive = c;
+            tmp.jmxRegistryPort = rs.getInt(5 + colShift);
+            tmp.jmxServerPort = rs.getInt(6 + colShift);
+            tmp.loadApiAdmin = rs.getBoolean(7 + colShift);
+            tmp.loadApiClient = rs.getBoolean(8 + colShift);
+            tmp.loapApiSimple = rs.getBoolean(9 + colShift);
+            tmp.name = rs.getString(10 + colShift);
+            tmp.port = rs.getInt(11 + colShift);
+            tmp.repo = rs.getString(12 + colShift);
+            tmp.rootLogLevel = rs.getString(13 + colShift);
+            tmp.stop = rs.getBoolean(14 + colShift);
+            tmp.tmpDirectory = rs.getString(15 + colShift);
+            tmp.lastSeenAlive = cnx.getCal(rs, 16 + colShift);
 
             return tmp;
         }
@@ -416,7 +391,7 @@ public class Node
             ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
-                res.add(map(rs, 0));
+                res.add(map(cnx, rs, 0));
             }
         }
         catch (SQLException e)
