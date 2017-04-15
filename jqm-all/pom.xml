@@ -77,7 +77,7 @@
 		<surefire.version>2.19.1</surefire.version>
 		<javadoc.version>2.10.3</javadoc.version>
 		<httpclient.version>4.5.2</httpclient.version>
-		<pool.version>7.0.68</pool.version>
+		<pool.version>8.5.13</pool.version>
 		<bc.version>1.54</bc.version>
 		<mail.version>1.5.2</mail.version>
 

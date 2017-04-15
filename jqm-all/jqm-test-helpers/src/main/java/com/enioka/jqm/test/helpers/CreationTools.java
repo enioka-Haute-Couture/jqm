@@ -376,6 +376,12 @@ public class CreationTools
     public static JndiObjectResource createDatabaseProp(String name, String driver, String url, String user, String pwd, EntityManager em,
             String validationQuery, HashMap<String, String> parameters)
     {
+        return createDatabaseProp(name, driver, url, user, pwd, em, validationQuery, parameters, true);
+    }
+
+    public static JndiObjectResource createDatabaseProp(String name, String driver, String url, String user, String pwd, EntityManager em,
+            String validationQuery, HashMap<String, String> parameters, boolean singleton)
+    {
         HashMap<String, String> prms = new HashMap<String, String>();
         prms.put("testWhileIdle", "true");
         prms.put("testOnBorrow", "false");
@@ -394,7 +400,7 @@ public class CreationTools
         prms.put("testOnBorrow", "true");
 
         return createJndiObjectResource(em, name, "javax.sql.DataSource", "org.apache.tomcat.jdbc.pool.DataSourceFactory",
-                "connection for " + user, true, prms);
+                "connection for " + user, singleton, prms);
     }
 
     // ------------------ DATABASEPROP --------------------------------
