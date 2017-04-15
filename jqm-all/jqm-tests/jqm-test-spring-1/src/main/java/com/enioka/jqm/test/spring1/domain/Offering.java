@@ -1,7 +1,6 @@
 package com.enioka.jqm.test.spring1.domain;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -52,27 +51,5 @@ public class Offering implements Serializable
     public void setOfferingTypeCode(String offeringTypeCode)
     {
         this.offeringTypeCode = offeringTypeCode;
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-        Offering offering = (Offering) o;
-        return Objects.equals(offeringId, offering.offeringId) && Objects.equals(offeringNumber, offering.offeringNumber)
-                && Objects.equals(offeringTypeCode, offering.offeringTypeCode);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(offeringId, offeringNumber, offeringTypeCode);
     }
 }
