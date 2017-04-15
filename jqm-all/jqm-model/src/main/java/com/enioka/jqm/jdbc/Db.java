@@ -18,6 +18,7 @@ public class Db
 
     private DataSource _ds;
     private Map<String, String> _queries;
+    private Driver driver;
 
     public Db(String dsName)
     {
@@ -125,10 +126,12 @@ public class Db
         jqmlogger.info("Using database " + product);
         if (product.contains("oracle"))
         {
+            driver = Driver.ORACLE;
             _queries = DbImplOracle.getQueries();
         }
         else if (product.contains("hsql"))
         {
+            driver = Driver.HSQLDB;
             _queries = DbImplHsql.getQueries();
         }
         else
