@@ -1,6 +1,38 @@
 Release notes
 ######################
 
+1.4.2
+*************
+
+Release goal
+++++++++++++++++++
+
+Maintenance release for the 1.4.x branch. This release only contains fixes and small usability tweaks and should be applied by all users of the 1.4.1 version.
+
+Upgrade notes
++++++++++++++++++++
+
+No API changes.
+However, everyone is strongly encouraged to upgrade all libraries to the latest version.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Major
++++++++++++++
+
+Nothing.
+
+Minor
++++++++++++++
+
+* Engine: added a warning when using a shared static field to inject the JobManager API.
+* Engine: better error message when trying to start a non-existing node.
+* GUI: fixed the search box for job definitions.
+* CLI: when importing a job definition XML, some fields are now trimmed to ensure their validity.
+* CLI: fixed job definition reimport which would not update tags if imported job definition already exists.
+* Documentation: added a mention on how to create valid uberjars without Maven.
+* Documentation: better feature list.
+
 1.4.1
 *************
 
