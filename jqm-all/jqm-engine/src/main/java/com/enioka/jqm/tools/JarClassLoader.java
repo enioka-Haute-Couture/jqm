@@ -18,19 +18,13 @@
 
 package com.enioka.jqm.tools;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -93,31 +87,35 @@ class JarClassLoader extends URLClassLoader
         }
     }
 
-    private boolean isLegacyPayload(Class c)
-    {
-        Class clazz = c;
-        while (!clazz.equals(Object.class))
-        {
-            if (clazz.getName().equals(Constants.API_OLD_IMPL))
-            {
-                return true;
-            }
-            clazz = clazz.getSuperclass();
-        }
-        return false;
-    }
-
-    void launchJar(JobInstance job, Map<String, String> parameters) throws JqmEngineException
+    void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm) throws JqmEngineException
     {
         this.prms = parameters;
 
-        // 1st: load the class
+        // 1 - Create the proxy.
+        Object proxy = null;
+        try
+        {
+            JobManagerHandler h = new JobManagerHandler(job, prms);
+            Class injInt = this.getParent().loadClass("com.enioka.jqm.api.JobManager");
+            proxy = Proxy.newProxyInstance(this, new Class[] { injInt }, h);
+        }
+        catch (Exception e)
+        {
+            throw new JqmEngineException("could not create proxy API object", e);
+        }
+
+        // 2 - Meta data used by runners
+        Map<String, String> metaprms = new HashMap<String, String>();
+        metaprms.put("mayBeShared", "" + this.mayBeShared);
+
+        // 3 - Load the target class inside the context class loader
         String classQualifiedName = job.getJd().getJavaClassName();
         jqmlogger.debug("Will now load class: " + classQualifiedName);
 
         Class c = null;
         try
         {
+            // using payload CL, i.e. this very object
             c = loadClass(classQualifiedName);
         }
         catch (Exception e)
@@ -126,247 +124,86 @@ class JarClassLoader extends URLClassLoader
         }
         jqmlogger.trace("Class " + classQualifiedName + " was correctly loaded");
 
-        // 2nd: what type of payload is this?
-        if (Runnable.class.isAssignableFrom(c))
+        // 4 - Determine which job runner should take the job and launch!
+        for (String runnerClassName : clm.getJobRunnerClasses())
         {
-            jqmlogger.trace("This payload is of type: Runnable");
-            launchRunnable(c, job);
-            return;
-        }
-        else if (isLegacyPayload(c))
-        {
-            jqmlogger.trace("This payload is of type: explicit API implementation");
-            launchApiPayload(c, job);
-            return;
-        }
-        else
-        {
-            // Might have a main
-            Method start = null;
+            Boolean canRun = false;
+            Class runnerClass = null;
+            Method run;
+            Object runner;
             try
             {
-                start = c.getMethod("main");
+                // Note we load the runner class inside the engine CL (with plugins), not the payload CL.
+                // NOTHING is allowed inside the payload CL which was not specifically asked for. (ext dir or lib dir)
+                runnerClass = clm.getPluginClassLoader().loadClass(runnerClassName);
             }
-            catch (NoSuchMethodException e)
+            catch (Exception e)
             {
-                // Nothing - let's try with arguments
+                throw new JqmEngineException(
+                        "could not load a runner: check you global parameters, or that the plugin for this runner is actually present "
+                                + runnerClassName,
+                        e);
             }
-            if (start == null)
+            try
             {
+                runner = runnerClass.newInstance();
+            }
+            catch (Exception e)
+            {
+                throw new JqmEngineException(
+                        "could not create an instance of a runner: it may not have a no-args constructor. " + runnerClassName, e);
+            }
+
+            try
+            {
+                Method m = runnerClass.getMethod("canRun", Class.class);
+                canRun = (Boolean) m.invoke(runner, c);
+            }
+            catch (Exception e)
+            {
+                throw new JqmEngineException("invocation of canRun failed on the runner plugin " + runnerClassName, e);
+            }
+
+            if (canRun)
+            {
+                jqmlogger.trace("Payload is of type: " + runnerClassName);
+
                 try
                 {
-                    start = c.getMethod("main", String[].class);
+                    // run(Class<? extends Object> toRun, Map<String, String> metaParameters, Map<String, String> jobParameters, Object
+                    // handlerProxy)
+                    run = runnerClass.getMethod("run", Class.class, Map.class, Map.class, Object.class);
                 }
-                catch (NoSuchMethodException e)
+                catch (Exception e)
                 {
-                    // Nothing
+                    throw new JqmEngineException("could not find run method for runner plugin " + runnerClassName, e);
                 }
-            }
-            if (start != null)
-            {
-                jqmlogger.trace("This payload is of type: static main");
-                launchMain(c, job);
-                return;
+
+                try
+                {
+                    run.invoke(runner, c, metaprms, parameters, proxy);
+                    return;
+                }
+                catch (InvocationTargetException e)
+                {
+                    if (e.getCause() instanceof RuntimeException)
+                    {
+                        // it may be a Kill order, or whatever exception...
+                        throw (RuntimeException) e.getCause();
+                    }
+                    else
+                    {
+                        throw new JqmEngineException("Payload has failed", e);
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new JqmEngineException("Could not launch a job instance (engine issue, not a payload issue", e);
+                }
             }
         }
 
         throw new JqmEngineException("This type of class cannot be launched by JQM. Please consult the documentation for more details.");
-    }
-
-    private void launchApiPayload(Class c, JobInstance job) throws JqmEngineException
-    {
-        Object o = null;
-        try
-        {
-            o = c.newInstance();
-        }
-        catch (Exception e)
-        {
-            throw new JqmEngineException(
-                    "Cannot create an instance of class " + c.getCanonicalName() + ". Does it have an argumentless constructor?", e);
-        }
-
-        // Injection
-        inject(o.getClass(), o, job);
-
-        try
-        {
-            // Start method that we will have to call
-            Method start = c.getMethod("start");
-            start.invoke(o);
-        }
-        catch (InvocationTargetException e)
-        {
-            if (e.getCause() instanceof RuntimeException)
-            {
-                // it may be a Kill order, or whatever exception...
-                throw (RuntimeException) e.getCause();
-            }
-            else
-            {
-                throw new JqmEngineException("Payload has failed", e);
-            }
-        }
-        catch (NoSuchMethodException e)
-        {
-            throw new JqmEngineException("Payload " + c.getCanonicalName() + " is incorrect - missing fields and methods.", e);
-        }
-        catch (Exception e)
-        {
-            throw new JqmEngineException("Payload launch failed for " + c.getCanonicalName() + ".", e);
-        }
-    }
-
-    private void launchRunnable(Class<Runnable> c, JobInstance job) throws JqmEngineException
-    {
-        Runnable o = null;
-        try
-        {
-            o = c.newInstance();
-        }
-        catch (Exception e)
-        {
-            throw new JqmEngineException("Could not instanciate runnable payload. Does it have a nullary constructor?", e);
-        }
-
-        // Injection stuff (if needed)
-        inject(o.getClass(), o, job);
-
-        // Go
-        o.run();
-    }
-
-    private void launchMain(Class c, JobInstance job) throws JqmEngineException
-    {
-        Method start = null;
-        try
-        {
-            start = c.getMethod("main");
-        }
-        catch (NoSuchMethodException e)
-        {
-            // Nothing - let's try with arguments
-        }
-        try
-        {
-            start = c.getMethod("main", String[].class);
-        }
-        catch (NoSuchMethodException e)
-        {
-            throw new JqmEngineException("The main type payload does not have a valid main static method");
-        }
-
-        if (!Modifier.isStatic(start.getModifiers()))
-        {
-            throw new JqmEngineException("The main type payload has a main function but it is not static");
-        }
-
-        // Injection
-        inject(c, null, job);
-
-        // Parameters
-        String[] params = new String[this.prms.size()];
-        List<String> keys = new ArrayList<String>(this.prms.keySet());
-        Collections.sort(keys, new Comparator<String>()
-        {
-            @Override
-            public int compare(String o1, String o2)
-            {
-                return o1.compareTo(o2);
-            }
-        });
-        int i = 0;
-        for (String p : keys)
-        {
-            params[i] = this.prms.get(p);
-            i++;
-        }
-
-        // Start
-        try
-        {
-            start.invoke(null, (Object) params);
-        }
-        catch (InvocationTargetException e)
-        {
-            if (e.getCause() instanceof RuntimeException)
-            {
-                // it may be a Kill order, or whatever exception...
-                throw (RuntimeException) e.getCause();
-            }
-            else
-            {
-                throw new JqmEngineException("Payload has failed", e);
-            }
-        }
-        catch (Exception e)
-        {
-            throw new JqmEngineException("Payload launch failed for " + c.getCanonicalName() + ".", e);
-        }
-    }
-
-    private void inject(Class c, Object o, JobInstance job) throws JqmEngineException
-    {
-        List<Field> ff = new ArrayList<Field>();
-        Class clazz = c;
-        while (!clazz.equals(Object.class))
-        {
-            ff.addAll(Arrays.asList(clazz.getDeclaredFields()));
-            clazz = clazz.getSuperclass();
-        }
-        boolean inject = false;
-        for (Field f : ff)
-        {
-            if (Constants.API_INTERFACE.equals(f.getType().getName()))
-            {
-                jqmlogger.trace("The object should be injected at least on field " + f.getName());
-                if (this.mayBeShared && Modifier.isStatic(f.getModifiers()))
-                {
-                    jqmlogger.warn("Injection done on a static field with shared isolation context - this may "
-                            + "create weird behaviour and crashes of the JobManager API as this field is shared between "
-                            + "all job instances created from this Job Definition. There should always be one instance"
-                            + " of JobManager per running job instance.");
-                }
-                inject = true;
-                break;
-            }
-        }
-        if (!inject)
-        {
-            jqmlogger.trace("This object has no fields available for injection. No injection will take place.");
-            return;
-        }
-
-        JobManagerHandler h = new JobManagerHandler(job, prms);
-        Class injInt = null;
-        Object proxy = null;
-        try
-        {
-            injInt = loadClass("com.enioka.jqm.api.JobManager");
-            proxy = Proxy.newProxyInstance(this, new Class[] { injInt }, h);
-        }
-        catch (Exception e)
-        {
-            throw new JqmEngineException("Could not load JQM internal interface", e);
-        }
-        try
-        {
-            for (Field f : ff)
-            {
-                if (f.getType().equals(injInt))
-                {
-                    jqmlogger.trace("Injecting interface JQM into field " + f.getName());
-                    boolean acc = f.isAccessible();
-                    f.setAccessible(true);
-                    f.set(o, proxy);
-                    f.setAccessible(acc);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            throw new JqmEngineException("Could not inject JQM interface into target payload", e);
-        }
     }
 
     private Class<?> loadFromParentCL(String name) throws ClassNotFoundException

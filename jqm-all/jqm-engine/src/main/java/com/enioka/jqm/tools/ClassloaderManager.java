@@ -3,7 +3,12 @@ package com.enioka.jqm.tools;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.naming.NamingException;
@@ -31,6 +36,12 @@ class ClassloaderManager
     private JarClassLoader sharedClassLoader = null;
 
     /**
+     * The CL for loading plugins (for the engine)
+     */
+    private URLClassLoader pluginClassLoader = null;
+    private boolean hasPlugins = true;
+
+    /**
      * The CLs corresponding to "one CL per jar" mode.
      */
     private Map<String, JarClassLoader> sharedJarClassLoader = new HashMap<String, JarClassLoader>();
@@ -39,6 +50,11 @@ class ClassloaderManager
      * The CLs corresponding to specific keys (specified inside {@link JobDef#getSpecificIsolationContext()}).
      */
     private Map<String, JarClassLoader> specificIsolationContextClassLoader = new HashMap<String, JarClassLoader>();
+
+    /**
+     * The different runners which may be involved inside the class loaders. Simple class names.
+     */
+    private List<String> runnerClasses = new ArrayList<String>();
 
     /**
      * The default CL mode. Values can be: null, Shared, SharedJar.
@@ -55,6 +71,14 @@ class ClassloaderManager
         {
             em = Helpers.getNewEm();
             launchIsolationDefault = Helpers.getParameter("launch_isolation_default", "Isolated", em);
+
+            String rns = Helpers.getParameter("job_runners",
+                    "com.enioka.jqm.tools.LegacyRunner,com.enioka.jqm.tools.MainRunner,com.enioka.jqm.tools.RunnableRunner", em);
+            for (String s : rns.split(","))
+            {
+                runnerClasses.add(s);
+                jqmlogger.info("Detected a job instance runner named " + s);
+            }
         }
         catch (Exception e)
         {
@@ -218,5 +242,58 @@ class ClassloaderManager
         case MEMORY:
             return Thread.currentThread().getContextClassLoader();
         }
+    }
+
+    List<String> getJobRunnerClasses()
+    {
+        return this.runnerClasses;
+    }
+
+    ClassLoader getPluginClassLoader()
+    {
+        if (hasPlugins && pluginClassLoader == null)
+        {
+            File extDir = new File("plugins/");
+            List<URL> urls = new ArrayList<URL>();
+            if (extDir.isDirectory())
+            {
+                for (File f : extDir.listFiles())
+                {
+                    if (!f.canRead())
+                    {
+                        throw new RuntimeException("can't access file " + f.getAbsolutePath());
+                    }
+                    try
+                    {
+                        urls.add(f.toURI().toURL());
+                    }
+                    catch (MalformedURLException e)
+                    {
+                        jqmlogger.error("Error when parsing the content of plugin directory. File will be ignored", e);
+                    }
+                }
+
+                // Create classloader
+                final URL[] aUrls = urls.toArray(new URL[0]);
+                for (URL u : aUrls)
+                {
+                    jqmlogger.trace(u.toString());
+                }
+                pluginClassLoader = AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>()
+                {
+                    @Override
+                    public URLClassLoader run()
+                    {
+                        return new URLClassLoader(aUrls, null);
+                    }
+                });
+            }
+            else
+            {
+                hasPlugins = false;
+                return ClassloaderManager.class.getClassLoader();
+            }
+        }
+        return pluginClassLoader;
     }
 }

@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.enioka.jqm</groupId>
@@ -95,7 +96,7 @@
 				</executions>
 			</plugin>
 
-			<!-- Create ext directory for tests -->
+			<!-- Create ext and lib directories for tests -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -150,6 +151,29 @@
 
 							</artifactItems>
 							<outputDirectory>${project.basedir}/ext</outputDirectory>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>copy2</id>
+						<phase>process-test-classes</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>jqm-api</artifactId>
+									<version>${project.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>jqm-runner-basic</artifactId>
+									<version>${project.version}</version>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.basedir}/plugins</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>

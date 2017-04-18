@@ -44,7 +44,7 @@
 				<include>*.xml</include>
 			</includes>
 		</fileSet>
-        <fileSet>
+		<fileSet>
 			<directory>${project.basedir}/lib/</directory>
 			<outputDirectory>/lib</outputDirectory>
 			<includes>
@@ -56,7 +56,7 @@
 			<outputDirectory>/bin</outputDirectory>
 			<includes>
 				<include>*.exe</include>
-                <include>permissions.sh</include>
+				<include>permissions.sh</include>
 			</includes>
 			<fileMode>0755</fileMode>
 		</fileSet>
@@ -74,7 +74,7 @@
 				<exclude>*</exclude>
 			</excludes>
 		</fileSet>
-        <fileSet>
+		<fileSet>
 			<directory>${project.basedir}/src/main/scripts/empty</directory>
 			<outputDirectory>tmp</outputDirectory>
 			<excludes>
@@ -144,6 +144,17 @@
 				<include>com.enioka.jqm:jqm-api</include>
 				<include>com.sun.mail:javax.mail</include>
 				<include>com.sun.mail:smtp</include>
+			</includes>
+			<scope>test</scope>
+		</dependencySet>
+
+		<dependencySet>
+			<outputDirectory>/plugins</outputDirectory>
+			<useProjectArtifact>false</useProjectArtifact>
+			<unpack>false</unpack>
+			<includes>
+				<include>com.enioka.jqm:jqm-api</include>
+				<include>com.enioka.jqm:jqm-runner-basic</include>
 			</includes>
 			<scope>test</scope>
 		</dependencySet>

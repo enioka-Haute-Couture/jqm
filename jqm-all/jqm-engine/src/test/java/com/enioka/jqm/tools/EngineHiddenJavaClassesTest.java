@@ -23,7 +23,7 @@ public class EngineHiddenJavaClassesTest extends JqmBaseTest
 
         CreationTools.createJobDef(null, true, "pyl.EngineHiddenJavaClasses", new ArrayList<JobDefParameter>(),
                 "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, -1, "EngineHiddenJavaClasses", null, null, null, null, null, false, em,
-                null, false, "java.lang.String,java.math.*"); 
+                null, false, "java.lang.Marsu,java.math.*"); 
         JobRequest.create("EngineHiddenJavaClasses", null).submit();
 
         TestHelpers.waitFor(1, 10000, em);
