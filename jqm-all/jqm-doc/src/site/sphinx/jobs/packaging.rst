@@ -1,4 +1,4 @@
-﻿Packaging
+Packaging
 ################
 
 JQM is able to load :term:`payloads<payload>` from jar files (in case your code is actually inside a war, it is possible to simply rename the file), which gives
