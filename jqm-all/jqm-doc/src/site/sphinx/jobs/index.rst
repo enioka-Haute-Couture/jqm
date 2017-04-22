@@ -1,4 +1,4 @@
-﻿Payload development
+Payload development
 #####################
 
 .. toctree::
@@ -13,3 +13,5 @@
 	packaging
 	testing_payloads
 
+	execution_context
+	spring

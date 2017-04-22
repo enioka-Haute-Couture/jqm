@@ -14,6 +14,3 @@ Otherwise, it can be skipepd without remorse.
     ../release_notes
     classloaders
     tests
-
-	execution_context
-	spring
