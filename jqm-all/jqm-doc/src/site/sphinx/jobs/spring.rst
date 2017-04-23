@@ -55,7 +55,7 @@ Cons:
 
 This is the recommended way of using Spring inside JQM, in the "keep it simple" philosophy.
 
-.. note: a full working sample is included inside the JQM integration tests. It is named "jqm-test-spring-1". (it also uses JPA with a JNDI resource handled by the JQM JNDI directory)
+.. note:: a full working sample is included inside the JQM integration tests. It is named "jqm-test-spring-1". (it also uses JPA with a JNDI resource handled by the JQM JNDI directory)
 
 
 By having JQM set the context 
@@ -155,5 +155,5 @@ Finally you may have noted in the sample that we had a @Resource(name = "runtime
 access to the job instance parameters through the Spring APIs. This bean is scoped on the thread, so you'll obviously get different values in different 
 job instances even if they run at the same time in the same runtime context.
 
-.. note: a full working sample is included inside the JQM integration tests. It is named "jqm-test-spring-2". It's deployment descriptor is named "xmlspring.xml".
+.. note:: a full working sample is included inside the JQM integration tests. It is named "jqm-test-spring-2". It's deployment descriptor is named "xmlspring.xml".
 
