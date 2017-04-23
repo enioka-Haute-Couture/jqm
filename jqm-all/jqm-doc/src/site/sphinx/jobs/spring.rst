@@ -1,16 +1,16 @@
 Using Spring
 #############################
 
-This gives a rundown on how to efficiently use Spring inside JQM. This can be of course be an inspiration for most big "container" frameworks.
+This gives a rundown on how to efficiently use Spring inside JQM. This can of course be an inspiration for other big "container" frameworks.
 
-There are multiple possibilities, and this page shows how to use them all. They are presented here in order of increasing complexity, which is also the order of decreasing recommendation.
+There are multiple possibilities, and this page shows how to use two of them. They are presented here in order of increasing complexity, which is also the order of decreasing recommendation.
 
 By doing nothing special
 **************************
 
 It has been said before, by default launching a new job instance in a JQM server is like launching a new JVM: if a Spring job already works from the command line, it will work in JQM without adaptation.
 
-There are different ways to create Spring programs, but they all boil down to: create a Spring context, load configuration inside the context, create the job bean and launch it.
+There are different ways to create Spring programs, but they all boil down to: create a Spring context, load configuration inside the context, create the job bean from the context and launch it.
 
 A most common example is by using Spring Boot, which hides most boilerplate code. The main method is simply::
 
@@ -74,8 +74,7 @@ The payload can be defined like this::
 
 	package com.compagny.project;
 	
-	@Import(ContextConfig.class)
-	@SpringBootApplication
+	@Component
 	public class MyJobClass implements Runnable
 	{
 		@Autowired
@@ -128,7 +127,7 @@ It is necessary to add the handler and runner to the execution context inside th
 					<parameters>
 						<parameter>
 							<key>additionalScan</key>
-							<value>com.myapp.package.*</value>
+							<value>com.compagny.project</value>
 						</parameter>
 					</parameters>
 				</handler>

@@ -27,8 +27,11 @@ Also, only the classes which are one of the supported job types (with a static m
 Changing the default mode
 ******************************
 
-There a few parameters which can be set to change the default behaviour - i.e. the execution context of all jobs which do not request a specific execution context.
-It is possible to use a single shared execution context for everything, or one execution context for all jobs inside the same jar.
+A few parameters can be set to change the default behaviour - i.e. the execution context of all jobs which do not request a specific execution context.
+Two modes are possible: 
+
+* a single shared execution context for all job definitions inside all jars
+* one execution context for all jobs inside the same jar (therefore one execution context per jar file)
 
 See the global parameters documentation for more details.
 
@@ -109,15 +112,15 @@ the lowest level and therefore the highest priority.
 Sometimes, you will want to give priority to your own classes. This is done by setting "childFirst" to "true". In that case,
 a class will be loaded from the lower levels only if not defined in your job (and its libraries).
 
-A similar effect can be obtained by simply hiding classes, see "hiddenJavaClasses".
+A similar effect can be obtained by simply hiding classes, see next paragraph.
 
 Default is "false" - meaning parent first.
 
 Hiding Java classes
 +++++++++++++++++++++
 
-Reversing the class loading loading order is radical, sometimes you just want to override a small set of classes. To do that, 
-just put a regular expression inside the "hiddenJavaClasses" tag. Classes which match the regular expression will never ever
+Changing the class loading loading priority is radical, sometimes you just want to override a small set of classes. To do that, 
+just put a comma-separated list of regular expressions inside the "hiddenJavaClasses" tag. Classes which match at least one of the regular expressions will never ever
 be loaded from a source outside your own jar and libraries.
 
 Default is no exclusions.
@@ -128,7 +131,7 @@ Class loading tracing
 To debug "why isn't my library loaded" issues, you can enable a trace by setting the "tracingEnabled" parameter to "true".
 The trace is written in the log (and stdout if active).
 
-Default is disabled.
+Default is "false" - meaning disabled.
 
 Context persistence
 +++++++++++++++++++++++++
@@ -136,7 +139,7 @@ Context persistence
 By default, the context is destroyed at the end of a run. This means there is no possibility to set anything static in a first
 run and retrieve it in a further job. While this is most often an excellent programming principle (no side effects possible!), it may
 be detrimental to some programs. For example, initializing a JPA provider such as Hibernate has a huge cost be it in memory
-or CPU cycles, which is why the Hibernate context (the EntityManagerFactory - EMF) is usually a shared static singleton. But as the context is
+or CPU cycles, which is why the JPA context (the EntityManagerFactory - EMF) is usually a shared static singleton. But as the context is
 thrown out at the end of each execution, with it goes the static context too, and the EMF has to be re-created on each run.
 
 To avoid this, a context can be set as persistent. Just set "persistent" to "true". In that case the context will be created the
@@ -155,13 +158,13 @@ Runners
 +++++++++++
 
 The runners are the agents responsible for actually launching the job instances. The example above actually give the default value, which
-is a comma-separated list of the three runners corresponding to the three different types of supported jobs: 
+is a comma-separated list of the three runners corresponding to the three different types of supported job definitions: 
 
 * com.enioka.jqm.tools.LegacyRunner runs any class which implements the "JobBase" interface
 * com.enioka.jqm.tools.MainRunner runs any class with a "static main" method
 * com.enioka.jqm.tools.RunnableRunner runs any class which implements the Runnable interface and has a default no arguments constructor.
 
-This list allows to restrict the job types available inside the context, or change the order in which they are evaluated.
+This list allows to restrict the job types available inside the context.
 
 Note that the runners only exist to define "how to start" a job instance. They cannot do more, and they actually run in a very limited
 bubble with only access to themselves and the JDK.
