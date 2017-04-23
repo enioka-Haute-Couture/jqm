@@ -126,6 +126,7 @@ class Loader implements Runnable, LoaderMBean
         EntityManager em = null;
         final Map<String, String> params;
         final JarClassLoader jobClassLoader;
+        final JobManagerHandler handler;
 
         // Block needing the database
         try
@@ -174,6 +175,8 @@ class Loader implements Runnable, LoaderMBean
             em.getTransaction().commit();
 
             jobClassLoader = this.clm.getClassloader(job, em);
+
+            handler = new JobManagerHandler(job, params);
         }
         catch (JqmPayloadException e)
         {
@@ -219,7 +222,7 @@ class Loader implements Runnable, LoaderMBean
         // Go! (launches the main function in the startup class designated in the manifest)
         try
         {
-            jobClassLoader.launchJar(job, params);
+            jobClassLoader.launchJar(job, params, clm, handler);
             this.resultStatus = State.ENDED;
         }
         catch (JqmKillException e)

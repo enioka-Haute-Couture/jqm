@@ -12,7 +12,7 @@ import com.enioka.jqm.jpamodel.JobDefParameter;
 /**
  * Helper class to define a new payload. This will help create an actual job definition, as if it had been imported from an XML deployment
  * descriptor.<br>
- * There are tow possibilities to create a job definition: from a class inside the current class path, or from an external Jar.
+ * There are two possibilities to create a job definition: from a class inside the current class path, or from an external Jar.
  */
 public class TestJobDefinition
 {

@@ -92,6 +92,7 @@ public class JqmAsyncTester
         // Needed parameters
         addGlobalParameter("defaultConnection", "");
         addGlobalParameter("disableWsApi", "true");
+        addGlobalParameter("logFilePerLaunch", "false");
     }
 
     /**
@@ -247,7 +248,7 @@ public class JqmAsyncTester
      */
     public JqmAsyncTester addJobDefinition(TestJobDefinition description)
     {
-        JobDef jd = Common.createJobDef(description, queues);
+        JobDef jd = Common.createJobDef(description, queues, em);
         em.getTransaction().begin();
         em.persist(jd);
         em.getTransaction().commit();

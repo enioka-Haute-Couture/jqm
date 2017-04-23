@@ -133,6 +133,9 @@ public class TestHelpers
         em.createQuery("DELETE RPermission WHERE 1=1").executeUpdate();
         em.createQuery("DELETE RRole WHERE 1=1").executeUpdate();
         em.createQuery("DELETE RUser WHERE 1=1").executeUpdate();
+        em.createQuery("DELETE ClHandlerParameter WHERE 1=1").executeUpdate();
+        em.createQuery("DELETE ClHandler WHERE 1=1").executeUpdate();
+        em.createQuery("DELETE Cl WHERE 1=1").executeUpdate();
 
         em.getTransaction().commit();
 

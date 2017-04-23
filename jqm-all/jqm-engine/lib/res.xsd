@@ -4,6 +4,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element minOccurs="1" maxOccurs="unbounded" ref="jar" />
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="context" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -49,15 +50,48 @@
                 <xs:element name="keyword1" type="xs:string" minOccurs="0" maxOccurs="1" />
                 <xs:element name="keyword2" type="xs:string" minOccurs="0" maxOccurs="1" />
                 <xs:element name="keyword3" type="xs:string" minOccurs="0" maxOccurs="1" />
-                <xs:element name="specificIsolationContext" type="xs:string" minOccurs="0" maxOccurs="1" />
-                <xs:element name="childFirstClassLoader" type="xs:boolean" minOccurs="0" maxOccurs="1" />
-                <xs:element name="hiddenJavaClasses" type="xs:string" minOccurs="0" maxOccurs="1" />
                 <xs:element name="reasonableRuntimeLimitMinute" type="xs:int" minOccurs="0" maxOccurs="1" />
                 <xs:element name="highlander" type="xs:boolean" />
+                <xs:element name="executionContext" type="xs:string" minOccurs="0" maxOccurs="1" />
 				<xs:element ref="parameters" minOccurs="0" maxOccurs="1" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
+	
+	<xs:element name="context">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1" />
+                <xs:element name="childFirst" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                <xs:element name="hiddenJavaClasses" type="xs:string" minOccurs="0" maxOccurs="1" />
+                <xs:element name="tracingEnabled" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                <xs:element name="persistent" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                <xs:element name="runners" type="xs:string" minOccurs="0" maxOccurs="1" />
+                
+                <xs:element name="eventHandlers">
+	                <xs:complexType>
+		                <xs:sequence>
+		                	<xs:element name="handler" type="contextHandler" minOccurs="0" maxOccurs="unbounded" />
+		                </xs:sequence>
+	                </xs:complexType>
+                </xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="contextHandler">
+		<xs:sequence>
+			<xs:element name="className" type="xs:string" minOccurs="1" maxOccurs="1" />
+			<xs:element name="event" type="contextHandlerType" minOccurs="1" maxOccurs="1" />
+			<xs:element ref="parameters" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:simpleType name="contextHandlerType" final="restriction" >
+    	<xs:restriction base="xs:string">
+	        <xs:enumeration value="JI_STARTING" />
+	    </xs:restriction>
+	</xs:simpleType>
 	
 	<xs:element name="parameters">
 		<xs:complexType>

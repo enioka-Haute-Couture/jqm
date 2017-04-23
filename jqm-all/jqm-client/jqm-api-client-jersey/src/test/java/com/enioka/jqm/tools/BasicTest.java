@@ -87,8 +87,15 @@ public class BasicTest
         Helpers.setSingleParam("disableWsApi", "false", em);
         Helpers.setSingleParam("enableWsApiAuth", "true", em);
         Helpers.setSingleParam("enableWsApiSsl", "false", em);
+        Helpers.setSingleParam("logFilePerLaunch", "false", em);
         File jar = FileUtils.listFiles(new File("../../jqm-ws/target/"), new String[] { "war" }, false).iterator().next();
         FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war"));
+
+        jar = FileUtils.listFiles(new File("../../jqm-runner/jqm-runner-basic/target/"), new String[] { "jar" }, false).iterator().next();
+        FileUtils.copyFile(jar, new File("./plugins/runner.jar"));
+        
+        jar = FileUtils.listFiles(new File("../../jqm-api/target/"), new String[] { "jar" }, false).iterator().next();
+        FileUtils.copyFile(jar, new File("./plugins/api.jar"));
 
         em.getTransaction().begin();
         Node n = em.find(Node.class, TestHelpers.node.getId());
@@ -193,8 +200,8 @@ public class BasicTest
         Assert.assertEquals(1, JqmClientFactory.getClient().getUserActiveJobs("MAG").size());
 
         // Kill test
-        CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
-                "KillMe", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42, "KillMe",
+                null, "Franquin", "ModuleMachin", "other", "other", false, em);
         j = new JobRequest("KillMe", "MAG");
         i = JqmClientFactory.getClient().enqueue(j);
         Assert.assertEquals(2, JqmClientFactory.getClient().getUserActiveJobs("MAG").size());

@@ -4,11 +4,14 @@ public class EngineHiddenJavaClasses implements Runnable
 {
     @Override
     public void run()
-    {        
-        try {
+    {
+        try
+        {
             this.getClass().getClassLoader().loadClass("java.math.BigInteger");
-        } catch(ClassNotFoundException e) {
-            throw new RuntimeException("Could not load java.math.BigInteger");
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new RuntimeException("Could not load java.math.BigInteger", e);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿Developement
+Developement
 #####################
 
 This chapter is only useful for JQM developers. For would-be contributors, it is a must-read.
