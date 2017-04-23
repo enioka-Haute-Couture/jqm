@@ -60,7 +60,8 @@ public class MainRunner implements JobRunner
         }
 
         // Injection
-        Common.inject(toRun, null, handlerProxy, Boolean.parseBoolean(metaParameters.getOrDefault("mayBeShared", "false")));
+        String prm = metaParameters.get("mayBeShared") == null ? "false" : metaParameters.get("mayBeShared");
+        Common.inject(toRun, null, handlerProxy, Boolean.parseBoolean(prm));
 
         // Parameters
         String[] params = new String[jobParameters.size()];

@@ -47,7 +47,8 @@ public class LegacyRunner implements JobRunner
         }
 
         // Injection
-        Common.inject(o.getClass(), o, handlerProxy, Boolean.parseBoolean(metaParameters.getOrDefault("mayBeShared", "false")));
+        String prm = metaParameters.get("mayBeShared") == null ? "false" : metaParameters.get("mayBeShared");
+        Common.inject(o.getClass(), o, handlerProxy, Boolean.parseBoolean(prm));
 
         try
         {
