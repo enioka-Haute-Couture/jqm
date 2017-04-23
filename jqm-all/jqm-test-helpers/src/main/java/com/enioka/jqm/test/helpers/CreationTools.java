@@ -41,10 +41,12 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 
+import com.enioka.jqm.jpamodel.Cl;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
 import com.enioka.jqm.jpamodel.GlobalParameter;
 import com.enioka.jqm.jpamodel.JndiObjectResource;
@@ -216,10 +218,29 @@ public class CreationTools
         j.setHighlander(highlander);
         j.setJarPath(jp);
         j.setPathType(pathType);
-        j.setSpecificIsolationContext(specificIsolationContext);
-        j.setChildFirstClassLoader(childFirstClassLoader);
-        j.setHiddenJavaClasses(hiddenJavaClasses);
-        j.setClassLoaderTracing(classLoaderTracing);
+
+        if (specificIsolationContext != null || childFirstClassLoader || hiddenJavaClasses != null)
+        {
+            Cl cl;
+            specificIsolationContext = specificIsolationContext == null ? applicationName : specificIsolationContext;
+            try
+            {
+                cl = em.createQuery("SELECT q FROM Cl q WHERE q.name=:name", Cl.class).setParameter("name", specificIsolationContext)
+                        .getSingleResult();
+                j.setCl(cl);
+            }
+            catch (NoResultException e)
+            {
+                cl = new Cl();
+                cl.setChildFirst(childFirstClassLoader);
+                cl.setHiddenClasses(hiddenJavaClasses);
+                cl.setName(specificIsolationContext);
+                cl.setPersistent(true);
+                cl.setTracingEnabled(false);
+                em.persist(cl);
+                j.setCl(cl);
+            }
+        }
 
         em.persist(j);
         transac.commit();

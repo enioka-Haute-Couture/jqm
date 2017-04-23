@@ -179,9 +179,9 @@ class Dto2Jpa
         jpa.setModule(dto.getModule());
         jpa.setQueue(em.find(Queue.class, dto.getQueueId()));
         jpa.setMaxTimeRunning(dto.getReasonableRuntimeLimitMinute());
-        jpa.setSpecificIsolationContext(dto.getSpecificIsolationContext());
-        jpa.setHiddenJavaClasses(dto.getHiddenJavaClasses());
-        jpa.setChildFirstClassLoader(dto.isChildFirstClassLoader());
+        // jpa.setSpecificIsolationContext(dto.getSpecificIsolationContext());
+        // jpa.setHiddenJavaClasses(dto.getHiddenJavaClasses());
+        // jpa.setChildFirstClassLoader(dto.isChildFirstClassLoader());
 
         jpa = em.merge(jpa);
 

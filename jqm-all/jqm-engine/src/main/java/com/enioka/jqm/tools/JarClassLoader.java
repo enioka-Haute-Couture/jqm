@@ -24,13 +24,17 @@ import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
+import com.enioka.jqm.jpamodel.ClHandler;
+import com.enioka.jqm.jpamodel.ClHandlerParameter;
 import com.enioka.jqm.jpamodel.JobInstance;
 
 /**
@@ -41,8 +45,6 @@ import com.enioka.jqm.jpamodel.JobInstance;
 class JarClassLoader extends URLClassLoader
 {
     private static Logger jqmlogger = Logger.getLogger(JarClassLoader.class);
-
-    private Map<String, String> prms = new HashMap<String, String>();
 
     private boolean childFirstClassLoader = false;
 
@@ -55,19 +57,6 @@ class JarClassLoader extends URLClassLoader
     private String hiddenJavaClasses = null;
 
     private boolean mayBeShared = false;
-
-    private static URL[] addUrls(URL url, URL[] libs)
-    {
-        URL[] urls = new URL[libs.length + 1];
-        urls[0] = url;
-        System.arraycopy(libs, 0, urls, 1, libs.length);
-        return urls;
-    }
-
-    JarClassLoader(URL url, URL[] libs, ClassLoader parent)
-    {
-        super(addUrls(url, libs), parent);
-    }
 
     JarClassLoader(ClassLoader parent)
     {
@@ -87,16 +76,27 @@ class JarClassLoader extends URLClassLoader
         }
     }
 
-    void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm) throws JqmEngineException
+    /**
+     * Everything here can run without the database.
+     * 
+     * @param job
+     *            the JI to run.
+     * @param parameters
+     *            already resolved runtime parameters
+     * @param clm
+     *            the CLM having created this CL.
+     * @param h
+     *            given as parameter because its constructor needs the database.
+     * @throws JqmEngineException
+     */
+    void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, JobManagerHandler h) throws JqmEngineException
     {
-        this.prms = parameters;
-
         // 1 - Create the proxy.
         Object proxy = null;
+        Class injInt;
         try
         {
-            JobManagerHandler h = new JobManagerHandler(job, prms);
-            Class injInt = this.getParent().loadClass("com.enioka.jqm.api.JobManager");
+            injInt = this.loadClass("com.enioka.jqm.api.JobManager");
             proxy = Proxy.newProxyInstance(this, new Class[] { injInt }, h);
         }
         catch (Exception e)
@@ -125,7 +125,13 @@ class JarClassLoader extends URLClassLoader
         jqmlogger.trace("Class " + classQualifiedName + " was correctly loaded");
 
         // 4 - Determine which job runner should take the job and launch!
-        for (String runnerClassName : clm.getJobRunnerClasses())
+        List<String> allowedRunners = clm.getJobRunnerClasses();
+        if (job.getJd().getClassLoader() != null && job.getJd().getClassLoader().getAllowedRunners() != null
+                && !job.getJd().getClassLoader().getAllowedRunners().isEmpty())
+        {
+            allowedRunners = Arrays.asList(job.getJd().getClassLoader().getAllowedRunners().split(","));
+        }
+        for (String runnerClassName : allowedRunners)
         {
             Boolean canRun = false;
             Class runnerClass = null;
@@ -170,8 +176,6 @@ class JarClassLoader extends URLClassLoader
 
                 try
                 {
-                    // run(Class<? extends Object> toRun, Map<String, String> metaParameters, Map<String, String> jobParameters, Object
-                    // handlerProxy)
                     run = runnerClass.getMethod("run", Class.class, Map.class, Map.class, Object.class);
                 }
                 catch (Exception e)
@@ -179,6 +183,32 @@ class JarClassLoader extends URLClassLoader
                     throw new JqmEngineException("could not find run method for runner plugin " + runnerClassName, e);
                 }
 
+                // We are ready to actually run the job instance. Time for all event handlers.
+                if (job.getJd().getClassLoader() != null)
+                {
+                    for (ClHandler handler : job.getJd().getClassLoader().getHandlers())
+                    {
+                        String handlerClass = handler.getClassName();
+                        Map<String, String> handlerPrms = new HashMap<String, String>();
+                        for (ClHandlerParameter hprm : handler.getParameters())
+                        {
+                            handlerPrms.put(hprm.getKey(), hprm.getValue());
+                        }
+
+                        try
+                        {
+                            Method handlerRun = loadClass(handlerClass).getMethod("run", Class.class, injInt, Map.class);
+                            Object handlerInstance = loadClass(handlerClass).newInstance();
+                            handlerRun.invoke(handlerInstance, c, proxy, handlerPrms);
+                        }
+                        catch (Exception e)
+                        {
+                            throw new JqmEngineException("event handler could not be loaded or run: " + handlerClass, e);
+                        }
+                    }
+                }
+
+                // Go for real.
                 try
                 {
                     run.invoke(runner, c, metaprms, parameters, proxy);

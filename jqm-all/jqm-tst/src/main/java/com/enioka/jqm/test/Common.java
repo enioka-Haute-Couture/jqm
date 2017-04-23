@@ -5,7 +5,11 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.persistence.EntityManager;
+
 import org.hsqldb.Server;
+
+import com.enioka.jqm.jpamodel.Cl;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.Queue;
 
@@ -61,7 +65,7 @@ final class Common
         return p;
     }
 
-    static JobDef createJobDef(TestJobDefinition d, Map<String, Queue> queues)
+    static JobDef createJobDef(TestJobDefinition d, Map<String, Queue> queues, EntityManager em)
     {
         JobDef j = new JobDef();
 
@@ -82,10 +86,14 @@ final class Common
         j.setKeyword2(d.getKeyword2());
         j.setKeyword3(d.getKeyword3());
 
-        j.setSpecificIsolationContext(d.getSpecificIsolationContext());
-        j.setChildFirstClassLoader(d.isChildFirstClassLoader());
-        j.setHiddenJavaClasses(d.getHiddenJavaClasses());
-        j.setClassLoaderTracing(d.isClassLoaderTracing());
+        Cl cl = new Cl();
+        cl.setChildFirst(d.isChildFirstClassLoader());
+        cl.setName(d.getSpecificIsolationContext() == null ? d.getName() : d.getSpecificIsolationContext());
+        cl.setHiddenClasses(d.getHiddenJavaClasses());
+        cl.setTracingEnabled(d.isClassLoaderTracing());
+        cl.setPersistent(false);
+        em.persist(cl);
+        j.setCl(cl);
 
         return j;
     }

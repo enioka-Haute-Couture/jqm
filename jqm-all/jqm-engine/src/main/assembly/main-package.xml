@@ -155,6 +155,7 @@
 			<includes>
 				<include>com.enioka.jqm:jqm-api</include>
 				<include>com.enioka.jqm:jqm-runner-basic</include>
+				<include>com.enioka.jqm:jqm-runner-spring</include>
 			</includes>
 			<scope>test</scope>
 		</dependencySet>

@@ -24,13 +24,12 @@ public class OfferingUpdateJob implements CommandLineRunner
             throw new RuntimeException("value is not correct");
         }
 
-        offeringService.updateOfferingTypeCode(34L, "HOUBA");
-        if (!offeringService.getOfferingByNumber(34L).getOfferingTypeCode().equals("HOUBA"))
-        {
-            throw new RuntimeException("value is not correct");
-        }
+        /*
+         * offeringService.updateOfferingTypeCode(34L, "HOUBA"); if
+         * (!offeringService.getOfferingByNumber(34L).getOfferingTypeCode().equals("HOUBA")) { throw new
+         * RuntimeException("value is not correct"); }
+         */ // commented - cannot run multiple times otherwise...
 
         System.out.println("Job is done!");
     }
-
 }

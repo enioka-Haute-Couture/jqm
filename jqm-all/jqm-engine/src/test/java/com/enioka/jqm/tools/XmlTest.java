@@ -193,9 +193,9 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals("other2", fibo.getKeyword2());
         Assert.assertEquals(null, fibo.getKeyword3());
         Assert.assertEquals(false, fibo.isHighlander());
-        Assert.assertEquals("Isolation", fibo.getSpecificIsolationContext());
-        Assert.assertEquals(true, fibo.isChildFirstClassLoader());
-        Assert.assertEquals("HIDDEN", fibo.getHiddenJavaClasses());
+        Assert.assertEquals("Isolation", fibo.getClassLoader().getName());
+        Assert.assertEquals(true, fibo.getClassLoader().isChildFirst());
+        Assert.assertEquals("HIDDEN", fibo.getClassLoader().getHiddenClasses());
 
         f.delete();
     }

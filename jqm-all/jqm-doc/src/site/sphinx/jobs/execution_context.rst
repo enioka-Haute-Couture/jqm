@@ -7,7 +7,7 @@ see anything from the engine (like the libraries the engine itself use - everyth
 nor from other jobs which may run at the same time. It really behaves as if a brand new JVM had been created
 just for your job instance (and a new one is created for each different launch).
 
-This chapter is an advanced topic useful if you want to go beyond that and lessen the isolation.
+This chapter is an advanced topic useful if you want to go beyond that and weaken the isolation.
 
 The default mode: isolation
 *******************************
@@ -175,8 +175,10 @@ when a job instance is about to start.
 The handlers run in the same context as the job instance itself. It means the class of the handler is inside the class path of the job instance itself.
 It is the responsibility of the developer to check there are no conflicts between his own code and the handler code.
 
+The handler parameters are key/value pairs, with unique keys.
+
 .. warning:: handlers are provided by the job definition itself, not by the engine. They MUST be present inside the available libraries 
-	(be it from a Maven dependency, a jar inside the "lib" directory, inside the über-jar...)
+	(be it from a Maven dependency, a jar inside the "lib" directory, inside the Ã¼ber-jar...)
 
 For an example of the use of an interpretor in the context of a Spring application, see :doc:`spring` where one is used to bootstrap the Spring context
 (much like when a listener is often used when dealing with Spring in a servlet container).

@@ -14,5 +14,6 @@
 
 	<modules>
 		<module>jqm-runner-basic</module>
+		<module>jqm-runner-spring</module>
 	</modules>
 </project>

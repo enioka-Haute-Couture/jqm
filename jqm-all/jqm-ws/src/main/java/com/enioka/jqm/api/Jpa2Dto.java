@@ -182,9 +182,9 @@ public class Jpa2Dto
         res.setModule(d.getModule());
         res.setQueueId(d.getQueue().getId());
         res.setReasonableRuntimeLimitMinute(d.getMaxTimeRunning());
-        res.setSpecificIsolationContext(d.getSpecificIsolationContext());
-        res.setHiddenJavaClasses(d.getHiddenJavaClasses());
-        res.setChildFirstClassLoader(d.isChildFirstClassLoader());
+        // res.setSpecificIsolationContext(d.getSpecificIsolationContext());
+        // res.setHiddenJavaClasses(d.getHiddenJavaClasses());
+        // res.setChildFirstClassLoader(d.isChildFirstClassLoader());
 
         for (JobDefParameter p : d.getParameters())
         {

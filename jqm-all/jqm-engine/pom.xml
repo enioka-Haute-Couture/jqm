@@ -119,6 +119,11 @@
 									<version>${hsqldb.version}</version>
 								</artifactItem>
 								<artifactItem>
+									<groupId>com.h2database</groupId>
+									<artifactId>h2</artifactId>
+									<version>1.4.194</version>
+								</artifactItem>
+								<artifactItem>
 									<groupId>org.apache.tomcat</groupId>
 									<artifactId>tomcat-jdbc</artifactId>
 									<version>${pool.version}</version>
@@ -170,6 +175,11 @@
 								<artifactItem>
 									<groupId>${project.groupId}</groupId>
 									<artifactId>jqm-runner-basic</artifactId>
+									<version>${project.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>jqm-runner-spring</artifactId>
 									<version>${project.version}</version>
 								</artifactItem>
 							</artifactItems>
@@ -386,6 +396,19 @@
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-test-pyl-hibapi</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>jqm-runner-basic</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>jqm-runner-spring</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

@@ -1,9 +1,9 @@
 Using Spring
 #############################
 
-This gives a rundown on how to efficiently use Spring inside JQM. This can be of course adapted for most big "container" frameworks.
+This gives a rundown on how to efficiently use Spring inside JQM. This can be of course be an inspiration for most big "container" frameworks.
 
-There multiple possibilities, and this page shows how to use them all. They are presented here in order of increasing complexity, which is also the order of decreasing recommendation.
+There are multiple possibilities, and this page shows how to use them all. They are presented here in order of increasing complexity, which is also the order of decreasing recommendation.
 
 By doing nothing special
 **************************
@@ -55,8 +55,8 @@ Cons:
 
 This is the recommended way of using Spring inside JQM, in the "keep it simple" philosophy.
 
-By sharing a Spring context defined in your code
-**************************************************
+.. note: a full working sample is included inside the JQM integration tests. It is named "jqm-test-spring-1". (it also uses JPA with a JNDI resource handled by the JQM JNDI directory)
+
 
 By having JQM set the context 
 ******************************************
@@ -68,7 +68,7 @@ This option is the direct equivalent of what happens inside a servlet container 
 is actually initialized by a servlet initialization listener, and the application code just uses Spring, never creating a SpringContext itself.
 
 JQM uses the same method, with an event handler. It also has a specialized runner which retrieves the job bean from the Spring context
-and run it (it must implement Runnable).
+and runs it (it must implement Runnable).
 
 The payload can be defined like this::
 
@@ -80,6 +80,9 @@ The payload can be defined like this::
 	{
 		@Autowired
 		private MyService myServiceToInject;
+		
+		@Resource(name = "runtimeParameters")
+		private Map<String, String> parameters;
 
 		@Override
 		public void run()
@@ -117,10 +120,10 @@ It is necessary to add the handler and runner to the execution context inside th
 			<tracingEnabled>false</tracingEnabled>
 			<persistent>true</persistent>
 			
-			<runners>com.enioka.jqm.runner.spring.Runner</runners>
+			<runners>com.enioka.jqm.runner.spring.AnnotationSpringRunner</runners>
 			<eventHandlers>
 				<handler>
-					<className>com.enioka.jqm.runner.spring.AnnotationBootstrapHandler</className>
+					<className>com.enioka.jqm.handler.AnnotationSpringContextBootstrapHandler</className>
 					<event>JI_STARTING</event>
 					<parameters>
 						<parameter>
@@ -148,3 +151,10 @@ The handler must be present in the job dependencies. In this case, it is provide
 
 Note we have only selected a single runner, which is provided by JQM: com.enioka.jqm.runner.spring.Runner. Depending on your needs, you may want
 to add the other runners (if you do not launch only Spring jobs in the same execution context for example).
+
+Finally you may have noted in the sample that we had a @Resource(name = "runtimeParameters") Map: the runner actually registers a named bean to allow 
+access to the job instance parameters through the Spring APIs. This bean is scoped on the thread, so you'll obviously get different values in different 
+job instances even if they run at the same time in the same runtime context.
+
+.. note: a full working sample is included inside the JQM integration tests. It is named "jqm-test-spring-2". It's deployment descriptor is named "xmlspring.xml".
+

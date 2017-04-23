@@ -10,7 +10,10 @@
 	</parent>
 	<artifactId>jqm-test-spring-1</artifactId>
 	<name>jqm-test-spring-1</name>
+	<packaging>jar</packaging>
 	<url>https://github.com/enioka/jqm</url>
+
+
 
 	<dependencies>
 		<dependency>
@@ -19,11 +22,6 @@
 			<version>1.5.2.RELEASE</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>

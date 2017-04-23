@@ -18,6 +18,7 @@ import javax.persistence.EntityManager;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
+import com.enioka.jqm.jpamodel.Cl;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobInstance;
 
@@ -38,7 +39,7 @@ class ClassloaderManager
     /**
      * The CL for loading plugins (for the engine)
      */
-    private URLClassLoader pluginClassLoader = null;
+    private ClassLoader pluginClassLoader = null;
     private boolean hasPlugins = true;
 
     /**
@@ -47,9 +48,9 @@ class ClassloaderManager
     private Map<String, JarClassLoader> sharedJarClassLoader = new HashMap<String, JarClassLoader>();
 
     /**
-     * The CLs corresponding to specific keys (specified inside {@link JobDef#getSpecificIsolationContext()}).
+     * The CLs corresponding to specific keys (specified inside {@link JobDef#getSpecificIsolationContext()}). Key is Cl object ID.
      */
-    private Map<String, JarClassLoader> specificIsolationContextClassLoader = new HashMap<String, JarClassLoader>();
+    private Map<Integer, JarClassLoader> persistentClassLoaders = new HashMap<Integer, JarClassLoader>();
 
     /**
      * The different runners which may be involved inside the class loaders. Simple class names.
@@ -102,74 +103,79 @@ class ClassloaderManager
         File jarFile = new File(FilenameUtils.concat(new File(ji.getNode().getRepo()).getAbsolutePath(), jd.getJarPath()));
 
         // The parent class loader is normally the CL with EXT on its CL. But if no lib load, user current one (happens for external
-        // pyloads)
+        // payloads)
         ClassLoader parent = getParentClassLoader(ji);
 
         // Priority is:
         // 1 - a specific context
         // 2 - general mode (jar or global)
 
-        String specificIsolationContext = jd.getSpecificIsolationContext();
-        if (specificIsolationContext != null && !specificIsolationContext.trim().isEmpty())
+        Cl cldef = jd.getClassLoader();
+
+        if (cldef != null)
         {
-            if (specificIsolationContextClassLoader.containsKey(specificIsolationContext))
+            // Specific CL options were given
+            String clSharingKey = cldef.getName();
+
+            if (persistentClassLoaders.containsKey(cldef.getId()))
             {
-                jqmlogger.info("Using specific isolation context : " + specificIsolationContext);
-                jobClassLoader = specificIsolationContextClassLoader.get(specificIsolationContext);
-                // Checking if the specific class loader configuration is exactly the same as this job definition configuration
-                if (jobClassLoader.isChildFirstClassLoader() != jd.isChildFirstClassLoader()
-                        || (jobClassLoader.getHiddenJavaClasses() == null && jd.getHiddenJavaClasses() != null)
-                        || (jobClassLoader.getHiddenJavaClasses() != null
-                                && !jobClassLoader.getHiddenJavaClasses().equals(jd.getHiddenJavaClasses())))
-                {
-                    throw new RuntimeException("Specific class loader: " + specificIsolationContext + " for job def ["
-                            + jd.getApplicationName() + "]have different configuration than the first one loaded ["
-                            + jobClassLoader.getReferenceJobDefName() + "]");
-                }
+                jqmlogger.info("Using an existing specific isolation context : " + clSharingKey);
+                jobClassLoader = persistentClassLoaders.get(cldef.getId());
             }
             else
             {
-                jqmlogger.info("Creating specific isolation context " + specificIsolationContext);
+                jqmlogger.info("Creating a new specific isolation context: " + clSharingKey);
                 jobClassLoader = new JarClassLoader(parent);
                 jobClassLoader.setReferenceJobDefName(jd.getApplicationName());
-                jobClassLoader.mayBeShared(true);
-                specificIsolationContextClassLoader.put(specificIsolationContext, jobClassLoader);
-            }
-        }
-        else if ("Shared".equals(launchIsolationDefault))
-        {
-            if (sharedClassLoader != null)
-            {
-                jqmlogger.info("Using sharedClassLoader");
-                jobClassLoader = sharedClassLoader;
-            }
-            else
-            {
-                jqmlogger.info("Creating sharedClassLoader");
-                jobClassLoader = new JarClassLoader(parent);
-                sharedClassLoader = jobClassLoader;
-            }
-        }
-        else if ("SharedJar".equals(launchIsolationDefault))
-        {
-            if (sharedJarClassLoader.containsKey(jd.getJarPath()))
-            {
-                // check if jarUrl has already a class loader
-                jqmlogger.info("Using shared Jar CL");
-                jobClassLoader = sharedJarClassLoader.get(jd.getJarPath());
-            }
-            else
-            {
-                jqmlogger.info("Creating shared Jar CL");
-                jobClassLoader = new JarClassLoader(parent);
-                sharedJarClassLoader.put(jd.getJarPath(), jobClassLoader);
+                jobClassLoader.mayBeShared(cldef.isPersistent());
+                jobClassLoader.setHiddenJavaClasses(cldef.getHiddenClasses());
+                jobClassLoader.setTracing(cldef.isTracingEnabled());
+                jobClassLoader.setChildFirstClassLoader(cldef.isChildFirst());
+
+                if (cldef.isPersistent())
+                {
+                    persistentClassLoaders.put(cldef.getId(), jobClassLoader);
+                }
             }
         }
         else
         {
-            // Standard case: all launches are independent. We create a transient CL.
-            jqmlogger.debug("Using an isolated transient CL");
-            jobClassLoader = new JarClassLoader(parent);
+            // Use default CL options.
+            if ("Shared".equals(launchIsolationDefault))
+            {
+                if (sharedClassLoader != null)
+                {
+                    jqmlogger.info("Using sharedClassLoader");
+                    jobClassLoader = sharedClassLoader;
+                }
+                else
+                {
+                    jqmlogger.info("Creating sharedClassLoader");
+                    jobClassLoader = new JarClassLoader(parent);
+                    sharedClassLoader = jobClassLoader;
+                }
+            }
+            else if ("SharedJar".equals(launchIsolationDefault))
+            {
+                if (sharedJarClassLoader.containsKey(jd.getJarPath()))
+                {
+                    // check if jarUrl has already a class loader
+                    jqmlogger.info("Using shared Jar CL");
+                    jobClassLoader = sharedJarClassLoader.get(jd.getJarPath());
+                }
+                else
+                {
+                    jqmlogger.info("Creating shared Jar CL");
+                    jobClassLoader = new JarClassLoader(parent);
+                    sharedJarClassLoader.put(jd.getJarPath(), jobClassLoader);
+                }
+            }
+            else
+            {
+                // Standard case: all launches are independent. We create a transient CL.
+                jqmlogger.debug("Using an isolated transient CL with default parameters");
+                jobClassLoader = new JarClassLoader(parent);
+            }
         }
 
         // Resolve the libraries and add them to the classpath
@@ -177,15 +183,6 @@ class ClassloaderManager
 
         // Remember to also add the jar file itself... as CL can be shared, there is no telling if it already present or not.
         jobClassLoader.extendUrls(jarFile.toURI().toURL(), classpath);
-
-        // Set ignore classes
-        jobClassLoader.setHiddenJavaClasses(jd.getHiddenJavaClasses());
-
-        // Tracing option
-        jobClassLoader.setTracing(jd.isClassLoaderTracing());
-
-        // Child first option
-        jobClassLoader.setChildFirstClassLoader(jd.isChildFirstClassLoader());
 
         // Some debug display
         jqmlogger.trace("CL URLs:");
@@ -291,7 +288,7 @@ class ClassloaderManager
             else
             {
                 hasPlugins = false;
-                return ClassloaderManager.class.getClassLoader();
+                pluginClassLoader = ClassloaderManager.class.getClassLoader();
             }
         }
         return pluginClassLoader;

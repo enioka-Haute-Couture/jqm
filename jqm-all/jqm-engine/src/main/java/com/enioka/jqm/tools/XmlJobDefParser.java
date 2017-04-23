@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -37,6 +38,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.enioka.jqm.jpamodel.Cl;
+import com.enioka.jqm.jpamodel.ClEvent;
+import com.enioka.jqm.jpamodel.ClHandler;
+import com.enioka.jqm.jpamodel.ClHandlerParameter;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDef.PathType;
 import com.enioka.jqm.jpamodel.JobDefParameter;
@@ -100,6 +105,112 @@ class XmlJobDefParser
 
             doc.getDocumentElement().normalize();
 
+            // First parse CLs
+            NodeList clList = doc.getElementsByTagName("context");
+            int nbCl = 0;
+            for (int clIndex = 0; clIndex < clList.getLength(); clIndex++)
+            {
+                Cl cl;
+                nbCl++;
+                Node clNode = clList.item(clIndex);
+                if (clNode.getNodeType() != Node.ELEMENT_NODE)
+                {
+                    continue;
+                }
+                Element clElement = (Element) clNode;
+
+                String clName = clElement.getElementsByTagName("name").item(0).getTextContent().trim();
+
+                try
+                {
+                    cl = em.createQuery("SELECT q FROM Cl q WHERE q.name=:name", Cl.class).setParameter("name", clName).getSingleResult();
+                }
+                catch (NoResultException e)
+                {
+                    cl = new Cl();
+                    cl.setName(clName);
+                    em.persist(cl);
+                }
+
+                // Basic attributes (with defaults)
+                if (clElement.getElementsByTagName("childFirst").getLength() > 0)
+                {
+                    cl.setChildFirst(Boolean.parseBoolean(clElement.getElementsByTagName("childFirst").item(0).getTextContent()));
+                }
+                else
+                {
+                    cl.setChildFirst(false);
+                }
+                if (clElement.getElementsByTagName("tracingEnabled").getLength() > 0)
+                {
+                    cl.setTracingEnabled(Boolean.parseBoolean(clElement.getElementsByTagName("tracingEnabled").item(0).getTextContent()));
+                }
+                else
+                {
+                    cl.setTracingEnabled(false);
+                }
+                if (clElement.getElementsByTagName("persistent").getLength() > 0)
+                {
+                    cl.setPersistent(Boolean.parseBoolean(clElement.getElementsByTagName("persistent").item(0).getTextContent()));
+                }
+                else
+                {
+                    cl.setPersistent(true);
+                }
+                if (clElement.getElementsByTagName("hiddenJavaClasses").getLength() > 0)
+                {
+                    cl.setHiddenClasses(clElement.getElementsByTagName("hiddenJavaClasses").item(0).getTextContent().trim());
+                }
+                else
+                {
+                    cl.setHiddenClasses(null);
+                }
+                if (clElement.getElementsByTagName("runners").getLength() > 0)
+                {
+                    cl.setAllowedRunners(clElement.getElementsByTagName("runners").item(0).getTextContent().trim());
+                }
+                else
+                {
+                    cl.setAllowedRunners(null);
+                }
+
+                cl.getHandlers().clear();
+                if (clElement.getElementsByTagName("eventHandlers").getLength() > 0)
+                {
+                    NodeList handlersList = ((Element) clElement.getElementsByTagName("eventHandlers").item(0))
+                            .getElementsByTagName("handler");
+                    for (int j = 0; j < handlersList.getLength(); j++)
+                    {
+                        Element hElement = (Element) handlersList.item(j);
+                        ClHandler handler = new ClHandler();
+                        cl.getHandlers().add(handler);
+
+                        handler.setClassName(hElement.getElementsByTagName("className").item(0).getTextContent().trim());
+                        handler.setEventType(ClEvent.JI_STARTING);
+
+                        if (hElement.getElementsByTagName("parameters").getLength() > 0)
+                        {
+                            NodeList prmList = ((Element) hElement.getElementsByTagName("parameters").item(0))
+                                    .getElementsByTagName("parameter");
+                            for (int k = 0; k < prmList.getLength(); k++)
+                            {
+                                Element prmElement = (Element) prmList.item(k);
+                                ClHandlerParameter prm = new ClHandlerParameter();
+                                prm.setKey(prmElement.getElementsByTagName("key").item(0).getTextContent());
+                                prm.setValue(prmElement.getElementsByTagName("value").item(0).getTextContent());
+                                handler.getParameters().add(prm);
+                            }
+                        }
+                    }
+                }
+            }
+            if (nbCl > 0)
+            {
+                em.getTransaction().commit();
+                em.getTransaction().begin();
+            }
+
+            // Second parse jars
             NodeList jarList = doc.getElementsByTagName("jar");
             for (int jarIndex = 0; jarIndex < jarList.getLength(); jarIndex++)
             {
@@ -230,31 +341,23 @@ class XmlJobDefParser
                     }
 
                     // Class loading
-                    if (jdElement.getElementsByTagName("specificIsolationContext").getLength() > 0)
+                    if (jdElement.getElementsByTagName("executionContext").getLength() > 0)
                     {
-                        jd.setSpecificIsolationContext(jdElement.getElementsByTagName("specificIsolationContext").item(0).getTextContent());
+                        try
+                        {
+                            jd.setCl(em.createQuery("SELECT q FROM Cl q WHERE q.name=:name", Cl.class)
+                                    .setParameter("name", jdElement.getElementsByTagName("executionContext").item(0).getTextContent())
+                                    .getSingleResult());
+                        }
+                        catch (NoResultException e)
+                        {
+                            jqmlogger.fatal("Incorrect deployment descriptor: a job definition is using undefined context "
+                                    + jdElement.getElementsByTagName("executionContext").item(0).getTextContent());
+                        }
                     }
                     else
                     {
-                        jd.setSpecificIsolationContext(null);
-                    }
-                    if (jdElement.getElementsByTagName("childFirstClassLoader").getLength() > 0)
-                    {
-                        jd.setChildFirstClassLoader(
-                                "true".equals(jdElement.getElementsByTagName("childFirstClassLoader").item(0).getTextContent().trim())
-                                        ? true : false);
-                    }
-                    else
-                    {
-                        jd.setChildFirstClassLoader(false);
-                    }
-                    if (jdElement.getElementsByTagName("hiddenJavaClasses").getLength() > 0)
-                    {
-                        jd.setHiddenJavaClasses(jdElement.getElementsByTagName("hiddenJavaClasses").item(0).getTextContent());
-                    }
-                    else
-                    {
-                        jd.setHiddenJavaClasses(null);
+                        jd.setCl(null);
                     }
 
                     // Alert time
