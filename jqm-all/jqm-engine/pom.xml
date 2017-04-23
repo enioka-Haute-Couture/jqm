@@ -121,7 +121,7 @@
 								<artifactItem>
 									<groupId>com.h2database</groupId>
 									<artifactId>h2</artifactId>
-									<version>1.4.194</version>
+									<version>${h2.version}</version>
 								</artifactItem>
 								<artifactItem>
 									<groupId>org.apache.tomcat</groupId>
