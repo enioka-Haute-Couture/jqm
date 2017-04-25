@@ -137,7 +137,12 @@ It is necessary to add the handler and runner to the execution context inside th
 
 The handler will intercept the "job instance is starting" event and initialize if needed an AnnotationConfigApplicationContext. All parameters are optional:
 
-* additionalScan: a set of base packages to scan for annotations.
+* additionalScan: a set of base packages to scan for annotations. Example: com.compagny.project,com.compagny.otherpackage
+* beanNameGenerator: a fully qualified class implementing the BeanNameGenerator interface with a no-args constructor to use for creating the names of the beans
+* contextDisplayName: name of the context in the logs
+* contextId: id of the context bean
+* allowCircularReferences: if "true", the context will allow circular references.
+
 
 If no parameters are given, the job class (the first one to run) itself will be added to the Spring context, so if is a @Configuration it will be enabled.
 

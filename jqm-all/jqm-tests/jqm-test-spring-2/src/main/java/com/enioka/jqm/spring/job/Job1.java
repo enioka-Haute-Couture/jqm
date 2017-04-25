@@ -30,6 +30,12 @@ public class Job1 implements Runnable
         {
             throw new RuntimeException("services were not set");
         }
+
+        if (!s1.getBeanName().equals("com.enioka.jqm.spring.service.Service1"))
+        {
+            throw new RuntimeException("wrong service bean name - custom bean name generator not in used. Name found: " + s1.getBeanName());
+        }
+
         s1.getInt();
     }
 }

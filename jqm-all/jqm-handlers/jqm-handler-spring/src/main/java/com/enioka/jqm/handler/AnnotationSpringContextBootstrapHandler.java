@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.Scope;
+import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.SimpleThreadScope;
@@ -46,6 +47,7 @@ public class AnnotationSpringContextBootstrapHandler implements JobInstanceStart
         return ctx.getBean(clazz);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void run(Class<? extends Object> toRun, JobManager handler, Map<String, String> handlerParameters)
     {
@@ -58,6 +60,50 @@ public class AnnotationSpringContextBootstrapHandler implements JobInstanceStart
                 if (!refreshed)
                 {
                     // Add the different elements to the context path
+                    if (handlerParameters.containsKey("beanNameGenerator"))
+                    {
+                        Class<? extends BeanNameGenerator> clazz;
+                        try
+                        {
+                            clazz = (Class<? extends BeanNameGenerator>) AnnotationSpringContextBootstrapHandler.class.getClassLoader()
+                                    .loadClass(handlerParameters.get("beanNameGenerator"));
+                        }
+                        catch (ClassNotFoundException e)
+                        {
+                            throw new RuntimeException("The handler beanNameGenerator class [" + handlerParameters.get("beanNameGenerator")
+                                    + "] cannot be found.", e);
+                        }
+
+                        BeanNameGenerator generator;
+                        try
+                        {
+                            generator = clazz.newInstance();
+                        }
+                        catch (Exception e)
+                        {
+                            throw new RuntimeException("The handler beanNameGenerator class [" + handlerParameters.get("beanNameGenerator")
+                                    + "] was found but cannot be instantiated. Check it has a no-arguments constructor.", e);
+                        }
+
+                        ctx.setBeanNameGenerator(generator);
+                    }
+
+                    if (handlerParameters.containsKey("contextDisplayName"))
+                    {
+                        ctx.setDisplayName(handlerParameters.get("contextDisplayName"));
+                    }
+
+                    if (handlerParameters.containsKey("contextId"))
+                    {
+                        ctx.setId(handlerParameters.get("contextId"));
+                    }
+
+                    if (handlerParameters.containsKey("allowCircularReferences"))
+                    {
+                        boolean allow = Boolean.parseBoolean(handlerParameters.get("allowCircularReferences"));
+                        ctx.setAllowCircularReferences(allow);
+                    }
+
                     if (handlerParameters.containsKey("additionalScan"))
                     {
                         ctx.scan(handlerParameters.get("additionalScan").split(","));

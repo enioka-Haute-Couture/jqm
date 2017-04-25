@@ -42,6 +42,10 @@
 						<key>additionalScan</key>
 						<value>com.enioka.jqm.spring</value>
 					</parameter>
+					<parameter>
+						<key>beanNameGenerator</key>
+						<value>com.enioka.jqm.spring.config.CustomBeanNameGenerator</value>
+					</parameter>
 				</parameters>
 			</handler>
 		</eventHandlers>
