@@ -100,9 +100,9 @@ final class JerseyClient implements JqmClient
         }
 
         // System parameter (only for URL, not documented nor supported by the way)
-        if (System.getProperty("com.enioka.ws.url") != null)
+        if (System.getProperty("com.enioka.jqm.ws.url") != null)
         {
-            this.p.setProperty("com.enioka.ws.url", System.getProperty("com.enioka.ws.url"));
+            this.p.setProperty("com.enioka.jqm.ws.url", System.getProperty("com.enioka.jqm.ws.url"));
         }
 
         // Given explicitly

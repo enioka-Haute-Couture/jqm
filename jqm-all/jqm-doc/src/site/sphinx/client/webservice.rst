@@ -52,7 +52,7 @@ The specific parameters are:
 +----------------------------------+------------+----------------------------------------------+------------------------------+
 | Name                             | Compulsory | Description                                  | Example                      |
 +==================================+============+==============================================+==============================+
-| com.enioka.ws.url                | YES        | The base URL of the web service              | http://localhost:1789/api/ws |
+| com.enioka.jqm.ws.url            | YES        | The base URL of the web service              | http://localhost:1789/api/ws |
 +----------------------------------+------------+----------------------------------------------+------------------------------+
 | com.enioka.jqm.ws.login          |            | If auth is used only.                        | mylogin                      |
 +----------------------------------+------------+----------------------------------------------+------------------------------+
@@ -75,9 +75,9 @@ and can be set:
 * (as for every other client) using Java code, before creating any client::
 
 	Properties p = new Properties();
-	p.put("com.enioka.ws.url", "http://localhost:9999/marsu/ws");
+	p.put("com.enioka.jqm.ws.url", "http://localhost:9999/marsu/ws");
 	JqmClientFactory.setProperties(p);
-* through a system parameter (-Dcom.enioka.ws.url=http://...)
+* through a system parameter (-Dcom.enioka.jqm.ws.url=http://...)
 	
 Interrogating the service directly
 ++++++++++++++++++++++++++++++++++++++++

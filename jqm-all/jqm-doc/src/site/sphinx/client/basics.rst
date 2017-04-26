@@ -33,7 +33,7 @@ connect to the database, and the web service must know the web service server. T
 #. It is possible to overload these values through the API **before the first call to getClient**::
 
 	Properties p = new Properties();
-	p.put("com.enioka.ws.url", "http://localhost:9999/marsu/ws");
+	p.put("com.enioka.jqm.ws.url", "http://localhost:9999/marsu/ws");
 	JqmClientFactory.setProperties(p);
 	List<JobInstance> jobs = JqmClientFactory.getClient().getJobs();
 #. An implementation can use obvious other means. E.g. Hibernate will try JNDI to retrieve a database connection.
