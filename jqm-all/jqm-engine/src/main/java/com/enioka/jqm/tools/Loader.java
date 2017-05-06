@@ -125,12 +125,14 @@ class Loader implements Runnable, LoaderMBean
         final Map<String, String> params;
         final JarClassLoader jobClassLoader;
         DbConn cnx = null;
+        final JobManagerHandler handler;
 
         // Block needing the database
         try
         {
             cnx = Helpers.getNewDbSession();
             this.node = Node.select(cnx, "node_select_by_id", job.getNode().getId()).get(0);
+            this.job.getJD().getClassLoader(cnx); // Cache it.
 
             // Log
             this.resultStatus = State.SUBMITTED;
@@ -156,6 +158,10 @@ class Loader implements Runnable, LoaderMBean
                 params.put(jp.getKey(), jp.getValue());
             }
 
+            // Cache heating
+            jobClassLoader = this.clm.getClassloader(job, cnx);
+            handler = new JobManagerHandler(job, params);
+
             // Update of the job status, dates & co
             this.job.setExecutionDate(Calendar.getInstance()); // For use in JMX
             QueryResult qr = cnx.runUpdate("jj_update_run_by_id", job.getId());
@@ -166,8 +172,6 @@ class Loader implements Runnable, LoaderMBean
                 return;
             }
             cnx.commit();
-
-            jobClassLoader = this.clm.getClassloader(job, cnx);
         }
         catch (JqmPayloadException e)
         {
@@ -213,7 +217,7 @@ class Loader implements Runnable, LoaderMBean
         // Go! (launches the main function in the startup class designated in the manifest)
         try
         {
-            jobClassLoader.launchJar(job, params);
+            jobClassLoader.launchJar(job, params, clm, handler);
             this.resultStatus = State.ENDED;
         }
         catch (JqmKillException e)

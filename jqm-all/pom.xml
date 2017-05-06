@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.enioka.jqm</groupId>
 	<artifactId>jqm-all</artifactId>
-	<version>1.4.2-SNAPSHOT</version>
+	<version>2.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>jqm-all</name>
@@ -77,12 +78,13 @@
 		<surefire.version>2.19.1</surefire.version>
 		<javadoc.version>2.10.3</javadoc.version>
 		<httpclient.version>4.5.2</httpclient.version>
-		<pool.version>7.0.68</pool.version>
+		<pool.version>7.0.77</pool.version>
 		<bc.version>1.54</bc.version>
 		<mail.version>1.5.2</mail.version>
 		<commons.logging.version>1.2</commons.logging.version>
 		<commons.io.version>2.5</commons.io.version>
 		<commons.lang.version>2.6</commons.lang.version>
+		<h2.version>1.4.191</h2.version> <!-- Very last Java 6 version - https://github.com/h2database/h2database/issues/300 -->
 
 		<sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
 
@@ -94,6 +96,7 @@
 
 	<modules>
 		<module>jqm-doc</module>
+		<module>jqm-runner</module>
 		<module>jqm-tests</module>
 		<module>jqm-model</module>
 		<module>jqm-api</module>
@@ -101,12 +104,13 @@
 		<module>jqm-client</module>
 		<module>jqm-test-helpers</module>
 		<module>jqm-engine</module>
-		<!--<module>jqm-jsfsample</module>-->
+		<!--<module>jqm-jsfsample</module> -->
 		<module>jqm-providers</module>
 		<module>jqm-pki</module>
 		<module>jqm-tst</module>
 		<module>jqm-admin</module>
-  </modules>
+		<module>jqm-handlers</module>
+	</modules>
 
 	<scm>
 		<developerConnection>scm:git:ssh://git@github.com:enioka/jqm.git</developerConnection>
@@ -321,7 +325,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore/>
+										<ignore />
 									</action>
 								</pluginExecution>
 								<pluginExecution>
@@ -340,7 +344,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore/>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>

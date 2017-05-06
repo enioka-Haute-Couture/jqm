@@ -24,6 +24,8 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.enioka.admin.MetaService;
+import com.enioka.api.admin.JobDefDto;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.Queue;
@@ -134,6 +136,37 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals(false, jd.get(0).isHighlander());
         Assert.assertEquals("1", jd.get(0).getParameters(cnx).get(0).getValue());
         Assert.assertEquals("2", jd.get(0).getParameters(cnx).get(1).getValue());
+        Assert.assertEquals("com.enioka.jqm.tests.App", jd.get(0).getJavaClassName());
+        Assert.assertEquals("com.enioka.jqm.tests.App", jd.get(1).getJavaClassName());
+    }
+
+    @Test
+    public void testUpdateJobDef()
+    {
+        // Init the default queue (don't start the engine!)
+        Helpers.updateConfiguration(cnx);
+
+        Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest.xml" });
+
+        // Sanity check
+        List<JobDefDto> jd = MetaService.getJobDef(cnx);
+
+        Assert.assertEquals(2, jd.size());
+        Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
+        Assert.assertEquals("vdjvkdv", jd.get(0).getKeyword1());
+        Assert.assertEquals("sgfbgg", jd.get(0).getKeyword2());
+        Assert.assertEquals("jvhkdfl", jd.get(0).getKeyword3());
+
+        // Import and therefore update the job definitions.
+        Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest_update.xml" });
+
+        jd = MetaService.getJobDef(cnx);
+
+        Assert.assertEquals(2, jd.size());
+        Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
+        Assert.assertEquals("NEWVALUE", jd.get(0).getKeyword1());
+        Assert.assertEquals("", jd.get(0).getKeyword2());
+        Assert.assertEquals(null, jd.get(0).getKeyword3());
     }
 
     @Test
@@ -186,9 +219,9 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals("other2", fibo.getKeyword2());
         Assert.assertEquals(null, fibo.getKeyword3());
         Assert.assertEquals(false, fibo.isHighlander());
-        Assert.assertEquals("Isolation", fibo.getSpecificIsolationContext());
-        Assert.assertEquals(true, fibo.isChildFirstClassLoader());
-        Assert.assertEquals("HIDDEN", fibo.getHiddenJavaClasses());
+        Assert.assertEquals("Isolation", fibo.getClassLoader(cnx).getName());
+        Assert.assertEquals(true, fibo.getClassLoader().isChildFirst());
+        Assert.assertEquals("HIDDEN", fibo.getClassLoader().getHiddenClasses());
 
         f.delete();
     }

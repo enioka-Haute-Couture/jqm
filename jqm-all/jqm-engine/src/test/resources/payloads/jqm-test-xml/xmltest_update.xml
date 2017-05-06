@@ -1,0 +1,52 @@
+<jqm>
+	<jar>
+		<path>jqm-test-fibo/jqm-test-fibo.jar</path>
+		<jobdefinitions>
+			<jobDefinition>
+				<name>Fibo</name>
+				<description>Test based on the Fibonachi suite</description>
+				<canBeRestarted>true</canBeRestarted>
+				<javaClassName>com.enioka.jqm.tests.App</javaClassName>
+				<maxTimeRunning>42</maxTimeRunning>
+				<application>ApplicationTest</application>
+				<module>TestModuleRATONLAVEUR</module>
+				<keyword1>NEWVALUE</keyword1>
+				<keyword2></keyword2>
+				<highlander>false</highlander>
+				<parameters>
+					<parameter>
+						<key>p1</key>
+						<value>1</value>
+					</parameter>
+					<parameter>
+						<key>p2</key>
+						<value>2</value>
+					</parameter>
+				</parameters>
+			</jobDefinition>
+			<jobDefinition>
+				<name>Fibo2</name>
+				<description>Test to check the xml implementation</description>
+				<canBeRestarted>true</canBeRestarted>
+				<javaClassName>com.enioka.jqm.tests.App</javaClassName>
+				<maxTimeRunning>42</maxTimeRunning>
+				<application>ApplicationTest</application>
+				<module>TestModule</module>
+				<keyword1>vdjvkdv</keyword1>
+				<keyword2>sgfbgg</keyword2>
+				<keyword3>jvhkdfl</keyword3>
+				<highlander>false</highlander>
+				<parameters>
+					<parameter>
+						<key>p1</key>
+						<value>1</value>
+					</parameter>
+					<parameter>
+						<key>p2</key>
+						<value>2</value>
+					</parameter>
+				</parameters>
+			</jobDefinition>
+		</jobdefinitions>
+	</jar>
+</jqm>

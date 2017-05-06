@@ -18,14 +18,20 @@ package com.enioka.jqm.tools;
 import java.io.FileOutputStream;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
+import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jpamodel.Cl;
+import com.enioka.jqm.jpamodel.ClHandler;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDefParameter;
 
@@ -82,6 +88,7 @@ class XmlJobDefExporter
 
         Element jobDefinitions = null;
         String currentJarPath = null;
+        Set<Cl> cls = new HashSet<Cl>();
 
         for (JobDef j : jobDefList)
         {
@@ -97,6 +104,16 @@ class XmlJobDefExporter
             }
             Element jobDefinition = getJobDefinitionElement(j, cnx);
             jobDefinitions.addContent(jobDefinition);
+
+            if (j.getClassLoader(cnx) != null)
+            {
+                cls.add(j.getClassLoader());
+            }
+        }
+
+        for (Cl cl : cls)
+        {
+            root.addContent(getClElement(cl));
         }
 
         // Done: save the file
@@ -125,12 +142,15 @@ class XmlJobDefExporter
         addTextElementToParentElement(jobDefinition, "keyword1", j.getKeyword1());
         addTextElementToParentElement(jobDefinition, "keyword2", j.getKeyword2());
         addTextElementToParentElement(jobDefinition, "keyword3", j.getKeyword3());
-        addTextElementToParentElement(jobDefinition, "specificIsolationContext", j.getSpecificIsolationContext());
-        addTextElementToParentElement(jobDefinition, "childFirstClassLoader", j.isChildFirstClassLoader() ? "true" : "false");
-        addTextElementToParentElement(jobDefinition, "hiddenJavaClasses", j.getHiddenJavaClasses());
+
         if (j.getMaxTimeRunning() != null)
             addTextElementToParentElement(jobDefinition, "reasonableRuntimeLimitMinute", j.getMaxTimeRunning() + "");
         addTextElementToParentElement(jobDefinition, "highlander", j.isHighlander() ? "true" : "false");
+
+        if (j.getClassLoader(cnx) != null)
+        {
+            addTextElementToParentElement(jobDefinition, "executionContext", j.getClassLoader().getName());
+        }
 
         List<JobDefParameter> jobDefParameters = j.getParameters(cnx);
         if (jobDefParameters != null && !jobDefParameters.isEmpty())
@@ -147,6 +167,44 @@ class XmlJobDefExporter
         }
 
         return jobDefinition;
+    }
+
+    private static Element getClElement(Cl cl)
+    {
+        Element res = new Element("context");
+        addTextElementToParentElement(res, "name", cl.getName());
+        addTextElementToParentElement(res, "childFirst", cl.isChildFirst());
+        addTextElementToParentElement(res, "hiddenJavaClasses", cl.getHiddenClasses());
+        addTextElementToParentElement(res, "tracingEnabled", cl.isTracingEnabled());
+        addTextElementToParentElement(res, "persistent", cl.isPersistent());
+        addTextElementToParentElement(res, "runners", cl.getAllowedRunners());
+
+        Element handlers = new Element("eventHandlers");
+        res.addContent(handlers);
+        for (ClHandler h : cl.getHandlers())
+        {
+            Element handler = new Element("handler");
+            handlers.addContent(handler);
+            addTextElementToParentElement(handler, "className", h.getClassName());
+            addTextElementToParentElement(handler, "event", h.getEventType().toString());
+
+            Element parameters = new Element("parameters");
+            handler.addContent(parameters);
+            for (Map.Entry<String, String> prm : h.getParameters().entrySet())
+            {
+                Element p = new Element("parameter");
+                parameters.addContent(p);
+                addTextElementToParentElement(p, "key", prm.getKey());
+                addTextElementToParentElement(p, "value", prm.getValue());
+            }
+        }
+
+        return res;
+    }
+
+    private static void addTextElementToParentElement(Element parent, String elementName, boolean content)
+    {
+        addTextElementToParentElement(parent, elementName, content ? "true" : "false");
     }
 
     private static void addTextElementToParentElement(Element parent, String elementName, String content)

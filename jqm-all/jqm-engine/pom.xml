@@ -1,9 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.enioka.jqm</groupId>
 		<artifactId>jqm-all</artifactId>
-		<version>1.4.2-SNAPSHOT</version>
+		<version>2.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>jqm-engine</artifactId>
 
@@ -95,7 +96,7 @@
 				</executions>
 			</plugin>
 
-			<!-- Create ext directory for tests -->
+			<!-- Create ext and lib directories for tests -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -116,6 +117,11 @@
 									<groupId>org.hsqldb</groupId>
 									<artifactId>hsqldb</artifactId>
 									<version>${hsqldb.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.h2database</groupId>
+									<artifactId>h2</artifactId>
+									<version>${h2.version}</version>
 								</artifactItem>
 								<artifactItem>
 									<groupId>org.apache.tomcat</groupId>
@@ -150,6 +156,34 @@
 
 							</artifactItems>
 							<outputDirectory>${project.basedir}/ext</outputDirectory>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>copy2</id>
+						<phase>process-test-classes</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>jqm-api</artifactId>
+									<version>${project.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>jqm-runner-basic</artifactId>
+									<version>${project.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>jqm-runner-spring</artifactId>
+									<version>${project.version}</version>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.basedir}/plugins</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
@@ -323,6 +357,12 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-admin</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- MAIL is only test scope - it is put inside ext and only used during 
 			tests -->
@@ -340,7 +380,7 @@
 		</dependency>
 
 		<!-- Test files that will be included in the package -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-test-pyl</artifactId>
 			<version>${project.version}</version>
@@ -357,15 +397,25 @@
 			<artifactId>jqm-test-pyl-hibapi</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
-		</dependency> -->
+		</dependency>
 
- 		<!--<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-ws</artifactId>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>jqm-runner-basic</artifactId>
 			<version>${project.version}</version>
-			<type>war</type>
 			<scope>test</scope>
-		</dependency> -->
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>jqm-runner-spring</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+
+		<!--<dependency> <groupId>com.enioka.jqm</groupId> <artifactId>jqm-ws</artifactId> 
+			<version>${project.version}</version> <type>war</type> <scope>test</scope> 
+			</dependency> -->
 
 	</dependencies>
 </project>

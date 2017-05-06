@@ -72,7 +72,9 @@ public class JqmSingleRunner
         }
 
         // Create run container
-        final Loader l = new Loader(job, (JqmEngine) null, (QueuePoller) null, new ClassloaderManager());
+        ClassloaderManager clm = new ClassloaderManager();
+        clm.setIsolationDefault(cnx);
+        final Loader l = new Loader(job, (JqmEngine) null, (QueuePoller) null, clm);
 
         // Kill signal handler
         final Thread mainT = Thread.currentThread();

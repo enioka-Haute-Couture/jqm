@@ -8,6 +8,7 @@ import java.util.Properties;
 import org.hsqldb.Server;
 
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jpamodel.Cl;
 import com.enioka.jqm.jpamodel.JobDef;
 
 final class Common
@@ -64,10 +65,12 @@ final class Common
 
     static void createJobDef(DbConn cnx, TestJobDefinition d, Map<String, Integer> queues)
     {
+        int clId = Cl.create(cnx, d.getSpecificIsolationContext() == null ? d.getName() : d.getSpecificIsolationContext(),
+                d.isChildFirstClassLoader(), d.getHiddenJavaClasses(), d.isClassLoaderTracing(), false, null);
+
         JobDef.create(cnx, d.getDescription(), d.getJavaClassName(), d.parameters, d.getPath(),
                 d.getQueueName() != null ? queues.get(d.getQueueName()) : queues.values().iterator().next(), 0, d.getName(),
-                d.getApplication(), d.getModule(), d.getKeyword1(), d.getKeyword2(), d.getKeyword3(), d.isHighlander(),
-                d.getSpecificIsolationContext(), d.isChildFirstClassLoader(), d.getHiddenJavaClasses(), d.isClassLoaderTracing(),
+                d.getApplication(), d.getModule(), d.getKeyword1(), d.getKeyword2(), d.getKeyword3(), d.isHighlander(), clId,
                 d.getPathType());
     }
 }

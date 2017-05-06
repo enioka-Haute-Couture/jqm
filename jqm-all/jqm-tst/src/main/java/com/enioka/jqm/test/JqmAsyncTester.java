@@ -93,6 +93,7 @@ public class JqmAsyncTester
         // Needed parameters
         addGlobalParameter("defaultConnection", "");
         addGlobalParameter("disableWsApi", "true");
+        addGlobalParameter("logFilePerLaunch", "false");
     }
 
     /**

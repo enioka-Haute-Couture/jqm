@@ -42,6 +42,8 @@ import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.util.ByteSource;
 
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.jpamodel.Cl;
 import com.enioka.jqm.jpamodel.JndiObjectResource;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDef.PathType;
@@ -113,9 +115,26 @@ public class CreationTools
             String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext,
             boolean childFirstClassLoader, String hiddenJavaClasses, boolean classLoaderTracing, PathType pathType)
     {
+        Integer clId = null;
+
+        if (specificIsolationContext != null || childFirstClassLoader || hiddenJavaClasses != null)
+        {
+            Cl cl;
+            specificIsolationContext = specificIsolationContext == null ? applicationName : specificIsolationContext;
+            try
+            {
+                cl = Cl.select_key(cnx, specificIsolationContext);
+                clId = cl.getId();
+            }
+            catch (NoResultException e)
+            {
+                clId = Cl.create(cnx, specificIsolationContext, childFirstClassLoader, hiddenJavaClasses, classLoaderTracing, true, null);
+            }
+        }
+
         int i = JobDef.create(cnx, description, javaClassName, parameters == null ? new HashMap<String, String>() : parameters, jp, queueId,
-                maxTimeRunning, applicationName, application, module, keyword1, keyword2, keyword3, highlander, specificIsolationContext,
-                childFirstClassLoader, hiddenJavaClasses, classLoaderTracing, pathType);
+                maxTimeRunning, applicationName, application, module, keyword1, keyword2, keyword3, highlander, clId, pathType);
+
         cnx.commit();
         return i;
     }
@@ -124,6 +143,12 @@ public class CreationTools
 
     public static int createDatabaseProp(String name, String driver, String url, String user, String pwd, DbConn cnx,
             String validationQuery, Map<String, String> parameters)
+    {
+        return createDatabaseProp(name, driver, url, user, pwd, cnx, validationQuery, parameters, true);
+    }
+
+    public static int createDatabaseProp(String name, String driver, String url, String user, String pwd, DbConn cnx,
+            String validationQuery, Map<String, String> parameters, boolean singleton)
     {
         HashMap<String, String> prms = new HashMap<String, String>();
         prms.put("testWhileIdle", "true");
@@ -143,10 +168,10 @@ public class CreationTools
         prms.put("testOnBorrow", "true");
 
         return JndiObjectResource.create(cnx, name, "javax.sql.DataSource", "org.apache.tomcat.jdbc.pool.DataSourceFactory",
-                "connection for " + user, true, prms);
+                "connection for " + user, singleton, prms);
     }
 
-    // ------------------ DATABASEPROP --------------------------------
+    // ------------------ MAIL --------------------------------
 
     public static void createMailSession(DbConn cnx, String name, String hostname, int port, boolean useTls, String username,
             String password)

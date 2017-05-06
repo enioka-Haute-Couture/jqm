@@ -70,26 +70,50 @@ public class DbImplBase
         queries.put("dp_select_all_with_names", "SELECT dp.ID, dp.ENABLED, dp.LAST_MODIFIED, dp.MAX_THREAD, dp.POLLING_INTERVAL, dp.NODE, dp.QUEUE, n.NAME, q.NAME FROM QUEUE_NODE_MAPPING dp LEFT JOIN NODE n ON n.ID=dp.NODE LEFT JOIN QUEUE q ON q.ID=dp.QUEUE ");
         queries.put("dp_select_with_names_by_id", queries.get("dp_select_all_with_names") + " WHERE ID=?");
         
+        // CL
+        queries.put("cl_insert", "INSERT INTO CL(ID, NAME, CHILD_FIRST, HIDDEN_CLASSES, TRACING, PERSISTENT, ALLOWED_RUNNERS) VALUES(JQM_PK.nextval, ?, ?, ?, ?, ?, ?)");
+        queries.put("cl_delete_all", "DELETE FROM CL");
+        queries.put("cl_delete_by_id", "DELETE FROM CL WHERE ID=?");
+        queries.put("cl_update_all_fields_by_id", "UPDATE CL SET NAME=?, CHILD_FIRST=?, HIDDEN_CLASSES=?, TRACING=?, PERSISTENT=?, ALLOWED_RUNNERS=? WHERE ID=?");
+        queries.put("cl_select_all", "SELECT ID, NAME, CHILD_FIRST, HIDDEN_CLASSES, TRACING, PERSISTENT, ALLOWED_RUNNERS FROM CL ");
+        queries.put("cl_select_by_id", queries.get("cl_select_all") + " WHERE ID=?");
+        queries.put("cl_select_by_key", queries.get("cl_select_all") + " WHERE NAME=?");
+        
+        // CL EVENT HANDLER
+        queries.put("cleh_insert", "INSERT INTO CL_HANDLER(ID, EVENT_TYPE, CLASS_NAME, CL) VALUES(JQM_PK.nextval, ?, ?, ?)");
+        queries.put("cleh_delete_all", "DELETE FROM CL_HANDLER");
+        queries.put("cleh_delete_all_for_cl", "DELETE FROM CL_HANDLER WHERE CL=?");
+        queries.put("cleh_select_all", "SELECT ID, EVENT_TYPE, CLASS_NAME, CL FROM CL_HANDLER ");
+        queries.put("cleh_select_all_for_cl", queries.get("cleh_select_all") + " WHERE CL=? ORDER BY ID");
+        
+        // CL EVENT HANDLER PARAMETER
+        queries.put("clehprm_insert", "INSERT INTO CL_HANDLER_PARAMETER(ID, KEYNAME, VALUE, CL_HANDLER) VALUES(JQM_PK.nextval, ?, ?, ?)");
+        queries.put("clehprm_delete_all", "DELETE FROM CL_HANDLER_PARAMETER");
+        queries.put("clehprm_delete_all_for_cleh", "DELETE FROM CL_HANDLER_PARAMETER WHERE CL_HANDLER=?");
+        queries.put("clehprm_delete_all_for_cl", "DELETE FROM CL_HANDLER_PARAMETER WHERE CL_HANDLER IN (SELECT h.ID FROM CL_HANDLER h WHERE h.CL=?)"); // subquery - better multi db support.
+        queries.put("clehprm_select_all", "SELECT ID, KEYNAME, VALUE, CL_HANDLER FROM CL_HANDLER_PARAMETER ");
+        queries.put("cleh_select_all_for_cleh", queries.get("clehprm_select_all") + " WHERE CL_HANDLER=?");
+        
         // JOB DEF
-        queries.put("jd_insert", "INSERT INTO JOB_DEFINITION(ID, APPLICATION, JD_KEY, CL_CHILD_FIRST, "
-                + "CL_TRACING, DESCRIPTION, ENABLED, EXTERNAL, CL_HIDDEN_CLASSES, HIGHLANDER, "
+        queries.put("jd_insert", "INSERT INTO JOB_DEFINITION(ID, APPLICATION, JD_KEY, CL, "
+                + "DESCRIPTION, ENABLED, EXTERNAL, HIGHLANDER, "
                 + "PATH, CLASS_NAME, JAVA_OPTS, KEYWORD1, KEYWORD2, KEYWORD3, ALERT_AFTER_SECONDS, "
-                + "MODULE, PATH_TYPE, CL_KEY, QUEUE) "
-                + "VALUES(JQM_PK.nextval, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                + "MODULE, PATH_TYPE, QUEUE) "
+                + "VALUES(JQM_PK.nextval, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         queries.put("jd_delete_all", "DELETE FROM JOB_DEFINITION");
         queries.put("jd_delete_by_id", "DELETE FROM JOB_DEFINITION WHERE ID=?");
-        queries.put("jd_update_all_fields_by_id", "UPDATE JOB_DEFINITION SET APPLICATION=?, JD_KEY=?, CL_CHILD_FIRST=?, "
-                + "CL_TRACING=?, DESCRIPTION=?, ENABLED=?, EXTERNAL=?, CL_HIDDEN_CLASSES=?, HIGHLANDER=?, "
+        queries.put("jd_update_all_fields_by_id", "UPDATE JOB_DEFINITION SET APPLICATION=?, JD_KEY=?, "
+                + "DESCRIPTION=?, ENABLED=?, EXTERNAL=?, HIGHLANDER=?, "
                 + "PATH=?, CLASS_NAME=?, JAVA_OPTS=?, KEYWORD1=?, KEYWORD2=?, KEYWORD3=?, ALERT_AFTER_SECONDS=?, "
-                + "MODULE=?, PATH_TYPE=?, CL_KEY=?, QUEUE=? "
+                + "MODULE=?, PATH_TYPE=?, CL=?, QUEUE=? "
                 + "WHERE ID=?");
         queries.put("jd_update_set_external_by_id", "UPDATE JOB_DEFINITION SET EXTERNAL=1 WHERE ID=?");
         queries.put("jd_update_set_enabled_by_id", "UPDATE JOB_DEFINITION SET ENABLED=? WHERE ID=?");
         queries.put("jd_update_set_queue_by_key", "UPDATE JOB_DEFINITION SET QUEUE=? WHERE JD_KEY=?");
-        queries.put("jd_select_all", "SELECT ID, APPLICATION, JD_KEY, CL_CHILD_FIRST, "
-                + "CL_TRACING, DESCRIPTION, ENABLED, EXTERNAL, CL_HIDDEN_CLASSES, HIGHLANDER, "
+        queries.put("jd_select_all", "SELECT ID, APPLICATION, JD_KEY, CL, "
+                + "DESCRIPTION, ENABLED, EXTERNAL, HIGHLANDER, "
                 + "PATH, CLASS_NAME, JAVA_OPTS, KEYWORD1, KEYWORD2, KEYWORD3, ALERT_AFTER_SECONDS, "
-                + "MODULE, PATH_TYPE, CL_KEY, QUEUE FROM JOB_DEFINITION");
+                + "MODULE, PATH_TYPE, QUEUE FROM JOB_DEFINITION");
         queries.put("jd_select_by_id", queries.get("jd_select_all") + " WHERE ID=?");
         queries.put("jd_select_by_key", queries.get("jd_select_all") + " WHERE JD_KEY=?");
         queries.put("jd_select_by_queue", queries.get("jd_select_all") + " WHERE QUEUE=?");
@@ -128,10 +152,10 @@ public class DbImplBase
         queries.put("ji_select_all", "SELECT ID, DATE_ATTRIBUTION, DATE_ENQUEUE, EMAIL, DATE_START, APPLICATION, KEYWORD1, KEYWORD2, "
                 + "KEYWORD3, MODULE, INTERNAL_POSITION, PARENT, PROGRESS, SESSION, STATUS, USERNAME, JOBDEF, NODE, QUEUE ,HIGHLANDER, "
                 + "q.ID, q.DEFAULT_QUEUE, q.DESCRIPTION, q.NAME, "
-                + "jd.ID, jd.APPLICATION, jd.JD_KEY, jd.CL_CHILD_FIRST, "
-                + "jd.CL_TRACING, jd.DESCRIPTION, jd.ENABLED, jd.EXTERNAL, jd.CL_HIDDEN_CLASSES, jd.HIGHLANDER, "
+                + "jd.ID, jd.APPLICATION, jd.JD_KEY, jd.CL, "
+                + "jd.DESCRIPTION, jd.ENABLED, jd.EXTERNAL, jd.HIGHLANDER, "
                 + "jd.PATH, jd.CLASS_NAME, jd.JAVA_OPTS, jd.KEYWORD1, jd.KEYWORD2, jd.KEYWORD3, jd.ALERT_AFTER_SECONDS, "
-                + "jd.MODULE, jd.PATH_TYPE, jd.CL_KEY, jd.QUEUE, "
+                + "jd.MODULE, jd.PATH_TYPE, jd.QUEUE, "
                 + "n.ID, n.REPO_DELIVERABLE, n.DNS, n.ENABLED, n.JMX_REGISTRY_PORT, n.JMX_SERVER_PORT, "
                 + "n.LOAD_API_ADMIN, n.LOAD_API_CLIENT, n.LOAD_API_SIMPLE, n.NAME, n.PORT, n.REPO_JOB_DEF, n.ROOT_LOG_LEVEL, n.STOP, n.REPO_TMP, n.LAST_SEEN_ALIVE "
                 + "FROM JOB_INSTANCE ji LEFT JOIN QUEUE q ON ji.QUEUE=q.ID LEFT JOIN JOB_DEFINITION jd ON ji.JOBDEF=jd.ID LEFT JOIN NODE n ON ji.NODE=n.ID ");

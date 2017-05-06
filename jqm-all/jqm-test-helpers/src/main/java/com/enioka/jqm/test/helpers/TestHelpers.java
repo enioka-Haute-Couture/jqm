@@ -126,6 +126,9 @@ public class TestHelpers
         cnx.runUpdate("perm_delete_all");
         cnx.runUpdate("role_delete_all");
         cnx.runUpdate("user_delete_all");
+        cnx.runUpdate("clehprm_delete_all");
+        cnx.runUpdate("cleh_delete_all");
+        cnx.runUpdate("cl_delete_all");
 
         cnx.commit();
 

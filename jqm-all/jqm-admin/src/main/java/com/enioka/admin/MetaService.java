@@ -435,30 +435,26 @@ public class MetaService
     private static JobDefDto mapJobDef(ResultSet rs, int colShift)
     {
         JobDefDto tmp = new JobDefDto();
-
         try
         {
             tmp.setId(rs.getInt(1 + colShift));
             tmp.setApplication(rs.getString(2 + colShift));
             tmp.setApplicationName(rs.getString(3 + colShift));
+            tmp.setCLassLoaderId(rs.getInt(4 + colShift));
             tmp.setCanBeRestarted(true);
-            tmp.setChildFirstClassLoader(rs.getBoolean(4 + colShift));
-            // tmp.tracing = rs.getBoolean(5 + colShift); // TODO: allow setting CL tracing.
-            tmp.setDescription(rs.getString(6 + colShift));
-            tmp.setEnabled(rs.getBoolean(7 + colShift));
-            // tmp. = rs.getBoolean(8 + colShift); // TODO: external exposure?
-            tmp.setHiddenJavaClasses(rs.getString(9 + colShift));
-            tmp.setHighlander(rs.getBoolean(10 + colShift));
-            tmp.setJarPath(rs.getString(11 + colShift));
-            tmp.setJavaClassName(rs.getString(12 + colShift));
-            // tmp.javaOpts = rs.getString(13 + colShift);
-            tmp.setKeyword1(rs.getString(14 + colShift));
-            tmp.setKeyword2(rs.getString(15 + colShift));
-            tmp.setKeyword3(rs.getString(16 + colShift));
-            tmp.setReasonableRuntimeLimitMinute(rs.getInt(17 + colShift));
-            tmp.setModule(rs.getString(18 + colShift));
-            tmp.setSpecificIsolationContext(rs.getString(20 + colShift));
-            tmp.setQueueId(rs.getInt(21 + colShift));
+            tmp.setDescription(rs.getString(5 + colShift));
+            tmp.setEnabled(rs.getBoolean(6 + colShift));
+            // tmp. = rs.getBoolean(7 + colShift); // TODO: external exposure?
+            tmp.setHighlander(rs.getBoolean(8 + colShift));
+            tmp.setJarPath(rs.getString(9 + colShift));
+            tmp.setJavaClassName(rs.getString(10 + colShift));
+            // tmp.javaOpts = rs.getString(11 + colShift);
+            tmp.setKeyword1(rs.getString(12 + colShift));
+            tmp.setKeyword2(rs.getString(13 + colShift));
+            tmp.setKeyword3(rs.getString(14 + colShift));
+            tmp.setReasonableRuntimeLimitMinute(rs.getInt(15 + colShift));
+            tmp.setModule(rs.getString(16 + colShift));
+            tmp.setQueueId(rs.getInt(18 + colShift));
         }
         catch (SQLException e)
         {
@@ -554,11 +550,10 @@ public class MetaService
         if (dto.getId() != null)
         {
             // Job: do it in a brutal way (no date to update here).
-            cnx.runUpdate("jd_update_all_fields_by_id", dto.getApplication(), dto.getApplicationName(), dto.isChildFirstClassLoader(),
-                    false, dto.getDescription(), dto.isEnabled(), false, dto.getHiddenJavaClasses(), dto.isHighlander(), dto.getJarPath(),
-                    dto.getJavaClassName(), null, dto.getKeyword1(), dto.getKeyword2(), dto.getKeyword3(),
-                    dto.getReasonableRuntimeLimitMinute(), dto.getModule(), PathType.FS, dto.getSpecificIsolationContext(),
-                    dto.getQueueId(), dto.getId());
+            cnx.runUpdate("jd_update_all_fields_by_id", dto.getApplication(), dto.getApplicationName(), false, dto.getDescription(),
+                    dto.isEnabled(), false, dto.isHighlander(), dto.getJarPath(), dto.getJavaClassName(), null, dto.getKeyword1(),
+                    dto.getKeyword2(), dto.getKeyword3(), dto.getReasonableRuntimeLimitMinute(), dto.getModule(), PathType.FS,
+                    dto.getClassLoaderId(), dto.getQueueId(), dto.getId());
 
             cnx.runUpdate("jdprm_delete_all_for_jd", dto.getId());
             for (Map.Entry<String, String> e : dto.getParameters().entrySet())
@@ -570,8 +565,7 @@ public class MetaService
         {
             JobDef.create(cnx, dto.getDescription(), dto.getJavaClassName(), dto.getParameters(), dto.getJarPath(), dto.getQueueId(),
                     dto.getReasonableRuntimeLimitMinute(), dto.getApplicationName(), dto.getApplication(), dto.getModule(),
-                    dto.getKeyword1(), dto.getKeyword2(), dto.getKeyword3(), dto.isHighlander(), dto.getSpecificIsolationContext(),
-                    dto.isChildFirstClassLoader(), dto.getHiddenJavaClasses(), false, PathType.FS);
+                    dto.getKeyword1(), dto.getKeyword2(), dto.getKeyword3(), dto.isHighlander(), dto.getClassLoaderId(), PathType.FS);
         }
     }
 
