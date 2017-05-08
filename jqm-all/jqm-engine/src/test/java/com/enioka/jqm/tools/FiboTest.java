@@ -24,6 +24,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -81,6 +82,7 @@ public class FiboTest extends JqmBaseTest
     @Test
     public void testFiboHib() throws Exception
     {
+        Assume.assumeTrue(JqmBaseTest.s != null);
         JqmSimpleTest.create(cnx, "pyl.StressFiboHib", "jqm-test-pyl-hibapi").addRuntimeParameter("p1", "1").addRuntimeParameter("p2", "2")
                 .addWaitMargin(60000).expectOk(11).run(this);
     }

@@ -15,24 +15,28 @@
  */
 package com.enioka.jqm.tools;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
-import org.hsqldb.jdbc.JDBCDataSource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
+import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.Query;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -53,19 +57,32 @@ public class JqmBaseTest
     @BeforeClass
     public static void testInit() throws Exception
     {
-        if (s == null)
+        if (db == null)
         {
             JndiContext.createJndiContext();
-            s = new Server();
-            s.setDatabaseName(0, "testdbengine");
-            s.setDatabasePath(0, "mem:testdbengine");
-            s.setLogWriter(null);
-            s.setSilent(true);
-            s.start();
 
-            JDBCDataSource ds = new JDBCDataSource();
-            ds.setDatabase("jdbc:hsqldb:mem:testdbengine");
-            db = new Db(ds);
+            // If needed, create an HSQLDB server.
+            InputStream fis = null;
+            Properties p = new Properties();
+            fis = Helpers.class.getClassLoader().getResourceAsStream("jqm.properties");
+            if (fis != null)
+            {
+                p.load(fis);
+                IOUtils.closeQuietly(fis);
+            }
+            if (p.isEmpty() || (p.containsKey("com.enioka.jqm.jdbc.datasource")
+                    && p.getProperty("com.enioka.jqm.jdbc.datasource").contains("hsql")))
+            {
+                s = new Server();
+                s.setDatabaseName(0, "testdbengine");
+                s.setDatabasePath(0, "mem:testdbengine");
+                s.setLogWriter(null);
+                s.setSilent(true);
+                s.start();
+            }
+
+            // In all cases load the datasource. (the helper itself will load the property file if any).
+            db = Helpers.getDb();
         }
     }
 
@@ -165,5 +182,45 @@ public class JqmBaseTest
         {
             this.sleepms(1);
         }
+    }
+
+    protected void simulateDbFailure()
+    {
+        if (db.getProduct().contains("hsql"))
+        {
+            s.stop();
+            this.waitDbStop();
+            this.sleep(1);
+            jqmlogger.info("Restarting DB");
+            s.start();
+        }
+        else if (db.getProduct().contains("postgresql"))
+        {
+            try
+            {
+                // update pg_database set datallowconn = false where datname = 'jqm' // Cannot run, as we cannot reconnect afterward!
+                cnx.runRawSelect("select pg_terminate_backend(pid) from pg_stat_activity where datname='jqm';");
+            }
+            catch (Exception e)
+            {
+                // Do nothing - the query is a suicide so it cannot work fully.
+            }
+            Helpers.closeQuietly(cnx);
+            cnx = getNewDbSession();
+        }
+    }
+
+    protected void displayAllHistoryTable()
+    {
+        java.text.SimpleDateFormat format = new java.text.SimpleDateFormat("HH:mm:ss.SSS");
+        jqmlogger.debug("==========================================================================================");
+        for (JobInstance h : Query.create().run())
+        {
+            jqmlogger.debug("JobInstance Id: " + h.getId() + " | " + h.getState() + " | JD: " + h.getApplicationName() + " | "
+                    + h.getQueueName() + " | enqueue: " + format.format(h.getEnqueueDate().getTime()) + " | exec: "
+                    + (h.getBeganRunningDate() != null ? format.format(h.getBeganRunningDate().getTime()) : null) + " | end: "
+                    + (h.getEndDate() != null ? format.format(h.getEndDate().getTime()) : null));
+        }
+        jqmlogger.debug("==========================================================================================");
     }
 }

@@ -643,7 +643,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         try
         {
             cnx = Helpers.getNewDbSession();
-            cnx.runUpdate("node_update_enabled_by_id", 0, node.getId());
+            cnx.runUpdate("node_update_enabled_by_id", Boolean.FALSE, node.getId());
             cnx.commit();
         }
         finally
@@ -661,7 +661,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         try
         {
             cnx = Helpers.getNewDbSession();
-            cnx.runUpdate("node_update_enabled_by_id", 1, node.getId());
+            cnx.runUpdate("node_update_enabled_by_id", Boolean.TRUE, node.getId());
             cnx.commit();
         }
         finally

@@ -24,8 +24,6 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.enioka.admin.MetaService;
-import com.enioka.api.admin.JobDefDto;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.Queue;
@@ -125,19 +123,20 @@ public class XmlTest extends JqmBaseTest
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest.xml" });
 
         List<JobDef> jd = JobDef.select(cnx, "jd_select_all");
+        JobDef fibo = JobDef.select_key(cnx, "Fibo");
 
         Assert.assertEquals(2, jd.size());
-        Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
-        Assert.assertEquals(true, jd.get(0).isCanBeRestarted());
-        Assert.assertEquals("com.enioka.jqm.tests.App", jd.get(0).getJavaClassName());
-        Assert.assertEquals(TestHelpers.qVip, jd.get(0).getQueue());
-        Assert.assertEquals("ApplicationTest", jd.get(0).getApplication());
-        Assert.assertEquals("TestModuleRATONLAVEUR", jd.get(0).getModule());
-        Assert.assertEquals(false, jd.get(0).isHighlander());
-        Assert.assertEquals("1", jd.get(0).getParameters(cnx).get(0).getValue());
-        Assert.assertEquals("2", jd.get(0).getParameters(cnx).get(1).getValue());
-        Assert.assertEquals("com.enioka.jqm.tests.App", jd.get(0).getJavaClassName());
-        Assert.assertEquals("com.enioka.jqm.tests.App", jd.get(1).getJavaClassName());
+        Assert.assertEquals("Fibo", fibo.getApplicationName());
+        Assert.assertEquals(true, fibo.isCanBeRestarted());
+        Assert.assertEquals("com.enioka.jqm.tests.App", fibo.getJavaClassName());
+        Assert.assertEquals(TestHelpers.qVip, fibo.getQueue());
+        Assert.assertEquals("ApplicationTest", fibo.getApplication());
+        Assert.assertEquals("TestModuleRATONLAVEUR", fibo.getModule());
+        Assert.assertEquals(false, fibo.isHighlander());
+        Assert.assertEquals("1", fibo.getParametersMap(cnx).get("p1"));
+        Assert.assertEquals("2", fibo.getParametersMap(cnx).get("p2"));
+        Assert.assertEquals("com.enioka.jqm.tests.App", fibo.getJavaClassName());
+        Assert.assertEquals("com.enioka.jqm.tests.App", fibo.getJavaClassName());
     }
 
     @Test
@@ -149,24 +148,26 @@ public class XmlTest extends JqmBaseTest
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest.xml" });
 
         // Sanity check
-        List<JobDefDto> jd = MetaService.getJobDef(cnx);
+        List<JobDef> jd = JobDef.select(cnx, "jd_select_all");
+        JobDef fibo = JobDef.select_key(cnx, "Fibo");
 
         Assert.assertEquals(2, jd.size());
-        Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
-        Assert.assertEquals("vdjvkdv", jd.get(0).getKeyword1());
-        Assert.assertEquals("sgfbgg", jd.get(0).getKeyword2());
-        Assert.assertEquals("jvhkdfl", jd.get(0).getKeyword3());
+        Assert.assertEquals("Fibo", fibo.getApplicationName());
+        Assert.assertEquals("vdjvkdv", fibo.getKeyword1());
+        Assert.assertEquals("sgfbgg", fibo.getKeyword2());
+        Assert.assertEquals("jvhkdfl", fibo.getKeyword3());
 
         // Import and therefore update the job definitions.
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest_update.xml" });
 
-        jd = MetaService.getJobDef(cnx);
+        jd = JobDef.select(cnx, "jd_select_all");
+        fibo = JobDef.select_key(cnx, "Fibo");
 
         Assert.assertEquals(2, jd.size());
-        Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
-        Assert.assertEquals("NEWVALUE", jd.get(0).getKeyword1());
-        Assert.assertEquals("", jd.get(0).getKeyword2());
-        Assert.assertEquals(null, jd.get(0).getKeyword3());
+        Assert.assertEquals("Fibo", fibo.getApplicationName());
+        Assert.assertEquals("NEWVALUE", fibo.getKeyword1());
+        Assert.assertEquals("", fibo.getKeyword2());
+        Assert.assertEquals(null, fibo.getKeyword3());
     }
 
     @Test
@@ -237,16 +238,19 @@ public class XmlTest extends JqmBaseTest
 
         List<JobDef> jd = JobDef.select(cnx, "jd_select_all");
         Assert.assertEquals(2, jd.size());
-        Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
-        Assert.assertEquals("1", jd.get(0).getParameters(cnx).get(0).getValue());
+        JobDef fibo = JobDef.select_key(cnx, "Fibo");
+        Assert.assertEquals("Fibo", fibo.getApplicationName());
+        Assert.assertEquals("1", fibo.getParametersMap(cnx).get("p1"));
 
         // Second import - parameters are different, note 3 instead of 1
         Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest_np.xml" });
 
         jd = JobDef.select(cnx, "jd_select_all");
+        fibo = JobDef.select_key(cnx, "Fibo");
         Assert.assertEquals(2, jd.size());
-        Assert.assertEquals("Fibo", jd.get(0).getApplicationName());
-        Assert.assertEquals("3", jd.get(0).getParameters(cnx).get(0).getValue());
+        Assert.assertNotNull(fibo);
+        Assert.assertEquals("Fibo", fibo.getApplicationName());
+        Assert.assertEquals("3", fibo.getParametersMap(cnx).get("p1"));
     }
 
     @Test

@@ -22,6 +22,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
+import java.net.SocketException;
 import java.sql.SQLException;
 import java.sql.SQLTransientException;
 import java.util.HashMap;
@@ -46,6 +47,7 @@ import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.util.ByteSource;
 import org.apache.shiro.util.StringUtils;
 
+import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
@@ -124,10 +126,11 @@ final class Helpers
             }
 
             String dsName = "jdbc/jqm";
-            if (p.contains("com.enioka.jqm.jdbc.datasource_name"))
+            if (props.containsKey("com.enioka.jqm.jdbc.datasource"))
             {
-                dsName = p.getProperty("com.enioka.jqm.jdbc.datasource_name");
+                dsName = p.getProperty("com.enioka.jqm.jdbc.datasource");
             }
+            JqmClientFactory.setProperties(props);
 
             return new Db(dsName);
         }
@@ -671,16 +674,10 @@ final class Helpers
                 || (e.getCause() != null && e.getCause().getCause() != null
                         && e.getCause().getCause().getCause() instanceof SQLTransientException)
                 || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() != null
-                        && e.getCause().getCause().getCause().getCause() instanceof SQLTransientException
-                        || (e.getCause() != null && e.getCause() instanceof SQLException
-                                && e.getMessage().equals("Failed to validate a newly established connection.")));
-        /*
-         * return (e instanceof LazyInitializationException) || (e instanceof JDBCConnectionException) || (e.getCause() instanceof
-         * JDBCConnectionException) || (e.getCause() != null && e.getCause().getCause() instanceof JDBCConnectionException) || (e.getCause()
-         * instanceof SQLTransientException) || (e.getCause() != null && e.getCause().getCause() instanceof SQLTransientException) ||
-         * (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() instanceof SQLTransientException)
-         * || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() != null &&
-         * e.getCause().getCause().getCause().getCause() instanceof SQLTransientException);
-         */
+                        && e.getCause().getCause().getCause().getCause() instanceof SQLTransientException)
+                || (e.getCause() != null && e.getCause() instanceof SQLException
+                        && e.getMessage().equals("Failed to validate a newly established connection."))
+                || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof SocketException)
+                || (e.getCause() != null && e.getCause().getMessage().equals("This connection has been closed"));
     }
 }

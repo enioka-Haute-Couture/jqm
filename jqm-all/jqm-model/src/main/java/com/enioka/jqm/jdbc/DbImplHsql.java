@@ -1,22 +1,24 @@
 package com.enioka.jqm.jdbc;
 
-import java.util.Map;
-
-public class DbImplHsql
+public class DbImplHsql implements DbAdapter
 {
-    public static Map<String, String> getQueries()
-    {
-        // HSQLDB is very simple
-        for (String key : DbImplBase.queries.keySet())
-        {
-            DbImplBase.queries.put(key, adaptSql(DbImplBase.queries.get(key)));
-        }
+    private final static String[] IDS = new String[] { "ID" };
 
-        return DbImplBase.queries;
+    @Override
+    public String adaptSql(String sql)
+    {
+        return sql.replace("JQM_PK.nextval", "NEXT VALUE FOR JQM_PK").replace("FOR UPDATE LIMIT", "LIMIT");
     }
 
-    public static String adaptSql(String sql)
+    @Override
+    public boolean compatibleWith(String product)
     {
-        return sql.replace("JQM_PK.nextval", "NEXT VALUE FOR JQM_PK");
+        return product.contains("hsql");
+    }
+
+    @Override
+    public String[] keyRetrievalColumn()
+    {
+        return IDS;
     }
 }

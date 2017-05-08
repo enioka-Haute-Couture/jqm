@@ -348,10 +348,15 @@ public class MultiNodeTest extends JqmBaseTest
         this.addAndStartEngine("n8");
         this.addAndStartEngine("n9");
 
-        TestHelpers.waitFor(size, 120000, cnx);
+        for (int i = 0; i < size; i++)
+        {
+            JobRequest.create("appliname", "user").submit();
+        }
+
+        TestHelpers.waitFor(size * 2, 120000, cnx);
 
         long msgs = cnx.runSelectSingle("message_select_count_all", Long.class);
-        Assert.assertEquals(size, msgs);
+        Assert.assertEquals(size * 2, msgs);
 
         // Every node must have run at least a few jobs...
         Map<String, Boolean> hasRunSomething = new HashMap<String, Boolean>(10);

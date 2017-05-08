@@ -1,6 +1,8 @@
 package com.enioka.jqm.tools;
 
 import org.junit.Assert;
+import org.junit.Assume;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
@@ -10,6 +12,15 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class DbFailTest extends JqmBaseTest
 {
+    @Before
+    public void before()
+    {
+        // These tests are HSQLDB dependent.
+        Assume.assumeTrue(JqmBaseTest.s != null);
+
+        // TODO: write some tests for PGSQL.
+    }
+
     @Test
     public void testDbFailure() throws Exception
     {
@@ -122,11 +133,8 @@ public class DbFailTest extends JqmBaseTest
 
         this.sleep(1);
         jqmlogger.info("Stopping db");
-        s.stop();
-        this.waitDbStop();
-        this.sleep(1);
-        jqmlogger.info("Restarting DB");
-        s.start();
+        simulateDbFailure();
+
         TestHelpers.waitFor(1000, 120000, this.getNewDbSession());
 
         Assert.assertEquals(1000, TestHelpers.getOkCount(this.getNewDbSession()));

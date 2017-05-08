@@ -38,13 +38,12 @@ public class ScriptRunner
             line = br.readLine();
             while (line != null)
             {
-                sb.append(line);
+                sb.append(line.replace(";", ""));
                 sb.append(nl);
 
                 if (line.contains(";"))
                 {
                     // End of order - run it.
-                    jqmlogger.info(sb.toString());
                     cnx.runRawUpdate(sb.toString());
                     sb = new StringBuilder();
                 }
@@ -81,5 +80,6 @@ public class ScriptRunner
             }
         }
 
+        jqmlogger.trace("File {} was run OK", classpath);
     }
 }

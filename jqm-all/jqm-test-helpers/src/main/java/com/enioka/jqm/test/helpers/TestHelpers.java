@@ -190,20 +190,6 @@ public class TestHelpers
         return res;
     }
 
-    public static void printHistoryTable(DbConn cnx)
-    {
-        /*
-         * List<History> res = em.createQuery("SELECT j FROM History j", History.class).getResultList(); SimpleDateFormat format = new
-         * SimpleDateFormat("HH:mm:ss.SSS");
-         * 
-         * jqmlogger.debug("=========================================================================================="); for (History h :
-         * res) { jqmlogger.debug("JobInstance Id: " + h.getId() + " | " + h.getState() + " | JD: " + h.getJd() + " | " + h.getQueue() +
-         * " | enqueue: " + format.format(h.getEnqueueDate().getTime()) + " | attr: " + format.format(h.getAttributionDate().getTime()) +
-         * " | exec: " + format.format(h.getExecutionDate().getTime()) + " | end: " + format.format(h.getEndDate().getTime())); }
-         * jqmlogger.debug("==========================================================================================");
-         */
-    }
-
     public static void setNodesLogLevel(String level, DbConn cnx)
     {
         cnx.runUpdate("node_update_all_log_level", level);

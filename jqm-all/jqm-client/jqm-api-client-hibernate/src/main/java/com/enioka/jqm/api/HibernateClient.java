@@ -111,15 +111,26 @@ final class HibernateClient implements JqmClient
         InputStream fis = null;
         try
         {
+            boolean foundProperties = false;
             fis = this.getClass().getClassLoader().getResourceAsStream("META-INF/jqm.properties");
-            if (fis == null)
+            if (fis != null)
             {
-                jqmlogger.trace("No jqm.properties file found.");
-            }
-            else
-            {
+                foundProperties = true;
                 p.load(fis);
-                jqmlogger.trace("A jqm.properties file was found");
+                jqmlogger.warn("A jqm.properties file was found in META-INF");
+            }
+
+            fis = this.getClass().getClassLoader().getResourceAsStream("jqm.properties");
+            if (fis != null)
+            {
+                foundProperties = true;
+                p.load(fis);
+                jqmlogger.warn("A jqm.properties file was found");
+            }
+
+            if (!foundProperties)
+            {
+                jqmlogger.warn("no jqm.properties file found");
             }
         }
         catch (IOException e)
@@ -139,8 +150,8 @@ final class HibernateClient implements JqmClient
             // This is a hack. Some containers will use root context as default for JNDI (WebSphere, Glassfish...), other will use
             // java:/comp/env/ (Tomcat...). So if we actually know the required alias, we try both, and the user only has to provide a
             // root JNDI alias that will work in both cases.
-            String dsAlias = (String) (p.containsKey("javax.persistence.nonJtaDataSource") ? p.get("javax.persistence.nonJtaDataSource")
-                    : p.get("com.enioka.jqm.jdbc.datasource"));
+            String dsAlias = (String) (p.containsKey("com.enioka.jqm.jdbc.datasource") ? p.get("com.enioka.jqm.jdbc.datasource")
+                    : p.get("javax.persistence.nonJtaDataSource"));
             try
             {
                 newDb = new Db(dsAlias);
@@ -990,8 +1001,7 @@ final class HibernateClient implements JqmClient
                 q2 += "SELECT ID, JD_APPLICATION, JD_KEY, DATE_ATTRIBUTION, EMAIL, "
                         + "DATE_END, DATE_ENQUEUE, DATE_START, HIGHLANDER, INSTANCE_APPLICATION, "
                         + "INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, "
-                        + "JD_KEYWORD1, JD_KEYWORD2, JD_KEYWORD3, "
-                        + "JD_MODULE, NODE_NAME, PARENT, PROGRESS, QUEUE_NAME, "
+                        + "JD_KEYWORD1, JD_KEYWORD2, JD_KEYWORD3, " + "JD_MODULE, NODE_NAME, PARENT, PROGRESS, QUEUE_NAME, "
                         + "RETURN_CODE, SESSION, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION FROM HISTORY ";
 
                 totalCountQuery += " (SELECT COUNT(1) FROM HISTORY) ,";

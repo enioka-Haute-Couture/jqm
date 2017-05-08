@@ -317,6 +317,11 @@ public class JobDef implements Serializable
         return JobDefParameter.select(cnx, "jdprm_select_all_for_jd", this.id);
     }
 
+    public Map<String, String> getParametersMap(DbConn cnx)
+    {
+        return JobDefParameter.select_map(cnx, "jdprm_select_all_for_jd", this.id);
+    }
+
     /**
      * A (compulsory) description of what this paylod does.<br>
      * Max length is 1024.
@@ -367,7 +372,7 @@ public class JobDef implements Serializable
     public Cl getClassLoader(DbConn cnx)
     {
         List<Cl> cls = Cl.select(cnx, "cl_select_by_id", this.classLoader);
-        clCache = cls.size() > 0 ?  cls.get(0) : null;
+        clCache = cls.size() > 0 ? cls.get(0) : null;
         return clCache;
     }
 

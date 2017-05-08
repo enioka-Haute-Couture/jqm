@@ -17,7 +17,6 @@ package com.enioka.jqm.tools;
 
 import java.io.File;
 import java.io.PrintStream;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 
@@ -33,18 +32,16 @@ import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
+import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
 import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.History;
 import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobDef.PathType;
-import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Queue;
 import com.enioka.jqm.jpamodel.RRole;
 import com.enioka.jqm.jpamodel.RUser;
-import com.enioka.jqm.jpamodel.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -111,6 +108,9 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testJobWithPersistenceUnit() throws Exception
     {
+        // The PU test expects an HSQLDB database which does not exist when running the tests on other databases
+        Assume.assumeTrue(JqmBaseTest.s != null);
+
         CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
         CreationTools.createDatabaseProp("jdbc/jqm2", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:hsql://localhost/testdbengine", "SA", "", cnx,
@@ -220,7 +220,7 @@ public class MiscTest extends JqmBaseTest
                 null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
         // Create a running job that should be cleaned at startup
-        int i1 = JqmClientFactory.getClient().enqueue("jqm-test-em", "test");
+        JqmClientFactory.getClient().enqueue("jqm-test-em", "test");
         cnx.runUpdate("ji_update_poll", TestHelpers.node.getId(), TestHelpers.qVip, 10);
         cnx.commit();
 
@@ -296,7 +296,6 @@ public class MiscTest extends JqmBaseTest
         JqmClientFactory.getClient().killJob(i5);
 
         TestHelpers.waitFor(5, 10000, cnx);
-        Assert.assertEquals(5, Query.create().addStatusFilter(com.enioka.jqm.api.State.KILLED).run().size());
     }
 
     // Does the poller take multiple JI on each loop?
@@ -310,37 +309,47 @@ public class MiscTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", qId, 42, "jqm-test-kill", null,
                 "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
-        int i1 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
-        int i2 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
-        int i3 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
-        int i4 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
-        int i5 = JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+        JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+        JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+        JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+        JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
+        JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
 
+        // Scenario is: 5 jobs in queue with 3 slots. 3 jobs should run. 2 are then killed - 3 should still run.
+        // (bc: poller loops on job end).
         addAndStartEngine();
+        TestHelpers.waitForRunning(3, 3000, cnx);
 
-        // Scenario is: 5 jobs in queue. 3 should run. 2 are then killed - 3 should still run.
-        Thread.sleep(3000);
-
+        // Check 3 running (max queue size).
         Assert.assertEquals(3, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
                 .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run().size());
         Assert.assertEquals(2, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
                 .addStatusFilter(com.enioka.jqm.api.State.SUBMITTED).run().size());
 
-        JqmClientFactory.getClient().killJob(i1);
-        JqmClientFactory.getClient().killJob(i2);
+        // Kill 2.
+        List<JobInstance> running = Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
+                .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run();
+        JqmClientFactory.getClient().killJob(running.get(0).getId());
+        JqmClientFactory.getClient().killJob(running.get(1).getId());
+        TestHelpers.waitFor(2, 10000, cnx);
+        TestHelpers.waitForRunning(3, 10000, cnx);
 
-        Thread.sleep(2000);
-
+        // Check the two waiting jobs have started.
         Assert.assertEquals(3, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
                 .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run().size());
         Assert.assertEquals(0, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
                 .addStatusFilter(com.enioka.jqm.api.State.SUBMITTED).run().size());
 
-        JqmClientFactory.getClient().killJob(i3);
-        JqmClientFactory.getClient().killJob(i4);
-        JqmClientFactory.getClient().killJob(i5);
+        // Kill remaining
+        running = Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
+                .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run();
+        JqmClientFactory.getClient().killJob(running.get(0).getId());
+        JqmClientFactory.getClient().killJob(running.get(1).getId());
+        JqmClientFactory.getClient().killJob(running.get(2).getId());
 
+        // Check all jobs are killed (and not cancelled as they would have been if not started)).
         TestHelpers.waitFor(5, 10000, cnx);
+        this.displayAllHistoryTable();
         Assert.assertEquals(5, Query.create().addStatusFilter(com.enioka.jqm.api.State.KILLED).run().size());
     }
 

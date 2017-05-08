@@ -27,6 +27,33 @@
           singleton="true"/>
           
      <resource 
+	      name="jdbc/pgsql"
+          auth="Container"
+          type="javax.sql.DataSource"
+          factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+          testWhileIdle="true"
+          testOnBorrow="true"
+          testOnReturn="false"
+          validationQuery="SELECT 1"
+          validationInterval="1000"
+          timeBetweenEvictionRunsMillis="30000"
+          maxActive="80"
+          maxIdle="40"
+          minIdle="3"
+          maxWait="10000"
+          initialSize="5"
+          removeAbandonedTimeout="3600"
+          removeAbandoned="true"
+          logAbandoned="true"
+          minEvictableIdleTimeMillis="30000"
+          jmxEnabled="true"
+          username="jqm"
+          password="jqm"
+          driverClassName="org.postgresql.Driver"
+          url="jdbc:postgresql://localhost/jqm"
+          singleton="true"/>
+          
+     <resource 
 	      name="jdbc/oracle"
           auth="Container"
           type="javax.sql.DataSource"

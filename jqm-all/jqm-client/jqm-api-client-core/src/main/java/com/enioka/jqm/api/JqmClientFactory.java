@@ -63,6 +63,15 @@ public final class JqmClientFactory
         JqmClientFactory.props = properties;
     }
 
+    public static void setProperty(String key, String value)
+    {
+        if (props == null)
+        {
+            throw new IllegalStateException("properties are null");
+        }
+        props.setProperty(key, value);
+    }
+
     private static final Set<URL> findClientBinders()
     {
         Set<URL> res = new LinkedHashSet<URL>();
@@ -107,8 +116,8 @@ public final class JqmClientFactory
         try
         {
             @SuppressWarnings("unchecked")
-            Class<IClientFactoryBinder> binderClass = (Class<IClientFactoryBinder>) JqmClientFactory.class.getClassLoader().loadClass(
-                    STATIC_CLIENT_BINDER_NAME);
+            Class<IClientFactoryBinder> binderClass = (Class<IClientFactoryBinder>) JqmClientFactory.class.getClassLoader()
+                    .loadClass(STATIC_CLIENT_BINDER_NAME);
 
             binder = (IClientFactoryBinder) binderClass.getMethod("getSingleton").invoke(null);
         }

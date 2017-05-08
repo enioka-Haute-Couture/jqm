@@ -126,10 +126,8 @@ public class DeliverableTest extends JqmBaseTest
         Helpers.setSingleParam("enableWsApiSsl", "true", cnx);
 
         JqmClientFactory.resetClient(null);
-        Properties p = new Properties();
-        p.put("com.enioka.jqm.ws.truststoreFile", "./conf/trusted.jks");
-        p.put("com.enioka.jqm.ws.truststorePass", "SuperPassword");
-        JqmClientFactory.setProperties(p);
+        JqmClientFactory.setProperty("com.enioka.jqm.ws.truststoreFile", "./conf/trusted.jks");
+        JqmClientFactory.setProperty("com.enioka.jqm.ws.truststorePass", "SuperPassword");
 
         int jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
                 .addDefParameter("fileName", "jqm-test-deliverable4.txt").run(this);

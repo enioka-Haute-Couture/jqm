@@ -5,13 +5,15 @@ import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,13 +99,16 @@ public class DbConn implements Closeable
         }
     }
 
-    void runRawUpdate(String query_sql)
+    public void runRawUpdate(String query_sql)
     {
+        transac_open = true;
         Statement s = null;
         try
         {
+            String sql = parent.getAdapter().adaptSql(query_sql);
+            jqmlogger.debug(sql);
             s = _cnx.createStatement();
-            s.executeQuery(query_sql);
+            s.executeUpdate(sql);
         }
         catch (SQLException e)
         {
@@ -129,7 +134,8 @@ public class DbConn implements Closeable
         PreparedStatement ps = null;
         try
         {
-            jqmlogger.debug("Running raw SQL query: {}", rawQuery);
+            String sql = this.parent.getAdapter().adaptSql(rawQuery);
+            jqmlogger.debug("Running raw SQL query: {}", sql);
             for (Object o : params)
             {
                 if (o == null)
@@ -140,7 +146,7 @@ public class DbConn implements Closeable
                     jqmlogger.debug("     {} - {}", o.toString(), o.getClass());
             }
 
-            ps = _cnx.prepareStatement(rawQuery, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            ps = _cnx.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
             int i = 0;
             for (Object prm : params)
             {
@@ -155,7 +161,7 @@ public class DbConn implements Closeable
         }
         finally
         {
-            closeQuietly(ps);
+            // closeQuietly(ps); // Closed when cnx is closed.
         }
     }
 
@@ -178,12 +184,13 @@ public class DbConn implements Closeable
         }
         finally
         {
-            closeQuietly(ps);
+            // closeQuietly(ps);
         }
     }
 
-    public ResultSet runSelectSingleRow(String query_key, Object... params)
+    public Map<String, Object> runSelectSingleRow(String query_key, Object... params)
     {
+        HashMap<String, Object> res = new HashMap<String, Object>();
         ResultSet rs = null;
         try
         {
@@ -193,17 +200,26 @@ public class DbConn implements Closeable
             {
                 throw new NoResultException("The query returned zero rows when one was expected.");
             }
+            ResultSetMetaData meta = rs.getMetaData();
+            for (int i = 1; i <= meta.getColumnCount(); i++)
+            {
+                res.put(meta.getColumnName(i).toUpperCase(), rs.getObject(i));
+            }
+
             if (rs.next())
             {
                 throw new NonUniqueResultException("The query returned more than one row when one was expected");
             }
-            rs.first();
         }
         catch (SQLException e)
         {
             throw new DatabaseException(e);
         }
-        return rs;
+        finally
+        {
+            closeQuietly(rs);
+        }
+        return res;
     }
 
     public <T> T runSelectSingle(String query_key, Class<T> clazz, Object... params)
@@ -301,7 +317,7 @@ public class DbConn implements Closeable
      * @param ps
      *            statement to close.
      */
-    private void closeQuietly(PreparedStatement ps)
+    private void closeQuietly(AutoCloseable ps)
     {
         if (ps != null)
         {
@@ -349,7 +365,7 @@ public class DbConn implements Closeable
             if (for_update)
                 ps = _cnx.prepareStatement(st, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
             else
-                ps = _cnx.prepareStatement(st, new String[] { "ID" });
+                ps = _cnx.prepareStatement(st, this.parent.getAdapter().keyRetrievalColumn());
         }
         catch (SQLException e)
         {
@@ -368,10 +384,13 @@ public class DbConn implements Closeable
 
     private void addParameter(Object value, int position, PreparedStatement s)
     {
+        // TODO: cache meta call and use setObject.
         try
         {
             if (value == null)
-                s.setNull(position, Types.VARCHAR);
+            {
+                s.setNull(position, s.getParameterMetaData().getParameterType(position));
+            }
             else if (Integer.class == value.getClass())
                 s.setInt(position, (Integer) value);
             else if (Long.class == value.getClass())
