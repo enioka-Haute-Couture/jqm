@@ -36,11 +36,10 @@ public class Db
      * The list of different database adapters. We are using reflection for loading them for future extensibility.
      */
     private static String[] ADAPTERS = new String[] { "com.enioka.jqm.jdbc.DbImplPg", "com.enioka.jqm.jdbc.DbImplHsql",
-            "com.enioka.jqm.jdbc.DbImplOracle" };
+            "com.enioka.jqm.jdbc.DbImplOracle", "com.enioka.jqm.jdbc.DbImplMySql" };
 
     private DataSource _ds;
     private DbAdapter adapter = null;
-    private Map<String, String> _queries;
     private String product;
 
     public Db(String dsName)
@@ -212,6 +211,7 @@ public class Db
             int loop_from = db_schema_version;
             int to = db_schema_version;
             List<String> toApply = new ArrayList<String>();
+            toApply.addAll(adapter.preSchemaCreationScripts());
 
             while (to != SCHEMA_VERSION)
             {
@@ -323,17 +323,9 @@ public class Db
      */
     private void initQueries()
     {
-        for (String key : DbImplBase.queries.keySet())
-        {
-            DbImplBase.queries.put(key, this.adapter.adaptSql(DbImplBase.queries.get(key)));
-        }
-        _queries = DbImplBase.queries;
-
-        // Replace parameters
-        for (Map.Entry<String, String> p : _queries.entrySet())
-        {
-            p.setValue(String.format(p.getValue(), ""));
-        }
+        DbConn cnx = getConn();
+        adapter.prepare(cnx._cnx);
+        cnx.close();
     }
 
     /**
@@ -347,6 +339,8 @@ public class Db
         {
             Connection cnx = _ds.getConnection();
             cnx.setAutoCommit(false);
+            cnx.rollback(); // To ensure no open transaction created by the pool before changing TX mode
+            cnx.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             return new DbConn(this, cnx);
         }
         catch (SQLException e)
@@ -364,13 +358,12 @@ public class Db
      */
     String getQuery(String key)
     {
-        String res = this._queries.get(key);
+        String res = this.adapter.getSqlText(key);
         if (res == null)
         {
             throw new DatabaseException("Query " + key + " does not exist");
         }
         return res;
-
     }
 
     DbAdapter getAdapter()

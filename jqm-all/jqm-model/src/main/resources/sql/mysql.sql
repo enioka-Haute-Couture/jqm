@@ -1,0 +1,21 @@
+/* This file must be idempotent - it is run on each db upgrade */
+
+CREATE TABLE IF NOT EXISTS JQM_SEQUENCE
+(
+	name VARCHAR(50) NOT NULL UNIQUE PRIMARY KEY,
+	next INTEGER NOT NULL
+);
+
+INSERT IGNORE INTO JQM_SEQUENCE(NAME, NEXT) VALUES ('MAIN', 1);
+
+DROP FUNCTION IF EXISTS NEXTVAL;
+
+CREATE FUNCTION NEXTVAL (sequence VARCHAR(50))
+RETURNS INT
+BEGIN
+	UPDATE JQM_SEQUENCE
+		SET next = (@next := next) + 1
+		WHERE name = sequence~
+	 
+	RETURN @next~
+END;

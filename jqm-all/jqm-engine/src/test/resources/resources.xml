@@ -93,7 +93,8 @@
           validationQuery="SELECT version()"
           validationInterval="5000"
           timeBetweenEvictionRunsMillis="60000"
-          maxActive="100"
+          maxActive="80"
+          maxIdle="10"
           minIdle="2"
           maxWait="30000"
           initialSize="5"
@@ -105,6 +106,7 @@
           username="jqm"
           password="jqm"
           driverClassName="com.mysql.jdbc.Driver"
-          url="jdbc:mysql://pic:3306/jqm"
-          singleton="true"/>
+          url="jdbc:mysql://localhost:3306/jqm?useSSL=false"
+          singleton="true"
+          connectionProperties="connectionAttributes=program_name:jqm;generateSimpleParameterMetadata=true;useLegacyDatetimeCode=false;"/>
 </resources>

@@ -10,6 +10,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -18,12 +20,17 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+//TODO: better way to close statements and RS.
+
+/**
+ * Db querying utility.
+ */
 public class DbConn implements Closeable
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(DbConn.class);
 
     private Db parent;
-    private Connection _cnx;
+    Connection _cnx;
     private boolean transac_open = false;
     private boolean rollbackOnly = false;
 
@@ -31,13 +38,6 @@ public class DbConn implements Closeable
     {
         this.parent = parent;
         this._cnx = cnx;
-    }
-
-    public QueryResult runUpdate(boolean commit, String query_key, Object... params)
-    {
-        QueryResult res = runUpdate(query_key, params);
-        commit();
-        return res;
     }
 
     public void commit()
@@ -76,16 +76,40 @@ public class DbConn implements Closeable
         rollbackOnly = true;
     }
 
+    private QueryPreparation adapterPreparation(String query_key, boolean forUpdate, Object... params)
+    {
+        QueryPreparation qp = new QueryPreparation();
+        qp.parameters = new ArrayList<Object>(Arrays.asList(params));
+        qp.queryKey = query_key;
+        qp.sqlText = parent.getQuery(query_key);
+        qp.forUpdate = forUpdate;
+
+        this.parent.getAdapter().beforeUpdate(_cnx, qp);
+        return qp;
+    }
+
     public QueryResult runUpdate(String query_key, Object... params)
     {
         transac_open = true;
         PreparedStatement ps = null;
+        QueryPreparation qp = adapterPreparation(query_key, false, params);
         try
         {
-            ps = prepare(query_key, false, params);
+            ps = prepare(qp);
             QueryResult qr = new QueryResult();
             qr.nbUpdated = ps.executeUpdate();
-            qr.generatedKeys = ps.getGeneratedKeys();
+            qr.generatedKey = qp.preGeneratedKey;
+            ResultSet gen = ps.getGeneratedKeys();
+            if (gen.next())
+                try
+                {
+                    qr.generatedKey = gen.getInt(1);
+                }
+                catch (SQLException e)
+                {
+                    // nothing to do.
+                }
+
             jqmlogger.debug("Updated rows: {}", qr.nbUpdated);
             return qr;
         }
@@ -95,17 +119,21 @@ public class DbConn implements Closeable
         }
         finally
         {
-            // closeQuietly(ps);
+            closeQuietly(ps);
         }
     }
 
-    public void runRawUpdate(String query_sql)
+    void runRawUpdate(String query_sql)
     {
         transac_open = true;
         Statement s = null;
         try
         {
             String sql = parent.getAdapter().adaptSql(query_sql);
+            if (sql.trim().isEmpty())
+            {
+                return;
+            }
             jqmlogger.debug(sql);
             s = _cnx.createStatement();
             s.executeUpdate(sql);
@@ -117,25 +145,21 @@ public class DbConn implements Closeable
         }
         finally
         {
-            try
-            {
-                s.close();
-            }
-            catch (Exception e)
-            {
-                // Ignore.
-            }
+            closeQuietly(s);
         }
-
     }
 
     public ResultSet runRawSelect(String rawQuery, Object... params)
     {
         PreparedStatement ps = null;
+        QueryPreparation q = new QueryPreparation();
+        q.parameters = new ArrayList<Object>(Arrays.asList(params));
+        q.sqlText = this.parent.getAdapter().adaptSql(rawQuery);
+        this.parent.getAdapter().beforeUpdate(_cnx, q);
+
         try
         {
-            String sql = this.parent.getAdapter().adaptSql(rawQuery);
-            jqmlogger.debug("Running raw SQL query: {}", sql);
+            jqmlogger.debug("Running raw SQL query: {}", q.sqlText);
             for (Object o : params)
             {
                 if (o == null)
@@ -143,12 +167,14 @@ public class DbConn implements Closeable
                     jqmlogger.debug("     null");
                 }
                 else
+                {
                     jqmlogger.debug("     {} - {}", o.toString(), o.getClass());
+                }
             }
 
-            ps = _cnx.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            ps = _cnx.prepareStatement(q.sqlText, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
             int i = 0;
-            for (Object prm : params)
+            for (Object prm : q.parameters)
             {
                 addParameter(prm, ++i, ps);
             }
@@ -173,9 +199,10 @@ public class DbConn implements Closeable
     public ResultSet runSelect(boolean for_update, String query_key, Object... params)
     {
         PreparedStatement ps = null;
+        QueryPreparation qp = adapterPreparation(query_key, for_update, params);
         try
         {
-            ps = prepare(query_key, for_update, params);
+            ps = prepare(qp);
             return ps.executeQuery();
         }
         catch (SQLException e)
@@ -282,6 +309,10 @@ public class DbConn implements Closeable
         {
             throw new DatabaseException(e);
         }
+        finally
+        {
+            closeQuietly(rs);
+        }
     }
 
     /**
@@ -294,30 +325,22 @@ public class DbConn implements Closeable
             try
             {
                 this._cnx.rollback();
-                transac_open = false;
             }
             catch (Exception e)
             {
                 // Ignore.
             }
         }
-        try
-        {
-            this._cnx.close();
-        }
-        catch (Exception s)
-        {
-            // Ignore.
-        }
+        closeQuietly(_cnx);
     }
 
     /**
-     * Close a statement. Connection itself is left open.
+     * Close utility method.
      * 
      * @param ps
      *            statement to close.
      */
-    private void closeQuietly(AutoCloseable ps)
+    public void closeQuietly(AutoCloseable ps)
     {
         if (ps != null)
         {
@@ -332,23 +355,22 @@ public class DbConn implements Closeable
         }
     }
 
-    private PreparedStatement prepare(String query_key, boolean for_update, Object... params)
+    private PreparedStatement prepare(QueryPreparation q)
     {
         PreparedStatement ps = null;
-        String st = parent.getQuery(query_key);
         if (_cnx == null)
         {
             throw new IllegalStateException("Connection does not exist");
         }
 
-        if (st == null)
+        if (q.sqlText == null || q.sqlText.trim().isEmpty())
         {
             throw new DatabaseException("unknown query key");
         }
 
         // Debug
-        jqmlogger.debug("Running {} : {} with {} parameters.", query_key, st, params.length);
-        for (Object o : params)
+        jqmlogger.debug("Running {} : {} with {} parameters.", q.queryKey, q.sqlText, q.parameters.size());
+        for (Object o : q.parameters)
         {
             if (o == null)
             {
@@ -362,10 +384,10 @@ public class DbConn implements Closeable
 
         try
         {
-            if (for_update)
-                ps = _cnx.prepareStatement(st, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
+            if (q.forUpdate)
+                ps = _cnx.prepareStatement(q.sqlText, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
             else
-                ps = _cnx.prepareStatement(st, this.parent.getAdapter().keyRetrievalColumn());
+                ps = _cnx.prepareStatement(q.sqlText, this.parent.getAdapter().keyRetrievalColumn());
         }
         catch (SQLException e)
         {
@@ -374,7 +396,7 @@ public class DbConn implements Closeable
 
         // Add parameters
         int i = 0;
-        for (Object prm : params)
+        for (Object prm : q.parameters)
         {
             addParameter(prm, ++i, ps);
         }
@@ -441,7 +463,7 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(e);
+            throw new DatabaseException("Could not set parameter at position " + position, e);
         }
     }
 

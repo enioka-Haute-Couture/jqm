@@ -26,6 +26,10 @@ public class ScriptRunner
         {
             throw new RuntimeException("cannot find db script " + classpath, e);
         }
+        if (is == null)
+        {
+            throw new RuntimeException("cannot find db script " + classpath);
+        }
 
         InputStreamReader isr = null;
         String line;
@@ -38,7 +42,7 @@ public class ScriptRunner
             line = br.readLine();
             while (line != null)
             {
-                sb.append(line.replace(";", ""));
+                sb.append(line.replace("~", ";"));
                 sb.append(nl);
 
                 if (line.contains(";"))

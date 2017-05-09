@@ -117,7 +117,7 @@ final class HibernateClient implements JqmClient
             {
                 foundProperties = true;
                 p.load(fis);
-                jqmlogger.warn("A jqm.properties file was found in META-INF");
+                jqmlogger.info("A jqm.properties file was found in META-INF");
             }
 
             fis = this.getClass().getClassLoader().getResourceAsStream("jqm.properties");
@@ -125,12 +125,12 @@ final class HibernateClient implements JqmClient
             {
                 foundProperties = true;
                 p.load(fis);
-                jqmlogger.warn("A jqm.properties file was found");
+                jqmlogger.info("A jqm.properties file was found");
             }
 
             if (!foundProperties)
             {
-                jqmlogger.warn("no jqm.properties file found");
+                jqmlogger.debug("no jqm.properties file found");
             }
         }
         catch (IOException e)
@@ -1584,7 +1584,7 @@ final class HibernateClient implements JqmClient
         }
         catch (IOException e)
         {
-            throw new JqmClientException("Could not create a webserver-local copy of the file. The remote node may be down.", e);
+            throw new JqmClientException("Could not create a webserver-local copy of the file. The remote node may be down. " + url, e);
         }
         finally
         {

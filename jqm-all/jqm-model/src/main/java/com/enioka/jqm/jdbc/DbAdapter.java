@@ -1,5 +1,8 @@
 package com.enioka.jqm.jdbc;
 
+import java.sql.Connection;
+import java.util.List;
+
 /**
  * The interface to implement to create a new database adapter. Adapters contain all the database-specific stuff for running JQM on a
  * specific database brand.<br>
@@ -33,4 +36,38 @@ public interface DbAdapter
      * @return the list of id columns.
      */
     public String[] keyRetrievalColumn();
+
+    /**
+     * A list of files to run (from the classpath) before running schema upgrades.
+     */
+    public List<String> preSchemaCreationScripts();
+
+    /**
+     * Hook run before creating a new update Statement.
+     * 
+     * @param cnx
+     *            an open and ready to use connection to the database. Please return it without any open statement/result set.
+     * @param q
+     *            the query which will be run. Can be modified by this method.
+     * @return a generated ID or null;
+     */
+    public void beforeUpdate(Connection cnx, QueryPreparation q);
+
+    /**
+     * Called after creating the first connection. The adapter should create its caches and do all initialization it requires. Most
+     * importantly, the SQL query cache should be created.
+     * 
+     * @param cnx
+     *            an open ready to use connection to the database.
+     */
+    public void prepare(Connection cnx);
+
+    /**
+     * Returns a ready to run SQL text for the given key. (adaptSql does not need to be run on the returned string)
+     * 
+     * @param key
+     *            key of the SQL order
+     * @return full text to run on the database. Null if key not found.
+     */
+    public String getSqlText(String key);
 }

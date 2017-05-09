@@ -124,6 +124,11 @@
 									<version>42.1.1.jre6</version>
 								</artifactItem>
 								<artifactItem>
+									<groupId>mysql</groupId>
+									<artifactId>mysql-connector-java</artifactId>
+									<version>5.1.41</version>
+								</artifactItem>
+								<artifactItem>
 									<groupId>com.h2database</groupId>
 									<artifactId>h2</artifactId>
 									<version>${h2.version}</version>
@@ -352,6 +357,12 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>42.1.1.jre6</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.41</version>
 			<scope>test</scope>
 		</dependency>
 
