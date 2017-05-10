@@ -99,16 +99,19 @@ public class DbConn implements Closeable
             QueryResult qr = new QueryResult();
             qr.nbUpdated = ps.executeUpdate();
             qr.generatedKey = qp.preGeneratedKey;
-            ResultSet gen = ps.getGeneratedKeys();
-            if (gen.next())
-                try
-                {
-                    qr.generatedKey = gen.getInt(1);
-                }
-                catch (SQLException e)
-                {
-                    // nothing to do.
-                }
+            if (query_key.contains("insert") && !query_key.equals("history_insert_with_end_date"))
+            {
+                ResultSet gen = ps.getGeneratedKeys();
+                if (gen.next())
+                    try
+                    {
+                        qr.generatedKey = gen.getInt(1);
+                    }
+                    catch (SQLException e)
+                    {
+                        // nothing to do.
+                    }
+            }
 
             jqmlogger.debug("Updated rows: {}", qr.nbUpdated);
             return qr;
@@ -230,7 +233,17 @@ public class DbConn implements Closeable
             ResultSetMetaData meta = rs.getMetaData();
             for (int i = 1; i <= meta.getColumnCount(); i++)
             {
-                res.put(meta.getColumnName(i).toUpperCase(), rs.getObject(i));
+                // We take the type as returned, with an exception for small numerics (we do not want long or BigInt which cannot be cast)
+                Object or;
+                if (meta.getColumnType(i) == java.sql.Types.NUMERIC && meta.getPrecision(i) <= 10)
+                {
+                    or = rs.getInt(i);
+                }
+                else
+                {
+                    or = rs.getObject(i);
+                }
+                res.put(meta.getColumnName(i).toUpperCase(), or);
             }
 
             if (rs.next())
@@ -411,7 +424,8 @@ public class DbConn implements Closeable
         {
             if (value == null)
             {
-                s.setNull(position, s.getParameterMetaData().getParameterType(position));
+                // s.setNull(position, s.getParameterMetaData().getParameterType(position));
+                s.setObject(position, null);
             }
             else if (Integer.class == value.getClass())
                 s.setInt(position, (Integer) value);

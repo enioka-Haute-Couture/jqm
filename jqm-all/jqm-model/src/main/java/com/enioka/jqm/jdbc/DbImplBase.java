@@ -132,7 +132,7 @@ public class DbImplBase
         
         // JOB INSTANCE
         queries.put("ji_insert_enqueue", "INSERT INTO JOB_INSTANCE (ID, DATE_ENQUEUE, EMAIL, APPLICATION, "
-                + "KEYWORD1, KEYWORD2, KEYWORD3, MODULE, INTERNAL_POSITION, PARENT, PROGRESS, SESSION, "
+                + "KEYWORD1, KEYWORD2, KEYWORD3, MODULE, INTERNAL_POSITION, PARENT, PROGRESS, SESSION_KEY, "
                 + "STATUS, USERNAME, JOBDEF, QUEUE, HIGHLANDER) "
                 + "VALUES(JQM_PK.nextval, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, UNIX_MILLIS(), ?, 0, ?, 'SUBMITTED', ?, ?, ?, ?)");
         queries.put("ji_delete_all", "DELETE FROM JOB_INSTANCE");
@@ -154,7 +154,7 @@ public class DbImplBase
         queries.put("ji_select_count_by_node", "SELECT COUNT(1) FROM JOB_INSTANCE WHERE NODE=?");
         queries.put("ji_select_count_by_queue", "SELECT COUNT(1) FROM JOB_INSTANCE WHERE QUEUE=?");
         queries.put("ji_select_all", "SELECT ji.ID, ji.DATE_ATTRIBUTION, ji.DATE_ENQUEUE, ji.EMAIL, ji.DATE_START, ji.APPLICATION, ji.KEYWORD1, ji.KEYWORD2, "
-                + "ji.KEYWORD3, ji.MODULE, ji.INTERNAL_POSITION, ji.PARENT, ji.PROGRESS, ji.SESSION, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.HIGHLANDER, "
+                + "ji.KEYWORD3, ji.MODULE, ji.INTERNAL_POSITION, ji.PARENT, ji.PROGRESS, ji.SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.HIGHLANDER, "
                 + "q.ID, q.DEFAULT_QUEUE, q.DESCRIPTION, q.NAME, "
                 + "jd.ID, jd.APPLICATION, jd.JD_KEY, jd.CL, "
                 + "jd.DESCRIPTION, jd.ENABLED, jd.EXTERNAL, jd.HIGHLANDER, "
@@ -181,7 +181,7 @@ public class DbImplBase
         queries.put("history_insert_with_end_date", "INSERT INTO HISTORY(ID, JD_APPLICATION, JD_KEY, DATE_ATTRIBUTION, EMAIL, "
                 + "DATE_END, DATE_ENQUEUE, DATE_START, HIGHLANDER, INSTANCE_APPLICATION, INSTANCE_KEYWORD1, "
                 + "INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, JD_KEYWORD1, JD_KEYWORD2, JD_KEYWORD3, JD_MODULE, "
-                + "NODE_NAME, PARENT, PROGRESS, QUEUE_NAME, RETURN_CODE, SESSION, STATUS, USERNAME, JOBDEF, "
+                + "NODE_NAME, PARENT, PROGRESS, QUEUE_NAME, RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, "
                 + "NODE, QUEUE) "
                 + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         queries.put("history_insert", queries.get("history_insert_with_end_date").replace("(?, ?, ?, ?, ?, ?",  "(?, ?, ?, ?, ?, CURRENT_TIMESTAMP"));
@@ -193,7 +193,7 @@ public class DbImplBase
         queries.put("history_select_count_last_mn_for_poller", "SELECT COUNT(1)/60 FROM History WHERE QUEUE=? AND NODE=? AND DATE_END > (CURRENT_TIMESTAMP - 1 MINUTE)");
         queries.put("history_select_count_ended", "SELECT COUNT(1) FROM History WHERE STATUS='ENDED'");
         queries.put("history_select_count_notended", "SELECT COUNT(1) FROM History WHERE STATUS<>'ENDED'");
-        queries.put("history_select_reenqueue_by_id", "SELECT JD_APPLICATION, JD_KEY, EMAIL, INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, PARENT, SESSION, USERNAME, STATUS FROM HISTORY WHERE ID=?");
+        queries.put("history_select_reenqueue_by_id", "SELECT JD_APPLICATION, JD_KEY, EMAIL, INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, PARENT, SESSION_KEY, USERNAME, STATUS FROM HISTORY WHERE ID=?");
         queries.put("history_select_cnx_data_by_id", "SELECT DNS||':'||PORT AS HOST FROM History h LEFT JOIN Node n ON h.NODE = n.ID WHERE h.ID=?");
         queries.put("history_select_state_by_id", "SELECT STATUS FROM HISTORY WHERE ID=?");
         
@@ -225,19 +225,19 @@ public class DbImplBase
         queries.put("jndi_delete_all", "DELETE FROM JNDI_OBJECT_RESOURCE");
         queries.put("jndi_update_changed_by_id", "UPDATE JNDI_OBJECT_RESOURCE SET AUTH=?, DESCRIPTION=?, FACTORY=?, LAST_MODIFIED=CURRENT_TIMESTAMP, NAME=?, SINGLETON=?, TEMPLATE=?, TYPE=? WHERE ID=? AND NOT (AUTH=? AND DESCRIPTION=? AND FACTORY=? AND NAME=? AND SINGLETON=? AND TEMPLATE=? AND TYPE=?)");
         queries.put("jndi_select_count_for_key", "SELECT COUNT(1) FROM JNDI_OBJECT_RESOURCE WHERE NAME=?");
-        queries.put("jndi_select_count_changed", "SELECT COUNT(1) FROM JNDI_OBJECT_RESOURCE r RIGHT JOIN JNDI_OR_PARAMETER p ON p.RESOURCE = r.ID WHERE r.LAST_MODIFIED > ? OR p.LAST_MODIFIED > ?");
+        queries.put("jndi_select_count_changed", "SELECT COUNT(1) FROM JNDI_OBJECT_RESOURCE r RIGHT JOIN JNDI_OR_PARAMETER p ON p.JNDI_OR = r.ID WHERE r.LAST_MODIFIED > ? OR p.LAST_MODIFIED > ?");
         queries.put("jndi_select_all", "SELECT ID, NAME, AUTH, TYPE, FACTORY, DESCRIPTION, TEMPLATE, SINGLETON, LAST_MODIFIED FROM JNDI_OBJECT_RESOURCE");
         queries.put("jndi_select_by_key", queries.get("jndi_select_all") + " WHERE NAME=?");
         
         // JNDI PRM
-        queries.put("jndiprm_insert", "INSERT INTO JNDI_OR_PARAMETER(ID, KEYNAME, LAST_MODIFIED, VALUE, RESOURCE) VALUES(JQM_PK.nextval, ?, CURRENT_TIMESTAMP, ?, ?)");
+        queries.put("jndiprm_insert", "INSERT INTO JNDI_OR_PARAMETER(ID, KEYNAME, LAST_MODIFIED, VALUE, JNDI_OR) VALUES(JQM_PK.nextval, ?, CURRENT_TIMESTAMP, ?, ?)");
         queries.put("jndiprm_delete_all", "DELETE FROM JNDI_OR_PARAMETER");
-        queries.put("jndiprm_delete_for_resource", "DELETE FROM JNDI_OR_PARAMETER WHERE RESOURCE=?");
+        queries.put("jndiprm_delete_for_resource", "DELETE FROM JNDI_OR_PARAMETER WHERE JNDI_OR=?");
         queries.put("jndiprm_delete_by_id", "DELETE FROM JNDI_OR_PARAMETER WHERE ID=?");
         queries.put("jndiprm_update_value_by_key", "UPDATE JNDI_OR_PARAMETER SET VALUE=?, LAST_MODIFIED=CURRENT_TIMESTAMP WHERE KEYNAME=?");
         queries.put("jndiprm_update_changed_by_id", "UPDATE JNDI_OR_PARAMETER SET VALUE=?, LAST_MODIFIED=CURRENT_TIMESTAMP WHERE KEYNAME=? AND NOT VALUE=?");
-        queries.put("jndiprm_select_all_in_jndisrc", "SELECT ID, KEYNAME, LAST_MODIFIED, VALUE FROM JNDI_OR_PARAMETER WHERE RESOURCE=?");
-        queries.put("jndiprm_select_all_in_jndisrc_list", "SELECT ID, KEYNAME, LAST_MODIFIED, VALUE, RESOURCE FROM JNDI_OR_PARAMETER WHERE RESOURCE IN(UNNEST(?))");
+        queries.put("jndiprm_select_all_in_jndisrc", "SELECT ID, KEYNAME, LAST_MODIFIED, VALUE FROM JNDI_OR_PARAMETER WHERE JNDI_OR=?");
+        queries.put("jndiprm_select_all_in_jndisrc_list", "SELECT ID, KEYNAME, LAST_MODIFIED, VALUE, JNDI_OR FROM JNDI_OR_PARAMETER WHERE JNDI_OR IN(UNNEST(?))");
         
         // PKI
         queries.put("pki_insert", "INSERT INTO PKI(ID, PEM_CERT, PEM_PK, PRETTY_NAME) VALUES(JQM_PK.nextval, ?, ?, ?)");

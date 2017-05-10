@@ -920,7 +920,7 @@ final class HibernateClient implements JqmClient
                 wh += getStringPredicate("ji.KEYWORD2", query.getInstanceKeyword2(), prms);
                 wh += getStringPredicate("ji.KEYWORD3", query.getInstanceKeyword3(), prms);
                 wh += getStringPredicate("ji.USERNAME", query.getUser(), prms);
-                wh += getStringPredicate("ji.SESSION", query.getSessionId(), prms);
+                wh += getStringPredicate("ji.SESSION_KEY", query.getSessionId(), prms);
                 wh += getStatusPredicate("ji.STATUS", query.getStatus(), prms);
 
                 wh += getStringPredicate("jd.JD_KEY", query.getJobDefApplication(), prms);
@@ -946,7 +946,7 @@ final class HibernateClient implements JqmClient
                         + "ji.KEYWORD2 AS INSTANCE_KEYWORD2, ji.KEYWORD3 AS INSTANCE_KEYWORD3, ji.MODULE AS INSTANCE_MODULE, "
                         + "jd.KEYWORD1 AS JD_KEYWORD1, jd.KEYWORD2 AS JD_KEYWORD2, jd.KEYWORD3 AS JD_KEYWORD3, jd.MODULE AS JD_MODULE,"
                         + "n.NAME AS NODE_NAME, ji.PARENT AS PARENT, ji.PROGRESS, q.NAME AS QUEUE_NAME, NULL AS RETURN_CODE,"
-                        + "ji.SESSION AS SESSION, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.INTERNAL_POSITION AS POSITION "
+                        + "ji.SESSION_KEY AS SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.INTERNAL_POSITION AS POSITION "
                         + "FROM JOB_INSTANCE ji LEFT JOIN QUEUE q ON ji.QUEUE=q.ID LEFT JOIN JOB_DEFINITION jd ON ji.JOBDEF=jd.ID LEFT JOIN NODE n ON ji.NODE=n.ID ";
 
                 totalCountQuery += " (SELECT COUNT(1) FROM JOB_INSTANCE) ,";
@@ -976,7 +976,7 @@ final class HibernateClient implements JqmClient
                 wh += getStringPredicate("INSTANCE_KEYWORD2", query.getInstanceKeyword2(), prms);
                 wh += getStringPredicate("INSTANCE_KEYWORD3", query.getInstanceKeyword3(), prms);
                 wh += getStringPredicate("USERNAME", query.getUser(), prms);
-                wh += getStringPredicate("SESSION", query.getSessionId(), prms);
+                wh += getStringPredicate("SESSION_KEY", query.getSessionId(), prms);
                 wh += getStatusPredicate("STATUS", query.getStatus(), prms);
 
                 wh += getStringPredicate("JD_KEY", query.getApplicationName(), prms);
@@ -1002,7 +1002,7 @@ final class HibernateClient implements JqmClient
                         + "DATE_END, DATE_ENQUEUE, DATE_START, HIGHLANDER, INSTANCE_APPLICATION, "
                         + "INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, "
                         + "JD_KEYWORD1, JD_KEYWORD2, JD_KEYWORD3, " + "JD_MODULE, NODE_NAME, PARENT, PROGRESS, QUEUE_NAME, "
-                        + "RETURN_CODE, SESSION, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION FROM HISTORY ";
+                        + "RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION FROM HISTORY ";
 
                 totalCountQuery += " (SELECT COUNT(1) FROM HISTORY) ,";
                 if (wh.length() > 3)
