@@ -1,6 +1,8 @@
 package com.enioka.jqm.jdbc;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -70,4 +72,14 @@ public interface DbAdapter
      * @return full text to run on the database. Null if key not found.
      */
     public String getSqlText(String key);
+
+    /**
+     * Databases all have different issues when settings null parameters.
+     * 
+     * @param position
+     *            in the statement (sql parameters).
+     * @param s
+     *            statement being built.
+     */
+    public void setNullParameter(int position, PreparedStatement s) throws SQLException;
 }

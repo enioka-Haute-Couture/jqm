@@ -1,6 +1,8 @@
 package com.enioka.jqm.jdbc;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,5 +60,11 @@ public class DbImplPg implements DbAdapter
     public void beforeUpdate(Connection cnx, QueryPreparation q)
     {
         return;
+    }
+
+    @Override
+    public void setNullParameter(int position, PreparedStatement s) throws SQLException
+    {
+        s.setNull(position, s.getParameterMetaData().getParameterType(position));
     }
 }

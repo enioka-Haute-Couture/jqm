@@ -424,8 +424,7 @@ public class DbConn implements Closeable
         {
             if (value == null)
             {
-                // s.setNull(position, s.getParameterMetaData().getParameterType(position));
-                s.setObject(position, null);
+                parent.getAdapter().setNullParameter(position, s);
             }
             else if (Integer.class == value.getClass())
                 s.setInt(position, (Integer) value);

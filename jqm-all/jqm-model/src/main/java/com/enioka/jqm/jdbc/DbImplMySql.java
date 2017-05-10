@@ -2,6 +2,7 @@ package com.enioka.jqm.jdbc;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -158,6 +159,13 @@ public class DbImplMySql implements DbAdapter
         {
             throw new DatabaseException(e);
         }
+    }
+
+    @Override
+    public void setNullParameter(int position, PreparedStatement s) throws SQLException
+    {
+        // Absolutely stupid: set to null regardless of type.
+        s.setObject(position, null);
     }
 
 }

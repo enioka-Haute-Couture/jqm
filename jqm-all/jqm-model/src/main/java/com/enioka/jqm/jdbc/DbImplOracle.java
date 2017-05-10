@@ -1,6 +1,8 @@
 package com.enioka.jqm.jdbc;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,5 +64,12 @@ public class DbImplOracle implements DbAdapter
     public void beforeUpdate(Connection cnx, QueryPreparation q)
     {
         return;
+    }
+
+    @Override
+    public void setNullParameter(int position, PreparedStatement s) throws SQLException
+    {
+        // Absolutely stupid: set to null regardless of type.
+        s.setObject(position, null);
     }
 }
