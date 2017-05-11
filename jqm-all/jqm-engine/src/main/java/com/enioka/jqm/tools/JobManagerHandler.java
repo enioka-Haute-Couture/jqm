@@ -21,7 +21,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 
 import javax.naming.NamingException;
@@ -39,10 +38,8 @@ import com.enioka.jqm.api.Query;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.JobDef;
 import com.enioka.jqm.jpamodel.JobInstance;
 import com.enioka.jqm.jpamodel.Message;
-import com.enioka.jqm.jpamodel.Node;
 import com.enioka.jqm.jpamodel.State;
 
 /**
@@ -53,35 +50,18 @@ class JobManagerHandler implements InvocationHandler
     private static Logger jqmlogger = Logger.getLogger(JobManagerHandler.class);
 
     private JobInstance ji;
-    private JobDef jd = null;
-    private Properties p = null;
     private Map<String, String> params = null;
-    private String defaultCon = null, application = null, sessionId = null;
-    private Node node = null;
     private Calendar lastPeek = null;
 
     JobManagerHandler(JobInstance ji, Map<String, String> prms)
     {
-        p = new Properties();
-        p.put("emf", Helpers.getDb());
-
-        DbConn cnx = Helpers.getNewDbSession();
         this.ji = ji;
         params = prms;
-
-        defaultCon = GlobalParameter.getParameter(cnx, "defaultConnection", null);
-
-        this.jd = this.ji.getJD();
-        this.application = this.jd.getApplication();
-        this.sessionId = this.ji.getSessionID();
-        this.node = this.ji.getNode();
-        this.node.getDlRepo();
-        cnx.close();
     }
 
     private JqmClient getJqmClient()
     {
-        return JqmClientFactory.getClient("uncached", p, false);
+        return JqmClientFactory.getClient();
     }
 
     @SuppressWarnings("unchecked")
@@ -102,7 +82,7 @@ class JobManagerHandler implements InvocationHandler
             {
                 if ("jobApplicationId".equals(methodName))
                 {
-                    return jd.getId();
+                    return this.ji.getJd();
                 }
                 else if ("parentID".equals(methodName))
                 {
@@ -114,11 +94,11 @@ class JobManagerHandler implements InvocationHandler
                 }
                 else if ("canBeRestarted".equals(methodName))
                 {
-                    return jd.isCanBeRestarted();
+                    return this.ji.getJD().isCanBeRestarted();
                 }
                 else if ("applicationName".equals(methodName))
                 {
-                    return jd.getApplicationName();
+                    return ji.getJD().getApplicationName();
                 }
                 else if ("sessionID".equals(methodName))
                 {
@@ -126,11 +106,11 @@ class JobManagerHandler implements InvocationHandler
                 }
                 else if ("application".equals(methodName))
                 {
-                    return application;
+                    return ji.getJD().getApplication();
                 }
                 else if ("module".equals(methodName))
                 {
-                    return jd.getModule();
+                    return this.ji.getJD().getModule();
                 }
                 else if ("keyword1".equals(methodName))
                 {
@@ -146,15 +126,15 @@ class JobManagerHandler implements InvocationHandler
                 }
                 else if ("definitionKeyword1".equals(methodName))
                 {
-                    return jd.getKeyword1();
+                    return this.ji.getJD().getKeyword1();
                 }
                 else if ("definitionKeyword2".equals(methodName))
                 {
-                    return jd.getKeyword2();
+                    return this.ji.getJD().getKeyword2();
                 }
                 else if ("definitionKeyword3".equals(methodName))
                 {
-                    return jd.getKeyword3();
+                    return this.ji.getJD().getKeyword3();
                 }
                 else if ("userName".equals(methodName))
                 {
@@ -166,7 +146,7 @@ class JobManagerHandler implements InvocationHandler
                 }
                 else if ("defaultConnect".equals(methodName))
                 {
-                    return this.defaultCon;
+                    return this.getDefaultConnectionName();
                 }
                 else if ("getDefaultConnection".equals(methodName))
                 {
@@ -312,9 +292,9 @@ class JobManagerHandler implements InvocationHandler
         jr.setApplicationName(applicationName);
         jr.setUser(user == null ? ji.getUserName() : user);
         jr.setEmail(mail);
-        jr.setSessionID(sessionId == null ? this.sessionId : sessionId);
-        jr.setApplication(application == null ? jd.getApplication() : application);
-        jr.setModule(module == null ? jd.getModule() : module);
+        jr.setSessionID(sessionId == null ? this.ji.getSessionID() : sessionId);
+        jr.setApplication(application == null ? this.ji.getJD().getApplication() : application);
+        jr.setModule(module == null ? this.ji.getJD().getModule() : module);
         jr.setKeyword1(keyword1);
         jr.setKeyword2(keyword2);
         jr.setKeyword3(keyword3);
@@ -382,7 +362,7 @@ class JobManagerHandler implements InvocationHandler
         {
             String outputRoot = this.ji.getNode().getDlRepo();
             String ext = FilenameUtils.getExtension(path);
-            String relDestPath = "" + ji.getJD().getApplicationName() + "/" + ji.getId() + "/" + UUID.randomUUID() + "." + ext;
+            String relDestPath = ji.getJD().getApplicationName() + "/" + ji.getId() + "/" + UUID.randomUUID() + "." + ext;
             String absDestPath = FilenameUtils.concat(outputRoot, relDestPath);
             String fileName = FilenameUtils.getName(path);
 
@@ -401,7 +381,7 @@ class JobManagerHandler implements InvocationHandler
 
     private File getWorkDir()
     {
-        File f = new File(FilenameUtils.concat(node.getTmpDirectory(), "" + this.ji.getId()));
+        File f = new File(FilenameUtils.concat(ji.getNode().getTmpDirectory(), Integer.toString(this.ji.getId())));
         if (!f.isDirectory())
         {
             try
@@ -416,12 +396,23 @@ class JobManagerHandler implements InvocationHandler
         return f;
     }
 
+    private String getDefaultConnectionName()
+    {
+        DbConn cnx = Helpers.getNewDbSession();
+        try
+        {
+            return GlobalParameter.getParameter(cnx, "defaultConnection", null);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
     private DataSource getDefaultConnection() throws NamingException
     {
-        Object dso = NamingManager.getInitialContext(null).lookup(this.defaultCon);
-        DataSource q = (DataSource) dso;
-
-        return q;
+        Object dso = NamingManager.getInitialContext(null).lookup(getDefaultConnectionName());
+        return (DataSource) dso;
     }
 
     private boolean hasEnded(int jobId)
