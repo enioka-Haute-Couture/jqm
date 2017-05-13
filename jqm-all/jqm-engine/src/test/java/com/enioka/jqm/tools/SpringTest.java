@@ -35,12 +35,12 @@ public class SpringTest extends JqmBaseTest
 
         // First job creates the database, so let it finish (test artifact).
         JobRequest.create("TestSpring1", null).submit();
-        TestHelpers.waitFor(1, 10000, cnx);
+        TestHelpers.waitFor(1, 30000, cnx);
 
         JobRequest.create("TestSpring1", null).submit();
         JobRequest.create("TestSpring1", null).submit();
 
-        TestHelpers.waitFor(3, 20000, cnx);
+        TestHelpers.waitFor(3, 60000, cnx);
 
         Assert.assertEquals(3, TestHelpers.getOkCount(cnx));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));

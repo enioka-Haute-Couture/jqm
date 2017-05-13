@@ -57,7 +57,7 @@ public class JmxTest extends JqmBaseTest
 
         // Go
         addAndStartEngine();
-        TestHelpers.waitForRunning(1, 1000, cnx);
+        TestHelpers.waitForRunning(1, 10000, cnx);
         this.sleep(1); // time to actually run, not only Loader start.
 
         // Connect to JMX server
