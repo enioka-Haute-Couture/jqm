@@ -175,7 +175,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     }
 
     @Override
-    public void run()
+    synchronized public void run() // sync: avoid race condition on run when restarting after failure.
     {
         this.localThread = Thread.currentThread();
         this.localThread.setName("QUEUE_POLLER;polling;" + this.queue.getName());

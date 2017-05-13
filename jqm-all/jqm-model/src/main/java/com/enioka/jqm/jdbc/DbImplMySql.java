@@ -123,7 +123,12 @@ public class DbImplMySql implements DbAdapter
                     {
                         newPrm[j] = "?";
                     }
-                    q.sqlText = q.sqlText.replaceFirst("IN\\(\\?\\)", "IN(" + String.join(",", newPrm) + ")");
+                    StringBuilder sb = new StringBuilder();
+                    for (int j = 0; j < vv.size(); j++)
+                    {
+                        sb.append("?,");
+                    }
+                    q.sqlText = q.sqlText.replaceFirst("IN\\(\\?\\)", "IN(" + sb.substring(0, sb.length() - 1) + ")");
                 }
                 else
                 {

@@ -304,7 +304,7 @@ public class DbConn implements Closeable
                 }
                 else
                 {
-                    throw new DatabaseException("unsupported single query return type " + clazz.toGenericString());
+                    throw new DatabaseException("unsupported single query return type " + clazz.getCanonicalName());
                 }
             }
             else

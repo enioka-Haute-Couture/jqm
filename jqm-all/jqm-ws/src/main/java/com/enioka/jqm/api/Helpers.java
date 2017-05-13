@@ -24,10 +24,10 @@ public final class Helpers
 {
     static
     {
-        Properties p = new Properties();
-        p.put("javax.persistence.nonJtaDataSource", "jdbc/jqm");
+        // Properties p = new Properties();
+        // p.put("javax.persistence.nonJtaDataSource", "jdbc/jqm");
         // p.put("hibernate.show_sql", "true");
-        JqmClientFactory.setProperties(p);
+        // JqmClientFactory.setProperties(p);
     }
 
     private Helpers()
