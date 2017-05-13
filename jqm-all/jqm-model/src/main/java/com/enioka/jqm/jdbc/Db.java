@@ -1,5 +1,8 @@
 package com.enioka.jqm.jdbc;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -42,88 +45,177 @@ public class Db
     private DbAdapter adapter = null;
     private String product;
 
-    public Db(String dsName)
-    {
-        try
-        {
-            this._ds = (DataSource) InitialContext.doLookup(dsName);
-        }
-        catch (NamingException e)
-        {
-            throw new DatabaseException("Could not retrieve datasource resource named " + dsName, e);
-        }
-        if (this._ds == null)
-        {
-            throw new DatabaseException("no data source found");
-        }
-        init();
-    }
-
+    /**
+     * Connects to the database by retrieving a DataDource from JNDI (with every parameter set to default, including the JNDI alias for the
+     * DataSource being jdbc/jqm).
+     */
     public Db()
     {
-        this("jdbc/jqm");
-    }
-
-    public Db(DataSource ds)
-    {
-        this._ds = ds;
-        init();
+        this(null);
     }
 
     /**
-     * Debug constructor only. Works only with HSQLDB.
+     * Constructor for cases when a DataSource is readily available (and not retrieved through JNDI).
+     * 
+     * @param ds
+     *            the existing DataSource.
+     * @param updateSchema
+     *            set to true if the database schema should upgrade (if needed) during initialization
+     */
+    public Db(DataSource ds, boolean updateSchema)
+    {
+        this._ds = ds;
+        init(updateSchema);
+    }
+
+    /**
+     * Main constructor. Properties may be null. Properties are not documented on purpose, as this is a private JQM API.
      * 
      * @param props
      */
     @SuppressWarnings("unchecked")
-    public Db(Properties props)
+    public Db(Properties properties)
     {
-        if (!props.containsKey("com.enioka.jqm.jdbc.url"))
+        if (properties != null && properties.containsKey("com.enioka.jqm.jdbc.url"))
         {
-            throw new IllegalArgumentException("No database URL (com.enioka.jqm.jdbc.url) in the database properties");
-        }
-        String url = props.getProperty("com.enioka.jqm.jdbc.url");
+            // In this case - full JDBC construction, not from JNDI. Only works for HSQLDB.
 
-        DataSource ds = null;
-        if (url.contains("jdbc:hsqldb"))
-        {
-            Class<? extends DataSource> dsclass;
-            try
+            // Allow upgrade by default in this case (this is used only in tests)
+            boolean upgrade = Boolean.parseBoolean(properties.getProperty("com.enioka.jqm.jdbc.allowSchemaUpdate", "true"));
+            String url = properties.getProperty("com.enioka.jqm.jdbc.url");
+
+            DataSource ds = null;
+            if (url.contains("jdbc:hsqldb"))
             {
-                dsclass = (Class<? extends DataSource>) Class.forName("org.hsqldb.jdbc.JDBCDataSource");
+
+                Class<? extends DataSource> dsclass;
+                try
+                {
+                    dsclass = (Class<? extends DataSource>) Class.forName("org.hsqldb.jdbc.JDBCDataSource");
+                }
+                catch (ClassNotFoundException e)
+                {
+                    throw new IllegalStateException("The driver for database HSQLDB was not found in the classpath");
+                }
+
+                try
+                {
+                    ds = dsclass.newInstance();
+                    dsclass.getMethod("setDatabase", String.class).invoke(ds, "jdbc:hsqldb:mem:testdbengine");
+                }
+                catch (Exception e)
+                {
+                    throw new DatabaseException("could not create datasource. See errors below.", e);
+                }
             }
-            catch (ClassNotFoundException e)
+            else
             {
-                throw new IllegalStateException("The driver for database HSQLDB was not found in the classpath");
+                throw new IllegalArgumentException("this constructor does not support this database type - URL " + url);
             }
 
-            try
-            {
-                ds = dsclass.newInstance();
-                dsclass.getMethod("setDatabase", String.class).invoke(ds, "jdbc:hsqldb:mem:testdbengine");
-            }
-            catch (Exception e)
-            {
-                throw new DatabaseException("could not create datasource. See errors below.", e);
-            }
+            this._ds = ds;
+            init(upgrade);
         }
         else
         {
-            throw new IllegalArgumentException("this constructor does not support this database - URL " + url);
-        }
+            // Standard case: fetch a DataSource from JNDI.
+            String dsName = properties.getProperty("com.enioka.jqm.jdbc.datasource", "jdbc/jqm");
 
-        this._ds = ds;
-        init();
+            // Ascending compatibility with v1.x: old name for the DataSource.
+            String oldName = properties.getProperty("javax.persistence.nonJtaDataSource");
+            if (oldName != null)
+            {
+                dsName = oldName;
+            }
+
+            boolean upgrade = Boolean.parseBoolean(properties.getProperty("com.enioka.jqm.jdbc.allowSchemaUpdate", "false"));
+
+            // This is a hack. Some containers will use root context as default for JNDI (WebSphere, Glassfish...), other will use
+            // java:/comp/env/ (Tomcat...). So if we actually know the required alias, we try both, and the user only has to provide a
+            // root JNDI alias that will work in both cases.
+            try
+            {
+                this._ds = (DataSource) InitialContext.doLookup(dsName);
+            }
+            catch (NamingException e)
+            {
+                jqmlogger.warn("JNDI alias {} was not found. Trying with java:/comp/env/ prefix", dsName);
+                dsName = "java:/comp/env/" + dsName;
+                try
+                {
+                    this._ds = (DataSource) InitialContext.doLookup(dsName);
+                }
+                catch (NamingException e2)
+                {
+                    throw new DatabaseException("Could not retrieve datasource resource named " + dsName, e);
+                }
+            }
+            if (this._ds == null)
+            {
+                throw new DatabaseException("no data source found");
+            }
+            init(upgrade);
+        }
+    }
+
+    /**
+     * Helper method to load the standard JQM property files from class path.
+     * 
+     * @return a Properties object, which may be empty but not null.
+     */
+    public static Properties loadProperties()
+    {
+        return loadProperties(new String[] { "META-INF/jqm.properties", "jqm.properties" });
+    }
+
+    /**
+     * Helper method to load a property file from class path.
+     * 
+     * @param filesToLoad
+     *            an array of paths (class path paths) designating where the files may be. All files are loaded, in the order given. Missing
+     *            files are silently ignored.
+     * 
+     * @return a Properties object, which may be empty but not null.
+     */
+    public static Properties loadProperties(String[] filesToLoad)
+    {
+        Properties p = new Properties();
+        InputStream fis = null;
+        for (String path : filesToLoad)
+        {
+            try
+            {
+                fis = Db.class.getClassLoader().getResourceAsStream(path);
+                if (fis != null)
+                {
+                    p.load(fis);
+                    jqmlogger.info("A jqm.properties file was found at {}", path);
+                }
+            }
+            catch (IOException e)
+            {
+                // We allow no configuration files, but not an unreadable configuration file.
+                throw new DatabaseException("META-INF/jqm.properties file is invalid", e);
+            }
+            finally
+            {
+                closeQuietly(fis);
+            }
+        }
+        return p;
     }
 
     /**
      * Main database initialization. To be called only when _ds is a valid DataSource.
      */
-    private void init()
+    private void init(boolean upgrade)
     {
         initAdapter();
         initQueries();
-        dbUpgrade();
+        if (upgrade)
+        {
+            dbUpgrade();
+        }
         checkSchemaVersion();
     }
 
@@ -374,5 +466,26 @@ public class Db
     public String getProduct()
     {
         return this.product;
+    }
+
+    /**
+     * Close utility method.
+     * 
+     * @param ps
+     *            statement to close.
+     */
+    private static void closeQuietly(AutoCloseable ps)
+    {
+        if (ps != null)
+        {
+            try
+            {
+                ps.close();
+            }
+            catch (Exception e)
+            {
+                // Do nothing.
+            }
+        }
     }
 }

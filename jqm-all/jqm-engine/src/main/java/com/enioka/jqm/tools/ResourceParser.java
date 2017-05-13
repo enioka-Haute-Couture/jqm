@@ -70,6 +70,10 @@ final class ResourceParser
         DbConn cnx = null;
         try
         {
+            if (!Helpers.isDbInitialized())
+            {
+                throw new IllegalStateException("cannot fetch a JNDI resource from DB when DB is not initialized");
+            }
             cnx = Helpers.getNewDbSession();
             resource = JndiObjectResource.select_alias(cnx, alias);
 

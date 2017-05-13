@@ -66,7 +66,7 @@ public class JqmTester
 
         JDBCDataSource ds = new JDBCDataSource();
         ds.setDatabase("jdbc:hsqldb:mem:" + s.getDatabaseName(0, true));
-        db = new Db(ds);
+        db = new Db(ds, true);
         cnx = db.getConn();
 
         JqmSingleRunner.setConnection(db);

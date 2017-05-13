@@ -52,14 +52,11 @@ final class Common
         return s;
     }
 
-    static Properties jpaProperties(Server s)
+    static Properties dbProperties(Server s)
     {
         Properties p = new Properties();
-        p.put("hibernate.hbm2ddl.auto", "update");
-        p.put("hibernate.dialect", "com.enioka.jqm.tools.HSQLDialect7479");
-        p.put("hibernate.pool_size", 5);
-        p.put("javax.persistence.nonJtaDataSource", "");
-        p.put("hibernate.connection.url", "jdbc:hsqldb:hsql://localhost/" + s.getDatabaseName(0, false));
+        p.put("com.enioka.jqm.jdbc.allowSchemaUpdate", "true");
+        p.put("com.enioka.jqm.jdbc.datasource", "jdbc/jqm");
         return p;
     }
 

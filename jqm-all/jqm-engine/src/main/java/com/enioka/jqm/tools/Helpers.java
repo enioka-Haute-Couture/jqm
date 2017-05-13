@@ -19,7 +19,6 @@
 package com.enioka.jqm.tools;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.net.SocketException;
@@ -30,14 +29,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.zip.ZipFile;
 
 import javax.mail.MessagingException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -74,7 +71,6 @@ final class Helpers
     private static Logger jqmlogger = Logger.getLogger(Helpers.class);
 
     // The one and only EMF in the engine.
-    private static Properties props = new Properties();
     private static Db _db;
 
     // Resource file contains at least the jqm jdbc connection definition. Static because JNDI root context is common to the whole JVM.
@@ -110,45 +106,27 @@ final class Helpers
         return _db;
     }
 
+    static boolean isDbInitialized()
+    {
+        return _db != null;
+    }
+
     private static Db createFactory()
     {
-        InputStream fis = null;
         try
         {
-            Properties p = new Properties();
-            fis = Helpers.class.getClassLoader().getResourceAsStream("jqm.properties");
-            if (fis != null)
-            {
-                jqmlogger.trace("A jqm.properties file was found");
-                p.load(fis);
-                IOUtils.closeQuietly(fis);
-                props.putAll(p);
-            }
+            Properties p = Db.loadProperties();
+            Db n = new Db(p);
+            p.put("emf", n); // Share the DataSource in engine and client.
+            JqmClientFactory.setProperties(p);
 
-            String dsName = "jdbc/jqm";
-            if (props.containsKey("com.enioka.jqm.jdbc.datasource"))
-            {
-                dsName = p.getProperty("com.enioka.jqm.jdbc.datasource");
-            }
-            JqmClientFactory.setProperties(props);
-
-            return new Db(dsName);
-        }
-        catch (IOException e)
-        {
-            jqmlogger.fatal("conf/jqm.properties file is invalid", e);
-            IOUtils.closeQuietly(fis);
-            throw new JqmInitError("Invalid JQM configuration file", e);
+            return n;
         }
         catch (Exception e)
         {
             jqmlogger.fatal("Unable to connect with the database. Maybe your configuration file is wrong. "
                     + "Please check the password or the url in the $JQM_DIR/conf/resources.xml", e);
             throw new JqmInitError("Database connection issue", e);
-        }
-        finally
-        {
-            IOUtils.closeQuietly(fis);
         }
     }
 

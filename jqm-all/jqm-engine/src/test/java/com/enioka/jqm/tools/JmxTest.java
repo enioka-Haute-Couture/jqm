@@ -57,7 +57,7 @@ public class JmxTest extends JqmBaseTest
 
         // Go
         addAndStartEngine();
-        Thread.sleep(1000);
+        TestHelpers.waitForRunning(1, 1000, cnx);
 
         // Connect to JMX server
         JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://" + hn + ":" + port1 + "/jndi/rmi://" + hn + ":" + port2 + "/jmxrmi");
@@ -67,22 +67,25 @@ public class JmxTest extends JqmBaseTest
         System.out.println(count);
 
         String[] domains = mbsc.getDomains();
+        System.out.println("*** domains:");
         for (String d : domains)
         {
             System.out.println(d);
         }
         Set<ObjectInstance> mbeans = mbsc.queryMBeans(new ObjectName("com.enioka.jqm:*"), null);
+        System.out.println("*** beans in com.enioka.jqm:*: ");
         for (ObjectInstance oi : mbeans)
         {
             System.out.println(oi.getObjectName());
         }
-        Assert.assertEquals(6, mbeans.size());
+        Assert.assertEquals(5, mbeans.size());
+        // 1 node, 3 pollers, 1 running instance, 1 JDBC pool. The pool is not visible due to a call to resetSingletons.
 
         // /////////////////
         // Loader beans
         ObjectName killBean = new ObjectName(
                 "com.enioka.jqm:type=Node.Queue.JobInstance,Node=" + TestHelpers.node.getName() + ",Queue=VIPQueue,name=" + i);
-        System.out.println(killBean.toString());
+        System.out.println("Name to kill: " + killBean.toString());
         mbeans = mbsc.queryMBeans(killBean, null);
         if (mbeans.isEmpty())
         {

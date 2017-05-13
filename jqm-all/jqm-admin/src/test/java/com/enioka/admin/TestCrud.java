@@ -36,7 +36,7 @@ public class TestCrud
 
             JDBCDataSource ds = new JDBCDataSource();
             ds.setDatabase("jdbc:hsqldb:mem:testdbengine");
-            db = new Db(ds);
+            db = new Db(ds, true);
         }
     }
 

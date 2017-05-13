@@ -18,6 +18,8 @@
 
 package com.enioka.jqm.tools;
 
+import java.util.Properties;
+
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -34,8 +36,6 @@ import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
-import com.enioka.jqm.jpamodel.RRole;
-import com.enioka.jqm.jpamodel.RUser;
 
 /**
  * Starter class & parameter parsing
@@ -277,7 +277,7 @@ public class Main
             cnx = Helpers.getNewDbSession();
             try
             {
-                int defaultQueueId = cnx.runSelectSingle("q_select_default", Integer.class);
+                cnx.runSelectSingle("q_select_default", Integer.class);
             }
             catch (NoResultException e)
             {
@@ -371,6 +371,13 @@ public class Main
         DbConn cnx = null;
         try
         {
+            if (!Helpers.isDbInitialized())
+            {
+                Properties p = Db.loadProperties();
+                p.setProperty("com.enioka.jqm.jdbc.allowSchemaUpdate", "true");
+                Db db = new Db(p);
+                Helpers.setDb(db);
+            }
             cnx = Helpers.getNewDbSession();
             Helpers.updateConfiguration(cnx);
             cnx.commit();

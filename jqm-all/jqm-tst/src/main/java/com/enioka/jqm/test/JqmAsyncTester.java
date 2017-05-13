@@ -77,10 +77,10 @@ public class JqmAsyncTester
 
         JDBCDataSource ds = new JDBCDataSource();
         ds.setDatabase("jdbc:hsqldb:mem:" + s.getDatabaseName(0, true));
-        db = new Db(ds);
+        db = new Db(ds, true);
         cnx = db.getConn();
 
-        Properties p2 = new Properties();
+        Properties p2 = Common.dbProperties(s);
         p2.put("emf", db);
         JqmClientFactory.setProperties(p2);
         Main.setEmf(db);

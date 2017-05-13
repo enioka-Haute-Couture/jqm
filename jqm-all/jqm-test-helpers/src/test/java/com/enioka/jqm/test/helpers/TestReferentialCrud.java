@@ -19,15 +19,15 @@ public class TestReferentialCrud
         s.setLogWriter(null);
         s.setSilent(true);
         s.start();
-        
+
         JDBCDataSource ds = new JDBCDataSource();
         ds.setDatabase("jdbc:hsqldb:mem:testdbengine");
-        
-        Db db = new Db(ds); 
+
+        Db db = new Db(ds, true);
         DbConn cnx = db.getConn();
-        
+
         TestHelpers.createTestData(cnx);
-        
+
         cnx.close();
     }
 }

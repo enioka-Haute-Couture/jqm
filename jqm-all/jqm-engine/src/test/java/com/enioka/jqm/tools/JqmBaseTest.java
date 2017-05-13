@@ -69,8 +69,9 @@ public class JqmBaseTest
             {
                 p.load(fis);
                 IOUtils.closeQuietly(fis);
+                fis.close();
             }
-            if (p.isEmpty() || (p.containsKey("com.enioka.jqm.jdbc.datasource")
+            if (p.isEmpty() || !p.containsKey("com.enioka.jqm.jdbc.datasource") || (p.containsKey("com.enioka.jqm.jdbc.datasource")
                     && p.getProperty("com.enioka.jqm.jdbc.datasource").contains("hsql")))
             {
                 s = new Server();

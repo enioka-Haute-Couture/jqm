@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
-import javax.naming.NameNotFoundException;
 import javax.net.ssl.SSLContext;
 
 import org.apache.http.Header;
@@ -108,83 +107,11 @@ final class HibernateClient implements JqmClient
     {
         jqmlogger.debug("Creating connection factory to database");
 
-        InputStream fis = null;
-        try
-        {
-            boolean foundProperties = false;
-            fis = this.getClass().getClassLoader().getResourceAsStream("META-INF/jqm.properties");
-            if (fis != null)
-            {
-                foundProperties = true;
-                p.load(fis);
-                jqmlogger.info("A jqm.properties file was found in META-INF");
-            }
+        // Get all properties from all allowed sources.
+        p.putAll(Db.loadProperties());
 
-            fis = this.getClass().getClassLoader().getResourceAsStream("jqm.properties");
-            if (fis != null)
-            {
-                foundProperties = true;
-                p.load(fis);
-                jqmlogger.info("A jqm.properties file was found");
-            }
-
-            if (!foundProperties)
-            {
-                jqmlogger.debug("no jqm.properties file found");
-            }
-        }
-        catch (IOException e)
-        {
-            // We allow no configuration files, but not an unreadable configuration file.
-            throw new JqmClientException("META-INF/jqm.properties file is invalid", e);
-        }
-        finally
-        {
-            closeQuietly(fis);
-        }
-
-        Db newDb = null;
-        // nonJTA kept for ascending compatibility.
-        if (p.containsKey("javax.persistence.nonJtaDataSource") || p.containsKey("com.enioka.jqm.jdbc.datasource"))
-        {
-            // This is a hack. Some containers will use root context as default for JNDI (WebSphere, Glassfish...), other will use
-            // java:/comp/env/ (Tomcat...). So if we actually know the required alias, we try both, and the user only has to provide a
-            // root JNDI alias that will work in both cases.
-            String dsAlias = (String) (p.containsKey("com.enioka.jqm.jdbc.datasource") ? p.get("com.enioka.jqm.jdbc.datasource")
-                    : p.get("javax.persistence.nonJtaDataSource"));
-            try
-            {
-                newDb = new Db(dsAlias);
-            }
-            catch (DatabaseException e)
-            {
-                if (e.getCause() != null && e.getCause() instanceof NameNotFoundException)
-                {
-                    jqmlogger.warn("JNDI alias " + dsAlias + " was not found. Trying with java:/comp/env/ prefix");
-                    dsAlias = "java:/comp/env/" + dsAlias;
-                    newDb = new Db(dsAlias);
-                }
-                else
-                {
-                    throw e;
-                }
-            }
-        }
-        else if (p.containsKey("com.enioka.jqm.jdbc.url"))
-        {
-            newDb = new Db(p);
-        }
-        else
-        {
-            newDb = new Db(); // use default alias.
-        }
-
-        // Do a stupid query to force initialization
-        DbConn c = newDb.getConn();
-        c.runSelect("node_select_by_id", -1);
-        c.close();
-
-        return newDb;
+        // Create DB.
+        return new Db(p);
     }
 
     DbConn getDbSession()
