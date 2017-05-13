@@ -48,7 +48,7 @@ public class ScriptRunner
                 if (line.contains(";"))
                 {
                     // End of order - run it.
-                    cnx.runRawUpdate(sb.substring(0, sb.length() - 3));
+                    cnx.runRawUpdate(sb.substring(0, sb.length() - 1 - nl.length()));
                     sb = new StringBuilder();
                 }
 
