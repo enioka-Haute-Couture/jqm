@@ -474,7 +474,7 @@ public class Db
      * @param ps
      *            statement to close.
      */
-    private static void closeQuietly(AutoCloseable ps)
+    private static void closeQuietly(Closeable ps)
     {
         if (ps != null)
         {

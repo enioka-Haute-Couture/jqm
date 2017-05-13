@@ -109,6 +109,11 @@ public class TestHelpers
 
     public static void cleanup(DbConn cnx)
     {
+        cleanup(cnx, false);
+    }
+
+    public static void cleanup(DbConn cnx, boolean onlyDb)
+    {
         cnx.runUpdate("globalprm_delete_all");
         cnx.runUpdate("deliverable_delete_all");
         cnx.runUpdate("dp_delete_all");
@@ -132,38 +137,41 @@ public class TestHelpers
 
         cnx.commit();
 
-        try
+        if (!onlyDb)
         {
-            // Conf dir may contain certificates and certificate stores
-            if ((new File("./conf")).isDirectory())
+            try
             {
-                FileUtils.deleteDirectory(new File("./conf"));
+                // Conf dir may contain certificates and certificate stores
+                if ((new File("./conf")).isDirectory())
+                {
+                    FileUtils.deleteDirectory(new File("./conf"));
+                }
+                // All logs
+                if ((new File("./logs")).isDirectory())
+                {
+                    FileUtils.deleteDirectory(new File("./logs"));
+                }
+                // The war...
+                if ((new File("./webapp")).isDirectory())
+                {
+                    FileUtils.deleteDirectory(new File("./webapp"));
+                }
+                // Where files created by payloads are stored
+                File f = TestHelpers.node == null ? null : new File(TestHelpers.node.getDlRepo());
+                if (f != null && f.isDirectory())
+                {
+                    FileUtils.cleanDirectory(new File(TestHelpers.node.getDlRepo()));
+                }
+                // Temp dir where files downloaded by the API are stored (supposed to be self-destructible file but anyway)
+                if ((new File(System.getProperty("java.io.tmpdir") + "/jqm")).isDirectory())
+                {
+                    FileUtils.cleanDirectory(new File(System.getProperty("java.io.tmpdir") + "/jqm"));
+                }
             }
-            // All logs
-            if ((new File("./logs")).isDirectory())
+            catch (IOException e)
             {
-                FileUtils.deleteDirectory(new File("./logs"));
+                // Nothing to do
             }
-            // The war...
-            if ((new File("./webapp")).isDirectory())
-            {
-                FileUtils.deleteDirectory(new File("./webapp"));
-            }
-            // Where files created by payloads are stored
-            File f = TestHelpers.node == null ? null : new File(TestHelpers.node.getDlRepo());
-            if (f != null && f.isDirectory())
-            {
-                FileUtils.cleanDirectory(new File(TestHelpers.node.getDlRepo()));
-            }
-            // Temp dir where files downloaded by the API are stored (supposed to be self-destructible file but anyway)
-            if ((new File(System.getProperty("java.io.tmpdir") + "/jqm")).isDirectory())
-            {
-                FileUtils.cleanDirectory(new File(System.getProperty("java.io.tmpdir") + "/jqm"));
-            }
-        }
-        catch (IOException e)
-        {
-            // Nothing to do
         }
     }
 

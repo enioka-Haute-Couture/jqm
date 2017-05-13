@@ -190,7 +190,7 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals(true, f.exists());
 
         // -> Delete all entries and try to reimport them from the exported file
-        TestHelpers.cleanup(cnx);
+        TestHelpers.cleanup(cnx, true);
 
         XmlJobDefParser.parse(TestHelpers.node.getDlRepo() + "xmlexportjobdeftest.xml", cnx);
 

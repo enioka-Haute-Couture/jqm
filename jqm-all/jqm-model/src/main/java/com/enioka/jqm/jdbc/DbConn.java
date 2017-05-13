@@ -353,7 +353,70 @@ public class DbConn implements Closeable
      * @param ps
      *            statement to close.
      */
-    public void closeQuietly(AutoCloseable ps)
+    public void closeQuietly(Closeable ps)
+    {
+        if (ps != null)
+        {
+            try
+            {
+                ps.close();
+            }
+            catch (Exception e)
+            {
+                // Do nothing.
+            }
+        }
+    }
+
+    /**
+     * Close utility method.
+     * 
+     * @param ps
+     *            statement to close.
+     */
+    public void closeQuietly(ResultSet ps)
+    {
+        if (ps != null)
+        {
+            try
+            {
+                ps.close();
+            }
+            catch (Exception e)
+            {
+                // Do nothing.
+            }
+        }
+    }
+
+    /**
+     * Close utility method.
+     * 
+     * @param ps
+     *            statement to close.
+     */
+    public void closeQuietly(Connection ps)
+    {
+        if (ps != null)
+        {
+            try
+            {
+                ps.close();
+            }
+            catch (Exception e)
+            {
+                // Do nothing.
+            }
+        }
+    }
+
+    /**
+     * Close utility method.
+     * 
+     * @param ps
+     *            statement to close.
+     */
+    public void closeQuietly(Statement ps)
     {
         if (ps != null)
         {
