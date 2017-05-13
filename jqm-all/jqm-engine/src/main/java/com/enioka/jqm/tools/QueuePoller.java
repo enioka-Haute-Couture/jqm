@@ -67,7 +67,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     @Override
     public void stop()
     {
-        jqmlogger.info("Poller has received a stop order");
+        jqmlogger.info("Poller " + queue.getName() + " has received a stop order");
         run = false;
         if (localThread != null)
         {
@@ -224,8 +224,10 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 }
                 else
                 {
-                    jqmlogger.error("Queue poller has failed!", e);
-                    throw e;
+                    jqmlogger.error("Queue poller has failed! It will stop.", e);
+                    this.run = false;
+                    this.hasStopped = true;
+                    break;
                 }
             }
             finally
@@ -282,8 +284,10 @@ class QueuePoller implements Runnable, QueuePollerMBean
         else
         {
             // else => Abnormal stop. Set booleans to reflect this.
+            jqmlogger.error("Poller on queue " + this.queue.getName() + " has ended abnormally");
             this.run = false;
             this.hasStopped = true;
+            this.engine.checkEngineEnd();
         }
     }
 
