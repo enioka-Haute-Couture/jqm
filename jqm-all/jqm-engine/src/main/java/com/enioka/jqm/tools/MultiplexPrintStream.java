@@ -28,7 +28,7 @@ import java.io.Writer;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
-import com.enioka.jqm.jpamodel.GlobalParameter;
+import com.enioka.jqm.model.GlobalParameter;
 
 /**
  * The goal of this Stream is to provide a replacement for stdout/err in which every running job instance has its own personal flow. This is

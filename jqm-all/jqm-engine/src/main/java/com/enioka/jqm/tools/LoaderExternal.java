@@ -8,15 +8,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.RollingFileAppender;
 
-import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.JobInstance;
 
 class LoaderExternal implements Runnable
 {
@@ -28,13 +28,14 @@ class LoaderExternal implements Runnable
     int killCheckPeriodMs = 1000;
     QueuePoller qp = null;
 
-    public LoaderExternal(EntityManager em, JobInstance job, QueuePoller qp)
+    public LoaderExternal(DbConn cnx, JobInstance job, QueuePoller qp)
     {
         this.jobId = job.getId();
         this.qp = qp;
-        opts = job.getJd().getJavaOpts() == null ? Helpers.getParameter("defaultExternalOpts", "-Xms32m -Xmx128m -XX:MaxPermSize=64m", em)
-                : job.getJd().getJavaOpts();
-        killCheckPeriodMs = Integer.parseInt(Helpers.getParameter("internalPollingPeriodMs", "1000", em));
+        opts = job.getJD().getJavaOpts() == null
+                ? GlobalParameter.getParameter(cnx, "defaultExternalOpts", "-Xms32m -Xmx128m -XX:MaxPermSize=64m")
+                : job.getJD().getJavaOpts();
+        killCheckPeriodMs = Integer.parseInt(GlobalParameter.getParameter(cnx, "internalPollingPeriodMs", "1000"));
 
         RollingFileAppender a = (RollingFileAppender) Logger.getRootLogger().getAppender("rollingfile");
         logFile = FilenameUtils.getFullPath(a.getFile());

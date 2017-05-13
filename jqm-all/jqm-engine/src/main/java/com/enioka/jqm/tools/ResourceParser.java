@@ -21,12 +21,6 @@ import java.util.Map;
 
 import javax.naming.NamingException;
 import javax.naming.StringRefAddr;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.ParameterExpression;
-import javax.persistence.criteria.Root;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -36,8 +30,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.enioka.jqm.jpamodel.JndiObjectResource;
-import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.JndiObjectResource;
+import com.enioka.jqm.model.JndiObjectResourceParameter;
 
 /**
  * Helper class to retrieve a {@link JndiResourceDescriptor} either from the XML resource file or from the database. <br>
@@ -72,22 +67,24 @@ final class ResourceParser
     private static JndiResourceDescriptor fromDatabase(String alias) throws NamingException
     {
         JndiObjectResource resource = null;
-        EntityManager em = null;
+        DbConn cnx = null;
         try
         {
-            // Using the horrible CriteriaBuilder API instead of a string query. This avoids classloading issues - Hibernate binds
-            // the entities at run time with the thread current classloader...
-            em = Helpers.getNewEm();
+            if (!Helpers.isDbInitialized())
+            {
+                throw new IllegalStateException("cannot fetch a JNDI resource from DB when DB is not initialized");
+            }
+            cnx = Helpers.getNewDbSession();
+            resource = JndiObjectResource.select_alias(cnx, alias);
 
-            CriteriaBuilder cb = em.getCriteriaBuilder();
-            CriteriaQuery<JndiObjectResource> q = cb.createQuery(JndiObjectResource.class);
-            Root<JndiObjectResource> c = q.from(JndiObjectResource.class);
-            ParameterExpression<String> p = cb.parameter(String.class);
-            q.select(c).where(cb.equal(c.get("name"), p));
+            JndiResourceDescriptor d = new JndiResourceDescriptor(resource.getType(), resource.getDescription(), null, resource.getAuth(),
+                    resource.getFactory(), resource.getSingleton());
+            for (JndiObjectResourceParameter prm : resource.getParameters(cnx))
+            {
+                d.add(new StringRefAddr(prm.getKey(), prm.getValue()));
+            }
 
-            TypedQuery<JndiObjectResource> query = em.createQuery(q);
-            query.setParameter(p, alias);
-            resource = query.getSingleResult();
+            return d;
         }
         catch (Exception e)
         {
@@ -97,21 +94,8 @@ final class ResourceParser
         }
         finally
         {
-            if (em != null)
-            {
-                em.close();
-            }
+            Helpers.closeQuietly(cnx);
         }
-
-        // Create the ResourceDescriptor from the JPA object
-        JndiResourceDescriptor d = new JndiResourceDescriptor(resource.getType(), resource.getDescription(), null, resource.getAuth(),
-                resource.getFactory(), resource.getSingleton());
-        for (JndiObjectResourceParameter prm : resource.getParameters())
-        {
-            d.add(new StringRefAddr(prm.getKey(), prm.getValue()));
-        }
-
-        return d;
     }
 
     private static void importXml() throws NamingException

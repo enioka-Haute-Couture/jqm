@@ -19,6 +19,7 @@
 package com.enioka.jqm.tools;
 
 import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -31,17 +32,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.LockModeType;
-import javax.persistence.LockTimeoutException;
 
 import org.apache.log4j.Logger;
 
-import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.QueryResult;
+import com.enioka.jqm.model.DeploymentParameter;
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Queue;
 
 /**
  * A thread that polls a queue according to the parameters defined inside a {@link DeploymentParameter}.
@@ -96,13 +94,12 @@ class QueuePoller implements Runnable, QueuePollerMBean
     {
         jqmlogger.info("Engine " + engine.getNode().getName() + " will poll JobInstances on queue " + q.getName() + " every "
                 + interval / 1000 + "s with " + nbThreads + " threads for concurrent instances");
-        EntityManager em = Helpers.getNewEm();
 
         this.engine = engine;
         this.queue = q;
         this.pollingInterval = interval;
         this.maxNbThread = nbThreads;
-        em.close();
+
         reset();
         registerMBean();
     }
@@ -137,90 +134,44 @@ class QueuePoller implements Runnable, QueuePollerMBean
         }
     }
 
-    protected JobInstance dequeue(EntityManager em, int additionalSlots)
+    protected List<JobInstance> dequeue(DbConn cnx)
     {
         // Free room?
-        if (actualNbThread.get() >= maxNbThread)
+        int usedSlots = actualNbThread.get();
+        if (usedSlots >= maxNbThread)
         {
-            return null;
+            return new ArrayList<JobInstance>();
         }
 
         // Get the list of all jobInstance within the defined queue, ordered by position
-        List<JobInstance> availableJobs = em
-                .createQuery(
-                        "SELECT j FROM JobInstance j LEFT JOIN FETCH j.jd WHERE j.queue = :q AND j.state = :s ORDER BY j.internalPosition ASC",
-                        JobInstance.class)
-                .setParameter("q", queue).setParameter("s", State.SUBMITTED).setMaxResults(maxNbThread + additionalSlots).getResultList();
-
-        em.getTransaction().begin();
-        int rejectedCauseHighlander = 0;
-        for (JobInstance res : availableJobs)
+        QueryResult qr = cnx.runUpdate("ji_update_poll", this.engine.getNode().getId(), queue.getId(), maxNbThread - usedSlots);
+        if (qr.nbUpdated > 0)
         {
-            // Lock is given when object is read, not during select... stupid.
-            // So we must check if the object is still SUBMITTED.
-            try
-            {
-                em.refresh(res, LockModeType.PESSIMISTIC_WRITE);
-            }
-            catch (EntityNotFoundException e)
-            {
-                // It has already been eaten and finished by another engine
-                // JPA2 dictates that in this case, the transaction is marked as rollback only.
-                // But beware, rollback detaches all entities from the session! So we simply give up and retry.
-                // As this is a very rare case, this is acceptable performance-wise.
-                em.getTransaction().rollback();
-                return dequeue(em, rejectedCauseHighlander);
-            }
-            catch (LockTimeoutException e)
-            {
-                // Just give up. We'll get another chance later.
-                em.getTransaction().rollback();
-                return null;
-            }
-            if (!res.getState().equals(State.SUBMITTED))
-            {
-                // Already eaten by another engine, not yet done
-                continue;
-            }
-
-            // Highlander?
-            if (res.getJd().isHighlander() && !highlanderPollingMode(res, em))
-            {
-                rejectedCauseHighlander++;
-                continue;
-            }
-
-            // Reserve the JI for this engine. Use a query rather than setter to avoid updating all fields (and locks when verifying FKs)
-            em.createQuery(
-                    "UPDATE JobInstance j SET j.state = 'ATTRIBUTED', j.node = :n, j.attributionDate = current_timestamp() WHERE id=:i")
-                    .setParameter("i", res.getId()).setParameter("n", this.engine.getNode()).executeUpdate();
-
-            // Stop at the first suitable JI. Release the lock & update the JI which has been attributed to us.
-            em.getTransaction().commit();
-            return res;
+            jqmlogger.debug("Poller has found " + qr.nbUpdated + " JI to run");
         }
-
-        // If here, no suitable JI is available
-        em.getTransaction().rollback();
-        if (rejectedCauseHighlander > additionalSlots)
+        if (qr.nbUpdated > 0)
         {
-            return dequeue(em, rejectedCauseHighlander);
+            List<JobInstance> res = JobInstance.select(cnx, "ji_select_to_run", this.engine.getNode().getId(), queue.getId());
+            if (res.size() == qr.nbUpdated)
+            {
+                cnx.commit();
+                return res;
+            }
+            else
+            {
+                // Try again. This means the jobs marked for exec on previous loop have not already started.
+                // So they were still in the SELECT WHERE STATE='ATTRIBUTED'.
+                // Happens when loop interval is too low (ms and not s), so only happens during tests.
+                jqmlogger.info("Polling interval seems too low");
+                cnx.rollback();
+                Thread.yield();
+                return dequeue(cnx);
+            }
         }
-        return null;
-    }
-
-    /**
-     * 
-     * @param jobToTest
-     * @param em
-     * @return true if job can be launched even if it is in highlander mode
-     */
-    protected boolean highlanderPollingMode(JobInstance jobToTest, EntityManager em)
-    {
-        List<JobInstance> jobs = em.createQuery(
-                "SELECT j FROM JobInstance j WHERE j IS NOT :refid AND j.jd = :jd AND (j.state = 'RUNNING' OR j.state = 'ATTRIBUTED')",
-                JobInstance.class).setParameter("refid", jobToTest).setParameter("jd", jobToTest.getJd()).getResultList();
-        return jobs.isEmpty();
+        else
+        {
+            return new ArrayList<JobInstance>();
+        }
     }
 
     @Override
@@ -228,40 +179,37 @@ class QueuePoller implements Runnable, QueuePollerMBean
     {
         this.localThread = Thread.currentThread();
         this.localThread.setName("QUEUE_POLLER;polling;" + this.queue.getName());
-        EntityManager em = null;
+        DbConn cnx = null;
 
         while (true)
         {
             lastLoop = Calendar.getInstance();
+            jqmlogger.trace("poller loop");
 
             try
             {
                 // Get a JI to run
-                em = Helpers.getNewEm();
-                JobInstance ji = dequeue(em, 0);
-                while (ji != null)
+                cnx = Helpers.getNewDbSession();
+                for (JobInstance ji : dequeue(cnx))
                 {
                     // We will run this JI!
                     jqmlogger.trace("JI number " + ji.getId() + " will be run by this poller this loop (already " + actualNbThread + "/"
                             + maxNbThread + " on " + this.queue.getName() + ")");
                     actualNbThread.incrementAndGet();
-                    if (ji.getJd().getMaxTimeRunning() != null)
+                    if (ji.getJD().getMaxTimeRunning() != null)
                     {
-                        this.peremption.put(ji.getId(), new Date((new Date()).getTime() + ji.getJd().getMaxTimeRunning() * 60 * 1000));
+                        this.peremption.put(ji.getId(), new Date((new Date()).getTime() + ji.getJD().getMaxTimeRunning() * 60 * 1000));
                     }
 
                     // Run it
-                    if (!ji.getJd().isExternal())
+                    if (!ji.getJD().isExternal())
                     {
                         (new Thread(new Loader(ji, this.engine, this, this.engine.getClassloaderManager()))).start();
                     }
                     else
                     {
-                        (new Thread(new LoaderExternal(em, ji, this))).start();
+                        (new Thread(new LoaderExternal(cnx, ji, this))).start();
                     }
-
-                    // Check if there is another job to run (does nothing - no db query - if queue is full so this is not expensive)
-                    ji = dequeue(em, 0);
                 }
             }
             catch (RuntimeException e)
@@ -282,8 +230,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
             }
             finally
             {
-                // Reset the em on each loop.
-                Helpers.closeQuietly(em);
+                // Reset the connection on each loop.
+                Helpers.closeQuietly(cnx);
             }
 
             // Wait according to the deploymentParameter
@@ -432,24 +380,30 @@ class QueuePoller implements Runnable, QueuePollerMBean
     @Override
     public long getCumulativeJobInstancesCount()
     {
-        EntityManager em2 = Helpers.getNewEm();
-        Long nb = em2.createQuery("SELECT COUNT(i) From History i WHERE i.node = :n AND i.queue = :q", Long.class)
-                .setParameter("n", this.engine.getNode()).setParameter("q", this.queue).getSingleResult();
-        em2.close();
-        return nb;
+        DbConn em2 = Helpers.getNewDbSession();
+        try
+        {
+            return em2.runSelectSingle("history_select_count_for_poller", Long.class, this.queue.getId(), this.engine.getNode().getId());
+        }
+        finally
+        {
+            Helpers.closeQuietly(em2);
+        }
     }
 
     @Override
     public float getJobsFinishedPerSecondLastMinute()
     {
-        EntityManager em2 = Helpers.getNewEm();
-        Calendar minusOneMinute = Calendar.getInstance();
-        minusOneMinute.add(Calendar.MINUTE, -1);
-        Float nb = em2.createQuery("SELECT COUNT(i) From History i WHERE i.endDate >= :d and i.node = :n AND i.queue = :q", Long.class)
-                .setParameter("d", minusOneMinute).setParameter("n", this.engine.getNode()).setParameter("q", this.queue).getSingleResult()
-                / 60f;
-        em2.close();
-        return nb;
+        DbConn em2 = Helpers.getNewDbSession();
+        try
+        {
+            return em2.runSelectSingle("history_select_count_last_mn_for_poller", Float.class, this.queue.getId(),
+                    this.engine.getNode().getId());
+        }
+        finally
+        {
+            Helpers.closeQuietly(em2);
+        }
     }
 
     @Override

@@ -13,14 +13,15 @@ import java.util.Map;
 
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
-import javax.persistence.EntityManager;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
-import com.enioka.jqm.jpamodel.Cl;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.Cl;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.JobInstance;
 
 /**
  * This class holds all the {@link JarClassLoader} and is the only place to create one. There should be one instance per engine.<br>
@@ -67,37 +68,26 @@ class ClassloaderManager
 
     ClassloaderManager()
     {
-        EntityManager em = null;
-        try
-        {
-            em = Helpers.getNewEm();
-            launchIsolationDefault = Helpers.getParameter("launch_isolation_default", "Isolated", em);
-
-            String rns = Helpers.getParameter("job_runners",
-                    "com.enioka.jqm.tools.LegacyRunner,com.enioka.jqm.tools.MainRunner,com.enioka.jqm.tools.RunnableRunner", em);
-            for (String s : rns.split(","))
-            {
-                runnerClasses.add(s);
-                jqmlogger.info("Detected a job instance runner named " + s);
-            }
-        }
-        catch (Exception e)
-        {
-            throw new JqmInitError("could not find parameter", e);
-        }
-        finally
-        {
-            Helpers.closeQuietly(em);
-        }
-
         this.fsResolver = new LibraryResolverFS();
         this.mavenResolver = new LibraryResolverMaven();
     }
 
-    JarClassLoader getClassloader(JobInstance ji, EntityManager em) throws MalformedURLException, JqmPayloadException, RuntimeException
+    void setIsolationDefault(DbConn cnx)
+    {
+        this.launchIsolationDefault = GlobalParameter.getParameter(cnx, "launch_isolation_default", "Isolated");
+        String rns = GlobalParameter.getParameter(cnx, "job_runners",
+                "com.enioka.jqm.tools.LegacyRunner,com.enioka.jqm.tools.MainRunner,com.enioka.jqm.tools.RunnableRunner");
+        for (String s : rns.split(","))
+        {
+            runnerClasses.add(s);
+            jqmlogger.info("Detected a job instance runner named " + s);
+        }
+    }
+
+    JarClassLoader getClassloader(JobInstance ji, DbConn cnx) throws MalformedURLException, JqmPayloadException, RuntimeException
     {
         final JarClassLoader jobClassLoader;
-        JobDef jd = ji.getJd();
+        JobDef jd = ji.getJD();
 
         // Extract the jar actual path
         File jarFile = new File(FilenameUtils.concat(new File(ji.getNode().getRepo()).getAbsolutePath(), jd.getJarPath()));
@@ -179,7 +169,7 @@ class ClassloaderManager
         }
 
         // Resolve the libraries and add them to the classpath
-        final URL[] classpath = getClasspath(ji, em);
+        final URL[] classpath = getClasspath(ji, cnx);
 
         // Remember to also add the jar file itself... as CL can be shared, there is no telling if it already present or not.
         jobClassLoader.extendUrls(jarFile.toURI().toURL(), classpath);
@@ -213,15 +203,15 @@ class ClassloaderManager
      * 
      * @throws JqmPayloadException
      */
-    private URL[] getClasspath(JobInstance ji, EntityManager em) throws JqmPayloadException
+    private URL[] getClasspath(JobInstance ji, DbConn cnx) throws JqmPayloadException
     {
-        switch (ji.getJd().getPathType())
+        switch (ji.getJD().getPathType())
         {
         default:
         case FS:
-            return fsResolver.getLibraries(ji.getNode(), ji.getJd(), em);
+            return fsResolver.getLibraries(ji.getNode(), ji.getJD(), cnx);
         case MAVEN:
-            return mavenResolver.resolve(ji, em);
+            return mavenResolver.resolve(ji, cnx);
         case MEMORY:
             return new URL[0];
         }
@@ -229,7 +219,7 @@ class ClassloaderManager
 
     private ClassLoader getParentClassLoader(JobInstance ji)
     {
-        switch (ji.getJd().getPathType())
+        switch (ji.getJD().getPathType())
         {
         default:
         case FS:

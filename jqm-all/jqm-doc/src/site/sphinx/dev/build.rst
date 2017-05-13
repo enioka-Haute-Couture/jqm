@@ -1,4 +1,4 @@
-﻿Release process
+Release process
 #############################
 
 .. highlight:: bash

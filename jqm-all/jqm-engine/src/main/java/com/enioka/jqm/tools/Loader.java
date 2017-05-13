@@ -22,7 +22,6 @@ import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
@@ -31,8 +30,6 @@ import java.util.Properties;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -40,11 +37,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.RuntimeParameter;
-import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.QueryResult;
+import com.enioka.jqm.model.History;
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.model.RuntimeParameter;
+import com.enioka.jqm.model.State;
 
 /**
  * The loader is the tracker object for a payload execution. The job thread starts here and ends here. This class handles logging (creation
@@ -76,7 +75,7 @@ class Loader implements Runnable, LoaderMBean
         this.engine = engine;
         this.clm = clm;
         this.job = job;
-        this.threadName = this.job.getJd().getApplicationName() + ";payload;" + this.job.getId();
+        this.threadName = this.job.getJD().getApplicationName() + ";payload;" + this.job.getId();
 
         // JMX
         if (p != null && this.p.getEngine().loadJmxBeans)
@@ -123,32 +122,28 @@ class Loader implements Runnable, LoaderMBean
             mps.registerThread(String.valueOf(fileName + ".stderr.log"));
         }
 
-        EntityManager em = null;
+        // Log
+        this.resultStatus = State.SUBMITTED;
+        jqmlogger.debug("A loader/runner thread has just started for Job Instance " + job.getId() + ". Jar is: " + job.getJD().getJarPath()
+                + " - class is: " + job.getJD().getJavaClassName());
+
         final Map<String, String> params;
         final JarClassLoader jobClassLoader;
+        DbConn cnx = null;
         final JobManagerHandler handler;
+
+        this.node = this.job.getNode();
 
         // Block needing the database
         try
         {
-            em = Helpers.getNewEm();
-
-            // Refresh entities from the current EM
-            this.job = em.find(JobInstance.class, job.getId());
-            this.node = em.find(Node.class, job.getNode().getId());
-
-            // Log
-            this.resultStatus = State.SUBMITTED;
-            jqmlogger.debug("A loader/runner thread has just started for Job Instance " + job.getId() + ". Jar is: "
-                    + job.getJd().getJarPath() + " - class is: " + job.getJd().getJavaClassName());
+            cnx = Helpers.getNewDbSession();
 
             // Disabled
-            if (!this.job.getJd().isEnabled())
+            if (!this.job.getJD().isEnabled())
             {
                 jqmlogger.info("Job Instance " + job.getId() + " will actually not truly run as its Job Definition is disabled");
-                em.getTransaction().begin();
-                this.job.setProgress(-1);
-                em.getTransaction().commit();
+                job.setProgress(-1); // Not persisted, but useful to endOfRunDb
                 resultStatus = State.ENDED;
                 endOfRun();
                 return;
@@ -156,38 +151,42 @@ class Loader implements Runnable, LoaderMBean
 
             // Parameters
             params = new HashMap<String, String>();
-            for (RuntimeParameter jp : em.createQuery("SELECT p FROM RuntimeParameter p WHERE p.ji = :i", RuntimeParameter.class)
-                    .setParameter("i", job.getId()).getResultList())
+            for (Map.Entry<String, String> jp : RuntimeParameter.select_map(cnx, "jiprm_select_by_ji", job.getId()).entrySet())
             {
                 jqmlogger.trace("Parameter " + jp.getKey() + " - " + jp.getValue());
                 params.put(jp.getKey(), jp.getValue());
             }
 
-            // Update of the job status, dates & co
-            em.getTransaction().begin();
-            em.refresh(job, LockModeType.PESSIMISTIC_WRITE);
-            if (!job.getState().equals(State.KILLED))
-            {
-                // Use a query to avoid locks on FK checks (with setters, every field is updated!)
-                em.createQuery("UPDATE JobInstance j SET j.executionDate = current_timestamp(), state = 'RUNNING' WHERE j.id = :i")
-                        .setParameter("i", job.getId()).executeUpdate();
-            }
-            em.getTransaction().commit();
-
-            jobClassLoader = this.clm.getClassloader(job, em);
-
+            // Cache heating
+            this.job.getJD().getClassLoader(cnx);
+            jobClassLoader = this.clm.getClassloader(job, cnx);
             handler = new JobManagerHandler(job, params);
+
+            // Update of the job status, dates & co
+            this.job.setExecutionDate(Calendar.getInstance()); // For use in JMX
+            QueryResult qr = cnx.runUpdate("jj_update_run_by_id", job.getId());
+            if (qr.nbUpdated == 0)
+            {
+                // This means the JI has been killed or has disappeared.
+                jqmlogger.warn("Trying to run a job which disappeared or is not in ATTRIBUTED state (likely killed) " + job.getId());
+                if (p != null)
+                {
+                    p.decreaseNbThread(job.getId());
+                }
+                return;
+            }
+            cnx.commit();
         }
         catch (JqmPayloadException e)
         {
-            jqmlogger.warn("Could not resolve CLASSPATH for job " + job.getJd().getApplicationName(), e);
+            jqmlogger.warn("Could not resolve CLASSPATH for job " + job.getJD().getApplicationName(), e);
             resultStatus = State.CRASHED;
             endOfRun();
             return;
         }
         catch (MalformedURLException e)
         {
-            jqmlogger.warn("The JAR file path specified in Job Definition is incorrect " + job.getJd().getApplicationName(), e);
+            jqmlogger.warn("The JAR file path specified in Job Definition is incorrect " + job.getJD().getApplicationName(), e);
             resultStatus = State.CRASHED;
             endOfRun();
             return;
@@ -199,7 +198,7 @@ class Loader implements Runnable, LoaderMBean
         }
         finally
         {
-            Helpers.closeQuietly(em);
+            Helpers.closeQuietly(cnx);
         }
 
         // Class loader switch
@@ -367,29 +366,17 @@ class Loader implements Runnable, LoaderMBean
      */
     void endOfRunDb()
     {
-        EntityManager em = Helpers.getNewEm();
+        DbConn cnx = null;
 
         try
         {
-            // Retrieve the object to update
-            job = em.find(JobInstance.class, this.job.getId());
-
-            // Which end time should we use? Default is always use DB time to avoid time lips between servers.
-            Date dbTimeTmp = em.createQuery("SELECT current_timestamp() AS A from GlobalParameter", Date.class).getSingleResult();
-            Calendar dbTime = Calendar.getInstance();
-            dbTime.setTime(dbTimeTmp);
-            if (!this.isDelayed)
-            {
-                // In case of delayed finalization, use the stored time instead of db time.
-                this.endDate = dbTime;
-            }
+            cnx = Helpers.getNewDbSession();
 
             // Done: put inside history & remove instance from queue.
-            em.getTransaction().begin();
-            History h = Helpers.createHistory(job, em, this.resultStatus, endDate);
-            jqmlogger.trace("An History was just created for job instance " + h.getId());
-            em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", job.getId()).executeUpdate();
-            em.getTransaction().commit();
+            History.create(cnx, job, this.resultStatus, endDate);
+            jqmlogger.trace("An History was just created for job instance " + this.job.getId());
+            cnx.runUpdate("ji_delete_by_id", this.job.getId());
+            cnx.commit();
         }
         catch (RuntimeException e)
         {
@@ -397,7 +384,7 @@ class Loader implements Runnable, LoaderMBean
         }
         finally
         {
-            Helpers.closeQuietly(em);
+            Helpers.closeQuietly(cnx);
         }
     }
 
@@ -431,7 +418,7 @@ class Loader implements Runnable, LoaderMBean
         }
         else
         {
-            jqmlogger.error("a database related operation has failed and cannot be recovered");
+            jqmlogger.error("a database related operation has failed and cannot be recovered", e);
             throw e;
         }
     }
@@ -444,14 +431,14 @@ class Loader implements Runnable, LoaderMBean
     public void kill()
     {
         Properties props = new Properties();
-        props.put("emf", Helpers.getEmf());
+        props.put("com.enioka.jqm.jdbc.contextobject", Helpers.getDb());
         JqmClientFactory.getClient("uncached", props, false).killJob(this.job.getId());
     }
 
     @Override
     public String getApplicationName()
     {
-        return this.job.getJd().getApplicationName();
+        return this.job.getJD().getApplicationName();
     }
 
     @Override
@@ -507,9 +494,9 @@ class Loader implements Runnable, LoaderMBean
     {
         if (this.job.getExecutionDate() == null)
         {
-            EntityManager em2 = Helpers.getNewEm();
-            this.job.setExecutionDate(em2.find(JobInstance.class, this.job.getId()).getExecutionDate());
-            em2.close();
+            DbConn cnx = Helpers.getNewDbSession();
+            this.job.setExecutionDate(cnx.runSelectSingle("ji_select_execution_date_by_id", Calendar.class, this.job.getId()));
+            cnx.close();
         }
         if (this.job.getExecutionDate() == null)
         {

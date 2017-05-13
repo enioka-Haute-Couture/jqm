@@ -1,12 +1,9 @@
 package com.enioka.jqm.tools;
 
-import java.util.ArrayList;
-
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.jpamodel.JobDefParameter;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -18,9 +15,9 @@ public class EngineCLIsolationTest extends JqmBaseTest
      */
     void createSubmitSetJob(String specificIsolationContext)
     {
-        CreationTools.createJobDef(null, true, "com.enioka.jqm.TestCLIsolation.TestSet", new ArrayList<JobDefParameter>(),
-                "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestSet", null, null, null, null, null, false, em,
-                specificIsolationContext);
+        CreationTools.createJobDef(null, true, "com.enioka.jqm.TestCLIsolation.TestSet", null,
+                "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestSet", null, null, null, null, null, false,
+                cnx, specificIsolationContext);
         JobRequest.create("TestSet", null).submit();
     }
 
@@ -29,9 +26,9 @@ public class EngineCLIsolationTest extends JqmBaseTest
      */
     void createSubmitGetJob(String specificIsolationContext)
     {
-        CreationTools.createJobDef(null, true, "com.enioka.jqm.TestCLIsolation.TestGet", new ArrayList<JobDefParameter>(),
-                "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestGet", null, null, null, null, null, false, em,
-                specificIsolationContext);
+        CreationTools.createJobDef(null, true, "com.enioka.jqm.TestCLIsolation.TestGet", null,
+                "jqm-tests/jqm-test-cl-isolation/target/test.jar", TestHelpers.qVip, -1, "TestGet", null, null, null, null, null, false,
+                cnx, specificIsolationContext);
         JobRequest.create("TestGet", null).submit();
     }
 
@@ -46,12 +43,12 @@ public class EngineCLIsolationTest extends JqmBaseTest
         addAndStartEngine();
 
         createSubmitSetJob(null);
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
         createSubmitGetJob(null);
-        TestHelpers.waitFor(2, 10000, em);
+        TestHelpers.waitFor(2, 10000, cnx);
 
-        Assert.assertEquals(2, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(2, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 
     /**
@@ -62,16 +59,18 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testGlobalIsolated() throws Exception
     {
-        CreationTools.createGlobalParameter("launch_isolation_default", "Isolated", em);
+        Helpers.setSingleParam("launch_isolation_default", "Isolated", cnx);
+        cnx.commit();
+
         addAndStartEngine();
 
         createSubmitSetJob(null);
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
         createSubmitGetJob(null);
-        TestHelpers.waitFor(2, 10000, em);
+        TestHelpers.waitFor(2, 10000, cnx);
 
-        Assert.assertEquals(2, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(2, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 
     /**
@@ -82,16 +81,18 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testGlobalSharedJarSame() throws Exception
     {
-        CreationTools.createGlobalParameter("launch_isolation_default", "SharedJar", em);
+        Helpers.setSingleParam("launch_isolation_default", "SharedJar", cnx);
+        cnx.commit();
+
         addAndStartEngine();
 
         createSubmitSetJob(null);
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
         createSubmitGetJob(null);
-        TestHelpers.waitFor(2, 10000, em);
+        TestHelpers.waitFor(2, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(1, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
     }
 
     /**
@@ -102,20 +103,21 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testGlobalSharedJarDifferent() throws Exception
     {
-        CreationTools.createGlobalParameter("launch_isolation_default", "SharedJar", em);
+        Helpers.setSingleParam("launch_isolation_default", "SharedJar", cnx);
+        cnx.commit();
+
         addAndStartEngine();
 
         createSubmitSetJob(null);
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
         // Use get job from test-pyl jar
-        CreationTools.createJobDef(null, true, "pyl.EngineCLIsolationGet", new ArrayList<JobDefParameter>(),
-                "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, -1, "EngineCLIsolationGet", null, null, null, null, null, false,
-                em);
+        CreationTools.createJobDef(null, true, "pyl.EngineCLIsolationGet", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip,
+                -1, "EngineCLIsolationGet", null, null, null, null, null, false, cnx);
         JobRequest.create("EngineCLIsolationGet", null).submit();
-        TestHelpers.waitFor(2, 10000, em);
+        TestHelpers.waitFor(2, 10000, cnx);
 
-        Assert.assertEquals(2, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(2, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 
     /**
@@ -126,16 +128,18 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testGlobalSharedSame() throws Exception
     {
-        CreationTools.createGlobalParameter("launch_isolation_default", "Shared", em);
+        Helpers.setSingleParam("launch_isolation_default", "Shared", cnx);
+        cnx.commit();
+
         addAndStartEngine();
 
         createSubmitSetJob(null);
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
         createSubmitGetJob(null);
-        TestHelpers.waitFor(2, 10000, em);
+        TestHelpers.waitFor(2, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(1, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
     }
 
     /**
@@ -146,20 +150,21 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testGlobalSharedDifferent() throws Exception
     {
-        CreationTools.createGlobalParameter("launch_isolation_default", "Shared", em);
+        Helpers.setSingleParam("launch_isolation_default", "Shared", cnx);
+        cnx.commit();
+
         addAndStartEngine();
 
         createSubmitSetJob(null);
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
         // Use get job from test-pyl jar
-        CreationTools.createJobDef(null, true, "pyl.EngineCLIsolationGet", new ArrayList<JobDefParameter>(),
-                "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, -1, "EngineCLIsolationGet", null, null, null, null, null, false,
-                em);
+        CreationTools.createJobDef(null, true, "pyl.EngineCLIsolationGet", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip,
+                -1, "EngineCLIsolationGet", null, null, null, null, null, false, cnx);
         JobRequest.create("EngineCLIsolationGet", null).submit();
-        TestHelpers.waitFor(2, 10000, em);
+        TestHelpers.waitFor(2, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(1, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
     }
 
     /**
@@ -174,12 +179,12 @@ public class EngineCLIsolationTest extends JqmBaseTest
         addAndStartEngine();
 
         createSubmitSetJob("test");
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
         createSubmitGetJob("test");
-        TestHelpers.waitFor(2, 10000, em);
+        TestHelpers.waitFor(2, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(1, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
     }
 
     /**
@@ -194,12 +199,12 @@ public class EngineCLIsolationTest extends JqmBaseTest
         addAndStartEngine();
 
         createSubmitSetJob("test1");
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
         createSubmitGetJob("test2");
-        TestHelpers.waitFor(2, 10000, em);
+        TestHelpers.waitFor(2, 10000, cnx);
 
-        Assert.assertEquals(2, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(2, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 
     /**
@@ -211,16 +216,18 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testJobDefSpecificDifferentShared() throws Exception
     {
-        CreationTools.createGlobalParameter("launch_isolation_default", "Shared", em);
+        Helpers.setSingleParam("launch_isolation_default", "Shared", cnx);
+        cnx.commit();
+
         addAndStartEngine();
 
         createSubmitSetJob("test1");
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
         createSubmitGetJob("test2");
-        TestHelpers.waitFor(2, 10000, em);
+        TestHelpers.waitFor(2, 10000, cnx);
 
-        Assert.assertEquals(2, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(2, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 
     /**
@@ -229,16 +236,15 @@ public class EngineCLIsolationTest extends JqmBaseTest
     @Test
     public void testJobDefSharedWithStaticJobManagerField() throws Exception
     {
-        CreationTools.createJobDef(null, true, "pyl.EngineApiStaticInjection", new ArrayList<JobDefParameter>(),
-                "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, -1, "TestSet", null, null, null, null, null, false, em,
-                "mycontext");
+        CreationTools.createJobDef(null, true, "pyl.EngineApiStaticInjection", null, "jqm-tests/jqm-test-pyl/target/test.jar",
+                TestHelpers.qVip, -1, "TestSet", null, null, null, null, null, false, cnx, "mycontext");
 
         JobRequest.create("TestSet", null).submit();
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 }

@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -35,159 +34,30 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.shiro.SecurityUtils;
-
-import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.JndiObjectResource;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.jpamodel.RPermission;
-import com.enioka.jqm.jpamodel.RRole;
-import com.enioka.jqm.jpamodel.RUser;
-import com.enioka.jqm.pki.JpaCa;
-import com.enioka.jqm.webui.admin.dto.GlobalParameterDto;
-import com.enioka.jqm.webui.admin.dto.JndiObjectResourceDto;
-import com.enioka.jqm.webui.admin.dto.JobDefDto;
-import com.enioka.jqm.webui.admin.dto.NodeDto;
-import com.enioka.jqm.webui.admin.dto.PemissionsBagDto;
-import com.enioka.jqm.webui.admin.dto.QueueDto;
-import com.enioka.jqm.webui.admin.dto.QueueMappingDto;
-import com.enioka.jqm.webui.admin.dto.RRoleDto;
-import com.enioka.jqm.webui.admin.dto.RUserDto;
+import com.enioka.admin.MetaService;
+import com.enioka.api.admin.GlobalParameterDto;
+import com.enioka.api.admin.JndiObjectResourceDto;
+import com.enioka.api.admin.JobDefDto;
+import com.enioka.api.admin.NodeDto;
+import com.enioka.api.admin.PemissionsBagDto;
+import com.enioka.api.admin.QueueDto;
+import com.enioka.api.admin.QueueMappingDto;
+import com.enioka.api.admin.RRoleDto;
+import com.enioka.api.admin.RUserDto;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.RPermission;
+import com.enioka.jqm.model.RRole;
+import com.enioka.jqm.model.RUser;
+import com.enioka.jqm.pki.JdbcCa;
 
 @Path("/admin")
 public class ServiceAdmin
 {
-    // ////////////////////////////////////////////////////////////////////////
-    // Common methods
-    // ////////////////////////////////////////////////////////////////////////
 
-    private <J, D> List<D> getDtoList(Class<J> jpaClass)
-    {
-        List<D> res = new ArrayList<D>();
-        EntityManager em = Helpers.getEm();
-
-        try
-        {
-            List<J> r = em.createQuery("SELECT n FROM " + jpaClass.getSimpleName() + " n", jpaClass).getResultList();
-            for (J n : r)
-            {
-                res.add(Jpa2Dto.<D> getDTO(n, em));
-            }
-            return res;
-        }
-        catch (Exception e)
-        {
-            throw new ErrorDto("The server failed to list all objects of type " + jpaClass.getSimpleName(), 2, e,
-                    Status.INTERNAL_SERVER_ERROR);
-        }
-        finally
-        {
-            em.close();
-        }
-    }
-
-    private <J, D> D getDto(Class<J> jpaClass, int id)
-    {
-        EntityManager em = Helpers.getEm();
-        try
-        {
-            D res = Jpa2Dto.<D> getDTO(em.find(jpaClass, id), em);
-            if (res == null)
-            {
-                throw new ErrorDto("There is no object of type " + jpaClass.getSimpleName() + " in the database with ID " + id + ".",
-                        "An attempt was made to GET an object that does not exist by a client", 1, Status.NOT_FOUND);
-            }
-            return res;
-        }
-        finally
-        {
-            em.close();
-        }
-    }
-
-    private <J> void deleteItem(Class<J> jpaClass, Integer id)
-    {
-        EntityManager em = Helpers.getEm();
-        Object j = null;
-        try
-        {
-            j = em.find(jpaClass, id);
-            if (j == null)
-            {
-                throw new ErrorDto("There is no object of type " + jpaClass.getSimpleName() + " in the database",
-                        "An attempt was made to DELETE an object that does not exist by a client", 3, Status.NOT_FOUND);
-            }
-            em.getTransaction().begin();
-            Dto2Jpa.clean(j, em);
-            em.remove(j);
-            em.getTransaction().commit();
-        }
-        finally
-        {
-            em.close();
-        }
-    }
-
-    private <D> void setItem(D dto)
-    {
-        EntityManager em = Helpers.getEm();
-        try
-        {
-            em.getTransaction().begin();
-            Dto2Jpa.setJpa(dto, em);
-            em.getTransaction().commit();
-        }
-        finally
-        {
-            em.close();
-        }
-    }
-
-    public <D, J> void setItems(Class<J> jpaClass, List<D> dtos)
-    {
-        EntityManager em = Helpers.getEm();
-        try
-        {
-            List<J> existBefore = em.createQuery("SELECT n FROM " + jpaClass.getSimpleName() + " n", jpaClass).getResultList();
-            List<J> existAfter = new ArrayList<J>();
-
-            em.getTransaction().begin();
-
-            // Update or create items
-            for (D dto : dtos)
-            {
-                existAfter.add(Dto2Jpa.<J> setJpa(dto, em));
-            }
-
-            // Delete old items
-            old: for (J before : existBefore)
-            {
-                for (J after : existAfter)
-                {
-                    if (before.equals(after))
-                    {
-                        continue old;
-                    }
-                }
-                Dto2Jpa.clean(before, em);
-                em.remove(before);
-            }
-
-            // Done
-            em.getTransaction().commit();
-        }
-        finally
-        {
-            em.close();
-        }
-    }
-
-    // ////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     // Nodes
-    // ////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
 
     @GET
     @Path("node")
@@ -195,7 +65,16 @@ public class ServiceAdmin
     @HttpCache("public, max-age=60")
     public List<NodeDto> getNodes()
     {
-        return getDtoList(Node.class);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getNodes(cnx);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @GET
@@ -204,8 +83,16 @@ public class ServiceAdmin
     @HttpCache("public, max-age=60")
     public NodeDto getNode(@PathParam("id") int id)
     {
-        System.out.println(SecurityUtils.getSubject().getPrincipal());
-        return getDto(Node.class, id);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getNode(cnx, id);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @PUT
@@ -213,7 +100,17 @@ public class ServiceAdmin
     @Consumes(MediaType.APPLICATION_JSON)
     public void setNodes(List<NodeDto> dtos)
     {
-        setItems(Node.class, dtos);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.syncNodes(cnx, dtos);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @POST
@@ -221,12 +118,22 @@ public class ServiceAdmin
     @Consumes(MediaType.APPLICATION_JSON)
     public void setNode(NodeDto dto)
     {
-        setItem(dto);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.upsertNode(cnx, dto);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
-    // ////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     // Queues
-    // ////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
 
     @GET
     @Path("q")
@@ -234,7 +141,16 @@ public class ServiceAdmin
     @HttpCache
     public List<QueueDto> getQueues()
     {
-        return getDtoList(Queue.class);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getQueues(cnx);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @PUT
@@ -243,7 +159,17 @@ public class ServiceAdmin
     @HttpCache
     public void setQueues(List<QueueDto> dtos)
     {
-        setItems(Queue.class, dtos);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.syncQueues(cnx, dtos);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @GET
@@ -252,7 +178,16 @@ public class ServiceAdmin
     @HttpCache
     public QueueDto getQueue(@PathParam("id") int id)
     {
-        return getDto(Queue.class, id);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getQueue(cnx, id);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @PUT
@@ -261,7 +196,7 @@ public class ServiceAdmin
     public void setQueue(@PathParam("id") Integer id, QueueDto dto)
     {
         dto.setId(id);
-        setItem(dto);
+        setQueue(dto);
     }
 
     @POST
@@ -269,19 +204,39 @@ public class ServiceAdmin
     @Consumes(MediaType.APPLICATION_JSON)
     public void setQueue(QueueDto dto)
     {
-        setItem(dto);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.upsertQueue(cnx, dto);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @DELETE
     @Path("q/{id}")
     public void deleteQueue(@PathParam("id") Integer id)
     {
-        deleteItem(Queue.class, id);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.deleteQueue(cnx, id);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
-    // ////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     // Deployment parameters - queue mappings
-    // ////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
 
     @GET
     @Path("qmapping")
@@ -289,15 +244,16 @@ public class ServiceAdmin
     @HttpCache
     public List<QueueMappingDto> getQueueMappings()
     {
-        return getDtoList(DeploymentParameter.class);
-    }
-
-    @PUT
-    @Path("qmapping")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void setQueueMappings(List<QueueMappingDto> dtos)
-    {
-        setItems(DeploymentParameter.class, dtos);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getQueueMappings(cnx);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @GET
@@ -306,7 +262,34 @@ public class ServiceAdmin
     @HttpCache
     public QueueMappingDto getQueueMapping(@PathParam("id") int id)
     {
-        return getDto(DeploymentParameter.class, id);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getQueueMapping(cnx, id);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @PUT
+    @Path("qmapping")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void setQueueMappings(List<QueueMappingDto> dtos)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.syncQueueMappings(cnx, dtos);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @PUT
@@ -315,7 +298,7 @@ public class ServiceAdmin
     public void setQueueMapping(@PathParam("id") Integer id, QueueMappingDto dto)
     {
         dto.setId(id);
-        setItem(dto);
+        setQueueMapping(dto);
     }
 
     @POST
@@ -323,19 +306,38 @@ public class ServiceAdmin
     @Consumes(MediaType.APPLICATION_JSON)
     public void setQueueMapping(QueueMappingDto dto)
     {
-        setItem(dto);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.upsertQueueMapping(cnx, dto);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @DELETE
     @Path("qmapping/{id}")
     public void deleteQueueMapping(@PathParam("id") Integer id)
     {
-        deleteItem(DeploymentParameter.class, id);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.deleteQueueMapping(cnx, id);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
-    // ////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
     // JNDI
-    // ////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
 
     @GET
     @Path("jndi")
@@ -343,7 +345,16 @@ public class ServiceAdmin
     @HttpCache
     public List<JndiObjectResourceDto> getJndiResources()
     {
-        return getDtoList(JndiObjectResource.class);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getJndiObjectResource(cnx);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @PUT
@@ -351,7 +362,17 @@ public class ServiceAdmin
     @Consumes(MediaType.APPLICATION_JSON)
     public void setJndiResources(List<JndiObjectResourceDto> dtos)
     {
-        setItems(JndiObjectResourceDto.class, dtos);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.syncJndiObjectResource(cnx, dtos);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @GET
@@ -360,7 +381,16 @@ public class ServiceAdmin
     @HttpCache
     public JndiObjectResourceDto getJndiResource(@PathParam("id") Integer id)
     {
-        return getDto(JndiObjectResource.class, id);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getJndiObjectResource(cnx, id);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @PUT
@@ -369,7 +399,7 @@ public class ServiceAdmin
     public void setJndiResource(@PathParam("id") Integer id, JndiObjectResourceDto dto)
     {
         dto.setId(id);
-        setItem(dto);
+        setJndiResource(dto);
     }
 
     @POST
@@ -377,19 +407,39 @@ public class ServiceAdmin
     @Consumes(MediaType.APPLICATION_JSON)
     public void setJndiResource(JndiObjectResourceDto dto)
     {
-        setItem(dto);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.upsertJndiObjectResource(cnx, dto);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @DELETE
     @Path("jndi/{id}")
     public void deleteJndiResource(@PathParam("id") Integer id)
     {
-        deleteItem(JndiObjectResource.class, id);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.deleteJndiObjectResource(cnx, id);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
-    // ////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
     // Global parameters
-    // ////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
 
     @GET
     @Path("prm")
@@ -397,7 +447,16 @@ public class ServiceAdmin
     @HttpCache
     public List<GlobalParameterDto> getGlobalParameters()
     {
-        return getDtoList(GlobalParameter.class);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getGlobalParameter(cnx);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @PUT
@@ -405,7 +464,17 @@ public class ServiceAdmin
     @Consumes(MediaType.APPLICATION_JSON)
     public void setGlobalParameters(List<GlobalParameterDto> dtos)
     {
-        setItems(GlobalParameter.class, dtos);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.syncGlobalParameters(cnx, dtos);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @GET
@@ -414,7 +483,16 @@ public class ServiceAdmin
     @HttpCache
     public GlobalParameterDto getGlobalParameter(@PathParam("id") int id)
     {
-        return getDto(GlobalParameter.class, id);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getGlobalParameter(cnx, id);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @PUT
@@ -423,7 +501,7 @@ public class ServiceAdmin
     public void setGlobalParameter(@PathParam("id") Integer id, GlobalParameterDto dto)
     {
         dto.setId(id);
-        setItem(dto);
+        setGlobalParameter(dto);
     }
 
     @POST
@@ -431,19 +509,39 @@ public class ServiceAdmin
     @Consumes(MediaType.APPLICATION_JSON)
     public void setGlobalParameter(GlobalParameterDto dto)
     {
-        setItem(dto);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.upsertGlobalParameter(cnx, dto);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @DELETE
     @Path("prm/{id}")
     public void deleteGlobalParameter(@PathParam("id") Integer id)
     {
-        deleteItem(GlobalParameter.class, id);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.deleteGlobalParameter(cnx, id);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
-    // ////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
     // JobDef
-    // ////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
 
     @GET
     @Path("jd")
@@ -451,7 +549,16 @@ public class ServiceAdmin
     @HttpCache
     public List<JobDefDto> getJobDefs()
     {
-        return getDtoList(JobDef.class);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getJobDef(cnx);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @PUT
@@ -459,7 +566,17 @@ public class ServiceAdmin
     @Consumes(MediaType.APPLICATION_JSON)
     public void setJobDefs(List<JobDefDto> dtos)
     {
-        setItems(JobDef.class, dtos);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.syncJobDefs(cnx, dtos);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @GET
@@ -468,7 +585,16 @@ public class ServiceAdmin
     @HttpCache
     public JobDefDto getJobDef(@PathParam("id") int id)
     {
-        return getDto(JobDef.class, id);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getJobDef(cnx, id);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @PUT
@@ -477,7 +603,7 @@ public class ServiceAdmin
     public void setJobDef(@PathParam("id") Integer id, JobDefDto dto)
     {
         dto.setId(id);
-        setItem(dto);
+        setJobDef(dto);
     }
 
     @POST
@@ -485,19 +611,39 @@ public class ServiceAdmin
     @Consumes(MediaType.APPLICATION_JSON)
     public void setJobDef(JobDefDto dto)
     {
-        setItem(dto);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.upsertJobDef(cnx, dto);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @DELETE
     @Path("jd/{id}")
     public void deleteJobDef(@PathParam("id") Integer id)
     {
-        deleteItem(JobDef.class, id);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.deleteJobDef(cnx, id);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
-    // ////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
     // User
-    // ////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
 
     @GET
     @Path("user")
@@ -505,7 +651,16 @@ public class ServiceAdmin
     @HttpCache
     public List<RUserDto> getUsers()
     {
-        return getDtoList(RUser.class);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getUsers(cnx);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @PUT
@@ -513,7 +668,17 @@ public class ServiceAdmin
     @Consumes(MediaType.APPLICATION_JSON)
     public void setUsers(List<RUserDto> dtos)
     {
-        setItems(RUser.class, dtos);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.syncUsers(cnx, dtos);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @GET
@@ -522,7 +687,16 @@ public class ServiceAdmin
     @HttpCache
     public RUserDto getUser(@PathParam("id") int id)
     {
-        return getDto(RUser.class, id);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getUser(cnx, id);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @PUT
@@ -531,7 +705,7 @@ public class ServiceAdmin
     public void setUser(@PathParam("id") Integer id, RUserDto dto)
     {
         dto.setId(id);
-        setItem(dto);
+        setUser(dto);
     }
 
     @POST
@@ -539,14 +713,34 @@ public class ServiceAdmin
     @Consumes(MediaType.APPLICATION_JSON)
     public void setUser(RUserDto dto)
     {
-        setItem(dto);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.upsertUser(cnx, dto);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @DELETE
     @Path("user/{id}")
     public void deleteUser(@PathParam("id") Integer id)
     {
-        deleteItem(RUser.class, id);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.deleteUser(cnx, id);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     // ////////////////////////////////////////////////////////////////////////
@@ -559,7 +753,16 @@ public class ServiceAdmin
     @HttpCache
     public List<RRoleDto> getRoles()
     {
-        return getDtoList(RRole.class);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getRoles(cnx);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @PUT
@@ -567,7 +770,17 @@ public class ServiceAdmin
     @Consumes(MediaType.APPLICATION_JSON)
     public void setRoles(List<RRoleDto> dtos)
     {
-        setItems(RRole.class, dtos);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.syncRoles(cnx, dtos);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @GET
@@ -576,7 +789,16 @@ public class ServiceAdmin
     @HttpCache
     public RRoleDto getRole(@PathParam("id") int id)
     {
-        return getDto(RRole.class, id);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            return MetaService.getRole(cnx, id);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @PUT
@@ -585,7 +807,7 @@ public class ServiceAdmin
     public void setRole(@PathParam("id") Integer id, RRoleDto dto)
     {
         dto.setId(id);
-        setItem(dto);
+        setRole(dto);
     }
 
     @POST
@@ -593,14 +815,34 @@ public class ServiceAdmin
     @Consumes(MediaType.APPLICATION_JSON)
     public void setRole(RRoleDto dto)
     {
-        setItem(dto);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.upsertRole(cnx, dto);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @DELETE
     @Path("role/{id}")
     public void deleteRole(@PathParam("id") Integer id)
     {
-        deleteItem(RRole.class, id);
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            MetaService.deleteRole(cnx, id, false);
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     @GET
@@ -609,28 +851,34 @@ public class ServiceAdmin
     @HttpCache("private, max-age=36000")
     public PemissionsBagDto getMyself(@Context HttpServletRequest req)
     {
-        EntityManager em = Helpers.getEm();
         List<String> res = new ArrayList<String>();
-        String auth = em.createQuery("SELECT gp From GlobalParameter gp where gp.key = 'enableWsApiAuth'", GlobalParameter.class)
-                .getSingleResult().getValue();
-        if (auth.equals("false"))
-        {
-            res.add("*:*");
-        }
-        else
-        {
-            RUser memyselfandi = em.createQuery("SELECT u FROM RUser u WHERE u.login = :l", RUser.class)
-                    .setParameter("l", req.getUserPrincipal().getName()).getSingleResult();
 
-            for (RRole r : memyselfandi.getRoles())
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getDbSession();
+            String auth = GlobalParameter.getParameter(cnx, "enableWsApiAuth", "true");
+            if (auth.equals("false"))
             {
-                for (RPermission p : r.getPermissions())
+                res.add("*:*");
+            }
+            else
+            {
+                RUser memyselfandi = RUser.selectlogin(cnx, req.getUserPrincipal().getName());
+
+                for (RRole r : memyselfandi.getRoles(cnx))
                 {
-                    res.add(p.getName());
+                    for (RPermission p : r.getPermissions(cnx))
+                    {
+                        res.add(p.getName());
+                    }
                 }
             }
         }
-        em.close();
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
 
         PemissionsBagDto b = new PemissionsBagDto();
         b.permissions = res;
@@ -640,14 +888,14 @@ public class ServiceAdmin
     @Path("user/{id}/certificate")
     @Produces("application/zip")
     @GET
-    public InputStream getNewCertificate(@PathParam("id") int userIds)
+    public InputStream getNewCertificate(@PathParam("id") int userId)
     {
-        EntityManager em = null;
+        DbConn cnx = null;
         try
         {
-            em = Helpers.getEm();
-            RUser u = em.find(RUser.class, userIds);
-            return JpaCa.getClientData(em, u.getLogin());
+            cnx = Helpers.getDbSession();
+            RUser u = RUser.select_id(cnx, userId);
+            return JdbcCa.getClientData(cnx, u.getLogin());
         }
         catch (Exception e)
         {
@@ -655,21 +903,22 @@ public class ServiceAdmin
         }
         finally
         {
-            em.close();
+            Helpers.closeQuietly(cnx);
         }
     }
 
-    // ////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
     // Engine log
-    // ////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
 
     @Path("node/{nodeName}/log")
     @Produces("application/octet-stream")
     @GET
-    public InputStream getNodeLog(@PathParam("nodeName") String nodeName, @QueryParam("latest") int latest, @Context HttpServletResponse res)
+    public InputStream getNodeLog(@PathParam("nodeName") String nodeName, @QueryParam("latest") int latest,
+            @Context HttpServletResponse res)
     {
-        SelfDestructFileStream fs = (SelfDestructFileStream) ((HibernateClient) JqmClientFactory.getClient())
-                .getEngineLog(nodeName, latest);
+        SelfDestructFileStream fs = (SelfDestructFileStream) ((JdbcClient) JqmClientFactory.getClient()).getEngineLog(nodeName,
+                latest);
         res.setHeader("Content-Disposition", "attachment; filename=" + nodeName + ".log");
         return fs;
     }

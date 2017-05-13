@@ -46,7 +46,7 @@ public class JobInstance
     private String user;
     private String sessionID;
     private State state;
-    private Integer position;
+    private Long position;
     private Queue queue;
     private String queueName;
     private String keyword1, keyword2, keyword3, definitionKeyword1, definitionKeyword2, definitionKeyword3, module, email, application;
@@ -57,6 +57,7 @@ public class JobInstance
     private List<String> messages = new ArrayList<String>();
     private Calendar enqueueDate, beganRunningDate, endDate;
     private String nodeName;
+    private boolean highlander;
 
     /**
      * The Job Instance ID, i.e. the unique identifier of the execution request. This is a key for numerous {@link JqmClient} functions.
@@ -127,12 +128,12 @@ public class JobInstance
      * Position in the queue. 0 if running.<br>
      * <strong>This is the value retrieved during the latest {@link JqmClient#getJob(int)} call and may not be up to date!</strong>
      */
-    public Integer getPosition()
+    public Long getPosition()
     {
         return position;
     }
 
-    void setPosition(Integer position)
+    void setPosition(Long position)
     {
         this.position = position;
     }
@@ -388,5 +389,18 @@ public class JobInstance
     void setNodeName(String nodeName)
     {
         this.nodeName = nodeName;
+    }
+
+    /**
+     * True if the job instance was subject to the Highlander mode rules.
+     */
+    public boolean isHighlander()
+    {
+        return highlander;
+    }
+
+    void setHighlander(boolean h)
+    {
+        this.highlander = h;
     }
 }

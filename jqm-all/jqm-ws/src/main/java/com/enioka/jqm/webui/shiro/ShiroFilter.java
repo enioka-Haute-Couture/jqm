@@ -15,9 +15,9 @@
  */
 package com.enioka.jqm.webui.shiro;
 
-import javax.persistence.EntityManager;
-
 import com.enioka.jqm.api.Helpers;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.GlobalParameter;
 
 /**
  * This filter extends the usual ShiroFilter by checking in the database if security should be enabled or not.
@@ -28,15 +28,16 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter
     @Override
     public void init() throws Exception
     {
-        EntityManager em = Helpers.getEm();
+        DbConn cnx = null;
         boolean load = true;
         try
         {
-            load = Boolean.parseBoolean(Helpers.getParameter("enableWsApiAuth", "true", em));
+            cnx = Helpers.getDbSession();
+            load = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableWsApiAuth", "true"));
         }
         finally
         {
-            Helpers.closeQuietly(em);
+            Helpers.closeQuietly(cnx);
         }
 
         setEnabled(load);

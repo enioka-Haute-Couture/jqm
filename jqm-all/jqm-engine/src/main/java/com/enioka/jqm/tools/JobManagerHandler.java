@@ -21,13 +21,10 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.FileUtils;
@@ -38,12 +35,12 @@ import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClient;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
-import com.enioka.jqm.jpamodel.Deliverable;
-import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Message;
+import com.enioka.jqm.model.State;
 
 /**
  * This is the implementation behind the proxy described in the <code>JobManager</code> interface inside the jqm-api artifact.
@@ -53,36 +50,18 @@ class JobManagerHandler implements InvocationHandler
     private static Logger jqmlogger = Logger.getLogger(JobManagerHandler.class);
 
     private JobInstance ji;
-    private JobDef jd = null;
-    private Properties p = null;
     private Map<String, String> params = null;
-    private String defaultCon = null, application = null, sessionId = null;
-    private Node node = null;
     private Calendar lastPeek = null;
 
     JobManagerHandler(JobInstance ji, Map<String, String> prms)
     {
-        p = new Properties();
-        p.put("emf", Helpers.getEmf());
-
-        EntityManager em = Helpers.getNewEm();
-        this.ji = em.find(JobInstance.class, ji.getId());
+        this.ji = ji;
         params = prms;
-
-        defaultCon = em.createQuery("SELECT gp.value FROM GlobalParameter gp WHERE gp.key = 'defaultConnection'", String.class)
-                .getSingleResult();
-
-        this.jd = this.ji.getJd();
-        this.application = this.jd.getApplication();
-        this.sessionId = this.ji.getSessionID();
-        this.node = this.ji.getNode();
-        this.node.getDlRepo();
-        em.close();
     }
 
     private JqmClient getJqmClient()
     {
-        return JqmClientFactory.getClient("uncached", p, false);
+        return JqmClientFactory.getClient();
     }
 
     @SuppressWarnings("unchecked")
@@ -103,7 +82,7 @@ class JobManagerHandler implements InvocationHandler
             {
                 if ("jobApplicationId".equals(methodName))
                 {
-                    return jd.getId();
+                    return this.ji.getJd();
                 }
                 else if ("parentID".equals(methodName))
                 {
@@ -115,11 +94,11 @@ class JobManagerHandler implements InvocationHandler
                 }
                 else if ("canBeRestarted".equals(methodName))
                 {
-                    return jd.isCanBeRestarted();
+                    return this.ji.getJD().isCanBeRestarted();
                 }
                 else if ("applicationName".equals(methodName))
                 {
-                    return jd.getApplicationName();
+                    return ji.getJD().getApplicationName();
                 }
                 else if ("sessionID".equals(methodName))
                 {
@@ -127,11 +106,11 @@ class JobManagerHandler implements InvocationHandler
                 }
                 else if ("application".equals(methodName))
                 {
-                    return application;
+                    return ji.getJD().getApplication();
                 }
                 else if ("module".equals(methodName))
                 {
-                    return jd.getModule();
+                    return this.ji.getJD().getModule();
                 }
                 else if ("keyword1".equals(methodName))
                 {
@@ -147,15 +126,15 @@ class JobManagerHandler implements InvocationHandler
                 }
                 else if ("definitionKeyword1".equals(methodName))
                 {
-                    return jd.getKeyword1();
+                    return this.ji.getJD().getKeyword1();
                 }
                 else if ("definitionKeyword2".equals(methodName))
                 {
-                    return jd.getKeyword2();
+                    return this.ji.getJD().getKeyword2();
                 }
                 else if ("definitionKeyword3".equals(methodName))
                 {
-                    return jd.getKeyword3();
+                    return this.ji.getJD().getKeyword3();
                 }
                 else if ("userName".equals(methodName))
                 {
@@ -167,7 +146,7 @@ class JobManagerHandler implements InvocationHandler
                 }
                 else if ("defaultConnect".equals(methodName))
                 {
-                    return this.defaultCon;
+                    return this.getDefaultConnectionName();
                 }
                 else if ("getDefaultConnection".equals(methodName))
                 {
@@ -245,12 +224,12 @@ class JobManagerHandler implements InvocationHandler
             return;
         }
 
-        EntityManager em = Helpers.getNewEm();
+        DbConn cnx = Helpers.getNewDbSession();
         try
         {
-            this.ji = em.find(JobInstance.class, this.ji.getId());
-            jqmlogger.trace("Analysis: should JI " + ji.getId() + " get killed? Status is " + ji.getState());
-            if (ji.getState().equals(State.KILLED))
+            State s = State.valueOf(cnx.runSelectSingle("ji_select_state_by_id", String.class, ji.getId()));
+            jqmlogger.trace("Analysis: should JI " + ji.getId() + " get killed? New status is " + s);
+            if (s.equals(State.KILLED))
             {
                 jqmlogger.info("Job will be killed at the request of a user");
                 Thread.currentThread().interrupt();
@@ -259,52 +238,51 @@ class JobManagerHandler implements InvocationHandler
         }
         finally
         {
-            em.close();
+            Helpers.closeQuietly(cnx);
             lastPeek = Calendar.getInstance();
         }
     }
 
     /**
-     * Create a {@link com.enioka.jqm.jpamodel.Message} with the given message. The {@link com.enioka.jqm.jpamodel.History} to link to is
-     * deduced from the context.
+     * Create a {@link com.enioka.jqm.model.Message} with the given message. The {@link com.enioka.jqm.model.History} to link to is deduced
+     * from the context.
      * 
      * @param msg
      * @throws JqmKillException
      */
     private void sendMsg(String msg)
     {
-        EntityManager em = Helpers.getNewEm();
+        DbConn cnx = Helpers.getNewDbSession();
+
         try
         {
-            em.getTransaction().begin();
-            Helpers.createMessage(msg, ji, em);
-            em.getTransaction().commit();
+            Message.create(cnx, msg, ji.getId());
+            cnx.commit();
         }
         finally
         {
-            em.close();
+            Helpers.closeQuietly(cnx);
         }
     }
 
     /**
-     * Update the {@link com.enioka.jqm.jpamodel.History} with the given progress data.
+     * Update the {@link com.enioka.jqm.model.History} with the given progress data.
      * 
      * @param msg
      * @throws JqmKillException
      */
     private void sendProgress(Integer msg)
     {
-        EntityManager em = Helpers.getNewEm();
+        DbConn cnx = Helpers.getNewDbSession();
         try
         {
-            em.getTransaction().begin();
-            this.ji = em.find(JobInstance.class, this.ji.getId(), LockModeType.PESSIMISTIC_WRITE);
-            ji.setProgress(msg);
-            em.getTransaction().commit();
+            this.ji.setProgress(msg); // Not persisted, but useful to the Loader.
+            cnx.runUpdate("jj_update_progress_by_id", msg, ji.getId());
+            cnx.commit();
         }
         finally
         {
-            em.close();
+            Helpers.closeQuietly(cnx);
         }
     }
 
@@ -315,9 +293,9 @@ class JobManagerHandler implements InvocationHandler
         jr.setApplicationName(applicationName);
         jr.setUser(user == null ? ji.getUserName() : user);
         jr.setEmail(mail);
-        jr.setSessionID(sessionId == null ? this.sessionId : sessionId);
-        jr.setApplication(application == null ? jd.getApplication() : application);
-        jr.setModule(module == null ? jd.getModule() : module);
+        jr.setSessionID(sessionId == null ? this.ji.getSessionID() : sessionId);
+        jr.setApplication(application == null ? this.ji.getJD().getApplication() : application);
+        jr.setModule(module == null ? this.ji.getJD().getModule() : module);
         jr.setKeyword1(keyword1);
         jr.setKeyword2(keyword2);
         jr.setKeyword3(keyword3);
@@ -380,34 +358,31 @@ class JobManagerHandler implements InvocationHandler
 
     private Integer addDeliverable(String path, String fileLabel) throws IOException
     {
-        Deliverable d = null;
-        EntityManager em = Helpers.getNewEm();
+        DbConn cnx = Helpers.getNewDbSession();
         try
         {
-            this.ji = em.find(JobInstance.class, ji.getId());
-
             String outputRoot = this.ji.getNode().getDlRepo();
             String ext = FilenameUtils.getExtension(path);
-            String relDestPath = "" + ji.getJd().getApplicationName() + "/" + ji.getId() + "/" + UUID.randomUUID() + "." + ext;
+            String relDestPath = ji.getJD().getApplicationName() + "/" + ji.getId() + "/" + UUID.randomUUID() + "." + ext;
             String absDestPath = FilenameUtils.concat(outputRoot, relDestPath);
             String fileName = FilenameUtils.getName(path);
-            FileUtils.moveFile(new File(path), new File(absDestPath));
-            jqmlogger.debug("A deliverable is added. Stored as " + absDestPath + ". Initial name: " + fileName);
 
-            em.getTransaction().begin();
-            d = Helpers.createDeliverable(relDestPath, fileName, fileLabel, this.ji.getId(), em);
-            em.getTransaction().commit();
+            jqmlogger.debug("A deliverable is added. Stored as " + absDestPath + ". Initial name: " + fileName);
+            FileUtils.moveFile(new File(path), new File(absDestPath));
+            cnx.commit();
+            int res = Helpers.createDeliverable(relDestPath, fileName, fileLabel, this.ji.getId(), cnx);
+            cnx.commit();
+            return res;
         }
         finally
         {
-            em.close();
+            Helpers.closeQuietly(cnx);
         }
-        return d.getId();
     }
 
     private File getWorkDir()
     {
-        File f = new File(FilenameUtils.concat(node.getTmpDirectory(), "" + this.ji.getId()));
+        File f = new File(FilenameUtils.concat(ji.getNode().getTmpDirectory(), Integer.toString(this.ji.getId())));
         if (!f.isDirectory())
         {
             try
@@ -422,65 +397,59 @@ class JobManagerHandler implements InvocationHandler
         return f;
     }
 
+    private String getDefaultConnectionName()
+    {
+        DbConn cnx = Helpers.getNewDbSession();
+        try
+        {
+            return GlobalParameter.getParameter(cnx, "defaultConnection", null);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
     private DataSource getDefaultConnection() throws NamingException
     {
-        Object dso = NamingManager.getInitialContext(null).lookup(this.defaultCon);
-        DataSource q = (DataSource) dso;
-
-        return q;
-    }
-
-    private JobInstance getRunningJI(int jobId)
-    {
-        EntityManager em = Helpers.getNewEm();
-        JobInstance jj = null;
-        try
-        {
-            jj = em.find(JobInstance.class, jobId);
-        }
-        catch (Exception e)
-        {
-            throw new JqmRuntimeException("Could not query job instance", e);
-        }
-        finally
-        {
-            em.close();
-        }
-        return jj;
-    }
-
-    private History getEndedJI(int jobId)
-    {
-        EntityManager em = Helpers.getNewEm();
-        History h = null;
-        try
-        {
-            h = em.find(History.class, jobId);
-        }
-        catch (Exception e)
-        {
-            throw new JqmRuntimeException("Could not query history", e);
-        }
-        finally
-        {
-            em.close();
-        }
-        return h;
+        Object dso = NamingManager.getInitialContext(null).lookup(getDefaultConnectionName());
+        return (DataSource) dso;
     }
 
     private boolean hasEnded(int jobId)
     {
-        return getRunningJI(jobId) == null;
+        DbConn cnx = Helpers.getNewDbSession();
+        try
+        {
+            cnx.runSelectSingle("ji_select_state_by_id", String.class, jobId);
+            return false;
+        }
+        catch (NoResultException e)
+        {
+            return true;
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     private Boolean hasSucceeded(int requestId)
     {
-        History h = getEndedJI(requestId);
-        if (h == null)
+        DbConn cnx = Helpers.getNewDbSession();
+        try
+        {
+            State s = State.valueOf(cnx.runSelectSingle("history_select_state_by_id", String.class, requestId));
+            return s.equals(State.ENDED);
+        }
+        catch (NoResultException e)
         {
             return null;
         }
-        return h.getState().equals(State.ENDED);
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     private Boolean hasFailed(int requestId)

@@ -2,24 +2,21 @@ package com.enioka.jqm.test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Properties;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-
 import org.hsqldb.Server;
+import org.hsqldb.jdbc.JDBCDataSource;
 
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobDef.PathType;
-import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.jpamodel.RuntimeParameter;
-import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.jdbc.Db;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.model.Queue;
+import com.enioka.jqm.model.RuntimeParameter;
+import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.tools.JqmSingleRunner;
 
 /**
@@ -52,12 +49,14 @@ import com.enioka.jqm.tools.JqmSingleRunner;
 public class JqmTester
 {
     private static Server s;
-    private EntityManagerFactory emf = null;
-    private EntityManager em = null;
+
+    private Db db = null;
+    private DbConn cnx = null;
+
     private Node node = null;
-    private JobDef jd = null;
-    private Queue q = null;
-    private JobInstance ji = null;
+    private Integer jd = null;
+    private Integer q = null;
+    private Integer ji = null;
     private File resDirectoryPath;
 
     private JqmTester(String className)
@@ -65,20 +64,20 @@ public class JqmTester
         s = Common.createHsqlServer();
         s.start();
 
-        emf = Persistence.createEntityManagerFactory("jobqueue-api-pu", Common.jpaProperties(s));
-        em = emf.createEntityManager();
-        em.getTransaction().begin();
-        JqmSingleRunner.setConnection(emf);
+        JDBCDataSource ds = new JDBCDataSource();
+        ds.setDatabase("jdbc:hsqldb:mem:" + s.getDatabaseName(0, true));
+        db = new Db(ds, true);
+        cnx = db.getConn();
+
+        JqmSingleRunner.setConnection(db);
 
         Properties p2 = new Properties();
-        p2.put("emf", emf);
+        p2.put("com.enioka.jqm.jdbc.contextobject", db);
         JqmClientFactory.setProperties(p2);
 
         // Needed parameters
-        GlobalParameter gp = new GlobalParameter();
-        gp.setKey("defaultConnection");
-        gp.setValue("");
-        em.persist(gp);
+        GlobalParameter.setParameter(cnx, "defaultConnection", "");
+        cnx.commit();
 
         // Ext dir
         File extDir = new File("./ext");
@@ -89,41 +88,18 @@ public class JqmTester
 
         // Create node
         resDirectoryPath = Common.createTempDirectory();
-        node = new Node();
-        node.setDlRepo(resDirectoryPath.getAbsolutePath());
-        node.setDns("test");
-        node.setName("testtempnode");
-        node.setRepo(resDirectoryPath.getAbsolutePath());
-        node.setTmpDirectory(resDirectoryPath.getAbsolutePath());
-        node.setPort(12);
-        em.persist(node);
+        node = Node.create(cnx, "testtempnode", 12, resDirectoryPath.getAbsolutePath(), resDirectoryPath.getAbsolutePath(),
+                resDirectoryPath.getAbsolutePath(), "test");
 
-        q = new Queue(); // Only useful because JobDef.queue is non-null
-        q.setDefaultQueue(true);
-        q.setName("default");
-        q.setDescription("default test queue");
-        em.persist(q);
+        q = Queue.create(cnx, "default", "default test queue", true); // Only useful because JobDef.queue is non-null
 
-        jd = new JobDef();
-        jd.setApplicationName("TestApplication");
-        jd.setJarPath("/dev/null");
-        jd.setPathType(PathType.MEMORY);
-        jd.setJavaClassName(className);
-        jd.setQueue(q);
-        em.persist(jd);
+        jd = JobDef.create(cnx, "test application", className, null, "/dev/null", q, 0, "TestApplication", null, null, null, null, null,
+                false, null, PathType.MEMORY);
 
-        ji = new JobInstance();
-        ji.setApplication("TestApplication");
-        ji.setCreationDate(Calendar.getInstance());
-        ji.setAttributionDate(Calendar.getInstance());
-        ji.setInternalPosition(0);
-        ji.setJd(jd);
-        ji.setNode(node);
-        ji.setQueue(q);
-        ji.setState(State.ATTRIBUTED);
-        em.persist(ji);
+        ji = JobInstance.enqueue(cnx, q, jd, null, null, null, null, null, null, null, null, null, false, null);
+        cnx.runUpdate("ji_update_poll", node.getId(), q, 10);
 
-        em.getTransaction().commit();
+        cnx.commit();
     }
 
     public static JqmTester create(String className)
@@ -133,15 +109,8 @@ public class JqmTester
 
     public JqmTester addParameter(String key, String value)
     {
-        RuntimeParameter rp = new RuntimeParameter();
-        rp.setJi(ji.getId());
-        rp.setKey(key);
-        rp.setValue(value);
-
-        em.getTransaction().begin();
-        em.persist(rp);
-        em.getTransaction().commit();
-
+        RuntimeParameter.create(cnx, ji, key, value);
+        cnx.commit();
         return this;
     }
 
@@ -149,7 +118,7 @@ public class JqmTester
     {
         s.stop();
         s.shutdown();
-        emf.close();
+        cnx.close();
         JqmClientFactory.resetClient();
         JqmClientFactory.setProperties(new Properties());
     }

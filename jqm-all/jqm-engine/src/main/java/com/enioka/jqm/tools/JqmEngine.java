@@ -30,9 +30,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.persistence.NoResultException;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.ConsoleAppender;
@@ -40,13 +37,16 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.RollingFileAppender;
 import org.eclipse.jetty.util.ArrayQueue;
 
-import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Message;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.jdbc.QueryResult;
+import com.enioka.jqm.model.DeploymentParameter;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.History;
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Message;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.model.State;
 
 /**
  * The engine itself. Everything starts in this class.
@@ -109,21 +109,22 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         Helpers.registerJndiIfNeeded();
 
         // Database connection
-        EntityManager em = Helpers.getNewEm();
+        DbConn cnx = Helpers.getNewDbSession();
+        clManager.setIsolationDefault(cnx);
 
         // Node configuration is in the database
         try
         {
-            node = em.createQuery("SELECT n FROM Node n WHERE n.name = :l", Node.class).setParameter("l", nodeName).getSingleResult();
+            node = Node.select_single(cnx, "node_select_by_key", nodeName);
         }
         catch (NoResultException e)
         {
-            throw new JqmRuntimeException(
-                    "the specified node name [" + nodeName + "] does not exist in the configuration. Please create this node before starting it", e);
+            throw new JqmRuntimeException("the specified node name [" + nodeName
+                    + "] does not exist in the configuration. Please create this node before starting it", e);
         }
 
         // Check if double-start
-        long toWait = (long) (1.1 * Long.parseLong(Helpers.getParameter("internalPollingPeriodMs", "60000", em)));
+        long toWait = (long) (1.1 * Long.parseLong(GlobalParameter.getParameter(cnx, "internalPollingPeriodMs", "60000")));
         if (node.getLastSeenAlive() != null
                 && Calendar.getInstance().getTimeInMillis() - node.getLastSeenAlive().getTimeInMillis() <= toWait)
         {
@@ -132,32 +133,34 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                     + " seconds ago. Either stop the other node, or if it already stopped, please wait " + (toWait - r) / 1000
                     + " seconds");
         }
+        jqmlogger.debug("The last time an engine with this name was seen was: " + node.getLastSeenAlive());
 
         // Prevent very quick multiple starts by immediately setting the keep-alive
-        em.getTransaction().begin();
-        node.setLastSeenAlive(Calendar.getInstance());
-        em.getTransaction().commit();
+        QueryResult qr = cnx.runUpdate("node_update_alive_by_id", node.getId());
+        cnx.commit();
+        if (qr.nbUpdated == 0)
+        {
+            throw new JqmInitErrorTooSoon("Another engine named " + nodeName + " is running");
+        }
 
         // Only start if the node configuration seems OK
-        Helpers.checkConfiguration(nodeName, em);
+        Helpers.checkConfiguration(nodeName, cnx);
 
         // Log parameters
-        Helpers.dumpParameters(em, node);
+        Helpers.dumpParameters(cnx, node);
 
         // Log level
         Helpers.setLogLevel(node.getRootLogLevel());
 
         // Log multicasting (& log4j stdout redirect)
-        GlobalParameter gp1 = em.createQuery("SELECT g FROM GlobalParameter g WHERE g.key = :k", GlobalParameter.class)
-                .setParameter("k", "logFilePerLaunch").getSingleResult();
-        if ("true".equals(gp1.getValue()) || "both".equals(gp1.getValue()))
+        String gp1 = GlobalParameter.getParameter(cnx, "logFilePerLaunch", "true");
+        if ("true".equals(gp1) || "both".equals(gp1))
         {
             RollingFileAppender a = (RollingFileAppender) Logger.getRootLogger().getAppender("rollingfile");
-            MultiplexPrintStream s = new MultiplexPrintStream(System.out, FilenameUtils.getFullPath(a.getFile()),
-                    "both".equals(gp1.getValue()));
+            MultiplexPrintStream s = new MultiplexPrintStream(System.out, FilenameUtils.getFullPath(a.getFile()), "both".equals(gp1));
             System.setOut(s);
             ((ConsoleAppender) Logger.getRootLogger().getAppender("consoleAppender")).setWriter(new OutputStreamWriter(s));
-            s = new MultiplexPrintStream(System.err, FilenameUtils.getFullPath(a.getFile()), "both".equals(gp1.getValue()));
+            s = new MultiplexPrintStream(System.err, FilenameUtils.getFullPath(a.getFile()), "both".equals(gp1));
             System.setErr(s);
         }
 
@@ -175,7 +178,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
 
         // Jetty
         this.server = new JettyServer();
-        this.server.start(node, em);
+        this.server.start(node, cnx);
 
         // JMX
         if (node.getJmxServerPort() != null && node.getJmxServerPort() > 0)
@@ -206,13 +209,10 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         jqmlogger.info("Security manager was registered");
 
         // Cleanup
-        purgeDeadJobInstances(em, this.node);
-
-        // Force Message EMF load
-        em.createQuery("SELECT m FROM Message m WHERE 1=0", Message.class).getResultList();
+        purgeDeadJobInstances(cnx, this.node);
 
         // Pollers
-        syncPollers(em, this.node);
+        syncPollers(cnx, this.node);
         jqmlogger.info("All required queues are now polled");
 
         // Internal poller (stop notifications, keepalive)
@@ -225,8 +225,8 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         Runtime.getRuntime().addShutdownHook(killHook);
 
         // Done
-        em.close();
-        em = null;
+        cnx.close();
+        cnx = null;
         latestNodeStartedName = node.getName();
         jqmlogger.info("End of JQM engine initialization");
     }
@@ -281,13 +281,11 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         return this.node;
     }
 
-    synchronized void syncPollers(EntityManager em, Node node)
+    synchronized void syncPollers(DbConn cnx, Node node)
     {
         if (node.getEnabled())
         {
-            List<DeploymentParameter> dps = em
-                    .createQuery("SELECT dp FROM DeploymentParameter dp WHERE dp.node.id = :n", DeploymentParameter.class)
-                    .setParameter("n", node.getId()).getResultList();
+            List<DeploymentParameter> dps = DeploymentParameter.select(cnx, "dp_select_for_node", node.getId());
 
             QueuePoller p = null;
             for (DeploymentParameter i : dps)
@@ -308,7 +306,8 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                 }
                 else
                 {
-                    p = new QueuePoller(this, i.getQueue(), (i.getEnabled() ? i.getNbThread() : 0), i.getPollingInterval());
+                    p = new QueuePoller(this, com.enioka.jqm.model.Queue.select(cnx, "q_select_by_id", i.getQueue()).get(0),
+                            (i.getEnabled() ? i.getNbThread() : 0), i.getPollingInterval());
                     pollers.put(i.getId(), p);
                     Thread t = new Thread(p);
                     t.start();
@@ -370,15 +369,12 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         this.intPoller.stop();
 
         // Reset the stop counter - we may want to restart one day
-        EntityManager em = null;
+        DbConn cnx = null;
         try
         {
-            em = Helpers.getNewEm();
-            em.getTransaction().begin();
-            this.node = em.find(Node.class, this.node.getId(), LockModeType.PESSIMISTIC_WRITE);
-            this.node.setStop(false);
-            this.node.setLastSeenAlive(null);
-            em.getTransaction().commit();
+            cnx = Helpers.getNewDbSession();
+            cnx.runUpdate("node_update_has_stopped_by_id", node.getId());
+            cnx.commit();
         }
         catch (Exception e)
         {
@@ -386,7 +382,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         }
         finally
         {
-            Helpers.closeQuietly(em);
+            Helpers.closeQuietly(cnx);
         }
 
         // JMX
@@ -411,26 +407,31 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         jqmlogger.info("JQM engine has stopped");
     }
 
-    private void purgeDeadJobInstances(EntityManager em, Node node)
+    /**
+     * To be called at node startup - it purges all job instances associated to this node.
+     * 
+     * @param cnx
+     * @param node
+     */
+    private void purgeDeadJobInstances(DbConn cnx, Node node)
     {
-        em.getTransaction().begin();
-        for (JobInstance ji : em.createQuery("SELECT ji FROM JobInstance ji WHERE ji.node = :node", JobInstance.class)
-                .setParameter("node", node).getResultList())
+        for (JobInstance ji : JobInstance.select(cnx, "ji_select_by_node", node.getId()))
         {
-            History h = em.find(History.class, ji.getId());
-            if (h == null)
+            try
             {
-                h = Helpers.createHistory(ji, em, State.CRASHED, Calendar.getInstance());
-                Message m = new Message();
-                m.setJi(ji.getId());
-                m.setTextMessage(
-                        "Job was supposed to be running at server startup - usually means it was killed along a server by an admin or a crash");
-                em.persist(m);
+                cnx.runSelectSingle("history_select_state_by_id", String.class, ji.getId());
+            }
+            catch (NoResultException e)
+            {
+                History.create(cnx, ji, State.CRASHED, Calendar.getInstance());
+                Message.create(cnx,
+                        "Job was supposed to be running at server startup - usually means it was killed along a server by an admin or a crash",
+                        ji.getId());
             }
 
-            em.createQuery("DELETE FROM JobInstance WHERE id = :i").setParameter("i", ji.getId()).executeUpdate();
+            cnx.runUpdate("ji_delete_by_id", ji.getId());
         }
-        em.getTransaction().commit();
+        cnx.commit();
     }
 
     /**
@@ -456,15 +457,12 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         startDbRestarter();
     }
 
-    void startDbRestarter()
+    synchronized void startDbRestarter()
     {
         // On first alert, start the thread which will check connection restoration and relaunch the pollers.
-        synchronized (this)
+        if (qpRestarter != null)
         {
-            if (qpRestarter != null)
-            {
-                return;
-            }
+            return;
         }
 
         final JqmEngine ee = this;
@@ -475,7 +473,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             {
                 // Test if the DB is back and wait for it if not
                 jqmlogger.warn("The engine will now indefinitely try to restore connection to the database");
-                EntityManager em = null;
+                DbConn cnx = null;
                 boolean back = false;
                 long timeToWait = 1;
                 while (!back)
@@ -484,8 +482,8 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                     {
                         synchronized (ee)
                         {
-                            em = Helpers.getNewEm();
-                            em.find(Node.class, 1);
+                            cnx = Helpers.getNewDbSession();
+                            cnx.runSelect("node_select_by_id", 1);
                             back = true;
                             ee.qpRestarter = null;
                             jqmlogger.warn("connection to database was restored");
@@ -508,7 +506,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                     }
                     finally
                     {
-                        Helpers.closeQuietly(em);
+                        Helpers.closeQuietly(cnx);
                     }
                 }
 
@@ -569,7 +567,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     }
 
     // //////////////////////////////////////////////////////////////////////////
-    // JMX stat methods (they get their own EM to be thread safe)
+    // JMX stat methods (they get their own connection to be thread safe)
     // //////////////////////////////////////////////////////////////////////////
 
     @Override
@@ -641,22 +639,36 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     @Override
     public void pause()
     {
-        EntityManager em = Helpers.getNewEm();
-        em.getTransaction().begin();
-        em.createQuery("UPDATE Node n SET n.enabled = false WHERE n.id = :id").setParameter("id", node.getId()).executeUpdate();
-        em.getTransaction().commit();
-        em.close();
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getNewDbSession();
+            cnx.runUpdate("node_update_enabled_by_id", Boolean.FALSE, node.getId());
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+
         refreshConfiguration();
     }
 
     @Override
     public void resume()
     {
-        EntityManager em = Helpers.getNewEm();
-        em.getTransaction().begin();
-        em.createQuery("UPDATE Node n SET n.enabled = true WHERE n.id = :id").setParameter("id", node.getId()).executeUpdate();
-        em.getTransaction().commit();
-        em.close();
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getNewDbSession();
+            cnx.runUpdate("node_update_enabled_by_id", Boolean.TRUE, node.getId());
+            cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+
         refreshConfiguration();
     }
 

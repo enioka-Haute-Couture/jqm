@@ -36,7 +36,8 @@ import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.pki.JpaCa;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.pki.JdbcCa;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -52,9 +53,9 @@ public class JettyTest extends JqmBaseTest
     @Test
     public void testSslStartup()
     {
-        Helpers.setSingleParam("enableWsApiSsl", "true", em);
-        Helpers.setSingleParam("disableWsApi", "false", em);
-        Helpers.setSingleParam("enableWsApiAuth", "false", em);
+        Helpers.setSingleParam("enableWsApiSsl", "true", cnx);
+        Helpers.setSingleParam("disableWsApi", "false", cnx);
+        Helpers.setSingleParam("enableWsApiAuth", "false", cnx);
 
         addAndStartEngine();
     }
@@ -62,18 +63,18 @@ public class JettyTest extends JqmBaseTest
     @Test
     public void testSslServices() throws Exception
     {
-        Helpers.setSingleParam("enableWsApiSsl", "true", em);
-        Helpers.setSingleParam("disableWsApi", "false", em);
-        Helpers.setSingleParam("enableWsApiAuth", "false", em);
+        Helpers.setSingleParam("enableWsApiSsl", "true", cnx);
+        Helpers.setSingleParam("disableWsApi", "false", cnx);
+        Helpers.setSingleParam("enableWsApiAuth", "false", cnx);
 
         addAndStartEngine();
 
         // Launch a job so as to be able to query its status later
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
         JobRequest j = new JobRequest("MarsuApplication", "TestUser");
         int i = JqmClientFactory.getClient().enqueue(j);
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
         // HTTPS client - with
         KeyStore trustStore = KeyStore.getInstance("JKS");
@@ -93,8 +94,7 @@ public class JettyTest extends JqmBaseTest
 
         CloseableHttpClient cl = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 
-        int port = em.createQuery("SELECT q.port FROM Node q WHERE q.id = :i", Integer.class).setParameter("i", TestHelpers.node.getId())
-                .getSingleResult();
+        int port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
         HttpUriRequest rq = new HttpGet("https://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + i);
         jqmlogger.debug(rq.getURI());
         CloseableHttpResponse rs = cl.execute(rq);
@@ -107,18 +107,18 @@ public class JettyTest extends JqmBaseTest
     @Test
     public void testSslClientCert() throws Exception
     {
-        Helpers.setSingleParam("enableWsApiSsl", "true", em);
-        Helpers.setSingleParam("disableWsApi", "false", em);
-        Helpers.setSingleParam("enableWsApiAuth", "false", em);
+        Helpers.setSingleParam("enableWsApiSsl", "true", cnx);
+        Helpers.setSingleParam("disableWsApi", "false", cnx);
+        Helpers.setSingleParam("enableWsApiAuth", "false", cnx);
 
         addAndStartEngine();
 
         // Launch a job so as to be able to query its status later
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
         JobRequest j = new JobRequest("MarsuApplication", "TestUser");
         int i = JqmClientFactory.getClient().enqueue(j);
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
         // Server auth against trusted CA root certificate
         KeyStore trustStore = KeyStore.getInstance("JKS");
@@ -133,7 +133,7 @@ public class JettyTest extends JqmBaseTest
         }
 
         // Client auth
-        JpaCa.prepareClientStore(em, "CN=testuser", "./conf/client.pfx", "SuperPassword", "client-cert", "./conf/client.cer");
+        JdbcCa.prepareClientStore(cnx, "CN=testuser", "./conf/client.pfx", "SuperPassword", "client-cert", "./conf/client.cer");
         KeyStore clientStore = KeyStore.getInstance("PKCS12");
         instream = new FileInputStream(new File("./conf/client.pfx"));
         try
@@ -152,8 +152,7 @@ public class JettyTest extends JqmBaseTest
 
         CloseableHttpClient cl = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 
-        int port = em.createQuery("SELECT q.port FROM Node q WHERE q.id = :i", Integer.class).setParameter("i", TestHelpers.node.getId())
-                .getSingleResult();
+        int port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
         HttpUriRequest rq = new HttpGet("https://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + i);
         CloseableHttpResponse rs = cl.execute(rq);
         Assert.assertEquals(200, rs.getStatusLine().getStatusCode());

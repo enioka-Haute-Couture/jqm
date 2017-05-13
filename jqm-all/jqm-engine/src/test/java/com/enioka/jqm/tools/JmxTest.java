@@ -40,10 +40,10 @@ public class JmxTest extends JqmBaseTest
     public void jmxRemoteTest() throws Exception
     {
         CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
-                "KillApp", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "KillApp", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         int i = JobRequest.create("KillApp", "TestUser").submit();
 
-        // Get free ports
+        // Set JMX server on free ports
         ServerSocket s1 = new ServerSocket(0);
         int port1 = s1.getLocalPort();
         ServerSocket s2 = new ServerSocket(0);
@@ -52,14 +52,14 @@ public class JmxTest extends JqmBaseTest
         s2.close();
         String hn = InetAddress.getLocalHost().getHostName();
 
-        em.getTransaction().begin();
-        TestHelpers.node.setJmxRegistryPort(port1);
-        TestHelpers.node.setJmxServerPort(port2);
-        em.getTransaction().commit();
+        cnx.runUpdate("node_update_jmx_by_id", port1, port2, TestHelpers.node.getId());
+        cnx.commit();
 
+        // Go
         addAndStartEngine();
-        Thread.sleep(1000);
+        TestHelpers.waitForRunning(1, 1000, cnx);
 
+        // Connect to JMX server
         JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://" + hn + ":" + port1 + "/jndi/rmi://" + hn + ":" + port2 + "/jmxrmi");
         JMXConnector cntor = JMXConnectorFactory.connect(url, null);
         MBeanServerConnection mbsc = cntor.getMBeanServerConnection();
@@ -67,22 +67,25 @@ public class JmxTest extends JqmBaseTest
         System.out.println(count);
 
         String[] domains = mbsc.getDomains();
+        System.out.println("*** domains:");
         for (String d : domains)
         {
             System.out.println(d);
         }
         Set<ObjectInstance> mbeans = mbsc.queryMBeans(new ObjectName("com.enioka.jqm:*"), null);
+        System.out.println("*** beans in com.enioka.jqm:*: ");
         for (ObjectInstance oi : mbeans)
         {
             System.out.println(oi.getObjectName());
         }
-        Assert.assertEquals(6, mbeans.size());
+        Assert.assertEquals(5, mbeans.size());
+        // 1 node, 3 pollers, 1 running instance, 1 JDBC pool. The pool is not visible due to a call to resetSingletons.
 
         // /////////////////
         // Loader beans
-        ObjectName killBean = new ObjectName("com.enioka.jqm:type=Node.Queue.JobInstance,Node=" + TestHelpers.node.getName() + ",Queue="
-                + TestHelpers.qVip.getName() + ",name=" + i);
-        System.out.println(killBean.toString());
+        ObjectName killBean = new ObjectName(
+                "com.enioka.jqm:type=Node.Queue.JobInstance,Node=" + TestHelpers.node.getName() + ",Queue=VIPQueue,name=" + i);
+        System.out.println("Name to kill: " + killBean.toString());
         mbeans = mbsc.queryMBeans(killBean, null);
         if (mbeans.isEmpty())
         {
@@ -119,8 +122,7 @@ public class JmxTest extends JqmBaseTest
 
         // //////////////////
         // Poller bean
-        ObjectName poller = new ObjectName("com.enioka.jqm:type=Node.Queue,Node=" + TestHelpers.node.getName() + ",name="
-                + TestHelpers.qVip.getName());
+        ObjectName poller = new ObjectName("com.enioka.jqm:type=Node.Queue,Node=" + TestHelpers.node.getName() + ",name=VIPQueue");
         QueuePollerMBean proxyPoller = JMX.newMBeanProxy(mbsc, poller, QueuePollerMBean.class);
         Assert.assertEquals(1, proxyPoller.getCumulativeJobInstancesCount() + proxyPoller.getCurrentActiveThreadCount());
         proxyPoller.getCurrentlyRunningJobCount();

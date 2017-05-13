@@ -15,12 +15,10 @@
  */
 package com.enioka.jqm.api;
 
+import java.io.Closeable;
 import java.util.Properties;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-
-import com.enioka.jqm.jpamodel.GlobalParameter;
+import com.enioka.jqm.jdbc.DbConn;
 
 public final class Helpers
 {
@@ -37,22 +35,18 @@ public final class Helpers
         // helper class
     }
 
-    public static EntityManager getEm()
+    public static DbConn getDbSession()
     {
-        return ((HibernateClient) JqmClientFactory.getClient()).getEm();
+        return ((JdbcClient) JqmClientFactory.getClient()).getDbSession();
     }
 
-    public static void closeQuietly(EntityManager em)
+    public static void closeQuietly(Closeable closeable)
     {
         try
         {
-            if (em != null)
+            if (closeable != null)
             {
-                if (em.getTransaction().isActive())
-                {
-                    em.getTransaction().rollback();
-                }
-                em.close();
+                closeable.close();
             }
         }
         catch (Exception e)
@@ -60,19 +54,4 @@ public final class Helpers
             // fail silently
         }
     }
-
-    public static String getParameter(String key, String defaultValue, EntityManager em)
-    {
-        try
-        {
-            GlobalParameter gp = em.createQuery("SELECT n from GlobalParameter n WHERE n.key = :key", GlobalParameter.class)
-                    .setParameter("key", key).getSingleResult();
-            return gp.getValue();
-        }
-        catch (NoResultException e)
-        {
-            return defaultValue;
-        }
-    }
-
 }

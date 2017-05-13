@@ -20,124 +20,117 @@ package com.enioka.jqm.test.helpers;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Calendar;
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.apache.shiro.crypto.SecureRandomNumberGenerator;
-import org.apache.shiro.crypto.hash.Sha512Hash;
-import org.apache.shiro.util.ByteSource;
 
-import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.jpamodel.JndiObjectResource;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.RUser;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.DeploymentParameter;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.model.Queue;
+import com.enioka.jqm.model.RRole;
 
 public class TestHelpers
 {
     public static Logger jqmlogger = Logger.getLogger(TestHelpers.class);
-    public static JndiObjectResource db = null;
 
-    public static com.enioka.jqm.jpamodel.Queue qVip, qNormal, qSlow, qVip2, qNormal2, qSlow2, qVip3, qNormal3, qSlow3;
+    public static Integer qVip, qNormal, qSlow, qVip2, qNormal2, qSlow2, qVip3, qNormal3, qSlow3;
     public static Node node, node2, node3, nodeMix, nodeMix2;
 
     public static DeploymentParameter dpVip, dpNormal, dpSlow, dpVip2, dpNormal2, dpSlow2, dpVip3, dpNormal3, dpSlow3, dpVipMix, dpVipMix2;
 
-    public static GlobalParameter gpCentral, gpEclipse;
-
-    public static void createTestData(EntityManager em)
+    public static void createTestData(DbConn cnx)
     {
-        db = CreationTools.createDatabaseProp("jdbc/marsu", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb", "SA", "", em,
+        CreationTools.createDatabaseProp("jdbc/marsu", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb", "SA", "", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
 
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenRepo", "http://repo1.maven.org/maven2/", em);
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("defaultConnection", "jdbc/marsu", em);
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("logFilePerLaunch", "false", em);
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("internalPollingPeriodMs", "60000", em);
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("mavenSettingsCL", "META-INF/settings.xml", em);
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("disableWsApi", "true", em);
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("enableWsApiSsl", "false", em);
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("enableWsApiAuth", "true", em);
-        TestHelpers.gpCentral = CreationTools.createGlobalParameter("disableVerboseStartup", "true", em);
+        GlobalParameter.create(cnx, "mavenRepo", "http://repo1.maven.org/maven2/");
+        GlobalParameter.create(cnx, "defaultConnection", "jdbc/marsu");
+        GlobalParameter.create(cnx, "logFilePerLaunch", "false");
+        GlobalParameter.create(cnx, "internalPollingPeriodMs", "60000");
+        GlobalParameter.create(cnx, "mavenSettingsCL", "META-INF/settings.xml");
+        GlobalParameter.create(cnx, "disableWsApi", "true");
+        GlobalParameter.create(cnx, "enableWsApiSsl", "false");
+        GlobalParameter.create(cnx, "enableWsApiAuth", "true");
+        GlobalParameter.create(cnx, "disableVerboseStartup", "true");
 
-        TestHelpers.qVip = CreationTools.initQueue("VIPQueue", "Queue for the winners", 42, em, true);
-        TestHelpers.qNormal = CreationTools.initQueue("NormalQueue", "Queue for the ordinary job", 7, em);
-        TestHelpers.qSlow = CreationTools.initQueue("SlowQueue", "Queue for the bad guys", 3, em);
+        TestHelpers.qVip = Queue.create(cnx, "VIPQueue", "Queue for the winners", true);
+        TestHelpers.qNormal = Queue.create(cnx, "NormalQueue", "Queue for the ordinary job", false);
+        TestHelpers.qSlow = Queue.create(cnx, "SlowQueue", "Queue for the bad guys", false);
 
-        TestHelpers.qVip2 = CreationTools.initQueue("VIPQueue2", "Queue for the winners2", 42, em);
-        TestHelpers.qNormal2 = CreationTools.initQueue("NormalQueue2", "Queue for the ordinary job2", 7, em);
-        TestHelpers.qSlow2 = CreationTools.initQueue("SlowQueue2", "Queue for the bad guys2", 3, em);
+        TestHelpers.qVip2 = Queue.create(cnx, "VIPQueue2", "Queue for the winners2", false);
+        TestHelpers.qNormal2 = Queue.create(cnx, "NormalQueue2", "Queue for the ordinary job2", false);
+        TestHelpers.qSlow2 = Queue.create(cnx, "SlowQueue2", "Queue for the bad guys2", false);
 
-        TestHelpers.qVip3 = CreationTools.initQueue("VIPQueue3", "Queue for the winners3", 42, em);
-        TestHelpers.qNormal3 = CreationTools.initQueue("NormalQueue3", "Queue for the ordinary job3", 7, em);
-        TestHelpers.qSlow3 = CreationTools.initQueue("SlowQueue3", "Queue for the bad guys3", 3, em);
+        TestHelpers.qVip3 = Queue.create(cnx, "VIPQueue3", "Queue for the winners3", false);
+        TestHelpers.qNormal3 = Queue.create(cnx, "NormalQueue3", "Queue for the ordinary job3", false);
+        TestHelpers.qSlow3 = Queue.create(cnx, "SlowQueue3", "Queue for the bad guys3", false);
 
-        TestHelpers.node = CreationTools.createNode("localhost", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
-        TestHelpers.node2 = CreationTools.createNode("localhost2", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
-        TestHelpers.node3 = CreationTools.createNode("localhost3", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
-        TestHelpers.nodeMix = CreationTools.createNode("localhost4", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
-        TestHelpers.nodeMix2 = CreationTools.createNode("localhost5", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
+        String dns = getLocalHostName();
+        TestHelpers.node = Node.create(cnx, "localhost", 0, "./target/outputfiles/", "./../", "./target/tmp", dns);
+        TestHelpers.node2 = Node.create(cnx, "localhost2", 0, "./target/outputfiles/", "./../", "./target/tmp", dns);
+        TestHelpers.node3 = Node.create(cnx, "localhost3", 0, "./target/outputfiles/", "./../", "./target/tmp", dns);
+        TestHelpers.nodeMix = Node.create(cnx, "localhost4", 0, "./target/outputfiles/", "./../", "./target/tmp", dns);
+        TestHelpers.nodeMix2 = Node.create(cnx, "localhost5", 0, "./target/outputfiles/", "./../", "./target/tmp", dns);
 
-        TestHelpers.dpVip = CreationTools.createDeploymentParameter(node, 40, 1, qVip, em);
-        TestHelpers.dpVipMix = CreationTools.createDeploymentParameter(nodeMix, 3, 1, qVip, em);
-        TestHelpers.dpVipMix2 = CreationTools.createDeploymentParameter(nodeMix2, 3, 1, qVip, em);
-        TestHelpers.dpNormal = CreationTools.createDeploymentParameter(node, 2, 300, qNormal, em);
-        TestHelpers.dpSlow = CreationTools.createDeploymentParameter(node, 1, 1000, qSlow, em);
+        TestHelpers.dpVip = DeploymentParameter.create(cnx, node, 40, 1, qVip);
+        TestHelpers.dpVipMix = DeploymentParameter.create(cnx, nodeMix, 3, 1, qVip);
+        TestHelpers.dpVipMix2 = DeploymentParameter.create(cnx, nodeMix2, 3, 1, qVip);
+        TestHelpers.dpNormal = DeploymentParameter.create(cnx, node, 2, 300, qNormal);
+        TestHelpers.dpSlow = DeploymentParameter.create(cnx, node, 1, 1000, qSlow);
 
-        TestHelpers.dpVip2 = CreationTools.createDeploymentParameter(node2, 3, 100, qVip2, em);
-        TestHelpers.dpNormal2 = CreationTools.createDeploymentParameter(node2, 2, 300, qNormal2, em);
-        TestHelpers.dpSlow2 = CreationTools.createDeploymentParameter(node2, 1, 1000, qSlow2, em);
+        TestHelpers.dpVip2 = DeploymentParameter.create(cnx, node2, 3, 100, qVip2);
+        TestHelpers.dpNormal2 = DeploymentParameter.create(cnx, node2, 2, 300, qNormal2);
+        TestHelpers.dpSlow2 = DeploymentParameter.create(cnx, node2, 1, 1000, qSlow2);
 
-        TestHelpers.dpVip3 = CreationTools.createDeploymentParameter(node3, 3, 100, qVip3, em);
-        TestHelpers.dpNormal3 = CreationTools.createDeploymentParameter(node3, 2, 300, qNormal3, em);
-        TestHelpers.dpSlow3 = CreationTools.createDeploymentParameter(node3, 1, 1000, qSlow3, em);
+        TestHelpers.dpVip3 = DeploymentParameter.create(cnx, node3, 3, 100, qVip3);
+        TestHelpers.dpNormal3 = DeploymentParameter.create(cnx, node3, 2, 300, qNormal3);
+        TestHelpers.dpSlow3 = DeploymentParameter.create(cnx, node3, 1, 1000, qSlow3);
 
         if (!(new File(TestHelpers.node.getDlRepo())).isDirectory() && !(new File(TestHelpers.node.getDlRepo())).mkdir())
         {
             throw new RuntimeException("could not create output directory");
         }
 
-        CreationTools.createMailSession(em, "mail/default", "localhost", 10025, false, "testlogin", "testpassword");
+        CreationTools.createMailSession(cnx, "mail/default", "localhost", 10025, false, "testlogin", "testpassword");
 
-        CreationTools.createRole(em, "administrator", "super admin", "*:*");
-        CreationTools.createRole(em, "client power user", "can use the full client API", "node:read", "queue:read", "job_instance:*",
-                "jd:read", "logs:read", "queue_position:create", "files:read");
-        CreationTools.createRole(em, "client read only", "can query job instances and get their files", "queue:read", "job_instance:read",
-                "logs:read", "files:read");
+        RRole.create(cnx, "administrator", "super admin", "*:*");
+        RRole.create(cnx, "client power user", "can use the full client API", "node:read", "queue:read", "job_instance:*", "jd:read",
+                "logs:read", "queue_position:create", "files:read");
+        RRole.create(cnx, "client read only", "can query job instances and get their files", "queue:read", "job_instance:read", "logs:read",
+                "files:read");
+
+        cnx.commit();
     }
 
-    public static void cleanup(EntityManager em)
+    public static void cleanup(DbConn cnx)
     {
-        em.getTransaction().begin();
-        em.createQuery("DELETE GlobalParameter WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE Deliverable WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE DeploymentParameter WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE Message WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE History WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE JobDefParameter WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE RuntimeParameter WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE JobInstance WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE Node WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE JobDef WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE Queue WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE JndiObjectResourceParameter WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE JndiObjectResource WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE PKI WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE RPermission WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE RRole WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE RUser WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE ClHandlerParameter WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE ClHandler WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE Cl WHERE 1=1").executeUpdate();
+        cnx.runUpdate("globalprm_delete_all");
+        cnx.runUpdate("deliverable_delete_all");
+        cnx.runUpdate("dp_delete_all");
+        cnx.runUpdate("message_delete_all");
+        cnx.runUpdate("history_delete_all");
+        cnx.runUpdate("jdprm_delete_all");
+        cnx.runUpdate("jiprm_delete_all");
+        cnx.runUpdate("ji_delete_all");
+        cnx.runUpdate("node_delete_all");
+        cnx.runUpdate("jd_delete_all");
+        cnx.runUpdate("q_delete_all");
+        cnx.runUpdate("jndiprm_delete_all");
+        cnx.runUpdate("jndi_delete_all");
+        cnx.runUpdate("pki_delete_all");
+        cnx.runUpdate("perm_delete_all");
+        cnx.runUpdate("role_delete_all");
+        cnx.runUpdate("user_delete_all");
+        cnx.runUpdate("clehprm_delete_all");
+        cnx.runUpdate("cleh_delete_all");
+        cnx.runUpdate("cl_delete_all");
 
-        em.getTransaction().commit();
+        cnx.commit();
 
         try
         {
@@ -174,35 +167,39 @@ public class TestHelpers
         }
     }
 
-    public static void printHistoryTable(EntityManager em)
+    private static String getLocalHostName()
     {
-        List<History> res = em.createQuery("SELECT j FROM History j", History.class).getResultList();
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss.SSS");
-
-        jqmlogger.debug("==========================================================================================");
-        for (History h : res)
+        String res = "localhost";
+        try
         {
-            jqmlogger.debug("JobInstance Id: " + h.getId() + " | " + h.getState() + " | JD: " + h.getJd().getId() + " | "
-                    + h.getQueue().getName() + " | enqueue: " + format.format(h.getEnqueueDate().getTime()) + " | attr: "
-                    + format.format(h.getAttributionDate().getTime()) + " | exec: " + format.format(h.getExecutionDate().getTime())
-                    + " | end: " + format.format(h.getEndDate().getTime()));
+            String tmp = InetAddress.getLocalHost().getHostName();
+            InetAddress[] adresses = InetAddress.getAllByName(tmp);
+            for (InetAddress s : adresses)
+            {
+                if (s.isLoopbackAddress())
+                {
+                    res = "localhost"; // force true loopback in this case. We may have a hostname that resolves on a public interface with
+                                       // a loopback adress...
+                }
+            }
         }
-        jqmlogger.debug("==========================================================================================");
+        catch (UnknownHostException e)
+        {
+            // We'll settle for localhost.
+        }
+        return res;
     }
 
-    public static void setNodesLogLevel(String level, EntityManager em)
+    public static void setNodesLogLevel(String level, DbConn cnx)
     {
-        em.getTransaction().begin();
-        em.createQuery("UPDATE Node n set n.rootLogLevel = :l").setParameter("l", level).executeUpdate();
-        em.getTransaction().commit();
+        cnx.runUpdate("node_update_all_log_level", level);
+        cnx.commit();
     }
 
-    public static void waitFor(long nbHistories, int timeoutMs, EntityManager em)
+    public static void waitFor(long nbHistories, int timeoutMs, DbConn cnx)
     {
-        TypedQuery<Long> q = em.createQuery("SELECT COUNT(h) FROM History h", Long.class);
-
         Calendar start = Calendar.getInstance();
-        while (q.getSingleResult() < nbHistories && Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis() <= timeoutMs)
+        while (getHistoryAllCount(cnx) < nbHistories && Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis() <= timeoutMs)
         {
             try
             {
@@ -214,12 +211,11 @@ public class TestHelpers
         }
     }
 
-    public static void waitForRunning(long nbJobInstances, int timeoutMs, EntityManager em)
+    public static void waitForRunning(long nbJobInstances, int timeoutMs, DbConn cnx)
     {
-        TypedQuery<Long> q = em.createQuery("SELECT COUNT(ji) FROM JobInstance ji WHERE ji.state = 'RUNNING'", Long.class);
-
         Calendar start = Calendar.getInstance();
-        while (q.getSingleResult() < nbJobInstances && Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis() <= timeoutMs)
+        while (getQueueRunningCount(cnx) < nbJobInstances
+                && Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis() <= timeoutMs)
         {
             try
             {
@@ -231,40 +227,34 @@ public class TestHelpers
         }
     }
 
-    public static int getHistoryAllCount(EntityManager em)
+    public static int getHistoryAllCount(DbConn cnx)
     {
-        TypedQuery<Long> q = em.createQuery("SELECT COUNT(h) FROM History h", Long.class);
-        return q.getSingleResult().intValue();
+        return cnx.runSelectSingle("history_select_count_all", Integer.class);
     }
 
-    public static int getQueueAllCount(EntityManager em)
+    public static int getQueueAllCount(DbConn cnx)
     {
-        TypedQuery<Long> q = em.createQuery("SELECT COUNT(h) FROM JobInstance h", Long.class);
-        return q.getSingleResult().intValue();
+        return cnx.runSelectSingle("ji_select_count_all", Integer.class);
     }
 
-    public static int getOkCount(EntityManager em)
+    public static int getQueueRunningCount(DbConn cnx)
     {
-        TypedQuery<Long> q = em.createQuery("SELECT COUNT(h) FROM History h WHERE h.status = 'ENDED'", Long.class);
-        return q.getSingleResult().intValue();
+        return cnx.runSelectSingle("ji_select_count_running", Integer.class);
     }
 
-    public static int getNonOkCount(EntityManager em)
+    public static int getOkCount(DbConn cnx)
     {
-        TypedQuery<Long> q = em.createQuery("SELECT COUNT(h) FROM History h WHERE h.status != 'ENDED'", Long.class);
-        return q.getSingleResult().intValue();
+        return cnx.runSelectSingle("history_select_count_ended", Integer.class);
     }
 
-    public static boolean testOkCount(long theoreticalOkCount, EntityManager em)
+    public static int getNonOkCount(DbConn cnx)
     {
-        TypedQuery<Long> q = em.createQuery("SELECT COUNT(h) FROM History h WHERE h.status = 'ENDED'", Long.class);
-        return q.getSingleResult() == theoreticalOkCount;
+        return cnx.runSelectSingle("history_select_count_notended", Integer.class);
     }
 
-    public static void encodePassword(RUser user)
+    public static boolean testOkCount(long theoreticalOkCount, DbConn cnx)
     {
-        ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
-        user.setPassword(new Sha512Hash(user.getPassword(), salt, 100000).toHex());
-        user.setHashSalt(salt.toHex());
+        return getOkCount(cnx) == theoreticalOkCount;
     }
+
 }

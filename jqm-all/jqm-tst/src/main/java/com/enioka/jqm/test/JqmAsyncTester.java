@@ -7,28 +7,28 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-
 import org.apache.commons.io.FilenameUtils;
 import org.hsqldb.Server;
+import org.hsqldb.jdbc.JDBCDataSource;
 
 import com.enioka.jqm.api.Deliverable;
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClient;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.JqmInvalidRequestException;
 import com.enioka.jqm.api.Query;
 import com.enioka.jqm.api.State;
-import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.jdbc.Db;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.DeploymentParameter;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.tools.JqmEngineOperations;
 import com.enioka.jqm.tools.Main;
 
@@ -49,10 +49,10 @@ public class JqmAsyncTester
 {
     private Map<String, JqmEngineOperations> engines = new HashMap<String, JqmEngineOperations>();
     private Map<String, Node> nodes = new HashMap<String, Node>();
-    private Map<String, Queue> queues = new HashMap<String, Queue>();
+    private Map<String, Integer> queues = new HashMap<String, Integer>();
 
-    private EntityManagerFactory emf = null;
-    private EntityManager em = null;
+    private Db db = null;
+    private DbConn cnx = null;
     private Server s = null;
 
     private boolean hasStarted = false;
@@ -75,19 +75,20 @@ public class JqmAsyncTester
         s = Common.createHsqlServer();
         s.start();
 
-        emf = Persistence.createEntityManagerFactory("jobqueue-api-pu", Common.jpaProperties(s));
-        em = emf.createEntityManager();
+        JDBCDataSource ds = new JDBCDataSource();
+        ds.setDatabase("jdbc:hsqldb:mem:" + s.getDatabaseName(0, true));
+        db = new Db(ds, true);
+        cnx = db.getConn();
 
-        Properties p2 = new Properties();
-        p2.put("emf", emf);
+        Properties p2 = Common.dbProperties(s);
+        p2.put("com.enioka.jqm.jdbc.contextobject", db);
         JqmClientFactory.setProperties(p2);
-        Main.setEmf(emf);
+        Main.setDb(db);
 
         // Minimum parameters
         Main.main(new String[] { "-u" });
-        em.getTransaction().begin();
-        em.createQuery("DELETE FROM Queue").executeUpdate();
-        em.getTransaction().commit();
+        cnx.runUpdate("q_delete_all");
+        cnx.commit();
 
         // Needed parameters
         addGlobalParameter("defaultConnection", "");
@@ -131,19 +132,12 @@ public class JqmAsyncTester
         }
 
         File resDirectoryPath = Common.createTempDirectory();
-        Node node = new Node();
-        node.setDlRepo(resDirectoryPath.getAbsolutePath());
-        node.setDns("test");
-        node.setName(nodeName);
-        node.setRepo(".");
-        node.setTmpDirectory(resDirectoryPath.getAbsolutePath());
-        node.setPort(12);
-        node.setRootLogLevel(logLevel);
 
-        em.getTransaction().begin();
-        em.persist(node);
-        em.getTransaction().commit();
+        Node node = Node.create(cnx, nodeName, 12, resDirectoryPath.getAbsolutePath(), ".", resDirectoryPath.getAbsolutePath(), "test");
+        cnx.commit();
         nodes.put(nodeName, node);
+
+        setNodesLogLevel(logLevel);
 
         return this;
     }
@@ -157,9 +151,8 @@ public class JqmAsyncTester
     public JqmAsyncTester setNodesLogLevel(String level)
     {
         logLevel = level;
-        em.getTransaction().begin();
-        em.createQuery("UPDATE Node n set n.rootLogLevel = :l").setParameter("l", level).executeUpdate();
-        em.getTransaction().commit();
+        cnx.runUpdate("node_update_all_log_level", level);
+        cnx.commit();
         return this;
     }
 
@@ -179,17 +172,9 @@ public class JqmAsyncTester
             throw new IllegalStateException("tester has already started");
         }
 
-        Queue q = new Queue();
-        q.setName(name);
-        q.setDescription("test queue");
-        if (queues.size() == 0)
-        {
-            q.setDefaultQueue(true);
-        }
+        int q = Queue.create(cnx, name, "test queue", queues.size() == 0);
+        cnx.commit();
 
-        em.getTransaction().begin();
-        em.persist(q);
-        em.getTransaction().commit();
         queues.put(name, q);
 
         return this;
@@ -208,15 +193,8 @@ public class JqmAsyncTester
 
         for (String name : nodeName)
         {
-            DeploymentParameter dp = new DeploymentParameter();
-            dp.setNbThread(maxJobsRunning);
-            dp.setNode(nodes.get(name));
-            dp.setPollingInterval(pollingIntervallMs);
-            dp.setQueue(queues.get(queueName));
-
-            em.getTransaction().begin();
-            em.persist(dp);
-            em.getTransaction().commit();
+            DeploymentParameter.create(cnx, nodes.get(name).getId(), maxJobsRunning, pollingIntervallMs, queues.get(queueName));
+            cnx.commit();
         }
 
         oneQueueDeployed = true;
@@ -228,18 +206,8 @@ public class JqmAsyncTester
      */
     public void addGlobalParameter(String key, String value)
     {
-        em.getTransaction().begin();
-        int i = em.createQuery("UPDATE GlobalParameter p SET p.value = :val WHERE p.key = :key").setParameter("key", key)
-                .setParameter("val", value).executeUpdate();
-
-        if (i == 0)
-        {
-            GlobalParameter gp = new GlobalParameter();
-            gp.setKey(key);
-            gp.setValue(value);
-            em.persist(gp);
-        }
-        em.getTransaction().commit();
+        GlobalParameter.setParameter(cnx, key, value);
+        cnx.commit();
     }
 
     /**
@@ -248,11 +216,8 @@ public class JqmAsyncTester
      */
     public JqmAsyncTester addJobDefinition(TestJobDefinition description)
     {
-        JobDef jd = Common.createJobDef(description, queues, em);
-        em.getTransaction().begin();
-        em.persist(jd);
-        em.getTransaction().commit();
-
+        Common.createJobDef(cnx, description, queues);
+        cnx.commit();
         return this;
     }
 
@@ -402,9 +367,10 @@ public class JqmAsyncTester
             op.stop();
         }
         JqmClientFactory.resetClient();
-        // No need to close EM & EMF - they were closed by the client reset.
+        cnx.close();
         s.stop();
         waitDbStop();
+        s = null;
         hasStarted = false;
         this.engines.clear();
     }
@@ -428,14 +394,12 @@ public class JqmAsyncTester
      */
     public void cleanupOperationalDbData()
     {
-        em.getTransaction().begin();
-        em.createQuery("DELETE Deliverable WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE Message WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE History WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE RuntimeParameter WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE JobInstance WHERE 1=1").executeUpdate();
-
-        em.getTransaction().commit();
+        cnx.runUpdate("deliverable_delete_all");
+        cnx.runUpdate("message_delete_all");
+        cnx.runUpdate("history_delete_all");
+        cnx.runUpdate("jiprm_delete_all");
+        cnx.runUpdate("ji_delete_all");
+        cnx.commit();
     }
 
     /**
@@ -447,10 +411,9 @@ public class JqmAsyncTester
     {
         cleanupOperationalDbData();
 
-        em.getTransaction().begin();
-        em.createQuery("DELETE JobDefParameter WHERE 1=1").executeUpdate();
-        em.createQuery("DELETE JobDef WHERE 1=1").executeUpdate();
-        em.getTransaction().commit();
+        cnx.runUpdate("jdprm_delete_all");
+        cnx.runUpdate("jd_delete_all");
+        cnx.commit();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -523,9 +486,14 @@ public class JqmAsyncTester
      */
     public InputStream getDeliverableContent(Deliverable file) throws FileNotFoundException
     {
-        com.enioka.jqm.jpamodel.Deliverable d = em
-                .createQuery("SELECT d FROM Deliverable d WHERE d.id = :i", com.enioka.jqm.jpamodel.Deliverable.class)
-                .setParameter("i", file.getId()).getSingleResult();
+        List<com.enioka.jqm.model.Deliverable> dd = com.enioka.jqm.model.Deliverable.select(cnx, "deliverable_select_by_id",
+                file.getId());
+        if (dd.isEmpty())
+        {
+            throw new JqmInvalidRequestException("no deliverable with this ID");
+        }
+
+        com.enioka.jqm.model.Deliverable d = dd.get(0);
         JobInstance ji = Query.create().setJobInstanceId(d.getJobId()).run().get(0);
         String nodeName = ji.getNodeName();
         Node n = nodes.get(nodeName);

@@ -26,27 +26,27 @@ public class ParameterTest extends JqmBaseTest
     @Test
     public void testParameterValue() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.JobBaseGetParam").addDefParameter("arg1", "Gaston Lagaffe").addDefParameter("arg2", "Franquin")
+        JqmSimpleTest.create(cnx, "pyl.JobBaseGetParam").addDefParameter("arg1", "Gaston Lagaffe").addDefParameter("arg2", "Franquin")
                 .expectNonOk(1).expectOk(0).run(this);
     }
 
     @Test
     public void testMixParameters() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.JobBaseGetParam").addDefParameter("arg1", "argument1").addDefParameter("arg2", "Franquin")
+        JqmSimpleTest.create(cnx, "pyl.JobBaseGetParam").addDefParameter("arg1", "argument1").addDefParameter("arg2", "Franquin")
                 .addRuntimeParameter("arg2", "argument2").run(this);
     }
 
     @Test
     public void testDefaultParameters() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.JobBaseGetParam").addDefParameter("arg1", "argument1").addDefParameter("arg2", "argument2").run(this);
+        JqmSimpleTest.create(cnx, "pyl.JobBaseGetParam").addDefParameter("arg1", "argument1").addDefParameter("arg2", "argument2").run(this);
     }
 
     @Test
     public void testOverrideAllParmeters() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.JobBaseGetParam").addDefParameter("arg1", "Gaston Lagaffe").addDefParameter("arg2", "Franquin")
+        JqmSimpleTest.create(cnx, "pyl.JobBaseGetParam").addDefParameter("arg1", "Gaston Lagaffe").addDefParameter("arg2", "Franquin")
                 .addRuntimeParameter("arg1", "argument1").addRuntimeParameter("arg2", "argument2").run(this);
     }
 

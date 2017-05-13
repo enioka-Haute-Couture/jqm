@@ -5,13 +5,11 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.persistence.EntityManager;
-
 import org.hsqldb.Server;
 
-import com.enioka.jqm.jpamodel.Cl;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.Cl;
+import com.enioka.jqm.model.JobDef;
 
 final class Common
 {
@@ -54,47 +52,22 @@ final class Common
         return s;
     }
 
-    static Properties jpaProperties(Server s)
+    static Properties dbProperties(Server s)
     {
         Properties p = new Properties();
-        p.put("hibernate.hbm2ddl.auto", "update");
-        p.put("hibernate.dialect", "com.enioka.jqm.tools.HSQLDialect7479");
-        p.put("hibernate.pool_size", 5);
-        p.put("javax.persistence.nonJtaDataSource", "");
-        p.put("hibernate.connection.url", "jdbc:hsqldb:hsql://localhost/" + s.getDatabaseName(0, false));
+        p.put("com.enioka.jqm.jdbc.allowSchemaUpdate", "true");
+        p.put("com.enioka.jqm.jdbc.datasource", "jdbc/jqm");
         return p;
     }
 
-    static JobDef createJobDef(TestJobDefinition d, Map<String, Queue> queues, EntityManager em)
+    static void createJobDef(DbConn cnx, TestJobDefinition d, Map<String, Integer> queues)
     {
-        JobDef j = new JobDef();
+        int clId = Cl.create(cnx, d.getSpecificIsolationContext() == null ? d.getName() : d.getSpecificIsolationContext(),
+                d.isChildFirstClassLoader(), d.getHiddenJavaClasses(), d.isClassLoaderTracing(), false, null);
 
-        j.setApplicationName(d.getName());
-        j.setDescription(d.getDescription());
-
-        j.setJavaClassName(d.getJavaClassName());
-        j.setJarPath(d.getPath());
-        j.setPathType(d.getPathType());
-
-        j.setParameters(d.getParameters());
-        j.setQueue(d.getQueueName() != null ? queues.get(d.getQueueName()) : queues.values().iterator().next());
-        j.setHighlander(d.isHighlander());
-
-        j.setApplication(d.getApplication());
-        j.setModule(d.getModule());
-        j.setKeyword1(d.getKeyword1());
-        j.setKeyword2(d.getKeyword2());
-        j.setKeyword3(d.getKeyword3());
-
-        Cl cl = new Cl();
-        cl.setChildFirst(d.isChildFirstClassLoader());
-        cl.setName(d.getSpecificIsolationContext() == null ? d.getName() : d.getSpecificIsolationContext());
-        cl.setHiddenClasses(d.getHiddenJavaClasses());
-        cl.setTracingEnabled(d.isClassLoaderTracing());
-        cl.setPersistent(false);
-        em.persist(cl);
-        j.setCl(cl);
-
-        return j;
+        JobDef.create(cnx, d.getDescription(), d.getJavaClassName(), d.parameters, d.getPath(),
+                d.getQueueName() != null ? queues.get(d.getQueueName()) : queues.values().iterator().next(), 0, d.getName(),
+                d.getApplication(), d.getModule(), d.getKeyword1(), d.getKeyword2(), d.getKeyword3(), d.isHighlander(), clId,
+                d.getPathType());
     }
 }

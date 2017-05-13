@@ -33,9 +33,8 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-import com.enioka.jqm.jpamodel.ClHandler;
-import com.enioka.jqm.jpamodel.ClHandlerParameter;
-import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.model.ClHandler;
+import com.enioka.jqm.model.JobInstance;
 
 /**
  * The {@link URLClassLoader} that will load everything related to a payload (the payload jar and all its dependencies).<br>
@@ -109,7 +108,7 @@ class JarClassLoader extends URLClassLoader
         metaprms.put("mayBeShared", "" + this.mayBeShared);
 
         // 3 - Load the target class inside the context class loader
-        String classQualifiedName = job.getJd().getJavaClassName();
+        String classQualifiedName = job.getJD().getJavaClassName();
         jqmlogger.debug("Will now load class: " + classQualifiedName);
 
         Class c = null;
@@ -126,10 +125,10 @@ class JarClassLoader extends URLClassLoader
 
         // 4 - Determine which job runner should take the job and launch!
         List<String> allowedRunners = clm.getJobRunnerClasses();
-        if (job.getJd().getClassLoader() != null && job.getJd().getClassLoader().getAllowedRunners() != null
-                && !job.getJd().getClassLoader().getAllowedRunners().isEmpty())
+        if (job.getJD().getClassLoader() != null && job.getJD().getClassLoader().getAllowedRunners() != null
+                && !job.getJD().getClassLoader().getAllowedRunners().isEmpty())
         {
-            allowedRunners = Arrays.asList(job.getJd().getClassLoader().getAllowedRunners().split(","));
+            allowedRunners = Arrays.asList(job.getJD().getClassLoader().getAllowedRunners().split(","));
         }
         for (String runnerClassName : allowedRunners)
         {
@@ -184,13 +183,13 @@ class JarClassLoader extends URLClassLoader
                 }
 
                 // We are ready to actually run the job instance. Time for all event handlers.
-                if (job.getJd().getClassLoader() != null)
+                if (job.getJD().getClassLoader() != null)
                 {
-                    for (ClHandler handler : job.getJd().getClassLoader().getHandlers())
+                    for (ClHandler handler : job.getJD().getClassLoader().getHandlers())
                     {
                         String handlerClass = handler.getClassName();
                         Map<String, String> handlerPrms = new HashMap<String, String>();
-                        for (ClHandlerParameter hprm : handler.getParameters())
+                        for (Map.Entry<String, String> hprm : handler.getParameters().entrySet())
                         {
                             handlerPrms.put(hprm.getKey(), hprm.getValue());
                         }
@@ -233,7 +232,9 @@ class JarClassLoader extends URLClassLoader
             }
         }
 
-        throw new JqmEngineException("This type of class cannot be launched by JQM. Please consult the documentation for more details.");
+        throw new JqmEngineException(
+                "This type of class cannot be launched by JQM. Please consult the documentation for more details. Available runners: "
+                        + allowedRunners);
     }
 
     private Class<?> loadFromParentCL(String name) throws ClassNotFoundException

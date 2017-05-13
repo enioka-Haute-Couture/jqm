@@ -10,6 +10,7 @@ Otherwise, it can be skipepd without remorse.
     :maxdepth: 2
 
     contrib
+	style
     build
     ../release_notes
     classloaders

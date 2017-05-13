@@ -5,20 +5,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-
 import org.junit.Assert;
 
 import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobDefParameter;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.JobDefParameter;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class JqmSimpleTest
 {
-    private EntityManager em;
-    private JobDef jd = null;
+    private DbConn cnx;
+    private Integer jd = null;
     private Map<String, String> runtimePrms = new HashMap<String, String>();
     private List<String> nodeNames = new ArrayList<String>();
     private String sessionId = null;
@@ -26,31 +24,28 @@ public class JqmSimpleTest
     private int expectedOk = 1, expectedNonOk = 0;
     private int waitMsMin = 0, waitMarginMs = 0;
 
-    private JqmSimpleTest(EntityManager em, String className, String artifactName)
+    private JqmSimpleTest(DbConn cnx, String className, String artifactName)
     {
-        this.em = em;
-        this.jd = CreationTools.createJobDef(null, true, className, new ArrayList<JobDefParameter>(), "jqm-tests/" + artifactName
-                + "/target/test.jar", TestHelpers.qVip, -1, "TestJqmApplication", "appFreeName", "TestModule", "kw1", "kw2", "kw3", false,
-                em);
+        this.cnx = cnx;
+        this.jd = CreationTools.createJobDef(null, true, className, null, "jqm-tests/" + artifactName + "/target/test.jar",
+                TestHelpers.qVip, -1, "TestJqmApplication", "appFreeName", "TestModule", "kw1", "kw2", "kw3", false, cnx);
         nodeNames.add("localhost");
     }
 
-    public static JqmSimpleTest create(EntityManager em, String className)
+    public static JqmSimpleTest create(DbConn cnx, String className)
     {
-        return new JqmSimpleTest(em, className, "jqm-test-pyl");
+        return new JqmSimpleTest(cnx, className, "jqm-test-pyl");
     }
 
-    public static JqmSimpleTest create(EntityManager em, String className, String artifact)
+    public static JqmSimpleTest create(DbConn cnx, String className, String artifact)
     {
-        return new JqmSimpleTest(em, className, artifact);
+        return new JqmSimpleTest(cnx, className, artifact);
     }
 
     public JqmSimpleTest addDefParameter(String key, String value)
     {
-        em.getTransaction().begin();
-        JobDefParameter jdp = CreationTools.createJobDefParameter(key, value, em);
-        this.jd.getParameters().add(jdp);
-        em.getTransaction().commit();
+        JobDefParameter.create(cnx, key, value, jd);
+        cnx.commit();
         return this;
     }
 
@@ -86,9 +81,8 @@ public class JqmSimpleTest
 
     public JqmSimpleTest setExternal()
     {
-        em.getTransaction().begin();
-        this.jd.setExternal(true);
-        em.getTransaction().commit();
+        cnx.runUpdate("jd_update_set_external_by_id", jd);
+        cnx.commit();
         return this;
     }
 
@@ -119,7 +113,7 @@ public class JqmSimpleTest
             test.addAndStartEngine(nodeName);
         }
         Integer i = JobRequest.create("TestJqmApplication", "TestUser").setSessionID(sessionId).setParameters(runtimePrms).submit();
-        TestHelpers.waitFor(nbExpected, 9000 + waitMarginMs + nbExpected * 2000, em);
+        TestHelpers.waitFor(nbExpected, 9000 + waitMarginMs + nbExpected * 2000, cnx);
         if (waitMsMin > 0)
         {
             try
@@ -132,8 +126,8 @@ public class JqmSimpleTest
             }
         }
 
-        Assert.assertEquals(expectedOk, TestHelpers.getOkCount(em));
-        Assert.assertEquals(expectedNonOk, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(expectedOk, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(expectedNonOk, TestHelpers.getNonOkCount(cnx));
 
         return i;
     }

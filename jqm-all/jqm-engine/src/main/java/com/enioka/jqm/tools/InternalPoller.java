@@ -20,11 +20,13 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import javax.naming.spi.NamingManager;
-import javax.persistence.EntityManager;
 
 import org.apache.log4j.Logger;
 
-import com.enioka.jqm.jpamodel.Node;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.Node;
 
 /**
  * The internal poller is responsible for doing all the repetitive tasks of an engine (excluding polling queues). Namely: check if
@@ -45,13 +47,13 @@ class InternalPoller implements Runnable
     InternalPoller(JqmEngine e)
     {
         this.engine = e;
-        EntityManager em = Helpers.getNewEm();
+        DbConn cnx = Helpers.getNewDbSession();
 
         // Get configuration data
-        node = em.find(Node.class, this.engine.getNode().getId());
-        this.step = Long.parseLong(Helpers.getParameter("internalPollingPeriodMs", "60000", em));
-        this.logLevel = node.getRootLogLevel();
-        em.close();
+        this.node = this.engine.getNode();
+        this.step = Long.parseLong(GlobalParameter.getParameter(cnx, "internalPollingPeriodMs", "60000"));
+        this.logLevel = this.node.getRootLogLevel();
+        cnx.close();
     }
 
     void stop()
@@ -79,7 +81,7 @@ class InternalPoller implements Runnable
     {
         Thread.currentThread().setName("INTERNAL_POLLER;polling orders;");
         jqmlogger.info("Start of the internal poller");
-        EntityManager em = null;
+        DbConn cnx = null;
         this.localThread = Thread.currentThread();
         Calendar latestJettyRestart = Calendar.getInstance(), lastJndiPurge = latestJettyRestart;
         String nodePrms = null;
@@ -103,18 +105,24 @@ class InternalPoller implements Runnable
             try
             {
                 // Get session
-                em = Helpers.getNewEm();
+                cnx = Helpers.getNewDbSession();
 
                 // Check if stop order
-                node = em.find(Node.class, node.getId());
+                try
+                {
+                    node = Node.select_single(cnx, "node_select_by_id", node.getId());
+                }
+                catch (NoResultException e)
+                {
+                    node = null;
+                }
                 if (node == null || node.isStop())
                 {
                     jqmlogger.info("Node has received a stop order from the database or was removed from the database");
-                    jqmlogger.trace("At stop order time, there are " + this.engine.getCurrentlyRunningJobCount()
-                            + " jobs running in the node");
+                    jqmlogger.trace(
+                            "At stop order time, there are " + this.engine.getCurrentlyRunningJobCount() + " jobs running in the node");
                     this.run = false;
                     this.engine.stop();
-                    em.close();
                     break;
                 }
 
@@ -126,14 +134,11 @@ class InternalPoller implements Runnable
                 }
 
                 // I am alive
-                em.getTransaction().begin();
-                em.createQuery("UPDATE Node n SET n.lastSeenAlive = current_timestamp() WHERE n.id = :id").setParameter("id", node.getId())
-                        .executeUpdate();
-                em.getTransaction().commit();
+                cnx.runUpdate("node_update_alive_by_id", node.getId());
+                cnx.commit();
 
                 // Have queue bindings changed, or is engine disabled?
-
-                this.engine.syncPollers(em, node);
+                this.engine.syncPollers(cnx, node);
 
                 // Jetty restart. Conditions are:
                 // * some parameters (such as security parameters) have changed
@@ -144,23 +149,16 @@ class InternalPoller implements Runnable
                 {
                     nodePrms = np;
                 }
-                Long i = em
-                        .createQuery(
-                                "SELECT COUNT(gp) from GlobalParameter gp WHERE gp.lastModified > :lm "
-                                        + "AND key IN ('disableWsApi', 'enableWsApiSsl', 'enableInternalPki', "
-                                        + "'pfxPassword', 'enableWsApiAuth')", Long.class).setParameter("lm", latestJettyRestart)
-                        .getSingleResult();
-                if (i > 0L || !np.equals(nodePrms))
+                int i = cnx.runSelectSingle("globalprm_select_count_modified_jetty", Integer.class, latestJettyRestart);
+                if (i > 0 || !np.equals(nodePrms))
                 {
-                    this.engine.getJetty().start(node, em);
+                    this.engine.getJetty().start(node, cnx);
                     latestJettyRestart = bflkpm;
                     nodePrms = np;
                 }
 
                 // Should JNDI cache be purged?
-                i = em.createQuery(
-                        "SELECT COUNT(p) FROM JndiObjectResourceParameter p WHERE p.lastModified > :lm OR p.resource.lastModified > :lm",
-                        Long.class).setParameter("lm", lastJndiPurge).getSingleResult();
+                i = cnx.runSelectSingle("jndi_select_count_changed", Integer.class, lastJndiPurge, lastJndiPurge);
                 if (i > 0L)
                 {
                     try
@@ -170,9 +168,9 @@ class InternalPoller implements Runnable
                     }
                     catch (Exception e)
                     {
-                        jqmlogger
-                                .warn("Could not reset JNDI singleton resources. New parameters won't be used. Restart engine to update them.",
-                                        e);
+                        jqmlogger.warn(
+                                "Could not reset JNDI singleton resources. New parameters won't be used. Restart engine to update them.",
+                                e);
                     }
                 }
             }
@@ -194,7 +192,7 @@ class InternalPoller implements Runnable
             finally
             {
                 // Loop is done, let session go
-                Helpers.closeQuietly(em);
+                Helpers.closeQuietly(cnx);
             }
         }
 

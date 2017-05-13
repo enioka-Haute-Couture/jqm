@@ -42,8 +42,7 @@ public class ServiceClient implements JqmClient
 {
     static Logger log = LoggerFactory.getLogger(ServiceClient.class);
 
-    private @Context
-    HttpServletResponse res;
+    private @Context HttpServletResponse res;
 
     // Not directly mapped: returning an integer would be weird. See enqueue_object.
     public int enqueue(JobRequest jd)
@@ -321,7 +320,7 @@ public class ServiceClient implements JqmClient
         ji.setSessionID(jd.getSessionID());
         ji.setState(State.SUBMITTED);
         ji.setUser(jd.getUser());
-        ji.setPosition(Integer.MAX_VALUE);
+        ji.setPosition(Long.MAX_VALUE);
         ji.setApplication(jd.getApplication());
 
         return ji;

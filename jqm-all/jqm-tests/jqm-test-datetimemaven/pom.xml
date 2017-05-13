@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.enioka.jqm</groupId>
@@ -11,7 +12,8 @@
 	<url>http://jqm.readthedocs.org</url>
 
 	<dependencies>
-	<!-- This is the oldest supported Hibenrate version. Test it here. Do not replace with ${hibernate.version} ! -->
+		<!-- This is the oldest supported Hibenrate version. Test it here. Do not 
+			replace with ${hibernate.version} ! -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
@@ -29,6 +31,7 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- Left as Hibernate, and not JDBC to test artifact redirection -->
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-api-client-hibernate</artifactId>

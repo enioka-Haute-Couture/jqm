@@ -119,6 +119,16 @@
 									<version>${hsqldb.version}</version>
 								</artifactItem>
 								<artifactItem>
+									<groupId>org.postgresql</groupId>
+									<artifactId>postgresql</artifactId>
+									<version>42.1.1.jre6</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>mysql</groupId>
+									<artifactId>mysql-connector-java</artifactId>
+									<version>5.1.41</version>
+								</artifactItem>
+								<artifactItem>
 									<groupId>com.h2database</groupId>
 									<artifactId>h2</artifactId>
 									<version>${h2.version}</version>
@@ -250,13 +260,6 @@
 
 
 	<dependencies>
-		<!-- We need an actual JPA2 implementation here. JPA-API is implied -->
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-			<version>${hibernate.version}</version>
-		</dependency>
-
 		<!-- CLI parsing -->
 		<dependency>
 			<groupId>commons-cli</groupId>
@@ -279,7 +282,7 @@
 		</dependency>
 
 		<!-- LOGGING (we directly use log4j in this project but we need a slf4j 
-			mapping for Hibernate & web app) -->
+			mapping for the web app) -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
@@ -324,7 +327,7 @@
 		<!-- JQM APIs -->
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-api-client-hibernate</artifactId>
+			<artifactId>jqm-api-client-jdbc</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -350,6 +353,18 @@
 			<version>${hsqldb.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.1.1.jre6</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.41</version>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
@@ -361,6 +376,12 @@
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-test-helpers</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-admin</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -399,7 +420,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>jqm-runner-basic</artifactId>
@@ -413,13 +434,10 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-ws</artifactId>
-			<version>${project.version}</version>
-			<type>war</type>
-			<scope>test</scope>
-		</dependency>
+
+		<!--<dependency> <groupId>com.enioka.jqm</groupId> <artifactId>jqm-ws</artifactId> 
+			<version>${project.version}</version> <type>war</type> <scope>test</scope> 
+			</dependency> -->
 
 	</dependencies>
 </project>

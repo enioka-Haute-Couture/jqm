@@ -33,191 +33,89 @@ package com.enioka.jqm.test.helpers;
  * limitations under the License.
  */
 
-import java.io.FileNotFoundException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.hsqldb.Server;
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.crypto.hash.Sha512Hash;
+import org.apache.shiro.util.ByteSource;
 
-import com.enioka.jqm.jpamodel.Cl;
-import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.JndiObjectResource;
-import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobDef.PathType;
-import com.enioka.jqm.jpamodel.JobDefParameter;
-import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.jpamodel.RPermission;
-import com.enioka.jqm.jpamodel.RRole;
-import com.enioka.jqm.jpamodel.RUser;
-import com.enioka.jqm.jpamodel.RuntimeParameter;
-import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.model.Cl;
+import com.enioka.jqm.model.JndiObjectResource;
+import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.Queue;
+import com.enioka.jqm.model.RRole;
+import com.enioka.jqm.model.RUser;
+import com.enioka.jqm.model.JobDef.PathType;
 
 /**
- * 
+ * A set of static methods which help creating test data for automated tests.<br>
+ * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
  */
 public class CreationTools
 {
     private static Logger jqmlogger = Logger.getLogger(CreationTools.class);
-    public static Server s;
 
     private CreationTools()
     {}
 
-    public static void reinitHsqldbServer() throws InterruptedException, FileNotFoundException
-    {
-        stopHsqldbServer();
-        jqmlogger.debug("Starting HSQLDB");
-        s = new Server();
-        s.setDatabaseName(0, "testdbengine");
-        s.setDatabasePath(0, "mem:testdbengine");
-        s.setLogWriter(null);
-        s.setSilent(true);
-        s.start();
+    // ------------------ JOB DEFINITION ------------------------
 
-        while (s.getState() != 1)
-        {
-            try
-            {
-                Thread.sleep(10);
-            }
-            catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        jqmlogger.debug("HSQLDB is now running");
+    // TODO: simplify all these overloads (test impact)
+
+    public static int createJobDef(String description, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
+            String jp, Integer queueId, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+            String keyword2, String keyword3, boolean highlander, DbConn cnx)
+    {
+        return createJobDef(description, canBeRestarted, javaClassName, parameters, jp, queueId, maxTimeRunning, applicationName,
+                application, module, keyword1, keyword2, keyword3, highlander, cnx, null, false, null, false, PathType.FS);
     }
 
-    public static void stopHsqldbServer()
+    public static int createJobDef(String description, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
+            String jp, Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+            String keyword2, String keyword3, boolean highlander, DbConn cnx)
     {
-        if (s != null)
-        {
-            jqmlogger.debug("Stopping HSQLDB");
-            s.signalCloseAllServerConnections();
-            s.shutdown();
-            s.stop();
-
-            while (s.getState() != 16)
-            {
-                try
-                {
-                    Thread.sleep(10);
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-            s = null;
-            jqmlogger.debug("HSQLDB is now stopped");
-        }
+        return createJobDef(description, canBeRestarted, javaClassName, parameters, jp, queue.getId(), maxTimeRunning, applicationName,
+                application, module, keyword1, keyword2, keyword3, highlander, cnx, null, false, null, false, PathType.FS);
     }
 
-    // ------------------ GLOBALPARAMETER ------------------------
-
-    public static GlobalParameter createGlobalParameter(String key, String value, EntityManager em)
+    public static int createJobDef(String descripton, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
+            String jp, int queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+            String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext)
     {
-        GlobalParameter gp = new GlobalParameter();
-        EntityTransaction transac = em.getTransaction();
-        transac.begin();
-
-        gp.setKey(key);
-        gp.setValue(value);
-
-        em.persist(gp);
-        transac.commit();
-        return gp;
+        return createJobDef(descripton, canBeRestarted, javaClassName, parameters, jp, queue, maxTimeRunning, applicationName, application,
+                module, keyword1, keyword2, keyword3, highlander, cnx, specificIsolationContext, false, null, false, PathType.FS);
     }
 
-    // ------------------ JOBDEFINITION ------------------------
-
-    public static JobDef initJobDefinition(String javaClassName, Queue queue, EntityManager em)
-    {
-        JobDef j = new JobDef();
-        EntityTransaction transac = em.getTransaction();
-        transac.begin();
-
-        j.setJavaClassName(javaClassName);
-        j.setQueue(queue);
-
-        em.persist(j);
-        transac.commit();
-
-        return j;
-    }
-
-    public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
-            Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
-            String keyword2, String keyword3, boolean highlander, EntityManager em)
-    {
-        return createJobDef(descripton, canBeRestarted, javaClassName, jps, jp, queue, maxTimeRunning, applicationName, application, module,
-                keyword1, keyword2, keyword3, highlander, em, null, false, null, false, PathType.FS);
-    }
-
-    public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
-            Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
-            String keyword2, String keyword3, boolean highlander, EntityManager em, String specificIsolationContext)
-    {
-        return createJobDef(descripton, canBeRestarted, javaClassName, jps, jp, queue, maxTimeRunning, applicationName, application, module,
-                keyword1, keyword2, keyword3, highlander, em, specificIsolationContext, false, null, false, PathType.FS);
-    }
-
-    public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
-            Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
-            String keyword2, String keyword3, boolean highlander, EntityManager em, String specificIsolationContext,
+    public static int createJobDef(String descripton, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
+            String jp, int queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+            String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext,
             boolean childFirstClassLoader)
     {
-        return createJobDef(descripton, canBeRestarted, javaClassName, jps, jp, queue, maxTimeRunning, applicationName, application, module,
-                keyword1, keyword2, keyword3, highlander, em, specificIsolationContext, childFirstClassLoader, null, false, PathType.FS);
-    }
-
-    public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
-            Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
-            String keyword2, String keyword3, boolean highlander, EntityManager em, String specificIsolationContext,
-            boolean childFirstClassLoader, String hiddenJavaClasses)
-    {
-        return createJobDef(descripton, canBeRestarted, javaClassName, jps, jp, queue, maxTimeRunning, applicationName, application, module,
-                keyword1, keyword2, keyword3, highlander, em, specificIsolationContext, childFirstClassLoader, hiddenJavaClasses, false,
+        return createJobDef(descripton, canBeRestarted, javaClassName, parameters, jp, queue, maxTimeRunning, applicationName, application,
+                module, keyword1, keyword2, keyword3, highlander, cnx, specificIsolationContext, childFirstClassLoader, null, false,
                 PathType.FS);
     }
 
-    public static JobDef createJobDef(String descripton, boolean canBeRestarted, String javaClassName, List<JobDefParameter> jps, String jp,
-            Queue queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
-            String keyword2, String keyword3, boolean highlander, EntityManager em, String specificIsolationContext,
+    public static int createJobDef(String descripton, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
+            String jp, int queue, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+            String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext,
+            boolean childFirstClassLoader, String hiddenJavaClasses)
+    {
+        return createJobDef(descripton, canBeRestarted, javaClassName, parameters, jp, queue, maxTimeRunning, applicationName, application,
+                module, keyword1, keyword2, keyword3, highlander, cnx, specificIsolationContext, childFirstClassLoader, hiddenJavaClasses,
+                false, PathType.FS);
+    }
+
+    public static int createJobDef(String description, boolean canBeRestarted, String javaClassName, Map<String, String> parameters,
+            String jp, Integer queueId, Integer maxTimeRunning, String applicationName, String application, String module, String keyword1,
+            String keyword2, String keyword3, boolean highlander, DbConn cnx, String specificIsolationContext,
             boolean childFirstClassLoader, String hiddenJavaClasses, boolean classLoaderTracing, PathType pathType)
     {
-        JobDef j = new JobDef();
-        EntityTransaction transac = em.getTransaction();
-        transac.begin();
-
-        // ------------------
-
-        j.setDescription(descripton);
-        j.setCanBeRestarted(canBeRestarted);
-        j.setJavaClassName(javaClassName);
-        j.setParameters(jps);
-        j.setQueue(queue);
-        j.setMaxTimeRunning(maxTimeRunning);
-        j.setApplicationName(applicationName);
-        j.setApplication(application);
-        j.setModule(module);
-        j.setKeyword1(keyword1);
-        j.setKeyword2(keyword2);
-        j.setKeyword3(keyword3);
-        j.setHighlander(highlander);
-        j.setJarPath(jp);
-        j.setPathType(pathType);
+        Integer clId = null;
 
         if (specificIsolationContext != null || childFirstClassLoader || hiddenJavaClasses != null)
         {
@@ -225,183 +123,32 @@ public class CreationTools
             specificIsolationContext = specificIsolationContext == null ? applicationName : specificIsolationContext;
             try
             {
-                cl = em.createQuery("SELECT q FROM Cl q WHERE q.name=:name", Cl.class).setParameter("name", specificIsolationContext)
-                        .getSingleResult();
-                j.setCl(cl);
+                cl = Cl.select_key(cnx, specificIsolationContext);
+                clId = cl.getId();
             }
             catch (NoResultException e)
             {
-                cl = new Cl();
-                cl.setChildFirst(childFirstClassLoader);
-                cl.setHiddenClasses(hiddenJavaClasses);
-                cl.setName(specificIsolationContext);
-                cl.setPersistent(true);
-                cl.setTracingEnabled(false);
-                em.persist(cl);
-                j.setCl(cl);
+                clId = Cl.create(cnx, specificIsolationContext, childFirstClassLoader, hiddenJavaClasses, classLoaderTracing, true, null);
             }
         }
 
-        em.persist(j);
-        transac.commit();
+        int i = JobDef.create(cnx, description, javaClassName, parameters == null ? new HashMap<String, String>() : parameters, jp, queueId,
+                maxTimeRunning, applicationName, application, module, keyword1, keyword2, keyword3, highlander, clId, pathType);
 
-        return j;
-    }
-
-    // ------------------ DEPLOYMENTPARAMETER ------------------
-
-    public static DeploymentParameter initDeploymentParameter(Node node, Integer nbThread, EntityManager em)
-    {
-        DeploymentParameter dp = new DeploymentParameter();
-        EntityTransaction transac = em.getTransaction();
-        transac.begin();
-
-        dp.setNode(node);
-        dp.setNbThread(nbThread);
-
-        em.persist(dp);
-        transac.commit();
-        return dp;
-    }
-
-    public static DeploymentParameter createDeploymentParameter(Node node, Integer nbThread, Integer pollingInterval, Queue qVip,
-            EntityManager em)
-    {
-        DeploymentParameter dp = new DeploymentParameter();
-        EntityTransaction transac = em.getTransaction();
-        transac.begin();
-
-        dp.setNode(node);
-        dp.setNbThread(nbThread);
-        dp.setPollingInterval(pollingInterval);
-        dp.setQueue(qVip);
-
-        em.persist(dp);
-        transac.commit();
-        return dp;
-    }
-
-    // ------------------ JOBINSTANCE --------------------------
-
-    public static JobInstance createJobInstance(JobDef jd, List<RuntimeParameter> jps, String user, String sessionID, State state,
-            Integer position, Queue queue, Node node, EntityManager em)
-    {
-        JobInstance j = new JobInstance();
-        jqmlogger.debug("Creating JobInstance with " + jps.size() + " parameters");
-
-        j.setJd(jd);
-        j.setSessionID(sessionID);
-        j.setUserName(user);
-        j.setState(state);
-        j.setQueue(queue);
-        j.setNode(node);
-
-        em.persist(j);
-        j.setInternalPosition(position);
-
-        for (RuntimeParameter jp : jps)
-        {
-            jqmlogger.debug("Parameter: " + jp.getKey() + " - " + jp.getValue());
-            jp.setJi(j.getId());
-            em.persist(jp);
-        }
-
-        return j;
-    }
-
-    // ------------------ RuntimeParameter -------------------------
-
-    public static RuntimeParameter createJobParameter(String key, String value, EntityManager em)
-    {
-        RuntimeParameter j = new RuntimeParameter();
-
-        j.setKey(key);
-        j.setValue(value);
-
-        em.persist(j);
-        return j;
-    }
-
-    public static JobDefParameter createJobDefParameter(String key, String value, EntityManager em)
-    {
-        JobDefParameter j = new JobDefParameter();
-
-        j.setKey(key);
-        j.setValue(value);
-
-        em.persist(j);
-        return j;
-    }
-
-    // ------------------ NODE ---------------------------------
-
-    public static Node createNode(String nodeName, Integer port, String dlRepo, String repo, String tmpDir, EntityManager em)
-    {
-        Node n = new Node();
-        EntityTransaction transac = em.getTransaction();
-        transac.begin();
-
-        n.setName(nodeName);
-        n.setPort(port);
-        n.setDlRepo(dlRepo);
-        n.setRepo(repo);
-        n.setTmpDirectory(tmpDir);
-        try
-        {
-            n.setDns(InetAddress.getLocalHost().getHostName());
-            InetAddress[] adresses = InetAddress.getAllByName(n.getDns());
-            for (InetAddress s : adresses)
-            {
-                if (s.isLoopbackAddress())
-                {
-                    n.setDns("localhost"); // force true loopback in this case. We may have a hostname that resolves on a public interface
-                                           // with a loopback adress...
-                }
-            }
-        }
-        catch (UnknownHostException e)
-        {
-            n.setDns("localhost");
-        }
-        em.persist(n);
-        transac.commit();
-        return n;
-    }
-
-    // ------------------ QUEUE --------------------------------
-
-    public static Queue initQueue(String name, String description, Integer timeToLive, EntityManager em)
-    {
-        return initQueue(name, description, timeToLive, em, false);
-    }
-
-    public static Queue initQueue(String name, String description, Integer timeToLive, EntityManager em, boolean defaultQueue)
-    {
-        Queue q = new Queue();
-        EntityTransaction transac = em.getTransaction();
-        transac.begin();
-
-        q.setName(name);
-        q.setDescription(description);
-        q.setTimeToLive(timeToLive);
-        q.setDefaultQueue(defaultQueue);
-
-        em.persist(q);
-        transac.commit();
-
-        return q;
+        cnx.commit();
+        return i;
     }
 
     // ------------------ DATABASEPROP --------------------------------
 
-    public static JndiObjectResource createDatabaseProp(String name, String driver, String url, String user, String pwd, EntityManager em,
-            String validationQuery, HashMap<String, String> parameters)
+    public static int createDatabaseProp(String name, String driver, String url, String user, String pwd, DbConn cnx,
+            String validationQuery, Map<String, String> parameters)
     {
-        return createDatabaseProp(name, driver, url, user, pwd, em, validationQuery, parameters, true);
+        return createDatabaseProp(name, driver, url, user, pwd, cnx, validationQuery, parameters, true);
     }
 
-    public static JndiObjectResource createDatabaseProp(String name, String driver, String url, String user, String pwd, EntityManager em,
-            String validationQuery, HashMap<String, String> parameters, boolean singleton)
+    public static int createDatabaseProp(String name, String driver, String url, String user, String pwd, DbConn cnx,
+            String validationQuery, Map<String, String> parameters, boolean singleton)
     {
         HashMap<String, String> prms = new HashMap<String, String>();
         prms.put("testWhileIdle", "true");
@@ -420,14 +167,14 @@ public class CreationTools
         prms.put("testWhileIdle", "true");
         prms.put("testOnBorrow", "true");
 
-        return createJndiObjectResource(em, name, "javax.sql.DataSource", "org.apache.tomcat.jdbc.pool.DataSourceFactory",
+        return JndiObjectResource.create(cnx, name, "javax.sql.DataSource", "org.apache.tomcat.jdbc.pool.DataSourceFactory",
                 "connection for " + user, singleton, prms);
     }
 
-    // ------------------ DATABASEPROP --------------------------------
+    // ------------------ MAIL --------------------------------
 
-    public static JndiObjectResource createMailSession(EntityManager em, String name, String hostname, int port, boolean useTls,
-            String username, String password)
+    public static void createMailSession(DbConn cnx, String name, String hostname, int port, boolean useTls, String username,
+            String password)
     {
         HashMap<String, String> prms = new HashMap<String, String>();
         prms.put("smtpServerHost", hostname);
@@ -436,46 +183,20 @@ public class CreationTools
         prms.put("smtpPassword", password);
         prms.put("useTls", String.valueOf(useTls));
 
-        return createJndiObjectResource(em, name, "javax.mail.Session", "com.enioka.jqm.providers.MailSessionFactory",
+        JndiObjectResource.create(cnx, name, "javax.mail.Session", "com.enioka.jqm.providers.MailSessionFactory",
                 "mail SMTP server used for sending notification mails", true, prms);
     }
 
     // ------------------ JNDI FOR JMS & co --------------------------------
-    public static JndiObjectResource createJndiObjectResource(EntityManager em, String jndiAlias, String className, String factoryClass,
-            String description, boolean singleton, HashMap<String, String> parameters)
+
+    public static void createJndiQcfMQSeries(DbConn cnx, String jndiAlias, String description, String hostname, String queueManagerName,
+            Integer port, String channel)
     {
-        em.getTransaction().begin();
-        JndiObjectResource res = new JndiObjectResource();
-        res.setAuth(null);
-        res.setDescription(description);
-        res.setFactory(factoryClass);
-        res.setName(jndiAlias);
-        res.setType(className);
-        res.setSingleton(singleton);
-        em.persist(res);
-
-        for (String parameterName : parameters.keySet())
-        {
-            JndiObjectResourceParameter prm = new JndiObjectResourceParameter();
-            prm.setKey(parameterName);
-            prm.setValue(parameters.get(parameterName));
-            em.persist(prm);
-            res.getParameters().add(prm);
-            prm.setResource(res);
-        }
-        em.getTransaction().commit();
-
-        return res;
+        createJndiQcfMQSeries(cnx, jndiAlias, description, hostname, queueManagerName, port, channel, null);
     }
 
-    public static JndiObjectResource createJndiQcfMQSeries(EntityManager em, String jndiAlias, String description, String hostname,
-            String queueManagerName, Integer port, String channel)
-    {
-        return createJndiQcfMQSeries(em, jndiAlias, description, hostname, queueManagerName, port, channel, null);
-    }
-
-    public static JndiObjectResource createJndiQcfMQSeries(EntityManager em, String jndiAlias, String description, String hostname,
-            String queueManagerName, Integer port, String channel, HashMap<String, String> optionalParameters)
+    public static void createJndiQcfMQSeries(DbConn cnx, String jndiAlias, String description, String hostname, String queueManagerName,
+            Integer port, String channel, HashMap<String, String> optionalParameters)
     {
         HashMap<String, String> prms = new HashMap<String, String>();
         prms.put("HOST", hostname);
@@ -488,11 +209,11 @@ public class CreationTools
             prms.putAll(optionalParameters);
         }
 
-        return createJndiObjectResource(em, jndiAlias, "com.ibm.mq.jms.MQQueueConnectionFactory",
+        JndiObjectResource.create(cnx, jndiAlias, "com.ibm.mq.jms.MQQueueConnectionFactory",
                 "com.ibm.mq.jms.MQQueueConnectionFactoryFactory", description, false, prms);
     }
 
-    public static JndiObjectResource createJndiQueueMQSeries(EntityManager em, String jndiAlias, String description, String queueName,
+    public static void createJndiQueueMQSeries(DbConn cnx, String jndiAlias, String description, String queueName,
             HashMap<String, String> optionalParameters)
     {
         HashMap<String, String> prms = new HashMap<String, String>();
@@ -502,10 +223,10 @@ public class CreationTools
             prms.putAll(optionalParameters);
         }
 
-        return createJndiObjectResource(em, jndiAlias, "com.ibm.mq.jms.MQQueue", "com.ibm.mq.jms.MQQueueFactory", description, false, prms);
+        JndiObjectResource.create(cnx, jndiAlias, "com.ibm.mq.jms.MQQueue", "com.ibm.mq.jms.MQQueueFactory", description, false, prms);
     }
 
-    public static JndiObjectResource createJndiQcfActiveMQ(EntityManager em, String jndiAlias, String description, String Url,
+    public static void createJndiQcfActiveMQ(DbConn cnx, String jndiAlias, String description, String Url,
             HashMap<String, String> optionalParameters)
     {
         HashMap<String, String> prms = new HashMap<String, String>();
@@ -515,11 +236,11 @@ public class CreationTools
             prms.putAll(optionalParameters);
         }
 
-        return createJndiObjectResource(em, jndiAlias, "org.apache.activemq.ActiveMQConnectionFactory",
+        JndiObjectResource.create(cnx, jndiAlias, "org.apache.activemq.ActiveMQConnectionFactory",
                 "org.apache.activemq.jndi.JNDIReferenceFactory", description, false, prms);
     }
 
-    public static JndiObjectResource createJndiQueueActiveMQ(EntityManager em, String jndiAlias, String description, String queueName,
+    public static void createJndiQueueActiveMQ(DbConn cnx, String jndiAlias, String description, String queueName,
             HashMap<String, String> optionalParameters)
     {
         HashMap<String, String> prms = new HashMap<String, String>();
@@ -529,60 +250,35 @@ public class CreationTools
             prms.putAll(optionalParameters);
         }
 
-        return createJndiObjectResource(em, jndiAlias, "org.apache.activemq.command.ActiveMQQueue",
+        JndiObjectResource.create(cnx, jndiAlias, "org.apache.activemq.command.ActiveMQQueue",
                 "org.apache.activemq.jndi.JNDIReferenceFactory", description, false, prms);
     }
 
-    public static JndiObjectResource createJndiFile(EntityManager em, String jndiAlias, String description, String path)
+    public static void createJndiFile(DbConn cnx, String jndiAlias, String description, String path)
     {
         HashMap<String, String> prms = new HashMap<String, String>();
         prms.put("PATH", path);
-        return createJndiObjectResource(em, jndiAlias, "java.io.File.File", "com.enioka.jqm.providers.FileFactory", description, true,
-                prms);
+        JndiObjectResource.create(cnx, jndiAlias, "java.io.File.File", "com.enioka.jqm.providers.FileFactory", description, true, prms);
     }
 
-    public static JndiObjectResource createJndiUrl(EntityManager em, String jndiAlias, String description, String url)
+    public static void createJndiUrl(DbConn cnx, String jndiAlias, String description, String url)
     {
         HashMap<String, String> prms = new HashMap<String, String>();
         prms.put("URL", url);
-        return createJndiObjectResource(em, jndiAlias, "java.io.URL", "com.enioka.jqm.providers.UrlFactory", description, true, prms);
+        JndiObjectResource.create(cnx, jndiAlias, "java.io.URL", "com.enioka.jqm.providers.UrlFactory", description, true, prms);
     }
 
-    public static RRole createRole(EntityManager em, String roleName, String description, String... permissions)
+    // ---------------------------- SEC -----------------------------------------------------
+
+    public static void createUser(DbConn cnx, String login, String password, RRole... roles)
     {
-        em.getTransaction().begin();
-        RRole r = new RRole();
-        r.setName(roleName);
-        r.setDescription(description);
-        em.persist(r);
-
-        for (String s : permissions)
+        ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
+        String[] rr = new String[roles.length];
+        for (int i = 0; i < roles.length; i++)
         {
-            RPermission p = new RPermission();
-            p.setName(s);
-            p.setRole(r);
-            r.getPermissions().add(p);
+            rr[i] = roles[i].getName();
         }
-        em.getTransaction().commit();
-        return r;
+
+        RUser.create(cnx, login, new Sha512Hash(password, salt, 100000).toHex(), salt.toHex(), rr);
     }
-
-    public static RUser createUser(EntityManager em, String login, String password, RRole... roles)
-    {
-        em.getTransaction().begin();
-        RUser u = new RUser();
-        u.setLogin(login);
-        u.setPassword(password);
-        TestHelpers.encodePassword(u);
-        em.persist(u);
-
-        for (RRole r : roles)
-        {
-            u.getRoles().add(r);
-            r.getUsers().add(u);
-        }
-        em.getTransaction().commit();
-        return u;
-    }
-
 }

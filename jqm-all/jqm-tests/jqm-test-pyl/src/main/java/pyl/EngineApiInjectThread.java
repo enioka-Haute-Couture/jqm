@@ -103,7 +103,9 @@ public class EngineApiInjectThread implements Runnable
             System.out.println("creating a new sync job instance request");
             jm.enqueueSync(jm.applicationName(), null, null, null, jm.application(), jm.module(), null, null, null, prms);
             System.out.println("New request is number " + i + " and should be done now");
-            jm.sendProgress(100);
         }
+
+        // Done
+        jm.sendProgress(100);
     }
 }

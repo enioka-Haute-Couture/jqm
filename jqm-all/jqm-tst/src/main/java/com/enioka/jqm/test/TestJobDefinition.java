@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.enioka.jqm.api.JqmClient;
-import com.enioka.jqm.jpamodel.JobDef.PathType;
-import com.enioka.jqm.jpamodel.JobDefParameter;
+import com.enioka.jqm.model.JobDefParameter;
+import com.enioka.jqm.model.JobDef.PathType;
 
 /**
  * Helper class to define a new payload. This will help create an actual job definition, as if it had been imported from an XML deployment

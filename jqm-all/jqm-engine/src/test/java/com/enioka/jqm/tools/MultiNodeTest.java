@@ -19,7 +19,8 @@
 package com.enioka.jqm.tools;
 
 import java.util.Calendar;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -28,11 +29,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.jpamodel.Message;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.api.Query;
+import com.enioka.jqm.model.DeploymentParameter;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -41,7 +44,7 @@ public class MultiNodeTest extends JqmBaseTest
     @Before
     public void b()
     {
-        TestHelpers.setNodesLogLevel("INFO", em);
+        TestHelpers.setNodesLogLevel("INFO", cnx);
     }
 
     @After
@@ -55,7 +58,7 @@ public class MultiNodeTest extends JqmBaseTest
     public void testOneQueueTwoNodes() throws Exception
     {
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
-                "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         JobRequest j11 = new JobRequest("AppliNode1-1", "TestUser");
         for (int i = 0; i < 10; i++)
         {
@@ -74,27 +77,24 @@ public class MultiNodeTest extends JqmBaseTest
             Thread.sleep(200);
         }
 
-        TestHelpers.waitFor(40, 60000, em);
+        TestHelpers.waitFor(40, 60000, cnx);
         Thread.sleep(2000); // to ensure there are no additional runs
 
-        Assert.assertEquals(40, em.createQuery("SELECT j FROM Message j", Message.class).getResultList().size());
-        Assert.assertEquals(40, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(40, (int) cnx.runSelectSingle("message_select_count_all", Integer.class));
+        Assert.assertEquals(40, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
 
         // Ran on both nodes?
-        Assert.assertTrue(
-                em.createQuery("SELECT count(j) FROM History j WHERE j.node.name='localhost48'", Long.class).getSingleResult() == 0L);
-        Assert.assertTrue(
-                em.createQuery("SELECT count(j) FROM History j WHERE j.node.name='localhost'", Long.class).getSingleResult() > 0L);
-        Assert.assertTrue(
-                em.createQuery("SELECT count(j) FROM History j WHERE j.node.name='localhost4'", Long.class).getSingleResult() > 0L);
+        Assert.assertTrue(Query.create().setNodeName("localhost48").run().size() == 0L);
+        Assert.assertTrue(Query.create().setNodeName("localhost").run().size() > 0L);
+        Assert.assertTrue(Query.create().setNodeName("localhost4").run().size() > 0L);
     }
 
     @Test
     public void testOneQueueThreeNodes() throws Exception
     {
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
-                "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         JobRequest j11 = new JobRequest("AppliNode1-1", "TestUser");
         for (int i = 0; i < 10; i++)
         {
@@ -113,31 +113,27 @@ public class MultiNodeTest extends JqmBaseTest
             }
             Thread.sleep(200);
         }
-        TestHelpers.waitFor(40, 60000, em);
+        TestHelpers.waitFor(40, 60000, cnx);
         Thread.sleep(2000); // to ensure there are no additional runs
 
-        Assert.assertEquals(40, em.createQuery("SELECT j FROM Message j", Message.class).getResultList().size());
-        Assert.assertEquals(40, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(40, (int) cnx.runSelectSingle("message_select_count_all", Integer.class));
+        Assert.assertEquals(40, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
 
         // Ran on all nodes?
-        Assert.assertTrue(
-                em.createQuery("SELECT count(j) FROM History j WHERE j.node.name='localhost48'", Long.class).getSingleResult() == 0L);
-        Assert.assertTrue(
-                em.createQuery("SELECT count(j) FROM History j WHERE j.node.name='localhost'", Long.class).getSingleResult() > 0L);
-        Assert.assertTrue(
-                em.createQuery("SELECT count(j) FROM History j WHERE j.node.name='localhost4'", Long.class).getSingleResult() > 0L);
-        Assert.assertTrue(
-                em.createQuery("SELECT count(j) FROM History j WHERE j.node.name='localhost5'", Long.class).getSingleResult() > 0L);
+        Assert.assertTrue(Query.create().setNodeName("localhost48").run().size() == 0L);
+        Assert.assertTrue(Query.create().setNodeName("localhost").run().size() > 0L);
+        Assert.assertTrue(Query.create().setNodeName("localhost4").run().size() > 0L);
+        Assert.assertTrue(Query.create().setNodeName("localhost5").run().size() > 0L);
     }
 
     @Test
     public void testTwoNodesTwoQueues() throws Exception
     {
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
-                "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip2,
-                42, "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                42, "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         JobRequest j11 = new JobRequest("AppliNode1-1", "TestUser");
         JobRequest j21 = new JobRequest("AppliNode2-1", "TestUser");
 
@@ -159,43 +155,40 @@ public class MultiNodeTest extends JqmBaseTest
             }
             Thread.sleep(200);
         }
-        TestHelpers.waitFor(80, 60000, em);
+        TestHelpers.waitFor(80, 60000, cnx);
         Thread.sleep(2000); // to ensure there are no additional runs
 
-        Assert.assertEquals(80, em.createQuery("SELECT j FROM Message j", Message.class).getResultList().size());
-        Assert.assertEquals(80, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(80, (int) cnx.runSelectSingle("message_select_count_all", Integer.class));
+        Assert.assertEquals(80, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
 
         // Ran on all nodes?
-        Assert.assertTrue(
-                em.createQuery("SELECT count(j) FROM History j WHERE j.node.name='localhost48'", Long.class).getSingleResult() == 0L);
-        Assert.assertTrue(
-                em.createQuery("SELECT count(j) FROM History j WHERE j.node.name='localhost'", Long.class).getSingleResult() > 0L);
-        Assert.assertTrue(
-                em.createQuery("SELECT count(j) FROM History j WHERE j.node.name='localhost2'", Long.class).getSingleResult() > 0L);
+        Assert.assertTrue(Query.create().setNodeName("localhost48").run().size() == 0L);
+        Assert.assertTrue(Query.create().setNodeName("localhost").run().size() > 0L);
+        Assert.assertTrue(Query.create().setNodeName("localhost2").run().size() > 0L);
     }
 
     @Test
     public void testThreeNodesThreeQueues() throws Exception
     {
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
-                "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qNormal,
-                42, "AppliNode1-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                42, "AppliNode1-2", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qSlow,
-                42, "AppliNode1-3", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                42, "AppliNode1-3", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip2,
-                42, "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                42, "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qNormal2,
-                42, "AppliNode2-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                42, "AppliNode2-2", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qSlow2,
-                42, "AppliNode2-3", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                42, "AppliNode2-3", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip3,
-                42, "AppliNode3-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                42, "AppliNode3-1", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qNormal3,
-                42, "AppliNode3-2", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                42, "AppliNode3-2", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qSlow3,
-                42, "AppliNode3-3", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                42, "AppliNode3-3", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
         JobRequest j11 = new JobRequest("AppliNode1-1", "TestUser");
         JobRequest j12 = new JobRequest("AppliNode1-2", "TestUser");
@@ -242,33 +235,29 @@ public class MultiNodeTest extends JqmBaseTest
             }
             Thread.sleep(200);
         }
-        TestHelpers.waitFor(72, 60000, em);
+        TestHelpers.waitFor(72, 60000, cnx);
         Thread.sleep(2000); // to ensure there are no additional runs
 
-        Assert.assertEquals(72, em.createQuery("SELECT j FROM Message j", Message.class).getResultList().size());
-        Assert.assertEquals(72, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(72, (int) cnx.runSelectSingle("message_select_count_all", Integer.class));
+        Assert.assertEquals(72, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
 
         // Ran on all nodes?
-        Assert.assertTrue(
-                em.createQuery("SELECT count(j) FROM History j WHERE j.node.name='localhost48'", Long.class).getSingleResult() == 0L);
-        Assert.assertTrue(
-                em.createQuery("SELECT count(j) FROM History j WHERE j.node.name='localhost'", Long.class).getSingleResult() > 0L);
-        Assert.assertTrue(
-                em.createQuery("SELECT count(j) FROM History j WHERE j.node.name='localhost2'", Long.class).getSingleResult() > 0L);
-        Assert.assertTrue(
-                em.createQuery("SELECT count(j) FROM History j WHERE j.node.name='localhost3'", Long.class).getSingleResult() > 0L);
+        Assert.assertTrue(Query.create().setNodeName("localhost48").run().size() == 0L);
+        Assert.assertTrue(Query.create().setNodeName("localhost").run().size() > 0L);
+        Assert.assertTrue(Query.create().setNodeName("localhost2").run().size() > 0L);
+        Assert.assertTrue(Query.create().setNodeName("localhost3").run().size() > 0L);
     }
 
     @Test
     public void testStopNicely() throws Exception
     {
-        Helpers.setSingleParam("internalPollingPeriodMs", "10", em);
+        Helpers.setSingleParam("internalPollingPeriodMs", "10", cnx);
 
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
-                "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "AppliNode1-1", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qNormal,
-                42, "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                42, "AppliNode2-1", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
         JobRequest j11 = new JobRequest("AppliNode1-1", "TestUser");
         JobRequest j21 = new JobRequest("AppliNode2-1", "TestUser");
@@ -280,12 +269,11 @@ public class MultiNodeTest extends JqmBaseTest
         }
         addAndStartEngine("localhost");
         addAndStartEngine("localhost4");
-        TestHelpers.waitFor(20, 60000, em);
+        TestHelpers.waitFor(20, 60000, cnx);
 
         // Stop one node
-        em.getTransaction().begin();
-        em.createQuery("UPDATE Node n SET n.stop = 'true' WHERE n.name = 'localhost'").executeUpdate();
-        em.getTransaction().commit();
+        cnx.runUpdate("node_update_stop_by_id", TestHelpers.node.getId());
+        cnx.commit();
         Thread.sleep(1000);
 
         // Enqueue other requests.. they should run on node 2
@@ -294,7 +282,7 @@ public class MultiNodeTest extends JqmBaseTest
             JqmClientFactory.getClient().enqueue(j11);
             JqmClientFactory.getClient().enqueue(j21);
         }
-        TestHelpers.waitFor(30, 5000, em);
+        TestHelpers.waitFor(30, 5000, cnx);
         Thread.sleep(2000); // to ensure there are no additional runs
 
         // Only stop node2... node1 should be already dead.
@@ -302,9 +290,9 @@ public class MultiNodeTest extends JqmBaseTest
         engines.clear();
 
         // Check 30 have ended (10 should be blocked in queue)
-        Assert.assertEquals(30, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
-        Assert.assertEquals(10, TestHelpers.getQueueAllCount(em));
+        Assert.assertEquals(30, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+        Assert.assertEquals(10, TestHelpers.getQueueAllCount(cnx));
     }
 
     @Test
@@ -312,34 +300,36 @@ public class MultiNodeTest extends JqmBaseTest
     {
         long size = 1000;
 
-        Queue q = CreationTools.initQueue("testqueue", "super test queue", 42, em, false);
+        int qId = Queue.create(cnx, "testqueue", "super test queue", false);
 
-        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", q, 42, "appliname",
-                null, "Franquin", "ModuleMachin", "other", "other", false, em);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", qId, 42, "appliname",
+                null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
-        Node n0 = CreationTools.createNode("n0", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
-        Node n1 = CreationTools.createNode("n1", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
-        Node n2 = CreationTools.createNode("n2", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
-        Node n3 = CreationTools.createNode("n3", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
-        Node n4 = CreationTools.createNode("n4", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
-        Node n5 = CreationTools.createNode("n5", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
-        Node n6 = CreationTools.createNode("n6", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
-        Node n7 = CreationTools.createNode("n7", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
-        Node n8 = CreationTools.createNode("n8", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
-        Node n9 = CreationTools.createNode("n9", 0, "./target/outputfiles/", "./../", "./target/tmp", em);
+        Node n0 = Node.create(cnx, "n0", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
+        Node n1 = Node.create(cnx, "n1", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
+        Node n2 = Node.create(cnx, "n2", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
+        Node n3 = Node.create(cnx, "n3", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
+        Node n4 = Node.create(cnx, "n4", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
+        Node n5 = Node.create(cnx, "n5", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
+        Node n6 = Node.create(cnx, "n6", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
+        Node n7 = Node.create(cnx, "n7", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
+        Node n8 = Node.create(cnx, "n8", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
+        Node n9 = Node.create(cnx, "n9", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
 
-        TestHelpers.setNodesLogLevel("INFO", em);
+        TestHelpers.setNodesLogLevel("INFO", cnx);
 
-        CreationTools.createDeploymentParameter(n0, 5, 1, q, em);
-        CreationTools.createDeploymentParameter(n1, 5, 1, q, em);
-        CreationTools.createDeploymentParameter(n2, 5, 1, q, em);
-        CreationTools.createDeploymentParameter(n3, 5, 1, q, em);
-        CreationTools.createDeploymentParameter(n4, 5, 1, q, em);
-        CreationTools.createDeploymentParameter(n5, 5, 1, q, em);
-        CreationTools.createDeploymentParameter(n6, 5, 1, q, em);
-        CreationTools.createDeploymentParameter(n7, 5, 1, q, em);
-        CreationTools.createDeploymentParameter(n8, 5, 1, q, em);
-        CreationTools.createDeploymentParameter(n9, 5, 1, q, em);
+        DeploymentParameter.create(cnx, n0.getId(), 5, 1, qId);
+        DeploymentParameter.create(cnx, n1.getId(), 5, 1, qId);
+        DeploymentParameter.create(cnx, n2.getId(), 5, 1, qId);
+        DeploymentParameter.create(cnx, n3.getId(), 5, 1, qId);
+        DeploymentParameter.create(cnx, n4.getId(), 5, 1, qId);
+        DeploymentParameter.create(cnx, n5.getId(), 5, 1, qId);
+        DeploymentParameter.create(cnx, n6.getId(), 5, 1, qId);
+        DeploymentParameter.create(cnx, n7.getId(), 5, 1, qId);
+        DeploymentParameter.create(cnx, n8.getId(), 5, 1, qId);
+        DeploymentParameter.create(cnx, n9.getId(), 5, 1, qId);
+
+        cnx.commit();
 
         for (int i = 0; i < size; i++)
         {
@@ -358,19 +348,31 @@ public class MultiNodeTest extends JqmBaseTest
         this.addAndStartEngine("n8");
         this.addAndStartEngine("n9");
 
-        TestHelpers.waitFor(size, 120000, em);
-
-        long msgs = em.createQuery("SELECT COUNT(m) from Message m", Long.class).getSingleResult();
-        Assert.assertEquals(size, msgs);
-
-        @SuppressWarnings("unchecked")
-        List<Object[]> res = em.createQuery("SELECT h.nodeName, COUNT(h) FROM History h GROUP BY h.nodeName").getResultList();
-        for (Object[] o : res)
+        for (int i = 0; i < size; i++)
         {
-            // Every node must have run at least a few jobs...
-            Assert.assertTrue(((Long) o[1]) > 10L);
-            jqmlogger.info(o[0] + " - " + o[1]);
+            JobRequest.create("appliname", "user").submit();
         }
+
+        TestHelpers.waitFor(size * 2, 120000, cnx);
+
+        long msgs = cnx.runSelectSingle("message_select_count_all", Long.class);
+        Assert.assertEquals(size * 2, msgs);
+
+        // Every node must have run at least a few jobs...
+        Map<String, Boolean> hasRunSomething = new HashMap<String, Boolean>(10);
+        for (int i = 0; i <= 9; i++)
+        {
+            hasRunSomething.put("n" + i, false);
+        }
+        for (JobInstance ji : Query.create().setPageSize(1000).run())
+        {
+            hasRunSomething.put(ji.getNodeName(), true);
+        }
+        for (Map.Entry<String, Boolean> e : hasRunSomething.entrySet())
+        {
+            Assert.assertTrue(e.getValue());
+        }
+
         jqmlogger.info("" + (Calendar.getInstance().getTimeInMillis() - c.getTimeInMillis()) / 1000);
     }
 }

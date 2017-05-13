@@ -19,10 +19,6 @@
 package com.enioka.jqm.tools;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.TypedQuery;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
@@ -30,9 +26,8 @@ import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.api.Query;
+import com.enioka.jqm.api.Query.Sort;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -42,54 +37,51 @@ public class NoApiPayloadTest extends JqmBaseTest
     public void testClassicPayload() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "jqm-test-datetimemaven", null, "Franquin", "ModuleMachin", "other", "other", false, em);
+                "jqm-test-datetimemaven", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         JobRequest.create("jqm-test-datetimemaven", "TestUser").submit();
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 
     @Test
     public void testRunnable() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.PckRunnable", "jqm-test-pyl-nodep").run(this);
+        JqmSimpleTest.create(cnx, "pyl.PckRunnable", "jqm-test-pyl-nodep").run(this);
     }
 
     @Test
     public void testRunnableInject() throws Exception
     {
-        int i = JqmSimpleTest.create(em, "pyl.EngineApiInjectThread").expectOk(3).run(this);
+        JqmSimpleTest.create(cnx, "pyl.EngineApiInjectThread").expectOk(3).run(this);
 
-        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
-        Assert.assertEquals(1, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 1 message per run.
-        Assert.assertEquals(100, (int) ji.get(0).getProgress());
+        Assert.assertEquals(3, (int) cnx.runSelectSingle("message_select_count_all", Integer.class));
+        Assert.assertEquals(100, (int) Query.create().addSortAsc(Sort.ID).run().get(0).getProgress());
     }
 
     @Test
     public void testMainType() throws Exception
     {
-        JqmSimpleTest.create(em, "pyl.PckMain", "jqm-test-pyl-nodep").run(this);
+        JqmSimpleTest.create(cnx, "pyl.PckMain", "jqm-test-pyl-nodep").run(this);
     }
 
     @Test
     public void testMainTypeInject() throws Exception
     {
-        int i = JqmSimpleTest.create(em, "pyl.EngineApiInject").setSessionId("123X").expectOk(3).run(this);
+        JqmSimpleTest.create(cnx, "pyl.EngineApiInject").setSessionId("123X").expectOk(3).run(this);
 
-        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
-
-        Assert.assertEquals(1, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 1 message per run created by payload
-        Assert.assertEquals(100, (int) ji.get(0).getProgress());
+        Assert.assertEquals(3, (int) cnx.runSelectSingle("message_select_count_all", Integer.class));
+        Assert.assertEquals(100, (int) Query.create().run().get(0).getProgress());
     }
 
     @Test
     public void testProvidedApi() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-providedapi/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
         // Create an empty lib directory just to be sure no dependencies will be resolved.
         FileUtils.forceMkdir(new File("../jqm-tests/jqm-test-providedapi/target/lib"));
@@ -98,45 +90,37 @@ public class NoApiPayloadTest extends JqmBaseTest
         JqmClientFactory.getClient().enqueue(j);
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        TypedQuery<History> query = em.createQuery("SELECT j FROM History j", History.class);
-        ArrayList<History> res = (ArrayList<History>) query.getResultList();
-
-        Assert.assertEquals(1, res.size());
-        Assert.assertEquals(State.ENDED, res.get(0).getState());
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 
     @Test
     public void testDisabledPayload() throws Exception
     {
-        JobDef jd = CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar",
-                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, em);
-        em.getTransaction().begin();
-        jd.setEnabled(false);
-        em.getTransaction().commit();
+        int jd = CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip,
+                42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+        cnx.runUpdate("jd_update_set_enabled_by_id", false, jd);
+        cnx.commit();
+
         JobRequest.create("MarsuApplication", "TestUser").submit();
 
         addAndStartEngine();
-        TestHelpers.waitFor(1, 10000, em);
+        TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(1, TestHelpers.getOkCount(em));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(em));
-
-        History h = em.createQuery("SELECT j FROM History j", History.class).getSingleResult();
-
-        Assert.assertEquals(-1, (int) h.getProgress());
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+        Assert.assertEquals(-1, (int) Query.create().run().get(0).getProgress());
     }
 
     @Test
     public void testMainTypeInjectWithFullApi() throws Exception
     {
         // Here, engine API + full API mix.
-        int i = JqmSimpleTest.create(em, "pyl.EngineApiInject", "jqm-test-pyl-hibapi").setSessionId("123X").expectOk(3).run(this);
-
-        List<History> ji = Helpers.getNewEm().createQuery("SELECT j FROM History j order by id asc", History.class).getResultList();
+        int i = JqmSimpleTest.create(cnx, "pyl.EngineApiInject", "jqm-test-pyl-hibapi").setSessionId("123X").expectOk(3).run(this);
 
         Assert.assertEquals(1, JqmClientFactory.getClient().getJob(i).getMessages().size()); // 1 message per run created by payload
-        Assert.assertEquals(100, (int) ji.get(0).getProgress());
+        Assert.assertEquals(100, (int) JqmClientFactory.getClient().getJob(i).getProgress());
     }
 }
