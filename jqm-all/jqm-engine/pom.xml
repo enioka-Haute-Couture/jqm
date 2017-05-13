@@ -282,7 +282,7 @@
 		</dependency>
 
 		<!-- LOGGING (we directly use log4j in this project but we need a slf4j 
-			mapping for Hibernate & web app) -->
+			mapping for the web app) -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
@@ -327,7 +327,7 @@
 		<!-- JQM APIs -->
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-api-client-hibernate</artifactId>
+			<artifactId>jqm-api-client-jdbc</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
