@@ -80,9 +80,9 @@ import com.enioka.jqm.jpamodel.State;
 /**
  * Main JQM client API entry point.
  */
-final class HibernateClient implements JqmClient
+final class JdbcClient implements JqmClient
 {
-    private static Logger jqmlogger = LoggerFactory.getLogger(HibernateClient.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(JdbcClient.class);
     private static final int IN_CLAUSE_LIMIT = 500;
     private Db db = null;
     private String protocol = null;
@@ -93,7 +93,7 @@ final class HibernateClient implements JqmClient
     // /////////////////////////////////////////////////////////////////////
 
     // No public constructor. MUST use factory.
-    HibernateClient(Properties p)
+    JdbcClient(Properties p)
     {
         this.p = p;
         if (p.containsKey("emf"))
@@ -735,7 +735,6 @@ final class HibernateClient implements JqmClient
                 }
                 if (!filterValue.isEmpty())
                 {
-                    String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1] + System.identityHashCode(filterValue);
                     prms.add(filterValue);
                     if (filterValue.contains("%"))
                     {
@@ -766,7 +765,6 @@ final class HibernateClient implements JqmClient
         {
             if (filterValue != -1)
             {
-                String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1];
                 prms.add(filterValue);
                 return String.format("AND %s = ? ", fieldName);
             }
@@ -782,7 +780,6 @@ final class HibernateClient implements JqmClient
     {
         if (filterValue != null)
         {
-            String prmName = fieldName.split("\\.")[fieldName.split("\\.").length - 1] + Math.abs(comparison.hashCode());
             prms.add(filterValue);
             return String.format("AND (%s %s ?) ", fieldName, comparison);
         }
@@ -832,7 +829,6 @@ final class HibernateClient implements JqmClient
 
             String q = "", q1 = "", q2 = "";
             String filterCountQuery = "SELECT ";
-            String totalCountQuery = "SELECT ";
 
             // ////////////////////////////////////////
             // Job Instance query
@@ -876,7 +872,6 @@ final class HibernateClient implements JqmClient
                         + "ji.SESSION_KEY AS SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.INTERNAL_POSITION AS POSITION "
                         + "FROM JOB_INSTANCE ji LEFT JOIN QUEUE q ON ji.QUEUE=q.ID LEFT JOIN JOB_DEFINITION jd ON ji.JOBDEF=jd.ID LEFT JOIN NODE n ON ji.NODE=n.ID ";
 
-                totalCountQuery += " (SELECT COUNT(1) FROM JOB_INSTANCE) ,";
                 if (wh.length() > 3)
                 {
                     wh = wh.substring(3, wh.length() - 1);
@@ -931,7 +926,6 @@ final class HibernateClient implements JqmClient
                         + "JD_KEYWORD1, JD_KEYWORD2, JD_KEYWORD3, " + "JD_MODULE, NODE_NAME, PARENT, PROGRESS, QUEUE_NAME, "
                         + "RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION FROM HISTORY ";
 
-                totalCountQuery += " (SELECT COUNT(1) FROM HISTORY) ,";
                 if (wh.length() > 3)
                 {
                     wh = wh.substring(3, wh.length() - 1);
@@ -966,6 +960,7 @@ final class HibernateClient implements JqmClient
             {
                 if (query.isQueryLiveInstances() && !query.isQueryHistoryInstances() && s.col == Sort.DATEEND)
                 {
+                    closeQuietly(cnx); // Not needed but linter bug
                     throw new JqmInvalidRequestException("cannot sort live instances by end date as those instances are still running");
                 }
 
@@ -983,19 +978,17 @@ final class HibernateClient implements JqmClient
 
             ///////////////////////////////////////////////
             // Set pagination parameters
-            // TODO: save this.
-            // if (query.getFirstRow() != null)
-            // {
-            // q2.setFirstResult(query.getFirstRow());
-            // }
-            // if (query.getPageSize() != null)
-            // {
-            // q2.setMaxResults(query.getPageSize());
-            // }
+            List<Object> paginatedParameters = new ArrayList<Object>(prms);
+            if (query.getFirstRow() != null || query.getPageSize() != null)
+            {
+                int start = query.getFirstRow() != null ? query.getFirstRow() : 0;
+                int end = query.getPageSize() != null ? start + query.getPageSize() : Integer.MAX_VALUE;
+                q = cnx.paginateQuery(q, start, end, paginatedParameters);
+            }
 
             ///////////////////////////////////////////////
             // Run the query
-            ResultSet rs = cnx.runRawSelect(q, prms.toArray());
+            ResultSet rs = cnx.runRawSelect(q, paginatedParameters.toArray());
             while (rs.next())
             {
                 com.enioka.jqm.api.JobInstance tmp = getJob(rs);
@@ -1034,9 +1027,6 @@ final class HibernateClient implements JqmClient
             }
             if (currentList != null && !currentList.isEmpty())
             {
-                List<RuntimeParameter> rps = new ArrayList<RuntimeParameter>(IN_CLAUSE_LIMIT * ids.size());
-                List<Message> msgs = new ArrayList<Message>(IN_CLAUSE_LIMIT * ids.size());
-
                 for (List<Integer> idsBatch : ids)
                 {
                     ResultSet run = cnx.runSelect("jiprm_select_by_ji_list", idsBatch);

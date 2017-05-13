@@ -37,7 +37,7 @@ public final class Helpers
 
     public static DbConn getDbSession()
     {
-        return ((HibernateClient) JqmClientFactory.getClient()).getDbSession();
+        return ((JdbcClient) JqmClientFactory.getClient()).getDbSession();
     }
 
     public static void closeQuietly(Closeable em)

@@ -490,4 +490,9 @@ public class DbConn implements Closeable
         }
         return c;
     }
+
+    public String paginateQuery(String sql, int start, int stopBefore, List<Object> prms)
+    {
+        return this.parent.getAdapter().paginateQuery(sql, start, stopBefore, prms);
+    }
 }

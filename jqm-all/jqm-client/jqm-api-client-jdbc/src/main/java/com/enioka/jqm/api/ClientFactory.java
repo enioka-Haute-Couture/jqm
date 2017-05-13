@@ -44,7 +44,7 @@ class ClientFactory implements IClientFactory
 
         if (!cached)
         {
-            return new HibernateClient(props);
+            return new JdbcClient(props);
         }
 
         synchronized (clients)
@@ -54,13 +54,13 @@ class ClientFactory implements IClientFactory
                 if (defaultClient == null)
                 {
                     jqmlogger.trace("creating default client");
-                    defaultClient = new HibernateClient(props);
+                    defaultClient = new JdbcClient(props);
                 }
                 return defaultClient;
             }
             else
             {
-                clients.putIfAbsent(name, new HibernateClient(props));
+                clients.putIfAbsent(name, new JdbcClient(props));
                 return clients.get(name);
             }
         }

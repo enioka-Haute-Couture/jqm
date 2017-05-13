@@ -917,7 +917,7 @@ public class ServiceAdmin
     public InputStream getNodeLog(@PathParam("nodeName") String nodeName, @QueryParam("latest") int latest,
             @Context HttpServletResponse res)
     {
-        SelfDestructFileStream fs = (SelfDestructFileStream) ((HibernateClient) JqmClientFactory.getClient()).getEngineLog(nodeName,
+        SelfDestructFileStream fs = (SelfDestructFileStream) ((JdbcClient) JqmClientFactory.getClient()).getEngineLog(nodeName,
                 latest);
         res.setHeader("Content-Disposition", "attachment; filename=" + nodeName + ".log");
         return fs;

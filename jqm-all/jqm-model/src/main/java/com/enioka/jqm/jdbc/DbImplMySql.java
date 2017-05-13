@@ -168,4 +168,13 @@ public class DbImplMySql implements DbAdapter
         s.setObject(position, null);
     }
 
+    @Override
+    public String paginateQuery(String sql, int start, int stopBefore, List<Object> prms)
+    {
+        int pageSize = stopBefore - start;
+        sql = String.format("%s LIMIT ? OFFSET ?", sql);
+        prms.add(pageSize);
+        prms.add(start);
+        return sql;
+    }
 }

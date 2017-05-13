@@ -82,4 +82,19 @@ public interface DbAdapter
      *            statement being built.
      */
     public void setNullParameter(int position, PreparedStatement s) throws SQLException;
+
+    /**
+     * Adds pagination elements to a query.
+     * 
+     * @param sql
+     *            the full SQL text
+     * @param start
+     *            the first included row (start of page). First row is zero, not one.
+     * @param stopBefore
+     *            the first excluded row (end of page)
+     * @param prms
+     *            the bind variables values. Can be modified.
+     * @return the ready to use SQL query for this database.
+     */
+    public String paginateQuery(String sql, int start, int stopBefore, List<Object> prms);
 }

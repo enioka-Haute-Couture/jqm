@@ -72,4 +72,16 @@ public class DbImplOracle implements DbAdapter
         // Absolutely stupid: set to null regardless of type.
         s.setObject(position, null);
     }
+
+    @Override
+    public String paginateQuery(String sql, int start, int stopBefore, List<Object> prms)
+    {
+        int pageSize = stopBefore - start;
+        sql = String.format("SELECT * FROM ( SELECT /*+ FIRST_ROWS(?) */ a.*, ROWNUM rnum FROM (%s) a WHERE ROWNUM < ?) WHERE RNUM >= ?",
+                sql);
+        prms.add(0, pageSize);
+        prms.add(stopBefore);
+        prms.add(start + 1);
+        return sql;
+    }
 }
