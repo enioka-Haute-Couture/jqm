@@ -122,29 +122,28 @@ class Loader implements Runnable, LoaderMBean
             mps.registerThread(String.valueOf(fileName + ".stderr.log"));
         }
 
+        // Log
+        this.resultStatus = State.SUBMITTED;
+        jqmlogger.debug("A loader/runner thread has just started for Job Instance " + job.getId() + ". Jar is: " + job.getJD().getJarPath()
+                + " - class is: " + job.getJD().getJavaClassName());
+
         final Map<String, String> params;
         final JarClassLoader jobClassLoader;
         DbConn cnx = null;
         final JobManagerHandler handler;
 
+        this.node = this.job.getNode();
+
         // Block needing the database
         try
         {
             cnx = Helpers.getNewDbSession();
-            this.node = Node.select(cnx, "node_select_by_id", job.getNode().getId()).get(0);
-            this.job.getJD().getClassLoader(cnx); // Cache it.
-
-            // Log
-            this.resultStatus = State.SUBMITTED;
-            jqmlogger.debug("A loader/runner thread has just started for Job Instance " + job.getId() + ". Jar is: "
-                    + job.getJD().getJarPath() + " - class is: " + job.getJD().getJavaClassName());
 
             // Disabled
             if (!this.job.getJD().isEnabled())
             {
                 jqmlogger.info("Job Instance " + job.getId() + " will actually not truly run as its Job Definition is disabled");
-                cnx.runUpdate("jj_update_progress_by_id", -1, this.job.getId());
-                cnx.commit();
+                job.setProgress(-1); // Not persisted, but useful to endOfRunDb
                 resultStatus = State.ENDED;
                 endOfRun();
                 return;
@@ -159,6 +158,7 @@ class Loader implements Runnable, LoaderMBean
             }
 
             // Cache heating
+            this.job.getJD().getClassLoader(cnx);
             jobClassLoader = this.clm.getClassloader(job, cnx);
             handler = new JobManagerHandler(job, params);
 
@@ -371,9 +371,6 @@ class Loader implements Runnable, LoaderMBean
         try
         {
             cnx = Helpers.getNewDbSession();
-
-            // Retrieve the object to update
-            job = JobInstance.select_id(cnx, this.job.getId());
 
             // Done: put inside history & remove instance from queue.
             History.create(cnx, job, this.resultStatus, endDate);

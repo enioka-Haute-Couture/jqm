@@ -244,8 +244,8 @@ class JobManagerHandler implements InvocationHandler
     }
 
     /**
-     * Create a {@link com.enioka.jqm.model.Message} with the given message. The {@link com.enioka.jqm.model.History} to link to is
-     * deduced from the context.
+     * Create a {@link com.enioka.jqm.model.Message} with the given message. The {@link com.enioka.jqm.model.History} to link to is deduced
+     * from the context.
      * 
      * @param msg
      * @throws JqmKillException
@@ -276,6 +276,7 @@ class JobManagerHandler implements InvocationHandler
         DbConn cnx = Helpers.getNewDbSession();
         try
         {
+            this.ji.setProgress(msg); // Not persisted, but useful to the Loader.
             cnx.runUpdate("jj_update_progress_by_id", msg, ji.getId());
             cnx.commit();
         }
