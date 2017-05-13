@@ -19,4 +19,12 @@
 			<message>JQM does not use Hibernate anymore, but a direct JDBC implementation. You may have to adapt your connection properties.</message>
 		</relocation>
 	</distributionManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>jqm-api-client-jdbc</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 </project>

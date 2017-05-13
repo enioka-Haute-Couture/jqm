@@ -16,5 +16,4 @@ env:
 #   sauce_connect: true
 branches:
   except:
-  - noorm
   - controller
