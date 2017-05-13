@@ -58,6 +58,7 @@ public class JmxTest extends JqmBaseTest
         // Go
         addAndStartEngine();
         TestHelpers.waitForRunning(1, 1000, cnx);
+        this.sleep(1); // time to actually run, not only Loader start.
 
         // Connect to JMX server
         JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://" + hn + ":" + port1 + "/jndi/rmi://" + hn + ":" + port2 + "/jmxrmi");

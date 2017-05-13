@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.zip.ZipFile;
 
 import javax.mail.MessagingException;
 import javax.naming.InitialContext;
@@ -131,6 +132,21 @@ final class Helpers
     }
 
     static void closeQuietly(Closeable zf)
+    {
+        try
+        {
+            if (zf != null)
+            {
+                zf.close();
+            }
+        }
+        catch (Exception e)
+        {
+            jqmlogger.warn("could not close jar file", e);
+        }
+    }
+
+    static void closeQuietly(ZipFile zf)
     {
         try
         {
