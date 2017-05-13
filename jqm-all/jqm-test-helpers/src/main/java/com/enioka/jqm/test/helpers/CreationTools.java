@@ -43,13 +43,13 @@ import org.apache.shiro.util.ByteSource;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
-import com.enioka.jqm.jpamodel.Cl;
-import com.enioka.jqm.jpamodel.JndiObjectResource;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobDef.PathType;
-import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.jpamodel.RRole;
-import com.enioka.jqm.jpamodel.RUser;
+import com.enioka.jqm.model.Cl;
+import com.enioka.jqm.model.JndiObjectResource;
+import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.Queue;
+import com.enioka.jqm.model.RRole;
+import com.enioka.jqm.model.RUser;
+import com.enioka.jqm.model.JobDef.PathType;
 
 /**
  * A set of static methods which help creating test data for automated tests.<br>

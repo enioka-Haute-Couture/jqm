@@ -39,11 +39,11 @@ import org.apache.log4j.Logger;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.QueryResult;
-import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.RuntimeParameter;
-import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.model.History;
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.model.RuntimeParameter;
+import com.enioka.jqm.model.State;
 
 /**
  * The loader is the tracker object for a payload execution. The job thread starts here and ends here. This class handles logging (creation
@@ -434,7 +434,7 @@ class Loader implements Runnable, LoaderMBean
     public void kill()
     {
         Properties props = new Properties();
-        props.put("emf", Helpers.getDb());
+        props.put("com.enioka.jqm.jdbc.contextobject", Helpers.getDb());
         JqmClientFactory.getClient("uncached", props, false).killJob(this.job.getId());
     }
 

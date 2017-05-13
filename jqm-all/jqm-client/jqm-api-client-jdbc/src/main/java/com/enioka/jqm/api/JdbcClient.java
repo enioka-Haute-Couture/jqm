@@ -66,16 +66,16 @@ import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.NonUniqueResultException;
 import com.enioka.jqm.jdbc.QueryResult;
-import com.enioka.jqm.jpamodel.Deliverable;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobDefParameter;
-import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Message;
-import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.jpamodel.RuntimeParameter;
-import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.model.Deliverable;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.History;
+import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.JobDefParameter;
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Message;
+import com.enioka.jqm.model.Queue;
+import com.enioka.jqm.model.RuntimeParameter;
+import com.enioka.jqm.model.State;
 
 /**
  * Main JQM client API entry point.
@@ -96,10 +96,10 @@ final class JdbcClient implements JqmClient
     JdbcClient(Properties p)
     {
         this.p = p;
-        if (p.containsKey("emf"))
+        if (p.containsKey("com.enioka.jqm.jdbc.contextobject"))
         {
-            jqmlogger.trace("emf present in properties");
-            db = (Db) p.get("emf");
+            jqmlogger.trace("database context present in properties");
+            db = (Db) p.get("com.enioka.jqm.jdbc.contextobject");
         }
     }
 

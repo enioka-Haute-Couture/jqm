@@ -17,7 +17,7 @@ package com.enioka.jqm.webui.shiro;
 
 import com.enioka.jqm.api.Helpers;
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.GlobalParameter;
+import com.enioka.jqm.model.GlobalParameter;
 
 /**
  * This filter extends the usual ShiroFilter by checking in the database if security should be enabled or not.

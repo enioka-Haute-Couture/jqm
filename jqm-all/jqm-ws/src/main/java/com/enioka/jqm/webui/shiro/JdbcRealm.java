@@ -32,13 +32,13 @@ import org.apache.shiro.util.ByteSource;
 import com.enioka.jqm.api.Helpers;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
-import com.enioka.jqm.jpamodel.RPermission;
-import com.enioka.jqm.jpamodel.RRole;
-import com.enioka.jqm.jpamodel.RUser;
+import com.enioka.jqm.model.RPermission;
+import com.enioka.jqm.model.RRole;
+import com.enioka.jqm.model.RUser;
 
-public class JpaRealm extends AuthorizingRealm
+public class JdbcRealm extends AuthorizingRealm
 {
-    public JpaRealm()
+    public JdbcRealm()
     {
         setName("database");
     }
@@ -82,11 +82,11 @@ public class JpaRealm extends AuthorizingRealm
 
     private SimpleAccount getUser(String login)
     {
-        DbConn em = null;
+        DbConn cnx = null;
         try
         {
-            em = Helpers.getDbSession();
-            RUser user = RUser.selectlogin(em, login);
+            cnx = Helpers.getDbSession();
+            RUser user = RUser.selectlogin(cnx, login);
 
             // Credential is a password - in token, it is as a char array
             SimpleAccount res = new SimpleAccount(user.getLogin(), user.getPassword(), getName());
@@ -111,10 +111,10 @@ public class JpaRealm extends AuthorizingRealm
             res.setLocked(user.getLocked());
 
             // Roles
-            for (RRole r : user.getRoles(em))
+            for (RRole r : user.getRoles(cnx))
             {
                 res.addRole(r.getName());
-                for (RPermission p : r.getPermissions(em))
+                for (RPermission p : r.getPermissions(cnx))
                 {
                     res.addStringPermission(p.getName());
                 }
@@ -133,7 +133,7 @@ public class JpaRealm extends AuthorizingRealm
         }
         finally
         {
-            em.close();
+            cnx.close();
         }
     }
 

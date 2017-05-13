@@ -50,15 +50,15 @@ import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.NonUniqueResultException;
 import com.enioka.jqm.jdbc.QueryResult;
-import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.JndiObjectResource;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.jpamodel.RRole;
-import com.enioka.jqm.jpamodel.RUser;
+import com.enioka.jqm.model.DeploymentParameter;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.JndiObjectResource;
+import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.model.Queue;
+import com.enioka.jqm.model.RRole;
+import com.enioka.jqm.model.RUser;
 
 // TODO: cnx should be first arg.
 
@@ -70,7 +70,7 @@ final class Helpers
 {
     private static Logger jqmlogger = Logger.getLogger(Helpers.class);
 
-    // The one and only EMF in the engine.
+    // The one and only Database context in the engine.
     private static Db _db;
 
     // Resource file contains at least the jqm jdbc connection definition. Static because JNDI root context is common to the whole JVM.
@@ -82,9 +82,9 @@ final class Helpers
     }
 
     /**
-     * Get a fresh EM on the jobqueue-api-pu persistence Unit
+     * Get a fresh connection on the engine database.
      * 
-     * @return an EntityManager
+     * @return a DbConn.
      */
     static DbConn getNewDbSession()
     {
@@ -117,7 +117,7 @@ final class Helpers
         {
             Properties p = Db.loadProperties();
             Db n = new Db(p);
-            p.put("emf", n); // Share the DataSource in engine and client.
+            p.put("com.enioka.jqm.jdbc.contextobject", n); // Share the DataSource in engine and client.
             JqmClientFactory.setProperties(p);
 
             return n;
@@ -201,7 +201,7 @@ final class Helpers
     }
 
     /**
-     * Create a Deliverable inside the database that will track a file created by a JobInstance Must be called from inside a JPA transaction
+     * Create a Deliverable inside the database that will track a file created by a JobInstance Must be called from inside a transaction
      * 
      * @param path
      *            FilePath (relative to a root directory - cf. Node)
@@ -211,8 +211,8 @@ final class Helpers
      *            File family (may be null). E.g.: "daily report"
      * @param jobId
      *            Job Instance ID
-     * @param em
-     *            the EM to use.
+     * @param cnx
+     *            the DbConn to use.
      */
     static int createDeliverable(String path, String originalFileName, String fileFamily, Integer jobId, DbConn cnx)
     {

@@ -40,13 +40,13 @@ import org.eclipse.jetty.util.ArrayQueue;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.QueryResult;
-import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.History;
-import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Message;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.model.DeploymentParameter;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.History;
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Message;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.model.State;
 
 /**
  * The engine itself. Everything starts in this class.
@@ -306,7 +306,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                 }
                 else
                 {
-                    p = new QueuePoller(this, com.enioka.jqm.jpamodel.Queue.select(cnx, "q_select_by_id", i.getQueue()).get(0),
+                    p = new QueuePoller(this, com.enioka.jqm.model.Queue.select(cnx, "q_select_by_id", i.getQueue()).get(0),
                             (i.getEnabled() ? i.getNbThread() : 0), i.getPollingInterval());
                     pollers.put(i.getId(), p);
                     Thread t = new Thread(p);
@@ -473,7 +473,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             {
                 // Test if the DB is back and wait for it if not
                 jqmlogger.warn("The engine will now indefinitely try to restore connection to the database");
-                DbConn em = null;
+                DbConn cnx = null;
                 boolean back = false;
                 long timeToWait = 1;
                 while (!back)
@@ -482,8 +482,8 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                     {
                         synchronized (ee)
                         {
-                            em = Helpers.getNewDbSession();
-                            em.runSelect("node_select_by_id", 1);
+                            cnx = Helpers.getNewDbSession();
+                            cnx.runSelect("node_select_by_id", 1);
                             back = true;
                             ee.qpRestarter = null;
                             jqmlogger.warn("connection to database was restored");
@@ -506,7 +506,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                     }
                     finally
                     {
-                        Helpers.closeQuietly(em);
+                        Helpers.closeQuietly(cnx);
                     }
                 }
 
@@ -567,7 +567,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     }
 
     // //////////////////////////////////////////////////////////////////////////
-    // JMX stat methods (they get their own EM to be thread safe)
+    // JMX stat methods (they get their own connection to be thread safe)
     // //////////////////////////////////////////////////////////////////////////
 
     @Override

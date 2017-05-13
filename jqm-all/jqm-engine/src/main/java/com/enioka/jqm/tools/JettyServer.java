@@ -40,9 +40,9 @@ import org.eclipse.jetty.webapp.WebInfConfiguration;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
 
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.pki.JpaCa;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.pki.JdbcCa;
 
 /**
  * Every engine has an embedded Jetty engine that serves the different web service APIs.
@@ -98,7 +98,7 @@ class JettyServer
             if (useInternalPki)
             {
                 jqmlogger.info("JQM will use its internal PKI for all certificates as parameter enableInternalPki is 'true'");
-                JpaCa.prepareWebServerStores(cnx, "CN=" + node.getDns(), "./conf/keystore.pfx", "./conf/trusted.jks", pfxPassword,
+                JdbcCa.prepareWebServerStores(cnx, "CN=" + node.getDns(), "./conf/keystore.pfx", "./conf/trusted.jks", pfxPassword,
                         node.getDns(), "./conf/server.cer", "./conf/ca.cer");
             }
             scf = new SslContextFactory("./conf/keystore.pfx");

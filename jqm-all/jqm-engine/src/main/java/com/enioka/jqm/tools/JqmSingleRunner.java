@@ -7,7 +7,7 @@ import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.JqmInvalidRequestException;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.GlobalParameter;
+import com.enioka.jqm.model.GlobalParameter;
 
 /**
  * This is a dumbed down version of the JQM engine that, instead of checking jobs from a database, will run at once a specified job
@@ -26,7 +26,7 @@ public class JqmSingleRunner
     {
         jqmlogger.debug("Single runner was asked to start with ID " + jobInstanceId);
         DbConn cnx = Helpers.getNewDbSession();
-        com.enioka.jqm.jpamodel.JobInstance jr = com.enioka.jqm.jpamodel.JobInstance.select_id(cnx, jobInstanceId);
+        com.enioka.jqm.model.JobInstance jr = com.enioka.jqm.model.JobInstance.select_id(cnx, jobInstanceId);
         cnx.close();
         if (jr == null)
         {
@@ -43,7 +43,7 @@ public class JqmSingleRunner
      *            the file to which output the run log. if null, only stdout will be used.
      * @return the result of the run
      */
-    public static JobInstance run(com.enioka.jqm.jpamodel.JobInstance job)
+    public static JobInstance run(com.enioka.jqm.model.JobInstance job)
     {
         if (job == null)
         {
@@ -59,7 +59,7 @@ public class JqmSingleRunner
 
         // Get a copy of the instance, to be sure to get a non detached item.
         DbConn cnx = Helpers.getNewDbSession();
-        job = com.enioka.jqm.jpamodel.JobInstance.select_id(cnx, job.getId());
+        job = com.enioka.jqm.model.JobInstance.select_id(cnx, job.getId());
 
         // Parameters
         final int poll = Integer.parseInt(GlobalParameter.getParameter(cnx, "internalPollingPeriodMs", "10000"));
@@ -114,7 +114,7 @@ public class JqmSingleRunner
                 {
                     // Timeout! Violently halt the JVM.
                     jqmlogger.info("Job has not finished gracefully and will be stopped abruptly");
-                    l.endOfRun(com.enioka.jqm.jpamodel.State.KILLED);
+                    l.endOfRun(com.enioka.jqm.model.State.KILLED);
                     Runtime.getRuntime().halt(0);
                 }
                 else
@@ -137,10 +137,10 @@ public class JqmSingleRunner
                 while (!Thread.interrupted())
                 {
                     cnx = Helpers.getNewDbSession();
-                    com.enioka.jqm.jpamodel.JobInstance job = com.enioka.jqm.jpamodel.JobInstance.select_id(cnx, jobId);
+                    com.enioka.jqm.model.JobInstance job = com.enioka.jqm.model.JobInstance.select_id(cnx, jobId);
                     cnx.close();
 
-                    if (job != null && job.getState().equals(com.enioka.jqm.jpamodel.State.KILLED))
+                    if (job != null && job.getState().equals(com.enioka.jqm.model.State.KILLED))
                     {
                         jqmlogger.debug(
                                 "Job " + jobId + " has received a kill order. It's JVM will be killed after a grace shutdown period");

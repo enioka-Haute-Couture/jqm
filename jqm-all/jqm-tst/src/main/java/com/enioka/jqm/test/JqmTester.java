@@ -10,13 +10,13 @@ import org.hsqldb.jdbc.JDBCDataSource;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobDef.PathType;
-import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.jpamodel.RuntimeParameter;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.model.Queue;
+import com.enioka.jqm.model.RuntimeParameter;
+import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.tools.JqmSingleRunner;
 
 /**
@@ -72,7 +72,7 @@ public class JqmTester
         JqmSingleRunner.setConnection(db);
 
         Properties p2 = new Properties();
-        p2.put("emf", db);
+        p2.put("com.enioka.jqm.jdbc.contextobject", db);
         JqmClientFactory.setProperties(p2);
 
         // Needed parameters

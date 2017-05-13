@@ -15,7 +15,7 @@
  */
 package com.enioka.jqm.tools;
 
-import com.enioka.jqm.jpamodel.GlobalParameter;
+import com.enioka.jqm.model.GlobalParameter;
 
 /**
  * Monitoring interface for the Engine

@@ -40,13 +40,13 @@ public final class Helpers
         return ((JdbcClient) JqmClientFactory.getClient()).getDbSession();
     }
 
-    public static void closeQuietly(Closeable em)
+    public static void closeQuietly(Closeable closeable)
     {
         try
         {
-            if (em != null)
+            if (closeable != null)
             {
-                em.close();
+                closeable.close();
             }
         }
         catch (Exception e)

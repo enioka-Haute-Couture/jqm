@@ -320,7 +320,7 @@ public class Main
         }
     }
 
-    public static void setEmf(Db db)
+    public static void setDb(Db db)
     {
         Helpers.setDb(db);
     }
@@ -506,10 +506,10 @@ public class Main
             throw new IllegalArgumentException("-U option requires one login, one password and at least one role (in this order)");
         }
 
-        DbConn em = null;
+        DbConn cnx = null;
         try
         {
-            em = Helpers.getNewDbSession();
+            cnx = Helpers.getNewDbSession();
 
             String[] roles = new String[options.length - 2];
             for (int i = 2; i < options.length; i++)
@@ -517,12 +517,12 @@ public class Main
                 roles[i - 2] = options[i];
             }
 
-            Helpers.createUserIfMissing(em, options[0], options[1], "created through CLI", roles);
-            em.commit();
+            Helpers.createUserIfMissing(cnx, options[0], options[1], "created through CLI", roles);
+            cnx.commit();
         }
         finally
         {
-            Helpers.closeQuietly(em);
+            Helpers.closeQuietly(cnx);
         }
     }
 

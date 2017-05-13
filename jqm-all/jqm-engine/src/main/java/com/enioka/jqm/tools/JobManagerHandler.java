@@ -37,10 +37,10 @@ import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Message;
-import com.enioka.jqm.jpamodel.State;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Message;
+import com.enioka.jqm.model.State;
 
 /**
  * This is the implementation behind the proxy described in the <code>JobManager</code> interface inside the jqm-api artifact.
@@ -244,7 +244,7 @@ class JobManagerHandler implements InvocationHandler
     }
 
     /**
-     * Create a {@link com.enioka.jqm.jpamodel.Message} with the given message. The {@link com.enioka.jqm.jpamodel.History} to link to is
+     * Create a {@link com.enioka.jqm.model.Message} with the given message. The {@link com.enioka.jqm.model.History} to link to is
      * deduced from the context.
      * 
      * @param msg
@@ -266,7 +266,7 @@ class JobManagerHandler implements InvocationHandler
     }
 
     /**
-     * Update the {@link com.enioka.jqm.jpamodel.History} with the given progress data.
+     * Update the {@link com.enioka.jqm.model.History} with the given progress data.
      * 
      * @param msg
      * @throws JqmKillException

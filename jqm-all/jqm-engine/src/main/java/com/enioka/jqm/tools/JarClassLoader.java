@@ -33,8 +33,8 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-import com.enioka.jqm.jpamodel.ClHandler;
-import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.model.ClHandler;
+import com.enioka.jqm.model.JobInstance;
 
 /**
  * The {@link URLClassLoader} that will load everything related to a payload (the payload jar and all its dependencies).<br>

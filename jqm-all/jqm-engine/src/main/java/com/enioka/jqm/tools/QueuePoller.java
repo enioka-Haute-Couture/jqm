@@ -37,9 +37,9 @@ import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.QueryResult;
-import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.JobInstance;
-import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.model.DeploymentParameter;
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Queue;
 
 /**
  * A thread that polls a queue according to the parameters defined inside a {@link DeploymentParameter}.
@@ -179,7 +179,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     {
         this.localThread = Thread.currentThread();
         this.localThread.setName("QUEUE_POLLER;polling;" + this.queue.getName());
-        DbConn em = null;
+        DbConn cnx = null;
 
         while (true)
         {
@@ -189,8 +189,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
             try
             {
                 // Get a JI to run
-                em = Helpers.getNewDbSession();
-                for (JobInstance ji : dequeue(em))
+                cnx = Helpers.getNewDbSession();
+                for (JobInstance ji : dequeue(cnx))
                 {
                     // We will run this JI!
                     jqmlogger.trace("JI number " + ji.getId() + " will be run by this poller this loop (already " + actualNbThread + "/"
@@ -208,7 +208,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
                     }
                     else
                     {
-                        (new Thread(new LoaderExternal(em, ji, this))).start();
+                        (new Thread(new LoaderExternal(cnx, ji, this))).start();
                     }
                 }
             }
@@ -230,8 +230,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
             }
             finally
             {
-                // Reset the em on each loop.
-                Helpers.closeQuietly(em);
+                // Reset the connection on each loop.
+                Helpers.closeQuietly(cnx);
             }
 
             // Wait according to the deploymentParameter

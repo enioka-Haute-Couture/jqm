@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.jpamodel;
+package com.enioka.jqm.model;
 
 import java.io.Serializable;
 import java.sql.ResultSet;
@@ -26,15 +26,15 @@ import java.util.List;
 
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.QueryResult;
 
-public class RPermission implements Serializable
+public class RRole implements Serializable
 {
     private static final long serialVersionUID = 1234354709423603792L;
 
     private Integer id;
     private String name;
-
-    private int role;
+    private String description;
 
     public Integer getId()
     {
@@ -56,29 +56,40 @@ public class RPermission implements Serializable
         this.name = name;
     }
 
-    public int getRole()
+    public List<RUser> getUsers(DbConn cnx)
     {
-        return role;
+        return RUser.select(cnx, "user_select_all_in_role", this.id);
     }
 
-    public void setRole(int role)
+    public List<RPermission> getPermissions(DbConn cnx)
     {
-        this.role = role;
+        return RPermission.select(cnx, "perm_select_all_in_role", this.id);
     }
 
-    public static List<RPermission> select(DbConn cnx, String query_key, Object... args)
+    public String getDescription()
     {
-        List<RPermission> res = new ArrayList<RPermission>();
+        return description;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
+    }
+
+    public static List<RRole> select(DbConn cnx, String query_key, Object... args)
+    {
+        List<RRole> res = new ArrayList<RRole>();
         try
         {
             ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
-                RPermission tmp = new RPermission();
+                RRole tmp = new RRole();
 
                 tmp.id = rs.getInt(1);
                 tmp.name = rs.getString(2);
-                tmp.role = rs.getInt(3);
+                tmp.description = rs.getString(3);
+
                 res.add(tmp);
             }
         }
@@ -88,4 +99,16 @@ public class RPermission implements Serializable
         }
         return res;
     }
+
+    public static void create(DbConn cnx, String roleName, String description, String... permissions)
+    {
+        QueryResult r = cnx.runUpdate("role_insert", description, roleName);
+        int newId = r.getGeneratedId();
+
+        for (String s : permissions)
+        {
+            cnx.runUpdate("perm_insert", s, newId);
+        }
+    }
+
 }

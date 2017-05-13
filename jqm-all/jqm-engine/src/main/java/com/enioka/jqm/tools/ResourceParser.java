@@ -31,8 +31,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.JndiObjectResource;
-import com.enioka.jqm.jpamodel.JndiObjectResourceParameter;
+import com.enioka.jqm.model.JndiObjectResource;
+import com.enioka.jqm.model.JndiObjectResourceParameter;
 
 /**
  * Helper class to retrieve a {@link JndiResourceDescriptor} either from the XML resource file or from the database. <br>

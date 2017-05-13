@@ -15,8 +15,8 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.RollingFileAppender;
 
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.JobInstance;
 
 class LoaderExternal implements Runnable
 {

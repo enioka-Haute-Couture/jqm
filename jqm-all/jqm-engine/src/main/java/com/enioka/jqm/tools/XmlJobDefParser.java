@@ -38,12 +38,12 @@ import org.w3c.dom.NodeList;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
-import com.enioka.jqm.jpamodel.Cl;
-import com.enioka.jqm.jpamodel.ClEvent;
-import com.enioka.jqm.jpamodel.ClHandler;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobDef.PathType;
-import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.model.Cl;
+import com.enioka.jqm.model.ClEvent;
+import com.enioka.jqm.model.ClHandler;
+import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.Queue;
+import com.enioka.jqm.model.JobDef.PathType;
 
 class XmlJobDefParser
 {
@@ -58,7 +58,7 @@ class XmlJobDefParser
      * Will import all JobDef from an XML file. Creates and commits a transaction.
      * 
      * @param path
-     * @param em
+     * @param cnx
      * @throws JqmEngineException
      */
     static void parse(String path, DbConn cnx) throws JqmEngineException

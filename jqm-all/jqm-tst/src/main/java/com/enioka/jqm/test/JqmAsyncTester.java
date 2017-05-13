@@ -25,10 +25,10 @@ import com.enioka.jqm.api.Query;
 import com.enioka.jqm.api.State;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.model.DeploymentParameter;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.tools.JqmEngineOperations;
 import com.enioka.jqm.tools.Main;
 
@@ -81,9 +81,9 @@ public class JqmAsyncTester
         cnx = db.getConn();
 
         Properties p2 = Common.dbProperties(s);
-        p2.put("emf", db);
+        p2.put("com.enioka.jqm.jdbc.contextobject", db);
         JqmClientFactory.setProperties(p2);
-        Main.setEmf(db);
+        Main.setDb(db);
 
         // Minimum parameters
         Main.main(new String[] { "-u" });
@@ -486,14 +486,14 @@ public class JqmAsyncTester
      */
     public InputStream getDeliverableContent(Deliverable file) throws FileNotFoundException
     {
-        List<com.enioka.jqm.jpamodel.Deliverable> dd = com.enioka.jqm.jpamodel.Deliverable.select(cnx, "deliverable_select_by_id",
+        List<com.enioka.jqm.model.Deliverable> dd = com.enioka.jqm.model.Deliverable.select(cnx, "deliverable_select_by_id",
                 file.getId());
         if (dd.isEmpty())
         {
             throw new JqmInvalidRequestException("no deliverable with this ID");
         }
 
-        com.enioka.jqm.jpamodel.Deliverable d = dd.get(0);
+        com.enioka.jqm.model.Deliverable d = dd.get(0);
         JobInstance ji = Query.create().setJobInstanceId(d.getJobId()).run().get(0);
         String nodeName = ji.getNodeName();
         Node n = nodes.get(nodeName);

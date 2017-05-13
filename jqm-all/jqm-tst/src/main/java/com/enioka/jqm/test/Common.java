@@ -8,8 +8,8 @@ import java.util.Properties;
 import org.hsqldb.Server;
 
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.Cl;
-import com.enioka.jqm.jpamodel.JobDef;
+import com.enioka.jqm.model.Cl;
+import com.enioka.jqm.model.JobDef;
 
 final class Common
 {

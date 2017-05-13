@@ -27,15 +27,15 @@ import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.NonUniqueResultException;
 import com.enioka.jqm.jdbc.QueryResult;
-import com.enioka.jqm.jpamodel.DeploymentParameter;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.JndiObjectResource;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobDef.PathType;
-import com.enioka.jqm.jpamodel.JobDefParameter;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.jpamodel.Queue;
-import com.enioka.jqm.jpamodel.RRole;
+import com.enioka.jqm.model.DeploymentParameter;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.JndiObjectResource;
+import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.JobDefParameter;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.model.Queue;
+import com.enioka.jqm.model.RRole;
+import com.enioka.jqm.model.JobDef.PathType;
 
 /**
  * Set of methods to handle metadata.
@@ -44,13 +44,13 @@ public class MetaService
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(MetaService.class);
 
-    private static void closeQuietly(Closeable em)
+    private static void closeQuietly(Closeable closeable)
     {
         try
         {
-            if (em != null)
+            if (closeable != null)
             {
-                em.close();
+                closeable.close();
             }
         }
         catch (Exception e)

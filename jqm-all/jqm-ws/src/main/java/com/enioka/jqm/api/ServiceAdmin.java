@@ -45,11 +45,11 @@ import com.enioka.api.admin.QueueMappingDto;
 import com.enioka.api.admin.RRoleDto;
 import com.enioka.api.admin.RUserDto;
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.RPermission;
-import com.enioka.jqm.jpamodel.RRole;
-import com.enioka.jqm.jpamodel.RUser;
-import com.enioka.jqm.pki.JpaCa;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.RPermission;
+import com.enioka.jqm.model.RRole;
+import com.enioka.jqm.model.RUser;
+import com.enioka.jqm.pki.JdbcCa;
 
 @Path("/admin")
 public class ServiceAdmin
@@ -895,7 +895,7 @@ public class ServiceAdmin
         {
             cnx = Helpers.getDbSession();
             RUser u = RUser.select_id(cnx, userId);
-            return JpaCa.getClientData(cnx, u.getLogin());
+            return JdbcCa.getClientData(cnx, u.getLogin());
         }
         catch (Exception e)
         {

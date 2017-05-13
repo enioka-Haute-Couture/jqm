@@ -25,8 +25,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.enioka.jqm.jdbc.NoResultException;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 

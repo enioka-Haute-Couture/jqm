@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.jpamodel;
+package com.enioka.jqm.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

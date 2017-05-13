@@ -1,4 +1,4 @@
-package com.enioka.jqm.jpamodel;
+package com.enioka.jqm.model;
 
 import java.io.Serializable;
 import java.sql.ResultSet;
@@ -14,7 +14,7 @@ import com.enioka.jqm.jdbc.QueryResult;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
- * JPA persistence class for storing the definition of the different event handlers hooked on a given class loader ({@link Cl}).
+ * Persistence class for storing the definition of the different event handlers hooked on a given class loader ({@link Cl}).
  */
 public class ClHandler implements Serializable
 {

@@ -9,7 +9,7 @@ import org.junit.Assert;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.JobDefParameter;
+import com.enioka.jqm.model.JobDefParameter;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 

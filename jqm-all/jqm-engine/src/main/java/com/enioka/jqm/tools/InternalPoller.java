@@ -25,8 +25,8 @@ import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.Node;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.Node;
 
 /**
  * The internal poller is responsible for doing all the repetitive tasks of an engine (excluding polling queues). Namely: check if

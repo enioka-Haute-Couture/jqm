@@ -25,8 +25,8 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.Queue;
 
 class XmlQueueExporter
 {

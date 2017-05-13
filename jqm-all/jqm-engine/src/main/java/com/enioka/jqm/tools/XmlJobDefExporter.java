@@ -30,10 +30,10 @@ import org.jdom.output.XMLOutputter;
 
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.Cl;
-import com.enioka.jqm.jpamodel.ClHandler;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobDefParameter;
+import com.enioka.jqm.model.Cl;
+import com.enioka.jqm.model.ClHandler;
+import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.JobDefParameter;
 
 class XmlJobDefExporter
 {

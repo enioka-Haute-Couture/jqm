@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.jpamodel;
+package com.enioka.jqm.model;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>

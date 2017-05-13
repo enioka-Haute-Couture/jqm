@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.Queue;
+import com.enioka.jqm.model.Queue;
 
 class XmlQueueParser
 {

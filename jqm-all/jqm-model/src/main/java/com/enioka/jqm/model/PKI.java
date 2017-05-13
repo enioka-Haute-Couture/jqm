@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.jpamodel;
+package com.enioka.jqm.model;
 
 import java.io.Serializable;
 import java.sql.ResultSet;

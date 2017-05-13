@@ -25,8 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.RUser;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.RUser;
 
 /**
  * Helper class helping dealing with internal security when calling the simple REST API (the API dealing with file transfers)<br>
@@ -56,7 +56,7 @@ final class SimpleApiSecurity
 
     /**
      * Will create (or recreate) if necessary the temporary login data.<br>
-     * Will create its own transaction - therefore the given em must not have any active transaction.
+     * Will create its own transaction - therefore the given connection must not have any active transaction.
      */
     static Duet getId(DbConn cnx)
     {

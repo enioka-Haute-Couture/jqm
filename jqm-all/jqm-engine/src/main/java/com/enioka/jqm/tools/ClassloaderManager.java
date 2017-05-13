@@ -18,10 +18,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.Cl;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.JobInstance;
+import com.enioka.jqm.model.Cl;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.JobInstance;
 
 /**
  * This class holds all the {@link JarClassLoader} and is the only place to create one. There should be one instance per engine.<br>

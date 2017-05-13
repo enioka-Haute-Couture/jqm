@@ -36,8 +36,8 @@ import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.jpamodel.Node;
-import com.enioka.jqm.pki.JpaCa;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.pki.JdbcCa;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -133,7 +133,7 @@ public class JettyTest extends JqmBaseTest
         }
 
         // Client auth
-        JpaCa.prepareClientStore(cnx, "CN=testuser", "./conf/client.pfx", "SuperPassword", "client-cert", "./conf/client.cer");
+        JdbcCa.prepareClientStore(cnx, "CN=testuser", "./conf/client.pfx", "SuperPassword", "client-cert", "./conf/client.cer");
         KeyStore clientStore = KeyStore.getInstance("PKCS12");
         instream = new FileInputStream(new File("./conf/client.pfx"));
         try

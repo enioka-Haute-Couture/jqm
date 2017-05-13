@@ -44,8 +44,8 @@ import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
-import com.enioka.jqm.jpamodel.Deliverable;
-import com.enioka.jqm.jpamodel.Node;
+import com.enioka.jqm.model.Deliverable;
+import com.enioka.jqm.model.Node;
 
 /**
  * A minimal API designed to interact well with CLI tools such as schedulers. Some of its methods (file retrieval) are also used by the two
@@ -72,14 +72,14 @@ public class ServiceSimple
         if (context.getInitParameter("jqmnodeid") != null)
         {
             // Running on a JQM node, not a standard servlet container.
-            DbConn em = null;
+            DbConn cnx = null;
             try
             {
-                em = Helpers.getDbSession();
+                cnx = Helpers.getDbSession();
 
                 try
                 {
-                    n = Node.select_single(em, "node_select_by_id", Integer.parseInt(context.getInitParameter("jqmnodeid")));
+                    n = Node.select_single(cnx, "node_select_by_id", Integer.parseInt(context.getInitParameter("jqmnodeid")));
                 }
                 catch (NoResultException e)
                 {
@@ -88,7 +88,7 @@ public class ServiceSimple
             }
             finally
             {
-                Helpers.closeQuietly(em);
+                Helpers.closeQuietly(cnx);
             }
         }
     }
@@ -137,11 +137,11 @@ public class ServiceSimple
         }
 
         Deliverable d = null;
-        DbConn em = null;
+        DbConn cnx = null;
         try
         {
-            em = Helpers.getDbSession();
-            List<Deliverable> dd = Deliverable.select(em, "deliverable_select_by_randomid", randomId);
+            cnx = Helpers.getDbSession();
+            List<Deliverable> dd = Deliverable.select(cnx, "deliverable_select_by_randomid", randomId);
             if (dd.isEmpty())
             {
                 throw new NoResultException("requested file does not exist");
@@ -159,7 +159,7 @@ public class ServiceSimple
         }
         finally
         {
-            Helpers.closeQuietly(em);
+            Helpers.closeQuietly(cnx);
         }
 
         String ext = FilenameUtils.getExtension(d.getOriginalFileName());

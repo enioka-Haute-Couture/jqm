@@ -37,8 +37,8 @@ import org.jboss.shrinkwrap.resolver.api.maven.ConfigurableMavenResolverSystem;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jpamodel.JobDef;
-import com.enioka.jqm.jpamodel.Node;
+import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.Node;
 
 /**
  * The cache is responsible for resolving the dependencies of a payload (from a pom, from a lib directory, ...). As the resolution is
@@ -71,8 +71,8 @@ class LibraryResolverFS
      *            the JQM Node that holds the binaries (local node)
      * @param jd
      *            the JobDefinition that should be resolved
-     * @param em
-     *            an EM that will be used only if not in cache, to fetch the Maven repository list from the database.
+     * @param cnx
+     *            a DbConn that will be used only if not in cache, to fetch the Maven repository list from the database.
      * @throws JqmPayloadException
      */
     synchronized URL[] getLibraries(Node n, JobDef jd, DbConn cnx) throws JqmPayloadException

@@ -25,8 +25,8 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.Node;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.Node;
 
 @ApplicationPath("/ws/*")
 public class JqmRestApp extends ResourceConfig

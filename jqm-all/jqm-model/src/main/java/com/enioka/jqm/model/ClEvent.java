@@ -1,4 +1,4 @@
-package com.enioka.jqm.jpamodel;
+package com.enioka.jqm.model;
 
 /**
  * The different events available for class loader event handlers.

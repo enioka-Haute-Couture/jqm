@@ -1,4 +1,4 @@
-package com.enioka.jqm.jpamodel;
+package com.enioka.jqm.model;
 
 import java.io.Serializable;
 import java.sql.ResultSet;

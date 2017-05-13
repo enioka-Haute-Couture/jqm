@@ -33,14 +33,14 @@ import org.bouncycastle.util.io.pem.PemReader;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
-import com.enioka.jqm.jpamodel.GlobalParameter;
-import com.enioka.jqm.jpamodel.PKI;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.PKI;
 
 /**
- * This class is the link between the X509 methods in CertificateRequest and the JPA database store.
+ * This class is the link between the X509 methods in CertificateRequest and the database store.
  * 
  */
-public class JpaCa
+public class JdbcCa
 {
     public static CertificateRequest initCa(DbConn cnx)
     {
@@ -158,7 +158,7 @@ public class JpaCa
         ByteArrayOutputStream sink = new ByteArrayOutputStream();
         ZipOutputStream zos = new ZipOutputStream(sink);
 
-        CertificateRequest ca = JpaCa.initCa(cnx);
+        CertificateRequest ca = JdbcCa.initCa(cnx);
         CertificateRequest cl = new CertificateRequest();
         cl.generateClientCert("JQM authentication certificate", ca.holder, ca.privateKey, "CN=" + userName);
 

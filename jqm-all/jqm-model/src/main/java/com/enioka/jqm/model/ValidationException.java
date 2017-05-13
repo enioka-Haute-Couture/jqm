@@ -1,4 +1,4 @@
-package com.enioka.jqm.jpamodel;
+package com.enioka.jqm.model;
 
 public class ValidationException extends RuntimeException
 {
