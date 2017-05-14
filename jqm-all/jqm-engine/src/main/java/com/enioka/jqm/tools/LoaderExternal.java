@@ -102,6 +102,7 @@ class LoaderExternal implements Runnable
                 try
                 {
                     res = p.exitValue();
+                    jqmlogger.debug("External payload " + jobId + " - the external process has exited with RC " + res);
                     // if here, has exited.
                     break;
                 }
@@ -129,7 +130,7 @@ class LoaderExternal implements Runnable
 
         if (res != 0)
         {
-            jqmlogger.error("an external payload has exited with return code " + res + ". Abnormal - it should always be 0.");
+            jqmlogger.error("An external payload has exited with return code " + res + ". Abnormal - it should always be 0.");
         }
     }
 }
