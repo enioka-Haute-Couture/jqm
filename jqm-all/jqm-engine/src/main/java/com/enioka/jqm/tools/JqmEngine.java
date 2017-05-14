@@ -471,11 +471,22 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             @Override
             public void run()
             {
-                // Test if the DB is back and wait for it if not
                 jqmlogger.warn("The engine will now indefinitely try to restore connection to the database");
                 DbConn cnx = null;
                 boolean back = false;
-                long timeToWait = 1;
+                long timeToWait = 1; // seconds.
+
+                // First thing is to wait - it is useless to immediately retry connecting as we *know* the DB is unreachable....
+                try
+                {
+                    Thread.sleep(timeToWait * 1000);
+                }
+                catch (InterruptedException e)
+                {
+                    return;
+                }
+
+                // Then, infinite loop trying to reconnect to the DB. We wait 1s more on each loop, max 1 minute.
                 while (!back)
                 {
                     try
@@ -496,7 +507,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                         {
                             jqmlogger.debug("waiting for db...");
                             Thread.sleep(1000 * timeToWait);
-                            timeToWait = Math.min(timeToWait + 1, 120);
+                            timeToWait = Math.min(timeToWait + 1, 60);
                         }
                         catch (InterruptedException e1)
                         {

@@ -129,12 +129,11 @@ class Loader implements Runnable, LoaderMBean
 
         final Map<String, String> params;
         final JarClassLoader jobClassLoader;
-        DbConn cnx = null;
         final JobManagerHandler handler;
-
         this.node = this.job.getNode();
 
         // Block needing the database
+        DbConn cnx = null;
         try
         {
             cnx = Helpers.getNewDbSession();

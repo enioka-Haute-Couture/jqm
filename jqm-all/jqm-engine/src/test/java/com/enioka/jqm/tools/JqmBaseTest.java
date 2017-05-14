@@ -189,8 +189,10 @@ public class JqmBaseTest
     {
         if (db.getProduct().contains("hsql"))
         {
+            jqmlogger.info("DB is going down");
             s.stop();
             this.waitDbStop();
+            jqmlogger.info("DB is now fully down");
             this.sleep(1);
             jqmlogger.info("Restarting DB");
             s.start();

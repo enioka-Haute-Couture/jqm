@@ -19,7 +19,6 @@
 package com.enioka.jqm.tools;
 
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -134,13 +133,13 @@ class QueuePoller implements Runnable, QueuePollerMBean
         }
     }
 
-    protected List<JobInstance> dequeue(DbConn cnx)
+    protected List<JobInstance> dequeue(DbConn cnx, int level)
     {
         // Free room?
         int usedSlots = actualNbThread.get();
         if (usedSlots >= maxNbThread)
         {
-            return new ArrayList<JobInstance>();
+            return null;
         }
 
         // Get the list of all jobInstance within the defined queue, ordered by position
@@ -157,7 +156,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 cnx.commit();
                 return res;
             }
-            else
+            else if (level <= 3)
             {
                 // Try again. This means the jobs marked for exec on previous loop have not already started.
                 // So they were still in the SELECT WHERE STATE='ATTRIBUTED'.
@@ -165,12 +164,17 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 jqmlogger.info("Polling interval seems too low");
                 cnx.rollback();
                 Thread.yield();
-                return dequeue(cnx);
+                return dequeue(cnx, level + 1);
+            }
+            else
+            {
+                // Simply give up. The engine is under such a heavy load that we should first deal with the backlog.
+                return null;
             }
         }
         else
         {
-            return new ArrayList<JobInstance>();
+            return null;
         }
     }
 
@@ -190,25 +194,29 @@ class QueuePoller implements Runnable, QueuePollerMBean
             {
                 // Get a JI to run
                 cnx = Helpers.getNewDbSession();
-                for (JobInstance ji : dequeue(cnx))
+                List<JobInstance> newInstances = dequeue(cnx, 1);
+                if (newInstances != null)
                 {
-                    // We will run this JI!
-                    jqmlogger.trace("JI number " + ji.getId() + " will be run by this poller this loop (already " + actualNbThread + "/"
-                            + maxNbThread + " on " + this.queue.getName() + ")");
-                    actualNbThread.incrementAndGet();
-                    if (ji.getJD().getMaxTimeRunning() != null)
+                    for (JobInstance ji : newInstances)
                     {
-                        this.peremption.put(ji.getId(), new Date((new Date()).getTime() + ji.getJD().getMaxTimeRunning() * 60 * 1000));
-                    }
+                        // We will run this JI!
+                        jqmlogger.trace("JI number " + ji.getId() + " will be run by this poller this loop (already " + actualNbThread + "/"
+                                + maxNbThread + " on " + this.queue.getName() + ")");
+                        actualNbThread.incrementAndGet();
+                        if (ji.getJD().getMaxTimeRunning() != null)
+                        {
+                            this.peremption.put(ji.getId(), new Date((new Date()).getTime() + ji.getJD().getMaxTimeRunning() * 60 * 1000));
+                        }
 
-                    // Run it
-                    if (!ji.getJD().isExternal())
-                    {
-                        (new Thread(new Loader(ji, this.engine, this, this.engine.getClassloaderManager()))).start();
-                    }
-                    else
-                    {
-                        (new Thread(new LoaderExternal(cnx, ji, this))).start();
+                        // Run it
+                        if (!ji.getJD().isExternal())
+                        {
+                            (new Thread(new Loader(ji, this.engine, this, this.engine.getClassloaderManager()))).start();
+                        }
+                        else
+                        {
+                            (new Thread(new LoaderExternal(cnx, ji, this))).start();
+                        }
                     }
                 }
             }
@@ -262,7 +270,6 @@ class QueuePoller implements Runnable, QueuePollerMBean
             jqmlogger
                     .info("Poller loop on queue " + this.queue.getName() + " is stopping [engine " + this.engine.getNode().getName() + "]");
             waitForAllThreads(60L * 1000);
-            jqmlogger.info("Poller on queue " + this.queue.getName() + " has ended normally");
 
             // JMX
             if (this.engine.loadJmxBeans)
@@ -279,15 +286,16 @@ class QueuePoller implements Runnable, QueuePollerMBean
 
             // Let the engine decide if it should stop completely
             this.hasStopped = true; // BEFORE check
+            jqmlogger.info("Poller on queue " + this.queue.getName() + " has ended normally");
             this.engine.checkEngineEnd();
         }
         else
         {
-            // else => Abnormal stop. Set booleans to reflect this.
+            // else => Abnormal stop (DB failure only). Set booleans to reflect this.
             jqmlogger.error("Poller on queue " + this.queue.getName() + " has ended abnormally");
             this.run = false;
             this.hasStopped = true;
-            this.engine.checkEngineEnd();
+            // Do not check for engine end - we do not want to shut down the engine on a poller failure.
         }
     }
 
