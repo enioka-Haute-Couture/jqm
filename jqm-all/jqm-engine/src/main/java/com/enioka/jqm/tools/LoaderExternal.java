@@ -95,6 +95,7 @@ class LoaderExternal implements Runnable
                     if (buf != null)
                     {
                         f.write(buf + linesep);
+                        jqmlogger.debug(buf);
                     }
                 }
 
