@@ -68,6 +68,11 @@ public class AnnotationSpringRunner implements JobRunner
             Method contextBeanLoaderS = handlerClass.getMethod("getBean", String.class);
             Map<String, String> prms = (Map<String, String>) contextBeanLoaderS.invoke(null, "runtimeParameters");
             prms.putAll(jobParameters);
+
+            // Set thread local JM
+            Class<? extends Object> jmClass = Class.forName("com.enioka.jqm.api.JobManager", true, toRun.getClassLoader());
+            Method contextBeanLoaderJ = handlerClass.getMethod("setJm", jmClass);
+            contextBeanLoaderJ.invoke(null, handlerProxy);
         }
         catch (Exception e)
         {

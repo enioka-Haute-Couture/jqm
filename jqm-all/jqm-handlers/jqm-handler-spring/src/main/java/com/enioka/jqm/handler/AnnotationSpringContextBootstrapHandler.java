@@ -26,6 +26,8 @@ public class AnnotationSpringContextBootstrapHandler implements JobInstanceStart
 
     private final static String THREAD_SCOPE_NAME = "thread";
 
+    final static ThreadLocal<JobManager> localJm = new ThreadLocal<JobManager>();
+
     static
     {
         // Implementation choice: we use annotations.
@@ -37,6 +39,15 @@ public class AnnotationSpringContextBootstrapHandler implements JobInstanceStart
         ctx.getBeanFactory().registerScope(THREAD_SCOPE_NAME, threadScope);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Collaboration methods with the runner
+    ///////////////////////////////////////////////////////////////////////////
+
+    public static void setJm(JobManager jm)
+    {
+        localJm.set(jm);
+    }
+
     public static Object getBean(String beanName)
     {
         return ctx.getBean(beanName);
@@ -46,6 +57,10 @@ public class AnnotationSpringContextBootstrapHandler implements JobInstanceStart
     {
         return ctx.getBean(clazz);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Main
+    ///////////////////////////////////////////////////////////////////////////
 
     @SuppressWarnings("unchecked")
     @Override
@@ -113,14 +128,26 @@ public class AnnotationSpringContextBootstrapHandler implements JobInstanceStart
                         ctx.register(toRun);
                     }
 
-                    // Create a holder for JQM injected items.
+                    // Create a holder for the parameters.
                     BeanDefinition def = new RootBeanDefinition(HashMap.class);
                     def.setScope(THREAD_SCOPE_NAME);
                     ctx.registerBeanDefinition("runtimeParameters", def);
 
-                    def = new RootBeanDefinition(JobManager.class);
-                    def.setScope(THREAD_SCOPE_NAME);
-                    ctx.registerBeanDefinition("jobManager", def);
+                    // This is a factory to retrieve the JobManager. We cannot just inject the JM, as it is created at runtime, long after
+                    // the context has been created!
+                    def = new RootBeanDefinition(JobManagerProvider.class);
+                    def.setScope(BeanDefinition.SCOPE_SINGLETON);
+                    ctx.registerBeanDefinition("jobManagerProvider", def);
+
+                    // It would however be possible to use a lazy bean injection. But this would require the user to put @Lazy everywhere,
+                    // or else the result is null... Too fragile. The provider/factory pattern above does the same thing and forces the user
+                    // to do a lazy call.
+                    // def = new RootBeanDefinition(JobManager.class);
+                    // def.setScope(RootBeanDefinition.SCOPE_PROTOTYPE);
+                    // def.setLazyInit(true);
+                    // def.setFactoryBeanName("jobManagerProvider");
+                    // def.setFactoryMethodName("getObject");
+                    // ctx.registerBeanDefinition("jobManager", def);
 
                     // Go: this initializes the context
                     ctx.refresh();

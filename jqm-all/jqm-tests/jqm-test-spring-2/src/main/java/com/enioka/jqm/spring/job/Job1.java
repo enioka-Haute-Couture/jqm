@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Component;
 
+import com.enioka.jqm.handler.JobManagerProvider;
 import com.enioka.jqm.spring.service.Service1;
 
 @Component
@@ -16,6 +17,9 @@ public class Job1 implements Runnable
 
     @Resource
     private Service1 s1;
+
+    @Resource
+    private JobManagerProvider jm;
 
     @Override
     public void run()
@@ -37,5 +41,11 @@ public class Job1 implements Runnable
         }
 
         s1.getInt();
+
+        if (jm == null)
+        {
+            throw new RuntimeException("JobManager was not set");
+        }
+        System.out.println("Job instance ID is " + jm.getObject().jobInstanceID());
     }
 }

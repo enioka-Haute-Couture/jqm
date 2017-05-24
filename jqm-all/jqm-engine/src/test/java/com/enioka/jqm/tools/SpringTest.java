@@ -68,8 +68,8 @@ public class SpringTest extends JqmBaseTest
         TestHelpers.waitFor(1, 10000, cnx);
         JobRequest.create("Job2", null).addParameter("key1", "value1").submit();
 
-        TestHelpers.waitFor(2, 10000, cnx);
-        Assert.assertEquals(2, TestHelpers.getOkCount(cnx));
+        TestHelpers.waitFor(3, 10000, cnx);
+        Assert.assertEquals(3, TestHelpers.getOkCount(cnx));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
     }
 }

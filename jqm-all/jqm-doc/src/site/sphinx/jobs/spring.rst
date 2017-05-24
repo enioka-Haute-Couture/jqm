@@ -82,12 +82,15 @@ The payload can be defined like this::
 		
 		@Resource(name = "runtimeParameters")
 		private Map<String, String> parameters;
+        
+        @Resource
+        private JobManagerProvider jmp;
 
 		@Override
 		public void run()
 		{
 			myServiceToInject.doSomething();
-			System.out.println("Job is done!");
+			System.out.println("Job " + jmp.getObject().jobInstanceID() + " is done!");
 		}
 	}
 
@@ -158,7 +161,10 @@ to add the other runners (if you do not launch only Spring jobs in the same exec
 
 Finally you may have noted in the sample that we had a @Resource(name = "runtimeParameters") Map: the runner actually registers a named bean to allow 
 access to the job instance parameters through the Spring APIs. This bean is scoped on the thread, so you'll obviously get different values in different 
-job instances even if they run at the same time in the same runtime context.
+job instances even if they run at the same time in the same runtime context. 
+If you need the full engine API, inject a JobManagerProvider as in the sample.
+This is a factory/provider, not a direct injection because a Spring context creates all non-lazy beans during context creation - and obviously the different
+parameters of a job contained by the JobManager can be set after that. So the provider is just a means to force lazy initialization.
 
 .. note:: a full working sample is included inside the JQM integration tests. It is named "jqm-test-spring-2". It's deployment descriptor is named "xmlspring.xml".
 
