@@ -880,7 +880,7 @@ final class JdbcClient implements JqmClient
                 }
                 else
                 {
-                    filterCountQuery += " (SELECT COUNT(1) FROM JOBINSTANCE) ,";
+                    filterCountQuery += " (SELECT COUNT(1) FROM JOB_INSTANCE) ,";
                 }
             }
 

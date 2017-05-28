@@ -270,7 +270,7 @@ public class DbImplBase
         queries.put("role_update_all_by_id", "UPDATE RROLE SET NAME=?, DESCRIPTION=? WHERE ID=? ");
         queries.put("role_select_all", "SELECT r.ID, r.NAME, r.DESCRIPTION FROM RROLE r ");
         queries.put("role_select_all_for_user", "SELECT r.ID, r.NAME, r.DESCRIPTION FROM RROLE r RIGHT JOIN RROLE_RUSER a ON a.ROLE = r.ID WHERE a.ACCOUNT=?");
-        queries.put("role_select_id_for_user_list", "SELECT a.ROLE, a.USER FROM RROLE_RUSER a WHERE a.USER IN(UNNEST(?))");
+        queries.put("role_select_id_for_user_list", "SELECT a.ROLE, a.ACCOUNT FROM RROLE_RUSER a WHERE a.ACCOUNT IN(UNNEST(?))");
         queries.put("role_select_by_key", "SELECT ID, NAME, DESCRIPTION FROM RROLE r WHERE NAME=?");
         
         // R-PERMISSION

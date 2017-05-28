@@ -31,6 +31,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 
+import com.enioka.admin.MetaService;
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.Db;
@@ -436,6 +437,7 @@ public class Main
             cnx = Helpers.getNewDbSession();
             Helpers.createRoleIfMissing(cnx, "administrator", "all permissions without exception", "*:*");
             Helpers.createUserIfMissing(cnx, "root", password, "all powerful user", "administrator");
+            MetaService.changeUserPassword(cnx, "root", password);
             cnx.commit();
         }
         catch (Exception ex)
@@ -518,6 +520,7 @@ public class Main
             }
 
             Helpers.createUserIfMissing(cnx, options[0], options[1], "created through CLI", roles);
+            MetaService.changeUserPassword(cnx, options[0], options[1]);
             cnx.commit();
         }
         finally
