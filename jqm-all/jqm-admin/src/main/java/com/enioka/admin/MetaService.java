@@ -768,23 +768,23 @@ public class MetaService
             tmp.setOutputDirectory(rs.getString(2 + colShift));
             tmp.setDns(rs.getString(3 + colShift));
             tmp.setEnabled(rs.getBoolean(4 + colShift));
-            tmp.setJmxRegistryPort(rs.getInt(6 + colShift));
-            tmp.setJmxServerPort(rs.getInt(7 + colShift));
-            tmp.setLoadApiAdmin(rs.getBoolean(8 + colShift));
-            tmp.setLoadApiClient(rs.getBoolean(9 + colShift));
-            tmp.setLoapApiSimple(rs.getBoolean(10 + colShift));
-            tmp.setName(rs.getString(11 + colShift));
-            tmp.setPort(rs.getInt(12 + colShift));
-            tmp.setJobRepoDirectory(rs.getString(13 + colShift));
-            tmp.setRootLogLevel(rs.getString(14 + colShift));
-            tmp.setStop(rs.getBoolean(15 + colShift));
-            tmp.setTmpDirectory(rs.getString(16 + colShift));
+            tmp.setJmxRegistryPort(rs.getInt(5 + colShift));
+            tmp.setJmxServerPort(rs.getInt(6 + colShift));
+            tmp.setLoadApiAdmin(rs.getBoolean(7 + colShift));
+            tmp.setLoadApiClient(rs.getBoolean(8 + colShift));
+            tmp.setLoapApiSimple(rs.getBoolean(9 + colShift));
+            tmp.setName(rs.getString(10 + colShift));
+            tmp.setPort(rs.getInt(11 + colShift));
+            tmp.setJobRepoDirectory(rs.getString(12 + colShift));
+            tmp.setRootLogLevel(rs.getString(13 + colShift));
+            tmp.setStop(rs.getBoolean(14 + colShift));
+            tmp.setTmpDirectory(rs.getString(15 + colShift));
 
             Calendar c = null;
-            if (rs.getTimestamp(17 + colShift) != null)
+            if (rs.getTimestamp(16 + colShift) != null)
             {
                 c = Calendar.getInstance();
-                c.setTimeInMillis(rs.getTimestamp(17 + colShift).getTime());
+                c.setTimeInMillis(rs.getTimestamp(16 + colShift).getTime());
             }
             tmp.setLastSeenAlive(c);
 
@@ -1323,7 +1323,7 @@ public class MetaService
         List<RUserDto> res = new ArrayList<RUserDto>();
         try
         {
-            ResultSet rs = cnx.runSelect(query_key);
+            ResultSet rs = cnx.runSelect(query_key, params);
             RUserDto tmp = null;
             while (rs.next())
             {
@@ -1384,11 +1384,21 @@ public class MetaService
         ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
         String hash = new Sha512Hash(newPassword, salt, 100000).toHex();
 
-        QueryResult qr = cnx.runUpdate("user_update_password_by_id", hash, salt, userId);
+        QueryResult qr = cnx.runUpdate("user_update_password_by_id", hash, salt.toHex(), userId);
         if (qr.nbUpdated == 0)
         {
             throw new JqmAdminApiUserException("user with this ID does not exist");
         }
+    }
+
+    public static void changeUserPassword(DbConn cnx, String userLogin, String newPassword)
+    {
+        List<RUserDto> dtos = getUsers(cnx, "user_select_by_key", 0, userLogin);
+        if (dtos.size() == 0)
+        {
+            throw new JqmAdminApiUserException("Cannot update the password of a user which does not exist - given login was " + userLogin);
+        }
+        changeUserPassword(cnx, dtos.get(0).getId(), newPassword);
     }
 
     public static void upsertUser(DbConn cnx, RUserDto dto)

@@ -128,6 +128,7 @@ function Import-AllXml
 function Register-JqmNode
 {
     cd $PSScriptRoot
+    & $java -jar jqm.jar -u
     & $java -jar jqm.jar -createnode $NodeName
 }
 

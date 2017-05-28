@@ -485,13 +485,6 @@ final class Helpers
         }
     }
 
-    static void encodePassword(RUser user)
-    {
-        ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
-        user.setPassword(new Sha512Hash(user.getPassword(), salt, 100000).toHex());
-        user.setHashSalt(salt.toHex());
-    }
-
     static String getMavenVersion()
     {
         String res = System.getProperty("mavenVersion");
