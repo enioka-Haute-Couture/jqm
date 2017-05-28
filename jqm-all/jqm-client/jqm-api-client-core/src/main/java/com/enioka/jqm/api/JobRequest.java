@@ -125,6 +125,18 @@ public class JobRequest implements Serializable
     }
 
     /**
+     * See {@link #addParameter(String, String)}
+     * 
+     * @param prms
+     * @return
+     */
+    public JobRequest addParameters(Map<String, String> prms)
+    {
+        parameters.putAll(prms);
+        return this;
+    }
+
+    /**
      * Parameters are <key,value> pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
      * job itself. If there is no parameter named key, no error is thrown.
      * 

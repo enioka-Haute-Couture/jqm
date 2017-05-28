@@ -309,6 +309,10 @@ public class DbImplBase
         queries.put("globalprm_select_by_key", queries.get("globalprm_select_all") + " WHERE KEYNAME=?");
         queries.put("globalprm_select_by_id", queries.get("globalprm_select_all") + " WHERE ID=?");
         queries.put("globalprm_select_count_modified_jetty", "SELECT COUNT(1) FROM GLOBAL_PARAMETER WHERE LAST_MODIFIED > ? AND KEYNAME IN('disableWsApi', 'enableWsApiSsl', 'enableInternalPki', 'pfxPassword', 'enableWsApiAuth')");
+        
+        // WITNESS
+        queries.put("w_insert", "INSERT INTO WITNESS(ID, KEYNAME, NODE, LATEST_CONTACT) VALUES(JQM_PK.nextval, 'SCHEDULER', ?, CURRENT_TIMESTAMP)");
+        queries.put("w_update_take", "UPDATE WITNESS SET NODE=?, LATEST_CONTACT=CURRENT_TIMESTAMP WHERE KEYNAME='SCHEDULER' AND (NODE=? OR (NODE<>? AND LATEST_CONTACT < ?))");
     }
    
 }

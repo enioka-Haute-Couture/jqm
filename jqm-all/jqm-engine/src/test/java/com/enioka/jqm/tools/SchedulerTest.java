@@ -109,4 +109,23 @@ public class SchedulerTest extends JqmBaseTest
         Assert.assertEquals(1, dto2.getSchedules().get(0).getParameters().size());
         Assert.assertEquals("value2", dto2.getSchedules().get(0).getParameters().get("test2"));
     }
+
+    // @Test // Commented - waiting for one minute is long.
+    public void testSimpleSchedule()
+    {
+        int i = CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+
+        JobDefDto dto = MetaService.getJobDef(cnx, i);
+        Assert.assertEquals(0, dto.getParameters().size());
+
+        // Add a schedule.
+        dto.addSchedule(ScheduledJob.create("* * * * *"));
+        MetaService.upsertJobDef(cnx, dto);
+        cnx.commit();
+
+        addAndStartEngine();
+
+        TestHelpers.waitFor(1, 90000, cnx);
+    }
 }
