@@ -68,6 +68,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     // Threads that together constitute the engine
     private Map<Integer, QueuePoller> pollers = new HashMap<Integer, QueuePoller>();
     private InternalPoller intPoller = null;
+    private CronScheduler scheduler = null;
     private JettyServer server = null;
 
     // Misc data
@@ -208,6 +209,9 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         }
         jqmlogger.info("Security manager was registered");
 
+        // Scheduler
+        scheduler = new CronScheduler(this);
+
         // Cleanup
         purgeDeadJobInstances(cnx, this.node);
 
@@ -261,6 +265,9 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         {
             p.stop();
         }
+
+        // Scheduler
+        this.scheduler.stop();
 
         // Jetty is closed automatically when all pollers are down
 
