@@ -1,0 +1,52 @@
+<div class="container-fluid modal-dialog">
+	<div class="modal-header">
+		<h4 class="modal-title">Schedules for job definition
+			{{selectedJd.applicationName}}</h4>
+	</div>
+
+	<div class="form-horizontal modal-body">
+
+		<div class="row" style="min-height: 150px;">
+			<div class="col-md-8" style="height: 100%;">
+				<div ui-grid='gridOptionsCron' ui-grid-edit ui-grid-selection
+					ui-grid-cellNav ui-grid-resize-columns ui-grid-auto-resize
+					style='height: 200px;'></div>
+
+				<button class="btn btn-default" ng-click="newcron()">
+					<span class="glyphicon glyphicon-plus"></span> New schedule
+				</button>
+				<button class="btn btn-default" ng-click="removecron()"
+					ng-disabled="selectedSchedule.length === 0"
+					jqm-permission="jd:delete">
+					<span class="glyphicon glyphicon-remove"></span> Delete selected
+				</button>
+			</div>
+
+
+			<div class="col-md-4">
+				<div ui-grid='gridOptionsCronPrm' ui-grid-edit ui-grid-selection
+					ui-grid-cellNav ui-grid-resize-columns ui-grid-auto-resize
+					style='height: 200px;'></div>
+
+				<button class="btn btn-default" ng-click="newcronprm()"
+					ng-disabled="selectedSchedule.length === 0">
+					<span class="glyphicon glyphicon-plus"> </span> New parameter
+				</button>
+				<button class="btn btn-default" ng-click="removecronprm()"
+					ng-disabled="selectedSchedulePrm.length === 0"
+					jqm-permission="jd:delete">
+					<span class="glyphicon glyphicon-remove"></span> Delete selected
+				</button>
+			</div>
+		</div>
+
+	</div>
+
+	<div class="modal-footer">
+		<span class="pull-left"><a target="_blank"
+			href="https://en.wikipedia.org/wiki/Cron">Wikipedia help on cron</a>
+		</span>
+
+		<button class="btn btn-default" data-dismiss="modal" ng-click="ok()">Close</button>
+	</div>
+</div>

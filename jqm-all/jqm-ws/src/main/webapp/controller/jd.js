@@ -154,7 +154,14 @@ jqmControllers
 									field : 'reasonableRuntimeLimitMinute',
 									displayName : 'AlertMn',
 									type : 'number',
-								}, {
+								},
+								{
+									field : 'schedules.length',
+									displayName : 'S',
+									enableCellEdit: false,
+									width : 28,
+								},
+								{
 									field : 'enabled',
 									displayName : 'E',
 									cellTemplate : jqmCellTemplateBoolean,
@@ -188,6 +195,22 @@ jqmControllers
 						});
 
 					};
+					
+					$scope.cron = function() {
+						$uibModal.open({
+							templateUrl : './template/jd_cron.html',
+							controller : 'jdCron',
+							size : 'lg',
+							resolve : {
+								jd : function() {
+									return $scope.selected[0];
+								},
+								queues: function() {
+									return $scope.queues;
+								}
+							},
+						});
+					}
 
 					$scope.refresh();
 				});
@@ -228,6 +251,164 @@ jqmApp.controller('jdClo', function($scope, $uibModalInstance, jd) {
 		$scope.selectedJd.childFirstClassLoader = $scope.data.childFirstClassLoader;
 		$scope.selectedJd.hiddenJavaClasses = $scope.data.hiddenJavaClasses;
 		$scope.selectedJd.specificIsolationContext = $scope.data.specificIsolationContext;
+		$uibModalInstance.close();
+	};
+});
+
+
+jqmApp.controller('jdCron', function($scope, $uibModalInstance, $interval, jd, queues) {
+	$scope.selectedJd = jd;
+	$scope.queues = [];
+	$scope.selectedSchedule = [];
+	$scope.selectedSchedulePrm = [];
+	
+	$scope.data = {
+			jd: $scope.selectedJd
+	}
+	
+	
+	$scope.queues.push({id: null, name: 'none'});
+	$.each(queues, function() {
+		$scope.queues.push(this);
+	});
+	
+	$scope.gridOptionsCron = {
+			data : 'selectedJd.schedules',
+
+			enableSelectAll : false,
+			enableRowSelection : true,
+			enableRowHeaderSelection : false,
+			enableFullRowSelection : true,
+			enableFooterTotalSelected : false,
+			multiSelect : false,
+			
+			enableColumnMenus : false,
+			enableCellEditOnFocus : true,
+			virtualizationThreshold : 20,
+			enableHorizontalScrollbar : 0,
+
+			onRegisterApi : function(gridApi) {
+				$scope.gridApiCron = gridApi;
+				gridApi.selection.on.rowSelectionChanged($scope, function(rows) {
+					$scope.selectedSchedule = gridApi.selection.getSelectedRows();
+				});
+				
+				gridApi.cellNav.on.navigate($scope,function(newRowCol, oldRowCol){
+					if (newRowCol !== oldRowCol)
+					{
+						gridApi.selection.selectRow(newRowCol.row.entity);
+					}
+	            });
+			},
+
+			
+			columnDefs : [
+					{
+						field : 'cronExpression',
+						displayName : 'Cron expression',
+						width : '***',
+					},
+					{
+						field : 'queue',
+						displayName : 'Queue override',
+						cellTemplate : '<div class="ui-grid-cell-contents"><span ng-cell-text>{{ (row.entity["queue"] | getByProperty:"id":grid.appScope.queues).name }}</span></div>',
+						editableCellTemplate : 'ui-grid/dropdownEditor',
+						editDropdownValueLabel : 'name',
+						editDropdownOptionsArray : $scope.queues,
+						width : '*',
+					},
+			]
+		};
+	
+	$scope.newcron = function() {
+		var t = {
+			id: null,
+			cronExpression: "* * * * *",
+			queue : null,
+			parameters: [],
+		};
+		$scope.selectedJd.schedules.push(t);
+		$scope.gridApiCron.selection.selectRow(t);
+        $interval(function() {
+            $scope.gridApiCron.cellNav.scrollToFocus(t, $scope.gridOptionsCron.columnDefs[0]);
+        }, 0, 1);
+	};
+	
+	$scope.removecron = function() {
+		var q = null;
+		for (var i = 0; i < $scope.selectedSchedule.length; i++) {
+			q = $scope.selectedSchedule[i];
+			$scope.selectedJd.schedules.splice($scope.selectedJd.schedules.indexOf(q), 1);
+		}
+		$scope.selectedSchedule.length = 0;
+	};
+	
+	$scope.gridOptionsCronPrm = {
+			data : 'selectedSchedule[0].parameters',
+
+			enableSelectAll : false,
+			enableRowSelection : true,
+			enableRowHeaderSelection : false,
+			enableFullRowSelection : true,
+			enableFooterTotalSelected : false,
+			multiSelect : false,
+			
+			enableColumnMenus : false,
+			enableCellEditOnFocus : true,
+			virtualizationThreshold : 20,
+			enableHorizontalScrollbar : 0,
+
+			onRegisterApi : function(gridApi) {
+				$scope.gridApiCronPrm = gridApi;
+				gridApi.selection.on.rowSelectionChanged($scope, function(rows) {
+					$scope.selectedSchedulePrm = gridApi.selection.getSelectedRows();
+				});
+				
+				gridApi.cellNav.on.navigate($scope,function(newRowCol, oldRowCol){
+					if (newRowCol !== oldRowCol)
+					{
+						gridApi.selection.selectRow(newRowCol.row.entity);
+					}
+	            });
+			},
+
+			
+			columnDefs : [
+					{
+						field : 'key',
+						displayName : 'Key',
+						width : '*',
+					},
+					{
+						field : 'value',
+						displayName : 'Value',
+						width : '*',
+					},
+			]
+		};
+	
+	$scope.newcronprm = function() {
+		var t = {
+			key: "key",
+			value: "value",
+		};
+		$scope.selectedSchedule[0].parameters.push(t);
+		$scope.gridApiCronPrm.selection.selectRow(t);
+        $interval(function() {
+            $scope.gridApiCronPrm.cellNav.scrollToFocus(t, $scope.gridOptionsCron.columnDefs[0]);
+        }, 0, 1);
+	};
+	
+	$scope.removecronprm = function() {
+		var q = null;
+		for (var i = 0; i < $scope.selectedSchedulePrm.length; i++) {
+			q = $scope.selectedSchedulePrm[i];
+			$scope.selectedSchedule[0].parameters.splice($scope.selectedSchedule[0].parameters.indexOf(q), 1);
+		}
+		$scope.selectedSchedulePrm.length = 0;
+	};
+	
+	$scope.ok = function() {
 		$uibModalInstance.close();
 	};
 });
