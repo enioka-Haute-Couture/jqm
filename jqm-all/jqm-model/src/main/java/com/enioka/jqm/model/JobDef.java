@@ -448,7 +448,7 @@ public class JobDef implements Serializable
             tmp.application = rs.getString(2 + colShift);
             tmp.applicationName = rs.getString(3 + colShift);
             tmp.canBeRestarted = true;
-            tmp.classLoader = rs.getInt(4 + colShift);
+            tmp.classLoader = rs.getInt(4 + colShift) > 0 ? rs.getInt(4 + colShift) : null;
             tmp.description = rs.getString(5 + colShift);
             tmp.enabled = rs.getBoolean(6 + colShift);
             tmp.external = rs.getBoolean(7 + colShift);

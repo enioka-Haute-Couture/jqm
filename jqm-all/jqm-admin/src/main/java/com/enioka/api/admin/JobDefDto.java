@@ -16,13 +16,20 @@
 package com.enioka.api.admin;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * A job definition is the template of the job instances (the actual launches). It fully defines what to run (the class to load, the default
+ * job instance parameters...) and how to run it (the execution context).
+ *
+ */
 @XmlRootElement
 public class JobDefDto implements Serializable
 {
@@ -47,6 +54,8 @@ public class JobDefDto implements Serializable
     @XmlElementWrapper(name = "parameters")
     @XmlElement(name = "parameter")
     private Map<String, String> parameters = new HashMap<String, String>();
+
+    private List<ScheduledJob> schedules = new ArrayList<ScheduledJob>();
 
     public Integer getId()
     {
@@ -208,13 +217,29 @@ public class JobDefDto implements Serializable
         this.reasonableRuntimeLimitMinute = reasonableRuntimeLimitMinute;
     }
 
-    public int getClassLoaderId()
+    public Integer getClassLoaderId()
     {
         return this.classLoaderId;
     }
 
-    public void setCLassLoaderId(int id)
+    public List<ScheduledJob> getSchedules()
     {
-        this.classLoaderId = id;
+        return schedules;
+    }
+
+    public void setSchedules(List<ScheduledJob> schedules)
+    {
+        this.schedules = schedules;
+    }
+
+    public void setClassLoaderId(Integer classLoaderId)
+    {
+        this.classLoaderId = classLoaderId;
+    }
+
+    public JobDefDto addSchedule(ScheduledJob sj)
+    {
+        this.schedules.add(sj);
+        return this;
     }
 }

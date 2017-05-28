@@ -130,6 +130,25 @@ public class DbImplBase
         queries.put("jdprm_select_all_for_jd_list", "SELECT ID, KEYNAME, VALUE, JOBDEF FROM JOB_DEFINITION_PARAMETER WHERE JOBDEF IN(UNNEST(?))");
         queries.put("jdprm_select_all", "SELECT ID, KEYNAME, VALUE, JOBDEF FROM JOB_DEFINITION_PARAMETER ORDER BY JOBDEF");
         
+        // SCHEDULED JOBS
+        queries.put("sj_insert", "INSERT INTO JOB_SCHEDULE(ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED) VALUES(JQM_PK.nextval, ?, ?, ?, CURRENT_TIMESTAMP)");
+        queries.put("sj_delete_all", "DELETE FROM JOB_SCHEDULE");
+        queries.put("sj_delete_all_for_jd", "DELETE FROM JOB_SCHEDULE WHERE JOBDEF=?");
+        queries.put("sj_delete_by_id", "DELETE FROM JOB_SCHEDULE WHERE ID=?");
+        queries.put("sj_update_all_fields_by_id", "UPDATE JOB_SCHEDULE SET CRON_EXPRESSION=?, QUEUE=?, LAST_UPDATED=CURRENT_TIMESTAMP WHERE ID=?");
+        queries.put("sj_select_all", "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED FROM JOB_SCHEDULE ORDER BY ID ");
+        queries.put("sj_select_updated",  "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED FROM JOB_SCHEDULE WHERE LAST_UPDATED > ?");
+        queries.put("sj_select_for_jd",  "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED FROM JOB_SCHEDULE WHERE JOBDEF = ?");
+        queries.put("sj_select_for_jd_list",  "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED FROM JOB_SCHEDULE WHERE JOBDEF IN(UNNEST(?)) ORDER BY ID");
+        
+        // SCHEDULED JOBS PARAMETERS
+        queries.put("sjprm_insert", "INSERT INTO JOB_SCHEDULE_PARAMETER(ID, KEYNAME, VALUE, JOB_SCHEDULE) VALUES(JQM_PK.nextval, ?, ?, ?)");
+        queries.put("sjprm_delete_all", "DELETE FROM JOB_SCHEDULE_PARAMETER");
+        queries.put("sjprm_delete_all_for_sj", "DELETE FROM JOB_SCHEDULE_PARAMETER WHERE JOB_SCHEDULE=?");
+        queries.put("sjprm_delete_all_for_jd", "DELETE FROM JOB_SCHEDULE_PARAMETER WHERE JOB_SCHEDULE IN (SELECT js.ID FROM JOB_SCHEDULE js WHERE js.JOBDEF = ?)");
+        queries.put("sjprm_select_all", "SELECT ID, KEYNAME, VALUE, JOB_SCHEDULE FROM JOB_SCHEDULE_PARAMETER ");
+        queries.put("sjprm_select_for_sj_list",  queries.get("sjprm_select_all") + " WHERE JOB_SCHEDULE IN(UNNEST(?)) ORDER BY JOB_SCHEDULE, ID");
+        
         // JOB INSTANCE
         queries.put("ji_insert_enqueue", "INSERT INTO JOB_INSTANCE (ID, DATE_ENQUEUE, EMAIL, APPLICATION, "
                 + "KEYWORD1, KEYWORD2, KEYWORD3, MODULE, INTERNAL_POSITION, PARENT, PROGRESS, SESSION_KEY, "

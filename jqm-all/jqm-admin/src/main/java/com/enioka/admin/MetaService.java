@@ -35,6 +35,7 @@ import com.enioka.jqm.model.JobDefParameter;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.RRole;
+import com.enioka.jqm.model.ScheduledJob;
 import com.enioka.jqm.model.JobDef.PathType;
 
 /**
@@ -68,7 +69,7 @@ public class MetaService
      * No commit performed.
      * 
      * @param cnx
-     *            database session to use. Not commited.
+     *            database session to use. Not committed.
      * @param force
      *            set to true if you want to delete metadata even if there is still transactional data depending on it.
      */
@@ -81,6 +82,8 @@ public class MetaService
 
         cnx.runUpdate("globalprm_delete_all");
         cnx.runUpdate("dp_delete_all");
+        cnx.runUpdate("sjprm_delete_all");
+        cnx.runUpdate("sj_delete_all");
         cnx.runUpdate("jdprm_delete_all");
         cnx.runUpdate("node_delete_all");
         cnx.runUpdate("jd_delete_all");
@@ -440,7 +443,7 @@ public class MetaService
             tmp.setId(rs.getInt(1 + colShift));
             tmp.setApplication(rs.getString(2 + colShift));
             tmp.setApplicationName(rs.getString(3 + colShift));
-            tmp.setCLassLoaderId(rs.getInt(4 + colShift));
+            tmp.setClassLoaderId(rs.getInt(4 + colShift) > 0 ? rs.getInt(4 + colShift) : null);
             tmp.setCanBeRestarted(true);
             tmp.setDescription(rs.getString(5 + colShift));
             tmp.setEnabled(rs.getBoolean(6 + colShift));
@@ -454,7 +457,7 @@ public class MetaService
             tmp.setKeyword3(rs.getString(14 + colShift));
             tmp.setReasonableRuntimeLimitMinute(rs.getInt(15 + colShift));
             tmp.setModule(rs.getString(16 + colShift));
-            tmp.setQueueId(rs.getInt(18 + colShift));
+            tmp.setQueueId(rs.getInt(18 + colShift) > 0 ? rs.getInt(18 + colShift) : null);
         }
         catch (SQLException e)
         {
@@ -463,33 +466,75 @@ public class MetaService
         return tmp;
     }
 
-    private static void addJobDefParametersToDto(DbConn cnx, List<JobDefDto> dtos)
+    private static void addSubElementsToDto(DbConn cnx, List<JobDefDto> dtos)
     {
-        List<Integer> ids = new ArrayList<Integer>();
+        List<Integer> currentIdList = null;
+        List<List<Integer>> allIdLists = new ArrayList<List<Integer>>();
         for (JobDefDto dto : dtos)
         {
-            ids.add(dto.getId());
+            if (currentIdList == null || currentIdList.size() == 500)
+            {
+                currentIdList = new ArrayList<Integer>();
+                allIdLists.add(currentIdList);
+            }
+            currentIdList.add(dto.getId());
         }
 
+        // Parameters
         try
         {
-            ResultSet rs = cnx.runSelect("jdprm_select_all_for_jd_list", ids);
-            while (rs.next())
+            for (List<Integer> ids : allIdLists)
             {
-                String key = rs.getString(2);
-                String value = rs.getString(3);
-                int id = rs.getInt(4);
-
-                for (JobDefDto dto : dtos)
+                ResultSet rs = cnx.runSelect("jdprm_select_all_for_jd_list", ids);
+                while (rs.next())
                 {
-                    if (dto.getId().equals(id))
+                    String key = rs.getString(2);
+                    String value = rs.getString(3);
+                    int id = rs.getInt(4);
+
+                    for (JobDefDto dto : dtos)
                     {
-                        dto.getParameters().put(key, value);
-                        break;
+                        if (dto.getId().equals(id))
+                        {
+                            dto.getParameters().put(key, value);
+                            break;
+                        }
+                    }
+                }
+                rs.close();
+            }
+        }
+        catch (Exception e)
+        {
+            throw new JqmAdminApiInternalException(e);
+        }
+
+        // Schedules
+        try
+        {
+            for (List<Integer> ids : allIdLists)
+            {
+                List<ScheduledJob> sjs = ScheduledJob.select(cnx, "sj_select_for_jd_list", ids);
+
+                for (ScheduledJob sj : sjs)
+                {
+                    com.enioka.api.admin.ScheduledJob sjdto = new com.enioka.api.admin.ScheduledJob();
+                    sjdto.setCronExpression(sj.getCronExpression());
+                    sjdto.setLastUpdated(sj.getLastUpdated());
+                    sjdto.setParameters(sj.getParameters());
+                    sjdto.setQueue(sj.getQueue());
+                    sjdto.setId(sj.getId());
+
+                    for (JobDefDto dto : dtos)
+                    {
+                        if (dto.getId().equals(sj.getJobDefinition()))
+                        {
+                            dto.getSchedules().add(sjdto);
+                            break;
+                        }
                     }
                 }
             }
-            rs.close();
         }
         catch (Exception e)
         {
@@ -509,7 +554,7 @@ public class MetaService
             }
             rs.close();
 
-            addJobDefParametersToDto(cnx, res);
+            addSubElementsToDto(cnx, res);
         }
         catch (SQLException e)
         {
@@ -518,12 +563,12 @@ public class MetaService
         return res;
     }
 
-    public static JobDefDto getJobDef(DbConn cnx, int id)
+    public static JobDefDto getJobDef(DbConn cnx, Integer id)
     {
         ResultSet rs = null;
         try
         {
-            rs = cnx.runSelect("jd_select_by_id");
+            rs = cnx.runSelect("jd_select_by_id", id);
             if (!rs.next())
             {
                 throw new JqmAdminApiUserException("no result");
@@ -532,16 +577,12 @@ public class MetaService
             JobDefDto tmp = mapJobDef(rs, 0);
             List<JobDefDto> tmp2 = new ArrayList<JobDefDto>();
             tmp2.add(tmp);
-            addJobDefParametersToDto(cnx, tmp2);
+            addSubElementsToDto(cnx, tmp2);
             return tmp;
         }
         catch (SQLException e)
         {
             throw new DatabaseException(e);
-        }
-        finally
-        {
-            closeQuietly(cnx);
         }
     }
 
@@ -550,22 +591,103 @@ public class MetaService
         if (dto.getId() != null)
         {
             // Job: do it in a brutal way (no date to update here).
-            cnx.runUpdate("jd_update_all_fields_by_id", dto.getApplication(), dto.getApplicationName(), false, dto.getDescription(),
+            cnx.runUpdate("jd_update_all_fields_by_id", dto.getApplication(), dto.getApplicationName(), dto.getDescription(),
                     dto.isEnabled(), false, dto.isHighlander(), dto.getJarPath(), dto.getJavaClassName(), null, dto.getKeyword1(),
                     dto.getKeyword2(), dto.getKeyword3(), dto.getReasonableRuntimeLimitMinute(), dto.getModule(), PathType.FS,
                     dto.getClassLoaderId(), dto.getQueueId(), dto.getId());
 
+            // Parameter sync is trivial for now: delete and recreate.
             cnx.runUpdate("jdprm_delete_all_for_jd", dto.getId());
             for (Map.Entry<String, String> e : dto.getParameters().entrySet())
             {
                 JobDefParameter.create(cnx, e.getKey(), e.getValue(), dto.getId());
             }
+
+            // Schedule sync cannot be that simple, as we must follow their updates in the scheduler (with key = PK).
+            if (dto.getSchedules().size() == 0)
+            {
+                cnx.runUpdate("sjprm_delete_all_for_jd", dto.getId());
+                cnx.runUpdate("sj_delete_all_for_jd", dto.getId());
+            }
+            else
+            {
+                List<ScheduledJob> existingSchedules = ScheduledJob.select(cnx, "sj_select_for_jd", dto.getId());
+                List<ScheduledJob> toDelete = new ArrayList<ScheduledJob>();
+
+                // First remove SJ not present anymore in the DTO.
+                firstloop: for (ScheduledJob sj : existingSchedules)
+                {
+                    for (com.enioka.api.admin.ScheduledJob inDto : dto.getSchedules())
+                    {
+                        if (inDto.getId() == null || inDto.getId().equals(sj.getId()))
+                        {
+                            continue firstloop;
+                        }
+                    }
+                    toDelete.add(sj);
+                    cnx.runUpdate("sjprm_delete_all_for_sj", sj.getId());
+                    cnx.runUpdate("sj_delete_by_id", sj.getId());
+                }
+
+                // Then update or insert remaining SJ.
+                // First, remove all parameters...
+                for (com.enioka.api.admin.ScheduledJob sj : dto.getSchedules())
+                {
+                    if (sj.getId() == null)
+                    {
+                        ScheduledJob.create(cnx, sj.getCronExpression(), dto.getId(), sj.getQueue(), sj.getParameters());
+                    }
+                    else
+                    {
+                        // This is an update. Get the existing SJ from the database.
+                        boolean update = false;
+                        ScheduledJob existing = null;
+                        for (ScheduledJob sj2 : existingSchedules)
+                        {
+                            if (sj2.getId() == sj.getId())
+                            {
+                                existing = sj2;
+                                break;
+                            }
+                        }
+                        if (existing == null)
+                        {
+                            throw new JqmAdminApiUserException("Trying to update a sccheduled job which does not exist - id " + sj.getId());
+                        }
+
+                        // Parameter update?
+                        if (!existing.getParameters().equals(sj.getParameters()))
+                        {
+                            update = true;
+                            cnx.runUpdate("sjprm_delete_all_for_sj", existing.getId());
+                            for (Map.Entry<String, String> e : sj.getParameters().entrySet())
+                            {
+                                cnx.runUpdate("sjprm_insert", e.getKey(), e.getValue(), sj.getId());
+                            }
+                        }
+
+                        // Update main SJ fields (only if needed).
+                        if (update || !sj.getCronExpression().equals(existing.getCronExpression()) || sj.getQueue() != existing.getQueue())
+                        {
+                            cnx.runUpdate("sj_update_all_fields_by_id", sj.getCronExpression(), sj.getQueue(), sj.getId());
+                        }
+                    }
+                }
+            }
+
         }
         else
         {
-            JobDef.create(cnx, dto.getDescription(), dto.getJavaClassName(), dto.getParameters(), dto.getJarPath(), dto.getQueueId(),
-                    dto.getReasonableRuntimeLimitMinute(), dto.getApplicationName(), dto.getApplication(), dto.getModule(),
-                    dto.getKeyword1(), dto.getKeyword2(), dto.getKeyword3(), dto.isHighlander(), dto.getClassLoaderId(), PathType.FS);
+            int i = JobDef.create(cnx, dto.getDescription(), dto.getJavaClassName(), dto.getParameters(), dto.getJarPath(),
+                    dto.getQueueId(), dto.getReasonableRuntimeLimitMinute(), dto.getApplicationName(), dto.getApplication(),
+                    dto.getModule(), dto.getKeyword1(), dto.getKeyword2(), dto.getKeyword3(), dto.isHighlander(), dto.getClassLoaderId(),
+                    PathType.FS);
+
+            // Sync the schedules too.
+            for (com.enioka.api.admin.ScheduledJob sjdto : dto.getSchedules())
+            {
+                ScheduledJob.create(cnx, sjdto.getCronExpression(), i, sjdto.getQueue(), sjdto.getParameters());
+            }
         }
     }
 
