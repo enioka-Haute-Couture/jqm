@@ -119,6 +119,8 @@ public class TestHelpers
         cnx.runUpdate("dp_delete_all");
         cnx.runUpdate("message_delete_all");
         cnx.runUpdate("history_delete_all");
+        cnx.runUpdate("sjprm_delete_all");
+        cnx.runUpdate("sj_delete_all");
         cnx.runUpdate("jdprm_delete_all");
         cnx.runUpdate("jiprm_delete_all");
         cnx.runUpdate("ji_delete_all");
