@@ -184,6 +184,10 @@ class CronScheduler implements Runnable, TaskCollector
             {
                 res.add(new SchedulingPattern(sj.getCronExpression()), new JqmTask(sj));
             }
+
+            // Also check delayed jobs
+            cnx.runUpdate("ji_update_delayed");
+            cnx.commit();
         }
         finally
         {

@@ -484,12 +484,12 @@ public class JobInstance implements Serializable
         }
     }
 
-    public static int enqueue(DbConn cnx, int queue_id, int job_id, String application, Integer parentId, String module, String keyword1,
-            String keyword2, String keyword3, String sessionId, String userName, String email, boolean highlander, boolean fromSchedule,
-            Map<String, String> prms)
+    public static int enqueue(DbConn cnx, State status, int queue_id, int job_id, String application, Integer parentId, String module,
+            String keyword1, String keyword2, String keyword3, String sessionId, String userName, String email, boolean highlander,
+            boolean fromSchedule, Calendar notBefore, Map<String, String> prms)
     {
         QueryResult qr = cnx.runUpdate("ji_insert_enqueue", email, application, keyword1, keyword2, keyword3, module, parentId, sessionId,
-                userName, job_id, queue_id, highlander, fromSchedule);
+                status, userName, job_id, queue_id, highlander, fromSchedule, notBefore);
 
         int newId = qr.getGeneratedId();
 

@@ -19,6 +19,7 @@
 package com.enioka.jqm.api;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +47,9 @@ public class JobRequest implements Serializable
     private Integer parentJobId = null;
     private Integer scheduleId = null;
     private Map<String, String> parameters = new HashMap<String, String>();
+
+    private Calendar runAfter;
+    private String recurrence;
 
     JobRequest()
     {
@@ -450,5 +454,42 @@ public class JobRequest implements Serializable
     {
         this.scheduleId = id;
         return this;
+    }
+
+    /**
+     * <strong>Optional</strong><br>
+     * The default behaviour for a newly submitted JobRequest is to run as soon as possible (i.e. as soon as there is a free slot inside a
+     * JQM node). This method allows to change this, and to put the request inside the queue but not run it when it reaches the top of the
+     * queue. It will only be eligible for run when the given date is reached. When the given date is reached, standard queuing resumes.<br>
+     * The resolution of this function is the minute: seconds and lower are ignored (truncated).<br>
+     */
+    public JobRequest setRunAfter(Calendar whenToRun)
+    {
+        this.runAfter = (Calendar) whenToRun.clone();
+        this.runAfter.set(Calendar.SECOND, 0);
+        this.runAfter.set(Calendar.MILLISECOND, 0);
+        return this;
+    }
+
+    Calendar getRunAfter()
+    {
+        return this.runAfter;
+    }
+
+    /**
+     * <strong>Optional</strong><br>
+     * This method allows to request for the run to be recurring. This actually creates a Scheduled Job for the given applicationName and
+     * optionally queue and parameters. (all other JobRequest elements are ignored). Note that when using this, there is no request
+     * immediately added to the queues - the actual requests will be created by the schedule.
+     */
+    public JobRequest setRecurrence(String cronExpression)
+    {
+        this.recurrence = cronExpression;
+        return this;
+    }
+
+    String getRecurrence()
+    {
+        return this.recurrence;
     }
 }

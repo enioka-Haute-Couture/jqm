@@ -153,8 +153,8 @@ public class DbImplBase
         // JOB INSTANCE
         queries.put("ji_insert_enqueue", "INSERT INTO JOB_INSTANCE (ID, DATE_ENQUEUE, EMAIL, APPLICATION, "
                 + "KEYWORD1, KEYWORD2, KEYWORD3, MODULE, INTERNAL_POSITION, PARENT, PROGRESS, SESSION_KEY, "
-                + "STATUS, USERNAME, JOBDEF, QUEUE, HIGHLANDER, FROM_SCHEDULE) "
-                + "VALUES(JQM_PK.nextval, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, UNIX_MILLIS(), ?, 0, ?, 'SUBMITTED', ?, ?, ?, ?, ?)");
+                + "STATUS, USERNAME, JOBDEF, QUEUE, HIGHLANDER, FROM_SCHEDULE, DATE_NOT_BEFORE) "
+                + "VALUES(JQM_PK.nextval, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, UNIX_MILLIS(), ?, 0, ?, ?, ?, ?, ?, ?, ?, ?)");
         queries.put("ji_delete_all", "DELETE FROM JOB_INSTANCE");
         queries.put("ji_delete_by_id", "DELETE FROM JOB_INSTANCE WHERE ID = ?");
         queries.put("jj_update_cancel_by_id", "UPDATE JOB_INSTANCE SET STATUS='CANCELLED' WHERE ID=? AND STATUS='SUBMITTED'");
@@ -196,6 +196,7 @@ public class DbImplBase
                 + "(SELECT j2.ID FROM JOB_INSTANCE j2 WHERE j2.STATUS='SUBMITTED' AND j2.QUEUE=? "
                 + "AND (j2.HIGHLANDER=false OR (j2.HIGHLANDER=true AND (SELECT COUNT(1) FROM JOB_INSTANCE j3 WHERE j3.STATUS IN('ATTRIBUTED', 'RUNNING') AND j3.JOBDEF=j2.JOBDEF)=0 )) ORDER BY INTERNAL_POSITION FOR UPDATE LIMIT ?)");
         queries.put("ji_select_to_run", queries.get("ji_select_all") + " WHERE ji.NODE = ? AND ji.QUEUE = ? AND ji.STATUS='ATTRIBUTED'");
+        queries.put("ji_update_delayed", "UPDATE JOB_INSTANCE SET STATUS='SUBMITTED' WHERE STATUS='SCHEDULED' AND DATE_NOT_BEFORE <= CURRENT_TIMESTAMP");
         
         // HISTORY
         queries.put("history_insert_with_end_date", "INSERT INTO HISTORY(ID, JD_APPLICATION, JD_KEY, DATE_ATTRIBUTION, EMAIL, "
