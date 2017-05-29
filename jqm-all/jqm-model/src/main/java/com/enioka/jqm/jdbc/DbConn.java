@@ -33,6 +33,7 @@ public class DbConn implements Closeable
     Connection _cnx;
     private boolean transac_open = false;
     private boolean rollbackOnly = false;
+    private List<Statement> toClose = new ArrayList<Statement>();
 
     DbConn(Db parent, Connection cnx)
     {
@@ -176,6 +177,7 @@ public class DbConn implements Closeable
             }
 
             ps = _cnx.prepareStatement(q.sqlText, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            toClose.add(ps);
             int i = 0;
             for (Object prm : q.parameters)
             {
@@ -206,6 +208,7 @@ public class DbConn implements Closeable
         try
         {
             ps = prepare(qp);
+            toClose.add(ps);
             return ps.executeQuery();
         }
         catch (SQLException e)
@@ -333,6 +336,12 @@ public class DbConn implements Closeable
      */
     public void close()
     {
+        for (Statement s : toClose)
+        {
+            closeQuietly(s);
+        }
+        toClose.clear();
+
         if (transac_open)
         {
             try
