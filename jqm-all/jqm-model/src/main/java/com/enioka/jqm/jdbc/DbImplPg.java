@@ -35,7 +35,8 @@ public class DbImplPg implements DbAdapter
     {
         return sql.replace("MEMORY TABLE", "TABLE").replace("JQM_PK.nextval", "nextval('JQM_PK')").replace(" DOUBLE", " DOUBLE PRECISION")
                 .replace("UNIX_MILLIS()", "extract('epoch' from current_timestamp)*1000").replace("IN(UNNEST(?))", "=ANY(?)")
-                .replace("CURRENT_TIMESTAMP - 1 MINUTE", "NOW() - INTERVAL '1 MINUTES'").replace("FROM (VALUES(0))", "");
+                .replace("CURRENT_TIMESTAMP - 1 MINUTE", "NOW() - INTERVAL '1 MINUTES'")
+                .replace("CURRENT_TIMESTAMP - ? SECOND", "(NOW() - (? || ' SECONDS')::interval)").replace("FROM (VALUES(0))", "");
     }
 
     @Override

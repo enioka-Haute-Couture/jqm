@@ -38,7 +38,8 @@ public class DbImplOracle implements DbAdapter
     {
         return sql.replace("MEMORY TABLE", "TABLE").replace(" INTEGER", " NUMBER(10, 0)").replace(" DOUBLE", " DOUBLE PRECISION")
                 .replace("UNIX_MILLIS()", "JQM_PK.currval").replace("IN(UNNEST(?))", "IN(?)")
-                .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(SYSDATE - 1/1440)").replace("FROM (VALUES(0))", "FROM DUAL")
+                .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(SYSDATE - 1/1440)")
+                .replace("CURRENT_TIMESTAMP - ? SECOND", "(SYSDATE - ?/86400)").replace("FROM (VALUES(0))", "FROM DUAL")
                 .replace("BOOLEAN", "NUMBER(1)").replace("true", "1").replace("false", "0");
     }
 

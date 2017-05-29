@@ -1,7 +1,5 @@
 package com.enioka.jqm.tools;
 
-import java.util.Calendar;
-
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.api.JobRequest;
@@ -70,6 +68,7 @@ class CronScheduler implements Runnable, TaskCollector
     void stop()
     {
         this.run = false;
+        stopScheduler();
         this.t.interrupt();
         // No need to wait... only daemon threads here, so cannot prevent engine shutdown.
     }
@@ -89,9 +88,8 @@ class CronScheduler implements Runnable, TaskCollector
                 cnx = Helpers.getNewDbSession();
 
                 // Try to take the lead.
-                Calendar limit = Calendar.getInstance();
-                limit.add(Calendar.MILLISECOND, (int) (-this.schedulerKeepAlive * 1.2));
-                qr = cnx.runUpdate("w_update_take", this.node.getId(), this.node.getId(), this.node.getId(), limit);
+                qr = cnx.runUpdate("w_update_take", this.node.getId(), this.node.getId(), this.node.getId(),
+                        (int) (schedulerKeepAlive * 1.2 / 1000));
                 cnx.commit();
             }
             catch (DatabaseException ex)
@@ -114,7 +112,10 @@ class CronScheduler implements Runnable, TaskCollector
                     jqmlogger.info("This node is being promoted to master scheduler");
                     startScheduler();
                 }
-                jqmlogger.trace("This node is confirmed as master scheduler");
+                else
+                {
+                    jqmlogger.trace("This node is confirmed as master scheduler");
+                }
             }
             else
             {
