@@ -346,7 +346,7 @@ final class Helpers
             jqmlogger.info("Node " + nodeName + " does not exist in the configuration and will be created with default values");
 
             nodeId = Node.create(cnx, nodeName, port, System.getProperty("user.dir") + "/jobs/", System.getProperty("user.dir") + "/jobs/",
-                    System.getProperty("user.dir") + "/tmp/", "localhost").getId();
+                    System.getProperty("user.dir") + "/tmp/", "localhost", "INFO").getId();
             cnx.commit();
         }
 
@@ -360,11 +360,6 @@ final class Helpers
 
             cnx.commit();
         }
-    }
-
-    static void updateNodeConfiguration(String nodeName, DbConn cnx)
-    {
-        updateNodeConfiguration(nodeName, cnx, 0);
     }
 
     /**

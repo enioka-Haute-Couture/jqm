@@ -71,11 +71,11 @@ public class TestHelpers
         TestHelpers.qSlow3 = Queue.create(cnx, "SlowQueue3", "Queue for the bad guys3", false);
 
         String dns = getLocalHostName();
-        TestHelpers.node = Node.create(cnx, "localhost", 0, "./target/outputfiles/", "./../", "./target/tmp", dns);
-        TestHelpers.node2 = Node.create(cnx, "localhost2", 0, "./target/outputfiles/", "./../", "./target/tmp", dns);
-        TestHelpers.node3 = Node.create(cnx, "localhost3", 0, "./target/outputfiles/", "./../", "./target/tmp", dns);
-        TestHelpers.nodeMix = Node.create(cnx, "localhost4", 0, "./target/outputfiles/", "./../", "./target/tmp", dns);
-        TestHelpers.nodeMix2 = Node.create(cnx, "localhost5", 0, "./target/outputfiles/", "./../", "./target/tmp", dns);
+        TestHelpers.node = Node.create(cnx, "localhost", 0, "./target/outputfiles/", "./../", "./target/tmp", dns, "DEBUG");
+        TestHelpers.node2 = Node.create(cnx, "localhost2", 0, "./target/outputfiles/", "./../", "./target/tmp", dns, "DEBUG");
+        TestHelpers.node3 = Node.create(cnx, "localhost3", 0, "./target/outputfiles/", "./../", "./target/tmp", dns, "DEBUG");
+        TestHelpers.nodeMix = Node.create(cnx, "localhost4", 0, "./target/outputfiles/", "./../", "./target/tmp", dns, "DEBUG");
+        TestHelpers.nodeMix2 = Node.create(cnx, "localhost5", 0, "./target/outputfiles/", "./../", "./target/tmp", dns, "DEBUG");
 
         TestHelpers.dpVip = DeploymentParameter.create(cnx, node, 40, 1, qVip);
         TestHelpers.dpVipMix = DeploymentParameter.create(cnx, nodeMix, 3, 1, qVip);

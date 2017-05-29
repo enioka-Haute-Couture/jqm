@@ -28,7 +28,6 @@ public class CertificateToken implements AuthenticationToken
     public CertificateToken(X509Certificate c)
     {
         this.clientCert = c;
-        System.out.println(getUserName());
     }
 
     @Override

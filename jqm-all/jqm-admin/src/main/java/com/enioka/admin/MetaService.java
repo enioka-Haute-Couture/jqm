@@ -853,7 +853,7 @@ public class MetaService
         {
             // Should actually never be used... nodes should be created through CLI.
             Node.create(cnx, dto.getName(), dto.getPort(), dto.getOutputDirectory(), dto.getJobRepoDirectory(), dto.getTmpDirectory(),
-                    dto.getDns());
+                    dto.getDns(), dto.getRootLogLevel());
         }
     }
 

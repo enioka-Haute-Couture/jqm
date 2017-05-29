@@ -90,7 +90,7 @@ public class JqmTester
         // Create node
         resDirectoryPath = Common.createTempDirectory();
         node = Node.create(cnx, "testtempnode", 12, resDirectoryPath.getAbsolutePath(), resDirectoryPath.getAbsolutePath(),
-                resDirectoryPath.getAbsolutePath(), "test");
+                resDirectoryPath.getAbsolutePath(), "test", "INFO");
 
         q = Queue.create(cnx, "default", "default test queue", true); // Only useful because JobDef.queue is non-null
 
