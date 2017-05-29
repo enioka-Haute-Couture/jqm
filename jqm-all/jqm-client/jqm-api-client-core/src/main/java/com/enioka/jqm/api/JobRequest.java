@@ -46,6 +46,7 @@ public class JobRequest implements Serializable
     private String queueName = null;
     private Integer parentJobId = null;
     private Integer scheduleId = null;
+    private State startState = null;
     private Map<String, String> parameters = new HashMap<String, String>();
 
     private Calendar runAfter;
@@ -492,5 +493,22 @@ public class JobRequest implements Serializable
     String getRecurrence()
     {
         return this.recurrence;
+    }
+
+    /**
+     * <strong>Optional</strong><br>
+     * The default behaviour for a newly submitted JobRequest is to run as soon as possible (i.e. as soon as there is a free slot inside a
+     * JQM node). This method allows to change this, and to put the request inside the queue but not run it until the
+     * {@link JqmClient#resumeJob(int)} method is called on the newly created job instance.
+     */
+    public JobRequest startHeld()
+    {
+        this.startState = State.HOLDED;
+        return this;
+    }
+
+    State getStartState()
+    {
+        return this.startState;
     }
 }
