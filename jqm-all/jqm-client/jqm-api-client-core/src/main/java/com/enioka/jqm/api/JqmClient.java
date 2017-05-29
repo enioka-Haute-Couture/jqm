@@ -125,6 +125,18 @@ public interface JqmClient
      */
     void killJob(int jobId);
 
+    /**
+     * Remove a schedule. Effect is immediate.
+     * 
+     * @param scheduleId
+     *            the ID returned by the scheduling method (the ID of the scheduledJob object).
+     * @throws JqmInvalidRequestException
+     *             when input data is invalid (schedule does not exist...)
+     * @throws JqmClientException
+     *             when an internal API implementation occurs. Usually linked to a configuration issue.
+     */
+    void removeRecurrence(int scheduleId);
+
     // /////////////////////////////////////////////////////////////////////
     // Job Pause/restart
     // /////////////////////////////////////////////////////////////////////

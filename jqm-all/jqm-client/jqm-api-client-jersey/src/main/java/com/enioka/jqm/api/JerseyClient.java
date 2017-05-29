@@ -123,8 +123,8 @@ final class JerseyClient implements JqmClient
             }
             catch (KeyStoreException e)
             {
-                throw new JqmInvalidRequestException("Specified trust store type ["
-                        + this.p.getProperty("com.enioka.jqm.ws.truststoreType", "JKS") + "] is invalid", e);
+                throw new JqmInvalidRequestException(
+                        "Specified trust store type [" + this.p.getProperty("com.enioka.jqm.ws.truststoreType", "JKS") + "] is invalid", e);
             }
 
             try
@@ -133,8 +133,8 @@ final class JerseyClient implements JqmClient
             }
             catch (FileNotFoundException e)
             {
-                throw new JqmInvalidRequestException("Trust store file [" + this.p.getProperty("com.enioka.jqm.ws.truststoreFile")
-                        + "] cannot be found", e);
+                throw new JqmInvalidRequestException(
+                        "Trust store file [" + this.p.getProperty("com.enioka.jqm.ws.truststoreFile") + "] cannot be found", e);
             }
 
             String trustp = this.p.getProperty("com.enioka.jqm.ws.truststorePass", null);
@@ -173,8 +173,8 @@ final class JerseyClient implements JqmClient
                 }
                 catch (KeyStoreException e)
                 {
-                    throw new JqmInvalidRequestException("Specified key store type ["
-                            + this.p.getProperty("com.enioka.jqm.ws.keystoreType", "JKS") + "] is invalid", e);
+                    throw new JqmInvalidRequestException(
+                            "Specified key store type [" + this.p.getProperty("com.enioka.jqm.ws.keystoreType", "JKS") + "] is invalid", e);
                 }
 
                 try
@@ -183,8 +183,8 @@ final class JerseyClient implements JqmClient
                 }
                 catch (FileNotFoundException e)
                 {
-                    throw new JqmInvalidRequestException("Key store file [" + this.p.getProperty("com.enioka.jqm.ws.keystoreFile")
-                            + "] cannot be found", e);
+                    throw new JqmInvalidRequestException(
+                            "Key store file [" + this.p.getProperty("com.enioka.jqm.ws.keystoreFile") + "] cannot be found", e);
                 }
 
                 String keyp = this.p.getProperty("com.enioka.jqm.ws.keystorePass", null);
@@ -347,6 +347,24 @@ final class JerseyClient implements JqmClient
         {
             throw new JqmClientException(e);
         }
+    }
+
+    @Override
+    public void removeRecurrence(int scheduleId)
+    {
+        try
+        {
+            target.path("schedule/" + scheduleId).request().delete();
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+
     }
 
     // /////////////////////////////////////////////////////////////////////

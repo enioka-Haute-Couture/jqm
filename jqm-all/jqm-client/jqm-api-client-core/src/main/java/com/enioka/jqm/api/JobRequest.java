@@ -480,7 +480,8 @@ public class JobRequest implements Serializable
      * <strong>Optional</strong><br>
      * This method allows to request for the run to be recurring. This actually creates a Scheduled Job for the given applicationName and
      * optionally queue and parameters. (all other JobRequest elements are ignored). Note that when using this, there is no request
-     * immediately added to the queues - the actual requests will be created by the schedule.
+     * immediately added to the queues - the actual requests will be created by the schedule.<br>
+     * When creating a new recurrence, the ID returned by {@link JobRequest#submit()} is actually the schedule ID.
      */
     public JobRequest setRecurrence(String cronExpression)
     {
