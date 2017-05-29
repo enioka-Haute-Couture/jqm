@@ -101,6 +101,14 @@ public class ServiceClient implements JqmClient
     }
 
     @Override
+    @Path("schedule/{scheduleId}")
+    @DELETE
+    public void removeRecurrence(int scheduleId)
+    {
+        JqmClientFactory.getClient().removeRecurrence(scheduleId);
+    }
+
+    @Override
     @Path("ji/paused/{jobId}")
     @POST
     public void pauseQueuedJob(@PathParam("jobId") int jobId)

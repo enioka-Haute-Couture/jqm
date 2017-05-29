@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -143,7 +142,7 @@ public class ScheduledJob
         return res;
     }
 
-    public static void create(DbConn cnx, String cronExpression, Integer jobDefId, Integer queueId, Map<String, String> parameterOverloads)
+    public static int create(DbConn cnx, String cronExpression, Integer jobDefId, Integer queueId, Map<String, String> parameterOverloads)
     {
         QueryResult r = cnx.runUpdate("sj_insert", cronExpression, jobDefId, queueId);
 
@@ -151,5 +150,7 @@ public class ScheduledJob
         {
             cnx.runUpdate("sjprm_insert", e.getKey(), e.getValue(), r.generatedKey);
         }
+
+        return r.generatedKey;
     }
 }

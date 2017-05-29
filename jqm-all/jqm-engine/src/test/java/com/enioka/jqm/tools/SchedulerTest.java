@@ -8,7 +8,9 @@ import org.junit.Test;
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.JobDefDto;
 import com.enioka.api.admin.ScheduledJob;
+import com.enioka.jqm.api.JobDef;
 import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
 import com.enioka.jqm.api.State;
 import com.enioka.jqm.test.helpers.CreationTools;
@@ -116,21 +118,24 @@ public class SchedulerTest extends JqmBaseTest
     @Test // Commented - waiting for one minute is long.
     public void testSimpleSchedule()
     {
-        int i = CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar",
+        int id = CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar",
                 TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
-        JobDefDto dto = MetaService.getJobDef(cnx, i);
-        Assert.assertEquals(0, dto.getParameters().size());
-
-        // Add a schedule.
-        dto.addSchedule(ScheduledJob.create("* * * * *"));
-        MetaService.upsertJobDef(cnx, dto);
-        cnx.commit();
+        int scheduleId = JobRequest.create("MarsuApplication", "test user").setRecurrence("* * * * *").addParameter("key1", "value1")
+                .submit();
 
         addAndStartEngine();
 
         TestHelpers.waitFor(1, 90000, cnx);
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+
+        JobDefDto jd = MetaService.getJobDef(cnx, id);
+        Assert.assertEquals(1, jd.getSchedules().size());
+
+        JqmClientFactory.getClient().removeRecurrence(scheduleId);
+
+        jd = MetaService.getJobDef(cnx, id);
+        Assert.assertEquals(0, jd.getSchedules().size());
 
         Assert.assertTrue(Query.create().run().get(0).isFromSchedule());
     }

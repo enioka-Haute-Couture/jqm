@@ -174,7 +174,16 @@ final class JdbcClient implements JqmClient
 
         DbConn cnx = getDbSession();
 
-        // Schedule?
+        // New schedule?
+        if (runRequest.getRecurrence() != null && !runRequest.getRecurrence().trim().isEmpty())
+        {
+            int res = createSchedule(runRequest, cnx);
+            cnx.commit();
+            cnx.close();
+            return res;
+        }
+
+        // Run existing schedule?
         ScheduledJob sj = null;
         if (runRequest.getScheduleId() != null)
         {
@@ -421,6 +430,39 @@ final class JdbcClient implements JqmClient
         return jd;
     }
 
+    private int createSchedule(JobRequest jr, DbConn cnx)
+    {
+        // The job def
+        JobDef jobDef = null;
+        try
+        {
+            jobDef = JobDef.select_key(cnx, jr.getApplicationName());
+        }
+        catch (NonUniqueResultException ex)
+        {
+            jqmlogger.error("There are multiple Job definition named " + jr.getApplicationName() + ". Inconsistent configuration.");
+            closeQuietly(cnx);
+            throw new JqmInvalidRequestException("There are multiple Job definition named " + jr.getApplicationName());
+        }
+        catch (NoResultException ex)
+        {
+            jqmlogger.error("Job definition named " + jr.getApplicationName() + " does not exist");
+            closeQuietly(cnx);
+            throw new JqmInvalidRequestException("no job definition named " + jr.getApplicationName());
+        }
+
+        // The queue
+        Integer queueId = null; // No override = use JD queue.
+        if (jr.getQueueName() != null)
+        {
+            // use requested key if given.
+            queueId = cnx.runSelectSingle("q_select_by_key", 1, Integer.class, jr.getQueueName());
+        }
+
+        // The new schedule
+        return ScheduledJob.create(cnx, jr.getRecurrence(), jobDef.getId(), queueId, jr.getParameters());
+    }
+
     // /////////////////////////////////////////////////////////////////////
     // Job destruction
     // /////////////////////////////////////////////////////////////////////
@@ -527,6 +569,36 @@ final class JdbcClient implements JqmClient
             }
 
             Message.create(cnx, "Kill attempt on the job", idJob);
+            cnx.commit();
+        }
+        catch (JqmClientException e)
+        {
+            throw e;
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("Could not kill a job (internal error)", e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+    }
+
+    @Override
+    public void removeRecurrence(int scheduleId)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = getDbSession();
+
+            cnx.runUpdate("sjprm_delete_all_for_sj", scheduleId);
+            QueryResult res = cnx.runUpdate("sj_delete_by_id", scheduleId);
+            if (res.nbUpdated != 1)
+            {
+                throw new JqmInvalidRequestException("Schedule does not exist");
+            }
             cnx.commit();
         }
         catch (JqmClientException e)
