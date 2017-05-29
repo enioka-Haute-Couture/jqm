@@ -202,6 +202,7 @@ jqm_status() {
 }
 
 jqm_createnode() {
+ $JAVA -jar $JQM_JAR -u
  $JAVA -jar $JQM_JAR -createnode $JQM_NODE
 }
 
