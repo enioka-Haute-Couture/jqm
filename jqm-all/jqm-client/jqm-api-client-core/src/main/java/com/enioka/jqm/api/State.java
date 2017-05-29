@@ -37,5 +37,7 @@ public enum State {
     /** The execution request is still waiting inside the queue, but will not advance anymore. **/
     HOLDED,
     /** Reserved for future use. **/
-    CANCELLED
+    CANCELLED,
+    /** Will become SUBMITTED when a set time is reached - it is a delayed launch. **/
+    SCHEDULED
 }

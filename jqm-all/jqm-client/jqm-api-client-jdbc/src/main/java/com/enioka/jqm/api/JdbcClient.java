@@ -273,9 +273,11 @@ final class JdbcClient implements JqmClient
         // Now create the JI
         try
         {
-            int id = JobInstance.enqueue(cnx, queue_id, jobDef.getId(), runRequest.getApplication(), runRequest.getParentID(),
-                    runRequest.getModule(), runRequest.getKeyword1(), runRequest.getKeyword2(), runRequest.getKeyword3(),
-                    runRequest.getSessionID(), runRequest.getUser(), runRequest.getEmail(), jobDef.isHighlander(), sj != null, prms);
+            int id = JobInstance.enqueue(cnx, runRequest.getRunAfter() == null ? State.SUBMITTED : State.SCHEDULED, queue_id,
+                    jobDef.getId(), runRequest.getApplication(), runRequest.getParentID(), runRequest.getModule(), runRequest.getKeyword1(),
+                    runRequest.getKeyword2(), runRequest.getKeyword3(), runRequest.getSessionID(), runRequest.getUser(),
+                    runRequest.getEmail(), jobDef.isHighlander(), sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(),
+                    prms);
 
             jqmlogger.trace("JI just created: " + id);
             cnx.commit();

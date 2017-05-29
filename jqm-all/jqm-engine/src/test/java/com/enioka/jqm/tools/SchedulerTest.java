@@ -8,7 +8,9 @@ import org.junit.Test;
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.JobDefDto;
 import com.enioka.api.admin.ScheduledJob;
+import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.Query;
+import com.enioka.jqm.api.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -111,7 +113,7 @@ public class SchedulerTest extends JqmBaseTest
         Assert.assertEquals("value2", dto2.getSchedules().get(0).getParameters().get("test2"));
     }
 
-    // @Test // Commented - waiting for one minute is long.
+    @Test // Commented - waiting for one minute is long.
     public void testSimpleSchedule()
     {
         int i = CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar",
@@ -131,5 +133,30 @@ public class SchedulerTest extends JqmBaseTest
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
 
         Assert.assertTrue(Query.create().run().get(0).isFromSchedule());
+    }
+
+    @Test // Commented - waiting for one minute is long.
+    public void testDelayedJob()
+    {
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+
+        Calendar runAt = Calendar.getInstance();
+        runAt.set(Calendar.MILLISECOND, 0); // Not needed in normal operations, but we will compare at the end.
+        runAt.set(Calendar.SECOND, 0);
+        runAt.add(Calendar.MINUTE, 1);
+
+        JobRequest.create("MarsuApplication", "testuser").setRunAfter(runAt).submit();
+        Assert.assertEquals(1, TestHelpers.getQueueAllCount(cnx));
+        Assert.assertEquals(State.SCHEDULED, Query.create().setQueryLiveInstances(true).run().get(0).getState());
+        Assert.assertTrue(Query.create().setQueryLiveInstances(true).run().get(0).isFromSchedule());
+
+        addAndStartEngine();
+
+        TestHelpers.waitFor(1, 90000, cnx);
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+
+        Assert.assertTrue(Query.create().run().get(0).isFromSchedule());
+        Assert.assertTrue(Query.create().run().get(0).getBeganRunningDate().after(runAt));
     }
 }

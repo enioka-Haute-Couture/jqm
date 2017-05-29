@@ -16,6 +16,7 @@ import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.RuntimeParameter;
+import com.enioka.jqm.model.State;
 import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.tools.JqmSingleRunner;
 
@@ -96,7 +97,8 @@ public class JqmTester
         jd = JobDef.create(cnx, "test application", className, null, "/dev/null", q, 0, "TestApplication", null, null, null, null, null,
                 false, null, PathType.MEMORY);
 
-        ji = JobInstance.enqueue(cnx, q, jd, null, null, null, null, null, null, null, null, null, false, false, null);
+        ji = JobInstance.enqueue(cnx, State.SUBMITTED, q, jd, null, null, null, null, null, null, null, null, null, false, false, null,
+                null);
         cnx.runUpdate("ji_update_poll", node.getId(), q, 10);
 
         cnx.commit();
