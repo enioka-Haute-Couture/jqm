@@ -279,14 +279,24 @@ final class JdbcClient implements JqmClient
             queue_id = jobDef.getQueue();
         }
 
+        // Decide what the starting state should be.
+        State startingState = State.SUBMITTED; // The default.
+        if (runRequest.getRunAfter() != null)
+        {
+            startingState = State.SCHEDULED;
+        }
+        else if (runRequest.getStartState() != null)
+        {
+            startingState = State.valueOf(runRequest.getStartState().toString());
+        }
+
         // Now create the JI
         try
         {
-            int id = JobInstance.enqueue(cnx, runRequest.getRunAfter() == null ? State.SUBMITTED : State.SCHEDULED, queue_id,
-                    jobDef.getId(), runRequest.getApplication(), runRequest.getParentID(), runRequest.getModule(), runRequest.getKeyword1(),
-                    runRequest.getKeyword2(), runRequest.getKeyword3(), runRequest.getSessionID(), runRequest.getUser(),
-                    runRequest.getEmail(), jobDef.isHighlander(), sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(),
-                    prms);
+            int id = JobInstance.enqueue(cnx, startingState, queue_id, jobDef.getId(), runRequest.getApplication(),
+                    runRequest.getParentID(), runRequest.getModule(), runRequest.getKeyword1(), runRequest.getKeyword2(),
+                    runRequest.getKeyword3(), runRequest.getSessionID(), runRequest.getUser(), runRequest.getEmail(), jobDef.isHighlander(),
+                    sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(), prms);
 
             jqmlogger.trace("JI just created: " + id);
             cnx.commit();

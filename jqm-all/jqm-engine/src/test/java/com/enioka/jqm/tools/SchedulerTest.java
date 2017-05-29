@@ -164,4 +164,24 @@ public class SchedulerTest extends JqmBaseTest
         Assert.assertTrue(Query.create().run().get(0).isFromSchedule());
         Assert.assertTrue(Query.create().run().get(0).getBeganRunningDate().after(runAt));
     }
+
+    @Test
+    public void testStartHeld()
+    {
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+
+        int i = JobRequest.create("MarsuApplication", "testuser").startHeld().submit();
+        addAndStartEngine();
+
+        // Should not run.
+        sleepms(1000);
+        Assert.assertEquals(1, TestHelpers.getQueueAllCount(cnx));
+        Assert.assertEquals(State.HOLDED, Query.create().setQueryLiveInstances(true).run().get(0).getState());
+
+        // Resume at will.
+        JqmClientFactory.getClient().resumeJob(i);
+        TestHelpers.waitFor(1, 10000, cnx);
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+    }
 }
