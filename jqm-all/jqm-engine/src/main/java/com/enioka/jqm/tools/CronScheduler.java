@@ -1,7 +1,6 @@
 package com.enioka.jqm.tools;
 
 import java.util.Calendar;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -11,9 +10,7 @@ import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.GlobalParameter;
-import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.Node;
-import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.ScheduledJob;
 
 import it.sauronsoftware.cron4j.Scheduler;
@@ -208,37 +205,7 @@ class CronScheduler implements Runnable, TaskCollector
         @Override
         public void execute(TaskExecutionContext context) throws RuntimeException
         {
-            DbConn cnx = null;
-            JobDef jd = null;
-            Queue q = null;
-            try
-            {
-                cnx = Helpers.getNewDbSession();
-
-                List<JobDef> jdd = JobDef.select(cnx, "jd_select_by_id", sj.getJobDefinition());
-                if (jdd.size() != 1)
-                {
-                    throw new JqmRuntimeException("Cannot launch a schedule job without associated JobDef");
-                }
-                jd = jdd.get(0);
-
-                if (sj.getQueue() != null && sj.getQueue() > 0)
-                {
-                    List<Queue> qq = Queue.select(cnx, "q_select_by_id", sj.getQueue());
-                    q = qq.get(0);
-                }
-            }
-            finally
-            {
-                Helpers.closeQuietly(cnx);
-            }
-
-            JobRequest jr = JobRequest.create(jd.getApplicationName(), "cron").addParameters(sj.getParameters()).setKeyword1("cron");
-            if (q != null)
-            {
-                jr.setQueueName(q.getName());
-            }
-
+            JobRequest jr = JobRequest.create("", "cron").setScheduleId(sj.getId());
             JqmClientFactory.getClient().enqueue(jr);
         }
 

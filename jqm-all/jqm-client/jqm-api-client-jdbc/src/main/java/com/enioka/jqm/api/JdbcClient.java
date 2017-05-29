@@ -75,6 +75,7 @@ import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Message;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.RuntimeParameter;
+import com.enioka.jqm.model.ScheduledJob;
 import com.enioka.jqm.model.State;
 
 /**
@@ -163,24 +164,73 @@ final class JdbcClient implements JqmClient
     public int enqueue(JobRequest runRequest)
     {
         jqmlogger.trace("BEGINING ENQUEUE - request is for application name " + runRequest.getApplicationName());
+
+        // Form validity.
+        if ((runRequest.getApplicationName() == null || runRequest.getApplicationName().trim().isEmpty())
+                && runRequest.getScheduleId() == null)
+        {
+            throw new JqmClientException("Invalid execution request: applicationName is empty");
+        }
+
         DbConn cnx = getDbSession();
+
+        // Schedule?
+        ScheduledJob sj = null;
+        if (runRequest.getScheduleId() != null)
+        {
+            List<ScheduledJob> sjj = ScheduledJob.select(cnx, "sj_select_by_id", runRequest.getScheduleId());
+            if (sjj.size() == 0)
+            {
+                jqmlogger.error("Invalid job request: no schedule with ID " + runRequest.getScheduleId());
+                throw new JqmInvalidRequestException("Invalid job request: no schedule with ID " + runRequest.getScheduleId());
+            }
+            if (sjj.size() > 1)
+            {
+                jqmlogger.error("Inconsistent metadata: multiple schedules with ID " + runRequest.getScheduleId());
+                throw new JqmClientException("Inconsistent metadata: multiple schedules with ID " + runRequest.getScheduleId());
+            }
+            sj = sjj.get(0);
+        }
 
         // First, get the JobDef.
         JobDef jobDef = null;
-        List<JobDef> jj = JobDef.select(cnx, "jd_select_by_key", runRequest.getApplicationName());
-        if (jj.size() == 0)
+        if (sj == null)
         {
-            jqmlogger.error("Job definition named " + runRequest.getApplicationName() + " does not exist");
-            closeQuietly(cnx);
-            throw new JqmInvalidRequestException("no job definition named " + runRequest.getApplicationName());
+            // Standard case: execution by applicationName.
+            try
+            {
+                jobDef = JobDef.select_key(cnx, runRequest.getApplicationName());
+            }
+            catch (NonUniqueResultException ex)
+            {
+                jqmlogger.error(
+                        "There are multiple Job definition named " + runRequest.getApplicationName() + ". Inconsistent configuration.");
+                closeQuietly(cnx);
+                throw new JqmInvalidRequestException("There are multiple Job definition named " + runRequest.getApplicationName());
+            }
+            catch (NoResultException ex)
+            {
+                jqmlogger.error("Job definition named " + runRequest.getApplicationName() + " does not exist");
+                closeQuietly(cnx);
+                throw new JqmInvalidRequestException("no job definition named " + runRequest.getApplicationName());
+            }
         }
-        if (jj.size() > 1)
+        else
         {
-            jqmlogger.error("There are multiple Job definition named " + runRequest.getApplicationName() + ". Inconsistent configuration.");
-            closeQuietly(cnx);
-            throw new JqmInvalidRequestException("There are multiple Job definition named " + runRequest.getApplicationName());
+            // Selection by schedule.
+            List<JobDef> jdd = JobDef.select(cnx, "jd_select_by_id", sj.getJobDefinition());
+            if (jdd.size() == 0)
+            {
+                jqmlogger.error("Invalid job request: no JobDef with ID " + sj.getJobDefinition());
+                throw new JqmInvalidRequestException("Invalid job request: no JobDef with ID " + sj.getJobDefinition());
+            }
+            if (jdd.size() > 1)
+            {
+                jqmlogger.error("Inconsistent metadata: multiple JobDef with ID " + sj.getJobDefinition());
+                throw new JqmClientException("Inconsistent metadata: multiple JobDef with ID " + sj.getJobDefinition());
+            }
+            jobDef = jdd.get(0);
         }
-        jobDef = jj.get(0);
         jqmlogger.trace("Job to enqueue is from JobDef " + jobDef.getId());
 
         // Then check Highlander.
@@ -197,6 +247,10 @@ final class JdbcClient implements JqmClient
 
         // Parameters are both from the JobDef and the execution request.
         Map<String, String> prms = JobDefParameter.select_map(cnx, "jdprm_select_all_for_jd", jobDef.getId());
+        if (sj != null)
+        {
+            prms.putAll(sj.getParameters());
+        }
         prms.putAll(runRequest.getParameters());
 
         // On which queue?
@@ -205,6 +259,10 @@ final class JdbcClient implements JqmClient
         {
             // use requested key if given.
             queue_id = cnx.runSelectSingle("q_select_by_key", 1, Integer.class, runRequest.getQueueName());
+        }
+        else if (sj != null && sj.getQueue() != null)
+        {
+            queue_id = sj.getQueue();
         }
         else
         {
@@ -217,7 +275,7 @@ final class JdbcClient implements JqmClient
         {
             int id = JobInstance.enqueue(cnx, queue_id, jobDef.getId(), runRequest.getApplication(), runRequest.getParentID(),
                     runRequest.getModule(), runRequest.getKeyword1(), runRequest.getKeyword2(), runRequest.getKeyword3(),
-                    runRequest.getSessionID(), runRequest.getUser(), runRequest.getEmail(), jobDef.isHighlander(), prms);
+                    runRequest.getSessionID(), runRequest.getUser(), runRequest.getEmail(), jobDef.isHighlander(), sj != null, prms);
 
             jqmlogger.trace("JI just created: " + id);
             cnx.commit();
@@ -869,7 +927,7 @@ final class JdbcClient implements JqmClient
                         + "ji.KEYWORD2 AS INSTANCE_KEYWORD2, ji.KEYWORD3 AS INSTANCE_KEYWORD3, ji.MODULE AS INSTANCE_MODULE, "
                         + "jd.KEYWORD1 AS JD_KEYWORD1, jd.KEYWORD2 AS JD_KEYWORD2, jd.KEYWORD3 AS JD_KEYWORD3, jd.MODULE AS JD_MODULE,"
                         + "n.NAME AS NODE_NAME, ji.PARENT AS PARENT, ji.PROGRESS, q.NAME AS QUEUE_NAME, NULL AS RETURN_CODE,"
-                        + "ji.SESSION_KEY AS SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.INTERNAL_POSITION AS POSITION "
+                        + "ji.SESSION_KEY AS SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.INTERNAL_POSITION AS POSITION, ji.FROM_SCHEDULE "
                         + "FROM JOB_INSTANCE ji LEFT JOIN QUEUE q ON ji.QUEUE=q.ID LEFT JOIN JOB_DEFINITION jd ON ji.JOBDEF=jd.ID LEFT JOIN NODE n ON ji.NODE=n.ID ";
 
                 if (wh.length() > 3)
@@ -924,7 +982,7 @@ final class JdbcClient implements JqmClient
                         + "DATE_END, DATE_ENQUEUE, DATE_START, HIGHLANDER, INSTANCE_APPLICATION, "
                         + "INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, "
                         + "JD_KEYWORD1, JD_KEYWORD2, JD_KEYWORD3, " + "JD_MODULE, NODE_NAME, PARENT, PROGRESS, QUEUE_NAME, "
-                        + "RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION FROM HISTORY ";
+                        + "RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION, FROM_SCHEDULE FROM HISTORY ";
 
                 if (wh.length() > 3)
                 {
@@ -1094,6 +1152,7 @@ final class JdbcClient implements JqmClient
         res.setQueue(q);
 
         res.setPosition(rs.getLong(30));
+        res.setFromSchedule(rs.getBoolean(31));
 
         return res;
     }

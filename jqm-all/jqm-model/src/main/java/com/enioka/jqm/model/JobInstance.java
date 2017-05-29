@@ -48,6 +48,7 @@ public class JobInstance implements Serializable
 
     private double internalPosition;
     private boolean highlander;
+    private boolean fromSchedule;
 
     private Integer parentId;
     private String email;
@@ -399,6 +400,14 @@ public class JobInstance implements Serializable
         this.attributionDate = attributionDate;
     }
 
+    /**
+     * True if this job instance was created from a schedule.
+     */
+    public boolean isFromSchedule()
+    {
+        return this.fromSchedule;
+    }
+
     public static List<JobInstance> select(DbConn cnx, String query_key, Object... args)
     {
         List<JobInstance> res = new ArrayList<JobInstance>();
@@ -431,10 +440,11 @@ public class JobInstance implements Serializable
                 tmp.node_id = rs.getInt(18);
                 tmp.queue_id = rs.getInt(19);
                 tmp.highlander = rs.getBoolean(20);
+                tmp.fromSchedule = rs.getBoolean(21);
 
-                tmp.q = Queue.map(rs, 20);
-                tmp.jd = JobDef.map(rs, 24);
-                tmp.n = Node.map(cnx, rs, 42);
+                tmp.q = Queue.map(rs, 21);
+                tmp.jd = JobDef.map(rs, 25);
+                tmp.n = Node.map(cnx, rs, 43);
 
                 res.add(tmp);
             }
@@ -475,10 +485,11 @@ public class JobInstance implements Serializable
     }
 
     public static int enqueue(DbConn cnx, int queue_id, int job_id, String application, Integer parentId, String module, String keyword1,
-            String keyword2, String keyword3, String sessionId, String userName, String email, boolean highlander, Map<String, String> prms)
+            String keyword2, String keyword3, String sessionId, String userName, String email, boolean highlander, boolean fromSchedule,
+            Map<String, String> prms)
     {
         QueryResult qr = cnx.runUpdate("ji_insert_enqueue", email, application, keyword1, keyword2, keyword3, module, parentId, sessionId,
-                userName, job_id, queue_id, highlander);
+                userName, job_id, queue_id, highlander, fromSchedule);
 
         int newId = qr.getGeneratedId();
 
