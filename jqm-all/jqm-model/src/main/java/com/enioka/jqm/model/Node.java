@@ -326,9 +326,10 @@ public class Node
     /**
      * Create a new entry in the database. No commit performed.
      */
-    public static Node create(DbConn cnx, String nodeName, Integer port, String dlRepo, String repo, String tmpDir, String dns)
+    public static Node create(DbConn cnx, String nodeName, Integer port, String dlRepo, String repo, String tmpDir, String dns,
+            String logLevel)
     {
-        QueryResult r = cnx.runUpdate("node_insert", dlRepo, dns, true, 0, 0, false, false, true, nodeName, port, repo, "DEBUG", false,
+        QueryResult r = cnx.runUpdate("node_insert", dlRepo, dns, true, 0, 0, false, false, true, nodeName, port, repo, logLevel, false,
                 tmpDir);
         Node res = new Node();
         res.id = r.getGeneratedId();

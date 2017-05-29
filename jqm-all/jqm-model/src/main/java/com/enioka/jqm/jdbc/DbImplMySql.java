@@ -100,7 +100,6 @@ public class DbImplMySql implements DbAdapter
             int nbIn = 0;
             while (index >= 0)
             {
-                System.out.println(index);
                 index = q.sqlText.indexOf("IN(?)", index + 1);
                 nbIn++;
             }

@@ -305,16 +305,16 @@ public class MultiNodeTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", qId, 42, "appliname",
                 null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
-        Node n0 = Node.create(cnx, "n0", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
-        Node n1 = Node.create(cnx, "n1", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
-        Node n2 = Node.create(cnx, "n2", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
-        Node n3 = Node.create(cnx, "n3", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
-        Node n4 = Node.create(cnx, "n4", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
-        Node n5 = Node.create(cnx, "n5", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
-        Node n6 = Node.create(cnx, "n6", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
-        Node n7 = Node.create(cnx, "n7", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
-        Node n8 = Node.create(cnx, "n8", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
-        Node n9 = Node.create(cnx, "n9", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost");
+        Node n0 = Node.create(cnx, "n0", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost", "INFO");
+        Node n1 = Node.create(cnx, "n1", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost", "INFO");
+        Node n2 = Node.create(cnx, "n2", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost", "INFO");
+        Node n3 = Node.create(cnx, "n3", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost", "INFO");
+        Node n4 = Node.create(cnx, "n4", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost", "INFO");
+        Node n5 = Node.create(cnx, "n5", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost", "INFO");
+        Node n6 = Node.create(cnx, "n6", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost", "INFO");
+        Node n7 = Node.create(cnx, "n7", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost", "INFO");
+        Node n8 = Node.create(cnx, "n8", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost", "INFO");
+        Node n9 = Node.create(cnx, "n9", 0, "./target/outputfiles/", "./../", "./target/tmp", "localhost", "INFO");
 
         TestHelpers.setNodesLogLevel("INFO", cnx);
 

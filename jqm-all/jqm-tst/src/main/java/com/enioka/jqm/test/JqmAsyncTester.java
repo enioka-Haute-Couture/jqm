@@ -133,7 +133,8 @@ public class JqmAsyncTester
 
         File resDirectoryPath = Common.createTempDirectory();
 
-        Node node = Node.create(cnx, nodeName, 12, resDirectoryPath.getAbsolutePath(), ".", resDirectoryPath.getAbsolutePath(), "test");
+        Node node = Node.create(cnx, nodeName, 12, resDirectoryPath.getAbsolutePath(), ".", resDirectoryPath.getAbsolutePath(), "test",
+                logLevel);
         cnx.commit();
         nodes.put(nodeName, node);
 
@@ -486,8 +487,7 @@ public class JqmAsyncTester
      */
     public InputStream getDeliverableContent(Deliverable file) throws FileNotFoundException
     {
-        List<com.enioka.jqm.model.Deliverable> dd = com.enioka.jqm.model.Deliverable.select(cnx, "deliverable_select_by_id",
-                file.getId());
+        List<com.enioka.jqm.model.Deliverable> dd = com.enioka.jqm.model.Deliverable.select(cnx, "deliverable_select_by_id", file.getId());
         if (dd.isEmpty())
         {
             throw new JqmInvalidRequestException("no deliverable with this ID");
