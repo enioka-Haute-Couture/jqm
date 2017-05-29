@@ -417,7 +417,9 @@ public class MiscTest extends JqmBaseTest
     public void testExternalKill() throws Exception
     {
         Helpers.setSingleParam("internalPollingPeriodMs", "100", cnx);
-        int i = JqmSimpleTest.create(cnx, "pyl.KillMeNot").setExternal().addWaitTime(3000).expectNonOk(0).expectOk(0).run(this);
+
+        int i = JqmSimpleTest.create(cnx, "pyl.KillMeNot").setExternal().expectNonOk(0).expectOk(0).run(this);
+        TestHelpers.waitForRunning(1, 20000, cnx);
 
         JqmClientFactory.getClient().killJob(i);
         TestHelpers.waitFor(1, 20000, cnx);
