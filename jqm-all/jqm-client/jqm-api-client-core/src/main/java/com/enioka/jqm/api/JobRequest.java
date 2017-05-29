@@ -44,6 +44,7 @@ public class JobRequest implements Serializable
     private String email = null;
     private String queueName = null;
     private Integer parentJobId = null;
+    private Integer scheduleId = null;
     private Map<String, String> parameters = new HashMap<String, String>();
 
     JobRequest()
@@ -148,7 +149,7 @@ public class JobRequest implements Serializable
     }
 
     /**
-     * <strong>Compulsory</strong><br>
+     * <strong>Compulsory</strong> (unless {@link #setScheduleId(Integer)} is used)<br>
      * The name of the batch job to launch. It is the "Job Definition" name, and the most important parameter in this form.
      */
     public String getApplicationName()
@@ -157,7 +158,7 @@ public class JobRequest implements Serializable
     }
 
     /**
-     * <strong>Compulsory</strong><br>
+     * <strong>Compulsory</strong> (unless {@link #setScheduleId(Integer)} is used)<br>
      * The name of the batch job to launch. It is the "Job Definition" name, and the most important parameter in this form.
      * 
      * @param applicationName
@@ -427,6 +428,27 @@ public class JobRequest implements Serializable
     public JobRequest setQueueName(String queueName)
     {
         this.queueName = queueName;
+        return this;
+    }
+
+    /**
+     * <strong>Optional</strong><br>
+     * This request is actually to create an occurrence of the specified recurrence. If specified, the {@link #getApplicationName()} is
+     * ignored.
+     */
+    public Integer getScheduleId()
+    {
+        return this.scheduleId;
+    }
+
+    /**
+     * <strong>Optional</strong><br>
+     * This request is actually to create an occurrence of the specified recurrence. If specified, the {@link #getApplicationName()} is
+     * ignored.
+     */
+    public JobRequest setScheduleId(Integer id)
+    {
+        this.scheduleId = id;
         return this;
     }
 }

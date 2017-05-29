@@ -8,6 +8,7 @@ import org.junit.Test;
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.JobDefDto;
 import com.enioka.api.admin.ScheduledJob;
+import com.enioka.jqm.api.Query;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -127,5 +128,8 @@ public class SchedulerTest extends JqmBaseTest
         addAndStartEngine();
 
         TestHelpers.waitFor(1, 90000, cnx);
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+
+        Assert.assertTrue(Query.create().run().get(0).isFromSchedule());
     }
 }

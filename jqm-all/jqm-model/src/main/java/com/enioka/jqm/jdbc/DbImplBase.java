@@ -137,6 +137,7 @@ public class DbImplBase
         queries.put("sj_delete_by_id", "DELETE FROM JOB_SCHEDULE WHERE ID=?");
         queries.put("sj_update_all_fields_by_id", "UPDATE JOB_SCHEDULE SET CRON_EXPRESSION=?, QUEUE=?, LAST_UPDATED=CURRENT_TIMESTAMP WHERE ID=?");
         queries.put("sj_select_all", "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED FROM JOB_SCHEDULE ORDER BY ID ");
+        queries.put("sj_select_by_id", "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED FROM JOB_SCHEDULE WHERE ID=? ");
         queries.put("sj_select_updated",  "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED FROM JOB_SCHEDULE WHERE LAST_UPDATED > ?");
         queries.put("sj_select_for_jd",  "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED FROM JOB_SCHEDULE WHERE JOBDEF = ?");
         queries.put("sj_select_for_jd_list",  "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED FROM JOB_SCHEDULE WHERE JOBDEF IN(UNNEST(?)) ORDER BY ID");
@@ -152,8 +153,8 @@ public class DbImplBase
         // JOB INSTANCE
         queries.put("ji_insert_enqueue", "INSERT INTO JOB_INSTANCE (ID, DATE_ENQUEUE, EMAIL, APPLICATION, "
                 + "KEYWORD1, KEYWORD2, KEYWORD3, MODULE, INTERNAL_POSITION, PARENT, PROGRESS, SESSION_KEY, "
-                + "STATUS, USERNAME, JOBDEF, QUEUE, HIGHLANDER) "
-                + "VALUES(JQM_PK.nextval, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, UNIX_MILLIS(), ?, 0, ?, 'SUBMITTED', ?, ?, ?, ?)");
+                + "STATUS, USERNAME, JOBDEF, QUEUE, HIGHLANDER, FROM_SCHEDULE) "
+                + "VALUES(JQM_PK.nextval, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, UNIX_MILLIS(), ?, 0, ?, 'SUBMITTED', ?, ?, ?, ?, ?)");
         queries.put("ji_delete_all", "DELETE FROM JOB_INSTANCE");
         queries.put("ji_delete_by_id", "DELETE FROM JOB_INSTANCE WHERE ID = ?");
         queries.put("jj_update_cancel_by_id", "UPDATE JOB_INSTANCE SET STATUS='CANCELLED' WHERE ID=? AND STATUS='SUBMITTED'");
@@ -173,7 +174,7 @@ public class DbImplBase
         queries.put("ji_select_count_by_node", "SELECT COUNT(1) FROM JOB_INSTANCE WHERE NODE=?");
         queries.put("ji_select_count_by_queue", "SELECT COUNT(1) FROM JOB_INSTANCE WHERE QUEUE=?");
         queries.put("ji_select_all", "SELECT ji.ID, ji.DATE_ATTRIBUTION, ji.DATE_ENQUEUE, ji.EMAIL, ji.DATE_START, ji.APPLICATION, ji.KEYWORD1, ji.KEYWORD2, "
-                + "ji.KEYWORD3, ji.MODULE, ji.INTERNAL_POSITION, ji.PARENT, ji.PROGRESS, ji.SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.HIGHLANDER, "
+                + "ji.KEYWORD3, ji.MODULE, ji.INTERNAL_POSITION, ji.PARENT, ji.PROGRESS, ji.SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.HIGHLANDER, ji.FROM_SCHEDULE, "
                 + "q.ID, q.DEFAULT_QUEUE, q.DESCRIPTION, q.NAME, "
                 + "jd.ID, jd.APPLICATION, jd.JD_KEY, jd.CL, "
                 + "jd.DESCRIPTION, jd.ENABLED, jd.EXTERNAL, jd.HIGHLANDER, "
@@ -201,8 +202,8 @@ public class DbImplBase
                 + "DATE_END, DATE_ENQUEUE, DATE_START, HIGHLANDER, INSTANCE_APPLICATION, INSTANCE_KEYWORD1, "
                 + "INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, JD_KEYWORD1, JD_KEYWORD2, JD_KEYWORD3, JD_MODULE, "
                 + "NODE_NAME, PARENT, PROGRESS, QUEUE_NAME, RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, "
-                + "NODE, QUEUE) "
-                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                + "NODE, QUEUE, FROM_SCHEDULE) "
+                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         queries.put("history_insert", queries.get("history_insert_with_end_date").replace("(?, ?, ?, ?, ?, ?",  "(?, ?, ?, ?, ?, CURRENT_TIMESTAMP"));
         
         queries.put("history_delete_all", "DELETE FROM HISTORY");

@@ -58,6 +58,7 @@ public class JobInstance
     private Calendar enqueueDate, beganRunningDate, endDate;
     private String nodeName;
     private boolean highlander;
+    private boolean fromSchedule;
 
     /**
      * The Job Instance ID, i.e. the unique identifier of the execution request. This is a key for numerous {@link JqmClient} functions.
@@ -402,5 +403,18 @@ public class JobInstance
     void setHighlander(boolean h)
     {
         this.highlander = h;
+    }
+
+    /**
+     * True if the job instance was created from a schedule.
+     */
+    public boolean isFromSchedule()
+    {
+        return this.fromSchedule;
+    }
+
+    void setFromSchedule(boolean b)
+    {
+        this.fromSchedule = b;
     }
 }

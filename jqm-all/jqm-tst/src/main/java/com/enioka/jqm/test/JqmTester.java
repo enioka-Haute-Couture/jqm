@@ -96,7 +96,7 @@ public class JqmTester
         jd = JobDef.create(cnx, "test application", className, null, "/dev/null", q, 0, "TestApplication", null, null, null, null, null,
                 false, null, PathType.MEMORY);
 
-        ji = JobInstance.enqueue(cnx, q, jd, null, null, null, null, null, null, null, null, null, false, null);
+        ji = JobInstance.enqueue(cnx, q, jd, null, null, null, null, null, null, null, null, null, false, false, null);
         cnx.runUpdate("ji_update_poll", node.getId(), q, 10);
 
         cnx.commit();
