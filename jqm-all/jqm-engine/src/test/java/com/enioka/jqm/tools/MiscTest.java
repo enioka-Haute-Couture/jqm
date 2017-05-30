@@ -313,25 +313,27 @@ public class MiscTest extends JqmBaseTest
         JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
         JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
         JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
-        JqmClientFactory.getClient().enqueue("jqm-test-kill", "test");
 
-        // Scenario is: 5 jobs in queue with 3 slots. 3 jobs should run. 2 are then killed - 3 should still run.
+        // Scenario is: 4 jobs in queue with 3 slots. 3 jobs should run. 1 is then killed - 3 should still run.
         // (bc: poller loops on job end).
+
+        // Note: this tests only with 1 "cannot run" job instance (used to be 2). That's because after a kill, the engine may only take one
+        // JI (and not more as expected) due to the heavy load failsafe - but one is guaranteed.
+
         addAndStartEngine();
         TestHelpers.waitForRunning(3, 3000, cnx);
 
         // Check 3 running (max queue size).
         Assert.assertEquals(3, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
                 .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run().size());
-        Assert.assertEquals(2, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
+        Assert.assertEquals(1, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
                 .addStatusFilter(com.enioka.jqm.api.State.SUBMITTED).run().size());
 
-        // Kill 2.
+        // Kill 1.
         List<JobInstance> running = Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
                 .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run();
         JqmClientFactory.getClient().killJob(running.get(0).getId());
-        JqmClientFactory.getClient().killJob(running.get(1).getId());
-        TestHelpers.waitFor(2, 10000, cnx);
+        TestHelpers.waitFor(1, 10000, cnx);
         TestHelpers.waitForRunning(3, 10000, cnx);
 
         // Check the two waiting jobs have started.
@@ -348,9 +350,9 @@ public class MiscTest extends JqmBaseTest
         JqmClientFactory.getClient().killJob(running.get(2).getId());
 
         // Check all jobs are killed (and not cancelled as they would have been if not started)).
-        TestHelpers.waitFor(5, 10000, cnx);
+        TestHelpers.waitFor(4, 10000, cnx);
         this.displayAllHistoryTable();
-        Assert.assertEquals(5, Query.create().addStatusFilter(com.enioka.jqm.api.State.KILLED).run().size());
+        Assert.assertEquals(4, Query.create().addStatusFilter(com.enioka.jqm.api.State.KILLED).run().size());
     }
 
     @Test
