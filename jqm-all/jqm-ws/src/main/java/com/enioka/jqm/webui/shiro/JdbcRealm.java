@@ -15,8 +15,12 @@
  */
 package com.enioka.jqm.webui.shiro;
 
-import java.util.Calendar;
-
+import com.enioka.jqm.api.Helpers;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.model.RPermission;
+import com.enioka.jqm.model.RRole;
+import com.enioka.jqm.model.RUser;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -28,16 +32,15 @@ import org.apache.shiro.codec.Hex;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.enioka.jqm.api.Helpers;
-import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jdbc.NoResultException;
-import com.enioka.jqm.model.RPermission;
-import com.enioka.jqm.model.RRole;
-import com.enioka.jqm.model.RUser;
+import java.util.Calendar;
 
 public class JdbcRealm extends AuthorizingRealm
 {
+    static Logger log = LoggerFactory.getLogger(JdbcRealm.class);
+
     public JdbcRealm()
     {
         setName("database");
@@ -50,6 +53,7 @@ public class JdbcRealm extends AuthorizingRealm
         {
             if (!((CertificateToken) token).getUserName().equals(info.getPrincipals().getPrimaryPrincipal()))
             {
+                log.warn("certificate [{}] presented did not match the awaited username: expected [{}] got [{}]", token.getPrincipal(), info.getPrincipals().getPrimaryPrincipal(), ((CertificateToken) token).getUserName());
                 throw new IncorrectCredentialsException("certificate presented did not match the awaited username");
             }
             return;
@@ -74,6 +78,7 @@ public class JdbcRealm extends AuthorizingRealm
     {
         if (token instanceof CertificateToken)
         {
+            log.debug("using certificate [{}] to authenticate user [{}]", token.getPrincipal(), ((CertificateToken) token).getUserName());
             return getUser(((CertificateToken) token).getUserName());
         }
         UsernamePasswordToken t = (UsernamePasswordToken) token;
@@ -124,6 +129,7 @@ public class JdbcRealm extends AuthorizingRealm
         catch (NoResultException e)
         {
             // No such user in realm
+            log.warn("no such user found [{}]", login);
             return null;
         }
         catch (RuntimeException e)
