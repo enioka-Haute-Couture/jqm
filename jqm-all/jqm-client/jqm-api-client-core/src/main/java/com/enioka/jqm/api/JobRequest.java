@@ -472,7 +472,7 @@ public class JobRequest implements Serializable
         return this;
     }
 
-    Calendar getRunAfter()
+    public Calendar getRunAfter()
     {
         return this.runAfter;
     }
@@ -490,7 +490,7 @@ public class JobRequest implements Serializable
         return this;
     }
 
-    String getRecurrence()
+    public String getRecurrence()
     {
         return this.recurrence;
     }
@@ -507,7 +507,7 @@ public class JobRequest implements Serializable
         return this;
     }
 
-    State getStartState()
+    public State getStartState()
     {
         return this.startState;
     }
