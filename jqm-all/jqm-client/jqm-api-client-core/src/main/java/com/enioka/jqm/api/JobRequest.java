@@ -47,6 +47,7 @@ public class JobRequest implements Serializable
     private Integer parentJobId = null;
     private Integer scheduleId = null;
     private State startState = null;
+    private Integer priority = 0;
     private Map<String, String> parameters = new HashMap<String, String>();
 
     private Calendar runAfter;
@@ -510,5 +511,37 @@ public class JobRequest implements Serializable
     State getStartState()
     {
         return this.startState;
+    }
+
+    /**
+     * <strong>Optional</strong><br>
+     * By default, JQM queues are pure FIFO. Setting a priority changes that: job instances with a higher priority always run before job
+     * instances with a lower priority (or no priority at all). Also, this is directly translated into Thread priority when the job instance
+     * actually runs.<br>
+     * Higher priority is better (runs before the others, has more CPU share).<br>
+     * Priority must be between {@link Thread#MIN_PRIORITY} and {@link Thread#MAX_PRIORITY}. To remove priority, set it to null.
+     * 
+     * @param priority
+     * @return
+     */
+    public JobRequest setPriority(Integer priority)
+    {
+        if (priority == null)
+        {
+            priority = 0;
+            return this;
+        }
+        if (priority > Thread.MAX_PRIORITY || priority < Thread.MIN_PRIORITY)
+        {
+            throw new JqmInvalidRequestException("Priority must be between Thread.MIN_PRIORITY and Thread.MAX_PRIORITY");
+        }
+
+        this.priority = priority;
+        return this;
+    }
+
+    Integer getPriority()
+    {
+        return this.priority;
     }
 }

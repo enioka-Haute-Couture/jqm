@@ -296,7 +296,7 @@ final class JdbcClient implements JqmClient
             int id = JobInstance.enqueue(cnx, startingState, queue_id, jobDef.getId(), runRequest.getApplication(),
                     runRequest.getParentID(), runRequest.getModule(), runRequest.getKeyword1(), runRequest.getKeyword2(),
                     runRequest.getKeyword3(), runRequest.getSessionID(), runRequest.getUser(), runRequest.getEmail(), jobDef.isHighlander(),
-                    sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(), prms);
+                    sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(), runRequest.getPriority(), prms);
 
             jqmlogger.trace("JI just created: " + id);
             cnx.commit();

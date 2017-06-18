@@ -47,6 +47,7 @@ public class JobInstance implements Serializable
     private State state;
 
     private double internalPosition;
+    private int priority;
     private boolean highlander;
     private boolean fromSchedule;
 
@@ -408,6 +409,14 @@ public class JobInstance implements Serializable
         return this.fromSchedule;
     }
 
+    /**
+     * See priority handling doc.
+     */
+    public Integer getPriority()
+    {
+        return this.priority;
+    }
+
     public static List<JobInstance> select(DbConn cnx, String query_key, Object... args)
     {
         List<JobInstance> res = new ArrayList<JobInstance>();
@@ -441,10 +450,11 @@ public class JobInstance implements Serializable
                 tmp.queue_id = rs.getInt(19);
                 tmp.highlander = rs.getBoolean(20);
                 tmp.fromSchedule = rs.getBoolean(21);
+                tmp.priority = rs.getInt(22);
 
-                tmp.q = Queue.map(rs, 21);
-                tmp.jd = JobDef.map(rs, 25);
-                tmp.n = Node.map(cnx, rs, 43);
+                tmp.q = Queue.map(rs, 22);
+                tmp.jd = JobDef.map(rs, 26);
+                tmp.n = Node.map(cnx, rs, 44);
 
                 res.add(tmp);
             }
@@ -486,10 +496,10 @@ public class JobInstance implements Serializable
 
     public static int enqueue(DbConn cnx, State status, int queue_id, int job_id, String application, Integer parentId, String module,
             String keyword1, String keyword2, String keyword3, String sessionId, String userName, String email, boolean highlander,
-            boolean fromSchedule, Calendar notBefore, Map<String, String> prms)
+            boolean fromSchedule, Calendar notBefore, int priority, Map<String, String> prms)
     {
         QueryResult qr = cnx.runUpdate("ji_insert_enqueue", email, application, keyword1, keyword2, keyword3, module, parentId, sessionId,
-                status, userName, job_id, queue_id, highlander, fromSchedule, notBefore);
+                status, userName, job_id, queue_id, highlander, fromSchedule, notBefore, priority);
 
         int newId = qr.getGeneratedId();
 

@@ -112,6 +112,13 @@ class Loader implements Runnable, LoaderMBean
         // Set thread name
         Thread.currentThread().setName(threadName);
 
+        // Priority?
+        if (this.job.getPriority() != null && this.job.getPriority() >= Thread.MIN_PRIORITY
+                && this.job.getPriority() <= Thread.MAX_PRIORITY)
+        {
+            Thread.currentThread().setPriority(this.job.getPriority());
+        }
+
         // One log per launch?
         if (System.out instanceof MultiplexPrintStream)
         {
