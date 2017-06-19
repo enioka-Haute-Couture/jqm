@@ -97,7 +97,7 @@ class XmlJobDefParser
 
             // Schema validation
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = factory.newSchema(new File("./lib/res.xsd"));
+            Schema schema = factory.newSchema(XmlJobDefParser.class.getClassLoader().getResource("res.xsd"));
             Validator validator = schema.newValidator();
             validator.validate(new DOMSource(doc));
 

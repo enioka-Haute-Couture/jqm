@@ -42,8 +42,7 @@ public class FiboTest extends JqmBaseTest
     @After
     public void a()
     {
-        Logger.getRootLogger().setLevel(Level.toLevel("DEBUG"));
-        Logger.getLogger("com.enioka").setLevel(Level.toLevel("DEBUG"));
+        CommonService.setLogLevel("DEBUG");
     }
 
     @Test

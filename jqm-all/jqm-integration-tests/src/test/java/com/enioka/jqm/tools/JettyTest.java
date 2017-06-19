@@ -96,7 +96,7 @@ public class JettyTest extends JqmBaseTest
 
         int port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
         HttpUriRequest rq = new HttpGet("https://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + i);
-        jqmlogger.debug(rq.getURI());
+        jqmlogger.debug(rq.getURI().toString());
         CloseableHttpResponse rs = cl.execute(rq);
         Assert.assertEquals(200, rs.getStatusLine().getStatusCode());
 

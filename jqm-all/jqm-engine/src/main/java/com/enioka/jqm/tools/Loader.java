@@ -113,7 +113,7 @@ class Loader implements Runnable, LoaderMBean
         Thread.currentThread().setName(threadName);
 
         // Handler event.
-        if (this.engine.getHandler() != null)
+        if (this.engine != null && this.engine.getHandler() != null)
         {
             this.engine.getHandler().onJobInstancePreparing(job);
         }
@@ -346,7 +346,7 @@ class Loader implements Runnable, LoaderMBean
         }
 
         // Unregister logger
-        if (this.engine.getHandler() != null)
+        if (this.engine != null && this.engine.getHandler() != null)
         {
             this.engine.getHandler().onJobInstanceDone(job);
         }

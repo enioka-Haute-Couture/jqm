@@ -30,6 +30,7 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.enioka.admin.MetaService;
 import com.enioka.jqm.api.JobInstance;
@@ -44,6 +45,12 @@ import com.enioka.jqm.jdbc.NoResultException;
  */
 public class Main
 {
+    static
+    {
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+    }
+
     private static Logger jqmlogger = Logger.getLogger(Main.class);
     private static JqmEngine engine;
 
@@ -83,7 +90,7 @@ public class Main
     @SuppressWarnings("static-access")
     public static void main(String[] args)
     {
-        Helpers.setLogFileName("cli");
+        CommonService.setLogFileName("cli");
         Option o00 = OptionBuilder.withArgName("nodeName").hasArg().withDescription("name of the JQM node to start").isRequired()
                 .create("startnode");
         Option o01 = OptionBuilder.withDescription("display help").withLongOpt("help").create("h");
@@ -326,7 +333,7 @@ public class Main
         try
         {
             engine = new JqmEngine();
-            engine.start(nodeName, null);
+            engine.start(nodeName, new EngineCallback());
             return engine;
         }
         catch (JqmRuntimeException e)

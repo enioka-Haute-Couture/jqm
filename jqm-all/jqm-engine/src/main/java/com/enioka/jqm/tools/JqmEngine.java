@@ -619,6 +619,12 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     }
 
     @Override
+    public boolean areAllPollersPolling()
+    {
+        return isAllPollersPolling();
+    }
+
+    @Override
     public boolean isFull()
     {
         for (QueuePoller p : this.pollers.values())

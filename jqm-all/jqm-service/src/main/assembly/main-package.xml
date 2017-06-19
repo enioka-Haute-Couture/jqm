@@ -117,6 +117,15 @@
 			<useProjectArtifact>false</useProjectArtifact>
 			<unpack>false</unpack>
 			<scope>runtime</scope>
+			<excludes>
+				<exclude>com.enioka.jqm:jqm-ws</exclude>
+				<exclude>com.enioka.jqm:jqm-providers</exclude>
+				<exclude>com.enioka.jqm:jqm-runner-basic</exclude>
+				<exclude>com.enioka.jqm:jqm-runner-spring</exclude>
+				<exclude>org.apache.tomcat</exclude>
+				<exclude>org.hsqldb</exclude>
+				<exclude>com.sun.mail</exclude>
+			</excludes>
 		</dependencySet>
 
 		<dependencySet>

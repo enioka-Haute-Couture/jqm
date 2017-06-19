@@ -35,7 +35,6 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.jboss.shrinkwrap.resolver.api.maven.ConfigurableMavenResolverSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.JobDef;
@@ -51,12 +50,6 @@ import com.enioka.jqm.model.Node;
 class LibraryResolverFS
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(LibraryResolverFS.class);
-
-    static
-    {
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
-    }
 
     private static class JobDefLibrary
     {

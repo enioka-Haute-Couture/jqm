@@ -58,7 +58,7 @@ public class CliTest extends JqmBaseTest
 
         // This is not really a one shot JVM, so let's reset log4j
         LogManager.resetConfiguration();
-        PropertyConfigurator.configure("target/classes/log4j.properties");
+        PropertyConfigurator.configure(this.getClass().getClassLoader().getResource("log4j.properties"));
 
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));

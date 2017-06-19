@@ -31,7 +31,6 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.zip.ZipFile;
 
-import javax.mail.MessagingException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
@@ -540,7 +539,7 @@ final class Helpers
      * @throws MessagingException
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    static void sendMessage(String to, String subject, String body, String mailSessionJndiAlias) throws MessagingException
+    static void sendMessage(String to, String subject, String body, String mailSessionJndiAlias)
     {
         jqmlogger.debug("sending mail to " + to + " - subject is " + subject);
         ClassLoader extLoader = getExtClassLoader();
@@ -553,7 +552,7 @@ final class Helpers
         }
         catch (NamingException e)
         {
-            throw new MessagingException("could not find mail session description", e);
+            throw new JqmRuntimeException("could not find mail session description", e);
         }
 
         try
@@ -575,7 +574,7 @@ final class Helpers
         }
         catch (Exception e)
         {
-            throw new MessagingException("an exception occurred during mail sending", e);
+            throw new JqmRuntimeException("an exception occurred during mail sending", e);
         }
         finally
         {

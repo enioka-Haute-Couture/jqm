@@ -1,6 +1,7 @@
 package com.enioka.jqm.tools;
 
 import com.enioka.jqm.jdbc.Db;
+import com.enioka.jqm.jdbc.DbConn;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
@@ -36,5 +37,29 @@ public class JqmEngineFactory
     public static void setDatasource(Db db)
     {
         Helpers.setDb(db);
+    }
+
+    /**
+     * If the database you use is brand new (empty tables) you may want to use this to initialize the metadata instead of using the meta
+     * API.
+     */
+    public static void initializeMetadata()
+    {
+        // TODO: merge inside meta API.
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getNewDbSession();
+            Helpers.updateConfiguration(cnx);
+            cnx.commit();
+        }
+        catch (Exception e)
+        {
+            throw new JqmRuntimeException("Could not set metadata", e);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 }

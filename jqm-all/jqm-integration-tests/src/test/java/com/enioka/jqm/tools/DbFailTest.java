@@ -32,7 +32,7 @@ public class DbFailTest extends JqmBaseTest
         jqmlogger.info("Restarting DB");
         s.start();
         this.sleep(5);
-        Assert.assertTrue(this.engines.get("localhost").isAllPollersPolling());
+        Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
     }
 
     @Test

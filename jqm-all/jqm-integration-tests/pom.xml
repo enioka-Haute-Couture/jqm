@@ -1,26 +1,236 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>com.enioka.jqm</groupId>
-    <artifactId>jqm-all</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
-  </parent>
-  <groupId>com.enioka.jqm</groupId>
-  <artifactId>jqm-integration-tests</artifactId>
-  <version>2.0.0-SNAPSHOT</version>
-  <name>jqm-integration-tests</name>
-  <url>http://maven.apache.org</url>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.enioka.jqm</groupId>
+		<artifactId>jqm-all</artifactId>
+		<version>2.0.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>jqm-integration-tests</artifactId>
+
+	<name>${project.groupId}:${project.artifactId}</name>
+	<url>http://jqm.readthedocs.org</url>
+
+	<build>
+		<plugins>
+			<!-- Create ext and lib directories for tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<skip>false</skip>
+				</configuration>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>process-test-classes</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.hsqldb</groupId>
+									<artifactId>hsqldb</artifactId>
+									<version>${hsqldb.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.postgresql</groupId>
+									<artifactId>postgresql</artifactId>
+									<version>42.1.1.jre6</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>mysql</groupId>
+									<artifactId>mysql-connector-java</artifactId>
+									<version>5.1.41</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.h2database</groupId>
+									<artifactId>h2</artifactId>
+									<version>${h2.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.apache.tomcat</groupId>
+									<artifactId>tomcat-jdbc</artifactId>
+									<version>${pool.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.apache.tomcat</groupId>
+									<artifactId>tomcat-juli</artifactId>
+									<version>${pool.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.enioka.jqm</groupId>
+									<artifactId>jqm-providers</artifactId>
+									<version>${project.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.enioka.jqm</groupId>
+									<artifactId>jqm-api</artifactId>
+									<version>${project.version}</version>
+								</artifactItem>
+								<dependency>
+									<groupId>com.sun.mail</groupId>
+									<artifactId>javax.mail</artifactId>
+									<version>${mail.version}</version>
+								</dependency>
+								<dependency>
+									<groupId>com.sun.mail</groupId>
+									<artifactId>smtp</artifactId>
+									<version>${mail.version}</version>
+								</dependency>
+
+							</artifactItems>
+							<outputDirectory>${project.basedir}/ext</outputDirectory>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>copy2</id>
+						<phase>process-test-classes</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>jqm-api</artifactId>
+									<version>${project.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>jqm-runner-basic</artifactId>
+									<version>${project.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>jqm-runner-spring</artifactId>
+									<version>${project.version}</version>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.basedir}/plugins</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- A mail server to test notifications -->
+			<plugin>
+				<groupId>com.btmatthews.maven.plugins</groupId>
+				<artifactId>emailserver-maven-plugin</artifactId>
+				<version>1.1.1</version>
+
+				<configuration>
+					<monitorKey>emailserver</monitorKey>
+					<monitorPort>11025</monitorPort>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>run-mail</id>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<phase>process-test-classes</phase>
+						<configuration>
+							<daemon>true</daemon>
+							<type>greenmail</type>
+							<portOffset>10000</portOffset>
+							<useSSL>false</useSSL>
+							<mailboxes>
+								<mailbox>
+									<login>testlogin</login>
+									<password>testpassword</password>
+									<email>test@jqm.com</email>
+								</mailbox>
+							</mailboxes>
+						</configuration>
+					</execution>
+					<execution>
+						<id>stop-mail</id>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+						<phase>post-integration-test</phase>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Copy test payload XML files -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>copy-payloads</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/payloads</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/test/resources/payloads</directory>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+
+
+		<!-- This project mostly tests the service JQM distribution -->
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-service</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Tests helpers -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-test-helpers</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- DB drivers for tests -->
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>${hsqldb.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.1.1.jre6</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.41</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
 </project>

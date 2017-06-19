@@ -84,12 +84,18 @@ public class JqmAsyncTester
         p2.put("com.enioka.jqm.jdbc.contextobject", db);
         JqmClientFactory.setProperties(p2);
         JqmEngineFactory.setDatasource(db);
+        JqmEngineFactory.initializeMetadata();
+        cnx.runUpdate("dp_delete_all");
+        cnx.runUpdate("q_delete_all");
         cnx.commit();
 
         // Needed parameters
         addGlobalParameter("defaultConnection", "");
         addGlobalParameter("disableWsApi", "true");
         addGlobalParameter("logFilePerLaunch", "false");
+
+        // Prepare DB
+
     }
 
     /**

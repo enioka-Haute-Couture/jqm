@@ -47,7 +47,7 @@ public class JqmBaseTest
     public static Logger jqmlogger = LoggerFactory.getLogger(JqmBaseTest.class);
     public static Server s;
     protected static Db db;
-    public Map<String, JqmEngine> engines = new HashMap<String, JqmEngine>();
+    public Map<String, JqmEngineOperations> engines = new HashMap<String, JqmEngineOperations>();
     public List<DbConn> cnxs = new ArrayList<DbConn>();
 
     protected DbConn cnx;
@@ -115,7 +115,7 @@ public class JqmBaseTest
         jqmlogger.debug("*** Cleaning after test " + testName.getMethodName());
         for (String k : engines.keySet())
         {
-            JqmEngine e = engines.get(k);
+            JqmEngineOperations e = engines.get(k);
             e.stop();
         }
         engines.clear();
@@ -134,22 +134,21 @@ public class JqmBaseTest
         System.gc();
     }
 
-    protected JqmEngine addAndStartEngine()
+    protected JqmEngineOperations addAndStartEngine()
     {
         return addAndStartEngine("localhost");
     }
 
-    protected JqmEngine addAndStartEngine(String nodeName)
+    protected JqmEngineOperations addAndStartEngine(String nodeName)
     {
-        JqmEngine e = new JqmEngine();
+        JqmEngineOperations e = JqmEngineFactory.startEngine(nodeName, new EngineCallback());
         engines.put(nodeName, e);
-        e.start(nodeName, null);
         return e;
     }
 
     protected void stopAndRemoveEngine(String nodeName)
     {
-        JqmEngine e = engines.get(nodeName);
+        JqmEngineOperations e = engines.get(nodeName);
         e.stop();
         engines.remove(nodeName);
     }
