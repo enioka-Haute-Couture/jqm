@@ -36,14 +36,12 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.RollingFileAppender;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.util.ByteSource;
 import org.apache.shiro.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.Db;
@@ -69,7 +67,7 @@ import com.enioka.jqm.model.RUser;
  */
 final class Helpers
 {
-    private static Logger jqmlogger = Logger.getLogger(Helpers.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(Helpers.class);
 
     // The one and only Database context in the engine.
     private static Db _db;
@@ -125,7 +123,7 @@ final class Helpers
         }
         catch (Exception e)
         {
-            jqmlogger.fatal("Unable to connect with the database. Maybe your configuration file is wrong. "
+            jqmlogger.error("Unable to connect with the database. Maybe your configuration file is wrong. "
                     + "Please check the password or the url in the $JQM_DIR/conf/resources.xml", e);
             throw new JqmInitError("Database connection issue", e);
         }
@@ -180,32 +178,6 @@ final class Helpers
     static void resetDb()
     {
         _db = null;
-    }
-
-    static void setLogFileName(String name)
-    {
-        Appender a = Logger.getRootLogger().getAppender("rollingfile");
-        if (a == null)
-        {
-            return;
-        }
-        RollingFileAppender r = (RollingFileAppender) a;
-        r.setFile("./logs/jqm-" + name + ".log");
-        r.activateOptions();
-    }
-
-    static void setLogLevel(String level)
-    {
-        try
-        {
-            Logger.getRootLogger().setLevel(Level.toLevel(level));
-            Logger.getLogger("com.enioka").setLevel(Level.toLevel(level));
-            jqmlogger.info("Setting general log level at " + level + " which translates as log4j level " + Level.toLevel(level));
-        }
-        catch (Exception e)
-        {
-            jqmlogger.warn("Log level could not be set", e);
-        }
     }
 
     /**
@@ -488,7 +460,7 @@ final class Helpers
             return res;
         }
 
-        InputStream is = Main.class.getResourceAsStream("/META-INF/maven/com.enioka.jqm/jqm-engine/pom.properties");
+        InputStream is = Helpers.class.getResourceAsStream("/META-INF/maven/com.enioka.jqm/jqm-engine/pom.properties");
         Properties p = new Properties();
         try
         {
@@ -506,16 +478,6 @@ final class Helpers
     static JobDef findJobDef(String applicationName, DbConn cnx)
     {
         List<JobDef> jj = JobDef.select(cnx, "jd_select_by_key", applicationName);
-        if (jj.size() == 0)
-        {
-            return null;
-        }
-        return jj.get(0);
-    }
-
-    static Queue findQueue(String qName, DbConn cnx)
-    {
-        List<Queue> jj = Queue.select(cnx, "q_select_by_key", qName);
         if (jj.size() == 0)
         {
             return null;

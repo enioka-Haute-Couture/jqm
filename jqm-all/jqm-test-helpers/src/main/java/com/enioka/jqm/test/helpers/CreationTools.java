@@ -36,10 +36,11 @@ package com.enioka.jqm.test.helpers;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.util.ByteSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
@@ -57,7 +58,7 @@ import com.enioka.jqm.model.JobDef.PathType;
  */
 public class CreationTools
 {
-    private static Logger jqmlogger = Logger.getLogger(CreationTools.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(CreationTools.class);
 
     private CreationTools()
     {}

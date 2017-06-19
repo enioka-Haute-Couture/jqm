@@ -32,7 +32,8 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.QueryResult;
@@ -45,7 +46,7 @@ import com.enioka.jqm.model.Queue;
  */
 class QueuePoller implements Runnable, QueuePollerMBean
 {
-    private static Logger jqmlogger = Logger.getLogger(QueuePoller.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(QueuePoller.class);
 
     private Queue queue = null;
     private JqmEngine engine;

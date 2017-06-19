@@ -1,6 +1,7 @@
 package com.enioka.jqm.tools;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
@@ -15,7 +16,7 @@ import com.enioka.jqm.model.GlobalParameter;
  */
 public class JqmSingleRunner
 {
-    private final static Logger jqmlogger = Logger.getLogger(JqmSingleRunner.class);
+    private final static Logger jqmlogger = LoggerFactory.getLogger(JqmSingleRunner.class);
 
     private JqmSingleRunner()
     {

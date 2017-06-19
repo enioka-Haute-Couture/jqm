@@ -15,7 +15,8 @@ import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Cl;
@@ -30,7 +31,7 @@ import com.enioka.jqm.model.JobInstance;
  */
 class ClassloaderManager
 {
-    private Logger jqmlogger = Logger.getLogger(ClassloaderManager.class);
+    private Logger jqmlogger = LoggerFactory.getLogger(ClassloaderManager.class);
 
     /**
      * The CL corresponding to "one CL to rule them all" mode.

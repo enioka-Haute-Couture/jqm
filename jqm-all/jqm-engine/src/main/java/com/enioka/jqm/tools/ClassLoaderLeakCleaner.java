@@ -7,11 +7,12 @@ import java.lang.reflect.Method;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class ClassLoaderLeakCleaner
 {
-    private static Logger jqmlogger = Logger.getLogger(ClassLoaderLeakCleaner.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(ClassLoaderLeakCleaner.class);
 
     private ClassLoaderLeakCleaner()
     {

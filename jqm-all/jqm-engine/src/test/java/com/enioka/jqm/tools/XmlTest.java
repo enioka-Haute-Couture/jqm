@@ -120,7 +120,8 @@ public class XmlTest extends JqmBaseTest
         // Init the default queue (don't start the engine!)
         Helpers.updateConfiguration(cnx);
 
-        Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest.xml" });
+        XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmltest.xml", cnx);
+        cnx.commit();
 
         List<JobDef> jd = JobDef.select(cnx, "jd_select_all");
         JobDef fibo = JobDef.select_key(cnx, "Fibo");
@@ -145,7 +146,8 @@ public class XmlTest extends JqmBaseTest
         // Init the default queue (don't start the engine!)
         Helpers.updateConfiguration(cnx);
 
-        Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest.xml" });
+        XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmltest.xml", cnx);
+        cnx.commit();
 
         // Sanity check
         List<JobDef> jd = JobDef.select(cnx, "jd_select_all");
@@ -158,7 +160,8 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals("jvhkdfl", fibo.getKeyword3());
 
         // Import and therefore update the job definitions.
-        Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest_update.xml" });
+        XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmltest_update.xml", cnx);
+        cnx.commit();
 
         jd = JobDef.select(cnx, "jd_select_all");
         fibo = JobDef.select_key(cnx, "Fibo");
@@ -234,7 +237,8 @@ public class XmlTest extends JqmBaseTest
         Helpers.updateConfiguration(cnx);
 
         // First import
-        Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest.xml" });
+        XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmltest.xml", cnx);
+        cnx.commit();
 
         List<JobDef> jd = JobDef.select(cnx, "jd_select_all");
         Assert.assertEquals(2, jd.size());
@@ -243,7 +247,8 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals("1", fibo.getParametersMap(cnx).get("p1"));
 
         // Second import - parameters are different, note 3 instead of 1
-        Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltest_np.xml" });
+        XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmltest_np.xml", cnx);
+        cnx.commit();
 
         jd = JobDef.select(cnx, "jd_select_all");
         fibo = JobDef.select_key(cnx, "Fibo");
@@ -259,7 +264,8 @@ public class XmlTest extends JqmBaseTest
         // Init the default queue (don't start the engine!)
         Helpers.updateConfiguration(cnx);
 
-        Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmltestnewqueue.xml" });
+        XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmltestnewqueue.xml", cnx);
+        cnx.commit();
 
         List<JobDef> jd = JobDef.select(cnx, "jd_select_all");
         Assert.assertEquals(2, jd.size());

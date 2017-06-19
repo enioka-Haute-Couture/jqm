@@ -18,24 +18,21 @@
 
 package com.enioka.jqm.tools;
 
-import java.io.OutputStreamWriter;
 import java.lang.management.ManagementFactory;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.RollingFileAppender;
-import org.eclipse.jetty.util.ArrayQueue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
@@ -53,8 +50,11 @@ import com.enioka.jqm.model.State;
  */
 class JqmEngine implements JqmEngineMBean, JqmEngineOperations
 {
-    private static Logger jqmlogger = Logger.getLogger(JqmEngine.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(JqmEngine.class);
     static String latestNodeStartedName = "";
+
+    // Callbacks
+    JqmEngineHandler handler = null;
 
     // Sync data for stopping the engine
     private Semaphore ended = new Semaphore(0);
@@ -69,7 +69,6 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     private Map<Integer, QueuePoller> pollers = new HashMap<Integer, QueuePoller>();
     private InternalPoller intPoller = null;
     private CronScheduler scheduler = null;
-    private JettyServer server = null;
 
     // Misc data
     private Calendar startTime = Calendar.getInstance();
@@ -78,9 +77,9 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     private AtomicLong endedInstances = new AtomicLong(0);
 
     // DB connection resilience data
-    private volatile Queue<QueuePoller> qpToRestart = new ArrayQueue<QueuePoller>();
-    private volatile Queue<Loader> loaderToFinalize = new ArrayQueue<Loader>();
-    private volatile Queue<Loader> loaderToRestart = new ArrayQueue<Loader>();
+    private volatile Queue<QueuePoller> qpToRestart = new LinkedBlockingQueue<QueuePoller>();
+    private volatile Queue<Loader> loaderToFinalize = new LinkedBlockingQueue<Loader>();
+    private volatile Queue<Loader> loaderToRestart = new LinkedBlockingQueue<Loader>();
     private volatile Thread qpRestarter = null;
 
     /**
@@ -90,16 +89,23 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
      *            the name of the node to start, as in the NODE table of the database.
      * @throws JqmInitError
      */
-    void start(String nodeName)
+    void start(String nodeName, JqmEngineHandler h)
     {
         if (nodeName == null || nodeName.isEmpty())
         {
             throw new IllegalArgumentException("nodeName cannot be null or empty");
         }
 
+        this.handler = h;
+
         // Set thread name - used in audits
         Thread.currentThread().setName("JQM engine;;" + nodeName);
-        Helpers.setLogFileName(nodeName);
+
+        // First event
+        if (this.handler != null)
+        {
+            this.handler.onNodeStarting(nodeName);
+        }
 
         // Log: we are starting...
         jqmlogger.info("JQM engine version " + this.getVersion() + " for node " + nodeName + " is starting");
@@ -150,19 +156,10 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         // Log parameters
         Helpers.dumpParameters(cnx, node);
 
-        // Log level
-        Helpers.setLogLevel(node.getRootLogLevel());
-
-        // Log multicasting (& log4j stdout redirect)
-        String gp1 = GlobalParameter.getParameter(cnx, "logFilePerLaunch", "true");
-        if ("true".equals(gp1) || "both".equals(gp1))
+        // The handler may take any actions it wishes here - such as setting log levels, starting Jetty...
+        if (this.handler != null)
         {
-            RollingFileAppender a = (RollingFileAppender) Logger.getRootLogger().getAppender("rollingfile");
-            MultiplexPrintStream s = new MultiplexPrintStream(System.out, FilenameUtils.getFullPath(a.getFile()), "both".equals(gp1));
-            System.setOut(s);
-            ((ConsoleAppender) Logger.getRootLogger().getAppender("consoleAppender")).setWriter(new OutputStreamWriter(s));
-            s = new MultiplexPrintStream(System.err, FilenameUtils.getFullPath(a.getFile()), "both".equals(gp1));
-            System.setErr(s);
+            this.handler.onNodeConfigurationRead(node);
         }
 
         // Remote JMX server
@@ -176,10 +173,6 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             jqmlogger.info(
                     "JMX remote listener will not be started as JMX registry port and JMX server port parameters are not both defined");
         }
-
-        // Jetty
-        this.server = new JettyServer();
-        this.server.start(node, cnx);
 
         // JMX
         if (node.getJmxServerPort() != null && node.getJmxServerPort() > 0)
@@ -219,7 +212,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         syncPollers(cnx, this.node);
         jqmlogger.info("All required queues are now polled");
 
-        // Internal poller (stop notifications, keepalive)
+        // Internal poller (stop notifications, keep alive)
         intPoller = new InternalPoller(this);
         Thread t = new Thread(intPoller);
         t.start();
@@ -232,6 +225,10 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         cnx.close();
         cnx = null;
         latestNodeStartedName = node.getName();
+        if (this.handler != null)
+        {
+            this.handler.onNodeStarted();
+        }
         jqmlogger.info("End of JQM engine initialization");
     }
 
@@ -369,8 +366,11 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         jqmlogger.trace("The engine should end with the latest poller");
         hasEnded = true;
 
-        // If here, all pollers are down. Stop Jetty too
-        this.server.stop();
+        // If here, all pollers are down. Stop everythong else.
+        if (handler != null)
+        {
+            handler.onNodeStopped();
+        }
 
         // Also stop the internal poller
         this.intPoller.stop();
@@ -574,14 +574,14 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         return this.clManager;
     }
 
-    JettyServer getJetty()
-    {
-        return this.server;
-    }
-
     void signalEndOfRun()
     {
         this.endedInstances.incrementAndGet();
+    }
+
+    JqmEngineHandler getHandler()
+    {
+        return this.handler;
     }
 
     // //////////////////////////////////////////////////////////////////////////

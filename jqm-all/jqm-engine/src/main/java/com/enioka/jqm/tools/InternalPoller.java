@@ -21,7 +21,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.naming.spi.NamingManager;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
@@ -35,13 +36,12 @@ import com.enioka.jqm.model.Node;
  */
 class InternalPoller implements Runnable
 {
-    private static Logger jqmlogger = Logger.getLogger(InternalPoller.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(InternalPoller.class);
     private boolean run = true;
     private JqmEngine engine = null;
     private Thread localThread = null;
     private long step;
     private Node node = null;
-    private String logLevel = null;
     private Semaphore loop = new Semaphore(0);
 
     InternalPoller(JqmEngine e)
@@ -52,7 +52,6 @@ class InternalPoller implements Runnable
         // Get configuration data
         this.node = this.engine.getNode();
         this.step = Long.parseLong(GlobalParameter.getParameter(cnx, "internalPollingPeriodMs", "60000"));
-        this.logLevel = this.node.getRootLogLevel();
         cnx.close();
     }
 
@@ -83,8 +82,7 @@ class InternalPoller implements Runnable
         jqmlogger.info("Start of the internal poller");
         DbConn cnx = null;
         this.localThread = Thread.currentThread();
-        Calendar latestJettyRestart = Calendar.getInstance(), lastJndiPurge = latestJettyRestart;
-        String nodePrms = null;
+        Calendar lastJndiPurge = Calendar.getInstance();
 
         // Launch main loop
         while (true)
@@ -126,11 +124,10 @@ class InternalPoller implements Runnable
                     break;
                 }
 
-                // Change log level?
-                if (!this.logLevel.equals(node.getRootLogLevel()))
+                // Engine handler is allowed to do changes on configuration changes.
+                if (this.engine.getHandler() != null)
                 {
-                    this.logLevel = node.getRootLogLevel();
-                    Helpers.setLogLevel(this.logLevel);
+                    this.engine.getHandler().onConfigurationChanged(node);
                 }
 
                 // I am alive
@@ -140,25 +137,9 @@ class InternalPoller implements Runnable
                 // Have queue bindings changed, or is engine disabled?
                 this.engine.syncPollers(cnx, node);
 
-                // Jetty restart. Conditions are:
-                // * some parameters (such as security parameters) have changed
-                // * node parameter change such as start or stop an API.
-                Calendar bflkpm = Calendar.getInstance();
-                String np = node.getDns() + node.getPort() + node.getLoadApiAdmin() + node.getLoadApiClient() + node.getLoapApiSimple();
-                if (nodePrms == null)
-                {
-                    nodePrms = np;
-                }
-                int i = cnx.runSelectSingle("globalprm_select_count_modified_jetty", Integer.class, latestJettyRestart);
-                if (i > 0 || !np.equals(nodePrms))
-                {
-                    this.engine.getJetty().start(node, cnx);
-                    latestJettyRestart = bflkpm;
-                    nodePrms = np;
-                }
-
                 // Should JNDI cache be purged?
-                i = cnx.runSelectSingle("jndi_select_count_changed", Integer.class, lastJndiPurge, lastJndiPurge);
+                Calendar bflkpm = Calendar.getInstance();
+                int i = cnx.runSelectSingle("jndi_select_count_changed", Integer.class, lastJndiPurge, lastJndiPurge);
                 if (i > 0L)
                 {
                     try

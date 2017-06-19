@@ -38,7 +38,7 @@ class XmlQueueExporter
     /**
      * Exports a single queue to an XML file.
      */
-    static void export(String path, String queueName, DbConn cnx) throws JqmEngineException
+    static void export(String path, String queueName, DbConn cnx) throws JqmXmlException
     {
         // Argument tests
         if (queueName == null)
@@ -49,7 +49,7 @@ class XmlQueueExporter
         {
             throw new IllegalArgumentException("database connection cannot be null");
         }
-        Queue q = Helpers.findQueue(queueName, cnx);
+        Queue q = CommonXml.findQueue(queueName, cnx);
         if (q == null)
         {
             throw new IllegalArgumentException("there is no queue named " + queueName);
@@ -63,7 +63,7 @@ class XmlQueueExporter
     /**
      * Exports all available queues to an XML file.
      */
-    static void export(String path, DbConn cnx) throws JqmEngineException
+    static void export(String path, DbConn cnx) throws JqmXmlException
     {
         if (cnx == null)
         {
@@ -75,7 +75,7 @@ class XmlQueueExporter
     /**
      * Exports all available queues to an XML file.
      */
-    static void export(String path, DbConn cnx, List<String> qNames) throws JqmEngineException
+    static void export(String path, DbConn cnx, List<String> qNames) throws JqmXmlException
     {
         if (cnx == null)
         {
@@ -88,7 +88,7 @@ class XmlQueueExporter
         List<Queue> qList = new ArrayList<Queue>();
         for (String qn : qNames)
         {
-            Queue q = Helpers.findQueue(qn, cnx);
+            Queue q = CommonXml.findQueue(qn, cnx);
             if (q == null)
             {
                 throw new IllegalArgumentException("There is no queue named " + qn);
@@ -101,7 +101,7 @@ class XmlQueueExporter
     /**
      * Exports several (given) queues to an XML file.
      */
-    static void export(String path, List<Queue> queueList, DbConn cnx) throws JqmEngineException
+    static void export(String path, List<Queue> queueList, DbConn cnx) throws JqmXmlException
     {
         // Argument tests
         if (path == null)
@@ -137,7 +137,7 @@ class XmlQueueExporter
         }
         catch (java.io.IOException e)
         {
-            throw new JqmEngineException("Coul npot save the XML file", e);
+            throw new JqmXmlException("Coul npot save the XML file", e);
         }
     }
 

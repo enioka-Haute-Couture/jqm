@@ -26,13 +26,14 @@ import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
@@ -43,7 +44,7 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class JqmBaseTest
 {
-    public static Logger jqmlogger = Logger.getLogger(JqmBaseTest.class);
+    public static Logger jqmlogger = LoggerFactory.getLogger(JqmBaseTest.class);
     public static Server s;
     protected static Db db;
     public Map<String, JqmEngine> engines = new HashMap<String, JqmEngine>();
@@ -142,7 +143,7 @@ public class JqmBaseTest
     {
         JqmEngine e = new JqmEngine();
         engines.put(nodeName, e);
-        e.start(nodeName);
+        e.start(nodeName, null);
         return e;
     }
 

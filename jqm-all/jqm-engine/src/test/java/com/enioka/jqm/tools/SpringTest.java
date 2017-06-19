@@ -56,7 +56,7 @@ public class SpringTest extends JqmBaseTest
         {
             XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmlspring.xml", cnx);
         }
-        catch (JqmEngineException e)
+        catch (JqmXmlException e)
         {
             jqmlogger.error("could not parse XML", e);
             Assert.fail();

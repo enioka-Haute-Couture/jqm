@@ -29,7 +29,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClient;
@@ -47,7 +48,7 @@ import com.enioka.jqm.model.State;
  */
 class JobManagerHandler implements InvocationHandler
 {
-    private static Logger jqmlogger = Logger.getLogger(JobManagerHandler.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(JobManagerHandler.class);
 
     private JobInstance ji;
     private Map<String, String> params = null;

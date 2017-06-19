@@ -17,7 +17,6 @@ package com.enioka.jqm.tools;
 
 import java.io.File;
 import java.io.PrintStream;
-import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Folder;
@@ -26,21 +25,14 @@ import javax.mail.Store;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.PropertyConfigurator;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
-import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
-import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.JobDef;
-import com.enioka.jqm.model.Queue;
-import com.enioka.jqm.model.RRole;
-import com.enioka.jqm.model.RUser;
 import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -143,7 +135,8 @@ public class MiscTest extends JqmBaseTest
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);
         cnx.commit();
 
-        Main.main(new String[] { "-importjobdef", "target/payloads/jqm-test-xml/xmlstop.xml" });
+        XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmlstop.xml", cnx);
+        cnx.commit();
 
         JobRequest j = new JobRequest("CompatHibApi", "TestUser");
         JqmClientFactory.getClient().enqueue(j);
@@ -176,17 +169,17 @@ public class MiscTest extends JqmBaseTest
         Helpers.setSingleParam("disableVerboseStartup", "false", cnx);
 
         JqmEngine engine1 = new JqmEngine();
-        engine1.start("localhost");
+        engine1.start("localhost", null);
 
         JqmEngine engine2 = new JqmEngine();
         try
         {
-            engine2.start("localhost");
+            engine2.start("localhost", null);
             Assert.fail("engine should not have been able to start");
         }
         catch (JqmInitErrorTooSoon e)
         {
-            jqmlogger.info(e);
+            jqmlogger.info("", e);
         }
         finally
         {
@@ -277,26 +270,6 @@ public class MiscTest extends JqmBaseTest
     }
 
     @Test
-    public void testSingleLauncher() throws Exception
-    {
-        CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
-        int i = JobRequest.create("MarsuApplication", "TestUser").submit();
-        cnx.runUpdate("ji_update_poll", TestHelpers.node.getId(), TestHelpers.qVip, 10);
-        cnx.runUpdate("debug_jj_update_node_by_id", TestHelpers.node.getId(), i);
-        cnx.commit();
-
-        Main.main(new String[] { "-s", String.valueOf(i) });
-
-        // This is not really a one shot JVM, so let's reset log4j
-        LogManager.resetConfiguration();
-        PropertyConfigurator.configure("target/classes/log4j.properties");
-
-        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
-        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
-    }
-
-    @Test
     public void testExternalLaunch() throws Exception
     {
         int jdId = CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip,
@@ -324,36 +297,6 @@ public class MiscTest extends JqmBaseTest
         TestHelpers.waitFor(1, 20000, cnx);
         Assert.assertEquals(0, TestHelpers.getOkCount(cnx));
         Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
-    }
-
-    @Test
-    public void testCliChangeUser()
-    {
-        Helpers.updateConfiguration(cnx);
-        Main.main(new String[] { "-U", "myuser", "mypassword", "administrator", "client" });
-
-        RUser u = RUser.selectlogin(cnx, "myuser");
-
-        Assert.assertEquals(2, u.getRoles(cnx).size());
-        boolean admin = false, client = false;
-        for (RRole r : u.getRoles(cnx))
-        {
-            if (r.getName().equals("administrator"))
-            {
-                admin = true;
-            }
-            if (r.getName().equals("client"))
-            {
-                client = true;
-            }
-        }
-        Assert.assertTrue(client && admin);
-
-        Main.main(new String[] { "-U", "myuser", "mypassword", "administrator" });
-        Assert.assertEquals(1, u.getRoles(cnx).size());
-
-        Main.main(new String[] { "-U", "myuser,mypassword,administrator,config admin" });
-        Assert.assertEquals(2, u.getRoles(cnx).size());
     }
 
     @Test

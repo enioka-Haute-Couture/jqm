@@ -32,8 +32,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.apache.log4j.Logger;
 import org.jboss.shrinkwrap.resolver.api.maven.ConfigurableMavenResolverSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.enioka.jqm.jdbc.DbConn;
@@ -49,7 +50,7 @@ import com.enioka.jqm.model.Node;
  */
 class LibraryResolverFS
 {
-    private static Logger jqmlogger = Logger.getLogger(LibraryResolverFS.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(LibraryResolverFS.class);
 
     static
     {

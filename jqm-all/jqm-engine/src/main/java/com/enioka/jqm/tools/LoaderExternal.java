@@ -11,8 +11,8 @@ import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.log4j.RollingFileAppender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
@@ -20,7 +20,7 @@ import com.enioka.jqm.model.JobInstance;
 
 class LoaderExternal implements Runnable
 {
-    private static Logger jqmlogger = Logger.getLogger(LoaderExternal.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(LoaderExternal.class);
 
     int jobId;
     String opts;
@@ -37,8 +37,7 @@ class LoaderExternal implements Runnable
                 : job.getJD().getJavaOpts();
         killCheckPeriodMs = Integer.parseInt(GlobalParameter.getParameter(cnx, "internalPollingPeriodMs", "1000"));
 
-        RollingFileAppender a = (RollingFileAppender) Logger.getRootLogger().getAppender("rollingfile");
-        logFile = FilenameUtils.getFullPath(a.getFile());
+        logFile = "./logs";
         logFile = FilenameUtils.concat(logFile, StringUtils.leftPad("" + jobId, 10, "0") + ".log");
     }
 

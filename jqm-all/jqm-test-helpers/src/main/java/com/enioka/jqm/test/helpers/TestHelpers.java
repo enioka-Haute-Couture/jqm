@@ -25,7 +25,8 @@ import java.net.UnknownHostException;
 import java.util.Calendar;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.DeploymentParameter;
@@ -36,7 +37,7 @@ import com.enioka.jqm.model.RRole;
 
 public class TestHelpers
 {
-    public static Logger jqmlogger = Logger.getLogger(TestHelpers.class);
+    public static Logger jqmlogger = LoggerFactory.getLogger(TestHelpers.class);
 
     public static Integer qVip, qNormal, qSlow, qVip2, qNormal2, qSlow2, qVip3, qNormal3, qSlow3;
     public static Node node, node2, node3, nodeMix, nodeMix2;

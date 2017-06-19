@@ -31,7 +31,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.model.ClHandler;
 import com.enioka.jqm.model.JobInstance;
@@ -43,7 +44,7 @@ import com.enioka.jqm.model.JobInstance;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 class JarClassLoader extends URLClassLoader
 {
-    private static Logger jqmlogger = Logger.getLogger(JarClassLoader.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(JarClassLoader.class);
 
     private boolean childFirstClassLoader = false;
 

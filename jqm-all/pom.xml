@@ -110,6 +110,9 @@
 		<module>jqm-tst</module>
 		<module>jqm-admin</module>
 		<module>jqm-handlers</module>
+		<module>jqm-service</module>
+		<module>jqm-xml</module>
+		<module>jqm-integration-tests</module>
 	</modules>
 
 	<scm>
@@ -229,8 +232,8 @@
 				<javadoc.opts>-Xdoclint:none</javadoc.opts>
 			</properties>
 		</profile>
-		
-		
+
+
 		<profile>
 			<id>sonar</id>
 			<build>

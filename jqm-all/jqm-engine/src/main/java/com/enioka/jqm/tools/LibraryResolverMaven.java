@@ -7,11 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
 import org.jboss.shrinkwrap.resolver.api.maven.ConfigurableMavenResolverSystem;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenRemoteRepositories;
 import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenUpdatePolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
@@ -19,7 +20,7 @@ import com.enioka.jqm.model.JobInstance;
 
 public class LibraryResolverMaven
 {
-    private static Logger jqmlogger = Logger.getLogger(LibraryResolverMaven.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(LibraryResolverMaven.class);
 
     private static List<String> REPO_LIST = null;
     private static String MAVEN_SETTINGS_CL = null;

@@ -47,7 +47,8 @@ import javax.naming.spi.InitialContextFactoryBuilder;
 import javax.naming.spi.NamingManager;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements a basic JNDI context
@@ -55,7 +56,7 @@ import org.apache.log4j.Logger;
  */
 class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory, NameParser
 {
-    private static Logger jqmlogger = Logger.getLogger(JndiContext.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(JndiContext.class);
 
     private Map<String, Object> singletons = new HashMap<String, Object>();
     private List<ObjectName> jmxNames = new ArrayList<ObjectName>();

@@ -24,7 +24,8 @@ import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
 import javax.naming.spi.NamingManager;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -32,7 +33,7 @@ import org.apache.log4j.Logger;
  */
 final class JmxAgent
 {
-    private static Logger jqmlogger = Logger.getLogger(JmxAgent.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(JmxAgent.class);
     private static boolean init = false;
 
     private JmxAgent()

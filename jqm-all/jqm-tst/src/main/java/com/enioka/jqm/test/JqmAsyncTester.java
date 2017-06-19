@@ -29,8 +29,8 @@ import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.Queue;
+import com.enioka.jqm.tools.JqmEngineFactory;
 import com.enioka.jqm.tools.JqmEngineOperations;
-import com.enioka.jqm.tools.Main;
 
 /**
  * An asynchronous tester for JQM payloads. It allows to configure and start one or more embedded JQM engines and run payloads against them.
@@ -83,11 +83,7 @@ public class JqmAsyncTester
         Properties p2 = Common.dbProperties(s);
         p2.put("com.enioka.jqm.jdbc.contextobject", db);
         JqmClientFactory.setProperties(p2);
-        Main.setDb(db);
-
-        // Minimum parameters
-        Main.main(new String[] { "-u" });
-        cnx.runUpdate("q_delete_all");
+        JqmEngineFactory.setDatasource(db);
         cnx.commit();
 
         // Needed parameters
@@ -288,7 +284,7 @@ public class JqmAsyncTester
         hasStarted = true;
         for (Node n : nodes.values())
         {
-            engines.put(n.getName(), Main.startEngine(n.getName()));
+            engines.put(n.getName(), JqmEngineFactory.startEngine(n.getName(), null));
         }
         return this;
     }

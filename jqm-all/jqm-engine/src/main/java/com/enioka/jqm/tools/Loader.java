@@ -33,8 +33,8 @@ import javax.management.ObjectName;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.DbConn;
@@ -51,7 +51,7 @@ import com.enioka.jqm.model.State;
  */
 class Loader implements Runnable, LoaderMBean
 {
-    private Logger jqmlogger = Logger.getLogger(Loader.class);
+    private Logger jqmlogger = LoggerFactory.getLogger(Loader.class);
 
     private JobInstance job = null;
     private Node node = null;
@@ -112,21 +112,17 @@ class Loader implements Runnable, LoaderMBean
         // Set thread name
         Thread.currentThread().setName(threadName);
 
+        // Handler event.
+        if (this.engine.getHandler() != null)
+        {
+            this.engine.getHandler().onJobInstancePreparing(job);
+        }
+
         // Priority?
         if (this.job.getPriority() != null && this.job.getPriority() >= Thread.MIN_PRIORITY
                 && this.job.getPriority() <= Thread.MAX_PRIORITY)
         {
             Thread.currentThread().setPriority(this.job.getPriority());
-        }
-
-        // One log per launch?
-        if (System.out instanceof MultiplexPrintStream)
-        {
-            String fileName = StringUtils.leftPad("" + this.job.getId(), 10, "0");
-            MultiplexPrintStream mps = (MultiplexPrintStream) System.out;
-            mps.registerThread(String.valueOf(fileName + ".stdout.log"));
-            mps = (MultiplexPrintStream) System.err;
-            mps.registerThread(String.valueOf(fileName + ".stderr.log"));
         }
 
         // Log
@@ -350,21 +346,13 @@ class Loader implements Runnable, LoaderMBean
         }
 
         // Unregister logger
-        unregisterLogger();
+        if (this.engine.getHandler() != null)
+        {
+            this.engine.getHandler().onJobInstanceDone(job);
+        }
 
         // Part needing DB connection with specific failure handling code.
         endOfRunDb();
-    }
-
-    private void unregisterLogger()
-    {
-        if (System.out instanceof MultiplexPrintStream)
-        {
-            MultiplexPrintStream mps = (MultiplexPrintStream) System.out;
-            mps.unregisterThread();
-            mps = (MultiplexPrintStream) System.err;
-            mps.unregisterThread();
-        }
     }
 
     /**
@@ -401,7 +389,10 @@ class Loader implements Runnable, LoaderMBean
             jqmlogger.error("connection to database lost - loader " + this.getId() + " will be restarted later");
             jqmlogger.trace("connection error was:", e);
             this.engine.loaderRestartNeeded(this);
-            unregisterLogger();
+            if (this.engine.getHandler() != null)
+            {
+                this.engine.getHandler().onJobInstanceDone(job);
+            }
             return;
         }
         else

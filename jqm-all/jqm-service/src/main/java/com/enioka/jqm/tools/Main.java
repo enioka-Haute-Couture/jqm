@@ -321,17 +321,12 @@ public class Main
         }
     }
 
-    public static void setDb(Db db)
-    {
-        Helpers.setDb(db);
-    }
-
     public static JqmEngineOperations startEngine(String nodeName)
     {
         try
         {
             engine = new JqmEngine();
-            engine.start(nodeName);
+            engine.start(nodeName, null);
             return engine;
         }
         catch (JqmRuntimeException e)

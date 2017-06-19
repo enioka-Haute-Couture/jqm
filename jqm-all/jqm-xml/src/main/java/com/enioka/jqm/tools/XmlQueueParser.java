@@ -23,7 +23,8 @@ import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -33,14 +34,14 @@ import com.enioka.jqm.model.Queue;
 
 class XmlQueueParser
 {
-    private static Logger jqmlogger = Logger.getLogger(XmlQueueParser.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(XmlQueueParser.class);
 
     private XmlQueueParser()
     {
         // Utility class.
     }
 
-    static void parse(String path, DbConn cnx) throws JqmEngineException
+    static void parse(String path, DbConn cnx) throws JqmXmlException
     {
         // Argument checks
         jqmlogger.trace(path);
@@ -78,7 +79,7 @@ class XmlQueueParser
 
                 // Insert or update?
                 String qName = qElement.getElementsByTagName("name").item(0).getTextContent();
-                q = Helpers.findQueue(qName, cnx);
+                q = CommonXml.findQueue(qName, cnx);
                 if (q == null)
                 {
                     q = new Queue();
@@ -110,7 +111,7 @@ class XmlQueueParser
         }
         catch (Exception e)
         {
-            throw new JqmEngineException("Could not parse the Queue XML", e);
+            throw new JqmXmlException("Could not parse the Queue XML", e);
         }
     }
 }

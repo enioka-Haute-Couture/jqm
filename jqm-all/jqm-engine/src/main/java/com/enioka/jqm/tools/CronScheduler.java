@@ -1,6 +1,7 @@
 package com.enioka.jqm.tools;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
@@ -25,7 +26,7 @@ import it.sauronsoftware.cron4j.TaskTable;
  */
 class CronScheduler implements Runnable, TaskCollector
 {
-    private static Logger jqmlogger = Logger.getLogger(CronScheduler.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(CronScheduler.class);
 
     private Node node = null;
     private Integer schedulerKeepAlive;

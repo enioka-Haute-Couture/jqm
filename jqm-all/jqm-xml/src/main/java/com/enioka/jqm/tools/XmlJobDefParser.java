@@ -30,7 +30,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -47,7 +48,7 @@ import com.enioka.jqm.model.JobDef.PathType;
 
 class XmlJobDefParser
 {
-    private static Logger jqmlogger = Logger.getLogger(XmlJobDefParser.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(XmlJobDefParser.class);
 
     private XmlJobDefParser()
     {
@@ -61,7 +62,7 @@ class XmlJobDefParser
      * @param cnx
      * @throws JqmEngineException
      */
-    static void parse(String path, DbConn cnx) throws JqmEngineException
+    static void parse(String path, DbConn cnx) throws JqmXmlException
     {
         // Argument checks
         jqmlogger.trace(path);
@@ -352,7 +353,7 @@ class XmlJobDefParser
                         }
                         catch (NoResultException e)
                         {
-                            jqmlogger.fatal("Incorrect deployment descriptor: a job definition is using undefined context " + clName);
+                            jqmlogger.error("Incorrect deployment descriptor: a job definition is using undefined context " + clName);
                         }
                     }
                     else
@@ -390,7 +391,7 @@ class XmlJobDefParser
         }
         catch (Exception e)
         {
-            throw new JqmEngineException(
+            throw new JqmXmlException(
                     "an error occured while parsing the XML file " + path + ". No changes were done to the configuration.", e);
         }
     }

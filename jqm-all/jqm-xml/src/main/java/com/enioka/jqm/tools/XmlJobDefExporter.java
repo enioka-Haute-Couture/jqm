@@ -28,7 +28,6 @@ import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
-import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Cl;
 import com.enioka.jqm.model.ClHandler;
@@ -45,7 +44,7 @@ class XmlJobDefExporter
     /**
      * Exports all available queues to an XML file.
      */
-    static void export(String path, DbConn cnx) throws JqmEngineException
+    static void export(String path, DbConn cnx) throws JqmXmlException
     {
         if (cnx == null)
         {
@@ -57,7 +56,7 @@ class XmlJobDefExporter
     /**
      * Exports several (given) job def to an XML file.
      */
-    static void export(String xmlPath, List<JobDef> jobDefList, DbConn cnx) throws JqmEngineException
+    static void export(String xmlPath, List<JobDef> jobDefList, DbConn cnx) throws JqmXmlException
     {
         // Argument tests
         if (xmlPath == null)
@@ -124,7 +123,7 @@ class XmlJobDefExporter
         }
         catch (java.io.IOException e)
         {
-            throw new JqmEngineException("Coul not save the XML file", e);
+            throw new JqmXmlException("Coul not save the XML file", e);
         }
     }
 
