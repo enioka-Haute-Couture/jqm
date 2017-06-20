@@ -540,7 +540,7 @@ public class JobRequest implements Serializable
         return this;
     }
 
-    Integer getPriority()
+    public Integer getPriority()
     {
         return this.priority;
     }
