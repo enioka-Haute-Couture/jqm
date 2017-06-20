@@ -13,6 +13,10 @@
 	<name>${project.groupId}:${project.artifactId}</name>
 	<url>http://jqm.readthedocs.org</url>
 
+	<properties>
+		<argLine>-Xms256m -Xmx1024m -XX:MaxPermSize=512m</argLine>
+	</properties>
+
 	<build>
 		<plugins>
 			<!-- Create ext and lib directories for tests -->
