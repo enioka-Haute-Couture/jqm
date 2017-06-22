@@ -31,6 +31,7 @@ import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
 import com.enioka.jqm.api.Query.Sort;
+import com.enioka.jqm.api.Queue;
 import com.enioka.jqm.api.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -323,5 +324,64 @@ public class ClientApiTest extends JqmBaseTest
         Assert.assertEquals(2, msgs.size());
 
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+    }
+
+    @Test
+    public void testPauseResumeQueue()
+    {
+        CreationTools.createJobDef(null, true, "pyl.CallYieldAtOnce", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+
+        Queue qV = null;
+        for (Queue q : JqmClientFactory.getClient().getQueues())
+        {
+            if (q.getId() == TestHelpers.qVip)
+            {
+                qV = q;
+                break;
+            }
+        }
+
+        JobRequest.create("MarsuApplication", "TestUser").submit();
+        addAndStartEngine();
+        TestHelpers.waitFor(1, 10000, cnx);
+
+        JqmClientFactory.getClient().pauseQueue(qV);
+        JobRequest.create("MarsuApplication", "TestUser").submit();
+        this.sleep(1);
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getQueueAllCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getQueueRunningCount(cnx));
+
+        JqmClientFactory.getClient().resumeQueue(qV);
+        TestHelpers.waitFor(2, 10000, cnx);
+        Assert.assertEquals(2, TestHelpers.getOkCount(cnx));
+    }
+
+    @Test
+    public void testClearQueue()
+    {
+        CreationTools.createJobDef(null, true, "pyl.CallYieldAtOnce", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+
+        Queue qV = null;
+        for (Queue q : JqmClientFactory.getClient().getQueues())
+        {
+            if (q.getId() == TestHelpers.qVip)
+            {
+                qV = q;
+                break;
+            }
+        }
+
+        JobRequest.create("MarsuApplication", "TestUser").submit();
+        JobRequest.create("MarsuApplication", "TestUser").submit();
+        JobRequest.create("MarsuApplication", "TestUser").submit();
+
+        Assert.assertEquals(3, TestHelpers.getQueueAllCount(cnx));
+
+        JqmClientFactory.getClient().clearQueue(qV);
+
+        Assert.assertEquals(0, TestHelpers.getQueueAllCount(cnx));
     }
 }

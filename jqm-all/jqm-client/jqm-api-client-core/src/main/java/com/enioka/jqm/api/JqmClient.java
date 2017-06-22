@@ -431,7 +431,7 @@ public interface JqmClient
     InputStream getJobLogStdErr(int jobId);
 
     // /////////////////////////////////////////////////////////////////////
-    // Parameters retrieval
+    // Queue API
     // /////////////////////////////////////////////////////////////////////
 
     /**
@@ -443,6 +443,35 @@ public interface JqmClient
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
     List<Queue> getQueues();
+
+    /**
+     * All subscribers to the given queue pause until {@link #resumeQueue(Queue)} is called (can also be reactivated from the UI by an
+     * administrator).
+     * 
+     * @param q
+     *            the queue to pause
+     */
+    void pauseQueue(Queue q);
+
+    /**
+     * Resume all subscribers to the given queue. Idempotent.
+     * 
+     * @param q
+     *            the queue to resume.
+     */
+    void resumeQueue(Queue q);
+
+    /**
+     * All job instances waiting inside this queue are purged. Does not affect job instances already running.
+     * 
+     * @param q
+     *            the queue to clear.
+     */
+    void clearQueue(Queue q);
+
+    // /////////////////////////////////////////////////////////////////////
+    // Parameters retrieval
+    // /////////////////////////////////////////////////////////////////////
 
     /**
      * Lists all the available {@link JobDef} objects, i.e. the different payloads that can be launched by JQM.

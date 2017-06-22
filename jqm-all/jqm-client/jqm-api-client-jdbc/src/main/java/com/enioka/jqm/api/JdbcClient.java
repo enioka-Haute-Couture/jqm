@@ -1805,7 +1805,7 @@ final class JdbcClient implements JqmClient
     }
 
     // /////////////////////////////////////////////////////////////////////
-    // Parameters retrieval
+    // Queue APIs
     // /////////////////////////////////////////////////////////////////////
 
     @Override
@@ -1834,6 +1834,73 @@ final class JdbcClient implements JqmClient
             closeQuietly(cnx);
         }
     }
+
+    @Override
+    public void pauseQueue(com.enioka.jqm.api.Queue q)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = getDbSession();
+            cnx.runUpdate("dp_update_enable_by_queue_id", Boolean.FALSE, q.getId());
+            cnx.commit();
+            jqmlogger.info("Queue {} has been paused", q.getId());
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not pause queue", e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+    }
+
+    @Override
+    public void resumeQueue(com.enioka.jqm.api.Queue q)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = getDbSession();
+            cnx.runUpdate("dp_update_enable_by_queue_id", Boolean.TRUE, q.getId());
+            cnx.commit();
+            jqmlogger.info("Queue {} has been resumed", q.getId());
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not pause queue", e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+    }
+
+    @Override
+    public void clearQueue(com.enioka.jqm.api.Queue q)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = getDbSession();
+            QueryResult qr = cnx.runUpdate("ji_delete_waiting_in_queue_id", q.getId());
+            cnx.commit();
+            jqmlogger.info("{} waiting job instances were removed from queue {}", qr.nbUpdated, q.getId());
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not clear queue", e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // Parameters retrieval
+    // /////////////////////////////////////////////////////////////////////
 
     private static com.enioka.jqm.api.Queue getQueue(Queue queue)
     {

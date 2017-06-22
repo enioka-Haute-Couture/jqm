@@ -52,6 +52,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     private JqmEngine engine;
     private int maxNbThread = 10;
     private int pollingInterval = 10000;
+    private int dpId;
 
     private boolean run = true;
     private AtomicInteger actualNbThread = new AtomicInteger(0);
@@ -90,18 +91,44 @@ class QueuePoller implements Runnable, QueuePollerMBean
         loop = new Semaphore(0);
     }
 
-    QueuePoller(JqmEngine engine, Queue q, int nbThreads, int interval)
+    QueuePoller(JqmEngine engine, Queue q, DeploymentParameter dp)
     {
-        jqmlogger.info("Engine " + engine.getNode().getName() + " will poll JobInstances on queue " + q.getName() + " every "
-                + interval / 1000 + "s with " + nbThreads + " threads for concurrent instances");
-
         this.engine = engine;
         this.queue = q;
-        this.pollingInterval = interval;
-        this.maxNbThread = nbThreads;
+        applyDeploymentParameter(dp);
 
         reset();
         registerMBean();
+    }
+
+    void applyDeploymentParameter(DeploymentParameter dp)
+    {
+        this.pollingInterval = dp.getPollingInterval();
+        this.maxNbThread = dp.getEnabled() ? dp.getNbThread() : 0;
+        this.dpId = dp.getId();
+
+        jqmlogger.info("Engine " + engine.getNode().getName() + " will poll JobInstances on queue " + queue.getName() + " every "
+                + pollingInterval / 1000 + "s with " + maxNbThread + " threads for concurrent instances");
+    }
+
+    /**
+     * Called at the beginning of the main loop to check if the poller config is up to date (nbThread, pause...)
+     */
+    private void refreshDeploymentParameter(DbConn cnx)
+    {
+        List<DeploymentParameter> prms = DeploymentParameter.select(cnx, "dp_select_by_id", this.dpId);
+        if (prms.size() != 1)
+        {
+            this.stop();
+            return;
+        }
+
+        DeploymentParameter p = prms.get(0);
+        if (p.getPollingInterval() != this.pollingInterval || (this.maxNbThread > 0 && !p.getEnabled())
+                || (this.maxNbThread == 0 && p.getEnabled()))
+        {
+            applyDeploymentParameter(p);
+        }
     }
 
     private void registerMBean()
@@ -195,6 +222,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
             {
                 // Get a JI to run
                 cnx = Helpers.getNewDbSession();
+                refreshDeploymentParameter(cnx);
                 List<JobInstance> newInstances = dequeue(cnx, 1);
                 if (newInstances != null)
                 {
@@ -298,6 +326,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
             this.hasStopped = true;
             // Do not check for engine end - we do not want to shut down the engine on a poller failure.
         }
+        localThread = null;
     }
 
     @Override

@@ -736,7 +736,7 @@ final class JerseyClient implements JqmClient
     }
 
     // /////////////////////////////////////////////////////////////////////
-    // Parameters retrieval
+    // Queue APIs
     // /////////////////////////////////////////////////////////////////////
 
     @Override
@@ -753,6 +753,61 @@ final class JerseyClient implements JqmClient
             throw new JqmClientException(e);
         }
     }
+
+    @Override
+    public void pauseQueue(Queue q)
+    {
+        try
+        {
+            target.path("q/" + q.getId() + "/pause").request().put(null);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    @Override
+    public void resumeQueue(Queue q)
+    {
+        try
+        {
+            target.path("q/" + q.getId() + "/pause").request().delete();
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    @Override
+    public void clearQueue(Queue q)
+    {
+        try
+        {
+            target.path("q/" + q.getId() + "/clear").request().put(null);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // Parameters retrieval
+    // /////////////////////////////////////////////////////////////////////
 
     @Override
     public List<JobDef> getJobDefinitions()

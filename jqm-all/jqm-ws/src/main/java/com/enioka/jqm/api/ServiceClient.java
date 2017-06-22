@@ -24,6 +24,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -326,6 +327,51 @@ public class ServiceClient implements JqmClient
     public List<Queue> getQueues()
     {
         return JqmClientFactory.getClient().getQueues();
+    }
+
+    @Override
+    public void pauseQueue(Queue q)
+    {
+        JqmClientFactory.getClient().pauseQueue(q);
+    }
+
+    @Path("q/{qId}/pause")
+    @PUT
+    public void pauseQueue(@PathParam("qId") int qId)
+    {
+        Queue q = new Queue();
+        q.setId(qId);
+        JqmClientFactory.getClient().pauseQueue(q);
+    }
+
+    @Override
+    public void resumeQueue(Queue q)
+    {
+        resumeQueue(q.getId());
+    }
+
+    @Path("q/{qId}/pause")
+    @DELETE
+    public void resumeQueue(@PathParam("qId") int qId)
+    {
+        Queue q = new Queue();
+        q.setId(qId);
+        JqmClientFactory.getClient().resumeQueue(q);
+    }
+
+    @Override
+    public void clearQueue(Queue q)
+    {
+        clearQueue(q.getId());
+    }
+
+    @Path("q/{qId}/clear")
+    @PUT
+    public void clearQueue(@PathParam("qId") int qId)
+    {
+        Queue q = new Queue();
+        q.setId(qId);
+        JqmClientFactory.getClient().clearQueue(q);
     }
 
     @Override

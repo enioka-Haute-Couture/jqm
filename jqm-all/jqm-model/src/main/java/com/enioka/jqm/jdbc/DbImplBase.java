@@ -66,9 +66,11 @@ public class DbImplBase
         queries.put("dp_delete_for_queue", "DELETE FROM QUEUE_NODE_MAPPING WHERE QUEUE=?");
         queries.put("dp_delete_by_id", "DELETE FROM QUEUE_NODE_MAPPING WHERE ID=?");
         queries.put("dp_update_interval_by_id", "UPDATE QUEUE_NODE_MAPPING SET POLLING_INTERVAL=? WHERE ID=?");
+        queries.put("dp_update_enable_by_queue_id", "UPDATE QUEUE_NODE_MAPPING SET ENABLED=? WHERE QUEUE=?");
         queries.put("dp_update_threads_by_id", "UPDATE QUEUE_NODE_MAPPING SET MAX_THREAD=? WHERE ID=?");
         queries.put("dp_update_changed_by_id", "UPDATE QUEUE_NODE_MAPPING SET ENABLED=?, LAST_MODIFIED=CURRENT_TIMESTAMP, MAX_THREAD=?, POLLING_INTERVAL=?, NODE=?, QUEUE=? WHERE ID=? AND NOT "
                 + "(ENABLED=? AND MAX_THREAD=? AND POLLING_INTERVAL=? AND NODE=? AND QUEUE=?)");
+        queries.put("dp_select_by_id", "SELECT ID, ENABLED, LAST_MODIFIED, MAX_THREAD, POLLING_INTERVAL, NODE, QUEUE FROM QUEUE_NODE_MAPPING WHERE ID=?");
         queries.put("dp_select_for_node", "SELECT ID, ENABLED, LAST_MODIFIED, MAX_THREAD, POLLING_INTERVAL, NODE, QUEUE FROM QUEUE_NODE_MAPPING WHERE NODE=?");
         queries.put("dp_select_count_for_node", "SELECT COUNT(1) FROM QUEUE_NODE_MAPPING WHERE NODE=?");
         queries.put("dp_select_all_with_names", "SELECT dp.ID, dp.ENABLED, dp.LAST_MODIFIED, dp.MAX_THREAD, dp.POLLING_INTERVAL, dp.NODE, dp.QUEUE, n.NAME, q.NAME FROM QUEUE_NODE_MAPPING dp LEFT JOIN NODE n ON n.ID=dp.NODE LEFT JOIN QUEUE q ON q.ID=dp.QUEUE ");
@@ -157,6 +159,7 @@ public class DbImplBase
                 + "VALUES(JQM_PK.nextval, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, UNIX_MILLIS(), ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         queries.put("ji_delete_all", "DELETE FROM JOB_INSTANCE");
         queries.put("ji_delete_by_id", "DELETE FROM JOB_INSTANCE WHERE ID = ?");
+        queries.put("ji_delete_waiting_in_queue_id", "DELETE FROM JOB_INSTANCE WHERE QUEUE = ? AND STATUS IN ('HOLDED', 'SUBMITTED', 'SCHEDULED')");
         queries.put("jj_update_cancel_by_id", "UPDATE JOB_INSTANCE SET STATUS='CANCELLED' WHERE ID=? AND STATUS='SUBMITTED'");
         queries.put("jj_update_kill_by_id", "UPDATE JOB_INSTANCE SET INSTRUCTION='KILL' WHERE ID=?");
         queries.put("jj_update_pause_by_id", "UPDATE JOB_INSTANCE SET STATUS='HOLDED' WHERE ID=? AND STATUS='SUBMITTED'");

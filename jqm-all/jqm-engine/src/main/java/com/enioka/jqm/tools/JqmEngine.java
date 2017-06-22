@@ -296,22 +296,11 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             {
                 if (pollers.containsKey(i.getId()))
                 {
-                    p = pollers.get(i.getId());
-                    p.setPollingInterval(i.getPollingInterval());
-
-                    if (i.getEnabled())
-                    {
-                        p.setMaxThreads(i.getNbThread());
-                    }
-                    else
-                    {
-                        p.setMaxThreads(0);
-                    }
+                    // Nothing to do - the poller updates its own parameters.
                 }
                 else
                 {
-                    p = new QueuePoller(this, com.enioka.jqm.model.Queue.select(cnx, "q_select_by_id", i.getQueue()).get(0),
-                            (i.getEnabled() ? i.getNbThread() : 0), i.getPollingInterval());
+                    p = new QueuePoller(this, com.enioka.jqm.model.Queue.select(cnx, "q_select_by_id", i.getQueue()).get(0), i);
                     pollers.put(i.getId(), p);
                     Thread t = new Thread(p);
                     t.start();
