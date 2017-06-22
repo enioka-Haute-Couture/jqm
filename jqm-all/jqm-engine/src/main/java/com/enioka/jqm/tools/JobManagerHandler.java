@@ -39,6 +39,7 @@ import com.enioka.jqm.api.Query;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Message;
 import com.enioka.jqm.model.State;
@@ -77,7 +78,7 @@ class JobManagerHandler implements InvocationHandler
         {
             initial = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
-            shouldKill();
+            handleInstructions();
 
             if (classes.length == 0)
             {
@@ -217,7 +218,7 @@ class JobManagerHandler implements InvocationHandler
         }
     }
 
-    private void shouldKill()
+    private void handleInstructions()
     {
         // Throttle: only peek once every 1 second.
         if (lastPeek != null && Calendar.getInstance().getTimeInMillis() - lastPeek.getTimeInMillis() < 1000L)
@@ -228,13 +229,34 @@ class JobManagerHandler implements InvocationHandler
         DbConn cnx = Helpers.getNewDbSession();
         try
         {
-            State s = State.valueOf(cnx.runSelectSingle("ji_select_state_by_id", String.class, ji.getId()));
-            jqmlogger.trace("Analysis: should JI " + ji.getId() + " get killed? New status is " + s);
-            if (s.equals(State.KILLED))
+            Instruction s = Instruction.valueOf(cnx.runSelectSingle("ji_select_instruction_by_id", String.class, ji.getId()));
+            jqmlogger.trace("Analysis: should JI " + ji.getId() + " get killed or paused? Current instruction is " + s);
+            if (s.equals(Instruction.KILL))
             {
                 jqmlogger.info("Job will be killed at the request of a user");
                 Thread.currentThread().interrupt();
                 throw new JqmKillException("This job" + "(ID: " + ji.getId() + ")" + " has been killed by a user");
+            }
+
+            if (s.equals(Instruction.PAUSE))
+            {
+                jqmlogger.info("Job will be paused at the request of a user");
+                sendMsg("Pause is beginning");
+
+                while (s.equals(Instruction.PAUSE))
+                {
+                    try
+                    {
+                        Thread.sleep(1000);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        throw new RuntimeException("job thread was interrupted");
+                    }
+                    s = Instruction.valueOf(cnx.runSelectSingle("ji_select_instruction_by_id", String.class, ji.getId()));
+                }
+                jqmlogger.info("Job instance is resuming");
+                sendMsg("Job instance is resuming");
             }
         }
         finally
@@ -327,7 +349,7 @@ class JobManagerHandler implements InvocationHandler
             try
             {
                 Thread.sleep(1000);
-                shouldKill();
+                handleInstructions();
             }
             catch (InterruptedException e)
             {
@@ -347,7 +369,7 @@ class JobManagerHandler implements InvocationHandler
             try
             {
                 Thread.sleep(1000);
-                shouldKill();
+                handleInstructions();
             }
             catch (InterruptedException e)
             {
@@ -422,7 +444,7 @@ class JobManagerHandler implements InvocationHandler
         DbConn cnx = Helpers.getNewDbSession();
         try
         {
-            cnx.runSelectSingle("ji_select_state_by_id", String.class, jobId);
+            cnx.runSelectSingle("ji_select_instruction_by_id", String.class, jobId);
             return false;
         }
         catch (NoResultException e)

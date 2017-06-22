@@ -44,6 +44,10 @@ import com.enioka.jqm.model.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
+/**
+ * Tests of the simple web API.
+ *
+ */
 public class ApiSimpleTest extends JqmBaseTest
 {
     @Before

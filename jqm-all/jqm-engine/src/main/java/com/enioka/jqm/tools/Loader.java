@@ -229,7 +229,7 @@ class Loader implements Runnable, LoaderMBean
         catch (JqmKillException e)
         {
             jqmlogger.info("Job instance  " + job.getId() + " has been killed.");
-            this.resultStatus = State.KILLED;
+            this.resultStatus = State.CRASHED;
         }
         catch (Exception e)
         {

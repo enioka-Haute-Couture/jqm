@@ -142,20 +142,20 @@ public interface JqmClient
     // /////////////////////////////////////////////////////////////////////
 
     /**
-     * Prevent a queued job request (not already accepted by an engine) from running. It can be restored afterwards.
+     * Prevent a queued job request (not already accepted by an engine) from running. It can be resumed afterwards.
      * 
      * @param jobId
      *            id of the job instance to pause
      * @see #resumeJob(int) resuming the paused request.
      * @throws JqmInvalidRequestException
-     *             when input data is invalid (job already run, job does not exist)
+     *             when input data is invalid (job already running or run, job does not exist)
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
     void pauseQueuedJob(int jobId);
 
     /**
-     * Resume a paused request.
+     * Resume a paused request and allow it to progress in queue once again.
      * 
      * @param jobId
      *            id of the job instance to resume
@@ -165,7 +165,39 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
+    void resumeQueuedJob(int jobId);
+
+    /**
+     * @deprecated use {@link #resumeQueuedJob(int)} instead.
+     * @param jobId
+     */
     void resumeJob(int jobId);
+
+    /**
+     * Signal a running job instance that it should pause. The job instance may ignore this signal if it does not call any JobManager APIs.
+     * Can be set only on job instance which are currently running.
+     * 
+     * @param jobId
+     *            id of the job instance to pause
+     * @throws JqmInvalidRequestException
+     *             when input data is invalid (job instance is not running, job instance does not exist...)
+     * @throws JqmClientException
+     *             when an internal API implementation occurs. Usually linked to a configuration issue.
+     */
+    void pauseRunningJob(int jobId);
+
+    /**
+     * Signal a job instance which was paused during its run with {@link #pauseRunningJob(int)} that it is allowed to resume. This works
+     * even if the pause signal was ignored by the job instance. Can be used only on job instance on which {@link #pauseRunningJob(int)} was
+     * used.
+     * 
+     * @param jobId
+     * @throws JqmInvalidRequestException
+     *             when input data is invalid (job instance was never paused, job instance does not exist...)
+     * @throws JqmClientException
+     *             when an internal API implementation occurs. Usually linked to a configuration issue.
+     */
+    void resumeRunningJob(int jobId);
 
     /**
      * Will restart a crashed job. This will remove all trace of the failed execution.

@@ -120,7 +120,7 @@ public class QueueTest extends JqmBaseTest
         // Check all jobs are killed (and not cancelled as they would have been if not started)).
         TestHelpers.waitFor(4, 10000, cnx);
         this.displayAllHistoryTable();
-        Assert.assertEquals(4, Query.create().addStatusFilter(com.enioka.jqm.api.State.KILLED).run().size());
+        Assert.assertEquals(4, Query.create().addStatusFilter(com.enioka.jqm.api.State.CRASHED).run().size());
     }
 
     @Test

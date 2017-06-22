@@ -69,6 +69,7 @@ import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.Deliverable;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.History;
+import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.JobDefParameter;
 import com.enioka.jqm.model.JobInstance;
@@ -296,7 +297,8 @@ final class JdbcClient implements JqmClient
             int id = JobInstance.enqueue(cnx, startingState, queue_id, jobDef.getId(), runRequest.getApplication(),
                     runRequest.getParentID(), runRequest.getModule(), runRequest.getKeyword1(), runRequest.getKeyword2(),
                     runRequest.getKeyword3(), runRequest.getSessionID(), runRequest.getUser(), runRequest.getEmail(), jobDef.isHighlander(),
-                    sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(), runRequest.getPriority(), prms);
+                    sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(), runRequest.getPriority(), Instruction.RUN,
+                    prms);
 
             jqmlogger.trace("JI just created: " + id);
             cnx.commit();
@@ -657,7 +659,13 @@ final class JdbcClient implements JqmClient
     }
 
     @Override
-    public void resumeJob(int idJob)
+    public void resumeJob(int jobId)
+    {
+        resumeQueuedJob(jobId);
+    }
+
+    @Override
+    public void resumeQueuedJob(int idJob)
     {
         jqmlogger.trace("Job status number " + idJob + " will be resumed");
         DbConn cnx = null;
@@ -727,6 +735,58 @@ final class JdbcClient implements JqmClient
         catch (Exception e)
         {
             throw new JqmClientException("could not restart a job (internal error)", e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+    }
+
+    @Override
+    public void pauseRunningJob(int jobId)
+    {
+        jqmlogger.trace("Job instance number " + jobId + " will receive a PAUSE instruction");
+        DbConn cnx = null;
+
+        try
+        {
+            cnx = getDbSession();
+            QueryResult qr = cnx.runUpdate("jj_update_instruction_pause_by_id", jobId);
+            if (qr.nbUpdated != 1)
+            {
+                throw new JqmInvalidRequestException("An attempt was made to pause a job instance that did not exist or was already done.");
+            }
+            cnx.commit();
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not pause a job (internal error)", e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+    }
+
+    @Override
+    public void resumeRunningJob(int jobId)
+    {
+        jqmlogger.trace("Job instance number {}, supposed to be paused, will receive a RUN instruction", jobId);
+        DbConn cnx = null;
+
+        try
+        {
+            cnx = getDbSession();
+            QueryResult qr = cnx.runUpdate("jj_update_instruction_resume_by_id", jobId);
+            if (qr.nbUpdated != 1)
+            {
+                throw new JqmInvalidRequestException("An attempt was made to resume a job instance that did not exist or was not paused.");
+            }
+            cnx.commit();
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not resume a job (internal error)", e);
         }
         finally
         {

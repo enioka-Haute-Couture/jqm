@@ -107,7 +107,7 @@ public class ClientApiTest extends JqmBaseTest
 
         List<JobInstance> res = Query.create().run();
         Assert.assertEquals(1, res.size());
-        Assert.assertEquals(State.KILLED, res.get(0).getState());
+        Assert.assertEquals(State.CRASHED, res.get(0).getState());
     }
 
     @Test
@@ -153,7 +153,7 @@ public class ClientApiTest extends JqmBaseTest
     }
 
     @Test
-    public void testPause() throws Exception
+    public void testPauseInQueue() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
@@ -228,7 +228,7 @@ public class ClientApiTest extends JqmBaseTest
     }
 
     @Test
-    public void testResume() throws Exception
+    public void testResumeInQueue() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
@@ -238,7 +238,7 @@ public class ClientApiTest extends JqmBaseTest
         addAndStartEngine();
         Thread.sleep(3000);
         Assert.assertEquals(0, TestHelpers.getOkCount(cnx));
-        JqmClientFactory.getClient().resumeJob(i);
+        JqmClientFactory.getClient().resumeQueuedJob(i);
 
         TestHelpers.waitFor(1, 5000, cnx);
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
@@ -294,5 +294,34 @@ public class ClientApiTest extends JqmBaseTest
         Assert.assertEquals("keyword1", h.getDefinitionKeyword1());
         Assert.assertEquals(null, h.getDefinitionKeyword2());
         Assert.assertEquals("keyword3", h.getDefinitionKeyword3());
+    }
+
+    @Test
+    public void testPauseResumeRunning() throws Exception
+    {
+        CreationTools.createJobDef(null, true, "pyl.CallYieldAtOnce", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+        int i = JobRequest.create("MarsuApplication", "TestUser").submit();
+
+        // Pause the JI in advance, so that it will receive the instruction on startup.
+        JqmClientFactory.getClient().pauseRunningJob(i);
+        addAndStartEngine();
+        TestHelpers.waitForRunning(1, 10000, cnx);
+        Thread.sleep(2000);
+        Assert.assertEquals(0, TestHelpers.getHistoryAllCount(cnx)); // Still running.
+
+        // Pause should leave a message.
+        List<String> msgs = JqmClientFactory.getClient().getJobMessages(i);
+        Assert.assertEquals(1, msgs.size());
+        Assert.assertTrue(msgs.get(0).toLowerCase().contains("pause"));
+
+        // Now resume.
+        JqmClientFactory.getClient().resumeRunningJob(i);
+        TestHelpers.waitFor(1, 10000, cnx);
+
+        msgs = JqmClientFactory.getClient().getJobMessages(i);
+        Assert.assertEquals(2, msgs.size());
+
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
     }
 }

@@ -11,6 +11,7 @@ import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Node;
@@ -98,7 +99,7 @@ public class JqmTester
                 false, null, PathType.MEMORY);
 
         ji = JobInstance.enqueue(cnx, State.SUBMITTED, q, jd, null, null, null, null, null, null, null, null, null, false, false, null, 0,
-                null);
+                Instruction.RUN, null);
         cnx.runUpdate("ji_update_poll", node.getId(), q, 10);
 
         cnx.commit();

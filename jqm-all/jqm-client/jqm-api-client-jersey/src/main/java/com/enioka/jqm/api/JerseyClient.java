@@ -389,7 +389,7 @@ final class JerseyClient implements JqmClient
     }
 
     @Override
-    public void resumeJob(int idJob)
+    public void resumeQueuedJob(int idJob)
     {
         try
         {
@@ -405,11 +405,51 @@ final class JerseyClient implements JqmClient
         }
     }
 
+    @Override
+    public void resumeJob(int jobId)
+    {
+        resumeQueuedJob(jobId);
+    }
+
     public int restartCrashedJob(int idJob)
     {
         try
         {
             return target.path("ji/crashed/" + idJob).request().delete(JobInstance.class).getId();
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    @Override
+    public void pauseRunningJob(int jobId)
+    {
+        try
+        {
+            target.path("ji/running/paused/" + jobId).request().post(null);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    @Override
+    public void resumeRunningJob(int jobId)
+    {
+        try
+        {
+            target.path("ji/running/paused/" + jobId).request().delete();
         }
         catch (BadRequestException e)
         {

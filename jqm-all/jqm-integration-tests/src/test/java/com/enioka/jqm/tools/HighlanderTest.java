@@ -117,8 +117,8 @@ public class HighlanderTest extends JqmBaseTest
 
         List<com.enioka.jqm.api.JobInstance> res = Query.create().addSortAsc(Sort.ID).run();
         Assert.assertEquals(2, res.size());
-        Assert.assertEquals(State.KILLED, res.get(0).getState());
-        Assert.assertEquals(State.KILLED, res.get(1).getState());
+        Assert.assertEquals(State.CRASHED, res.get(0).getState());
+        Assert.assertEquals(State.CRASHED, res.get(1).getState());
         Assert.assertTrue(killTime1.compareTo(res.get(1).getBeganRunningDate()) <= 0);
     }
 

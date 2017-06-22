@@ -119,9 +119,28 @@ public class ServiceClient implements JqmClient
     @Override
     @Path("ji/paused/{jobId}")
     @DELETE
+    public void resumeQueuedJob(@PathParam("jobId") int jobId)
+    {
+        JqmClientFactory.getClient().resumeQueuedJob(jobId);
+    }
+
     public void resumeJob(@PathParam("jobId") int jobId)
     {
-        JqmClientFactory.getClient().resumeJob(jobId);
+        resumeQueuedJob(jobId);
+    }
+
+    @Override
+    @Path("ji/running/paused/{jobId}")
+    public void pauseRunningJob(int jobId)
+    {
+        JqmClientFactory.getClient().pauseRunningJob(jobId);
+    }
+
+    @Override
+    @Path("ji/running/paused/{jobId}")
+    public void resumeRunningJob(int jobId)
+    {
+        JqmClientFactory.getClient().resumeRunningJob(jobId);
     }
 
     // Not exposed directly - we prefer objects to primitive types

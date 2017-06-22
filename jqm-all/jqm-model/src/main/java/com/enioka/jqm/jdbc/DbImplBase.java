@@ -153,14 +153,16 @@ public class DbImplBase
         // JOB INSTANCE
         queries.put("ji_insert_enqueue", "INSERT INTO JOB_INSTANCE (ID, DATE_ENQUEUE, EMAIL, APPLICATION, "
                 + "KEYWORD1, KEYWORD2, KEYWORD3, MODULE, INTERNAL_POSITION, PARENT, PROGRESS, SESSION_KEY, "
-                + "STATUS, USERNAME, JOBDEF, QUEUE, HIGHLANDER, FROM_SCHEDULE, DATE_NOT_BEFORE, PRIORITY) "
-                + "VALUES(JQM_PK.nextval, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, UNIX_MILLIS(), ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                + "STATUS, USERNAME, JOBDEF, QUEUE, HIGHLANDER, FROM_SCHEDULE, DATE_NOT_BEFORE, PRIORITY, INSTRUCTION) "
+                + "VALUES(JQM_PK.nextval, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, UNIX_MILLIS(), ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         queries.put("ji_delete_all", "DELETE FROM JOB_INSTANCE");
         queries.put("ji_delete_by_id", "DELETE FROM JOB_INSTANCE WHERE ID = ?");
         queries.put("jj_update_cancel_by_id", "UPDATE JOB_INSTANCE SET STATUS='CANCELLED' WHERE ID=? AND STATUS='SUBMITTED'");
-        queries.put("jj_update_kill_by_id", "UPDATE JOB_INSTANCE SET STATUS='KILLED' WHERE ID=?");
+        queries.put("jj_update_kill_by_id", "UPDATE JOB_INSTANCE SET INSTRUCTION='KILL' WHERE ID=?");
         queries.put("jj_update_pause_by_id", "UPDATE JOB_INSTANCE SET STATUS='HOLDED' WHERE ID=? AND STATUS='SUBMITTED'");
         queries.put("jj_update_resume_by_id", "UPDATE JOB_INSTANCE SET STATUS='SUBMITTED' WHERE ID=? AND STATUS='HOLDED'");
+        queries.put("jj_update_instruction_pause_by_id", "UPDATE JOB_INSTANCE SET INSTRUCTION='PAUSE' WHERE ID=? AND STATUS IN ('RUNNING', 'HOLDED', 'SUBMITTED', 'ATTRIBUTED', 'SCHEDULED')");
+        queries.put("jj_update_instruction_resume_by_id", "UPDATE JOB_INSTANCE SET INSTRUCTION='RUN' WHERE ID=? AND INSTRUCTION = 'PAUSE'");
         queries.put("jj_update_queue_by_id", "UPDATE JOB_INSTANCE SET QUEUE=? WHERE ID=? AND STATUS IN('SUBMITTED', 'HOLDED')");
         queries.put("jj_update_rank_by_id", "UPDATE JOB_INSTANCE SET INTERNAL_POSITION=? WHERE ID=? AND STATUS='SUBMITTED'");
         queries.put("jj_update_progress_by_id", "UPDATE JOB_INSTANCE SET PROGRESS=? WHERE ID=?");
@@ -174,7 +176,7 @@ public class DbImplBase
         queries.put("ji_select_count_by_node", "SELECT COUNT(1) FROM JOB_INSTANCE WHERE NODE=?");
         queries.put("ji_select_count_by_queue", "SELECT COUNT(1) FROM JOB_INSTANCE WHERE QUEUE=?");
         queries.put("ji_select_all", "SELECT ji.ID, ji.DATE_ATTRIBUTION, ji.DATE_ENQUEUE, ji.EMAIL, ji.DATE_START, ji.APPLICATION, ji.KEYWORD1, ji.KEYWORD2, "
-                + "ji.KEYWORD3, ji.MODULE, ji.INTERNAL_POSITION, ji.PARENT, ji.PROGRESS, ji.SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.HIGHLANDER, ji.FROM_SCHEDULE, ji.PRIORITY, "
+                + "ji.KEYWORD3, ji.MODULE, ji.INTERNAL_POSITION, ji.PARENT, ji.PROGRESS, ji.SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.HIGHLANDER, ji.FROM_SCHEDULE, ji.PRIORITY, ji.INSTRUCTION, "
                 + "q.ID, q.DEFAULT_QUEUE, q.DESCRIPTION, q.NAME, "
                 + "jd.ID, jd.APPLICATION, jd.JD_KEY, jd.CL, "
                 + "jd.DESCRIPTION, jd.ENABLED, jd.EXTERNAL, jd.HIGHLANDER, "
@@ -188,7 +190,7 @@ public class DbImplBase
         queries.put("ji_select_by_node", queries.get("ji_select_all") + " WHERE ji.NODE=?");
         queries.put("ji_select_existing_highlander", "SELECT ID FROM JOB_INSTANCE WHERE JOBDEF=? AND STATUS='SUBMITTED'");
         queries.put("ji_select_changequeuepos_by_id", "SELECT QUEUE, INTERNAL_POSITION FROM JOB_INSTANCE WHERE ID=? AND STATUS='SUBMITTED'");
-        queries.put("ji_select_state_by_id", "SELECT STATUS FROM JOB_INSTANCE WHERE ID=?");
+        queries.put("ji_select_instruction_by_id", "SELECT INSTRUCTION FROM JOB_INSTANCE WHERE ID=?");
         queries.put("ji_select_execution_date_by_id", "SELECT DATE_START FROM JOB_INSTANCE WHERE ID=?");
         queries.put("ji_select_cnx_data_by_id", "SELECT DNS||':'||PORT AS HOST FROM JOB_INSTANCE ji LEFT JOIN Node n ON ji.NODE = n.ID WHERE ji.ID=?");
         

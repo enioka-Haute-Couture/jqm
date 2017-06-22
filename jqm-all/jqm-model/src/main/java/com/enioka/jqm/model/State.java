@@ -31,8 +31,6 @@ public enum State {
     CRASHED,
     /** The payload has ended correctly (no exception). **/
     ENDED,
-    /** The payload is still running but has received a KILL order. **/
-    KILLED,
     /** The execution request is still waiting inside the queue, but will not advance anymore. **/
     HOLDED,
     /** Reserved for future use. **/

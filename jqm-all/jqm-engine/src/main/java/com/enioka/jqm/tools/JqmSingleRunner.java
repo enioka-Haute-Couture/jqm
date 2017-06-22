@@ -115,7 +115,7 @@ public class JqmSingleRunner
                 {
                     // Timeout! Violently halt the JVM.
                     jqmlogger.info("Job has not finished gracefully and will be stopped abruptly");
-                    l.endOfRun(com.enioka.jqm.model.State.KILLED);
+                    l.endOfRun(com.enioka.jqm.model.State.CRASHED);
                     Runtime.getRuntime().halt(0);
                 }
                 else
@@ -141,7 +141,7 @@ public class JqmSingleRunner
                     com.enioka.jqm.model.JobInstance job = com.enioka.jqm.model.JobInstance.select_id(cnx, jobId);
                     cnx.close();
 
-                    if (job != null && job.getState().equals(com.enioka.jqm.model.State.KILLED))
+                    if (job != null && job.getInstruction().equals(com.enioka.jqm.model.Instruction.KILL))
                     {
                         jqmlogger.debug(
                                 "Job " + jobId + " has received a kill order. It's JVM will be killed after a grace shutdown period");
