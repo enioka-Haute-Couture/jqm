@@ -3,6 +3,8 @@ package com.enioka.jqm.api;
 import java.util.Map;
 
 /**
+ * Note: this is not a public API yet. It is not stable enough yet.<br>
+ * <br>
  * For plugin writers only.<br>
  * This interface is implemented by the different job runners, i.e. the agents which actually launch the job instances. The job runners must
  * be placed in the plugins directory of the engine.<br>

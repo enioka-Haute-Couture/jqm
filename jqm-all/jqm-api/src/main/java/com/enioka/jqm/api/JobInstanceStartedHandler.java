@@ -3,6 +3,8 @@ package com.enioka.jqm.api;
 import java.util.Map;
 
 /**
+ * Note: this is not a public API yet. It is not stable enough yet.<br>
+ * <br>
  * For plugin writers only.<br>
  * The interface implemented by the event handlers hooked on the "a job instance has started" event. <br>
  * <br>
