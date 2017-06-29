@@ -7,16 +7,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class DbImplHsql implements DbAdapter
 {
     private final static String[] IDS = new String[] { "ID" };
 
     private Map<String, String> queries = new HashMap<String, String>();
+    private String tablePrefix = null;
 
     @Override
-    public void prepare(Connection cnx)
+    public void prepare(Properties p, Connection cnx)
     {
+        this.tablePrefix = p.getProperty("com.enioka.jqm.jdbc.tablePrefix", "");
         queries.putAll(DbImplBase.queries);
         for (Map.Entry<String, String> entry : DbImplBase.queries.entrySet())
         {
@@ -33,7 +36,8 @@ public class DbImplHsql implements DbAdapter
     @Override
     public String adaptSql(String sql)
     {
-        return sql.replace("JQM_PK.nextval", "NEXT VALUE FOR JQM_PK").replace("FOR UPDATE LIMIT", "LIMIT");
+        return sql.replace("JQM_PK.nextval", "NEXT VALUE FOR JQM_PK").replace("FOR UPDATE LIMIT", "LIMIT").replace("__T__",
+                this.tablePrefix);
     }
 
     @Override

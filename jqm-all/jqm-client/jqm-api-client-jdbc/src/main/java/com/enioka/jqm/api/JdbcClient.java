@@ -1072,17 +1072,17 @@ final class JdbcClient implements JqmClient
                         + "jd.KEYWORD1 AS JD_KEYWORD1, jd.KEYWORD2 AS JD_KEYWORD2, jd.KEYWORD3 AS JD_KEYWORD3, jd.MODULE AS JD_MODULE,"
                         + "n.NAME AS NODE_NAME, ji.PARENT AS PARENT, ji.PROGRESS, q.NAME AS QUEUE_NAME, NULL AS RETURN_CODE,"
                         + "ji.SESSION_KEY AS SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.INTERNAL_POSITION AS POSITION, ji.FROM_SCHEDULE "
-                        + "FROM JOB_INSTANCE ji LEFT JOIN QUEUE q ON ji.QUEUE=q.ID LEFT JOIN JOB_DEFINITION jd ON ji.JOBDEF=jd.ID LEFT JOIN NODE n ON ji.NODE=n.ID ";
+                        + "FROM __T__JOB_INSTANCE ji LEFT JOIN __T__QUEUE q ON ji.QUEUE=q.ID LEFT JOIN __T__JOB_DEFINITION jd ON ji.JOBDEF=jd.ID LEFT JOIN __T__NODE n ON ji.NODE=n.ID ";
 
                 if (wh.length() > 3)
                 {
                     wh = wh.substring(3, wh.length() - 1);
                     q1 += "WHERE " + wh;
-                    filterCountQuery += String.format(" (SELECT COUNT(1) FROM JOB_INSTANCE ji WHERE %s) ,", wh);
+                    filterCountQuery += String.format(" (SELECT COUNT(1) FROM __T__JOB_INSTANCE ji WHERE %s) ,", wh);
                 }
                 else
                 {
-                    filterCountQuery += " (SELECT COUNT(1) FROM JOB_INSTANCE) ,";
+                    filterCountQuery += " (SELECT COUNT(1) FROM __T__JOB_INSTANCE) ,";
                 }
             }
 
@@ -1126,17 +1126,17 @@ final class JdbcClient implements JqmClient
                         + "DATE_END, DATE_ENQUEUE, DATE_START, HIGHLANDER, INSTANCE_APPLICATION, "
                         + "INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, "
                         + "JD_KEYWORD1, JD_KEYWORD2, JD_KEYWORD3, " + "JD_MODULE, NODE_NAME, PARENT, PROGRESS, QUEUE_NAME, "
-                        + "RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION, FROM_SCHEDULE FROM HISTORY ";
+                        + "RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION, FROM_SCHEDULE FROM __T__HISTORY ";
 
                 if (wh.length() > 3)
                 {
                     wh = wh.substring(3, wh.length() - 1);
                     q2 += "WHERE " + wh;
-                    filterCountQuery += String.format(" (SELECT COUNT(1) FROM HISTORY WHERE %s) ,", wh);
+                    filterCountQuery += String.format(" (SELECT COUNT(1) FROM __T__HISTORY WHERE %s) ,", wh);
                 }
                 else
                 {
-                    filterCountQuery += " (SELECT COUNT(1) FROM HISTORY) ,";
+                    filterCountQuery += " (SELECT COUNT(1) FROM __T__HISTORY) ,";
                 }
             }
 

@@ -9,16 +9,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class DbImplMySql implements DbAdapter
 {
     private final static String[] IDS = new String[] { "ID" };
 
     private Map<String, String> queries = new HashMap<String, String>();
+    private String tablePrefix = null;
 
     @Override
-    public void prepare(Connection cnx)
+    public void prepare(Properties p, Connection cnx)
     {
+        this.tablePrefix = p.getProperty("com.enioka.jqm.jdbc.tablePrefix", "");
+
         queries.putAll(DbImplBase.queries);
         for (Map.Entry<String, String> entry : DbImplBase.queries.entrySet())
         {
@@ -27,11 +31,11 @@ public class DbImplMySql implements DbAdapter
 
         // Full rewrite for the most critical query.
         queries.put("ji_update_poll",
-                "UPDATE JOB_INSTANCE j1 FORCE INDEX (`PRIMARY`) RIGHT JOIN "
-                        + "(SELECT j3.ID FROM JOB_INSTANCE j3 FORCE INDEX(`IDX_JOB_INSTANCE_1`) WHERE j3.STATUS = 'SUBMITTED' AND j3.QUEUE = ? AND "
-                        + "(j3.HIGHLANDER = FALSE OR (j3.HIGHLANDER = TRUE AND (SELECT COUNT(1) FROM JOB_INSTANCE j4 FORCE INDEX(`IDX_JOB_INSTANCE_2`) "
+                this.adaptSql("UPDATE __T__JOB_INSTANCE j1 FORCE INDEX (`PRIMARY`) RIGHT JOIN "
+                        + "(SELECT j3.ID FROM __T__JOB_INSTANCE j3 FORCE INDEX(`IDX_JOB_INSTANCE_1`) WHERE j3.STATUS = 'SUBMITTED' AND j3.QUEUE = ? AND "
+                        + "(j3.HIGHLANDER = FALSE OR (j3.HIGHLANDER = TRUE AND (SELECT COUNT(1) FROM __T__JOB_INSTANCE j4 FORCE INDEX(`IDX_JOB_INSTANCE_2`) "
                         + "WHERE j4.STATUS IN ('ATTRIBUTED' , 'RUNNING') AND j4.JOBDEF = j3.JOBDEF) = 0)) ORDER BY PRIORITY DESC, INTERNAL_POSITION FOR UPDATE LIMIT ?) j2 "
-                        + "ON j2.ID = j1.ID SET j1.NODE = ?, j1.STATUS = 'ATTRIBUTED', j1.DATE_ATTRIBUTION = CURRENT_TIMESTAMP(3)");
+                        + "ON j2.ID = j1.ID SET j1.NODE = ?, j1.STATUS = 'ATTRIBUTED', j1.DATE_ATTRIBUTION = CURRENT_TIMESTAMP"));
     }
 
     @Override
@@ -53,7 +57,7 @@ public class DbImplMySql implements DbAdapter
                 .replace("CURRENT_TIMESTAMP - ? SECOND", "(NOW() - INTERVAL ? SECOND)").replace("FROM (VALUES(0))", "FROM DUAL")
                 .replace("DNS||':'||PORT", "CONCAT(DNS, ':', PORT)").replace(" TIMESTAMP ", " TIMESTAMP(3) ")
                 .replace("CURRENT_TIMESTAMP", "FFFFFFFFFFFFFFFFF@@@@").replace("FFFFFFFFFFFFFFFFF@@@@", "CURRENT_TIMESTAMP(3)")
-                .replace("TIMESTAMP(3) NOT NULL", "TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)");
+                .replace("TIMESTAMP(3) NOT NULL", "TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)").replace("__T__", this.tablePrefix);
     }
 
     @Override

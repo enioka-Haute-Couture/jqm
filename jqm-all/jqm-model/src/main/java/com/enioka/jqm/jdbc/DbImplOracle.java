@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class DbImplOracle implements DbAdapter
 {
     private final static String[] IDS = new String[] { "ID" };
 
     private Map<String, String> queries = new HashMap<String, String>();
+    private String tablePrefix = null;
 
     @Override
     public boolean compatibleWith(String product)
@@ -21,8 +23,9 @@ public class DbImplOracle implements DbAdapter
     }
 
     @Override
-    public void prepare(Connection cnx)
+    public void prepare(Properties p, Connection cnx)
     {
+        this.tablePrefix = p.getProperty("com.enioka.jqm.jdbc.tablePrefix", "");
         queries.putAll(DbImplBase.queries);
         for (Map.Entry<String, String> entry : DbImplBase.queries.entrySet())
         {
@@ -40,7 +43,7 @@ public class DbImplOracle implements DbAdapter
                 .replace("UNIX_MILLIS()", "JQM_PK.currval").replace("IN(UNNEST(?))", "IN(?)")
                 .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(SYSDATE - 1/1440)")
                 .replace("CURRENT_TIMESTAMP - ? SECOND", "(SYSDATE - ?/86400)").replace("FROM (VALUES(0))", "FROM DUAL")
-                .replace("BOOLEAN", "NUMBER(1)").replace("true", "1").replace("false", "0");
+                .replace("BOOLEAN", "NUMBER(1)").replace("true", "1").replace("false", "0").replace("__T__", this.tablePrefix);
     }
 
     @Override

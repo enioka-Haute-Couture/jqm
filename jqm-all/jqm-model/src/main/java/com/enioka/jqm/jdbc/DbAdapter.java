@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * The interface to implement to create a new database adapter. Adapters contain all the database-specific stuff for running JQM on a
@@ -62,7 +63,7 @@ public interface DbAdapter
      * @param cnx
      *            an open ready to use connection to the database.
      */
-    public void prepare(Connection cnx);
+    public void prepare(Properties p, Connection cnx);
 
     /**
      * Returns a ready to run SQL text for the given key. (adaptSql does not need to be run on the returned string)

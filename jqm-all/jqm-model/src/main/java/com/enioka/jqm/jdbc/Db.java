@@ -44,6 +44,7 @@ public class Db
     private DataSource _ds;
     private DbAdapter adapter = null;
     private String product;
+    private Properties p = null;
 
     /**
      * Connects to the database by retrieving a DataDource from JNDI (with every parameter set to default, including the JNDI alias for the
@@ -65,6 +66,7 @@ public class Db
     public Db(DataSource ds, boolean updateSchema)
     {
         this._ds = ds;
+        this.p = new Properties();
         init(updateSchema);
     }
 
@@ -76,6 +78,8 @@ public class Db
     @SuppressWarnings("unchecked")
     public Db(Properties properties)
     {
+        this.p = properties != null ? properties : new Properties();
+
         if (properties != null && properties.containsKey("com.enioka.jqm.jdbc.url"))
         {
             // In this case - full JDBC construction, not from JNDI. Only works for HSQLDB.
@@ -416,7 +420,7 @@ public class Db
     private void initQueries()
     {
         DbConn cnx = getConn();
-        adapter.prepare(cnx._cnx);
+        adapter.prepare(p, cnx._cnx);
         cnx.close();
     }
 
