@@ -280,6 +280,21 @@ final class JdbcClient implements JqmClient
             queue_id = jobDef.getQueue();
         }
 
+        // Priority can come from schedule, JD, request. (in order of ascending priority)
+        Integer priority = null;
+        if (sj != null)
+        {
+            priority = sj.getPriority();
+        }
+        if (jobDef.getPriority() != null)
+        {
+            priority = jobDef.getPriority();
+        }
+        if (runRequest.getPriority() != null)
+        {
+            priority = runRequest.getPriority();
+        }
+
         // Decide what the starting state should be.
         State startingState = State.SUBMITTED; // The default.
         if (runRequest.getRunAfter() != null)
@@ -297,8 +312,7 @@ final class JdbcClient implements JqmClient
             int id = JobInstance.enqueue(cnx, startingState, queue_id, jobDef.getId(), runRequest.getApplication(),
                     runRequest.getParentID(), runRequest.getModule(), runRequest.getKeyword1(), runRequest.getKeyword2(),
                     runRequest.getKeyword3(), runRequest.getSessionID(), runRequest.getUser(), runRequest.getEmail(), jobDef.isHighlander(),
-                    sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(), runRequest.getPriority(), Instruction.RUN,
-                    prms);
+                    sj != null || runRequest.getRunAfter() != null, runRequest.getRunAfter(), priority, Instruction.RUN, prms);
 
             jqmlogger.trace("JI just created: " + id);
             cnx.commit();
@@ -472,7 +486,7 @@ final class JdbcClient implements JqmClient
         }
 
         // The new schedule
-        return ScheduledJob.create(cnx, jr.getRecurrence(), jobDef.getId(), queueId, jr.getParameters());
+        return ScheduledJob.create(cnx, jr.getRecurrence(), jobDef.getId(), queueId, jr.getPriority(), jr.getParameters());
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -910,6 +924,151 @@ final class JdbcClient implements JqmClient
         }
     }
 
+    @Override
+    public void setJobPriority(int jobId, int priority)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = getDbSession();
+            QueryResult qr = cnx.runUpdate("jj_update_priority_by_id", priority, jobId);
+
+            if (qr.nbUpdated != 1)
+            {
+                throw new JqmClientException("Job instance does not exist or has already ended");
+            }
+            cnx.commit();
+        }
+        catch (DatabaseException e)
+        {
+            throw new JqmClientException("could not change the priority of a job (internal database error)", e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not change the priority of a job (internal error)", e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+    }
+
+    @Override
+    public void setJobRunAfter(int jobId, Calendar whenToRun)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = getDbSession();
+            QueryResult qr = cnx.runUpdate("jj_update_notbefore_by_id", whenToRun, jobId);
+
+            if (qr.nbUpdated != 1)
+            {
+                throw new JqmClientException("Job instance does not exist or has already started");
+            }
+            cnx.commit();
+        }
+        catch (DatabaseException e)
+        {
+            throw new JqmClientException("could not change the 'not before time' of a job (internal database error)", e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not change the 'not before time' of a job (internal error)", e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+    }
+
+    @Override
+    public void setScheduleRecurrence(int scheduleId, String cronExpression)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = getDbSession();
+            QueryResult qr = cnx.runUpdate("sj_update_cron_by_id", cronExpression, scheduleId);
+
+            if (qr.nbUpdated != 1)
+            {
+                throw new JqmClientException("Schedule does not exist");
+            }
+            cnx.commit();
+        }
+        catch (DatabaseException e)
+        {
+            throw new JqmClientException("could not change the cron expression of a schedule (internal database error)", e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not change the cron expression of a schedule (internal error)", e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+    }
+
+    @Override
+    public void setScheduleQueue(int scheduleId, int queueId)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = getDbSession();
+            QueryResult qr = cnx.runUpdate("sj_update_queue_by_id", queueId, scheduleId);
+
+            if (qr.nbUpdated != 1)
+            {
+                throw new JqmClientException("Schedule does not exist");
+            }
+            cnx.commit();
+        }
+        catch (DatabaseException e)
+        {
+            throw new JqmClientException("could not change the queue of a schedule (internal database error)", e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not change the queue of a schedule (internal error)", e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+    }
+
+    @Override
+    public void setSchedulePriority(int scheduleId, int priority)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = getDbSession();
+            QueryResult qr = cnx.runUpdate("sj_update_priority_by_id", priority, scheduleId);
+
+            if (qr.nbUpdated != 1)
+            {
+                throw new JqmClientException("Schedule does not exist");
+            }
+            cnx.commit();
+        }
+        catch (DatabaseException e)
+        {
+            throw new JqmClientException("could not change the priority of a schedule (internal database error)", e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not change the priority of a schedule (internal error)", e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+    }
+
     // /////////////////////////////////////////////////////////////////////
     // Job queries
     // /////////////////////////////////////////////////////////////////////
@@ -1071,7 +1230,7 @@ final class JdbcClient implements JqmClient
                         + "ji.KEYWORD2 AS INSTANCE_KEYWORD2, ji.KEYWORD3 AS INSTANCE_KEYWORD3, ji.MODULE AS INSTANCE_MODULE, "
                         + "jd.KEYWORD1 AS JD_KEYWORD1, jd.KEYWORD2 AS JD_KEYWORD2, jd.KEYWORD3 AS JD_KEYWORD3, jd.MODULE AS JD_MODULE,"
                         + "n.NAME AS NODE_NAME, ji.PARENT AS PARENT, ji.PROGRESS, q.NAME AS QUEUE_NAME, NULL AS RETURN_CODE,"
-                        + "ji.SESSION_KEY AS SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.INTERNAL_POSITION AS POSITION, ji.FROM_SCHEDULE "
+                        + "ji.SESSION_KEY AS SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.INTERNAL_POSITION AS POSITION, ji.FROM_SCHEDULE, ji.PRIORITY "
                         + "FROM __T__JOB_INSTANCE ji LEFT JOIN __T__QUEUE q ON ji.QUEUE=q.ID LEFT JOIN __T__JOB_DEFINITION jd ON ji.JOBDEF=jd.ID LEFT JOIN __T__NODE n ON ji.NODE=n.ID ";
 
                 if (wh.length() > 3)
@@ -1126,7 +1285,7 @@ final class JdbcClient implements JqmClient
                         + "DATE_END, DATE_ENQUEUE, DATE_START, HIGHLANDER, INSTANCE_APPLICATION, "
                         + "INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, "
                         + "JD_KEYWORD1, JD_KEYWORD2, JD_KEYWORD3, " + "JD_MODULE, NODE_NAME, PARENT, PROGRESS, QUEUE_NAME, "
-                        + "RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION, FROM_SCHEDULE FROM __T__HISTORY ";
+                        + "RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION, FROM_SCHEDULE, NULL AS PRIORITY FROM __T__HISTORY ";
 
                 if (wh.length() > 3)
                 {
@@ -1297,6 +1456,7 @@ final class JdbcClient implements JqmClient
 
         res.setPosition(rs.getLong(30));
         res.setFromSchedule(rs.getBoolean(31));
+        res.setPriority(rs.getInt(32) > 0 ? rs.getInt(32) : null);
 
         return res;
     }

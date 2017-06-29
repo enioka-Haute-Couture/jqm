@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -494,6 +495,91 @@ final class JerseyClient implements JqmClient
         try
         {
             target.path("ji/" + idJob + "/position/" + position).request().post(null);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    @Override
+    public void setJobPriority(int jobId, int priority)
+    {
+        try
+        {
+            target.path("ji/" + jobId + "/priority/" + priority).request().post(null);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    @Override
+    public void setJobRunAfter(int jobId, Calendar whenToRun)
+    {
+        try
+        {
+            target.path("ji/" + jobId + "/delay/" + whenToRun).request().post(null);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    @Override
+    public void setScheduleQueue(int scheduleId, int queueId)
+    {
+        try
+        {
+            target.path("schedule/" + scheduleId + "/queue/" + queueId).request().post(null);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    @Override
+    public void setScheduleRecurrence(int scheduleId, String cronExpression)
+    {
+        try
+        {
+            target.path("schedule/" + scheduleId + "/cron/" + cronExpression).request().post(null);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    @Override
+    public void setSchedulePriority(int scheduleId, int priority)
+    {
+        try
+        {
+            target.path("schedule/" + scheduleId + "/priority/" + priority).request().post(null);
         }
         catch (BadRequestException e)
         {

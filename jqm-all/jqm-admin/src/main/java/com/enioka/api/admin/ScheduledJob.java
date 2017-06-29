@@ -24,6 +24,8 @@ public class ScheduledJob implements Serializable
 
     private Integer queue;
 
+    private Integer priority;
+
     private Map<String, String> parameters = new HashMap<String, String>();
 
     /**
@@ -163,5 +165,19 @@ public class ScheduledJob implements Serializable
     {
         this.parameters.remove(key);
         return this;
+    }
+
+    /**
+     * The default priority for job instances created from this scheduled job. Null if the default.
+     * 
+     */
+    public Integer getPriority()
+    {
+        return priority;
+    }
+
+    public void setPriority(Integer priority)
+    {
+        this.priority = priority;
     }
 }

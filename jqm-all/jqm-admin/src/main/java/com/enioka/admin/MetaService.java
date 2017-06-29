@@ -523,6 +523,7 @@ public class MetaService
                     sjdto.setLastUpdated(sj.getLastUpdated());
                     sjdto.setParameters(sj.getParameters());
                     sjdto.setQueue(sj.getQueue());
+                    sjdto.setPriority(sj.getPriority());
                     sjdto.setId(sj.getId());
 
                     for (JobDefDto dto : dtos)
@@ -635,7 +636,7 @@ public class MetaService
                 {
                     if (sj.getId() == null)
                     {
-                        ScheduledJob.create(cnx, sj.getCronExpression(), dto.getId(), sj.getQueue(), sj.getParameters());
+                        ScheduledJob.create(cnx, sj.getCronExpression(), dto.getId(), sj.getQueue(), sj.getPriority(), sj.getParameters());
                     }
                     else
                     {
@@ -669,7 +670,8 @@ public class MetaService
                         // Update main SJ fields (only if needed).
                         if (update || !sj.getCronExpression().equals(existing.getCronExpression()) || sj.getQueue() != existing.getQueue())
                         {
-                            cnx.runUpdate("sj_update_all_fields_by_id", sj.getCronExpression(), sj.getQueue(), sj.getId());
+                            cnx.runUpdate("sj_update_all_fields_by_id", sj.getCronExpression(), sj.getQueue(), sj.getPriority(),
+                                    sj.getId());
                         }
                     }
                 }
@@ -686,7 +688,7 @@ public class MetaService
             // Sync the schedules too.
             for (com.enioka.api.admin.ScheduledJob sjdto : dto.getSchedules())
             {
-                ScheduledJob.create(cnx, sjdto.getCronExpression(), i, sjdto.getQueue(), sjdto.getParameters());
+                ScheduledJob.create(cnx, sjdto.getCronExpression(), i, sjdto.getQueue(), sjdto.getPriority(), sjdto.getParameters());
             }
         }
     }

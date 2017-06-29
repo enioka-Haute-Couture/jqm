@@ -20,12 +20,15 @@ package com.enioka.jqm.tools;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.enioka.admin.MetaService;
+import com.enioka.api.admin.JobDefDto;
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
@@ -383,5 +386,58 @@ public class ClientApiTest extends JqmBaseTest
         JqmClientFactory.getClient().clearQueue(qV);
 
         Assert.assertEquals(0, TestHelpers.getQueueAllCount(cnx));
+    }
+
+    @Test
+    public void testChangeXVerbs()
+    {
+        int idJobDef = CreationTools.createJobDef(null, true, "pyl.CallYieldAtOnce", null, "jqm-tests/jqm-test-pyl/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+
+        int i = JobRequest.create("MarsuApplication", "TestUser").submit();
+
+        //////////////////////////////////
+        // JI priority
+
+        // No priority by default
+        Assert.assertEquals(null, JqmClientFactory.getClient().getJob(i).getPriority());
+
+        // Change it.
+        JqmClientFactory.getClient().setJobPriority(i, 5);
+        Assert.assertEquals(5, (int) JqmClientFactory.getClient().getJob(i).getPriority());
+
+        //////////////////////////////////
+        // JI run after
+
+        Calendar after = Calendar.getInstance();
+        after.add(Calendar.YEAR, 1);
+        int i2 = JobRequest.create("MarsuApplication", "TestUser").setRunAfter(after).submit();
+
+        after = Calendar.getInstance();
+        after.add(Calendar.YEAR, -1);
+        JqmClientFactory.getClient().setJobRunAfter(i2, after);
+        Assert.assertTrue(com.enioka.jqm.model.JobInstance.select_id(cnx, i2).getNotBefore().before(Calendar.getInstance()));
+
+        //////////////////////////////////
+        // Schedule
+
+        int i3 = JobRequest.create("MarsuApplication", "TestUser").setPriority(3).setRecurrence("* * * * *").submit();
+
+        JobDefDto jd = MetaService.getJobDef(cnx, idJobDef);
+        Assert.assertEquals(3, (int) jd.getSchedules().get(0).getPriority());
+        Assert.assertEquals("* * * * *", jd.getSchedules().get(0).getCronExpression());
+        Assert.assertEquals(null, jd.getSchedules().get(0).getQueue());
+
+        JqmClientFactory.getClient().setScheduleRecurrence(i3, "1 * * * *");
+        jd = MetaService.getJobDef(cnx, idJobDef);
+        Assert.assertEquals("1 * * * *", jd.getSchedules().get(0).getCronExpression());
+
+        JqmClientFactory.getClient().setScheduleQueue(i3, TestHelpers.qSlow);
+        jd = MetaService.getJobDef(cnx, idJobDef);
+        Assert.assertEquals(TestHelpers.qSlow, jd.getSchedules().get(0).getQueue());
+
+        JqmClientFactory.getClient().setSchedulePriority(i3, 4);
+        jd = MetaService.getJobDef(cnx, idJobDef);
+        Assert.assertEquals(4, (int) jd.getSchedules().get(0).getPriority());
     }
 }

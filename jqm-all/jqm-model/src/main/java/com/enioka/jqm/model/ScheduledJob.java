@@ -26,6 +26,8 @@ public class ScheduledJob
 
     private Calendar lastUpdated;
 
+    private Integer priority;
+
     private Integer queue;
 
     private Map<String, String> parametersCache = new HashMap<String, String>();
@@ -85,6 +87,16 @@ public class ScheduledJob
         return parametersCache;
     }
 
+    public Integer getPriority()
+    {
+        return priority;
+    }
+
+    public void setPriority(Integer priority)
+    {
+        this.priority = priority;
+    }
+
     public static List<ScheduledJob> select(DbConn cnx, String query_key, Object... args)
     {
         List<ScheduledJob> res = new ArrayList<ScheduledJob>();
@@ -102,7 +114,8 @@ public class ScheduledJob
                 tmp.setCronExpression(rs.getString(2));
                 tmp.setJobDefinition(rs.getInt(3));
                 tmp.setQueue(rs.getInt(4) > 0 ? rs.getInt(4) : null);
-                tmp.setLastUpdated(cnx.getCal(rs, 5));
+                tmp.setPriority(rs.getInt(5) > 0 ? rs.getInt(5) : null);
+                tmp.setLastUpdated(cnx.getCal(rs, 6));
 
                 res.add(tmp);
 
@@ -142,9 +155,10 @@ public class ScheduledJob
         return res;
     }
 
-    public static int create(DbConn cnx, String cronExpression, Integer jobDefId, Integer queueId, Map<String, String> parameterOverloads)
+    public static int create(DbConn cnx, String cronExpression, Integer jobDefId, Integer queueId, Integer priority,
+            Map<String, String> parameterOverloads)
     {
-        QueryResult r = cnx.runUpdate("sj_insert", cronExpression, jobDefId, queueId);
+        QueryResult r = cnx.runUpdate("sj_insert", cronExpression, jobDefId, queueId, priority);
 
         for (Map.Entry<String, String> e : parameterOverloads.entrySet())
         {

@@ -119,7 +119,7 @@ public class DbImplBase
         queries.put("jd_select_all", "SELECT ID, APPLICATION, JD_KEY, CL, "
                 + "DESCRIPTION, ENABLED, EXTERNAL, HIGHLANDER, "
                 + "PATH, CLASS_NAME, JAVA_OPTS, KEYWORD1, KEYWORD2, KEYWORD3, ALERT_AFTER_SECONDS, "
-                + "MODULE, PATH_TYPE, QUEUE FROM __T__JOB_DEFINITION");
+                + "MODULE, PATH_TYPE, QUEUE, PRIORITY FROM __T__JOB_DEFINITION");
         queries.put("jd_select_by_id", queries.get("jd_select_all") + " WHERE ID=?");
         queries.put("jd_select_by_key", queries.get("jd_select_all") + " WHERE JD_KEY=?");
         queries.put("jd_select_by_queue", queries.get("jd_select_all") + " WHERE QUEUE=?");
@@ -133,16 +133,19 @@ public class DbImplBase
         queries.put("jdprm_select_all", "SELECT ID, KEYNAME, VALUE, JOBDEF FROM __T__JOB_DEFINITION_PARAMETER ORDER BY JOBDEF");
         
         // SCHEDULED JOBS
-        queries.put("sj_insert", "INSERT INTO __T__JOB_SCHEDULE(ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED) VALUES(JQM_PK.nextval, ?, ?, ?, CURRENT_TIMESTAMP)");
+        queries.put("sj_insert", "INSERT INTO __T__JOB_SCHEDULE(ID, CRON_EXPRESSION, JOBDEF, QUEUE, PRIORITY, LAST_UPDATED) VALUES(JQM_PK.nextval, ?, ?, ?, ?, CURRENT_TIMESTAMP)");
         queries.put("sj_delete_all", "DELETE FROM __T__JOB_SCHEDULE");
         queries.put("sj_delete_all_for_jd", "DELETE FROM __T__JOB_SCHEDULE WHERE JOBDEF=?");
         queries.put("sj_delete_by_id", "DELETE FROM __T__JOB_SCHEDULE WHERE ID=?");
-        queries.put("sj_update_all_fields_by_id", "UPDATE __T__JOB_SCHEDULE SET CRON_EXPRESSION=?, QUEUE=?, LAST_UPDATED=CURRENT_TIMESTAMP WHERE ID=?");
-        queries.put("sj_select_all", "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED FROM __T__JOB_SCHEDULE ORDER BY ID ");
-        queries.put("sj_select_by_id", "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED FROM __T__JOB_SCHEDULE WHERE ID=? ");
-        queries.put("sj_select_updated",  "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED FROM __T__JOB_SCHEDULE WHERE LAST_UPDATED > ?");
-        queries.put("sj_select_for_jd",  "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED FROM __T__JOB_SCHEDULE WHERE JOBDEF = ?");
-        queries.put("sj_select_for_jd_list",  "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED FROM __T__JOB_SCHEDULE WHERE JOBDEF IN(UNNEST(?)) ORDER BY ID");
+        queries.put("sj_update_all_fields_by_id", "UPDATE __T__JOB_SCHEDULE SET CRON_EXPRESSION=?, QUEUE=?, PRIORITY=?, LAST_UPDATED=CURRENT_TIMESTAMP WHERE ID=?");
+        queries.put("sj_update_cron_by_id", "UPDATE __T__JOB_SCHEDULE SET CRON_EXPRESSION=?, LAST_UPDATED=CURRENT_TIMESTAMP WHERE ID=?");
+        queries.put("sj_update_queue_by_id", "UPDATE __T__JOB_SCHEDULE SET QUEUE=?, LAST_UPDATED=CURRENT_TIMESTAMP WHERE ID=?");
+        queries.put("sj_update_priority_by_id", "UPDATE __T__JOB_SCHEDULE SET PRIORITY=?, LAST_UPDATED=CURRENT_TIMESTAMP WHERE ID=?");
+        queries.put("sj_select_all", "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, PRIORITY, LAST_UPDATED FROM __T__JOB_SCHEDULE ORDER BY ID ");
+        queries.put("sj_select_by_id", "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, PRIORITY, LAST_UPDATED FROM __T__JOB_SCHEDULE WHERE ID=? ");
+        queries.put("sj_select_updated",  "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, PRIORITY, LAST_UPDATED FROM __T__JOB_SCHEDULE WHERE LAST_UPDATED > ?");
+        queries.put("sj_select_for_jd",  "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, PRIORITY, LAST_UPDATED FROM __T__JOB_SCHEDULE WHERE JOBDEF = ?");
+        queries.put("sj_select_for_jd_list",  "SELECT ID, CRON_EXPRESSION, JOBDEF, QUEUE, PRIORITY, LAST_UPDATED FROM __T__JOB_SCHEDULE WHERE JOBDEF IN(UNNEST(?)) ORDER BY ID");
         
         // SCHEDULED JOBS PARAMETERS
         queries.put("sjprm_insert", "INSERT INTO __T__JOB_SCHEDULE_PARAMETER(ID, KEYNAME, VALUE, JOB_SCHEDULE) VALUES(JQM_PK.nextval, ?, ?, ?)");
@@ -167,6 +170,8 @@ public class DbImplBase
         queries.put("jj_update_instruction_pause_by_id", "UPDATE __T__JOB_INSTANCE SET INSTRUCTION='PAUSE' WHERE ID=? AND STATUS IN ('RUNNING', 'HOLDED', 'SUBMITTED', 'ATTRIBUTED', 'SCHEDULED')");
         queries.put("jj_update_instruction_resume_by_id", "UPDATE __T__JOB_INSTANCE SET INSTRUCTION='RUN' WHERE ID=? AND INSTRUCTION = 'PAUSE'");
         queries.put("jj_update_queue_by_id", "UPDATE __T__JOB_INSTANCE SET QUEUE=? WHERE ID=? AND STATUS IN('SUBMITTED', 'HOLDED')");
+        queries.put("jj_update_priority_by_id", "UPDATE __T__JOB_INSTANCE SET PRIORITY=? WHERE ID=?");
+        queries.put("jj_update_notbefore_by_id", "UPDATE __T__JOB_INSTANCE SET DATE_NOT_BEFORE=? WHERE ID=? AND STATUS IN('SCHEDULED')");
         queries.put("jj_update_rank_by_id", "UPDATE __T__JOB_INSTANCE SET INTERNAL_POSITION=? WHERE ID=? AND STATUS='SUBMITTED'");
         queries.put("jj_update_progress_by_id", "UPDATE __T__JOB_INSTANCE SET PROGRESS=? WHERE ID=?");
         queries.put("jj_update_run_by_id", "UPDATE __T__JOB_INSTANCE SET DATE_START=CURRENT_TIMESTAMP, STATUS='RUNNING' WHERE ID=? AND STATUS='ATTRIBUTED'");
@@ -179,7 +184,7 @@ public class DbImplBase
         queries.put("ji_select_count_by_node", "SELECT COUNT(1) FROM __T__JOB_INSTANCE WHERE NODE=?");
         queries.put("ji_select_count_by_queue", "SELECT COUNT(1) FROM __T__JOB_INSTANCE WHERE QUEUE=?");
         queries.put("ji_select_all", "SELECT ji.ID, ji.DATE_ATTRIBUTION, ji.DATE_ENQUEUE, ji.EMAIL, ji.DATE_START, ji.APPLICATION, ji.KEYWORD1, ji.KEYWORD2, "
-                + "ji.KEYWORD3, ji.MODULE, ji.INTERNAL_POSITION, ji.PARENT, ji.PROGRESS, ji.SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.HIGHLANDER, ji.FROM_SCHEDULE, ji.PRIORITY, ji.INSTRUCTION, "
+                + "ji.KEYWORD3, ji.MODULE, ji.INTERNAL_POSITION, ji.PARENT, ji.PROGRESS, ji.SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.HIGHLANDER, ji.FROM_SCHEDULE, ji.PRIORITY, ji.INSTRUCTION, ji.DATE_NOT_BEFORE, "
                 + "q.ID, q.DEFAULT_QUEUE, q.DESCRIPTION, q.NAME, "
                 + "jd.ID, jd.APPLICATION, jd.JD_KEY, jd.CL, "
                 + "jd.DESCRIPTION, jd.ENABLED, jd.EXTERNAL, jd.HIGHLANDER, "

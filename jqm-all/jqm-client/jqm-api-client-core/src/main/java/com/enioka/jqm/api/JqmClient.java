@@ -16,6 +16,7 @@
 package com.enioka.jqm.api;
 
 import java.io.InputStream;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -258,6 +259,58 @@ public interface JqmClient
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
     void setJobQueuePosition(int jobId, int newPosition);
+
+    /**
+     * Change the priority of a queued (waiting) or running job instance.
+     * 
+     * @param jobId
+     *            id of the job instance to modify
+     * @param priority
+     *            must be between {@link Thread#MIN_PRIORITY} and {@link Thread#MAX_PRIORITY}. Higher priority is better (runs before the
+     *            others, has more CPU share).
+     */
+    void setJobPriority(int jobId, int priority);
+
+    /**
+     * Change the "do not run before" date of a waiting job.
+     * 
+     * @param jobId
+     *            id of the job instance to modify
+     * @param whenToRun
+     *            the new date
+     */
+    void setJobRunAfter(int jobId, Calendar whenToRun);
+
+    /**
+     * Change the cron pattern used by a schedule. It is used on next schedule evaluation.
+     * 
+     * @param scheduleId
+     *            the schedule to update
+     * @param cronExpression
+     *            the new expression. Validity is not tested.
+     */
+    void setScheduleRecurrence(int scheduleId, String cronExpression);
+
+    /**
+     * Change the default queue of a scheduled job.
+     * 
+     * @param scheduleId
+     *            the schedule to update
+     * @param queueId
+     *            the new queue to use (see {@link #getQueues()}.
+     */
+    void setScheduleQueue(int scheduleId, int queueId);
+
+    /**
+     * Change the default priority for job instances created by this schedule.
+     * 
+     * @param scheduleId
+     *            the schedule to update
+     * @param priority
+     *            must be between {@link Thread#MIN_PRIORITY} and {@link Thread#MAX_PRIORITY}. Higher priority is better (runs before the
+     *            others, has more CPU share).
+     */
+    void setSchedulePriority(int scheduleId, int priority);
 
     // /////////////////////////////////////////////////////////////////////
     // Job queries

@@ -16,6 +16,7 @@
 package com.enioka.jqm.api;
 
 import java.io.InputStream;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -182,6 +183,46 @@ public class ServiceClient implements JqmClient
     public void setJobQueuePosition(@PathParam("jobId") int jobId, @PathParam("newPosition") int newPosition)
     {
         JqmClientFactory.getClient().setJobQueuePosition(jobId, newPosition);
+    }
+
+    @Override
+    @POST
+    @Path("ji/{jobId}/priority/{priority}")
+    public void setJobPriority(int jobId, int priority)
+    {
+        JqmClientFactory.getClient().setJobPriority(jobId, priority);
+    }
+
+    @Override
+    @POST
+    @Path("ji/{jobId}/delay/{whenToRun}")
+    public void setJobRunAfter(int jobId, Calendar whenToRun)
+    {
+        JqmClientFactory.getClient().setJobRunAfter(jobId, whenToRun);
+    }
+
+    @Override
+    @POST
+    @Path("schedule/{scheduleId}/queue/{queueId}")
+    public void setScheduleQueue(int scheduleId, int queueId)
+    {
+        JqmClientFactory.getClient().setScheduleQueue(scheduleId, queueId);
+    }
+
+    @Override
+    @POST
+    @Path("schedule/{scheduleId}/cron/{cronExpression}")
+    public void setScheduleRecurrence(int scheduleId, String cronExpression)
+    {
+        JqmClientFactory.getClient().setScheduleRecurrence(scheduleId, cronExpression);
+    }
+
+    @Override
+    @POST
+    @Path("schedule/{scheduleId}/priority/{priority}")
+    public void setSchedulePriority(int scheduleId, int priority)
+    {
+        JqmClientFactory.getClient().setSchedulePriority(scheduleId, priority);
     }
 
     @Override

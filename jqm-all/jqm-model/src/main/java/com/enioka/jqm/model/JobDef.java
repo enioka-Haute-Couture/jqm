@@ -66,6 +66,7 @@ public class JobDef implements Serializable
     private String jarPath;
 
     private int queue_id;
+    private Integer priority;
 
     private boolean canBeRestarted = true;
     private Integer maxTimeRunning;
@@ -432,6 +433,16 @@ public class JobDef implements Serializable
         this.pathType = type;
     }
 
+    public Integer getPriority()
+    {
+        return priority;
+    }
+
+    public void setPriority(Integer priority)
+    {
+        this.priority = priority;
+    }
+
     /**
      * ResultSet is not modified (no rs.next called).
      * 
@@ -463,6 +474,7 @@ public class JobDef implements Serializable
             tmp.module = rs.getString(16 + colShift);
             tmp.pathType = PathType.valueOf(rs.getString(17 + colShift));
             tmp.queue_id = rs.getInt(18 + colShift);
+            tmp.priority = rs.getInt(19 + colShift) > 0 ? rs.getInt(19 + colShift) : null;
         }
         catch (SQLException e)
         {

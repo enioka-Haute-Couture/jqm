@@ -47,6 +47,7 @@ public class JobInstance
     private String sessionID;
     private State state;
     private Long position;
+    private Integer priority;
     private Queue queue;
     private String queueName;
     private String keyword1, keyword2, keyword3, definitionKeyword1, definitionKeyword2, definitionKeyword3, module, email, application;
@@ -416,5 +417,18 @@ public class JobInstance
     void setFromSchedule(boolean b)
     {
         this.fromSchedule = b;
+    }
+
+    /**
+     * The thread and queue priority of the job instance.
+     */
+    public Integer getPriority()
+    {
+        return priority;
+    }
+
+    void setPriority(Integer priority)
+    {
+        this.priority = priority;
     }
 }

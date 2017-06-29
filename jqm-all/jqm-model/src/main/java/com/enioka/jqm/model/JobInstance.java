@@ -59,6 +59,7 @@ public class JobInstance implements Serializable
     private Calendar creationDate;
     private Calendar attributionDate;
     private Calendar executionDate;
+    private Calendar notBefore;
 
     private String userName;
     private String sessionID;
@@ -428,6 +429,16 @@ public class JobInstance implements Serializable
         return this.instruction;
     }
 
+    public Calendar getNotBefore()
+    {
+        return notBefore;
+    }
+
+    public void setNotBefore(Calendar notBefore)
+    {
+        this.notBefore = notBefore;
+    }
+
     public static List<JobInstance> select(DbConn cnx, String query_key, Object... args)
     {
         List<JobInstance> res = new ArrayList<JobInstance>();
@@ -463,10 +474,11 @@ public class JobInstance implements Serializable
                 tmp.fromSchedule = rs.getBoolean(21);
                 tmp.priority = rs.getInt(22);
                 tmp.instruction = Instruction.valueOf(rs.getString(23));
+                tmp.notBefore = cnx.getCal(rs, 24);
 
-                tmp.q = Queue.map(rs, 23);
-                tmp.jd = JobDef.map(rs, 27);
-                tmp.n = Node.map(cnx, rs, 45);
+                tmp.q = Queue.map(rs, 24);
+                tmp.jd = JobDef.map(rs, 28);
+                tmp.n = Node.map(cnx, rs, 46);
 
                 res.add(tmp);
             }
