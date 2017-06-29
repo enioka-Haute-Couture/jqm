@@ -170,7 +170,6 @@
 			<groupId>org.apache.shiro</groupId>
 			<artifactId>shiro-web</artifactId>
 			<version>${shiro.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
@@ -237,5 +236,6 @@
 			<version>${commons.lang.version}</version>
 			<scope>provided</scope>
 		</dependency>
+
 	</dependencies>
 </project>

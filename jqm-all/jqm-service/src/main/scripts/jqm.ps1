@@ -92,14 +92,16 @@ if (! (Test-Path env:/JAVA_OPTS))
     $env:JAVA_OPTS = "-Xms128m -Xmx512m -XX:MaxPermSize=128m"
 }
 $JAVA_OOM_ACTION="-XX:OnOutOfMemoryError=powershell.exe -NonInteractive -Command Stop-Process -Force  -Id (gwmi -Class Win32_Process -Filter `"processid=`$pid`").parentprocessid"
+$JAVA_HOME=Resolve-Path $java/../..
 
 ## Helper functions
 function New-JqmService
 {   
     if (-not (Get-Service $ServiceName -ErrorAction SilentlyContinue))
-    { 
+    {
+        $dll = Get-ChildItem -Path $JAVA_HOME -Filter jvm.dll -Recurse -ErrorAction SilentlyContinue -Force
         Register-JqmNode
-        & .\bin\jqmservice-64.exe //IS//$ServiceName --Description="Job Queue Manager node $NodeName" --Startup="auto" --ServiceUser="$ServiceUser" --ServicePassword="$ServicePassword" --StartMode="jvm" --StopMode="jvm" --StartPath=$PSScriptRoot ++StartParams="--startnode;$NodeName" --StartClass="com.enioka.jqm.tools.Main" --StopClass="com.enioka.jqm.tools.Main" --StartMethod="start" --StopMethod="stop" --LogPath="$PSScriptRoot\logs" --StdOutput="auto" --StdError="auto" --Classpath="$PSScriptRoot\jqm.jar" ++JvmOptions="$($env:JAVA_OPTS.Replace(' ', ';'));$JAVA_OOM_ACTION"
+        & .\bin\jqmservice-64.exe //IS//$ServiceName --Description="Job Queue Manager node $NodeName" --JavaHome="$JAVA_HOME" --Jvm="$(${dll}.FullName)" --Startup="auto" --ServiceUser="$ServiceUser" --ServicePassword="$ServicePassword" --StartMode="jvm" --StopMode="jvm" --StartPath=$PSScriptRoot ++StartParams="--startnode;$NodeName" --StartClass="com.enioka.jqm.tools.Main" --StopClass="com.enioka.jqm.tools.Main" --StartMethod="start" --StopMethod="stop" --LogPath="$PSScriptRoot\logs" --StdOutput="auto" --StdError="auto" --Classpath="$PSScriptRoot\jqm.jar" ++JvmOptions="$($env:JAVA_OPTS.Replace(' ', ';'));$JAVA_OOM_ACTION"
         if (!$?)
         {
             throw "could not create service $ServiceName"

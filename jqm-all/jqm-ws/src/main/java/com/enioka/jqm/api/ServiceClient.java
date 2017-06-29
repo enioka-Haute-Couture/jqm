@@ -132,6 +132,7 @@ public class ServiceClient implements JqmClient
 
     @Override
     @Path("ji/running/paused/{jobId}")
+    @POST
     public void pauseRunningJob(int jobId)
     {
         JqmClientFactory.getClient().pauseRunningJob(jobId);
@@ -139,6 +140,7 @@ public class ServiceClient implements JqmClient
 
     @Override
     @Path("ji/running/paused/{jobId}")
+    @DELETE
     public void resumeRunningJob(int jobId)
     {
         JqmClientFactory.getClient().resumeRunningJob(jobId);
