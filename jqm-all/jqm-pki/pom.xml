@@ -9,8 +9,9 @@
 	</parent>
 
 	<artifactId>jqm-pki</artifactId>
-	<name>jqm-pki</name>
-	<url>http://maven.apache.org</url>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<url>http://jqm.readthedocs.org</url>
+	<description>A minimal PKI to provide basic X509 services</description>
 
 	<properties>
 	</properties>

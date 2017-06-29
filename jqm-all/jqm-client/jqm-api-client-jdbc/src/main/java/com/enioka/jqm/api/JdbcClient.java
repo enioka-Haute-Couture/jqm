@@ -530,7 +530,7 @@ final class JdbcClient implements JqmClient
             cnx.commit();
             if (res.nbUpdated != 1)
             {
-                new JqmInvalidRequestException(
+                throw new JqmInvalidRequestException(
                         "An attempt was made to delete a job instance that either did not exist or was already running");
             }
 

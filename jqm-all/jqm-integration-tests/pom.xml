@@ -12,6 +12,7 @@
 
 	<name>${project.groupId}:${project.artifactId}</name>
 	<url>http://jqm.readthedocs.org</url>
+	<description>Test suite for the JQM engine + service</description>
 
 	<properties>
 		<argLine>-Xms256m -Xmx1024m -XX:MaxPermSize=512m</argLine>

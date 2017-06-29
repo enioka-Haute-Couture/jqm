@@ -135,7 +135,7 @@ public class JdbcRealm extends AuthorizingRealm
         }
         catch (RuntimeException e)
         {
-            e.printStackTrace();
+            log.error("Could not retrieve user from database", e);
             throw e;
         }
         finally

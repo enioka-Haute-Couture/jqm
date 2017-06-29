@@ -10,7 +10,7 @@
 	<artifactId>jqm-tests</artifactId>
 	<packaging>pom</packaging>
 
-	<name>JQM test payloads parent</name>
+	<name>${project.groupId}:${project.artifactId}</name>
 	<url>http://jqm.readthedocs.org</url>
 
 	<modules>

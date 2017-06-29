@@ -9,6 +9,7 @@
 
 	<name>${project.groupId}:${project.artifactId}</name>
 	<url>http://jqm.readthedocs.org</url>
+	<description>JQM public API interfaces</description>
 
 	<build>
 		<plugins>

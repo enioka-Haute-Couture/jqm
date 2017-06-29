@@ -144,8 +144,7 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new DatabaseException(e);
         }
         finally
         {

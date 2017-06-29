@@ -11,7 +11,8 @@
 	<artifactId>jqm-ws</artifactId>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<packaging>war</packaging>
-	<url>http://maven.apache.org</url>
+	<url>http://jqm.readthedocs.org</url>
+	<description>JQM web API implementation and administration UI</description>
 
 	<properties>
 		<sonar.exclusions>src/main/webapp/libs/**</sonar.exclusions>
