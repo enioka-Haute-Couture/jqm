@@ -208,13 +208,13 @@ class ClassloaderManager
     {
         switch (ji.getJD().getPathType())
         {
-        default:
-        case FS:
-            return fsResolver.getLibraries(ji.getNode(), ji.getJD(), cnx);
         case MAVEN:
             return mavenResolver.resolve(ji, cnx);
         case MEMORY:
             return new URL[0];
+        case FS:
+        default:
+            return fsResolver.getLibraries(ji.getNode(), ji.getJD(), cnx);
         }
     }
 
@@ -222,13 +222,13 @@ class ClassloaderManager
     {
         switch (ji.getJD().getPathType())
         {
-        default:
-        case FS:
-            return getExtensionCLassloader();
         case MAVEN:
             return getExtensionCLassloader();
         case MEMORY:
             return Thread.currentThread().getContextClassLoader();
+        default:
+        case FS:
+            return getExtensionCLassloader();
         }
     }
 

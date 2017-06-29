@@ -70,7 +70,7 @@ public class AnnotationSpringContextBootstrapHandler implements JobInstanceStart
         // and only on first boot: the Spring context cannot be refreshed multiple times.
         if (!refreshed)
         {
-            synchronized (refreshed)
+            synchronized (AnnotationSpringContextBootstrapHandler.class)
             {
                 if (!refreshed)
                 {

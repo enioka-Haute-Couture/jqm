@@ -17,7 +17,9 @@ import com.enioka.jqm.api.JobRunner;
 public class MainRunner implements JobRunner
 {
     public MainRunner()
-    {}
+    {
+        // No special initialization.
+    }
 
     private Method getMainMethod(Class<? extends Object> toRun)
     {
@@ -42,7 +44,8 @@ public class MainRunner implements JobRunner
     @Override
     public boolean canRun(Class<? extends Object> toRun)
     {
-        return getMainMethod(toRun) != null && Modifier.isStatic(getMainMethod(toRun).getModifiers());
+        Method m = getMainMethod(toRun);
+        return m != null && Modifier.isStatic(m.getModifiers());
     }
 
     @Override

@@ -18,6 +18,7 @@
 
 package com.enioka.jqm.model;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -39,8 +40,10 @@ import com.enioka.jqm.jdbc.QueryResult;
  * A node is the holder of all the parameters needed for the engine to run: a list of {@link Queue}s to poll (through
  * {@link DeploymentParameter}s), the different TCP ports to use, etc.
  */
-public class Node
+public class Node implements Serializable
 {
+    private static final long serialVersionUID = 7445517437816067903L;
+
     private Integer id = null;
 
     private String name;

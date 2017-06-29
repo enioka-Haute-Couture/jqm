@@ -1,5 +1,5 @@
 /**
- * Copyright © 2013 enioka. All rights reserved
+* * Copyright © 2013 enioka. All rights reserved
  * Authors: Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
  *          Pierre COPPEE (pierre.coppee@enioka.com)
  *
@@ -107,8 +107,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
         this.maxNbThread = dp.getEnabled() ? dp.getNbThread() : 0;
         this.dpId = dp.getId();
 
-        jqmlogger.info("Engine " + engine.getNode().getName() + " will poll JobInstances on queue " + queue.getName() + " every "
-                + pollingInterval / 1000 + "s with " + maxNbThread + " threads for concurrent instances");
+        jqmlogger.info("Engine {}" + " will poll JobInstances on queue {} every {} s with {} threads for concurrent instances",
+                engine.getNode().getName(), queue.getName(), pollingInterval / 1000, maxNbThread);
     }
 
     /**
@@ -174,7 +174,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
         QueryResult qr = cnx.runUpdate("ji_update_poll", this.engine.getNode().getId(), queue.getId(), maxNbThread - usedSlots);
         if (qr.nbUpdated > 0)
         {
-            jqmlogger.debug("Poller has found " + qr.nbUpdated + " JI to run");
+            jqmlogger.debug("Poller has found {} JI to run", qr.nbUpdated);
         }
         if (qr.nbUpdated > 0)
         {
@@ -207,7 +207,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     }
 
     @Override
-    synchronized public void run() // sync: avoid race condition on run when restarting after failure.
+    public synchronized void run() // sync: avoid race condition on run when restarting after failure.
     {
         this.localThread = Thread.currentThread();
         this.localThread.setName("QUEUE_POLLER;polling;" + this.queue.getName());
@@ -229,8 +229,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
                     for (JobInstance ji : newInstances)
                     {
                         // We will run this JI!
-                        jqmlogger.trace("JI number " + ji.getId() + " will be run by this poller this loop (already " + actualNbThread + "/"
-                                + maxNbThread + " on " + this.queue.getName() + ")");
+                        jqmlogger.trace("JI number {} will be run by this poller this loop (already {}/{} on {})", ji.getId(),
+                                actualNbThread, maxNbThread, this.queue.getName());
                         actualNbThread.incrementAndGet();
                         if (ji.getJD().getMaxTimeRunning() != null)
                         {
@@ -357,7 +357,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
         long stepMs = 1000;
         while (timeWaitedMs <= timeOutMs)
         {
-            jqmlogger.trace("Waiting the end of " + actualNbThread + " job(s)");
+            jqmlogger.trace("Waiting the end of {} job(s)", actualNbThread);
 
             if (actualNbThread.get() == 0)
             {
@@ -365,8 +365,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
             }
             if (timeWaitedMs == 0)
             {
-                jqmlogger.info("Waiting for the end of " + actualNbThread + " jobs on queue " + this.queue.getName() + " - timeout is "
-                        + timeOutMs + "ms");
+                jqmlogger.info("Waiting for the end of {} jobs on queue {} - timeout is {} ms", actualNbThread, this.queue.getName(),
+                        timeOutMs);
             }
             try
             {

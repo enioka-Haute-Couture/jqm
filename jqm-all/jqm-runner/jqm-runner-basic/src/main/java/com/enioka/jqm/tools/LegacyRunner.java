@@ -14,7 +14,9 @@ import com.enioka.jqm.api.JobRunner;
 public class LegacyRunner implements JobRunner
 {
     public LegacyRunner()
-    {}
+    {
+        // No special initialization.
+    }
 
     @Override
     public boolean canRun(Class<? extends Object> toRun)

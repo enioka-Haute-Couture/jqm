@@ -84,7 +84,7 @@ class JobManagerHandler implements InvocationHandler
             {
                 if ("jobApplicationId".equals(methodName))
                 {
-                    return this.ji.getJd();
+                    return this.ji.getJdId();
                 }
                 else if ("parentID".equals(methodName))
                 {

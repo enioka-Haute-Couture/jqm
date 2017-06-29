@@ -80,13 +80,13 @@ public class Db
     {
         this.p = properties != null ? properties : new Properties();
 
-        if (properties != null && properties.containsKey("com.enioka.jqm.jdbc.url"))
+        if (p.containsKey("com.enioka.jqm.jdbc.url"))
         {
             // In this case - full JDBC construction, not from JNDI. Only works for HSQLDB.
 
             // Allow upgrade by default in this case (this is used only in tests)
-            boolean upgrade = Boolean.parseBoolean(properties.getProperty("com.enioka.jqm.jdbc.allowSchemaUpdate", "true"));
-            String url = properties.getProperty("com.enioka.jqm.jdbc.url");
+            boolean upgrade = Boolean.parseBoolean(p.getProperty("com.enioka.jqm.jdbc.allowSchemaUpdate", "true"));
+            String url = p.getProperty("com.enioka.jqm.jdbc.url");
 
             DataSource ds = null;
             if (url.contains("jdbc:hsqldb"))
@@ -123,16 +123,16 @@ public class Db
         else
         {
             // Standard case: fetch a DataSource from JNDI.
-            String dsName = properties.getProperty("com.enioka.jqm.jdbc.datasource", "jdbc/jqm");
+            String dsName = p.getProperty("com.enioka.jqm.jdbc.datasource", "jdbc/jqm");
 
             // Ascending compatibility with v1.x: old name for the DataSource.
-            String oldName = properties.getProperty("javax.persistence.nonJtaDataSource");
+            String oldName = p.getProperty("javax.persistence.nonJtaDataSource");
             if (oldName != null)
             {
                 dsName = oldName;
             }
 
-            boolean upgrade = Boolean.parseBoolean(properties.getProperty("com.enioka.jqm.jdbc.allowSchemaUpdate", "false"));
+            boolean upgrade = Boolean.parseBoolean(p.getProperty("com.enioka.jqm.jdbc.allowSchemaUpdate", "false"));
 
             // This is a hack. Some containers will use root context as default for JNDI (WebSphere, Glassfish...), other will use
             // java:/comp/env/ (Tomcat...). So if we actually know the required alias, we try both, and the user only has to provide a
@@ -377,7 +377,10 @@ public class Db
         {
             try
             {
-                tmp.close();
+                if (tmp != null)
+                {
+                    tmp.close();
+                }
             }
             catch (SQLException e)
             {

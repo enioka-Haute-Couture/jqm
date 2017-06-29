@@ -33,12 +33,12 @@ public class JobBase
 
     public void start()
     {
-
+        // Usually overridden by the job implementation.
     }
 
     public void stop()
     {
-
+        // Sometimes overridden by the job implementation.
     }
 
     public DataSource getDefaultConnection() throws NamingException
@@ -119,17 +119,17 @@ public class JobBase
     {
         return jm.keyword3();
     }
-    
+
     public String getDefinitionKeyword1()
     {
         return jm.definitionKeyword1();
     }
-    
+
     public String getDefinitionKeyword2()
     {
         return jm.definitionKeyword2();
     }
-    
+
     public String getDefinitionKeyword3()
     {
         return jm.definitionKeyword3();

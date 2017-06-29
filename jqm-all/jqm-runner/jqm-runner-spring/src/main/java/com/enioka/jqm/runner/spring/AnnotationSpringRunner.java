@@ -14,7 +14,9 @@ import com.enioka.jqm.api.JobRunner;
 public class AnnotationSpringRunner implements JobRunner
 {
     public AnnotationSpringRunner()
-    {}
+    {
+        // Simple no-operation.
+    }
 
     @Override
     public boolean canRun(Class<? extends Object> toRun)

@@ -364,17 +364,7 @@ public class DbConn implements Closeable
      */
     public void closeQuietly(Closeable ps)
     {
-        if (ps != null)
-        {
-            try
-            {
-                ps.close();
-            }
-            catch (Exception e)
-            {
-                // Do nothing.
-            }
-        }
+        DbHelper.closeQuietly(ps);
     }
 
     /**
@@ -385,17 +375,7 @@ public class DbConn implements Closeable
      */
     public void closeQuietly(ResultSet ps)
     {
-        if (ps != null)
-        {
-            try
-            {
-                ps.close();
-            }
-            catch (Exception e)
-            {
-                // Do nothing.
-            }
-        }
+        DbHelper.closeQuietly(ps);
     }
 
     /**
@@ -406,17 +386,7 @@ public class DbConn implements Closeable
      */
     public void closeQuietly(Connection ps)
     {
-        if (ps != null)
-        {
-            try
-            {
-                ps.close();
-            }
-            catch (Exception e)
-            {
-                // Do nothing.
-            }
-        }
+        DbHelper.closeQuietly(ps);
     }
 
     /**
@@ -427,17 +397,7 @@ public class DbConn implements Closeable
      */
     public void closeQuietly(Statement ps)
     {
-        if (ps != null)
-        {
-            try
-            {
-                ps.close();
-            }
-            catch (Exception e)
-            {
-                // Do nothing.
-            }
-        }
+        DbHelper.closeQuietly(ps);
     }
 
     private PreparedStatement prepare(QueryPreparation q)

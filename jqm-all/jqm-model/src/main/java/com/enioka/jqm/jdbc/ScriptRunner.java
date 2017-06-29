@@ -66,22 +66,8 @@ public class ScriptRunner
         }
         finally
         {
-            try
-            {
-                isr.close();
-            }
-            catch (Exception e)
-            {
-                // Ignore.
-            }
-            try
-            {
-                is.close();
-            }
-            catch (Exception e)
-            {
-                // Ignore.
-            }
+            DbHelper.closeQuietly(isr);
+            DbHelper.closeQuietly(is);
         }
 
         jqmlogger.trace("File {} was run OK", classpath);

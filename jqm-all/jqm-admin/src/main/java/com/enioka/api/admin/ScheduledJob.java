@@ -1,5 +1,6 @@
 package com.enioka.api.admin;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,8 +12,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  */
 @XmlRootElement
-public class ScheduledJob
+public class ScheduledJob implements Serializable
 {
+    private static final long serialVersionUID = 7928212054684657247L;
+
     private Integer id = null;
 
     private String cronExpression;

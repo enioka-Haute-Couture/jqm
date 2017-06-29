@@ -153,9 +153,10 @@ public class DbImplMySql implements DbAdapter
         {
             return;
         }
+        CallableStatement s = null;
         try
         {
-            CallableStatement s = cnx.prepareCall("{? = CALL NEXTVAL(?)}");
+            s = cnx.prepareCall("{? = CALL NEXTVAL(?)}");
 
             s.registerOutParameter(1, Types.INTEGER);
             s.setString(2, "MAIN");
@@ -168,6 +169,10 @@ public class DbImplMySql implements DbAdapter
         catch (SQLException e)
         {
             throw new DatabaseException(e);
+        }
+        finally
+        {
+            DbHelper.closeQuietly(s);
         }
     }
 

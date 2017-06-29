@@ -53,7 +53,8 @@ public class JdbcRealm extends AuthorizingRealm
         {
             if (!((CertificateToken) token).getUserName().equals(info.getPrincipals().getPrimaryPrincipal()))
             {
-                log.warn("certificate [{}] presented did not match the awaited username: expected [{}] got [{}]", token.getPrincipal(), info.getPrincipals().getPrimaryPrincipal(), ((CertificateToken) token).getUserName());
+                log.warn("certificate [{}] presented did not match the awaited username: expected [{}] got [{}]", token.getPrincipal(),
+                        info.getPrincipals().getPrimaryPrincipal(), ((CertificateToken) token).getUserName());
                 throw new IncorrectCredentialsException("certificate presented did not match the awaited username");
             }
             return;
@@ -139,7 +140,7 @@ public class JdbcRealm extends AuthorizingRealm
         }
         finally
         {
-            cnx.close();
+            Helpers.closeQuietly(cnx);
         }
     }
 

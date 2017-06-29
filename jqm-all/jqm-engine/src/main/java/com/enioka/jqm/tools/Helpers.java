@@ -130,31 +130,31 @@ final class Helpers
 
     static void closeQuietly(Closeable zf)
     {
-        try
+        if (zf != null)
         {
-            if (zf != null)
+            try
             {
                 zf.close();
             }
-        }
-        catch (Exception e)
-        {
-            jqmlogger.warn("could not close jar file", e);
+            catch (Exception e)
+            {
+                jqmlogger.warn("could not close closeable item", e);
+            }
         }
     }
 
     static void closeQuietly(ZipFile zf)
     {
-        try
+        if (zf != null)
         {
-            if (zf != null)
+            try
             {
                 zf.close();
             }
-        }
-        catch (Exception e)
-        {
-            jqmlogger.warn("could not close jar file", e);
+            catch (Exception e)
+            {
+                jqmlogger.warn("could not close jar file", e);
+            }
         }
     }
 
@@ -543,6 +543,7 @@ final class Helpers
     {
         jqmlogger.debug("sending mail to " + to + " - subject is " + subject);
         ClassLoader extLoader = getExtClassLoader();
+        extLoader = extLoader == null ? Helpers.class.getClassLoader() : extLoader;
         ClassLoader old = Thread.currentThread().getContextClassLoader();
         Object mailSession = null;
 

@@ -59,6 +59,8 @@ import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.util.BigIntegers;
 
+import com.enioka.jqm.jdbc.DbHelper;
+
 public class CertificateRequest
 {
     // Parameter fields
@@ -137,72 +139,97 @@ public class CertificateRequest
 
     public void writePemPublicToFile(String path)
     {
+        FileWriter fw = null;
+        PEMWriter wr = null;
         try
         {
             File f = new File(path);
             if (!f.getParentFile().isDirectory() && !f.getParentFile().mkdir())
             {
-                throw new PkiException("couldn't create directory " + f.getParentFile().getAbsolutePath() + " for storing the SSL keystore");
+                throw new PkiException(
+                        "couldn't create directory " + f.getParentFile().getAbsolutePath() + " for storing the SSL keystore");
             }
-            FileWriter fw = new FileWriter(path);
-            PEMWriter wr = new PEMWriter(fw);
+            fw = new FileWriter(path);
+            wr = new PEMWriter(fw);
             wr.writeObject(holder);
-            wr.close();
-            fw.close();
+            wr.flush();
         }
         catch (Exception e)
         {
             throw new PkiException(e);
+        }
+        finally
+        {
+            closeQuietly(wr);
+            closeQuietly(fw);
         }
     }
 
     public String writePemPublicToString()
     {
+        StringWriter sw = null;
+        PEMWriter wr = null;
         try
         {
-            StringWriter sw = new StringWriter();
-            PEMWriter wr = new PEMWriter(sw);
+            sw = new StringWriter();
+            wr = new PEMWriter(sw);
             wr.writeObject(holder);
-            wr.close();
-            sw.close();
+            wr.flush();
             return sw.toString();
         }
         catch (Exception e)
         {
             throw new PkiException(e);
+        }
+        finally
+        {
+            closeQuietly(wr);
+            closeQuietly(sw);
         }
     }
 
     public void writePemPrivateToFile(String path)
     {
+        FileWriter fw = null;
+        PEMWriter wr = null;
         try
         {
-            FileWriter fw = new FileWriter(path);
-            PEMWriter wr = new PEMWriter(fw);
+            fw = new FileWriter(path);
+            wr = new PEMWriter(fw);
             wr.writeObject(privateKey);
-            wr.close();
-            fw.close();
+            wr.flush();
         }
         catch (Exception e)
         {
             throw new PkiException(e);
+        }
+        finally
+        {
+            closeQuietly(wr);
+            closeQuietly(fw);
         }
     }
 
     public String writePemPrivateToString()
     {
+        StringWriter sw = null;
+        PEMWriter wr = null;
         try
         {
-            StringWriter sw = new StringWriter();
-            PEMWriter wr = new PEMWriter(sw);
+            sw = new StringWriter();
+            wr = new PEMWriter(sw);
             wr.writeObject(privateKey);
-            wr.close();
-            sw.close();
+            wr.flush();
             return sw.toString();
         }
         catch (Exception e)
         {
             throw new PkiException(e);
+        }
+        finally
+        {
+            closeQuietly(wr);
+            closeQuietly(sw);
         }
     }
 
@@ -223,13 +250,16 @@ public class CertificateRequest
 
     private void generatePem()
     {
+        Writer osw = null;
+        PEMWriter wr = null;
         try
         {
             // PEM public key
             pemPublicFile = new ByteArrayOutputStream();
-            Writer osw = new OutputStreamWriter(pemPublicFile);
-            PEMWriter wr = new PEMWriter(osw);
+            osw = new OutputStreamWriter(pemPublicFile);
+            wr = new PEMWriter(osw);
             wr.writeObject(holder);
+            wr.flush();
             wr.close();
 
             // PEM private key
@@ -237,11 +267,17 @@ public class CertificateRequest
             osw = new OutputStreamWriter(pemPrivateFile);
             wr = new PEMWriter(osw);
             wr.writeObject(privateKey);
+            wr.flush();
             wr.close();
         }
         catch (Exception e)
         {
             throw new PkiException(e);
+        }
+        finally
+        {
+            closeQuietly(wr);
+            closeQuietly(osw);
         }
     }
 
@@ -277,6 +313,7 @@ public class CertificateRequest
 
     public void writeTrustPfxToFile(String path, String password)
     {
+        FileOutputStream fos = null;
         try
         {
             KeyStore ks = KeyStore.getInstance("JKS");
@@ -286,13 +323,27 @@ public class CertificateRequest
 
             ks.setCertificateEntry("JQM-CA", ca);
 
-            FileOutputStream fos = new FileOutputStream(path);
+            fos = new FileOutputStream(path);
             ks.store(fos, password.toCharArray());
             fos.close();
         }
         catch (Exception e)
         {
             throw new PkiException(e);
+        }
+        finally
+        {
+            try
+            {
+                if (fos != null)
+                {
+                    fos.close();
+                }
+            }
+            catch (Exception e)
+            {
+                // Ignore.
+            }
         }
     }
 
@@ -318,9 +369,10 @@ public class CertificateRequest
 
         SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
 
-        X509v3CertificateBuilder gen = new X509v3CertificateBuilder(authorityCertificate == null ? dnName
-                : authorityCertificate.getSubject(), BigIntegers.createRandomInRange(BigInteger.ZERO, BigInteger.valueOf(Long.MAX_VALUE),
-                random), new Date(), endValidity.getTime(), dnName, publicKeyInfo);
+        X509v3CertificateBuilder gen = new X509v3CertificateBuilder(
+                authorityCertificate == null ? dnName : authorityCertificate.getSubject(),
+                BigIntegers.createRandomInRange(BigInteger.ZERO, BigInteger.valueOf(Long.MAX_VALUE), random), new Date(),
+                endValidity.getTime(), dnName, publicKeyInfo);
 
         // Public key ID
         DigestCalculator digCalc = new BcDigestCalculatorProvider().get(new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1));
@@ -349,8 +401,8 @@ public class CertificateRequest
         }
 
         // Signer
-        ContentSigner signer = new JcaContentSignerBuilder("SHA512WithRSAEncryption").setProvider(Constants.JCA_PROVIDER).build(
-                authorityKey == null ? privateKey : authorityKey);
+        ContentSigner signer = new JcaContentSignerBuilder("SHA512WithRSAEncryption").setProvider(Constants.JCA_PROVIDER)
+                .build(authorityKey == null ? privateKey : authorityKey);
 
         // Go
         holder = gen.build(signer);
@@ -388,5 +440,20 @@ public class CertificateRequest
     public PrivateKey getPrivateKey()
     {
         return privateKey;
+    }
+
+    private void closeQuietly(Writer fw)
+    {
+        if (fw != null)
+        {
+            try
+            {
+                fw.close();
+            }
+            catch (Exception e)
+            {
+                // Do nothing.
+            }
+        }
     }
 }

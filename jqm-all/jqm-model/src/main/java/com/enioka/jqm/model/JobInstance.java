@@ -68,9 +68,9 @@ public class JobInstance implements Serializable
     private String instanceKeyword2;
     private String instanceKeyword3;
 
-    private JobDef jd;
-    private Queue q;
-    private Node n;
+    private transient JobDef jd;
+    private transient Queue q;
+    private transient Node n;
 
     /**
      * Helper method to add a parameter without having to create it explicitely. The created parameter should be persisted afterwards.
@@ -117,7 +117,7 @@ public class JobInstance implements Serializable
     /**
      * The {@link JobDef} from which this {@link JobInstance} was instantiated.
      */
-    public int getJd()
+    public int getJdId()
     {
         return jd_id;
     }
@@ -133,7 +133,7 @@ public class JobInstance implements Serializable
     }
 
     /**
-     * See {@link #getJd()}
+     * See {@link #getJdId()}
      */
     public void setJd(final int jd)
     {
@@ -420,6 +420,7 @@ public class JobInstance implements Serializable
 
     /**
      * An instruction given to the job instance.
+     * 
      * @return
      */
     public Instruction getInstruction()

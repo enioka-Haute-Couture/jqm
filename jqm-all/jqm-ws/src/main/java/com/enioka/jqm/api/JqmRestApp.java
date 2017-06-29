@@ -38,43 +38,51 @@ public class JqmRestApp extends ResourceConfig
         this.property(UnmarshallerProperties.JSON_WRAPPER_AS_ARRAY_NAME, true);
 
         // Determine which of the three APIs should be loaded
-        DbConn cnx = Helpers.getDbSession();
         boolean loadApiSimple;
         boolean loadApiClient;
         boolean loadApiAdmin;
+        DbConn cnx = null;
 
-        if (context.getInitParameter("jqmnodeid") != null)
+        try
         {
-            // The application is running hosted by a JQM node.
-            Node n = null;
-
-            try
+            cnx = Helpers.getDbSession();
+            if (context.getInitParameter("jqmnodeid") != null)
             {
-                n = Node.select_single(cnx, "node_select_by_id", Integer.parseInt(context.getInitParameter("jqmnodeid")));
-            }
-            catch (NoResultException e)
-            {
-                throw new RuntimeException("invalid configuration: no node of ID " + context.getInitParameter("jqmnodeid"));
-            }
-            loadApiSimple = !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApiSimple", "false"));
-            loadApiClient = !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApiClient", "false"));
-            loadApiAdmin = !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApiAdmin", "false"));
+                // The application is running hosted by a JQM node.
+                Node n = null;
 
-            loadApiAdmin = loadApiAdmin && (n.getLoadApiAdmin() == null ? false : n.getLoadApiAdmin());
-            loadApiClient = loadApiClient && (n.getLoadApiClient() == null ? false : n.getLoadApiClient());
-            loadApiSimple = loadApiSimple && (n.getLoapApiSimple() == null ? true : n.getLoapApiSimple());
+                try
+                {
+                    n = Node.select_single(cnx, "node_select_by_id", Integer.parseInt(context.getInitParameter("jqmnodeid")));
+                }
+                catch (NoResultException e)
+                {
+                    throw new RuntimeException("invalid configuration: no node of ID " + context.getInitParameter("jqmnodeid"));
+                }
+                loadApiSimple = !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApiSimple", "false"));
+                loadApiClient = !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApiClient", "false"));
+                loadApiAdmin = !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApiAdmin", "false"));
+
+                loadApiAdmin = loadApiAdmin && (n.getLoadApiAdmin() == null ? false : n.getLoadApiAdmin());
+                loadApiClient = loadApiClient && (n.getLoadApiClient() == null ? false : n.getLoadApiClient());
+                loadApiSimple = loadApiSimple && (n.getLoapApiSimple() == null ? true : n.getLoapApiSimple());
+            }
+            else
+            {
+                // The application is hosted by some other server (Tomcat, JBoss... but not a JQM node)
+
+                // Never load the simple API when not running on JQM's own server. This API relies on files that are local to the JQM
+                // server.
+                loadApiSimple = false;
+                // Always load the two others
+                loadApiAdmin = true;
+                loadApiClient = true;
+            }
         }
-        else
+        finally
         {
-            // The application is hosted by some other server (Tomcat, JBoss... but not a JQM node)
-
-            // Never load the simple API when not running on JQM's own server. This API relies on files that are local to the JQM server.
-            loadApiSimple = false;
-            // Always load the two others
-            loadApiAdmin = true;
-            loadApiClient = true;
+            Helpers.closeQuietly(cnx);
         }
-        Helpers.closeQuietly(cnx);
 
         // Load the APIs
         if (loadApiAdmin)

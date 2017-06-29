@@ -224,7 +224,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         // Done
         cnx.close();
         cnx = null;
-        latestNodeStartedName = node.getName();
+        JqmEngine.latestNodeStartedName = node.getName();
         if (this.handler != null)
         {
             this.handler.onNodeStarted();

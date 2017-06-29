@@ -10,7 +10,9 @@ import com.enioka.jqm.api.JobRunner;
 public class RunnableRunner implements JobRunner
 {
     public RunnableRunner()
-    {}
+    {
+        // No special initialization.
+    }
 
     @Override
     public boolean canRun(Class<? extends Object> toRun)
