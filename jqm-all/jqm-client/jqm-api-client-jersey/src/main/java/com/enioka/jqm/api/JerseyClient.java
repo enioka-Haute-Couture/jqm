@@ -528,7 +528,7 @@ final class JerseyClient implements JqmClient
     {
         try
         {
-            target.path("ji/" + jobId + "/delay/" + whenToRun).request().post(null);
+            target.path("ji/" + jobId + "/delay/" + whenToRun.getTimeInMillis()).request().post(null);
         }
         catch (BadRequestException e)
         {

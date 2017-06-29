@@ -188,23 +188,30 @@ public class ServiceClient implements JqmClient
     @Override
     @POST
     @Path("ji/{jobId}/priority/{priority}")
-    public void setJobPriority(int jobId, int priority)
+    public void setJobPriority(@PathParam("jobId") int jobId, @PathParam("priority") int priority)
     {
         JqmClientFactory.getClient().setJobPriority(jobId, priority);
     }
 
     @Override
-    @POST
-    @Path("ji/{jobId}/delay/{whenToRun}")
-    public void setJobRunAfter(int jobId, Calendar whenToRun)
+    public void setJobRunAfter(@PathParam("jobId") int jobId, @PathParam("whenToRun") Calendar whenToRun)
     {
         JqmClientFactory.getClient().setJobRunAfter(jobId, whenToRun);
+    }
+
+    @POST
+    @Path("ji/{jobId}/delay/{whenToRun}")
+    public void setJobRunAfter(@PathParam("jobId") int jobId, @PathParam("whenToRun") long whenToRun)
+    {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(whenToRun);
+        JqmClientFactory.getClient().setJobRunAfter(jobId, c);
     }
 
     @Override
     @POST
     @Path("schedule/{scheduleId}/queue/{queueId}")
-    public void setScheduleQueue(int scheduleId, int queueId)
+    public void setScheduleQueue(@PathParam("scheduleId") int scheduleId, @PathParam("queueId") int queueId)
     {
         JqmClientFactory.getClient().setScheduleQueue(scheduleId, queueId);
     }
@@ -212,7 +219,7 @@ public class ServiceClient implements JqmClient
     @Override
     @POST
     @Path("schedule/{scheduleId}/cron/{cronExpression}")
-    public void setScheduleRecurrence(int scheduleId, String cronExpression)
+    public void setScheduleRecurrence(@PathParam("scheduleId") int scheduleId, @PathParam("cronExpression") String cronExpression)
     {
         JqmClientFactory.getClient().setScheduleRecurrence(scheduleId, cronExpression);
     }
@@ -220,7 +227,7 @@ public class ServiceClient implements JqmClient
     @Override
     @POST
     @Path("schedule/{scheduleId}/priority/{priority}")
-    public void setSchedulePriority(int scheduleId, int priority)
+    public void setSchedulePriority(@PathParam("scheduleId") int scheduleId, @PathParam("priority") int priority)
     {
         JqmClientFactory.getClient().setSchedulePriority(scheduleId, priority);
     }

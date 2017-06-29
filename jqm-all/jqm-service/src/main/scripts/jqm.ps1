@@ -124,7 +124,7 @@ function Remove-JqmService
 function Import-AllXml
 {
     cd $PSScriptRoot
-    & $java -jar jqm.jar -importjobdef ((ls $PSScriptRoot/jobs -Recurse -Filter *.xml |% FullName) -join ',')
+    & $java -jar jqm.jar -importjobdef ((ls $PSScriptRoot/jobs -Recurse -Filter *.xml -Exclude pom.xml |% FullName) -join ',')
 }
 
 function Register-JqmNode
