@@ -25,7 +25,6 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -105,7 +104,7 @@ public class ServiceClient implements JqmClient
     @Override
     @Path("schedule/{scheduleId}")
     @DELETE
-    public void removeRecurrence(int scheduleId)
+    public void removeRecurrence(@PathParam("scheduleId") int scheduleId)
     {
         JqmClientFactory.getClient().removeRecurrence(scheduleId);
     }
@@ -134,7 +133,7 @@ public class ServiceClient implements JqmClient
     @Override
     @Path("ji/running/paused/{jobId}")
     @POST
-    public void pauseRunningJob(int jobId)
+    public void pauseRunningJob(@PathParam("jobId") int jobId)
     {
         JqmClientFactory.getClient().pauseRunningJob(jobId);
     }
@@ -142,7 +141,7 @@ public class ServiceClient implements JqmClient
     @Override
     @Path("ji/running/paused/{jobId}")
     @DELETE
-    public void resumeRunningJob(int jobId)
+    public void resumeRunningJob(@PathParam("jobId") int jobId)
     {
         JqmClientFactory.getClient().resumeRunningJob(jobId);
     }
@@ -386,7 +385,7 @@ public class ServiceClient implements JqmClient
     }
 
     @Path("q/{qId}/pause")
-    @PUT
+    @POST
     public void pauseQueue(@PathParam("qId") int qId)
     {
         Queue q = new Queue();
@@ -416,7 +415,7 @@ public class ServiceClient implements JqmClient
     }
 
     @Path("q/{qId}/clear")
-    @PUT
+    @POST
     public void clearQueue(@PathParam("qId") int qId)
     {
         Queue q = new Queue();

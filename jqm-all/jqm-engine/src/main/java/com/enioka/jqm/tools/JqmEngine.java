@@ -258,6 +258,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         }
 
         // Stop pollers
+        int pollerCount = pollers.size();
         for (QueuePoller p : pollers.values())
         {
             p.stop();
@@ -269,13 +270,16 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         // Jetty is closed automatically when all pollers are down
 
         // Wait for the end of the world
-        try
+        if (pollerCount > 0)
         {
-            this.ended.acquire();
-        }
-        catch (InterruptedException e)
-        {
-            jqmlogger.error("interrupted", e);
+            try
+            {
+                this.ended.acquire();
+            }
+            catch (InterruptedException e)
+            {
+                jqmlogger.error("interrupted", e);
+            }
         }
         jqmlogger.debug("Stop order was correctly handled. Engine for node " + this.node.getName() + " has stopped.");
     }

@@ -845,7 +845,7 @@ final class JerseyClient implements JqmClient
     {
         try
         {
-            target.path("q/" + q.getId() + "/pause").request().put(null);
+            target.path("q/" + q.getId() + "/pause").request().post(null);
         }
         catch (BadRequestException e)
         {
@@ -879,7 +879,7 @@ final class JerseyClient implements JqmClient
     {
         try
         {
-            target.path("q/" + q.getId() + "/clear").request().put(null);
+            target.path("q/" + q.getId() + "/clear").request().post(null);
         }
         catch (BadRequestException e)
         {

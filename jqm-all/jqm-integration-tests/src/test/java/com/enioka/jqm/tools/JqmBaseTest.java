@@ -141,9 +141,21 @@ public class JqmBaseTest
 
     protected JqmEngineOperations addAndStartEngine(String nodeName)
     {
+        beforeStartEngine(nodeName);
         JqmEngineOperations e = JqmEngineFactory.startEngine(nodeName, new EngineCallback());
         engines.put(nodeName, e);
+        afterStartEngine(nodeName);
         return e;
+    }
+
+    protected void beforeStartEngine(String nodeName)
+    {
+        // For overrides.
+    }
+
+    protected void afterStartEngine(String nodeName)
+    {
+        // For overrides.
     }
 
     protected void stopAndRemoveEngine(String nodeName)

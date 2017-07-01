@@ -178,7 +178,7 @@ public class TestHelpers
         }
     }
 
-    private static String getLocalHostName()
+    public static String getLocalHostName()
     {
         String res = "localhost";
         try

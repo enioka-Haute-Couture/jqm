@@ -92,7 +92,7 @@
 		<!-- Sonar coverage -->
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-		<sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
+		<sonar.jacoco.reportPaths>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPaths>
 	</properties>
 
 	<modules>
@@ -114,6 +114,7 @@
 		<module>jqm-service</module>
 		<module>jqm-xml</module>
 		<module>jqm-integration-tests</module>
+		<module>jqm-integration-tests-ws</module>
 	</modules>
 
 	<scm>
