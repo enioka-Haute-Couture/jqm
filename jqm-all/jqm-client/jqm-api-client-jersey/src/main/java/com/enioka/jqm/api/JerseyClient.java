@@ -906,7 +906,7 @@ final class JerseyClient implements JqmClient
     {
         try
         {
-            return target.path("jd").request().get(new GenericType<List<JobDef>>()
+            return target.path("jd" + (application != null ? "/" + application : "")).request().get(new GenericType<List<JobDef>>()
             {
             });
         }

@@ -55,7 +55,7 @@ public class ServiceClient implements JqmClient
     @Path("ji")
     @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public JobInstance enqueue_object(JobRequest jd)
+    public JobInstance enqueueObject(JobRequest jd)
     {
         int i = JqmClientFactory.getClient().enqueue(jd);
 
@@ -155,7 +155,7 @@ public class ServiceClient implements JqmClient
     @Path("ji/crashed/{jobId}")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @DELETE
-    public JobInstance restartCrashedJob_object(@PathParam("jobId") int jobId)
+    public JobInstance restartCrashedJobObject(@PathParam("jobId") int jobId)
     {
         int i = JqmClientFactory.getClient().restartCrashedJob(jobId);
         return getJob(i);
@@ -312,8 +312,7 @@ public class ServiceClient implements JqmClient
     @HttpCache("public, max-age=60")
     public List<Deliverable> getJobDeliverables(@PathParam("jobId") int jobId)
     {
-        List<Deliverable> res = JqmClientFactory.getClient().getJobDeliverables(jobId);
-        return res;
+        return JqmClientFactory.getClient().getJobDeliverables(jobId);
     }
 
     // Not exposed. Returning a list of files is a joke anyway... Loop should be client-side.

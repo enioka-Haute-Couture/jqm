@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.JobDefDto;
+import com.enioka.jqm.api.JobDef;
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
@@ -439,5 +440,51 @@ public class ClientApiTest extends JqmBaseTest
         JqmClientFactory.getClient().setSchedulePriority(i3, 4);
         jd = MetaService.getJobDef(cnx, idJobDef);
         Assert.assertEquals(4, (int) jd.getSchedules().get(0).getPriority());
+    }
+
+    @Test
+    public void testMiscVerbs()
+    {
+        int idJobDef1 = CreationTools.createJobDef(null, true, "pyl.CallYieldAtOnce", null, "jqm-tests/jqm-test-pyl/target/test.jar",
+                TestHelpers.qVip, 42, "MarsuApplication", "AppTag", "Franquin", "ModuleMachin", "other", "other", false, cnx);
+        CreationTools.createJobDef(null, true, "pyl.SecThrow", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42, "Dies",
+                null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
+                "Message", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+
+        List<JobDef> jds = JqmClientFactory.getClient().getJobDefinitions();
+        Assert.assertEquals(3, jds.size());
+
+        jds = JqmClientFactory.getClient().getJobDefinitions("AppTag");
+        Assert.assertEquals(1, jds.size());
+
+        int i = JobRequest.create("MarsuApplication", "TestUser").submit();
+        addAndStartEngine();
+        TestHelpers.waitFor(1, 5000, cnx);
+
+        JqmClientFactory.getClient().enqueueFromHistory(i);
+        TestHelpers.waitFor(2, 5000, cnx);
+
+        int idRec = JobRequest.create("MarsuApplication", "TestUser").setRecurrence("* * * * *").submit();
+        Assert.assertEquals(1, MetaService.getJobDef(cnx, idJobDef1).getSchedules().size());
+        JqmClientFactory.getClient().removeRecurrence(idRec);
+        Assert.assertEquals(0, MetaService.getJobDef(cnx, idJobDef1).getSchedules().size());
+
+        i = JobRequest.create("Dies", "TestUser").submit();
+        TestHelpers.waitFor(3, 5000, cnx);
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
+        JqmClientFactory.getClient().restartCrashedJob(i);
+        TestHelpers.waitFor(3, 5000, cnx);
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
+
+        Assert.assertEquals(3, JqmClientFactory.getClient().getJobs().size());
+        Assert.assertEquals(0, JqmClientFactory.getClient().getActiveJobs().size());
+        Assert.assertEquals(0, JqmClientFactory.getClient().getUserActiveJobs("TestUser").size());
+
+        i = JobRequest.create("Message", "TestUser").submit();
+        TestHelpers.waitFor(4, 5000, cnx);
+        Assert.assertEquals(1, JqmClientFactory.getClient().getJobMessages(i).size());
+
+        JqmClientFactory.getClient().dispose();
     }
 }
