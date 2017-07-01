@@ -6,7 +6,6 @@ import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
-import org.junit.BeforeClass;
 
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.model.Node;
@@ -19,16 +18,12 @@ public class WsClientClearTest extends ClientApiTest
 {
     private Node n;
 
-    @BeforeClass
-    public static void beforeClass() throws IOException
+    @Before
+    public void before() throws IOException
     {
         File jar = FileUtils.listFiles(new File("../jqm-ws/target/"), new String[] { "war" }, false).iterator().next();
         FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war"));
-    }
 
-    @Before
-    public void before()
-    {
         // Create a node without pollers which will host all WS calls.
         n = Node.create(cnx, "wsnode", 0, "./target/outputfiles/", "./../", "./target/tmp", TestHelpers.getLocalHostName(), "DEBUG");
         Helpers.setSingleParam("disableWsApi", "false", cnx);
