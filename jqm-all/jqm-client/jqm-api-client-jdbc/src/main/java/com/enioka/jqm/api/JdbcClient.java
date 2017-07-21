@@ -1167,7 +1167,7 @@ final class JdbcClient implements JqmClient
     {
         if ((query.getFirstRow() != null || query.getPageSize() != null) && query.isQueryLiveInstances() && query.isQueryHistoryInstances())
         {
-            throw new JqmInvalidRequestException("cannot use paging when querying both live and historical instances");
+            // throw new JqmInvalidRequestException("cannot use paging when querying both live and historical instances");
         }
         if (query.isQueryLiveInstances() && query.isQueryHistoryInstances() && query.getSorts().size() > 0)
         {

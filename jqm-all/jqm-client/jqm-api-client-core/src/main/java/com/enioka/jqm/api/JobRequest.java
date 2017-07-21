@@ -23,6 +23,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -30,6 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * consumed by {@link JqmClient#enqueue(JobRequest)}
  */
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class JobRequest implements Serializable
 {
     private static final long serialVersionUID = -2289375352629706591L;
