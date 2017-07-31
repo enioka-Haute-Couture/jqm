@@ -582,7 +582,7 @@ public class History implements Serializable
                     ji.getKeyword2(), ji.getKeyword3(), ji.getModule(), jd.getKeyword1(), jd.getKeyword2(), jd.getKeyword3(),
                     jd.getModule(), n == null ? null : n.getName(), ji.getParentId(), ji.getProgress(), q == null ? null : q.getName(), 0,
                     ji.getSessionID(), finalState.toString(), ji.getUserName(), ji.getJdId(), n == null ? null : n.getId(), ji.getQueue(),
-                    ji.isFromSchedule());
+                    ji.isFromSchedule(), ji.getPriority());
         }
         else
         {
@@ -590,7 +590,8 @@ public class History implements Serializable
                     ji.getEmail(), endDate, ji.getCreationDate(), ji.getExecutionDate(), jd.isHighlander(), ji.getApplication(),
                     ji.getKeyword1(), ji.getKeyword2(), ji.getKeyword3(), ji.getModule(), jd.getKeyword1(), jd.getKeyword2(),
                     jd.getKeyword3(), jd.getModule(), n.getName(), ji.getParentId(), ji.getProgress(), q.getName(), 0, ji.getSessionID(),
-                    finalState.toString(), ji.getUserName(), ji.getJdId(), ji.getNode().getId(), ji.getQueue(), ji.isFromSchedule());
+                    finalState.toString(), ji.getUserName(), ji.getJdId(), ji.getNode().getId(), ji.getQueue(), ji.isFromSchedule(),
+                    ji.getPriority());
         }
     }
 

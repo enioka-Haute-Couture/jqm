@@ -149,6 +149,9 @@ public class QueueTest extends JqmBaseTest
         JobInstance ji1 = Query.create().setJobInstanceId(i1).run().get(0);
         JobInstance ji2 = Query.create().setJobInstanceId(i2).run().get(0);
 
+        Assert.assertEquals(1, (int) ji1.getPriority());
+        Assert.assertEquals(6, (int) ji2.getPriority());
+
         Assert.assertTrue(ji1.getBeganRunningDate().compareTo(ji2.getEndDate()) >= 0);
     }
 

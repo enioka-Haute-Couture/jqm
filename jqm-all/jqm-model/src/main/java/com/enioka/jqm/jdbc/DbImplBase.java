@@ -216,8 +216,8 @@ public class DbImplBase
                 + "DATE_END, DATE_ENQUEUE, DATE_START, HIGHLANDER, INSTANCE_APPLICATION, INSTANCE_KEYWORD1, "
                 + "INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, JD_KEYWORD1, JD_KEYWORD2, JD_KEYWORD3, JD_MODULE, "
                 + "NODE_NAME, PARENT, PROGRESS, QUEUE_NAME, RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, "
-                + "NODE, QUEUE, FROM_SCHEDULE) "
-                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                + "NODE, QUEUE, FROM_SCHEDULE, PRIORITY) "
+                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         queries.put("history_insert", queries.get("history_insert_with_end_date").replace("(?, ?, ?, ?, ?, ?",  "(?, ?, ?, ?, ?, CURRENT_TIMESTAMP"));
         
         queries.put("history_delete_all", "DELETE FROM __T__HISTORY");
