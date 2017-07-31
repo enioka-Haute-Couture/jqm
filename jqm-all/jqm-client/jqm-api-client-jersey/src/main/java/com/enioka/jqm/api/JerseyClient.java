@@ -29,6 +29,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.client.Client;
@@ -880,6 +881,23 @@ final class JerseyClient implements JqmClient
         try
         {
             target.path("q/" + q.getId() + "/clear").request().post(null);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    @Override
+    public QueueStatus getQueueStatus(Queue q)
+    {
+        try
+        {
+            return target.path("q/" + q.getId() + "/status").request().get().readEntity(QueueStatus.class);
         }
         catch (BadRequestException e)
         {

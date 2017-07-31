@@ -522,6 +522,15 @@ public interface JqmClient
      */
     void clearQueue(Queue q);
 
+    /**
+     * Query the status of a given queue
+     * 
+     * @param q
+     *            the queue to query
+     * @return the status at the time of call.
+     */
+    QueueStatus getQueueStatus(Queue q);
+
     // /////////////////////////////////////////////////////////////////////
     // Parameters retrieval
     // /////////////////////////////////////////////////////////////////////

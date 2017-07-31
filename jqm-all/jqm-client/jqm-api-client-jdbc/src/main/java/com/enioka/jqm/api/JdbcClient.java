@@ -2059,6 +2059,54 @@ final class JdbcClient implements JqmClient
         }
     }
 
+    @Override
+    public QueueStatus getQueueStatus(com.enioka.jqm.api.Queue q)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = getDbSession();
+            ResultSet rs = cnx.runSelect("dp_select_enabled_for_queue", q.getId());
+
+            int nbEnabled = 0, nbDisabled = 0;
+            while (rs.next())
+            {
+                boolean enabled = rs.getBoolean(1);
+                int nbThreads = rs.getInt(2);
+
+                if (!enabled || nbThreads == 0)
+                {
+                    nbDisabled++;
+                }
+                else
+                {
+                    nbEnabled++;
+                }
+            }
+
+            if (nbDisabled > 0 && nbEnabled > 0)
+            {
+                return QueueStatus.PARTIALLY_RUNNING;
+            }
+            else if (nbDisabled > 0 || (nbDisabled == 0 && nbEnabled == 0))
+            {
+                return QueueStatus.PAUSED;
+            }
+            else
+            {
+                return QueueStatus.RUNNING;
+            }
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not query queue status", e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+    }
+
     // /////////////////////////////////////////////////////////////////////
     // Parameters retrieval
     // /////////////////////////////////////////////////////////////////////

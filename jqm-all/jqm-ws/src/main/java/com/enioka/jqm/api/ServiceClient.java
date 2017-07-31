@@ -16,6 +16,7 @@
 package com.enioka.jqm.api;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -420,6 +422,21 @@ public class ServiceClient implements JqmClient
         Queue q = new Queue();
         q.setId(qId);
         JqmClientFactory.getClient().clearQueue(q);
+    }
+
+    @Path("q/{qId}/status")
+    @GET
+    public QueueStatus getQueueStatus(@PathParam("qId") int qId)
+    {
+        Queue q = new Queue();
+        q.setId(qId);
+        return getQueueStatus(q);
+    }
+
+    @Override
+    public QueueStatus getQueueStatus(Queue q)
+    {
+        return JqmClientFactory.getClient().getQueueStatus(q);
     }
 
     @Override

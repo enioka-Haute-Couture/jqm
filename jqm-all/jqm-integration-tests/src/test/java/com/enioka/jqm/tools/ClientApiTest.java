@@ -36,6 +36,7 @@ import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
 import com.enioka.jqm.api.Query.Sort;
 import com.enioka.jqm.api.Queue;
+import com.enioka.jqm.api.QueueStatus;
 import com.enioka.jqm.api.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -356,8 +357,11 @@ public class ClientApiTest extends JqmBaseTest
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
         Assert.assertEquals(1, TestHelpers.getQueueAllCount(cnx));
         Assert.assertEquals(0, TestHelpers.getQueueRunningCount(cnx));
+        Assert.assertEquals(QueueStatus.PAUSED, JqmClientFactory.getClient().getQueueStatus(qV));
 
         JqmClientFactory.getClient().resumeQueue(qV);
+
+        Assert.assertEquals(QueueStatus.RUNNING, JqmClientFactory.getClient().getQueueStatus(qV));
         TestHelpers.waitFor(2, 10000, cnx);
         Assert.assertEquals(2, TestHelpers.getOkCount(cnx));
     }
@@ -487,7 +491,7 @@ public class ClientApiTest extends JqmBaseTest
 
         JqmClientFactory.getClient().dispose();
     }
-    
+
     @Test
     public void testStartHeld()
     {

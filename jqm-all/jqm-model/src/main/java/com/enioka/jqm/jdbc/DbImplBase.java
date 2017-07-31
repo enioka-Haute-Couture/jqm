@@ -75,6 +75,7 @@ public class DbImplBase
         queries.put("dp_select_by_id", "SELECT ID, ENABLED, LAST_MODIFIED, MAX_THREAD, POLLING_INTERVAL, NODE, QUEUE FROM __T__QUEUE_NODE_MAPPING WHERE ID=?");
         queries.put("dp_select_for_node", "SELECT ID, ENABLED, LAST_MODIFIED, MAX_THREAD, POLLING_INTERVAL, NODE, QUEUE FROM __T__QUEUE_NODE_MAPPING WHERE NODE=?");
         queries.put("dp_select_count_for_node", "SELECT COUNT(1) FROM __T__QUEUE_NODE_MAPPING WHERE NODE=?");
+        queries.put("dp_select_enabled_for_queue", "SELECT ENABLED, MAX_THREAD FROM __T__QUEUE_NODE_MAPPING WHERE QUEUE=?");
         queries.put("dp_select_all_with_names", "SELECT dp.ID, dp.ENABLED, dp.LAST_MODIFIED, dp.MAX_THREAD, dp.POLLING_INTERVAL, dp.NODE, dp.QUEUE, n.NAME, q.NAME FROM __T__QUEUE_NODE_MAPPING dp LEFT JOIN __T__NODE n ON n.ID=dp.NODE LEFT JOIN __T__QUEUE q ON q.ID=dp.QUEUE ");
         queries.put("dp_select_with_names_by_id", queries.get("dp_select_all_with_names") + " WHERE ID=?");
         
