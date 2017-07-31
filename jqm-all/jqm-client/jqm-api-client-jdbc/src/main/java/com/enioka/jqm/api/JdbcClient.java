@@ -172,6 +172,7 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("Invalid execution request: applicationName is empty");
         }
+        runRequest.setParameters(runRequest.getParameters()); // This will validate parameters.
 
         DbConn cnx = getDbSession();
 

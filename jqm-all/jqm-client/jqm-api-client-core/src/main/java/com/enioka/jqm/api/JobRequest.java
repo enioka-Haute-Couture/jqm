@@ -130,8 +130,18 @@ public class JobRequest implements Serializable
      */
     public JobRequest addParameter(String key, String value)
     {
+        validateParameter(key, value);
         parameters.put(key, value);
         return this;
+    }
+
+    private void validateParameter(String key, String value)
+    {
+        if (key == null || key.isEmpty() || key.length() > 50 || value == null || value.isEmpty() || value.length() > 1000)
+        {
+            throw new JqmInvalidRequestException(
+                    "Parameters key must be between 1 and 50 chaarcters, parameter values between 1 and 1000 characters");
+        }
     }
 
     /**
@@ -142,6 +152,10 @@ public class JobRequest implements Serializable
      */
     public JobRequest addParameters(Map<String, String> prms)
     {
+        for (Map.Entry<String, String> e : prms.entrySet())
+        {
+            validateParameter(e.getKey(), e.getValue());
+        }
         parameters.putAll(prms);
         return this;
     }
@@ -175,6 +189,10 @@ public class JobRequest implements Serializable
      */
     public JobRequest setApplicationName(String applicationName)
     {
+        if (applicationName == null || applicationName.length() > 100)
+        {
+            throw new JqmInvalidRequestException("Job definition name must be between 1 and 100 characters");
+        }
         this.applicationName = applicationName;
         return this;
     }
@@ -314,15 +332,19 @@ public class JobRequest implements Serializable
     }
 
     /**
-     * Get the Map of all parameters
+     * Get the Map of all parameters. This is a copy, not the original map so changes made to the result map are not taken into account.
      */
     public Map<String, String> getParameters()
     {
-        return parameters;
+        return new HashMap<String, String>(parameters);
     }
 
     public JobRequest setParameters(Map<String, String> parameters)
     {
+        for (Map.Entry<String, String> e : parameters.entrySet())
+        {
+            validateParameter(e.getKey(), e.getValue());
+        }
         this.parameters = parameters;
         return this;
     }
