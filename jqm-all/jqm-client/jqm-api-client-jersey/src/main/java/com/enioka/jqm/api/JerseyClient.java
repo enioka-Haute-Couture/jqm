@@ -29,7 +29,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.client.Client;
@@ -916,7 +915,16 @@ final class JerseyClient implements JqmClient
     @Override
     public List<JobDef> getJobDefinitions()
     {
-        return getJobDefinitions(null);
+        try
+        {
+            return target.path("jd").request().get(new GenericType<List<JobDef>>()
+            {
+            });
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
     }
 
     @Override
@@ -924,7 +932,22 @@ final class JerseyClient implements JqmClient
     {
         try
         {
-            return target.path("jd" + (application != null ? "/" + application : "")).request().get(new GenericType<List<JobDef>>()
+            return target.path("jd/" + application).request().get(new GenericType<List<JobDef>>()
+            {
+            });
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
+    @Override
+    public JobDef getJobDefinition(String name)
+    {
+        try
+        {
+            return target.path("jd/name/" + name).request().get(new GenericType<JobDef>()
             {
             });
         }

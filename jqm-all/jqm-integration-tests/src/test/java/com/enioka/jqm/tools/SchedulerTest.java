@@ -8,6 +8,7 @@ import org.junit.Test;
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.JobDefDto;
 import com.enioka.api.admin.ScheduledJob;
+import com.enioka.jqm.api.JobDef;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
@@ -122,6 +123,12 @@ public class SchedulerTest extends JqmBaseTest
 
         int scheduleId = JobRequest.create("MarsuApplication", "test user").setRecurrence("* * * * *").addParameter("key1", "value1")
                 .submit();
+
+        JobDef jd_client = JqmClientFactory.getClient().getJobDefinition("MarsuApplication");
+        Assert.assertEquals(id, (int) jd_client.getId());
+        Assert.assertEquals(1, jd_client.getSchedules().size());
+        Assert.assertEquals(scheduleId, jd_client.getSchedules().get(0).getId());
+        Assert.assertEquals("* * * * *", jd_client.getSchedules().get(0).getCronExpression());
 
         addAndStartEngine();
 

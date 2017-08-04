@@ -555,6 +555,11 @@ public interface JqmClient
      */
     List<JobDef> getJobDefinitions(String application);
 
+    /**
+     * Gets a {@link JobDef} from its {@link JobDef#getApplicationName()}. Throws if the job definition does not exists.
+     */
+    JobDef getJobDefinition(String name);
+
     // /////////////////////////////////////////////////////////////////////
     // Technical
     // /////////////////////////////////////////////////////////////////////

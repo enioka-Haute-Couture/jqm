@@ -16,7 +16,6 @@
 package com.enioka.jqm.api;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -32,7 +31,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -482,6 +480,16 @@ public class ServiceClient implements JqmClient
     public List<JobDef> getJobDefinitions(@PathParam("applicationName") String application)
     {
         return JqmClientFactory.getClient().getJobDefinitions(application);
+    }
+
+    @Override
+    @Path("jd/name/{name}")
+    @GET
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @HttpCache("public, max-age=60")
+    public JobDef getJobDefinition(@PathParam("name") String name)
+    {
+        return JqmClientFactory.getClient().getJobDefinition(name);
     }
 
     @Path("ji/query")

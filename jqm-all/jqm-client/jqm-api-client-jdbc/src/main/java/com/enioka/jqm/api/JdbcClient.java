@@ -35,6 +35,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -2122,36 +2123,78 @@ final class JdbcClient implements JqmClient
         return q;
     }
 
+    private static Schedule getSchedule(ScheduledJob s, Map<Integer, com.enioka.jqm.api.Queue> queues)
+    {
+        Schedule res = new Schedule();
+        res.setCronExpression(s.getCronExpression());
+        res.setId(s.getId());
+        res.setPriority(s.getPriority());
+        res.setQueue(s.getQueue() == null ? null : queues.get(s.getQueue()));
+        res.setParameters(s.getParameters());
+
+        return res;
+    }
+
     @Override
     public List<com.enioka.jqm.api.JobDef> getJobDefinitions()
     {
-        return getJobDefinitions(null);
+        return getJobDefinitionsInternal("jd_select_all");
     }
 
     @Override
     public List<com.enioka.jqm.api.JobDef> getJobDefinitions(String application)
     {
+        return getJobDefinitionsInternal("jd_select_by_tag_app", application);
+    }
+
+    @Override
+    public com.enioka.jqm.api.JobDef getJobDefinition(String name)
+    {
+        List<com.enioka.jqm.api.JobDef> res = getJobDefinitionsInternal("jd_select_by_key", name);
+        if (res.isEmpty())
+        {
+            throw new JqmInvalidRequestException("No job definition named " + name);
+        }
+        return res.get(0);
+    }
+
+    private List<com.enioka.jqm.api.JobDef> getJobDefinitionsInternal(String queryName, String... args)
+    {
         List<com.enioka.jqm.api.JobDef> res = new ArrayList<com.enioka.jqm.api.JobDef>();
         DbConn cnx = null;
         List<JobDef> dbr = null;
+        List<Integer> ids = null;
+        Map<Integer, com.enioka.jqm.api.Queue> queues = null;
+        List<ScheduledJob> sjs = null;
 
         try
         {
             // TODO: remove model objects and go directly from RS to API objects. Also, join to avoid multiple queries.
 
             cnx = getDbSession();
-            if (application == null)
+            dbr = JobDef.select(cnx, queryName, (Object[]) args);
+
+            if (!dbr.isEmpty())
             {
-                dbr = JobDef.select(cnx, "jd_select_all");
-            }
-            else
-            {
-                dbr = JobDef.select(cnx, "jd_select_by_tag_app", application);
+                queues = new HashMap<Integer, com.enioka.jqm.api.Queue>();
+                for (com.enioka.jqm.api.Queue q : getQueues())
+                {
+                    queues.put(q.getId(), q);
+                }
+
+                ids = new ArrayList<Integer>();
+                for (JobDef jd : dbr)
+                {
+                    ids.add(jd.getId());
+                }
+                sjs = ScheduledJob.select(cnx, "sj_select_for_jd_list", ids);
             }
 
             for (JobDef jd : dbr)
             {
                 com.enioka.jqm.api.JobDef tmp = new com.enioka.jqm.api.JobDef();
+
+                // Basic fields
                 tmp.setApplication(jd.getApplication());
                 tmp.setApplicationName(jd.getApplicationName());
                 tmp.setCanBeRestarted(jd.isCanBeRestarted());
@@ -2161,12 +2204,23 @@ final class JdbcClient implements JqmClient
                 tmp.setKeyword2(jd.getKeyword2());
                 tmp.setKeyword3(jd.getKeyword3());
                 tmp.setModule(jd.getModule());
-                tmp.setQueue(getQueue(jd.getQueue(cnx)));
                 tmp.setId(jd.getId());
 
+                tmp.setQueue(queues.get(jd.getQueue()));
+
+                // Parameters
                 for (JobDefParameter jdf : jd.getParameters(cnx))
                 {
                     tmp.addParameter(jdf.getKey(), jdf.getValue());
+                }
+
+                // Schedules
+                for (ScheduledJob s : sjs)
+                {
+                    if (s.getJobDefinition() == jd.getId())
+                    {
+                        tmp.addSchedule(getSchedule(s, queues));
+                    }
                 }
 
                 res.add(tmp);

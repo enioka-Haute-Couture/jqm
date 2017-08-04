@@ -433,6 +433,12 @@ public class ClientApiTest extends JqmBaseTest
         Assert.assertEquals("* * * * *", jd.getSchedules().get(0).getCronExpression());
         Assert.assertEquals(null, jd.getSchedules().get(0).getQueue());
 
+        JobDef jd_client = JqmClientFactory.getClient().getJobDefinition("MarsuApplication");
+        Assert.assertEquals(idJobDef, (int) jd_client.getId());
+        Assert.assertEquals(1, jd_client.getSchedules().size());
+        Assert.assertEquals(i3, jd_client.getSchedules().get(0).getId());
+        Assert.assertEquals("* * * * *", jd_client.getSchedules().get(0).getCronExpression());
+
         JqmClientFactory.getClient().setScheduleRecurrence(i3, "1 * * * *");
         jd = MetaService.getJobDef(cnx, idJobDef);
         Assert.assertEquals("1 * * * *", jd.getSchedules().get(0).getCronExpression());
