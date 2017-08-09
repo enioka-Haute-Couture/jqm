@@ -9,7 +9,7 @@ whatsoever: configuring libraries, logs, throttling processes, handling prioriti
 jobs, distributing the load over multiple servers, distributing the files created by the jobs, and much more...
 Basically, it is a very lightweight application server specifically tailored for making it easier to run Java batch jobs. 
 
-The rational behind JQM is that there are too many jobs that fall inside that uncomfortable middle ground between 
+The rationale behind JQM is that there are too many jobs that fall inside that uncomfortable middle ground between 
 "a few seconds" (this could be done synchronously inside a web application server) and "a few hours" (in 
 which case forking a new dedicated JVM is often the most suitable way). 
 A traditional servlet or J2EE application server should not house this kind of jobs: they are designed to deal 
