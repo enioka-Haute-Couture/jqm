@@ -1239,7 +1239,9 @@ final class JdbcClient implements JqmClient
                 {
                     wh = wh.substring(3, wh.length() - 1);
                     q1 += "WHERE " + wh;
-                    filterCountQuery += String.format(" (SELECT COUNT(1) FROM __T__JOB_INSTANCE ji WHERE %s) ,", wh);
+                    filterCountQuery += String.format(
+                            " (SELECT COUNT(1) FROM __T__JOB_INSTANCE ji LEFT JOIN __T__QUEUE q ON ji.QUEUE=q.ID LEFT JOIN __T__NODE n ON ji.NODE=n.ID WHERE %s) ,",
+                            wh);
                 }
                 else
                 {

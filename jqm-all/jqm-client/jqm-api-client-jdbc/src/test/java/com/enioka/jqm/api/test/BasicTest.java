@@ -16,6 +16,7 @@
 package com.enioka.jqm.api.test;
 
 import java.util.Calendar;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -175,5 +176,11 @@ public class BasicTest
     {
         Query.create().setJobInstanceId(1234).setQueryLiveInstances(true).setQueryHistoryInstances(false).setPageSize(15).setFirstRow(0)
                 .run();
+    }
+
+    @Test
+    public void testBug292()
+    {
+        Query.create().addSortDesc(Query.Sort.ID).setQueueName("QBATCH").setQueryHistoryInstances(true).setQueryLiveInstances(true).run();
     }
 }
