@@ -32,6 +32,6 @@ public class JqmExceptionMapper implements ExceptionMapper<JqmInvalidRequestExce
     {
         // String type = headers.getMediaType() == null ? MediaType.APPLICATION_JSON : headers.getMediaType().getType();
         ErrorDto d = new ErrorDto(exception.getMessage(), 10, exception, Status.BAD_REQUEST);
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(d).type(MediaType.APPLICATION_JSON).build();
+        return Response.status(Response.Status.BAD_REQUEST).entity(d).type(MediaType.APPLICATION_JSON).build();
     }
 }

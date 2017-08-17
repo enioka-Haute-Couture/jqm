@@ -6,8 +6,11 @@ import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
+import org.junit.Test;
 
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.JqmInvalidRequestException;
+import com.enioka.jqm.api.Query;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -47,5 +50,11 @@ public class WsClientClearTest extends ClientApiTest
 
         Helpers.createUserIfMissing(cnx, "test", "testpassword", "test user for WS Junit tests", "client power user");
         cnx.commit();
+    }
+
+    @Test(expected = JqmInvalidRequestException.class)
+    public void testBug292()
+    {
+        Query.create().setQueryHistoryInstances(false).setQueryLiveInstances(false).run();
     }
 }

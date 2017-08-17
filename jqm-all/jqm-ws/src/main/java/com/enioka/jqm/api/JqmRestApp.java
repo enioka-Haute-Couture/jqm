@@ -103,6 +103,9 @@ public class JqmRestApp extends ResourceConfig
         this.register(JqmExceptionMapper.class);
         this.register(JqmInternalExceptionMapper.class);
 
+        // Logger
+        this.register(ExceptionLogger.class);
+
         // Load the cache annotation helper
         this.register(HttpCacheImpl.class);
     }
