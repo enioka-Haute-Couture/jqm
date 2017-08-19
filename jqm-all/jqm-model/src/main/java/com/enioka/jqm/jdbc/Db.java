@@ -39,7 +39,7 @@ public class Db
      * The list of different database adapters. We are using reflection for loading them for future extensibility.
      */
     private static String[] ADAPTERS = new String[] { "com.enioka.jqm.jdbc.DbImplPg", "com.enioka.jqm.jdbc.DbImplHsql",
-            "com.enioka.jqm.jdbc.DbImplOracle", "com.enioka.jqm.jdbc.DbImplMySql" };
+            "com.enioka.jqm.jdbc.DbImplOracle", "com.enioka.jqm.jdbc.DbImplMySql", "com.enioka.jqm.jdbc.DbImplDb2" };
 
     private DataSource _ds;
     private DbAdapter adapter = null;
