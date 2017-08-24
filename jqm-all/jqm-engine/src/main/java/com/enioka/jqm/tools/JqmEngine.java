@@ -118,6 +118,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         // Database connection
         DbConn cnx = Helpers.getNewDbSession();
         clManager.setIsolationDefault(cnx);
+        cnx.logDatabaseInfo(jqmlogger);
 
         // Node configuration is in the database
         try

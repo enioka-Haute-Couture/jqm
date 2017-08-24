@@ -3,6 +3,7 @@ package com.enioka.jqm.jdbc;
 import java.io.Closeable;
 import java.sql.Array;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -119,7 +120,7 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(e);
+            throw new DatabaseException(qp.sqlText, e);
         }
         finally
         {
@@ -131,9 +132,10 @@ public class DbConn implements Closeable
     {
         transac_open = true;
         Statement s = null;
+        String sql = null;
         try
         {
-            String sql = parent.getAdapter().adaptSql(query_sql);
+            sql = parent.getAdapter().adaptSql(query_sql);
             if (sql.trim().isEmpty())
             {
                 return;
@@ -144,7 +146,7 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(e);
+            throw new DatabaseException(sql, e);
         }
         finally
         {
@@ -187,7 +189,7 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(e);
+            throw new DatabaseException(q.sqlText, e);
         }
         finally
         {
@@ -212,7 +214,7 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(e);
+            throw new DatabaseException(qp.sqlText, e);
         }
         finally
         {
@@ -525,5 +527,19 @@ public class DbConn implements Closeable
     public String paginateQuery(String sql, int start, int stopBefore, List<Object> prms)
     {
         return this.parent.getAdapter().paginateQuery(sql, start, stopBefore, prms);
+    }
+
+    public void logDatabaseInfo(Logger log)
+    {
+        try
+        {
+            DatabaseMetaData m = this._cnx.getMetaData();
+            log.info("Database driver {} version {} on database {} version {}.{} (product {})", m.getDriverName(), m.getDriverVersion(),
+                    m.getDatabaseProductName(), m.getDatabaseMajorVersion(), m.getDatabaseMinorVersion(), m.getDatabaseProductVersion());
+        }
+        catch (SQLException e1)
+        {
+            jqmlogger.warn("Could not fetch database version", e1);
+        }
     }
 }
