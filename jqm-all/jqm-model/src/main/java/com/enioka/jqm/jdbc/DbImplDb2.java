@@ -31,7 +31,7 @@ public class DbImplDb2 implements DbAdapter
         queries.put("ji_update_poll", this.adaptSql(
                 "UPDATE __T__JOB_INSTANCE j1 SET NODE=?, STATUS='ATTRIBUTED', DATE_ATTRIBUTION=CURRENT_TIMESTAMP WHERE j1.STATUS='SUBMITTED' AND j1.ID IN "
                         + "(SELECT j2.ID FROM __T__JOB_INSTANCE j2 WHERE j2.STATUS='SUBMITTED' AND j2.QUEUE=? "
-                        + "AND (j2.HIGHLANDER=false OR (j2.HIGHLANDER=true AND (SELECT COUNT(1) FROM __T__JOB_INSTANCE j3 WHERE j3.STATUS IN('ATTRIBUTED', 'RUNNING') AND j3.JOBDEF=j2.JOBDEF)=0 )) ORDER BY PRIORITY DESC, INTERNAL_POSITION LIMIT ?)"));
+                        + "AND (j2.HIGHLANDER=0 OR (j2.HIGHLANDER=1 AND (SELECT COUNT(1) FROM __T__JOB_INSTANCE j3 WHERE j3.STATUS IN('ATTRIBUTED', 'RUNNING') AND j3.JOBDEF=j2.JOBDEF)=0 )) ORDER BY PRIORITY DESC, INTERNAL_POSITION FETCH FIRST ? ROWS ONLY)"));
     }
 
     @Override
@@ -44,7 +44,8 @@ public class DbImplDb2 implements DbAdapter
     public String adaptSql(String sql)
     {
         return sql.replace("MEMORY TABLE", "TABLE").replace("UNIX_MILLIS()", "JQM_PK.nextval").replace("IN(UNNEST(?))", "IN(?)")
-                .replace("FROM (VALUES(0))", "FROM SYSIBM.SYSDUMMY1").replace("BOOLEAN", "SMALLINT").replace("__T__", this.tablePrefix);
+                .replace("FROM (VALUES(0))", "FROM SYSIBM.SYSDUMMY1").replace("BOOLEAN", "SMALLINT").replace("__T__", this.tablePrefix)
+                .replace("true", "1").replace("false", "0");
     }
 
     @Override
@@ -69,6 +70,13 @@ public class DbImplDb2 implements DbAdapter
     @Override
     public void beforeUpdate(Connection cnx, QueryPreparation q)
     {
+        // DB2 (without compatibility mode) does not support LIMIT/OFFSET nor binding for FETCH FIRST ? ROWS ONLY. So be it.
+        if (q.isKey("ji_update_poll"))
+        {
+            q.sqlText = q.sqlText.replace("FETCH FIRST ? ROWS ONLY", "FETCH FIRST " + q.parameters.get(2) + " ROWS ONLY");
+            q.parameters.remove(2);
+        }
+
         // There is no (clean) way to do parameterized IN(?) queries with DB2 so we must rewrite these queries as IN(?, ?, ?...)
         // This cannot be done at startup, as the ? count may be different for each call.
         if (q.sqlText.contains("IN(?)"))
@@ -133,9 +141,10 @@ public class DbImplDb2 implements DbAdapter
     public String paginateQuery(String sql, int start, int stopBefore, List<Object> prms)
     {
         int pageSize = stopBefore - start;
-        sql = String.format("%s LIMIT ? OFFSET ?", sql);
-        prms.add(pageSize);
+        sql = String.format("SELECT * FROM (%s) WHERE rn BETWEEN ? AND ?", sql.replace(" FROM ", ", ROW_NUMBER() OVER() as rn FROM "));
         prms.add(start);
+        prms.add(stopBefore);
+
         return sql;
     }
 }
