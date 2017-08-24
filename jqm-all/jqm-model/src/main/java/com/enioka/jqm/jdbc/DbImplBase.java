@@ -258,11 +258,13 @@ public class DbImplBase
         // JNDI
         queries.put("jndi_insert", "INSERT INTO __T__JNDI_OBJECT_RESOURCE(ID, AUTH, DESCRIPTION, FACTORY, LAST_MODIFIED, NAME, SINGLETON, TEMPLATE, TYPE) VALUES(JQM_PK.nextval, 'CONTAINER', ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?)");
         queries.put("jndi_delete_all", "DELETE FROM __T__JNDI_OBJECT_RESOURCE");
+        queries.put("jndi_delete_by_id", "DELETE FROM __T__JNDI_OBJECT_RESOURCE WHERE ID=?");
         queries.put("jndi_update_changed_by_id", "UPDATE __T__JNDI_OBJECT_RESOURCE SET AUTH=?, DESCRIPTION=?, FACTORY=?, LAST_MODIFIED=CURRENT_TIMESTAMP, NAME=?, SINGLETON=?, TEMPLATE=?, TYPE=? WHERE ID=? AND NOT (AUTH=? AND DESCRIPTION=? AND FACTORY=? AND NAME=? AND SINGLETON=? AND TEMPLATE=? AND TYPE=?)");
         queries.put("jndi_select_count_for_key", "SELECT COUNT(1) FROM __T__JNDI_OBJECT_RESOURCE WHERE NAME=?");
         queries.put("jndi_select_count_changed", "SELECT COUNT(1) FROM __T__JNDI_OBJECT_RESOURCE r RIGHT JOIN __T__JNDI_OR_PARAMETER p ON p.JNDI_OR = r.ID WHERE r.LAST_MODIFIED > ? OR p.LAST_MODIFIED > ?");
         queries.put("jndi_select_all", "SELECT ID, NAME, AUTH, TYPE, FACTORY, DESCRIPTION, TEMPLATE, SINGLETON, LAST_MODIFIED FROM __T__JNDI_OBJECT_RESOURCE");
         queries.put("jndi_select_by_key", queries.get("jndi_select_all") + " WHERE NAME=?");
+        queries.put("jndi_select_by_id", queries.get("jndi_select_all") + " WHERE ID=?");
         
         // JNDI PRM
         queries.put("jndiprm_insert", "INSERT INTO __T__JNDI_OR_PARAMETER(ID, KEYNAME, LAST_MODIFIED, VALUE, JNDI_OR) VALUES(JQM_PK.nextval, ?, CURRENT_TIMESTAMP, ?, ?)");
@@ -270,7 +272,7 @@ public class DbImplBase
         queries.put("jndiprm_delete_for_resource", "DELETE FROM __T__JNDI_OR_PARAMETER WHERE JNDI_OR=?");
         queries.put("jndiprm_delete_by_id", "DELETE FROM __T__JNDI_OR_PARAMETER WHERE ID=?");
         queries.put("jndiprm_update_value_by_key", "UPDATE __T__JNDI_OR_PARAMETER SET VALUE=?, LAST_MODIFIED=CURRENT_TIMESTAMP WHERE KEYNAME=?");
-        queries.put("jndiprm_update_changed_by_id", "UPDATE __T__JNDI_OR_PARAMETER SET VALUE=?, LAST_MODIFIED=CURRENT_TIMESTAMP WHERE KEYNAME=? AND NOT VALUE=?");
+        queries.put("jndiprm_update_changed_by_id", "UPDATE __T__JNDI_OR_PARAMETER SET VALUE=?, LAST_MODIFIED=CURRENT_TIMESTAMP WHERE JNDI_OR=? AND KEYNAME=? AND NOT (VALUE=?)");
         queries.put("jndiprm_select_all_in_jndisrc", "SELECT ID, KEYNAME, LAST_MODIFIED, VALUE FROM __T__JNDI_OR_PARAMETER WHERE JNDI_OR=?");
         queries.put("jndiprm_select_all_in_jndisrc_list", "SELECT ID, KEYNAME, LAST_MODIFIED, VALUE, JNDI_OR FROM __T__JNDI_OR_PARAMETER WHERE JNDI_OR IN(UNNEST(?))");
         

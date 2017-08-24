@@ -17,6 +17,8 @@ package com.enioka.jqm.tools;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Folder;
@@ -29,6 +31,8 @@ import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
+import com.enioka.admin.MetaService;
+import com.enioka.api.admin.JndiObjectResourceDto;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
@@ -279,5 +283,58 @@ public class MiscTest extends JqmBaseTest
         TestHelpers.waitFor(1, 10000, cnx);
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+    }
+
+    @Test
+    public void testMetaJndiBug()
+    {
+        JndiObjectResourceDto or = new JndiObjectResourceDto();
+        or.setAuth("CONTAINER");
+        or.setDescription("description");
+        or.setFactory("my.factory");
+        or.setName("jndi/resource");
+        or.setSingleton(true);
+        or.setType("classname");
+
+        or.addParameter("prm1", "val1");
+
+        MetaService.upsertJndiObjectResource(cnx, or);
+        JndiObjectResourceDto tmp = MetaService.getJndiObjectResource(cnx, "jndi/resource");
+        Assert.assertEquals("val1", tmp.getParameters().get("prm1"));
+
+        tmp.addParameter("prm1", "val2");
+        MetaService.upsertJndiObjectResource(cnx, tmp);
+        tmp = MetaService.getJndiObjectResource(cnx, "jndi/resource");
+        Assert.assertEquals("val2", tmp.getParameters().get("prm1"));
+
+        // Now sync.
+        List<JndiObjectResourceDto> dtos = new ArrayList<JndiObjectResourceDto>();
+        dtos.add(tmp);
+        MetaService.syncJndiObjectResource(cnx, dtos);
+        tmp = MetaService.getJndiObjectResource(cnx, "jndi/resource");
+        Assert.assertEquals("val2", tmp.getParameters().get("prm1"));
+
+        dtos.get(0).addParameter("prm1", "val3");
+        MetaService.syncJndiObjectResource(cnx, dtos);
+        tmp = MetaService.getJndiObjectResource(cnx, "jndi/resource");
+        Assert.assertEquals("val3", tmp.getParameters().get("prm1"));
+
+        dtos.get(0).addParameter("prm2", "val1");
+        MetaService.syncJndiObjectResource(cnx, dtos);
+        tmp = MetaService.getJndiObjectResource(cnx, "jndi/resource");
+        Assert.assertEquals("val3", tmp.getParameters().get("prm1"));
+        Assert.assertEquals("val1", tmp.getParameters().get("prm2"));
+
+        dtos.get(0).removeParameter("prm2");
+        MetaService.syncJndiObjectResource(cnx, dtos);
+        tmp = MetaService.getJndiObjectResource(cnx, "jndi/resource");
+        Assert.assertEquals("val3", tmp.getParameters().get("prm1"));
+        Assert.assertEquals(1, tmp.getParameters().size());
+
+        dtos.clear();
+        MetaService.syncJndiObjectResource(cnx, dtos);
+        Assert.assertEquals(0, MetaService.getJndiObjectResource(cnx).size());
+
+        cnx.commit();
     }
 }

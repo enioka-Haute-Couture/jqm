@@ -124,6 +124,11 @@ public class JndiObjectResourceDto implements Serializable
         this.parameters.put(key, value);
     }
 
+    public void removeParameter(String key)
+    {
+        this.parameters.remove(key);
+    }
+
     public Map<String, String> getParameters()
     {
         return parameters;

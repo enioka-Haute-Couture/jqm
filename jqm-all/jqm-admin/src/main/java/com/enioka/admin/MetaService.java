@@ -230,7 +230,7 @@ public class MetaService
     public static void deleteJndiObjectResource(DbConn cnx, int id)
     {
         cnx.runUpdate("jndiprm_delete_for_resource", id);
-        QueryResult qr = cnx.runUpdate("globalprm_delete_by_id", id);
+        QueryResult qr = cnx.runUpdate("jndi_delete_by_id", id);
         if (qr.nbUpdated != 1)
         {
             cnx.setRollbackOnly();
@@ -263,10 +263,18 @@ public class MetaService
             // Sync parameters too
             for (Map.Entry<String, String> e : dto.getParameters().entrySet())
             {
-                QueryResult qr2 = cnx.runUpdate("jndiprm_update_changed_by_id", e.getValue(), e.getKey(), e.getValue());
+                QueryResult qr2 = cnx.runUpdate("jndiprm_update_changed_by_id", e.getValue(), dto.getId(), e.getKey(), e.getValue());
                 if (qr2.nbUpdated == 0)
                 {
-                    cnx.runUpdate("jndiprm_insert", e.getKey(), e.getValue(), dto.getId());
+                    // Two possibilities: exists but no update to do (OK!) or does not exist. Try to create it.
+                    try
+                    {
+                        cnx.runUpdate("jndiprm_insert", e.getKey(), e.getValue(), dto.getId());
+                    }
+                    catch (DatabaseException e2)
+                    {
+                        // Nothing to do.
+                    }
                 }
             }
             ResultSet rs = cnx.runSelect("jndiprm_select_all_in_jndisrc", dto.getId());
@@ -311,43 +319,39 @@ public class MetaService
         return res;
     }
 
-    private static JndiObjectResourceDto getJndiObjectResource(DbConn cnx, String query_key, Object key)
+    private static JndiObjectResourceDto getUniqueJndiResource(DbConn cnx, String query_key, Object key)
     {
-        ResultSet rs = cnx.runSelect(query_key, key);
-        try
+        List<JndiObjectResourceDto> res = getJndiObjectResources(cnx, query_key, key);
+        if (res.isEmpty())
         {
-            if (!rs.next())
-            {
-                throw new NoResultException("The query returned zero rows when one was expected.");
-            }
-            JndiObjectResourceDto res = mapJndiObjectResource(rs);
-            if (rs.next())
-            {
-                throw new NonUniqueResultException("The query returned more than one row when one was expected");
-            }
+            throw new NoResultException("The query returned zero rows when one was expected.");
+        }
+        if (res.size() > 1)
+        {
+            throw new NonUniqueResultException("The query returned more than one row when one was expected");
+        }
 
-            rs.close();
-            return res;
-        }
-        catch (SQLException e)
-        {
-            throw new JqmAdminApiInternalException("An error occurred while querying the database", e);
-        }
+        return res.get(0);
     }
 
     public static JndiObjectResourceDto getJndiObjectResource(DbConn cnx, String key)
     {
-        return getJndiObjectResource(cnx, "globalprm_select_by_key", key);
+        return getUniqueJndiResource(cnx, "jndi_select_by_key", key);
     }
 
     public static JndiObjectResourceDto getJndiObjectResource(DbConn cnx, Integer key)
     {
-        return getJndiObjectResource(cnx, "globalprm_select_by_id", key);
+        return getUniqueJndiResource(cnx, "jndi_select_by_id", key);
     }
 
     public static List<JndiObjectResourceDto> getJndiObjectResource(DbConn cnx)
     {
-        ResultSet rs = cnx.runSelect("jndi_select_all");
+        return getJndiObjectResources(cnx, "jndi_select_all");
+    }
+
+    private static List<JndiObjectResourceDto> getJndiObjectResources(DbConn cnx, String query_key, Object... prms)
+    {
+        ResultSet rs = cnx.runSelect(query_key, prms);
         List<JndiObjectResourceDto> res = new ArrayList<JndiObjectResourceDto>();
         List<Integer> rscIds = new ArrayList<Integer>();
         try
@@ -362,23 +366,26 @@ public class MetaService
             rs.close();
 
             // The parameters
-            rs = cnx.runSelect("jndiprm_select_all_in_jndisrc_list", rscIds);
-            while (rs.next())
+            if (!rscIds.isEmpty())
             {
-                String key = rs.getString(2);
-                String value = rs.getString(4);
-                int rid = rs.getInt(5);
-
-                for (JndiObjectResourceDto tmp : res)
+                rs = cnx.runSelect("jndiprm_select_all_in_jndisrc_list", rscIds);
+                while (rs.next())
                 {
-                    if (tmp.getId().equals(rid))
+                    String key = rs.getString(2);
+                    String value = rs.getString(4);
+                    int rid = rs.getInt(5);
+
+                    for (JndiObjectResourceDto tmp : res)
                     {
-                        tmp.addParameter(key, value);
-                        break;
+                        if (tmp.getId().equals(rid))
+                        {
+                            tmp.addParameter(key, value);
+                            break;
+                        }
                     }
                 }
+                rs.close();
             }
-            rs.close();
         }
         catch (SQLException e)
         {
