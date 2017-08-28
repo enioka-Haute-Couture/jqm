@@ -149,7 +149,7 @@ public class DbImplDb2 implements DbAdapter
          */
         // So we must use an OLAP method as a poor man replacement of ROWNUM. With two sub queries to avoid messing with the initial query.
         // Sigh.
-        sql = String.format("SELECT * FROM (SELECT *, ROW_NUMBER() OVER() AS rn FROM (%s)) WHERE rn BETWEEN ? AND ?", sql);
+        sql = String.format("SELECT * FROM (SELECT a.*, ROW_NUMBER() OVER() AS rn FROM (%s) a) WHERE rn BETWEEN ? AND ?", sql);
         prms.add(start + 1); // +1 : ROW_NUMBER() is 1-based, not 0-based.
         prms.add(stopBefore);
 
