@@ -140,9 +140,17 @@ public class DbImplDb2 implements DbAdapter
     @Override
     public String paginateQuery(String sql, int start, int stopBefore, List<Object> prms)
     {
-        int pageSize = stopBefore - start;
-        sql = String.format("SELECT * FROM (%s) WHERE rn BETWEEN ? AND ?", sql.replace(" FROM ", ", ROW_NUMBER() OVER() as rn FROM "));
-        prms.add(start);
+        // Issue here is that DB2 does not support the efficient LIMIT/OFFSET or ROWNUM without compatibility options.
+        // The commented code below only has one sub query but does not work with UNION queries...
+        /*
+         * String sb = sql.split("ORDER BY")[1]; sql = sql.split("ORDER BY")[0]; sql = sql.replace(" FROM ",
+         * String.format(", ROW_NUMBER() OVER(ORDER BY %s) as rn FROM ", sb)); sql =
+         * String.format("SELECT * FROM (%s) WHERE rn BETWEEN ? AND ?", sql);
+         */
+        // So we must use an OLAP method as a poor man replacement of ROWNUM. With two sub queries to avoid messing with the initial query.
+        // Sigh.
+        sql = String.format("SELECT * FROM (SELECT *, ROW_NUMBER() OVER() AS rn FROM (%s)) WHERE rn BETWEEN ? AND ?", sql);
+        prms.add(start + 1); // +1 : ROW_NUMBER() is 1-based, not 0-based.
         prms.add(stopBefore);
 
         return sql;
