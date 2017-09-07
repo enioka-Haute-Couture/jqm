@@ -17,7 +17,7 @@ What they do
 
 Any job definition can be associated with zero to any number of schedules. The "schedule" object defines:
 
-* a recurrence (see below), like * * * * * for "very minute"
+* a recurrence (see below), like * * * * * for "every minute"
 * optionally, a queue which will override the default queue from the job definition
 * optionally, a set of parameters which will override the ones inside the job definition.
 

@@ -5,7 +5,7 @@ For each completed execution request, one entry is created inside the database t
 table that is actually never read by the engine. It is purely write-only (no deletes, no updates) and it only exists for the needs of reporting.
 
 Therefore, this is also the only table which is not really under the control of the engine. It is impossible to guess how this table will be used - perhaps
-all queries will be by field 'user', or by job definiton + date, etc. **Hence, it is the only table that needs special DBA care** and on which it is allowed to 
+all queries will be by field 'user', or by job definition + date, etc. **Hence, it is the only table that needs special DBA care** and on which it is allowed to 
 do structural changes.
 
 The table comes without any indexes, and without any purges.

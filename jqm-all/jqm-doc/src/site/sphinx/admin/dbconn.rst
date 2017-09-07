@@ -12,9 +12,9 @@ In details:
     * They will not be impacted otherwise
     * Impacted instances will classically crash with a JDBC exception.
 * ending job instances are stored in memory and wait for the database to come back to be reported. This is referred to as "delayed finalization" inside the logs.
-    * Therefore, these instances will be stored as "running" inside the database even if they are actually done. Not that it matters if the database is fully down, but if only the connectivity is down and the db is up.
+    * Therefore, these instances will be stored as "running" inside the database even if they are actually already done. Not that it matters if the database is fully down, but if only the connectivity is down and the db is up it may seem surprising.
     
     
 Pollers failing and the need for delayed finalization are reported as errors inside the main log. Coming back online operations are reported as warnings.
 
-Finally, please note that delayed finalization is purely an in-memory process. That is, if the node is stopped, the state of the ended job instance is lost. On next node startup, the node will realize it does not know what has happened to a job instance it was running before being killed and will report it as crashed, even if it had ended correctly. This is to avoid false OK that would cause havoc inside scheduled production plans. So the rule of thumb is: *do not restart JQM nodes when the database is unavailable*.
+Finally, please note that delayed finalization is purely an in-memory process. That is, if the node is stopped, the state of the ended job instance is lost. On next node startup, the node will realize it does not know what has happened to a job instance it was running before being killed and will report it as crashed, even if it had ended correctly. This is to avoid false OK that would cause havoc inside scheduled production plans. So the rule of thumb is: *do not restart JQM nodes as long as the database is unavailable*.

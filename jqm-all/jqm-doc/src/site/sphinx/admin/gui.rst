@@ -10,7 +10,7 @@ It is **disabled by default**.
 Enabling the console
 *************************
 
-The console must be enabled node by node. It should only be enabled on a single node, as one console is able to administer every node
+The console must be enabled node by node. It should only be enabled on a single node (or a couple of nodes behind a load balancer), as one console is able to administer every node
 referenced inside the central database.
 
 For the GUI basic functions to work, the admin web service API must be enabled. See :doc:`security` for this. For full functionality the three WS APIs must be enabled.

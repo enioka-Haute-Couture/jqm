@@ -17,8 +17,8 @@ defines the underlying concepts and gives examples.
 Defining queues
 *****************
 
-Queues are defined inside the JQM database table QUEUE. It can be directly modified though the web administration console,
-directly in the database, or an XML export/import system can be used.
+Queues are defined inside the JQM database table QUEUE. It can be directly modified though the web administration console, 
+or an XML export/import system can be used.
 Basically, a queue only has an internal technical ID, a name and a description. All fields are compulsory.
 
 The XML is in the form::
@@ -57,7 +57,8 @@ Defining pollers
 Having a queue is enough to enqueue job requests in it but nothing will happen to these requests if no node polls the queue
 to retrieve the requests...
 
-The association between a node and a queue is done inside the JQM database table DEPLOYMENTPARAMETER (or the GUI). 
+The association between a node and a queue is done with the GUI.
+ 
 It defines the following elements:
 
 * ID: A technical unique ID

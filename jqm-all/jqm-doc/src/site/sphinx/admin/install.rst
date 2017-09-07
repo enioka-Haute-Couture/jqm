@@ -17,24 +17,23 @@ Prerequisites:
 * An admin account (for installation only)
 * A service account with minimal permissions: LOGON AS SERVICE + full permissions on JQM_ROOT.
 
-The following script will download and copy the binaries (adapt the first two lines). Run it with admin rights. ::
+The following script (PowerShell 5+) will download and copy the binaries (adapt the first two lines). Run it with admin rights. ::
 
     $JQM_ROOT = "C:\TEMP\jqm"
     $JQM_VERSION = "${project.version}"
     mkdir -Force $JQM_ROOT; cd $JQM_ROOT
     Invoke-RestMethod https://github.com/enioka/jqm/releases/download/jqm-all-$JQM_VERSION/jqm-$JQM_VERSION.zip -OutFile jqm.zip
-    # Unzipping is finally coming in POSH 5... so not yet.
-    $shell = new-object -com shell.application
-    $zip = $shell.NameSpace((Resolve-Path .\jqm.zip).Path)
-    foreach($item in $zip.items()) { $shell.Namespace($JQM_ROOT).copyhere($item) }
+    Expand-Archive ./jqm.zip . -Force
     rm jqm.zip; mv jqm*/* .
 
-Then create a service (adapt user, password and desired node name)::
+Then create a service (change user, password and desired node name)::
 
     ./jqm.ps1 installservice -ServiceUser marsu -ServicePassword marsu -NodeName $env:COMPUTERNAME
     ./jqm.ps1 start
 
 And it's done, a JQM service node is now running.
+
+.. note:: it is **really** not a good idea to run JQM, an application server with a broad attack surface, as SYSTEM or any priviledged account. Always use a service account as stated above.
 
 Linux / Unix
 ====================

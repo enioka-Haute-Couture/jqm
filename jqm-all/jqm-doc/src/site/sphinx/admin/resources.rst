@@ -51,7 +51,7 @@ Singleton resources are created the first time they are looked up, and kept fore
 
 As singleton resources are created by the engine, the jar files containing resource & resource factory must be available to the engine class loader.
 For this reason, the jar files must be placed manually inside the $JQM_ROOT/ext directory (and they do not need to be placed inside the 
-dependencies of the payload, even if it does not hurt to have them there). For a resource which provider is within the payload, being
+dependencies of the payload, even if it does not hurt to have them there when the default parent-first class loading is used). For a resource which provider is within the payload, being
 a singleton is impossible - the engine class context has no access to the payload class context.
 
 By default, the $JQM_ROOT/ext directory contains the following providers, ready to be used as singleton (or not) resources:

@@ -28,8 +28,11 @@ Actually, resources.xml can contain any resource, not just the connection to the
 recommended - the resource would only be available to the local node, while resources defined in the database are
 available to any node.
 
-A second file exists, named JQM_ROOT/conf/jqm.properties. It is not currently used, except if you are using the (not
-production grade) database HSQLDB, in which case the line it contains must be uncommented. It can be - and should be - safely deleted otherwise.
+A second file exists, named JQM_ROOT/conf/jqm.properties. It is used specifically for database-specific bootstrap parameters, and is only useful in very specific use cases. It can be - and should be - safely deleted otherwise. The parameters are:
+
+* com.enioka.jqm.jdbc.tablePrefix: a prefix to add to all table names (if value is "MARSU_", tables will be named MARSU_HISTORY, MARSU_NODE...). Default is empty.
+* com.enioka.jqm.jdbc.datasource: JNDI name of the datasource from resource.xml to use as the main JQM database connection. Default is jdbc/jqm.
+* com.enioka.jqm.jdbc.allowSchemaUpdate: should not be used in normal operations.
 
 **Changes to bootstrap files require an engine restart**.
 
@@ -70,7 +73,7 @@ have to be altered directly inside the database with your tool of choice or thro
 +-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
 | Name                    | Description                                                                                         | Default       | Restart | Nullable     |
 +=========================+=====================================================================================================+===============+=========+==============+
-| mavenRepo               | A Maven repository to use for dependency resolution                                                 | Maven Central | No      | At least one |
+| mavenRepo               | A comma-separated list of Maven repositories to use for dependency resolution                       | Maven Central | No      | No           |
 +-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
 | mavenSettingsCL         | an alternate Maven settings.xml to use. If absent, the usual file inside ~/.m2 is used.             | NULL          | No      | Yes          |
 +-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
@@ -107,7 +110,7 @@ Here, nullable means the parameter can be absent from the table.
 
 Parameter name is case-sensitive.
 
-.. note:: the mavenRepo is the only parameter that can be specified multiple times. There must be at least one repository specified.
+.. note:: There must be at least one Maven repository specified.
 	If using Maven central, please specify 'http://repo1.maven.org/maven2/' and not one the numerous other aliases that exist.
 	Maven Central is only used if explicitly specified (which is the default).
 

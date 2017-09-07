@@ -1,6 +1,86 @@
 Release notes
 ######################
 
+2.0.0
+*************
+
+Release goal
+++++++++++++++++
+
+We are excited to announce the release of JQM 2.0.0. This release is the first of the 2.x series. It is at core a major refactoring of the 1.4 code, which has enabled a few big new features and will allow many more in future versions.
+
+Important note: Oracle support is not present in the initial release. It will be added again in the next release.
+
+Major changes
+++++++++++++++++++++++++++++
+
+Better integration with big frameworks:
+
+* More class loading options: it is now possible to specify CL options on transient CL.
+* New "starting job instance" event which can be used in user-provided handlers.
+* New Spring context management, using the aforementioned event. JQM can now be a fully-fledged Spring container!
+
+Client APIs:
+
+* Many new client APIs to modify job instances.
+* Running job instances can now be paused (in addition to being killed).
+* New client APIs on queues : pause a queue, resume it…
+* New client API to enqueue an instance in a frozen state (and unfreeze it).
+* Queues, which used to be purely FIFO, can now use an optional priority parameter. This priority is also translated in Thread priority (the CPU quota for the job instance).
+
+Performances:
+
+* All but one explicit database locks have been eliminated. This means greater JQM cluster scalability and performance.
+* Less memory usage. JQM 1.4 was about 40MN idle, 2.0 is 25MB.
+* Startup time is now below one second without web services
+* Far less libraries used, including in the tester module. (this includes removing Hibernate - JQM does not need an ORM anymore).
+
+Administration:
+
+* New integrated cron-like scheduler - no need anymore for a scheduler in simple cases.
+* Beginning with the next version, upgrade scripts are provided when the database schema changes.
+* Support for DB2 databases (v 10.5+).
+
+Minor additions
+++++++++++++++++++++
+
+* All components: it is now possible to prefix the name of the database tables.
+* All components: no more log4j in the different modules - purely slf4j-api.
+* Engine: better external launch logs.
+* JDBC client API: no need anymore to specify the datasource name to use the Tomcat hack.
+* WS client API: lots of reliability fixes and better logging both on client and server side.
+
+Breaking changes
++++++++++++++++++++
+
+As the semantic versioning designation entails, this version conatains a few breaking changes. However, it should be noted that the code API (the Java interfaces) themselves have no breaking changes from version 1.4, so impact should be minimal - most changes are behind the scenes, and have consequences for the administrators only.
+
+The breaking changes are:
+
+* The client API implementation named "jqm-api-hibernate" has been replaced by the "jqm-api-jdbc" implementation (with a Maven redirection). The parameters have changed. If you were not using specific parameter (like a specific datasource JNDI name) it should be transparent, as defaults are the same.
+* When using the client API, note that validation of the parameters is now stricter (this means failures now occur earlier). It may mean that a JqmInvalidRequestException is now thrown instead of a JqmClientException. If you were catching JqmException,  it has no impact as it is the mother class of the two other.
+* The JSF sample has been dropped (it was a demonstration of using the full client API in the context of a JSF2/PrimeFaces web application). Users may still look at the sample in version 1.4, as the API used have not changed. This was done because we do not want anyone to believe we encourage to use JSF for creating user interfaces with JQM.
+* Web API user login is now case sensitive, as it should always have been.
+* Then "mavenRepo" global parameter cannot be specified multiple times anymore. It now takes a list (comma separated) instead. All global parameters keys are now unique.
+* Class loading options are no more given per job definition, but have a declaration of their own. This allows for a more consistent configuration, and should reduce confusion over how to configure class loaders. This impacts the deployment descriptor XML (XSD change).
+* For those using the client API Webservice implementation, note that the system properties com.enioka.ws.url has been renamed com.enioka.jqm.ws.url, making it consistent with all the other properties.
+* Killed jobs now consistently report as CRASHED. KILLED is no longer a job status, as instructions to running jobs are now handled properly outside the status of the job instance.
+
+Also, a few changes may be breaking for those who were doing explicitly forbidden things, as a lot of internals have changed.
+
+* The database schema has changed a lot. This was never an official API (and likely won't ever be one), but we know a few users were directly making changes in the database so we are listing it here.
+* As a consequence the Java classes used to map the database have changed (or disappeared altogether). Same remark: was not an API.
+* If you were using an unsupported database, it is it will very likely not work anymore - JQM has dropped using an ORM and therefore does not benefit from the abstraction it provided anymore. Supported databases (HSQLDB, Oracle, MySQL, PostgreSQL, DB2) of course continue to work.
+
+
+Deprecated
++++++++++++++++
+
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
+* JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs)
+* Java 6 & 7, which are no longer supported, are considered depracted in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
+
+
 1.4.1
 *************
 

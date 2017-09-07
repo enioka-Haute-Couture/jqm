@@ -38,7 +38,7 @@ Stopping
 **************
 
 A stop operation will wait for all running jobs to complete, with a two minutes (parameter) timeout.
-No new jobs are taken as soon as the stop order is thrown.
+No new job instances are started on the node as soon as the stop order is thrown.
 
 Windows
 ++++++++++
@@ -78,7 +78,7 @@ In both cases, it is strictly equivalent to stopping and then starting again man
 Pausing and resuming
 ***********************
 
-An engine in pause runs normally but does not take new job instances anymore. Job instances already running at the time of pause go on normally.
+An paused engine runs normally but does not take new job instances anymore. Job instances already running at the time of pause go on normally.
 
 Pausing and resuming methods are available at two levels:
 
@@ -87,6 +87,8 @@ Pausing and resuming methods are available at two levels:
 
 These methods are available through JMX and though the database (in which case modifications are only applied after at most 
 parameter internalPollingPeriodMs). The database method is also exposed by the admin GUI.
+
+Also, a client through the client API can pause all bindings on a designated queue.
 
 Backup
 ************
