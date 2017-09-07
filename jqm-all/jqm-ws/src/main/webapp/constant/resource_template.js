@@ -413,7 +413,7 @@ jqmConstants.value("jndiAmqQ", {
     auth : 'CONTAINER',
     type : 'org.apache.activemq.command.ActiveMQQueue',
     factory : 'org.apache.activemq.jndi.JNDIReferenceFactory',
-    description : 'MQ Series JMS queue',
+    description : 'Active MQ JMS queue',
     singleton : false,
     parameters : [ {
         key : 'physicalName',
