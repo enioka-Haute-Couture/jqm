@@ -161,6 +161,7 @@ public class SchedulerTest extends JqmBaseTest
         Assert.assertEquals(1, TestHelpers.getQueueAllCount(cnx));
         Assert.assertEquals(State.SCHEDULED, Query.create().setQueryLiveInstances(true).run().get(0).getState());
         Assert.assertTrue(Query.create().setQueryLiveInstances(true).run().get(0).isFromSchedule());
+        Assert.assertEquals(runAt, Query.create().setQueryLiveInstances(true).run().get(0).getRunAfter());
 
         addAndStartEngine();
 

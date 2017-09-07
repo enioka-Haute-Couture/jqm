@@ -56,7 +56,7 @@ public class JobInstance
     @XmlElementWrapper(name = "messages")
     @XmlElement(name = "message", type = String.class)
     private List<String> messages = new ArrayList<String>();
-    private Calendar enqueueDate, beganRunningDate, endDate;
+    private Calendar enqueueDate, beganRunningDate, endDate, runAfter;
     private String nodeName;
     private boolean highlander;
     private boolean fromSchedule;
@@ -430,5 +430,18 @@ public class JobInstance
     void setPriority(Integer priority)
     {
         this.priority = priority;
+    }
+
+    /**
+     * An optional date in the future after which JQLM should try to run the job. It is always null for ended job instances.
+     */
+    public Calendar getRunAfter()
+    {
+        return this.runAfter;
+    }
+
+    void setRunAfter(Calendar c)
+    {
+        this.runAfter = c;
     }
 }
