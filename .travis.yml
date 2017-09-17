@@ -4,8 +4,6 @@ before_install:
   - cd jqm-all
   - export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"
 jdk:
-  - oraclejdk7
-  - openjdk6
   - openjdk7
   - oraclejdk8
 env:
