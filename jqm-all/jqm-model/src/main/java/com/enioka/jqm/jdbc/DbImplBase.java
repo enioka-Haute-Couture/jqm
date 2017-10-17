@@ -204,7 +204,7 @@ public class DbImplBase
         queries.put("ji_select_changequeuepos_by_id", "SELECT QUEUE, INTERNAL_POSITION FROM __T__JOB_INSTANCE WHERE ID=? AND STATUS='SUBMITTED'");
         queries.put("ji_select_instruction_by_id", "SELECT INSTRUCTION FROM __T__JOB_INSTANCE WHERE ID=?");
         queries.put("ji_select_execution_date_by_id", "SELECT DATE_START FROM __T__JOB_INSTANCE WHERE ID=?");
-        queries.put("ji_select_cnx_data_by_id", "SELECT DNS||':'||PORT AS HOST FROM __T__JOB_INSTANCE ji LEFT JOIN __T__Node n ON ji.NODE = n.ID WHERE ji.ID=?");
+        queries.put("ji_select_cnx_data_by_id", "SELECT DNS||':'||PORT AS HOST FROM __T__JOB_INSTANCE ji LEFT JOIN __T__NODE n ON ji.NODE = n.ID WHERE ji.ID=?");
         
         queries.put("ji_update_poll", "UPDATE __T__JOB_INSTANCE j1 SET NODE=?, STATUS='ATTRIBUTED', DATE_ATTRIBUTION=CURRENT_TIMESTAMP WHERE j1.STATUS='SUBMITTED' AND j1.ID IN "
                 + "(SELECT j2.ID FROM __T__JOB_INSTANCE j2 WHERE j2.STATUS='SUBMITTED' AND j2.QUEUE=? "
@@ -223,13 +223,13 @@ public class DbImplBase
         
         queries.put("history_delete_all", "DELETE FROM __T__HISTORY");
         queries.put("history_delete_by_id", "DELETE FROM __T__HISTORY WHERE ID=?");
-        queries.put("history_select_count_all", "SELECT COUNT(1) FROM __T__History");
-        queries.put("history_select_count_for_poller", "SELECT COUNT(1) FROM __T__History WHERE QUEUE=? AND NODE=?");
-        queries.put("history_select_count_last_mn_for_poller", "SELECT COUNT(1)/60 FROM __T__History WHERE QUEUE=? AND NODE=? AND DATE_END > (CURRENT_TIMESTAMP - 1 MINUTE)");
-        queries.put("history_select_count_ended", "SELECT COUNT(1) FROM __T__History WHERE STATUS='ENDED'");
-        queries.put("history_select_count_notended", "SELECT COUNT(1) FROM __T__History WHERE STATUS<>'ENDED'");
+        queries.put("history_select_count_all", "SELECT COUNT(1) FROM __T__HISTORY");
+        queries.put("history_select_count_for_poller", "SELECT COUNT(1) FROM __T__HISTORY WHERE QUEUE=? AND NODE=?");
+        queries.put("history_select_count_last_mn_for_poller", "SELECT COUNT(1)/60 FROM __T__HISTORY WHERE QUEUE=? AND NODE=? AND DATE_END > (CURRENT_TIMESTAMP - 1 MINUTE)");
+        queries.put("history_select_count_ended", "SELECT COUNT(1) FROM __T__HISTORY WHERE STATUS='ENDED'");
+        queries.put("history_select_count_notended", "SELECT COUNT(1) FROM __T__HISTORY WHERE STATUS<>'ENDED'");
         queries.put("history_select_reenqueue_by_id", "SELECT JD_APPLICATION, JD_KEY, EMAIL, INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, PARENT, SESSION_KEY, USERNAME, STATUS FROM __T__HISTORY WHERE ID=?");
-        queries.put("history_select_cnx_data_by_id", "SELECT DNS||':'||PORT AS HOST FROM __T__History h LEFT JOIN __T__Node n ON h.NODE = n.ID WHERE h.ID=?");
+        queries.put("history_select_cnx_data_by_id", "SELECT DNS||':'||PORT AS HOST FROM __T__HISTORY h LEFT JOIN __T__NODE n ON h.NODE = n.ID WHERE h.ID=?");
         queries.put("history_select_state_by_id", "SELECT STATUS FROM __T__HISTORY WHERE ID=?");
         
         // DELIVERABLE
