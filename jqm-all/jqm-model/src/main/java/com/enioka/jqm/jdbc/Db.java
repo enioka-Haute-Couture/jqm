@@ -437,9 +437,15 @@ public class Db
         try
         {
             Connection cnx = _ds.getConnection();
-            cnx.setAutoCommit(false);
-            cnx.rollback(); // To ensure no open transaction created by the pool before changing TX mode
-            cnx.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+            if (cnx.getAutoCommit()) {
+                cnx.setAutoCommit(false);
+                cnx.rollback(); // To ensure no open transaction created by the pool before changing TX mode
+            }
+
+            if (cnx.getTransactionIsolation() != Connection.TRANSACTION_READ_COMMITTED) {
+                cnx.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+            }
+
             return new DbConn(this, cnx);
         }
         catch (SQLException e)
