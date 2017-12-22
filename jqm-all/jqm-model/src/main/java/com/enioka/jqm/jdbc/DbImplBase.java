@@ -167,7 +167,7 @@ public class DbImplBase
         queries.put("ji_delete_all", "DELETE FROM __T__JOB_INSTANCE");
         queries.put("ji_delete_by_id", "DELETE FROM __T__JOB_INSTANCE WHERE ID = ?");
         queries.put("ji_delete_waiting_in_queue_id", "DELETE FROM __T__JOB_INSTANCE WHERE QUEUE = ? AND STATUS IN ('HOLDED', 'SUBMITTED', 'SCHEDULED')");
-        queries.put("jj_update_cancel_by_id", "UPDATE __T__JOB_INSTANCE SET STATUS='CANCELLED' WHERE ID=? AND STATUS='SUBMITTED'");
+        queries.put("jj_update_cancel_by_id", "UPDATE __T__JOB_INSTANCE SET STATUS='CANCELLED' WHERE ID=? AND (STATUS='SUBMITTED' OR STATUS='SCHEDULED' OR STATUS='HOLDED')");
         queries.put("jj_update_kill_by_id", "UPDATE __T__JOB_INSTANCE SET INSTRUCTION='KILL' WHERE ID=?");
         queries.put("jj_update_pause_by_id", "UPDATE __T__JOB_INSTANCE SET STATUS='HOLDED' WHERE ID=? AND STATUS='SUBMITTED'");
         queries.put("jj_update_resume_by_id", "UPDATE __T__JOB_INSTANCE SET STATUS='SUBMITTED' WHERE ID=? AND STATUS='HOLDED'");

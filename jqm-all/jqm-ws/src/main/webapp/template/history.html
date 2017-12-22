@@ -101,7 +101,7 @@
                 <span class="glyphicon glyphicon-repeat"></span> Relaunch
             </button>
             <button class="btn btn-default" ng-click="kill()" jqm-permission="job_instance:create"
-                ng-disabled="selected.length === 0 || target === 'hist' || (selected[0].state !== 'RUNNING' && selected[0].state !== 'SUBMITTED')">
+                ng-disabled="selected.length === 0 || target === 'hist' || (selected[0].state !== 'RUNNING' && selected[0].state !== 'SUBMITTED' && selected[0].state !== 'SCHEDULED')">
                 <span class="glyphicon glyphicon-stop"></span> Kill
             </button>
             <button class="btn btn-default" ng-click="newLaunch()" jqm-permission="job_instance:create">
