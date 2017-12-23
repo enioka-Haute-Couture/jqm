@@ -128,6 +128,8 @@ public class Main
                 .withDescription("resource parameter file to use. Default is resources.xml").withLongOpt("resources").create("p");
         Option o141 = OptionBuilder.withArgName("login,password,role1,role2,...").hasArgs(Option.UNLIMITED_VALUES).withValueSeparator(',')
                 .withDescription("Create or update a JQM account. Roles must exist beforehand.").create("U");
+        Option o151 = OptionBuilder.withArgName("configXmlFile").hasArg().withDescription("Import this file").withLongOpt("configXmlFile")
+                .create("c");
 
         Options options = new Options();
         OptionGroup og1 = new OptionGroup();
@@ -147,6 +149,7 @@ public class Main
         og1.addOption(o111);
         og1.addOption(o121);
         og1.addOption(o141);
+        og1.addOption(o151);
         options.addOptionGroup(og1);
         OptionGroup og2 = new OptionGroup();
         og2.addOption(o131);
@@ -256,6 +259,11 @@ public class Main
             else if (line.hasOption(o141.getOpt()))
             {
                 user(line.getOptionValues(o141.getOpt()));
+            }
+            // Configuration import
+            else if (line.hasOption(o151.getOpt()))
+            {
+                importConfiguration(line.getOptionValue(o151.getOpt()));
             }
         }
         catch (ParseException exp)
@@ -536,5 +544,28 @@ public class Main
         int id = Integer.parseInt(option);
         JobInstance res = JqmSingleRunner.run(id);
         jqmlogger.info(res.getState());
+    }
+
+    private static void importConfiguration(String xmlpath)
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getNewDbSession();
+
+            String[] pathes = xmlpath.split(",");
+            for (String path : pathes)
+            {
+                XmlConfigurationParser.parse(path, cnx);
+            }
+        }
+        catch (Exception e)
+        {
+            throw new JqmRuntimeException("Could not import file", e);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 }
