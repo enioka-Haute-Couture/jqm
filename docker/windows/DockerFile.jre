@@ -1,0 +1,49 @@
+ARG WINDOWS_TAG=1709
+
+FROM microsoft/powershell:nanoserver as installer
+
+SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+ENV JAVA_HOME C:\\ojdkbuild
+
+# https://github.com/ojdkbuild/ojdkbuild/releases
+ENV JAVA_VERSION 8u151
+ENV JAVA_OJDKBUILD_VERSION 1.8.0.151-1
+ENV JAVA_OJDKBUILD_ZIP java-1.8.0-openjdk-1.8.0.151-1.b12.ojdkbuild.windows.x86_64.zip
+ENV JAVA_OJDKBUILD_SHA256 1905ea74b79d6d1d2ea2b2b6887c14770f090fbb8b46e7e1bfb56e92845e9cf2
+ENV JAVA_HOME C:\\ojdk 
+
+RUN $env:Path=\"$env:Path;C:/ojdk/bin\"; \
+    $url = ('https://github.com/ojdkbuild/ojdkbuild/releases/download/{0}/{1}' -f $env:JAVA_OJDKBUILD_VERSION, $env:JAVA_OJDKBUILD_ZIP); \
+    Write-Host ('Downloading {0} ...' -f $url); \
+    Invoke-WebRequest -Uri $url -OutFile 'ojdkbuild.zip' -UseBasicParsing ; \
+    Write-Host ('Verifying sha256 ({0}) ...' -f $env:JAVA_OJDKBUILD_SHA256); \
+    if ((Get-FileHash ojdkbuild.zip -Algorithm sha256).Hash -ne $env:JAVA_OJDKBUILD_SHA256) { \
+        Write-Host 'FAILED!'; \
+        exit 1; \
+    }; \
+	\
+	Write-Host 'Expanding ...'; \
+	Expand-Archive ojdkbuild.zip -DestinationPath C:\; \
+	Remove-Item ojdkbuild.zip; \
+	\
+	Write-Host 'Renaming ...'; \
+	Move-Item *ojdkbuild*/jre $env:JAVA_HOME ; \
+	\
+	Write-Host 'Verifying install ...'; \
+	Write-Host '  java -version'; java -version; \
+	\
+	Write-Host 'Complete.';
+
+
+
+FROM microsoft/nanoserver:${WINDOWS_TAG}
+
+COPY --from=installer C:/ojdk/ C:/ojdk/
+
+RUN setx JAVA_HOME C:\\ojdk
+RUN setx PATH %PATH%;C:\\ojdk\\bin
+
+LABEL maintainer="Enioka" \
+      readme.md="https://github.com/enioka/jqm/blob/master/README.md" \
+      description="OpenJDK JRE for Windows Nano 1709 (no official pure JRE image for Windows)"

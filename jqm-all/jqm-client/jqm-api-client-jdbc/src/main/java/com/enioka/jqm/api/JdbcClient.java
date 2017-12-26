@@ -1209,8 +1209,8 @@ final class JdbcClient implements JqmClient
                 wh += getStringPredicate("ji.SESSION_KEY", query.getSessionId(), prms);
                 wh += getStatusPredicate("ji.STATUS", query.getStatus(), prms);
 
-                wh += getStringPredicate("jd.JD_KEY", query.getJobDefApplication(), prms);
-                wh += getStringPredicate("jd.APPLICATION", query.getInstanceApplication(), prms);
+                wh += getStringPredicate("jd.JD_KEY", query.getApplicationName(), prms);
+                wh += getStringPredicate("jd.APPLICATION", query.getJobDefApplication(), prms);
                 wh += getStringPredicate("jd.MODULE", query.getJobDefModule(), prms);
                 wh += getStringPredicate("jd.KEYWORD1", query.getJobDefKeyword1(), prms);
                 wh += getStringPredicate("jd.KEYWORD2", query.getJobDefKeyword2(), prms);

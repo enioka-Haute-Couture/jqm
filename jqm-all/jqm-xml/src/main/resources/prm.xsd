@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+
+	<xs:element name="jqm">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="1" maxOccurs="1" ref="nodes" />
+				<xs:element minOccurs="1" maxOccurs="1" ref="globalParameters" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:element name="nodes">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="0" maxOccurs="unbounded" ref="node" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="node">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" minOccurs="1" maxOccurs="1"
+					type="xs:string"></xs:element>
+
+				<xs:element name="interface" minOccurs="1" maxOccurs="1"
+					type="xs:string"></xs:element>
+				<xs:element name="webPort" minOccurs="1" maxOccurs="1"
+					type="xs:int"></xs:element>
+				<xs:element name="jmxRegistryPort" minOccurs="1"
+					maxOccurs="1" type="xs:int"></xs:element>
+				<xs:element name="jmxServerPort" minOccurs="1" maxOccurs="1"
+					type="xs:int"></xs:element>
+
+				<xs:element name="enabled" minOccurs="1" maxOccurs="1"
+					type="xs:boolean"></xs:element>
+				<xs:element name="loadSimpleWebApi" minOccurs="1"
+					maxOccurs="1" type="xs:boolean"></xs:element>
+				<xs:element name="loadClientWebApi" minOccurs="1"
+					maxOccurs="1" type="xs:boolean"></xs:element>
+				<xs:element name="loadAdminWebApi" minOccurs="1"
+					maxOccurs="1" type="xs:boolean"></xs:element>
+
+				<xs:element name="jobDefDirectory" minOccurs="1"
+					maxOccurs="1" type="xs:string"></xs:element>
+				<xs:element name="tmpDirectory" minOccurs="1" maxOccurs="1"
+					type="xs:string"></xs:element>
+				<xs:element name="deliverableDirectory" minOccurs="1"
+					maxOccurs="1" type="xs:string"></xs:element>
+
+				<xs:element name="logLevel" minOccurs="1" maxOccurs="1"
+					type="logLevel"></xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="logLevel" final="restriction">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="TRACE" />
+			<xs:enumeration value="DEBUG" />
+			<xs:enumeration value="INFO" />
+			<xs:enumeration value="WARNING" />
+			<xs:enumeration value="FATAL" />
+		</xs:restriction>
+	</xs:simpleType>
+
+
+	<xs:element name="globalParameters">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="0" maxOccurs="unbounded" ref="parameter" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="parameter">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="key" type="xs:string" />
+				<xs:element name="value" type="xs:string" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

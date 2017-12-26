@@ -1,0 +1,41 @@
+ARG WINDOWS_TAG=1709
+
+FROM microsoft/powershell:nanoserver as installer
+
+SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+# http://www-us.apache.org/dist/maven/maven-3/3.5.2/binaries/apache-maven-3.5.2-bin.zip
+ENV MVN_VERSION 3.5.2
+ENV MVN_URL http://www-us.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.zip
+ENV MVN_MD5 b8d8d49d8178734124c4ff6f3a409d3d
+
+RUN Write-Host ('Downloading {0} ...' -f $env:MVN_URL); \
+    Invoke-WebRequest -Uri $env:MVN_URL -OutFile 'mvn.zip' -UseBasicParsing ; \
+    Write-Host ('Verifying md5 ({0}) ...' -f $env:MVN_MD5); \
+    if ((Get-FileHash mvn.zip -Algorithm md5).Hash -ne $env:MVN_MD5) { \
+        Write-Host 'FAILED!'; \
+        exit 1; \
+    }; \
+	\
+	Write-Host 'Expanding ...'; \
+	Expand-Archive mvn.zip -DestinationPath C:\; \
+	\
+	Write-Host 'Renaming ...'; \
+	Move-Item apache* C:/mvn; \
+	\
+	Write-Host 'Removing ...'; \
+	Remove-Item mvn.zip -Force; \
+	\
+	Write-Host 'Complete.';
+
+
+	
+FROM jqm/openjdk:latest
+
+COPY --from=installer C:/mvn/ C:/mvn/
+
+RUN setx PATH %PATH%;C:\\mvn\\bin
+
+LABEL maintainer="Enioka" \
+      readme.md="https://github.com/enioka/jqm/blob/master/README.md" \
+      description="Maven packaging"

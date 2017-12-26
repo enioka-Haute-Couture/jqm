@@ -1,0 +1,30 @@
+<jqm>
+	<nodes>
+		<node>
+			<name>Node1</name>
+
+			<interface>localhost</interface>
+			<webPort>1789</webPort>
+			<jmxRegistryPort>1790</jmxRegistryPort>
+			<jmxServerPort>1791</jmxServerPort>
+
+			<enabled>true</enabled>
+			<loadSimpleWebApi>true</loadSimpleWebApi>
+			<loadClientWebApi>true</loadClientWebApi>
+			<loadAdminWebApi>true</loadAdminWebApi>
+
+			<jobDefDirectory>./jobs</jobDefDirectory>
+			<tmpDirectory>./tmp</tmpDirectory>
+			<deliverableDirectory>./outputfiles</deliverableDirectory>
+
+			<logLevel>INFO</logLevel>
+		</node>
+	</nodes>
+
+	<globalParameters>
+		<parameter>
+			<key>key1</key>
+			<value>value1</value>
+		</parameter>
+	</globalParameters>
+</jqm>

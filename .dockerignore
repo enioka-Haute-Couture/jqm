@@ -1,0 +1,10 @@
+**/target/
+**/*.log
+**/*.jar
+**/*.war
+**/.settings/
+**/bin/
+**/.project
+**/ext/
+**/logs/
+**/plugins/

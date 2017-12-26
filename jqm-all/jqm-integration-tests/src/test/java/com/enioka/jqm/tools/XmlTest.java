@@ -24,6 +24,8 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.enioka.admin.MetaService;
+import com.enioka.api.admin.NodeDto;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.Queue;
@@ -305,5 +307,106 @@ public class XmlTest extends JqmBaseTest
         {
             Assert.fail("missing configuration element");
         }
+    }
+
+    @Test
+    public void testImportConfiguration()
+    {
+        // First import = creation
+        XmlConfigurationParser.parse("target/payloads/jqm-test-xml/xmlnodeimport1.xml", cnx);
+        cnx.commit();
+
+        List<NodeDto> nodes = MetaService.getNodes(cnx);
+        NodeDto node = null;
+
+        for (NodeDto dto : nodes)
+        {
+            if (dto.getName().equals("Node1"))
+            {
+                node = dto;
+                break;
+            }
+        }
+
+        Assert.assertNotNull(node);
+
+        Assert.assertEquals("Node1", node.getName());
+
+        Assert.assertEquals("localhost", node.getDns());
+        Assert.assertEquals((Integer) 1789, node.getPort());
+        Assert.assertEquals((Integer) 1790, node.getJmxRegistryPort());
+        Assert.assertEquals((Integer) 1791, node.getJmxServerPort());
+
+        Assert.assertTrue(node.getEnabled());
+        Assert.assertTrue(node.getLoadApiAdmin());
+        Assert.assertTrue(node.getLoadApiClient());
+        Assert.assertTrue(node.getLoapApiSimple());
+
+        Assert.assertEquals("./jobs", node.getJobRepoDirectory());
+        Assert.assertEquals("./tmp", node.getTmpDirectory());
+        Assert.assertEquals("./outputfiles", node.getOutputDirectory());
+
+        Assert.assertEquals("INFO", node.getRootLogLevel());
+
+        Assert.assertEquals("value1", MetaService.getGlobalParameter(cnx, "key1").getValue());
+
+        // 2nd import (other file) = update
+        XmlConfigurationParser.parse("target/payloads/jqm-test-xml/xmlnodeimport2.xml", cnx);
+        cnx.commit();
+
+        nodes = MetaService.getNodes(cnx);
+        node = null;
+        for (NodeDto dto : nodes)
+        {
+            if (dto.getName().equals("Node1"))
+            {
+                node = dto;
+                break;
+            }
+        }
+
+        Assert.assertNotNull(node);
+
+        Assert.assertEquals("Node1", node.getName());
+
+        Assert.assertEquals("localhost2", node.getDns());
+        Assert.assertEquals((Integer) 2789, node.getPort());
+        Assert.assertEquals((Integer) 2790, node.getJmxRegistryPort());
+        Assert.assertEquals((Integer) 2791, node.getJmxServerPort());
+
+        Assert.assertFalse(node.getEnabled());
+        Assert.assertFalse(node.getLoadApiAdmin());
+        Assert.assertFalse(node.getLoadApiClient());
+        Assert.assertFalse(node.getLoapApiSimple());
+
+        Assert.assertEquals("./jobs2", node.getJobRepoDirectory());
+        Assert.assertEquals("./tmp2", node.getTmpDirectory());
+        Assert.assertEquals("./outputfiles2", node.getOutputDirectory());
+
+        Assert.assertEquals("WARNING", node.getRootLogLevel());
+
+        Assert.assertEquals("value2", MetaService.getGlobalParameter(cnx, "key1").getValue());
+
+        // 3rd import (same file) = stable
+        XmlConfigurationParser.parse("target/payloads/jqm-test-xml/xmlnodeimport2.xml", cnx);
+        cnx.commit();
+
+        nodes = MetaService.getNodes(cnx);
+        node = null;
+        for (NodeDto dto : nodes)
+        {
+            if (dto.getName().equals("Node1"))
+            {
+                node = dto;
+                break;
+            }
+        }
+
+        Assert.assertNotNull(node);
+
+        Assert.assertEquals("Node1", node.getName());
+
+        Assert.assertEquals("localhost2", node.getDns());
+        Assert.assertEquals("WARNING", node.getRootLogLevel());
     }
 }
