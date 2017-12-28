@@ -116,6 +116,37 @@ public class JobDefParameter implements Serializable
         return res;
     }
 
+    public static Map<Integer, List<JobDefParameter>> select_all(DbConn cnx, String query_key, Object... args)
+    {
+        Map<Integer, List<JobDefParameter>> res = new HashMap<Integer, List<JobDefParameter>>();
+        try
+        {
+            ResultSet rs = cnx.runSelect(query_key, args);
+            while (rs.next())
+            {
+                JobDefParameter tmp = new JobDefParameter();
+
+                tmp.id = rs.getInt(1);
+                tmp.key = rs.getString(2);
+                tmp.value = rs.getString(3);
+                tmp.jobdef_id = rs.getInt(4);
+
+                List<JobDefParameter> list = res.get(tmp.jobdef_id);
+                if (list == null){
+                    list = new ArrayList<JobDefParameter>();
+                    res.put(tmp.jobdef_id, list);
+                }
+
+                list.add(tmp);
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
+    }
+
     public static Map<String, String> select_map(DbConn cnx, String query_key, Object... args)
     {
         Map<String, String> res = new HashMap<String, String>();
