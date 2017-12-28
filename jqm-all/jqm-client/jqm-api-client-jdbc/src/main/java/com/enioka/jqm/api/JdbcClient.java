@@ -2169,6 +2169,7 @@ final class JdbcClient implements JqmClient
         List<JobDef> dbr = null;
         List<Integer> ids = null;
         Map<Integer, com.enioka.jqm.api.Queue> queues = null;
+        Map<Integer, List<JobDefParameter>> allParams = null;
         List<ScheduledJob> sjs = null;
 
         try
@@ -2192,6 +2193,7 @@ final class JdbcClient implements JqmClient
                     ids.add(jd.getId());
                 }
                 sjs = ScheduledJob.select(cnx, "sj_select_for_jd_list", ids);
+                allParams = JobDefParameter.select_all(cnx,"jdprm_select_all_for_jd_list", ids);
             }
 
             for (JobDef jd : dbr)
@@ -2213,9 +2215,12 @@ final class JdbcClient implements JqmClient
                 tmp.setQueue(queues.get(jd.getQueue()));
 
                 // Parameters
-                for (JobDefParameter jdf : jd.getParameters(cnx))
+                List<JobDefParameter> parameters = allParams.get(jd.getId());
+                if (parameters != null)
                 {
-                    tmp.addParameter(jdf.getKey(), jdf.getValue());
+                    for (JobDefParameter jdf : parameters) {
+                        tmp.addParameter(jdf.getKey(), jdf.getValue());
+                    }
                 }
 
                 // Schedules
