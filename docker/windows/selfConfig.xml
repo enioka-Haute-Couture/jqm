@@ -1,6 +1,6 @@
 <jqm>
 	<defaultQueueName>Queue1</defaultQueueName>
-	
+
 	<nodes>
 		<node>
 			<name>ContainerNode</name>
@@ -22,7 +22,7 @@
 			<logLevel>INFO</logLevel>
 		</node>
 	</nodes>
-	
+
 	<queues>
 		<queue>
 			<name>Queue1</name>
@@ -64,4 +64,93 @@
 			<value>http://repo1.maven.org/maven2/,https://oss.sonatype.org/content/repositories/snapshots/</value>
 		</parameter>
 	</globalParameters>
+
+	<resources>
+		<resource>
+			<alias>jdbc/test</alias>
+			<type>javax.sql.DataSource</type>
+			<factory>org.apache.tomcat.jdbc.pool.DataSourceFactory</factory>
+			<description>test resource for demo job</description>
+			<singleton>true</singleton>
+			<parameters>
+				<parameter>
+					<key>testWhileIdle</key>
+					<value>true</value>
+				</parameter>
+				<parameter>
+					<key>testOnBorrow</key>
+					<value>false</value>
+				</parameter>
+				<parameter>
+					<key>testOnReturn</key>
+					<value>true</value>
+				</parameter>
+				<parameter>
+					<key>validationQuery</key>
+					<value>SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS</value>
+				</parameter>
+				<parameter>
+					<key>validationInterval</key>
+					<value>1000</value>
+				</parameter>
+				<parameter>
+					<key>timeBetweenEvictionRunsMillis</key>
+					<value>60000</value>
+				</parameter>
+				<parameter>
+					<key>maxActive</key>
+					<value>100</value>
+				</parameter>
+				<parameter>
+					<key>minIdle</key>
+					<value>2</value>
+				</parameter>
+				<parameter>
+					<key>maxWait</key>
+					<value>30000</value>
+				</parameter>
+				<parameter>
+					<key>initialSize</key>
+					<value>5</value>
+				</parameter>
+				<parameter>
+					<key>removeAbandonedTimeout</key>
+					<value>3600</value>
+				</parameter>
+				<parameter>
+					<key>removeAbandoned</key>
+					<value>true</value>
+				</parameter>
+				<parameter>
+					<key>logAbandoned</key>
+					<value>true</value>
+				</parameter>
+				<parameter>
+					<key>minEvictableIdleTimeMillis</key>
+					<value>60000</value>
+				</parameter>
+				<parameter>
+					<key>jmxEnabled</key>
+					<value>true</value>
+				</parameter>
+				<parameter>
+					<key>username</key>
+					<value>JQM</value>
+				</parameter>
+				<parameter>
+					<key>password</key>
+					<value>jqm</value>
+				</parameter>
+				<parameter>
+					<key>driverClassName</key>
+					<value>org.hsqldb.jdbcDriver</value>
+				</parameter>
+				<parameter>
+					<key>url</key>
+					<value>jdbc:hsqldb:file:db/dbfilename;shutdown=true;hsqldb.write_delay=false</value>
+				</parameter>
+			</parameters>
+		</resource>
+	</resources>
+
 </jqm>

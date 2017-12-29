@@ -31,6 +31,8 @@ import javax.naming.spi.ObjectFactory;
 
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.jdbc.NonUniqueResultException;
 import com.enioka.jqm.jdbc.QueryResult;
 
 /**
@@ -272,11 +274,11 @@ public class JndiObjectResource implements Serializable
         List<JndiObjectResource> res = select(cnx, "jndi_select_by_key", alias);
         if (res.isEmpty())
         {
-            throw new DatabaseException("no result for query by key for key " + alias);
+            throw new NoResultException("no result for query by key for key " + alias);
         }
         if (res.size() > 1)
         {
-            throw new DatabaseException("Inconsistent database! Multiple results for query by key for key " + alias);
+            throw new NonUniqueResultException("Inconsistent database! Multiple results for query by key for key " + alias);
         }
         return res.get(0);
     }

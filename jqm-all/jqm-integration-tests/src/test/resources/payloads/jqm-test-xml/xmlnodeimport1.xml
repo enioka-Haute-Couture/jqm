@@ -49,4 +49,34 @@
 			<value>value1</value>
 		</parameter>
 	</globalParameters>
+
+	<resources>
+		<resource>
+			<alias>string/test1</alias>
+			<type>java.lang.String</type>
+			<factory>com.enioka.jqm.providers.StringFactory</factory>
+			<description>test resource</description>
+			<singleton>false</singleton>
+			<parameters>
+				<parameter>
+					<key>STRING</key>
+					<value>test1</value>
+				</parameter>
+			</parameters>
+		</resource>
+
+		<resource>
+			<alias>string/test2</alias>
+			<type>java.lang.String</type>
+			<factory>com.enioka.jqm.providers.StringFactory</factory>
+			<description>test resource</description>
+			<singleton>false</singleton>
+			<parameters>
+				<parameter>
+					<key>STRING</key>
+					<value>test2</value>
+				</parameter>
+			</parameters>
+		</resource>
+	</resources>
 </jqm>

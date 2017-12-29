@@ -367,6 +367,8 @@ public class XmlTest extends JqmBaseTest
         QueueDto q = MetaService.getQueue(cnx, queueMapping.getQueueId());
         Assert.assertTrue(q.isDefaultQueue());
 
+        Assert.assertEquals("test1", MetaService.getJndiObjectResource(cnx, "string/test1").getParameters().get("STRING"));
+
         // 2nd import (other file) = update
         XmlConfigurationParser.parse("target/payloads/jqm-test-xml/xmlnodeimport2.xml", cnx);
         cnx.commit();
@@ -418,6 +420,8 @@ public class XmlTest extends JqmBaseTest
 
         q = MetaService.getQueue(cnx, queueMapping.getQueueId());
         Assert.assertFalse(q.isDefaultQueue());
+        
+        Assert.assertEquals("test1_2", MetaService.getJndiObjectResource(cnx, "string/test1").getParameters().get("STRING"));
 
         // 3rd import (same file) = stable
         XmlConfigurationParser.parse("target/payloads/jqm-test-xml/xmlnodeimport2.xml", cnx);
