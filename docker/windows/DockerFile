@@ -14,7 +14,7 @@ WORKDIR /jqm-all
 # Copy all poms ls -Recurse pom.xml | resolve-path -Relative |? {select-string -NotMatch "target|bin" -InputObject $_} |% {echo "COPY $_ $(Split-Path -Parent $_)\".Replace("\", "/")}
 # RUN mvn dependency:go-offline # sadly no: https://issues.apache.org/jira/browse/MDEP-204 (reactor not used by this goal)
 
-# Attempt 2: use Nexus. But Nexus has big issues when using volumes...
+# Attempt 2: use Nexus in another container. But Nexus (like most Java programs) has big issues when using volumes due to a JDK bug...
 # If you HAVE a Nexus or another Central caching reverse proxy, just use setting.xml.
 
 
@@ -42,7 +42,8 @@ COPY --from=builder c:/jqm-all/jqm-service/target/jqm-2.1.0-SNAPSHOT.zip .
 
 RUN Expand-Archive jqm*.zip -DestinationPath C:/; \
     rm *.zip; \
-	mv jqm* c:/jqm
+	mv jqm* c:/jqm;
+#	mkdir c:/jqm/jobs/jqm-demo/jqm-test-pyl/lib/
 
 
 	
@@ -55,12 +56,11 @@ COPY --from=installer C:/jqm/ C:/jqm/
 COPY ./docker/windows/selfConfig.xml C:/jqm/selfConfig.xml
 
 ENV JAVA_OPTS "-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m"
-RUN setx PATH %PATH%;C:\\jqm
 
 EXPOSE 1789 1790 1791
 
-WORKDIR jqm
-
+# Configuration
+WORKDIR C:/jqm
 RUN java -jar jqm.jar -u && java -jar jqm.jar -c selfConfig.xml && java -jar jqm.jar -importjobdef ./jobs/jqm-demo/xml/xml-jd-demo.xml && DEL /Q .\\logs\\*
 
 ENTRYPOINT java %JAVA_OPTS% -jar jqm.jar -startnode ContainerNode
