@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.NodeDto;
+import com.enioka.api.admin.QueueDto;
 import com.enioka.api.admin.QueueMappingDto;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.JobDef;
@@ -363,6 +364,9 @@ public class XmlTest extends JqmBaseTest
         Assert.assertNotNull(queueMapping);
         Assert.assertEquals((Integer) 2000, queueMapping.getPollingInterval());
 
+        QueueDto q = MetaService.getQueue(cnx, queueMapping.getQueueId());
+        Assert.assertTrue(q.isDefaultQueue());
+
         // 2nd import (other file) = update
         XmlConfigurationParser.parse("target/payloads/jqm-test-xml/xmlnodeimport2.xml", cnx);
         cnx.commit();
@@ -411,6 +415,9 @@ public class XmlTest extends JqmBaseTest
         }
         Assert.assertNotNull(queueMapping);
         Assert.assertEquals((Integer) 5000, queueMapping.getPollingInterval());
+
+        q = MetaService.getQueue(cnx, queueMapping.getQueueId());
+        Assert.assertFalse(q.isDefaultQueue());
 
         // 3rd import (same file) = stable
         XmlConfigurationParser.parse("target/payloads/jqm-test-xml/xmlnodeimport2.xml", cnx);

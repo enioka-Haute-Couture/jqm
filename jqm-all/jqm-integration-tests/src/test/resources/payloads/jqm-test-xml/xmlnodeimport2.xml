@@ -1,4 +1,6 @@
 <jqm>
+	<defaultQueueName>Queue2</defaultQueueName>
+
 	<nodes>
 		<node>
 			<name>Node1</name>

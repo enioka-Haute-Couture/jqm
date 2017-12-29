@@ -958,7 +958,7 @@ public class MetaService
         ResultSet rs = null;
         try
         {
-            rs = cnx.runSelect("q_select_by_id");
+            rs = cnx.runSelect("q_select_by_id", id);
             if (!rs.next())
             {
                 throw new JqmAdminApiUserException("no result");
@@ -969,10 +969,6 @@ public class MetaService
         catch (SQLException e)
         {
             throw new DatabaseException(e);
-        }
-        finally
-        {
-            closeQuietly(cnx);
         }
     }
 

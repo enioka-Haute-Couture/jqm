@@ -48,5 +48,10 @@ Command Line Interface (CLI)
 	
 	display JQM engine version
 
+.. option:: -p, --resources
+
+	use specified resource.xml file (the file containing the database connection string). Default is JQM_HOME/config/resources.xml
 
 .. note:: Common options like start, createnode, importxml etc. can be used with convenience script jqm.sh / jqm.ps1
+
+.. warning:: a few options exist which are not documented here. They are internal and are not part the API (may change without notice, etc).

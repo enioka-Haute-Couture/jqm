@@ -165,6 +165,9 @@ class XmlConfigurationParser
             List<DeploymentParameter> mappings = DeploymentParameter.select(cnx, "dp_select_all_with_names");
 
             // Queues
+            cnx.runUpdate("q_update_default_none");
+            Element dqElement = (Element) doc.getElementsByTagName("defaultQueueName").item(0);
+            String dqName = dqElement.getTextContent().trim();
             NodeList qList = doc.getElementsByTagName("queue");
             for (int qIndex = 0; qIndex < qList.getLength(); qIndex++)
             {
@@ -187,6 +190,9 @@ class XmlConfigurationParser
                 // Simple fields
                 q.setName(qElement.getElementsByTagName("name").item(0).getTextContent());
                 q.setDescription(qElement.getElementsByTagName("description").item(0).getTextContent());
+
+                // Default?
+                q.setDefaultQueue(dqName.equals(name));
 
                 // Merge
                 q.update(cnx);
@@ -230,7 +236,7 @@ class XmlConfigurationParser
                     }
                     else
                     {
-                        DeploymentParameter.create(cnx, nodeId, maxThreads, pollingIntervalMs, queueId);
+                        DeploymentParameter.create(cnx, enabled, nodeId, maxThreads, pollingIntervalMs, queueId);
                     }
                 }
 

@@ -128,7 +128,7 @@ public class Main
                 .withDescription("resource parameter file to use. Default is resources.xml").withLongOpt("resources").create("p");
         Option o141 = OptionBuilder.withArgName("login,password,role1,role2,...").hasArgs(Option.UNLIMITED_VALUES).withValueSeparator(',')
                 .withDescription("Create or update a JQM account. Roles must exist beforehand.").create("U");
-        Option o151 = OptionBuilder.withArgName("configXmlFile").hasArg().withDescription("Import this file").withLongOpt("configXmlFile")
+        Option o151 = OptionBuilder.withArgName("configXmlFile").hasArg().withDescription("Import this file. JQM internal use only.").withLongOpt("configXmlFile")
                 .create("c");
 
         Options options = new Options();

@@ -185,9 +185,10 @@ public class DeploymentParameter
     /**
      * Create a new entry in the database. No commit performed.
      */
-    public static DeploymentParameter create(DbConn cnx, Integer nodeId, Integer nbThread, Integer pollingInterval, Integer qId)
+    public static DeploymentParameter create(DbConn cnx, Boolean enabled, Integer nodeId, Integer nbThread, Integer pollingInterval,
+            Integer qId)
     {
-        QueryResult r = cnx.runUpdate("dp_insert", true, nbThread, pollingInterval, nodeId, qId);
+        QueryResult r = cnx.runUpdate("dp_insert", enabled, nbThread, pollingInterval, nodeId, qId);
         DeploymentParameter res = new DeploymentParameter();
         res.id = r.getGeneratedId();
         res.node = nodeId;
@@ -196,6 +197,11 @@ public class DeploymentParameter
         res.queue = qId;
 
         return res;
+    }
+
+    public static DeploymentParameter create(DbConn cnx, Integer nodeId, Integer nbThread, Integer pollingInterval, Integer qId)
+    {
+        return create(cnx, true, nodeId, nbThread, pollingInterval, qId);
     }
 
     public static List<DeploymentParameter> select(DbConn cnx, String query_key, Object... args)
