@@ -19,6 +19,7 @@
 package com.enioka.jqm.tools;
 
 import java.io.File;
+import java.util.List;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -37,7 +38,9 @@ import org.w3c.dom.NodeList;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.Queue;
 
 class XmlConfigurationParser
 {
@@ -156,6 +159,83 @@ class XmlConfigurationParser
 
                 GlobalParameter.setParameter(cnx, key, value);
                 jqmlogger.info("Imported global parameter key: " + key + " - value: " + value);
+            }
+
+            // Mapping cache
+            List<DeploymentParameter> mappings = DeploymentParameter.select(cnx, "dp_select_all_with_names");
+
+            // Queues
+            NodeList qList = doc.getElementsByTagName("queue");
+            for (int qIndex = 0; qIndex < qList.getLength(); qIndex++)
+            {
+                Node qNode = qList.item(qIndex);
+                if (qNode.getNodeType() != Node.ELEMENT_NODE)
+                {
+                    continue;
+                }
+                Element qElement = (Element) qNode;
+
+                String name = qElement.getElementsByTagName("name").item(0).getTextContent().trim();
+                String description = qElement.getElementsByTagName("description").item(0).getTextContent().trim();
+
+                Queue q = CommonXml.findQueue(name, cnx);
+                if (q == null)
+                {
+                    q = new Queue();
+                }
+
+                // Simple fields
+                q.setName(qElement.getElementsByTagName("name").item(0).getTextContent());
+                q.setDescription(qElement.getElementsByTagName("description").item(0).getTextContent());
+
+                // Merge
+                q.update(cnx);
+
+                int queueId = Queue.select_key(cnx, name).getId();
+
+                // Mappings
+                NodeList mList = qElement.getElementsByTagName("mapping");
+                for (int mIndex = 0; mIndex < mList.getLength(); mIndex++)
+                {
+                    Node mNode = mList.item(mIndex);
+                    if (mNode.getNodeType() != Node.ELEMENT_NODE)
+                    {
+                        continue;
+                    }
+                    Element mElement = (Element) mNode;
+
+                    String nodeName = mElement.getElementsByTagName("nodeName").item(0).getTextContent();
+                    int maxThreads = Integer.parseInt(mElement.getElementsByTagName("maxThreads").item(0).getTextContent().trim());
+                    int pollingIntervalMs = Integer
+                            .parseInt(mElement.getElementsByTagName("pollingIntervalMs").item(0).getTextContent().trim());
+                    boolean enabled = Boolean.parseBoolean(mElement.getElementsByTagName("enabled").item(0).getTextContent().trim());
+
+                    // existing mapping?
+                    int nodeId = com.enioka.jqm.model.Node.select_single(cnx, "node_select_by_key", nodeName).getId();
+
+                    DeploymentParameter dp = null;
+                    for (DeploymentParameter dpp : mappings)
+                    {
+                        if (dpp.getQueue() == queueId && dpp.getNode() == nodeId)
+                        {
+                            dp = dpp;
+                            break;
+                        }
+                    }
+
+                    if (dp != null)
+                    {
+                        cnx.runUpdate("dp_update_changed_by_id", enabled, maxThreads, pollingIntervalMs, nodeId, queueId, dp.getId(),
+                                enabled, maxThreads, pollingIntervalMs, nodeId, queueId);
+                    }
+                    else
+                    {
+                        DeploymentParameter.create(cnx, nodeId, maxThreads, pollingIntervalMs, queueId);
+                    }
+                }
+
+                // Done
+                jqmlogger.info("Imported queue: " + name + " - " + description);
             }
 
             // Done

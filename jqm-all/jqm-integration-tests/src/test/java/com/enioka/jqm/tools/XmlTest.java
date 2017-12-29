@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.NodeDto;
+import com.enioka.api.admin.QueueMappingDto;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.Queue;
@@ -350,6 +351,18 @@ public class XmlTest extends JqmBaseTest
 
         Assert.assertEquals("value1", MetaService.getGlobalParameter(cnx, "key1").getValue());
 
+        QueueMappingDto queueMapping = null;
+        for (QueueMappingDto qm : MetaService.getQueueMappings(cnx))
+        {
+            if (qm.getNodeName().equals("Node1"))
+            {
+                queueMapping = qm;
+                break;
+            }
+        }
+        Assert.assertNotNull(queueMapping);
+        Assert.assertEquals((Integer) 2000, queueMapping.getPollingInterval());
+
         // 2nd import (other file) = update
         XmlConfigurationParser.parse("target/payloads/jqm-test-xml/xmlnodeimport2.xml", cnx);
         cnx.commit();
@@ -386,6 +399,18 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals("WARNING", node.getRootLogLevel());
 
         Assert.assertEquals("value2", MetaService.getGlobalParameter(cnx, "key1").getValue());
+
+        queueMapping = null;
+        for (QueueMappingDto qm : MetaService.getQueueMappings(cnx))
+        {
+            if (qm.getNodeName().equals("Node1"))
+            {
+                queueMapping = qm;
+                break;
+            }
+        }
+        Assert.assertNotNull(queueMapping);
+        Assert.assertEquals((Integer) 5000, queueMapping.getPollingInterval());
 
         // 3rd import (same file) = stable
         XmlConfigurationParser.parse("target/payloads/jqm-test-xml/xmlnodeimport2.xml", cnx);

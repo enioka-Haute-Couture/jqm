@@ -7,11 +7,26 @@ ARG WINDOWS_TAG=1709
 ###############################################################################
 FROM jqm/maven:latest AS builder
 
+WORKDIR /jqm-all
+
+# This WILL download the whole Maven Central repository on each build.
+# Attempt 1 to avoid this: 
+# Copy all poms ls -Recurse pom.xml | resolve-path -Relative |? {select-string -NotMatch "target|bin" -InputObject $_} |% {echo "COPY $_ $(Split-Path -Parent $_)\".Replace("\", "/")}
+# RUN mvn dependency:go-offline # sadly no: https://issues.apache.org/jira/browse/MDEP-204 (reactor not used by this goal)
+
+# Attempt 2: use Nexus. But Nexus has big issues when using volumes...
+# If you HAVE a Nexus or another Central caching reverse proxy, just use setting.xml.
+
+
+# Build
+COPY ./docker/windows/settings.xml .
 COPY ./jqm-all .
 
-ENV SKIP_TESTS=true
+ENV SKIP_TESTS=true \
+	MVN_SETTINGS=" "
+#   MVN_SETTINGS="-s settings.xml"
 
-RUN mvn install -DskipTests
+RUN mvn install -DskipTests %MVN_SETTINGS%
 RUN IF /I NOT "%SKIP_TESTS%" == "true" (mvn test) ELSE (echo "Skipping tests")
 
 
@@ -23,7 +38,7 @@ FROM microsoft/powershell:nanoserver AS installer
 
 SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-COPY --from=builder c:\\jqm-service\\target\\jqm-2.1.0-SNAPSHOT.zip .
+COPY --from=builder c:/jqm-all/jqm-service/target/jqm-2.1.0-SNAPSHOT.zip .
 
 RUN Expand-Archive jqm*.zip -DestinationPath C:/; \
     rm *.zip; \

@@ -21,6 +21,26 @@
 		</node>
 	</nodes>
 
+	<queues>
+		<queue>
+			<name>Queue1</name>
+			<description>test queue 1</description>
+			<mappings>
+				<mapping>
+					<nodeName>Node1</nodeName>
+					<maxThreads>10</maxThreads>
+					<pollingIntervalMs>5000</pollingIntervalMs>
+					<enabled>true</enabled>
+				</mapping>
+			</mappings>
+		</queue>
+		<queue>
+			<name>Queue2</name>
+			<description>test queue 2</description>
+			<mappings></mappings>
+		</queue>
+	</queues>
+
 	<globalParameters>
 		<parameter>
 			<key>key1</key>

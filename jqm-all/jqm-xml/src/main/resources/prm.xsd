@@ -6,6 +6,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element minOccurs="1" maxOccurs="1" ref="nodes" />
+				<xs:element minOccurs="1" maxOccurs="1" ref="queues" />
 				<xs:element minOccurs="1" maxOccurs="1" ref="globalParameters" />
 			</xs:sequence>
 		</xs:complexType>
@@ -81,6 +82,41 @@
 			<xs:sequence>
 				<xs:element name="key" type="xs:string" />
 				<xs:element name="value" type="xs:string" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="queues">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="1" maxOccurs="unbounded" ref="queue" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="queue">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string" />
+				<xs:element name="description" type="xs:string" />
+				<xs:element name="mappings">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element minOccurs="0" maxOccurs="unbounded" ref="mapping" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="mapping">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="nodeName" type="xs:string" />
+				<xs:element name="maxThreads" type="xs:int" />
+				<xs:element name="pollingIntervalMs" type="xs:int" />
+				<xs:element name="enabled" type="xs:boolean" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

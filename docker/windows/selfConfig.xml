@@ -20,6 +20,33 @@
 			<logLevel>INFO</logLevel>
 		</node>
 	</nodes>
+	
+	<queues>
+		<queue>
+			<name>Queue1</name>
+			<description>test queue 1</description>
+			<mappings>
+				<mapping>
+					<nodeName>ContainerNode</nodeName>
+					<maxThreads>10</maxThreads>
+					<pollingIntervalMs>2000</pollingIntervalMs>
+					<enabled>true</enabled>
+				</mapping>
+			</mappings>
+		</queue>
+		<queue>
+			<name>Queue2</name>
+			<description>test queue 2</description>
+			<mappings>
+				<mapping>
+					<nodeName>ContainerNode</nodeName>
+					<maxThreads>3</maxThreads>
+					<pollingIntervalMs>60000</pollingIntervalMs>
+					<enabled>false</enabled>
+				</mapping>
+			</mappings>
+		</queue>
+	</queues>
 
 	<globalParameters>
 		<parameter>
