@@ -16,15 +16,25 @@
 package com.enioka.jqm.api.test;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
 import com.enioka.jqm.api.Query.Sort;
 import com.enioka.jqm.api.State;
+import com.enioka.jqm.jdbc.Db;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.Instruction;
+import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.JobDef.PathType;
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Queue;
 
 /**
  * Simple tests for checking query syntax (no data)
@@ -182,5 +192,43 @@ public class BasicTest
     public void testBug292()
     {
         Query.create().addSortDesc(Query.Sort.ID).setQueueName("QBATCH").setQueryHistoryInstances(true).setQueryLiveInstances(true).run();
+    }
+
+    @Test
+    public void testBug305()
+    {
+        Properties p = new Properties();
+        p.putAll(Db.loadProperties());
+        Db db = new Db(p);
+        DbConn cnx = null;
+        try
+        {
+            cnx = db.getConn();
+
+            int qId = Queue.create(cnx, "q1", "q1 description", true);
+            int jobDefdId = JobDef.create(cnx, "test description", "class", null, "jar", qId, 1, "appName", null, null, null, null, null,
+                    false, null, PathType.FS);
+
+            JobInstance.enqueue(cnx, com.enioka.jqm.model.State.RUNNING, qId, jobDefdId, null, null, null, null, null, null, null, null,
+                    null, false, false, null, 1, Instruction.RUN, new HashMap<String, String>());
+            JobInstance.enqueue(cnx, com.enioka.jqm.model.State.RUNNING, qId, jobDefdId, null, null, null, null, null, null, null, null,
+                    null, false, false, null, 1, Instruction.RUN, new HashMap<String, String>());
+            cnx.commit();
+
+            Properties p2 = new Properties();
+            p2.put("com.enioka.jqm.jdbc.contextobject", db);
+            List<com.enioka.jqm.api.JobInstance> res = JqmClientFactory.getClient("test", p2, false)
+                    .getJobs(Query.create().setQueryHistoryInstances(false).setQueryLiveInstances(true).addSortDesc(Query.Sort.ID)
+                            .setPageSize(1).setApplicationName("appName"));
+
+            Assert.assertEquals(1, res.size());
+        }
+        finally
+        {
+            if (cnx != null)
+            {
+                cnx.closeQuietly(cnx);
+            }
+        }
     }
 }
