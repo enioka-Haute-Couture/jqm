@@ -18,6 +18,9 @@
 
 package com.enioka.jqm.tools;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.cli.BasicParser;
@@ -29,6 +32,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -128,8 +132,8 @@ public class Main
                 .withDescription("resource parameter file to use. Default is resources.xml").withLongOpt("resources").create("p");
         Option o141 = OptionBuilder.withArgName("login,password,role1,role2,...").hasArgs(Option.UNLIMITED_VALUES).withValueSeparator(',')
                 .withDescription("Create or update a JQM account. Roles must exist beforehand.").create("U");
-        Option o151 = OptionBuilder.withArgName("configXmlFile").hasArg().withDescription("Import this file. JQM internal use only.").withLongOpt("configXmlFile")
-                .create("c");
+        Option o151 = OptionBuilder.withArgName("configXmlFile").hasArg().withDescription("Import this file. JQM internal use only.")
+                .withLongOpt("configXmlFile").create("c");
 
         Options options = new Options();
         OptionGroup og1 = new OptionGroup();
@@ -302,8 +306,32 @@ public class Main
                 return;
             }
 
-            String[] pathes = xmlpath.split(",");
-            for (String path : pathes)
+            // The parameter is a list of deployment descriptor files OR of directory which may contain descriptor files (XML).
+            List<String> expandedPathes = new ArrayList<String>();
+            for (String path : xmlpath.split(","))
+            {
+                File f = new File(path);
+                if (!f.exists())
+                {
+                    jqmlogger.fatal("File does not exist: " + path);
+                    return;
+                }
+
+                if (f.isDirectory())
+                {
+                    for (File xmlFile : FileUtils.listFiles(f, new String[] { "xml" }, true))
+                    {
+                        expandedPathes.add(xmlFile.getPath());
+                    }
+                }
+                else
+                {
+                    expandedPathes.add(path);
+                }
+            }
+
+            // Parse each file.
+            for (String path : expandedPathes)
             {
                 XmlJobDefParser.parse(path, cnx);
             }
