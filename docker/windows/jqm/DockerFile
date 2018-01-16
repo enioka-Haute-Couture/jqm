@@ -1,11 +1,10 @@
-ARG WINDOWS_TAG=1709
-
-
-
 ###############################################################################
 ## Build inside full JDK image.
 ###############################################################################
-FROM jqm/maven:latest AS builder
+FROM enioka/buildhelpers:maven-3.5.2 AS builder
+
+ARG MVN_SETTINGS=" "
+ARG SKIP_TESTS=true
 
 WORKDIR /jqm-all
 
@@ -17,14 +16,8 @@ WORKDIR /jqm-all
 # Attempt 2: use Nexus in another container. But Nexus (like most Java programs) has big issues when using volumes due to a JDK bug...
 # If you HAVE a Nexus or another Central caching reverse proxy, just use setting.xml.
 
-
 # Build
-COPY ./docker/windows/settings.xml .
-COPY ./jqm-all .
-
-ENV SKIP_TESTS=true \
-	MVN_SETTINGS=" "
-#   MVN_SETTINGS="-s settings.xml"
+COPY ./docker/windows/nexus/settings.xml ./jqm-all ./
 
 RUN mvn install -DskipTests %MVN_SETTINGS%
 RUN IF /I NOT "%SKIP_TESTS%" == "true" (mvn test) ELSE (echo "Skipping tests")
@@ -50,10 +43,10 @@ RUN Expand-Archive jqm*.zip -DestinationPath C:/; \
 ###############################################################################
 ## Actual image, based on minimal JRE.
 ###############################################################################
-FROM jqm/openjdk:latest-jre
+FROM enioka/buildhelpers:jre-1.8.0.151-1
 
 COPY --from=installer C:/jqm/ C:/jqm/
-COPY ./docker/windows/selfConfig.xml C:/jqm/selfConfig.xml
+COPY ./docker/windows/jqm/selfConfig.xml C:/jqm/selfConfig.xml
 
 ENV JAVA_OPTS "-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m"
 

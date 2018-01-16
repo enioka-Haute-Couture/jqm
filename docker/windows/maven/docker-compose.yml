@@ -1,0 +1,15 @@
+version: "3.4"
+services:
+    mvn:
+        build:
+            context: .
+            dockerfile: DockerFile
+            labels:
+                com.enioka.description: "build helper - Maven build for windows nano 1709"
+            args:
+                - JDK_VERSION=1.8.0.151-1
+        image: enioka/buildhelpers:maven-3.5.2
+        hostname: maven
+        environment:
+            - MVN_VERSION="3.5.2"
+            - MVN_MD5="b8d8d49d8178734124c4ff6f3a409d3d"   
