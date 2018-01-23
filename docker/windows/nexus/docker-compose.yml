@@ -1,8 +1,9 @@
+# Optional build environment - a Nexus Maven cache server.
 version: "3.4"
 services:
     nexus:
         build:
-            context: ./nexus/
+            context: .
             dockerfile: DockerFile
             labels:
                 com.enioka.description: "build helper - Maven cache"
