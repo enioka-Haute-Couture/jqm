@@ -46,6 +46,7 @@ import javax.naming.spi.InitialContextFactory;
 import javax.naming.spi.InitialContextFactoryBuilder;
 import javax.naming.spi.NamingManager;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,7 +109,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
         List<URL> urls = new ArrayList<URL>();
         if (extDir.isDirectory())
         {
-            for (File f : extDir.listFiles())
+            for (File f : FileUtils.listFiles(extDir, new String[] { "jar", "war", "bar" }, true))
             {
                 if (!f.canRead())
                 {
@@ -200,8 +201,9 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
                 try
                 {
                     ResourceFactory rf = new ResourceFactory(
-                            Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.tools.JarClassLoader ? Thread
-                                    .currentThread().getContextClassLoader() : extResources);
+                            Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.tools.JarClassLoader
+                                    ? Thread.currentThread().getContextClassLoader()
+                                    : extResources);
                     res = rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
                 }
                 catch (Exception e)
@@ -215,8 +217,8 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
                 // Cache result
                 if (res.getClass().getClassLoader() instanceof JarClassLoader)
                 {
-                    jqmlogger
-                            .warn("A JNDI resource was defined as singleton but was loaded by a payload class loader - it won't be cached to avoid class loader leaks");
+                    jqmlogger.warn(
+                            "A JNDI resource was defined as singleton but was loaded by a payload class loader - it won't be cached to avoid class loader leaks");
                 }
                 else
                 {
@@ -230,9 +232,8 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
                         {
                             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
                             ObjectName jmxname = new ObjectName("com.enioka.jqm:type=JdbcPool,name=" + name);
-                            mbs.registerMBean(
-                                    res.getClass().getMethod("getPool").invoke(res).getClass().getMethod("getJmxPool")
-                                            .invoke(res.getClass().getMethod("getPool").invoke(res)), jmxname);
+                            mbs.registerMBean(res.getClass().getMethod("getPool").invoke(res).getClass().getMethod("getJmxPool")
+                                    .invoke(res.getClass().getMethod("getPool").invoke(res)), jmxname);
                             jmxNames.add(jmxname);
                         }
                         catch (Exception e)
@@ -253,8 +254,9 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
             // We use the current thread loader to find the resource and resource factory class - ext is inside that CL.
             // This is done only for payload CL - engine only need ext, not its own CL (as its own CL does NOT include ext).
             ResourceFactory rf = new ResourceFactory(
-                    Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.tools.JarClassLoader ? Thread.currentThread()
-                            .getContextClassLoader() : extResources);
+                    Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.tools.JarClassLoader
+                            ? Thread.currentThread().getContextClassLoader()
+                            : extResources);
             return rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
         }
         catch (Exception e)
