@@ -40,7 +40,7 @@ RUN Expand-Archive jqm*.zip -DestinationPath C:/; \
     mkdir C:/jqm/ext/drivers >$null;
 #	mkdir c:/jqm/jobs/jqm-demo/jqm-test-pyl/lib/
 
-COPY ./docker/windows/jqm/resource.bat C:/jqm/bin/
+COPY ./docker/windows/jqm/*.bat C:/jqm/bin/
 
 
 	
@@ -71,4 +71,4 @@ VOLUME C:/jqm/hotdeploy/ \
 WORKDIR C:/jqm
 RUN java -jar jqm.jar -u && java -jar jqm.jar -c selfConfig.xml && java -jar jqm.jar -importjobdef ./jobs/jqm-demo && DEL /Q .\logs\*
 
-ENTRYPOINT C:\jqm\bin\resource.bat && java %JAVA_OPTS% -jar jqm.jar -startnode %JQM_NODE_NAME%
+ENTRYPOINT C:\jqm\bin\resource.bat && C:\jqm\bin\node.bat && java %JAVA_OPTS% -jar jqm.jar -startnode %JQM_NODE_NAME%
