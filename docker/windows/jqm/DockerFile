@@ -38,9 +38,8 @@ RUN Expand-Archive jqm*.zip -DestinationPath C:/; \
     mv jqm* c:/jqm; \
     mkdir C:/jqm/hotdeploy >$null; \
     mkdir C:/jqm/ext/drivers >$null;
-#	mkdir c:/jqm/jobs/jqm-demo/jqm-test-pyl/lib/
 
-COPY ./docker/windows/jqm/*.bat C:/jqm/bin/
+COPY ./docker/windows/jqm/*.bat ./docker/windows/jqm/*.jar C:/jqm/bin/
 
 
 	
@@ -72,3 +71,6 @@ WORKDIR C:/jqm
 RUN java -jar jqm.jar -u && java -jar jqm.jar -c selfConfig.xml && java -jar jqm.jar -importjobdef ./jobs/jqm-demo && DEL /Q .\logs\*
 
 ENTRYPOINT C:\jqm\bin\resource.bat && C:\jqm\bin\node.bat && java %JAVA_OPTS% -jar jqm.jar -startnode %JQM_NODE_NAME%
+
+# Healthcheck is commented-out. Too costly. Should instead use an active check from the engine.
+#HEALTHCHECK --interval=60s --start-period=30s --retries=1 --timeout=10s CMD echo get -b com.enioka.jqm:name=%JQM_NODE_NAME%,type=Node AllPollersPolling | java -jar C:\jqm\bin\jmx.jar -n -l "service:jmx:rmi://localhost:1791/jndi/rmi://localhost:1790/jmxrmi" -e -v silent
