@@ -48,3 +48,7 @@ html,body {
 .ui-grid-header-cell {
 	background-color: rgb(240, 240, 238);
 }
+
+.history-detail-td {
+    word-break: break-all;
+}
