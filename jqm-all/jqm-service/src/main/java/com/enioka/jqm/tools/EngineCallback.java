@@ -19,6 +19,7 @@ public class EngineCallback implements JqmEngineHandler
     private static Logger jqmlogger = Logger.getLogger(EngineCallback.class);
 
     private JettyServer server = null;
+    private DirectoryScanner scanner = null;
     private String logLevel = "INFO";
     private String nodePrms = null;
     private Calendar latestJettyRestart = Calendar.getInstance();
@@ -87,6 +88,14 @@ public class EngineCallback implements JqmEngineHandler
         this.server = new JettyServer();
         this.server.start(node, cnx);
 
+        // Deployment scanner
+        String gp2 = GlobalParameter.getParameter(cnx, "directoryScannerRoot", "");
+        if (!gp2.isEmpty())
+        {
+            scanner = new DirectoryScanner(gp2, node);
+            (new Thread(scanner)).start();
+        }
+
         cnx.close();
     }
 
@@ -94,6 +103,10 @@ public class EngineCallback implements JqmEngineHandler
     public void onNodeStopped()
     {
         this.server.stop();
+        if (this.scanner != null)
+        {
+            this.scanner.stop();
+        }
     }
 
     @Override

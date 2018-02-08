@@ -43,8 +43,8 @@ import com.enioka.jqm.model.Cl;
 import com.enioka.jqm.model.ClEvent;
 import com.enioka.jqm.model.ClHandler;
 import com.enioka.jqm.model.JobDef;
-import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.JobDef.PathType;
+import com.enioka.jqm.model.Queue;
 
 class XmlJobDefParser
 {
@@ -59,10 +59,28 @@ class XmlJobDefParser
      * Will import all JobDef from an XML file. Creates and commits a transaction.
      * 
      * @param path
+     *            full or relative path to the deployment descriptor to read.
      * @param cnx
+     *            a database connection to use with no active transaction.
      * @throws JqmEngineException
      */
     static void parse(String path, DbConn cnx) throws JqmXmlException
+    {
+        parse(path, cnx, null);
+    }
+
+    /**
+     * Will import all JobDef from an XML file. Creates and commits a transaction.
+     * 
+     * @param path
+     *            full or relative path to the deployment descriptor to read.
+     * @param cnx
+     *            a database connection to use with no active transaction.
+     * @param overrideJarBasePath
+     *            ignore the base path of the jar in the deployment descriptor and use this one. It must be relative to to repository root.
+     * @throws JqmEngineException
+     */
+    static void parse(String path, DbConn cnx, String overrideJarBasePath) throws JqmXmlException
     {
         // Argument checks
         jqmlogger.trace(path);
@@ -213,6 +231,14 @@ class XmlJobDefParser
                 Element jarElement = (Element) jarNode;
                 NodeList jdList = jarElement.getElementsByTagName("jobDefinition");
 
+                // Potentially remap jar path
+                String jarPath = jarElement.getElementsByTagName("path").item(0).getTextContent().trim();
+                if (overrideJarBasePath != null)
+                {
+                    String fileName = (new File(jarPath)).getName();
+                    jarPath = (new File(overrideJarBasePath, fileName)).getPath();
+                }
+
                 for (int jdIndex = 0; jdIndex < jdList.getLength(); jdIndex++)
                 {
                     Element jdElement = (Element) jdList.item(jdIndex);
@@ -269,9 +295,10 @@ class XmlJobDefParser
                     }
 
                     // Simple jar attributes
-                    jd.setJarPath(jarElement.getElementsByTagName("path").item(0).getTextContent().trim());
+                    jd.setJarPath(jarPath);
                     jd.setPathType(PathType.valueOf(jarElement.getElementsByTagName("pathType").getLength() > 0
-                            ? jarElement.getElementsByTagName("pathType").item(0).getTextContent().trim() : "FS"));
+                            ? jarElement.getElementsByTagName("pathType").item(0).getTextContent().trim()
+                            : "FS"));
 
                     // Simple JD attributes
                     jd.setCanBeRestarted(

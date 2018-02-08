@@ -44,25 +44,27 @@ It uses a ready to use single-node JQM install configured with sensible options 
 
 Run: `docker run -it -p 1789:1789 -v /path/to/target/build/directory:/jqm/hotdeploy enioka/jqm`
 
-The web UI is then available on the local machine, port 1789.
+Adapt pathes to your environments (and do not forget C:/ on WIndows). The web UI is made available on the local machine, port 1789.
+
+Configure your build system (Maven, Gradle, Ant...) to copy your job and deployment descriptor (jars and the XML) inside /path/to/target/build/directory/myjob (myjob is a name of your choosing. Do not copy files directly inside the mount directory). Files should disappear after a few seconds, and jobs should appear as ready to run inside the web UI.
 
 Use CTRL+C to exit the node (obviously, running the node in the background then using `docker stop` also works).
 
-To deploy your batch jobs, copy both the jar and the XML deployment descriptor inside the /jqm/hotdeploy mount.
-* A hotdeploy sub-directory is a `deployment unit`. It contains the deployment descriptor and the jar files referenced by this deployment descriptor.
-  * The name of this sub-directory is important, as subsequent deployments with the same name will replace each other.
-  * Only first-level sub-directories are scanned.
-* The deployment mechanism is triggered by the deployment descriptor.
-  * When copying files into a subdirectory it is therefore preferable to copy the descriptor last.
-  * To avoid using `inotify` which has cross-platform issues, the directories are simply scanned every 30s.
-* There can only be a single deployment descriptor per sub-directory. Directories with multiple XML files are ignored.
-* The jqm.jar.path inside the deployment descriptor is interpreted without its full path (JQM will use its own directory structure). The file name (base name in Unix terms) inside this path is however still very important, as there may be multiple jar files per deployment unit. This allows to reuse the "production" deployment descriptor directly.
-* All files are moved regardless of their nature, respecting existing directory structure. (such as an eventual `lib` directory with libraries, see [the packaging documentation](https://jqm.readthedocs.io/en/latest/jobs/packaging.html#libraries-handling))
-* The files are removed from hotdeploy on success. (sub-directory is emptied, but not removed)
-
-This (in the end, a simple file copy) can easily be automated with any build tool on each build.
-
-> Note: this deployment mechanism is a Docker image specificity, and is not available on non-Docker deployments. It is also only available in single-node deployments.
+> In more details...
+> 
+> To deploy your batch jobs, copy both the jar and the XML deployment descriptor inside the /jqm/hotdeploy mount.
+> * A hotdeploy sub-directory is a `deployment unit`. It contains the deployment descriptor and the jar files referenced by this deployment descriptor.
+>   * The name of this sub-directory is important, as subsequent deployments with the same name will replace each other.
+>   * Only first-level sub-directories are scanned.
+> * The deployment mechanism is triggered by the deployment descriptor.
+>   * When copying files into a subdirectory it is therefore preferable to copy the descriptor last.
+>   * To avoid using `inotify` which has cross-platform issues, the directories are simply scanned every 30s.
+> * There can only be a single deployment descriptor per sub-directory. Directories with multiple XML files are ignored.
+> * The jqm.jar.path inside the deployment descriptor is interpreted without its full path (JQM will use its own directory structure). The file name (base name in Unix terms) inside this path is however still very important, as there may be multiple jar files per deployment unit. This allows to reuse the "production" deployment descriptor directly.
+> * All files are moved regardless of their nature, respecting existing directory structure. (such as an eventual `lib` directory with libraries, see [the packaging documentation](https://jqm.readthedocs.io/en/latest/jobs/packaging.html#libraries-handling))
+> * The files are removed from hotdeploy on success. (sub-directory is emptied, but not removed)
+>
+> This deployment mechanism is a Docker image specificity, and is **not available on non-Docker deployments**. It is also only available in single-node deployments.
 
 > Note: in this scenario, the database is inside the container. So deleting the container deletes the database and all configuration changes with it.
 

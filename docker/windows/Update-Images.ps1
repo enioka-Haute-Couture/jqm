@@ -40,10 +40,10 @@ if ($UseNexus) {
     # Wait for startup
     $ErrorActionPreference = "SilentlyContinue"
     Write-Progress -Activity "Starting Nexus" -Status "Waiting for Nexus to be up"
-    $r = Invoke-WebRequest "http://$env:COMPUTERNAME`:8081" -UseBasicParsing -DisableKeepAlive -Method Head -TimeoutSec 5 2>$null
+    $r = Invoke-WebRequest "http://nexus:8081/static/rapture/resources/fonts/proxima-nova/stylesheet.css" -UseBasicParsing -DisableKeepAlive -Method Head -TimeoutSec 5 2>$null
     while ($r = $null -or $r.statuscode -ne 200) {
         Start-Sleep -Seconds 1
-        $r = Invoke-WebRequest "http://$env:COMPUTERNAME`:8081" -UseBasicParsing -DisableKeepAlive -Method Head -TimeoutSec 5 2>$null
+        $r = Invoke-WebRequest "http://nexus:8081/static/rapture/resources/fonts/proxima-nova/stylesheet.css" -UseBasicParsing -DisableKeepAlive -Method Head -TimeoutSec 5 2>$null
     }
     $ErrorActionPreference = "Stop"
     Write-Progress -Activity "Starting Nexus" -Completed
