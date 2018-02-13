@@ -351,7 +351,12 @@ public class ClientApiTest extends JqmBaseTest
         addAndStartEngine();
         TestHelpers.waitFor(1, 10000, cnx);
 
+        Assert.assertEquals(1, JqmClientFactory.getClient().getQueueCapacity(qV));
+
         JqmClientFactory.getClient().pauseQueue(qV);
+
+        Assert.assertEquals(0, JqmClientFactory.getClient().getQueueCapacity(qV));
+
         this.sleep(1); // This sleep is because: parameters are refreshed on poller loop start, so let the loop end.
         JobRequest.create("MarsuApplication", "TestUser").submit();
         this.sleep(1);

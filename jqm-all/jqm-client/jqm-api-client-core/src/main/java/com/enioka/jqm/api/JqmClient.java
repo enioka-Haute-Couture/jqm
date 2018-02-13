@@ -531,6 +531,14 @@ public interface JqmClient
      */
     QueueStatus getQueueStatus(Queue q);
 
+    /**
+     * Query capacity.
+     *
+     * @param q the queue to query
+     * @return sum of maximum parallel instances for the queue around the active nodes
+     */
+    int getQueueCapacity(Queue q);
+
     // /////////////////////////////////////////////////////////////////////
     // Parameters retrieval
     // /////////////////////////////////////////////////////////////////////

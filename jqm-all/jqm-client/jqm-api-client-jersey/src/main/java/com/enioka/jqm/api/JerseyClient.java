@@ -908,6 +908,23 @@ final class JerseyClient implements JqmClient
         }
     }
 
+    @Override
+    public int getQueueCapacity(Queue q)
+    {
+        try
+        {
+            return target.path("q/" + q.getId() + "/capacity").request().get().readEntity(Integer.class);
+        }
+        catch (BadRequestException e)
+        {
+            throw new JqmInvalidRequestException(e.getResponse().readEntity(String.class), e);
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException(e);
+        }
+    }
+
     // /////////////////////////////////////////////////////////////////////
     // Parameters retrieval
     // /////////////////////////////////////////////////////////////////////

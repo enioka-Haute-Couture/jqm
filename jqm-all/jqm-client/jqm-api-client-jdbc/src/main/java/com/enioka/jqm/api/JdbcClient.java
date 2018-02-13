@@ -2112,6 +2112,32 @@ final class JdbcClient implements JqmClient
         }
     }
 
+    @Override
+    public int getQueueCapacity(com.enioka.jqm.api.Queue q) {
+        int capacity = 0;
+        DbConn cnx = null;
+        try
+        {
+            cnx = getDbSession();
+            ResultSet rs = cnx.runSelect("dp_select_enabled_for_queue", q.getId());
+
+            while (rs.next())
+            {
+               capacity = rs.getInt(1);
+            }
+        }
+        catch (Exception e)
+        {
+            throw new JqmClientException("could not query queue capacity around nodes", e);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+
+        return capacity;
+    }
+
     // /////////////////////////////////////////////////////////////////////
     // Parameters retrieval
     // /////////////////////////////////////////////////////////////////////
