@@ -437,6 +437,21 @@ public class ServiceClient implements JqmClient
         return JqmClientFactory.getClient().getQueueStatus(q);
     }
 
+    @Path("q/{qId}/capacity")
+    @GET
+    public int getQueueCapacity(@PathParam("qId") int qId)
+    {
+        Queue q = new Queue();
+        q.setId(qId);
+        return getQueueCapacity(q);
+    }
+
+    @Override
+    public int getQueueCapacity(Queue q)
+    {
+        return JqmClientFactory.getClient().getQueueCapacity(q);
+    }
+
     @Override
     public void dispose()
     {
