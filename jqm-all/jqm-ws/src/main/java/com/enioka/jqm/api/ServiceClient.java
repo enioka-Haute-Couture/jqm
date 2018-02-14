@@ -437,9 +437,9 @@ public class ServiceClient implements JqmClient
         return JqmClientFactory.getClient().getQueueStatus(q);
     }
 
-    @Path("q/{qId}/capacity")
+    @Path("q/{qId}/enabled-capacity")
     @GET
-    public int getQueueCapacity(@PathParam("qId") int qId)
+    public int getQueueEnabledCapacity(@PathParam("qId") int qId)
     {
         Queue q = new Queue();
         q.setId(qId);
