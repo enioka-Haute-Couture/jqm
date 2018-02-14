@@ -2113,13 +2113,13 @@ final class JdbcClient implements JqmClient
     }
 
     @Override
-    public int getQueueCapacity(com.enioka.jqm.api.Queue q) {
+    public int getQueueEnabledCapacity(com.enioka.jqm.api.Queue q) {
         int capacity = 0;
         DbConn cnx = null;
         try
         {
             cnx = getDbSession();
-            ResultSet rs = cnx.runSelect("dp_select_enabled_for_queue", q.getId());
+            ResultSet rs = cnx.runSelect("dp_select_sum_queue_capacity", q.getId());
 
             while (rs.next())
             {
