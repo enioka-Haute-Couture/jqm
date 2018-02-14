@@ -443,13 +443,13 @@ public class ServiceClient implements JqmClient
     {
         Queue q = new Queue();
         q.setId(qId);
-        return getQueueCapacity(q);
+        return getQueueEnabledCapacity(q);
     }
 
     @Override
-    public int getQueueCapacity(Queue q)
+    public int getQueueEnabledCapacity(Queue q)
     {
-        return JqmClientFactory.getClient().getQueueCapacity(q);
+        return JqmClientFactory.getClient().getQueueEnabledCapacity(q);
     }
 
     @Override

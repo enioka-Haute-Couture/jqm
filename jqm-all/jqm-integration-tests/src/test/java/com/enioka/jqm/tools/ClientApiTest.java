@@ -18,6 +18,9 @@
 
 package com.enioka.jqm.tools;
 
+import static com.enioka.jqm.test.helpers.TestHelpers.dpVip;
+import static com.enioka.jqm.test.helpers.TestHelpers.dpVip2;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -351,11 +354,12 @@ public class ClientApiTest extends JqmBaseTest
         addAndStartEngine();
         TestHelpers.waitFor(1, 10000, cnx);
 
-        Assert.assertEquals(1, JqmClientFactory.getClient().getQueueCapacity(qV));
+        // 46: 40 for dpVip + 3 for dpVipMix + dpVipMix2, see TestHelpers
+        Assert.assertEquals(46, JqmClientFactory.getClient().getQueueEnabledCapacity(qV));
 
         JqmClientFactory.getClient().pauseQueue(qV);
 
-        Assert.assertEquals(0, JqmClientFactory.getClient().getQueueCapacity(qV));
+        Assert.assertEquals(0, JqmClientFactory.getClient().getQueueEnabledCapacity(qV));
 
         this.sleep(1); // This sleep is because: parameters are refreshed on poller loop start, so let the loop end.
         JobRequest.create("MarsuApplication", "TestUser").submit();

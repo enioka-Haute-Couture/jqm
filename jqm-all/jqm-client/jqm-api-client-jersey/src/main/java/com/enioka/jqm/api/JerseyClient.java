@@ -909,7 +909,7 @@ final class JerseyClient implements JqmClient
     }
 
     @Override
-    public int getQueueCapacity(Queue q)
+    public int getQueueEnabledCapacity(Queue q)
     {
         try
         {
