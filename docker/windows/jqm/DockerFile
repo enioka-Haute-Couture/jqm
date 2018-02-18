@@ -70,6 +70,7 @@ VOLUME C:/jqm/hotdeploy/ \
 WORKDIR C:/jqm
 RUN java -jar jqm.jar -u && java -jar jqm.jar -c selfConfig.xml && java -jar jqm.jar -importjobdef ./jobs/jqm-demo && DEL /Q .\logs\*
 
+# Run node on startup
 ENTRYPOINT C:\jqm\bin\resource.bat && C:\jqm\bin\node.bat && java %JAVA_OPTS% -jar jqm.jar -startnode %JQM_NODE_NAME%
 
 # Healthcheck is commented-out. Too costly. Should instead use an active check from the engine.

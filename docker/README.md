@@ -73,14 +73,15 @@ Use CTRL+C to exit the node (obviously, running the node in the background then 
 
 In this scenario, batch jobs are packaged inside a custom image. The server still uses an internal HSQLDB database. The result is a ready to run server already containing the jobs (which can in turn be triggered manually, or simply be scheduled).
 
-The only thing needed is to copy the batch files (jar(s) and deployment descriptor(s)) inside the job repository. There is an ONBUILD trigger which will import the deployment descriptor inside the database on build, so there is nothing else to do.
+The only thing needed is to copy the batch files (jar(s) and deployment descriptor(s)) inside the job repository, and import the job decsriptor as in any deployment.
 
 An example Dockerfile would be:
 ```
 FROM enioka/jqm
 
-# Copy jars and deployment descriptors inside the job definiton repository, as in a normal deployment
+# Copy jars and deployment descriptors inside the job definition repository, as in a normal deployment
 COPY buildresult/* C:/jqm/jobs/
+RUN java -jar jqm.jar -importjobdef ./jobs
 ```
 
 The resulting image can then be run just as the base JQM image.
@@ -133,7 +134,7 @@ When using JQM_CREATE_NODE_IF_MISSING, all deployment descriptors inside /jqm/jo
   * /jqm/ext/drivers: an empty directory inside which JDBC drivers (and actually also other shared libraries) may be placed. Mostly useful for developer-computer deployments, as in other deployment types images are created which can directly include these drivers in /jqm/ext.
   * /jqm/hotdeploy: an empty directory in which to copy your batch jobs. Same remark as above.
 * Events
-  * ONBUILD: all xml files inside /jqm/jobs are imported on image build.
+  * ONBUILD: none.
 * Ports
   * 1789: main web service and web UI
   * 1790: JMX registry
