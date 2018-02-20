@@ -913,7 +913,7 @@ final class JerseyClient implements JqmClient
     {
         try
         {
-            return target.path("q/" + q.getId() + "/capacity").request().get().readEntity(Integer.class);
+            return target.path("q/" + q.getId() + "/enabled-capacity").request().get().readEntity(Integer.class);
         }
         catch (BadRequestException e)
         {
