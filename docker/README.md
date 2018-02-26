@@ -73,7 +73,7 @@ Use CTRL+C to exit the node (obviously, running the node in the background then 
 
 In this scenario, batch jobs are packaged inside a custom image. The server still uses an internal HSQLDB database. The result is a ready to run server already containing the jobs (which can in turn be triggered manually, or simply be scheduled).
 
-The only thing needed is to copy the batch files (jar(s) and deployment descriptor(s)) inside the job repository, and import the job decsriptor as in any deployment.
+The only thing needed is to copy the batch files (jar(s) and deployment descriptor(s)) inside the job repository, and import the job descriptor as in any deployment.
 
 An example Dockerfile would be:
 ```
@@ -130,6 +130,7 @@ When using JQM_CREATE_NODE_IF_MISSING, all deployment descriptors inside /jqm/jo
   * JAVA_OPTS: parameters passed as-is to the JVM. Default is: -Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m
   * JQM_CREATE_NODE_IF_MISSING: if set to 1, the node JQM_NODE_NAME is created if it is missing with a default configuration (only polling the default queue). This allows easy swarm scale-out.
   * JQM_ROOT: the JQM installation root. It should not be changed - it exists solely to simplify some scripts.
+  * JQM_HEALTHCHECK_URL: the URL used by the healthcheck. Must be modified if authentication is enabled, no need to touch it otherwise. Default is http://localhost:1789/ws/simple/localnode/health.
 * Mounts
   * /jqm/ext/drivers: an empty directory inside which JDBC drivers (and actually also other shared libraries) may be placed. Mostly useful for developer-computer deployments, as in other deployment types images are created which can directly include these drivers in /jqm/ext.
   * /jqm/hotdeploy: an empty directory in which to copy your batch jobs. Same remark as above.
@@ -139,4 +140,4 @@ When using JQM_CREATE_NODE_IF_MISSING, all deployment descriptors inside /jqm/jo
   * 1789: main web service and web UI
   * 1790: JMX registry
   * 1791: JMX server
-* Health check: none for now (Goal was to have : every minute, the health of the node is checked through the standard JMX node bean. See [the monitoring documentation](https://jqm.readthedocs.io/en/latest/admin/jmx.html) for more details.) - it proved way too costly to recreate a JVM + a JMX connection every minute.
+* Health check: yes, equivalent to calling the JMX bean Node.AllPollersPolling. See [the monitoring documentation](https://jqm.readthedocs.io/en/latest/admin/jmx.html) for more details.

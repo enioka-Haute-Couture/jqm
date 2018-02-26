@@ -39,7 +39,18 @@ RUN Expand-Archive jqm*.zip -DestinationPath C:/; \
     mkdir C:/jqm/hotdeploy >$null; \
     mkdir C:/jqm/ext/drivers >$null;
 
-COPY ./docker/windows/jqm/*.bat ./docker/windows/jqm/*.jar C:/jqm/bin/
+ENV CURL_VERSION="7.58.0"
+ENV CURL_ZIP="https://dl.uxnr.de/build/curl/curl_winssl_msys2_mingw64_stc/curl-${CURL_VERSION}/curl-${CURL_VERSION}.zip"
+
+RUN \
+    Write-Host ('Downloading {0} ...' -f $env:CURL_ZIP); \
+    Invoke-WebRequest -Uri $env:CURL_ZIP -OutFile 'C:/curl.zip'; \
+    Write-Host 'unzipping curl'; \
+    Expand-Archive -Path C:/curl.zip -DestinationPath C:\curl; \
+    Move-Item C:\curl\src\curl.exe C:/jqm/bin/;
+
+COPY ./docker/windows/jqm/*.bat C:/jqm/bin/
+COPY ./docker/windows/jqm/selfConfig.xml C:/jqm/selfConfig.xml
 
 
 	
@@ -49,7 +60,6 @@ COPY ./docker/windows/jqm/*.bat ./docker/windows/jqm/*.jar C:/jqm/bin/
 FROM enioka/buildhelpers:jre-1.8.0.151-1
 
 COPY --from=installer C:/jqm/ C:/jqm/
-COPY ./docker/windows/jqm/selfConfig.xml C:/jqm/selfConfig.xml
 
 ENV JAVA_OPTS="-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m" \
     JQM_ROOT="C:\\jqm" \
@@ -60,7 +70,8 @@ ENV JAVA_OPTS="-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m" \
     JQM_POOL_PASSWORD="" \
     JQM_POOL_DRIVER="org.hsqldb.jdbcDriver" \
     JQM_POOL_VALIDATION_QUERY="SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS" \
-    JQM_POOL_MAX=10
+    JQM_POOL_MAX=10 \
+    JQM_HEALTHCHECK_URL="http://localhost:1789/ws/simple/localnode/health"
 
 EXPOSE 1789 1790 1791
 VOLUME C:/jqm/hotdeploy/ \
@@ -73,5 +84,5 @@ RUN java -jar jqm.jar -u && java -jar jqm.jar -c selfConfig.xml && java -jar jqm
 # Run node on startup
 ENTRYPOINT C:\jqm\bin\resource.bat && C:\jqm\bin\node.bat && java %JAVA_OPTS% -jar jqm.jar -startnode %JQM_NODE_NAME%
 
-# Healthcheck is commented-out. Too costly. Should instead use an active check from the engine.
-#HEALTHCHECK --interval=60s --start-period=30s --retries=1 --timeout=10s CMD echo get -b com.enioka.jqm:name=%JQM_NODE_NAME%,type=Node AllPollersPolling | java -jar C:\jqm\bin\jmx.jar -n -l "service:jmx:rmi://localhost:1791/jndi/rmi://localhost:1790/jmxrmi" -e -v silent
+# Healthcheck is equivalent to calling Node.AllPollersPolling
+HEALTHCHECK --interval=30s --start-period=31s --retries=1 --timeout=10s CMD .\bin\curl --connect-timeout 2 -q --http1.1 -4 -s -S  %JQM_HEALTHCHECK_URL%
