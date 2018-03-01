@@ -124,8 +124,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
         }
 
         DeploymentParameter p = prms.get(0);
-        if (p.getPollingInterval() != this.pollingInterval || (this.maxNbThread > 0 && !p.getEnabled())
-                || (this.maxNbThread == 0 && p.getEnabled()))
+        if (p.getPollingInterval() != this.pollingInterval || (p.getEnabled() && this.maxNbThread != p.getNbThread())
+                || (this.maxNbThread > 0 && !p.getEnabled()) || (this.maxNbThread == 0 && p.getEnabled()))
         {
             applyDeploymentParameter(p);
         }
