@@ -105,33 +105,58 @@ class ClassloaderManager
 
         if (cldef != null)
         {
+            ////////////////////////////////////
             // Specific CL options were given
             String clSharingKey = cldef.getName();
 
-            if (persistentClassLoaders.containsKey(cldef.getId()))
+            // We take great care to reduce locking as much as possible, so this code may seem to be too complicated at first glance.
+            if (cldef.isPersistent())
             {
-                jqmlogger.info("Using an existing specific isolation context : " + clSharingKey);
-                jobClassLoader = persistentClassLoaders.get(cldef.getId());
+                if (persistentClassLoaders.containsKey(cldef.getId()))
+                {
+                    jqmlogger.info("Using an existing specific isolation context : " + clSharingKey);
+                    jobClassLoader = persistentClassLoaders.get(cldef.getId());
+                }
+                else
+                {
+                    synchronized (persistentClassLoaders)
+                    {
+                        if (persistentClassLoaders.containsKey(cldef.getId()))
+                        {
+                            jqmlogger.info("Using an existing specific isolation context : " + clSharingKey);
+                            jobClassLoader = persistentClassLoaders.get(cldef.getId());
+                        }
+                        else
+                        {
+                            jqmlogger.info("Creating a new persistent specific isolation context: " + clSharingKey);
+                            jobClassLoader = new JarClassLoader(parent);
+                            jobClassLoader.setReferenceJobDefName(jd.getApplicationName());
+                            jobClassLoader.mayBeShared(cldef.isPersistent());
+                            jobClassLoader.setHiddenJavaClasses(cldef.getHiddenClasses());
+                            jobClassLoader.setTracing(cldef.isTracingEnabled());
+                            jobClassLoader.setChildFirstClassLoader(cldef.isChildFirst());
+
+                            persistentClassLoaders.put(cldef.getId(), jobClassLoader);
+                        }
+                    }
+                }
             }
             else
             {
-                jqmlogger.info("Creating a new specific isolation context: " + clSharingKey);
+                jqmlogger.info("Creating a new transient specific isolation context: " + clSharingKey);
                 jobClassLoader = new JarClassLoader(parent);
                 jobClassLoader.setReferenceJobDefName(jd.getApplicationName());
                 jobClassLoader.mayBeShared(cldef.isPersistent());
                 jobClassLoader.setHiddenJavaClasses(cldef.getHiddenClasses());
                 jobClassLoader.setTracing(cldef.isTracingEnabled());
                 jobClassLoader.setChildFirstClassLoader(cldef.isChildFirst());
-
-                if (cldef.isPersistent())
-                {
-                    persistentClassLoaders.put(cldef.getId(), jobClassLoader);
-                }
             }
+            // END SPECIFIC CL OPTIONS
+            ////////////////////////////////////
         }
         else
         {
-            // Use default CL options.
+            // Use default CL options. We accept double creation on edge sync states in this case.
             if ("Shared".equals(launchIsolationDefault))
             {
                 if (sharedClassLoader != null)
