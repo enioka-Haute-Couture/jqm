@@ -18,9 +18,6 @@
 
 package com.enioka.jqm.tools;
 
-import static com.enioka.jqm.test.helpers.TestHelpers.dpVip;
-import static com.enioka.jqm.test.helpers.TestHelpers.dpVip2;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -432,6 +429,11 @@ public class ClientApiTest extends JqmBaseTest
         after.add(Calendar.YEAR, -1);
         JqmClientFactory.getClient().setJobRunAfter(i2, after);
         Assert.assertTrue(com.enioka.jqm.model.JobInstance.select_id(cnx, i2).getNotBefore().before(Calendar.getInstance()));
+
+        int i4 = JobRequest.create("MarsuApplication", "TestUser").submit();
+        Assert.assertNull(com.enioka.jqm.model.JobInstance.select_id(cnx, i4).getNotBefore());
+        JqmClientFactory.getClient().setJobRunAfter(i4, after);
+        Assert.assertTrue(com.enioka.jqm.model.JobInstance.select_id(cnx, i4).getNotBefore().before(Calendar.getInstance()));
 
         //////////////////////////////////
         // Schedule

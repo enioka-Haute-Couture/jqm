@@ -272,7 +272,8 @@ public interface JqmClient
     void setJobPriority(int jobId, int priority);
 
     /**
-     * Change the "do not run before" date of a waiting job.
+     * Change the "do not run before" date of a waiting job. Only works on job instances already having a "do not run before" date or
+     * waiting in queue.
      * 
      * @param jobId
      *            id of the job instance to modify
@@ -534,7 +535,8 @@ public interface JqmClient
     /**
      * Query capacity.
      *
-     * @param q the queue to query
+     * @param q
+     *            the queue to query
      * @return sum of maximum parallel instances for the queue around the active nodes
      */
     int getQueueEnabledCapacity(Queue q);
