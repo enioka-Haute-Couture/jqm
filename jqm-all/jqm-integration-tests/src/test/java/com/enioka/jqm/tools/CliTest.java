@@ -5,12 +5,13 @@ import org.apache.log4j.PropertyConfigurator;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.enioka.admin.MetaService;
+import com.enioka.api.admin.NodeDto;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.RUser;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
-import com.enioka.jqm.tools.Helpers;
 
 public class CliTest extends JqmBaseTest
 {
@@ -62,5 +63,24 @@ public class CliTest extends JqmBaseTest
 
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+    }
+
+    @Test
+    public void testTemplate() throws Exception
+    {
+        NodeDto template = MetaService.getNode(cnx, TestHelpers.nodeMix.getId());
+        template.setPort(123);
+        MetaService.upsertNode(cnx, template);
+        cnx.commit();
+
+        NodeDto target = MetaService.getNode(cnx, TestHelpers.node.getId());
+        Assert.assertEquals(3, MetaService.getNodeQueueMappings(cnx, target.getId()).size());
+
+        Main.main(new String[] { "-t", TestHelpers.nodeMix.getName() + "," + TestHelpers.node.getName() });
+
+        target = MetaService.getNode(cnx, TestHelpers.node.getId());
+
+        Assert.assertEquals(template.getPort(), target.getPort());
+        Assert.assertEquals(1, MetaService.getNodeQueueMappings(cnx, target.getId()).size());
     }
 }
