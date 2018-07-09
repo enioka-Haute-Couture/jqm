@@ -58,13 +58,22 @@ if ($BuildHelpers) {
 # Now build JQM itself
 if ($UseNexus) {
     docker build --rm -t "enioka/jqm:latest" --build-arg "MVN_SETTINGS=-s settings.xml" --network nexus_default -f $PSScriptRoot\jqm\DockerFile $PSScriptRoot/../..
+    if (-not $?) {
+        return
+    }
 }
 else {
     docker build --rm -t "enioka/jqm:latest" -f $PSScriptRoot\jqm\DockerFile $PSScriptRoot/../..
+    if (-not $?) {
+        return
+    }
 }
 
 if ($UploadJqm) {
     docker push enioka/jqm:latest
+    if (-not $?) {
+        return
+    }
 }
 
 #  docker run -it --rm -p 1789:1789 enioka/jqm

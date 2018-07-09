@@ -829,7 +829,7 @@ public class MetaService
         ResultSet rs = null;
         try
         {
-            rs = cnx.runSelect("node_select_by_id");
+            rs = cnx.runSelect("node_select_by_id", id);
             if (!rs.next())
             {
                 throw new JqmAdminApiUserException("no result");
@@ -841,9 +841,24 @@ public class MetaService
         {
             throw new DatabaseException(e);
         }
-        finally
+    }
+
+    public static NodeDto getNode(DbConn cnx, String nodeName)
+    {
+        ResultSet rs = null;
+        try
         {
-            closeQuietly(cnx);
+            rs = cnx.runSelect("node_select_by_key", nodeName);
+            if (!rs.next())
+            {
+                throw new JqmAdminApiUserException("no result");
+            }
+
+            return mapNode(rs, 0);
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
         }
     }
 
@@ -851,12 +866,17 @@ public class MetaService
     {
         if (dto.getId() != null)
         {
-            cnx.runUpdate("node_update_changed_by_id", dto.getOutputDirectory(), dto.getDns(), dto.getEnabled(), dto.getJmxRegistryPort(),
-                    dto.getJmxServerPort(), dto.getLoadApiAdmin(), dto.getLoadApiClient(), dto.getLoapApiSimple(), dto.getName(),
-                    dto.getPort(), dto.getJobRepoDirectory(), dto.getRootLogLevel(), dto.getStop(), dto.getTmpDirectory(), dto.getId(),
-                    dto.getOutputDirectory(), dto.getDns(), dto.getEnabled(), dto.getJmxRegistryPort(), dto.getJmxServerPort(),
+            QueryResult qr = cnx.runUpdate("node_update_changed_by_id", dto.getOutputDirectory(), dto.getDns(), dto.getEnabled(),
+                    dto.getJmxRegistryPort(), dto.getJmxServerPort(), dto.getLoadApiAdmin(), dto.getLoadApiClient(), dto.getLoapApiSimple(),
+                    dto.getName(), dto.getPort(), dto.getJobRepoDirectory(), dto.getRootLogLevel(), dto.getStop(), dto.getTmpDirectory(),
+                    dto.getId(), dto.getOutputDirectory(), dto.getDns(), dto.getEnabled(), dto.getJmxRegistryPort(), dto.getJmxServerPort(),
                     dto.getLoadApiAdmin(), dto.getLoadApiClient(), dto.getLoapApiSimple(), dto.getName(), dto.getPort(),
                     dto.getJobRepoDirectory(), dto.getRootLogLevel(), dto.getStop(), dto.getTmpDirectory());
+
+            if (qr.nbUpdated != 1)
+            {
+                jqmlogger.debug("No update was done as object either does not exist or no modifications were done");
+            }
         }
         else
         {
@@ -1073,22 +1093,38 @@ public class MetaService
         ResultSet rs = null;
         try
         {
-            rs = cnx.runSelect("dp_select_with_names_by_id");
+            rs = cnx.runSelect("dp_select_with_names_by_id", id);
             if (!rs.next())
             {
                 throw new JqmAdminApiUserException("no result");
             }
-
+            rs.close();
             return mapQueueMapping(rs, 0);
         }
         catch (SQLException e)
         {
             throw new DatabaseException(e);
         }
-        finally
+    }
+
+    public static List<QueueMappingDto> getNodeQueueMappings(DbConn cnx, int nodeId)
+    {
+        ResultSet rs = null;
+        List<QueueMappingDto> res = new ArrayList<QueueMappingDto>();
+        try
         {
-            closeQuietly(cnx);
+            rs = cnx.runSelect("dp_select_with_names_by_node_id", nodeId);
+            while (rs.next())
+            {
+                res.add(mapQueueMapping(rs, 0));
+            }
+            rs.close();
         }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        return res;
     }
 
     public static void upsertQueueMapping(DbConn cnx, QueueMappingDto dto)
@@ -1121,7 +1157,7 @@ public class MetaService
 
             if (!foundInNewSet)
             {
-                deleteQueue(cnx, existing.getId());
+                deleteQueueMapping(cnx, existing.getId());
             }
         }
 
