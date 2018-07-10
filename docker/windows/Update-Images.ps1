@@ -53,6 +53,7 @@ if ($UseNexus) {
 if ($BuildHelpers) {
     docker-compose -f $PSScriptRoot/java/docker-compose.yml build --pull
     docker-compose -f $PSScriptRoot/maven/docker-compose.yml build --pull
+    docker-compose -f $PSScriptRoot/hsqldb/docker-compose.yml build --pull
 }
 
 # Now build JQM itself

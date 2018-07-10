@@ -1,0 +1,11 @@
+ARG JDK_VERSION=1.8.0.151-1
+
+FROM enioka/jqm:latest as jqm
+RUN move C:\jqm\ext\hsqldb* C:\hsqldb.jar
+
+FROM enioka/buildhelpers:jdk-${JDK_VERSION}
+
+COPY --from=jqm C:/hsqldb.jar ./
+EXPOSE 9001
+
+ENTRYPOINT ["java", "-classpath","./hsqldb.jar","org.hsqldb.server.Server","--database.0","file:jqm", "-dbname.0", "jqm"]

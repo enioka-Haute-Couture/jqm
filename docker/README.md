@@ -1,6 +1,6 @@
 # JQM Docker image
 
-This is the official image for JQM (Job Queue Manager). It is available on Windows Nano 1709+ and Linux under the Apache Public License, v2.
+This is the official image for JQM (Job Queue Manager). It has Docker images available for Windows Nano 1709+ and Linux under the Apache Public License, v2.
 
 
 ## 1. What is JQM
@@ -44,7 +44,7 @@ It uses a ready to use single-node JQM install configured with sensible options 
 
 Run: `docker run -it -p 1789:1789 -v /path/to/target/build/directory:/jqm/hotdeploy enioka/jqm`
 
-Adapt pathes to your environments (and do not forget C:/ on WIndows). The web UI is made available on the local machine, port 1789.
+Adapt pathes to your environments (and do not forget C:/ on Windows). The web UI is made available on the local machine, port 1789.
 
 Configure your build system (Maven, Gradle, Ant...) to copy your job and deployment descriptor (jars and the XML) inside /path/to/target/build/directory/myjob (myjob is a name of your choosing. Do not copy files directly inside the mount directory). Files should disappear after a few seconds, and jobs should appear as ready to run inside the web UI.
 
@@ -101,18 +101,20 @@ FROM enioka/jqm
 ENV JQM_POOL_DRIVER="oracle.jdbc.OracleDriver" \
     JQM_POOL_VALIDATION_QUERY="SELECT SYSDATE FROM DUAL" \
     JAVA_OPTS="-Xms1g -Xmx1g -XX:MaxMetaspaceSize=128m" \
-    JQM_NODE_NAME=%COMPUTERNAME%
+    JQM_NODE_NAME=_localhost_
     JQM_CREATE_NODE_IF_MISSING=1
 
 COPY ojdbc4.jar C:/jqm/ext/
 COPY buildtarget/* C:/jqm/jobs/
 ```
 
-Note the `JQM_CREATE_NODE_IF_MISSING` variable: it tells JQM to create the node (as named by `JQM_NODE_NAME`, here the container name) in the configuration if it does not exists. That way starting the container is enough to add the new node to the cluster. Also, database information should be provided on the command line or in a compose file (which would be used in a swarm anyway). For example:
+Note the `JQM_CREATE_NODE_IF_MISSING` variable: it tells JQM to create the node (as named by `JQM_NODE_NAME`, here the container name - \_localhost_ is a special value valid in this image) in the configuration if it does not exists. That way starting the container is enough to add the new node to the cluster. Also, database information should be provided on the command line or in a compose/K8s/... file. For example:
 
 `docker run -p 1789:1789 --env "JQM_POOL_USER=login" --env "JQM_POOL_PASSWORD=secret" --env "JQM_POOL_CONNSTR=jdbc:oracle:thin:@//oraclehost:1521/MYINSTANCE"`
 
 When using JQM_CREATE_NODE_IF_MISSING, all deployment descriptors inside /jqm/jobs are also imported at node creation time. Also, the database schema is upgraded if needed.
+
+Also, an interesting environment variable is `JQM_CREATE_NODE_TEMPLATE`. It specifies the name of a template node (any existing node is OK as a template) to create new nodes. When the first node is created, two templates are automatically referenced, named TEMPLATE_WEB (default value - with full web interface) and TEMPLATE_DRONE (without the web interface enabled). These templates can be modified, removed, etc - and replaced with your own if required.
 
 > For production environments, the first thing to do should be to enable security on the web services.
 
@@ -129,6 +131,7 @@ When using JQM_CREATE_NODE_IF_MISSING, all deployment descriptors inside /jqm/jo
   * JQM_POOL_MAX: the maximum number of connections the pool may contain. Default value of 10 should be OK in all cases.
   * JAVA_OPTS: parameters passed as-is to the JVM. Default is: -Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m
   * JQM_CREATE_NODE_IF_MISSING: if set to 1, the node JQM_NODE_NAME is created if it is missing with a default configuration (only polling the default queue). This allows easy swarm scale-out.
+  * JQM_CREATE_NODE_TEMPLATE: if set to an existing node name, its characteristics (queues polled, enabled WS...) will be copied over when creating new nodes (only - existing nodes are left untouched). Mostly useful for templating new instances when using an orchestrator.
   * JQM_ROOT: the JQM installation root. It should not be changed - it exists solely to simplify some scripts.
   * JQM_HEALTHCHECK_URL: the URL used by the healthcheck. Must be modified if authentication is enabled, no need to touch it otherwise. Default is http://localhost:1789/ws/simple/localnode/health.
 * Mounts
