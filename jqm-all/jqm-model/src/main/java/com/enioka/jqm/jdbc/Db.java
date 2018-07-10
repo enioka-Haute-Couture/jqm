@@ -220,7 +220,34 @@ public class Db
         {
             dbUpgrade();
         }
-        checkSchemaVersion();
+
+        // First contact with the DB is version checking.
+        // If DB is in wrong version or not available, just wait for it to be ready.
+        boolean versionValid = false;
+        while (!versionValid)
+        {
+            try
+            {
+                checkSchemaVersion();
+                versionValid = true;
+            }
+            catch (Exception e)
+            {
+                String msg = e.getLocalizedMessage();
+                if (e.getCause() != null)
+                {
+                    msg += " - " + e.getCause().getLocalizedMessage();
+                }
+                jqmlogger.error("Database not ready: " + msg + ". Waiting for database...");
+                try
+                {
+                    Thread.sleep(10000);
+                }
+                catch (Exception e2)
+                {
+                }
+            }
+        }
     }
 
     private void checkSchemaVersion()
@@ -281,7 +308,6 @@ public class Db
      */
     private void dbUpgrade()
     {
-
         DbConn cnx = this.getConn();
         Map<String, Object> rs = null;
         int db_schema_version = 0;
@@ -437,12 +463,14 @@ public class Db
         try
         {
             Connection cnx = _ds.getConnection();
-            if (cnx.getAutoCommit()) {
+            if (cnx.getAutoCommit())
+            {
                 cnx.setAutoCommit(false);
                 cnx.rollback(); // To ensure no open transaction created by the pool before changing TX mode
             }
 
-            if (cnx.getTransactionIsolation() != Connection.TRANSACTION_READ_COMMITTED) {
+            if (cnx.getTransactionIsolation() != Connection.TRANSACTION_READ_COMMITTED)
+            {
                 cnx.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             }
 
