@@ -139,6 +139,9 @@ public class Main
         Option o161 = OptionBuilder.withArgName("apply-node-template").hasArg()
                 .withDescription("Copy all queue polling parameters from one node to the another node. Syntax is templatenode,targetnode")
                 .withLongOpt("apply-node-template").create("t");
+        Option o171 = OptionBuilder
+                .withDescription("Returns node count")
+                .create("nodecount");
 
         Options options = new Options();
         OptionGroup og1 = new OptionGroup();
@@ -160,6 +163,7 @@ public class Main
         og1.addOption(o141);
         og1.addOption(o151);
         og1.addOption(o161);
+        og1.addOption(o171);
         options.addOptionGroup(og1);
         OptionGroup og2 = new OptionGroup();
         og2.addOption(o131);
@@ -279,6 +283,11 @@ public class Main
             else if (line.hasOption(o161.getOpt()))
             {
                 applyTemplate(line.getOptionValue(o161.getOpt()).split(",")[0], line.getOptionValue(o161.getOpt()).split(",")[1]);
+            }
+            // Node count
+            else if (line.hasOption(o171.getOpt()))
+            {
+                count();
             }
         }
         catch (ParseException exp)
@@ -431,6 +440,8 @@ public class Main
             cnx = Helpers.getNewDbSession();
             Helpers.updateConfiguration(cnx);
             cnx.commit();
+            jqmlogger.info("Upgrade done");
+            jqmlogger.info("Existing nodes: " + MetaService.getNodes(cnx).size());
         }
         catch (Exception e)
         {
@@ -663,6 +674,24 @@ public class Main
         catch (Exception e)
         {
             throw new JqmRuntimeException("Could not import file", e);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    private static void count()
+    {
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getNewDbSession();
+            jqmlogger.info("Existing nodes: " + MetaService.getNodes(cnx).size());
+        }
+        catch (Exception e)
+        {
+            throw new JqmRuntimeException("Could not fetch node count", e);
         }
         finally
         {

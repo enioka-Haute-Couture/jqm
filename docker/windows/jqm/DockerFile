@@ -50,7 +50,7 @@ RUN \
     Move-Item C:\curl\src\curl.exe C:/jqm/bin/;
 
 COPY ./docker/windows/jqm/*.bat C:/jqm/bin/
-COPY ./docker/windows/jqm/selfConfig.xml C:/jqm/selfConfig.xml
+COPY ./docker/windows/jqm/selfConfig*.xml C:/jqm/
 
 
 	
@@ -65,6 +65,7 @@ ENV JAVA_OPTS="-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m" \
     JQM_ROOT="C:\\jqm" \
     JQM_NODE_NAME="ContainerNode" \
     JQM_CREATE_NODE_IF_MISSING=0 \
+    JQM_CREATE_NODE_TEMPLATE=TEMPLATE_WEB \
     JQM_POOL_CONNSTR="jdbc:hsqldb:file:db/jqmdatabase;shutdown=true;hsqldb.write_delay=false" \
     JQM_POOL_USER="sa" \
     JQM_POOL_PASSWORD="" \
@@ -79,10 +80,10 @@ VOLUME C:/jqm/hotdeploy/ \
 
 # Configuration
 WORKDIR C:/jqm
-RUN java -jar jqm.jar -u && java -jar jqm.jar -c selfConfig.xml && java -jar jqm.jar -importjobdef ./jobs/jqm-demo && DEL /Q .\logs\*
+RUN java -jar jqm.jar -u && java -jar jqm.jar -c selfConfig.single.xml && java -jar jqm.jar -importjobdef ./jobs/jqm-demo && DEL /Q .\logs\*
 
 # Run node on startup
-ENTRYPOINT C:\jqm\bin\resource.bat && C:\jqm\bin\node.bat && java %JAVA_OPTS% -jar jqm.jar -startnode %JQM_NODE_NAME%
+ENTRYPOINT C:\jqm\bin\node.bat
 
 # Healthcheck is equivalent to calling Node.AllPollersPolling
-HEALTHCHECK --interval=30s --start-period=31s --retries=1 --timeout=10s CMD .\bin\curl --connect-timeout 2 -q --http1.1 -4 -s -S  %JQM_HEALTHCHECK_URL%
+HEALTHCHECK --interval=30s --start-period=31s --retries=2 --timeout=10s CMD .\bin\curl --connect-timeout 2 -q --http1.1 -4 -s -S  %JQM_HEALTHCHECK_URL%

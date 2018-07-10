@@ -9,3 +9,6 @@
 **/logs/
 **/plugins/
 .git
+**/Dockerfile*
+**/DockerFile*
+**/docker-compose.yml
