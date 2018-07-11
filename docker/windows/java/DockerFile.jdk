@@ -12,17 +12,18 @@ ENV JAVA_OJDKBUILD_ZIP java-1.8.0-openjdk-1.8.0.151-1.b12.ojdkbuild.windows.x86_
 ENV JAVA_OJDKBUILD_SHA256 1905ea74b79d6d1d2ea2b2b6887c14770f090fbb8b46e7e1bfb56e92845e9cf2
 ENV JAVA_HOME C:\\ojdk 
 
-RUN $url = ('https://github.com/ojdkbuild/ojdkbuild/releases/download/{0}/{1}' -f $env:JAVA_OJDKBUILD_VERSION, $env:JAVA_OJDKBUILD_ZIP); \
+RUN  mkdir /TEMP; \
+    $url = ('https://github.com/ojdkbuild/ojdkbuild/releases/download/{0}/{1}' -f $env:JAVA_OJDKBUILD_VERSION, $env:JAVA_OJDKBUILD_ZIP); \
     Write-Host ('Downloading {0} ...' -f $url); \
-    Invoke-WebRequest -Uri $url -OutFile 'ojdkbuild.zip' -UseBasicParsing ; \
+    Invoke-WebRequest -Uri $url -OutFile '/TEMP/ojdkbuild.zip' -UseBasicParsing ; \
     Write-Host ('Verifying sha256 ({0}) ...' -f $env:JAVA_OJDKBUILD_SHA256); \
-    if ((Get-FileHash ojdkbuild.zip -Algorithm sha256).Hash -ne $env:JAVA_OJDKBUILD_SHA256) { \
+    if ((Get-FileHash /TEMP/ojdkbuild.zip -Algorithm sha256).Hash -ne $env:JAVA_OJDKBUILD_SHA256) { \
         Write-Host 'FAILED!'; \
         exit 1; \
     };
 
 RUN	Write-Host 'Expanding ...'; \
-	Expand-Archive ojdkbuild.zip -DestinationPath C:\; \
+	Expand-Archive /TEMP/ojdkbuild.zip -DestinationPath C:\; \
 	\
 	Write-Host 'Renaming ...'; \
 	Move-Item \
@@ -36,7 +37,7 @@ RUN	Write-Host 'Expanding ...'; \
 	Write-Host '  javac -version'; javac -version; \
 	\
 	Write-Host 'Removing ...'; \
-	Remove-Item ojdkbuild.zip -Force; \
+	Remove-Item /TEMP/ojdkbuild.zip -Force; \
 	\
 	Write-Host 'Complete.';
 
