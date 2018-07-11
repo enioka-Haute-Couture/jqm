@@ -8,7 +8,7 @@ services:
                 com.enioka.description: "build helper - Maven build for windows nano 1709"
             args:
                 - JDK_VERSION=1.8.0.151-1
-        image: enioka/buildhelpers:maven-3.5.2
+        image: enioka/buildhelpers:maven-3.5.4
         hostname: maven
         environment:
             - MVN_VERSION="3.5.2"

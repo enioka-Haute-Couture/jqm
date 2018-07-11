@@ -5,26 +5,27 @@ FROM microsoft/powershell:nanoserver as installer
 SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 # http://www-us.apache.org/dist/maven/maven-3/3.5.2/binaries/apache-maven-3.5.2-bin.zip
-ENV MVN_VERSION 3.5.2
+ENV MVN_VERSION 3.5.4
 ENV MVN_URL http://www-us.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.zip
-ENV MVN_MD5 b8d8d49d8178734124c4ff6f3a409d3d
+ENV MVN_MD5 235db716537989e9e949e5bf23f965c0
 
 RUN Write-Host ('Downloading {0} ...' -f $env:MVN_URL); \
-    Invoke-WebRequest -Uri $env:MVN_URL -OutFile 'mvn.zip' -UseBasicParsing ; \
+	mkdir /TEMP >$null; \
+    Invoke-WebRequest -Uri $env:MVN_URL -OutFile '/TEMP/mvn.zip' -UseBasicParsing ; \
     Write-Host ('Verifying md5 ({0}) ...' -f $env:MVN_MD5); \
-    if ((Get-FileHash mvn.zip -Algorithm md5).Hash -ne $env:MVN_MD5) { \
+    if ((Get-FileHash /TEMP/mvn.zip -Algorithm md5).Hash -ne $env:MVN_MD5) { \
         Write-Host 'FAILED!'; \
         exit 1; \
     };
 
 RUN	Write-Host 'Expanding ...'; \
-	Expand-Archive mvn.zip -DestinationPath C:\; \
+	Expand-Archive /TEMP/mvn.zip -DestinationPath C:\; \
 	\
 	Write-Host 'Renaming ...'; \
 	Move-Item apache* C:/mvn; \
 	\
 	Write-Host 'Removing ...'; \
-	Remove-Item mvn.zip -Force; \
+	Remove-Item /TEMP/mvn.zip -Force; \
 	\
 	Write-Host 'Complete.';
 

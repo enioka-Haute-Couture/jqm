@@ -1,7 +1,7 @@
 ###############################################################################
 ## Build inside full JDK image.
 ###############################################################################
-FROM enioka/buildhelpers:maven-3.5.2 AS builder
+FROM enioka/buildhelpers:maven-3.5.4 AS builder
 
 ARG MVN_SETTINGS=" "
 ARG SKIP_TESTS=true
@@ -31,11 +31,10 @@ FROM microsoft/powershell:nanoserver AS installer
 
 SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-COPY --from=builder c:/jqm-all/jqm-service/target/jqm-2.1.0-SNAPSHOT.zip .
+COPY --from=builder c:/jqm-all/jqm-service/target/jqm-2.1.0-SNAPSHOT.zip C:/TEMP/jqm.zip
 
-RUN Expand-Archive jqm*.zip -DestinationPath C:/; \
-    rm *.zip; \
-    mv jqm* c:/jqm; \
+RUN Expand-Archive C:/TEMP/jqm.zip -DestinationPath C:/TEMP/; \
+    mv C:/TEMP/jqm-* c:/jqm; \
     mkdir C:/jqm/hotdeploy >$null; \
     mkdir C:/jqm/ext/drivers >$null;
 
@@ -44,9 +43,9 @@ ENV CURL_ZIP="https://dl.uxnr.de/build/curl/curl_winssl_msys2_mingw64_stc/curl-$
 
 RUN \
     Write-Host ('Downloading {0} ...' -f $env:CURL_ZIP); \
-    Invoke-WebRequest -Uri $env:CURL_ZIP -OutFile 'C:/curl.zip'; \
+    Invoke-WebRequest -Uri $env:CURL_ZIP -OutFile 'C:/TEMP/curl.zip'; \
     Write-Host 'unzipping curl'; \
-    Expand-Archive -Path C:/curl.zip -DestinationPath C:\curl; \
+    Expand-Archive -Path C:/TEMP/curl.zip -DestinationPath C:/curl; \
     Move-Item C:\curl\src\curl.exe C:/jqm/bin/;
 
 COPY ./docker/windows/jqm/*.bat C:/jqm/bin/

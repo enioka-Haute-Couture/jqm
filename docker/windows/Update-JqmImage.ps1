@@ -6,16 +6,20 @@
     Set of Docker commands for the maintenance of the following images: JQM, JRE, JDK, Maven, Nexus.
 #>
 param(
-    # Set to uplaod the helper images (JRE, JDK, Nexus, Maven) after a successful build.
-    [switch]$UploadHelpers,
-    # Set to refresh the helper images. They are otherwise taken from the Hub.
-    [switch]$BuildHelpers,
     # Set to upload the resulting JQM image to the Hub.
-    [switch]$UploadJqm,
+    [switch]$Push,
     # Set to use a local Nexus cache using a persistent disk. This allows better offline work.
-    [switch]$UseNexus
+    [switch]$UseNexus,
+    # Set to use a different repository and image name when pushing.
+    [string]$ImageName = "marcanpilami/test",
+    # First part of the tag (the one whiih will be visible through a manifest)
+    [string]$TagRoot = "nightly",
+    # Second part of the tag - architecture (not used by end-user)
+    [string]$Architecture = "1709"
 )
 $ErrorActionPreference = "Stop"
+
+$Tag = "${TagRoot}-${Architecture}"
 
 # Nexus must be started before build.
 if ($UseNexus) {
@@ -24,14 +28,6 @@ if ($UseNexus) {
         Write-Progress -Activity "Starting Nexus" -Status "Creating volume"
         docker volume create --name=nexus-data >$null
     }
-    if ($BuildHelpers) {
-        Write-Progress -Activity "Starting Nexus" -Status "Refreshing Nexus image"
-        docker-compose -f $PSScriptRoot/nexus/docker-compose.yml build --pull >$null
-
-        if ($UploadHelpers) {
-            docker push enioka/buildhelpers:nexus
-        }
-    }    
 
     # Start
     Write-Progress -Activity "Starting Nexus" -Status "Starting container"
@@ -49,32 +45,20 @@ if ($UseNexus) {
     Write-Progress -Activity "Starting Nexus" -Completed
 }
 
-# JDK & JRE & co
-if ($BuildHelpers) {
-    docker-compose -f $PSScriptRoot/java/docker-compose.yml build --pull
-    docker-compose -f $PSScriptRoot/maven/docker-compose.yml build --pull
-    docker-compose -f $PSScriptRoot/hsqldb/docker-compose.yml build --pull
-}
 
 # Now build JQM itself
+$bArgs=@()
 if ($UseNexus) {
-    docker build --rm -t "enioka/jqm:latest" --build-arg "MVN_SETTINGS=-s settings.xml" --network nexus_default -f $PSScriptRoot\jqm\DockerFile $PSScriptRoot/../..
-    if (-not $?) {
-        return
-    }
+    $bArgs += ("--build-arg", "MVN_SETTINGS=-s settings.xml", "--network", "nexus_default")
 }
-else {
-    docker build --rm -t "enioka/jqm:latest" -f $PSScriptRoot\jqm\DockerFile $PSScriptRoot/../..
-    if (-not $?) {
-        return
-    }
+& docker build --rm -t "${ImageName}:${Tag}" @bArgs -f $PSScriptRoot\jqm\DockerFile $PSScriptRoot/../..
+if ($LASTEXITCODE -ne 0) {
+    throw "build error"
 }
 
-if ($UploadJqm) {
-    docker push enioka/jqm:latest
-    if (-not $?) {
-        return
+if ($Push) {
+    docker push ${ImageName}:${Tag}
+    if ($LASTEXITCODE -ne 0) {
+        throw "push error"
     }
 }
-
-#  docker run -it --rm -p 1789:1789 enioka/jqm

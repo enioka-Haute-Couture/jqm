@@ -18,7 +18,7 @@ Full product description and documentation is available at [read the docs](https
 
 * latest: the highest stable release (not the most recent one, as the most recent one may be a patch on an older major version)
 * nightly: a build of the master branch, with no guarantees nor support.
-* specific release tags: each release has its own tag with the release version, like 2.1.0.
+* specific release tags: each release has its own tag with the release version with target OS, like 2.1.0-1709 for Windows 1709.
 * major release tags: this tracks major (first digit) releases. Minor releases for a given major release (e.g. minor 2.2.x for major 2.x) have no breaking changes and do have an upgrade path, so this should be the default type of tag to use for most deployments.
 
 The first tag is 2.1.0, previous versions have no official images.
