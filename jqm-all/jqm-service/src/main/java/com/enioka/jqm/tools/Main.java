@@ -537,6 +537,7 @@ public class Main
             target.setLoadApiClient(template.getLoadApiClient());
             target.setLoapApiSimple(template.getLoapApiSimple());
             target.setOutputDirectory(template.getOutputDirectory());
+            target.setDns(template.getDns());
             target.setPort(template.getPort());
             target.setRootLogLevel(template.getRootLogLevel());
             target.setTmpDirectory(template.getTmpDirectory());
