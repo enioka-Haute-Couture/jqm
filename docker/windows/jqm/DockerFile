@@ -52,7 +52,7 @@ COPY ./docker/windows/jqm/*.bat C:/jqm/bin/
 COPY ./docker/windows/jqm/selfConfig*.xml C:/jqm/
 
 
-	
+
 ###############################################################################
 ## Actual image, based on minimal JRE.
 ###############################################################################
@@ -75,7 +75,7 @@ ENV JAVA_OPTS="-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m" \
 
 EXPOSE 1789 1790 1791
 VOLUME C:/jqm/hotdeploy/ \
-       C:/jqm/ext/drivers/
+    C:/jqm/ext/drivers/
 
 # Configuration
 WORKDIR C:/jqm
@@ -85,4 +85,4 @@ RUN java -jar jqm.jar -u && java -jar jqm.jar -c selfConfig.single.xml && java -
 ENTRYPOINT C:\jqm\bin\node.bat
 
 # Healthcheck is equivalent to calling Node.AllPollersPolling
-HEALTHCHECK --interval=30s --start-period=31s --retries=2 --timeout=10s CMD .\bin\curl --connect-timeout 2 -q --http1.1 -4 -s -S  %JQM_HEALTHCHECK_URL%
+HEALTHCHECK --interval=30s --start-period=91s --retries=2 --timeout=10s CMD .\bin\curl --connect-timeout 2 -q --http1.1 -4 -s -S  %JQM_HEALTHCHECK_URL%

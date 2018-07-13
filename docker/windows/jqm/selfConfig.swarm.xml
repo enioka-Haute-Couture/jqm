@@ -1,5 +1,5 @@
 <jqm>
-	<defaultQueueName>Default</defaultQueueName>
+	<defaultQueueName>DEFAULT</defaultQueueName>
 
 	<nodes>
 		<node>
@@ -45,7 +45,7 @@
 
 	<queues>
 		<queue>
-			<name>Default</name>
+			<name>DEFAULT</name>
 			<description>default queue</description>
 			<mappings>
 				<mapping>
@@ -62,7 +62,7 @@
 					<enabled>true</enabled>
 				</mapping>
 			</mappings>
-		</queue>	
+		</queue>
 	</queues>
 
 	<globalParameters>
@@ -77,10 +77,10 @@
 		<parameter>
 			<key>mavenRepo</key>
 			<value>http://repo1.maven.org/maven2/,https://oss.sonatype.org/content/repositories/snapshots/</value>
-		</parameter>	
+		</parameter>
 	</globalParameters>
 
-	<resources>		
+	<resources>
 	</resources>
 
 </jqm>
