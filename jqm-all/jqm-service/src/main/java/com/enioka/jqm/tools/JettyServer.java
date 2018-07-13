@@ -135,12 +135,19 @@ class JettyServer
                         connector = new SelectChannelConnector();
                     }
 
-                    if (s.isLoopbackAddress() || "localhost".equals(node.getDns()))
+                    if (node.getDns().equals("0.0.0.0"))
+                    {
+                        connector.setHost("0.0.0.0");
+                        connector.setPort(node.getPort());
+                        ls.add(connector);
+                        jqmlogger.debug("Jetty will bind on all interfaces on port " + node.getPort());
+                    }
+                    else if (s.isLoopbackAddress() || "localhost".equals(node.getDns()))
                     {
                         connector.setHost("localhost");
                         connector.setPort(node.getPort());
                         ls.add(connector);
-                        jqmlogger.debug("Jetty will bind on localhost:" + node.getPort());
+                        jqmlogger.debug("Jetty will bind on loopback - localhost:" + node.getPort());
                     }
                     else
                     {
