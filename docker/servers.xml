@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<servers>
+    <server>
+        <tag>windows-1709</tag>
+        <url>docker1709:2375</url>
+    </server>
+    <server>
+        <tag>windows-1803</tag>
+        <url>docker:2375</url>
+    </server>
+    <server>
+        <tag>linux-alpine</tag>
+        <url>dockerubnt:2376</url>
+    </server>
+</servers>

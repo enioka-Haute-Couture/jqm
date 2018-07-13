@@ -1,7 +1,10 @@
+ARG WINDOWS_TAG
+ARG JAVA_VERSION=1.8.0
+
 ###############################################################################
 ## Build inside full JDK image.
 ###############################################################################
-FROM enioka/buildhelpers:maven-3.5.4 AS builder
+FROM enioka/buildhelpers:maven-3-${WINDOWS_TAG} AS builder
 
 ARG MVN_SETTINGS=" "
 ARG SKIP_TESTS=true
@@ -27,7 +30,7 @@ RUN IF /I NOT "%SKIP_TESTS%" == "true" (mvn test) ELSE (echo "Skipping tests")
 ###############################################################################
 ## Powershell so as to unzip
 ###############################################################################
-FROM microsoft/powershell:nanoserver AS installer
+FROM microsoft/powershell:nanoserver-${WINDOWS_TAG} AS installer
 
 SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
@@ -41,7 +44,8 @@ RUN Expand-Archive C:/TEMP/jqm.zip -DestinationPath C:/TEMP/; \
 ENV CURL_VERSION="7.58.0"
 ENV CURL_ZIP="https://dl.uxnr.de/build/curl/curl_winssl_msys2_mingw64_stc/curl-${CURL_VERSION}/curl-${CURL_VERSION}.zip"
 
-RUN \
+# For 1709 only, get curl. It is inside the base image from 1803 onward.
+RUN if ($env:WINDOWS_TAG -ne "1709") { return 0}; \
     Write-Host ('Downloading {0} ...' -f $env:CURL_ZIP); \
     Invoke-WebRequest -Uri $env:CURL_ZIP -OutFile 'C:/TEMP/curl.zip'; \
     Write-Host 'unzipping curl'; \
@@ -56,7 +60,7 @@ COPY ./docker/windows/jqm/selfConfig*.xml C:/jqm/
 ###############################################################################
 ## Actual image, based on minimal JRE.
 ###############################################################################
-FROM enioka/buildhelpers:jre-1.8.0.151-1
+FROM enioka/buildhelpers:jre-${JAVA_VERSION}-${WINDOWS_TAG}
 
 COPY --from=installer C:/jqm/ C:/jqm/
 
