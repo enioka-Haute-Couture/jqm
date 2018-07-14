@@ -22,8 +22,8 @@ WORKDIR /jqm-all
 # Build
 COPY ./docker/windows/nexus/settings.xml ./jqm-all ./
 
-RUN mvn install -DskipTests %MVN_SETTINGS%
-RUN IF /I NOT "%SKIP_TESTS%" == "true" (mvn test) ELSE (echo "Skipping tests")
+RUN mvn install -DskipTests=%SKIP_TESTS% %MVN_SETTINGS%
+
 
 
 
