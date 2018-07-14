@@ -35,7 +35,7 @@ A single-node, fully functional server starts after a few seconds. The web UI is
 Use CTRL+C to exit. All changes made to the server are lost on exit.
 
 
-### 3.2 Developer computer: non production standalone node, with stock image only.
+### 3.2 Developer computer
 
 In this scenario, a developer uses his preferred IDE or build tool and the resulting product of his work is automatically made available to a local JQM server.
 
@@ -80,14 +80,14 @@ An example Dockerfile would be:
 FROM enioka/jqm
 
 # Copy jars and deployment descriptors inside the job definition repository, as in a normal deployment
-COPY buildresult/* C:/jqm/jobs/
+COPY buildresult/* /jqm/jobs/
 RUN java -jar jqm.jar -importjobdef ./jobs
 ```
 
 The resulting image can then be run just as the base JQM image.
 
 
-### 3.4 Single node or multiple nodes production deployment
+### 3.4 Single or multiple nodes production deployment
 
 In this scenario, the goal is to have an easy to scale and deploy image with Swarm (or any orchestrator) on a production or production-like environment.
 
@@ -104,8 +104,8 @@ ENV JQM_POOL_DRIVER="oracle.jdbc.OracleDriver" \
     JQM_NODE_NAME=_localhost_
     JQM_INIT_MODE=CLUSTER
 
-COPY ojdbc4.jar C:/jqm/ext/
-COPY buildtarget/* C:/jqm/jobs/
+COPY ojdbc4.jar /jqm/ext/
+COPY buildtarget/* /jqm/jobs/
 ```
 
 Note the `JQM_INIT_MODE` variable: it tells (among other things) JQM to create the node (as named by `JQM_NODE_NAME`, here the container name - \_localhost_ is a special value valid in this image) in the configuration if it does not exists, using a template (here the default one, changeable with `JQM_CREATE_NODE_TEMPLATE`). That way starting the container is enough to add the new node to the cluster. Also, database information should be provided on the command line or in a compose/K8s/... file. For example:

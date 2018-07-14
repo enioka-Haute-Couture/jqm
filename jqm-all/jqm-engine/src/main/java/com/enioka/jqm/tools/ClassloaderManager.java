@@ -143,6 +143,7 @@ class ClassloaderManager
                 {
                     jqmlogger.info("Creating sharedClassLoader");
                     jobClassLoader = new JarClassLoader(parent);
+                    jobClassLoader.mayBeShared(true);
                     sharedClassLoader = jobClassLoader;
                 }
             }
@@ -158,6 +159,7 @@ class ClassloaderManager
                 {
                     jqmlogger.info("Creating shared Jar CL");
                     jobClassLoader = new JarClassLoader(parent);
+                    jobClassLoader.mayBeShared(true);
                     sharedJarClassLoader.put(jd.getJarPath(), jobClassLoader);
                 }
             }
@@ -166,6 +168,7 @@ class ClassloaderManager
                 // Standard case: all launches are independent. We create a transient CL.
                 jqmlogger.debug("Using an isolated transient CL with default parameters");
                 jobClassLoader = new JarClassLoader(parent);
+                jobClassLoader.mayBeShared(false);
             }
         }
 

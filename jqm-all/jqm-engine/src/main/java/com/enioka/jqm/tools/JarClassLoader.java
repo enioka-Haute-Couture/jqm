@@ -370,4 +370,42 @@ class JarClassLoader extends URLClassLoader
     {
         this.mayBeShared = val;
     }
+
+    /**
+     * Hack - in Java 7, CL.Close was introduced but is not present in earlier versions. Yet it is highly useful on Windows as it frees file
+     * handlers.<br>
+     * Shared class loaders are left open.
+     */
+    void tryClose()
+    {
+        if (!mayBeShared)
+        {
+            Method m = null;
+            try
+            {
+                m = this.getClass().getMethod("close");
+            }
+            catch (NoSuchMethodException e)
+            {
+                jqmlogger.trace("CL cannot be closed");
+                return;
+            }
+            catch (SecurityException e)
+            {
+                jqmlogger.error("Cannot access CL.close", e);
+                return;
+            }
+
+            try
+            {
+                m.invoke(this);
+            }
+            catch (Exception e)
+            {
+                jqmlogger.error("Cannot close CL", e);
+                return;
+            }
+            jqmlogger.debug("CL was closed");
+        }
+    }
 }

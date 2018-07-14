@@ -305,6 +305,10 @@ class Loader implements Runnable, LoaderMBean
         // Restore class loader
         if (this.classLoaderToRestoreAtEnd != null)
         {
+            if (Thread.currentThread().getContextClassLoader() instanceof JarClassLoader)
+            {
+                ((JarClassLoader) Thread.currentThread().getContextClassLoader()).tryClose();
+            }
             Thread.currentThread().setContextClassLoader(classLoaderToRestoreAtEnd);
             jqmlogger.trace("Class Loader was correctly restored");
         }
