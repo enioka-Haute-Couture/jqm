@@ -53,7 +53,7 @@ RUN if ($env:WINDOWS_TAG -ne "1709") { return 0}; \
     Move-Item C:\curl\src\curl.exe C:/jqm/bin/;
 
 COPY ./docker/windows/jqm/*.bat C:/jqm/bin/
-COPY ./docker/windows/jqm/selfConfig*.xml C:/jqm/
+COPY ./docker/config/selfConfig*.xml C:/jqm/
 
 
 

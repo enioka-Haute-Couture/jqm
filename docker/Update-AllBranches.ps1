@@ -1,43 +1,84 @@
+<# 
+    .DESCRIPTION
+    Main entry point for the docker build. It checks out branches and calls their respective Update-JqmImage.ps1 scripts.
+    In the end, it updates the manifests.
+
+    This supports WhatIf - but in this case, the checkout still takes place to really emulate all later Docker operations which need the code to be checked-out.
+#>
+[CmdletBinding(SupportsShouldProcess)]
 param(
-    # Pairs of (tag, docker server to use) to build images for.
-    [string[][]]$Architectures = @(@("1709", "docker1709:2375"), $null),
-    # Branches to build (on all architectures). (tag, git branch name) list.
-    [string[][]]$Branches = @( @("dockertest", "docker"), $null),
+    # Branches/tags to build (on all architectures). (tag, git branch name) list.
+    [hashtable]$Branches = @{"dockertest" = "docker"},
     # Set to use a different repository and image name when pushing.
-    [string]$ImageName = "marcanpilami/test"
+    [string]$ImageName = "marcanpilami/test",
+    # Mapping betwwen build tags and corresponding Docker hosts.
+    [string]$ServerFile = "$PSScriptRoot/servers.xml",
+    # Push the created images to Docker hub.
+    [switch]$Push
 )
 $ErrorActionPreference = "Stop"
 
-& $PSScriptRoot/windows/Update-HelperImages.ps1 -push
 
 Remove-Item -Recurse -Force /TEMP/BUILDJQM/ -ErrorAction SilentlyContinue
 
-foreach($Branch in $Branches) {
-    if (-not $Branch) {continue}
-    $BranchName = $Branch[1]
-    $BranchTag = $Branch[0]
+$args = @{
+    "Push" = $Push
+}
+
+$manifestData = @{}
+
+foreach ($BranchTag in $Branches.Keys) {
+    if (-not $BranchTag) {continue}
+    $BranchName = $Branches[$BranchTag]
+
     # Work in temp directory
     $root = "/TEMP/BUILDJQM/${BranchName}/"
-    mkdir $root >$null
+    mkdir -Force $root -WhatIf:$false >$null
 
     # Checkout branch in that directory
     git --work-tree=$root checkout ${BranchName} -- .
     if ($LASTEXITCODE -ne 0) {
-        throw "branch ${BranchName} cannot be checked out"
+        throw "branch/tag ${BranchName} cannot be checked out"
     }
 
-    $archList = @()
-    foreach($Arch in $Architectures) {
-        if (-not $Arch) {continue}
-        $ArchTag = $Arch[0]
-        $Server = $Arch[1]
-        $archList += $ArchTag
+    Write-Progress -Activity "Building branch/tag $BranchName $BranchTag" -id 0
+    $branchManifest = @(& (Join-Path $root docker/Update-JqmImage.ps1) -ServerFile $ServerFile @args -ImageName $ImageName -TagRoot ${BranchTag})
 
-        $env:DOCKER_HOST = $Server
-        Write-Host "Building image on branch ${BranchName} for ${ArchTag} on server {$env:DOCKER_HOST}"
-        & (Join-Path $root docker/windows/Update-JqmImage.ps1) -Push -ImageName $ImageName -TagRoot ${BranchTag} -Architecture $ArchTag
+    foreach ($pair in $branchManifest) {
+        $list = $manifestData[$pair.ManifestImage]
+        if ($null -eq $list) {
+            $list = @()
+            $manifestData[$pair.ManifestImage] = $list
+        }
+        $manifestData[$pair.ManifestImage] += $pair.LocalImage
     }
 
-    # Update manifest for this version
-    & ./Update-Manifest.ps1 -ImageName $ImageName -Tags $BranchTag -Architectures $archList -Push
+    Write-Progress -Activity "Building branch/tag $BranchName $BranchTag" -id 0 -Completed
 }
+
+# Update manifest
+Write-Progress -Activity "Updating manifests" -id 0
+foreach ($manifestName in $manifestData.Keys) {
+    $imageList = $manifestData[$manifestName]
+
+    Write-Progress -Activity "Updating manifests" -CurrentOperation "Manifest $manifestName" -id 0
+
+    if ($PSCmdlet.ShouldProcess($manifestName, "Create manifest")) {
+        docker manifest create $manifestName @imageList --amend
+        if ($LASTEXITCODE -ne 0) {
+            throw "Manifest creation error"
+        }
+    }
+
+    if ($Push) {
+        if ($PSCmdlet.ShouldProcess($manifestName, "Push manifest")) {
+            docker manifest push ${manifestName}
+            if ($LASTEXITCODE -ne 0) {
+                throw "Manifest push error"
+            }
+        }
+    }
+}
+Write-Progress -Activity "Updating manifests" -id 0 -Completed
+
+$manifestData

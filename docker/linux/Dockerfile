@@ -21,7 +21,7 @@ RUN unzip ./jqm-service/target/jqm*.zip -d /tmp/
 RUN mv /tmp/jqm*/ /tmp/jqm/
 
 COPY ./docker/linux/*.sh /tmp/jqm/bin/
-COPY ./docker/windows/jqm/selfConfig*.xml /tmp/jqm/
+COPY ./docker/config/selfConfig*.xml /tmp/jqm/
 
 
 

@@ -5,6 +5,7 @@
     .DESCRIPTION
     Set of Docker commands for the maintenance of the following images: JQM, JRE, JDK, Maven, Nexus.
 #>
+[CmdletBinding(SupportsShouldProcess)]
 param(
     # Set to upload the resulting JQM image to the Hub.
     [switch]$Push,
@@ -12,9 +13,13 @@ param(
     [string]$ImageName = "marcanpilami/test",
     # First part of the tag (the one which will be visible through a manifest)
     [string]$TagRoot = "nightly",
-    [string]$ServerFile = "$PSScriptRoot/servers.xml"
+    # Mapping betwwen build tags and corresponding Docker hosts.
+    [string]$ServerFile = "$PSScriptRoot/servers.xml",
+    # When specified, ignores the "subTargets" section of the targets.xml file. (does not build helper images)
+    [switch]$SkipSubImages
 )
 $ErrorActionPreference = "Stop"
+
 mkdir -Force (Join-Path $PSScriptRoot "target") >$null
 $LogFile = Join-Path $PSScriptRoot "target/docker.log"
 
@@ -49,55 +54,69 @@ foreach (${Target} in ${targets}.targets.target) {
     }
 
     $Tag = "${TagRoot}-${Architecture}"
-    $env:JQM_IMAGE_NAME = "${ImageName}:${Tag}"
+    New-Item env:/JQM_IMAGE_NAME -Value "${ImageName}:${Tag}" -Force >$null
 
     if ($Compose) {
         # Helper build
-        foreach ($preBuild in @($Target.subTargets.target)) {
-            if (-not $preBuild) { continue }
-            Write-Progress "$Description build on ${env:DOCKER_HOST} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building image $preBuild"
-            docker-compose -f $Compose --log-level warning build --pull @buildArgs $preBuild >>$LogFile
-            if (-not $?) {
-                throw "Build error"
-            }
+        if (-not $SkipSubImages) {
+            foreach ($preBuild in @($Target.subTargets.target)) {
+                if (-not $preBuild) { continue }
+                Write-Progress "$Description build on ${env:DOCKER_HOST} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building image $preBuild"
+                if ($PSCmdlet.ShouldProcess($preBuild, 'Compose Build')) {
+                    docker-compose -f $Compose --log-level warning build --pull @buildArgs $preBuild >>$LogFile
+                    if (-not $?) {
+                        throw "Build error"
+                    }
+                }
 
-            if ($Push) {
-                Write-Progress "$Description build on ${env:DOCKER_HOST} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Pushing image $preBuild"
-                docker-compose -f $Compose --log-level warning push $preBuild >>$LogFile
-                if (-not $?) {
-                    throw "Push error"
+                if ($Push) {
+                    Write-Progress "$Description build on ${env:DOCKER_HOST} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Pushing image $preBuild"
+                    if ($PSCmdlet.ShouldProcess($preBuild, 'Compose Push')) {
+                        docker-compose -f $Compose --log-level warning push $preBuild >>$LogFile
+                        if (-not $?) {
+                            throw "Push error"
+                        }
+                    }
                 }
             }
         }
 
         # JQM build
         Write-Progress "$Description build on ${env:DOCKER_HOST} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building JQM image"
-        docker-compose -f $Compose --log-level warning build --pull @buildArgs jqm >>$LogFile
-        if (-not $?) {
-            throw "Build error"
+        if ($PSCmdlet.ShouldProcess("JQM", 'Compose Build')) {
+            docker-compose -f $Compose --log-level warning build --pull @buildArgs jqm >>$LogFile
+            if (-not $?) {
+                throw "Build error"
+            }
         }
 
         # Push!
         if ($Push) {
             Write-Progress "$Description build on ${env:DOCKER_HOST} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Pushing JQM image"
-            docker-compose -f $Compose --log-level warning push jqm >>$LogFile
-            if (-not $?) {
-                throw "Push error"
+            if ($PSCmdlet.ShouldProcess("JQM", 'Compose Push')) {
+                docker-compose -f $Compose --log-level warning push jqm >>$LogFile
+                if (-not $?) {
+                    throw "Push error"
+                }
             }
         }
     }
     elseif ($Dockerfile) {
         Write-Progress "$Description build on ${env:DOCKER_HOST} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building JQM image"
-        docker build --rm --pull -t $env:JQM_IMAGE_NAME @buildArgs -f (Join-Path $PSScriptRoot  $DockerFile) $PSScriptRoot/../ 2>&1 >>$LogFile
-        if (-not $?) {
-            throw "Build error"
+        if ($PSCmdlet.ShouldProcess("JQM", 'Build')) {
+            docker build --rm --pull -t $env:JQM_IMAGE_NAME @buildArgs -f (Join-Path $PSScriptRoot  $DockerFile) $PSScriptRoot/../ 2>&1 >>$LogFile
+            if (-not $?) {
+                throw "Build error"
+            }
         }
 
         if ($Push) {
             Write-Progress "$Description build on ${env:DOCKER_HOST} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Pushing JQM image"
-            docker push $env:JQM_IMAGE_NAME 2>&1 >>$LogFile
-            if (-not $?) {
-                throw "Push error"
+            if ($PSCmdlet.ShouldProcess("JQM", 'Push')) {
+                docker push $env:JQM_IMAGE_NAME 2>&1 >>$LogFile
+                if (-not $?) {
+                    throw "Push error"
+                }
             }
         }
     }

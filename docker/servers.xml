@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!-- This is a sample mapping file. It maps the tags used in targets.xml and actual build servers (DOCKER_HOST) -->
 <servers>
     <server>
         <tag>windows-1709</tag>

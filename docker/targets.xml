@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!-- This file is versioned and specific to each branch. It specifies which OS can be built by the branch, and how -->
 <targets>
     <target>
         <description>Windows Server 1709</description>
@@ -35,7 +36,7 @@
     <target>
         <description>Linux x64</description>
         <tag>linux-alpine</tag>
-        <dockerfile>linux/DockerFile</dockerfile>
+        <dockerfile>linux/Dockerfile</dockerfile>
         <buildArgs></buildArgs>
         <subTargets></subTargets>
     </target>
