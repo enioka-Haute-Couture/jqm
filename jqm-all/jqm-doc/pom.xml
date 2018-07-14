@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.enioka.jqm</groupId>
@@ -14,22 +15,36 @@
 	<properties>
 		<sonar.skip>true</sonar.skip>
 	</properties>
-	
-	<build>
+
+	<reporting>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.9</version>
+				<reportSets>
+					<reportSet>
+						<reports />
+					</reportSet>
+				</reportSets>
+			</plugin>
+
 			<plugin>
 				<groupId>kr.motd.maven</groupId>
 				<artifactId>sphinx-maven-plugin</artifactId>
-				<version>1.2.0.Final</version>
-				<configuration>
-					<outputDirectory>${project.build.directory}/docs</outputDirectory>
-				</configuration>
-				<executions>
-				</executions>
+				<version>2.2.2</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>generate</report>
+						</reports>
+					</reportSet>
+				</reportSets>
 			</plugin>
 		</plugins>
-
-		<resources>
+	</reporting
+>
+	<!--<resources>
 			<resource>
 				<directory>src/site/sphinx</directory>
 				<filtering>true</filtering>
@@ -40,7 +55,7 @@
 			</resource>
 		</resources>
 
-	</build>
+	</build>-->
 
 	<dependencies>
 	</dependencies>

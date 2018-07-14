@@ -5,6 +5,14 @@ Please follow the paragraph specific to your OS and then go through the common c
 
 .. highlight:: bash
 
+Docker install
+*****************
+
+JQM is available for Docker for Linux/MacOS and Docker for Windows on the Docker Hub. The image is optimized both
+for development usage and for scale-out production deployment (Kubernetes, Swarm).
+
+Full image documentation is available on the `Docker Hub <https://hub.docker.com/r/enioka/jqm/>`_.
+
 Binary install
 ***************
 
