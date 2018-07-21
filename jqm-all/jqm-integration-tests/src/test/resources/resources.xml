@@ -108,7 +108,7 @@
           driverClassName="com.mysql.jdbc.Driver"
           url="jdbc:mysql://localhost:3306/jqm?useSSL=false"
           singleton="true"
-          connectionProperties="connectionAttributes=program_name:jqm;useLegacyDatetimeCode=false;"/>
+          connectionProperties="connectionAttributes=program_name:jqm;useLegacyDatetimeCode=false;serverTimezone=UTC;"/>
           
       <resource 
 	      name="jdbc/db2"

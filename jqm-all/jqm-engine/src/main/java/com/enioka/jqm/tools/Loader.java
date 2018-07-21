@@ -296,13 +296,7 @@ class Loader implements Runnable, LoaderMBean
             }
         }
 
-        // Clean class loader
-        ClassLoaderLeakCleaner.clean(Thread.currentThread().getContextClassLoader());
-
-        // Clean JDBC connections
-        ClassLoaderLeakCleaner.cleanJdbc(Thread.currentThread());
-
-        // Restore class loader
+        // Restore and clean class loaders (if needed, as CLs may be persistent)
         if (this.classLoaderToRestoreAtEnd != null)
         {
             if (Thread.currentThread().getContextClassLoader() instanceof JarClassLoader)

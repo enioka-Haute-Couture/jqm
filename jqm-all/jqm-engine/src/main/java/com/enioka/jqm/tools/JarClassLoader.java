@@ -146,7 +146,7 @@ class JarClassLoader extends URLClassLoader
             catch (Exception e)
             {
                 throw new JqmEngineException(
-                        "could not load a runner: check you global parameters, or that the plugin for this runner is actually present "
+                        "could not load a runner: check your global parameters, or that the plugin for this runner is actually present "
                                 + runnerClassName,
                         e);
             }
@@ -380,6 +380,11 @@ class JarClassLoader extends URLClassLoader
     {
         if (!mayBeShared)
         {
+            // First: free the hounds, er, the CL leak hunter
+            ClassLoaderLeakCleaner.clean(this);
+            ClassLoaderLeakCleaner.cleanJdbc(Thread.currentThread());
+
+            // Then try to call CL.close()
             Method m = null;
             try
             {
