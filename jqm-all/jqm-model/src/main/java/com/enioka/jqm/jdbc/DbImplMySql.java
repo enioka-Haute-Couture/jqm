@@ -168,7 +168,7 @@ public class DbImplMySql implements DbAdapter
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(e);
+            throw new DatabaseException(q.sqlText, e);
         }
         finally
         {

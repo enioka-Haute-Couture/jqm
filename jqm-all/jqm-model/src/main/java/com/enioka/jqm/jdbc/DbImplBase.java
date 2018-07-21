@@ -179,7 +179,7 @@ public class DbImplBase
         queries.put("jj_update_notbefore_by_id", "UPDATE __T__JOB_INSTANCE SET DATE_NOT_BEFORE=? WHERE ID=? AND STATUS IN('SCHEDULED')");
         queries.put("jj_update_rank_by_id", "UPDATE __T__JOB_INSTANCE SET INTERNAL_POSITION=? WHERE ID=? AND STATUS='SUBMITTED'");
         queries.put("jj_update_progress_by_id", "UPDATE __T__JOB_INSTANCE SET PROGRESS=? WHERE ID=?");
-        queries.put("jj_update_run_by_id", "UPDATE __T__JOB_INSTANCE SET DATE_START=CURRENT_TIMESTAMP, STATUS='RUNNING' WHERE ID=? AND STATUS='ATTRIBUTED'");
+        queries.put("jj_update_run_by_id", "UPDATE __T__JOB_INSTANCE SET DATE_START=CURRENT_TIMESTAMP, STATUS='RUNNING' WHERE ID=? AND (STATUS='ATTRIBUTED' OR STATUS='RUNNING')");
         queries.put("debug_jj_update_node_by_id", "UPDATE __T__JOB_INSTANCE SET NODE=? WHERE ID=?");
         queries.put("debug_jj_update_status_by_id", "UPDATE __T__JOB_INSTANCE SET STATUS=? WHERE ID=?");
         queries.put("ji_select_current_pos", "SELECT COUNT(ji) FROM __T__JOB_INSTANCE ji WHERE ji.INTERNAL_POSITION < ? AND ji.status = 'SUBMITTED' AND QUEUE=?");

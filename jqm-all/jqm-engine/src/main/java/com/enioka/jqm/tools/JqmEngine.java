@@ -34,6 +34,7 @@ import javax.management.ObjectName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.QueryResult;
@@ -544,7 +545,21 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                 while (l != null)
                 {
                     jqmlogger.warn("storing delayed results for loader " + l.getId());
-                    l.endOfRunDb();
+                    try
+                    {
+                        l.endOfRunDb();
+                    }
+                    catch (DatabaseException e3)
+                    {
+                        // There is an edge case here: if the DB fails after commit but before sending ACK.
+                        // In that case, we may get a duplicate in the history table, and therefore a constraint violation.
+                        if (!(e3.getCause().getMessage().toLowerCase().contains("violation")
+                                || e3.getCause().getMessage().toLowerCase().contains("duplicate")))
+                        {
+                            throw e3;
+                        }
+                        jqmlogger.info("duplicate loader finalization avoided for loader " + l.getId());
+                    }
                     l = loaderToFinalize.poll();
                 }
 
