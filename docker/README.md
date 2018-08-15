@@ -16,12 +16,14 @@ Full product description and documentation is available at [read the docs](https
 
 ## 2. Tags
 
+All these tags are shared, i.e. multi-architecture - each tag named "mytag" actually hides multiple platform-specific tags: mytag-windows-1709, mytag-windows-1803, mytag-linux-alpine. There should be no reason to directly use the platform-specific tags instead of the shared tags.
+
 * latest: the highest stable release (not the most recent one, as the most recent one may be a patch on an older major version)
-* nightly: a build of the master branch, with no guarantees nor support.
-* specific release tags: each release has its own tag with the release version with target OS, like 2.1.0-1709 for Windows 1709.
+* nightly: a build of the master branch, with no guarantees nor support. Updated on every signifant change of the master branch.
+* specific release tags: each release has its own tag with the release version like 2.1.0.
 * major release tags: this tracks major (first digit) releases. Minor releases for a given major release (e.g. minor 2.2.x for major 2.x) have no breaking changes and do have an upgrade path, so this should be the default type of tag to use for most deployments.
 
-The first tag is 2.1.0, previous versions have no official images.
+The first release tag is 2.1.0, previous versions have no official images.
 
 
 ## 3. Main usage scenarios
@@ -125,7 +127,7 @@ A sample swarm file (also working as a compose file) is provided in the JQM sour
 ## 4. Image reference
 
 * Environment variables
-  * JQM_NODE_NAME: name of the node in the configuration. Default is ContainerNode. If using the internal HSQLDB database, a node named ContainerNode is already configured. If using another database, take care to add a node of this name to your configuration (or/and use JQM_CREATE_NODE_IF_MISSING).
+  * JQM_NODE_NAME: name of the node in the configuration. Default is ContainerNode. If using the internal HSQLDB database, a node named ContainerNode is already configured. If using another database, take care to add a node of this name to your configuration.
   * JQM_POOL_CONNSTR: connection string to the database. Default is an HSQLDB file database inside the container. If using another database, make sure the database driver is inside JQM_ROOT/ext (or subdirectory).
   * JQM_POOL_USER, JQM_POOL_PASSWORD: login and password for your database.
   * JQM_POOL_DRIVER: driver class name. Default is `org.hsqldb.jdbcDriver`.
@@ -149,3 +151,7 @@ A sample swarm file (also working as a compose file) is provided in the JQM sour
   * 1790: JMX registry
   * 1791: JMX server
 * Health check: yes, equivalent to calling the JMX bean Node.AllPollersPolling. See [the monitoring documentation](https://jqm.readthedocs.io/en/latest/admin/jmx.html) for more details.
+
+## 5. FAQ
+
+Error "Cannot create directory C:\jqm\.\hotdeploy" on node startup when running on Windows server (not client). JQM does not run as admin, and this means the default permissions on docker volume are restricted to admin on your server. Just run `icacls 'C:\ProgramData\docker\volumes\' /grant "Authenticated Users:(OI)(CI)(F)"` and `icacls 'C:\ProgramData\docker\windowsfilter\' /grant "Authenticated Users:(OI)(CI)(F)"` to allow non admin users to use volumes. Otherwise, run the container as admin with --user ContainerAdministrator (not recommended).
