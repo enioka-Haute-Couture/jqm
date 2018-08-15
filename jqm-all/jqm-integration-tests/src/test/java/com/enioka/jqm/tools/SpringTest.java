@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,6 +53,10 @@ public class SpringTest extends JqmBaseTest
     @Test
     public void testSpringRunner()
     {
+        String ver = System.getProperty("java.version");
+        double javaVersion = Double.parseDouble(ver.substring(0, ver.indexOf('.') + 2));
+        Assume.assumeTrue(javaVersion < 1.9); // The tested version of Spring is not really compatible with Java 9+.
+
         try
         {
             XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmlspring.xml", cnx);
