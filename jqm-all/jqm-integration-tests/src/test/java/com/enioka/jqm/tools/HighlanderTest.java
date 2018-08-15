@@ -155,11 +155,13 @@ public class HighlanderTest extends JqmBaseTest
         addAndStartEngine();
         addAndStartEngine("localhost4");
 
-        sleep(3);
+        TestHelpers.waitForRunning(1, 5000, cnx);
         int i2 = JqmClientFactory.getClient().enqueue(new JobRequest("WithH", "TestUser"));
         sleep(2);
         int i3 = JqmClientFactory.getClient().enqueue(new JobRequest("WithoutH", "TestUser"));
-        sleep(1);
+
+        TestHelpers.waitForRunning(2, 5000, cnx);
+        sleep(1); // Additional - check no more than two running!
 
         List<com.enioka.jqm.api.JobInstance> res = Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
                 .addSortAsc(Sort.ID).run();

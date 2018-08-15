@@ -20,6 +20,7 @@ package com.enioka.jqm.tools;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -136,7 +137,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
                 @Override
                 public URLClassLoader run()
                 {
-                    return new URLClassLoader(aUrls, null);
+                    return new URLClassLoader(aUrls, getParentCl());
                 }
             });
         }
@@ -400,6 +401,30 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
         else
         {
             this.singletons.remove(name);
+        }
+    }
+
+    /**
+     * A helper - in Java 9, the extension CL was renamed to platform CL and hosts all the JDK classes. Before 9, it was useless and we used
+     * bootstrap CL instead.
+     *
+     * @return the base CL to use.
+     */
+    private static ClassLoader getParentCl()
+    {
+        try
+        {
+            Method m = ClassLoader.class.getMethod("getPlatformClassLoader");
+            return (ClassLoader) m.invoke(null);
+        }
+        catch (NoSuchMethodException e)
+        {
+            // Java < 9, just use the bootstrap CL.
+            return null;
+        }
+        catch (Exception e)
+        {
+            throw new JqmInitError("Could not fetch Platform Class Loader", e);
         }
     }
 }

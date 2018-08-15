@@ -188,7 +188,7 @@ class ClassloaderManager
         return jobClassLoader;
     }
 
-    private ClassLoader getExtensionCLassloader()
+    private ClassLoader getExtensionClassloader()
     {
         ClassLoader extLoader = null;
         try
@@ -226,12 +226,12 @@ class ClassloaderManager
         switch (ji.getJD().getPathType())
         {
         case MAVEN:
-            return getExtensionCLassloader();
+            return getExtensionClassloader();
         case MEMORY:
             return Thread.currentThread().getContextClassLoader();
         default:
         case FS:
-            return getExtensionCLassloader();
+            return getExtensionClassloader();
         }
     }
 
