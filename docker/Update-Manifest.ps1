@@ -11,8 +11,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 
-function New-Manifest($Tag)
-{
+function New-Manifest($Tag) {
     $manifestName = "${ImageName}:${Tag}"
     $images = @()
     foreach ($Arch in $Architectures) {
@@ -31,6 +30,6 @@ function New-Manifest($Tag)
     }
 }
 
-foreach($Tag in $Tags) {
+foreach ($Tag in $Tags) {
     New-Manifest $Tag
 }
