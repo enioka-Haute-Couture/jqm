@@ -26,6 +26,10 @@ public class SpringTest extends JqmBaseTest
     @Test
     public void testSimpleSingleLaunch()
     {
+        String ver = System.getProperty("java.version");
+        double javaVersion = Double.parseDouble(ver.substring(0, ver.indexOf('.') + 2));
+        Assume.assumeTrue(javaVersion < 1.9); // The tested version of Spring is not really compatible with Java 9+.
+        
         CreationTools.createDatabaseProp("jdbc/spring_ds", "org.h2.Driver", "jdbc:h2:./target/TEST.db;DB_CLOSE_ON_EXIT=FALSE", "sa", "sa",
                 cnx, "SELECT 1", null, true);
         CreationTools.createJobDef(null, true, "com.enioka.jqm.test.spring1.Application", null,
