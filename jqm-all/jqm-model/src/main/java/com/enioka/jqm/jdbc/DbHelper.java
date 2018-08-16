@@ -32,7 +32,7 @@ public class DbHelper
      * Close utility method.
      * 
      * @param ps
-     *            statement to close.
+     *            statement to close (through a RS).
      */
     static void closeQuietly(ResultSet ps)
     {
@@ -40,7 +40,8 @@ public class DbHelper
         {
             try
             {
-                ps.close();
+                ps.getStatement().close();
+                // ps.close();
             }
             catch (Exception e)
             {

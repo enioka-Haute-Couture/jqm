@@ -228,6 +228,7 @@ class Loader implements Runnable, LoaderMBean
         }
         catch (JqmKillException e)
         {
+            Thread.interrupted(); // Clear interrupted status. (sad: only useful for Oracle driver)
             jqmlogger.info("Job instance  " + job.getId() + " has been killed.");
             this.resultStatus = State.CRASHED;
         }

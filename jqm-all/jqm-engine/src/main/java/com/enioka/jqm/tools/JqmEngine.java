@@ -19,6 +19,7 @@
 package com.enioka.jqm.tools;
 
 import java.lang.management.ManagementFactory;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -142,7 +143,9 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                     + " seconds ago. Either stop the other node, or if it already stopped, please wait " + (toWait - r) / 1000
                     + " seconds");
         }
-        jqmlogger.debug("The last time an engine with this name was seen was: " + node.getLastSeenAlive());
+        SimpleDateFormat ft = new SimpleDateFormat("dd/MM/YYYY hh:mm:ss");
+        jqmlogger.debug("The last time an engine with this name was seen was: "
+                + (node.getLastSeenAlive() == null ? "" : ft.format(node.getLastSeenAlive().getTime())));
 
         // Prevent very quick multiple starts by immediately setting the keep-alive
         QueryResult qr = cnx.runUpdate("node_update_alive_by_id", node.getId());
@@ -361,9 +364,10 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         jqmlogger.trace("The engine should end with the latest poller");
         hasEnded = true;
 
-        // If here, all pollers are down. Stop everythong else.
+        // If here, all pollers are down. Stop everything else.
         if (handler != null)
         {
+            // This is an optional callback for the engine host.
             handler.onNodeStopped();
         }
 

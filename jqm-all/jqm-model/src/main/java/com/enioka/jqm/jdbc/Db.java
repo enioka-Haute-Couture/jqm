@@ -168,7 +168,7 @@ public class Db
             {
                 res = (DataSource) InitialContext.doLookup(dsName);
             }
-            catch(NameNotFoundException e2)
+            catch (NameNotFoundException e2)
             {
                 res = null;
             }
@@ -178,7 +178,7 @@ public class Db
                 {
                     break;
                 }
-                //TODO: naming exception name does not exist.
+                // TODO: naming exception name does not exist.
 
                 String msg = e.getLocalizedMessage();
                 if (e.getCause() != null)
@@ -501,6 +501,7 @@ public class Db
     {
         try
         {
+            Thread.interrupted(); // this is VERY sad. Needed for Oracle driver which otherwise fails spectacularly.
             Connection cnx = _ds.getConnection();
             if (cnx.getAutoCommit())
             {

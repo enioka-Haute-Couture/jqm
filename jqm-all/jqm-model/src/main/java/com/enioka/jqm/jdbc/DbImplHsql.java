@@ -1,38 +1,11 @@
 package com.enioka.jqm.jdbc;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
-public class DbImplHsql implements DbAdapter
+public class DbImplHsql extends DbAdapter
 {
-    private final static String[] IDS = new String[] { "ID" };
-
-    private Map<String, String> queries = new HashMap<String, String>();
-    private String tablePrefix = null;
-
-    @Override
-    public void prepare(Properties p, Connection cnx)
-    {
-        this.tablePrefix = p.getProperty("com.enioka.jqm.jdbc.tablePrefix", "");
-        queries.putAll(DbImplBase.queries);
-        for (Map.Entry<String, String> entry : DbImplBase.queries.entrySet())
-        {
-            queries.put(entry.getKey(), this.adaptSql(entry.getValue()));
-        }
-    }
-
-    @Override
-    public String getSqlText(String key)
-    {
-        return queries.get(key);
-    }
-
     @Override
     public String adaptSql(String sql)
     {
@@ -44,24 +17,6 @@ public class DbImplHsql implements DbAdapter
     public boolean compatibleWith(String product)
     {
         return product.contains("hsql");
-    }
-
-    @Override
-    public String[] keyRetrievalColumn()
-    {
-        return IDS;
-    }
-
-    @Override
-    public List<String> preSchemaCreationScripts()
-    {
-        return new ArrayList<String>();
-    }
-
-    @Override
-    public void beforeUpdate(Connection cnx, QueryPreparation q)
-    {
-        return;
     }
 
     @Override

@@ -21,6 +21,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.model.Queue;
+
 //TODO: better way to close statements and RS.
 
 /**
@@ -210,6 +214,10 @@ public class DbConn implements Closeable
         {
             ps = prepare(qp);
             toClose.add(ps);
+            if (for_update)
+            {
+                transac_open = true;
+            }
             return ps.executeQuery();
         }
         catch (SQLException e)
@@ -332,6 +340,66 @@ public class DbConn implements Closeable
         }
     }
 
+    public <T> List<T> runSelectColumn(String query_key, Class<T> clazz, Object... params)
+    {
+        return runSelectColumn(query_key, 1, clazz, params);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> List<T> runSelectColumn(String query_key, int column, Class<T> clazz, Object... params)
+    {
+        ArrayList<T> resList = new ArrayList<T>();
+        ResultSet rs = runSelect(query_key, params);
+        try
+        {
+            if (rs.getMetaData().getColumnCount() < column)
+            {
+                throw new DatabaseException("query was supposed to return at least " + (column) + " columns - "
+                        + rs.getMetaData().getColumnCount() + " were returned.");
+            }
+
+            T res;
+            while (rs.next())
+            {
+                if (clazz.equals(Integer.class))
+                {
+                    res = (T) (Integer) rs.getInt(column);
+                }
+                else if (clazz.equals(String.class))
+                {
+                    res = (T) rs.getString(column);
+                }
+                else if (clazz.equals(Calendar.class))
+                {
+                    res = (T) getCal(rs, column);
+                }
+                else if (clazz.equals(Long.class))
+                {
+                    res = (T) (Long) rs.getLong(column);
+                }
+                else if (clazz.equals(Float.class))
+                {
+                    res = (T) (Float) rs.getFloat(column);
+                }
+                else
+                {
+                    throw new DatabaseException("unsupported single query return type " + clazz.getCanonicalName());
+                }
+                resList.add(res);
+            }
+
+            return resList;
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+        finally
+        {
+            closeQuietly(rs);
+        }
+    }
+
     /**
      * Close all JDBC objects related to this connection.
      */
@@ -372,7 +440,7 @@ public class DbConn implements Closeable
      * Close utility method.
      * 
      * @param ps
-     *            statement to close.
+     *            statement to close through a result set.
      */
     public void closeQuietly(ResultSet ps)
     {
@@ -500,7 +568,6 @@ public class DbConn implements Closeable
                     a = _cnx.createArrayOf("VARCHAR", vvv);
                 }
                 s.setArray(position, a);
-
             }
             else
             {
@@ -541,5 +608,10 @@ public class DbConn implements Closeable
         {
             jqmlogger.warn("Could not fetch database version", e1);
         }
+    }
+
+    public List<JobInstance> poll(Node node, Queue queue, int nbSlots)
+    {
+        return this.parent.getAdapter().poll(this, node, queue, nbSlots, 0);
     }
 }

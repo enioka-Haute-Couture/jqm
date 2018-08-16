@@ -6,42 +6,22 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
-public class DbImplMySql implements DbAdapter
+public class DbImplMySql extends DbAdapter
 {
-    private final static String[] IDS = new String[] { "ID" };
-
-    private Map<String, String> queries = new HashMap<String, String>();
-    private String tablePrefix = null;
-
     @Override
     public void prepare(Properties p, Connection cnx)
     {
-        this.tablePrefix = p.getProperty("com.enioka.jqm.jdbc.tablePrefix", "");
-
-        queries.putAll(DbImplBase.queries);
-        for (Map.Entry<String, String> entry : DbImplBase.queries.entrySet())
-        {
-            queries.put(entry.getKey(), this.adaptSql(entry.getValue()));
-        }
+        super.prepare(p, cnx);
 
         // Full rewrite for the most critical query.
-        queries.put("ji_update_poll",
-                this.adaptSql("UPDATE __T__JOB_INSTANCE j1 FORCE INDEX (`PRIMARY`) RIGHT JOIN "
-                        + "(SELECT j3.ID FROM __T__JOB_INSTANCE j3 FORCE INDEX(`IDX_JOB_INSTANCE_1`) WHERE j3.STATUS = 'SUBMITTED' AND j3.QUEUE = ? AND "
-                        + "(j3.HIGHLANDER = FALSE OR (j3.HIGHLANDER = TRUE AND (SELECT COUNT(1) FROM __T__JOB_INSTANCE j4 FORCE INDEX(`IDX_JOB_INSTANCE_2`) "
-                        + "WHERE j4.STATUS IN ('ATTRIBUTED' , 'RUNNING') AND j4.JOBDEF = j3.JOBDEF) = 0)) ORDER BY PRIORITY DESC, INTERNAL_POSITION LIMIT ? FOR UPDATE) j2 "
-                        + "ON j2.ID = j1.ID SET j1.NODE = ?, j1.STATUS = 'ATTRIBUTED', j1.DATE_ATTRIBUTION = CURRENT_TIMESTAMP"));
-    }
-
-    @Override
-    public String getSqlText(String key)
-    {
-        return queries.get(key);
+        queries.put("ji_update_poll", this.adaptSql("UPDATE __T__JOB_INSTANCE j1 FORCE INDEX (`PRIMARY`) RIGHT JOIN "
+                + "(SELECT j3.ID FROM __T__JOB_INSTANCE j3 FORCE INDEX(`IDX_JOB_INSTANCE_1`) WHERE j3.STATUS = 'SUBMITTED' AND j3.QUEUE = ? AND "
+                + "(j3.HIGHLANDER = FALSE OR (j3.HIGHLANDER = TRUE AND (SELECT COUNT(1) FROM __T__JOB_INSTANCE j4 FORCE INDEX(`IDX_JOB_INSTANCE_2`) "
+                + "WHERE j4.STATUS IN ('ATTRIBUTED' , 'RUNNING') AND j4.JOBDEF = j3.JOBDEF) = 0)) ORDER BY PRIORITY DESC, INTERNAL_POSITION LIMIT ? FOR UPDATE) j2 "
+                + "ON j2.ID = j1.ID SET j1.NODE = ?, j1.STATUS = 'ATTRIBUTED', j1.DATE_ATTRIBUTION = CURRENT_TIMESTAMP"));
     }
 
     @Override
@@ -64,12 +44,6 @@ public class DbImplMySql implements DbAdapter
     public boolean compatibleWith(String product)
     {
         return product.contains("mysql");
-    }
-
-    @Override
-    public String[] keyRetrievalColumn()
-    {
-        return IDS;
     }
 
     @Override

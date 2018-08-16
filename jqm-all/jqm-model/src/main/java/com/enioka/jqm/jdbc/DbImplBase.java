@@ -3,7 +3,10 @@ package com.enioka.jqm.jdbc;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DbImplBase
+/**
+ * All the SQL templates used in the application. Templates are as pure ANSI 92 SQL as possible, if not are HSQLDB inspired and pass through a {@link DbAdapter} to run on specific databases.
+ */
+class DbImplBase
 {
     /**
      *  Key convention is: entity_verb_descr<br>

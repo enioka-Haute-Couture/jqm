@@ -40,7 +40,7 @@ querying the state of a request, retrieving files created by a job instance, ...
 
 It is also of note that JQM was created with compatibility in mind:
 
-* runs any OS that has support for either Java 6, 7 or 8. Always tested on Windows, RHEL, Ubuntu. Also known to work on MacOSX and WSL (for non production use).
+* runs on any OS that has support for either Java 6, 7, 8, 9 and 10. Always tested on Windows, RHEL, Ubuntu. Also known to work on MacOSX and WSL (for non production use).
 * uses either PostgreSQL, Oracle or HSQLDB (also works with MySQL with a documented quirk)
 * the client API is usable in all application servers and JSE code (tested with WebsSphere 8.x, Glassfish 3.x, Tomcat 7.x, JBoss EAP 6.x)
 * one of the client API implementations is a REST-like API, callable from everywhere, not only Java but also .NET or shell scripts
