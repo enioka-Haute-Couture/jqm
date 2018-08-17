@@ -19,6 +19,7 @@
 package com.enioka.jqm.tools;
 
 import java.lang.management.ManagementFactory;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,7 @@ import javax.management.ObjectName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.QueryResult;
@@ -141,7 +143,9 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                     + " seconds ago. Either stop the other node, or if it already stopped, please wait " + (toWait - r) / 1000
                     + " seconds");
         }
-        jqmlogger.debug("The last time an engine with this name was seen was: " + node.getLastSeenAlive());
+        SimpleDateFormat ft = new SimpleDateFormat("dd/MM/YYYY hh:mm:ss");
+        jqmlogger.debug("The last time an engine with this name was seen was: "
+                + (node.getLastSeenAlive() == null ? "" : ft.format(node.getLastSeenAlive().getTime())));
 
         // Prevent very quick multiple starts by immediately setting the keep-alive
         QueryResult qr = cnx.runUpdate("node_update_alive_by_id", node.getId());
@@ -360,9 +364,10 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         jqmlogger.trace("The engine should end with the latest poller");
         hasEnded = true;
 
-        // If here, all pollers are down. Stop everythong else.
+        // If here, all pollers are down. Stop everything else.
         if (handler != null)
         {
+            // This is an optional callback for the engine host.
             handler.onNodeStopped();
         }
 
@@ -379,7 +384,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         }
         catch (Exception e)
         {
-            // Shutdown exception is ignored (happens during tests)
+            jqmlogger.error("Could not store node new state in database during node shutdown", e);
         }
         finally
         {
@@ -544,7 +549,21 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                 while (l != null)
                 {
                     jqmlogger.warn("storing delayed results for loader " + l.getId());
-                    l.endOfRunDb();
+                    try
+                    {
+                        l.endOfRunDb();
+                    }
+                    catch (DatabaseException e3)
+                    {
+                        // There is an edge case here: if the DB fails after commit but before sending ACK.
+                        // In that case, we may get a duplicate in the history table, and therefore a constraint violation.
+                        if (!(e3.getCause().getMessage().toLowerCase().contains("violation")
+                                || e3.getCause().getMessage().toLowerCase().contains("duplicate")))
+                        {
+                            throw e3;
+                        }
+                        jqmlogger.info("duplicate loader finalization avoided for loader " + l.getId());
+                    }
                     l = loaderToFinalize.poll();
                 }
 

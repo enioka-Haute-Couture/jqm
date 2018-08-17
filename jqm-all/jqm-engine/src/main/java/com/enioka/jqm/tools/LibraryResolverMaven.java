@@ -50,11 +50,10 @@ public class LibraryResolverMaven
         // Retrieve resolver configuration
         if (REPO_LIST == null)
         {
-            List<GlobalParameter> repolist = GlobalParameter.select(cnx, "globalprm_select_by_key", "mavenRepo");
-            REPO_LIST = new ArrayList<String>(repolist.size());
-            for (GlobalParameter gp : repolist)
+            REPO_LIST = new ArrayList<String>(5);
+            for (String gp : GlobalParameter.getParameter(cnx, "mavenRepo", "http://repo1.maven.org/maven2/").split(","))
             {
-                REPO_LIST.add(gp.getValue());
+                REPO_LIST.add(gp);
             }
 
             MAVEN_SETTINGS_CL = GlobalParameter.getParameter(cnx, "mavenSettingsCL", null);
@@ -91,9 +90,11 @@ public class LibraryResolverMaven
             if (repo.contains("repo1.maven.org"))
             {
                 withCentral = true;
+                continue;
             }
-            resolver = resolver.withRemoteRepo(MavenRemoteRepositories.createRemoteRepository(repo, repo, "default")
-                    .setUpdatePolicy(MavenUpdatePolicy.UPDATE_POLICY_NEVER));
+            resolver = resolver
+                    .withRemoteRepo(MavenRemoteRepositories.createRemoteRepository("repo" + Math.abs(repo.hashCode()), repo, "default")
+                            .setUpdatePolicy(MavenUpdatePolicy.UPDATE_POLICY_NEVER));
         }
         resolver.withMavenCentralRepo(withCentral);
         return resolver;

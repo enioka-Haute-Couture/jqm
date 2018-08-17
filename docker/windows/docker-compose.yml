@@ -1,0 +1,52 @@
+version: "3.4"
+services:
+    jre:
+        build:
+            context: ./java
+            dockerfile: DockerFile.jre
+            labels:
+                com.enioka.description: "build helper - OpenJDK JRE for windows nano"
+            args:
+                - OJDK_VERSION=171-1
+                - OJDK_BUILD=b10
+                - OJDK_SHA256=35104f658ed51d1b24cf6f0f6d1d21524d7640d3e3e7b64d8d7ac86cbfbc2ab9
+                - WINDOWS_TAG=${WINDOWS_TAG}
+        image: enioka/buildhelpers:jre-1.8.0-${WINDOWS_TAG:?tag must be given}
+        hostname: jre
+
+    jdk:
+        build:
+            context: ./java
+            dockerfile: DockerFile.jdk
+            labels:
+                com.enioka.description: "build helper - OpenJDK JDK for windows nano"
+            args:
+                - OJDK_VERSION=171-1
+                - OJDK_BUILD=b10
+                - OJDK_SHA256=35104f658ed51d1b24cf6f0f6d1d21524d7640d3e3e7b64d8d7ac86cbfbc2ab9
+                - WINDOWS_TAG=${WINDOWS_TAG}
+        image: enioka/buildhelpers:jdk-1.8.0-${WINDOWS_TAG:?tag must be given}
+        hostname: jdk
+
+    mvn:
+        build:
+            context: ./maven
+            dockerfile: DockerFile
+            labels:
+                com.enioka.description: "build helper - Maven build for windows nano"
+            args:
+                - WINDOWS_TAG=${WINDOWS_TAG}
+                - MVN_VERSION=3.5.4
+                - MVN_MD5=235db716537989e9e949e5bf23f965c0
+        image: enioka/buildhelpers:maven-3-${WINDOWS_TAG:?tag must be given}
+        hostname: maven
+
+    jqm:
+        build:
+            context: ../../
+            dockerfile: ./docker/windows/jqm/Dockerfile
+            labels:
+                com.enioka.description: "official JQM Docker distribution"
+            args:
+                - WINDOWS_TAG=${WINDOWS_TAG}
+        image: ${JQM_IMAGE_NAME}

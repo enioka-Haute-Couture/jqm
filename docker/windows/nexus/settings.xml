@@ -1,0 +1,14 @@
+<settings>
+	<profiles>
+	</profiles>
+
+	<mirrors>
+		<mirror>
+			<id>CentralProxy</id>
+			<name>central-proxy</name>
+			<url>http://nexus:8081/repository/maven-public/</url>
+			<mirrorOf>*</mirrorOf>
+		</mirror>		
+	</mirrors>
+
+</settings>

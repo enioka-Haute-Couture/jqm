@@ -1,0 +1,49 @@
+version: "3.5"
+services:
+  db:
+    image: enioka/buildhelpers:hsqldb-test
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: dnsrr
+
+  jqmbootstrap:
+    # Create the database schema on startup and stops.
+    image: enioka/jqm:latest
+    environment:
+      - JQM_NODE_NAME=_localhost_
+      - JQM_INIT_MODE=UPDATER
+      - JQM_POOL_CONNSTR=jdbc:hsqldb:hsql://db/jqm    
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: dnsrr
+
+  jqmweb:
+    image: enioka/jqm:latest
+    environment:
+      - JQM_NODE_NAME=_localhost_
+      - JQM_INIT_MODE=CLUSTER
+      - JQM_CREATE_NODE_TEMPLATE=TEMPLATE_WEB
+      - JQM_POOL_CONNSTR=jdbc:hsqldb:hsql://db/jqm
+    ports:
+      - target: 1789
+        published: 8080
+        protocol: tcp
+        mode: host
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: dnsrr
+  
+  jqmworker:
+    image: enioka/jqm:latest
+    environment:
+      - JQM_NODE_NAME=_localhost_
+      - JQM_INIT_MODE=CLUSTER
+      - JQM_CREATE_NODE_TEMPLATE=TEMPLATE_DRONE
+      - JQM_POOL_CONNSTR=jdbc:hsqldb:hsql://db/jqm
+    deploy:
+      mode: replicated
+      replicas: 2
+      endpoint_mode: dnsrr

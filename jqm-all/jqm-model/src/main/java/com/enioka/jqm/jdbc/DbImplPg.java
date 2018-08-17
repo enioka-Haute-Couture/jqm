@@ -1,36 +1,14 @@
 package com.enioka.jqm.jdbc;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
-public class DbImplPg implements DbAdapter
+public class DbImplPg extends DbAdapter
 {
-    private final static String[] IDS = new String[] { "id" };
-
-    private Map<String, String> queries = new HashMap<String, String>();
-    private String tablePrefix = null;
-
-    @Override
-    public void prepare(Properties p, Connection cnx)
+    public DbImplPg()
     {
-        this.tablePrefix = p.getProperty("com.enioka.jqm.jdbc.tablePrefix", "");
-        queries.putAll(DbImplBase.queries);
-        for (Map.Entry<String, String> entry : DbImplBase.queries.entrySet())
-        {
-            queries.put(entry.getKey(), this.adaptSql(entry.getValue()));
-        }
-    }
-
-    @Override
-    public String getSqlText(String key)
-    {
-        return queries.get(key);
+        this.IDS[0] = "id";
     }
 
     @Override
@@ -47,24 +25,6 @@ public class DbImplPg implements DbAdapter
     public boolean compatibleWith(String product)
     {
         return product.contains("postgresql");
-    }
-
-    @Override
-    public String[] keyRetrievalColumn()
-    {
-        return IDS;
-    }
-
-    @Override
-    public List<String> preSchemaCreationScripts()
-    {
-        return new ArrayList<String>();
-    }
-
-    @Override
-    public void beforeUpdate(Connection cnx, QueryPreparation q)
-    {
-        return;
     }
 
     @Override

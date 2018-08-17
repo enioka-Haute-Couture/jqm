@@ -1,4 +1,6 @@
 <jqm>
+	<defaultQueueName>Queue2</defaultQueueName>
+
 	<nodes>
 		<node>
 			<name>Node1</name>
@@ -21,10 +23,60 @@
 		</node>
 	</nodes>
 
+	<queues>
+		<queue>
+			<name>Queue1</name>
+			<description>test queue 1</description>
+			<mappings>
+				<mapping>
+					<nodeName>Node1</nodeName>
+					<maxThreads>10</maxThreads>
+					<pollingIntervalMs>5000</pollingIntervalMs>
+					<enabled>true</enabled>
+				</mapping>
+			</mappings>
+		</queue>
+		<queue>
+			<name>Queue2</name>
+			<description>test queue 2</description>
+			<mappings></mappings>
+		</queue>
+	</queues>
+
 	<globalParameters>
 		<parameter>
 			<key>key1</key>
 			<value>value2</value>
 		</parameter>
 	</globalParameters>
+	
+	<resources>
+		<resource>
+			<alias>string/test1</alias>
+			<type>java.lang.String</type>
+			<factory>com.enioka.jqm.providers.StringFactory</factory>
+			<description>test resource</description>
+			<singleton>false</singleton>
+			<parameters>
+				<parameter>
+					<key>STRING</key>
+					<value>test1_2</value>
+				</parameter>
+			</parameters>
+		</resource>
+
+		<resource>
+			<alias>string/test2</alias>
+			<type>java.lang.String</type>
+			<factory>com.enioka.jqm.providers.StringFactory</factory>
+			<description>test resource</description>
+			<singleton>false</singleton>
+			<parameters>
+				<parameter>
+					<key>STRING</key>
+					<value>test2_2</value>
+				</parameter>
+			</parameters>
+		</resource>
+	</resources>
 </jqm>

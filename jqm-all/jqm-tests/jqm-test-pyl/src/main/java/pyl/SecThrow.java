@@ -7,6 +7,6 @@ public class SecThrow extends JobBase
     @Override
     public void start()
     {
-        throw new Error("test error");
+        throw new Error("error voluntarily thrown by test payload");
     }
 }

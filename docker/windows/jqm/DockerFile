@@ -1,0 +1,92 @@
+ARG WINDOWS_TAG
+ARG JAVA_VERSION=1.8.0
+
+###############################################################################
+## Build inside full JDK image.
+###############################################################################
+FROM enioka/buildhelpers:maven-3-${WINDOWS_TAG} AS builder
+
+ARG MVN_SETTINGS=" "
+ARG SKIP_TESTS=true
+
+WORKDIR /jqm-all
+
+# This WILL download the whole Maven Central repository on each build.
+# Attempt 1 to avoid this: 
+# Copy all poms ls -Recurse pom.xml | resolve-path -Relative |? {select-string -NotMatch "target|bin" -InputObject $_} |% {echo "COPY $_ $(Split-Path -Parent $_)\".Replace("\", "/")}
+# RUN mvn dependency:go-offline # sadly no: https://issues.apache.org/jira/browse/MDEP-204 (reactor not used by this goal)
+
+# Attempt 2: use Nexus in another container. But Nexus (like most Java programs) has big issues when using volumes due to a JDK bug...
+# If you HAVE a Nexus or another Central caching reverse proxy, just use setting.xml.
+
+# Build
+COPY ./docker/windows/nexus/settings.xml ./jqm-all ./
+
+RUN mvn install -DskipTests=%SKIP_TESTS% %MVN_SETTINGS%
+
+
+
+
+###############################################################################
+## Powershell so as to unzip
+###############################################################################
+FROM microsoft/powershell:nanoserver-${WINDOWS_TAG} AS installer
+
+SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+COPY --from=builder c:/jqm-all/jqm-service/target/jqm-2.1.0-SNAPSHOT.zip C:/TEMP/jqm.zip
+
+RUN Expand-Archive C:/TEMP/jqm.zip -DestinationPath C:/TEMP/; \
+    mv C:/TEMP/jqm-* c:/jqm; \
+    mkdir C:/jqm/hotdeploy >$null; \
+    mkdir C:/jqm/ext/drivers >$null;
+
+ENV CURL_VERSION="7.58.0"
+ENV CURL_ZIP="https://dl.uxnr.de/build/curl/curl_winssl_msys2_mingw64_stc/curl-${CURL_VERSION}/curl-${CURL_VERSION}.zip"
+
+# For 1709 only, get curl. It is inside the base image from 1803 onward.
+RUN if ($env:WINDOWS_TAG -ne "1709") { return 0}; \
+    Write-Host ('Downloading {0} ...' -f $env:CURL_ZIP); \
+    Invoke-WebRequest -Uri $env:CURL_ZIP -OutFile 'C:/TEMP/curl.zip'; \
+    Write-Host 'unzipping curl'; \
+    Expand-Archive -Path C:/TEMP/curl.zip -DestinationPath C:/curl; \
+    Move-Item C:\curl\src\curl.exe C:/jqm/bin/;
+
+COPY ./docker/windows/jqm/*.bat C:/jqm/bin/
+COPY ./docker/config/selfConfig*.xml C:/jqm/
+
+
+
+###############################################################################
+## Actual image, based on minimal JRE.
+###############################################################################
+FROM enioka/buildhelpers:jre-${JAVA_VERSION}-${WINDOWS_TAG}
+
+COPY --from=installer C:/jqm/ C:/jqm/
+
+ENV JAVA_OPTS="-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m" \
+    JQM_ROOT="C:\\jqm" \
+    JQM_NODE_NAME="ContainerNode" \
+    JQM_CREATE_NODE_IF_MISSING=0 \
+    JQM_CREATE_NODE_TEMPLATE=TEMPLATE_WEB \
+    JQM_POOL_CONNSTR="jdbc:hsqldb:file:db/jqmdatabase;shutdown=true;hsqldb.write_delay=false" \
+    JQM_POOL_USER="sa" \
+    JQM_POOL_PASSWORD="" \
+    JQM_POOL_DRIVER="org.hsqldb.jdbcDriver" \
+    JQM_POOL_VALIDATION_QUERY="SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS" \
+    JQM_POOL_MAX=10 \
+    JQM_HEALTHCHECK_URL="http://localhost:1789/ws/simple/localnode/health"
+
+EXPOSE 1789 1790 1791
+VOLUME C:/jqm/hotdeploy/ \
+    C:/jqm/ext/drivers/
+
+# Configuration
+WORKDIR C:/jqm
+RUN java -jar jqm.jar -u && java -jar jqm.jar -c selfConfig.single.xml && java -jar jqm.jar -importjobdef ./jobs/jqm-demo && DEL /Q .\logs\*
+
+# Run node on startup
+ENTRYPOINT C:\jqm\bin\node.bat
+
+# Healthcheck is equivalent to calling Node.AllPollersPolling
+HEALTHCHECK --interval=30s --start-period=91s --retries=2 --timeout=10s CMD .\bin\curl --connect-timeout 2 -q --http1.1 -4 -s -S  %JQM_HEALTHCHECK_URL%

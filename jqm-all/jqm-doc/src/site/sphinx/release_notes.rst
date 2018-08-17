@@ -1,6 +1,46 @@
 Release notes
 ######################
 
+2.1.0
+*************
+
+Release goal
+++++++++++++++++
+
+This release aimed at increasing compatibility with various development ecosystems, chief of which Docker and newer Java versions. Just run `docker run -it --rm -p 1789:1789 enioka/jqm` and go to http://localhost:1789 !
+
+It is a simple upgrade with no breaking change.
+
+Major changes
+++++++++++++++++++++++++++++
+
+* Docker compatibility. Official images (Linux Alpine & Windows Nano) are released on the Docker Hub at https://hub.docker.com/r/enioka/jqm/ and are usable for many development and production scenarios. 
+  Read the documentation on the Docker Hub for more details - this is the pièce de résistance of the release.
+* Java 9 and 10 compatibility. Note that Java 6 & 7 are still supported, but also still deprecated and will be removed in the next version.
+  * Note that using the WS client will require to change the Jersey dependencies to newer one on Java 9+, as the older Java 6 compatible libraries used by default are not compatible with 9+.
+* Oracle compatibility is back.
+* Engine: on Java >= 7, the job instance class loader are now closed. On Windows, this means no more file locks remaining after run and therefore job jars are now hot swap-able.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Engine: better db failure handling on MySQL and Oracle.
+* Engine: will now wait for the database to be available on startup, allowing easier startup sequences.
+* Engine: drivers and other libraries can now be placed in sub-folders of the "ext" directory (used to be: only at the root of ext).
+* Client API: can now switch scheduled job instances from one queue to another, and cancel them.
+* Simple API: new easier health check by an HTTP GET (equivalent to calling JMX bean AreAllPollersPolling).
+* CLI: added possibility to apply a node template to a given node, allowing it to poll specific queues and other parameters.
+
+Deprecated
++++++++++++++++
+
+No new entries - same list as for 2.0.x.
+
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
+* JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs)
+* Java 6 & 7, which are no longer supported, are considered deprecated in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
+
+
 2.0.0
 *************
 
@@ -78,7 +118,7 @@ Deprecated
 
 * The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
 * JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs)
-* Java 6 & 7, which are no longer supported, are considered depracted in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
+* Java 6 & 7, which are no longer supported, are considered deprecated in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
 
 
 1.4.1

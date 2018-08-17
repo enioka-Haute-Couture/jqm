@@ -146,7 +146,7 @@ class JarClassLoader extends URLClassLoader
             catch (Exception e)
             {
                 throw new JqmEngineException(
-                        "could not load a runner: check you global parameters, or that the plugin for this runner is actually present "
+                        "could not load a runner: check your global parameters, or that the plugin for this runner is actually present "
                                 + runnerClassName,
                         e);
             }
@@ -369,5 +369,48 @@ class JarClassLoader extends URLClassLoader
     void mayBeShared(boolean val)
     {
         this.mayBeShared = val;
+    }
+
+    /**
+     * Hack - in Java 7, CL.Close was introduced but is not present in earlier versions. Yet it is highly useful on Windows as it frees file
+     * handlers.<br>
+     * Shared class loaders are left open.
+     */
+    void tryClose()
+    {
+        if (!mayBeShared)
+        {
+            // First: free the hounds, er, the CL leak hunter
+            ClassLoaderLeakCleaner.clean(this);
+            ClassLoaderLeakCleaner.cleanJdbc(Thread.currentThread());
+
+            // Then try to call CL.close()
+            Method m = null;
+            try
+            {
+                m = this.getClass().getMethod("close");
+            }
+            catch (NoSuchMethodException e)
+            {
+                jqmlogger.trace("CL cannot be closed");
+                return;
+            }
+            catch (SecurityException e)
+            {
+                jqmlogger.error("Cannot access CL.close", e);
+                return;
+            }
+
+            try
+            {
+                m.invoke(this);
+            }
+            catch (Exception e)
+            {
+                jqmlogger.error("Cannot close CL", e);
+                return;
+            }
+            jqmlogger.debug("CL was closed");
+        }
     }
 }

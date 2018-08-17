@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.net.SocketException;
 import java.sql.SQLException;
+import java.sql.SQLNonTransientConnectionException;
+import java.sql.SQLNonTransientException;
 import java.sql.SQLTransientException;
 import java.util.HashMap;
 import java.util.List;
@@ -622,6 +624,9 @@ final class Helpers
                 || (e.getCause() != null && e.getCause() instanceof SQLException
                         && e.getMessage().equals("Failed to validate a newly established connection."))
                 || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof SocketException)
-                || (e.getCause() != null && e.getCause().getMessage().equals("This connection has been closed"));
+                || (e.getCause() != null && e.getCause().getMessage().equals("This connection has been closed"))
+                || (e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
+                || (e.getCause() != null && e.getCause() instanceof SQLNonTransientException
+                        && e.getCause().getMessage().equals("connection exception: closed"));
     }
 }

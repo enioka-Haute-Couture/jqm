@@ -3,7 +3,10 @@ package com.enioka.jqm.jdbc;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DbImplBase
+/**
+ * All the SQL templates used in the application. Templates are as pure ANSI 92 SQL as possible, if not are HSQLDB inspired and pass through a {@link DbAdapter} to run on specific databases.
+ */
+class DbImplBase
 {
     /**
      *  Key convention is: entity_verb_descr<br>
@@ -78,7 +81,8 @@ public class DbImplBase
         queries.put("dp_select_enabled_for_queue", "SELECT ENABLED, MAX_THREAD FROM __T__QUEUE_NODE_MAPPING WHERE QUEUE=?");
         queries.put("dp_select_sum_queue_capacity", "SELECT SUM(dp.MAX_THREAD) FROM __T__QUEUE_NODE_MAPPING dp LEFT JOIN __T__NODE n ON n.ID = dp.NODE WHERE dp.ENABLED = true AND n.ENABLED = true AND dp.QUEUE = ?");
         queries.put("dp_select_all_with_names", "SELECT dp.ID, dp.ENABLED, dp.LAST_MODIFIED, dp.MAX_THREAD, dp.POLLING_INTERVAL, dp.NODE, dp.QUEUE, n.NAME, q.NAME FROM __T__QUEUE_NODE_MAPPING dp LEFT JOIN __T__NODE n ON n.ID=dp.NODE LEFT JOIN __T__QUEUE q ON q.ID=dp.QUEUE ");
-        queries.put("dp_select_with_names_by_id", queries.get("dp_select_all_with_names") + " WHERE ID=?");
+        queries.put("dp_select_with_names_by_id", queries.get("dp_select_all_with_names") + " WHERE dp.ID=?");
+        queries.put("dp_select_with_names_by_node_id", queries.get("dp_select_all_with_names") + " WHERE dp.NODE=?");
         
         // CL
         queries.put("cl_insert", "INSERT INTO __T__CL(ID, NAME, CHILD_FIRST, HIDDEN_CLASSES, TRACING, PERSISTENT, ALLOWED_RUNNERS) VALUES(JQM_PK.nextval, ?, ?, ?, ?, ?, ?)");
@@ -174,12 +178,12 @@ public class DbImplBase
         queries.put("jj_update_resume_by_id", "UPDATE __T__JOB_INSTANCE SET STATUS='SUBMITTED' WHERE ID=? AND STATUS='HOLDED'");
         queries.put("jj_update_instruction_pause_by_id", "UPDATE __T__JOB_INSTANCE SET INSTRUCTION='PAUSE' WHERE ID=? AND STATUS IN ('RUNNING', 'HOLDED', 'SUBMITTED', 'ATTRIBUTED', 'SCHEDULED')");
         queries.put("jj_update_instruction_resume_by_id", "UPDATE __T__JOB_INSTANCE SET INSTRUCTION='RUN' WHERE ID=? AND INSTRUCTION = 'PAUSE'");
-        queries.put("jj_update_queue_by_id", "UPDATE __T__JOB_INSTANCE SET QUEUE=? WHERE ID=? AND STATUS IN('SUBMITTED', 'HOLDED')");
+        queries.put("jj_update_queue_by_id", "UPDATE __T__JOB_INSTANCE SET QUEUE=? WHERE ID=? AND STATUS IN('SUBMITTED', 'HOLDED', 'SCHEDULED')");
         queries.put("jj_update_priority_by_id", "UPDATE __T__JOB_INSTANCE SET PRIORITY=? WHERE ID=?");
         queries.put("jj_update_notbefore_by_id", "UPDATE __T__JOB_INSTANCE SET STATUS='SCHEDULED', DATE_NOT_BEFORE=? WHERE ID=? AND STATUS IN('SCHEDULED', 'SUBMITTED')");
         queries.put("jj_update_rank_by_id", "UPDATE __T__JOB_INSTANCE SET INTERNAL_POSITION=? WHERE ID=? AND STATUS='SUBMITTED'");
         queries.put("jj_update_progress_by_id", "UPDATE __T__JOB_INSTANCE SET PROGRESS=? WHERE ID=?");
-        queries.put("jj_update_run_by_id", "UPDATE __T__JOB_INSTANCE SET DATE_START=CURRENT_TIMESTAMP, STATUS='RUNNING' WHERE ID=? AND STATUS='ATTRIBUTED'");
+        queries.put("jj_update_run_by_id", "UPDATE __T__JOB_INSTANCE SET DATE_START=CURRENT_TIMESTAMP, STATUS='RUNNING' WHERE ID=? AND (STATUS='ATTRIBUTED' OR STATUS='RUNNING')");
         queries.put("debug_jj_update_node_by_id", "UPDATE __T__JOB_INSTANCE SET NODE=? WHERE ID=?");
         queries.put("debug_jj_update_status_by_id", "UPDATE __T__JOB_INSTANCE SET STATUS=? WHERE ID=?");
         queries.put("ji_select_current_pos", "SELECT COUNT(ji) FROM __T__JOB_INSTANCE ji WHERE ji.INTERNAL_POSITION < ? AND ji.status = 'SUBMITTED' AND QUEUE=?");
@@ -331,7 +335,7 @@ public class DbImplBase
         
         // WITNESS
         queries.put("w_insert", "INSERT INTO __T__WITNESS(ID, KEYNAME, NODE, LATEST_CONTACT) VALUES(JQM_PK.nextval, 'SCHEDULER', ?, CURRENT_TIMESTAMP)");
-        queries.put("w_update_take", "UPDATE __T__WITNESS SET NODE=?, LATEST_CONTACT=CURRENT_TIMESTAMP WHERE KEYNAME='SCHEDULER' AND (NODE=? OR (NODE<>? AND LATEST_CONTACT < (CURRENT_TIMESTAMP - ? SECOND)))");
+        queries.put("w_update_take", "UPDATE __T__WITNESS SET NODE=?, LATEST_CONTACT=CURRENT_TIMESTAMP WHERE KEYNAME='SCHEDULER' AND (LATEST_CONTACT IS NULL OR NODE IS NULL OR NODE=? OR (NODE<>? AND LATEST_CONTACT < (CURRENT_TIMESTAMP - ? SECOND)))");
     }
    
 }

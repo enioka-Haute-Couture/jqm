@@ -1,0 +1,11 @@
+version: "3.4"
+services:
+    hsqldb:
+        build:
+            context: .
+            dockerfile: DockerFile
+            labels:
+                com.enioka.description: "build helper - tests with HSQLDB"
+            args:
+                - JDK_VERSION=1.8.0.151-1
+        image: enioka/buildhelpers:hsqldb-test

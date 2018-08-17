@@ -7,8 +7,32 @@ This guide will show how to run a job inside JQM with the strict minimum of oper
 The resulting installation is not suitable for production at all, but perfect for development environments.
 It also gives pointers to the general documentation.
 
-Windows
-************
+Docker on Windows or Linux/Mac
+*******************************
+
+Prerequisites:
+
+* Docker is configured and can access public images
+  * On Windows server (not client), that includes configuring default volume permissions 
+    (:bash:`icacls "C:\ProgramData\docker\volumes\" /grant "Authenticated Users:(OI)(CI)(F)"` and :bash:`icacls 'C:\ProgramData\docker\windowsfilter\' /grant "Authenticated Users:(OI)(CI)(F)"`)
+* A recent Windows (greater or equal to 1709) or Linux (this includes Macs which run containers inside a hidden Linux VM)
+
+Just run the very classic::
+
+	docker run -it --rm -p 1789:1789 enioka/jqm
+
+
+The log inside the console should give you an indication "Jetty has started on port 1789". You can now use your preferred browser
+to go to http://localhost:1789 and browse the administration console.
+
+Go to the last tab, click on "new launch" on the bottom, select the "DemoEcho" job and validate. The job should run and appear in the
+history list when clicking on "refresh". Congratulations, that was a first JQM job instance launch!
+
+Use Ctrl+C inside the console to stop the engine with the container.
+
+
+Windows without Docker
+**************************
 
 Prerequisites:
 
@@ -49,8 +73,8 @@ The log inside the console should give you an indication "Jetty has started on p
 to go to localhost:port and browse the administration console. Use Ctrl+C inside the PowerShell console to stop the engine.
 
 
-Linux / Unix
-************
+Linux / Unix without Docker
+******************************
 
 Prerequisites:
 

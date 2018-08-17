@@ -15,19 +15,22 @@ To ease the pain for the users of what we may call the "default Eclipse formatti
 Database
 ***********
 
-General: 
+General:
+
 * always use upper-case letters for object names (whatever the database, even if case insensitive).
 * in case multiple words are needed in a name, they are separated by an underscore.
 * spaces and special characters are forbidden. Only A-Z and _ and 0-9.
 * Always prefer choices compatible with ANSI SQL.
 * Shorter names are better!
 
-Main tables: 
+Main tables:
+
 * the name of the table is the name of the notion contained by the table. E.g. QUEUE for the table containing the description of the different queues.
 * always use singular: QUEUE, and not QUEUES.
 * never more than 25 characters. If needed, use a shorter version of the notion (JOB_DEF instead of JOB_DEFINITION for example).
 
 Constraints:
+
 * constraints must all be named. Never use auto generated names as they make the schema harder to update. (exception for NOT NULL)
 * PK: PK_TABLE_NAME
 * FK: FK_TABLE_NAME_n where n is an integer incremented on each new FK. We choose not to mention the target table in the name, as it would make the name really long and unwieldy.
@@ -36,10 +39,12 @@ Constraints:
 * As much as possible, constraints are expressed inside the database rather than in code.
 
 ID generation:
+
 * use sequences if available. There should be one unique sequence for all needs.
 * otherwise do the best you can. Beware MySQL auto ID, which are reset on startup.
 
 Table columns:
+
 * Name follows same guides as for  table names.
 * FK columns do not need to add _ID: an FK to a queue is named QUEUE.
 * max length is 20 characters.
@@ -49,5 +54,6 @@ Table columns:
 * sometimes, the "good name" is a reserved SQL keyword: key, value... in that case just put another word next to it, without underscore (KEYNAME instead of KEY...)
 
 Indices:
+
 * For indices on constraints, IDX_CONSTRAINT_NAME
 * Otherwise, IDX_TABLE_NAME_n

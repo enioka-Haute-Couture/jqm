@@ -1,0 +1,21 @@
+# Optional build environment - a Nexus Maven cache server.
+version: "3.4"
+services:
+    nexus:
+        build:
+            context: .
+            dockerfile: DockerFile
+            labels:
+                com.enioka.description: "build helper - Maven cache"
+        image: enioka/buildhelpers:nexus
+        hostname: nexus
+        volumes:
+            - type: volume
+              source: nexus-data
+              target: c:/nexus/sonatype-work/
+        ports:
+            - 8081:8081
+
+volumes:
+    nexus-data:
+        external: true

@@ -228,6 +228,7 @@ class Loader implements Runnable, LoaderMBean
         }
         catch (JqmKillException e)
         {
+            Thread.interrupted(); // Clear interrupted status. (sad: only useful for Oracle driver)
             jqmlogger.info("Job instance  " + job.getId() + " has been killed.");
             this.resultStatus = State.CRASHED;
         }
@@ -296,15 +297,13 @@ class Loader implements Runnable, LoaderMBean
             }
         }
 
-        // Clean class loader
-        ClassLoaderLeakCleaner.clean(Thread.currentThread().getContextClassLoader());
-
-        // Clean JDBC connections
-        ClassLoaderLeakCleaner.cleanJdbc(Thread.currentThread());
-
-        // Restore class loader
+        // Restore and clean class loaders (if needed, as CLs may be persistent)
         if (this.classLoaderToRestoreAtEnd != null)
         {
+            if (Thread.currentThread().getContextClassLoader() instanceof JarClassLoader)
+            {
+                ((JarClassLoader) Thread.currentThread().getContextClassLoader()).tryClose();
+            }
             Thread.currentThread().setContextClassLoader(classLoaderToRestoreAtEnd);
             jqmlogger.trace("Class Loader was correctly restored");
         }

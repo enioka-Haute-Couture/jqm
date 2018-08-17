@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "Dockerfile.*": "dockerfile"
+    },
+    "LineCount.includes": [
+        "**/*.java",
+        "**/*.js",
+    ],
+    "LineCount.output": {
+        "txt": true,
+        "json": true,
+        "csv": false,
+        "md": false,
+        "outdir": "jqm-all/jqm-service/target/count/"
+    },
+    "editor.formatOnSave": true,
+    "java.configuration.updateBuildConfiguration": "automatic",
+}

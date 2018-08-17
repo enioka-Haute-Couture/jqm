@@ -26,6 +26,8 @@ import org.junit.Test;
 
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.NodeDto;
+import com.enioka.api.admin.QueueDto;
+import com.enioka.api.admin.QueueMappingDto;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.Queue;
@@ -171,7 +173,7 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals(2, jd.size());
         Assert.assertEquals("Fibo", fibo.getApplicationName());
         Assert.assertEquals("NEWVALUE", fibo.getKeyword1());
-        Assert.assertEquals("", fibo.getKeyword2());
+        Assert.assertEquals("", fibo.getKeyword2() == null ? "" : fibo.getKeyword2());
         Assert.assertEquals(null, fibo.getKeyword3());
     }
 
@@ -350,6 +352,23 @@ public class XmlTest extends JqmBaseTest
 
         Assert.assertEquals("value1", MetaService.getGlobalParameter(cnx, "key1").getValue());
 
+        QueueMappingDto queueMapping = null;
+        for (QueueMappingDto qm : MetaService.getQueueMappings(cnx))
+        {
+            if (qm.getNodeName().equals("Node1"))
+            {
+                queueMapping = qm;
+                break;
+            }
+        }
+        Assert.assertNotNull(queueMapping);
+        Assert.assertEquals((Integer) 2000, queueMapping.getPollingInterval());
+
+        QueueDto q = MetaService.getQueue(cnx, queueMapping.getQueueId());
+        Assert.assertTrue(q.isDefaultQueue());
+
+        Assert.assertEquals("test1", MetaService.getJndiObjectResource(cnx, "string/test1").getParameters().get("STRING"));
+
         // 2nd import (other file) = update
         XmlConfigurationParser.parse("target/payloads/jqm-test-xml/xmlnodeimport2.xml", cnx);
         cnx.commit();
@@ -386,6 +405,23 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals("WARNING", node.getRootLogLevel());
 
         Assert.assertEquals("value2", MetaService.getGlobalParameter(cnx, "key1").getValue());
+
+        queueMapping = null;
+        for (QueueMappingDto qm : MetaService.getQueueMappings(cnx))
+        {
+            if (qm.getNodeName().equals("Node1"))
+            {
+                queueMapping = qm;
+                break;
+            }
+        }
+        Assert.assertNotNull(queueMapping);
+        Assert.assertEquals((Integer) 5000, queueMapping.getPollingInterval());
+
+        q = MetaService.getQueue(cnx, queueMapping.getQueueId());
+        Assert.assertFalse(q.isDefaultQueue());
+
+        Assert.assertEquals("test1_2", MetaService.getJndiObjectResource(cnx, "string/test1").getParameters().get("STRING"));
 
         // 3rd import (same file) = stable
         XmlConfigurationParser.parse("target/payloads/jqm-test-xml/xmlnodeimport2.xml", cnx);

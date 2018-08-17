@@ -22,3 +22,7 @@
 *.PNG -text
 *.exe -text
 *.EXE -text
+
+# BAT files should stay in CRLF for cmd.exe to ba able to run them.
+*.bat -text
+*.BAT -text

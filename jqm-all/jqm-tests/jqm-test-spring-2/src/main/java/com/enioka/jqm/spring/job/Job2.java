@@ -26,7 +26,7 @@ public class Job2 implements Runnable
     public void run()
     {
         System.out.println("Spring job 2");
-        if (parameters.size() == 0)
+        if (parameters == null || parameters.size() == 0)
         {
             throw new RuntimeException("parameters were not set");
         }

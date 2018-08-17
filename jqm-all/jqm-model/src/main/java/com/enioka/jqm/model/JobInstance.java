@@ -207,6 +207,15 @@ public class JobInstance implements Serializable
     }
 
     /**
+     * See {@link #getNode()}
+     */
+    public void setNode(final Node node)
+    {
+        this.n = node;
+        this.node_id = node.getId();
+    }
+
+    /**
      * Null by default. If specified, an e-mail will be sent to this address at run end.
      */
     public String getEmail()

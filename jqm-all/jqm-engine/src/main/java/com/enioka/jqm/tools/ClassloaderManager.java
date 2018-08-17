@@ -168,6 +168,7 @@ class ClassloaderManager
                 {
                     jqmlogger.info("Creating sharedClassLoader");
                     jobClassLoader = new JarClassLoader(parent);
+                    jobClassLoader.mayBeShared(true);
                     sharedClassLoader = jobClassLoader;
                 }
             }
@@ -183,6 +184,7 @@ class ClassloaderManager
                 {
                     jqmlogger.info("Creating shared Jar CL");
                     jobClassLoader = new JarClassLoader(parent);
+                    jobClassLoader.mayBeShared(true);
                     sharedJarClassLoader.put(jd.getJarPath(), jobClassLoader);
                 }
             }
@@ -191,6 +193,7 @@ class ClassloaderManager
                 // Standard case: all launches are independent. We create a transient CL.
                 jqmlogger.debug("Using an isolated transient CL with default parameters");
                 jobClassLoader = new JarClassLoader(parent);
+                jobClassLoader.mayBeShared(false);
             }
         }
 
@@ -210,7 +213,7 @@ class ClassloaderManager
         return jobClassLoader;
     }
 
-    private ClassLoader getExtensionCLassloader()
+    private ClassLoader getExtensionClassloader()
     {
         ClassLoader extLoader = null;
         try
@@ -248,12 +251,12 @@ class ClassloaderManager
         switch (ji.getJD().getPathType())
         {
         case MAVEN:
-            return getExtensionCLassloader();
+            return getExtensionClassloader();
         case MEMORY:
             return Thread.currentThread().getContextClassLoader();
         default:
         case FS:
-            return getExtensionCLassloader();
+            return getExtensionClassloader();
         }
     }
 

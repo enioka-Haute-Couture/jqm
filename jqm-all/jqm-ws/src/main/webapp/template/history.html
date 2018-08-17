@@ -108,7 +108,7 @@
                 <span class="glyphicon glyphicon-plus"></span> New launch form
             </button>
 
-            <span ng-hide="selected.length === 0 || target === 'hist' || selected[0].state !== 'SUBMITTED'">
+            <span ng-hide="selected.length === 0 || target === 'hist' || !(selected[0].state === 'SUBMITTED' || selected[0].state === 'HOLDED' || selected[0].state === 'SCHEDULED')">
                 <button class="btn btn-default" ng-click="changeQueue(newqueueid)" jqm-permission="queue_position:create">
                     <span class="glyphicon glyphicon-sort-by-order"></span> Switch to queue
                 </button> <select ng-cell-input ng-model="newqueueid" ng-options="q.id as q.name for q in queues"></select>

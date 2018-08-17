@@ -119,9 +119,9 @@ public class JqmBaseTest
             e.stop();
         }
         engines.clear();
-        for (DbConn em : cnxs)
+        for (DbConn cnx : cnxs)
         {
-            em.close();
+            cnx.close();
         }
         cnxs.clear();
 

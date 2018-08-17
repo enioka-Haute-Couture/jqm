@@ -4,40 +4,21 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
-public class DbImplDb2 implements DbAdapter
+public class DbImplDb2 extends DbAdapter
 {
-    private final static String[] IDS = new String[] { "ID" };
-
-    private Map<String, String> queries = new HashMap<String, String>();
-    private String tablePrefix = null;
-
     @Override
     public void prepare(Properties p, Connection cnx)
     {
-        this.tablePrefix = p.getProperty("com.enioka.jqm.jdbc.tablePrefix", "");
-
-        queries.putAll(DbImplBase.queries);
-        for (Map.Entry<String, String> entry : DbImplBase.queries.entrySet())
-        {
-            queries.put(entry.getKey(), this.adaptSql(entry.getValue()));
-        }
+        super.prepare(p, cnx);
 
         // Simpler polling query, as DB2 has a very weird locking model.
         queries.put("ji_update_poll", this.adaptSql(
                 "UPDATE __T__JOB_INSTANCE j1 SET NODE=?, STATUS='ATTRIBUTED', DATE_ATTRIBUTION=CURRENT_TIMESTAMP WHERE j1.STATUS='SUBMITTED' AND j1.ID IN "
                         + "(SELECT j2.ID FROM __T__JOB_INSTANCE j2 WHERE j2.STATUS='SUBMITTED' AND j2.QUEUE=? "
                         + "AND (j2.HIGHLANDER=0 OR (j2.HIGHLANDER=1 AND (SELECT COUNT(1) FROM __T__JOB_INSTANCE j3 WHERE j3.STATUS IN('ATTRIBUTED', 'RUNNING') AND j3.JOBDEF=j2.JOBDEF)=0 )) ORDER BY PRIORITY DESC, INTERNAL_POSITION FETCH FIRST ? ROWS ONLY)"));
-    }
-
-    @Override
-    public String getSqlText(String key)
-    {
-        return queries.get(key);
     }
 
     @Override
@@ -52,19 +33,6 @@ public class DbImplDb2 implements DbAdapter
     public boolean compatibleWith(String product)
     {
         return product.contains("db2");
-    }
-
-    @Override
-    public String[] keyRetrievalColumn()
-    {
-        return IDS;
-    }
-
-    @Override
-    public List<String> preSchemaCreationScripts()
-    {
-        List<String> res = new ArrayList<String>();
-        return res;
     }
 
     @Override

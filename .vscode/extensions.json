@@ -1,0 +1,13 @@
+{
+    "recommendations": [
+        "vscjava.vscode-java-pack",
+        "PeterJausovec.vscode-docker",
+        "EditorConfig.editorconfig",
+        "ms-vscode.powershell",
+        "humao.rest-client",
+        "lextudio.restructuredtext",
+        "DotJoshJohnson.xml",
+        "ban.spellright",
+        "yycalm.linecount",
+    ]
+}

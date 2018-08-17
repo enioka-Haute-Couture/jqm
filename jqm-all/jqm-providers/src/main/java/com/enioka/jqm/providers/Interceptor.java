@@ -22,38 +22,40 @@ import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 
+/**
+ * For Oracle connections only (does nothing on other databases). Sets session information so that the DBA has data to identify sessions
+ * used by the engine and the different job instances.
+ */
 public class Interceptor extends JdbcInterceptor
 {
 
     @Override
     public void reset(ConnectionPool parent, PooledConnection con)
     {
-        if (con == null)
+        if (con == null || !con.isInitialized() || con.isReleased() || !con.getConnection().getClass().toString().contains("racle"))
         {
             return;
         }
 
-        if (con.getConnection().getClass().toString().contains("racle"))
+        try
         {
-            try
-            {
-                String[] names = Thread.currentThread().getName().split(";");
+            String[] names = Thread.currentThread().getName().split(";");
 
-                String module = "'" + names[0] + "'";
-                String action = names.length > 1 ? "'" + names[1] + "'" : "NULL";
-                String clientInfo = names.length > 2 ? "'" + names[2] + "'" : "NULL";
+            String module = "'" + names[0] + "'";
+            String action = names.length > 1 ? "'" + names[1] + "'" : "NULL";
+            String clientInfo = names.length > 2 ? "'" + names[2] + "'" : "NULL";
 
-                Statement s = con.getConnection().createStatement();
-                s.execute("CALL DBMS_APPLICATION_INFO.SET_MODULE(" + module + ", " + action + ")");
-                s.execute("CALL DBMS_APPLICATION_INFO.SET_CLIENT_INFO(" + clientInfo + ")");
-                s.close();
-            }
-            catch (SQLException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            Statement s = con.getConnection().createStatement();
+            s.execute("CALL DBMS_APPLICATION_INFO.SET_MODULE(" + module + ", " + action + ")");
+            s.execute("CALL DBMS_APPLICATION_INFO.SET_CLIENT_INFO(" + clientInfo + ")");
+            s.close();
         }
-
+        catch (SQLException e)
+        {
+            // Print (we do not have a logger here). And throw away the connection.
+            e.printStackTrace();
+            con.setDiscarded(true);
+            throw new RuntimeException(e);
+        }
     }
 }

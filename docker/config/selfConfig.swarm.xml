@@ -1,0 +1,86 @@
+<jqm>
+	<defaultQueueName>DEFAULT</defaultQueueName>
+
+	<nodes>
+		<node>
+			<name>TEMPLATE_WEB</name>
+
+			<interface>0.0.0.0</interface>
+			<webPort>1789</webPort>
+			<jmxRegistryPort>1790</jmxRegistryPort>
+			<jmxServerPort>1791</jmxServerPort>
+
+			<enabled>true</enabled>
+			<loadSimpleWebApi>true</loadSimpleWebApi>
+			<loadClientWebApi>true</loadClientWebApi>
+			<loadAdminWebApi>true</loadAdminWebApi>
+
+			<jobDefDirectory>./jobs</jobDefDirectory>
+			<tmpDirectory>./tmp</tmpDirectory>
+			<deliverableDirectory>./outputfiles</deliverableDirectory>
+
+			<logLevel>INFO</logLevel>
+		</node>
+
+		<node>
+			<name>TEMPLATE_DRONE</name>
+
+			<interface>0.0.0.0</interface>
+			<webPort>1789</webPort>
+			<jmxRegistryPort>1790</jmxRegistryPort>
+			<jmxServerPort>1791</jmxServerPort>
+
+			<enabled>true</enabled>
+			<loadSimpleWebApi>true</loadSimpleWebApi>
+			<loadClientWebApi>false</loadClientWebApi>
+			<loadAdminWebApi>false</loadAdminWebApi>
+
+			<jobDefDirectory>./jobs</jobDefDirectory>
+			<tmpDirectory>./tmp</tmpDirectory>
+			<deliverableDirectory>./outputfiles</deliverableDirectory>
+
+			<logLevel>INFO</logLevel>
+		</node>
+	</nodes>
+
+	<queues>
+		<queue>
+			<name>DEFAULT</name>
+			<description>default queue</description>
+			<mappings>
+				<mapping>
+					<nodeName>TEMPLATE_WEB</nodeName>
+					<maxThreads>10</maxThreads>
+					<pollingIntervalMs>2000</pollingIntervalMs>
+					<enabled>true</enabled>
+				</mapping>
+
+				<mapping>
+					<nodeName>TEMPLATE_DRONE</nodeName>
+					<maxThreads>10</maxThreads>
+					<pollingIntervalMs>2000</pollingIntervalMs>
+					<enabled>true</enabled>
+				</mapping>
+			</mappings>
+		</queue>
+	</queues>
+
+	<globalParameters>
+		<parameter>
+			<key>logFilePerLaunch</key>
+			<value>true</value>
+		</parameter>
+		<parameter>
+			<key>enableWsApiAuth</key>
+			<value>false</value>
+		</parameter>
+		<parameter>
+			<key>mavenRepo</key>
+			<value>http://repo1.maven.org/maven2/,https://oss.sonatype.org/content/repositories/snapshots/</value>
+		</parameter>
+	</globalParameters>
+
+	<resources>
+	</resources>
+
+</jqm>

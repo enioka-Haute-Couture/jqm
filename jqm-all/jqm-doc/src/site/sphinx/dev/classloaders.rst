@@ -1,7 +1,7 @@
 Classloading
 ################
 
-JQM obeys a very simple classloading architecture, respecting the design goal of simplicity and robustness (to the expense of PermGen space).
+JQM obeys a very simple classloading architecture, respecting the design goal of simplicity and robustness (to the expense of PermGen/Metaspace size).
 
 The engine classloader stack is as follows (bottom of the stack is at the bottom of the table):
 
@@ -51,7 +51,7 @@ Advantages:
 
 Cons:
 
-* It is costly in terms of PermGen: if multiple payloads use the same library, it will be loaded once per payload, which is a waste of memory.
+* It is costly in terms of PermGen/metaspace: if multiple payloads use the same library, it will be loaded once per payload, which is a waste of memory.
   If there are costly shared resources, they can however be put inside ext - but the same version will be used by all payloads on the engine.
 * In case the payload does something stupid which prevents the garbage collection of at least one of its objects, the classloader will not be able
   to be garbage collected. This a huge memory leak (usually called a classloader leak). The best known example: registering a JDBC driver
@@ -59,6 +59,9 @@ Cons:
   collection. This special case is the reason why singleton mode should always be used for JDBC resources.
 * There is a bug inside the Sun JVM 6: even if garbage collected, a classloader will leave behind an open file descriptor. This will effectively 
   prevent hot swap of libs on Windows.
+
+To alleviate some of the conses, JQM also provides options to share class loaders between different job instances and reuse them between runs,
+but this is at the cost of some of the pros. It is disabled by default.
 
 
 All in all, this solution is not perfect (the classloader leak is a permanent threat) but has so many benefits in terms of simplicity that

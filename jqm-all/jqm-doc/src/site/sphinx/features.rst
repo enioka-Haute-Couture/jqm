@@ -9,7 +9,7 @@ JQM features
 
 Batch code is easy to create:
 
-* Runs existing Java 1.6 code, without need for programming specifically for JQM
+* Runs existing Java 1.6 to 1.10 code, without need for programming specifically for JQM
 * Possible (but not required) to use a specific framework of your choice (Spring batch, etc.)
 * Possible (but not required) to easily tweak class loading to enable advance scenarios
 * Many samples for all features (inside JQM's own integration tests)
@@ -18,7 +18,8 @@ Batch code is easy to create:
 * Jobs can be tested as if they were running inside a JQM node thanks to a test library which can be 
   used in jQuery tests.
 * Can easily report an advancement status to users or administrators
-* All (always optional) JQM artefacts are published on Maven Central and therefore easily integrate with most build systems
+* All JQM artefacts (optional libraries developers may want to use in some cases) are published on Maven Central and therefore easily 
+  integrate with most build systems
 
 Interacting with batch jobs is simple:
 
@@ -36,13 +37,14 @@ Batch packaging: just use your own
 Administration is a breathe:
 
 * Both command line and web-based graphic user interface for administration
+* Can run in Docker environments with provided images optimized for development usage as well as scale-out production scenarios (Swarm, Kubernetes...)
 * Can run as a Windows service or a Linux /etc/init.d script
 * Fully ready to run out of the box without complicated configuration
 * Supported on most OSes and databases
 * Log files can be accessed easily through a distributed web GUI
 * Easy definition of service classes (VIP jobs, standard jobs, ...) through queues
 * Easy integration with schedulers and CLI
-* Most configuration change are hot-applied, with little to no need for server restarts
+* Most configuration changes are hot-applied, with little to no need for server restarts
 * Resists most environment failures (database failure, network failure, ...)
 * Maintenance jobs are integrated
 * Can be fully monitored through JMX - which make it compatible with most monitoring systems out of the box (a Zabbix template is provided)

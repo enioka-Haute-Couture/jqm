@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
@@ -70,10 +69,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     {
         jqmlogger.info("Poller " + queue.getName() + " has received a stop order");
         run = false;
-        if (localThread != null)
-        {
-            localThread.interrupt();
-        }
+        loop.release();
     }
 
     /**
@@ -161,7 +157,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
         }
     }
 
-    protected List<JobInstance> dequeue(DbConn cnx, int level)
+    protected List<JobInstance> dequeue(DbConn cnx)
     {
         // Free room?
         int usedSlots = actualNbThread.get();
@@ -170,40 +166,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
             return null;
         }
 
-        // Get the list of all jobInstance within the defined queue, ordered by position
-        QueryResult qr = cnx.runUpdate("ji_update_poll", this.engine.getNode().getId(), queue.getId(), maxNbThread - usedSlots);
-        if (qr.nbUpdated > 0)
-        {
-            jqmlogger.debug("Poller has found {} JI to run", qr.nbUpdated);
-        }
-        if (qr.nbUpdated > 0)
-        {
-            List<JobInstance> res = JobInstance.select(cnx, "ji_select_to_run", this.engine.getNode().getId(), queue.getId());
-            if (res.size() == qr.nbUpdated)
-            {
-                cnx.commit();
-                return res;
-            }
-            else if (level <= 3)
-            {
-                // Try again. This means the jobs marked for exec on previous loop have not already started.
-                // So they were still in the SELECT WHERE STATE='ATTRIBUTED'.
-                // Happens when loop interval is too low (ms and not s), so only happens during tests.
-                jqmlogger.trace("Polling interval seems too low");
-                cnx.rollback();
-                Thread.yield();
-                return dequeue(cnx, level + 1);
-            }
-            else
-            {
-                // Simply give up. The engine is under such a heavy load that we should first deal with the backlog.
-                return null;
-            }
-        }
-        else
-        {
-            return null;
-        }
+        // Polling is delegated to the DB adapter.
+        return cnx.poll(this.engine.getNode(), queue, maxNbThread - usedSlots);
     }
 
     @Override
@@ -223,7 +187,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 // Get a JI to run
                 cnx = Helpers.getNewDbSession();
                 refreshDeploymentParameter(cnx);
-                List<JobInstance> newInstances = dequeue(cnx, 1);
+                List<JobInstance> newInstances = dequeue(cnx);
                 if (newInstances != null)
                 {
                     for (JobInstance ji : newInstances)
@@ -251,6 +215,10 @@ class QueuePoller implements Runnable, QueuePollerMBean
             }
             catch (RuntimeException e)
             {
+                if (!run)
+                {
+                    break;
+                }
                 if (Helpers.testDbFailure(e))
                 {
                     jqmlogger.error("connection to database lost - stopping poller");
@@ -267,9 +235,20 @@ class QueuePoller implements Runnable, QueuePollerMBean
                     break;
                 }
             }
+            catch (Exception e)
+            {
+                jqmlogger.error("Queue poller has failed! It will stop.", e);
+                this.run = false;
+                this.hasStopped = true;
+                break;
+            }
             finally
             {
                 // Reset the connection on each loop.
+                if (Thread.interrupted()) // always clear interrupted status before doing DB operations.
+                {
+                    run = false;
+                }
                 Helpers.closeQuietly(cnx);
             }
 

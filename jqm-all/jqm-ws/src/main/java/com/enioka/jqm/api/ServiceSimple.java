@@ -19,8 +19,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
 import java.util.List;
+import java.util.Set;
 
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -63,9 +71,9 @@ public class ServiceSimple
     @Context
     private ServletContext context;
 
-    // ///////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
     // Constructor: determine if running on top of JQM or not
-    // ///////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
 
     public ServiceSimple(@Context ServletContext context)
     {
@@ -93,9 +101,10 @@ public class ServiceSimple
         }
     }
 
-    // ///////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
     // The one and only really simple API
-    // ///////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
+
     @GET
     @Path("status")
     @Produces(MediaType.TEXT_PLAIN)
@@ -104,9 +113,9 @@ public class ServiceSimple
         return JqmClientFactory.getClient().getJob(id).getState().toString();
     }
 
-    // ///////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
     // File retrieval
-    // ///////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
 
     @GET
     @Path("stdout")
@@ -235,9 +244,9 @@ public class ServiceSimple
         }
     }
 
-    // ///////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
     // Enqueue - a form service...
-    // ///////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
 
     @POST
     @Path("ji")
@@ -282,5 +291,60 @@ public class ServiceSimple
 
         Integer i = JqmClientFactory.getClient().enqueue(jd);
         return i.toString();
+    }
+
+    /////////////////////////////////////////////////////////////
+    // Health
+    /////////////////////////////////////////////////////////////
+
+    @GET
+    @Path("localnode/health")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getLocalNodeHealth() throws MalformedObjectNameException
+    {
+        // Local service only - not enabled when running on top of Tomcat & co.
+        if (n == null)
+        {
+            throw new ErrorDto("can only retrieve local node health when the web app runs on top of JQM", "", 7, Status.BAD_REQUEST);
+        }
+        if (n.getJmxServerPort() == null || n.getJmxServerPort() == 0)
+        {
+            throw new ErrorDto("JMX is not enabled on this server", "", 8, Status.BAD_REQUEST);
+        }
+
+        // Connect to JMX server
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName nodeBean = new ObjectName("com.enioka.jqm:type=Node,name=" + n.getName());
+        Set<ObjectName> names = server.queryNames(nodeBean, null);
+        if (names.isEmpty())
+        {
+            throw new ErrorDto("could not find the JMX Mbean of the local JQM node", "", 8, Status.INTERNAL_SERVER_ERROR);
+        }
+        ObjectName localNodeBean = names.iterator().next();
+
+        // Query bean
+        Object result;
+        try
+        {
+            result = server.getAttribute(localNodeBean, "AllPollersPolling");
+        }
+        catch (Exception e)
+        {
+            throw new ErrorDto("Issue when querying JMX server", 12, e, Status.INTERNAL_SERVER_ERROR);
+        }
+        if (!(result instanceof Boolean))
+        {
+            throw new ErrorDto("JMX bean answered with wrong datatype - answer was " + result.toString(), "", 9,
+                    Status.INTERNAL_SERVER_ERROR);
+        }
+
+        // Analyze output
+        boolean res = (Boolean) result;
+        if (!res)
+        {
+            throw new ErrorDto("JQM node has is not working as expected", "", 11, Status.SERVICE_UNAVAILABLE);
+        }
+
+        return "Pollers are polling";
     }
 }

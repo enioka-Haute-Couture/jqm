@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.naming.NameNotFoundException;
 import javax.sql.DataSource;
 
 import org.slf4j.Logger;
@@ -41,7 +41,7 @@ public class Db
     private static String[] ADAPTERS = new String[] { "com.enioka.jqm.jdbc.DbImplPg", "com.enioka.jqm.jdbc.DbImplHsql",
             "com.enioka.jqm.jdbc.DbImplOracle", "com.enioka.jqm.jdbc.DbImplMySql", "com.enioka.jqm.jdbc.DbImplDb2" };
 
-    private DataSource _ds;
+    private DataSource _ds = null;
     private DbAdapter adapter = null;
     private String product;
     private Properties p = null;
@@ -124,6 +124,8 @@ public class Db
         {
             // Standard case: fetch a DataSource from JNDI.
             String dsName = p.getProperty("com.enioka.jqm.jdbc.datasource", "jdbc/jqm");
+            int retryCount = Integer.parseInt(p.getProperty("com.enioka.jqm.jdbc.initialRetries", "10"));
+            int waitMs = Integer.parseInt(p.getProperty("com.enioka.jqm.jdbc.initialRetryWaitMs", "10000"));
 
             // Ascending compatibility with v1.x: old name for the DataSource.
             String oldName = p.getProperty("javax.persistence.nonJtaDataSource");
@@ -134,32 +136,69 @@ public class Db
 
             boolean upgrade = Boolean.parseBoolean(p.getProperty("com.enioka.jqm.jdbc.allowSchemaUpdate", "false"));
 
+            // Try to open the pool.
+            this._ds = getDataSource(dsName, retryCount, waitMs);
+
             // This is a hack. Some containers will use root context as default for JNDI (WebSphere, Glassfish...), other will use
             // java:/comp/env/ (Tomcat...). So if we actually know the required alias, we try both, and the user only has to provide a
             // root JNDI alias that will work in both cases.
-            try
-            {
-                this._ds = (DataSource) InitialContext.doLookup(dsName);
-            }
-            catch (NamingException e)
+            if (this._ds == null)
             {
                 jqmlogger.warn("JNDI alias {} was not found. Trying with java:/comp/env/ prefix", dsName);
                 dsName = "java:/comp/env/" + dsName;
-                try
-                {
-                    this._ds = (DataSource) InitialContext.doLookup(dsName);
-                }
-                catch (NamingException e2)
-                {
-                    throw new DatabaseException("Could not retrieve datasource resource named " + dsName, e);
-                }
+                this._ds = getDataSource(dsName, retryCount, waitMs);
             }
+
             if (this._ds == null)
             {
                 throw new DatabaseException("no data source found");
             }
+
             init(upgrade);
         }
+    }
+
+    private DataSource getDataSource(String dsName, int retryCount, int waitMs)
+    {
+        int retries = 0;
+        DataSource res = null;
+        while (res == null)
+        {
+            try
+            {
+                res = (DataSource) InitialContext.doLookup(dsName);
+            }
+            catch (NameNotFoundException e2)
+            {
+                res = null;
+            }
+            catch (Exception e)
+            {
+                if (++retries > retryCount)
+                {
+                    break;
+                }
+                // TODO: naming exception name does not exist.
+
+                String msg = e.getLocalizedMessage();
+                if (e.getCause() != null)
+                {
+                    msg += " - " + e.getCause().getLocalizedMessage();
+                    jqmlogger.error(
+                            "Database not available: " + msg + ". Retry " + retries + "/" + retryCount + ". Waiting for database...");
+
+                    try
+                    {
+                        Thread.sleep(waitMs);
+                    }
+                    catch (InterruptedException e1)
+                    {
+                        // Nothing to do.
+                    }
+                }
+            }
+        }
+        return res;
     }
 
     /**
@@ -220,7 +259,34 @@ public class Db
         {
             dbUpgrade();
         }
-        checkSchemaVersion();
+
+        // First contact with the DB is version checking (if no connection opened by pool).
+        // If DB is in wrong version or not available, just wait for it to be ready.
+        boolean versionValid = false;
+        while (!versionValid)
+        {
+            try
+            {
+                checkSchemaVersion();
+                versionValid = true;
+            }
+            catch (Exception e)
+            {
+                String msg = e.getLocalizedMessage();
+                if (e.getCause() != null)
+                {
+                    msg += " - " + e.getCause().getLocalizedMessage();
+                }
+                jqmlogger.error("Database not ready: " + msg + ". Waiting for database...");
+                try
+                {
+                    Thread.sleep(10000);
+                }
+                catch (Exception e2)
+                {
+                }
+            }
+        }
     }
 
     private void checkSchemaVersion()
@@ -281,7 +347,6 @@ public class Db
      */
     private void dbUpgrade()
     {
-
         DbConn cnx = this.getConn();
         Map<String, Object> rs = null;
         int db_schema_version = 0;
@@ -434,15 +499,19 @@ public class Db
      */
     public DbConn getConn()
     {
+        Connection cnx = null;
         try
         {
-            Connection cnx = _ds.getConnection();
-            if (cnx.getAutoCommit()) {
+            Thread.interrupted(); // this is VERY sad. Needed for Oracle driver which otherwise fails spectacularly.
+            cnx = _ds.getConnection();
+            if (cnx.getAutoCommit())
+            {
                 cnx.setAutoCommit(false);
                 cnx.rollback(); // To ensure no open transaction created by the pool before changing TX mode
             }
 
-            if (cnx.getTransactionIsolation() != Connection.TRANSACTION_READ_COMMITTED) {
+            if (cnx.getTransactionIsolation() != Connection.TRANSACTION_READ_COMMITTED)
+            {
                 cnx.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             }
 
@@ -450,6 +519,7 @@ public class Db
         }
         catch (SQLException e)
         {
+            DbHelper.closeQuietly(cnx); // May have been left open when the pool has given us a failed connection.
             throw new DatabaseException(e);
         }
     }

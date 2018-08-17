@@ -391,7 +391,7 @@ final class JdbcClient implements JqmClient
         }
         catch (NoResultException ex)
         {
-            // Just continue, this means no existing waiting JI in queue.
+            // Just continue, this means no existing waiting JI in queue. We keep the lock!
         }
         catch (SQLException e)
         {
