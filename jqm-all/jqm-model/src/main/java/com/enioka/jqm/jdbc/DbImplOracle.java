@@ -33,7 +33,7 @@ public class DbImplOracle extends DbAdapter
         queries.put("ji_poll", adaptSql("SELECT /*+ FIRST_ROWS */ ID from (" + "SELECT j2.ID" + "    FROM __T__JOB_INSTANCE j2"
                 + "    WHERE j2.STATUS='SUBMITTED' AND j2.QUEUE=? AND (j2.HIGHLANDER=0 OR (j2.HIGHLANDER=1 AND (SELECT COUNT(1)"
                 + "        FROM __T__JOB_INSTANCE j3" + "        WHERE j3.STATUS IN('ATTRIBUTED', 'RUNNING') AND j3.JOBDEF=j2.JOBDEF)=0))"
-                + "    ORDER BY INTERNAL_POSITION) a " + "WHERE ROWNUM <= ?"));
+                + "    ORDER BY PRIORITY DESC, INTERNAL_POSITION) a " + "WHERE ROWNUM <= ?"));
         queries.put("ji_poll_lock", adaptSql(DbImplBase.queries.get("ji_select_all") + " WHERE ji.ID IN(?) "
                 + "AND STATUS='SUBMITTED' AND (ji.HIGHLANDER=0 OR (ji.HIGHLANDER=1 AND (SELECT COUNT(1) FROM __T__JOB_INSTANCE j2 WHERE j2.STATUS IN('ATTRIBUTED', 'RUNNING') AND ji.JOBDEF=j2.JOBDEF)=0)) "
                 + "FOR UPDATE OF STATUS, NODE, DATE_ATTRIBUTION"));
@@ -46,8 +46,8 @@ public class DbImplOracle extends DbAdapter
     {
         return sql.replace("MEMORY TABLE", "TABLE").replace(" INTEGER", " NUMBER(10, 0)").replace(" DOUBLE", " DOUBLE PRECISION")
                 .replace("UNIX_MILLIS()", "JQM_PK.currval").replace("IN(UNNEST(?))", "IN(?)")
-                .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(SYSDATE - 1/1440)")
-                .replace("CURRENT_TIMESTAMP - ? SECOND", "(SYSDATE - ?/86400)").replace("FROM (VALUES(0))", "FROM DUAL")
+                .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(CURRENT_TIMESTAMP - 1/1440)")
+                .replace("CURRENT_TIMESTAMP - ? SECOND", "(CURRENT_TIMESTAMP - ?/86400)").replace("FROM (VALUES(0))", "FROM DUAL")
                 .replace("BOOLEAN", "NUMBER(1)").replace("true", "1").replace("false", "0").replace("__T__", this.tablePrefix);
     }
 

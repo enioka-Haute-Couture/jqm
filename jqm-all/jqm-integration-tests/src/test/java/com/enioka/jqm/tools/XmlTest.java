@@ -173,7 +173,7 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals(2, jd.size());
         Assert.assertEquals("Fibo", fibo.getApplicationName());
         Assert.assertEquals("NEWVALUE", fibo.getKeyword1());
-        Assert.assertEquals("", fibo.getKeyword2());
+        Assert.assertEquals("", fibo.getKeyword2() == null ? "" : fibo.getKeyword2());
         Assert.assertEquals(null, fibo.getKeyword3());
     }
 
@@ -420,7 +420,7 @@ public class XmlTest extends JqmBaseTest
 
         q = MetaService.getQueue(cnx, queueMapping.getQueueId());
         Assert.assertFalse(q.isDefaultQueue());
-        
+
         Assert.assertEquals("test1_2", MetaService.getJndiObjectResource(cnx, "string/test1").getParameters().get("STRING"));
 
         // 3rd import (same file) = stable

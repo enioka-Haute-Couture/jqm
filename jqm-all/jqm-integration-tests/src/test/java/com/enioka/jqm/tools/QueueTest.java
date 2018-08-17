@@ -24,7 +24,7 @@ public class QueueTest extends JqmBaseTest
     public void testQueueWidth() throws Exception
     {
         // Only 3 threads
-        int qId = Queue.create(cnx, "testqueue", "", false);
+        int qId = Queue.create(cnx, "testqueue", " ", false);
         DeploymentParameter.create(cnx, TestHelpers.node.getId(), 3, 1, qId);
 
         CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", qId, 42, "jqm-test-kill", null,
@@ -71,7 +71,7 @@ public class QueueTest extends JqmBaseTest
     public void testQueuePollWidth() throws Exception
     {
         // Only 3 threads, one poll every hour
-        int qId = Queue.create(cnx, "testqueue", "", false);
+        int qId = Queue.create(cnx, "testqueue", " ", false);
         DeploymentParameter.create(cnx, TestHelpers.node.getId(), 3, 3600000, qId);
 
         CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", qId, 42, "jqm-test-kill", null,
@@ -127,7 +127,7 @@ public class QueueTest extends JqmBaseTest
     public void testPriority() throws Exception
     {
         // Single thread available.
-        int qId = Queue.create(cnx, "testqueue", "", false);
+        int qId = Queue.create(cnx, "testqueue", " ", false);
         DeploymentParameter.create(cnx, TestHelpers.node.getId(), 1, 1, qId);
 
         CreationTools.createJobDef(null, true, "pyl.Wait", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", qId, 42, "jqm-test-wait",
@@ -158,7 +158,7 @@ public class QueueTest extends JqmBaseTest
     @Test(expected = JqmInvalidRequestException.class)
     public void testPriorityLimits()
     {
-        int qId = Queue.create(cnx, "testqueue", "", false);
+        int qId = Queue.create(cnx, "testqueue", " ", false);
         DeploymentParameter.create(cnx, TestHelpers.node.getId(), 1, 1, qId);
 
         CreationTools.createJobDef(null, true, "pyl.Wait", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", qId, 42, "jqm-test-wait",
@@ -173,7 +173,7 @@ public class QueueTest extends JqmBaseTest
     public void testFifo() throws Exception
     {
         // Single thread available.
-        int qId = Queue.create(cnx, "testqueue", "", false);
+        int qId = Queue.create(cnx, "testqueue", " ", false);
         DeploymentParameter.create(cnx, TestHelpers.node.getId(), 1, 1, qId);
 
         CreationTools.createJobDef(null, true, "pyl.Wait", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", qId, 42, "jqm-test-wait",

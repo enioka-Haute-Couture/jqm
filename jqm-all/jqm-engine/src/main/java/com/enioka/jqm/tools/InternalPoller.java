@@ -57,17 +57,9 @@ class InternalPoller implements Runnable
 
     void stop()
     {
-        // The test is important: it prevents the engine from calling interrupt() when stopping
-        // ... which can be triggered inside InternalPoller.run!
         jqmlogger.info("Internal poller has received a stop request");
-        if (this.run)
-        {
-            this.run = false;
-            if (this.localThread != null)
-            {
-                this.localThread.interrupt();
-            }
-        }
+        this.run = false;
+        forceLoop();
     }
 
     void forceLoop()

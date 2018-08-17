@@ -18,6 +18,7 @@ Major changes
   Read the documentation on the Docker Hub for more details - this is the pièce de résistance of the release.
 * Java 9 and 10 compatibility. Note that Java 6 & 7 are still supported, but also still deprecated and will be removed in the next version.
   * Note that using the WS client will require to change the Jersey dependencies to newer one on Java 9+, as the older Java 6 compatible libraries used by default are not compatible with 9+.
+* Oracle compatibility is back.
 * Engine: on Java >= 7, the job instance class loader are now closed. On Windows, this means no more file locks remaining after run and therefore job jars are now hot swap-able.
 
 Minor changes

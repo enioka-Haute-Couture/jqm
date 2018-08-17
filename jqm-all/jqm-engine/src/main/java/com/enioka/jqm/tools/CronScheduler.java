@@ -78,7 +78,7 @@ class CronScheduler implements Runnable, TaskCollector
     public void run()
     {
         Thread.currentThread().setName("Scheduler keepalive");
-        jqmlogger.info("Start of the scheduler (cron) manager");
+        jqmlogger.info("Start of the manager of the scheduler (not the scheduler itself)");
         while (run)
         {
             DbConn cnx = null;

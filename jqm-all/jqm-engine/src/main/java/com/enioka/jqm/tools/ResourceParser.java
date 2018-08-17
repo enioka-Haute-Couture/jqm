@@ -81,7 +81,8 @@ final class ResourceParser
                     resource.getFactory(), resource.getSingleton());
             for (JndiObjectResourceParameter prm : resource.getParameters(cnx))
             {
-                d.add(new StringRefAddr(prm.getKey(), prm.getValue()));
+                d.add(new StringRefAddr(prm.getKey(), prm.getValue() != null ? prm.getValue() : ""));
+                // null values forbidden (but equivalent to "" in Oracle!)
             }
 
             return d;
