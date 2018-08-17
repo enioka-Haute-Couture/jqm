@@ -405,12 +405,6 @@ public class DbConn implements Closeable
      */
     public void close()
     {
-        for (Statement s : toClose)
-        {
-            closeQuietly(s);
-        }
-        toClose.clear();
-
         if (transac_open)
         {
             try
@@ -422,7 +416,15 @@ public class DbConn implements Closeable
                 // Ignore.
             }
         }
+
+        for (Statement s : toClose)
+        {
+            closeQuietly(s);
+        }
+        toClose.clear();
+
         closeQuietly(_cnx);
+        _cnx = null;
     }
 
     /**

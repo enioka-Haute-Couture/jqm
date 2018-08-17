@@ -384,7 +384,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         }
         catch (Exception e)
         {
-            // Shutdown exception is ignored (happens during tests)
+            jqmlogger.error("Could not store node new state in database during node shutdown", e);
         }
         finally
         {

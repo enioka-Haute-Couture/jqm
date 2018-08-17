@@ -499,10 +499,11 @@ public class Db
      */
     public DbConn getConn()
     {
+        Connection cnx = null;
         try
         {
             Thread.interrupted(); // this is VERY sad. Needed for Oracle driver which otherwise fails spectacularly.
-            Connection cnx = _ds.getConnection();
+            cnx = _ds.getConnection();
             if (cnx.getAutoCommit())
             {
                 cnx.setAutoCommit(false);
@@ -518,6 +519,7 @@ public class Db
         }
         catch (SQLException e)
         {
+            DbHelper.closeQuietly(cnx); // May have been left open when the pool has given us a failed connection.
             throw new DatabaseException(e);
         }
     }

@@ -54,7 +54,8 @@ public class Interceptor extends JdbcInterceptor
         {
             // Print (we do not have a logger here). And throw away the connection.
             e.printStackTrace();
-            con.release();
+            con.setDiscarded(true);
+            throw new RuntimeException(e);
         }
     }
 }

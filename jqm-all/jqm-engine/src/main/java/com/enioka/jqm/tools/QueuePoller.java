@@ -69,10 +69,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     {
         jqmlogger.info("Poller " + queue.getName() + " has received a stop order");
         run = false;
-        if (localThread != null)
-        {
-            localThread.interrupt();
-        }
+        loop.release();
     }
 
     /**
@@ -160,7 +157,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
         }
     }
 
-    protected List<JobInstance> dequeue(DbConn cnx, int level)
+    protected List<JobInstance> dequeue(DbConn cnx)
     {
         // Free room?
         int usedSlots = actualNbThread.get();
@@ -190,7 +187,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 // Get a JI to run
                 cnx = Helpers.getNewDbSession();
                 refreshDeploymentParameter(cnx);
-                List<JobInstance> newInstances = dequeue(cnx, 1);
+                List<JobInstance> newInstances = dequeue(cnx);
                 if (newInstances != null)
                 {
                     for (JobInstance ji : newInstances)
@@ -248,6 +245,10 @@ class QueuePoller implements Runnable, QueuePollerMBean
             finally
             {
                 // Reset the connection on each loop.
+                if (Thread.interrupted()) // always clear interrupted status before doing DB operations.
+                {
+                    run = false;
+                }
                 Helpers.closeQuietly(cnx);
             }
 

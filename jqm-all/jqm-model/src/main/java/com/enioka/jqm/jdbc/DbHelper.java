@@ -5,8 +5,13 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DbHelper
 {
+    private static Logger jqmlogger = LoggerFactory.getLogger(DbHelper.class);
+
     /**
      * Close utility method.
      * 
@@ -23,7 +28,7 @@ public class DbHelper
             }
             catch (Exception e)
             {
-                // Do nothing.
+                jqmlogger.warn("Could not close a closeable - possible leak", e);
             }
         }
     }
@@ -45,7 +50,8 @@ public class DbHelper
             }
             catch (Exception e)
             {
-                // Do nothing.
+                // Should go with the connection anyway.
+                // jqmlogger.warn("Could not close a DB result set - possible pool leak", e);
             }
         }
     }
@@ -66,7 +72,7 @@ public class DbHelper
             }
             catch (Exception e)
             {
-                // Do nothing.
+                jqmlogger.warn("Could not close a DB connection - possible pool leak", e);
             }
         }
     }
@@ -77,17 +83,18 @@ public class DbHelper
      * @param ps
      *            statement to close.
      */
-    static void closeQuietly(Statement ps)
+    static void closeQuietly(Statement st)
     {
-        if (ps != null)
+        if (st != null)
         {
             try
             {
-                ps.close();
+                st.close();
             }
             catch (Exception e)
             {
-                // Do nothing.
+                // Should go with the connection anyway.
+                // jqmlogger.warn("Could not close a DB statement - possible pool leak", e);
             }
         }
     }
