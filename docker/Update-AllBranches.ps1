@@ -8,9 +8,9 @@
 [CmdletBinding(SupportsShouldProcess)]
 param(
     # Branches/tags to build (on all architectures). (tag, git branch name) list.
-    [hashtable]$Branches = @{"dockertest" = "docker"},
+    [hashtable]$Branches = @{"nightly" = "master"},
     # Set to use a different repository and image name when pushing.
-    [string]$ImageName = "marcanpilami/test",
+    [string]$ImageName = "enioka/jqm",
     # Mapping betwwen build tags and corresponding Docker hosts.
     [string]$ServerFile = "$PSScriptRoot/servers.xml",
     # Push the created images to Docker hub.
