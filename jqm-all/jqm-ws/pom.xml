@@ -44,94 +44,31 @@
 					</webResources>
 				</configuration>
 			</plugin>
+
+			<!-- run mvn jetty:run to test (with hot deployment) the app on a dev 
+				computer. localhost:8080 -->
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>9.4.8.v20180619</version>
+				<configuration>
+					<scanIntervalSeconds>10</scanIntervalSeconds>
+					<useProvidedScope>true</useProvidedScope>
+					<useTestScope>true</useTestScope>
+					<jettyXml>${project.basedir}/src/test/resources/jetty.xml</jettyXml>
+					<httpConnector>
+						<port>8080</port>
+						<name>testConnector</name>
+					</httpConnector>
+					<webApp>
+						<contextPath>/</contextPath>
+						<overrideDescriptor>${project.basedir}/src/test/resources/web-jetty.xml</overrideDescriptor>
+					</webApp>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
-	<profiles>
-		<!-- To ease testing under Tomcat in Eclipse, we actually put normally 
-			provided libs in the runtime scope -->
-		<profile>
-			<id>EclipseM2E</id>
-			<activation>
-				<property>
-					<name>m2e.version</name>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-war-plugin</artifactId>
-						<version>2.6</version>
-						<configuration>
-							<webResources combine.children="append">
-								<resource>
-									<directory>src/test/webapp</directory>
-									<filtering>false</filtering>
-									<includes>
-										<include>**</include>
-									</includes>
-								</resource>
-							</webResources>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-
-			<dependencies>
-				<dependency>
-					<groupId>org.apache.shiro</groupId>
-					<artifactId>shiro-web</artifactId>
-					<version>${shiro.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>com.enioka.jqm</groupId>
-					<artifactId>jqm-pki</artifactId>
-					<version>${project.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>org.apache.httpcomponents</groupId>
-					<artifactId>httpclient</artifactId>
-					<version>${httpclient.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>com.enioka.jqm</groupId>
-					<artifactId>jqm-model</artifactId>
-					<version>${project.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>org.slf4j</groupId>
-					<artifactId>jul-to-slf4j</artifactId>
-					<version>${slf4j.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-					<version>${slf4j.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-simple</artifactId>
-					<version>${slf4j.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-					<version>${commons.logging.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>commons-io</groupId>
-					<artifactId>commons-io</artifactId>
-					<version>${commons.io.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>commons-lang</groupId>
-					<artifactId>commons-lang</artifactId>
-					<version>${commons.lang.version}</version>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
 
 	<dependencies>
 		<dependency>
@@ -235,6 +172,20 @@
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 			<version>${commons.lang.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Sample DB & DB pool for tests only -->
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jdbc</artifactId>
+			<version>${pool.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>${hsqldb.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
