@@ -72,7 +72,8 @@ foreach ($manifestName in $manifestData.Keys) {
 
     if ($Push) {
         if ($PSCmdlet.ShouldProcess($manifestName, "Push manifest")) {
-            docker manifest push ${manifestName}
+            # bug https://github.com/docker/cli/issues/954 - we must clean the cached manifest with --purge
+            docker manifest push --purge ${manifestName}
             if ($LASTEXITCODE -ne 0) {
                 throw "Manifest push error"
             }

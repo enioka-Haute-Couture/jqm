@@ -39,7 +39,8 @@ COPY --from=builder c:/jqm-all/jqm-service/target/jqm-2.1.0-SNAPSHOT.zip C:/TEMP
 RUN Expand-Archive C:/TEMP/jqm.zip -DestinationPath C:/TEMP/; \
     mv C:/TEMP/jqm-* c:/jqm; \
     mkdir C:/jqm/hotdeploy >$null; \
-    mkdir C:/jqm/ext/drivers >$null;
+    mkdir C:/jqm/ext/drivers >$null; \
+    Remove-Item -Force C:/jqm/bin/*.exe,C:/jqm/bin/*.sh >$null;
 
 ENV CURL_VERSION="7.58.0"
 ENV CURL_ZIP="https://dl.uxnr.de/build/curl/curl_winssl_msys2_mingw64_stc/curl-${CURL_VERSION}/curl-${CURL_VERSION}.zip"
@@ -94,10 +95,11 @@ VOLUME C:/jqm/hotdeploy/ \
 
 # Configuration
 WORKDIR C:/jqm
-RUN java -jar jqm.jar -u && java -jar jqm.jar -c selfConfig.single.xml && java -jar jqm.jar -importjobdef ./jobs/jqm-demo && DEL /Q .\logs\*
+RUN setx PATH %PATH%;C:\\jqm\\bin >NUL && \
+    java -jar jqm.jar -u && java -jar jqm.jar -c selfConfig.single.xml && java -jar jqm.jar -importjobdef ./jobs/jqm-demo && DEL /Q .\logs\*
 
 # Run node on startup
-ENTRYPOINT C:\jqm\bin\node.bat
+ENTRYPOINT node.bat <NUL
 
 # Healthcheck is equivalent to calling Node.AllPollersPolling
-HEALTHCHECK --interval=30s --start-period=91s --retries=2 --timeout=10s CMD .\bin\curl --connect-timeout 2 -q --http1.1 -4 -s -S  %JQM_HEALTHCHECK_URL%
+HEALTHCHECK --interval=30s --start-period=91s --retries=2 --timeout=10s CMD curl --connect-timeout 2 -q --http1.1 -4 -s -S  %JQM_HEALTHCHECK_URL%
