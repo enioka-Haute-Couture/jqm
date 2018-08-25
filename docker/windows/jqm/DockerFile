@@ -64,6 +64,17 @@ FROM enioka/buildhelpers:jre-${JAVA_VERSION}-${WINDOWS_TAG}
 
 COPY --from=installer C:/jqm/ C:/jqm/
 
+USER ContainerAdministrator
+# COPY is done with root - so (minimaly) correct permissions to run with non-root user.
+# Also, workaround weird Docker DNS resolver TTL of 600s... (moby/moby#30029)
+RUN icacls C:\jqm\conf /reset /T /Q && icacls C:\jqm\conf /grant:r "User Manager\ContainerUser:(OI)(CI)F" && \
+    icacls C:\jqm\logs /reset /T /Q &&  icacls C:\jqm\logs /grant:r "User Manager\ContainerUser:(OI)(CI)F" && \
+    icacls C:\jqm\hotdeploy /reset /T /Q &&  icacls C:\jqm\hotdeploy /grant:r "User Manager\ContainerUser:(OI)(CI)F" && \
+    icacls C:\jqm\ext\drivers /reset /T /Q &&  icacls C:\jqm\ext\drivers /grant:r "User Manager\ContainerUser:(OI)(CI)F" && \
+    REG ADD "HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters" /v MaxCacheTtl /t REG_DWORD /d 30 && \
+    REG ADD "HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters" /v MaxNegativeCacheTtl /t REG_DWORD /d 30
+USER ContainerUser
+
 ENV JAVA_OPTS="-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m" \
     JQM_ROOT="C:\\jqm" \
     JQM_NODE_NAME="ContainerNode" \
