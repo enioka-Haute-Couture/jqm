@@ -1,0 +1,75 @@
+@CHARSET "UTF-8";
+
+html,body {
+	height: 100%;
+}
+
+
+/* Full page container */
+body > div.container-fluid.ng-scope {
+	padding: 0px;
+}
+
+/* View container (i.e. page without the tabs) */
+body > div > div.ng-scope {	
+	padding: 1em;
+	height: calc(100% - 50px);
+}
+
+/* Tabs are links, so show the adequate cursor */
+.nav,.pagination,.carousel,.panel-title a {
+	cursor: pointer;
+}
+
+.form-horizontal .control-group,.form-horizontal .form-group {
+	margin-bottom: 1px;
+}
+
+.col-form-label {
+	font-weight: bold;
+}
+
+/* Prevent some browser (like firefox) to add a red border on required input */
+[required] {
+    box-shadow: none;
+}
+
+/* Enlarge modal width */
+.modal-dialog {
+    width: 100%;
+    max-width: 1200px;
+}
+
+/* Lastly, apply responsive CSS fixes as necessary */
+@media ( max-width : 767px) {
+	#footer {
+		margin-left: -20px;
+		margin-right: -20px;
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+}
+
+/* overloads for slider */
+.ngrs-range-slider {
+	margin-bottom: 3px;
+	margin-top: 3px;
+	border: none;
+	background-color: #ECEDED;
+	margin: 0px;
+	padding: 0px;
+	box-shadow: none;
+}
+
+/* grid styling */
+.ui-grid-header-cell {
+	background-color: rgb(240, 240, 238);
+}
+
+.history-detail-td {
+    word-break: break-all;
+}
+
+div.dropdown-item {
+	cursor: pointer;
+}

@@ -1,0 +1,49 @@
+{
+	"name": "jqmwebapp",
+	"version": "0.0.1",
+	"private": true,
+	"sideEffects": false,
+	"license": "Apache-2.0",
+	"homepage": "https://jqm.rtfd.org",
+	"description": "JQM administration UI and web services - to be hosted by JQM itself, but still a standard webapp",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/enioka/jqm.git"
+	},
+	"dependencies": {
+		"angular": "1.7.x",
+		"angular-animate": "1.7.x",
+		"angular-cookies": "1.7.x",
+		"angular-rangeslider": "0.0.14",
+		"angular-resource": "1.7.x",
+		"angular-route": "1.7.x",
+		"angular-sanitize": "1.7.x",
+		"angular-touch": "1.7.x",
+		"angular-ui-bootstrap": "2.5.x",
+		"angular-ui-grid": "4.6.x",
+		"bootstrap": "4.1.x",
+		"bootstrap-datepicker": "1.8.x",
+		"jquery": "3.3.x",
+		"popper.js": "^1.14.4",
+		"ui-select": "0.19.x",
+		"@fortawesome/fontawesome-free": "5.3.x"
+	},
+	"devDependencies": {
+		"webpack": "4.x",
+		"webpack-cli": "3.x",
+		"style-loader": "x",
+		"css-loader": "x",
+		"file-loader": "x",
+		"raw-loader": "x",
+		"html-webpack-plugin": "x",
+		"clean-webpack-plugin": "x",
+		"webpack-dev-server": "x",
+		"webpack-merge": "x"
+	},
+	"scripts": {
+		"prebuild": "npm install",
+		"watch": "webpack --watch --config webpack.dev.js",
+		"start": "webpack-dev-server --config webpack.dev.js --open",
+		"build": "webpack --config webpack.prod.js"
+	}
+}

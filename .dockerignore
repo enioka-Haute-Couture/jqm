@@ -12,3 +12,5 @@
 **/Dockerfile*
 **/DockerFile*
 **/docker-compose.yml
+**/node_modules/
+**/package-lock.json

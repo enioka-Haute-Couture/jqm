@@ -1,0 +1,25 @@
+<helpblock content="$ctrl.helpcontent"></helpblock>
+<input type="text" ng-model="$ctrl.filterValue" ng-change="$ctrl.gridApi.grid.refresh()" style="position:absolute; right: 5px; top: 47px;" />
+
+<div style="height: calc(100% - 110px);">
+    <div ui-grid='$ctrl.gridOptions' ui-grid-edit ui-grid-selection ui-grid-cellNav ui-grid-resize-columns
+        ui-grid-auto-resize style='height: 100%;'></div>
+</div>
+<br />
+
+<button class="btn btn-outline-dark" ng-click="$ctrl.newprm()" jqm-permission="prm:create">
+    <span class="fas fa-plus-circle"></span>
+    New parameter
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.remove()" ng-disabled="$ctrl.selected.length === 0" jqm-permission="prm:delete">
+    <span class="far fa-trash-alt"></span>
+    Delete selected
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.refresh()" jqm-permission="prm:read">
+    <span class="fas fa-sync-alt"></span>
+    Refresh
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.save()" jqm-permission="prm:create">
+    <span class="far fa-save"></span>
+    Save parameters
+</button>

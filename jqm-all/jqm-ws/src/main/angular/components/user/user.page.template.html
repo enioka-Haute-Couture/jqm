@@ -1,0 +1,42 @@
+<div class="row">
+    <div class="col-md-2">
+        <input ng-model="queryStr" type="text" placeholder="filter users..." />
+
+        <select id="userSelect" class="form-control" style="overflow: auto; width: 100%;" ng-model="$ctrl.selected_user"
+            size="25" ng-options="o as o.login for o in $ctrl.users | filter: {login: queryStr} | filter: {internal:false} | orderBy: 'login'"">
+        </select>
+
+        <button class="
+            btn btn-outline-dark" ng-click="$ctrl.newitem()">
+            <span class="fas fa-plus-circle"></span>
+            New user
+            </button>
+            <button class="btn btn-outline-dark" ng-click="$ctrl.refresh()">
+                <span class="fas fa-sync-alt"></span>
+                Refresh
+            </button>
+    </div>
+
+    <div ng-show="$ctrl.selected_user" class="col-md-10">
+        <useredit user="$ctrl.selected_user" roles="$ctrl.roles"></useredit>
+
+        <div class="form-group row">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button class="btn btn-outline-dark" ng-click="$ctrl.saveitem()">
+                    <span class="far fa-save"></span>
+                    Save user {{$ctrl.selected_user.login}}
+                </button>
+                <button class="btn btn-outline-dark" ng-click="$ctrl.deleteitem()">
+                    <span class="far fa-trash-alt"></span>
+                    Delete user {{$ctrl.selected_user.login}}
+                </button>
+                <a class="btn btn-outline-dark" href="./ws/admin/user/{{$ctrl.selected_user.id}}/certificate" download="user.zip"
+                    target="_blank">
+                    <i class="fas fa-key"></i>
+                    New certificate for {{$ctrl.selected_user.login}}
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>

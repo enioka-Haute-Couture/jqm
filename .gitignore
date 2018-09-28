@@ -28,3 +28,6 @@ serious/JobBaseAPI/nullnull
 **/conf/*.cer
 **/conf/*.pfx
 **/conf/*.jks
+**/node_modules/
+**/package-lock.json
+.tern-project

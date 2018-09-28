@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.enioka.jqm</groupId>
@@ -17,6 +16,7 @@
 
 	<properties>
 		<sonar.exclusions>src/main/webapp/libs/**</sonar.exclusions>
+		<node.dir>${project.basedir}/target/node</node.dir>
 	</properties>
 
 	<build>
@@ -65,6 +65,98 @@
 						<overrideDescriptor>${project.basedir}/src/test/resources/web-jetty.xml</overrideDescriptor>
 					</webApp>
 				</configuration>
+			</plugin>
+
+			<!-- <plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<version>1.6</version>
+
+				<configuration>
+					<nodeVersion>v8.11.4</nodeVersion>
+					<installDirectory>target/</installDirectory>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>install node and npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+						<phase>initialize</phase>
+					</execution>
+
+					<execution>
+						<id>npm install</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+
+						<phase>generate-resources</phase>
+
+						<configuration>
+							<arguments>install -Xno-optional</arguments>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>webpack build</id>
+						<goals>
+							<goal>webpack</goal>
+						</goals>
+
+						<phase>generate-resources</phase>
+
+						<configuration>
+							<arguments>-Xconfig webpack.dev.js</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>-->
+
+			<!-- Used for creating a viable autoreload dev environment. 1) launch 
+				the webpack build in background. 2) Create a compound goal exec:exec to run 
+				jetty+ webpack. -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<executions>
+					<execution>
+						<id>startwebpacksrv</id>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+
+						<configuration>
+							<addOutputToClasspath>false</addOutputToClasspath>
+							<async>true</async>
+							<asyncDestroyOnShutdown>true</asyncDestroyOnShutdown>
+							<commandlineArgs>${node.dir}/node_modules/npm/bin/npm-cli.js run watch</commandlineArgs>
+							<executable>node</executable>
+							<workingDirectory>${project.basedir}</workingDirectory>
+							<environmentVariables>
+								<PATH>${node.dir}</PATH>
+							</environmentVariables>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>default-cli</id>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+
+						<configuration>
+							<executable>mvn</executable>
+							<arguments>
+								<argument>exec:exec@startwebpacksrv</argument>
+								<argument>jetty:run</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+
 			</plugin>
 		</plugins>
 	</build>
