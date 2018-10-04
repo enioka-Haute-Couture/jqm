@@ -31,3 +31,5 @@ serious/JobBaseAPI/nullnull
 **/node_modules/
 **/package-lock.json
 .tern-project
+/jqm-all/jqm-ws/src/main/webapp/**
+!/jqm-all/jqm-ws/src/main/webapp/WEB-INF/**

@@ -11,8 +11,7 @@ import './css/app.css';
 
 var jqmApp = angular.module('jqmApp', [jqmComponentsModule, ngRoute, ngSanitize]);
 
-jqmApp.config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider)
-{
+jqmApp.config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
   $locationProvider.hashPrefix('!');
 
   $routeProvider.when('/', {
@@ -31,6 +30,8 @@ jqmApp.config(['$routeProvider', '$locationProvider', function ($routeProvider, 
     template: '<jds></jds>'
   }).when('/user', {
     template: '<users></users>'
+  }).when('/role', {
+    template: '<roles></roles>'
   }).otherwise({
     redirectTo: '/'
   });
