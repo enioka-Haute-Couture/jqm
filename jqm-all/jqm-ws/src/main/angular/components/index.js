@@ -13,6 +13,7 @@ import { jdPrmsDiagComponent } from './jd/jd.prm.component';
 import { userEditPanelComponent } from './user/user.editpanel.component';
 import { userPageComponent } from './user/user.page.component';
 import { rolePageComponent } from './role/role.page.component';
+import { historyPageComponent } from './history/history.page.component';
 
 import modal from 'angular-ui-bootstrap';
 import uiGrid from 'angular-ui-grid';
@@ -36,6 +37,7 @@ var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule
     .component('useredit', userEditPanelComponent)
     .component('users', userPageComponent)
     .component('roles', rolePageComponent)
+    .component('history', historyPageComponent)
 
     .component('helptag', helpTagComponent)
     .component('helpblock', helpBlockComponent)
@@ -44,7 +46,12 @@ var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule
         return function (val) {
             return $sce.trustAsHtml(val);
         };
-    }]);
+    }])
+    .filter('epoch2date', function () {
+        return function (epochms) {
+            return new Date(epochms);
+        };
+    });
 
 Date.prototype.addDays = function (days) {
     var date = new Date(this.valueOf());
