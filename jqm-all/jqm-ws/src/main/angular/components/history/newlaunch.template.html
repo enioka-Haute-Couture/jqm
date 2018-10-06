@@ -1,0 +1,89 @@
+<modal show='$ctrl.show'>
+    <div class="form-group row">
+        <label for="ddJd" class="col-sm-5 col-form-label">Application to launch</label>
+        <div class="col-sm-7">
+            <select2 id="ddJd" data="$ctrl.jds" display-key="applicationName" ng-model="$ctrl.selectedJd" placeholder="Enter an application name..."></select2>
+            <small class="form-text text-muted">
+                Name of the batch process to launch.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="txtUser" class="col-sm-5 col-form-label">Username</label>
+        <div class="col-sm-7">
+            <input id="txtUser" class="form-control" type="text" ng-model="$ctrl.request.user" />
+            <small class="form-text text-muted">
+                Name that will appear in the history
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="txtUser" class="col-sm-5 col-form-label">Session ID</label>
+        <div class="col-sm-7">
+            <input id="txtUser" class="form-control" type="text" ng-model="$ctrl.request.sessionID" />
+            <small class="form-text text-muted">
+                Optional data that will appear in the history
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="txtUser" class="col-sm-5 col-form-label">Default parameters</label>
+        <div class="col-sm-7">
+            <div ng-repeat="p in $ctrl.selectedJd.parameters | orderBy:'key'">
+                <div class="col-xs-6">{{p.key}}</div>
+                <div class="col-xs-6">{{p.value}}</div>
+            </div>
+            <small class="form-text text-muted">
+                Can be overridden below
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="txtUser" class="col-sm-5 col-form-label">Override or new parameters</label>
+        <div class="col-sm-7">
+            <div class="row">
+                <div class="col-xs-4">
+                    <input id="txtKey" class="form-control" type="text" ng-model="$ctrl.data.newKey" placeholder="key" />
+                </div>
+                <div class="col-xs-4">
+                    <input id="txtValue" class="form-control" type="text" ng-model="$ctrl.data.newValue" placeholder="value" />
+                </div>
+                <div class="col-xs-4">
+                    <button class="btn btn-outline-success" ng-click="$ctrl.addPrm()">
+                        <span class="fas fa-plus-circle"></span>
+                        Add
+                    </button>
+                </div>
+            </div>
+            <small class="form-text text-muted">
+                Enter here additional key/values pairs
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="txtUser" class="col-sm-5 col-form-label"></label>
+        <div class="col-sm-7">
+            <div ng-repeat="p in $ctrl.request.parameters | orderBy:'key'" class="row">
+                <div class="col-xs-6">{{p.key}}</div>
+                <div class="col-xs-6">{{p.value}}</div>
+            </div>
+        </div>
+    </div>
+
+    <modal-footer>
+        <button class="btn btn-outline-dark" ng-click="$ctrl.ok()" ng-disabled="!$ctrl.selectedJd || !$ctrl.request.user">
+            <span class="fas fa-check"></span>
+            OK
+        </button>
+        <button class="btn btn-outline-dark" ng-click="$ctrl.cancel()">
+            <span class="fas fa-ban"></span>
+            Cancel
+        </button>
+    </modal-footer>
+
+</modal>

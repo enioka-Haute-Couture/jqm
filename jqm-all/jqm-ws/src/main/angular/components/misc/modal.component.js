@@ -61,7 +61,9 @@ class ModalController {
 export const modalComponent = {
     controller: ModalController,
     template: template,
-    transclude: true,
+    transclude: {
+        'footer': '?modalFooter'
+    },
     bindings: {
         'title': '@',
         'show': '=',

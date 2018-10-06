@@ -84,7 +84,7 @@
         <button class="btn btn-outline-dark" ng-click="$ctrl.kill()" jqm-permission="job_instance:create" ng-disabled="$ctrl.selected.length === 0 || $ctrl.target === 'hist' || ($ctrl.selected[0].state !== 'RUNNING' && $ctrl.selected[0].state !== 'SUBMITTED' && $ctrl.selected[0].state !== 'SCHEDULED')">
             <span class="fas fa-stop"></span> Kill
         </button>
-        <button class="btn btn-outline-dark" ng-click="$ctrl.newLaunch()" jqm-permission="job_instance:create">
+        <button class="btn btn-outline-dark" ng-click="showNewJi = true" jqm-permission="job_instance:create">
             <span class="fas fa-plus-circle"></span> New launch form
         </button>
 
@@ -103,3 +103,4 @@
 </div>
 
 <jidetail ji="$ctrl.selected[0]" show="$ctrl.showDetails"></jidetail>
+<newji show="showNewJi"></newji>

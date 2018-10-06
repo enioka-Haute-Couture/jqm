@@ -16,17 +16,19 @@ import { rolePageComponent } from './role/role.page.component';
 import { historyPageComponent } from './history/history.page.component';
 import { historyDetailComponent } from './history/history.detail.component';
 import { modalComponent } from './misc/modal.component';
+import { newLaunchComponent } from './history/newlaunch.component';
+import { select2Component } from './misc/select2.component';
 
 import modal from 'angular-ui-bootstrap';
 import uiGrid from 'angular-ui-grid';
+import s from 'ui-select/dist/select';
 
 import 'angular-ui-grid/ui-grid.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 
 
-
-var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule, modal, uiGrid, 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.cellNav', 'ui.grid.resizeColumns', 'ui.grid.autoResize', 'ui.grid.pagination'])
+var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule, modal, uiGrid, 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.cellNav', 'ui.grid.resizeColumns', 'ui.grid.autoResize', 'ui.grid.pagination', 'ngSanitize'])
     .component('home', homeComponent)
 
     .component('tabs', tabsComponent)
@@ -41,10 +43,12 @@ var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule
     .component('roles', rolePageComponent)
     .component('history', historyPageComponent)
     .component('jidetail', historyDetailComponent)
+    .component('newji', newLaunchComponent)
 
     .component('helptag', helpTagComponent)
     .component('helpblock', helpBlockComponent)
     .component('modal', modalComponent)
+    .component('select2', select2Component)
 
     .filter('unsafe', ['$sce', function ($sce) {
         return function (val) {

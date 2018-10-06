@@ -11,7 +11,9 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" ng-click="$ctrl.hide()">Close</button>
+                <ng-transclude ng-transclude-slot="footer">
+                    <button type="button" class="btn btn-primary" ng-click="$ctrl.hide()">Close</button>
+                </ng-transclude>
             </div>
         </div>
     </div>

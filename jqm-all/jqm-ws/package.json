@@ -19,14 +19,13 @@
 		"angular-route": "1.7.x",
 		"angular-sanitize": "1.7.x",
 		"angular-touch": "1.7.x",
-		"angular-ui-bootstrap": "2.5.x",
 		"angular-ui-grid": "4.6.x",
 		"bootstrap": "4.1.x",
 		"bootstrap-datepicker": "1.8.x",
 		"jquery": "3.3.x",
 		"popper.js": "^1.14.4",
-		"ui-select": "0.19.x",
-		"@fortawesome/fontawesome-free": "5.3.x"
+		"@fortawesome/fontawesome-free": "5.3.x",
+		"select2": "4.0.x"
 	},
 	"devDependencies": {
 		"webpack": "4.x",
