@@ -73,3 +73,7 @@ body > div > div.ng-scope {
 div.dropdown-item {
 	cursor: pointer;
 }
+
+table > caption {
+	caption-side: top;
+}

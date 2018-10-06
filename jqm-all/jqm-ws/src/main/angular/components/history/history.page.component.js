@@ -15,6 +15,7 @@ class HistoryPageCtrl {
         this.queues = µQueueDto.query();
         this.target = "hist";
         this.filterDate = false;
+        this.showDetails = false;
 
         // Default range is three hours from now
         this.now = (new Date()).getTime();
@@ -86,7 +87,12 @@ class HistoryPageCtrl {
             useExternalPagination: true,
             useExternalSorting: true,
 
-            rowTemplate: '<div ng-dblclick="grid.appScope.showDetail(row)" ng-repeat="(colRenderIndex, col) in colContainer.renderedColumns track by col.uid" ui-grid-one-bind-id-grid="rowRenderIndex + \'-\' + col.uid + \'-cell\'" class="ui-grid-cell" ng-class="{ \'ui-grid-row-header-cell\': col.isRowHeader }" role="{{col.isRowHeader ? \'rowheader\' : \'gridcell\'}}" ui-grid-cell> </div>',
+            appScopeProvider: {
+                onDblClick: function (row) {
+                    ctrl.showDetails = true;
+                }
+            },
+            rowTemplate: '<div ng-dblclick="grid.appScope.onDblClick(row)" ng-repeat="(colRenderIndex, col) in colContainer.renderedColumns track by col.uid" ui-grid-one-bind-id-grid="rowRenderIndex + \'-\' + col.uid + \'-cell\'" class="ui-grid-cell" ng-class="{ \'ui-grid-row-header-cell\': col.isRowHeader }" role="{{col.isRowHeader ? \'rowheader\' : \'gridcell\'}}" ui-grid-cell> </div>',
 
             columnDefs: [{
                 field: 'id',

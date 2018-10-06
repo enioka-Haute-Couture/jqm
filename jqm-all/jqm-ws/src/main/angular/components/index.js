@@ -14,6 +14,8 @@ import { userEditPanelComponent } from './user/user.editpanel.component';
 import { userPageComponent } from './user/user.page.component';
 import { rolePageComponent } from './role/role.page.component';
 import { historyPageComponent } from './history/history.page.component';
+import { historyDetailComponent } from './history/history.detail.component';
+import { modalComponent } from './misc/modal.component';
 
 import modal from 'angular-ui-bootstrap';
 import uiGrid from 'angular-ui-grid';
@@ -38,9 +40,11 @@ var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule
     .component('users', userPageComponent)
     .component('roles', rolePageComponent)
     .component('history', historyPageComponent)
+    .component('jidetail', historyDetailComponent)
 
     .component('helptag', helpTagComponent)
     .component('helpblock', helpBlockComponent)
+    .component('modal', modalComponent)
 
     .filter('unsafe', ['$sce', function ($sce) {
         return function (val) {

@@ -1,31 +1,4 @@
-jqmApp.controller('historyDetail', function ($scope, $http, $uibModal, ji) {
-    $scope.ji = ji;
-    $scope.dels = [];
 
-    $scope.getdel = function () {
-        $http.get("ws/client/ji/" + $scope.ji.id + "/files").success($scope.getdelOk);
-    };
-
-    $scope.getdelOk = function (data, status, headers, config) {
-        $scope.dels = data;
-    };
-
-    $scope.showlog = function (url) {
-        $uibModal.open({
-            templateUrl: './template/file_reader.html',
-            controller: 'fileReader',
-            size: 'lg',
-
-            resolve: {
-                url: function () {
-                    return url;
-                },
-            },
-        });
-    };
-
-    $scope.getdel();
-});
 
 jqmApp.controller('jiNew', function ($scope, µUserJdDto, $uibModalInstance, $http) {
     $scope.jds = µUserJdDto.query();
