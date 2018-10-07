@@ -1,4 +1,5 @@
 <jdprmsdialog jd="$ctrl.selected[0]" show="showPrm"></jdprmsdialog>
+<jdcrondialog ng-model="$ctrl.selected[0]" queues="$ctrl.queues" show="showCron"></jdcrondialog>
 <helpblock content="$ctrl.helpcontent"></helpblock>
 <input type="text" ng-model="$ctrl.filterValue" ng-change="$ctrl.gridApi.grid.refresh()" style="position:absolute; right: 5px; top: 47px;" />
 
@@ -25,7 +26,7 @@
     <span class="fas fa-layer-group"></span>
     Class loader options
 </button>
-<button class="btn btn-outline-dark" ng-click="$ctrl.cron()" ng-disabled="$ctrl.selected.length !== 1">
+<button class="btn btn-outline-dark" ng-click="showCron=true" ng-disabled="$ctrl.selected.length !== 1">
     <span class="far fa-clock"></span>
     Cron scheduling
 </button>

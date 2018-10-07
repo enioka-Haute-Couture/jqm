@@ -10,6 +10,7 @@ import { helpBlockComponent } from './misc/helpblock.component';
 import { prmListComponent } from './prm/prm.list.component';
 import { jdListComponent } from './jd/jd.list.component';
 import { jdPrmsDiagComponent } from './jd/jd.prm.component';
+import { jdCronDiagComponent } from './jd/jd.cron.component';
 import { userEditPanelComponent } from './user/user.editpanel.component';
 import { userPageComponent } from './user/user.page.component';
 import { rolePageComponent } from './role/role.page.component';
@@ -39,6 +40,7 @@ var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule
     .component('prms', prmListComponent)
     .component('jds', jdListComponent)
     .component('jdprmsdialog', jdPrmsDiagComponent)
+    .component('jdcrondialog', jdCronDiagComponent)
     .component('useredit', userEditPanelComponent)
     .component('users', userPageComponent)
     .component('roles', rolePageComponent)
