@@ -18,6 +18,7 @@ import { historyDetailComponent } from './history/history.detail.component';
 import { modalComponent } from './misc/modal.component';
 import { newLaunchComponent } from './history/newlaunch.component';
 import { select2Component } from './misc/select2.component';
+import { mappingListComponent } from './mapping/mapping.list.component';
 
 import modal from 'angular-ui-bootstrap';
 import uiGrid from 'angular-ui-grid';
@@ -44,6 +45,7 @@ var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule
     .component('history', historyPageComponent)
     .component('jidetail', historyDetailComponent)
     .component('newji', newLaunchComponent)
+    .component('mappings', mappingListComponent)
 
     .component('helptag', helpTagComponent)
     .component('helpblock', helpBlockComponent)
@@ -58,6 +60,17 @@ var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule
     .filter('epoch2date', function () {
         return function (epochms) {
             return new Date(epochms);
+        };
+    })
+    .filter('getByProperty', function () {
+        return function (propertyValue, propertyName, collection) {
+            var i = 0, len = collection.length;
+            for (; i < len; i++) {
+                if (collection[i][propertyName] === +propertyValue) {
+                    return collection[i];
+                }
+            }
+            return null;
         };
     });
 

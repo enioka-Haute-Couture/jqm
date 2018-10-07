@@ -34,6 +34,8 @@ jqmApp.config(['$routeProvider', '$locationProvider', function ($routeProvider, 
     template: '<roles></roles>'
   }).when('/history', {
     template: '<history></history>'
+  }).when('/qmapping', {
+    template: '<mappings></mappings>'
   }).otherwise({
     redirectTo: '/'
   });

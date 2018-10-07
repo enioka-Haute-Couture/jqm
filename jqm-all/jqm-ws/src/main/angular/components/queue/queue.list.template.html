@@ -7,11 +7,19 @@
 </div>
 
 <br />
-<button class="btn btn-outline-dark" ng-click="$ctrl.newqueue()" jqm-permission="prm:create"><span class="glyphicon glyphicon-plus"></span>
-    New Queue</button>
-<button class=" btn btn-outline-dark" ng-click="$ctrl.save()" jqm-permission="prm:create"><span class="glyphicon glyphicon-floppy-save"></span>
-    Save queues</button>
-<button class="btn btn-outline-dark" ng-click="$ctrl.refresh()" jqm-permission="prm:read"><span class="glyphicon glyphicon-refresh"></span>
-    Refresh</button>
-<button class="btn btn-outline-dark" ng-click="$ctrl.remove()" ng-disabled="$ctrl.selected.length === 0" jqm-permission="prm:delete"><span
-        class="glyphicon glyphicon-remove"></span> Delete selected</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.newqueue()" jqm-permission="prm:create">
+    <span class="fas fa-plus-circle"></span>
+    New Queue
+</button>
+<button class=" btn btn-outline-dark" ng-click="$ctrl.save()" jqm-permission="prm:create">
+    <span class="far fa-save"></span>
+    Save queues
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.refresh()" jqm-permission="prm:read">
+    <span class="fas fa-sync-alt"></span>
+    Refresh
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.remove()" ng-disabled="$ctrl.selected.length === 0" jqm-permission="prm:delete">
+    <span class="far fa-trash-alt"></span>
+    Delete selected
+</button>
