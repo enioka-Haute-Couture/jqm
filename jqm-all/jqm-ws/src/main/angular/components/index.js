@@ -20,6 +20,7 @@ import { modalComponent } from './misc/modal.component';
 import { newLaunchComponent } from './history/newlaunch.component';
 import { select2Component } from './misc/select2.component';
 import { mappingListComponent } from './mapping/mapping.list.component';
+import { FileReaderComponent } from './misc/filereader.component';
 
 import uiGrid from 'angular-ui-grid';
 
@@ -51,6 +52,7 @@ var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule
     .component('helpblock', helpBlockComponent)
     .component('modal', modalComponent)
     .component('select2', select2Component)
+    .component('fileReader', FileReaderComponent)
 
     .filter('unsafe', ['$sce', function ($sce)
     {

@@ -2,6 +2,7 @@
 
 import template from './helpblock.template.html';
 
+
 class HelpBlockCtrl
 { }
 

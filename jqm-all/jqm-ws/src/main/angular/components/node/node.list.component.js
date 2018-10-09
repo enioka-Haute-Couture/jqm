@@ -114,12 +114,6 @@ class NodeListCtrl
                     cellTemplate: jqmCellTemplateBoolean,
                     editableCellTemplate: jqmCellEditorTemplateBoolean,
                     width: '*',
-                }, {
-                    field: 'id',
-                    enableCellEdit: false,
-                    displayName: '',
-                    cellTemplate: '<div class="ngCellText"><a ng-click="showlog(row.entity.name)">log</a></div>',
-                    width: '*',
                 }]
         };
 
