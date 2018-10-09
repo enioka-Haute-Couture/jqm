@@ -14,5 +14,5 @@
 **/docker-compose.yml
 **/node_modules/
 **/package-lock.json
-/jqm-all/jqm-ws/src/main/webapp/**
-!/jqm-all/jqm-ws/src/main/webapp/WEB-INF/**
+/jqm-all/jqm-ws/src/main/webapp/dist/**
+/jqm-all/jqm-ws/src/main/webapp/index.html

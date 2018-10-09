@@ -4,15 +4,19 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
 	entry: './src/main/angular/app.js',
-	plugins: [new CleanWebpackPlugin(['dist']), new HtmlWebpackPlugin({
-		title: 'JQM administration',
-		template: 'src/main/angular/template/index.html',
-		inject: false,
-		favicon: 'src/main/angular/css/favicon.png'
-	})],
+	plugins: [
+		new CleanWebpackPlugin(['dist']),
+		new HtmlWebpackPlugin({
+			title: 'JQM administration',
+			template: 'src/main/angular/template/index.html',
+			inject: false,
+			favicon: 'src/main/angular/css/favicon.png',
+			filename: '../index.html'
+		})],
 	output: {
 		filename: '[name].bundle.[contenthash].js',
-		path: path.resolve(__dirname, 'src/main/webapp/')
+		path: path.resolve(__dirname, 'src/main/webapp/dist'),
+		publicPath: '/dist/'
 	},
 	module: {
 		rules: [{

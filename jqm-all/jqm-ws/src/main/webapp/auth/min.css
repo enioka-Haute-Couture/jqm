@@ -1,0 +1,50 @@
+body , html{
+    background-color: lightblue;
+    
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.marsu {
+    border: 1px solid darkblue;
+    border-radius: 1em;
+    padding: 1em;
+    text-align: center;
+}
+
+table {
+    text-align: right;
+}
+
+.relative {
+    display: block;
+    position: relative;
+}
+
+.title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 1em;
+}
+
+.center {    
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.button {
+    background-color: rgba(0, 0, 0, 0);
+    border: solid 1px rgb(52, 58, 64);
+    border-radius: 3.2px;
+    color: rgb(52, 58, 64);
+    padding: 0.5em;
+    margin-top: 0.5em;
+}
