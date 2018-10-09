@@ -8,10 +8,8 @@ import template from './tabs.template.html';
 // module.controller('TabsCtrl', ['$location', '$http', function TabsCtrl($location, $http)
 class TabsCtrl
 {
-    constructor($location, $http)
+    constructor($location)
     {
-        $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-
         this.tabs = [{
             link: '#!/home',
             label: '<span class="fas fa-home"></span> Home',
@@ -64,8 +62,6 @@ class TabsCtrl
                 break;
             }
         }
-
-        // µPermManager.refresh();
     }
 
     setSelectedTab(tab)
@@ -85,7 +81,7 @@ class TabsCtrl
         }
     };
 }
-TabsCtrl.$inject = ['$location', '$http'];
+TabsCtrl.$inject = ['$location',];
 
 export const tabsComponent = {
     controller: TabsCtrl,

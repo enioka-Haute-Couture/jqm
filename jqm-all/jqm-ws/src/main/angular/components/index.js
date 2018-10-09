@@ -1,4 +1,5 @@
 import jqmServicesModule from '../service/data';
+import { jqmPermissionDirective } from './misc/permission.directive';
 import { jqmHelperModule } from '../helpers/grid.js';
 import { homeComponent } from './home/home.component.js';
 import { tabsComponent } from './tabs/tabs.component.js';
@@ -53,6 +54,8 @@ var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule
     .component('modal', modalComponent)
     .component('select2', select2Component)
     .component('fileReader', FileReaderComponent)
+
+    .directive('jqmPermission', jqmPermissionDirective)
 
     .filter('unsafe', ['$sce', function ($sce)
     {

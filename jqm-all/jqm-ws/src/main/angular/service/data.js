@@ -116,6 +116,12 @@ jqmServices.factory('µUserPerms', ['$resource', function ($resource)
     });
 }]);
 
+// A cache for the permission data.
+jqmServices.service('µPermManager', ['µUserPerms', function (µUserPerms)
+{
+    this.perms = µUserPerms.get(null);
+}]);
+
 jqmServices.factory('µUserJdDto', ['$resource', function ($resource)
 {
     return $resource('ws/client/jd/:id', {
