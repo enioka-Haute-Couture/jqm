@@ -1,0 +1,12 @@
+# Root code style rules. Can be overridden in sub-directories.
+root = true
+
+# Rules for all common files
+[*]
+indent_size = 4
+charset = utf-8
+end_of_line = lf
+indent_style = space
+insert_final_newline = true
+tab_width = 4
+trim_trailing_whitespace = true
