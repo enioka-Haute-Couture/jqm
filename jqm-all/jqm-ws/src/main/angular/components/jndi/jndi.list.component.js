@@ -3,6 +3,7 @@
 import template from './jndi.list.template.html';
 import { resourceTemplates } from './jndi.constants';
 
+import 'bootstrap/js/dist/dropdown';
 
 class JndiListCtrl
 {
