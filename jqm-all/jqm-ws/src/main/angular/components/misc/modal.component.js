@@ -26,6 +26,7 @@ class ModalController
             {
                 $ctrl.onclose();
             }
+            e.stopPropagation();
 
             // Always reset parent 'show' attribute, as dialog may not have been closed through close button.
             $ctrl.show = false;

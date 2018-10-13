@@ -3,10 +3,10 @@
 import template from './newlaunch.template.html';
 
 
-
-
-class NewLaunchController {
-    constructor($http, µUserJdDto) {
+class NewLaunchController
+{
+    constructor($http, µUserJdDto)
+    {
         this.jds = µUserJdDto.query();
         this.selectedJd = null;
         this.$http = $http;
@@ -24,23 +24,27 @@ class NewLaunchController {
         };
     }
 
-    addPrm() {
+    addPrm()
+    {
         var np = {};
         np.key = this.data.newKey;
         np.value = this.data.newValue;
         this.request.parameters.push(np);
     };
 
-    postOk() {
+    postOk()
+    {
         this.show = false;
     };
 
-    ok() {
+    ok()
+    {
         this.request.applicationName = this.selectedJd.applicationName;
         this.$http.post("ws/client/ji", this.request).then(this.postOk.bind(this));
     };
 
-    cancel() {
+    cancel()
+    {
         this.show = false;
     };
 }
