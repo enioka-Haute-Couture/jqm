@@ -1,8 +1,9 @@
-<modal show='$ctrl.show'>
+<jqm-modal show='$ctrl.show'>
     <div class="form-group row">
         <label for="ddJd" class="col-sm-5 col-form-label">Application to launch</label>
         <div class="col-sm-7">
-            <select2 id="ddJd" data="$ctrl.jds" display-key="applicationName" ng-model="$ctrl.selectedJd" placeholder="Enter an application name..."></select2>
+            <jqm-select2 id="ddJd" data="$ctrl.jds" display-key="applicationName" ng-model="$ctrl.selectedJd"
+                placeholder="Enter an application name..."></jqm-select2>
             <small class="form-text text-muted">
                 Name of the batch process to launch.
             </small>
@@ -86,4 +87,4 @@
         </button>
     </modal-footer>
 
-</modal>
+</jqm-modal>
