@@ -4,6 +4,10 @@ html,body {
 	height: 100%;
 }
 
+a {
+ color:   rgb(51, 122, 183);
+}
+
 
 /* Full page container */
 body > div.container-fluid.ng-scope {

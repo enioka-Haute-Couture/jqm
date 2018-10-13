@@ -1,7 +1,8 @@
 <ul class="nav nav-tabs">
-    <li ng-repeat="tab in $ctrl.tabs" ng-class="nav-item" jqm-permission="{{tab.permission}}">
+    <li ng-repeat="tab in $ctrl.tabs" class="nav-item" jqm-permission="{{tab.permission}}">
         <a href="{{tab.link}}" ng-click="$ctrl.setSelectedTab(tab)" class="{{$ctrl.tabClass(tab)}}">
-            <div ng-bind-html="tab.label"></div>
+            <span class="{{tab.icon}}"></span>
+            {{tab.label}}
         </a>
     </li>
 

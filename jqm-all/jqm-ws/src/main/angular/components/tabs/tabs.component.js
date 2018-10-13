@@ -12,43 +12,53 @@ class TabsCtrl
     {
         this.tabs = [{
             link: '#!/home',
-            label: '<span class="fas fa-home"></span> Home',
+            icon: 'fas fa-home',
+            label: 'Home',
             permission: '',
         }, {
             link: '#!/node',
-            label: '<span class="fas fa-microchip"></span> Nodes',
+            icon: 'fas fa-microchip',
+            label: 'Nodes',
             permission: 'node:read',
         }, {
             link: '#!/q',
-            label: '<span class="fas fa-list-ol"></span> Queues',
+            icon: 'fas fa-list-ol',
+            label: 'Queues',
             permission: 'queue:create',
         }, {
             link: '#!/qmapping',
-            label: '<span class="fas fa-exchange-alt"></span> Queue Mappings',
+            icon: 'fas fa-exchange-alt',
+            label: 'Mappings',
             permission: 'qmapping:read',
         }, {
             link: '#!/jndi',
-            label: '<span class="fas fa-cog"></span> JNDI Resources',
+            icon: 'fas fa-cog',
+            label: 'JNDI Resources',
             permission: 'jndi:read',
         }, {
             link: '#!/prm',
-            label: '<span class="fas fa-wrench"></span> Cluster-wide parameters',
+            icon: 'fas fa-wrench',
+            label: 'Cluster-wide parameters',
             permission: 'prm:read',
         }, {
             link: '#!/jd',
-            label: '<span class="fas fa-book"></span> Job definitions',
+            icon: 'fas fa-book',
+            label: 'Job definitions',
             permission: 'jd:read',
         }, {
             link: '#!/user',
-            label: '<span class="fas fa-users"></span> Users',
+            icon: 'fas fa-users',
+            label: 'Users',
             permission: 'user:read',
         }, {
             link: '#!/role',
-            label: '<span class="fas fa-lock"></span> Roles',
+            icon: 'fas fa-lock',
+            label: 'Roles',
             permission: 'role:read',
         }, {
             link: '#!/history',
-            label: '<span class="far fa-eye"></span> Runs',
+            icon: 'far fa-eye',
+            label: 'Runs',
             permission: 'job_instance:read',
         },];
 
