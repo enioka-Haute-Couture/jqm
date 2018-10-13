@@ -27,4 +27,10 @@ public class PemissionsBagDto
     @XmlElementWrapper(name = "permissions")
     @XmlElement(name = "permission", type = String.class)
     public List<String> permissions;
+
+    @XmlElement(name = "login", type = String.class)
+    public String login;
+
+    @XmlElement(name = "enforced", type = Boolean.class)
+    public Boolean enforced;
 }

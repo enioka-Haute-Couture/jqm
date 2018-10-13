@@ -8,5 +8,9 @@
         Further reference can be found in the <a href="http://jqm.readthedocs.org/en/jqm-all-${project.version}">full
             online documentation <span class="glyphicon glyphicon-book"></span></a> for version ${project.version}.
     </div>
-    <a href="/auth/logout" class="btn btn-outline-dark">Logout</a>
+
+    <div ng-show="$ctrl.me.perms.enforced">
+        <div>Logged as user {{$ctrl.me.perms.login}}.</div>
+        <a href="/auth/logout" class="btn btn-outline-dark">Logout</a>
+    </div>
 </div>
