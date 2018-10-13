@@ -1,13 +1,13 @@
 @CHARSET "UTF-8";
 
 html,body {
-	height: 100%;
+    height: 100%;
+    font-size: 14px; /* define the REM */
 }
 
 a {
  color:   rgb(51, 122, 183);
 }
-
 
 /* Full page container */
 body > div.container-fluid.ng-scope {
@@ -29,6 +29,7 @@ body > div > div.ng-scope {
 	margin-bottom: 1px;
 }
 
+/* Forms */
 .col-form-label {
 	font-weight: bold;
 }
@@ -51,28 +52,7 @@ body > div > div.ng-scope {
     max-width: 80%;
 }
 
-/* Lastly, apply responsive CSS fixes as necessary */
-@media ( max-width : 767px) {
-	#footer {
-		margin-left: -20px;
-		margin-right: -20px;
-		padding-left: 20px;
-		padding-right: 20px;
-	}
-}
-
-/* overloads for slider */
-.ngrs-range-slider {
-	margin-bottom: 3px;
-	margin-top: 3px;
-	border: none;
-	background-color: #ECEDED;
-	margin: 0px;
-	padding: 0px;
-	box-shadow: none;
-}
-
-/* grid styling */
+/* UIGrid styling */
 .ui-grid-header-cell {
 	background-color: rgb(240, 240, 238);
 }
@@ -81,10 +61,12 @@ body > div > div.ng-scope {
     word-break: break-all;
 }
 
+/* Menu styling */
 div.dropdown-item {
 	cursor: pointer;
 }
 
+/* For history detail modal */
 table > caption {
 	caption-side: top;
 }
