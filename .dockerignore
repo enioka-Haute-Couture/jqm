@@ -12,3 +12,7 @@
 **/Dockerfile*
 **/DockerFile*
 **/docker-compose.yml
+**/webapp/dist/
+.tern-project
+**/node_modules/
+**/package-lock.json
