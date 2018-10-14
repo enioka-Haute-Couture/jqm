@@ -227,7 +227,7 @@ class JobManagerHandler implements InvocationHandler
                 jqmlogger.info("Job will be killed at the request of a user");
                 Helpers.closeQuietly(cnx); // Close at once. Some DB drivers (Oracle...) will use the interruption state and reset.
                 Thread.currentThread().interrupt();
-                throw new JqmKillException("This job" + "(ID: " + ji.getId() + ")" + " has been killed by a user");
+                throw new JqmKillException("This job" + "(ID: " + ji.getId() + ")" + " has been forcefully ended by a user");
             }
 
             if (s.equals(Instruction.PAUSE))
