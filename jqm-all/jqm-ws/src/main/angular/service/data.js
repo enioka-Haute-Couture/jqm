@@ -82,7 +82,7 @@ jqmServices.factory('µJdDto', ['$resource', function ($resource)
         });
 }]);
 
-jqmServices.factory('µUserDto', function ($resource)
+jqmServices.factory('µUserDto', ['$resource', function ($resource)
 {
     return $resource('ws/admin/user/:id', {
         id: ''
@@ -92,7 +92,7 @@ jqmServices.factory('µUserDto', function ($resource)
                 isArray: true
             },
         });
-});
+}]);
 
 jqmServices.factory('µRoleDto', ['$resource', function ($resource)
 {

@@ -25,14 +25,14 @@ import { mappingListComponent } from './mapping/mapping.list.component';
 import { FileReaderComponent } from './misc/filereader.component';
 
 import uiGrid from 'angular-ui-grid';
-import './misc/busy.directive';
+import ngBusy from './misc/busy.directive';
 
-import 'angular-ui-grid/ui-grid.css';
+import 'angular-ui-grid/ui-grid.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '@fortawesome/fontawesome-free/css/all.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 
-var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule, jqmAlertModule, uiGrid, 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.cellNav', 'ui.grid.resizeColumns', 'ui.grid.autoResize', 'ui.grid.pagination', 'ngSanitize', 'ngBusy'])
+var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule, jqmAlertModule, uiGrid, 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.cellNav', 'ui.grid.resizeColumns', 'ui.grid.autoResize', 'ui.grid.pagination', 'ngSanitize', ngBusy])
     .component('jqmHome', homeComponent)
 
     .component('jqmTabs', tabsComponent)

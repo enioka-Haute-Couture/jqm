@@ -199,3 +199,5 @@
     angular.module('ngBusy', ['ngBusy.interceptor', 'ngBusy.busy']);
 
 })(window, window.angular);
+
+export default 'ngBusy';

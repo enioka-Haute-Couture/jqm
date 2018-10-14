@@ -1,292 +1,292 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.enioka.jqm</groupId>
-		<artifactId>jqm-all</artifactId>
-		<version>2.1.0-SNAPSHOT</version>
-	</parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.enioka.jqm</groupId>
+        <artifactId>jqm-all</artifactId>
+        <version>2.1.0-SNAPSHOT</version>
+    </parent>
 
-	<artifactId>jqm-ws</artifactId>
-	<name>${project.groupId}:${project.artifactId}</name>
-	<packaging>war</packaging>
-	<url>http://jqm.readthedocs.org</url>
-	<description>JQM web API implementation and administration UI</description>
+    <artifactId>jqm-ws</artifactId>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <packaging>war</packaging>
+    <url>http://jqm.readthedocs.org</url>
+    <description>JQM web API implementation and administration UI</description>
 
-	<properties>
-		<sonar.exclusions>src/main/webapp/libs/**</sonar.exclusions>
-		<node.dir>${project.basedir}/target/node</node.dir>
-	</properties>
+    <properties>
+        <sonar.exclusions>src/main/webapp/libs/**</sonar.exclusions>
+        <node.dir>${project.basedir}/target/node</node.dir>
+    </properties>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<webResources>
-						<resource>
-							<directory>src/main/webapp</directory>
-							<filtering>true</filtering>
-							<includes>
-								<include>**/home.html</include>
-							</includes>
-						</resource>
-						<resource>
-							<directory>src/main/webapp</directory>
-							<filtering>false</filtering>
-							<excludes>
-								<exclude>**/home.html</exclude>
-							</excludes>
-						</resource>
-					</webResources>
-				</configuration>
-			</plugin>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>src/main/webapp</directory>
+                            <filtering>true</filtering>
+                            <includes>
+                                <include>**/dist/main.bundle*.js</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <directory>src/main/webapp</directory>
+                            <filtering>false</filtering>
+                            <excludes>
+                                <exclude>**/dist/main.bundle*.js</exclude>
+                            </excludes>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
 
-			<!-- run mvn jetty:run to test (with hot deployment) the app on a dev 
+            <!-- run mvn jetty:run to test (with hot deployment) the app on a dev
 				computer. localhost:8080 -->
-			<plugin>
-				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-maven-plugin</artifactId>
-				<version>9.4.8.v20180619</version>
-				<configuration>
-					<scanIntervalSeconds>10</scanIntervalSeconds>
-					<useProvidedScope>true</useProvidedScope>
-					<useTestScope>true</useTestScope>
-					<jettyXml>${project.basedir}/src/test/resources/jetty.xml</jettyXml>
-					<httpConnector>
-						<port>8080</port>
-						<name>testConnector</name>
-					</httpConnector>
-					<webApp>
-						<contextPath>/</contextPath>
-						<overrideDescriptor>${project.basedir}/src/test/resources/web-jetty.xml</overrideDescriptor>
-					</webApp>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.4.8.v20180619</version>
+                <configuration>
+                    <scanIntervalSeconds>10</scanIntervalSeconds>
+                    <useProvidedScope>true</useProvidedScope>
+                    <useTestScope>true</useTestScope>
+                    <jettyXml>${project.basedir}/src/test/resources/jetty.xml</jettyXml>
+                    <httpConnector>
+                        <port>8080</port>
+                        <name>testConnector</name>
+                    </httpConnector>
+                    <webApp>
+                        <contextPath>/</contextPath>
+                        <overrideDescriptor>${project.basedir}/src/test/resources/web-jetty.xml</overrideDescriptor>
+                    </webApp>
+                </configuration>
+            </plugin>
 
-			<!-- <plugin>
-				<groupId>com.github.eirslett</groupId>
-				<artifactId>frontend-maven-plugin</artifactId>
-				<version>1.6</version>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.6</version>
 
-				<configuration>
-					<nodeVersion>v8.11.4</nodeVersion>
-					<installDirectory>target/</installDirectory>
-				</configuration>
+                <configuration>
+                    <nodeVersion>v8.11.4</nodeVersion>
+                    <installDirectory>target/</installDirectory>
+                </configuration>
 
-				<executions>
-					<execution>
-						<id>install node and npm</id>
-						<goals>
-							<goal>install-node-and-npm</goal>
-						</goals>
-						<phase>initialize</phase>
-					</execution>
+                <executions>
+                    <execution>
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                    </execution>
 
-					<execution>
-						<id>npm install</id>
-						<goals>
-							<goal>npm</goal>
-						</goals>
+                    <execution>
+                        <id>npm install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
 
-						<phase>generate-resources</phase>
+                        <phase>generate-resources</phase>
 
-						<configuration>
-							<arguments>install -Xno-optional</arguments>
-						</configuration>
-					</execution>
+                        <configuration>
+                            <arguments>install --no-optional</arguments>
+                        </configuration>
+                    </execution>
 
-					<execution>
-						<id>webpack build</id>
-						<goals>
-							<goal>webpack</goal>
-						</goals>
+                    <execution>
+                        <id>webpack build</id>
+                        <goals>
+                            <goal>webpack</goal>
+                        </goals>
 
-						<phase>generate-resources</phase>
+                        <phase>generate-resources</phase>
 
-						<configuration>
-							<arguments>-Xconfig webpack.dev.js</arguments>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>-->
+                        <configuration>
+                            <arguments>--config webpack.prod.js</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<!-- Used for creating a viable autoreload dev environment. 1) launch 
-				the webpack build in background. 2) Create a compound goal exec:exec to run 
+            <!-- Used for creating a viable autoreload dev environment. 1) launch
+				the webpack build in background. 2) Create a compound goal exec:exec to run
 				jetty+ webpack. -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.6.0</version>
-				<executions>
-					<execution>
-						<id>startwebpacksrv</id>
-						<goals>
-							<goal>exec</goal>
-						</goals>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <id>startwebpacksrv</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
 
-						<configuration>
-							<addOutputToClasspath>false</addOutputToClasspath>
-							<async>true</async>
-							<asyncDestroyOnShutdown>true</asyncDestroyOnShutdown>
-							<commandlineArgs>${node.dir}/node_modules/npm/bin/npm-cli.js run watch</commandlineArgs>
-							<executable>node</executable>
-							<workingDirectory>${project.basedir}</workingDirectory>
-							<environmentVariables>
-								<PATH>${node.dir}</PATH>
-							</environmentVariables>
-						</configuration>
-					</execution>
+                        <configuration>
+                            <addOutputToClasspath>false</addOutputToClasspath>
+                            <async>true</async>
+                            <asyncDestroyOnShutdown>true</asyncDestroyOnShutdown>
+                            <commandlineArgs>${node.dir}/node_modules/npm/bin/npm-cli.js run watch</commandlineArgs>
+                            <executable>node</executable>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <environmentVariables>
+                                <PATH>${node.dir}</PATH>
+                            </environmentVariables>
+                        </configuration>
+                    </execution>
 
-					<execution>
-						<id>default-cli</id>
-						<goals>
-							<goal>exec</goal>
-						</goals>
+                    <execution>
+                        <id>default-cli</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
 
-						<configuration>
-							<executable>mvn</executable>
-							<arguments>
-								<argument>exec:exec@startwebpacksrv</argument>
-								<argument>jetty:run</argument>
-							</arguments>
-						</configuration>
-					</execution>
-				</executions>
+                        <configuration>
+                            <executable>mvn</executable>
+                            <arguments>
+                                <argument>exec:exec@startwebpacksrv</argument>
+                                <argument>jetty:run</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
 
-			</plugin>
-		</plugins>
-	</build>
+            </plugin>
+        </plugins>
+    </build>
 
 
-	<dependencies>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.0.1</version>
-			<scope>provided</scope>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+            <scope>provided</scope>
+        </dependency>
 
-		<!-- Jersey 2.x JAX-RS implementation, running inside a servlet, with a 
+        <!-- Jersey 2.x JAX-RS implementation, running inside a servlet, with a
 			JSON mapper -->
-		<dependency>
-			<groupId>org.glassfish.jersey.containers</groupId>
-			<artifactId>jersey-container-servlet</artifactId>
-			<version>${jersey-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-moxy</artifactId>
-			<version>${jersey-version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.eclipse.persistence</groupId>
-					<artifactId>org.eclipse.persistence.moxy</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<!-- We impose a newer version of Moxy to avoid nasty bug 411001 -->
-		<dependency>
-			<groupId>org.eclipse.persistence</groupId>
-			<artifactId>org.eclipse.persistence.moxy</artifactId>
-			<version>2.5.2</version>
-		</dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
+            <version>${jersey-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-moxy</artifactId>
+            <version>${jersey-version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.eclipse.persistence</groupId>
+                    <artifactId>org.eclipse.persistence.moxy</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- We impose a newer version of Moxy to avoid nasty bug 411001 -->
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.moxy</artifactId>
+            <version>2.5.2</version>
+        </dependency>
 
-		<!-- Security -->
-		<dependency>
-			<groupId>org.apache.shiro</groupId>
-			<artifactId>shiro-web</artifactId>
-			<version>${shiro.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-pki</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <!-- Security -->
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-web</artifactId>
+            <version>${shiro.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-pki</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
-		<!-- For the client API -->
-		<!-- This includes HTTPCLIENT, which is used in tests in this project -->
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-api-client-jdbc</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-admin</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>${httpclient.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-model</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <!-- For the client API -->
+        <!-- This includes HTTPCLIENT, which is used in tests in this project -->
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-api-client-jdbc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-admin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-model</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
-		<!-- Some log -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jul-to-slf4j</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>${commons.logging.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <!-- Some log -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>${commons.logging.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
-		<!-- Stupid java IO APIs solution -->
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>${commons.io.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>${commons.lang.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <!-- Stupid java IO APIs solution -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons.lang.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
-		<!-- Sample DB & DB pool for tests only -->
-		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-jdbc</artifactId>
-			<version>${pool.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
-			<version>${hsqldb.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <!-- Sample DB & DB pool for tests only -->
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jdbc</artifactId>
+            <version>${pool.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>${hsqldb.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
-		<!-- Java 9+ compat -->
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>2.0</version>
-		</dependency>
+        <!-- Java 9+ compat -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.1</version>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 </project>
