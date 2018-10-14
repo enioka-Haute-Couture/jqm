@@ -1,4 +1,5 @@
 import jqmServicesModule from '../service/data';
+import jqmAlertModule from './misc/alert.component';
 import { jqmPermissionDirective } from './misc/permission.directive';
 import { jqmHelperModule } from '../helpers/grid.js';
 import { homeComponent } from './home/home.component.js';
@@ -31,7 +32,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 
 
-var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule, uiGrid, 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.cellNav', 'ui.grid.resizeColumns', 'ui.grid.autoResize', 'ui.grid.pagination', 'ngSanitize', 'ngBusy'])
+var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule, jqmAlertModule, uiGrid, 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.cellNav', 'ui.grid.resizeColumns', 'ui.grid.autoResize', 'ui.grid.pagination', 'ngSanitize', 'ngBusy'])
     .component('jqmHome', homeComponent)
 
     .component('jqmTabs', tabsComponent)
