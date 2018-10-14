@@ -17,7 +17,31 @@
     <properties>
         <sonar.exclusions>src/main/webapp/libs/**</sonar.exclusions>
         <node.dir>${project.basedir}/target/node</node.dir>
+        <jsplugin.version>1.6</jsplugin.version>
     </properties>
+
+    <profiles>
+        <!-- Disable webpack prod build when using dev mode -->
+        <!-- It is enabled inside the exec:exec goal -->
+        <profile>
+            <id>dev</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>${jsplugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>webpack build</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>
@@ -70,7 +94,7 @@
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.6</version>
+                <version>${jsplugin.version}</version>
 
                 <configuration>
                     <nodeVersion>v8.11.4</nodeVersion>
@@ -152,6 +176,7 @@
                             <arguments>
                                 <argument>exec:exec@startwebpacksrv</argument>
                                 <argument>jetty:run</argument>
+                                <argument>-Pdev</argument>
                             </arguments>
                         </configuration>
                     </execution>
