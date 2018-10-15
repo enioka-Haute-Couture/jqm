@@ -13,8 +13,6 @@ Docker on Windows or Linux/Mac
 Prerequisites:
 
 * Docker is configured and can access public images
-  * On Windows server (not client), that includes configuring default volume permissions 
-    (:bash:`icacls "C:\ProgramData\docker\volumes\" /grant "Authenticated Users:(OI)(CI)(F)"` and :bash:`icacls 'C:\ProgramData\docker\windowsfilter\' /grant "Authenticated Users:(OI)(CI)(F)"`)
 * A recent Windows (greater or equal to 1709) or Linux (this includes Macs which run containers inside a hidden Linux VM)
 
 Just run the very classic::

@@ -129,8 +129,8 @@ The node created in the previous step has serious drawbacks:
 * it cannot be used in a network as nodes communicate through the database
 * General low performances and persistence issues inherent to HSQLDB
 
-Just edit JQM_ROOT/conf/resources.xml file to reference your own database and delete or comment JQM_ROOT/conf/db.properties.
-It contains by default sample configuration for Oracle, PostgreSQL, HSQLDB and MySQL which are the four supported databases. (HSQLDB is not supported
+Just edit JQM_ROOT/conf/resources.xml file to reference your own database.
+It contains by default sample configuration for Oracle, PostgreSQL, HSQLDB, DB2 and MySQL which are the supported databases. (HSQLDB is not supported
 in production environments)
 
 .. note:: the database is intended to be shared by all JQM nodes - you should not create a schema/database per node.
@@ -175,7 +175,7 @@ Oracle 10gR2 & 11gR2 are supported. No specific configuration is required in JQM
 PostgreSQL
 ------------------
 
-PostgreSQL 9 is supported (tested with PostgreSQL 9.3). It is the recommended open source database to work with JQM.
+PostgreSQL 9 & 10 are supported (tested with PostgreSQL 9.3). It is the recommended open source database to work with JQM.
 No specific configuration is required in JQM: no options inside jqm.properties (or absent file). No specific database configuration is required. 
 
 Here's a quickstart to setup a test database. As postgres user::
@@ -193,7 +193,7 @@ MySQL
 ------------------
 
 MySQL 5.6+ is supported with InnoDB (the default). No specific configuration is required in JQM: no options inside jqm.properties (or absent file).
-    
+
 These commands can be used to setup a database.::
 
     $ mysql -u root -p
@@ -207,14 +207,11 @@ HSQLDB
 ------------------
 
 HSQLDB 2.3.x is supported in test environments only.
-
-As Hibernate support of HSQLDB has a bug, the jqm.properties file must contain the following line::
-
-	hibernate.dialect=com.enioka.jqm.tools.HSQLDialect7479
 	
 No specific HSQLDB configuration is required. Please note that if using a file database, HSQLDB prevents multiple processes from accessing it
 so it will cause issues for creating multi node environments.
 
+.. note:: prior to version 2.0, there was a bug in a library which required specific options inside the jqm.properties file. This is no longer needed, and this file (now useless but harmless) can be removed.
 
 Global configuration
 **********************

@@ -10,29 +10,30 @@ Basically, it is a very lightweight application server specifically tailored for
 
 The rational behind JQM is that there are too many jobs that fall inside that uncomfortable middle ground between 
 "a few seconds" (this could be done synchronously inside a web application server) and "a few hours" (in 
-which case forking a new dedicated JVM is often the most adapted way). 
+which case forking a new dedicated JVM is often the most suitable way). 
 A traditional servlet or J2EE application server should not house this kind of jobs: they are designed to deal 
-with very short running synchronous user requests, not asynchronous long running jobs. For example, creating a thread
-in such a server is dangerous as they offer little control over it, and they do not offer job queuing (which is a basic
-tenet of asynchronous execution).
+with very short locally-running synchronous user requests, not asynchronous distributed long running jobs. For example, creating a thread
+in such a server is dangerous as they offer little control over it, and they do not offer job queuing and remote execution (which is a basic
+tenet of asynchronous batch execution).
 
 JQM should also be considered just for its ability to untangle the execution itself from the program that requires it. 
-Two of the most obvious applications are:
+Some of the most obvious applications are:
 
 * relieving the application server, which often costs money - the front end stays on the licensed application 
-  server on an expensive server, while the resource consuming jobs go inside JQM on low end servers.
+  server on an expensive server, while the resource consuming jobs go inside JQM on low-end servers.
 * job execution request frequency adaptation. Often a job is requested to run multiple times at the same moment 
   (either by a human request, or an automated system reacting to frequent events, ...) while the job should 
   actually run only one at a time (e.g. the job handles all available data at the time of its 
   launch - so there is really no need for multiple instances in parallel). JQM will throttle these requests.
+* adding a queueing & distributed execution capacity to job schedulers.
 
 Most of the time, the code that will be run by JQM will be a direct reuse of existing code without any modifications 
-(for jars including a classic main function, or Runnable threads). But it also optionally offers a rich API that 
+(for jars including a classic main function, or Runnable threads). But JQM also optionally offers a rich API that 
 allows running code to ask for another execution, to retrieve structured parameters, to send messages and other 
 advancement notices... Also of note, JQM is pure Java Standard Edition 6 (JSE 1.6) to enable not only code but binary reuse.
 Standard JSE code also means it is possible to use any framework within JQM, like Spring batch or Hibernate.
 
-Interacting with JQM is also easy: an API, with two different implementations (JPA & REST web service, which can be 
+Interacting with JQM is also easy: an API, with two different implementations (SQL & REST web service, which can be 
 used from a non-Java world) for different needs, is offered to do every imaginable operation (new execution request, 
 querying the state of a request, retrieving files created by a job instance, ...).
 
@@ -40,7 +41,7 @@ querying the state of a request, retrieving files created by a job instance, ...
 It is also of note that JQM was created with compatibility in mind:
 
 * uses either PostgreSQL, Oracle, MySQL, DB2 or HSQLDB
-* the client API is usable in all application servers and JSE code (tested with WebsSphere 8.x, Glassfish 3.x, Tomcat 7.x)
+* the client API is usable in all application servers and JSE code (tested with WebsSphere 8.x, Glassfish 3.x, Tomcat 7.x, JBoss 7+...)
 * one of the client API implementations is a REST-like API, callable from everywhere, not only Java but also .NET or shell scripts
   (which by the way allows very easy scheduler integration).
 * under an Apache 2 license, which basically allows you to do anything you want with the product and its code in any environment

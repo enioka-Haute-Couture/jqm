@@ -8,7 +8,7 @@ In details:
 
 * pollers stop on first failure. Therefore, no new job instance will run until database connectivity is restored. Failed pollers are restarted on database coming back on line.
 * running job instances continue to run as long as they are not concerned with database connectivity. 
-    * They will be impacted if they use some JQM API methods that call the database behind the scenes, such as when they themselves enqueue new job execution requests
+    * They will be impacted if they use a JQM API method, as they all call the database behind the scenes
     * They will not be impacted otherwise
     * Impacted instances will classically crash with a JDBC exception.
 * ending job instances are stored in memory and wait for the database to come back to be reported. This is referred to as "delayed finalization" inside the logs.
