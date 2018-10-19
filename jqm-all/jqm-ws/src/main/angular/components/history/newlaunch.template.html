@@ -1,4 +1,4 @@
-<jqm-modal show='$ctrl.show'>
+<jqm-modal show='$ctrl.show' title="New launch">
     <div class="form-group row">
         <label for="ddJd" class="col-sm-5 col-form-label">Application to launch</label>
         <div class="col-sm-7">
@@ -30,12 +30,12 @@
         </div>
     </div>
 
-    <div class="form-group row">
-        <label for="txtUser" class="col-sm-5 col-form-label">Default parameters</label>
+    <div class="form-group row" ng-show="$ctrl.selectedJd.parameters.length > 0">
+        <label for="defaultPrmList" class="col-sm-5 col-form-label">Default parameters</label>
         <div class="col-sm-7">
-            <div ng-repeat="p in $ctrl.selectedJd.parameters | orderBy:'key'">
-                <div class="col-xs-6">{{p.key}}</div>
-                <div class="col-xs-6">{{p.value}}</div>
+            <div id="defaultPrmList" class="form-row" ng-repeat="p in $ctrl.selectedJd.parameters | orderBy:'key'">
+                <div class="col-sm-4">{{p.key}}</div>
+                <div class="col-sm-4">{{p.value}}</div>
             </div>
             <small class="form-text text-muted">
                 Can be overridden below
@@ -44,34 +44,35 @@
     </div>
 
     <div class="form-group row">
-        <label for="txtUser" class="col-sm-5 col-form-label">Override or new parameters</label>
+        <label for="txtUser" class="col-sm-5 col-form-label">{{$ctrl.selectedJd.parameters.length > 0 ? "Override or
+            new parameters" : "Job instance parameters"}}</label>
         <div class="col-sm-7">
-            <div class="row">
-                <div class="col-xs-4">
+            <div class="form-row">
+                <div class="col-sm-4">
                     <input id="txtKey" class="form-control" type="text" ng-model="$ctrl.data.newKey" placeholder="key" />
                 </div>
-                <div class="col-xs-4">
+                <div class="col-sm-4">
                     <input id="txtValue" class="form-control" type="text" ng-model="$ctrl.data.newValue" placeholder="value" />
                 </div>
-                <div class="col-xs-4">
-                    <button class="btn btn-outline-success" ng-click="$ctrl.addPrm()">
+                <div class="col-sm-4">
+                    <button class="btn btn-outline-success" ng-click="$ctrl.addPrm()" ng-disabled="!$ctrl.data.newKey || !$ctrl.data.newValue">
                         <span class="fas fa-plus-circle"></span>
                         Add
                     </button>
                 </div>
             </div>
             <small class="form-text text-muted">
-                Enter here additional key/values pairs
+                Enter here additional key/value pairs
             </small>
         </div>
     </div>
 
     <div class="form-group row">
-        <label for="txtUser" class="col-sm-5 col-form-label"></label>
+        <label for="additionalPrms" class="col-sm-5 col-form-label"></label>
         <div class="col-sm-7">
-            <div ng-repeat="p in $ctrl.request.parameters | orderBy:'key'" class="row">
-                <div class="col-xs-6">{{p.key}}</div>
-                <div class="col-xs-6">{{p.value}}</div>
+            <div class="form-row" id="additionalPrms" ng-repeat="p in $ctrl.request.parameters | orderBy:'key'">
+                <div class="col-sm-4">{{p.key}}</div>
+                <div class="col-sm-4">{{p.value}}</div>
             </div>
         </div>
     </div>

@@ -30,6 +30,8 @@ class NewLaunchController
         np.key = this.data.newKey;
         np.value = this.data.newValue;
         this.request.parameters.push(np);
+        this.data.newKey = null;
+        this.data.newValue = null;
     };
 
     postOk()
