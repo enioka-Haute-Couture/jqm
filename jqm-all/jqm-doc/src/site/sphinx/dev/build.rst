@@ -107,6 +107,6 @@ This updates the following tags:
 
 For maintenance releases of past majors, care must be taken to change the updated tags.
 
-Changing version, run `$jqmVer="2.1.0"; $majorVer=$jqmVer.Split('.')[0]; $newTag="jqm-all-$jqmVer"; docker/Update-AllBranches.ps1 -Branches @{$jqmVer = $newTag; $majorVer = $newTag; "latest" = $newTag; "nightly" = "master"}`
+Changing version, run `$jqmVer="2.1.0"; $majorVer=$jqmVer.Split('.')[0]; $newTag="jqm-all-$jqmVer"; ./Update-AllBranches.ps1 -Push -Branches @{$jqmVer = $newTag; $majorVer = $newTag; "latest" = $newTag; "nightly" = "master"}`
 
 You also may rebuild older branches - this updates OS and middlewares.

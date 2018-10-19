@@ -36,10 +36,12 @@ foreach ($BranchTag in $Branches.Keys) {
     mkdir -Force $root -WhatIf:$false >$null
 
     # Checkout branch in that directory
+    cd $PSScriptRoot
     git --work-tree=$root checkout ${BranchName} -- .
     if ($LASTEXITCODE -ne 0) {
         throw "branch/tag ${BranchName} cannot be checked out"
     }
+    cd $root/docker
 
     Write-Progress -Activity "Building branch/tag $BranchName $BranchTag" -id 0
     $branchManifest = @(& (Join-Path $root docker/Update-JqmImage.ps1) -ServerFile $ServerFile @args -ImageName $ImageName -TagRoot ${BranchTag})
