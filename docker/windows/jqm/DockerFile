@@ -22,8 +22,7 @@ WORKDIR /jqm-all
 # Build
 COPY ./docker/windows/nexus/settings.xml ./jqm-all ./
 
-RUN mvn install -DskipTests=%SKIP_TESTS% %MVN_SETTINGS%
-
+RUN mvn install -DskipTests=%SKIP_TESTS% %MVN_SETTINGS% && mkdir C:\TEMP && echo F | xcopy /S /Q /Y /F jqm-service\target\jqm-*.zip C:\TEMP\jqm.zip && mvn clean
 
 
 
@@ -34,7 +33,7 @@ FROM microsoft/powershell:nanoserver-${WINDOWS_TAG} AS installer
 
 SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-COPY --from=builder c:/jqm-all/jqm-service/target/jqm-2.1.0-SNAPSHOT.zip C:/TEMP/jqm.zip
+COPY --from=builder c:/TEMP/jqm.zip C:/TEMP/jqm.zip
 
 RUN Expand-Archive C:/TEMP/jqm.zip -DestinationPath C:/TEMP/; \
     mv C:/TEMP/jqm-* c:/jqm; \
