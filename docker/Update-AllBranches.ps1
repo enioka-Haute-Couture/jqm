@@ -64,6 +64,8 @@ foreach ($manifestName in $manifestData.Keys) {
     Write-Progress -Activity "Updating manifests" -CurrentOperation "Manifest $manifestName" -id 0
 
     if ($PSCmdlet.ShouldProcess($manifestName, "Create manifest")) {
+        # bug 954 too
+        rm -Recurse ~/.docker/manifests/*
         docker manifest create $manifestName @imageList --amend
         if ($LASTEXITCODE -ne 0) {
             throw "Manifest creation error"
