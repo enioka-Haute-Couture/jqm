@@ -227,7 +227,7 @@ class JobManagerHandler implements InvocationHandler
                 jqmlogger.info("Job will be killed at the request of a user");
                 Helpers.closeQuietly(cnx); // Close at once. Some DB drivers (Oracle...) will use the interruption state and reset.
                 Thread.currentThread().interrupt();
-                throw new JqmKillException("This job" + "(ID: " + ji.getId() + ")" + " has been killed by a user");
+                throw new JqmKillException("This job" + "(ID: " + ji.getId() + ")" + " has been forcefully ended by a user");
             }
 
             if (s.equals(Instruction.PAUSE))
@@ -249,6 +249,16 @@ class JobManagerHandler implements InvocationHandler
                 }
                 jqmlogger.info("Job instance is resuming");
                 sendMsg("Job instance is resuming");
+            }
+
+            // TEMP: #319 workaround. Full implementation should be in the engine, not here.
+            int priority = cnx.runSelectSingle("ji_select_priority_by_id", Integer.class, ji.getId());
+            if (priority != 0)
+            {
+                if (Thread.currentThread().getPriority() != priority)
+                {
+                    Thread.currentThread().setPriority(priority);
+                }
             }
         }
         finally

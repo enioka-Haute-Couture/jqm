@@ -16,6 +16,7 @@ The release environment must have:
 * Internet access
 * Login & password to Sonatype OSSRH with permissions on com.enioka.jqm.
 * Login & password to Read the Docs with permissions on com.enioka.jqm.
+* Docker client 18.06+ and access to the multi-arch build environment.
 
 Update release notes
 +++++++++++++++++++++++++
@@ -93,3 +94,19 @@ GitHub upload
 Create a release inside GitHub and upload the zip and tar.gz produced by the jqm-engine project. Add a link to the release notes inside.
 
 .. note:: only do this **after** the documentation is up on ReadTheDocs. Creating a release sends a mail to followers, so any link to the doc would be dead otherwise.
+
+Docker Hub upload
+++++++++++++++++++++
+
+This updates the following tags:
+
+* release tag
+* major tag
+* latest is updated to this release
+* nightly is updated to the next upcoming version.
+
+For maintenance releases of past majors, care must be taken to change the updated tags.
+
+Changing version, run `$jqmVer="2.1.0"; $majorVer=$jqmVer.Split('.')[0]; $newTag="jqm-all-$jqmVer"; ./Update-AllBranches.ps1 -Push -Branches @{$jqmVer = $newTag; $majorVer = $newTag; "latest" = $newTag; "nightly" = "master"}`
+
+You also may rebuild older branches - this updates OS and middlewares.

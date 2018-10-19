@@ -7,9 +7,9 @@ services:
             labels:
                 com.enioka.description: "build helper - OpenJDK JRE for windows nano"
             args:
-                - OJDK_VERSION=171-1
-                - OJDK_BUILD=b10
-                - OJDK_SHA256=35104f658ed51d1b24cf6f0f6d1d21524d7640d3e3e7b64d8d7ac86cbfbc2ab9
+                - OJDK_VERSION=181-1
+                - OJDK_BUILD=b13
+                - OJDK_SHA256=dd7d2ea7951c06857523e95359e5e94630039a1eae5b5223e4b8c308afc95ebb
                 - WINDOWS_TAG=${WINDOWS_TAG}
         image: enioka/buildhelpers:jre-1.8.0-${WINDOWS_TAG:?tag must be given}
         hostname: jre
@@ -21,9 +21,9 @@ services:
             labels:
                 com.enioka.description: "build helper - OpenJDK JDK for windows nano"
             args:
-                - OJDK_VERSION=171-1
-                - OJDK_BUILD=b10
-                - OJDK_SHA256=35104f658ed51d1b24cf6f0f6d1d21524d7640d3e3e7b64d8d7ac86cbfbc2ab9
+                - OJDK_VERSION=181-1
+                - OJDK_BUILD=b13
+                - OJDK_SHA256=dd7d2ea7951c06857523e95359e5e94630039a1eae5b5223e4b8c308afc95ebb
                 - WINDOWS_TAG=${WINDOWS_TAG}
         image: enioka/buildhelpers:jdk-1.8.0-${WINDOWS_TAG:?tag must be given}
         hostname: jdk

@@ -36,10 +36,12 @@ foreach ($BranchTag in $Branches.Keys) {
     mkdir -Force $root -WhatIf:$false >$null
 
     # Checkout branch in that directory
+    cd $PSScriptRoot
     git --work-tree=$root checkout ${BranchName} -- .
     if ($LASTEXITCODE -ne 0) {
         throw "branch/tag ${BranchName} cannot be checked out"
     }
+    cd $root/docker
 
     Write-Progress -Activity "Building branch/tag $BranchName $BranchTag" -id 0
     $branchManifest = @(& (Join-Path $root docker/Update-JqmImage.ps1) -ServerFile $ServerFile @args -ImageName $ImageName -TagRoot ${BranchTag})
@@ -64,6 +66,8 @@ foreach ($manifestName in $manifestData.Keys) {
     Write-Progress -Activity "Updating manifests" -CurrentOperation "Manifest $manifestName" -id 0
 
     if ($PSCmdlet.ShouldProcess($manifestName, "Create manifest")) {
+        # bug 954 too
+        rm -Recurse ~/.docker/manifests/*
         docker manifest create $manifestName @imageList --amend
         if ($LASTEXITCODE -ne 0) {
             throw "Manifest creation error"

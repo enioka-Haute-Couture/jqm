@@ -16,3 +16,4 @@
 **/package-lock.json
 /jqm-all/jqm-ws/src/main/webapp/dist/**
 /jqm-all/jqm-ws/src/main/webapp/index.html
+.tern-project

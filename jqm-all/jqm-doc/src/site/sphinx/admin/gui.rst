@@ -5,7 +5,7 @@ As all serious server-oriented middlewares, JQM is first and foremost a CLI (and
 for a more Windows administrator-friendly experience, a web console is also offered. It allows every parameter modification (alter the definition of jobs, 
 remove an engine node from the cluster, etc) and every client operation (new launch, consult launch history...) available.
 
-It is **disabled by default**.
+It is **disabled by default** (except in single node Docker distributions).
 
 Enabling the console
 *************************
@@ -24,7 +24,7 @@ A CLI shortcut is offered to enable all what is needed to use the GUI::
 First connection
 *******************
 
-Using either Internet Explorer (>= 10), Chrome (>= 25), Firefox (>= 28), connect to:
+Using a supported browser, connect to:
 
     http://servername:httpport (or, if SSL is enabled, https://...)
 
@@ -34,7 +34,7 @@ Then click on "login", and submit authentication data for user "root" (its passw
 
 Then head to the "users" tab, and create your own user with your own password and associate it with a suitable role.
 
-If SSL is enabled
+If TLS is enabled
 *******************
 
 In that case, the recommended approach is to use a certificate to connect.
