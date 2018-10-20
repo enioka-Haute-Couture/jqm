@@ -5,9 +5,10 @@ import $ from 'jquery'; // needed by bootstrap js.
 import 'bootstrap/js/dist/button';
 import 'bootstrap/js/dist/popover';
 
-class HistoryPageCtrl {
-
-    constructor(µQueueDto, $http) {
+class HistoryPageCtrl
+{
+    constructor(µQueueDto, $http)
+    {
         this.$http = $http;
 
         this.data = null;
@@ -54,22 +55,27 @@ class HistoryPageCtrl {
             enableSelectionBatchEvent: false,
             noUnselect: true,
 
-            onRegisterApi: function (gridApi) {
+            onRegisterApi: function (gridApi)
+            {
                 ctrl.gridApi = gridApi;
-                gridApi.selection.on.rowSelectionChanged(null, function (rows) {
+                gridApi.selection.on.rowSelectionChanged(null, function (rows)
+                {
                     ctrl.selected = gridApi.selection.getSelectedRows();
                 });
 
-                gridApi.core.on.sortChanged(null, function (grid, sortColumns) {
+                gridApi.core.on.sortChanged(null, function (grid, sortColumns)
+                {
                     ctrl.sortInfo.length = 0;
-                    $.each(sortColumns, function () {
+                    $.each(sortColumns, function ()
+                    {
                         ctrl.sortInfo.push({ col: ctrl.colDef.sortField, order: ctrl.sort.direction === "desc" ? "DESCENDING" : "ASCENDING" });
                     });
 
                     ctrl.getDataAsync();
                 });
 
-                gridApi.pagination.on.paginationChanged(null, function (newPage, pageSize) {
+                gridApi.pagination.on.paginationChanged(null, function (newPage, pageSize)
+                {
                     ctrl.pagingOptions.currentPage = newPage;
                     ctrl.pagingOptions.pageSize = pageSize;
                     ctrl.getDataAsync();
@@ -88,7 +94,8 @@ class HistoryPageCtrl {
             useExternalSorting: true,
 
             appScopeProvider: {
-                onDblClick: function (row) {
+                onDblClick: function (row)
+                {
                     ctrl.showDetails = true;
                 }
             },
@@ -165,16 +172,19 @@ class HistoryPageCtrl {
         this.getDataAsync();
     }
 
-    $onInit() {
+    $onInit()
+    {
         $('[data-toggle="popover"]').popover();
     }
 
-    getDataOk(response) {
+    getDataOk(response)
+    {
         this.data = response.data.instances;
         this.gridOptions.totalItems = response.data.resultSize;
 
         // Reset the time slider to avoid time drift.
-        if (this.now < (new Date()).getTime() - 30000) {
+        if (this.now < (new Date()).getTime() - 30000)
+        {
             this.now = (new Date()).getTime();
             if (this.datemax === this.daterangemax)
                 this.datemax = this.now;
@@ -183,31 +193,37 @@ class HistoryPageCtrl {
         }
     };
 
-    getDataAsync() {
+    getDataAsync()
+    {
         // Paging options
         this.query.firstRow = (this.pagingOptions.currentPage - 1) * this.pagingOptions.pageSize;
         this.query.pageSize = this.pagingOptions.pageSize;
 
         // History or queues?
-        if (this.target === "hist") {
+        if (this.target === "hist")
+        {
             this.query.queryLiveInstances = false;
             this.query.queryHistoryInstances = true;
         }
-        else {
+        else
+        {
             this.query.queryLiveInstances = true;
             this.query.queryHistoryInstances = false;
         }
 
         // KO only?
-        if (this.target === "hist" && this.ko) {
+        if (this.target === "hist" && this.ko)
+        {
             this.query.statuses = ['CRASHED', 'KILLED',];
         }
-        else {
+        else
+        {
             this.query.statuses = [];
         }
 
         // Running only?
-        if (this.target === "queues" && this.running) {
+        if (this.target === "queues" && this.running)
+        {
             this.query.statuses = ['RUNNING',];
         }
 
@@ -217,36 +233,45 @@ class HistoryPageCtrl {
         // Time filters
         delete this.query.enqueuedBefore;
         delete this.query.enqueuedAfter;
-        if (this.filterDate) {
-            if (this.datemax !== this.daterangemax) {
+        if (this.filterDate)
+        {
+            if (this.datemax !== this.daterangemax)
+            {
                 this.query.enqueuedBefore = new Date(this.datemax);
             }
-            else {
+            else
+            {
                 delete this.query.enqueuedBefore;
             }
             this.query.enqueuedAfter = new Date(this.datemin);
         }
 
         // Lists
-        if (this.query.applicationName && this.query.applicationName.indexOf(',') > -1) {
+        if (this.query.applicationName && this.query.applicationName.indexOf(',') > -1)
+        {
             this.query.applicationName = this.query.applicationName.split(',');
         }
+
+        this.onLaunched = this.onLaunched.bind(this);
 
         // Go
         this.$http.post("ws/client/ji/query", this.query).then(this.getDataOk.bind(this));
     };
 
-    scaleX(s) {
+    /*scaleX(s)
+    {
         this.daterangemin = this.now - s;
-        if (this.datemax < this.daterangemin) {
+        if (this.datemax < this.daterangemin)
+        {
             this.datemax = this.daterangemax;
         }
-        if (this.datemin < this.daterangemin) {
+        if (this.datemin < this.daterangemin)
+        {
             this.datemin = this.daterangemin;
         }
     }
 
-    /*this.$watch('scale', function (newVal, oldVal) {
+    this.$watch('scale', function (newVal, oldVal) {
         scale(newVal);
     });
     this.$watch('[target, ko, running, filterOptions, filterDate]', function (newVal, oldVal) {
@@ -279,59 +304,58 @@ class HistoryPageCtrl {
         }, 100);
     }, true);*/
 
-    showDetail() {
+    showDetail()
+    {
         $uibModal.open({
             templateUrl: './template/history_detail.html',
             controller: 'historyDetail',
             size: 'lg',
 
             resolve: {
-                ji: function () {
+                ji: function ()
+                {
                     return this.selected[0];
                 }
             },
         });
     };
 
-    newLaunch() {
-        var modalInstance = $uibModal.open({
-            templateUrl: './template/new_launch.html',
-            controller: 'jiNew',
-            size: 'lg',
-        });
-
-        modalInstance.result.then(function () {
-            this.target = "queues";
-        }, function () {
-            this.getDataAsync();
-        });
-
-    };
-
     // Buttons
-    relaunch() {
+    relaunch()
+    {
         var ji = this.selected[0];
+        this.target = 'queues';
         this.$http.post("ws/client/ji/" + ji.id).then(this.getDataAsync.bind(this));
     };
 
-    kill() {
+    onLaunched()
+    {
+        this.target = 'queues';
+        this.getDataAsync();
+    }
+
+    kill()
+    {
         var ji = this.selected[0];
         this.$http.post("ws/client/ji/killed/" + ji.id).then(this.getDataAsync.bind(this));
         this.selected.length = 0;
     };
 
-    changeQueue(newqueueid) {
+    changeQueue(newqueueid)
+    {
         var ji = this.selected[0];
         this.$http.post("ws/client/q/" + newqueueid + "/" + ji.id).then(this.getDataAsync.bind(this));
     };
 
-    pause() {
+    pause()
+    {
         var ji = this.selected[0];
         this.$http.post("ws/client/ji/paused/" + ji.id).then(this.getDataAsync.bind(this));
         this.selected.length = 0;
     };
 
-    resume() {
+    resume()
+    {
         var ji = this.selected[0];
         this.$http.delete("ws/client/ji/paused/" + ji.id).then(this.getDataAsync.bind(this));
         this.selected.length = 0;

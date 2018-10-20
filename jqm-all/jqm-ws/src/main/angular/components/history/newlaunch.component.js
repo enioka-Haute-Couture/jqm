@@ -37,6 +37,10 @@ class NewLaunchController
     postOk()
     {
         this.show = false;
+        if (this.onLaunched)
+        {
+            this.onLaunched();
+        }
     };
 
     ok()
@@ -59,5 +63,6 @@ export const newLaunchComponent = {
     template: template,
     bindings: {
         'show': '=',
+        'onLaunched': '<',
     }
 };
