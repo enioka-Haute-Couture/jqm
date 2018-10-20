@@ -25,6 +25,7 @@ import { mappingListComponent } from './mapping/mapping.list.component';
 import { FileReaderComponent } from './misc/filereader.component';
 
 import uiGrid from 'angular-ui-grid';
+import 'angular-ui-grid/ui-grid.auto-resize';
 import ngBusy from './misc/busy.directive';
 
 import 'angular-ui-grid/ui-grid.min.css';

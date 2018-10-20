@@ -61,15 +61,21 @@
 
     </div>
 </div>
-
 <!-- end of filter row -->
 
 <!-- The result grid placeholder -->
-<div style="height: calc(100% - 150px);">
-    <div ui-grid='$ctrl.gridOptions' ui-grid-pagination ui-grid-selection ui-grid-resize-columns ui-grid-auto-resize
-        style='height: 100%;'></div>
+<div class='row' style="height: calc(100% - 10em);">
+    <div class='col-sm-12 fullheight'>
+        <div ui-grid='$ctrl.gridOptions' ui-grid-pagination ui-grid-selection ui-grid-resize-columns
+            ui-grid-auto-resize style='height: 100%;'></div>
+    </div>
 </div>
-<div class="small">Double-click on a line to get job details, files produced and logs.</div>
+<div class='row'>
+    <div class='col-sm-12'>
+        <div class="small">Double-click on a line to get job details, files produced and logs.</div>
+    </div>
+</div>
+
 
 <!-- Buttons -->
 <div class='row'>

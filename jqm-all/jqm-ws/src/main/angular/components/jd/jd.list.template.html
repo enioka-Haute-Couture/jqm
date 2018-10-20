@@ -1,14 +1,13 @@
 <jqm-jd-prms-dialog jd="$ctrl.selected[0]" show="showPrm"></jqm-jd-prms-dialog>
 <jqm-jd-cron-dialog ng-model="$ctrl.selected[0]" queues="$ctrl.queues" show="showCron"></jqm-jd-cron-dialog>
 <jqm-help-block content="$ctrl.helpcontent"></jqm-help-block>
-<input type="text" ng-model="$ctrl.filterValue" ng-change="$ctrl.gridApi.grid.refresh()" style="position:absolute; right: 5px; top: 47px;" />
+<input type="text" ng-model="$ctrl.filterValue" ng-change="$ctrl.gridApi.grid.refresh()" class="filterArea" />
 
 
-<div style="height: calc(100% - 110px);">
+<div class="ui-grid-reactive-container">
     <div ui-grid='$ctrl.gridOptions' ui-grid-edit ui-grid-selection ui-grid-cellNav ui-grid-resize-columns
-        ui-grid-auto-resize style='height: 100%;'></div>
+        ui-grid-auto-resize></div>
 </div>
-<br />
 
 <button class="btn btn-outline-dark" ng-click="$ctrl.newitem()" jqm-permission="jd:create">
     <span class="fas fa-plus-circle"></span>

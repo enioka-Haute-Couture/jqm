@@ -1,8 +1,8 @@
 <jqm-help-block content="$ctrl.helpcontent"></jqm-help-block>
 
-<div style="height: calc(100% - 110px);">
+<div class="ui-grid-reactive-container">
     <div ui-grid='$ctrl.gridOptions' ui-grid-edit ui-grid-selection ui-grid-cellNav ui-grid-resize-columns
-        ui-grid-auto-resize style='height: 100%;'></div>
+        ui-grid-auto-resize></div>
 </div>
 
 <button class="btn btn-outline-dark" ng-click="$ctrl.newmapping()" ng-disabled="$ctrl.bDbBusy" jqm-permission="qmapping:create">

@@ -47,7 +47,7 @@ import com.enioka.jqm.model.State;
 
 /**
  * The loader is the tracker object for a payload execution. The job thread starts here and ends here. This class handles logging (creation
- * of {@link History}),starting the payload, etc.
+ * of {@link History}), starting the payload, etc.
  */
 class Loader implements Runnable, LoaderMBean
 {

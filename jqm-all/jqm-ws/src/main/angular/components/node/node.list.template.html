@@ -1,26 +1,25 @@
 <jqm-help-block content="$ctrl.helpcontent"></jqm-help-block>
 
-<div class="row">
-    <div class="col-md-12">
-        <div ui-grid='$ctrl.gridOptions' ui-grid-edit ui-grid-selection ui-grid-cellNav ui-grid-resize-columns
-            ui-grid-auto-resize></div>
-        <br />
-        <button class="btn btn-outline-dark" ng-click="$ctrl.refresh()">
-            <span class="fas fa-sync-alt"></span> Refresh
-        </button>
-        <button class="btn btn-outline-dark" ng-click="$ctrl.stop()" jqm-permission="node:create" ng-disabled="$ctrl.selected.length === 0">
-            <span class="fas fa-minus-circle"></span> Send stop order
-        </button>
-        <button class="btn btn-outline-dark" ng-click="showReader=true" jqm-permission="node:read" ng-disabled="$ctrl.selected.length === 0">
-            <span class="far fa-file"></span> Display log
-        </button>
-        <button class="btn btn-outline-dark" ng-click="$ctrl.save()" jqm-permission="node:create">
-            <span class="far fa-save"></span> Save nodes
-        </button>
-        <button class="btn btn-outline-dark" ng-click="$ctrl.remove()" ng-disabled="$ctrl.selected.length === 0"
-            jqm-permission="jd:delete">
-            <span class="far fa-trash-alt"></span> Delete selected
-        </button>
-    </div>
+
+<div class="ui-grid-reactive-container">
+    <div ui-grid='$ctrl.gridOptions' ui-grid-edit ui-grid-selection ui-grid-cellNav ui-grid-resize-columns
+        ui-grid-auto-resize></div>
 </div>
+
+<button class="btn btn-outline-dark" ng-click="$ctrl.refresh()">
+    <span class="fas fa-sync-alt"></span> Refresh
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.stop()" jqm-permission="node:create" ng-disabled="$ctrl.selected.length === 0">
+    <span class="fas fa-minus-circle"></span> Send stop order
+</button>
+<button class="btn btn-outline-dark" ng-click="showReader=true" jqm-permission="node:read" ng-disabled="$ctrl.selected.length === 0">
+    <span class="far fa-file"></span> Display log
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.save()" jqm-permission="node:create">
+    <span class="far fa-save"></span> Save nodes
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.remove()" ng-disabled="$ctrl.selected.length === 0" jqm-permission="jd:delete">
+    <span class="far fa-trash-alt"></span> Delete selected
+</button>
+
 <jqm-file-reader show="showReader" href="'/ws/admin/node/' + $ctrl.selected[0].name + '/log?latest=200'"></jqm-file-reader>

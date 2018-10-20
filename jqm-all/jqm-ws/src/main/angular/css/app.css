@@ -3,21 +3,34 @@
 html,body {
     height: 100%;
     font-size: 14px; /* define the REM */
+    margin: 0px;
+    padding: 0px;
+}
+
+.fullheight {
+    height: 100%;
+}
+
+/* Sigh */
+.container-fluid{
+    overflow: hidden;
 }
 
 a {
- color:   rgb(51, 122, 183);
+    color:   rgb(51, 122, 183);
 }
 
 /* Full page container */
-body > div.container-fluid.ng-scope {
-	padding: 0px;
+#jqmApp {
+    height: 100%;
 }
 
 /* View container (i.e. page without the tabs) */
-body > div > div.ng-scope {
-	padding: 1em;
-	height: calc(100% - 50px);
+#appMain {
+    height: calc(100% - 2em);
+    width: 100%;
+    padding-left: 1em;
+    padding-right: 1em;
 }
 
 /* Tabs are links, so show the adequate cursor */
@@ -32,6 +45,12 @@ body > div > div.ng-scope {
 /* Forms */
 .col-form-label {
 	font-weight: bold;
+}
+
+.filterArea {
+    position:absolute;
+    right: 5px;
+    top: 37px;
 }
 
 /* Prevent some browser (like firefox) to add a red border on required input */
@@ -59,6 +78,16 @@ body > div > div.ng-scope {
 
 .history-detail-td {
     word-break: break-all;
+}
+
+div.ui-grid-reactive-container {
+    height: calc(100% - 9em);
+    margin-bottom: 1em;
+}
+
+.ui-grid-reactive-container > div.ui-grid {
+    height: 100%;
+    width: calc(100%-4px);
 }
 
 /* Menu styling */

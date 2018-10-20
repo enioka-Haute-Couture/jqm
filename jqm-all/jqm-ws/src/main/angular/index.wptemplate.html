@@ -20,12 +20,12 @@
 </head>
 
 <body>
-    <div ng-app="jqmApp" class="container-fluid">
+    <div id="jqmApp" ng-app="jqmApp" class="container-fluid p-0">
         <jqm-tabs></jqm-tabs>
 
         <jqm-alert></jqm-alert>
 
-        <div ng-view></div>
+        <div id="appMain" ng-view></div>
     </div>
 
     <% if (htmlWebpackPlugin.options.appMountId) { %>

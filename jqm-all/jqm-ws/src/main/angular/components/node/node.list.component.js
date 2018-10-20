@@ -86,10 +86,10 @@ class NodeListCtrl
                     displayName: 'Log level',
                 }, {
                     field: 'jmxRegistryPort',
-                    displayName: 'jmxRegistryPort',
+                    displayName: 'JmxRegistryPort',
                 }, {
                     field: 'jmxServerPort',
-                    displayName: 'jmxServerPort',
+                    displayName: 'JmxServerPort',
                 }, {
                     field: 'enabled',
                     displayName: 'Enabled',

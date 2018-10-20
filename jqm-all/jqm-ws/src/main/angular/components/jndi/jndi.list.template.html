@@ -1,10 +1,11 @@
 <jqm-help-block content="$ctrl.helpcontent"></jqm-help-block>
 
-<div class="row">
+<div class="row fullheight">
     <div class="col-md-8">
-        <div ui-grid='$ctrl.gridOptions' ui-grid-edit ui-grid-selection ui-grid-cellNav ui-grid-resize-columns
-            ui-grid-auto-resize></div>
-        <br />
+        <div class="ui-grid-reactive-container">
+            <div ui-grid='$ctrl.gridOptions' ui-grid-edit ui-grid-selection ui-grid-cellNav ui-grid-resize-columns
+                ui-grid-auto-resize></div>
+        </div>
 
         <div class="btn-group" role="group">
             <button id='bntDb' type="button" class="btn btn-outline-dark dropdown-toggle" data-toggle="dropdown"
@@ -72,18 +73,19 @@
     </div>
 
     <div class="col-md-4">
-        <div ui-grid='$ctrl.gridOptions2' ui-grid-edit ui-grid-selection ui-grid-cellNav ui-grid-resize-columns
-            ui-grid-auto-resize></div>
-        <div>
-            <br />
-            <button type="button" class="btn btn-outline-dark" ng-click="$ctrl.addprm()" ng-disabled="$ctrl.selected.length === 0">
-                <span class="fas fa-plus-circle"></span>
-                Add new parameter
-            </button>
-            <button type="button" class="btn btn-outline-dark" ng-click="$ctrl.removeprms()" ng-disabled="$ctrl.selected2.length === 0">
-                <span class="far fa-trash-alt"></span>
-                Remove selected
-            </button>
+        <div class="ui-grid-reactive-container">
+            <div ui-grid='$ctrl.gridOptions2' ui-grid-edit ui-grid-selection ui-grid-cellNav ui-grid-resize-columns
+                ui-grid-auto-resize></div>
         </div>
+
+
+        <button type="button" class="btn btn-outline-dark" ng-click="$ctrl.addprm()" ng-disabled="$ctrl.selected.length === 0">
+            <span class="fas fa-plus-circle"></span>
+            Add new parameter
+        </button>
+        <button type="button" class="btn btn-outline-dark" ng-click="$ctrl.removeprms()" ng-disabled="$ctrl.selected2.length === 0">
+            <span class="far fa-trash-alt"></span>
+            Remove selected
+        </button>
     </div>
 </div>
