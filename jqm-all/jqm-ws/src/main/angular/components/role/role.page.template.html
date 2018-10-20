@@ -17,74 +17,85 @@
     </div>
 
     <div ng-show="$ctrl.selected_role" class="col-md-10">
-
-        <div class="form-group row">
-            <label for="txtName" class="col-sm-2 col-form-label">Name</label>
-            <div class="col-sm-8">
-                <input id="txtName" class="form-control" type="text" ng-model="$ctrl.selected_role.name" />
-                <small class="form-text text-muted">Name of the role. Must be unique.</small>
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label for="txtDescription" class="col-sm-2 col-form-label">Description</label>
-            <div class="col-sm-8">
-                <input id="txtDescription" class="form-control" type="text" ng-model="$ctrl.selected_role.description" />
-                <small class="form-text text-muted">What the role does.</small>
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label for="lsPerm" class="col-sm-2 col-form-label">Permissions</label>
-            <div class="col-sm-8">
-                <div class="input-group">
-                    <label>Can </label>
-                    <select class="form-control" ng-model="$ctrl.verb">
-                        <option value="read">read</option>
-                        <option value="create">create</option>
-                        <option value="update">update</option>
-                        <option value="delete">delete</option>
-                        <option value="*">do everything on</option>
-                    </select>
-                    <label> objects of type </label>
-                    <select class="form-control" ng-model="$ctrl.noun">
-                        <option value="node">node</option>
-                        <option value="queue">queue</option>
-                        <option value="qmapping">mapping</option>
-                        <option value="jndi">JNDI resource</option>
-                        <option value="prm">parameter</option>
-                        <option value="jd">job definition</option>
-                        <option value="user">user</option>
-                        <option value="role">role</option>
-                        <option value="job_instance">history and queue content</option>
-                        <option value="logs">job log files</option>
-                        <option value="queue_position">job position in queue</option>
-                        <option value="files">files produced</option>
-                        <option value="*">all types</option>
-                    </select>
-                    <button class="btn btn-outline-dark" ng-click="$ctrl.addperm()">
-                        <span class="fas fa-plus-circle"></span>
-                        add permission
-                    </button>
+        <form>
+            <div class="form-group row">
+                <label for="txtName" class="col-sm-2 col-form-label">Name</label>
+                <div class="col-sm-10">
+                    <div class="input-group">
+                        <input id="txtName" class="form-control" type="text" ng-model="$ctrl.selected_role.name" />
+                        <div class="input-group-append">
+                            <span class="input-group-text fas fa-signature"></span>
+                        </div>
+                    </div>
+                    <small class="form-text text-muted">Name of the role. Must be unique.</small>
                 </div>
-                <select id="lsPerm" class="form-control" size="10" ng-options="r for r in $ctrl.selected_role.permissions"
-                    ng-model="$ctrl.selected_perm" ng-dblclick="$ctrl.removeperm()">
-                </select>
-                <small class="form-text text-muted">What the role can do. Double click to remove a permission</small>
             </div>
-        </div>
+
+            <div class="form-group row">
+                <label for="txtDescription" class="col-sm-2 col-form-label">Description</label>
+                <div class="col-sm-10">
+                    <div class="input-group">
+                        <input id="txtDescription" class="form-control" type="text" ng-model="$ctrl.selected_role.description" />
+                        <div class="input-group-append">
+                            <span class="input-group-text fas fa-font"></span>
+                        </div>
+                    </div>
+                    <small class="form-text text-muted">What the role does.</small>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="lsPerm" class="col-sm-2 col-form-label">Permissions</label>
+                <div class="col-sm-10">
+                    <div class="input-group">
+                        <label>Can </label>
+                        <select class="form-control" ng-model="$ctrl.verb">
+                            <option value="read">read</option>
+                            <option value="create">create</option>
+                            <option value="update">update</option>
+                            <option value="delete">delete</option>
+                            <option value="*">do everything on</option>
+                        </select>
+                        <label> objects of type </label>
+                        <select class="form-control" ng-model="$ctrl.noun">
+                            <option value="node">node</option>
+                            <option value="queue">queue</option>
+                            <option value="qmapping">mapping</option>
+                            <option value="jndi">JNDI resource</option>
+                            <option value="prm">parameter</option>
+                            <option value="jd">job definition</option>
+                            <option value="user">user</option>
+                            <option value="role">role</option>
+                            <option value="job_instance">history and queue content</option>
+                            <option value="logs">job log files</option>
+                            <option value="queue_position">job position in queue</option>
+                            <option value="files">files produced</option>
+                            <option value="*">all types</option>
+                        </select>
+                        <button class="btn btn-outline-dark" ng-click="$ctrl.addperm()">
+                            <span class="fas fa-plus-circle"></span>
+                            add permission
+                        </button>
+                    </div>
+                    <select id="lsPerm" class="form-control" size="10" ng-options="r for r in $ctrl.selected_role.permissions"
+                        ng-model="$ctrl.selected_perm" ng-dblclick="$ctrl.removeperm()">
+                    </select>
+                    <small class="form-text text-muted">What the role can do. Double click to remove a permission</small>
+                </div>
+            </div>
 
 
-        <div class="col-sm-offset-2 col-sm-10">
-            <button class="btn btn-outline-dark" ng-click="$ctrl.saveitem()">
-                <span class="far fa-save"></span>
-                Save role {{role.name}}
-            </button>
-            <button class="btn btn-outline-dark" ng-click="$ctrl.deleteitem()">
-                <span class="far fa-trash-alt"></span>
-                Delete role {{role.name}}
-            </button>
-        </div>
+            <div class="col-sm-offset-2 col-sm-10">
+                <button class="btn btn-outline-dark" ng-click="$ctrl.saveitem()">
+                    <span class="far fa-save"></span>
+                    Save role {{role.name}}
+                </button>
+                <button class="btn btn-outline-dark" ng-click="$ctrl.deleteitem()">
+                    <span class="far fa-trash-alt"></span>
+                    Delete role {{role.name}}
+                </button>
+            </div>
 
+        </form>
     </div>
 </div>
