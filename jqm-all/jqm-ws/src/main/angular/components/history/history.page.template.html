@@ -98,7 +98,7 @@
             <button class="btn btn-outline-dark" ng-click="$ctrl.changeQueue(newqueueid)" jqm-permission="queue_position:create">
                 <span class="fas fa-sort-amount-down"></span> Switch to queue
             </button> <select ng-cell-input ng-model="newqueueid" ng-options="q.id as q.name for q in $ctrl.queues"></select>
-            <button class="btn btn-outline-dark" ng-click="$ctrl.pause()" jqm-permission="job_instance:create">
+            <button class="btn btn-outline-dark" ng-click="$ctrl.pause()" jqm-permission="job_instance:create" ng-hide="$ctrl.selected[0].state === 'HOLDED'">
                 <span class="fas fa-pause"></span> Pause
             </button>
         </span>

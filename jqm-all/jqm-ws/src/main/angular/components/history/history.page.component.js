@@ -189,7 +189,6 @@ class HistoryPageCtrl
             if (this.datemax === this.daterangemax)
                 this.datemax = this.now;
             this.daterangemax = this.now;
-            this.scaleX(this.scale);
         }
     };
 
@@ -255,7 +254,7 @@ class HistoryPageCtrl
         this.onLaunched = this.onLaunched.bind(this);
 
         // Go
-        this.$http.post("ws/client/ji/query", this.query).then(this.getDataOk.bind(this));
+        return this.$http.post("ws/client/ji/query", this.query).then(this.getDataOk.bind(this));
     };
 
     /*scaleX(s)
@@ -328,10 +327,22 @@ class HistoryPageCtrl
         this.$http.post("ws/client/ji/" + ji.id).then(this.getDataAsync.bind(this));
     };
 
-    onLaunched()
+    onLaunched(ji)
     {
         this.target = 'queues';
-        this.getDataAsync();
+        var $ctrl = this;
+        this.getDataAsync().then(function ()
+        {
+            for (var bji of $ctrl.data)
+            {
+                if (bji.id === ji.id)
+                {
+                    $ctrl.gridApi.grid.modifyRows($ctrl.data);
+                    $ctrl.gridApi.selection.selectRow(bji);
+                    break;
+                }
+            }
+        });
     }
 
     kill()

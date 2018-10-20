@@ -30,6 +30,34 @@
         </div>
     </div>
 
+    <div class="form-group row">
+        <label for="txtState" class="col-sm-5 col-form-label">Start</label>
+        <div class="col-sm-7">
+            <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="stRadio1" value="SUBMITTED" class="custom-control-input" ng-model="$ctrl.request.startState">
+                <label class="custom-control-label" for="stRadio1">Immediate start</label>
+            </div>
+            <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="stRadio2" value="HOLDED" class="custom-control-input" ng-model="$ctrl.request.startState">
+                <label class="custom-control-label" for="stRadio2">Paused until released</label>
+            </div>
+
+            <small class="form-text text-muted">
+                API has more options: scheduled at a time, recurring...
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="txtPriority" class="col-sm-5 col-form-label">Priority</label>
+        <div class="col-sm-7">
+            <input id="txtPriority" class="form-control" type="number" ng-model="$ctrl.request.priority" />
+            <small class="form-text text-muted">
+                Higher priority job instances run before the others and have a bigger CPU share.
+            </small>
+        </div>
+    </div>
+
     <div class="form-group row" ng-show="$ctrl.selectedJd.parameters.length > 0">
         <label for="defaultPrmList" class="col-sm-5 col-form-label">Default parameters</label>
         <div class="col-sm-7">

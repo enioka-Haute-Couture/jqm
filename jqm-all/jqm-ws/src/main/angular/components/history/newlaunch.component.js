@@ -5,11 +5,12 @@ import template from './newlaunch.template.html';
 
 class NewLaunchController
 {
-    constructor($http, µUserJdDto)
+    constructor($http, µUserJdDto, µPermManager)
     {
         this.jds = µUserJdDto.query();
         this.selectedJd = null;
         this.$http = $http;
+        this.me = µPermManager;
 
         this.data = {
             selectedJd: null,
@@ -17,11 +18,15 @@ class NewLaunchController
             newValue: null
         };
 
+        var $ctrl = this;
         this.request = {
-            user: 'webuser',
+            user: null,
             sessionID: 0,
             parameters: [],
+            startState: 'SUBMITTED',
+            module: "JQM web UI"
         };
+        µPermManager.perms.$promise.then(function () { $ctrl.request.user = µPermManager.perms.enforced ? µPermManager.perms.login : 'webuser'; });
     }
 
     addPrm()
@@ -34,12 +39,12 @@ class NewLaunchController
         this.data.newValue = null;
     };
 
-    postOk()
+    postOk(response)
     {
         this.show = false;
         if (this.onLaunched)
         {
-            this.onLaunched();
+            this.onLaunched(response.data);
         }
     };
 
@@ -54,7 +59,7 @@ class NewLaunchController
         this.show = false;
     };
 }
-NewLaunchController.$inject = ['$http', 'µUserJdDto'];
+NewLaunchController.$inject = ['$http', 'µUserJdDto', 'µPermManager'];
 
 
 
