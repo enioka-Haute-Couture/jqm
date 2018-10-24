@@ -2,12 +2,13 @@ package com.enioka.jqm.tools;
 
 import java.util.Map;
 
-import com.enioka.jqm.api.JobRunner;
+import com.enioka.jqm.api.JavaJobRunner;
+import com.enioka.jqm.api.JobRunnerException;
 
 /**
  * A runner for classes which implement Runnable with a no-args constructor.
  */
-public class RunnableRunner implements JobRunner
+public class RunnableRunner implements JavaJobRunner
 {
     public RunnableRunner()
     {

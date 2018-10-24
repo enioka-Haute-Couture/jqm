@@ -15,7 +15,9 @@
  */
 package com.enioka.jqm.tools;
 
-class JqmPayloadException extends JqmEngineException
+import com.enioka.jqm.api.JobRunnerException;
+
+class JqmPayloadException extends JobRunnerException
 {
     private static final long serialVersionUID = 3909566496696739368L;
 
