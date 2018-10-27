@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class manages all the runner instances inside the engine.
+ * This class manages all the {@link JobRunner} instances inside an engine.
  */
 class RunnerManager
 {
@@ -29,6 +29,11 @@ class RunnerManager
         runners.add(new JavaRunner(cnx));
     }
 
+    /**
+     * Retrieves the most adequate {@link JobRunner} for a given {@link JobInstance}. Throws {@link JqmRuntimeException} if none was found.
+     * @param ji
+     * @return
+     */
     JobRunner getRunner(JobInstance ji)
     {
         if (runnerCache.containsKey(ji.getJdId()))

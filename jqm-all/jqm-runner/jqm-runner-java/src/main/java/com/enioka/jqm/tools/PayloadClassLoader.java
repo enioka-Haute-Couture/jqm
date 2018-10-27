@@ -43,9 +43,9 @@ import com.enioka.jqm.model.JobInstance;
  * It is also responsible for launching the payload (be it a Runnable, a main function, etc).
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
-class JarClassLoader extends URLClassLoader
+class PayloadClassLoader extends URLClassLoader
 {
-    private static Logger jqmlogger = LoggerFactory.getLogger(JarClassLoader.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(PayloadClassLoader.class);
 
     private boolean childFirstClassLoader = false;
 
@@ -59,7 +59,7 @@ class JarClassLoader extends URLClassLoader
 
     private boolean mayBeShared = false;
 
-    JarClassLoader(ClassLoader parent)
+    PayloadClassLoader(ClassLoader parent)
     {
         super(new URL[0], parent);
     }

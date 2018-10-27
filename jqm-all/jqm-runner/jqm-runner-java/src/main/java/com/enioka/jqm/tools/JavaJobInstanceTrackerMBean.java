@@ -20,7 +20,7 @@ import java.util.Calendar;
 /**
  * Monitoring interface for a running job instance.
  */
-public interface LoaderMBean
+public interface JavaJobInstanceTrackerMBean
 {
     /**
      * tries to kill the job instance

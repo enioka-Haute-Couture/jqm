@@ -18,7 +18,7 @@ In the engine:
 For payloads:
 
 +-----------------------------------------------------------------------------------------------------------------------------------------+
-| Payload class loader (JQM provided - type JarClassLoader).                                                                              |
+| Payload class loader (JQM provided - type PayloadClassLoader).                                                                          |
 | Loads the libs of payloads from .m2 or from the payload's "lib" directory                                                               |
 +-----------------------------------------------------------------------------------------------------------------------------------------+
 | JNDI class loader (JQM provided - type URLClassloader)                                                                                  |

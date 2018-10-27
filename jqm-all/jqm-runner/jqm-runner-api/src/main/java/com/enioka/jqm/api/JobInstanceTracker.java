@@ -5,8 +5,10 @@ import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.State;
 
 /**
- * An object created by a {@link JobRunner} to track a running instance. The instance is supposed to be given through a constructor called
- * by {@link JobRunner#getTracker(JobInstance, JobManager, JobRunnerCallback)}.
+ * <strong>This is not a public API and it will stay private in the foreseeable future.</strong><br>
+ * <br>
+ * An object created by a {@link JobRunner} to track an instance. The instance is supposed to be given through a constructor called by
+ * {@link JobRunner#getTracker(JobInstance, JobManager, JobRunnerCallback)}.
  */
 public interface JobInstanceTracker
 {
@@ -27,7 +29,7 @@ public interface JobInstanceTracker
      * {@link JobRunnerException}.<br>
      * Called within a dedicated thread. - this method should NOT create any thread (the payload itself, outside JQM's responsibility,
      * may)<br>
-     * When this method is called, the context class loader is the engine class loader. A loader is part of the engine.<br>
+     * When this method is called, the context class loader is the engine class loader - as a loader is part of the engine.<br>
      */
     public State run();
 

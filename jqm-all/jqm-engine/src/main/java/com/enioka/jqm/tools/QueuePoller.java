@@ -208,7 +208,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
                         }
                         else
                         {
-                            (new Thread(new LoaderExternal(cnx, ji, this))).start();
+                            (new Thread(new RunningExternalJobInstance(cnx, ji, this))).start();
                         }
                     }
                 }

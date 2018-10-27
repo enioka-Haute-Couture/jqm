@@ -23,9 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class holds all the {@link JarClassLoader} and is the only place to create one. There should be one instance per engine.<br>
- * We use a specific object rather than static objects in the {@link Loader} class to allow multiple engine instantiations. It also allows
- * to centralise all CL creation methods and have cleaner code in Loader and in JCL.
+ * This class holds all the {@link PayloadClassLoader} and is the only place to create one. There should be one instance per engine.<br>
+ * We use a specific object rather than static objects in the {@link JavaJobInstanceTracker} class to allow multiple engine instantiations.
+ * It also allows to centralise all CL creation methods and have cleaner code in Loader and in JCL.
  */
 class ClassloaderManager
 {
@@ -34,7 +34,7 @@ class ClassloaderManager
     /**
      * The CL corresponding to "one CL to rule them all" mode.
      */
-    private JarClassLoader sharedClassLoader = null;
+    private PayloadClassLoader sharedClassLoader = null;
 
     /**
      * The CL for loading plugins (for the engine)
@@ -45,12 +45,12 @@ class ClassloaderManager
     /**
      * The CLs corresponding to "one CL per jar" mode.
      */
-    private Map<String, JarClassLoader> sharedJarClassLoader = new HashMap<String, JarClassLoader>();
+    private Map<String, PayloadClassLoader> sharedJarClassLoader = new HashMap<String, PayloadClassLoader>();
 
     /**
      * The CLs corresponding to specific keys (specified inside {@link JobDef#getSpecificIsolationContext()}). Key is Cl object ID.
      */
-    private Map<Integer, JarClassLoader> persistentClassLoaders = new HashMap<Integer, JarClassLoader>();
+    private Map<Integer, PayloadClassLoader> persistentClassLoaders = new HashMap<Integer, PayloadClassLoader>();
 
     /**
      * The different runners which may be involved inside the class loaders. Simple class names.
@@ -85,9 +85,10 @@ class ClassloaderManager
         }
     }
 
-    JarClassLoader getClassloader(JobInstance ji, JobRunnerCallback cb) throws MalformedURLException, JqmPayloadException, RuntimeException
+    PayloadClassLoader getClassloader(JobInstance ji, JobRunnerCallback cb)
+            throws MalformedURLException, JqmPayloadException, RuntimeException
     {
-        final JarClassLoader jobClassLoader;
+        final PayloadClassLoader jobClassLoader;
         JobDef jd = ji.getJD();
 
         // Extract the jar actual path
@@ -129,7 +130,7 @@ class ClassloaderManager
                         else
                         {
                             jqmlogger.info("Creating a new persistent specific isolation context: " + clSharingKey);
-                            jobClassLoader = new JarClassLoader(parent);
+                            jobClassLoader = new PayloadClassLoader(parent);
                             jobClassLoader.setReferenceJobDefName(jd.getApplicationName());
                             jobClassLoader.mayBeShared(cldef.isPersistent());
                             jobClassLoader.setHiddenJavaClasses(cldef.getHiddenClasses());
@@ -144,7 +145,7 @@ class ClassloaderManager
             else
             {
                 jqmlogger.info("Creating a new transient specific isolation context: " + clSharingKey);
-                jobClassLoader = new JarClassLoader(parent);
+                jobClassLoader = new PayloadClassLoader(parent);
                 jobClassLoader.setReferenceJobDefName(jd.getApplicationName());
                 jobClassLoader.mayBeShared(cldef.isPersistent());
                 jobClassLoader.setHiddenJavaClasses(cldef.getHiddenClasses());
@@ -167,7 +168,7 @@ class ClassloaderManager
                 else
                 {
                     jqmlogger.info("Creating sharedClassLoader");
-                    jobClassLoader = new JarClassLoader(parent);
+                    jobClassLoader = new PayloadClassLoader(parent);
                     jobClassLoader.mayBeShared(true);
                     sharedClassLoader = jobClassLoader;
                 }
@@ -183,7 +184,7 @@ class ClassloaderManager
                 else
                 {
                     jqmlogger.info("Creating shared Jar CL");
-                    jobClassLoader = new JarClassLoader(parent);
+                    jobClassLoader = new PayloadClassLoader(parent);
                     jobClassLoader.mayBeShared(true);
                     sharedJarClassLoader.put(jd.getJarPath(), jobClassLoader);
                 }
@@ -192,7 +193,7 @@ class ClassloaderManager
             {
                 // Standard case: all launches are independent. We create a transient CL.
                 jqmlogger.debug("Using an isolated transient CL with default parameters");
-                jobClassLoader = new JarClassLoader(parent);
+                jobClassLoader = new PayloadClassLoader(parent);
                 jobClassLoader.mayBeShared(false);
             }
         }

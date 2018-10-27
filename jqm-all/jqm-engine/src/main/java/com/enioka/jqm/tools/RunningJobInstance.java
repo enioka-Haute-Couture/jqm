@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The role of this class is to track the actual run of a JI. An instance is created when the engine decides a JI should run. It delegates
- * the running stuff to a {@link com.enioka.jqm.api.JobRunner}s it selects and concentrates itself on plumbing.
+ * the running stuff to a {@link com.enioka.jqm.api.JobRunner}s it selects and concentrates itself on plumbing ommon to all job instances.
  */
 class RunningJobInstance implements Runnable, JobRunnerCallback
 {

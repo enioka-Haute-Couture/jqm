@@ -92,7 +92,7 @@ public class JmxTest extends JqmBaseTest
         {
             Assert.fail("could not find the JMX Mbean of the launched job");
         }
-        LoaderMBean proxy = JMX.newMBeanProxy(mbsc, killBean, LoaderMBean.class);
+        JavaJobInstanceTrackerMBean proxy = JMX.newMBeanProxy(mbsc, killBean, JavaJobInstanceTrackerMBean.class);
         Assert.assertEquals("KillApp", proxy.getApplicationName());
         Assert.assertEquals((Integer) i, proxy.getId());
         Assert.assertEquals("TestUser", proxy.getUser());

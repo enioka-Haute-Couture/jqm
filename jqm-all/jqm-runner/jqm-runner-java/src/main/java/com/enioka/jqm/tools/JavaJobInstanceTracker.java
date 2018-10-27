@@ -30,7 +30,6 @@ import com.enioka.jqm.api.JobRunnerCallback;
 import com.enioka.jqm.api.JobRunnerException;
 import com.enioka.jqm.api.JqmKillException;
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.model.History;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.State;
 
@@ -38,12 +37,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The loader is the tracker object for a payload execution. The job thread starts here and ends here. This class handles logging (creation
- * of {@link History}),starting the payload, etc.
+ * Implementation of {@link JobInstanceTracker} for Java job instances. This class is responsible for everything Java-specific, including
+ * the class loader switch.
  */
-class Loader implements JobInstanceTracker, LoaderMBean
+class JavaJobInstanceTracker implements JobInstanceTracker, JavaJobInstanceTrackerMBean
 {
-    private Logger jqmlogger = LoggerFactory.getLogger(Loader.class);
+    private Logger jqmlogger = LoggerFactory.getLogger(JavaJobInstanceTracker.class);
 
     private JobInstance job = null;
     private JobManager engineApi = null;
@@ -53,10 +52,10 @@ class Loader implements JobInstanceTracker, LoaderMBean
 
     private ObjectName name = null;
     private ClassLoader classLoaderToRestoreAtEnd = null;
-    private JarClassLoader jobClassLoader = null;
+    private PayloadClassLoader jobClassLoader = null;
     private EngineApiProxy handler = null;
 
-    Loader(JobInstance job, JobRunnerCallback cb, ClassloaderManager clm, JobManager engineApi)
+    JavaJobInstanceTracker(JobInstance job, JobRunnerCallback cb, ClassloaderManager clm, JobManager engineApi)
     {
         this.engineCallback = cb;
         this.clm = clm;
@@ -142,9 +141,9 @@ class Loader implements JobInstanceTracker, LoaderMBean
         // Restore and clean class loaders (if needed, as CLs may be persistent)
         if (this.classLoaderToRestoreAtEnd != null)
         {
-            if (Thread.currentThread().getContextClassLoader() instanceof JarClassLoader)
+            if (Thread.currentThread().getContextClassLoader() instanceof PayloadClassLoader)
             {
-                ((JarClassLoader) Thread.currentThread().getContextClassLoader()).tryClose();
+                ((PayloadClassLoader) Thread.currentThread().getContextClassLoader()).tryClose();
             }
             Thread.currentThread().setContextClassLoader(classLoaderToRestoreAtEnd);
             jqmlogger.trace("Class Loader was correctly restored");

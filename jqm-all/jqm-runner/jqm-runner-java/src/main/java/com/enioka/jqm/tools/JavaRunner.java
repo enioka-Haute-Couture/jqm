@@ -12,11 +12,11 @@ import com.enioka.jqm.model.JobInstance;
  * Being in Java, JQM can have a special relationship with jobs coded in Java. This runner provides the capacity to run classes with
  * advanced CL handling inside the engine process. It itself has multiple plugins allowing it to load different types of classes.
  */
-public class JavaRunner implements JobRunner
+class JavaRunner implements JobRunner
 {
     private ClassloaderManager classloaderManager;
 
-    public JavaRunner(DbConn cnx)
+    JavaRunner(DbConn cnx)
     {
         classloaderManager = new ClassloaderManager(cnx);
     }
@@ -31,6 +31,6 @@ public class JavaRunner implements JobRunner
     @Override
     public JobInstanceTracker getTracker(JobInstance toRun, JobManager engineApi, JobRunnerCallback cb)
     {
-        return new Loader(toRun, cb, classloaderManager, engineApi);
+        return new JavaJobInstanceTracker(toRun, cb, classloaderManager, engineApi);
     }
 }
