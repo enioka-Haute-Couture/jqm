@@ -80,27 +80,28 @@ class Loader implements JobInstanceTracker, LoaderMBean
     }
 
     @Override
-    public void initialize(DbConn cnx, JobInstance ji)
+    public void initialize(DbConn cnx)
     {
         // Set CL cache inside JD
         this.job.getJD().getClassLoader(cnx);
 
+        // Create a proxy able to cross CL boundaries for the Engine API.
         handler = new EngineApiProxy(engineApi);
-    }
 
-    @Override
-    public State run(JobRunnerCallback cb)
-    {
         // Class loader creation (or retrieval from cache)
         try
         {
-            jobClassLoader = this.clm.getClassloader(job, cb);
+            this.jobClassLoader = this.clm.getClassloader(this.job, this.engineCallback);
         }
         catch (Exception e)
         {
             throw new JobRunnerException(e);
         }
+    }
 
+    @Override
+    public State run()
+    {
         // Class loader switch
         classLoaderToRestoreAtEnd = Thread.currentThread().getContextClassLoader();
         try
@@ -133,7 +134,6 @@ class Loader implements JobInstanceTracker, LoaderMBean
             jqmlogger.info("Job instance " + job.getId() + " has crashed. Exception was:", e);
             return State.CRASHED;
         }
-
     }
 
     @Override

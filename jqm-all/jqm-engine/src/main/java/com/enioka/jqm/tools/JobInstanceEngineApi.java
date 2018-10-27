@@ -57,7 +57,6 @@ class JobInstanceEngineApi implements JobManager
     public void sendMsg(String msg)
     {
         DbConn cnx = Helpers.getNewDbSession();
-
         try
         {
             Message.create(cnx, msg, ji.getId());

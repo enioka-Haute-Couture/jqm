@@ -134,7 +134,7 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
             this.ji.loadPrmCache(cnx);
 
             // Cache heating & co, loader-specific.
-            tracker.initialize(cnx, this.ji);
+            tracker.initialize(cnx);
 
             // Update of the job status, dates & co
             this.ji.setExecutionDate(Calendar.getInstance()); // For use in JMX
@@ -171,7 +171,7 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
         // Actual laucnh
         try
         {
-            resultStatus = tracker.run(this);
+            resultStatus = tracker.run();
         }
         catch (Exception e)
         {
