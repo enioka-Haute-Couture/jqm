@@ -48,18 +48,18 @@ class ShellJobInstanceTracker implements JobInstanceTracker
         Map<String, String> env = new HashMap<String, String>(10);
 
         env.put("JQM_JD_APPLICATION_NAME", this.ji.getJD().getApplicationName());
-        env.put("JQM_JD_KEYWORD_1", this.ji.getJD().getKeyword1());
-        env.put("JQM_JD_KEYWORD_2", this.ji.getJD().getKeyword2());
-        env.put("JQM_JD_KEYWORD_3", this.ji.getJD().getKeyword3());
-        env.put("JQM_JD_MODULE", this.ji.getJD().getModule());
+        env.put("JQM_JD_KEYWORD_1", this.ji.getJD().getKeyword1() != null ? this.ji.getJD().getKeyword1() : "");
+        env.put("JQM_JD_KEYWORD_2", this.ji.getJD().getKeyword2() != null ? this.ji.getJD().getKeyword2() : "");
+        env.put("JQM_JD_KEYWORD_3", this.ji.getJD().getKeyword3() != null ? this.ji.getJD().getKeyword3() : "");
+        env.put("JQM_JD_MODULE", this.ji.getJD().getModule() != null ? this.ji.getJD().getModule() : null);
         env.put("JQM_JD_PRIORITY", this.ji.getJD().getPriority() != null ? this.ji.getJD().getPriority().toString() : "0");
 
         env.put("JQM_JI_ID", this.ji.getId() + "");
-        env.put("JQM_JI_KEYWORD_1", this.ji.getKeyword1());
-        env.put("JQM_JI_KEYWORD_2", this.ji.getKeyword2());
-        env.put("JQM_JI_KEYWORD_3", this.ji.getKeyword3());
-        env.put("JQM_JI_MODULE", this.ji.getModule());
-        env.put("JQM_JI_USER_NAME", this.ji.getUserName());
+        env.put("JQM_JI_KEYWORD_1", this.ji.getKeyword1() != null ? this.ji.getKeyword1() : "");
+        env.put("JQM_JI_KEYWORD_2", this.ji.getKeyword2() != null ? this.ji.getKeyword2() : "");
+        env.put("JQM_JI_KEYWORD_3", this.ji.getKeyword3() != null ? this.ji.getKeyword3() : "");
+        env.put("JQM_JI_MODULE", this.ji.getModule() != null ? this.ji.getModule() : "");
+        env.put("JQM_JI_USER_NAME", this.ji.getUserName() != null ? this.ji.getUserName() : "");
         env.put("JQM_JI_PARENT_ID", this.ji.getParentId() + "");
 
         env.put("JQM_NODE_NAME", this.ji.getNode().getName());
