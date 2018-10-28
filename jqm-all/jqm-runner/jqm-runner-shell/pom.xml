@@ -27,7 +27,14 @@
             <artifactId>jqm-api-client-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-       
+
+        <!-- Helpers -->
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons.lang.version}</version>
+        </dependency>
+
         <!-- Log, as always... -->
         <dependency>
             <groupId>org.slf4j</groupId>

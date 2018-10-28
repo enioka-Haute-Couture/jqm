@@ -11,6 +11,8 @@ import com.enioka.jqm.api.JobRunnerException;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.JobDef.PathType;
 
+import org.apache.commons.lang.StringUtils;
+
 final class OsHelpers
 {
     private static Comparator<String> prmComparator = new Comparator<String>()
@@ -102,7 +104,7 @@ final class OsHelpers
 
         if (!prms.isEmpty())
         {
-            prms.add(String.join(" ", raw));
+            prms.add(StringUtils.join(raw, " "));
         }
     }
 
