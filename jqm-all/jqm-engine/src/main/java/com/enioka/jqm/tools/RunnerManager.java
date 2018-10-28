@@ -27,10 +27,12 @@ class RunnerManager
     {
         jqmlogger.info("Registering java runner");
         runners.add(new JavaRunner(cnx));
+        runners.add(new ShellRunner(cnx));
     }
 
     /**
      * Retrieves the most adequate {@link JobRunner} for a given {@link JobInstance}. Throws {@link JqmRuntimeException} if none was found.
+     * 
      * @param ji
      * @return
      */

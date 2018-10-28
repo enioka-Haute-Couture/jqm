@@ -7,6 +7,12 @@
         "**/*.js",
         "**/*.html",
     ],
+    "LineCount.excludes": [
+        "**/.vscode/**",
+        "**/node_modules/**",
+        "**/jqm-tests/**",
+        "**/target/**"
+    ],
     "LineCount.output": {
         "txt": true,
         "json": true,
@@ -26,7 +32,7 @@
         "**/target/",
         "**/web/dist/"
     ],
-    "java.autobuild.enabled": false,
+    "java.autobuild.enabled": true,
     "maven.excludedFolders": [
         "**/.*", // exclude hidden folders
         "**/node_modules", // exclude node modules to speed up

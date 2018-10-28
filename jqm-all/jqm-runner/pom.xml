@@ -15,6 +15,7 @@
 	<modules>
 		<module>jqm-runner-api</module>
 		<module>jqm-runner-java</module>
+		<module>jqm-runner-shell</module>
 		<module>jqm-runner-basic</module>
 		<module>jqm-runner-spring</module>
 	</modules>

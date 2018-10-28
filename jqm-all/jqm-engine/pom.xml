@@ -43,10 +43,15 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- For now, Java runner is hard linked -->
+		<!-- Runners -->
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-runner-java</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.enioka.jqm</groupId>
+			<artifactId>jqm-runner-shell</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
