@@ -200,7 +200,7 @@ public class ShellRunnerTest extends JqmBaseTest
             String script = "curl --user \"${JQM_API_LOGIN}:${JQM_API_PASSWORD}\" --url \"${JQM_API_LOCAL_URL}/ws/simple/ji\" -XPOST -F 'applicationname=TestApp2' -F \"parentid=${JQM_JI_ID}\" ";
 
             CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), script, TestHelpers.qNormal, 0, "TestApp1",
-                    null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.POWERSHELLCOMMAND);
+                    null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
         }
 
         int i = JobRequest.create("TestApp1", "TestUser").submit();

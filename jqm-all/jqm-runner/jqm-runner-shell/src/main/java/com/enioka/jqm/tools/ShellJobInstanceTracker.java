@@ -115,8 +115,9 @@ class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTra
         {
             Waiter w = StreamGobbler.plumbProcess(process);
             int res = process.waitFor();
-            w.waitForEnd();
             jqmlogger.debug("Shell payload " + this.ji.getId() + " - the external process has exited with RC " + res);
+            w.waitForEnd();
+            jqmlogger.debug("External process outputs are closed");
             return res == 0 ? State.ENDED : State.CRASHED;
         }
         catch (InterruptedException e)
