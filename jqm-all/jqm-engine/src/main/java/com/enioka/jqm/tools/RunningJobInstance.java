@@ -1,9 +1,11 @@
 package com.enioka.jqm.tools;
 
 import java.io.File;
+import java.util.AbstractMap;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.naming.NamingException;
@@ -14,11 +16,14 @@ import com.enioka.jqm.api.JobRunner;
 import com.enioka.jqm.api.JobRunnerCallback;
 import com.enioka.jqm.api.JobRunnerException;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.SimpleApiSecurity;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.QueryResult;
+import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.History;
 import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.State;
 
 import org.apache.commons.io.FileUtils;
@@ -435,4 +440,19 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
         return this.isDone;
     }
 
+    @Override
+    public Entry<String, String> getWebApiUser(DbConn cnx)
+    {
+        SimpleApiSecurity.Duet d = SimpleApiSecurity.getId(cnx);
+        return new AbstractMap.SimpleEntry<String, String>(d.usr, d.pass);
+    }
+
+    @Override
+    public String getWebApiLocalUrl(DbConn cnx)
+    {
+        // Do not use port from engine.getNode, as it may have been set AFTER engine startup.
+        Node node = Node.select_single(cnx, "node_select_by_id", this.engine.getNode().getId());
+        boolean useSsl = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableWsApiSsl", "false"));
+        return (useSsl ? "https://localhost:" : "http://localhost:") + node.getPort();
+    }
 }

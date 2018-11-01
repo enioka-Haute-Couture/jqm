@@ -15,15 +15,21 @@
  */
 package com.enioka.jqm.tools;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.Query;
 import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -160,5 +166,52 @@ public class ShellRunnerTest extends JqmBaseTest
 
         Assert.assertEquals(0, TestHelpers.getOkCount(cnx));
         Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
+    }
+
+    /**
+     * In this test, a first shell command calls the simple web API with JQM-provided parameters to enqueue a second job (a simple echo).
+     */
+    @Test
+    public void testApiCallFromShellJob() throws IOException
+    {
+        // Start the WS
+        Helpers.setSingleParam("disableWsApi", "false", cnx);
+        Helpers.setSingleParam("enableWsApiAuth", "true", cnx);
+        File jar = FileUtils.listFiles(new File("../jqm-ws/target/"), new String[] { "war" }, false).iterator().next();
+        FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war"));
+
+        // Normal test
+        if (onWindows())
+        {
+            CreationTools.createJobDef("test job 2", true, "", new HashMap<String, String>(), "echo aa", TestHelpers.qNormal, 0, "TestApp2",
+                    null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
+
+            String script = "ls env: ; $c = New-Object System.Management.Automation.PSCredential ($env:JQM_API_LOGIN, (ConvertTo-SecureString $env:JQM_API_PASSWORD -AsPlainText -Force) ) ;"
+                    + "Invoke-webrequest $env:JQM_API_LOCAL_URL/ws/simple/ji -Method Post -Body @{applicationname='TestApp2';parentid=$env:JQM_JI_ID}  -credential $c";
+
+            CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), script, TestHelpers.qNormal, 0, "TestApp1",
+                    null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.POWERSHELLCOMMAND);
+        }
+        else
+        {
+            CreationTools.createJobDef("test job 2", true, "", new HashMap<String, String>(), "echo 'aa'", TestHelpers.qNormal, 0,
+                    "TestApp2", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
+
+            String script = "curl --user \"${JQM_API_LOGIN}:${JQM_API_PASSWORD}\" --url \"${JQM_API_LOCAL_URL}/ws/simple/ji\" -XPOST -F 'applicationname=TestApp2' -F \"parentid=${JQM_JI_ID}\" ";
+
+            CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), script, TestHelpers.qNormal, 0, "TestApp1",
+                    null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.POWERSHELLCOMMAND);
+        }
+
+        int i = JobRequest.create("TestApp1", "TestUser").submit();
+
+        addAndStartEngine();
+        TestHelpers.waitFor(2, 20000, cnx);
+
+        Assert.assertEquals(2, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+
+        List<JobInstance> jis = Query.create().setParentId(i).run();
+        Assert.assertEquals(1, jis.size());
     }
 }

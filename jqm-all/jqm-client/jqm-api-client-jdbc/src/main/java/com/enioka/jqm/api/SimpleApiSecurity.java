@@ -29,11 +29,13 @@ import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.RUser;
 
 /**
+ * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
+ *
  * Helper class helping dealing with internal security when calling the simple REST API (the API dealing with file transfers)<br>
  * This API may be secured - therefore, we must create a temporary internal user with the necessary permissions.
  * 
  */
-final class SimpleApiSecurity
+public final class SimpleApiSecurity
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(SimpleApiSecurity.class);
 
@@ -43,22 +45,22 @@ final class SimpleApiSecurity
     private static Boolean useAuth = null;
     private static volatile Object lock = new Object();
 
-    static class Duet
+    public static class Duet
     {
-        String usr;
-        String pass;
+        public String usr;
+        public String pass;
     }
 
     private SimpleApiSecurity()
     {
-        // Helper class
+        // Helper static class
     }
 
     /**
      * Will create (or recreate) if necessary the temporary login data.<br>
      * Will create its own transaction - therefore the given connection must not have any active transaction.
      */
-    static Duet getId(DbConn cnx)
+    public static Duet getId(DbConn cnx)
     {
         if (logindata == null && useAuth == null)
         {
@@ -66,14 +68,14 @@ final class SimpleApiSecurity
 
             if (!useAuth)
             {
-                jqmlogger.debug("The client API will not use any authentication to download files");
+                jqmlogger.debug("The client web API calls will not use any authentication");
                 logindata = new Duet();
                 logindata.pass = null;
                 logindata.usr = null;
             }
             else
             {
-                jqmlogger.debug("The client API will use authentication to download files");
+                jqmlogger.debug("The client web API calls will use a temporary account for authentication");
             }
         }
 
@@ -82,13 +84,21 @@ final class SimpleApiSecurity
             return logindata;
         }
 
-        if (user == null || user.getExpirationDate().before(Calendar.getInstance()))
+        // Renew one day before limit, to ensure account is valid for a day.
+        Calendar renewalLimit = null;
+        if (user != null)
+        {
+            renewalLimit = (Calendar) user.getExpirationDate().clone(); // clone. otherwise we modify the user object next line!
+            renewalLimit.add(Calendar.DAY_OF_YEAR, -1);
+        }
+
+        if (user == null || renewalLimit == null || renewalLimit.before(Calendar.getInstance()))
         {
             synchronized (lock)
             {
                 if (user == null || user.getExpirationDate().before(Calendar.getInstance()))
                 {
-                    jqmlogger.debug("The client API will create an internal secret to access the simple API for file downloading");
+                    jqmlogger.debug("The client API will create an internal secret to access the simple API");
 
                     // Create new
                     String login = UUID.randomUUID().toString();
@@ -99,7 +109,7 @@ final class SimpleApiSecurity
                     String saltS = salt.toHex();
 
                     Calendar expiration = Calendar.getInstance();
-                    expiration.add(Calendar.DAY_OF_YEAR, 1);
+                    expiration.add(Calendar.DAY_OF_YEAR, 2);
 
                     int id = RUser.create(cnx, login, hash, saltS, expiration, true, "administrator");
                     user = RUser.select_id(cnx, id);

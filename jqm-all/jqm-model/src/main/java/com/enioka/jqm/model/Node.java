@@ -100,7 +100,7 @@ public class Node implements Serializable
     }
 
     /**
-     * The TCP port used for starting the engine Jetty server (it holds the servlet API as well as the We Service API).
+     * The TCP port used for starting the engine Jetty server (it holds all the WS APIs).
      */
     public Integer getPort()
     {

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.enioka.jqm.api.JobInstanceTracker;
+import com.enioka.jqm.api.JobRunnerCallback;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobInstance;
@@ -24,16 +25,21 @@ class ShellJobInstanceTracker implements JobInstanceTracker
 
     private JobInstance ji;
     private Process process;
+    private JobRunnerCallback cb;
+    private String login = null, pwd = null, url = null;
 
-    ShellJobInstanceTracker(JobInstance ji)
+    ShellJobInstanceTracker(JobInstance ji, JobRunnerCallback cb)
     {
         this.ji = ji;
+        this.cb = cb;
     }
 
     @Override
     public void initialize(DbConn cnx)
     {
-
+        login = this.cb.getWebApiUser(cnx).getKey();
+        pwd = this.cb.getWebApiUser(cnx).getValue();
+        url = this.cb.getWebApiLocalUrl(cnx);
     }
 
     @Override
@@ -67,6 +73,10 @@ class ShellJobInstanceTracker implements JobInstanceTracker
         env.put("JQM_NODE_NAME", this.ji.getNode().getName());
 
         env.put("JQM_Q_NAME", this.ji.getQ().getName());
+
+        env.put("JQM_API_LOGIN", this.login != null ? this.login : "");
+        env.put("JQM_API_PASSWORD", this.pwd != null ? this.pwd : "");
+        env.put("JQM_API_LOCAL_URL", this.url != null ? this.url : "");
 
         pb.environment().putAll(env);
 

@@ -28,6 +28,6 @@ class ShellRunner implements JobRunner
     @Override
     public JobInstanceTracker getTracker(JobInstance toRun, JobManager engineApi, JobRunnerCallback cb)
     {
-        return new ShellJobInstanceTracker(toRun);
+        return new ShellJobInstanceTracker(toRun, cb);
     }
 }

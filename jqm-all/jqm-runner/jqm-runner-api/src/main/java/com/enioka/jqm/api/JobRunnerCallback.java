@@ -1,5 +1,9 @@
 package com.enioka.jqm.api;
 
+import java.util.Map;
+
+import com.enioka.jqm.jdbc.DbConn;
+
 /**
  * A way to communicate between a runner and its caller.
  */
@@ -44,4 +48,14 @@ public interface JobRunnerCallback
      * @return
      */
     public ClassLoader getEngineClassloader();
+
+    /**
+     * A login/password able to use the web APIs.
+     */
+    public Map.Entry<String, String> getWebApiUser(DbConn cnx);
+
+    /**
+     * How to contact the WS.
+     */
+    public String getWebApiLocalUrl(DbConn cnx);
 }
