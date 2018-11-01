@@ -211,6 +211,7 @@ class DbImplBase
         queries.put("ji_select_priority_by_id", "SELECT PRIORITY FROM __T__JOB_INSTANCE WHERE ID=?");
         queries.put("ji_select_execution_date_by_id", "SELECT DATE_START FROM __T__JOB_INSTANCE WHERE ID=?");
         queries.put("ji_select_cnx_data_by_id", "SELECT DNS||':'||PORT AS HOST FROM __T__JOB_INSTANCE ji LEFT JOIN __T__NODE n ON ji.NODE = n.ID WHERE ji.ID=?");
+        queries.put("ji_select_instructions_by_node", "SELECT ji.ID, ji.INSTRUCTION FROM __T__JOB_INSTANCE ji WHERE ji.STATUS='RUNNING' AND ji.INSTRUCTION <> 'RUN' AND ji.NODE=?");
         
         queries.put("ji_update_poll", "UPDATE __T__JOB_INSTANCE j1 SET NODE=?, STATUS='ATTRIBUTED', DATE_ATTRIBUTION=CURRENT_TIMESTAMP WHERE j1.STATUS='SUBMITTED' AND j1.ID IN "
                 + "(SELECT j2.ID FROM __T__JOB_INSTANCE j2 WHERE j2.STATUS='SUBMITTED' AND j2.QUEUE=? "

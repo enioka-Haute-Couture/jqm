@@ -77,6 +77,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     boolean loadJmxBeans = true;
     private AtomicLong endedInstances = new AtomicLong(0);
     private RunnerManager runnerManager;
+    private RunningJobInstanceManager runningJobInstanceManager;
 
     // DB connection resilience data
     private volatile Queue<QueuePoller> qpToRestart = new LinkedBlockingQueue<QueuePoller>();
@@ -213,6 +214,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         purgeDeadJobInstances(cnx, this.node);
 
         // Runners
+        runningJobInstanceManager = new RunningJobInstanceManager();
         runnerManager = new RunnerManager(cnx);
 
         // Pollers
@@ -599,9 +601,14 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         return this.runnerManager;
     }
 
-    // //////////////////////////////////////////////////////////////////////////
+    RunningJobInstanceManager getRunningJobInstanceManager()
+    {
+        return this.runningJobInstanceManager;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
     // JMX stat methods (they get their own connection to be thread safe)
-    // //////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
 
     @Override
     public long getCumulativeJobInstancesCount()

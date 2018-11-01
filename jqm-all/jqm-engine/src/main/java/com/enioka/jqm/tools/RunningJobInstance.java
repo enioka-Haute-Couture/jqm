@@ -17,6 +17,7 @@ import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.History;
+import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.State;
 
@@ -27,15 +28,16 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The role of this class is to track the actual run of a JI. An instance is created when the engine decides a JI should run. It delegates
- * the running stuff to a {@link com.enioka.jqm.api.JobRunner}s it selects and concentrates itself on plumbing ommon to all job instances.
+ * the running stuff to a {@link com.enioka.jqm.api.JobRunner}s it selects and concentrates itself on plumbing common to all job instances.
  */
 class RunningJobInstance implements Runnable, JobRunnerCallback
 {
     private Logger jqmlogger = LoggerFactory.getLogger(RunningJobInstance.class);
 
     private JobInstance ji;
-    private QueuePoller qp = null;
     private JqmEngine engine = null;
+    private QueuePoller qp = null;
+    private RunningJobInstanceManager manager = null;
 
     private JobInstanceTracker tracker;
     private State resultStatus = State.ATTRIBUTED;
@@ -54,6 +56,7 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
         this.ji = ji;
         this.qp = qp;
         this.engine = qp.getEngine();
+        this.manager = engine.getRunningJobInstanceManager();
     }
 
     /**
@@ -143,9 +146,9 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
             {
                 // This means the JI has been killed or has disappeared.
                 jqmlogger.warn("Trying to run a job which disappeared or is not in ATTRIBUTED state (likely killed) " + this.ji.getId());
-                if (qp != null)
+                if (this.manager != null)
                 {
-                    qp.decreaseNbThread(ji.getId());
+                    manager.signalEndOfRun(this);
                 }
                 return;
             }
@@ -168,7 +171,7 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
             Helpers.closeQuietly(cnx);
         }
 
-        // Actual laucnh
+        // Actual launch
         try
         {
             resultStatus = tracker.run();
@@ -224,9 +227,9 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
         }
 
         // Release the slot so as to allow other job instances to run (first op!)
-        if (qp != null)
+        if (this.manager != null)
         {
-            qp.decreaseNbThread(this.ji.getId());
+            this.manager.signalEndOfRun(this);
         }
 
         // Send e-mail before releasing the slot - it may be long
@@ -317,10 +320,10 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
         {
             jqmlogger.error("connection to database lost - loader " + this.ji.getId() + " will be restarted later");
             jqmlogger.trace("connection error was:", e);
-            this.qp.getEngine().loaderRestartNeeded(this);
-            if (this.qp.getEngine().getHandler() != null)
+            this.engine.loaderRestartNeeded(this);
+            if (this.engine.getHandler() != null)
             {
-                this.qp.getEngine().getHandler().onJobInstanceDone(this.ji);
+                this.engine.getHandler().onJobInstanceDone(this.ji);
             }
             return;
         }
@@ -339,7 +342,7 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
         {
             jqmlogger.error("connection to database lost - loader " + this.ji.getId() + " will need delayed finalization");
             jqmlogger.trace("connection error was:", e.getCause());
-            this.qp.getEngine().loaderFinalizationNeeded(this);
+            this.engine.loaderFinalizationNeeded(this);
         }
         else
         {
@@ -361,7 +364,7 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
     @Override
     public String getJmxBeanName()
     {
-        return "com.enioka.jqm:type=Node.Queue.JobInstance,Node=" + this.qp.getEngine().getNode().getName() + ",Queue="
+        return "com.enioka.jqm:type=Node.Queue.JobInstance,Node=" + this.engine.getNode().getName() + ",Queue="
                 + this.qp.getQueue().getName() + ",name=" + this.ji.getId();
     }
 
@@ -371,6 +374,14 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
         Properties props = new Properties();
         props.put("com.enioka.jqm.jdbc.contextobject", Helpers.getDb());
         JqmClientFactory.getClient("uncached", props, false).killJob(this.ji.getId());
+    }
+
+    void handleInstruction(Instruction instruction)
+    {
+        if (this.tracker != null)
+        {
+            this.tracker.handleInstruction(instruction);
+        }
     }
 
     @Override

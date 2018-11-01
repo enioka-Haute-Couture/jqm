@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -133,5 +134,31 @@ public class ShellRunnerTest extends JqmBaseTest
 
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+    }
+
+    @Test
+    public void testKill()
+    {
+        if (onWindows())
+        {
+            CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), "Start-Sleep 3600", TestHelpers.qNormal, 0,
+                    "TestApp1", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.POWERSHELLCOMMAND);
+        }
+        else
+        {
+            CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), "sleep 3600", TestHelpers.qNormal, 0,
+                    "TestApp1", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
+        }
+
+        int i = JobRequest.create("TestApp1", "TestUser").submit();
+        Helpers.setSingleParam("internalPollingPeriodMs", "500", cnx);
+
+        addAndStartEngine();
+        TestHelpers.waitForRunning(1, 20000, cnx);
+        JqmClientFactory.getClient().killJob(i);
+        TestHelpers.waitFor(1, 20000, cnx);
+
+        Assert.assertEquals(0, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
     }
 }

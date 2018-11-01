@@ -30,6 +30,7 @@ import com.enioka.jqm.api.JobRunnerCallback;
 import com.enioka.jqm.api.JobRunnerException;
 import com.enioka.jqm.api.JqmKillException;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.State;
 
@@ -49,6 +50,8 @@ class JavaJobInstanceTracker implements JobInstanceTracker, JavaJobInstanceTrack
 
     private final JobRunnerCallback engineCallback;
     private final ClassloaderManager clm;
+
+    private Thread mainThread;
 
     private ObjectName name = null;
     private ClassLoader classLoaderToRestoreAtEnd = null;
@@ -81,6 +84,8 @@ class JavaJobInstanceTracker implements JobInstanceTracker, JavaJobInstanceTrack
     @Override
     public void initialize(DbConn cnx)
     {
+        mainThread = Thread.currentThread();
+
         // Set CL cache inside JD
         this.job.getJD().getClassLoader(cnx);
 
@@ -232,5 +237,24 @@ class JavaJobInstanceTracker implements JobInstanceTracker, JavaJobInstanceTrack
     public Long getRunTimeSeconds()
     {
         return this.engineCallback.getRunTimeSeconds();
+    }
+
+    @Override
+    public void handleInstruction(Instruction instruction)
+    {
+        switch (instruction)
+        {
+        case KILL:
+            // All we can do safely is to interrupt the thread.
+            if (mainThread != null)
+            {
+                mainThread.interrupt();
+            }
+            jqmlogger.warn("Job instance has received a kill instruction - the engine has sent an interrupt to "
+                    + "the job instance thread but this requires cooperation from the job instance itself");
+            break;
+        default:
+            jqmlogger.debug("instructions inside a java job instance are handled by yield when called by the instance, not by the engine");
+        }
     }
 }

@@ -11,6 +11,7 @@ import java.util.Map;
 
 import com.enioka.jqm.api.JobInstanceTracker;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.State;
 
@@ -21,7 +22,8 @@ class ShellJobInstanceTracker implements JobInstanceTracker
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(ShellJobInstanceTracker.class);
 
-    JobInstance ji;
+    private JobInstance ji;
+    private Process process;
 
     ShellJobInstanceTracker(JobInstance ji)
     {
@@ -69,11 +71,10 @@ class ShellJobInstanceTracker implements JobInstanceTracker
         pb.environment().putAll(env);
 
         // Start
-        Process p = null;
         try
         {
             jqmlogger.debug("Starting process for shell payload " + this.ji.getId() + " - arguments: " + args.toString());
-            p = pb.start();
+            process = pb.start();
         }
         catch (IOException e)
         {
@@ -84,8 +85,8 @@ class ShellJobInstanceTracker implements JobInstanceTracker
         // Wait for end, flushing logs.
         try
         {
-            Waiter w = StreamGobbler.plumbProcess(p);
-            int res = p.waitFor();
+            Waiter w = StreamGobbler.plumbProcess(process);
+            int res = process.waitFor();
             w.waitForEnd();
             jqmlogger.debug("Shell payload " + this.ji.getId() + " - the external process has exited with RC " + res);
             return res == 0 ? State.ENDED : State.CRASHED;
@@ -107,5 +108,24 @@ class ShellJobInstanceTracker implements JobInstanceTracker
     public void wrap()
     {
 
+    }
+
+    @Override
+    public void handleInstruction(Instruction instruction)
+    {
+        switch (instruction)
+        {
+        case KILL:
+            // For shell job instances, this is rather easy. This is however platform-dependant, as forking OSes will kill the tree, and
+            // spawning OSes will only kill the process itself.
+            jqmlogger.debug("Killing process");
+            this.process.destroy();
+            break;
+        case PAUSE:
+            jqmlogger.warn("Cannot pause a running shell job instance");
+            break;
+        default:
+            // Ignore.
+        }
     }
 }

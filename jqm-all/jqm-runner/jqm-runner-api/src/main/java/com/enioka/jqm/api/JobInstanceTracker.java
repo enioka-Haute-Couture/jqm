@@ -1,6 +1,7 @@
 package com.enioka.jqm.api;
 
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.State;
 
@@ -38,4 +39,14 @@ public interface JobInstanceTracker
      * reserved word.
      */
     public void wrap();
+
+    /**
+     * Instructions can be set after the job instance has started to run. Trackers may ignore some instructions if they log a warning when
+     * doing so. Called in another thread than {@link JobInstanceTracker#run()}. Note that this should not directly interact with JQM
+     * plumbing - things like job finalization should still take place on the main thread, so this method basically should just send signals
+     * to the job.
+     *
+     * @param instruction
+     */
+    public void handleInstruction(Instruction instruction);
 }
