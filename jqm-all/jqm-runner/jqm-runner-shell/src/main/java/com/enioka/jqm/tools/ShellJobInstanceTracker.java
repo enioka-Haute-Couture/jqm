@@ -1,16 +1,18 @@
 package com.enioka.jqm.tools;
 
-import java.io.BufferedReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.lang.management.ManagementFactory;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+
 import com.enioka.jqm.api.JobInstanceTracker;
 import com.enioka.jqm.api.JobRunnerCallback;
+import com.enioka.jqm.api.JobRunnerException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobInstance;
@@ -19,7 +21,7 @@ import com.enioka.jqm.model.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class ShellJobInstanceTracker implements JobInstanceTracker
+class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTrackerMBean
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(ShellJobInstanceTracker.class);
 
@@ -27,11 +29,27 @@ class ShellJobInstanceTracker implements JobInstanceTracker
     private Process process;
     private JobRunnerCallback cb;
     private String login = null, pwd = null, url = null;
+    private ObjectName name = null;
 
     ShellJobInstanceTracker(JobInstance ji, JobRunnerCallback cb)
     {
         this.ji = ji;
         this.cb = cb;
+
+        // JMX
+        if (cb != null && cb.isJmxEnabled())
+        {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            try
+            {
+                name = new ObjectName(cb.getJmxBeanName());
+                mbs.registerMBean(this, name);
+            }
+            catch (Exception e)
+            {
+                throw new JobRunnerException("Could not create JMX bean for running job instance", e);
+            }
+        }
     }
 
     @Override
@@ -117,7 +135,19 @@ class ShellJobInstanceTracker implements JobInstanceTracker
     @Override
     public void wrap()
     {
-
+        // Unregister MBean
+        if (this.cb != null && this.cb.isJmxEnabled())
+        {
+            try
+            {
+                MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                mbs.unregisterMBean(name);
+            }
+            catch (Exception e)
+            {
+                jqmlogger.error("Could not unregister JobInstance JMX bean", e);
+            }
+        }
     }
 
     @Override
@@ -137,5 +167,69 @@ class ShellJobInstanceTracker implements JobInstanceTracker
         default:
             // Ignore.
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // JMX
+    ///////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public void kill()
+    {
+        this.handleInstruction(Instruction.KILL);
+    }
+
+    @Override
+    public String getApplicationName()
+    {
+        return this.ji.getJD().getApplicationName();
+    }
+
+    @Override
+    public Calendar getEnqueueDate()
+    {
+        return this.ji.getCreationDate();
+    }
+
+    @Override
+    public String getKeyword1()
+    {
+        return this.ji.getKeyword1();
+    }
+
+    @Override
+    public String getKeyword2()
+    {
+        return this.ji.getKeyword2();
+    }
+
+    @Override
+    public String getKeyword3()
+    {
+        return this.ji.getKeyword3();
+    }
+
+    @Override
+    public String getModule()
+    {
+        return this.ji.getModule();
+    }
+
+    @Override
+    public String getUser()
+    {
+        return this.ji.getUserName();
+    }
+
+    @Override
+    public String getSessionId()
+    {
+        return this.ji.getSessionID();
+    }
+
+    @Override
+    public Integer getId()
+    {
+        return this.ji.getId();
     }
 }
