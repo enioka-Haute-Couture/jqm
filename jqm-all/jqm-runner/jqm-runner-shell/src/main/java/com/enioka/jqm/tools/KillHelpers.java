@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,7 +43,7 @@ class KillHelpers
         {
             try
             {
-                java9PlusPidMethod = process.getClass().getMethod("pid");
+                java9PlusPidMethod = Process.class.getMethod("pid");
                 java9Plus = true;
                 jqmlogger.debug("Using Java9+ Process.pid() public method to fetch PID");
             }
@@ -54,7 +55,7 @@ class KillHelpers
         }
 
         // Check if we can access the old fashioned Process.pid hidden field on Unix.
-        if (processWithPid == null && !onWindows())
+        if (processWithPid == null && !java9Plus && !onWindows())
         {
             try
             {
@@ -171,7 +172,8 @@ class KillHelpers
 
     private static void killByPidUnix(long pid)
     {
-        // Negative PID means process group.
-        killByPidGeneric(pid, "kill -TERM -" + pid);
+        // Negative PID means process group. Cannot use this on all Unixes sadly.
+        killByPidGeneric(pid, "pstree -p pid | sed -e 's/[^0-9]/ /g' -e  's/ \\+/ /g' -e 's/^ //g' -e 's/ $//g' -e 's/ /\\n/g' | xargs kill"
+                .replace("pid", "" + pid));
     }
 }

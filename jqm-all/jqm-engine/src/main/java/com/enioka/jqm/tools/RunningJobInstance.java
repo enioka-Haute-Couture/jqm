@@ -385,7 +385,14 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
     {
         if (this.tracker != null)
         {
-            this.tracker.handleInstruction(instruction);
+            try
+            {
+                this.tracker.handleInstruction(instruction);
+            }
+            catch (Exception e)
+            {
+                jqmlogger.error("Could not handle instruction inside job instance runner.", e);
+            }
         }
     }
 
