@@ -110,7 +110,10 @@ class KillHelpers
             catch (Exception e)
             {
                 jqmlogger.error("Could not get PID from Process.pid field. Kill order is ignored.", e);
+                return;
             }
+            killByPid(pid);
+            return;
         }
 
         // If here, that's a problem.
