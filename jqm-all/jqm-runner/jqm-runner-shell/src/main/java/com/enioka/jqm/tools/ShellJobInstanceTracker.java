@@ -160,7 +160,7 @@ class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTra
             // For shell job instances, this is rather easy. This is however platform-dependant, as forking OSes will kill the tree, and
             // spawning OSes will only kill the process itself.
             jqmlogger.debug("Killing process");
-            this.process.destroy();
+            KillHelpers.kill(this.process);
             break;
         case PAUSE:
             jqmlogger.warn("Cannot pause a running shell job instance");

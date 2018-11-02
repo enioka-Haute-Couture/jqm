@@ -3,7 +3,6 @@ package com.enioka.jqm.tools;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,25 +26,25 @@ final class OsHelpers
     private OsHelpers()
     {}
 
-    private static List<String> getSh(JobInstance ji)
+    private static List<String> getSh(String commandLine, Map<String, String> prms)
     {
         List<String> res = new ArrayList<String>(10);
         res.add("/bin/sh");
         res.add("-c");
-        addAllParametersAsSingleString(res, ji);
+        addAllParametersAsSingleString(res, commandLine, prms);
         return res;
     }
 
-    private static List<String> getCmdShell(JobInstance ji)
+    private static List<String> getCmdShell(String commandLine, Map<String, String> prms)
     {
         List<String> res = new ArrayList<String>(10);
         res.add("cmd.exe");
         res.add("/C");
-        addAllParametersAsSingleString(res, ji);
+        addAllParametersAsSingleString(res, commandLine, prms);
         return res;
     }
 
-    private static List<String> getPowerShell(JobInstance ji)
+    private static List<String> getPowerShell(String commandLine, Map<String, String> prms)
     {
         List<String> res = new ArrayList<String>(10);
         res.add("powershell.exe");
@@ -54,20 +53,20 @@ final class OsHelpers
         res.add("-WindowStyle");
         res.add("Hidden");
         res.add("-Command");
-        addAllParametersAsSingleString(res, ji);
+        addAllParametersAsSingleString(res, commandLine, prms);
         return res;
     }
 
-    private static List<String> getDefaultShell(JobInstance ji)
+    private static List<String> getDefaultShell(String commandLine, Map<String, String> prms)
     {
         String osName = System.getProperty("os.name");
         if (osName.startsWith("Windows"))
         {
-            return getCmdShell(ji);
+            return getCmdShell(commandLine, prms);
         }
         else
         {
-            return getSh(ji);
+            return getSh(commandLine, prms);
         }
     }
 
@@ -76,35 +75,30 @@ final class OsHelpers
      * Note we encourange users through the GUI to only specify the whole shell command in a single field. Only XML imports may result in
      * multiple arguments.
      * 
-     * @param prms
+     * @param resultList
      * @param ji
      */
-    private static void addAllParametersAsSingleString(List<String> prms, JobInstance ji)
+    private static void addAllParametersAsSingleString(List<String> resultList, String commandLine, Map<String, String> prms)
     {
-        if (prms.isEmpty())
-        {
-            return;
-        }
-
-        List<String> raw = new ArrayList<String>(ji.getPrms().size() * 2);
+        List<String> raw = new ArrayList<String>(prms.size() * 2);
 
         // Command itself
-        raw.add(ji.getJD().getJarPath());
+        raw.add(commandLine);
 
         // Parameters, ordered by key
-        List<String> keys = new ArrayList<String>(ji.getPrms().keySet());
+        List<String> keys = new ArrayList<String>(prms.keySet());
         Collections.sort(keys, prmComparator);
         for (String p : keys)
         {
-            if (!ji.getPrms().get(p).trim().isEmpty())
+            if (!prms.get(p).trim().isEmpty())
             {
-                raw.add(ji.getPrms().get(p).trim());
+                raw.add(prms.get(p).trim());
             }
         }
 
-        if (!prms.isEmpty())
+        if (!raw.isEmpty())
         {
-            prms.add(StringUtils.join(raw, " "));
+            resultList.add(StringUtils.join(raw, " "));
         }
     }
 
@@ -114,26 +108,26 @@ final class OsHelpers
      * @param ji
      * @return
      */
-    private static List<String> getSimpleProcess(JobInstance ji)
+    private static List<String> getSimpleProcess(String processPath, Map<String, String> prms)
     {
         List<String> res = new ArrayList<String>(10);
 
         // Process itself
-        res.add(ji.getJD().getJarPath());
+        res.add(processPath);
 
         // Optional parameters - keys are just indices to sort the values.
-        if (ji.getPrms().isEmpty())
+        if (prms.isEmpty())
         {
             return res;
         }
 
-        List<String> keys = new ArrayList<String>(ji.getPrms().keySet());
+        List<String> keys = new ArrayList<String>(prms.keySet());
         Collections.sort(keys, prmComparator);
         for (String p : keys)
         {
-            if (!ji.getPrms().get(p).trim().isEmpty())
+            if (!prms.get(p).trim().isEmpty())
             {
-                res.add(ji.getPrms().get(p).trim());
+                res.add(prms.get(p).trim());
             }
         }
 
@@ -143,16 +137,21 @@ final class OsHelpers
 
     static List<String> getProcessArguments(JobInstance ji)
     {
-        switch (ji.getJD().getPathType())
+        return getProcessArguments(ji.getJD().getJarPath(), ji.getPrms(), ji.getJD().getPathType());
+    }
+
+    static List<String> getProcessArguments(String commandLine, Map<String, String> prms, PathType pathType)
+    {
+        switch (pathType)
         {
         case DEFAULTSHELLCOMMAND:
-            return getDefaultShell(ji);
+            return getDefaultShell(commandLine, prms);
         case POWERSHELLCOMMAND:
-            return getPowerShell(ji);
+            return getPowerShell(commandLine, prms);
         case DIRECTEXECUTABLE:
-            return getSimpleProcess(ji);
+            return getSimpleProcess(commandLine, prms);
         default:
-            throw new JobRunnerException("Unsupported path type " + ji.getJD().getPathType());
+            throw new JobRunnerException("Unsupported path type " + pathType);
         }
     }
 }

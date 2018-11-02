@@ -28,6 +28,13 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- OS specific libraries, Java 6-8 only -->
+        <dependency>
+            <groupId>org.jvnet.winp</groupId>
+            <artifactId>winp</artifactId>
+            <version>1.27</version>
+        </dependency>
+
         <!-- Helpers -->
         <dependency>
             <groupId>commons-lang</groupId>

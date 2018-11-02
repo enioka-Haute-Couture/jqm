@@ -147,11 +147,14 @@ public class ShellRunnerTest extends JqmBaseTest
     {
         if (onWindows())
         {
-            CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), "Start-Sleep 3600", TestHelpers.qNormal, 0,
-                    "TestApp1", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.POWERSHELLCOMMAND);
+            // We explicitely start a sub shell here so as to have a process tree powershell-> powershell.
+            CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), "powershell.exe -Command 'Start-Sleep 3600'",
+                    TestHelpers.qNormal, 0, "TestApp1", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false,
+                    PathType.POWERSHELLCOMMAND);
         }
         else
         {
+            // For Linux, sleep is a process, not a command, so we have a shell->sleep tree.
             CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), "sleep 3600", TestHelpers.qNormal, 0,
                     "TestApp1", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
         }
@@ -197,7 +200,7 @@ public class ShellRunnerTest extends JqmBaseTest
             CreationTools.createJobDef("test job 2", true, "", new HashMap<String, String>(), "echo 'aa'", TestHelpers.qNormal, 0,
                     "TestApp2", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
 
-            String script = "curl --user \"${JQM_API_LOGIN}:${JQM_API_PASSWORD}\" --url \"${JQM_API_LOCAL_URL}/ws/simple/ji\" -XPOST -F 'applicationname=TestApp2' -F \"parentid=${JQM_JI_ID}\" ";
+            String script = "curl --user \"${JQM_API_LOGIN}:${JQM_API_PASSWORD}\" --url \"${JQM_API_LOCAL_URL}/ws/simple/ji\" -XPOST -F 'applicationname=TestApp2' -F \"parentid=${JQM_JI_ID}\" -H 'Content-Type: application/x-www-form-urlencoded' ";
 
             CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), script, TestHelpers.qNormal, 0, "TestApp1",
                     null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
