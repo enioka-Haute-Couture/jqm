@@ -1,5 +1,6 @@
 package com.enioka.jqm.tools;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Calendar;
@@ -11,6 +12,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import com.enioka.jqm.api.JobInstanceTracker;
+import com.enioka.jqm.api.JobManager;
 import com.enioka.jqm.api.JobRunnerCallback;
 import com.enioka.jqm.api.JobRunnerException;
 import com.enioka.jqm.jdbc.DbConn;
@@ -28,13 +30,25 @@ class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTra
     private JobInstance ji;
     private Process process;
     private JobRunnerCallback cb;
+    private JobManager engineApi;
     private String login = null, pwd = null, url = null;
     private ObjectName name = null;
+    private File tmpDir = null, deliveryDir = null;
 
-    ShellJobInstanceTracker(JobInstance ji, JobRunnerCallback cb)
+    ShellJobInstanceTracker(JobInstance ji, JobRunnerCallback cb, JobManager engineApi)
     {
         this.ji = ji;
         this.cb = cb;
+        this.engineApi = engineApi;
+    }
+
+    @Override
+    public void initialize(DbConn cnx)
+    {
+        // API user
+        login = this.cb.getWebApiUser(cnx).getKey();
+        pwd = this.cb.getWebApiUser(cnx).getValue();
+        url = this.cb.getWebApiLocalUrl(cnx);
 
         // JMX
         if (cb != null && cb.isJmxEnabled())
@@ -50,14 +64,16 @@ class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTra
                 throw new JobRunnerException("Could not create JMX bean for running job instance", e);
             }
         }
-    }
 
-    @Override
-    public void initialize(DbConn cnx)
-    {
-        login = this.cb.getWebApiUser(cnx).getKey();
-        pwd = this.cb.getWebApiUser(cnx).getValue();
-        url = this.cb.getWebApiLocalUrl(cnx);
+        // Temp work directory
+        tmpDir = this.engineApi.getWorkDir();
+
+        // Delivery
+        deliveryDir = new File(tmpDir.getAbsolutePath() + "_delivery");
+        if (!deliveryDir.mkdirs())
+        {
+            throw new JobRunnerException("Could not create delivery directory");
+        }
     }
 
     @Override
@@ -87,8 +103,12 @@ class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTra
         env.put("JQM_JI_MODULE", this.ji.getModule() != null ? this.ji.getModule() : "");
         env.put("JQM_JI_USER_NAME", this.ji.getUserName() != null ? this.ji.getUserName() : "");
         env.put("JQM_JI_PARENT_ID", this.ji.getParentId() + "");
+        env.put("JQM_JI_TEMP_DIR", this.tmpDir.getAbsolutePath());
+        env.put("JQM_JI_DELIVERY_DIR", this.deliveryDir.getAbsolutePath());
 
         env.put("JQM_NODE_NAME", this.ji.getNode().getName());
+        env.put("JQM_NODE_APPLICATION_ROOT", this.ji.getNode().getRepo());
+        env.put("JQM_NODE_LOG_LEVEL", this.ji.getNode().getRootLogLevel());
 
         env.put("JQM_Q_NAME", this.ji.getQ().getName());
 
@@ -149,6 +169,20 @@ class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTra
                 jqmlogger.error("Could not unregister JobInstance JMX bean", e);
             }
         }
+
+        // Collect delivery files
+        for (File f : this.deliveryDir.listFiles())
+        {
+            try
+            {
+                this.engineApi.addDeliverable(f.getAbsolutePath(), f.getName());
+            }
+            catch (IOException e)
+            {
+                jqmlogger.warn("Could not register delivery file " + f.getAbsolutePath(), e);
+            }
+        }
+        this.deliveryDir.delete();
     }
 
     @Override

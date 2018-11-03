@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.enioka.jqm.api.Deliverable;
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
@@ -216,5 +217,36 @@ public class ShellRunnerTest extends JqmBaseTest
 
         List<JobInstance> jis = Query.create().setParentId(i).run();
         Assert.assertEquals(1, jis.size());
+    }
+
+    @Test
+    public void testShellDelivery()
+    {
+        if (onWindows())
+        {
+            CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(),
+                    "echo 'toto' > $env:JQM_JI_DELIVERY_DIR/test.txt", TestHelpers.qNormal, 0, "TestApp1", null, "module1", "kw1", "kw2",
+                    null, false, cnx, null, false, null, false, PathType.POWERSHELLCOMMAND);
+        }
+        else
+        {
+            // For Linux, sleep is a process, not a command, so we have a shell->sleep tree.
+            CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), "echo 'toto' > $JQM_JI_DELIVERY_DIR/test.txt",
+                    TestHelpers.qNormal, 0, "TestApp1", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false,
+                    PathType.DEFAULTSHELLCOMMAND);
+        }
+
+        int i = JobRequest.create("TestApp1", "TestUser").submit();
+        Helpers.setSingleParam("internalPollingPeriodMs", "500", cnx);
+
+        addAndStartEngine();
+        TestHelpers.waitFor(1, 20000, cnx);
+
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+
+        List<Deliverable> deliverables = JqmClientFactory.getClient().getJobDeliverables(i);
+        Assert.assertEquals(1, deliverables.size());
+        Assert.assertEquals("test.txt", deliverables.get(0).getFileFamily());
     }
 }
