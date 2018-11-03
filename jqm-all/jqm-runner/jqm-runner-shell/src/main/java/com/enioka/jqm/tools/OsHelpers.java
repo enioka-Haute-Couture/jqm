@@ -47,7 +47,7 @@ final class OsHelpers
     private static List<String> getPowerShell(String commandLine, Map<String, String> prms)
     {
         List<String> res = new ArrayList<String>(10);
-        res.add("powershell.exe");
+        res.add("powershell");
         res.add("-NoLogo");
         res.add("-NonInteractive");
         res.add("-WindowStyle");
