@@ -18,9 +18,12 @@ import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobInstance;
 
-class LoaderExternal implements Runnable
+/**
+ * A tracker and launcher for running payloads inside a {@link JqmSingleRunner} running in a new process.
+ */
+class RunningExternalJobInstance implements Runnable
 {
-    private static Logger jqmlogger = LoggerFactory.getLogger(LoaderExternal.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(RunningExternalJobInstance.class);
 
     int jobId;
     String opts;
@@ -28,7 +31,7 @@ class LoaderExternal implements Runnable
     int killCheckPeriodMs = 1000;
     QueuePoller qp = null;
 
-    public LoaderExternal(DbConn cnx, JobInstance job, QueuePoller qp)
+    public RunningExternalJobInstance(DbConn cnx, JobInstance job, QueuePoller qp)
     {
         this.jobId = job.getId();
         this.qp = qp;

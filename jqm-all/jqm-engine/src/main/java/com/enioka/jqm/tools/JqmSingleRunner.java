@@ -41,14 +41,14 @@ public class JqmSingleRunner
      * 
      * @param job
      * @param logFile
-     *            the file to which output the run log. if null, only stdout will be used.
+     *                    the file to which output the run log. if null, only stdout will be used.
      * @return the result of the run
      */
     public static JobInstance run(com.enioka.jqm.model.JobInstance job)
     {
         if (job == null)
         {
-            throw new IllegalArgumentException("Argument jr cannot be null");
+            throw new IllegalArgumentException("Argument job cannot be null");
         }
         jqmlogger.info("Starting single runner for payload " + job.getId());
 
@@ -73,9 +73,7 @@ public class JqmSingleRunner
         }
 
         // Create run container
-        ClassloaderManager clm = new ClassloaderManager();
-        clm.setIsolationDefault(cnx);
-        final Loader l = new Loader(job, (JqmEngine) null, (QueuePoller) null, clm);
+        final RunningJobInstance l = new RunningJobInstance(job, new JavaRunner(cnx));
 
         // Kill signal handler
         final Thread mainT = Thread.currentThread();
@@ -111,7 +109,7 @@ public class JqmSingleRunner
                 }
 
                 // Shut down the process if needed
-                if (!l.isDone)
+                if (!l.isDone())
                 {
                     // Timeout! Violently halt the JVM.
                     jqmlogger.info("Job has not finished gracefully and will be stopped abruptly");

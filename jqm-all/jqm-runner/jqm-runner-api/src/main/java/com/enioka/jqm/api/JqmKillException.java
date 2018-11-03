@@ -16,17 +16,17 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.tools;
+package com.enioka.jqm.api;
 
 /**
  * The KILL JOB JQM exception class.
  * 
  */
-class JqmKillException extends RuntimeException
+public class JqmKillException extends RuntimeException
 {
     private static final long serialVersionUID = -2937310125732117976L;
 
-    JqmKillException(String msg)
+    public JqmKillException(String msg)
     {
         super(msg);
     }

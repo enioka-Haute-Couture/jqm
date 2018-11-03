@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.enioka.jqm.api.JobManager;
-import com.enioka.jqm.api.JobRunner;
+import com.enioka.jqm.api.JobRunnerException;
 
 public class Common
 {
@@ -48,7 +48,7 @@ public class Common
         }
         catch (Exception e)
         {
-            throw new JobRunner.JobRunnerException("Could not load JQM internal interface", e);
+            throw new JobRunnerException("Could not load JQM internal interface", e);
         }
         try
         {
@@ -65,7 +65,7 @@ public class Common
         }
         catch (Exception e)
         {
-            throw new JobRunner.JobRunnerException("Could not inject JQM interface into target payload", e);
+            throw new JobRunnerException("Could not inject JQM interface into target payload", e);
         }
     }
 }

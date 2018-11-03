@@ -2,10 +2,25 @@
     "files.associations": {
         "Dockerfile.*": "dockerfile"
     },
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/node_modules/": true,
+        "**/target/": true,
+        "**/.classpath": true,
+        "**/.project": true,
+        "**/.settings/": true,
+    },
     "LineCount.includes": [
         "**/*.java",
         "**/*.js",
         "**/*.html",
+    ],
+    "LineCount.excludes": [
+        "**/.vscode/**",
+        "**/node_modules/**",
+        "**/jqm-tests/**",
+        "**/target/**"
     ],
     "LineCount.output": {
         "txt": true,
@@ -26,7 +41,7 @@
         "**/target/",
         "**/web/dist/"
     ],
-    "java.autobuild.enabled": false,
+    "java.autobuild.enabled": true,
     "maven.excludedFolders": [
         "**/.*", // exclude hidden folders
         "**/node_modules", // exclude node modules to speed up

@@ -1,56 +1,45 @@
-﻿JQM - Java Job Queue Manager
+﻿JQM
 ##################################
 
-JQM (short for Job Queue Manager) is a Java batch job manager. It takes standard Java code (which does 
-not need to be specifically tailored for JQM) and, when receiving an execution request, will run it 
-asynchronously, taking care of everything that would otherwise be boilerplate code with no added value 
-whatsoever: configuring libraries, logs, throttling processes, handling priorities between different classes of 
+The aptly named Job Queue Manager, or JQM for short, is a queue manager. It has three goals:
+
+* to optimize and streamline the execution of jobs, whatever they may be, by using queues with rich configuration
+* to make job administration simple
+* to be easy to include or embedd in most environments.
+
+The result is a small-footprint, easy to use grid execution system that takes care of everything which would be
+boilerplate code or missing otherwise: configuring logs, throttling processes, handling priorities between different classes of 
 jobs, distributing the load over multiple servers, distributing the files created by the jobs, and much more...
-Basically, it is a very lightweight application server specifically tailored for making it easier to run Java batch jobs. 
 
-The rational behind JQM is that there are too many jobs that fall inside that uncomfortable middle ground between 
-"a few seconds" (this could be done synchronously inside a web application server) and "a few hours" (in 
-which case forking a new dedicated JVM is often the most suitable way). 
-A traditional servlet or J2EE application server should not house this kind of jobs: they are designed to deal 
-with very short locally-running synchronous user requests, not asynchronous distributed long running jobs. For example, creating a thread
-in such a server is dangerous as they offer little control over it, and they do not offer job queuing and remote execution (which is a basic
-tenet of asynchronous batch execution).
+It is able to run anything that can be run on the command line without modifications. It also has a very rich Java integration which make it 
+an ideal "job application server" for Java users - with no modifications required, allowing to directly use code from plain Main to
+Spring Batch and other frameworks...
 
-JQM should also be considered just for its ability to untangle the execution itself from the program that requires it. 
-Some of the most obvious applications are:
+Jobs and users also optionaly benefit from rich REST APIs exposing all JQM data and operations.
 
-* relieving the application server, which often costs money - the front end stays on the licensed application 
-  server on an expensive server, while the resource consuming jobs go inside JQM on low-end servers.
-* job execution request frequency adaptation. Often a job is requested to run multiple times at the same moment 
-  (either by a human request, or an automated system reacting to frequent events, ...) while the job should 
-  actually run only one at a time (e.g. the job handles all available data at the time of its 
-  launch - so there is really no need for multiple instances in parallel). JQM will throttle these requests.
-* adding a queueing & distributed execution capacity to job schedulers.
+There are many use cases for JQM. Common real-world examples include:
 
-Most of the time, the code that will be run by JQM will be a direct reuse of existing code without any modifications 
-(for jars including a classic main function, or Runnable threads). But JQM also optionally offers a rich API that 
-allows running code to ask for another execution, to retrieve structured parameters, to send messages and other 
-advancement notices... Also of note, JQM is pure Java Standard Edition 6 (JSE 1.6) to enable not only code but binary reuse.
-Standard JSE code also means it is possible to use any framework within JQM, like Spring batch or Hibernate.
-
-Interacting with JQM is also easy: an API, with two different implementations (SQL & REST web service, which can be 
-used from a non-Java world) for different needs, is offered to do every imaginable operation (new execution request, 
-querying the state of a request, retrieving files created by a job instance, ...).
+* replacing another job execution manager, like the one inside OS/400 - a reference as far as job queuing is concerned
+* adding a distributed execution capability to a scheduler or any application
+* removing load from a paid application server
+* removing asynchronous executions from a web application server, not designed to deal with long running threads
+* throttling jobs, like allowing only one instance of the same job at a time
 
 
-It is also of note that JQM was created with compatibility in mind:
 
-* uses either PostgreSQL, Oracle, MySQL, DB2 or HSQLDB
-* the client API is usable in all application servers and JSE code (tested with WebsSphere 8.x, Glassfish 3.x, Tomcat 7.x, JBoss 7+...)
+Also of note that JQM was created with compatibility in mind:
+
+* uses either PostgreSQL, Oracle, MySQL, DB2 or an embedded HSQLDB
 * one of the client API implementations is a REST-like API, callable from everywhere, not only Java but also .NET or shell scripts
-  (which by the way allows very easy scheduler integration).
-* under an Apache 2 license, which basically allows you to do anything you want with the product and its code in any environment
+* the Java implementation of the client API is usable in all application servers and JSE code (tested with WebsSphere 8.x, Glassfish 3.x, Tomcat 7.x, JBoss 7+...)
+* under an Apache 2 license, which basically allows you to do anything you want with the product and its code in any situation.
 
 
 Finally, JQM is a free (as beer) and open source product backed by the IT consulting firm [Enioka](http://www.enioka.com) 
-which first developed it for a multinational conglomerate. Enquiries about support, development of extensions, 
+which first developed it for an international conglomerate. Enquiries about support, development of extensions, 
 integration with other products, consulting and other commercial questions are more than welcome at contact@enioka.com. 
 Community support is of course freely offered on GitHub using the bug-tracker.
+
 
 .. toctree::
     :numbered:
@@ -61,6 +50,7 @@ Community support is of course freely offered on GitHub using the bug-tracker.
     archi
     quickstart
     
+    jobs_shell/index
     jobs/index
     client/index
     

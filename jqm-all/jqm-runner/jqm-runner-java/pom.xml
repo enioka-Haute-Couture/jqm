@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.enioka.jqm</groupId>
+        <artifactId>jqm-runner</artifactId>
+        <version>2.2.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>jqm-runner-java</artifactId>
+
+    <name>${project.groupId}:${project.artifactId}</name>
+    <url>http://jqm.readthedocs.org</url>
+    <description>The Java Job Instance Runner is tasked with running Java classes inside the JQM process</description>
+
+    <dependencies>
+        <!-- JQM internal APIs -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-runner-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-api-client-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Maven integration -->
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.resolver</groupId>
+            <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+            <version>${shrinkwrap.resolver.version}</version>
+        </dependency>
+
+        <!-- Stupid Java APIs workarounds -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons.lang.version}</version>
+        </dependency>
+
+        <!-- Log, as always... -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

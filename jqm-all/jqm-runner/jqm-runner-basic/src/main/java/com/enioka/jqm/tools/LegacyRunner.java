@@ -5,13 +5,14 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import com.enioka.jqm.api.JobBase;
-import com.enioka.jqm.api.JobRunner;
+import com.enioka.jqm.api.JobRunnerException;
+import com.enioka.jqm.api.JavaJobRunner;
 
 /**
  * A runner for the deprecated "JobBase" type of jobs.
  */
 @SuppressWarnings("deprecation")
-public class LegacyRunner implements JobRunner
+public class LegacyRunner implements JavaJobRunner
 {
     public LegacyRunner()
     {

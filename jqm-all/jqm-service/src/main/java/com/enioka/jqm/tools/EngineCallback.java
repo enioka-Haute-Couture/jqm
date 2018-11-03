@@ -112,8 +112,7 @@ public class EngineCallback implements JqmEngineHandler
     @Override
     public void onNodeStarted()
     {
-        // TODO Auto-generated method stub
-
+        // Nothing done by default.
     }
 
     @Override

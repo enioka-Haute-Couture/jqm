@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.enioka.jqm.api.JobRunnerException;
 import com.enioka.jqm.model.ClHandler;
 import com.enioka.jqm.model.JobInstance;
 
@@ -42,9 +43,9 @@ import com.enioka.jqm.model.JobInstance;
  * It is also responsible for launching the payload (be it a Runnable, a main function, etc).
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
-class JarClassLoader extends URLClassLoader
+class PayloadClassLoader extends URLClassLoader
 {
-    private static Logger jqmlogger = LoggerFactory.getLogger(JarClassLoader.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(PayloadClassLoader.class);
 
     private boolean childFirstClassLoader = false;
 
@@ -58,7 +59,7 @@ class JarClassLoader extends URLClassLoader
 
     private boolean mayBeShared = false;
 
-    JarClassLoader(ClassLoader parent)
+    PayloadClassLoader(ClassLoader parent)
     {
         super(new URL[0], parent);
     }
@@ -80,16 +81,16 @@ class JarClassLoader extends URLClassLoader
      * Everything here can run without the database.
      * 
      * @param job
-     *            the JI to run.
+     *                       the JI to run.
      * @param parameters
-     *            already resolved runtime parameters
+     *                       already resolved runtime parameters
      * @param clm
-     *            the CLM having created this CL.
+     *                       the CLM having created this CL.
      * @param h
-     *            given as parameter because its constructor needs the database.
+     *                       given as parameter because its constructor needs the database.
      * @throws JqmEngineException
      */
-    void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, JobManagerHandler h) throws JqmEngineException
+    void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, EngineApiProxy h) throws JobRunnerException
     {
         // 1 - Create the proxy.
         Object proxy = null;
@@ -101,7 +102,7 @@ class JarClassLoader extends URLClassLoader
         }
         catch (Exception e)
         {
-            throw new JqmEngineException("could not create proxy API object", e);
+            throw new JobRunnerException("could not create proxy API object", e);
         }
 
         // 2 - Meta data used by runners
@@ -120,7 +121,7 @@ class JarClassLoader extends URLClassLoader
         }
         catch (Exception e)
         {
-            throw new JqmEngineException("could not load class " + classQualifiedName, e);
+            throw new JobRunnerException("could not load class " + classQualifiedName, e);
         }
         jqmlogger.trace("Class " + classQualifiedName + " was correctly loaded");
 
@@ -145,7 +146,7 @@ class JarClassLoader extends URLClassLoader
             }
             catch (Exception e)
             {
-                throw new JqmEngineException(
+                throw new JobRunnerException(
                         "could not load a runner: check your global parameters, or that the plugin for this runner is actually present "
                                 + runnerClassName,
                         e);
@@ -156,7 +157,7 @@ class JarClassLoader extends URLClassLoader
             }
             catch (Exception e)
             {
-                throw new JqmEngineException(
+                throw new JobRunnerException(
                         "could not create an instance of a runner: it may not have a no-args constructor. " + runnerClassName, e);
             }
 
@@ -167,7 +168,7 @@ class JarClassLoader extends URLClassLoader
             }
             catch (Exception e)
             {
-                throw new JqmEngineException("invocation of canRun failed on the runner plugin " + runnerClassName, e);
+                throw new JobRunnerException("invocation of canRun failed on the runner plugin " + runnerClassName, e);
             }
 
             if (canRun)
@@ -180,7 +181,7 @@ class JarClassLoader extends URLClassLoader
                 }
                 catch (Exception e)
                 {
-                    throw new JqmEngineException("could not find run method for runner plugin " + runnerClassName, e);
+                    throw new JobRunnerException("could not find run method for runner plugin " + runnerClassName, e);
                 }
 
                 // We are ready to actually run the job instance. Time for all event handlers.
@@ -203,7 +204,7 @@ class JarClassLoader extends URLClassLoader
                         }
                         catch (Exception e)
                         {
-                            throw new JqmEngineException("event handler could not be loaded or run: " + handlerClass, e);
+                            throw new JobRunnerException("event handler could not be loaded or run: " + handlerClass, e);
                         }
                     }
                 }
@@ -223,17 +224,17 @@ class JarClassLoader extends URLClassLoader
                     }
                     else
                     {
-                        throw new JqmEngineException("Payload has failed", e);
+                        throw new JobRunnerException("Payload has failed", e);
                     }
                 }
                 catch (Exception e)
                 {
-                    throw new JqmEngineException("Could not launch a job instance (engine issue, not a payload issue", e);
+                    throw new JobRunnerException("Could not launch a job instance (engine issue, not a payload issue", e);
                 }
             }
         }
 
-        throw new JqmEngineException(
+        throw new JobRunnerException(
                 "This type of class cannot be launched by JQM. Please consult the documentation for more details. Available runners: "
                         + allowedRunners);
     }

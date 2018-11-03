@@ -4,8 +4,8 @@
 Basic JQM concepts
 **********************
 
-The goal of JQM is to launch :term:`payloads<payload>`, i.e. Java code doing something useful, asynchronously. This code can be anything -
-a shell program launcher, a Spring batch, really anything that works with Java SE and libraries provided with the code.
+The goal of JQM is to launch :term:`payloads<payload>`, i.e. an executable or Java code doing something useful, asynchronously. This payload can be anything -
+a shell script, a Spring batch, really anything that can be launched in a CLI or works with Java SE and libraries provided with the code.
 
 The payload is described inside a :term:`job definition` - so that JQM knows things like the class to load, the path of the jar file if any, etc.
 It is usually contained within an XML file. The job definition is actually a deployment descriptor - the batch equivalent for a web.xml or an ejb-jar.xml.
@@ -36,7 +36,8 @@ JQM works like this:
 * it uses the 'enqueue' method of the client, passing it a job request with the name of the job definition to launch (and potentially parameters, tags, ...)
 * a job instance is created inside the database
 * engines are polling the database (see below). One of them with enough free resources takes the job instance
-* it creates a dedicated class loader for this job instance, imports the correct libraries with it, launches the payload inside a thread
+* if a Java job: it creates a dedicated class loader for this job instance, imports the correct libraries with it, launches the payload inside a thread
+* if a shell job: it created a new process for the job instance and waits for its death
 * during the run, the application that was at the origin of the request can use other methods of the client API to retrieve the status, the advancement, etc. of the job instance
 * at the end of the run, the JQM engine updates the database and is ready to accept new jobs. The client can still query the history of executions.
 

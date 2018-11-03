@@ -51,7 +51,19 @@ public class JobDef implements Serializable
         /**
          * The payload is actually already in memory - the path is meaningless.
          */
-        MEMORY
+        MEMORY,
+        /**
+         * The path is a shell command, using the platform-dependent default shell.
+         */
+        DEFAULTSHELLCOMMAND,
+        /**
+         * The path is a powershell command
+         */
+        POWERSHELLCOMMAND,
+        /**
+         * The path is an executable which does not need a shell to run.
+         */
+        DIRECTEXECUTABLE,
     }
 
     private Integer id = null;
