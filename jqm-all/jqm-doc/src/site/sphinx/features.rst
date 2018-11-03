@@ -1,13 +1,21 @@
 JQM features
 ###############
 
-* The only dedicated Java batch server
+* The only dedicated job queueing server
 * Open Source under the Apache 2 licence, a business-friendly licence securing your investments in JQM
 * No-cost ready to use solution. Paying support can if needed be purchased from the original authors 
   at contact@enioka.com or at any other firm open to doing maintenance on the tool.
 * Fully documented
 
-Batch code is easy to create:
+Full command line integration:
+
+* launch any command - be it a shell command or an executable with no need for a shell
+* use many environment variables provided by JQM
+* easily call JQM APIs with provided account and URL
+* store files for later retrieval by end users or admins
+* deal with parent/child relationship
+
+Optional rich Java integration:
 
 * Runs existing Java 1.6 to 1.10 code, without need for programming specifically for JQM
 * Possible (but not required) to use a specific framework of your choice (Spring batch, etc.)
@@ -25,10 +33,10 @@ Interacting with batch jobs is simple:
 
 * Query API enabling to easily create client applications (with two full samples included in the distribution), such as 
   web pages listing all the jobs for given user, for a given module, etc.
-* Feature rich API with provided Java clients, which can be used out of the box for launching jobs,
-  cancelling them, changing their priorities
+* Feature rich REST API with provided Java clients, which can be used out of the box for launching jobs,
+  cancelling them, changing their priorities...
 
-Batch packaging: just use your own
+Java batch packaging: just use your own
 
 * Full Maven 3 support: as a Maven-created jar contains its pom.xml, JQM is able to retrieve all the dependencies, simplifying packaging libraries.
 * It is even possible to directly run Maven coordinates without providing any jar file!

@@ -4,14 +4,14 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import com.enioka.jqm.api.JobRunner;
+import com.enioka.jqm.api.JavaJobRunner;
 
 /**
  * A very simple Spring context creation and maintenance. Designed to be used in shared class loaders, but also works with standard "use
  * once" class loaders. Will accept any job class which is using a Spring annotation.
  *
  */
-public class AnnotationSpringRunner implements JobRunner
+public class AnnotationSpringRunner implements JavaJobRunner
 {
     public AnnotationSpringRunner()
     {

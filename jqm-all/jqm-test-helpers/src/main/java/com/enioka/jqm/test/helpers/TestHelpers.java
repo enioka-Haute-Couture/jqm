@@ -258,6 +258,9 @@ public class TestHelpers
         return cnx.runSelectSingle("history_select_count_ended", Integer.class);
     }
 
+    /**
+     * Ended JI, but not OK.
+     */
     public static int getNonOkCount(DbConn cnx)
     {
         return cnx.runSelectSingle("history_select_count_notended", Integer.class);

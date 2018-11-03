@@ -15,6 +15,8 @@
  */
 package com.enioka.jqm.tools;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -24,9 +26,11 @@ import javax.naming.spi.NamingManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.Node;
 
 /**
@@ -39,7 +43,6 @@ class InternalPoller implements Runnable
     private static Logger jqmlogger = LoggerFactory.getLogger(InternalPoller.class);
     private boolean run = true;
     private JqmEngine engine = null;
-    private Thread localThread = null;
     private long step;
     private Node node = null;
     private Semaphore loop = new Semaphore(0);
@@ -73,7 +76,6 @@ class InternalPoller implements Runnable
         Thread.currentThread().setName("INTERNAL_POLLER;polling orders;");
         jqmlogger.info("Start of the internal poller");
         DbConn cnx = null;
-        this.localThread = Thread.currentThread();
         Calendar lastJndiPurge = Calendar.getInstance();
 
         // Launch main loop
@@ -146,6 +148,35 @@ class InternalPoller implements Runnable
                                 e);
                     }
                 }
+
+                // Should job instances be killed or changed priorities?
+                try
+                {
+                    ResultSet rs = cnx.runSelect("ji_select_instructions_by_node", node.getId());
+                    while (rs.next())
+                    {
+                        Integer jiid = rs.getInt(1);
+                        String instr = rs.getString(2);
+                        Instruction instruction;
+                        try
+                        {
+                            instruction = Instruction.valueOf(instr);
+                        }
+                        catch (IllegalArgumentException ex2)
+                        {
+                            jqmlogger.warn("An unknown instruction was found and is ignored: " + instr);
+                            continue;
+                        }
+
+                        this.engine.getRunningJobInstanceManager().handleInstruction(jiid, instruction);
+                    }
+                }
+                catch (SQLException e)
+                {
+                    throw new DatabaseException(e);
+                }
+
+                // All engine pollings done!
             }
             catch (RuntimeException e)
             {

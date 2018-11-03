@@ -36,7 +36,6 @@ import org.jboss.shrinkwrap.resolver.api.maven.ConfigurableMavenResolverSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.Node;
 
@@ -58,22 +57,28 @@ class LibraryResolverFS
     }
 
     private Map<String, JobDefLibrary> cache = new HashMap<String, LibraryResolverFS.JobDefLibrary>();
+    private LibraryResolverMaven mavenResolver;
+
+    LibraryResolverFS(LibraryResolverMaven mavenResolver)
+    {
+        this.mavenResolver = mavenResolver;
+    }
 
     /**
      * 
      * @param n
-     *            the JQM Node that holds the binaries (local node)
+     *                the JQM Node that holds the binaries (local node)
      * @param jd
-     *            the JobDefinition that should be resolved
+     *                the JobDefinition that should be resolved
      * @param cnx
-     *            a DbConn that will be used only if not in cache, to fetch the Maven repository list from the database.
+     *                a DbConn that will be used only if not in cache, to fetch the Maven repository list from the database.
      * @throws JqmPayloadException
      */
-    synchronized URL[] getLibraries(Node n, JobDef jd, DbConn cnx) throws JqmPayloadException
+    synchronized URL[] getLibraries(Node n, JobDef jd) throws JqmPayloadException
     {
         if (shouldLoad(n, jd))
         {
-            loadCache(n, jd, cnx);
+            loadCache(n, jd);
         }
         return cache.get(jd.getApplicationName()).urls;
     }
@@ -108,7 +113,7 @@ class LibraryResolverFS
         return false;
     }
 
-    private void loadCache(Node node, JobDef jd, DbConn cnx) throws JqmPayloadException
+    private void loadCache(Node node, JobDef jd) throws JqmPayloadException
     {
         jqmlogger.debug("Resolving classpath for job definition " + jd.getApplicationName());
 
@@ -163,7 +168,7 @@ class LibraryResolverFS
             {
                 IOUtils.closeQuietly(is);
                 IOUtils.closeQuietly(os);
-                Helpers.closeQuietly(zf);
+                closeQuietly(zf);
             }
         }
 
@@ -205,7 +210,7 @@ class LibraryResolverFS
             {
                 IOUtils.closeQuietly(is);
                 IOUtils.closeQuietly(os);
-                Helpers.closeQuietly(zf);
+                closeQuietly(zf);
             }
 
             // If libs were extracted, put in cache and return
@@ -237,7 +242,7 @@ class LibraryResolverFS
         {
             jqmlogger.trace("Reading a pom file");
 
-            ConfigurableMavenResolverSystem resolver = LibraryResolverMaven.getMavenResolver(cnx);
+            ConfigurableMavenResolverSystem resolver = mavenResolver.getMavenResolver();
 
             // Resolve
             File[] depFiles = null;
@@ -253,7 +258,7 @@ class LibraryResolverFS
             }
 
             // Extract results
-            URL[] tmp = LibraryResolverMaven.extractMavenResults(depFiles);
+            URL[] tmp = mavenResolver.extractMavenResults(depFiles);
 
             // Put in cache
             putInCache(tmp, jd.getApplicationName());
@@ -301,5 +306,20 @@ class LibraryResolverFS
         jdl.urls = urls;
 
         this.cache.put(applicationName, jdl);
+    }
+
+    private static void closeQuietly(ZipFile zf)
+    {
+        try
+        {
+            if (zf != null)
+            {
+                zf.close();
+            }
+        }
+        catch (Exception e)
+        {
+            // Do nothing.
+        }
     }
 }

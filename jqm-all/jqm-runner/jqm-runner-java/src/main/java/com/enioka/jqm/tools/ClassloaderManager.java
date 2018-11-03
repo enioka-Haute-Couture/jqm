@@ -11,23 +11,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.NamingException;
-import javax.naming.spi.NamingManager;
-
-import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.enioka.jqm.api.JobRunnerCallback;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Cl;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.JobInstance;
 
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- * This class holds all the {@link JarClassLoader} and is the only place to create one. There should be one instance per engine.<br>
- * We use a specific object rather than static objects in the {@link Loader} class to allow multiple engine instantiations. It also allows
- * to centralise all CL creation methods and have cleaner code in Loader and in JCL.
+ * This class holds all the {@link PayloadClassLoader} and is the only place to create one. There should be one instance per engine.<br>
+ * We use a specific object rather than static objects in the {@link JavaJobInstanceTracker} class to allow multiple engine instantiations.
+ * It also allows to centralise all CL creation methods and have cleaner code in Loader and in JCL.
  */
 class ClassloaderManager
 {
@@ -36,7 +34,7 @@ class ClassloaderManager
     /**
      * The CL corresponding to "one CL to rule them all" mode.
      */
-    private JarClassLoader sharedClassLoader = null;
+    private PayloadClassLoader sharedClassLoader = null;
 
     /**
      * The CL for loading plugins (for the engine)
@@ -47,12 +45,12 @@ class ClassloaderManager
     /**
      * The CLs corresponding to "one CL per jar" mode.
      */
-    private Map<String, JarClassLoader> sharedJarClassLoader = new HashMap<String, JarClassLoader>();
+    private Map<String, PayloadClassLoader> sharedJarClassLoader = new HashMap<String, PayloadClassLoader>();
 
     /**
      * The CLs corresponding to specific keys (specified inside {@link JobDef#getSpecificIsolationContext()}). Key is Cl object ID.
      */
-    private Map<Integer, JarClassLoader> persistentClassLoaders = new HashMap<Integer, JarClassLoader>();
+    private Map<Integer, PayloadClassLoader> persistentClassLoaders = new HashMap<Integer, PayloadClassLoader>();
 
     /**
      * The different runners which may be involved inside the class loaders. Simple class names.
@@ -67,13 +65,15 @@ class ClassloaderManager
     private final LibraryResolverFS fsResolver;
     private final LibraryResolverMaven mavenResolver;
 
-    ClassloaderManager()
+    ClassloaderManager(DbConn cnx)
     {
-        this.fsResolver = new LibraryResolverFS();
-        this.mavenResolver = new LibraryResolverMaven();
+        this.mavenResolver = new LibraryResolverMaven(cnx);
+        this.fsResolver = new LibraryResolverFS(this.mavenResolver);
+
+        setIsolationDefault(cnx);
     }
 
-    void setIsolationDefault(DbConn cnx)
+    private void setIsolationDefault(DbConn cnx)
     {
         this.launchIsolationDefault = GlobalParameter.getParameter(cnx, "launch_isolation_default", "Isolated");
         String rns = GlobalParameter.getParameter(cnx, "job_runners",
@@ -85,9 +85,10 @@ class ClassloaderManager
         }
     }
 
-    JarClassLoader getClassloader(JobInstance ji, DbConn cnx) throws MalformedURLException, JqmPayloadException, RuntimeException
+    PayloadClassLoader getClassloader(JobInstance ji, JobRunnerCallback cb)
+            throws MalformedURLException, JqmPayloadException, RuntimeException
     {
-        final JarClassLoader jobClassLoader;
+        final PayloadClassLoader jobClassLoader;
         JobDef jd = ji.getJD();
 
         // Extract the jar actual path
@@ -95,7 +96,7 @@ class ClassloaderManager
 
         // The parent class loader is normally the CL with EXT on its CL. But if no lib load, user current one (happens for external
         // payloads)
-        ClassLoader parent = getParentClassLoader(ji);
+        ClassLoader parent = getParentClassLoader(ji, cb);
 
         // Priority is:
         // 1 - a specific context
@@ -129,7 +130,7 @@ class ClassloaderManager
                         else
                         {
                             jqmlogger.info("Creating a new persistent specific isolation context: " + clSharingKey);
-                            jobClassLoader = new JarClassLoader(parent);
+                            jobClassLoader = new PayloadClassLoader(parent);
                             jobClassLoader.setReferenceJobDefName(jd.getApplicationName());
                             jobClassLoader.mayBeShared(cldef.isPersistent());
                             jobClassLoader.setHiddenJavaClasses(cldef.getHiddenClasses());
@@ -144,7 +145,7 @@ class ClassloaderManager
             else
             {
                 jqmlogger.info("Creating a new transient specific isolation context: " + clSharingKey);
-                jobClassLoader = new JarClassLoader(parent);
+                jobClassLoader = new PayloadClassLoader(parent);
                 jobClassLoader.setReferenceJobDefName(jd.getApplicationName());
                 jobClassLoader.mayBeShared(cldef.isPersistent());
                 jobClassLoader.setHiddenJavaClasses(cldef.getHiddenClasses());
@@ -167,7 +168,7 @@ class ClassloaderManager
                 else
                 {
                     jqmlogger.info("Creating sharedClassLoader");
-                    jobClassLoader = new JarClassLoader(parent);
+                    jobClassLoader = new PayloadClassLoader(parent);
                     jobClassLoader.mayBeShared(true);
                     sharedClassLoader = jobClassLoader;
                 }
@@ -183,7 +184,7 @@ class ClassloaderManager
                 else
                 {
                     jqmlogger.info("Creating shared Jar CL");
-                    jobClassLoader = new JarClassLoader(parent);
+                    jobClassLoader = new PayloadClassLoader(parent);
                     jobClassLoader.mayBeShared(true);
                     sharedJarClassLoader.put(jd.getJarPath(), jobClassLoader);
                 }
@@ -192,13 +193,13 @@ class ClassloaderManager
             {
                 // Standard case: all launches are independent. We create a transient CL.
                 jqmlogger.debug("Using an isolated transient CL with default parameters");
-                jobClassLoader = new JarClassLoader(parent);
+                jobClassLoader = new PayloadClassLoader(parent);
                 jobClassLoader.mayBeShared(false);
             }
         }
 
         // Resolve the libraries and add them to the classpath
-        final URL[] classpath = getClasspath(ji, cnx);
+        final URL[] classpath = getClasspath(ji, cb);
 
         // Remember to also add the jar file itself... as CL can be shared, there is no telling if it already present or not.
         jobClassLoader.extendUrls(jarFile.toURI().toURL(), classpath);
@@ -213,50 +214,36 @@ class ClassloaderManager
         return jobClassLoader;
     }
 
-    private ClassLoader getExtensionClassloader()
-    {
-        ClassLoader extLoader = null;
-        try
-        {
-            extLoader = ((JndiContext) NamingManager.getInitialContext(null)).getExtCl();
-        }
-        catch (NamingException e)
-        {
-            jqmlogger.warn("could not find ext directory class loader. No parent classloader will be used", e);
-        }
-        return extLoader;
-    }
-
     /**
      * Returns all the URL that should be inside the classpath. This includes the jar itself if any.
      * 
      * @throws JqmPayloadException
      */
-    private URL[] getClasspath(JobInstance ji, DbConn cnx) throws JqmPayloadException
+    private URL[] getClasspath(JobInstance ji, JobRunnerCallback cb) throws JqmPayloadException
     {
         switch (ji.getJD().getPathType())
         {
         case MAVEN:
-            return mavenResolver.resolve(ji, cnx);
+            return mavenResolver.resolve(ji);
         case MEMORY:
             return new URL[0];
         case FS:
         default:
-            return fsResolver.getLibraries(ji.getNode(), ji.getJD(), cnx);
+            return fsResolver.getLibraries(ji.getNode(), ji.getJD());
         }
     }
 
-    private ClassLoader getParentClassLoader(JobInstance ji)
+    private ClassLoader getParentClassLoader(JobInstance ji, JobRunnerCallback cb)
     {
         switch (ji.getJD().getPathType())
         {
         case MAVEN:
-            return getExtensionClassloader();
+            return cb.getExtensionClassloader();
         case MEMORY:
             return Thread.currentThread().getContextClassLoader();
         default:
         case FS:
-            return getExtensionClassloader();
+            return cb.getExtensionClassloader();
         }
     }
 

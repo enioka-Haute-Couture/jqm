@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,13 +74,15 @@ public class JobInstance implements Serializable
     private transient Queue q;
     private transient Node n;
 
+    private HashMap<String, String> prmCache;
+
     /**
      * Helper method to add a parameter without having to create it explicitely. The created parameter should be persisted afterwards.
      * 
      * @param key
-     *            name of the parameter to add
+     *                  name of the parameter to add
      * @param value
-     *            value of the parameter to create
+     *                  value of the parameter to create
      * @return the newly created parameter
      */
     public RuntimeParameter addParameter(String key, String value)
@@ -446,6 +449,24 @@ public class JobInstance implements Serializable
     public void setNotBefore(Calendar notBefore)
     {
         this.notBefore = notBefore;
+    }
+
+    public Map<String, String> getPrms()
+    {
+        if (this.prmCache == null)
+        {
+            throw new IllegalStateException("cache was not loaded");
+        }
+        return this.prmCache;
+    }
+
+    public void loadPrmCache(DbConn cnx)
+    {
+        prmCache = new HashMap<String, String>();
+        for (Map.Entry<String, String> jp : RuntimeParameter.select_map(cnx, "jiprm_select_by_ji", this.id).entrySet())
+        {
+            prmCache.put(jp.getKey(), jp.getValue());
+        }
     }
 
     public static List<JobInstance> select(DbConn cnx, String query_key, Object... args)

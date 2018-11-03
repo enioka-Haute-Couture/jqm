@@ -9,12 +9,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import com.enioka.jqm.api.JobRunner;
+import com.enioka.jqm.api.JavaJobRunner;
+import com.enioka.jqm.api.JobRunnerException;
 
 /**
  * The most simple of all runners: this launches a static main method.
  */
-public class MainRunner implements JobRunner
+public class MainRunner implements JavaJobRunner
 {
     public MainRunner()
     {

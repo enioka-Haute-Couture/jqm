@@ -32,9 +32,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
@@ -46,6 +43,9 @@ import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Message;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.State;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The engine itself. Everything starts in this class.
@@ -65,7 +65,6 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     // Parameters and parameter cache
     private Node node = null;
     private ObjectName name;
-    private final ClassloaderManager clManager = new ClassloaderManager();
 
     // Threads that together constitute the engine
     private Map<Integer, QueuePoller> pollers = new HashMap<Integer, QueuePoller>();
@@ -77,18 +76,20 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     private Thread killHook = null;
     boolean loadJmxBeans = true;
     private AtomicLong endedInstances = new AtomicLong(0);
+    private RunnerManager runnerManager;
+    private RunningJobInstanceManager runningJobInstanceManager;
 
     // DB connection resilience data
     private volatile Queue<QueuePoller> qpToRestart = new LinkedBlockingQueue<QueuePoller>();
-    private volatile Queue<Loader> loaderToFinalize = new LinkedBlockingQueue<Loader>();
-    private volatile Queue<Loader> loaderToRestart = new LinkedBlockingQueue<Loader>();
+    private volatile Queue<RunningJobInstance> loaderToFinalize = new LinkedBlockingQueue<RunningJobInstance>();
+    private volatile Queue<RunningJobInstance> loaderToRestart = new LinkedBlockingQueue<RunningJobInstance>();
     private volatile Thread qpRestarter = null;
 
     /**
      * Starts the engine
      * 
      * @param nodeName
-     *            the name of the node to start, as in the NODE table of the database.
+     *                     the name of the node to start, as in the NODE table of the database.
      * @throws JqmInitError
      */
     void start(String nodeName, JqmEngineHandler h)
@@ -119,7 +120,6 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
 
         // Database connection
         DbConn cnx = Helpers.getNewDbSession();
-        clManager.setIsolationDefault(cnx);
         cnx.logDatabaseInfo(jqmlogger);
 
         // Node configuration is in the database
@@ -212,6 +212,10 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
 
         // Cleanup
         purgeDeadJobInstances(cnx, this.node);
+
+        // Runners
+        runningJobInstanceManager = new RunningJobInstanceManager();
+        runnerManager = new RunnerManager(cnx);
 
         // Pollers
         syncPollers(cnx, this.node);
@@ -451,13 +455,13 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         startDbRestarter();
     }
 
-    void loaderFinalizationNeeded(Loader l)
+    void loaderFinalizationNeeded(RunningJobInstance l)
     {
         loaderToFinalize.add(l);
         startDbRestarter();
     }
 
-    void loaderRestartNeeded(Loader l)
+    void loaderRestartNeeded(RunningJobInstance l)
     {
         loaderToRestart.add(l);
         startDbRestarter();
@@ -545,7 +549,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                 t.start();
 
                 // Finalize loaders that could not store their result inside the database
-                Loader l = loaderToFinalize.poll();
+                RunningJobInstance l = loaderToFinalize.poll();
                 while (l != null)
                 {
                     jqmlogger.warn("storing delayed results for loader " + l.getId());
@@ -582,11 +586,6 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         qpRestarter.start();
     }
 
-    ClassloaderManager getClassloaderManager()
-    {
-        return this.clManager;
-    }
-
     void signalEndOfRun()
     {
         this.endedInstances.incrementAndGet();
@@ -597,9 +596,19 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         return this.handler;
     }
 
-    // //////////////////////////////////////////////////////////////////////////
+    RunnerManager getRunnerManager()
+    {
+        return this.runnerManager;
+    }
+
+    RunningJobInstanceManager getRunningJobInstanceManager()
+    {
+        return this.runningJobInstanceManager;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
     // JMX stat methods (they get their own connection to be thread safe)
-    // //////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
 
     @Override
     public long getCumulativeJobInstancesCount()

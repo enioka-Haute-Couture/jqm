@@ -28,6 +28,7 @@ import javax.naming.spi.NamingManager;
 import org.apache.commons.io.IOUtils;
 import org.hsqldb.Server;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -132,6 +133,21 @@ public class JqmBaseTest
         System.runFinalization();
         System.gc();
         System.gc();
+    }
+
+    protected void AssumeWindows()
+    {
+        Assume.assumeTrue(System.getProperty("os.name").toLowerCase().startsWith("win"));
+    }
+
+    protected void AssumeNotWindows()
+    {
+        Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+    }
+
+    protected boolean onWindows()
+    {
+        return System.getProperty("os.name").toLowerCase().startsWith("win");
     }
 
     protected JqmEngineOperations addAndStartEngine()
