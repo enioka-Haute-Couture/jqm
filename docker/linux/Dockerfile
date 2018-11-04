@@ -13,7 +13,7 @@ WORKDIR /jqm-all
 # Resume normal operations
 COPY ./docker/windows/nexus/settings.xml ./jqm-all ./
 
-RUN apk add unzip
+RUN apt install unzip
 
 RUN mvn install -DskipTests=${SKIP_TESTS} ${MVN_SETTINGS}
 RUN mkdir /jqm
