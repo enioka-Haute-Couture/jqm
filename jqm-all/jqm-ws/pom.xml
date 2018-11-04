@@ -15,7 +15,7 @@
     <description>JQM web API implementation and administration UI</description>
 
     <properties>
-        <sonar.exclusions>src/main/webapp/libs/**</sonar.exclusions>
+        <sonar.exclusions>src/main/webapp/dist/**</sonar.exclusions>
         <node.dir>${project.basedir}/target/node</node.dir>
         <jsplugin.version>1.6</jsplugin.version>
     </properties>
@@ -25,6 +25,12 @@
         <!-- It is enabled inside the exec:exec goal -->
         <profile>
             <id>dev</id>
+            <activation>
+                <property>
+                    <!-- Also disable this build when inside eclipse or vs code. -->
+                    <name>m2e.version</name>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
@@ -173,6 +179,7 @@
 
                         <configuration>
                             <executable>mvn</executable>
+                            <asyncDestroyOnShutdown>true</asyncDestroyOnShutdown>
                             <arguments>
                                 <argument>exec:exec@startwebpacksrv</argument>
                                 <argument>jetty:run</argument>

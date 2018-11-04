@@ -39,12 +39,13 @@
         "**/archetype-resources/**",
         "**/META-INF/maven/**",
         "**/target/",
-        "**/web/dist/"
+        "**/webapp/dist/"
     ],
     "java.autobuild.enabled": true,
     "maven.excludedFolders": [
         "**/.*", // exclude hidden folders
         "**/node_modules", // exclude node modules to speed up
-        "**/target" // exclude duplicated pom file in target folder
+        "**/target", // exclude duplicated pom file in target folder
     ],
+    "maven.executable.options": "",
 }
