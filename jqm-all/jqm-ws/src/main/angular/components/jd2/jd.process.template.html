@@ -1,0 +1,37 @@
+<div class="card-deck">
+
+    <div class="card m-2">
+        <div class="card-header">
+            Process specific properties
+        </div>
+
+        <div class="card-body">
+            <div class="form-group row">
+                <label for="txtJarPath" class="col-sm-2 col-form-label">Path to executable</label>
+                <div class="col-sm-10">
+                    <div class="input-group">
+                        <input id="txtJarPath" class="form-control" type="text" ng-model="$ctrl.jd.jarPath" />
+                        <div class="input-group-append">
+                            <span class="input-group-text fas fa-signature"></span>
+                        </div>
+                    </div>
+                    <small class="form-text text-muted">Current path is node job directory. Do not add parameters here,
+                        just a path.</small>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="txtComment" class="col-sm-2 col-form-label"></label>
+                <div class="col-sm-10">
+                    <small class="form-text text-muted">Process is launched with the value of the provided parameters,
+                        sorted by key. Key is only used for sorting.</small>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <jqm-jd-prms2 class="card m-2" jd="$ctrl.jd"></jqm-jd-prms2>
+</div>

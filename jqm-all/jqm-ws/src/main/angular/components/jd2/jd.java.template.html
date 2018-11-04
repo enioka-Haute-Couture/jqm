@@ -1,0 +1,66 @@
+<div class="card-deck">
+
+    <div class="card m-2">
+        <div class="card-header">
+            Java specific properties
+        </div>
+
+        <div class="card-body">
+            <div class="form-group row">
+                <label for="txtJarPath" class="col-sm-2 col-form-label">Path to the jar file</label>
+                <div class="col-sm-10">
+                    <div class="input-group">
+                        <input id="txtJarPath" class="form-control" type="text" ng-model="$ctrl.jd.jarPath" />
+                        <div class="input-group-append">
+                            <span class="input-group-text far fa-file"></span>
+                        </div>
+                    </div>
+                    <small class="form-text text-muted">The relative path to the jar containing the class to run. It is
+                        relative to the 'directory containing jars' parameter of the different nodes.</small>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="txtClass" class="col-sm-2 col-form-label">Class to launch</label>
+                <div class="col-sm-10">
+                    <div class="input-group">
+                        <input id="txtClass" class="form-control" type="text" ng-model="$ctrl.jd.javaClassName" />
+                        <div class="input-group-append">
+                            <span class="input-group-text far fa-file-code"></span>
+                        </div>
+                    </div>
+                    <small class="form-text text-muted">The fully qualified name of the class to run. (it must either
+                        have a main function, or implement Runnable, or inherit from JobBase).</small>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="txtCl" class="col-sm-2 col-form-label">Specific class loader</label>
+                <div class="col-sm-10">
+                    <div class="input-group">
+                        <input id="txtClass" class="form-control" type="text" value="{{$ctrl.jd.classLoaderId != null}}"
+                            disabled />
+                        <div class="input-group-append">
+                            <span class="input-group-text fas fa-layer-group"></span>
+                        </div>
+                    </div>
+                    <small class="form-text text-muted">Class loader options can be specified inside the deployment
+                        descriptor.</small>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="txtComment" class="col-sm-2 col-form-label"></label>
+                <div class="col-sm-10">
+                    <small class="form-text text-muted">Depending on the class type (Main, Runnable...) parameters are
+                        handled differently. Full details in the documentation.</small>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <jqm-jd-prms2 class="card m-2" jd="$ctrl.jd"></jqm-jd-prms2>
+</div>

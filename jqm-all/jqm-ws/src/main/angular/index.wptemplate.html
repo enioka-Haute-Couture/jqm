@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" <% if(htmlWebpackPlugin.files.manifest) { %> manifest="
+<%= htmlWebpackPlugin.files.manifest %>"
+<% } %>>
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        <%= htmlWebpackPlugin.options.title || 'Webpack App'%>
+    </title>
+    <% if (htmlWebpackPlugin.files.favicon) { %>
+    <link rel="shortcut icon" href="<%= htmlWebpackPlugin.files.favicon%>">
+    <% } %>
+    <% if (htmlWebpackPlugin.options.mobile) { %>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <% } %>
+    <% for (var css in htmlWebpackPlugin.files.css) { %>
+    <link href="<%= htmlWebpackPlugin.files.css[css] %>" rel="stylesheet">
+    <% } %>
+</head>
+
+<body>
+    <div id="jqmApp" ng-app="jqmApp" class="container-fluid p-0">
+        <jqm-tabs></jqm-tabs>
+
+        <jqm-alert></jqm-alert>
+
+        <div id="appMain" ng-view></div>
+    </div>
+
+    <% if (htmlWebpackPlugin.options.appMountId) { %>
+    <div id="<%= htmlWebpackPlugin.options.appMountId%>"></div>
+    <% } %>
+    <% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
+    <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>"></script>
+    <% } %>
+    <% if (htmlWebpackPlugin.options.devServer) { %>
+    <script src="<%= htmlWebpackPlugin.options.devServer%>/webpack-dev-server.js"></script>
+    <% } %>
+
+</body>
+
+</html>

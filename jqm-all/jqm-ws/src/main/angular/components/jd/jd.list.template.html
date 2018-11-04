@@ -1,0 +1,39 @@
+<jqm-jd-prms-dialog jd="$ctrl.selected[0]" show="showPrm"></jqm-jd-prms-dialog>
+<jqm-jd-cron-dialog ng-model="$ctrl.selected[0]" show="showCron"></jqm-jd-cron-dialog>
+<jqm-help-block content="$ctrl.helpcontent"></jqm-help-block>
+<input type="text" ng-model="$ctrl.filterValue" ng-change="$ctrl.gridApi.grid.refresh()" class="filterArea" />
+
+
+<div class="ui-grid-reactive-container">
+    <div ui-grid='$ctrl.gridOptions' ui-grid-edit ui-grid-selection ui-grid-cellNav ui-grid-resize-columns
+        ui-grid-auto-resize></div>
+</div>
+
+<button class="btn btn-outline-dark" ng-click="$ctrl.newitem()" jqm-permission="jd:create">
+    <span class="fas fa-plus-circle"></span>
+    New definition
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.remove()" ng-disabled="$ctrl.selected.length === 0" jqm-permission="jd:delete">
+    <span class="far fa-trash-alt"></span>
+    Delete selected
+</button>
+<button class="btn btn-outline-dark" ng-click="showPrm = true" ng-disabled="$ctrl.selected.length !== 1">
+    <span class="fas fa-sliders-h"></span>
+    Default parameters
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.clo()" ng-disabled="true">
+    <span class="fas fa-layer-group"></span>
+    Class loader options
+</button>
+<button class="btn btn-outline-dark" ng-click="showCron=true" ng-disabled="$ctrl.selected.length !== 1">
+    <span class="far fa-clock"></span>
+    Cron scheduling
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.refresh()">
+    <span class="fas fa-sync-alt"></span>
+    Refresh
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.save()" jqm-permission="jd:create">
+    <span class="far fa-save"></span>
+    Save all definitions
+</button>

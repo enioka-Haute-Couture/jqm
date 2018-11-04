@@ -1,0 +1,25 @@
+<jqm-help-block content="$ctrl.helpcontent"></jqm-help-block>
+
+<div class="ui-grid-reactive-container">
+    <div ui-grid='$ctrl.gridOptions' ui-grid-edit ui-grid-selection ui-grid-cellNav ui-grid-resize-columns
+        ui-grid-auto-resize></div>
+</div>
+
+<button class="btn btn-outline-dark" ng-click="$ctrl.newmapping()" ng-disabled="$ctrl.bDbBusy" jqm-permission="qmapping:create">
+    <span class="fas fa-plus-circle"></span>
+    New mapping
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.save()" ng-disabled="$ctrl.bDbBusy" jqm-permission="qmapping:create"
+    ng-hide="error">
+    <span class="far fa-save"></span>
+    Save mappings
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.refresh()" ng-disabled="$ctrl.bDbBusy" jqm-permission="qmapping:read">
+    <span class="fas fa-sync-alt"></span>
+    Refresh
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.remove()" ng-disabled="$ctrl.bDbBusy || $ctrl.selected.length === 0"
+    jqm-permission="qmapping:delete">
+    <span class="far fa-trash-alt"></span>
+    Delete selected
+</button>

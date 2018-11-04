@@ -125,6 +125,10 @@ public class JdbcRealm extends AuthorizingRealm
                     res.addStringPermission(p.getName());
                 }
             }
+            if (!user.getInternal())
+            {
+                res.addRole("human");
+            }
             return res;
         }
         catch (NoResultException e)

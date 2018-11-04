@@ -1,0 +1,167 @@
+<div>
+    <jqm-modal show="$ctrl.show">
+        <div class="row">
+            <!--First column-->
+            <div class="col-sm-4">
+                <table class='table table-sm table-striped table-hover'>
+                    <caption><strong>Identification</strong></caption>
+                    <tr>
+                        <th>ID</th>
+                        <th>{{$ctrl.ji.id}}</th>
+                    </tr>
+                    <tr>
+                        <td>Parent job</td>
+                        <td>{{$ctrl.ji.parent}}</td>
+                    </tr>
+                    <tr>
+                        <td>Application</td>
+                        <td>{{$ctrl.ji.applicationName}}</td>
+                    </tr>
+                    <tr>
+                        <td>Session ID</td>
+                        <td>{{$ctrl.ji.sessionID}}</td>
+                    </tr>
+                    <tr>
+                        <td>From schedule</td>
+                        <td>{{$ctrl.ji.fromSchedule}}</td>
+                    </tr>
+                </table>
+
+                <table class='table table-sm table-striped table-hover'>
+                    <caption><strong>Parameters</strong></caption>
+                    <tr>
+                        <th>Name</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr ng-repeat="p in $ctrl.ji.parameters  | orderBy:'key'">
+                        <td>{{p.key}}</td>
+                        <td class="history-detail-td">{{p.value}}</td>
+                    </tr>
+                </table>
+
+                <table class='table table-sm table-striped table-hover' ng-hide="$ctrl.ji.state === 'CANCELLED'">
+                    <caption><strong>Log files</strong></caption>
+                    <tr>
+                        <td>
+                            Log stdout: <a ng-click='showReaderOut=true' href="">view</a>
+                            -
+                            <a href='{{ "./ws/client/ji/" + $ctrl.ji.id + "/stdout"}}'>download</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Log stderr: <a ng-click='showReaderErr=true' href="">view</a>
+                            -
+                            <a href='{{ "./ws/client/ji/" + $ctrl.ji.id + "/stderr"}}'>download</a>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+
+            <!--Second column-->
+            <div class="col-sm-4">
+                <table class='table table-sm table-striped table-hover'>
+                    <caption><strong>Queue</strong></caption>
+                    <tr>
+                        <td>Name</td>
+                        <td>{{$ctrl.ji.queueName}}</td>
+                    </tr>
+                    <tr>
+                        <td>Position</td>
+                        <td>{{$ctrl.ji.position}}</td>
+                    </tr>
+                    <tr>
+                        <td>Affected to server</td>
+                        <td>{{$ctrl.ji.nodeName}}</td>
+                    </tr>
+                    <tr>
+                        <td>Priority</td>
+                        <td>{{$ctrl.ji.priority}}</td>
+                    </tr>
+                </table>
+
+                <table class='table table-sm table-striped table-hover'>
+                    <caption><strong>User messages</strong></caption>
+                    <tr ng-repeat="m in $ctrl.ji.messages">
+                        <td>{{m}}</td>
+                    </tr>
+                </table>
+
+                <table class='table table-sm table-striped table-hover'>
+                    <caption><strong>Files created</strong></caption>
+                    <tr ng-repeat="d in dels">
+                        <td>ID</td>
+                        <td>{{d.id}}</td>
+                        <td><a href="{{'./ws/client/ji/files/' + d.id}}">{{d.fileFamily}}</a></td>
+                </table>
+            </div>
+
+            <!--Third column-->
+            <div class="col-sm-4">
+
+                <table class='table table-sm table-striped table-hover'>
+                    <caption><strong>Progress</strong></caption>
+                    <tr>
+                        <td>Status</td>
+                        <td>{{$ctrl.ji.state}}</td>
+                    </tr>
+                    <tr>
+                        <td>Progress%</td>
+                        <td>{{$ctrl.ji.progress}}</td>
+                    </tr>
+                    <tr>
+                        <td>Enqueue time</td>
+                        <td>{{$ctrl.ji.enqueueDate | date : "dd/MM HH:mm:ss"}}</td>
+                    </tr>
+                    <tr>
+                        <td>Start time</td>
+                        <td>{{$ctrl.ji.beganRunningDate | date : "dd/MM HH:mm:ss"}}</td>
+                    </tr>
+                    <tr>
+                        <td>End time</td>
+                        <td>{{$ctrl.ji.endDate | date : "dd/MM HH:mm:ss"}}</td>
+                    </tr>
+                </table>
+
+                <table class='table table-sm table-striped table-hover'>
+                    <caption><strong>Optional flags</strong></caption>
+                    <tr>
+                        <td>Software</td>
+                        <td>{{$ctrl.ji.application}}
+            </div>
+        </div>
+        <div class='row'>
+            <tr>
+                <td>Keyword 1</td>
+                <td>{{$ctrl.ji.keyword1}}</td>
+            </tr>
+            <tr>
+                <td>Keyword 2</td>
+                <td>{{$ctrl.ji.keyword2}}</td>
+            </tr>
+            <tr>
+                <td>Keyword 3</td>
+                <td>{{$ctrl.ji.keyword3}}</td>
+            </tr>
+            <tr>
+                <td>Module</td>
+                <td>{{$ctrl.ji.module}}</td>
+            </tr>
+            <tr>
+                <td>User</td>
+                <td>{{$ctrl.ji.user}}</td>
+            </tr>
+            <tr>
+                <td>User e-mail</td>
+                <td>{{$ctrl.ji.email}}</td>
+            </tr>
+            </table>
+
+        </div>
+
+    </jqm-modal>
+
+    <jqm-file-reader show="showReaderOut" href="'./ws/client/ji/' + $ctrl.ji.id + '/stdout'"></jqm-file-reader>
+    <jqm-file-reader show="showReaderErr" href="'./ws/client/ji/' + $ctrl.ji.id + '/stderr'"></jqm-file-reader>
+</div>

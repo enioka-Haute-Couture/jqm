@@ -1,0 +1,101 @@
+@charset "UTF-8";
+
+html,body {
+    height: 100%;
+    font-size: 14px; /* define the REM */
+    margin: 0px;
+    padding: 0px;
+}
+
+.fullheight {
+    height: 100%;
+}
+
+/* Sigh */
+.container-fluid{
+    overflow: hidden;
+}
+
+a {
+    color:   rgb(51, 122, 183);
+}
+
+/* Full page container */
+#jqmApp {
+    height: 100%;
+}
+
+/* View container (i.e. page without the tabs) */
+#appMain {
+    height: calc(100% - 2em);
+    width: 100%;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+/* Tabs are links, so show the adequate cursor */
+.nav,.pagination,.carousel,.panel-title a {
+	cursor: pointer;
+}
+
+.form-horizontal .control-group,.form-horizontal .form-group {
+	margin-bottom: 1px;
+}
+
+/* Forms */
+.col-form-label {
+	font-weight: bold;
+}
+
+.filterArea {
+    position:absolute;
+    right: 5px;
+    top: 37px;
+}
+
+/* Prevent some browser (like firefox) to add a red border on required input */
+[required] {
+    box-shadow: none;
+}
+
+/* Enlarge modal width */
+.modal-dialog {
+    max-width: 1200px;
+}
+
+.modal-sm {
+    max-width: 20%;
+}
+
+.modal-lg {
+    max-width: 80%;
+}
+
+/* UIGrid styling */
+.ui-grid-header-cell {
+	background-color: rgb(240, 240, 238);
+}
+
+.history-detail-td {
+    word-break: break-all;
+}
+
+div.ui-grid-reactive-container {
+    height: calc(100% - 9em);
+    margin-bottom: 1em;
+}
+
+.ui-grid-reactive-container > div.ui-grid {
+    height: 100%;
+    width: calc(100%-4px);
+}
+
+/* Menu styling */
+div.dropdown-item {
+	cursor: pointer;
+}
+
+/* For history detail modal */
+table > caption {
+	caption-side: top;
+}

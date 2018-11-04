@@ -1,0 +1,12 @@
+<ul class="nav nav-tabs">
+    <li ng-repeat="tab in $ctrl.tabs" class="nav-item" jqm-permission="{{tab.permission}}">
+        <a href="{{tab.link}}" ng-click="$ctrl.setSelectedTab(tab)" class="{{$ctrl.tabClass(tab)}}">
+            <span class="{{tab.icon}}"></span>
+            {{tab.label}}
+        </a>
+    </li>
+
+    <li style="right: 5px; vertical-align: center; position: absolute; height: 42px; font-style: italic; font-weight: bolder;"
+        busy="Busy...">
+    </li>
+</ul>

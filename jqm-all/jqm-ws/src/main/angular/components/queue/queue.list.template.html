@@ -1,0 +1,24 @@
+<jqm-help-block content="$ctrl.helpcontent"></jqm-help-block>
+<input type="text" ng-model="$ctrl.filterValue" ng-change="$ctrl.gridApi.grid.refresh()" class="filterArea" />
+
+<div class="ui-grid-reactive-container">
+    <div ui-grid='$ctrl.gridOptions' ui-grid-edit ui-grid-selection ui-grid-cellNav ui-grid-resize-columns
+        ui-grid-auto-resize></div>
+</div>
+
+<button class="btn btn-outline-dark" ng-click="$ctrl.newqueue()" jqm-permission="prm:create">
+    <span class="fas fa-plus-circle"></span>
+    New Queue
+</button>
+<button class=" btn btn-outline-dark" ng-click="$ctrl.save()" jqm-permission="prm:create">
+    <span class="far fa-save"></span>
+    Save queues
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.refresh()" jqm-permission="prm:read">
+    <span class="fas fa-sync-alt"></span>
+    Refresh
+</button>
+<button class="btn btn-outline-dark" ng-click="$ctrl.remove()" ng-disabled="$ctrl.selected.length === 0" jqm-permission="prm:delete">
+    <span class="far fa-trash-alt"></span>
+    Delete selected
+</button>

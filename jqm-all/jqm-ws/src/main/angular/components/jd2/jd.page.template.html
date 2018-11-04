@@ -1,0 +1,39 @@
+<div class="row" style="max-height: calc(100% - 4em);">
+    <div class="col-md-2">
+        <input ng-model=" queryStr" type="text" placeholder="filter definitions..." />
+
+        <select class="form-control" style="overflow: auto; height: calc(100% - 4em);" ng-model="$ctrl.selected_jd"
+            size="25" ng-options="o as o.applicationName for o in $ctrl.jds | filter: {applicationName: queryStr}  | orderBy: 'applicationName'">
+        </select>
+
+        <div class="btn-group" role="group">
+            <button id="btnNew" type="button" class="btn btn-outline-dark dropdown-toggle" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+                <span class="fas fa-plus-circle"></span>
+                New
+            </button>
+            <div class="dropdown-menu" aria-labelledby="btnNew">
+                <div class="dropdown-item" ng-click="$ctrl.newitem('FS')">Java job</div>
+                <div class="dropdown-item" ng-click="$ctrl.newitem('DEFAULTSHELLCOMMAND')">Shell job</div>
+                <div class="dropdown-item" ng-click="$ctrl.newitem('DIRECTEXECUTABLE')">Process job</div>
+            </div>
+        </div>
+        <button class="btn btn-outline-dark" ng-click="$ctrl.refresh()">
+            <span class="fas fa-sync-alt"></span>
+            Refresh
+        </button>
+        <button class="btn btn-outline-dark" ng-click="$ctrl.save()" jqm-permission="jd:create">
+            <span class="far fa-save"></span>
+            Save all
+        </button>
+        <button class="btn btn-outline-dark" ng-click="$ctrl.remove()" ng-enabled="$ctrl.selected_jd" jqm-permission="jd:delete">
+            <span class="far fa-trash-alt"></span>
+            Delete selected
+        </button>
+
+    </div>
+
+    <div class="col-md-10" style="overflow-y: auto;">
+        <jqm-jd-details jd="$ctrl.selected_jd"></jqm-jd-details>
+    </div>
+</div>

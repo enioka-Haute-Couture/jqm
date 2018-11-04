@@ -852,6 +852,7 @@ public class ServiceAdmin
     public PemissionsBagDto getMyself(@Context HttpServletRequest req)
     {
         List<String> res = new ArrayList<String>();
+        PemissionsBagDto b = new PemissionsBagDto();
 
         DbConn cnx = null;
         try
@@ -861,11 +862,13 @@ public class ServiceAdmin
             if (auth.equals("false"))
             {
                 res.add("*:*");
+                b.enforced = false;
             }
             else
             {
                 RUser memyselfandi = RUser.selectlogin(cnx, req.getUserPrincipal().getName());
-
+                b.enforced = true;
+                b.login = memyselfandi.getLogin();
                 for (RRole r : memyselfandi.getRoles(cnx))
                 {
                     for (RPermission p : r.getPermissions(cnx))
@@ -880,7 +883,6 @@ public class ServiceAdmin
             Helpers.closeQuietly(cnx);
         }
 
-        PemissionsBagDto b = new PemissionsBagDto();
         b.permissions = res;
         return b;
     }
@@ -917,8 +919,7 @@ public class ServiceAdmin
     public InputStream getNodeLog(@PathParam("nodeName") String nodeName, @QueryParam("latest") int latest,
             @Context HttpServletResponse res)
     {
-        SelfDestructFileStream fs = (SelfDestructFileStream) ((JdbcClient) JqmClientFactory.getClient()).getEngineLog(nodeName,
-                latest);
+        SelfDestructFileStream fs = (SelfDestructFileStream) ((JdbcClient) JqmClientFactory.getClient()).getEngineLog(nodeName, latest);
         res.setHeader("Content-Disposition", "attachment; filename=" + nodeName + ".log");
         return fs;
     }

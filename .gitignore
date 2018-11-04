@@ -28,3 +28,8 @@ serious/JobBaseAPI/nullnull
 **/conf/*.cer
 **/conf/*.pfx
 **/conf/*.jks
+**/node_modules/
+**/package-lock.json
+.tern-project
+/jqm-all/jqm-ws/src/main/webapp/dist/**
+/jqm-all/jqm-ws/src/main/webapp/index.html
