@@ -2,8 +2,10 @@
 
 import template from './jd.cron.template.html';
 
-class jdCronDiagController {
-    $onChanges() {
+class jdCronDiagController
+{
+    $onChanges()
+    {
         this.selectedJd = this.ngModel;
         this.data['jd'] = this.selectedJd;
 
@@ -11,9 +13,11 @@ class jdCronDiagController {
         this.selectedSchedulePrm.length = 0;
     }
 
-    constructor($interval) {
+    constructor($interval, µQueueDto)
+    {
         this.selectedSchedule = [];
         this.selectedSchedulePrm = [];
+        this.queues = µQueueDto.query();
 
         this.$interval = $interval;
 
@@ -43,14 +47,18 @@ class jdCronDiagController {
             virtualizationThreshold: 20,
             enableHorizontalScrollbar: 0,
 
-            onRegisterApi: function (gridApi) {
+            onRegisterApi: function (gridApi)
+            {
                 $ctrl.gridApiCron = gridApi;
-                gridApi.selection.on.rowSelectionChanged(null, function (rows) {
+                gridApi.selection.on.rowSelectionChanged(null, function (rows)
+                {
                     $ctrl.selectedSchedule = gridApi.selection.getSelectedRows();
                 });
 
-                gridApi.cellNav.on.navigate(null, function (newRowCol, oldRowCol) {
-                    if (newRowCol !== oldRowCol) {
+                gridApi.cellNav.on.navigate(null, function (newRowCol, oldRowCol)
+                {
+                    if (newRowCol !== oldRowCol)
+                    {
                         gridApi.selection.selectRow(newRowCol.row.entity);
                     }
                 });
@@ -89,14 +97,18 @@ class jdCronDiagController {
             virtualizationThreshold: 20,
             enableHorizontalScrollbar: 0,
 
-            onRegisterApi: function (gridApi) {
+            onRegisterApi: function (gridApi)
+            {
                 $ctrl.gridApiCronPrm = gridApi;
-                gridApi.selection.on.rowSelectionChanged(null, function (rows) {
+                gridApi.selection.on.rowSelectionChanged(null, function (rows)
+                {
                     $ctrl.selectedSchedulePrm = gridApi.selection.getSelectedRows();
                 });
 
-                gridApi.cellNav.on.navigate(null, function (newRowCol, oldRowCol) {
-                    if (newRowCol !== oldRowCol) {
+                gridApi.cellNav.on.navigate(null, function (newRowCol, oldRowCol)
+                {
+                    if (newRowCol !== oldRowCol)
+                    {
                         gridApi.selection.selectRow(newRowCol.row.entity);
                     }
                 });
@@ -117,7 +129,8 @@ class jdCronDiagController {
         };
     }
 
-    newcron() {
+    newcron()
+    {
         var t = {
             id: null,
             cronExpression: "* * * * *",
@@ -127,21 +140,25 @@ class jdCronDiagController {
         this.selectedJd.schedules.push(t);
         this.gridApiCron.selection.selectRow(t);
         var $ctrl = this;
-        this.$interval(function () {
+        this.$interval(function ()
+        {
             $ctrl.gridApiCron.cellNav.scrollToFocus(t, $ctrl.gridOptionsCron.columnDefs[0]);
         }, 0, 1);
     };
 
-    removecron() {
+    removecron()
+    {
         var q = null;
-        for (var i = 0; i < this.selectedSchedule.length; i++) {
+        for (var i = 0; i < this.selectedSchedule.length; i++)
+        {
             q = this.selectedSchedule[i];
             this.selectedJd.schedules.splice(this.selectedJd.schedules.indexOf(q), 1);
         }
         this.selectedSchedule.length = 0;
     };
 
-    newcronprm() {
+    newcronprm()
+    {
         var t = {
             key: "key",
             value: "value",
@@ -149,21 +166,24 @@ class jdCronDiagController {
         this.selectedSchedule[0].parameters.push(t);
         this.gridApiCronPrm.selection.selectRow(t);
         var $ctrl = this;
-        this.$interval(function () {
+        this.$interval(function ()
+        {
             $ctrl.gridApiCronPrm.cellNav.scrollToFocus(t, $ctrl.gridOptionsCron.columnDefs[0]);
         }, 0, 1);
     };
 
-    removecronprm() {
+    removecronprm()
+    {
         var q = null;
-        for (var i = 0; i < this.selectedSchedulePrm.length; i++) {
+        for (var i = 0; i < this.selectedSchedulePrm.length; i++)
+        {
             q = this.selectedSchedulePrm[i];
             this.selectedSchedule[0].parameters.splice(this.selectedSchedule[0].parameters.indexOf(q), 1);
         }
         this.selectedSchedulePrm.length = 0;
     };
 };
-jdCronDiagController.$inject = ['$interval',];
+jdCronDiagController.$inject = ['$interval', 'µQueueDto',];
 
 export const jdCronDiagComponent = {
     controller: jdCronDiagController,
@@ -171,6 +191,5 @@ export const jdCronDiagComponent = {
     bindings: {
         'ngModel': '<',
         'show': '=',
-        'queues': '<',
     }
 };
