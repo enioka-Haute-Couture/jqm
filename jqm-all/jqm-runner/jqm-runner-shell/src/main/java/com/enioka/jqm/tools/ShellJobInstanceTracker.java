@@ -84,6 +84,7 @@ class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTra
 
         // Ready launch
         ProcessBuilder pb = new ProcessBuilder(args);
+        pb.directory(new File(this.ji.getNode().getRepo()));
         pb.redirectErrorStream(false);
 
         // Environment variables
