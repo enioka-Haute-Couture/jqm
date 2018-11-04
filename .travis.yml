@@ -19,4 +19,3 @@ env:
 branches:
   except:
   - controller
-  - guicompo
