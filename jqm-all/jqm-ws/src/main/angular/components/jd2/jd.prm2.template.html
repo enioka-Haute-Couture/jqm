@@ -1,0 +1,37 @@
+<div class="card-header">
+    Parameters
+</div>
+
+<div class="card-body">
+    <div class="form-group row">
+        <label for="existingPrms" class="col-sm-5 col-form-label">Parameters</label>
+        <div class="col-sm-7" id='existingPrms'>
+            <div ng-repeat="p in $ctrl.jd.parameters | orderBy:'key'" class="row">
+                <div class="col-sm-5">{{p.key}}</div>
+                <div class="col-sm-5">{{p.value}}</div>
+                <a class="col-sm-2" href="" ng-click="$ctrl.delPrm(p)"><span style="color: red;" class="far fa-trash-alt"></span></a>
+
+            </div>
+            <small ng-if="$ctrl.jd.parameters.length > 1" class="form-text text-muted">Order in this list is not
+                significant.</small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="txtUser" class="col-sm-5 col-form-label">Add a parameter</label>
+        <div class="col-sm-7">
+            <div class="row">
+                <div class="col-sm-5">
+                    <input id="txtKey" class="form-control" type="text" ng-model="$ctrl.data.newKey" placeholder="key" />
+                </div>
+                <div class="col-sm-5">
+                    <input id="txtValue" class="form-control" type="text" ng-model="$ctrl.data.newValue" placeholder="value" />
+                </div>
+                <div class="col-sm-2">
+                    <button class="btn btn-outline-success btn-sm" ng-click="$ctrl.addPrm()">Add</button>
+                </div>
+            </div>
+            <small class="form-text text-muted">Enter an additional key/value pair above and press "Add"</small>
+        </div>
+    </div>
+</div>

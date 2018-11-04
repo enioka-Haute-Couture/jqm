@@ -28,7 +28,7 @@ jqmApp.config(['$routeProvider', '$locationProvider', function ($routeProvider, 
     }).when('/prm', {
         template: '<jqm-prms></jqm-prms>'
     }).when('/jd', {
-        template: '<jqm-jds></jqm-jds>'
+        template: '<jqm-jds2></jqm-jds2>'
     }).when('/user', {
         template: '<jqm-users></jqm-users>'
     }).when('/role', {

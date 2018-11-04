@@ -13,6 +13,13 @@ import { prmListComponent } from './prm/prm.list.component';
 import { jdListComponent } from './jd/jd.list.component';
 import { jdPrmsDiagComponent } from './jd/jd.prm.component';
 import { jdCronDiagComponent } from './jd/jd.cron.component';
+import { jdPageComponent } from './jd2/jd.page.component';
+import { jdCommonComponent } from './jd2/jd.common.component';
+import { jdProcessComponent } from './jd2/jd.process.component';
+import { jdPrms2Component } from './jd2/jd.prm2.component';
+import { jdJavaComponent } from './jd2/jd.java.component';
+import { jdShellComponent } from './jd2/jd.shell.component';
+import { jdDetailComponent } from './jd2/jd.detail.component';
 import { userEditPanelComponent } from './user/user.editpanel.component';
 import { userPageComponent } from './user/user.page.component';
 import { rolePageComponent } from './role/role.page.component';
@@ -44,6 +51,13 @@ var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule
     .component('jqmJds', jdListComponent)
     .component('jqmJdPrmsDialog', jdPrmsDiagComponent)
     .component('jqmJdCronDialog', jdCronDiagComponent)
+    .component('jqmJds2', jdPageComponent)
+    .component('jqmJdCommon', jdCommonComponent)
+    .component('jqmJdProcess', jdProcessComponent)
+    .component('jqmJdJava', jdJavaComponent)
+    .component('jqmJdShell', jdShellComponent)
+    .component('jqmJdDetails', jdDetailComponent)
+    .component('jqmJdPrms2', jdPrms2Component)
     .component('jqmUserEdit', userEditPanelComponent)
     .component('jqmUsers', userPageComponent)
     .component('jqmRoles', rolePageComponent)

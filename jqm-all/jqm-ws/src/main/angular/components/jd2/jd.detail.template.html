@@ -1,0 +1,7 @@
+<jqm-jd-common jd="$ctrl.jd"></jqm-jd-common>
+
+<jqm-jd-process jd="$ctrl.jd" ng-if="$ctrl.jd.pathType === 'DIRECTEXECUTABLE'"></jqm-jd-process>
+
+<jqm-jd-shell jd="$ctrl.jd" ng-if="$ctrl.jd.pathType === 'DEFAULTSHELLCOMMAND' || $ctrl.jd.pathType === 'POWERSHELLCOMMAND'"></jqm-jd-shell>
+
+<jqm-jd-java jd="$ctrl.jd" ng-if="$ctrl.jd.pathType === 'FS' || $ctrl.jd.pathType === 'MAVEN' || $ctrl.jd.pathType === 'MEMORY'"></jqm-jd-java>
