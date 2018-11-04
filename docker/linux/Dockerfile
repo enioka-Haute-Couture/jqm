@@ -1,4 +1,4 @@
-FROM maven:3-jdk-8-alpine as installer
+FROM maven:3-jdk-8 as installer
 
 ARG MVN_SETTINGS=" "
 ARG SKIP_TESTS=true
