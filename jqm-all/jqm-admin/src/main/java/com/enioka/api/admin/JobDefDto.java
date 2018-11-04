@@ -48,6 +48,7 @@ public class JobDefDto implements Serializable
     private String keyword3;
     private boolean highlander, enabled;
     private String jarPath;
+    private String pathType;
     private Integer reasonableRuntimeLimitMinute;
     private Integer classLoaderId;
 
@@ -185,6 +186,16 @@ public class JobDefDto implements Serializable
     public void setJarPath(String jarPath)
     {
         this.jarPath = jarPath;
+    }
+
+    public String getPathType()
+    {
+        return pathType;
+    }
+
+    public void setPathType(String pathType)
+    {
+        this.pathType = pathType;
     }
 
     public Map<String, String> getParameters()

@@ -67,11 +67,11 @@ public class MetaService
     /**
      * Empty the database. <br>
      * No commit performed.
-     * 
+     *
      * @param cnx
-     *            database session to use. Not committed.
+     *                  database session to use. Not committed.
      * @param force
-     *            set to true if you want to delete metadata even if there is still transactional data depending on it.
+     *                  set to true if you want to delete metadata even if there is still transactional data depending on it.
      */
     public static void deleteAllMeta(DbConn cnx, boolean force)
     {
@@ -100,7 +100,7 @@ public class MetaService
      * This method is an exception - it does not deal with metadata but transactional data. It is included here to allow easier purge of
      * metadata.<br>
      * No commit performed.
-     * 
+     *
      * @param cnx
      */
     public static void deleteAllTransac(DbConn cnx)
@@ -244,7 +244,7 @@ public class MetaService
      * <br>
      * This method only updates (and sets the timestamp for last update) if there are actual modifications done. Modifications are detected
      * by value comparison on all fields (except the ID, but including parameters).
-     * 
+     *
      * @param cnx
      * @param dto
      */
@@ -457,6 +457,7 @@ public class MetaService
             // tmp. = rs.getBoolean(7 + colShift); // TODO: external exposure?
             tmp.setHighlander(rs.getBoolean(8 + colShift));
             tmp.setJarPath(rs.getString(9 + colShift));
+            tmp.setPathType(rs.getString(17 + colShift));
             tmp.setJavaClassName(rs.getString(10 + colShift));
             // tmp.javaOpts = rs.getString(11 + colShift);
             tmp.setKeyword1(rs.getString(12 + colShift));
@@ -601,8 +602,8 @@ public class MetaService
             // Job: do it in a brutal way (no date to update here).
             cnx.runUpdate("jd_update_all_fields_by_id", dto.getApplication(), dto.getApplicationName(), dto.getDescription(),
                     dto.isEnabled(), false, dto.isHighlander(), dto.getJarPath(), dto.getJavaClassName(), null, dto.getKeyword1(),
-                    dto.getKeyword2(), dto.getKeyword3(), dto.getReasonableRuntimeLimitMinute(), dto.getModule(), PathType.FS,
-                    dto.getClassLoaderId(), dto.getQueueId(), dto.getId());
+                    dto.getKeyword2(), dto.getKeyword3(), dto.getReasonableRuntimeLimitMinute(), dto.getModule(),
+                    PathType.valueOf(dto.getPathType()), dto.getClassLoaderId(), dto.getQueueId(), dto.getId());
 
             // Parameter sync is trivial for now: delete and recreate.
             cnx.runUpdate("jdprm_delete_all_for_jd", dto.getId());
@@ -690,7 +691,7 @@ public class MetaService
             int i = JobDef.create(cnx, dto.getDescription(), dto.getJavaClassName(), dto.getParameters(), dto.getJarPath(),
                     dto.getQueueId(), dto.getReasonableRuntimeLimitMinute(), dto.getApplicationName(), dto.getApplication(),
                     dto.getModule(), dto.getKeyword1(), dto.getKeyword2(), dto.getKeyword3(), dto.isHighlander(), dto.getClassLoaderId(),
-                    PathType.FS);
+                    PathType.valueOf(dto.getPathType()));
 
             // Sync the schedules too.
             for (com.enioka.api.admin.ScheduledJob sjdto : dto.getSchedules())
