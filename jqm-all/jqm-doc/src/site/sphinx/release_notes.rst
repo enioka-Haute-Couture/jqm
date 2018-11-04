@@ -1,6 +1,48 @@
 Release notes
 ######################
 
+2.2.0
+*************
+
+Release goal
+++++++++++++++++
+
+This release aimed at making it easier to launch non-Java jobs. Launching external processes (shell commands, binaries...) was always supported through the use of a special payload... which was never included
+in the public distribution, and existed in many versions with different possibilities. The sum of all their functionalities, documentation and admin UI were added to the JQM engine itself, making processes first class
+job definitions, on equal footing with Java.
+
+Also of note, the admin UI was fully refactored using es6 and recent library versions. All functionalities and appearance should be the same as before - this move is mostly to prepare for the demise of
+a framework which has overstayed its welcome. However, a few tweaks and fixes were included alongside the refactor and should make administrators' lives easier.
+
+It is a simple upgrade with no breaking change.
+
+Major changes
+++++++++++++++++++++++++++++
+
+* Engine: added process runner, making process and shell jobs first class citizen.
+* Build: migrated the UI build to modern npm toolchain (controled by Maven). This allows slightly better startup JS performances, and removes all stale cache issues when upgrading.
+* GUI: rewritten the job definition page to use a master/detail view, as the previous tabular view was becoming impractical with too many columns.
+* GUI: better login & logout experience.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* GUI: updated all libraries and refactored javascript code using a component pattern in nearly pure ES6, in preparation for AngularJS removal from JQM.
+* GUI: now uses sessions. This enables visibly better performances when security is enabled. Web services are untouched and still use either a certificate or a basic HTTP password in a purely stateless way.
+* GUI: Our longest standing bug has been squashed! It is now possible to scroll horizontally while viewing a log.
+* GUI: added the possibility to view node log files, not only job instance log files.
+* GUI: slightly tweaked appearance (new icons, fonts… but nothing major).
+
+Deprecated
++++++++++++++++
+
+No new entries - same list as for 2.0.x.
+
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
+* JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs).
+* Java 6 & 7, which are no longer supported, are considered deprecated in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
+
+
 2.1.0
 *************
 
@@ -14,7 +56,7 @@ It is a simple upgrade with no breaking change.
 Major changes
 ++++++++++++++++++++++++++++
 
-* Docker compatibility. Official images (Linux Alpine & Windows Nano) are released on the Docker Hub at https://hub.docker.com/r/enioka/jqm/ and are usable for many development and production scenarios. 
+* Docker compatibility. Official images (Linux Alpine & Windows Nano) are released on the Docker Hub at https://hub.docker.com/r/enioka/jqm/ and are usable for many development and production scenarios.
   Read the documentation on the Docker Hub for more details - this is the pièce de résistance of the release.
 * Java 9 and 10 compatibility. Note that Java 6 & 7 are still supported, but also still deprecated and will be removed in the next version.
   * Note that using the WS client will require to change the Jersey dependencies to newer one on Java 9+, as the older Java 6 compatible libraries used by default are not compatible with 9+.
@@ -134,7 +176,7 @@ Many other features are also included, see details below.
 Upgrade notes
 +++++++++++++++++++
 
-All API changes are backward compatible: 1.3.x APIs will work with 1.4.1 engines. 
+All API changes are backward compatible: 1.3.x APIs will work with 1.4.1 engines.
 However, everyone is strongly encouraged to upgrade to the latest version.
 
 There are database structure modifications in this release, so the standard upgrade path must be used (with database drop).
@@ -177,7 +219,7 @@ Maintenance release with a few optimizations concerning the client API.
 Upgrade notes
 +++++++++++++++++++
 
-All API changes are backward compatible: 1.2.x and 1.3.x APIs will work with 1.3.6 engines. 
+All API changes are backward compatible: 1.2.x and 1.3.x APIs will work with 1.3.6 engines.
 However, everyone is strongly encouraged to upgrade to the latest version.
 
 No database modification in this release - upgrade can be done by simply replacing engine files.
@@ -209,7 +251,7 @@ Maintenance release for the integration scripts (jqm.sh and jqm.ps1).
 Upgrade notes
 +++++++++++++++++++
 
-No API change (APIs version 1.3.5 are the same as version 1.3.3). 1.2.x and 1.3.x APIs will work with 1.3.4 engines. 
+No API change (APIs version 1.3.5 are the same as version 1.3.3). 1.2.x and 1.3.x APIs will work with 1.3.4 engines.
 However, everyone is strongly encouraged to upgrade to the latest version.
 
 No database modification in this release - upgrade can be done by simply replacing engine files.
@@ -356,7 +398,7 @@ Minor
 Release goal
 ++++++++++++++++++
 
-This is a maintenance release, containing mostly bugfixes and very few new features that could not be included in the previous 
+This is a maintenance release, containing mostly bugfixes and very few new features that could not be included in the previous
 version (mostly administration GUI tweaks).
 
 Upgrade notes
@@ -439,7 +481,7 @@ A very few developer features slipped inside the release.
 Upgrade notes
 +++++++++++++++++++
 
-No breaking changes. 
+No breaking changes.
 
 Compatibility matrix:
 
@@ -453,7 +495,7 @@ Compatibility matrix:
 | Engine API                    | >= 1.1.5 |            |            |
 +-------------------------------+----------+------------+------------+
 
-How to read the compatibility matrix: each line corresponds to one JQM element in version 1.1.6. 
+How to read the compatibility matrix: each line corresponds to one JQM element in version 1.1.6.
 The different versions given correspond to the minimal version of other components for version 1.1.6 to work.
 A void cell means there is no constraint between these components.
 
@@ -491,12 +533,12 @@ Minor
 Release goal
 ++++++++++++++++++
 
-Bugfix release. 
+Bugfix release.
 
 Upgrade notes
 +++++++++++++++++++
 
-No breaking changes. 
+No breaking changes.
 
 Major
 ++++++++++++
@@ -524,7 +566,7 @@ Upgrade notes
 Many breaking changes in this release in all components. Upgrade of engine, upgrade of all libraries are required plus rebuild of database. *There
 is no compatibiliy whatsoever between version 1.1.4 of the libraries and previous versions of the engine and database.*
 
-Please read the rest of the release notes and check the updated documentation at https://github.com/enioka/jqm/blob/master/doc/index.md 
+Please read the rest of the release notes and check the updated documentation at https://github.com/enioka/jqm/blob/master/doc/index.md
 
 Major
 ++++++++++++++++++
@@ -542,7 +584,7 @@ Major
 * Engine: can now run as a service in Windows.
 * Engine: - **breaking** - the engine command line, which was purely a debug feature up to now, is officialized and was made usable and documented.
 * Engine API: now offers a File resource through the JNDI API
-* Engine API: payloads no longer need to use the client or engine API. A simple static main is enough, or implementing Runnable. 
+* Engine API: payloads no longer need to use the client or engine API. A simple static main is enough, or implementing Runnable.
   Access to the API is done through injection with a provided interface.
 * Engine API: added a method to provide a temporary work directory
 
