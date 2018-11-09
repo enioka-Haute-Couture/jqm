@@ -40,7 +40,8 @@ public class QueueTest extends JqmBaseTest
         addAndStartEngine();
 
         // Scenario is: 5 jobs in queue. 3 should run. 2 are then killed - 3 should still run.
-        Thread.sleep(3000);
+        TestHelpers.waitForRunning(3, 10000, cnx);
+        Thread.sleep(3000); // Additional wait time to ensure no additional starts
 
         jqmlogger.debug("COUNT RUNNING " + cnx.runSelectSingle("ji_select_count_running", Integer.class));
         jqmlogger.debug("COUNT ALL     " + cnx.runSelectSingle("ji_select_count_all", Integer.class));

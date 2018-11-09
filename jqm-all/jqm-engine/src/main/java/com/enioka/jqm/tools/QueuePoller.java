@@ -19,6 +19,7 @@
 package com.enioka.jqm.tools;
 
 import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -36,9 +37,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
+import com.enioka.jqm.model.ResourceManager;
+import com.enioka.jqm.model.State;
 
 /**
  * A thread that polls a queue according to the parameters defined inside a {@link DeploymentParameter}.
@@ -58,6 +62,9 @@ class QueuePoller implements Runnable, QueuePollerMBean
     private boolean hasStopped = true;
     private Calendar lastLoop = null;
     private Map<Integer, Date> peremption = new ConcurrentHashMap<Integer, Date>();
+
+    private List<ResourceManagerBase> resourceManagers = new ArrayList<ResourceManagerBase>();
+    private ResourceManager threadresourceManagerConfiguration;
 
     private ObjectName name = null;
 
@@ -91,6 +98,29 @@ class QueuePoller implements Runnable, QueuePollerMBean
     {
         this.engine = engine;
         this.queue = q;
+
+        // Hard code a thread count RM and link it to the DP parameters (transitory - no db change for now this way)
+        this.threadresourceManagerConfiguration = new ResourceManager();
+        threadresourceManagerConfiguration.setClassName(QuantityResourceManager.class.getCanonicalName());
+        threadresourceManagerConfiguration.setDeploymentParameterId(dp.getId());
+        threadresourceManagerConfiguration.setEnabled(true);
+        threadresourceManagerConfiguration.setKey("thread");
+        threadresourceManagerConfiguration.setNodeId(null);
+        threadresourceManagerConfiguration.addParameter("com.enioka.jqm.rm.quantity.quantity", "" + dp.getNbThread());
+        QuantityResourceManager threadResourceManager = new QuantityResourceManager(threadresourceManagerConfiguration);
+        this.resourceManagers.add(threadResourceManager);
+
+        // Hard code a highlander RM
+        ResourceManager highlanderResourceManagerConfiguration = new ResourceManager();
+        highlanderResourceManagerConfiguration.setClassName(HighlanderResourceManager.class.getCanonicalName());
+        highlanderResourceManagerConfiguration.setDeploymentParameterId(dp.getId());
+        highlanderResourceManagerConfiguration.setEnabled(true);
+        highlanderResourceManagerConfiguration.setKey("highlander");
+        highlanderResourceManagerConfiguration.setNodeId(null);
+        HighlanderResourceManager highlanderResourceManager = new HighlanderResourceManager(highlanderResourceManagerConfiguration);
+        this.resourceManagers.add(highlanderResourceManager);
+
+        // Synchronize parameters
         applyDeploymentParameter(dp);
 
         reset();
@@ -103,8 +133,11 @@ class QueuePoller implements Runnable, QueuePollerMBean
         this.maxNbThread = dp.getEnabled() ? dp.getNbThread() : 0;
         this.dpId = dp.getId();
 
-        jqmlogger.info("Engine {}" + " will poll JobInstances on queue {} every {} s with {} threads for concurrent instances",
-                engine.getNode().getName(), queue.getName(), pollingInterval / 1000, maxNbThread);
+        jqmlogger.info("Engine {}" + " will poll JobInstances on queue {} every {} s", engine.getNode().getName(), queue.getName(),
+                pollingInterval / 1000);
+
+        this.threadresourceManagerConfiguration.addParameter("com.enioka.jqm.rm.quantity.quantity", "" + this.maxNbThread);
+        this.resourceManagers.get(0).refreshConfiguration(this.threadresourceManagerConfiguration);
     }
 
     /**
@@ -157,17 +190,23 @@ class QueuePoller implements Runnable, QueuePollerMBean
         }
     }
 
-    protected List<JobInstance> dequeue(DbConn cnx)
+    private int potentialFreeRoom()
     {
-        // Free room?
-        int usedSlots = actualNbThread.get();
-        if (usedSlots >= maxNbThread)
+        int room = Integer.MAX_VALUE;
+        for (ResourceManagerBase rm : this.resourceManagers)
         {
-            return null;
+            room = Math.min(room, rm.getSlotsAvailable());
         }
+        return room;
+    }
 
-        // Polling is delegated to the DB adapter.
-        return cnx.poll(this.engine.getNode(), queue, maxNbThread - usedSlots);
+    private boolean mayHaveFreeRoom()
+    {
+        if (potentialFreeRoom() <= 0)
+        {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -184,18 +223,69 @@ class QueuePoller implements Runnable, QueuePollerMBean
 
             try
             {
-                // Get a JI to run
+                // Always check latest polling parameters
                 cnx = Helpers.getNewDbSession();
                 refreshDeploymentParameter(cnx);
-                List<JobInstance> newInstances = dequeue(cnx);
-                if (newInstances != null)
+
+                // Free room?
+                if (mayHaveFreeRoom())
                 {
-                    for (JobInstance ji : newInstances)
+                    // Fetch the queue head.
+                    List<JobInstance> newInstances = JobInstance.select(cnx, "ji_select_poll", this.queue.getId());
+
+                    jiloop: for (JobInstance ji : newInstances)
                     {
+                        // TODO: bulk load parameters
+                        ji.loadPrmCache(cnx);
+
+                        // Check if we have the resources needed to run this JI
+                        List<ResourceManagerBase> alreadyReserved = new ArrayList<ResourceManagerBase>(this.resourceManagers.size());
+                        for (ResourceManagerBase rm : this.resourceManagers)
+                        {
+                            switch (rm.bookResource(ji, cnx))
+                            {
+                            case BOOKED:
+                                // OK, nothing to do.
+                                alreadyReserved.add(rm);
+                                break;
+                            case EXHAUSTED:
+                                // Stop the loop - cannot do anything anymore with these resources.
+                                jqmlogger.trace("Poller has a full RM");
+                                for (ResourceManagerBase reservedRm : alreadyReserved)
+                                {
+                                    reservedRm.releaseResource(ji);
+                                }
+                                break jiloop;
+                            case FAILED:
+                                // Skip this JI - no resource for it but there may be resources for the next ones.
+                                jqmlogger.trace("Head JI asks for unavailable resources, skipping to next one");
+                                for (ResourceManagerBase reservedRm : alreadyReserved)
+                                {
+                                    reservedRm.releaseResource(ji);
+                                }
+                                continue jiloop;
+                            }
+                        }
+
+                        actualNbThread.incrementAndGet();
+
+                        // Actually set it for running on this node and report it on the in-memory object.
+                        QueryResult qr = cnx.runUpdate("ji_update_status_by_id", this.engine.getNode().getId(), ji.getId());
+                        if (qr.nbUpdated != 1)
+                        {
+                            // Means the JI was taken by another node, so simply continue.
+                            releaseResources(ji);
+                            continue;
+                        }
+                        ji.setNode(this.engine.getNode());
+                        ji.setState(State.ATTRIBUTED);
+
+                        // Commit taking possession of the JI (as well as anything whih may have been done inside the RMs)
+                        cnx.commit();
+
                         // We will run this JI!
                         jqmlogger.trace("JI number {} will be run by this poller this loop (already {}/{} on {})", ji.getId(),
                                 actualNbThread, maxNbThread, this.queue.getName());
-                        actualNbThread.incrementAndGet();
                         if (ji.getJD().getMaxTimeRunning() != null)
                         {
                             this.peremption.put(ji.getId(), new Date((new Date()).getTime() + ji.getJD().getMaxTimeRunning() * 60 * 1000));
@@ -315,12 +405,18 @@ class QueuePoller implements Runnable, QueuePollerMBean
     }
 
     /**
-     * Called when a payload thread has ended. This notifies the poller to free a slot and poll once again.
+     * Called when a payload thread has ended. This also notifies the poller to poll once again.
      */
-    void decreaseNbThread(int jobId)
+    void releaseResources(JobInstance ji)
     {
-        this.peremption.remove(jobId);
+        this.peremption.remove(ji.getId());
         this.actualNbThread.decrementAndGet();
+
+        for (ResourceManagerBase rm : this.resourceManagers)
+        {
+            rm.releaseResource(ji);
+        }
+
         loop.release(1);
         this.engine.signalEndOfRun();
     }

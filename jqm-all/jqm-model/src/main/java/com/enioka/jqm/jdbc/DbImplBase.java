@@ -206,6 +206,7 @@ class DbImplBase
         queries.put("ji_select_by_queue", queries.get("ji_select_all") + " WHERE ji.QUEUE=? ORDER BY INTERNAL_POSITION");
         queries.put("ji_select_by_node", queries.get("ji_select_all") + " WHERE ji.NODE=?");
         queries.put("ji_select_existing_highlander", "SELECT ID FROM __T__JOB_INSTANCE WHERE JOBDEF=? AND STATUS='SUBMITTED'");
+        queries.put("ji_select_existing_highlander_2", "SELECT COUNT(1) FROM __T__JOB_INSTANCE WHERE JOBDEF=? AND STATUS IN('ATTRIBUTED', 'RUNNING')");
         queries.put("ji_select_changequeuepos_by_id", "SELECT QUEUE, INTERNAL_POSITION FROM __T__JOB_INSTANCE WHERE ID=? AND STATUS='SUBMITTED'");
         queries.put("ji_select_instruction_by_id", "SELECT INSTRUCTION FROM __T__JOB_INSTANCE WHERE ID=?");
         queries.put("ji_select_priority_by_id", "SELECT PRIORITY FROM __T__JOB_INSTANCE WHERE ID=?");
@@ -218,6 +219,9 @@ class DbImplBase
                 + "AND (j2.HIGHLANDER=false OR (j2.HIGHLANDER=true AND (SELECT COUNT(1) FROM __T__JOB_INSTANCE j3 WHERE j3.STATUS IN('ATTRIBUTED', 'RUNNING') AND j3.JOBDEF=j2.JOBDEF)=0 )) ORDER BY PRIORITY DESC, INTERNAL_POSITION FOR UPDATE LIMIT ?)");
         queries.put("ji_select_to_run", queries.get("ji_select_all") + " WHERE ji.NODE = ? AND ji.QUEUE = ? AND ji.STATUS='ATTRIBUTED'");
         queries.put("ji_update_delayed", "UPDATE __T__JOB_INSTANCE SET STATUS='SUBMITTED' WHERE STATUS='SCHEDULED' AND DATE_NOT_BEFORE <= CURRENT_TIMESTAMP");
+
+        queries.put("ji_select_poll",queries.get("ji_select_all") + " WHERE ji.QUEUE = ? AND ji.STATUS='SUBMITTED' ORDER BY PRIORITY DESC, INTERNAL_POSITION");
+        queries.put("ji_update_status_by_id", "UPDATE __T__JOB_INSTANCE SET STATUS='ATTRIBUTED', NODE=? WHERE STATUS='SUBMITTED' AND ID=?");
         
         // HISTORY
         queries.put("history_insert_with_end_date", "INSERT INTO __T__HISTORY(ID, JD_APPLICATION, JD_KEY, DATE_ATTRIBUTION, EMAIL, "

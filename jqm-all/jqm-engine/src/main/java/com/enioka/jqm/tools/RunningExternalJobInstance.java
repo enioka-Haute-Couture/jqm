@@ -26,6 +26,7 @@ class RunningExternalJobInstance implements Runnable
     private static Logger jqmlogger = LoggerFactory.getLogger(RunningExternalJobInstance.class);
 
     int jobId;
+    JobInstance ji;
     String opts;
     String logFile;
     int killCheckPeriodMs = 1000;
@@ -34,6 +35,7 @@ class RunningExternalJobInstance implements Runnable
     public RunningExternalJobInstance(DbConn cnx, JobInstance job, QueuePoller qp)
     {
         this.jobId = job.getId();
+        this.ji = job;
         this.qp = qp;
         opts = job.getJD().getJavaOpts() == null
                 ? GlobalParameter.getParameter(cnx, "defaultExternalOpts", "-Xms32m -Xmx128m -XX:MaxPermSize=64m")
@@ -70,7 +72,7 @@ class RunningExternalJobInstance implements Runnable
         catch (IOException e)
         {
             jqmlogger.error("Could not launch an external payload", e);
-            qp.decreaseNbThread(this.jobId);
+            qp.releaseResources(this.ji);
             return;
         }
 
@@ -128,7 +130,7 @@ class RunningExternalJobInstance implements Runnable
             IOUtils.closeQuietly(f);
             IOUtils.closeQuietly(isr);
 
-            qp.decreaseNbThread(this.jobId);
+            qp.releaseResources(this.ji);
         }
 
         if (res != 0)
