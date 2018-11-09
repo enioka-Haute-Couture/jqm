@@ -1,9 +1,8 @@
 package com.enioka.jqm.tools;
 
+import java.util.HashMap;
 import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
+import java.util.Map;
 
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JobRequest;
@@ -14,6 +13,9 @@ import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * All tests directly concerning the QueuePoller.
@@ -199,4 +201,40 @@ public class QueueTest extends JqmBaseTest
         Assert.assertTrue(ji1.getBeganRunningDate().compareTo(ji2.getEndDate()) <= 0);
     }
 
+    @Test
+    public void testTakingMultipleResources() throws Exception
+    {
+        // Single thread available.
+        int qId = Queue.create(cnx, "testqueue", " ", false);
+        DeploymentParameter.create(cnx, TestHelpers.node.getId(), 2, 1, qId); // 2 slots
+
+        Map<String, String> prms = new HashMap<String, String>(1);
+        prms.put("com.enioka.jqm.rm.quantity.thread.consumption", "2"); // using fully qualified RM with RM name 'thread' - not the generic
+                                                                        // key
+        CreationTools.createJobDef(null, true, "pyl.Wait", prms, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", qId, 42,
+                "jqm-test-wait-dual", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+        CreationTools.createJobDef(null, true, "pyl.Wait", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", qId, 42,
+                "jqm-test-wait-single", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+        cnx.commit();
+
+        // No priority = FIFO queue.
+        int i1 = JobRequest.create("jqm-test-wait-single", "test").setPriority(null).submit();
+        int i2 = JobRequest.create("jqm-test-wait-dual", "test").setPriority(null).submit();
+
+        addAndStartEngine();
+
+        TestHelpers.waitForRunning(1, 60000, cnx);
+        sleep(1); // Time to start another if case of bug...
+
+        // Check only one of the two JI has started (asking for total 3 slots, only 2 available)
+        Assert.assertEquals(0, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getQueueRunningCount(cnx));
+        Assert.assertEquals(2, TestHelpers.getQueueAllCount(cnx));
+
+        // Cleanup
+        JqmClientFactory.getClient().killJob(i1);
+        JqmClientFactory.getClient().killJob(i2);
+        TestHelpers.waitFor(2, 1000, cnx);
+    }
 }

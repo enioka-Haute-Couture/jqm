@@ -20,8 +20,9 @@ class QuantityResourceManager extends ResourceManagerBase
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(QuantityResourceManager.class);
 
-    private static String PRM_QUANTITY = "com.enioka.jqm.rm.quantity.quantity";
-    private static String PRM_CONSUMPTION = "com.enioka.jqm.rm.quantity.consumption";
+    private static String PRM_ROOT = "com.enioka.jqm.rm.quantity.";
+    private static String PRM_QUANTITY = "quantity";
+    private static String PRM_CONSUMPTION = "consumption";
 
     private AtomicInteger availableUnits = new AtomicInteger(0);
     private int previousMaxUnits = 0;
@@ -36,8 +37,14 @@ class QuantityResourceManager extends ResourceManagerBase
     @Override
     protected void setDefaultProperties()
     {
-        this.currentProperties.put(PRM_QUANTITY, "10");
-        this.currentProperties.put(PRM_CONSUMPTION, "1");
+        this.currentProperties.put(PRM_ROOT + PRM_QUANTITY, "10");
+        this.currentProperties.put(PRM_ROOT + PRM_CONSUMPTION, "1");
+    }
+
+    @Override
+    String getParameterRoot()
+    {
+        return PRM_ROOT;
     }
 
     @Override
@@ -57,7 +64,7 @@ class QuantityResourceManager extends ResourceManagerBase
 
         // Log
         jqmlogger.info("\tConfigured quantity resource manager [{}] with max count {} - currently free {} - taking {} per JI by default",
-                this.key, getIntegerParameter(PRM_QUANTITY), this.availableUnits.intValue(), this.defaultConsumption);
+                this.key, newMaxUnits, this.availableUnits.intValue(), this.defaultConsumption);
     }
 
     @Override
@@ -89,6 +96,6 @@ class QuantityResourceManager extends ResourceManagerBase
     @Override
     int getSlotsAvailable()
     {
-        return this.availableUnits.get() / (Integer.parseInt((String) this.currentProperties.get(PRM_CONSUMPTION)));
+        return this.availableUnits.get() / this.defaultConsumption;
     }
 }

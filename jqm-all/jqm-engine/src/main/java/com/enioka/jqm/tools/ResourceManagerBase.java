@@ -70,6 +70,16 @@ abstract class ResourceManagerBase
         return Integer.MAX_VALUE;
     }
 
+    /**
+     * The prefix for all parameter names. Default is empty.
+     *
+     * @return
+     */
+    String getParameterRoot()
+    {
+        return "";
+    }
+
     protected void setDefaultProperties()
     {}
 
@@ -83,7 +93,7 @@ abstract class ResourceManagerBase
     void refreshConfiguration(ResourceManager configuration)
     {
         this.definition = configuration;
-        this.key = configuration.getKey();
+        this.key = configuration.getKey().toLowerCase();
         this.currentProperties = new HashMap<String, String>();
 
         // Add hard-coded defaults to properties
@@ -103,12 +113,22 @@ abstract class ResourceManagerBase
      */
     protected String getStringParameterForInstance(String key, JobInstance ji)
     {
-        // TODO : prms with keys
-        String res = ji.getPrms().get(key);
+        // First try: parameter name with specific RM key.
+        String res = ji.getPrms().get(getParameterRoot() + this.key + "." + key);
+
+        // Second try: parameter name without specific key (used by all RM of this type)
         if (res == null)
         {
-            res = this.currentProperties.get(key);
+            res = ji.getPrms().get(getParameterRoot() + key);
         }
+
+        // Third try: just use value from RM configuration (which may be a hard-coded default).
+        if (res == null)
+        {
+            res = this.currentProperties.get(getParameterRoot() + key);
+        }
+
+        // Go. Third try is by convention always supposed to succeed - all keys should have a default value.
         return res;
     }
 
@@ -119,7 +139,7 @@ abstract class ResourceManagerBase
 
     protected String getStringParameter(String key)
     {
-        return this.currentProperties.get(key);
+        return this.currentProperties.get(getParameterRoot() + key);
     }
 
     protected Integer getIntegerParameter(String key)
