@@ -43,20 +43,19 @@ class QuantityResourceManager extends ResourceManagerBase
     @Override
     void refreshConfiguration(ResourceManager configuration)
     {
-        // Store the one important parameter for service continuity.
-        previousMaxUnits = Integer.parseInt((String) this.currentProperties.getOrDefault(PRM_QUANTITY, "0"));
-
         // Read configuration
         super.refreshConfiguration(configuration);
 
         // Init the resource itself.
-        int delta = getIntegerParameter(PRM_QUANTITY) - previousMaxUnits;
+        int newMaxUnits = getIntegerParameter(PRM_QUANTITY);
+        int delta = newMaxUnits - previousMaxUnits;
+        previousMaxUnits = newMaxUnits;
         this.availableUnits.addAndGet(delta);
 
         // Helpers
         this.defaultConsumption = getIntegerParameter(PRM_CONSUMPTION);
 
-        // log
+        // Log
         jqmlogger.info("\tConfigured quantity resource manager [{}] with max count {} - currently free {} - taking {} per JI by default",
                 this.key, getIntegerParameter(PRM_QUANTITY), this.availableUnits.intValue(), this.defaultConsumption);
     }

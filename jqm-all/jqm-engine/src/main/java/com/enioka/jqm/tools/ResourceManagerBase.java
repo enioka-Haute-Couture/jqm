@@ -1,5 +1,7 @@
 package com.enioka.jqm.tools;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import com.enioka.jqm.jdbc.DbConn;
@@ -22,7 +24,7 @@ abstract class ResourceManagerBase
     /**
      * Properties after loading default properties and parameters from the RM's own definition.
      */
-    protected Properties currentProperties = new Properties();
+    protected Map<String, String> currentProperties;
 
     /**
      * The key used to identity this specific instance of a RM class. May be used in parameter keys, and is used in the output values keys.
@@ -82,7 +84,7 @@ abstract class ResourceManagerBase
     {
         this.definition = configuration;
         this.key = configuration.getKey();
-        this.currentProperties = new Properties();
+        this.currentProperties = new HashMap<String, String>();
 
         // Add hard-coded defaults to properties
         setDefaultProperties();
@@ -102,7 +104,12 @@ abstract class ResourceManagerBase
     protected String getStringParameterForInstance(String key, JobInstance ji)
     {
         // TODO : prms with keys
-        return ji.getPrms().getOrDefault(key, this.currentProperties.getProperty(key));
+        String res = ji.getPrms().get(key);
+        if (res == null)
+        {
+            res = this.currentProperties.get(key);
+        }
+        return res;
     }
 
     protected Integer getIntegerParameterForInstance(String key, JobInstance ji)
@@ -112,7 +119,7 @@ abstract class ResourceManagerBase
 
     protected String getStringParameter(String key)
     {
-        return this.currentProperties.getProperty(key);
+        return this.currentProperties.get(key);
     }
 
     protected Integer getIntegerParameter(String key)
