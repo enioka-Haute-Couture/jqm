@@ -6,6 +6,9 @@ import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.ResourceManager;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Highlander is when only a single instance of the same job definition can run at the same time on all queues.<br>
  * The resource is therefore defined here as "a single slot per job definition".<br>
@@ -14,9 +17,18 @@ import com.enioka.jqm.model.ResourceManager;
  */
 class HighlanderResourceManager extends ResourceManagerBase
 {
+    private static Logger jqmlogger = LoggerFactory.getLogger(HighlanderResourceManager.class);
+
     HighlanderResourceManager(ResourceManager rm)
     {
         super(rm);
+    }
+
+    @Override
+    void refreshConfiguration(ResourceManager configuration)
+    {
+        super.refreshConfiguration(configuration);
+        jqmlogger.info("\tConfigured Highlander resource Manager");
     }
 
     @Override

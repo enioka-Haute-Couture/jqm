@@ -120,6 +120,9 @@ class QueuePoller implements Runnable, QueuePollerMBean
         HighlanderResourceManager highlanderResourceManager = new HighlanderResourceManager(highlanderResourceManagerConfiguration);
         this.resourceManagers.add(highlanderResourceManager);
 
+        // Add global resource managers
+        this.resourceManagers.addAll(engine.getResourceManagers());
+
         // Synchronize parameters
         applyDeploymentParameter(dp);
 

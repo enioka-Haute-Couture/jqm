@@ -9,7 +9,9 @@ import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.JqmInvalidRequestException;
 import com.enioka.jqm.api.Query;
+import com.enioka.jqm.api.State;
 import com.enioka.jqm.model.DeploymentParameter;
+import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -266,5 +268,64 @@ public class QueueTest extends JqmBaseTest
         // Check the parameter wazs removed by the RM
         JobInstance ji = JqmClientFactory.getClient().getJob(i1);
         Assert.assertEquals(1, ji.getMessages().size());
+    }
+
+    // Test queue behaviour with a discrete RM.
+    @Test
+    public void testRmDiscrete() throws Exception
+    {
+        // Create queue
+        int qId = Queue.create(cnx, "testqueue", " ", false);
+        DeploymentParameter.create(cnx, TestHelpers.node.getId(), 40, 1, qId); // 40 threads, so not the limiting factor.
+
+        // Enable the global discrete RM.
+        GlobalParameter.setParameter(cnx, "discreteRmName", "ports");
+        GlobalParameter.setParameter(cnx, "discreteRmList", "port01,port02");
+
+        Map<String, String> prms = new HashMap<String, String>(1);
+        prms.put("com.enioka.jqm.rm.discrete.consumption", "1");
+        CreationTools.createJobDef(null, true, "pyl.KillMe", prms, "jqm-tests/jqm-test-pyl/target/test.jar", qId, 42, "jqm-test-kill", null,
+                "Franquin", "ModuleMachin", "other", "other", false, cnx);
+        cnx.commit();
+
+        JobRequest.create("jqm-test-kill", "test").setPriority(null).submit();
+        JobRequest.create("jqm-test-kill", "test").setPriority(null).submit();
+        JobRequest.create("jqm-test-kill", "test").setPriority(null).submit();
+
+        addAndStartEngine();
+        TestHelpers.waitForRunning(2, 60000, cnx);
+        sleep(1); // Time for bugs to happen.
+
+        // Two should be running, a we have two slots
+        Assert.assertEquals(2, TestHelpers.getQueueRunningCount(cnx));
+        Assert.assertEquals(3, TestHelpers.getQueueAllCount(cnx));
+
+        // Kill one, the last JI should start after the kill
+        int toKill = Query.create().setQueryHistoryInstances(false).setQueryLiveInstances(true).addStatusFilter(State.RUNNING).run().get(0)
+                .getId();
+        JqmClientFactory.getClient().killJob(toKill);
+
+        TestHelpers.waitFor(1, 60000, cnx);
+        TestHelpers.waitForRunning(2, 60000, cnx);
+
+        Assert.assertEquals(2, TestHelpers.getQueueRunningCount(cnx));
+        Assert.assertEquals(2, TestHelpers.getQueueAllCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(1, TestHelpers.getNonOkCount(cnx));
+
+        // Kill all to end the test.
+        for (JobInstance ji : Query.create().setQueryHistoryInstances(false).setQueryLiveInstances(true).addStatusFilter(State.RUNNING)
+                .run())
+        {
+            JqmClientFactory.getClient().killJob(ji.getId());
+        }
+
+        TestHelpers.waitFor(3, 60000, cnx);
+
+        // Check only one of the two JI has started (asking for total 3 slots, only 2 available)
+        Assert.assertEquals(0, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(3, TestHelpers.getNonOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getQueueRunningCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getQueueAllCount(cnx));
     }
 }

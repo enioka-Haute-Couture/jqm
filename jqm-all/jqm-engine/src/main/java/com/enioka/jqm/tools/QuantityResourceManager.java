@@ -1,5 +1,7 @@
 package com.enioka.jqm.tools;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -28,6 +30,7 @@ class QuantityResourceManager extends ResourceManagerBase
     private int previousMaxUnits = 0;
 
     private int defaultConsumption;
+    private Map<Integer, Integer> runningJobs = new HashMap<Integer, Integer>(10);
 
     QuantityResourceManager(ResourceManager rm)
     {
@@ -82,13 +85,15 @@ class QuantityResourceManager extends ResourceManagerBase
         }
 
         // If here, booking has succeeded.
+        runningJobs.put(ji.getId(), slots);
         return BookingStatus.BOOKED;
     }
 
     @Override
     void releaseResource(JobInstance ji)
     {
-        int slots = this.getIntegerParameter(PRM_CONSUMPTION, ji);
+        int slots = runningJobs.getOrDefault(ji.getId(), 0);
+        runningJobs.remove(ji.getId());
         jqmlogger.debug("Releasing {} slots for RM {}", slots, this.key);
         availableUnits.addAndGet(slots);
     }
@@ -96,6 +101,6 @@ class QuantityResourceManager extends ResourceManagerBase
     @Override
     int getSlotsAvailable()
     {
-        return this.availableUnits.get() / this.defaultConsumption;
+        return this.availableUnits.get() / (this.defaultConsumption > 0 ? this.defaultConsumption : 1);
     }
 }
