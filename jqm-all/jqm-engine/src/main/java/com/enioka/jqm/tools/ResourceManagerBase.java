@@ -2,7 +2,6 @@ package com.enioka.jqm.tools;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.JobInstance;
@@ -43,7 +42,8 @@ abstract class ResourceManagerBase
     }
 
     /**
-     * The main method of a RM: decide if a job can run. This should try to book the resources.
+     * The main method of a RM: decide if a job can run. This should try to book the resources. {@link JobInstance} parameters specific to
+     * this RM (if any) should be removed by this method.
      *
      * @param ji
      * @return
@@ -108,18 +108,30 @@ abstract class ResourceManagerBase
      * JD > RM > defaults
      *
      * @param key
+     *                the end of the parameter key. getParameterRoot()[.key] is automatically prefixed.
      * @param ji
+     *                the analysed job instance
+     * @param pop
+     *                if true, parameter will be removed from the JI prm list
      * @return
      */
-    protected String getStringParameterForInstance(String key, JobInstance ji)
+    protected String getStringParameter(String key, JobInstance ji, boolean pop)
     {
         // First try: parameter name with specific RM key.
         String res = ji.getPrms().get(getParameterRoot() + this.key + "." + key);
+        if (res != null && pop)
+        {
+            ji.getPrms().remove(getParameterRoot() + this.key + "." + key);
+        }
 
         // Second try: parameter name without specific key (used by all RM of this type)
         if (res == null)
         {
             res = ji.getPrms().get(getParameterRoot() + key);
+            if (res != null && pop)
+            {
+                ji.getPrms().remove(getParameterRoot() + key);
+            }
         }
 
         // Third try: just use value from RM configuration (which may be a hard-coded default).
@@ -132,9 +144,19 @@ abstract class ResourceManagerBase
         return res;
     }
 
-    protected Integer getIntegerParameterForInstance(String key, JobInstance ji)
+    protected String getStringParameter(String key, JobInstance ji)
     {
-        return Integer.parseInt(getStringParameterForInstance(key, ji));
+        return getStringParameter(key, ji, false);
+    }
+
+    protected Integer getIntegerParameter(String key, JobInstance ji)
+    {
+        return getIntegerParameter(key, ji, false);
+    }
+
+    protected Integer getIntegerParameter(String key, JobInstance ji, boolean pop)
+    {
+        return Integer.parseInt(getStringParameter(key, ji, pop));
     }
 
     protected String getStringParameter(String key)

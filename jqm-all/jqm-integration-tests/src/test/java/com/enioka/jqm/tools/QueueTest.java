@@ -217,7 +217,6 @@ public class QueueTest extends JqmBaseTest
                 "jqm-test-wait-single", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         cnx.commit();
 
-        // No priority = FIFO queue.
         int i1 = JobRequest.create("jqm-test-wait-single", "test").setPriority(null).submit();
         int i2 = JobRequest.create("jqm-test-wait-dual", "test").setPriority(null).submit();
 
@@ -236,5 +235,36 @@ public class QueueTest extends JqmBaseTest
         JqmClientFactory.getClient().killJob(i1);
         JqmClientFactory.getClient().killJob(i2);
         TestHelpers.waitFor(2, 1000, cnx);
+    }
+
+    // Test if RM parameters are invisible to running JI.
+    @Test
+    public void testRmParameterCleanup() throws Exception
+    {
+        // Single thread available.
+        int qId = Queue.create(cnx, "testqueue", " ", false);
+        DeploymentParameter.create(cnx, TestHelpers.node.getId(), 2, 1, qId); // 2 slots
+
+        Map<String, String> prms = new HashMap<String, String>(1);
+        prms.put("com.enioka.jqm.rm.quantity.thread.consumption", "2");
+        prms.put("whatever", "value");
+        CreationTools.createJobDef(null, true, "pyl.MessagePerParameter", prms, "jqm-tests/jqm-test-pyl/target/test.jar", qId, 42,
+                "jqm-test-kill", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+        cnx.commit();
+
+        int i1 = JobRequest.create("jqm-test-kill", "test").setPriority(null).submit();
+
+        addAndStartEngine();
+        TestHelpers.waitFor(1, 60000, cnx);
+
+        // Check only one of the two JI has started (asking for total 3 slots, only 2 available)
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getQueueRunningCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getQueueAllCount(cnx));
+
+        // Check the parameter wazs removed by the RM
+        JobInstance ji = JqmClientFactory.getClient().getJob(i1);
+        Assert.assertEquals(1, ji.getMessages().size());
     }
 }

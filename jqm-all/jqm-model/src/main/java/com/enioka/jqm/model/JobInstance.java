@@ -75,10 +75,11 @@ public class JobInstance implements Serializable
     private transient Node n;
 
     private HashMap<String, String> prmCache;
+    private HashMap<String, String> envVarCache;
 
     /**
      * Helper method to add a parameter without having to create it explicitely. The created parameter should be persisted afterwards.
-     * 
+     *
      * @param key
      *                  name of the parameter to add
      * @param value
@@ -433,7 +434,7 @@ public class JobInstance implements Serializable
 
     /**
      * An instruction given to the job instance.
-     * 
+     *
      * @return
      */
     public Instruction getInstruction()
@@ -467,6 +468,20 @@ public class JobInstance implements Serializable
         {
             prmCache.put(jp.getKey(), jp.getValue());
         }
+    }
+
+    public void addEnvVar(String key, String value)
+    {
+        if (envVarCache == null)
+        {
+            envVarCache = new HashMap<String, String>(1);
+        }
+        envVarCache.put(key, value);
+    }
+
+    public Map<String, String> getEnvVarCache()
+    {
+        return envVarCache == null ? new HashMap<String, String>() : envVarCache;
     }
 
     public static List<JobInstance> select(DbConn cnx, String query_key, Object... args)

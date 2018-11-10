@@ -70,7 +70,7 @@ class QuantityResourceManager extends ResourceManagerBase
     @Override
     BookingStatus bookResource(JobInstance ji, DbConn cnx)
     {
-        int slots = this.getIntegerParameterForInstance(PRM_CONSUMPTION, ji);
+        int slots = this.getIntegerParameter(PRM_CONSUMPTION, ji, true);
 
         if (availableUnits.addAndGet(-slots) < 0)
         {
@@ -88,7 +88,7 @@ class QuantityResourceManager extends ResourceManagerBase
     @Override
     void releaseResource(JobInstance ji)
     {
-        int slots = this.getIntegerParameterForInstance(PRM_CONSUMPTION, ji);
+        int slots = this.getIntegerParameter(PRM_CONSUMPTION, ji);
         jqmlogger.debug("Releasing {} slots for RM {}", slots, this.key);
         availableUnits.addAndGet(slots);
     }
