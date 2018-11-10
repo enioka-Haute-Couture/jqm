@@ -41,7 +41,7 @@ public class ShellRunnerTest extends JqmBaseTest
     {
         AssumeWindows();
 
-        CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), "set", TestHelpers.qNormal, 0, "TestApp1", null,
+        CreationTools.createJobDef("test job", true, "none", new HashMap<String, String>(), "set", TestHelpers.qNormal, 0, "TestApp1", null,
                 "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
         JobRequest.create("TestApp1", "TestUser").submit();
 
@@ -64,9 +64,9 @@ public class ShellRunnerTest extends JqmBaseTest
             command2 = "set | findstr JQM_XXXX";
         }
 
-        CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), command1, TestHelpers.qNormal, 0, "TestApp1", null,
-                "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
-        CreationTools.createJobDef("failing test job", true, "", new HashMap<String, String>(), command2, TestHelpers.qNormal, 0,
+        CreationTools.createJobDef("test job", true, "none", new HashMap<String, String>(), command1, TestHelpers.qNormal, 0, "TestApp1",
+                null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
+        CreationTools.createJobDef("failing test job", true, "none", new HashMap<String, String>(), command2, TestHelpers.qNormal, 0,
                 "TestApp2", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
         JobRequest.create("TestApp1", "TestUser").submit();
         JobRequest.create("TestApp2", "TestUser").submit();
@@ -87,8 +87,8 @@ public class ShellRunnerTest extends JqmBaseTest
             command1 = "cmd.exe /C \"echo 'aa bb'\"";
         }
 
-        CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), command1, TestHelpers.qNormal, 0, "TestApp1", null,
-                "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
+        CreationTools.createJobDef("test job", true, "none", new HashMap<String, String>(), command1, TestHelpers.qNormal, 0, "TestApp1",
+                null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
         JobRequest.create("TestApp1", "TestUser").submit();
 
         addAndStartEngine();
@@ -105,8 +105,8 @@ public class ShellRunnerTest extends JqmBaseTest
 
         String command1 = "echo 'aa' ; echo 'bb';";
 
-        CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), command1, TestHelpers.qNormal, 0, "TestApp1", null,
-                "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.POWERSHELLCOMMAND);
+        CreationTools.createJobDef("test job", true, "none", new HashMap<String, String>(), command1, TestHelpers.qNormal, 0, "TestApp1",
+                null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.POWERSHELLCOMMAND);
         JobRequest.create("TestApp1", "TestUser").submit();
 
         addAndStartEngine();
@@ -132,8 +132,8 @@ public class ShellRunnerTest extends JqmBaseTest
             args.put("00", "/D"); // Note the order - should arrive first in result command
         }
 
-        CreationTools.createJobDef("test job", true, "", args, command1, TestHelpers.qNormal, 0, "TestApp1", null, "module1", "kw1", "kw2",
-                null, false, cnx, null, false, null, false, PathType.DIRECTEXECUTABLE);
+        CreationTools.createJobDef("test job", true, "none", args, command1, TestHelpers.qNormal, 0, "TestApp1", null, "module1", "kw1",
+                "kw2", null, false, cnx, null, false, null, false, PathType.DIRECTEXECUTABLE);
         JobRequest.create("TestApp1", "TestUser").submit();
 
         addAndStartEngine();
@@ -149,14 +149,14 @@ public class ShellRunnerTest extends JqmBaseTest
         if (onWindows())
         {
             // We explicitely start a sub shell here so as to have a process tree powershell-> powershell.
-            CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), "powershell.exe -Command 'Start-Sleep 3600'",
-                    TestHelpers.qNormal, 0, "TestApp1", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false,
-                    PathType.POWERSHELLCOMMAND);
+            CreationTools.createJobDef("test job", true, "none", new HashMap<String, String>(),
+                    "powershell.exe -Command 'Start-Sleep 3600'", TestHelpers.qNormal, 0, "TestApp1", null, "module1", "kw1", "kw2", null,
+                    false, cnx, null, false, null, false, PathType.POWERSHELLCOMMAND);
         }
         else
         {
             // For Linux, sleep is a process, not a command, so we have a shell->sleep tree.
-            CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), "sleep 3600", TestHelpers.qNormal, 0,
+            CreationTools.createJobDef("test job", true, "none", new HashMap<String, String>(), "sleep 3600", TestHelpers.qNormal, 0,
                     "TestApp1", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
         }
 
@@ -187,18 +187,18 @@ public class ShellRunnerTest extends JqmBaseTest
         // Normal test
         if (onWindows())
         {
-            CreationTools.createJobDef("test job 2", true, "", new HashMap<String, String>(), "echo aa", TestHelpers.qNormal, 0, "TestApp2",
-                    null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
+            CreationTools.createJobDef("test job 2", true, "none", new HashMap<String, String>(), "echo aa", TestHelpers.qNormal, 0,
+                    "TestApp2", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
 
             String script = "ls env: ; $c = New-Object System.Management.Automation.PSCredential ($env:JQM_API_LOGIN, (ConvertTo-SecureString $env:JQM_API_PASSWORD -AsPlainText -Force) ) ;"
                     + "Invoke-webrequest $env:JQM_API_LOCAL_URL/ws/simple/ji -Method Post -Body @{applicationname='TestApp2';parentid=$env:JQM_JI_ID}  -credential $c";
 
-            CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), script, TestHelpers.qNormal, 0, "TestApp1",
+            CreationTools.createJobDef("test job", true, "none", new HashMap<String, String>(), script, TestHelpers.qNormal, 0, "TestApp1",
                     null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.POWERSHELLCOMMAND);
         }
         else
         {
-            CreationTools.createJobDef("test job 2", true, "", new HashMap<String, String>(), "echo 'aa'", TestHelpers.qNormal, 0,
+            CreationTools.createJobDef("test job 2", true, "none", new HashMap<String, String>(), "echo 'aa'", TestHelpers.qNormal, 0,
                     "TestApp2", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
 
             String script = "curl --user \"${JQM_API_LOGIN}:${JQM_API_PASSWORD}\" --url \"${JQM_API_LOCAL_URL}/ws/simple/ji\" -XPOST -d \"applicationname=TestApp2&parentid=${JQM_JI_ID}\" -H 'Content-Type: application/x-www-form-urlencoded' -s ";
@@ -224,16 +224,16 @@ public class ShellRunnerTest extends JqmBaseTest
     {
         if (onWindows())
         {
-            CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(),
+            CreationTools.createJobDef("test job", true, "none", new HashMap<String, String>(),
                     "echo 'toto' > $env:JQM_JI_DELIVERY_DIR/test.txt", TestHelpers.qNormal, 0, "TestApp1", null, "module1", "kw1", "kw2",
                     null, false, cnx, null, false, null, false, PathType.POWERSHELLCOMMAND);
         }
         else
         {
             // For Linux, sleep is a process, not a command, so we have a shell->sleep tree.
-            CreationTools.createJobDef("test job", true, "", new HashMap<String, String>(), "echo 'toto' > $JQM_JI_DELIVERY_DIR/test.txt",
-                    TestHelpers.qNormal, 0, "TestApp1", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false,
-                    PathType.DEFAULTSHELLCOMMAND);
+            CreationTools.createJobDef("test job", true, "none", new HashMap<String, String>(),
+                    "echo 'toto' > $JQM_JI_DELIVERY_DIR/test.txt", TestHelpers.qNormal, 0, "TestApp1", null, "module1", "kw1", "kw2", null,
+                    false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
         }
 
         int i = JobRequest.create("TestApp1", "TestUser").submit();

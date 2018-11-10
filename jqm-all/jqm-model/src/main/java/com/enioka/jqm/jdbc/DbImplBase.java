@@ -194,13 +194,13 @@ class DbImplBase
         queries.put("ji_select_count_by_queue", "SELECT COUNT(1) FROM __T__JOB_INSTANCE WHERE QUEUE=?");
         queries.put("ji_select_all", "SELECT ji.ID, ji.DATE_ATTRIBUTION, ji.DATE_ENQUEUE, ji.EMAIL, ji.DATE_START, ji.APPLICATION, ji.KEYWORD1, ji.KEYWORD2, "
                 + "ji.KEYWORD3, ji.MODULE, ji.INTERNAL_POSITION, ji.PARENT, ji.PROGRESS, ji.SESSION_KEY, ji.STATUS, ji.USERNAME, ji.JOBDEF, ji.NODE, ji.QUEUE, ji.HIGHLANDER, ji.FROM_SCHEDULE, ji.PRIORITY, ji.INSTRUCTION, ji.DATE_NOT_BEFORE, "
-                + "q.ID, q.DEFAULT_QUEUE, q.DESCRIPTION, q.NAME, "
-                + "jd.ID, jd.APPLICATION, jd.JD_KEY, jd.CL, "
-                + "jd.DESCRIPTION, jd.ENABLED, jd.EXTERNAL, jd.HIGHLANDER, "
-                + "jd.PATH, jd.CLASS_NAME, jd.JAVA_OPTS, jd.KEYWORD1, jd.KEYWORD2, jd.KEYWORD3, jd.ALERT_AFTER_SECONDS, "
-                + "jd.MODULE, jd.PATH_TYPE, jd.QUEUE, "
-                + "n.ID, n.REPO_DELIVERABLE, n.DNS, n.ENABLED, n.JMX_REGISTRY_PORT, n.JMX_SERVER_PORT, "
-                + "n.LOAD_API_ADMIN, n.LOAD_API_CLIENT, n.LOAD_API_SIMPLE, n.NAME, n.PORT, n.REPO_JOB_DEF, n.ROOT_LOG_LEVEL, n.STOP, n.REPO_TMP, n.LAST_SEEN_ALIVE "
+                + "q.ID AS Q_ID, q.DEFAULT_QUEUE, q.DESCRIPTION AS Q_DESCRIPTION, q.NAME AS Q_NAME, "
+                + "jd.ID AS JD_ID, jd.APPLICATION AS JD_APPLICATION, jd.JD_KEY, jd.CL, "
+                + "jd.DESCRIPTION AS JD_DESCRITPION, jd.ENABLED AS JD_ENABLED, jd.EXTERNAL, jd.HIGHLANDER AS JD_HIGHLANDER, "
+                + "jd.PATH, jd.CLASS_NAME, jd.JAVA_OPTS, jd.KEYWORD1 AS JD_KW1, jd.KEYWORD2 AS JD_KW2, jd.KEYWORD3 AS JD_KW3, jd.ALERT_AFTER_SECONDS, "
+                + "jd.MODULE AS JD_MODULE, jd.PATH_TYPE, jd.QUEUE AS JD_QUEUE, "
+                + "n.ID AS N_ID, n.REPO_DELIVERABLE, n.DNS, n.ENABLED AS N_ENABLED, n.JMX_REGISTRY_PORT, n.JMX_SERVER_PORT, "
+                + "n.LOAD_API_ADMIN, n.LOAD_API_CLIENT, n.LOAD_API_SIMPLE, n.NAME AS N_NAME, n.PORT, n.REPO_JOB_DEF, n.ROOT_LOG_LEVEL, n.STOP, n.REPO_TMP, n.LAST_SEEN_ALIVE "
                 + "FROM __T__JOB_INSTANCE ji LEFT JOIN __T__QUEUE q ON ji.QUEUE=q.ID LEFT JOIN __T__JOB_DEFINITION jd ON ji.JOBDEF=jd.ID LEFT JOIN __T__NODE n ON ji.NODE=n.ID ");
         queries.put("ji_select_by_id", queries.get("ji_select_all") + " WHERE ji.ID=?");
         queries.put("ji_select_by_queue", queries.get("ji_select_all") + " WHERE ji.QUEUE=? ORDER BY INTERNAL_POSITION");
@@ -215,7 +215,7 @@ class DbImplBase
         queries.put("ji_select_instructions_by_node", "SELECT ji.ID, ji.INSTRUCTION FROM __T__JOB_INSTANCE ji WHERE ji.STATUS='RUNNING' AND ji.INSTRUCTION <> 'RUN' AND ji.NODE=?");
         
         queries.put("ji_update_delayed", "UPDATE __T__JOB_INSTANCE SET STATUS='SUBMITTED' WHERE STATUS='SCHEDULED' AND DATE_NOT_BEFORE <= CURRENT_TIMESTAMP");
-        queries.put("ji_select_poll",queries.get("ji_select_all") + " WHERE ji.QUEUE = ? AND ji.STATUS='SUBMITTED' ORDER BY PRIORITY DESC, INTERNAL_POSITION");
+        queries.put("ji_select_poll",queries.get("ji_select_all") + " WHERE ji.QUEUE = ? AND ji.STATUS='SUBMITTED' ORDER BY ji.PRIORITY DESC, ji.INTERNAL_POSITION");
         queries.put("ji_update_status_by_id", "UPDATE __T__JOB_INSTANCE SET STATUS='ATTRIBUTED', NODE=? WHERE STATUS='SUBMITTED' AND ID=?");
         
         // HISTORY
