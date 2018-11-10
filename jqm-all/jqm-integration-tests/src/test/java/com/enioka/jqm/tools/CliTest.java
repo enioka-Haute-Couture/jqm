@@ -51,7 +51,7 @@ public class CliTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
         int i = JobRequest.create("MarsuApplication", "TestUser").submit();
-        cnx.runUpdate("ji_update_poll", TestHelpers.node.getId(), TestHelpers.qVip, 10);
+        cnx.runUpdate("ji_update_status_by_id", TestHelpers.node.getId(), i);
         cnx.runUpdate("debug_jj_update_node_by_id", TestHelpers.node.getId(), i);
         cnx.commit();
 

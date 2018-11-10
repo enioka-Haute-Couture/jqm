@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Queue;
+
 public class DbImplMySql extends DbAdapter
 {
     @Override
@@ -16,12 +19,8 @@ public class DbImplMySql extends DbAdapter
     {
         super.prepare(p, cnx);
 
-        // Full rewrite for the most critical query.
-        queries.put("ji_update_poll", this.adaptSql("UPDATE __T__JOB_INSTANCE j1 FORCE INDEX (`PRIMARY`) RIGHT JOIN "
-                + "(SELECT j3.ID FROM __T__JOB_INSTANCE j3 FORCE INDEX(`IDX_JOB_INSTANCE_1`) WHERE j3.STATUS = 'SUBMITTED' AND j3.QUEUE = ? AND "
-                + "(j3.HIGHLANDER = FALSE OR (j3.HIGHLANDER = TRUE AND (SELECT COUNT(1) FROM __T__JOB_INSTANCE j4 FORCE INDEX(`IDX_JOB_INSTANCE_2`) "
-                + "WHERE j4.STATUS IN ('ATTRIBUTED' , 'RUNNING') AND j4.JOBDEF = j3.JOBDEF) = 0)) ORDER BY PRIORITY DESC, INTERNAL_POSITION LIMIT ? FOR UPDATE) j2 "
-                + "ON j2.ID = j1.ID SET j1.NODE = ?, j1.STATUS = 'ATTRIBUTED', j1.DATE_ATTRIBUTION = CURRENT_TIMESTAMP"));
+        // We do NOT want to use paginateQuery on each poll query as we want polling to be as painless as possible, so we pre-paginate it.
+        queries.put("ji_select_poll", queries.get("ji_select_poll") + " LIMIT ?");
     }
 
     @Override
@@ -58,17 +57,6 @@ public class DbImplMySql extends DbAdapter
     public void beforeUpdate(Connection cnx, QueryPreparation q)
     {
         List<Object> params = q.parameters;
-
-        // The main query is very different for MySQL, so we must change the parameter order.
-        if (q.isKey("ji_update_poll"))
-        {
-            Object param0 = params.get(0);
-            Object param1 = params.get(1);
-            Object param2 = params.get(2);
-            params.set(0, param1);
-            params.set(1, param2);
-            params.set(2, param0);
-        }
 
         // There is no way to do parameterized IN(?) queries with MySQL so we must rewrite these queries as IN(?, ?, ?...)
         // This cannot be done at startup, as the ? count may be different for each call.
@@ -165,5 +153,11 @@ public class DbImplMySql extends DbAdapter
         prms.add(pageSize);
         prms.add(start);
         return sql;
+    }
+
+    @Override
+    public List<JobInstance> poll(DbConn cnx, Queue queue, int headSize)
+    {
+        return JobInstance.select(cnx, "ji_select_poll", queue.getId(), headSize);
     }
 }

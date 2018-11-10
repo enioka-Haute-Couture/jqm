@@ -200,15 +200,6 @@ class QueuePoller implements Runnable, QueuePollerMBean
         return room;
     }
 
-    private boolean mayHaveFreeRoom()
-    {
-        if (potentialFreeRoom() <= 0)
-        {
-            return false;
-        }
-        return true;
-    }
-
     @Override
     public synchronized void run() // sync: avoid race condition on run when restarting after failure.
     {
@@ -228,10 +219,11 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 refreshDeploymentParameter(cnx);
 
                 // Free room?
-                if (mayHaveFreeRoom())
+                int freeRoom = potentialFreeRoom();
+                if (freeRoom > 0)
                 {
-                    // Fetch the queue head.
-                    List<JobInstance> newInstances = JobInstance.select(cnx, "ji_select_poll", this.queue.getId());
+                    // Fetch the queue head. * 3 because we may reject quite a few JI inside resource managers.
+                    List<JobInstance> newInstances = cnx.poll(this.queue, freeRoom > 100000 ? Integer.MAX_VALUE : freeRoom * 3);
 
                     jiloop: for (JobInstance ji : newInstances)
                     {

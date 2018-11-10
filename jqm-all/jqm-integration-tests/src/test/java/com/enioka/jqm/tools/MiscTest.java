@@ -198,7 +198,7 @@ public class MiscTest extends JqmBaseTest
 
         /// Create a running job that should be cleaned at startup
         int i1 = JqmClientFactory.getClient().enqueue("jqm-test-em", "test");
-        cnx.runUpdate("ji_update_poll", TestHelpers.node.getId(), TestHelpers.qVip, 10);
+        cnx.runUpdate("ji_update_status_by_id", TestHelpers.node.getId(), i1);
         cnx.runUpdate("jj_update_run_by_id", i1);
         cnx.commit();
 
@@ -216,8 +216,8 @@ public class MiscTest extends JqmBaseTest
                 null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
         // Create a running job that should be cleaned at startup
-        JqmClientFactory.getClient().enqueue("jqm-test-em", "test");
-        cnx.runUpdate("ji_update_poll", TestHelpers.node.getId(), TestHelpers.qVip, 10);
+        int i = JqmClientFactory.getClient().enqueue("jqm-test-em", "test");
+        cnx.runUpdate("ji_update_status_by_id", TestHelpers.node.getId(), i);
         cnx.commit();
 
         addAndStartEngine();

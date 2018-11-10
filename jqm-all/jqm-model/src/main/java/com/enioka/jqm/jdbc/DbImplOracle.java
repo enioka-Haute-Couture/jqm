@@ -8,9 +8,7 @@ import java.util.List;
 import java.util.Properties;
 
 import com.enioka.jqm.model.JobInstance;
-import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.Queue;
-import com.enioka.jqm.model.State;
 
 public class DbImplOracle extends DbAdapter
 {
@@ -30,15 +28,8 @@ public class DbImplOracle extends DbAdapter
         System.setProperty("oracle.jdbc.Trace", "false");
 
         // See poll method for everything which is wrong with Oracle and queues.
-        queries.put("ji_poll", adaptSql("SELECT /*+ FIRST_ROWS */ ID from (" + "SELECT j2.ID" + "    FROM __T__JOB_INSTANCE j2"
-                + "    WHERE j2.STATUS='SUBMITTED' AND j2.QUEUE=? AND (j2.HIGHLANDER=0 OR (j2.HIGHLANDER=1 AND (SELECT COUNT(1)"
-                + "        FROM __T__JOB_INSTANCE j3" + "        WHERE j3.STATUS IN('ATTRIBUTED', 'RUNNING') AND j3.JOBDEF=j2.JOBDEF)=0))"
-                + "    ORDER BY PRIORITY DESC, INTERNAL_POSITION) a " + "WHERE ROWNUM <= ?"));
-        queries.put("ji_poll_lock", adaptSql(DbImplBase.queries.get("ji_select_all") + " WHERE ji.ID IN(?) "
-                + "AND STATUS='SUBMITTED' AND (ji.HIGHLANDER=0 OR (ji.HIGHLANDER=1 AND (SELECT COUNT(1) FROM __T__JOB_INSTANCE j2 WHERE j2.STATUS IN('ATTRIBUTED', 'RUNNING') AND ji.JOBDEF=j2.JOBDEF)=0)) "
-                + "FOR UPDATE OF STATUS, NODE, DATE_ATTRIBUTION"));
-        queries.put("ji_poll_attribute", adaptSql(
-                "UPDATE __T__JOB_INSTANCE j1 SET j1.NODE=?, j1.STATUS='ATTRIBUTED', j1.DATE_ATTRIBUTION=CURRENT_TIMESTAMP WHERE j1.ID IN(?) "));
+        queries.put("ji_select_poll",
+                String.format("SELECT /*+ FIRST_ROWS */ a.* FROM (%s) a WHERE ROWNUM < ?", queries.get("ji_select_poll")));
     }
 
     @Override
@@ -125,48 +116,15 @@ public class DbImplOracle extends DbAdapter
         return sql;
     }
 
+    // Oracle is very problematic in regards to creating queues with tables, probably since it has AQ (Advanced Queuing, a
+    // fully-fledged message broker) to create actual queues.
+    // We may want to evaluate that framework one day. For now, we actually cannot use a message broker since we use many filters like
+    // the Highlander filter. So it will have to wait for a new H handling mode.
+    // There is no - to our knowledge - way of polling a table in a single UPDATE on this db.
+
     @Override
-    public List<JobInstance> poll(DbConn cnx, Node node, Queue queue, int nbSlots, int level)
+    public List<JobInstance> poll(DbConn cnx, Queue queue, int headSize)
     {
-        // Oracle is very problematic in regards to creating queues with tables, probably since it has AQ (Advanced Queuing, a
-        // fully-fledged message broker) to create actual queues.
-        // We may want to evaluate that framework one day. For now, we actually cannot use a message broker since we use many filters like
-        // the Highlander filter. So it will have to wait for a new H handling mode.
-        // There is no - to our knowledge - way of polling a table in a single UPDATE on this db.
-
-        // We do it very stupidly: first a non-locking query, then a locking query checking status again. After that update.
-        // Cannot do both SELECT at the same time, as Oracle does not really support FOR UPDATE in sub queries with ORDER BY.
-
-        // This implementation will often return less results than allowed by nbSlots.
-
-        // Sorted list.
-        List<Integer> ids = cnx.runSelectColumn("ji_poll", Integer.class, queue.getId(), nbSlots);
-        if (ids.isEmpty())
-        {
-            return null;
-        }
-
-        // Now lock (this repeats the WHERE clause, just not the ORDER BY/LIMIT).
-        List<JobInstance> res = JobInstance.select(cnx, "ji_poll_lock", ids);
-        if (res.isEmpty())
-        {
-            cnx.rollback();
-            return null;
-        }
-
-        // Now update and actually attribute the JI to the local node
-        ids.clear();
-        for (JobInstance jobInstance : res)
-        {
-            ids.add(jobInstance.getId());
-
-            // We have taken the JI from the DB before the update, so update the object in memory.
-            jobInstance.setNode(node);
-            jobInstance.setState(State.ATTRIBUTED);
-        }
-        cnx.runUpdate("ji_poll_attribute", node.getId(), ids);
-        cnx.commit();
-
-        return res;
+        return JobInstance.select(cnx, "ji_select_poll", queue.getId(), headSize);
     }
 }

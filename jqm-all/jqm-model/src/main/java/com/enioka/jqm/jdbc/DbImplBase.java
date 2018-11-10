@@ -214,12 +214,7 @@ class DbImplBase
         queries.put("ji_select_cnx_data_by_id", "SELECT DNS||':'||PORT AS HOST FROM __T__JOB_INSTANCE ji LEFT JOIN __T__NODE n ON ji.NODE = n.ID WHERE ji.ID=?");
         queries.put("ji_select_instructions_by_node", "SELECT ji.ID, ji.INSTRUCTION FROM __T__JOB_INSTANCE ji WHERE ji.STATUS='RUNNING' AND ji.INSTRUCTION <> 'RUN' AND ji.NODE=?");
         
-        queries.put("ji_update_poll", "UPDATE __T__JOB_INSTANCE j1 SET NODE=?, STATUS='ATTRIBUTED', DATE_ATTRIBUTION=CURRENT_TIMESTAMP WHERE j1.STATUS='SUBMITTED' AND j1.ID IN "
-                + "(SELECT j2.ID FROM __T__JOB_INSTANCE j2 WHERE j2.STATUS='SUBMITTED' AND j2.QUEUE=? "
-                + "AND (j2.HIGHLANDER=false OR (j2.HIGHLANDER=true AND (SELECT COUNT(1) FROM __T__JOB_INSTANCE j3 WHERE j3.STATUS IN('ATTRIBUTED', 'RUNNING') AND j3.JOBDEF=j2.JOBDEF)=0 )) ORDER BY PRIORITY DESC, INTERNAL_POSITION FOR UPDATE LIMIT ?)");
-        queries.put("ji_select_to_run", queries.get("ji_select_all") + " WHERE ji.NODE = ? AND ji.QUEUE = ? AND ji.STATUS='ATTRIBUTED'");
         queries.put("ji_update_delayed", "UPDATE __T__JOB_INSTANCE SET STATUS='SUBMITTED' WHERE STATUS='SCHEDULED' AND DATE_NOT_BEFORE <= CURRENT_TIMESTAMP");
-
         queries.put("ji_select_poll",queries.get("ji_select_all") + " WHERE ji.QUEUE = ? AND ji.STATUS='SUBMITTED' ORDER BY PRIORITY DESC, INTERNAL_POSITION");
         queries.put("ji_update_status_by_id", "UPDATE __T__JOB_INSTANCE SET STATUS='ATTRIBUTED', NODE=? WHERE STATUS='SUBMITTED' AND ID=?");
         

@@ -429,9 +429,9 @@ public class DbConn implements Closeable
 
     /**
      * Close utility method.
-     * 
+     *
      * @param ps
-     *            statement to close.
+     *               statement to close.
      */
     public void closeQuietly(Closeable ps)
     {
@@ -440,9 +440,9 @@ public class DbConn implements Closeable
 
     /**
      * Close utility method.
-     * 
+     *
      * @param ps
-     *            statement to close through a result set.
+     *               statement to close through a result set.
      */
     public void closeQuietly(ResultSet ps)
     {
@@ -451,9 +451,9 @@ public class DbConn implements Closeable
 
     /**
      * Close utility method.
-     * 
+     *
      * @param ps
-     *            statement to close.
+     *               statement to close.
      */
     public void closeQuietly(Connection ps)
     {
@@ -462,9 +462,9 @@ public class DbConn implements Closeable
 
     /**
      * Close utility method.
-     * 
+     *
      * @param ps
-     *            statement to close.
+     *               statement to close.
      */
     public void closeQuietly(Statement ps)
     {
@@ -612,8 +612,8 @@ public class DbConn implements Closeable
         }
     }
 
-    public List<JobInstance> poll(Node node, Queue queue, int nbSlots)
+    public List<JobInstance> poll(Queue queue, int nbSlots)
     {
-        return this.parent.getAdapter().poll(this, node, queue, nbSlots, 0);
+        return this.parent.getAdapter().poll(this, queue, nbSlots);
     }
 }
