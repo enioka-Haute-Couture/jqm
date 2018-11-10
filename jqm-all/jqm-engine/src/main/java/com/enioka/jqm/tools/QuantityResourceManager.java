@@ -92,7 +92,7 @@ class QuantityResourceManager extends ResourceManagerBase
     @Override
     void releaseResource(JobInstance ji)
     {
-        int slots = runningJobs.getOrDefault(ji.getId(), 0);
+        int slots = runningJobs.get(ji.getId()) != null ? runningJobs.get(ji.getId()) : 0;
         runningJobs.remove(ji.getId());
         jqmlogger.debug("Releasing {} slots for RM {}", slots, this.key);
         availableUnits.addAndGet(slots);
