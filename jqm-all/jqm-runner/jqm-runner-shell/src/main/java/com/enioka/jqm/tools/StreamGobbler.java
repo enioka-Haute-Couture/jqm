@@ -23,11 +23,13 @@ class StreamGobbler extends Thread
     InputStream is;
     OutputStream os;
     Semaphore end = new Semaphore(0);
+    String threadName;
 
     private StreamGobbler(InputStream is, OutputStream os)
     {
         this.is = is;
         this.os = os;
+        this.threadName = Thread.currentThread().getName(); // Share the name with parent thread, so as to share stdout.
     }
 
     static Waiter plumbProcess(Process p)
@@ -42,6 +44,7 @@ class StreamGobbler extends Thread
 
     public void run()
     {
+        Thread.currentThread().setName(this.threadName);
         try
         {
             PrintWriter pw = new PrintWriter(this.os);

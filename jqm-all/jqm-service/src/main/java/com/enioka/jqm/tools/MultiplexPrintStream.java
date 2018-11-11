@@ -24,6 +24,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Writer;
+import java.nio.Buffer;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
@@ -45,13 +48,8 @@ class MultiplexPrintStream extends PrintStream
 
     private BufferedWriter original = null;
     private boolean useCommonLogFile = false;
-    private ThreadLocal<BufferedWriter> logger = new ThreadLocal<BufferedWriter>()
-    {
-        protected BufferedWriter initialValue()
-        {
-            return original;
-        }
-    };
+
+    private Map<String, BufferedWriter> writers = new HashMap<String, BufferedWriter>();
     String rootLogDir;
 
     MultiplexPrintStream(OutputStream out, String rootLogDir, boolean alsoWriteToCommonLog)
@@ -68,13 +66,23 @@ class MultiplexPrintStream extends PrintStream
         }
     }
 
+    private BufferedWriter getWriter()
+    {
+        BufferedWriter res = writers.get(Thread.currentThread().getName());
+        if (res == null)
+        {
+            return this.original;
+        }
+        return res;
+    }
+
     void registerThread(String fileName)
     {
         try
         {
             unregisterThread();
             Writer w = new FileWriter(FilenameUtils.concat(rootLogDir, fileName), true);
-            logger.set(new BufferedWriter(w));
+            writers.put(Thread.currentThread().getName(), new BufferedWriter(w));
         }
         catch (IOException e)
         {
@@ -87,11 +95,11 @@ class MultiplexPrintStream extends PrintStream
     {
         try
         {
-            BufferedWriter bf = logger.get();
+            BufferedWriter bf = getWriter();
             if (bf != original)
             {
                 bf.close();
-                logger.remove();
+                this.writers.remove(Thread.currentThread().getName());
             }
         }
         catch (IOException e)
@@ -117,7 +125,7 @@ class MultiplexPrintStream extends PrintStream
 
     private void write(String s, boolean newLine)
     {
-        BufferedWriter textOut = logger.get();
+        BufferedWriter textOut = getWriter();
         try
         {
             ensureOpen();
