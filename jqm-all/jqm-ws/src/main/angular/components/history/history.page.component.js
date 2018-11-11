@@ -5,6 +5,7 @@ import $ from 'jquery'; // needed by bootstrap js.
 import 'bootstrap/js/dist/button';
 import 'bootstrap/js/dist/popover';
 
+
 class HistoryPageCtrl
 {
     constructor(µQueueDto, $http)
@@ -26,6 +27,9 @@ class HistoryPageCtrl
         this.datemax = this.now;
         this.step = 600000;
         this.scale = 86400000;
+
+        // Thanks JS and ng...
+        this.getDataAsync = this.getDataAsync.bind(this);
 
         // Query
         this.query = {};
@@ -229,20 +233,10 @@ class HistoryPageCtrl
         // Sort options
         this.query.sortby = this.sortInfo;
 
-        // Time filters
-        delete this.query.enqueuedBefore;
-        delete this.query.enqueuedAfter;
-        if (this.filterDate)
+        // Time filters: add a day to "started before" to be inclusive.
+        if (this.query.enqueuedBefore)
         {
-            if (this.datemax !== this.daterangemax)
-            {
-                this.query.enqueuedBefore = new Date(this.datemax);
-            }
-            else
-            {
-                delete this.query.enqueuedBefore;
-            }
-            this.query.enqueuedAfter = new Date(this.datemin);
+            this.query.enqueuedBefore = new Date(this.query.enqueuedBefore.getTime() + 86400000);
         }
 
         // Lists

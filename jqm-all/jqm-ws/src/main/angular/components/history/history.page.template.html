@@ -42,16 +42,11 @@
                 <select ng-cell-input ng-model="$ctrl.query.queueId" class="form-control" placeholder="parent id"
                     ng-options="q.id as q.name for q in $ctrl.queues" ng-change="$ctrl.getDataAsync();" data-toggle="popover"
                     data-content="filter by queue" data-trigger="hover"></select>
-                <div ng-show='$ctrl.filterDate' style="display: inline;">
-                    From
-                    <span>{{datemin | epoch2date | date:'dd/MM HH:mm'}}</span>
-                    to
-                    <span ng-show="$ctrl.datemax!==$ctrl.daterangemax">{{$ctrl.datemax|epoch2date|date:'dd/MM_HH:mm'}}</span>
-                    <span ng-show="$ctrl.datemax===$ctrl.daterangemax || !$ctrl.datemax">now</span>
-                </div>
 
+                <jqm-date-picker ng-model="$ctrl.query.enqueuedAfter" ng-change="$ctrl.getDataAsync" ng-title="Created after"></jqm-date-picker>
+                <jqm-date-picker ng-model="$ctrl.query.enqueuedBefore" ng-change="$ctrl.getDataAsync" ng-title="Created before"></jqm-date-picker>
 
-                <button class="btn btn-outline-dark btn-sm" ng-click="$ctrl.filterDate = false; $ctrl.ko = false; $ctrl.running = false; $ctrl.query = {}; $ctrl.getDataAsync();"
+                <button class="btn btn-outline-dark btn-sm" ng-click="$ctrl.ko = false; $ctrl.running = false; $ctrl.query = {}; $ctrl.getDataAsync();"
                     data-toggle="popover" data-content="reset all filters to default" data-trigger="hover">
                     Reset
                 </button>
