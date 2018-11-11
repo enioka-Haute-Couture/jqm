@@ -296,6 +296,21 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                 jqmlogger.error("interrupted", e);
             }
         }
+
+        // Send a KILL signal to remaining job instances, and wait some more.
+        if (this.getCurrentlyRunningJobCount() > 0)
+        {
+            this.runningJobInstanceManager.killAll();
+            try
+            {
+                Thread.sleep(10000);
+            }
+            catch (InterruptedException e)
+            {
+                jqmlogger.error("interrupted", e);
+            }
+        }
+
         jqmlogger.debug("Stop order was correctly handled. Engine for node " + this.node.getName() + " has stopped.");
     }
 

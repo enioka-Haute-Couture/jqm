@@ -71,4 +71,15 @@ class RunningJobInstanceManager
         QueuePoller qp;
         JobInstance ji;
     }
+
+    /**
+     * Send a kill signal to all running instances and return as soon as the signal is sent.
+     */
+    void killAll()
+    {
+        for (RjiRegistration reg : this.instancesById.values().toArray(new RjiRegistration[] {}))
+        {
+            reg.rji.handleInstruction(Instruction.KILL);
+        }
+    }
 }
