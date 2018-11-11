@@ -11,7 +11,7 @@ cd $(dirname $0)
 if [ $(whoami) = "root" ]
 then
     if [ "x${JQM_SERVICE_ACCOUNT}" = "x" ]
-    then        
+    then
         echo "Defaulting to account jqm for running the script. Set JQM_SERVICE_ACCOUNT to use a different account."
         JQM_SERVICE_ACCOUNT="jqm"
     fi
@@ -214,6 +214,10 @@ jqm_import_xml() {
  $JAVA -jar $JQM_JAR -importjobdef $1
 }
 
+jqm_import_queues() {
+ $JAVA -jar $JQM_JAR -importqueuefile $1
+}
+
 jqm_import_all_xml() {
  $JAVA -jar $JQM_JAR -importjobdef $(find jobs -name "*xml" -type f | grep -v pom.xml | tr "\\n" ",")
 }
@@ -256,6 +260,9 @@ case "$ACTION" in
   ;;
  importxml|import|xml)
   jqm_import_xml $2
+  ;;
+ importqueues|queues)
+  jqm_import_queues $2
   ;;
  importallxml|allxml)
   jqm_import_all_xml

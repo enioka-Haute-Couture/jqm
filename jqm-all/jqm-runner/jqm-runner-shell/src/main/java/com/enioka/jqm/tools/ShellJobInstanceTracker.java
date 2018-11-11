@@ -117,6 +117,8 @@ class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTra
         env.put("JQM_API_PASSWORD", this.pwd != null ? this.pwd : "");
         env.put("JQM_API_LOCAL_URL", this.url != null ? this.url : "");
 
+        env.putAll(ji.getEnvVarCache());
+
         pb.environment().putAll(env);
 
         // Start

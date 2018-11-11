@@ -61,6 +61,7 @@ public class JqmSingleRunner
         // Get a copy of the instance, to be sure to get a non detached item.
         DbConn cnx = Helpers.getNewDbSession();
         job = com.enioka.jqm.model.JobInstance.select_id(cnx, job.getId());
+        job.loadPrmCache(cnx);
 
         // Parameters
         final int poll = Integer.parseInt(GlobalParameter.getParameter(cnx, "internalPollingPeriodMs", "10000"));

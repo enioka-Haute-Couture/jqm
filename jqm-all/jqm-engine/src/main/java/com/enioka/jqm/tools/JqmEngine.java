@@ -20,6 +20,7 @@ package com.enioka.jqm.tools;
 
 import java.lang.management.ManagementFactory;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,7 @@ import com.enioka.jqm.model.History;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Message;
 import com.enioka.jqm.model.Node;
+import com.enioka.jqm.model.ResourceManager;
 import com.enioka.jqm.model.State;
 
 import org.slf4j.Logger;
@@ -78,6 +80,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     private AtomicLong endedInstances = new AtomicLong(0);
     private RunnerManager runnerManager;
     private RunningJobInstanceManager runningJobInstanceManager;
+    private List<ResourceManagerBase> resourceManagers = new ArrayList<ResourceManagerBase>();
 
     // DB connection resilience data
     private volatile Queue<QueuePoller> qpToRestart = new LinkedBlockingQueue<QueuePoller>();
@@ -87,7 +90,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
 
     /**
      * Starts the engine
-     * 
+     *
      * @param nodeName
      *                     the name of the node to start, as in the NODE table of the database.
      * @throws JqmInitError
@@ -216,6 +219,9 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         // Runners
         runningJobInstanceManager = new RunningJobInstanceManager();
         runnerManager = new RunnerManager(cnx);
+
+        // Resource managers
+        initResourceManagers(cnx);
 
         // Pollers
         syncPollers(cnx, this.node);
@@ -350,6 +356,38 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         }
     }
 
+    private void initResourceManagers(DbConn cnx)
+    {
+        jqmlogger.info("Initializing node-level resource managers");
+
+        // For now, single RM using a global parameter. Future: from db configuration.
+        String itemList = GlobalParameter.getParameter(cnx, "discreteRmList", null);
+        if (itemList == null)
+        {
+            return;
+        }
+
+        ResourceManager discreteResourceManagerConfiguration = new ResourceManager();
+        discreteResourceManagerConfiguration.setClassName(DiscreteResourceManager.class.getCanonicalName());
+        discreteResourceManagerConfiguration.setDeploymentParameterId(null);
+        discreteResourceManagerConfiguration.setEnabled(true);
+        discreteResourceManagerConfiguration.setKey(GlobalParameter.getParameter(cnx, "discreteRmName", "ports"));
+        discreteResourceManagerConfiguration.setNodeId(this.node.getId());
+        discreteResourceManagerConfiguration.addParameter("com.enioka.jqm.rm.discrete.list", itemList);
+
+        ResourceManagerBase rm1 = new DiscreteResourceManager(discreteResourceManagerConfiguration);
+        rm1.refreshConfiguration(discreteResourceManagerConfiguration);
+        this.resourceManagers.add(rm1);
+    }
+
+    /**
+     * @return All the resourceManagers associated with the engine itself.
+     */
+    public List<ResourceManagerBase> getResourceManagers()
+    {
+        return resourceManagers;
+    }
+
     synchronized void checkEngineEnd()
     {
         jqmlogger.trace("Checking if engine should end with the latest poller");
@@ -419,7 +457,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
 
     /**
      * To be called at node startup - it purges all job instances associated to this node.
-     * 
+     *
      * @param cnx
      * @param node
      */

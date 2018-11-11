@@ -65,7 +65,7 @@ The following script will download and copy the binaries (adapt the first two li
     rmdir jqm-*
     ./bin/permissions.sh
     ./jqm.sh createnode
-    ./jqm.sh start    
+    ./jqm.sh start
 
 And it's done, a JQM node is now running.
 
@@ -169,14 +169,22 @@ Database support
 Oracle
 ------------------
 
-Oracle 10gR2 & 11gR2 are supported. No specific configuration is required in JQM: no options inside jqm.properties (or absent file). No specific database configuration is required.
+Oracle 10gR2 & 11gR2 && 12c are supported. No specific configuration is required in JQM: no options inside jqm.properties (or absent file). No specific database configuration is required.
 
+A typical schema creation would be::
+
+    $sqlplus / as sysdba
+    CREATE USER JQM IDENTIFIED BY jqm DEFAULT TABLESPACE SYSAUX QUOTA UNLIMITED ON SYSAUX ACCOUNT UNLOCK;
+    GRANT CONNECT, RESOURCE TO JQM;
+    exit;
+
+On 12c the user cannot be named JQM (must be prefixed with C##, unless `alter session set "_ORACLE_SCRIPT"=true;` is run).
 
 PostgreSQL
 ------------------
 
 PostgreSQL 9 & 10 are supported (tested with PostgreSQL 9.3). It is the recommended open source database to work with JQM.
-No specific configuration is required in JQM: no options inside jqm.properties (or absent file). No specific database configuration is required. 
+No specific configuration is required in JQM: no options inside jqm.properties (or absent file). No specific database configuration is required.
 
 Here's a quickstart to setup a test database. As postgres user::
 
@@ -202,12 +210,12 @@ These commands can be used to setup a database.::
     mysql> flush privileges;
 
 .. note:: before version 1.4, a startup script was needed to align sequences between tables on database startup. This is no longer needed and if present, this script should be removed.
-    
+
 HSQLDB
 ------------------
 
 HSQLDB 2.3.x is supported in test environments only.
-	
+
 No specific HSQLDB configuration is required. Please note that if using a file database, HSQLDB prevents multiple processes from accessing it
 so it will cause issues for creating multi node environments.
 
@@ -216,7 +224,7 @@ so it will cause issues for creating multi node environments.
 Global configuration
 **********************
 
-When the first node is created inside a database, some parameters are automatically created. You may want to change them using your preferred 
+When the first node is created inside a database, some parameters are automatically created. You may want to change them using your preferred
 database editing tool or the web console. See :doc:`parameters` for this.
 
 Many users will immediately enable the web administration console in order to easily change this configuration::

@@ -30,6 +30,9 @@
             <xs:enumeration value="FS" />
             <xs:enumeration value="MAVEN" />
             <xs:enumeration value="MEMORY" />
+            <xs:enumeration value="DEFAULTSHELLCOMMAND" />
+            <xs:enumeration value="POWERSHELLCOMMAND" />
+            <xs:enumeration value="DIRECTEXECUTABLE" />
         </xs:restriction>
     </xs:simpleType>
 	

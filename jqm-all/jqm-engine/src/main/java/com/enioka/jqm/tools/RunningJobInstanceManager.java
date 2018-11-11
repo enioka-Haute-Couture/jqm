@@ -49,7 +49,7 @@ class RunningJobInstanceManager
         // Signal queue poller.
         if (reg.qp != null)
         {
-            reg.qp.decreaseNbThread(reg.ji.getId());
+            reg.qp.releaseResources(reg.ji);
         }
     }
 

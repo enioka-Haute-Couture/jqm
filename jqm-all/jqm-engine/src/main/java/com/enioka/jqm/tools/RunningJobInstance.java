@@ -52,7 +52,7 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
 
     /**
      * Constructor for JI coming from queue pollers.
-     * 
+     *
      * @param ji
      * @param qp
      */
@@ -103,7 +103,6 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
 
         // Priority?
         if (this.ji.getPriority() != null && this.ji.getPriority() >= Thread.MIN_PRIORITY && this.ji.getPriority() <= Thread.MAX_PRIORITY)
-
         {
             Thread.currentThread().setPriority(this.ji.getPriority());
         }
@@ -137,9 +136,6 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
         try
         {
             cnx = Helpers.getNewDbSession();
-
-            // Parameters
-            this.ji.loadPrmCache(cnx);
 
             // Cache heating & co, loader-specific.
             tracker.initialize(cnx);

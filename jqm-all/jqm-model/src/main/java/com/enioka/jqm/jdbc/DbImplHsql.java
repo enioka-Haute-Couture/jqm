@@ -1,11 +1,25 @@
 package com.enioka.jqm.jdbc;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
+
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Queue;
 
 public class DbImplHsql extends DbAdapter
 {
+    @Override
+    public void prepare(Properties p, Connection cnx)
+    {
+        super.prepare(p, cnx);
+
+        // We do NOT want to use paginateQuery on each poll query as we want polling to be as painless as possible, so we pre-paginate it.
+        queries.put("ji_select_poll", queries.get("ji_select_poll") + " LIMIT ?");
+    }
+
     @Override
     public String adaptSql(String sql)
     {
@@ -34,5 +48,11 @@ public class DbImplHsql extends DbAdapter
         prms.add(pageSize);
         prms.add(start);
         return sql;
+    }
+
+    @Override
+    public List<JobInstance> poll(DbConn cnx, Queue queue, int headSize)
+    {
+        return JobInstance.select(cnx, "ji_select_poll", queue.getId(), headSize);
     }
 }

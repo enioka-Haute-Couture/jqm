@@ -132,7 +132,8 @@ public class JobDefParameter implements Serializable
                 tmp.jobdef_id = rs.getInt(4);
 
                 List<JobDefParameter> list = res.get(tmp.jobdef_id);
-                if (list == null){
+                if (list == null)
+                {
                     list = new ArrayList<JobDefParameter>();
                     res.put(tmp.jobdef_id, list);
                 }

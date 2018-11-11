@@ -100,7 +100,7 @@ public class JqmTester
 
         ji = JobInstance.enqueue(cnx, State.SUBMITTED, q, jd, null, null, null, null, null, null, null, null, null, false, false, null, 0,
                 Instruction.RUN, null);
-        cnx.runUpdate("ji_update_poll", node.getId(), q, 10);
+        cnx.runUpdate("ji_update_status_by_id", node.getId(), ji);
 
         cnx.commit();
     }

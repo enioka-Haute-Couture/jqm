@@ -20,6 +20,7 @@ Major changes
 ++++++++++++++++++++++++++++
 
 * Engine: added process runner, making process and shell jobs first class citizen.
+* Engine: laid the foundations for more diversity in polling mechanisms, starting next release.
 * Build: migrated the UI build to modern npm toolchain (controled by Maven). This allows slightly better startup JS performances, and removes all stale cache issues when upgrading.
 * GUI: rewritten the job definition page to use a master/detail view, as the previous tabular view was becoming impractical with too many columns.
 * GUI: better login & logout experience.
