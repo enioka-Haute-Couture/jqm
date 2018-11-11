@@ -1,12 +1,17 @@
 <div>
-    <h2 class="bs-docs-header">Welcome to the JQM ${project.version} administration web console</h2>
+    <h2 class="bs-docs-header">Welcome to the JQM {{ ("${project.version}".endsWith("SNAPSHOT") ||
+        "${project.version}".endsWith("version}") ? "" :
+        "${project.version}") }} administration web console</h2>
 
     <div>
         <br />
         <div>On each tab, click the <span class="fas fa-question-circle"></span>
             icon for contextual help.</div>
-        Further reference can be found in the <a href="http://jqm.readthedocs.org/en/jqm-all-${project.version}">full
-            online documentation <span class="glyphicon glyphicon-book"></span></a> for version ${project.version}.
+        Further reference can be found in the <a ng-show="!'${project.version}'.endsWith('SNAPSHOT') && !'${project.version}'.endsWith('version}')"
+            href="http://jqm.readthedocs.org/en/jqm-all-${project.version}">full
+            online documentation <span class="fas fa-book"></span></a>
+        <a ng-show="'${project.version}'.endsWith('SNAPSHOT') || '${project.version}'.endsWith('version}')" href="http://jqm.readthedocs.org/en/master">full
+            online documentation for the development branch <span class="fas fa-book"></span></a>.
     </div>
 
     <div ng-show="$ctrl.me.perms.enforced">
