@@ -27,6 +27,7 @@ import { historyPageComponent } from './history/history.page.component';
 import { historyDetailComponent } from './history/history.detail.component';
 import { modalComponent } from './misc/modal.component';
 import { newLaunchComponent } from './history/newlaunch.component';
+import { ganttComponent } from './history/gantt.component';
 import { select2Component } from './misc/select2.component';
 import { mappingListComponent } from './mapping/mapping.list.component';
 import { FileReaderComponent } from './misc/filereader.component';
@@ -64,6 +65,7 @@ var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule
     .component('jqmRoles', rolePageComponent)
     .component('jqmHistory', historyPageComponent)
     .component('jqmJiDetail', historyDetailComponent)
+    .component('jqmGantt', ganttComponent)
     .component('jqmNewJi', newLaunchComponent)
     .component('jqmMappings', mappingListComponent)
 
