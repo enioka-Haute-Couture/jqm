@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.DeploymentParameter;
+import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.ResourceManager;
@@ -56,6 +57,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     private int maxNbThread = 10;
     private int pollingInterval = 10000;
     private int dpId;
+    private boolean strictPollingPeriod = false;
 
     private boolean run = true;
     private AtomicInteger actualNbThread = new AtomicInteger(0);
@@ -161,6 +163,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
         {
             applyDeploymentParameter(p);
         }
+
+        this.strictPollingPeriod = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "strictPollingPeriod", "false"));
     }
 
     private void registerMBean()
@@ -412,7 +416,11 @@ class QueuePoller implements Runnable, QueuePollerMBean
             rm.releaseResource(ji);
         }
 
-        loop.release(1);
+        if (!this.strictPollingPeriod)
+        {
+            // Force a new loop at once. This makes queues more fluid.
+            loop.release(1);
+        }
         this.engine.signalEndOfRun();
     }
 
