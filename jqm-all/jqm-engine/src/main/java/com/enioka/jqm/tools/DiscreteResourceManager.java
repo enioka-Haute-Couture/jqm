@@ -157,6 +157,10 @@ class DiscreteResourceManager extends ResourceManagerBase
         int released = 0;
         for (Map.Entry<String, Token> e : this.tokenRepository.entrySet())
         {
+            if (e.getValue() == null || e.getValue().free == null || e.getValue().jiId == null)
+            {
+                continue; // Happens when the token has just been created - not an issue.
+            }
             if (!e.getValue().free.get() && e.getValue().jiId == ji.getId())
             {
                 e.getValue().jiId = null;
