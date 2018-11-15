@@ -15,6 +15,7 @@ export const jdDetailComponent = {
     controller: JdDetailCtrl,
     template: template,
     bindings: {
-        'jd': '='
+        'jd': '=',
+        'onRemove': '<?',
     }
 };

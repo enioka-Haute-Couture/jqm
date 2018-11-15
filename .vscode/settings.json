@@ -48,4 +48,6 @@
         "**/target", // exclude duplicated pom file in target folder
     ],
     "maven.executable.options": "",
+    "javascript.format.placeOpenBraceOnNewLineForFunctions": true,
+    "javascript.format.placeOpenBraceOnNewLineForControlBlocks": true,
 }
