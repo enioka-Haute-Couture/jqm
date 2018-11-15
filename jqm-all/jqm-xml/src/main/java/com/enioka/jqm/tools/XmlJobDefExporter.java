@@ -72,6 +72,7 @@ public class XmlJobDefExporter
         try
         {
             os = new FileOutputStream(xmlPath);
+            export(os, jobDefList, cnx);
         }
         catch (FileNotFoundException e)
         {
@@ -88,7 +89,6 @@ public class XmlJobDefExporter
                 // Who cares.
             }
         }
-        export(os, jobDefList, cnx);
     }
 
     /**
