@@ -26,14 +26,15 @@
             <span class="far fa-save"></span>
             Save all
         </button>
-        <button class="btn btn-outline-dark" ng-click="$ctrl.remove()" ng-enabled="$ctrl.selected_jd" jqm-permission="jd:delete">
-            <span class="far fa-trash-alt"></span>
-            Delete selected
-        </button>
+
+        <a class="btn btn-outline-dark" href="/ws/admin/jd/all/xml" ng-show="$ctrl.jds.length > 0">
+            <span class="fas fa-file-export"></span>
+            Export all
+        </a>
 
     </div>
 
     <div class="col-md-10" style="overflow-y: auto;">
-        <jqm-jd-details jd="$ctrl.selected_jd"></jqm-jd-details>
+        <jqm-jd-details jd="$ctrl.selected_jd" on-remove="$ctrl.remove"></jqm-jd-details>
     </div>
 </div>

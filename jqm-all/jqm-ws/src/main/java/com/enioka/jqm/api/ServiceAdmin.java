@@ -15,6 +15,7 @@
  */
 package com.enioka.jqm.api;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,10 +47,13 @@ import com.enioka.api.admin.RRoleDto;
 import com.enioka.api.admin.RUserDto;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.RPermission;
 import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.RUser;
 import com.enioka.jqm.pki.JdbcCa;
+import com.enioka.jqm.tools.JqmXmlException;
+import com.enioka.jqm.tools.XmlJobDefExporter;
 
 @Path("/admin")
 public class ServiceAdmin
@@ -634,6 +638,62 @@ public class ServiceAdmin
             cnx = Helpers.getDbSession();
             MetaService.deleteJobDef(cnx, id);
             cnx.commit();
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @GET
+    @Path("jd/{id}/xml")
+    @Produces(MediaType.APPLICATION_XML)
+    @HttpCache
+    public void getJobDefDeploymentDescriptor(@PathParam("id") int id, @Context HttpServletResponse res)
+    {
+        DbConn cnx = null;
+        res.setHeader("Content-Disposition", "attachment; filename=jobdef_" + id + ".xml");
+
+        try
+        {
+            cnx = Helpers.getDbSession();
+            XmlJobDefExporter.export(res.getOutputStream(), JobDef.select(cnx, "jd_select_by_id", id), cnx);
+        }
+        catch (JqmXmlException e)
+        {
+            throw new JqmClientException(e);
+        }
+        catch (IOException e)
+        {
+            throw new JqmClientException(e);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+    }
+
+    @GET
+    @Path("jd/all/xml")
+    @Produces(MediaType.APPLICATION_XML)
+    @HttpCache
+    public void getJobDefDeploymentDescriptor(@Context HttpServletResponse res)
+    {
+        DbConn cnx = null;
+        res.setHeader("Content-Disposition", "attachment; filename=jobdef.xml");
+
+        try
+        {
+            cnx = Helpers.getDbSession();
+            XmlJobDefExporter.export(res.getOutputStream(), JobDef.select(cnx, "jd_select_all"), cnx);
+        }
+        catch (JqmXmlException e)
+        {
+            throw new JqmClientException(e);
+        }
+        catch (IOException e)
+        {
+            throw new JqmClientException(e);
         }
         finally
         {

@@ -13,6 +13,7 @@ class JdPageCtrl
         this.µQueueDto = µQueueDto;
         this.queues = µQueueDto.query();
 
+        this.remove = this.remove.bind(this);
         this.refresh();
     }
 

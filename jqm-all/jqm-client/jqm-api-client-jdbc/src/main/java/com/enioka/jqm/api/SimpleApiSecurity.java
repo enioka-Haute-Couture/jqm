@@ -33,7 +33,7 @@ import com.enioka.jqm.model.RUser;
  *
  * Helper class helping dealing with internal security when calling the simple REST API (the API dealing with file transfers)<br>
  * This API may be secured - therefore, we must create a temporary internal user with the necessary permissions.
- * 
+ *
  */
 public final class SimpleApiSecurity
 {
@@ -62,41 +62,41 @@ public final class SimpleApiSecurity
      */
     public static Duet getId(DbConn cnx)
     {
-        if (logindata == null && useAuth == null)
+        Duet currentLoginData = logindata; // Pointer copy to avoid having it reset under us during this method run.
+        RUser currentUser = user;
+
+        if (useAuth == null)
         {
             useAuth = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableWsApiAuth", "true"));
+        }
 
-            if (!useAuth)
-            {
-                jqmlogger.debug("The client web API calls will not use any authentication");
-                logindata = new Duet();
-                logindata.pass = null;
-                logindata.usr = null;
-            }
-            else
-            {
-                jqmlogger.debug("The client web API calls will use a temporary account for authentication");
-            }
+        if (currentLoginData == null)
+        {
+            currentLoginData = new Duet();
+            currentLoginData.pass = null;
+            currentLoginData.usr = null;
+            logindata = currentLoginData;
         }
 
         if (!useAuth)
         {
-            return logindata;
+            jqmlogger.debug("The client web API calls will not use any authentication");
+            return currentLoginData;
         }
 
         // Renew one day before limit, to ensure account is valid for a day.
         Calendar renewalLimit = null;
-        if (user != null)
+        if (currentUser != null)
         {
-            renewalLimit = (Calendar) user.getExpirationDate().clone(); // clone. otherwise we modify the user object next line!
+            renewalLimit = (Calendar) currentUser.getExpirationDate().clone(); // clone. otherwise we modify the user object next line!
             renewalLimit.add(Calendar.DAY_OF_YEAR, -1);
         }
 
-        if (user == null || renewalLimit == null || renewalLimit.before(Calendar.getInstance()))
+        if (currentUser == null || renewalLimit == null || renewalLimit.before(Calendar.getInstance()))
         {
             synchronized (lock)
             {
-                if (user == null || user.getExpirationDate().before(Calendar.getInstance()))
+                if (currentUser == null || currentUser.getExpirationDate().before(Calendar.getInstance()))
                 {
                     jqmlogger.debug("The client API will create an internal secret to access the simple API");
 
@@ -112,11 +112,13 @@ public final class SimpleApiSecurity
                     expiration.add(Calendar.DAY_OF_YEAR, 2);
 
                     int id = RUser.create(cnx, login, hash, saltS, expiration, true, "administrator");
-                    user = RUser.select_id(cnx, id);
+                    currentUser = RUser.select_id(cnx, id);
+                    user = currentUser;
 
-                    logindata = new Duet();
-                    logindata.pass = secret;
-                    logindata.usr = login;
+                    currentLoginData = new Duet();
+                    currentLoginData.pass = secret;
+                    currentLoginData.usr = login;
+                    logindata = currentLoginData;
 
                     // Purge all old internal accounts
                     cnx.runUpdate("user_delete_expired_internal");
@@ -126,7 +128,7 @@ public final class SimpleApiSecurity
             }
         }
 
-        return logindata;
+        return currentLoginData;
     }
 
     static void dispose()

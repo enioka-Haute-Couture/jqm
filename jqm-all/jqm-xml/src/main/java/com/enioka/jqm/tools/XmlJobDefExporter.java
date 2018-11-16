@@ -15,7 +15,10 @@
  */
 package com.enioka.jqm.tools;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -34,7 +37,7 @@ import com.enioka.jqm.model.ClHandler;
 import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.JobDefParameter;
 
-class XmlJobDefExporter
+public class XmlJobDefExporter
 {
     private XmlJobDefExporter()
     {
@@ -54,7 +57,7 @@ class XmlJobDefExporter
     }
 
     /**
-     * Exports several (given) job def to an XML file.
+     * Exports several (given) job def to a XML file.
      */
     static void export(String xmlPath, List<JobDef> jobDefList, DbConn cnx) throws JqmXmlException
     {
@@ -63,13 +66,48 @@ class XmlJobDefExporter
         {
             throw new IllegalArgumentException("file path cannot be null");
         }
+
+        // Create XML into file
+        OutputStream os = null;
+        try
+        {
+            os = new FileOutputStream(xmlPath);
+            export(os, jobDefList, cnx);
+        }
+        catch (FileNotFoundException e)
+        {
+            throw new JqmXmlException(e);
+        }
+        finally
+        {
+            try
+            {
+                os.close();
+            }
+            catch (IOException e)
+            {
+                // Who cares.
+            }
+        }
+    }
+
+    /**
+     * Exports several (given) job def to a given stream. Stream is not closed here.
+     */
+    public static void export(OutputStream os, List<JobDef> jobDefList, DbConn cnx) throws JqmXmlException
+    {
+        // Argument tests
+        if (os == null)
+        {
+            throw new IllegalArgumentException("output stream cannot be null");
+        }
         if (jobDefList == null || jobDefList.isEmpty())
         {
             throw new IllegalArgumentException("job def list cannot be null or empty");
         }
         if (cnx == null)
         {
-            throw new IllegalArgumentException("database connection name cannot be null");
+            throw new IllegalArgumentException("database connection cannot be null");
         }
 
         Collections.sort(jobDefList, new Comparator<JobDef>()
@@ -115,15 +153,15 @@ class XmlJobDefExporter
             root.addContent(getClElement(cl));
         }
 
-        // Done: save the file
+        // Done: output XML to stream.
         try
         {
             XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
-            out.output(document, new FileOutputStream(xmlPath));
+            out.output(document, os);
         }
         catch (java.io.IOException e)
         {
-            throw new JqmXmlException("Coul not save the XML file", e);
+            throw new JqmXmlException("Could not output XML to stream", e);
         }
     }
 
