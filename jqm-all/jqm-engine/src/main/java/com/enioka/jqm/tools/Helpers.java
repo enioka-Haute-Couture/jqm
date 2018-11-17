@@ -303,10 +303,14 @@ final class Helpers
      * 
      * @param nodeName
      *            name of the node that should be created or updated (if incompletely defined only)
-     * @param em
-     *            an EntityManager on which a transaction will be opened.
+     * @param cnx
+     *            an DbConn on which a transaction will be opened.
+     * @param port
+     *            port for a node to listen on
+     * @param dns
+     *            network interface (dns) for a node to listen on (localhost by default)
      */
-    static void updateNodeConfiguration(String nodeName, DbConn cnx, int port)
+    static void updateNodeConfiguration(String nodeName, DbConn cnx, int port, String dns)
     {
         // Node
         Integer nodeId = null;
@@ -319,7 +323,7 @@ final class Helpers
             jqmlogger.info("Node " + nodeName + " does not exist in the configuration and will be created with default values");
 
             nodeId = Node.create(cnx, nodeName, port, System.getProperty("user.dir") + "/jobs/", System.getProperty("user.dir") + "/jobs/",
-                    System.getProperty("user.dir") + "/tmp/", "localhost", "INFO").getId();
+                    System.getProperty("user.dir") + "/tmp/", dns, "INFO").getId();
             cnx.commit();
         }
 

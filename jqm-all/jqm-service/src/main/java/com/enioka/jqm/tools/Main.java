@@ -19,6 +19,8 @@
 package com.enioka.jqm.tools;
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -119,6 +121,8 @@ public class Main
                 .create("createnode");
         Option o62 = OptionBuilder.withArgName("port").hasArg().withDescription("Specify the port used by the newly created node.")
                 .isRequired().create("port");
+        Option o63 = OptionBuilder.withArgName("dns").hasArg().withDescription("Specify the dns(network interface) used by the newly created node.")
+                .withType(String.class).create("dns");
         Option o71 = OptionBuilder.withDescription("display JQM engine version").withLongOpt("version").create("v");
         Option o81 = OptionBuilder.withDescription("upgrade JQM database").withLongOpt("upgrade").create("u");
         Option o91 = OptionBuilder.withArgName("jobInstanceId").hasArg().withDescription("get job instance status by ID").isRequired()
@@ -170,6 +174,7 @@ public class Main
         options.addOptionGroup(og2);
         OptionGroup og3 = new OptionGroup();
         og3.addOption(o62);
+        og3.addOption(o63);
         options.addOptionGroup(og3);
 
         HelpFormatter formatter = new HelpFormatter();
@@ -197,6 +202,15 @@ public class Main
             {
                 jqmlogger.info("Using specific port " + line.getOptionValue(o62.getOpt()));
                 port = Integer.parseInt(line.getOptionValue(o62.getOpt()));
+            }
+
+            //Specific interface (use localhost by default)
+            String dns = "localhost";
+            if (line.getOptionValue(o63.getOpt()) != null) {
+                jqmlogger.info("Using specific dns(network interface) " + line.getOptionValue(o62.getOpt()));
+                dns = InetAddress.getByName(line.getOptionValue(o63.getOpt())).getHostName();
+            } else {
+                jqmlogger.info("Using loopback address as dns " + dns);
             }
 
             // Enqueue
@@ -237,7 +251,7 @@ public class Main
             // Create node
             else if (line.getOptionValue(o61.getOpt()) != null)
             {
-                createEngine(line.getOptionValue(o61.getOpt()), port);
+                createEngine(line.getOptionValue(o61.getOpt()), port, dns);
             }
             // Upgrade
             else if (line.hasOption(o81.getOpt()))
@@ -294,7 +308,9 @@ public class Main
         {
             jqmlogger.fatal("Could not read command line: " + exp.getMessage());
             formatter.printHelp("java -jar jqm-engine.jar", options, true);
-            return;
+        } catch (UnknownHostException exp) {
+            jqmlogger.fatal("Network interface name is invalid: " + exp.getMessage());
+            formatter.printHelp("java -jar jqm-engine.jar", options, true);
         }
     }
 
@@ -405,7 +421,7 @@ public class Main
         }
     }
 
-    private static void createEngine(String nodeName, int port)
+    private static void createEngine(String nodeName, int port, String dns)
     {
         DbConn cnx = null;
         try
@@ -413,7 +429,7 @@ public class Main
             jqmlogger.info("Creating engine node " + nodeName);
             cnx = Helpers.getNewDbSession();
             Helpers.updateConfiguration(cnx);
-            Helpers.updateNodeConfiguration(nodeName, cnx, port);
+            Helpers.updateNodeConfiguration(nodeName, cnx, port, dns);
         }
         catch (Exception e)
         {
