@@ -28,8 +28,8 @@ class DbImplBase
                 + "VALUES(JQM_PK.nextval, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         queries.put("node_delete_all", "DELETE FROM __T__NODE");
         queries.put("node_delete_by_id", "DELETE __T__NODE WHERE ID=?");
-        queries.put("node_update_all_enable_ws", "UPDATE __T__NODE SET LOAD_API_SIMPLE=true, LOAD_API_CLIENT=true, LOAD_API_ADMIN=true, DNS='0.0.0.0'");
-        queries.put("node_update_enable_ws_by_id", "UPDATE __T__NODE SET LOAD_API_SIMPLE=true, LOAD_API_CLIENT=true, LOAD_API_ADMIN=true, DNS='0.0.0.0' WHERE ID=?");
+        queries.put("node_update_all_enable_ws", "UPDATE __T__NODE SET LOAD_API_SIMPLE=true, LOAD_API_CLIENT=true, LOAD_API_ADMIN=true");
+        queries.put("node_update_enable_ws_by_id", "UPDATE __T__NODE SET LOAD_API_SIMPLE=true, LOAD_API_CLIENT=true, LOAD_API_ADMIN=true WHERE ID=?");
         queries.put("node_update_all_disable_ws", "UPDATE __T__NODE SET LOAD_API_CLIENT=false, LOAD_API_ADMIN=false");
         queries.put("node_update_all_disable_all_ws", "UPDATE __T__NODE SET LOAD_API_SIMPLE=false, LOAD_API_CLIENT=false, LOAD_API_ADMIN=false");
         queries.put("node_update_enabled_by_id", "UPDATE __T__NODE SET ENABLED=? WHERE ID=?");
