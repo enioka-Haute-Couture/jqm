@@ -4,8 +4,10 @@ import * as SVG from 'svg.js';
 
 class GanttController
 {
-    constructor()
+    constructor(dateFilter)
     {
+        this.dateFilter = dateFilter;
+
         // Ng way of registering an after DOM init hook...
         angular.element(this.afterDomReady.bind(this));
     }
@@ -21,6 +23,12 @@ class GanttController
 
     $onChanges(changesObj)
     {
+        if (changesObj.jqmAlgo)
+        {
+            this.drawData = this["drawData" + this.jqmAlgo].bind(this);
+            // Do not redraw, as an algo change goes with a click.
+        }
+
         if (changesObj.jqmData && this.jqmData && this.draw)
         {
             this.drawData.bind(this)();
@@ -109,24 +117,26 @@ class GanttController
                 // Draw each segemnt inside the line
                 for (var ji of line)
                 {
-                    this.draw.rect((ji.end.getTime() - ji.start.getTime()) * PX_PER_MS, PX_PER_LINE / 2).attr({ fill: color }).move((ji.start.getTime() - minStart.getTime()) * PX_PER_MS, lineIdx * PX_PER_LINE);
+                    //this.draw.rect((ji.end.getTime() - ji.start.getTime()) * PX_PER_MS, PX_PER_LINE / 2).attr({ fill: color }).move((ji.start.getTime() - minStart.getTime()) * PX_PER_MS, lineIdx * PX_PER_LINE);
+                    this.draw.line(0, 0, (ji.end.getTime() - ji.start.getTime()) * PX_PER_MS, 0).stroke({ width: 2, color: color }).move((ji.start.getTime() - minStart.getTime()) * PX_PER_MS, (lineIdx + 0.5) * PX_PER_LINE);
+                    this.draw.line((ji.end.getTime() - ji.start.getTime()) * PX_PER_MS, -5, (ji.end.getTime() - ji.start.getTime()) * PX_PER_MS, 5).stroke({ width: 2, color: color }).move((ji.start.getTime() - minStart.getTime()) * PX_PER_MS, (lineIdx + 0.5) * PX_PER_LINE - 5);
                 }
 
                 lineIdx++;
             }
 
-            // Draw legend
+            // Draw queue legend
             this.draw.text(queueName).move(0, (lineIdx - 0.5) * PX_PER_LINE).attr({ fill: color });
 
             queueIdx++;
         }
 
-        // Legend
-        this.draw.text(minStart.toString());
-        this.draw.text(maxEnd.toString()).move(window.innerWidth - 300);
+        // Global date legend
+        this.draw.text(this.dateFilter(minStart, 'dd/MM HH:mm:ss'));
+        this.draw.text(this.dateFilter(maxEnd, 'dd/MM HH:mm:ss')).move(window.innerWidth - 150);
     }
 
-    drawData()
+    drawData0()
     {
         this.draw.clear();
         if (!this.jqmData || this.jqmData.length == 0)
@@ -416,20 +426,21 @@ class GanttController
             x2 = ((endTime - min) * width / (max - min));
             this.draw.line(x1, y1, x2, y2).stroke({ color: COLORS[queues[job.queue.name].color], width: 2 });
             this.draw.line(x1, y1 - 5, x1, y1 + 5).stroke({ color: COLORS[queues[job.queue.name].color], width: 2 });
-            this.draw.text(job.applicationName + job.id).move(x1, y1 - 10).font({ fill: COLORS[queues[job.queue.name].color], size: 8 });
+            //this.draw.text(job.applicationName + job.id).move(x1, y1 - 10).font({ fill: COLORS[queues[job.queue.name].color], size: 8 });
         }
         console.info(queues);
         // Legend
-        this.draw.text(minStart.toString());
-        this.draw.text(maxEnd.toString()).move(window.innerWidth - 300);
+        this.draw.text(this.dateFilter(minStart, 'dd/MM HH:mm:ss'));
+        this.draw.text(this.dateFilter(maxEnd, 'dd/MM HH:mm:ss')).move(window.innerWidth - 150);
     }
 }
-GanttController.$inject = [];
+GanttController.$inject = ["dateFilter",];
 
 export const ganttComponent = {
     controller: GanttController,
     template: '<div id="drawing"></div>',
     bindings: {
         'jqmData': '<',
+        'jqmAlgo': '<',
     }
 };

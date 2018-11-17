@@ -1,7 +1,5 @@
 <div class="row">
     <div class="col-sm-12">
-        <jqm-gantt jqm-data="$ctrl.data"></jqm-gantt>
-
         <div class="card border-light">
             <div class="card-body form-inline" style="padding: 8px;">
                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
@@ -52,6 +50,17 @@
                     data-toggle="popover" data-content="reset all filters to default" data-trigger="hover">
                     Reset
                 </button>
+
+                <button class="btn btn-outline-dark btn-sm" ng-click="$ctrl.algo=0; $ctrl.toggleImage();" data-toggle="popover"
+                    data-content="show filtered data as a GANTT chart" data-trigger="hover">
+                    <span class="far fa-image"></span>
+                    Chart A
+                </button>
+                <button class="btn btn-outline-dark btn-sm" ng-click="$ctrl.algo=1; $ctrl.toggleImage();" data-toggle="popover"
+                    data-content="show filtered data as a GANTT chart" data-trigger="hover">
+                    <span class="far fa-image"></span>
+                    Chart B
+                </button>
             </div>
         </div>
 
@@ -61,7 +70,7 @@
 <!-- end of filter row -->
 
 <!-- The result grid placeholder -->
-<div class='row' style="height: calc(100% - 10em);">
+<div ng-if="!$ctrl.image" class='row' style="height: calc(100% - 10em);">
     <div class='col-sm-12 fullheight'>
         <div ui-grid='$ctrl.gridOptions' ui-grid-pagination ui-grid-selection ui-grid-resize-columns
             ui-grid-auto-resize style='height: 100%;'></div>
@@ -71,6 +80,10 @@
     <div class='col-sm-12'>
         <div class="small">Double-click on a line to get job details, files produced and logs.</div>
     </div>
+</div>
+
+<div ng-if="$ctrl.image" class='row'>
+    <jqm-gantt jqm-data="$ctrl.data" jqm-algo="$ctrl.algo"></jqm-gantt>
 </div>
 
 

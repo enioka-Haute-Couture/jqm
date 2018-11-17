@@ -18,6 +18,7 @@ class HistoryPageCtrl
         this.target = "hist";
         this.filterDate = false;
         this.showDetails = false;
+        this.algo = 0;
 
         // Default range is three hours from now
         this.now = (new Date()).getTime();
@@ -365,6 +366,13 @@ class HistoryPageCtrl
         this.$http.delete("ws/client/ji/paused/" + ji.id).then(this.getDataAsync.bind(this));
         this.selected.length = 0;
     };
+
+    toggleImage()
+    {
+        this.image = !this.image;
+        this.pagingOptions.pageSize = 0;
+        this.getDataAsync();
+    }
 };
 HistoryPageCtrl.$inject = ['µQueueDto', '$http'];
 
