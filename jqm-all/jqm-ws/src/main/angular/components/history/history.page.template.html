@@ -51,15 +51,15 @@
                     Reset
                 </button>
 
-                <button class="btn btn-outline-dark btn-sm" ng-click="$ctrl.toggleImage(0);" data-toggle="popover"
-                    data-content="show filtered data as a GANTT chart" data-trigger="hover">
-                    <span class="far fa-image"></span>
-                    Chart A
+                <button class="btn btn-outline-dark btn-sm" ng-click="$ctrl.toggleImage();" data-toggle="popover"
+                    data-content="show filtered data as a GANTT chart" data-trigger="hover" ng-show="$ctrl.table">
+                    <span class="fas fa-sliders-h"></span>
+                    Chart
                 </button>
-                <button class="btn btn-outline-dark btn-sm" ng-click="$ctrl.toggleImage(1);" data-toggle="popover"
-                    data-content="show filtered data as a GANTT chart" data-trigger="hover">
-                    <span class="far fa-image"></span>
-                    Chart B
+                <button class="btn btn-outline-dark btn-sm" ng-click="$ctrl.toggleImage();" data-toggle="popover"
+                    data-content="show filtered data as a table" data-trigger="hover" ng-show="$ctrl.image">
+                    <span class="fas fa-table"></span>
+                    Table
                 </button>
             </div>
         </div>
@@ -70,20 +70,21 @@
 <!-- end of filter row -->
 
 <!-- The result grid placeholder -->
-<div ng-if="!$ctrl.image" class='row' style="height: calc(100% - 10em);">
+<div ng-if="$ctrl.table" class='row' style="height: calc(100% - 10em);">
     <div class='col-sm-12 fullheight'>
         <div ui-grid='$ctrl.gridOptions' ui-grid-pagination ui-grid-selection ui-grid-resize-columns
             ui-grid-auto-resize style='height: 100%;'></div>
     </div>
 </div>
-<div class='row'>
+<div ng-if="$ctrl.table" class='row'>
     <div class='col-sm-12'>
         <div class="small">Double-click on a line to get job details, files produced and logs.</div>
     </div>
 </div>
 
-<div ng-if="$ctrl.image" class='row'>
-    <jqm-gantt jqm-data="$ctrl.data" jqm-algo="$ctrl.algo"></jqm-gantt>
+<!-- The result image placeholder -->
+<div ng-if="$ctrl.image" class='row' style="height: calc(100% - 10em);">
+    <jqm-gantt jqm-data="$ctrl.data"></jqm-gantt>
 </div>
 
 

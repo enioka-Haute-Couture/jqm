@@ -16,6 +16,8 @@ class HistoryPageCtrl
         this.selected = [];
         this.queues = µQueueDto.query();
         this.target = "hist";
+        this.table = true;
+        this.image = false;
         this.filterDate = false;
         this.showDetails = false;
         this.algo = 0;
@@ -71,11 +73,10 @@ class HistoryPageCtrl
                 gridApi.core.on.sortChanged(null, function (grid, sortColumns)
                 {
                     ctrl.sortInfo.length = 0;
-                    $.each(sortColumns, function ()
+                    for (var sortColumn of sortColumns)
                     {
-                        ctrl.sortInfo.push({ col: ctrl.colDef.sortField, order: ctrl.sort.direction === "desc" ? "DESCENDING" : "ASCENDING" });
-                    });
-
+                        ctrl.sortInfo.push({ col: sortColumn.colDef.sortField ? sortColumn.colDef.sortField : sortColumn.field, order: sortColumn.sort.direction === "desc" ? "DESCENDING" : "ASCENDING" });
+                    }
                     ctrl.getDataAsync();
                 });
 
@@ -252,52 +253,6 @@ class HistoryPageCtrl
         return this.$http.post("ws/client/ji/query", this.query).then(this.getDataOk.bind(this));
     };
 
-    /*scaleX(s)
-    {
-        this.daterangemin = this.now - s;
-        if (this.datemax < this.daterangemin)
-        {
-            this.datemax = this.daterangemax;
-        }
-        if (this.datemin < this.daterangemin)
-        {
-            this.datemin = this.daterangemin;
-        }
-    }
-
-    this.$watch('scale', function (newVal, oldVal) {
-        scale(newVal);
-    });
-    this.$watch('[target, ko, running, filterOptions, filterDate]', function (newVal, oldVal) {
-        if (newVal !== oldVal) {
-            this.selected.length = 0;
-            this.pagingOptions.currentPage = 1;
-            this.getDataAsync();
-        }
-    }, true);
-    this.$watch('datemin', function (newVal, oldVal) {
-        // Different watch - this one is debounced manually, as the slider does not support ng-model-options
-        setTimeout(function () {
-            if (newVal === this.datemin && this.filterDate) {
-                // Has not changed in the past xx milliseconds => do the query.
-                this.selected.length = 0;
-                this.pagingOptions.currentPage = 1;
-                this.getDataAsync();
-            }
-        }, 100);
-    }, true);
-    this.$watch('datemax', function (newVal, oldVal) {
-        // Different watch - this one is debounced manually, as the slider does not support ng-model-options
-        setTimeout(function () {
-            if (newVal === this.datemax && this.filterDate) {
-                // Has not changed in the past xx milliseconds => do the query.
-                this.selected.length = 0;
-                this.pagingOptions.currentPage = 1;
-                this.getDataAsync();
-            }
-        }, 100);
-    }, true);*/
-
     showDetail()
     {
         $uibModal.open({
@@ -367,11 +322,12 @@ class HistoryPageCtrl
         this.selected.length = 0;
     };
 
-    toggleImage(algo)
+    toggleImage()
     {
         if (!this.image)
         {
-            this.algo = algo;
+            this.table = false;
+            this.image = true;
             this.pagingOptions.pageSize = 20000;
             this.sortInfo = [
                 {
@@ -385,6 +341,22 @@ class HistoryPageCtrl
         else
         {
             this.image = false;
+
+            // Reset table data to default.
+            this.pagingOptions = {
+                pageSize: 15,
+                currentPage: 1
+            };
+
+            this.sortInfo = [
+                {
+                    col: 'ID',
+                    order: 'DESCENDING'
+                }
+            ];
+
+            var $ctrl = this;
+            this.getDataAsync().then(_ => $ctrl.table = true);
         }
     }
 };
