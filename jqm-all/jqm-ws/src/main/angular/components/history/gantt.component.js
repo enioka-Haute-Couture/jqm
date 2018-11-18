@@ -48,7 +48,7 @@ class GanttController
 
         var queues = new Map();
         var minStart;
-        var maxEnd;
+        var maxEnd = new Date(data[0].endDate);
         var lineCount = 0;
 
         for (var ji of data)
@@ -89,12 +89,20 @@ class GanttController
             freeLine.push(ji);
 
             // Also check max/min.
-            if (!maxEnd || maxEnd < ji.end)
+            if (maxEnd < ji.end)
             {
                 maxEnd = ji.end;
             }
         }
-        minStart = data[0].start;
+
+        for (var ji of data)
+        {
+            if (ji.start)
+            {
+                minStart = ji.start;
+                break;
+            }
+        }
 
         // Go to drawing.
         var PX_PER_MS = (window.innerWidth - 50) / (maxEnd.getTime() - minStart.getTime());
