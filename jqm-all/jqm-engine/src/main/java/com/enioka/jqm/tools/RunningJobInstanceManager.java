@@ -1,6 +1,6 @@
 package com.enioka.jqm.tools;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobInstance;
@@ -15,8 +15,8 @@ class RunningJobInstanceManager
 {
     private Logger jqmlogger = LoggerFactory.getLogger(RunningJobInstanceManager.class);
 
-    private HashMap<RunningJobInstance, RjiRegistration> instancesByTracker = new HashMap<RunningJobInstance, RjiRegistration>();
-    private HashMap<Integer, RjiRegistration> instancesById = new HashMap<Integer, RunningJobInstanceManager.RjiRegistration>();
+    private ConcurrentHashMap<RunningJobInstance, RjiRegistration> instancesByTracker = new ConcurrentHashMap<RunningJobInstance, RjiRegistration>();
+    private ConcurrentHashMap<Integer, RjiRegistration> instancesById = new ConcurrentHashMap<Integer, RunningJobInstanceManager.RjiRegistration>();
 
     void startNewJobInstance(JobInstance ji, QueuePoller qp)
     {
