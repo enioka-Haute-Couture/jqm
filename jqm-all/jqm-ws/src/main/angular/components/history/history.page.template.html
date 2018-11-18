@@ -53,17 +53,6 @@
                     data-toggle="popover" data-content="reset all filters to default" data-trigger="hover">
                     Reset
                 </button>
-
-                <button class="btn btn-outline-dark btn-sm" ng-click="$ctrl.toggleImage();" data-toggle="popover"
-                    data-content="show filtered data as a GANTT chart" data-trigger="hover" ng-show="$ctrl.table">
-                    <span class="fas fa-sliders-h"></span>
-                    Chart
-                </button>
-                <button class="btn btn-outline-dark btn-sm" ng-click="$ctrl.toggleImage();" data-toggle="popover"
-                    data-content="show filtered data as a table" data-trigger="hover" ng-show="$ctrl.image">
-                    <span class="fas fa-table"></span>
-                    Table
-                </button>
             </div>
         </div>
 
@@ -88,6 +77,11 @@
 <!-- The result image placeholder -->
 <div ng-if="$ctrl.image" class='row' style="height: calc(100% - 10em);">
     <jqm-gantt jqm-data="$ctrl.data"></jqm-gantt>
+</div>
+<div ng-if="$ctrl.image" class='row'>
+    <div class='col-sm-12'>
+        <div class="small">&nbsp;</div>
+    </div>
 </div>
 
 
@@ -118,6 +112,17 @@
         </span>
         <button class="btn btn-outline-dark" ng-click="$ctrl.resume()" jqm-permission="job_instance:create" ng-hide="$ctrl.selected.length === 0 || $ctrl.target === 'hist' || $ctrl.selected[0].state !== 'HOLDED'">
             <span class="fas fa-play"></span> Resume
+        </button>
+
+        <button class="btn btn-outline-dark float-right" ng-click="$ctrl.toggleImage();" data-toggle="popover"
+            data-content="show filtered data as a GANTT chart" data-trigger="hover" ng-show="$ctrl.table">
+            <span class="fas fa-sliders-h"></span>
+            Chart
+        </button>
+        <button class="btn btn-outline-dark float-right" ng-click="$ctrl.toggleImage();" data-toggle="popover"
+            data-content="show filtered data as a table" data-trigger="hover" ng-show="$ctrl.image">
+            <span class="fas fa-table"></span>
+            Table
         </button>
     </div>
 </div>
