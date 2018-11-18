@@ -35,6 +35,7 @@ Minor changes
 * GUI: slightly tweaked appearance (new icons, fonts… but nothing major).
 * GUI: added deployment descriptor export from job definition.
 * GUI: added an experimental graphic visualization of runs.
+* GUI: added option to filter job instances by session ID.
 
 Deprecated
 +++++++++++++++

@@ -2,18 +2,8 @@
     <div class="col-sm-12">
         <div class="card border-light">
             <div class="card-body form-inline" style="padding: 8px;">
-                <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                    <label class="btn btn-light active" ng-click="$ctrl.target='hist'; $ctrl.getDataAsync();">
-                        <input type="radio" value="hist">
-                        <span class="far fa-check-circle"></span>
-                        ended
-                    </label>
-                    <label class="btn btn-light" ng-click="$ctrl.target='queues'; $ctrl.getDataAsync();">
-                        <input type="radio" value="queues">
-                        <span class="fas fa-road"></span>
-                        active
-                    </label>
-                </div>
+                <jqm-toggle ng-data="[['hist', 'ended', 'far fa-check-circle'], ['queues', 'active', 'fas fa-road']]"
+                    ng-value="$ctrl.target" value-change="$ctrl.getDataAsync"></jqm-toggle>
 
                 <div class="form-check form-check-inline" ng-show="$ctrl.target === 'hist'">
                     <input id="cbKo" class="form-check-input" type="checkbox" ng-model="$ctrl.ko" ng-change="$ctrl.getDataAsync()">
