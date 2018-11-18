@@ -42,6 +42,7 @@ class GanttController
         {
             // Just give up.
             console.error("area too small for graph");
+            console.timeEnd("drawData1");
             return;
         }
 
@@ -111,6 +112,13 @@ class GanttController
                 minStart = ji.start;
                 break;
             }
+        }
+
+        if (!minStart || !maxEnd)
+        {
+            // No data! (all JI must be SUBMITTED or likewise)
+            console.timeEnd("drawData1");
+            return;
         }
 
         // Go to drawing.

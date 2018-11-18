@@ -34,6 +34,7 @@ Minor changes
 * GUI: added the possibility to view node log files, not only job instance log files.
 * GUI: slightly tweaked appearance (new icons, fonts… but nothing major).
 * GUI: added deployment descriptor export from job definition.
+* GUI: added an experimental graphic visualization of runs.
 
 Deprecated
 +++++++++++++++
