@@ -25,7 +25,7 @@
                 </div>
 
                 <input ng-model="$ctrl.query.applicationName" class="form-control" placeholder="application" type="text"
-                    ng-change="$ctrl.getDataAsync()" ng-required="true" style="width: 10em;" data-toggle="popover"
+                    ng-change="$ctrl.getDataAsync()" ng-required="true" style="width: 7em;" data-toggle="popover"
                     data-content="Use % as wildcard" data-trigger="hover" ng-model-options='{debounce: 200}' />
                 <input ng-model="$ctrl.query.user" class="form-control" placeholder="user" type="text" ng-change="$ctrl.getDataAsync()"
                     ng-required="true" style="width: 8em;" data-toggle="popover" data-content="Use % as wildcard"
@@ -33,9 +33,12 @@
                 <input ng-model="$ctrl.query.jobInstanceId" class="form-control" placeholder="id" type="integer"
                     ng-change="$ctrl.getDataAsync();" ng-required="true" style="width: 5em;" data-toggle="popover"
                     data-content="Give exact ID" data-trigger="hover" ng-model-options='{debounce: 200}' />
-                <input ng-model="$ctrl.query.parentId" class="form-control" placeholder="parent id" type="integer"
+                <input ng-model="$ctrl.query.parentId" class="form-control" placeholder="parent" type="integer"
                     ng-change="$ctrl.getDataAsync();" ng-required="true" style="width: 5em;" data-toggle="popover"
-                    data-content="Give exact ID" data-trigger="hover" ng-model-options='{debounce: 200}' />
+                    data-content="Give exact parent ID" data-trigger="hover" ng-model-options='{debounce: 200}' />
+                <input ng-model="$ctrl.query.sessionId" class="form-control" placeholder="session" type="integer"
+                    ng-change="$ctrl.getDataAsync();" ng-required="true" style="width: 5em;" data-toggle="popover"
+                    data-content="Give exact session ID" data-trigger="hover" ng-model-options='{debounce: 200}' />
                 <input ng-model="$ctrl.query.nodeName" class="form-control" placeholder="node name" type="text"
                     ng-change="$ctrl.getDataAsync();" ng-required="true" style="width: 8em;" data-toggle="popover"
                     data-content="Use % as wildcard" data-trigger="hover" ng-model-options='{debounce: 200}' />
