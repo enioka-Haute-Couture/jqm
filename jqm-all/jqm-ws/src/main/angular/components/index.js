@@ -27,10 +27,12 @@ import { historyPageComponent } from './history/history.page.component';
 import { historyDetailComponent } from './history/history.detail.component';
 import { modalComponent } from './misc/modal.component';
 import { newLaunchComponent } from './history/newlaunch.component';
+import { ganttComponent } from './history/gantt.component';
 import { select2Component } from './misc/select2.component';
 import { mappingListComponent } from './mapping/mapping.list.component';
 import { FileReaderComponent } from './misc/filereader.component';
 import { datepickerComponent } from './misc/datepicker.component';
+import { toggleComponent } from './misc/toggle.component';
 
 import uiGrid from 'angular-ui-grid';
 import 'angular-ui-grid/ui-grid.auto-resize';
@@ -64,6 +66,7 @@ var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule
     .component('jqmRoles', rolePageComponent)
     .component('jqmHistory', historyPageComponent)
     .component('jqmJiDetail', historyDetailComponent)
+    .component('jqmGantt', ganttComponent)
     .component('jqmNewJi', newLaunchComponent)
     .component('jqmMappings', mappingListComponent)
 
@@ -73,6 +76,7 @@ var module = angular.module('jqmComponents', [jqmServicesModule, jqmHelperModule
     .component('jqmSelect2', select2Component)
     .component('jqmFileReader', FileReaderComponent)
     .component('jqmDatePicker', datepickerComponent)
+    .component('jqmToggle', toggleComponent)
 
     .directive('jqmPermission', jqmPermissionDirective)
 

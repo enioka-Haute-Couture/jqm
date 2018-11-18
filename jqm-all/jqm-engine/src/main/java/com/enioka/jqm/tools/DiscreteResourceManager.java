@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.enioka.jqm.jdbc.DbConn;
@@ -33,7 +34,7 @@ class DiscreteResourceManager extends ResourceManagerBase
     /**
      * The tokens, indexed by name. Boolean is true if available, false if booked.
      */
-    private Map<String, Token> tokenRepository = new HashMap<String, Token>(10);
+    private Map<String, Token> tokenRepository = new ConcurrentHashMap<String, Token>(10);
 
     private class Token
     {

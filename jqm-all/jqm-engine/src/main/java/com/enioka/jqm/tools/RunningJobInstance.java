@@ -95,6 +95,9 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
         // Set thread name
         Thread.currentThread().setName(this.ji.getJD().getApplicationName() + ";payload;" + this.ji.getId());
 
+        // As a precaution (real date is taken from database, unless in case of dire crash and for JMX).
+        ji.setExecutionDate(Calendar.getInstance());
+
         // Engine Callbacks (e.g. used by multi log handling)
         if (this.engine != null && this.engine.getHandler() != null)
         {
@@ -141,7 +144,6 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
             tracker.initialize(cnx);
 
             // Update of the job status, dates & co
-            this.ji.setExecutionDate(Calendar.getInstance()); // For use in JMX
             QueryResult qr = cnx.runUpdate("jj_update_run_by_id", this.ji.getId());
             if (qr.nbUpdated == 0)
             {
