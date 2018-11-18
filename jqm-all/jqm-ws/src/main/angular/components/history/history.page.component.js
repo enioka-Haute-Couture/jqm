@@ -367,11 +367,25 @@ class HistoryPageCtrl
         this.selected.length = 0;
     };
 
-    toggleImage()
+    toggleImage(algo)
     {
-        this.image = !this.image;
-        this.pagingOptions.pageSize = 0;
-        this.getDataAsync();
+        if (!this.image)
+        {
+            this.algo = algo;
+            this.pagingOptions.pageSize = 20000;
+            this.sortInfo = [
+                {
+                    col: 'DATEEXECUTION',
+                    order: 'ASCENDING'
+                }
+            ];
+            this.getDataAsync();
+            this.image = true;
+        }
+        else
+        {
+            this.image = false;
+        }
     }
 };
 HistoryPageCtrl.$inject = ['µQueueDto', '$http'];

@@ -15,10 +15,6 @@ class GanttController
     afterDomReady()
     {
         this.draw = SVG('drawing').size(window.innerWidth - 50, 500);
-        if (this.jqmData && this.jqmData.length > 0)
-        {
-            this.drawData();
-        }
     }
 
     $onChanges(changesObj)
@@ -29,27 +25,32 @@ class GanttController
             // Do not redraw, as an algo change goes with a click.
         }
 
-        if (changesObj.jqmData && this.jqmData && this.draw)
+        if (changesObj.jqmData && this.jqmData && this.draw && this.drawData)
         {
-            this.drawData.bind(this)();
+            this.drawData();
         }
     }
 
     drawData1()
     {
+        console.time("drawData1");
         this.draw.clear();
         if (!this.jqmData || this.jqmData.length == 0)
         {
+            console.timeEnd("drawData1");
             return;
         }
 
-        var data = this.jqmData.slice(); // Shallow copy.
-        data.sort(function (a, b) { return new Date(a.beganRunningDate) - new Date(b.beganRunningDate); }); // sort by startup.
+        // No need to copy data anymore - data is just for us.
+        var data = this.jqmData;
+
+        // Data is sorted on the DB side by beganRunningDate descending.
 
         var queues = new Map();
         var minStart;
         var maxEnd;
         var lineCount = 0;
+
         for (var ji of data)
         {
             if (!ji.beganRunningDate || !ji.endDate)
@@ -82,23 +83,18 @@ class GanttController
             if (!freeLine)
             {
                 freeLine = [];
-                queue.lines.push(freeLine);
+                queue.lines.unshift(freeLine);
                 lineCount++;
             }
             freeLine.push(ji);
 
             // Also check max/min.
-            if (!minStart || minStart > ji.start)
-            {
-                minStart = ji.start;
-            }
             if (!maxEnd || maxEnd < ji.end)
             {
                 maxEnd = ji.end;
             }
         }
-
-        console.info(queues);
+        minStart = data[0].start;
 
         // Go to drawing.
         var PX_PER_MS = (window.innerWidth - 50) / (maxEnd.getTime() - minStart.getTime());
@@ -107,26 +103,36 @@ class GanttController
 
         var queueIdx = 0;
         var lineIdx = 0;
+        var x1 = 0, x2 = 0;
+
         for (var [queueName, queue] of queues)
         {
             var color = COLORS[queueIdx];
+            var jiInsideQueue = 0;
 
             // Draw each line
             for (var line of queue.lines)
             {
-                // Draw each segemnt inside the line
+                var y = (lineIdx + 0.5) * PX_PER_LINE;
+
+                // Draw each segment inside the line
                 for (var ji of line)
                 {
-                    //this.draw.rect((ji.end.getTime() - ji.start.getTime()) * PX_PER_MS, PX_PER_LINE / 2).attr({ fill: color }).move((ji.start.getTime() - minStart.getTime()) * PX_PER_MS, lineIdx * PX_PER_LINE);
-                    this.draw.line(0, 0, (ji.end.getTime() - ji.start.getTime()) * PX_PER_MS, 0).stroke({ width: 2, color: color }).move((ji.start.getTime() - minStart.getTime()) * PX_PER_MS, (lineIdx + 0.5) * PX_PER_LINE);
-                    this.draw.line((ji.end.getTime() - ji.start.getTime()) * PX_PER_MS, -5, (ji.end.getTime() - ji.start.getTime()) * PX_PER_MS, 5).stroke({ width: 2, color: color }).move((ji.start.getTime() - minStart.getTime()) * PX_PER_MS, (lineIdx + 0.5) * PX_PER_LINE - 5);
+                    x1 = (ji.start.getTime() - minStart.getTime()) * PX_PER_MS;
+                    x2 = (ji.end.getTime() - minStart.getTime()) * PX_PER_MS;
+
+                    //this.draw.line(x1, y,x2, y).stroke({ width: 2, color: color });
+                    //this.draw.line(x2, y-5,x2, y+5).stroke({ width: 2, color: color });
+
+                    this.draw.polyline([x1, y - 5, x1, y + 5, x1, y, x2, y]).fill('none').stroke({ width: 2, color: color });
                 }
 
                 lineIdx++;
+                jiInsideQueue += line.length;
             }
 
             // Draw queue legend
-            this.draw.text(queueName).move(0, (lineIdx - 0.5) * PX_PER_LINE).attr({ fill: color });
+            this.draw.text(queueName + " - " + jiInsideQueue).move(20, (lineIdx - 0.4) * PX_PER_LINE).attr({ fill: color });
 
             queueIdx++;
         }
@@ -134,10 +140,13 @@ class GanttController
         // Global date legend
         this.draw.text(this.dateFilter(minStart, 'dd/MM HH:mm:ss'));
         this.draw.text(this.dateFilter(maxEnd, 'dd/MM HH:mm:ss')).move(window.innerWidth - 150);
+
+        console.timeEnd("drawData1");
     }
 
     drawData0()
     {
+        console.time("drawData0");
         this.draw.clear();
         if (!this.jqmData || this.jqmData.length == 0)
         {
@@ -402,7 +411,7 @@ class GanttController
 
         var COLORS = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000'];
 
-        for (qname in queues)
+        for (qname of queues)
         {
             queue = queues[qname];
             this.draw.text(queue.name).move(50, (queue.offset * height / count - height / (count * 4))).font({ fill: COLORS[queue.color], size: 15 });
@@ -420,18 +429,19 @@ class GanttController
             {
                 endTime = job.end.getTime();
             }
-            var x1, y1, x2, y2;
-            y1 = y2 = (queues[job.queue.name].offset - job.slot) * height / count - height / (count * 2);
+            var x1, y, x2;
+            y = (queues[job.queue.name].offset - job.slot) * height / count - height / (count * 2);
             x1 = ((startTime - min) * width / (max - min));
             x2 = ((endTime - min) * width / (max - min));
-            this.draw.line(x1, y1, x2, y2).stroke({ color: COLORS[queues[job.queue.name].color], width: 2 });
-            this.draw.line(x1, y1 - 5, x1, y1 + 5).stroke({ color: COLORS[queues[job.queue.name].color], width: 2 });
+
+            this.draw.polyline([x1, y - 5, x1, y + 5, x1, y, x2, y]).fill('none').stroke({ width: 2, color: COLORS[queues[job.queue.name].color] });
             //this.draw.text(job.applicationName + job.id).move(x1, y1 - 10).font({ fill: COLORS[queues[job.queue.name].color], size: 8 });
         }
-        console.info(queues);
+
         // Legend
         this.draw.text(this.dateFilter(minStart, 'dd/MM HH:mm:ss'));
         this.draw.text(this.dateFilter(maxEnd, 'dd/MM HH:mm:ss')).move(window.innerWidth - 150);
+        console.timeEnd("drawData0");
     }
 }
 GanttController.$inject = ["dateFilter",];
