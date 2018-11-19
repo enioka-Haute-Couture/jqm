@@ -174,7 +174,7 @@ abstract class ResourceManagerBase
      */
     enum BookingStatus {
         /**
-         * The necessary resources have been booked - they are not available to anymone else until released.
+         * The necessary resources have been booked - they are not available to anyone else until released.
          */
         BOOKED,
         /**

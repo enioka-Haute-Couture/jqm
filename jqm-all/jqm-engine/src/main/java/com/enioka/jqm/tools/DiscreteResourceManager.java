@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.enioka.jqm.api.JqmInvalidRequestException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.ResourceManager;
@@ -155,18 +156,33 @@ class DiscreteResourceManager extends ResourceManagerBase
     @Override
     void releaseResource(JobInstance ji)
     {
-        int released = 0;
-        for (Map.Entry<String, Token> e : this.tokenRepository.entrySet())
+        if (ji == null)
         {
-            if (e.getValue() == null || e.getValue().free == null || e.getValue().jiId == null)
+            throw new JqmInvalidRequestException("JI cannot be null");
+        }
+
+        int released = 0;
+        for (Token e : this.tokenRepository.values())
+        {
+            if (e == null || e.free == null || e.jiId == null)
             {
                 continue; // Happens when the token has just been created - not an issue.
             }
-            if (!e.getValue().free.get() && e.getValue().jiId == ji.getId())
+            try
             {
-                e.getValue().jiId = null;
-                e.getValue().free.set(true);
-                released++;
+                if (!e.free.get() && e.jiId == ji.getId())
+                {
+                    e.jiId = null;
+                    e.free.set(true);
+                    released++;
+                }
+            }
+            catch (NullPointerException e2)
+            {
+                // For bug search.
+                jqmlogger.error("TOKEN : " + e.toString());
+                jqmlogger.error("TOKEN FREE " + e.free);
+                throw new JqmRuntimeException("some NPE where there should be none", e2);
             }
         }
 
