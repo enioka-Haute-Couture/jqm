@@ -93,7 +93,7 @@ class GanttController
             if (!freeLine)
             {
                 freeLine = [];
-                queue.lines.unshift(freeLine);
+                queue.lines.push(freeLine);
                 lineCount++;
             }
             freeLine.push(ji);
@@ -138,7 +138,7 @@ class GanttController
             var jiInsideQueue = 0;
 
             // Draw each line
-            for (var line of queue.lines)
+            for (var line of queue.lines.reverse())
             {
                 var y = (lineIdx + 0.5) * PX_PER_LINE + Y_SHIFT;
 
