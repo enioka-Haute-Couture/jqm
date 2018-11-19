@@ -174,8 +174,10 @@ public class Main
         options.addOptionGroup(og2);
         OptionGroup og3 = new OptionGroup();
         og3.addOption(o62);
-        og3.addOption(o63);
         options.addOptionGroup(og3);
+        OptionGroup og4 = new OptionGroup();
+        og4.addOption(o63);
+        options.addOptionGroup(og4);
 
         HelpFormatter formatter = new HelpFormatter();
         formatter.setWidth(160);
