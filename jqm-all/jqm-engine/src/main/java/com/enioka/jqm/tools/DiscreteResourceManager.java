@@ -154,7 +154,7 @@ class DiscreteResourceManager extends ResourceManagerBase
     }
 
     @Override
-    void releaseResource(JobInstance ji)
+    synchronized void releaseResource(JobInstance ji)
     {
         if (ji == null)
         {
