@@ -40,7 +40,7 @@ class DiscreteResourceManager extends ResourceManagerBase
     private class Token
     {
         private AtomicBoolean free = new AtomicBoolean(true);
-        private Integer jiId = null;
+        private int jiId = 0;
     }
 
     private int defaultConsumption;
@@ -141,7 +141,6 @@ class DiscreteResourceManager extends ResourceManagerBase
             {
                 for (Token e : booked.values())
                 {
-                    e.jiId = null;
                     e.free.set(true);
                 }
                 return BookingStatus.FAILED; // If here there are items available, just not enough.
@@ -154,35 +153,15 @@ class DiscreteResourceManager extends ResourceManagerBase
     }
 
     @Override
-    synchronized void releaseResource(JobInstance ji)
+    void releaseResource(JobInstance ji)
     {
-        if (ji == null)
-        {
-            throw new JqmInvalidRequestException("JI cannot be null");
-        }
-
         int released = 0;
         for (Token e : this.tokenRepository.values())
         {
-            if (e == null || e.free == null || e.jiId == null)
+            if (!e.free.get() && e.jiId == ji.getId())
             {
-                continue; // Happens when the token has just been created - not an issue.
-            }
-            try
-            {
-                if (!e.free.get() && e.jiId == ji.getId())
-                {
-                    e.jiId = null;
-                    e.free.set(true);
-                    released++;
-                }
-            }
-            catch (NullPointerException e2)
-            {
-                // For bug search.
-                jqmlogger.error("TOKEN : " + e.toString());
-                jqmlogger.error("TOKEN FREE " + e.free);
-                throw new JqmRuntimeException("some NPE where there should be none", e2);
+                e.free.set(true);
+                released++;
             }
         }
 
