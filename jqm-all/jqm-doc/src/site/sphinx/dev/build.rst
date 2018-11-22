@@ -42,19 +42,19 @@ This will create a new Sonar analysis.
 
 ::
 
-	mvn sonar:sonar
-
-Once done, take a snaphot in Sonar.
+    mvn clean install -DskipTests -Psonar
+	mvn test sonar:sonar -Psonar
+    mvn clean
 
 Release test
 +++++++++++++
 
-The release plug-in is (inside the pom.xml) parametrized to use a local git repository, so as to allow mistakes. 
+The release plug-in is (inside the pom.xml) parametrized to use a local git repository, so as to allow mistakes.
 During that step, all packages are bumped in version number, even if they were not modified. ::
 
 	mvn release:prepare -Darguments='-DskipTests'
 	mvn package
-	
+
 Then the test package must be test-deployed in a two-node configuration.
 
 Release
@@ -82,7 +82,7 @@ At this step, the release is done and the local git modifications can be pushed 
     git push origin
 
 (push tags before code to help RTD synchronization)
-    
+
 Documentation
 +++++++++++++++
 
