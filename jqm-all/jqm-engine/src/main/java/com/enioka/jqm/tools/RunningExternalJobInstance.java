@@ -38,7 +38,7 @@ class RunningExternalJobInstance implements Runnable
         this.ji = job;
         this.qp = qp;
         opts = job.getJD().getJavaOpts() == null
-                ? GlobalParameter.getParameter(cnx, "defaultExternalOpts", "-Xms32m -Xmx128m -XX:MaxPermSize=64m")
+                ? GlobalParameter.getParameter(cnx, "defaultExternalOpts", "-Xms32m -Xmx128m -XX:MaxMetaspaceSize=64m")
                 : job.getJD().getJavaOpts();
         killCheckPeriodMs = Integer.parseInt(GlobalParameter.getParameter(cnx, "internalPollingPeriodMs", "1000"));
 
@@ -56,7 +56,8 @@ class RunningExternalJobInstance implements Runnable
         args.add(java_path);
         args.addAll(Arrays.asList(opts.split(" ")));
         args.add("com.enioka.jqm.tools.Main");
-        args.add("-s");
+        args.add("Start-Single");
+        args.add("--id");
         args.add("" + this.jobId);
 
         ProcessBuilder pb = new ProcessBuilder(args);

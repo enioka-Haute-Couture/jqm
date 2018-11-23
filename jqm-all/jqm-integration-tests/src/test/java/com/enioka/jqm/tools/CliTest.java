@@ -19,7 +19,7 @@ public class CliTest extends JqmBaseTest
     public void testCliChangeUser()
     {
         Helpers.updateConfiguration(cnx);
-        Main.main(new String[] { "-U", "myuser", "mypassword", "administrator", "client" });
+        Main.runCommand(new String[] { "Reset-User", "--login", "myuser", "-p", "mypassword", "--roles", "administrator", "client" });
 
         RUser u = RUser.selectlogin(cnx, "myuser");
 
@@ -38,10 +38,10 @@ public class CliTest extends JqmBaseTest
         }
         Assert.assertTrue(client && admin);
 
-        Main.main(new String[] { "-U", "myuser", "mypassword", "administrator" });
+        Main.runCommand(new String[] { "Reset-User", "--login", "myuser", "--password", "mypassword", "--roles", "administrator" });
         Assert.assertEquals(1, u.getRoles(cnx).size());
 
-        Main.main(new String[] { "-U", "myuser,mypassword,administrator,config admin" });
+        Main.runCommand(new String[] { "Reset-User", "--login", "myuser", "-p", "mypassword", "--roles", "administrator", "config admin" });
         Assert.assertEquals(2, u.getRoles(cnx).size());
     }
 
@@ -55,7 +55,7 @@ public class CliTest extends JqmBaseTest
         cnx.runUpdate("debug_jj_update_node_by_id", TestHelpers.node.getId(), i);
         cnx.commit();
 
-        Main.main(new String[] { "-s", String.valueOf(i) });
+        Main.runCommand(new String[] { "Start-Single", "--id", String.valueOf(i) });
 
         // This is not really a one shot JVM, so let's reset log4j
         LogManager.resetConfiguration();
@@ -76,7 +76,8 @@ public class CliTest extends JqmBaseTest
         NodeDto target = MetaService.getNode(cnx, TestHelpers.node.getId());
         Assert.assertEquals(3, MetaService.getNodeQueueMappings(cnx, target.getId()).size());
 
-        Main.main(new String[] { "-t", TestHelpers.nodeMix.getName() + "," + TestHelpers.node.getName() });
+        // Capital letter -> should be ignored.
+        Main.runCommand(new String[] { "Install-NodeTemPlate", "-t", TestHelpers.nodeMix.getName(), "-n", TestHelpers.node.getName() });
 
         target = MetaService.getNode(cnx, TestHelpers.node.getId());
 
