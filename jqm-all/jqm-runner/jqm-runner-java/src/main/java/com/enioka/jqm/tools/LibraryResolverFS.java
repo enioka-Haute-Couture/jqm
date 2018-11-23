@@ -28,16 +28,17 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.Node;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.jboss.shrinkwrap.resolver.api.maven.ConfigurableMavenResolverSystem;
+import org.jboss.shrinkwrap.resolver.api.maven.ScopeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.enioka.jqm.model.JobDef;
-import com.enioka.jqm.model.Node;
 
 /**
  * The cache is responsible for resolving the dependencies of a payload (from a pom, from a lib directory, ...). As the resolution is
@@ -65,7 +66,7 @@ class LibraryResolverFS
     }
 
     /**
-     * 
+     *
      * @param n
      *                the JQM Node that holds the binaries (local node)
      * @param jd
@@ -240,15 +241,16 @@ class LibraryResolverFS
         // 3rd: if pom, use pom!
         if (pomFile.exists() && !libDir.exists())
         {
-            jqmlogger.trace("Reading a pom file");
-
+            jqmlogger.trace("Reading pom file {}", pomFile.getAbsoluteFile());
             ConfigurableMavenResolverSystem resolver = mavenResolver.getMavenResolver();
 
             // Resolve
             File[] depFiles = null;
             try
             {
-                depFiles = resolver.loadPomFromFile(pomFile).importRuntimeDependencies().resolve().withTransitivity().asFile();
+                depFiles = resolver.loadPomFromFile(pomFile)
+                        .importDependencies(ScopeType.COMPILE, ScopeType.RUNTIME, ScopeType.IMPORT, ScopeType.SYSTEM).resolve()
+                        .withTransitivity().asFile();
             }
             catch (IllegalArgumentException e)
             {

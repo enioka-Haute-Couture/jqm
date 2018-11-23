@@ -18,21 +18,10 @@ package com.enioka.jqm.tools;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 
 import javax.net.ssl.SSLContext;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContexts;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
@@ -40,6 +29,20 @@ import com.enioka.jqm.model.Node;
 import com.enioka.jqm.pki.JdbcCa;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ssl.DefaultHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class JettyTest extends JqmBaseTest
 {
@@ -88,9 +91,9 @@ public class JettyTest extends JqmBaseTest
             instream.close();
         }
 
-        SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(trustStore).build();
+        SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(trustStore, null).build();
         SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1" }, null,
-                SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+                new DefaultHostnameVerifier());
 
         CloseableHttpClient cl = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 
@@ -99,6 +102,7 @@ public class JettyTest extends JqmBaseTest
         jqmlogger.debug(rq.getURI().toString());
         CloseableHttpResponse rs = cl.execute(rq);
         Assert.assertEquals(200, rs.getStatusLine().getStatusCode());
+        jqmlogger.debug(IOUtils.toString(rs.getEntity().getContent(), StandardCharsets.UTF_8));
 
         rs.close();
         cl.close();
@@ -145,19 +149,22 @@ public class JettyTest extends JqmBaseTest
             instream.close();
         }
 
-        SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(trustStore)
+        SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(trustStore, null)
                 .loadKeyMaterial(clientStore, "SuperPassword".toCharArray()).build();
         SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1" }, null,
-                SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+                new DefaultHostnameVerifier());
 
         CloseableHttpClient cl = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 
         int port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
         HttpUriRequest rq = new HttpGet("https://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + i);
         CloseableHttpResponse rs = cl.execute(rq);
+        jqmlogger.debug(rq.getURI().toString());
+        jqmlogger.debug(IOUtils.toString(rs.getEntity().getContent(), StandardCharsets.UTF_8));
         Assert.assertEquals(200, rs.getStatusLine().getStatusCode());
 
         rs.close();
         cl.close();
+
     }
 }

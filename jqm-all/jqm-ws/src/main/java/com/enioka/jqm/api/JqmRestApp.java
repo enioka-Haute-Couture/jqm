@@ -22,6 +22,8 @@ import javax.ws.rs.core.Context;
 import org.eclipse.persistence.jaxb.MarshallerProperties;
 import org.eclipse.persistence.jaxb.UnmarshallerProperties;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
@@ -31,8 +33,12 @@ import com.enioka.jqm.model.Node;
 @ApplicationPath("/ws/*")
 public class JqmRestApp extends ResourceConfig
 {
+    static Logger log = LoggerFactory.getLogger(JqmRestApp.class);
+
     public JqmRestApp(@Context ServletContext context)
     {
+        log.debug("Starting REST WS app");
+
         // These two properties ensure lists are properly named in JSON objects
         this.property(MarshallerProperties.JSON_WRAPPER_AS_ARRAY_NAME, true);
         this.property(UnmarshallerProperties.JSON_WRAPPER_AS_ARRAY_NAME, true);
@@ -87,14 +93,17 @@ public class JqmRestApp extends ResourceConfig
         // Load the APIs
         if (loadApiAdmin)
         {
+            log.debug("\tRegistering admin service");
             this.register(ServiceAdmin.class);
         }
         if (loadApiClient)
         {
+            log.debug("\tRegistering client service");
             this.register(ServiceClient.class);
         }
         if (loadApiSimple)
         {
+            log.debug("\tRegistering simple service");
             this.register(ServiceSimple.class);
         }
 

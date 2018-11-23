@@ -4,7 +4,6 @@ before_install:
   - cd jqm-all
   - export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"
 jdk:
-  - openjdk7
   - openjdk8
   - openjdk9
   - openjdk10

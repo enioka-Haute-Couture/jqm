@@ -19,7 +19,7 @@
           removeAbandoned="true"
           logAbandoned="true"
           minEvictableIdleTimeMillis="30000"
-          jmxEnabled="true"
+          jmxEnabled="false"
           username="SA"
           password=""
           driverClassName="org.hsqldb.jdbcDriver"

@@ -12,7 +12,6 @@ import java.util.Properties;
 
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
-import javax.persistence.EntityManager;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -30,7 +29,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.jpamodel.Node;
+import com.enioka.jqm.model.Node;
 import com.enioka.jqm.test.helpers.TestHelpers;
 import com.saucelabs.common.SauceOnDemandAuthentication;
 import com.saucelabs.common.SauceOnDemandSessionIdProvider;
@@ -67,7 +66,7 @@ public class AdminSeleniumTest implements SauceOnDemandSessionIdProvider
     private WebDriver driver;
 
     static JqmEngine engine1;
-    static EntityManager em;
+    // static EntityManager em;
     public static org.hsqldb.Server s;
     static Node n;
 
@@ -93,7 +92,7 @@ public class AdminSeleniumTest implements SauceOnDemandSessionIdProvider
      * Constructs a new instance of the test. The constructor requires three string parameters, which represent the operating system,
      * version and browser to be used when launching a Sauce VM. The order of the parameters should be the same as that of the elements
      * within the {@link #browsersStrings()} method.
-     * 
+     *
      * @param os
      * @param version
      * @param browser
@@ -106,55 +105,27 @@ public class AdminSeleniumTest implements SauceOnDemandSessionIdProvider
         this.browser = browser;
     }
 
-    @BeforeClass
-    public static void startServer() throws Exception
-    {
-        JndiContext.createJndiContext();
-        s = new org.hsqldb.Server();
-        s.setDatabaseName(0, "testdbengine");
-        s.setDatabasePath(0, "mem:testdbengine");
-        s.setLogWriter(null);
-        s.setSilent(true);
-        s.start();
-
-        // Test envt
-        em = Helpers.getNewEm();
-        TestHelpers.cleanup(em);
-        TestHelpers.createTestData(em);
-
-        // Start in SSL mode with web services
-        File jar = FileUtils.listFiles(new File("../jqm-ws/target/"), new String[] { "war" }, false).iterator().next();
-        FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war"));
-        Helpers.setSingleParam("disableWsApi", "false", em);
-        Helpers.setSingleParam("enableWsApiAuth", "false", em);
-        Helpers.setSingleParam("enableWsApiSsl", "false", em);
-
-        em.getTransaction().begin();
-        TestHelpers.node.setLoadApiAdmin(true);
-        TestHelpers.node.setLoadApiClient(true);
-        TestHelpers.node.setLoapApiSimple(true);
-        TestHelpers.node.setPort(8080); // A standard port is required by Sauce Connect
-        TestHelpers.node.setDns("localhost");
-        em.getTransaction().commit();
-
-        engine1 = new JqmEngine();
-        engine1.start("localhost");
-
-        n = em.find(Node.class, TestHelpers.node.getId());
-        em.refresh(n);
-    }
-
-    @AfterClass
-    public static void stopServer() throws NamingException
-    {
-        engine1.stop();
-        em.close();
-        JqmClientFactory.resetClient(null);
-        Helpers.resetEmf();
-        ((JndiContext) NamingManager.getInitialContext(null)).resetSingletons();
-        s.shutdown();
-        s.stop();
-    }
+    /*
+     * @BeforeClass public static void startServer() throws Exception { JndiContext.createJndiContext(); s = new org.hsqldb.Server();
+     * s.setDatabaseName(0, "testdbengine"); s.setDatabasePath(0, "mem:testdbengine"); s.setLogWriter(null); s.setSilent(true); s.start();
+     *
+     * // Test envt em = Helpers.getNewEm(); TestHelpers.cleanup(em); TestHelpers.createTestData(em);
+     *
+     * // Start in SSL mode with web services File jar = FileUtils.listFiles(new File("../jqm-ws/target/"), new String[] { "war" },
+     * false).iterator().next(); FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war")); Helpers.setSingleParam("disableWsApi", "false",
+     * em); Helpers.setSingleParam("enableWsApiAuth", "false", em); Helpers.setSingleParam("enableWsApiSsl", "false", em);
+     *
+     * em.getTransaction().begin(); TestHelpers.node.setLoadApiAdmin(true); TestHelpers.node.setLoadApiClient(true);
+     * TestHelpers.node.setLoapApiSimple(true); TestHelpers.node.setPort(8080); // A standard port is required by Sauce Connect
+     * TestHelpers.node.setDns("localhost"); em.getTransaction().commit();
+     *
+     * engine1 = new JqmEngine(); engine1.start("localhost");
+     *
+     * n = em.find(Node.class, TestHelpers.node.getId()); em.refresh(n); }
+     *
+     * @AfterClass public static void stopServer() throws NamingException { engine1.stop(); em.close(); JqmClientFactory.resetClient(null);
+     * Helpers.resetEmf(); ((JndiContext) NamingManager.getInitialContext(null)).resetSingletons(); s.shutdown(); s.stop(); }
+     */
 
     @After
     public void tearDown() throws Exception
@@ -172,9 +143,9 @@ public class AdminSeleniumTest implements SauceOnDemandSessionIdProvider
      * Constructs a new {@link RemoteWebDriver} instance which is configured to use the capabilities defined by the {@link #browser},
      * {@link #version} and {@link #os} instance variables, and which is configured to run against ondemand.saucelabs.com, using the
      * username and access key populated by the {@link #authentication} instance.
-     * 
+     *
      * @throws Exception
-     *             if an error occurs during the creation of the {@link RemoteWebDriver} instance.
+     *                       if an error occurs during the creation of the {@link RemoteWebDriver} instance.
      */
     @Before
     public void setUp() throws Exception
@@ -225,8 +196,9 @@ public class AdminSeleniumTest implements SauceOnDemandSessionIdProvider
         }
 
         // Connection
-        this.driver = new RemoteWebDriver(new URL("http://" + authentication.getUsername() + ":" + authentication.getAccessKey() + "@"
-                + seleniumBaseUrl), capabilities);
+        this.driver = new RemoteWebDriver(
+                new URL("http://" + authentication.getUsername() + ":" + authentication.getAccessKey() + "@" + seleniumBaseUrl),
+                capabilities);
         this.sauceJobId = (((RemoteWebDriver) driver).getSessionId()).toString();
     }
 
