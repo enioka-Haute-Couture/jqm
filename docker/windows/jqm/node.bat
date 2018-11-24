@@ -13,10 +13,10 @@ IF "%JQM_INIT_MODE%" == "SINGLE" (
         echo #### Node does not exist (as seen by the container^). Single node mode.
 
         echo ### Updating database schema
-        java -jar jqm.jar -u
+        java -jar jqm.jar Update-Schema
 
         echo ### Creating node %JQM_NODE_NAME%
-        java -jar jqm.jar -createnode %JQM_NODE_NAME%
+        java -jar jqm.jar NewNode -n %JQM_NODE_NAME%
 
         rem mark the node as existing
         echo 1 > C:\jqm\db\%JQM_NODE_NAME%
@@ -24,12 +24,12 @@ IF "%JQM_INIT_MODE%" == "SINGLE" (
         rem Apply template
         IF defined JQM_CREATE_NODE_TEMPLATE (
             echo #### Applying template %JQM_CREATE_NODE_TEMPLATE% to new JQM node
-            java -jar jqm.jar -t %JQM_CREATE_NODE_TEMPLATE%,%JQM_NODE_NAME%
+            java -jar jqm.jar Install-NodeTemplate -t %JQM_CREATE_NODE_TEMPLATE% -n %JQM_NODE_NAME%
         )
 
         rem Jobs
         echo ### Importing local job definitions inside database
-        java -jar jqm.jar -importjobdef ./jobs/
+        java -jar jqm.jar Import-jobdef -n ./jobs/
     )
 )
 
@@ -39,7 +39,7 @@ IF "%JQM_INIT_MODE%" == "CLUSTER" (
 
         echo ### Waiting for templates import
         :loop
-        java -jar jqm.jar -nodecount >C:\jqm\tmp\nodes.txt
+        java -jar jqm.jar Get-NodeCount >C:\jqm\tmp\nodes.txt
         type C:\jqm\tmp\nodes.txt | findstr /C:"Existing nodes: 0"
         IF %ERRORLEVEL% EQU 0 (
             rem no templates yet - wait one second and retry
@@ -48,7 +48,7 @@ IF "%JQM_INIT_MODE%" == "CLUSTER" (
         )
 
         echo ### Creating node %JQM_NODE_NAME%
-        java -jar jqm.jar -createnode %JQM_NODE_NAME%
+        java -jar jqm.jar New-Node -n %JQM_NODE_NAME%
 
         rem mark the node as existing
         echo 1 > C:\jqm\db\%JQM_NODE_NAME%
@@ -56,27 +56,27 @@ IF "%JQM_INIT_MODE%" == "CLUSTER" (
         rem Apply template
         IF defined JQM_CREATE_NODE_TEMPLATE (
             echo #### Applying template %JQM_CREATE_NODE_TEMPLATE% to new JQM node
-            java -jar jqm.jar -t %JQM_CREATE_NODE_TEMPLATE%,%JQM_NODE_NAME%
+            java -jar jqm.jar Apply-NodeTemplate -t %JQM_CREATE_NODE_TEMPLATE% -n %JQM_NODE_NAME%
         )
     )
 )
 
 IF "%JQM_INIT_MODE%" == "UPDATER" (
     echo ### Updating database schema
-    java -jar jqm.jar -u
+    java -jar jqm.jar Update-Schema
 
     echo ### Importing local job definitions inside database
-    java -jar jqm.jar -importjobdef ./jobs/
+    java -jar jqm.jar Import-jobdef -f ./jobs/
 
     echo ### Listing nodes
-    java -jar jqm.jar -nodecount >C:\jqm\tmp\nodes.txt
+    java -jar jqm.jar get-nodecount >C:\jqm\tmp\nodes.txt
     type C:\jqm\tmp\nodes.txt
 
     rem If first node, upload template and initial configuration.
     type C:\jqm\tmp\nodes.txt | findstr /C:"Existing nodes: 0"
     IF NOT errorlevel 1 (
         echo ### No nodes yet - uploading templates and initial configuration to database
-        java -jar jqm.jar -c selfConfig.swarm.xml
+        java -jar jqm.jar Import-ClusterConfiguration -f selfConfig.swarm.xml
     )
 
     exit 0
@@ -85,4 +85,4 @@ IF "%JQM_INIT_MODE%" == "UPDATER" (
 
 rem Go!
 echo ### Starting JQM node %JQM_NODE_NAME%
-java %JAVA_OPTS% -jar jqm.jar -startnode %JQM_NODE_NAME%
+java %JAVA_OPTS% -jar jqm.jar Start-Node -n %JQM_NODE_NAME%
