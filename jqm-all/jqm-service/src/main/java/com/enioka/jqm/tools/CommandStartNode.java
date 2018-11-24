@@ -16,6 +16,7 @@ class CommandStartNode extends CommandBase
         {
             JqmEngine engine = new JqmEngine();
             engine.start(nodeName, new EngineCallback());
+            engine.join();
             return 0;
         }
         catch (JqmRuntimeException e)

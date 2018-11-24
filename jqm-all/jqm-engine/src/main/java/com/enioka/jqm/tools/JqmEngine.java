@@ -71,6 +71,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     // Threads that together constitute the engine
     private Map<Integer, QueuePoller> pollers = new HashMap<Integer, QueuePoller>();
     private InternalPoller intPoller = null;
+    private Thread intPollerThread = null;
     private CronScheduler scheduler = null;
 
     // Misc data
@@ -229,8 +230,8 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
 
         // Internal poller (stop notifications, keep alive)
         intPoller = new InternalPoller(this);
-        Thread t = new Thread(intPoller);
-        t.start();
+        intPollerThread = new Thread(intPoller);
+        intPollerThread.start();
 
         // Kill notifications
         killHook = new SignalHandler(this);
@@ -245,6 +246,18 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             this.handler.onNodeStarted();
         }
         jqmlogger.info("End of JQM engine initialization");
+    }
+
+    public void join()
+    {
+        try
+        {
+            this.intPollerThread.join();
+        }
+        catch (InterruptedException e)
+        {
+            // We are done.
+        }
     }
 
     /**
