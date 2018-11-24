@@ -9,7 +9,8 @@ import com.enioka.jqm.jdbc.DbConn;
 @Parameters(commandNames = "Set-WebConfiguration", commandDescription = "Changes the way JQM exposes its web services and GUI.")
 class CommandSetWebConfiguration extends CommandBase
 {
-    @Parameter(description = "(ENABLE_HTTP_GUI|DISABLE_ALL|ENABLE_TLS|DISABLE_TLS|ENABLE_INTERNAL_PKI|DISABLE_INTERNAL_PKI|ENABLE_AUTHENTICATION|DISABLE_AUTHENTICATION)", required = true, converter = EnumConverter.class)
+    @Parameter(names = { "-c",
+            "--change" }, description = "(ENABLE_HTTP_GUI|DISABLE_ALL|ENABLE_TLS|DISABLE_TLS|ENABLE_INTERNAL_PKI|DISABLE_INTERNAL_PKI|ENABLE_AUTHENTICATION|DISABLE_AUTHENTICATION)", required = true, converter = EnumConverter.class)
     private Action action;
 
     @Override
@@ -59,7 +60,7 @@ class CommandSetWebConfiguration extends CommandBase
         return 0;
     }
 
-    private enum Action {
+    enum Action {
         /**
          * Changes all configuration options needed to enable the web UI on HTTP (not HTTPS).
          */
@@ -85,20 +86,19 @@ class CommandSetWebConfiguration extends CommandBase
          */
         DISABLE_INTERNAL_PKI, ENABLE_AUTHENTICATION, DISABLE_AUTHENTICATION
     }
+}
 
-    private class EnumConverter implements IStringConverter<Action>
+class EnumConverter implements IStringConverter<CommandSetWebConfiguration.Action>
+{
+    @Override
+    public CommandSetWebConfiguration.Action convert(String value)
     {
-        @Override
-        public Action convert(String value)
+        CommandSetWebConfiguration.Action convertedValue = CommandSetWebConfiguration.Action.valueOf(value);
+
+        if (convertedValue == null)
         {
-            Action convertedValue = Action.valueOf(value);
-
-            if (convertedValue == null)
-            {
-                throw new ParameterException("Value " + value + "can not be converted to Action. ");
-            }
-            return convertedValue;
+            throw new ParameterException("Value " + value + "can not be converted to Action. ");
         }
-
+        return convertedValue;
     }
 }

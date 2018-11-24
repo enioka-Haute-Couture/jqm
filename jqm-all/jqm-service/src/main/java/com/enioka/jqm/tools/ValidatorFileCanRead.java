@@ -5,7 +5,10 @@ import java.io.File;
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.ParameterException;
 
-class ValidatorFileCanRead implements IParameterValidator
+/**
+ * Simple file read check. Must be public to be instanciated by JCommander.
+ */
+public class ValidatorFileCanRead implements IParameterValidator
 {
     @Override
     public void validate(String name, String value) throws ParameterException

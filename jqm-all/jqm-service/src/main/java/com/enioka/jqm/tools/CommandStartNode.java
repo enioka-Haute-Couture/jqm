@@ -9,12 +9,17 @@ class CommandStartNode extends CommandBase
     @Parameter(names = { "-n", "--node-name" }, description = "Name of the node to start.", required = true)
     private String nodeName;
 
+    /**
+     * Hack to allow the service to stop the engine more easily from Main.
+     */
+    static JqmEngine engine;
+
     @Override
     int doWork()
     {
         try
         {
-            JqmEngine engine = new JqmEngine();
+            engine = new JqmEngine();
             engine.start(nodeName, new EngineCallback());
             engine.join();
             return 0;

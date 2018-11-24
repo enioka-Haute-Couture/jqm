@@ -37,7 +37,6 @@ public class Main
     }
 
     private static Logger jqmlogger = LoggerFactory.getLogger(Main.class);
-    private static JqmEngine engine;
 
     private Main()
     {
@@ -63,7 +62,7 @@ public class Main
     static void stop(String[] args)
     {
         jqmlogger.info("Service stop");
-        engine.stop();
+        CommandStartNode.engine.stop();
     }
 
     /**
@@ -84,7 +83,7 @@ public class Main
         // Create parser
         JCommander jc = JCommander.newBuilder().addCommand(new CommandExportJobDef()).addCommand(new CommandExportQueue())
                 .addCommand(new CommandGetEngineVersion()).addCommand(new CommandGetJiStatus()).addCommand(new CommandGetNodeCount())
-                .addCommand(new CommandImportClusterConfiguration()).addCommand(new CommandImportJobDef())
+                .addCommand(new CommandGetRole()).addCommand(new CommandImportClusterConfiguration()).addCommand(new CommandImportJobDef())
                 .addCommand(new CommandImportQueue()).addCommand(new CommandInstallNodeTemplate()).addCommand(new CommandNewJi())
                 .addCommand(new CommandNewNode()).addCommand(new CommandResetRoot()).addCommand(new CommandResetUser())
                 .addCommand(new CommandSetWebConfiguration()).addCommand(new CommandStartNode()).addCommand(new CommandStartSingle())
