@@ -16,7 +16,6 @@
 package com.enioka.jqm.api;
 
 import java.io.Closeable;
-import java.util.Properties;
 
 import com.enioka.jqm.jdbc.DbConn;
 

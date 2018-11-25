@@ -24,15 +24,14 @@ import javax.naming.StringRefAddr;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.commons.io.IOUtils;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.JndiObjectResource;
+import com.enioka.jqm.model.JndiObjectResourceParameter;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.model.JndiObjectResource;
-import com.enioka.jqm.model.JndiObjectResourceParameter;
 
 /**
  * Helper class to retrieve a {@link JndiResourceDescriptor} either from the XML resource file or from the database. <br>
@@ -101,10 +100,9 @@ final class ResourceParser
 
     private static void importXml() throws NamingException
     {
-        InputStream is = ResourceParser.class.getClassLoader().getResourceAsStream(Helpers.resourceFile);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 
-        try
+        try (InputStream is = ResourceParser.class.getClassLoader().getResourceAsStream(Helpers.resourceFile))
         {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(is);
@@ -175,10 +173,6 @@ final class ResourceParser
             NamingException pp = new NamingException("could not initialize the JNDI local resources");
             pp.setRootCause(e);
             throw pp;
-        }
-        finally
-        {
-            IOUtils.closeQuietly(is);
         }
     }
 }

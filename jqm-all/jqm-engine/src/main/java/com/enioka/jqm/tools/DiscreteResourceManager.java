@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.enioka.jqm.api.JqmInvalidRequestException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.ResourceManager;

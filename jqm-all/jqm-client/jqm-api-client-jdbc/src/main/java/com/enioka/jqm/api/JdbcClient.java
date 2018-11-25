@@ -52,10 +52,10 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -407,11 +407,11 @@ final class JdbcClient implements JqmClient
      * Internal helper to create a new execution request from an History row.<br>
      * To be called for a single row only, not for converting multiple History elements.<br>
      * Does not create a transaction, and no need for an active transaction.
-     * 
+     *
      * @param launchId
-     *            the ID of the launch (was the ID of the JI, now the ID of the History object)
+     *                     the ID of the launch (was the ID of the JI, now the ID of the History object)
      * @param cnx
-     *            an open DB session
+     *                     an open DB session
      * @return a new execution request
      */
     private JobRequest getJobRequest(int launchId, DbConn cnx)
@@ -1827,7 +1827,7 @@ final class JdbcClient implements JqmClient
                                 // Nothing to do.
                             }
                         }
-                        ctx = SSLContexts.custom().loadTrustMaterial(trust).build();
+                        ctx = SSLContexts.custom().loadTrustMaterial(trust, null).build();
                     }
                     else
                     {
@@ -1840,7 +1840,7 @@ final class JdbcClient implements JqmClient
                     jqmlogger.error("An supposedly impossible error has happened. Downloading files through the API may not work.", e);
                 }
             }
-            cl = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setSslcontext(ctx).build();
+            cl = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setSSLContext(ctx).build();
 
             // Run HTTP request
             HttpUriRequest rq = new HttpGet(url.toString());
@@ -2113,7 +2113,8 @@ final class JdbcClient implements JqmClient
     }
 
     @Override
-    public int getQueueEnabledCapacity(com.enioka.jqm.api.Queue q) {
+    public int getQueueEnabledCapacity(com.enioka.jqm.api.Queue q)
+    {
         int capacity = 0;
         DbConn cnx = null;
         try
@@ -2123,7 +2124,7 @@ final class JdbcClient implements JqmClient
 
             while (rs.next())
             {
-               capacity = rs.getInt(1);
+                capacity = rs.getInt(1);
             }
         }
         catch (Exception e)
@@ -2219,7 +2220,7 @@ final class JdbcClient implements JqmClient
                     ids.add(jd.getId());
                 }
                 sjs = ScheduledJob.select(cnx, "sj_select_for_jd_list", ids);
-                allParams = JobDefParameter.select_all(cnx,"jdprm_select_all_for_jd_list", ids);
+                allParams = JobDefParameter.select_all(cnx, "jdprm_select_all_for_jd_list", ids);
             }
 
             for (JobDef jd : dbr)
@@ -2244,7 +2245,8 @@ final class JdbcClient implements JqmClient
                 List<JobDefParameter> parameters = allParams.get(jd.getId());
                 if (parameters != null)
                 {
-                    for (JobDefParameter jdf : parameters) {
+                    for (JobDefParameter jdf : parameters)
+                    {
                         tmp.addParameter(jdf.getKey(), jdf.getValue());
                     }
                 }

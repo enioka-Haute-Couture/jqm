@@ -16,7 +16,7 @@ import com.enioka.jqm.model.Node;
 
 public class EngineCallback implements JqmEngineHandler
 {
-    private static Logger jqmlogger = Logger.getLogger(EngineCallback.class);
+    // private static Logger jqmlogger = Logger.getLogger(EngineCallback.class);
 
     private JettyServer server = null;
     private DirectoryScanner scanner = null;

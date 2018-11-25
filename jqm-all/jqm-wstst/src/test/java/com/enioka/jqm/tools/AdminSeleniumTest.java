@@ -2,23 +2,20 @@ package com.enioka.jqm.tools;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 
-import javax.naming.NamingException;
-import javax.naming.spi.NamingManager;
+import com.enioka.jqm.model.Node;
+import com.saucelabs.common.SauceOnDemandAuthentication;
+import com.saucelabs.common.SauceOnDemandSessionIdProvider;
+import com.saucelabs.junit.ConcurrentParameterized;
+import com.saucelabs.junit.SauceOnDemandTestWatcher;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -28,21 +25,13 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.model.Node;
-import com.enioka.jqm.test.helpers.TestHelpers;
-import com.saucelabs.common.SauceOnDemandAuthentication;
-import com.saucelabs.common.SauceOnDemandSessionIdProvider;
-import com.saucelabs.junit.ConcurrentParameterized;
-import com.saucelabs.junit.SauceOnDemandTestWatcher;
-
 /**
  * Selenium tests for administration GUI
  */
 @RunWith(ConcurrentParameterized.class)
 public class AdminSeleniumTest implements SauceOnDemandSessionIdProvider
 {
-    private static Logger jqmlogger = Logger.getLogger(AdminSeleniumTest.class);
+    // private static Logger jqmlogger = Logger.getLogger(AdminSeleniumTest.class);
 
     // Authentication uses values from system or environment variables
     public SauceOnDemandAuthentication authentication = new SauceOnDemandAuthentication();

@@ -9,11 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.enioka.jqm.model.JobInstance;
-import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.Queue;
 
 /**
@@ -25,8 +21,6 @@ import com.enioka.jqm.model.Queue;
  */
 public abstract class DbAdapter
 {
-    private static Logger jqmlogger = LoggerFactory.getLogger(DbAdapter.class);
-
     protected String[] IDS = new String[] { "ID" };
 
     /**

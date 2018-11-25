@@ -18,17 +18,17 @@ package com.enioka.jqm.tools;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Properties;
+
+import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.test.helpers.TestHelpers;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class DeliverableTest extends JqmBaseTest
 {
@@ -54,7 +54,7 @@ public class DeliverableTest extends JqmBaseTest
 
         List<InputStream> tmp = JqmClientFactory.getClient().getJobDeliverablesContent(id);
         // Assert.assertTrue(tmp.get(0).available() > 0);
-        String res = IOUtils.toString(tmp.get(0));
+        String res = IOUtils.toString(tmp.get(0), Charset.defaultCharset());
         Assert.assertTrue(res.startsWith("Hello World!"));
 
         tmp.get(0).close();
@@ -82,7 +82,7 @@ public class DeliverableTest extends JqmBaseTest
         InputStream tmp = JqmClientFactory.getClient().getDeliverableContent(files.get(0));
 
         Assert.assertTrue(tmp.available() > 0);
-        String res = IOUtils.toString(tmp);
+        String res = IOUtils.toString(tmp, Charset.defaultCharset());
         Assert.assertTrue(res.startsWith("Hello World!"));
 
         tmp.close();
@@ -109,7 +109,7 @@ public class DeliverableTest extends JqmBaseTest
 
         InputStream tmp = JqmClientFactory.getClient().getDeliverableContent(files.get(0));
         Assert.assertTrue(tmp.available() > 0);
-        String res = IOUtils.toString(tmp);
+        String res = IOUtils.toString(tmp, Charset.defaultCharset());
         Assert.assertTrue(res.startsWith("Hello World!"));
 
         tmp.close();
@@ -140,7 +140,7 @@ public class DeliverableTest extends JqmBaseTest
 
         InputStream tmp = JqmClientFactory.getClient().getDeliverableContent(files.get(0));
         Assert.assertTrue(tmp.available() > 0);
-        String res = IOUtils.toString(tmp);
+        String res = IOUtils.toString(tmp, Charset.defaultCharset());
         Assert.assertTrue(res.startsWith("Hello World!"));
 
         tmp.close();

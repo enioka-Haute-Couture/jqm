@@ -24,14 +24,13 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Writer;
-import java.nio.Buffer;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.enioka.jqm.model.GlobalParameter;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
-
-import com.enioka.jqm.model.GlobalParameter;
 
 /**
  * The goal of this Stream is to provide a replacement for stdout/err in which every running job instance has its own personal flow. This is

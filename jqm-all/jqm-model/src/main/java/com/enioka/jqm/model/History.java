@@ -566,8 +566,25 @@ public class History implements Serializable
     }
 
     /**
+     * @return the return_code
+     */
+    public Integer getReturnCode()
+    {
+        return return_code;
+    }
+
+    /**
+     * @param return_code
+     *                        the return_code to set
+     */
+    public void setReturnCode(Integer return_code)
+    {
+        this.return_code = return_code;
+    }
+
+    /**
      * Create an History object from a {@link JobInstance}.
-     * 
+     *
      */
     public static void create(DbConn cnx, JobInstance ji, State finalState, Calendar endDate)
     {
@@ -597,7 +614,7 @@ public class History implements Serializable
 
     /**
      * Create an History object from a {@link JobInstance}. (if it does not exist, exception).
-     * 
+     *
      */
     public static void create(DbConn cnx, int launchId, State finalState, Calendar endDate)
     {

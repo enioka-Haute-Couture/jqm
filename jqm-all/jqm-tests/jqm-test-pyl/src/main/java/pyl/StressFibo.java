@@ -23,6 +23,7 @@ import java.util.Map;
 
 import com.enioka.jqm.api.JobBase;
 
+@SuppressWarnings("deprecation")
 public class StressFibo extends JobBase
 {
     @Override

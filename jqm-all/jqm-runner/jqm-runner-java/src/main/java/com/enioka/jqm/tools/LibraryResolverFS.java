@@ -139,23 +139,19 @@ class LibraryResolverFS
         if (!pomFile.exists() && !libDir.exists())
         {
             jqmlogger.trace("No pom inside jar directory. Checking for a pom inside the jar file");
-            InputStream is = null;
-            FileOutputStream os = null;
-            ZipFile zf = null;
 
-            try
+            try (ZipFile zf = new ZipFile(jarFile))
             {
-                zf = new ZipFile(jarFile);
                 Enumeration<? extends ZipEntry> zes = zf.entries();
                 while (zes.hasMoreElements())
                 {
                     ZipEntry ze = zes.nextElement();
                     if (ze.getName().endsWith("pom.xml"))
                     {
-
-                        is = zf.getInputStream(ze);
-                        os = new FileOutputStream(pomFile);
-                        IOUtils.copy(is, os);
+                        try (InputStream is = zf.getInputStream(ze); FileOutputStream os = new FileOutputStream(pomFile))
+                        {
+                            IOUtils.copy(is, os);
+                        }
                         pomFromJar = true;
                         break;
                     }
@@ -165,26 +161,16 @@ class LibraryResolverFS
             {
                 throw new JqmPayloadException("Could not handle pom inside jar", e);
             }
-            finally
-            {
-                IOUtils.closeQuietly(is);
-                IOUtils.closeQuietly(os);
-                closeQuietly(zf);
-            }
         }
 
         // 2nd: no pom, no pom inside jar, no lib dir => find a lib dir inside the jar
         if (!pomFile.exists() && !libDir.exists())
         {
             jqmlogger.trace("Checking for a lib directory inside jar");
-            InputStream is = null;
-            FileOutputStream os = null;
-            ZipFile zf = null;
             FileUtils.deleteQuietly(libDirExtracted);
 
-            try
+            try (ZipFile zf = new ZipFile(jarFile))
             {
-                zf = new ZipFile(jarFile);
                 Enumeration<? extends ZipEntry> zes = zf.entries();
                 while (zes.hasMoreElements())
                 {
@@ -196,22 +182,16 @@ class LibraryResolverFS
                             throw new JqmPayloadException("Could not extract libraries from jar");
                         }
 
-                        is = zf.getInputStream(ze);
-                        os = new FileOutputStream(
-                                FilenameUtils.concat(libDirExtracted.getAbsolutePath(), FilenameUtils.getName(ze.getName())));
-                        IOUtils.copy(is, os);
+                        try (InputStream is = zf.getInputStream(ze); FileOutputStream os = new FileOutputStream(FilenameUtils.concat(libDirExtracted.getAbsolutePath(), FilenameUtils.getName(ze.getName()))))
+                        {
+                            IOUtils.copy(is, os);
+                        }
                     }
                 }
             }
             catch (Exception e)
             {
                 throw new JqmPayloadException("Could not handle internal lib directory", e);
-            }
-            finally
-            {
-                IOUtils.closeQuietly(is);
-                IOUtils.closeQuietly(os);
-                closeQuietly(zf);
             }
 
             // If libs were extracted, put in cache and return
@@ -308,20 +288,5 @@ class LibraryResolverFS
         jdl.urls = urls;
 
         this.cache.put(applicationName, jdl);
-    }
-
-    private static void closeQuietly(ZipFile zf)
-    {
-        try
-        {
-            if (zf != null)
-            {
-                zf.close();
-            }
-        }
-        catch (Exception e)
-        {
-            // Do nothing.
-        }
     }
 }

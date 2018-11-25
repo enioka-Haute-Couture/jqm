@@ -20,6 +20,7 @@ import org.joda.time.DateTime;
 
 import com.enioka.jqm.api.JobBase;
 
+@SuppressWarnings("deprecation")
 public class App extends JobBase
 {
 

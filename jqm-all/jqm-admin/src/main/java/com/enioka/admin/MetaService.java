@@ -1,18 +1,11 @@
 package com.enioka.admin;
 
-import java.io.Closeable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.shiro.crypto.SecureRandomNumberGenerator;
-import org.apache.shiro.crypto.hash.Sha512Hash;
-import org.apache.shiro.util.ByteSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.enioka.api.admin.GlobalParameterDto;
 import com.enioka.api.admin.JndiObjectResourceDto;
@@ -31,12 +24,18 @@ import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JndiObjectResource;
 import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.model.JobDefParameter;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.ScheduledJob;
-import com.enioka.jqm.model.JobDef.PathType;
+
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.crypto.hash.Sha512Hash;
+import org.apache.shiro.util.ByteSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Set of methods to handle metadata.
@@ -44,21 +43,6 @@ import com.enioka.jqm.model.JobDef.PathType;
 public class MetaService
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(MetaService.class);
-
-    private static void closeQuietly(Closeable closeable)
-    {
-        try
-        {
-            if (closeable != null)
-            {
-                closeable.close();
-            }
-        }
-        catch (Exception e)
-        {
-            // fail silently
-        }
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     // GLOBAL DELETE

@@ -16,13 +16,11 @@
 package com.enioka.jqm.webui.shiro;
 
 import java.security.cert.X509Certificate;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.web.util.WebUtils;
 
 public class BasicHttpAuthenticationFilter extends org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter
 {

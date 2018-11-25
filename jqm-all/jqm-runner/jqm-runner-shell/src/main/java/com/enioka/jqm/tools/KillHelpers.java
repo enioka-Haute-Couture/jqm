@@ -2,13 +2,10 @@ package com.enioka.jqm.tools;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
 
-import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.JobDef.PathType;
 
 import org.jvnet.winp.WinProcess;

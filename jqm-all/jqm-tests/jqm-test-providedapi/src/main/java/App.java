@@ -18,6 +18,7 @@
 
 import com.enioka.jqm.api.JobBase;
 
+@SuppressWarnings("deprecation")
 public class App extends JobBase
 {
     @Override

@@ -52,14 +52,12 @@ import org.bouncycastle.cert.X509ExtensionUtils;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMWriter;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculator;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.util.BigIntegers;
-
-import com.enioka.jqm.jdbc.DbHelper;
 
 public class CertificateRequest
 {
@@ -140,7 +138,7 @@ public class CertificateRequest
     public void writePemPublicToFile(String path)
     {
         FileWriter fw = null;
-        PEMWriter wr = null;
+        JcaPEMWriter wr = null;
         try
         {
             File f = new File(path);
@@ -150,7 +148,7 @@ public class CertificateRequest
                         "couldn't create directory " + f.getParentFile().getAbsolutePath() + " for storing the SSL keystore");
             }
             fw = new FileWriter(path);
-            wr = new PEMWriter(fw);
+            wr = new JcaPEMWriter(fw);
             wr.writeObject(holder);
             wr.flush();
         }
@@ -168,11 +166,11 @@ public class CertificateRequest
     public String writePemPublicToString()
     {
         StringWriter sw = null;
-        PEMWriter wr = null;
+        JcaPEMWriter wr = null;
         try
         {
             sw = new StringWriter();
-            wr = new PEMWriter(sw);
+            wr = new JcaPEMWriter(sw);
             wr.writeObject(holder);
             wr.flush();
             return sw.toString();
@@ -191,11 +189,11 @@ public class CertificateRequest
     public void writePemPrivateToFile(String path)
     {
         FileWriter fw = null;
-        PEMWriter wr = null;
+        JcaPEMWriter wr = null;
         try
         {
             fw = new FileWriter(path);
-            wr = new PEMWriter(fw);
+            wr = new JcaPEMWriter(fw);
             wr.writeObject(privateKey);
             wr.flush();
         }
@@ -213,11 +211,11 @@ public class CertificateRequest
     public String writePemPrivateToString()
     {
         StringWriter sw = null;
-        PEMWriter wr = null;
+        JcaPEMWriter wr = null;
         try
         {
             sw = new StringWriter();
-            wr = new PEMWriter(sw);
+            wr = new JcaPEMWriter(sw);
             wr.writeObject(privateKey);
             wr.flush();
             return sw.toString();
@@ -251,13 +249,13 @@ public class CertificateRequest
     private void generatePem()
     {
         Writer osw = null;
-        PEMWriter wr = null;
+        JcaPEMWriter wr = null;
         try
         {
             // PEM public key
             pemPublicFile = new ByteArrayOutputStream();
             osw = new OutputStreamWriter(pemPublicFile);
-            wr = new PEMWriter(osw);
+            wr = new JcaPEMWriter(osw);
             wr.writeObject(holder);
             wr.flush();
             wr.close();
@@ -265,7 +263,7 @@ public class CertificateRequest
             // PEM private key
             pemPrivateFile = new ByteArrayOutputStream();
             osw = new OutputStreamWriter(pemPrivateFile);
-            wr = new PEMWriter(osw);
+            wr = new JcaPEMWriter(osw);
             wr.writeObject(privateKey);
             wr.flush();
             wr.close();

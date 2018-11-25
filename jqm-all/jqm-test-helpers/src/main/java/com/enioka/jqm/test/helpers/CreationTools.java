@@ -36,21 +36,19 @@ package com.enioka.jqm.test.helpers;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.shiro.crypto.SecureRandomNumberGenerator;
-import org.apache.shiro.crypto.hash.Sha512Hash;
-import org.apache.shiro.util.ByteSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.Cl;
 import com.enioka.jqm.model.JndiObjectResource;
 import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.RUser;
-import com.enioka.jqm.model.JobDef.PathType;
+
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.crypto.hash.Sha512Hash;
+import org.apache.shiro.util.ByteSource;
 
 /**
  * A set of static methods which help creating test data for automated tests.<br>
@@ -58,7 +56,7 @@ import com.enioka.jqm.model.JobDef.PathType;
  */
 public class CreationTools
 {
-    private static Logger jqmlogger = LoggerFactory.getLogger(CreationTools.class);
+    // private static Logger jqmlogger = LoggerFactory.getLogger(CreationTools.class);
 
     private CreationTools()
     {}

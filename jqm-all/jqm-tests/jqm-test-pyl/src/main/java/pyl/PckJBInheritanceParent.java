@@ -2,6 +2,7 @@ package pyl;
 
 import com.enioka.jqm.api.JobBase;
 
+@SuppressWarnings("deprecation")
 public class PckJBInheritanceParent extends JobBase
 {
     @Override

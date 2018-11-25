@@ -25,7 +25,13 @@ import java.util.Properties;
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
-import org.apache.commons.io.IOUtils;
+import com.enioka.jqm.api.JobInstance;
+import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.Query;
+import com.enioka.jqm.jdbc.Db;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.test.helpers.TestHelpers;
+
 import org.hsqldb.Server;
 import org.junit.After;
 import org.junit.Assume;
@@ -35,13 +41,6 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.enioka.jqm.api.JobInstance;
-import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.api.Query;
-import com.enioka.jqm.jdbc.Db;
-import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class JqmBaseTest
 {
@@ -64,14 +63,13 @@ public class JqmBaseTest
             JndiContext.createJndiContext();
 
             // If needed, create an HSQLDB server.
-            InputStream fis = null;
             Properties p = new Properties();
-            fis = Helpers.class.getClassLoader().getResourceAsStream("jqm.properties");
-            if (fis != null)
+            try (InputStream fis = Helpers.class.getClassLoader().getResourceAsStream("jqm.properties"))
             {
-                p.load(fis);
-                IOUtils.closeQuietly(fis);
-                fis.close();
+                if (fis != null)
+                {
+                    p.load(fis);
+                }
             }
             if (p.isEmpty() || !p.containsKey("com.enioka.jqm.jdbc.datasource") || (p.containsKey("com.enioka.jqm.jdbc.datasource")
                     && p.getProperty("com.enioka.jqm.jdbc.datasource").contains("hsql")))
