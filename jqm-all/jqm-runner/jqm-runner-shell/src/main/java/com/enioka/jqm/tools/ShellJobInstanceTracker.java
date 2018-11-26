@@ -88,7 +88,7 @@ class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTra
         pb.redirectErrorStream(false);
 
         // Environment variables
-        Map<String, String> env = new HashMap<String, String>(10);
+        Map<String, String> env = new HashMap<>(10);
 
         env.put("JQM_JD_APPLICATION_NAME", this.ji.getJD().getApplicationName());
         env.put("JQM_JD_KEYWORD_1", this.ji.getJD().getKeyword1() != null ? this.ji.getJD().getKeyword1() : "");

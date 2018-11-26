@@ -35,7 +35,7 @@ class CommandImportJobDef extends CommandBase
             }
 
             // The parameter is a list of deployment descriptor files OR of directory which may contain descriptor files (XML).
-            List<String> expandedPathes = new ArrayList<String>();
+            List<String> expandedPathes = new ArrayList<>();
             for (String path : xmlPathes)
             {
                 File f = new File(path);

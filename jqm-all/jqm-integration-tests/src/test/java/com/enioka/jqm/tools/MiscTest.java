@@ -308,7 +308,7 @@ public class MiscTest extends JqmBaseTest
         Assert.assertEquals("val2", tmp.getParameters().get("prm1"));
 
         // Now sync.
-        List<JndiObjectResourceDto> dtos = new ArrayList<JndiObjectResourceDto>();
+        List<JndiObjectResourceDto> dtos = new ArrayList<>();
         dtos.add(tmp);
         MetaService.syncJndiObjectResource(cnx, dtos);
         tmp = MetaService.getJndiObjectResource(cnx, "jndi/resource");

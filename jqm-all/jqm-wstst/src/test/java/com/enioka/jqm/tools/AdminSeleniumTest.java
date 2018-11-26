@@ -13,7 +13,6 @@ import com.saucelabs.common.SauceOnDemandSessionIdProvider;
 import com.saucelabs.junit.ConcurrentParameterized;
 import com.saucelabs.junit.SauceOnDemandTestWatcher;
 
-import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -66,7 +65,7 @@ public class AdminSeleniumTest implements SauceOnDemandSessionIdProvider
     @ConcurrentParameterized.Parameters
     public static List<String[]> browsersStrings()
     {
-        LinkedList<String[]> browsers = new LinkedList<String[]>();
+        LinkedList<String[]> browsers = new LinkedList<>();
         browsers.add(new String[] { "Windows 8.1", "11", "internet explorer" });
         browsers.add(new String[] { "OSX 10.8", "6", "safari" });
         return browsers;
@@ -160,7 +159,7 @@ public class AdminSeleniumTest implements SauceOnDemandSessionIdProvider
             capabilities.setCapability("build", travisBuildNumber);
         }
 
-        List<String> tags = new ArrayList<String>();
+        List<String> tags = new ArrayList<>();
         if (travisJdk != null)
         {
             tags.add("CI");

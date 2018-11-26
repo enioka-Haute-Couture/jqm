@@ -911,7 +911,7 @@ public class ServiceAdmin
     @HttpCache("private, max-age=36000")
     public PemissionsBagDto getMyself(@Context HttpServletRequest req)
     {
-        List<String> res = new ArrayList<String>();
+        List<String> res = new ArrayList<>();
         PemissionsBagDto b = new PemissionsBagDto();
 
         DbConn cnx = null;

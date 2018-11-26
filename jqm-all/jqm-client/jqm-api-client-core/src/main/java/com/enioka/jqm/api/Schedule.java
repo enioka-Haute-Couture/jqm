@@ -22,7 +22,7 @@ public class Schedule implements Serializable
     private String cronExpression;
     private Integer priority;
     private Queue queue;
-    private Map<String, String> parameters = new HashMap<String, String>();
+    private Map<String, String> parameters = new HashMap<>();
 
     /**
      * The schedule ID. This is the same ID returned by {@link JqmClient#enqueue(JobRequest)}.

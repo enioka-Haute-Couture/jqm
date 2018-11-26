@@ -165,7 +165,7 @@ public class MetaService
     public static List<GlobalParameterDto> getGlobalParameter(DbConn cnx)
     {
         ResultSet rs = cnx.runSelect("globalprm_select_all");
-        List<GlobalParameterDto> res = new ArrayList<GlobalParameterDto>();
+        List<GlobalParameterDto> res = new ArrayList<>();
         try
         {
             while (rs.next())
@@ -336,8 +336,8 @@ public class MetaService
     private static List<JndiObjectResourceDto> getJndiObjectResources(DbConn cnx, String query_key, Object... prms)
     {
         ResultSet rs = cnx.runSelect(query_key, prms);
-        List<JndiObjectResourceDto> res = new ArrayList<JndiObjectResourceDto>();
-        List<Integer> rscIds = new ArrayList<Integer>();
+        List<JndiObjectResourceDto> res = new ArrayList<>();
+        List<Integer> rscIds = new ArrayList<>();
         try
         {
             // The resources
@@ -461,12 +461,12 @@ public class MetaService
     private static void addSubElementsToDto(DbConn cnx, List<JobDefDto> dtos)
     {
         List<Integer> currentIdList = null;
-        List<List<Integer>> allIdLists = new ArrayList<List<Integer>>();
+        List<List<Integer>> allIdLists = new ArrayList<>();
         for (JobDefDto dto : dtos)
         {
             if (currentIdList == null || currentIdList.size() == 500)
             {
-                currentIdList = new ArrayList<Integer>();
+                currentIdList = new ArrayList<>();
                 allIdLists.add(currentIdList);
             }
             currentIdList.add(dto.getId());
@@ -537,7 +537,7 @@ public class MetaService
 
     public static List<JobDefDto> getJobDef(DbConn cnx)
     {
-        List<JobDefDto> res = new ArrayList<JobDefDto>();
+        List<JobDefDto> res = new ArrayList<>();
         try
         {
             ResultSet rs = cnx.runSelect("jd_select_all");
@@ -568,7 +568,7 @@ public class MetaService
             }
 
             JobDefDto tmp = mapJobDef(rs, 0);
-            List<JobDefDto> tmp2 = new ArrayList<JobDefDto>();
+            List<JobDefDto> tmp2 = new ArrayList<>();
             tmp2.add(tmp);
             addSubElementsToDto(cnx, tmp2);
             return tmp;
@@ -605,7 +605,7 @@ public class MetaService
             else
             {
                 List<ScheduledJob> existingSchedules = ScheduledJob.select(cnx, "sj_select_for_jd", dto.getId());
-                List<ScheduledJob> toDelete = new ArrayList<ScheduledJob>();
+                List<ScheduledJob> toDelete = new ArrayList<>();
 
                 // First remove SJ not present anymore in the DTO.
                 firstloop: for (ScheduledJob sj : existingSchedules)
@@ -792,7 +792,7 @@ public class MetaService
 
     public static List<NodeDto> getNodes(DbConn cnx)
     {
-        List<NodeDto> res = new ArrayList<NodeDto>();
+        List<NodeDto> res = new ArrayList<>();
         try
         {
             ResultSet rs = cnx.runSelect("node_select_all");
@@ -941,7 +941,7 @@ public class MetaService
 
     public static List<QueueDto> getQueues(DbConn cnx)
     {
-        List<QueueDto> res = new ArrayList<QueueDto>();
+        List<QueueDto> res = new ArrayList<>();
         try
         {
             ResultSet rs = cnx.runSelect("q_select_all");
@@ -1056,7 +1056,7 @@ public class MetaService
 
     public static List<QueueMappingDto> getQueueMappings(DbConn cnx)
     {
-        List<QueueMappingDto> res = new ArrayList<QueueMappingDto>();
+        List<QueueMappingDto> res = new ArrayList<>();
         try
         {
             ResultSet rs = cnx.runSelect("dp_select_all_with_names");
@@ -1095,7 +1095,7 @@ public class MetaService
     public static List<QueueMappingDto> getNodeQueueMappings(DbConn cnx, int nodeId)
     {
         ResultSet rs = null;
-        List<QueueMappingDto> res = new ArrayList<QueueMappingDto>();
+        List<QueueMappingDto> res = new ArrayList<>();
         try
         {
             rs = cnx.runSelect("dp_select_with_names_by_node_id", nodeId);
@@ -1201,7 +1201,7 @@ public class MetaService
 
     private static List<RRoleDto> getRoles(DbConn cnx, String query_key, int colShift, Object... args)
     {
-        List<RRoleDto> res = new ArrayList<RRoleDto>();
+        List<RRoleDto> res = new ArrayList<>();
         try
         {
             ResultSet rs = cnx.runSelect(query_key, args);
@@ -1213,7 +1213,7 @@ public class MetaService
             }
             rs.close();
 
-            List<Integer> ids = new ArrayList<Integer>();
+            List<Integer> ids = new ArrayList<>();
             for (RRoleDto dto : res)
             {
                 ids.add(dto.getId());
@@ -1346,7 +1346,7 @@ public class MetaService
 
     private static List<RUserDto> getUsers(DbConn cnx, String query_key, int colShift, Object... params)
     {
-        List<RUserDto> res = new ArrayList<RUserDto>();
+        List<RUserDto> res = new ArrayList<>();
         try
         {
             ResultSet rs = cnx.runSelect(query_key, params);
@@ -1358,7 +1358,7 @@ public class MetaService
             }
             rs.close();
 
-            List<Integer> ids = new ArrayList<Integer>();
+            List<Integer> ids = new ArrayList<>();
             for (RUserDto dto : res)
             {
                 ids.add(dto.getId());

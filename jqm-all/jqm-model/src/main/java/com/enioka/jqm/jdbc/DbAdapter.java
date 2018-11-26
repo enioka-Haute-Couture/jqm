@@ -26,7 +26,7 @@ public abstract class DbAdapter
     /**
      * Query cache.
      */
-    protected Map<String, String> queries = new HashMap<String, String>();
+    protected Map<String, String> queries = new HashMap<>();
 
     /**
      * Prefix to use for all tables and views.
@@ -67,7 +67,7 @@ public abstract class DbAdapter
      */
     public List<String> preSchemaCreationScripts()
     {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     /**

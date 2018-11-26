@@ -30,7 +30,7 @@ public class StressGeo implements Runnable
     @Override
     public void run()
     {
-        Map<String, String> p = new HashMap<String, String>();
+        Map<String, String> p = new HashMap<>();
         p.put("nbJob", ((Integer.parseInt(jm.parameters().get("nbJob")) + 1) + ""));
 
         if (Integer.parseInt(jm.parameters().get("nbJob")) >= 9)

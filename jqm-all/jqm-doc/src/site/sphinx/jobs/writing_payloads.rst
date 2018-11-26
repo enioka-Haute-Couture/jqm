@@ -1,31 +1,31 @@
 Payload basics
 #########################
 
-JQM is a specialized application server dedicated to ease the management of Java batch jobs. 
+JQM is a specialized application server dedicated to ease the management of Java batch jobs.
 Application servers usually have two main aspects: on one hand they bring in frameworks to help writing the business programs,
-on the other they try to ease daily operations. For example, JBoss or Glassfish provide an implementation of the EE6 framework for building 
+on the other they try to ease daily operations. For example, JBoss or Glassfish provide an implementation of the EE6 framework for building
 web applications, and provide many administration utilities to deploy applications, monitor them, load balance them, etc.
 
-JQM's philosophy is that **all existing Java programs should be reusable as is**, and that programmers should be free to use whatever frameworks 
+JQM's philosophy is that **all existing Java programs should be reusable as is**, and that programmers should be free to use whatever frameworks
 they want (if any at all). Therefore, JQM nearly totally forgoes the "framework" part and concentrates on
 the management part. For great frameworks created for making batch jobs easier to write, look at Spring batch, a part of Spring, or JSR 352, a part of EE7.
 As long as the required libraries are provided, JQM can run :term:`payloads<payload>` based on all these frameworks.
 
-**This section aims at giving all the keys to developers in order to create great batch jobs for JQM**. This may seem in contradiction with 
+**This section aims at giving all the keys to developers in order to create great batch jobs for JQM**. This may seem in contradiction with
 what was just said: why have a "develop for JQM" chapter if JQM runs any Java code?
 
 * First, as in all application server containers, there a a few guidelines to respect, such as packaging rules.
 * Then, as an option, JQM provides a few APIs that can be of help to batch jobs, such as getting the ID of the run or the caller name.
 
 But this document must insist: unless there is a need to use the APIs, there is no need to develop specifically for JQM. **JQM
-runs standard JSE code**. 
+runs standard JSE code**.
 
 .. highlight:: java
 
 Payloads types
 ********************
 
-There are three :term:`payload<payload>` types: programs with a good old main (the preferred method for newly written jobs), and two 
+There are three :term:`payload<payload>` types: programs with a good old main (the preferred method for newly written jobs), and two
 types designed to allow reuse of even more existing binaries: Runnable implementers & JobBase extenders.
 
 Main
@@ -55,7 +55,7 @@ Runnable
 --------------
 
 Some existing code is already written to be run as a thread, implementing the Runnable interface. If these classes have a no-argument
-constructor (this is not imposed by the Runnable interface as interfaces cannot impose a constructor), JQM can instantiate 
+constructor (this is not imposed by the Runnable interface as interfaces cannot impose a constructor), JQM can instantiate
 and launch them. In that case, the run() method from the interface is executed. As it takes no arguments, it is not possible to access
 parameters without using JQM specific methods as described later in this chapter.
 
@@ -81,7 +81,7 @@ overloading method start() and keeping a no-arg constructor. Parameters were acc
 For example (note the import and the use of an accessor from the base class)::
 
     import com.enioka.jqm.api.JobBase;
-    
+
     public class App extends JobBase
     {
         @Override
@@ -115,12 +115,12 @@ Sometimes, a job will need to directly interact with JQM, for operations such as
 * report progress to an end user
 * ...
 
-For this, an interface exists called :class:`JobManager` inside jar jqm-api.jar. Using it is trivial: 
-just create a field (static or not) inside your job class (whatever type - Main, Runnable or JQM) and the engine 
+For this, an interface exists called :class:`JobManager` inside jar jqm-api.jar. Using it is trivial:
+just create a field (static or not) inside your job class (whatever type - Main, Runnable or JQM) and the engine
 will **inject an implementation ready for use**.
 
 .. note:: the 'explicit JQM jobs' payload type already has one :class:`JobManager` field named jm defined in the base class JobBase - it would have
-    been stupid not to define it as the API must be imported anyway for that payload type. 
+    been stupid not to define it as the API must be imported anyway for that payload type.
 
 The dependency is::
 
@@ -136,23 +136,23 @@ For more details, please read :doc:`engineapi`.
 .. note:: the scope given here is provided. It means it will be present for compilation but not at runtime. Indeed, JQM always provides the jqm-api.jar to
    its payloads without them needing to package it. That being said, packaging it (default 'compile' scope) is harmless as it will be ignored at runtime in
    favour of the engine-provided one.
-    
+
 Creating files
 ******************
 
 An important use case for JQM is the generation of files (such as reports) at the direct request of an end-user through a web interface (or other interfaces).
-It happens when generating the file is too long or resource intensive for a web application server (these are not made 
+It happens when generating the file is too long or resource intensive for a web application server (these are not made
 to handle 'long' processes), or blocking a thread for a user
 is unacceptable: the generation must be deported elsewhere. JQM has methods to do just that.
 
 In this case, the :term:`payload` simply has to be the file generation code. However, JQM is a distributed system, so
-unless it is forced into a single node deployment, the end user has no idea where the file was generated and cannot directly retrieve it. 
-The idea is to notify JQM of a file creation, so that JQM will take it (remove it from the work directory) and reference it. 
+unless it is forced into a single node deployment, the end user has no idea where the file was generated and cannot directly retrieve it.
+The idea is to notify JQM of a file creation, so that JQM will take it (remove it from the work directory) and reference it.
 It is then be made available to clients through a small HTTP GET that is leveraged by the engine itself (and can be proxied).
 
 The method to do so is :meth:`JobManager.addDeliverable` from the :doc:`engineapi`.
 
-.. note:: Work/temp directories are obtained through :meth:`JobManager.getWorkDir`. These are purged after execution. Use of temporary Java 
+.. note:: Work/temp directories are obtained through :meth:`JobManager.getWorkDir`. These are purged after execution. Use of temporary Java
     files is strongly discouraged - these are purged only on JVM exit, which on the whole never happens inside an application server.
 
 Example::
@@ -163,7 +163,7 @@ Example::
     public class App implements Runnable
     {
         private JobManager jm;
-        
+
         @Override
         public void run()
         {
@@ -188,12 +188,12 @@ Example::
 Going to the culling
 **********************
 
-Payloads are run inside a thread by the JQM engine. Alas, Java threads have one caveat: they cannot be cleanly killed. 
+Payloads are run inside a thread by the JQM engine. Alas, Java threads have one caveat: they cannot be cleanly killed.
 Therefore, there is no obvious way to allow a user to kill a job instance that has gone haywire. To provide some measure
 of relief, the :doc:`engineapi` provides a method called :meth:`JobManager.yield` that, when called, will do nothing but give briefly control
 of the job's thread to the engine. This allows the engine to check if the job should be killed (it throws an exception
-as well as sets the thread's interruption status to do so). Now, if the job instance really has entered an infinite loop where 
-yield is not called nor is the interruption status read, it won't help much. It is more to allow killing instances that 
+as well as sets the thread's interruption status to do so). Now, if the job instance really has entered an infinite loop where
+yield is not called nor is the interruption status read, it won't help much. It is more to allow killing instances that
 run well (user has changed his mind, etc.).
 
 To ease the use of the kill function, all other engine API methods actually call yield before doing their own work.
@@ -276,7 +276,7 @@ This fully commented payload uses nearly all the API. ::
             if (jm.parameters().size() == 0)
             {
                 jm.sendProgress(33);
-                Map<String, String> prms = new HashMap<String, String>();
+                Map<String, String> prms = new HashMap<>();
                 prms.put("rr", "2nd run");
                 System.out.println("creating a new async job instance request");
                 int i = jm.enqueue(jm.applicationName(), null, null, null, jm.application(), jm.module(), null, null, null, prms);
@@ -315,7 +315,7 @@ JQM is some sort of light application server - therefore the same type of guidel
   and we wouldn't want existing code using these frameworks to fail just because we are being too strict.
 * Don't create threads. A thread is an unmanageable object in Java - if it blocks for whatever reason, the whole application server
   has to be restarted, impacting other jobs/users. They are only allowed for the same reason as for creating class loaders.
-* Be wary of bootstrap static contexts. Using static elements is all-right as long as the static context is from your class loader (in our case, it means 
+* Be wary of bootstrap static contexts. Using static elements is all-right as long as the static context is from your class loader (in our case, it means
   classes from your own code or dependencies). Messing with
   static elements from the bootstrap class loader is opening the door to weird interactions between jobs running in parallel. For example, loading a JDBC
   driver does store such static elements, and should be frowned upon (use a shared JNDI JDBC resource for this).

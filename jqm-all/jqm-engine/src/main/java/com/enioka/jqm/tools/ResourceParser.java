@@ -50,7 +50,7 @@ final class ResourceParser
     {
         if (xml == null)
         {
-            xml = new HashMap<String, JndiResourceDescriptor>();
+            xml = new HashMap<>();
             importXml();
         }
         if (xml.containsKey(alias))
@@ -116,7 +116,7 @@ final class ResourceParser
             for (int i = 0; i < nList.getLength(); i++)
             {
                 Node n = nList.item(i);
-                Map<String, String> otherParams = new HashMap<String, String>();
+                Map<String, String> otherParams = new HashMap<>();
 
                 NamedNodeMap attrs = n.getAttributes();
                 for (int j = 0; j < attrs.getLength(); j++)

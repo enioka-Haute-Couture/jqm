@@ -172,7 +172,7 @@ public class JndiObjectResource implements Serializable
     public Collection<JndiObjectResourceParameter> getParameters(DbConn cnx)
     {
         ResultSet rs = cnx.runSelect("jndiprm_select_all_in_jndisrc", this.id);
-        List<JndiObjectResourceParameter> res = new ArrayList<JndiObjectResourceParameter>();
+        List<JndiObjectResourceParameter> res = new ArrayList<>();
         JndiObjectResourceParameter tmp = null;
         try
         {
@@ -241,7 +241,7 @@ public class JndiObjectResource implements Serializable
 
     public static List<JndiObjectResource> select(DbConn cnx, String query_key, Object... args)
     {
-        List<JndiObjectResource> res = new ArrayList<JndiObjectResource>();
+        List<JndiObjectResource> res = new ArrayList<>();
         try
         {
             ResultSet rs = cnx.runSelect(query_key, args);

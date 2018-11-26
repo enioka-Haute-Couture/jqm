@@ -69,7 +69,7 @@ public class MainRunner implements JavaJobRunner
 
         // Parameters
         String[] params = new String[jobParameters.size()];
-        List<String> keys = new ArrayList<String>(jobParameters.keySet());
+        List<String> keys = new ArrayList<>(jobParameters.keySet());
         Collections.sort(keys, new Comparator<String>()
         {
             @Override

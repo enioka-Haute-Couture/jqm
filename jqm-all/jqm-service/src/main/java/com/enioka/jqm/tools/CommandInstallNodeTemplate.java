@@ -29,9 +29,9 @@ class CommandInstallNodeTemplate extends CommandBase
             NodeDto target = MetaService.getNode(cnx, nodeName);
 
             // Apply deployments parameters
-            ArrayList<QueueMappingDto> mappings = new ArrayList<QueueMappingDto>(MetaService.getQueueMappings(cnx));
-            List<QueueMappingDto> toRemove = new ArrayList<QueueMappingDto>(10);
-            List<QueueMappingDto> toAdd = new ArrayList<QueueMappingDto>(10);
+            ArrayList<QueueMappingDto> mappings = new ArrayList<>(MetaService.getQueueMappings(cnx));
+            List<QueueMappingDto> toRemove = new ArrayList<>(10);
+            List<QueueMappingDto> toAdd = new ArrayList<>(10);
             for (QueueMappingDto mapping : mappings)
             {
                 if (mapping.getNodeId().equals(template.getId()))

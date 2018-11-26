@@ -132,7 +132,7 @@ public class ResourceManager implements Serializable
     {
         if (parameterCache == null)
         {
-            parameterCache = new HashMap<String, String>(1);
+            parameterCache = new HashMap<>(1);
         }
         parameterCache.put(key, value);
     }

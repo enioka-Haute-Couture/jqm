@@ -60,7 +60,7 @@ class LibraryResolverMaven
         // Retrieve resolver configuration
         if (REPO_LIST == null)
         {
-            REPO_LIST = new ArrayList<String>(5);
+            REPO_LIST = new ArrayList<>(5);
             for (String gp : mavenRepos)
             {
                 REPO_LIST.add(gp);

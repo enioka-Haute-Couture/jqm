@@ -104,7 +104,7 @@ class XmlJobDefParser
         DocumentBuilder dBuilder;
 
         // Result fields
-        Map<String, Integer> createdQueues = new HashMap<String, Integer>();
+        Map<String, Integer> createdQueues = new HashMap<>();
         JobDef jd = null;
         Integer queueId = null;
 
@@ -199,7 +199,7 @@ class XmlJobDefParser
                     for (int j = 0; j < handlersList.getLength(); j++)
                     {
                         Element hElement = (Element) handlersList.item(j);
-                        Map<String, String> handlerPrms = new HashMap<String, String>();
+                        Map<String, String> handlerPrms = new HashMap<>();
 
                         if (hElement.getElementsByTagName("parameters").getLength() > 0)
                         {
@@ -400,7 +400,7 @@ class XmlJobDefParser
                     }
 
                     // Parameters
-                    Map<String, String> parameters = new HashMap<String, String>();
+                    Map<String, String> parameters = new HashMap<>();
                     NodeList prmList = jdElement.getElementsByTagName("parameter");
                     for (int prmIndex = 0; prmIndex < prmList.getLength(); prmIndex++)
                     {

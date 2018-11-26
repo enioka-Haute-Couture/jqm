@@ -371,7 +371,7 @@ public class Db
 
             int loop_from = db_schema_version;
             int to = db_schema_version;
-            List<String> toApply = new ArrayList<String>();
+            List<String> toApply = new ArrayList<>();
             toApply.addAll(adapter.preSchemaCreationScripts());
 
             while (to != SCHEMA_VERSION)

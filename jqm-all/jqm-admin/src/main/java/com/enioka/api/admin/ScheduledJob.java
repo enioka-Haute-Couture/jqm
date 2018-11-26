@@ -26,11 +26,11 @@ public class ScheduledJob implements Serializable
 
     private Integer priority;
 
-    private Map<String, String> parameters = new HashMap<String, String>();
+    private Map<String, String> parameters = new HashMap<>();
 
     /**
      * Fluent API builder.
-     * 
+     *
      * @param cronExpression
      * @return
      */
@@ -45,7 +45,7 @@ public class ScheduledJob implements Serializable
      * Unique key of the schedule job. If null, this is considered a new scheduled job.<br>
      * Note that the ScheduledJob is a part of the JobDefDto and yet it has a unique key. This is because we want to track updates to the
      * schedules individually, and not only the updates to the job as a whole.
-     * 
+     *
      * @return the ID.
      */
     public Integer getId()
@@ -55,7 +55,7 @@ public class ScheduledJob implements Serializable
 
     /**
      * See {@link #getId()}
-     * 
+     *
      * @param id
      */
     public ScheduledJob setId(Integer id)
@@ -66,7 +66,7 @@ public class ScheduledJob implements Serializable
 
     /**
      * A valid cron expression.
-     * 
+     *
      * @return
      */
     public String getCronExpression()
@@ -76,7 +76,7 @@ public class ScheduledJob implements Serializable
 
     /**
      * See {@link #getCronExpression()}.
-     * 
+     *
      * @param cronExpression
      */
     public ScheduledJob setCronExpression(String cronExpression)
@@ -87,7 +87,7 @@ public class ScheduledJob implements Serializable
 
     /**
      * This date is updated whenever the object (or one of its parameters) gets updated. This allows easier parameter sync.
-     * 
+     *
      * @return
      */
     public Calendar getLastUpdated()
@@ -97,7 +97,7 @@ public class ScheduledJob implements Serializable
 
     /**
      * See {@link #getLastUpdated()}
-     * 
+     *
      * @param lastUpdated
      */
     public void setLastUpdated(Calendar lastUpdated)
@@ -108,7 +108,7 @@ public class ScheduledJob implements Serializable
     /**
      * A scheduled job can override the default queue of its {@link JobDefDto}. If null, the {@link JobDefDto} default queue is used (or the
      * global default queue if it has none).
-     * 
+     *
      * @return
      */
     public Integer getQueue()
@@ -118,7 +118,7 @@ public class ScheduledJob implements Serializable
 
     /**
      * See {@link #getQueue()}
-     * 
+     *
      * @param queue
      */
     public ScheduledJob setQueue(Integer queue)
@@ -130,17 +130,17 @@ public class ScheduledJob implements Serializable
     /**
      * A scheduled job can override the default parameters (and add new ones, but not remove any) of its {@link JobDefDto}. Can be empty,
      * but not null.
-     * 
+     *
      * @return a copy of the parameter map.
      */
     public Map<String, String> getParameters()
     {
-        return new HashMap<String, String>(parameters);
+        return new HashMap<>(parameters);
     }
 
     /**
      * See {@link #getParameters()}.
-     * 
+     *
      * @param parameters
      */
     public void setParameters(Map<String, String> parameters)
@@ -150,7 +150,7 @@ public class ScheduledJob implements Serializable
 
     /**
      * Add a parameter to the override parameters. See {@link #getParameters()}.
-     * 
+     *
      * @param key
      * @param value
      * @return
@@ -169,7 +169,7 @@ public class ScheduledJob implements Serializable
 
     /**
      * The default priority for job instances created from this scheduled job. Null if the default.
-     * 
+     *
      */
     public Integer getPriority()
     {

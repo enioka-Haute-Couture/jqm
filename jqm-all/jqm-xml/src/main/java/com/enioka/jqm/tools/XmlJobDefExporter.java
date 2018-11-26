@@ -125,7 +125,7 @@ public class XmlJobDefExporter
 
         Element jobDefinitions = null;
         String currentJarPath = null;
-        Set<Cl> cls = new HashSet<Cl>();
+        Set<Cl> cls = new HashSet<>();
 
         for (JobDef j : jobDefList)
         {

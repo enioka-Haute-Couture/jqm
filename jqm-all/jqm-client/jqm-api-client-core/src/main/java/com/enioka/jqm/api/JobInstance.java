@@ -34,7 +34,7 @@ import com.enioka.jqm.api.State;
 
 /**
  * Represents the result of a job execution request - either a queued request, or a running job, or the result of said execution.
- * 
+ *
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -51,11 +51,11 @@ public class JobInstance
     private Queue queue;
     private String queueName;
     private String keyword1, keyword2, keyword3, definitionKeyword1, definitionKeyword2, definitionKeyword3, module, email, application;
-    private Map<String, String> parameters = new HashMap<String, String>();
+    private Map<String, String> parameters = new HashMap<>();
     private Integer progress;
     @XmlElementWrapper(name = "messages")
     @XmlElement(name = "message", type = String.class)
-    private List<String> messages = new ArrayList<String>();
+    private List<String> messages = new ArrayList<>();
     private Calendar enqueueDate, beganRunningDate, endDate, runAfter;
     private String nodeName;
     private boolean highlander;

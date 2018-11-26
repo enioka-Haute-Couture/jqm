@@ -51,7 +51,7 @@ public class JobRequest implements Serializable
     private Integer scheduleId = null;
     private State startState = null;
     private Integer priority = 0;
-    private Map<String, String> parameters = new HashMap<String, String>();
+    private Map<String, String> parameters = new HashMap<>();
 
     private Calendar runAfter;
     private String recurrence;
@@ -63,12 +63,12 @@ public class JobRequest implements Serializable
 
     /**
      * Public constructor
-     * 
+     *
      * @param applicationName
-     *            name (key) of the job to launch
+     *                            name (key) of the job to launch
      * @param user
-     *            name of the human user that is at the origin of the request. If no user (e.g. inside an automated system), the application
-     *            module name should be used.
+     *                            name of the human user that is at the origin of the request. If no user (e.g. inside an automated system),
+     *                            the application module name should be used.
      */
     public JobRequest(String applicationName, String user)
     {
@@ -78,12 +78,12 @@ public class JobRequest implements Serializable
 
     /**
      * Public constructor for fluid API.
-     * 
+     *
      * @param applicationName
-     *            name (key) of the job to launch
+     *                            name (key) of the job to launch
      * @param user
-     *            name of the human user that is at the origin of the request. If no user (e.g. inside an automated system), the application
-     *            module name should be used.
+     *                            name of the human user that is at the origin of the request. If no user (e.g. inside an automated system),
+     *                            the application module name should be used.
      */
     public static JobRequest create(String applicationName, String user)
     {
@@ -92,13 +92,13 @@ public class JobRequest implements Serializable
 
     /**
      * Public constructor
-     * 
+     *
      * @param applicationName
-     *            name (key) of the job to launch
+     *                            name (key) of the job to launch
      * @param user
-     *            name of the human user that is at the origin of the request. If no user, use the application module name.
+     *                            name of the human user that is at the origin of the request. If no user, use the application module name.
      * @param email
-     *            email of the human user that to want to receive a notification when the job ends.
+     *                            email of the human user that to want to receive a notification when the job ends.
      */
     public JobRequest(String applicationName, String user, String email)
     {
@@ -111,7 +111,7 @@ public class JobRequest implements Serializable
      * Shortcut to submit the request to the JQM cluster. Equivalent to doing<br>
      * <code>JqmClientFactory.getClient().enqueue(this)</code><br>
      * See {@link JqmClient#enqueue(JobRequest)} for details on exceptions.
-     * 
+     *
      * @return the ID of the job instance.
      */
     public Integer submit()
@@ -122,11 +122,11 @@ public class JobRequest implements Serializable
     /**
      * Parameters are <key,value> pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
      * job itself.
-     * 
+     *
      * @param key
-     *            max length is 50
+     *                  max length is 50
      * @param value
-     *            max length is 1000
+     *                  max length is 1000
      */
     public JobRequest addParameter(String key, String value)
     {
@@ -146,7 +146,7 @@ public class JobRequest implements Serializable
 
     /**
      * See {@link #addParameter(String, String)}
-     * 
+     *
      * @param prms
      * @return
      */
@@ -163,7 +163,7 @@ public class JobRequest implements Serializable
     /**
      * Parameters are <key,value> pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
      * job itself. If there is no parameter named key, no error is thrown.
-     * 
+     *
      * @param key
      */
     public void delParameter(String key)
@@ -183,9 +183,9 @@ public class JobRequest implements Serializable
     /**
      * <strong>Compulsory</strong> (unless {@link #setScheduleId(Integer)} is used)<br>
      * The name of the batch job to launch. It is the "Job Definition" name, and the most important parameter in this form.
-     * 
+     *
      * @param applicationName
-     *            max length is 100
+     *                            max length is 100
      */
     public JobRequest setApplicationName(String applicationName)
     {
@@ -211,9 +211,9 @@ public class JobRequest implements Serializable
      * <strong>Optional</strong><br>
      * It is possible to link a job instance to an arbitrary ID, such as a session ID and later query result by this ID.<br>
      * Default is null.
-     * 
+     *
      * @param sessionID
-     *            max length is 100
+     *                      max length is 100
      */
     public JobRequest setSessionID(String sessionID)
     {
@@ -233,9 +233,9 @@ public class JobRequest implements Serializable
     /**
      * <strong>Optional</strong><br>
      * The application making the query. E.g.: Accounting, Interfaces, ...
-     * 
+     *
      * @param application
-     *            max length is 50
+     *                        max length is 50
      */
     public JobRequest setApplication(String application)
     {
@@ -255,9 +255,9 @@ public class JobRequest implements Serializable
     /**
      * <strong>Optional</strong><br>
      * An optional classification axis (and therefore query criterion)
-     * 
+     *
      * @param module
-     *            max length is 50
+     *                   max length is 50
      */
     public JobRequest setModule(String module)
     {
@@ -277,9 +277,9 @@ public class JobRequest implements Serializable
     /**
      * <strong>Optional</strong><br>
      * An optional classification axis (and therefore query criterion)
-     * 
+     *
      * @param keyword1
-     *            max length is 50
+     *                     max length is 50
      */
     public JobRequest setKeyword1(String keyword1)
     {
@@ -299,9 +299,9 @@ public class JobRequest implements Serializable
     /**
      * <strong>Optional</strong><br>
      * An optional classification axis (and therefore query criterion)
-     * 
+     *
      * @param keyword2
-     *            max length is 50
+     *                     max length is 50
      */
     public JobRequest setKeyword2(String keyword2)
     {
@@ -321,9 +321,9 @@ public class JobRequest implements Serializable
     /**
      * <strong>Optional</strong><br>
      * An optional classification axis (and therefore query criterion)
-     * 
+     *
      * @param keyword3
-     *            max length is 50
+     *                     max length is 50
      */
     public JobRequest setKeyword3(String keyword3)
     {
@@ -336,7 +336,7 @@ public class JobRequest implements Serializable
      */
     public Map<String, String> getParameters()
     {
-        return new HashMap<String, String>(parameters);
+        return new HashMap<>(parameters);
     }
 
     public JobRequest setParameters(Map<String, String> parameters)
@@ -361,9 +361,9 @@ public class JobRequest implements Serializable
     /**
      * <strong>Optional</strong><br>
      * It is possible to associate a user to a job execution request, and later query job execution by user.
-     * 
+     *
      * @param user
-     *            max length is 50
+     *                 max length is 50
      */
     public JobRequest setUser(String user)
     {
@@ -383,9 +383,9 @@ public class JobRequest implements Serializable
     /**
      * <strong>Optional</strong><br>
      * The user can enter an email to receive an email when the job is ended.
-     * 
+     *
      * @param email
-     *            max length is 100
+     *                  max length is 100
      */
     public JobRequest setEmail(String email)
     {
@@ -545,7 +545,7 @@ public class JobRequest implements Serializable
      * actually runs.<br>
      * Higher priority is better (runs before the others, has more CPU share).<br>
      * Priority must be between {@link Thread#MIN_PRIORITY} and {@link Thread#MAX_PRIORITY}. To remove priority, set it to null.
-     * 
+     *
      * @param priority
      * @return
      */

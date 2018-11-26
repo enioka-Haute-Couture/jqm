@@ -96,7 +96,7 @@ public class EngineApiInject
         if (jm.parameters().size() == 0)
         {
             jm.sendProgress(33);
-            Map<String, String> prms = new HashMap<String, String>();
+            Map<String, String> prms = new HashMap<>();
             prms.put("rr", "2nd run");
             System.out.println("creating a new async job instance request");
             int i = jm.enqueue(jm.applicationName(), null, null, null, jm.application(), jm.module(), null, null, null, prms);

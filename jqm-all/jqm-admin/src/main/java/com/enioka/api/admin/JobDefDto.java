@@ -54,9 +54,9 @@ public class JobDefDto implements Serializable
 
     @XmlElementWrapper(name = "parameters")
     @XmlElement(name = "parameter")
-    private Map<String, String> parameters = new HashMap<String, String>();
+    private Map<String, String> parameters = new HashMap<>();
 
-    private List<ScheduledJob> schedules = new ArrayList<ScheduledJob>();
+    private List<ScheduledJob> schedules = new ArrayList<>();
 
     public Integer getId()
     {

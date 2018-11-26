@@ -51,7 +51,7 @@ public class CompatHibApi implements Runnable
         if (jm.parameters().size() == 0)
         {
             log.info("Queuing again - with parameter and through the JM API");
-            Map<String, String> prms = new HashMap<String, String>();
+            Map<String, String> prms = new HashMap<>();
             prms.put("stop", "1");
             jm.enqueue(jm.applicationName(), null, null, null, null, null, null, null, null, prms);
         }

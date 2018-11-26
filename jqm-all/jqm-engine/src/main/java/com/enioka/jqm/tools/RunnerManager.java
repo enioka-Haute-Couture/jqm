@@ -19,9 +19,9 @@ class RunnerManager
 {
     private Logger jqmlogger = LoggerFactory.getLogger(RunnerManager.class);
 
-    private Map<Integer, JobRunner> runnerCache = new HashMap<Integer, JobRunner>();
+    private Map<Integer, JobRunner> runnerCache = new HashMap<>();
 
-    private List<JobRunner> runners = new ArrayList<JobRunner>(2);
+    private List<JobRunner> runners = new ArrayList<>(2);
 
     RunnerManager(DbConn cnx)
     {
@@ -32,7 +32,7 @@ class RunnerManager
 
     /**
      * Retrieves the most adequate {@link JobRunner} for a given {@link JobInstance}. Throws {@link JqmRuntimeException} if none was found.
-     * 
+     *
      * @param ji
      * @return
      */

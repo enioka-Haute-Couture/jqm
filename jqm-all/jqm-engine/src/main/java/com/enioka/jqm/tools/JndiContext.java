@@ -54,20 +54,20 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class implements a basic JNDI context
- * 
+ *
  */
 class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory, NameParser
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(JndiContext.class);
 
-    private Map<String, Object> singletons = new HashMap<String, Object>();
-    private List<ObjectName> jmxNames = new ArrayList<ObjectName>();
+    private Map<String, Object> singletons = new HashMap<>();
+    private List<ObjectName> jmxNames = new ArrayList<>();
     private Registry r = null;
     private ClassLoader extResources;
 
     /**
      * Will create a JNDI Context and register it as the initial context factory builder
-     * 
+     *
      * @return the context
      * @throws NamingException
      *                             on any issue during initial context factory builder registration
@@ -98,7 +98,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
 
     /**
      * Create a new Context
-     * 
+     *
      * @throws NamingException
      */
     private JndiContext() throws NamingException
@@ -107,7 +107,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
 
         // List all jars inside ext directory
         File extDir = new File("ext/");
-        List<URL> urls = new ArrayList<URL>();
+        List<URL> urls = new ArrayList<>();
         if (extDir.isDirectory())
         {
             for (File f : FileUtils.listFiles(extDir, new String[] { "jar", "war", "bar" }, true))
@@ -284,8 +284,8 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
                 jqmlogger.error("could not unregister bean", e);
             }
         }
-        this.jmxNames = new ArrayList<ObjectName>();
-        this.singletons = new HashMap<String, Object>();
+        this.jmxNames = new ArrayList<>();
+        this.singletons = new HashMap<>();
     }
 
     @Override
@@ -356,7 +356,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
 
     /**
      * Will register the given Registry as a provider for the RMI: context. If there is already a registered Registry, the call is ignored.
-     * 
+     *
      * @param r
      */
     void registerRmiContext(Registry r)

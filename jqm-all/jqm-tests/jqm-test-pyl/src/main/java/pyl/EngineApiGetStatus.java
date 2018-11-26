@@ -41,11 +41,11 @@ public class EngineApiGetStatus implements Runnable
             return;
         }
 
-        Map<String, String> prms = new HashMap<String, String>();
+        Map<String, String> prms = new HashMap<>();
         prms.put("fail", "1");
         int failId = jm.enqueueSync(jm.applicationName(), jm.userName(), null, null, null, null, null, null, null, prms);
 
-        prms = new HashMap<String, String>();
+        prms = new HashMap<>();
         prms.put("succeed", "1");
         int successId = jm.enqueueSync(jm.applicationName(), jm.userName(), null, null, null, null, null, null, null, prms);
 

@@ -15,7 +15,7 @@ class DbImplBase
      *      <li>1: table name prefix (can contain schema information)</li>
      *  </ul>
      */
-    static Map<String, String> queries = new HashMap<String, String>();
+    static Map<String, String> queries = new HashMap<>();
     
     static {
         // VERSION

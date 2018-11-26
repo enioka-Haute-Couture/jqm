@@ -463,7 +463,7 @@ public class JobInstance implements Serializable
 
     public void loadPrmCache(DbConn cnx)
     {
-        prmCache = new HashMap<String, String>();
+        prmCache = new HashMap<>();
         for (Map.Entry<String, String> jp : RuntimeParameter.select_map(cnx, "jiprm_select_by_ji", this.id).entrySet())
         {
             prmCache.put(jp.getKey(), jp.getValue());
@@ -474,19 +474,19 @@ public class JobInstance implements Serializable
     {
         if (envVarCache == null)
         {
-            envVarCache = new HashMap<String, String>(1);
+            envVarCache = new HashMap<>(1);
         }
         envVarCache.put(key, value);
     }
 
     public Map<String, String> getEnvVarCache()
     {
-        return envVarCache == null ? new HashMap<String, String>() : envVarCache;
+        return envVarCache == null ? new HashMap<>() : envVarCache;
     }
 
     public static List<JobInstance> select(DbConn cnx, String query_key, Object... args)
     {
-        List<JobInstance> res = new ArrayList<JobInstance>();
+        List<JobInstance> res = new ArrayList<>();
         ResultSet rs = null;
         try
         {

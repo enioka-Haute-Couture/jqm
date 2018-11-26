@@ -93,7 +93,7 @@ public class JobDefParameter implements Serializable
 
     public static List<JobDefParameter> select(DbConn cnx, String query_key, Object... args)
     {
-        List<JobDefParameter> res = new ArrayList<JobDefParameter>();
+        List<JobDefParameter> res = new ArrayList<>();
         try
         {
             ResultSet rs = cnx.runSelect(query_key, args);
@@ -118,7 +118,7 @@ public class JobDefParameter implements Serializable
 
     public static Map<Integer, List<JobDefParameter>> select_all(DbConn cnx, String query_key, Object... args)
     {
-        Map<Integer, List<JobDefParameter>> res = new HashMap<Integer, List<JobDefParameter>>();
+        Map<Integer, List<JobDefParameter>> res = new HashMap<>();
         try
         {
             ResultSet rs = cnx.runSelect(query_key, args);
@@ -134,7 +134,7 @@ public class JobDefParameter implements Serializable
                 List<JobDefParameter> list = res.get(tmp.jobdef_id);
                 if (list == null)
                 {
-                    list = new ArrayList<JobDefParameter>();
+                    list = new ArrayList<>();
                     res.put(tmp.jobdef_id, list);
                 }
 
@@ -150,7 +150,7 @@ public class JobDefParameter implements Serializable
 
     public static Map<String, String> select_map(DbConn cnx, String query_key, Object... args)
     {
-        Map<String, String> res = new HashMap<String, String>();
+        Map<String, String> res = new HashMap<>();
         try
         {
             ResultSet rs = cnx.runSelect(query_key, args);

@@ -55,7 +55,7 @@ class XmlQueueExporter
             throw new IllegalArgumentException("there is no queue named " + queueName);
         }
 
-        List<Queue> l = new ArrayList<Queue>();
+        List<Queue> l = new ArrayList<>();
         l.add(q);
         export(path, l, cnx);
     }
@@ -85,7 +85,7 @@ class XmlQueueExporter
         {
             throw new IllegalArgumentException("queue names list name cannot be null or empty");
         }
-        List<Queue> qList = new ArrayList<Queue>();
+        List<Queue> qList = new ArrayList<>();
         for (String qn : qNames)
         {
             Queue q = CommonXml.findQueue(qn, cnx);

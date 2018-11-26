@@ -131,7 +131,7 @@ class KillHelpers
 
     private static void killByPidGeneric(long pid, String command)
     {
-        List<String> args = OsHelpers.getProcessArguments(command, new HashMap<String, String>(), PathType.DEFAULTSHELLCOMMAND);
+        List<String> args = OsHelpers.getProcessArguments(command, new HashMap<>(), PathType.DEFAULTSHELLCOMMAND);
         ProcessBuilder pb = new ProcessBuilder(args);
         Process process;
         try

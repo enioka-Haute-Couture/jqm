@@ -34,7 +34,7 @@ class DiscreteResourceManager extends ResourceManagerBase
     /**
      * The tokens, indexed by name. Boolean is true if available, false if booked.
      */
-    private Map<String, Token> tokenRepository = new ConcurrentHashMap<String, Token>(10);
+    private Map<String, Token> tokenRepository = new ConcurrentHashMap<>(10);
 
     private class Token
     {
@@ -70,7 +70,7 @@ class DiscreteResourceManager extends ResourceManagerBase
         String[] newItems = getStringParameter(PRM_LIST).split(",");
 
         // Remove items absent from configuration
-        List<String> toRemove = new ArrayList<String>(); // Cannot directly modify map we iterate on.
+        List<String> toRemove = new ArrayList<>(); // Cannot directly modify map we iterate on.
         for (String key : this.tokenRepository.keySet())
         {
             boolean found = false;
@@ -119,7 +119,7 @@ class DiscreteResourceManager extends ResourceManagerBase
             return BookingStatus.BOOKED; // Perf optim.
         }
 
-        Map<String, Token> booked = new HashMap<String, Token>();
+        Map<String, Token> booked = new HashMap<>();
         for (Map.Entry<String, Token> e : this.tokenRepository.entrySet())
         {
             if (e.getValue().free.compareAndSet(true, false))

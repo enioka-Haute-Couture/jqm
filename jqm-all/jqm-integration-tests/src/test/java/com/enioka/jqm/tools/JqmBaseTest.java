@@ -47,8 +47,8 @@ public class JqmBaseTest
     public static Logger jqmlogger = LoggerFactory.getLogger(JqmBaseTest.class);
     public static Server s;
     protected static Db db;
-    public Map<String, JqmEngineOperations> engines = new HashMap<String, JqmEngineOperations>();
-    public List<DbConn> cnxs = new ArrayList<DbConn>();
+    public Map<String, JqmEngineOperations> engines = new HashMap<>();
+    public List<DbConn> cnxs = new ArrayList<>();
 
     protected DbConn cnx;
 

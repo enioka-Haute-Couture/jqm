@@ -57,7 +57,7 @@ class LibraryResolverFS
         Date loadTime;
     }
 
-    private Map<String, JobDefLibrary> cache = new HashMap<String, LibraryResolverFS.JobDefLibrary>();
+    private Map<String, JobDefLibrary> cache = new HashMap<>();
     private LibraryResolverMaven mavenResolver;
 
     LibraryResolverFS(LibraryResolverMaven mavenResolver)

@@ -26,7 +26,7 @@ public class AnnotationSpringContextBootstrapHandler implements JobInstanceStart
 
     private final static String THREAD_SCOPE_NAME = "thread";
 
-    final static ThreadLocal<JobManager> localJm = new ThreadLocal<JobManager>();
+    final static ThreadLocal<JobManager> localJm = new ThreadLocal<>();
 
     static
     {

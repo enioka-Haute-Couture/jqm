@@ -17,8 +17,8 @@ public class JqmSimpleTest
 {
     private DbConn cnx;
     private Integer jd = null;
-    private Map<String, String> runtimePrms = new HashMap<String, String>();
-    private List<String> nodeNames = new ArrayList<String>();
+    private Map<String, String> runtimePrms = new HashMap<>();
+    private List<String> nodeNames = new ArrayList<>();
     private String sessionId = null;
 
     private int expectedOk = 1, expectedNonOk = 0;

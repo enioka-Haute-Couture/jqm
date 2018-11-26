@@ -63,9 +63,9 @@ class QueuePoller implements Runnable, QueuePollerMBean
     private AtomicInteger actualNbThread = new AtomicInteger(0);
     private boolean hasStopped = true;
     private Calendar lastLoop = null;
-    private Map<Integer, Date> peremption = new ConcurrentHashMap<Integer, Date>();
+    private Map<Integer, Date> peremption = new ConcurrentHashMap<>();
 
-    private List<ResourceManagerBase> resourceManagers = new ArrayList<ResourceManagerBase>();
+    private List<ResourceManagerBase> resourceManagers = new ArrayList<>();
     private ResourceManager threadresourceManagerConfiguration;
 
     private ObjectName name = null;
@@ -238,7 +238,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
                         ji.loadPrmCache(cnx);
 
                         // Check if we have the resources needed to run this JI
-                        List<ResourceManagerBase> alreadyReserved = new ArrayList<ResourceManagerBase>(this.resourceManagers.size());
+                        List<ResourceManagerBase> alreadyReserved = new ArrayList<>(this.resourceManagers.size());
                         for (ResourceManagerBase rm : this.resourceManagers)
                         {
                             switch (rm.bookResource(ji, cnx))

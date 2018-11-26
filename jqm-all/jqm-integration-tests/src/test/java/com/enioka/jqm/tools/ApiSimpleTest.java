@@ -71,7 +71,7 @@ public class ApiSimpleTest extends JqmBaseTest
                 42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
         HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + TestHelpers.node.getPort() + "/ws/simple/ji");
-        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        List<NameValuePair> nvps = new ArrayList<>();
         nvps.add(new BasicNameValuePair("applicationname", "Marsu-Application"));
         nvps.add(new BasicNameValuePair("user", "testuser"));
         nvps.add(new BasicNameValuePair("module", "testuser"));
@@ -121,7 +121,7 @@ public class ApiSimpleTest extends JqmBaseTest
                 42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
         HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + TestHelpers.node.getPort() + "/ws/simple/ji");
-        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        List<NameValuePair> nvps = new ArrayList<>();
         nvps.add(new BasicNameValuePair("applicationname", "Marsu-Application"));
         nvps.add(new BasicNameValuePair("user", "testuser"));
         nvps.add(new BasicNameValuePair("module", "testuser"));

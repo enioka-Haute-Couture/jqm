@@ -210,9 +210,9 @@ public class BasicTest
                     false, null, PathType.FS);
 
             JobInstance.enqueue(cnx, com.enioka.jqm.model.State.RUNNING, qId, jobDefdId, null, null, null, null, null, null, null, null,
-                    null, false, false, null, 1, Instruction.RUN, new HashMap<String, String>());
+                    null, false, false, null, 1, Instruction.RUN, new HashMap<>());
             JobInstance.enqueue(cnx, com.enioka.jqm.model.State.RUNNING, qId, jobDefdId, null, null, null, null, null, null, null, null,
-                    null, false, false, null, 1, Instruction.RUN, new HashMap<String, String>());
+                    null, false, false, null, 1, Instruction.RUN, new HashMap<>());
             cnx.commit();
 
             Properties p2 = new Properties();

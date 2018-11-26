@@ -49,7 +49,7 @@ class PayloadClassLoader extends URLClassLoader
 
     private boolean childFirstClassLoader = false;
 
-    private ArrayList<Pattern> hiddenJavaClassesPatterns = new ArrayList<Pattern>();
+    private ArrayList<Pattern> hiddenJavaClassesPatterns = new ArrayList<>();
 
     private boolean tracing = false;
 
@@ -106,7 +106,7 @@ class PayloadClassLoader extends URLClassLoader
         }
 
         // 2 - Meta data used by runners
-        Map<String, String> metaprms = new HashMap<String, String>();
+        Map<String, String> metaprms = new HashMap<>();
         metaprms.put("mayBeShared", "" + this.mayBeShared);
 
         // 3 - Load the target class inside the context class loader
@@ -190,7 +190,7 @@ class PayloadClassLoader extends URLClassLoader
                     for (ClHandler handler : job.getJD().getClassLoader().getHandlers())
                     {
                         String handlerClass = handler.getClassName();
-                        Map<String, String> handlerPrms = new HashMap<String, String>();
+                        Map<String, String> handlerPrms = new HashMap<>();
                         for (Map.Entry<String, String> hprm : handler.getParameters().entrySet())
                         {
                             handlerPrms.put(hprm.getKey(), hprm.getValue());

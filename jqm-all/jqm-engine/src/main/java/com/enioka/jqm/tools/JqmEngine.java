@@ -69,7 +69,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     private ObjectName name;
 
     // Threads that together constitute the engine
-    private Map<Integer, QueuePoller> pollers = new HashMap<Integer, QueuePoller>();
+    private Map<Integer, QueuePoller> pollers = new HashMap<>();
     private InternalPoller intPoller = null;
     private Thread intPollerThread = null;
     private CronScheduler scheduler = null;
@@ -81,12 +81,12 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     private AtomicLong endedInstances = new AtomicLong(0);
     private RunnerManager runnerManager;
     private RunningJobInstanceManager runningJobInstanceManager;
-    private List<ResourceManagerBase> resourceManagers = new ArrayList<ResourceManagerBase>();
+    private List<ResourceManagerBase> resourceManagers = new ArrayList<>();
 
     // DB connection resilience data
-    private volatile Queue<QueuePoller> qpToRestart = new LinkedBlockingQueue<QueuePoller>();
-    private volatile Queue<RunningJobInstance> loaderToFinalize = new LinkedBlockingQueue<RunningJobInstance>();
-    private volatile Queue<RunningJobInstance> loaderToRestart = new LinkedBlockingQueue<RunningJobInstance>();
+    private volatile Queue<QueuePoller> qpToRestart = new LinkedBlockingQueue<>();
+    private volatile Queue<RunningJobInstance> loaderToFinalize = new LinkedBlockingQueue<>();
+    private volatile Queue<RunningJobInstance> loaderToRestart = new LinkedBlockingQueue<>();
     private volatile Thread qpRestarter = null;
 
     /**

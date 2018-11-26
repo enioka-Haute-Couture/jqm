@@ -48,11 +48,11 @@ public final class JqmClientFactory
      * Moreover, changing the properties only impact <code>JqmClient</code>s created after the modification. It is important to keep in mind
      * that created <code>JqmClient</code>s are cached - therefore it is customary to use this function <strong>before creating any
      * clients</strong>.
-     * 
+     *
      * @param properties
-     *            a non null property bag
+     *                       a non null property bag
      * @throws InvalidParameterException
-     *             if props is null
+     *                                       if props is null
      */
     public static void setProperties(Properties properties)
     {
@@ -74,7 +74,7 @@ public final class JqmClientFactory
 
     private static final Set<URL> findClientBinders()
     {
-        Set<URL> res = new LinkedHashSet<URL>();
+        Set<URL> res = new LinkedHashSet<>();
         try
         {
             ClassLoader loggerFactoryClassLoader = JqmClientFactory.class.getClassLoader();
@@ -135,7 +135,7 @@ public final class JqmClientFactory
     /**
      * Return the default client. Note this client is shared in the static context. (said otherwise: the same client is always returned
      * inside a same class loading context). The initialization cost is only paid at first call.
-     * 
+     *
      * @return the default client
      */
     public static JqmClient getClient()
@@ -146,13 +146,13 @@ public final class JqmClientFactory
     /**
      * Return a new client that may be cached or not. Given properties are always use when not cached, and only used at creation time for
      * cached clients.
-     * 
+     *
      * @param name
-     *            if null, default client. Otherwise, helpful to retrieve cached clients later.
+     *                   if null, default client. Otherwise, helpful to retrieve cached clients later.
      * @param p
-     *            a set of properties. Implementation specific. Unknown properties are silently ignored.
+     *                   a set of properties. Implementation specific. Unknown properties are silently ignored.
      * @param cached
-     *            if false, the client will not be cached and subsequent calls with the same name will return different objects.
+     *                   if false, the client will not be cached and subsequent calls with the same name will return different objects.
      */
     public static JqmClient getClient(String name, Properties p, boolean cached)
     {
@@ -180,9 +180,9 @@ public final class JqmClientFactory
      * This method is mostly useful for tests when databases are reset and therefore clients become invalid as they hold connections to
      * them.<br>
      * If the name does not exist, no exception is thrown.
-     * 
+     *
      * @param name
-     *            the client to reset, or <code>null</code> for the default client
+     *                 the client to reset, or <code>null</code> for the default client
      */
     public static void resetClient(String name)
     {

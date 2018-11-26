@@ -495,7 +495,7 @@ public class JobDef implements Serializable
 
     public static List<JobDef> select(DbConn cnx, String query_key, Object... args)
     {
-        List<JobDef> res = new ArrayList<JobDef>();
+        List<JobDef> res = new ArrayList<>();
         try
         {
             ResultSet rs = cnx.runSelect(query_key, args);

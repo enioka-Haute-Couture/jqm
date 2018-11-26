@@ -48,7 +48,7 @@ class MultiplexPrintStream extends PrintStream
     private BufferedWriter original = null;
     private boolean useCommonLogFile = false;
 
-    private Map<String, BufferedWriter> writers = new HashMap<String, BufferedWriter>();
+    private Map<String, BufferedWriter> writers = new HashMap<>();
     String rootLogDir;
 
     MultiplexPrintStream(OutputStream out, String rootLogDir, boolean alsoWriteToCommonLog)

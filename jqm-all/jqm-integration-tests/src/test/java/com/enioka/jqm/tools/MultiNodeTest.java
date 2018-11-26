@@ -359,7 +359,7 @@ public class MultiNodeTest extends JqmBaseTest
         Assert.assertEquals(size * 2, msgs);
 
         // Every node must have run at least a few jobs...
-        Map<String, Boolean> hasRunSomething = new HashMap<String, Boolean>(10);
+        Map<String, Boolean> hasRunSomething = new HashMap<>(10);
         for (int i = 0; i <= 9; i++)
         {
             hasRunSomething.put("n" + i, false);
