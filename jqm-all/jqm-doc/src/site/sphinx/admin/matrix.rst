@@ -6,8 +6,6 @@ Java (JRE)
 
 Supported: 8, 9, 10.
 
-Deprecated in JQM but still supported: 6,7.
-
 Databases
 **************
 

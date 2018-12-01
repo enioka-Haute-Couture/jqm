@@ -13,7 +13,7 @@ public class Common
 {
     static void inject(Class<? extends Object> c, Object o, Object handlerProxy, boolean mayBeShared)
     {
-        List<Field> ff = new ArrayList<Field>();
+        List<Field> ff = new ArrayList<>();
         Class<? extends Object> clazz = c;
         while (!clazz.equals(Object.class))
         {

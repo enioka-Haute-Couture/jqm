@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +71,7 @@ public class ApiSimpleTest extends JqmBaseTest
                 42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
         HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + TestHelpers.node.getPort() + "/ws/simple/ji");
-        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        List<NameValuePair> nvps = new ArrayList<>();
         nvps.add(new BasicNameValuePair("applicationname", "Marsu-Application"));
         nvps.add(new BasicNameValuePair("user", "testuser"));
         nvps.add(new BasicNameValuePair("module", "testuser"));
@@ -86,11 +87,12 @@ public class ApiSimpleTest extends JqmBaseTest
         Assert.assertEquals(200, res.getStatusLine().getStatusCode());
 
         HttpEntity entity = res.getEntity();
-        InputStream in = entity.getContent();
-        StringWriter writer = new StringWriter();
-        IOUtils.copy(in, writer);
-        String result = writer.toString();
-        IOUtils.closeQuietly(in);
+        String result;
+        try (InputStream in = entity.getContent(); StringWriter writer = new StringWriter();)
+        {
+            IOUtils.copy(in, writer, Charset.defaultCharset());
+            result = writer.toString();
+        }
 
         Integer jid = 0;
         try
@@ -119,7 +121,7 @@ public class ApiSimpleTest extends JqmBaseTest
                 42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
         HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + TestHelpers.node.getPort() + "/ws/simple/ji");
-        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        List<NameValuePair> nvps = new ArrayList<>();
         nvps.add(new BasicNameValuePair("applicationname", "Marsu-Application"));
         nvps.add(new BasicNameValuePair("user", "testuser"));
         nvps.add(new BasicNameValuePair("module", "testuser"));
@@ -133,11 +135,12 @@ public class ApiSimpleTest extends JqmBaseTest
         Assert.assertEquals(200, res.getStatusLine().getStatusCode());
 
         HttpEntity entity = res.getEntity();
-        InputStream in = entity.getContent();
-        StringWriter writer = new StringWriter();
-        IOUtils.copy(in, writer);
-        String result = writer.toString();
-        IOUtils.closeQuietly(in);
+        String result;
+        try (InputStream in = entity.getContent(); StringWriter writer = new StringWriter();)
+        {
+            IOUtils.copy(in, writer, Charset.defaultCharset());
+            result = writer.toString();
+        }
 
         Integer jid = 0;
         try
@@ -156,13 +159,13 @@ public class ApiSimpleTest extends JqmBaseTest
         Assert.assertEquals(200, res.getStatusLine().getStatusCode());
 
         entity = res.getEntity();
-        in = entity.getContent();
-        writer = new StringWriter();
-        IOUtils.copy(in, writer);
-        State currentState = State.valueOf(writer.toString());
-        IOUtils.closeQuietly(in);
+        State currentState;
+        try (InputStream in = entity.getContent(); StringWriter writer = new StringWriter();)
+        {
+            IOUtils.copy(in, writer, Charset.defaultCharset());
+            currentState = State.valueOf(writer.toString());
+        }
 
         Assert.assertEquals(State.ENDED, currentState);
     }
-
 }

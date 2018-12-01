@@ -86,7 +86,7 @@ public class JobInstanceControler extends LazyDataModel<JobInstance> implements 
     {
         System.out.println("using wrong method");
         // SortMeta sm = new SortMeta(null, sortField, sortOrder, null);
-        return load(first, pageSize, new ArrayList<SortMeta>(), filters);
+        return load(first, pageSize, new ArrayList<>(), filters);
     }
 
     @SuppressWarnings("unused")

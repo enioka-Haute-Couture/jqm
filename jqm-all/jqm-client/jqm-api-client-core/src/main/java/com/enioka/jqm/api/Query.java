@@ -35,17 +35,17 @@ import javax.xml.bind.annotation.XmlRootElement;
  * launch ID (i.e. by time). See {@link Query#setQueryLiveInstances(boolean)} for details and how to retrieve living instances in addition
  * to ended ones.<br>
  * <br>
- * 
+ *
  * Also please note that queries get more expensive with the result count, so it is <strong>strongly recommended to use pagination</strong>
  * ({@link #setFirstRow(Integer)} and {@link #setPageSize(Integer)}).
- * 
+ *
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class Query
 {
     private Integer jobInstanceId, parentId;
-    private List<String> applicationName = new ArrayList<String>();
+    private List<String> applicationName = new ArrayList<>();
     private String user, sessionId;
     private String jobDefKeyword1, jobDefKeyword2, jobDefKeyword3, jobDefModule, jobDefApplication;
     private String instanceKeyword1, instanceKeyword2, instanceKeyword3, instanceModule, instanceApplication;
@@ -55,7 +55,7 @@ public final class Query
 
     @XmlElementWrapper(name = "statuses")
     @XmlElement(name = "status", type = State.class)
-    private List<State> status = new ArrayList<State>();
+    private List<State> status = new ArrayList<>();
 
     private Integer firstRow, pageSize = 50;
     private Integer resultSize;
@@ -66,7 +66,7 @@ public final class Query
 
     @XmlElementWrapper(name = "sortby")
     @XmlElement(name = "sortitem", type = SortSpec.class)
-    private List<SortSpec> sorts = new ArrayList<Query.SortSpec>();
+    private List<SortSpec> sorts = new ArrayList<>();
 
     private boolean queryLiveInstances = false, queryHistoryInstances = true;
 
@@ -135,7 +135,7 @@ public final class Query
 
     /**
      * Adds a new column a the end of the sorting clause.
-     * 
+     *
      * @see #addSortDesc(Sort)
      */
     public Query addSortAsc(Sort column)
@@ -146,7 +146,7 @@ public final class Query
 
     /**
      * Adds a new column a the end of the sorting clause.
-     * 
+     *
      * @see #addSortAsc(Sort)
      */
     public Query addSortDesc(Sort column)
@@ -207,9 +207,9 @@ public final class Query
     /**
      * This sets the maximum returned results count, for pagination purposes.<br>
      * It is <strong>highly recommended to use pagination</strong> when using the Query API, since queries are expensive.
-     * 
+     *
      * @param pageSize
-     *            the maximal result count, or null for no limit (dangerous!)
+     *                     the maximal result count, or null for no limit (dangerous!)
      * @return the Query itself (fluent API - used to chain calls).
      * @see #setFirstRow(Integer) setFirstRow for the other pagination parameter.
      */
@@ -223,9 +223,9 @@ public final class Query
      * This sets the starting row returned by the query, for pagination purposes. Note that even if order is very important for paginated
      * queries (to ensure that the pages stay the same between calls for new pages), a default sort is used if none is specified.<br>
      * It is <strong>highly recommended to use pagination</strong> when using the Query API, since queries are expensive.
-     * 
+     *
      * @param firstRow
-     *            the first row to return. 0 is equivalent to null.
+     *                     the first row to return. 0 is equivalent to null.
      * @return the Query itself (fluent API - used to chain calls).
      * @see #setPageSize(Integer) setPageSize for the other pagination parameter.
      */
@@ -288,9 +288,9 @@ public final class Query
      * To query a specific job instance. This ID is returned, for example, by the {@link JqmClient#enqueue(JobRequest)} method. <br>
      * It is pretty useless to give any other query parameters if you know the ID. Also note that there is a shortcut method named
      * {@link JqmClient#getJob(int)} to make a query by ID.
-     * 
+     *
      * @param jobInstanceId
-     *            the job instance ID
+     *                          the job instance ID
      */
     public Query setJobInstanceId(Integer jobInstanceId)
     {
@@ -306,9 +306,9 @@ public final class Query
     /**
      * Some job instances are launched by other job instances (linked jobs which launch one another). This allows to query all job instances
      * launched by a specific job instance.
-     * 
+     *
      * @param parentId
-     *            the ID of the parent job instance.
+     *                     the ID of the parent job instance.
      */
     public Query setParentId(Integer parentId)
     {
@@ -324,7 +324,7 @@ public final class Query
     /**
      * The application name is the name of the job definition - the same name that is given in the Job Definition XML. This allows to query
      * all job instances for given job definitions. If the list contains multiple names, an OR query takes place.
-     * 
+     *
      * @param applicationName
      */
     public Query setApplicationName(List<String> applicationName)
@@ -337,7 +337,7 @@ public final class Query
      * The application name is the name of the job definition - the same name that is given in the Job Definition XML. This allows to query
      * all job instances for a single given job definition. If other names were given previously (e.g. with
      * {@link #setApplicationName(List)} , they are removed by this method.
-     * 
+     *
      * @param applicationName
      * @return
      */
@@ -356,7 +356,7 @@ public final class Query
     /**
      * Optionally, it is possible to specify some classification data at enqueue time (inside the {@link JobRequest} object). This data
      * exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying.
-     * 
+     *
      * @param user
      */
     public Query setUser(String user)
@@ -373,7 +373,7 @@ public final class Query
     /**
      * Optionally, it is possible to specify some classification data at enqueue time (inside the {@link JobRequest} object). This data
      * exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying.
-     * 
+     *
      * @param sessionId
      */
     public Query setSessionId(String sessionId)
@@ -390,7 +390,7 @@ public final class Query
     /**
      * Optionally, it is possible to specify some classification data inside the Job Definition (usually through the import of a JobDef XML
      * file). This data exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying.
-     * 
+     *
      * @param jobDefKeyword1
      */
     public Query setJobDefKeyword1(String jobDefKeyword1)
@@ -407,7 +407,7 @@ public final class Query
     /**
      * Optionally, it is possible to specify some classification data inside the Job Definition (usually through the import of a JobDef XML
      * file). This data exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying.
-     * 
+     *
      * @param jobDefKeyword2
      */
     public Query setJobDefKeyword2(String jobDefKeyword2)
@@ -424,7 +424,7 @@ public final class Query
     /**
      * Optionally, it is possible to specify some classification data inside the Job Definition (usually through the import of a JobDef XML
      * file). This data exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying.
-     * 
+     *
      * @param jobDefKeyword3
      */
     public Query setJobDefKeyword3(String jobDefKeyword3)
@@ -441,7 +441,7 @@ public final class Query
     /**
      * Optionally, it is possible to specify some classification data inside the Job Definition (usually through the import of a JobDef XML
      * file). This data exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying.
-     * 
+     *
      * @param jobDefModule
      */
     public Query setJobDefModule(String jobDefModule)
@@ -460,7 +460,7 @@ public final class Query
      * file). This data exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying.
      * <br>
      * <strong>This has nothing to so with applicationName, which is the name of the Job Definition !</strong>
-     * 
+     *
      * @param jobDefApplication
      */
     public Query setJobDefApplication(String jobDefApplication)
@@ -477,7 +477,7 @@ public final class Query
     /**
      * Optionally, it is possible to specify some classification data at enqueue time (inside the {@link JobRequest} object). This data
      * exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying.
-     * 
+     *
      * @param instanceKeyword1
      */
     public Query setInstanceKeyword1(String instanceKeyword1)
@@ -494,7 +494,7 @@ public final class Query
     /**
      * Optionally, it is possible to specify some classification data at enqueue time (inside the {@link JobRequest} object). This data
      * exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying.
-     * 
+     *
      * @param instanceKeyword2
      */
     public Query setInstanceKeyword2(String instanceKeyword2)
@@ -511,7 +511,7 @@ public final class Query
     /**
      * Optionally, it is possible to specify some classification data at enqueue time (inside the {@link JobRequest} object). This data
      * exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying.
-     * 
+     *
      * @param instanceKeyword3
      */
     public Query setInstanceKeyword3(String instanceKeyword3)
@@ -528,7 +528,7 @@ public final class Query
     /**
      * Optionally, it is possible to specify some classification data at enqueue time (inside the {@link JobRequest} object). This data
      * exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying.
-     * 
+     *
      * @param instanceModule
      */
     public Query setInstanceModule(String instanceModule)
@@ -546,7 +546,7 @@ public final class Query
      * Optionally, it is possible to specify some classification data at enqueue time (inside the {@link JobRequest} object). This data
      * exists solely for later querying (no signification whatsoever for JQM itself). This parameter allows such querying. <br>
      * <strong>This has nothing to so with applicationName, which is the name of the Job Definition !</strong>
-     * 
+     *
      * @param instanceApplication
      */
     public Query setInstanceApplication(String instanceApplication)
@@ -602,7 +602,7 @@ public final class Query
 
     /**
      * The time at which the execution request was given to {@link JqmClient#enqueue(JobRequest)}. This is an <= comparison.
-     * 
+     *
      * @param enqueuedBefore
      */
     public Query setEnqueuedBefore(Calendar enqueuedBefore)
@@ -618,7 +618,7 @@ public final class Query
 
     /**
      * The time at which the execution request was given to {@link JqmClient#enqueue(JobRequest)}. This is an >= comparison.
-     * 
+     *
      * @param enqueuedAfter
      */
     public Query setEnqueuedAfter(Calendar enqueuedAfter)
@@ -635,7 +635,7 @@ public final class Query
     /**
      * The time at which the execution really began (the request arrived at the top of the queue and was run by an engine). This is an <=
      * comparison.
-     * 
+     *
      * @param beganRunningBefore
      */
     public Query setBeganRunningBefore(Calendar beganRunningBefore)
@@ -652,7 +652,7 @@ public final class Query
     /**
      * The time at which the execution really began (the request arrived at the top of the queue and was run by an engine). This is an >=
      * comparison.
-     * 
+     *
      * @param beganRunningAfter
      */
     public Query setBeganRunningAfter(Calendar beganRunningAfter)
@@ -668,7 +668,7 @@ public final class Query
 
     /**
      * The time at which the execution ended, resulting in an ENDED or CRASHED status. This is an <= comparison.
-     * 
+     *
      * @param endedBefore
      */
     public Query setEndedBefore(Calendar endedBefore)
@@ -684,7 +684,7 @@ public final class Query
 
     /**
      * The time at which the execution ended, resulting in an ENDED or CRASHED status. This is an <= comparison.
-     * 
+     *
      * @param endedAfter
      */
     public Query setEndedAfter(Calendar endedAfter)
@@ -701,7 +701,7 @@ public final class Query
     /**
      * Filter by status. See {@link State} for the different possible values and their meaning. If multiple values are added, a logical OR
      * will take place.
-     * 
+     *
      * @param status
      */
     public Query addStatusFilter(State status)

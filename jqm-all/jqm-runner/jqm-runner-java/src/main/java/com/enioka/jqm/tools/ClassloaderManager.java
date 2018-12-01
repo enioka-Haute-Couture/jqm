@@ -45,17 +45,17 @@ class ClassloaderManager
     /**
      * The CLs corresponding to "one CL per jar" mode.
      */
-    private Map<String, PayloadClassLoader> sharedJarClassLoader = new HashMap<String, PayloadClassLoader>();
+    private Map<String, PayloadClassLoader> sharedJarClassLoader = new HashMap<>();
 
     /**
      * The CLs corresponding to specific keys (specified inside {@link JobDef#getSpecificIsolationContext()}). Key is Cl object ID.
      */
-    private Map<Integer, PayloadClassLoader> persistentClassLoaders = new HashMap<Integer, PayloadClassLoader>();
+    private Map<Integer, PayloadClassLoader> persistentClassLoaders = new HashMap<>();
 
     /**
      * The different runners which may be involved inside the class loaders. Simple class names.
      */
-    private List<String> runnerClasses = new ArrayList<String>();
+    private List<String> runnerClasses = new ArrayList<>();
 
     /**
      * The default CL mode. Values can be: null, Shared, SharedJar.
@@ -216,7 +216,7 @@ class ClassloaderManager
 
     /**
      * Returns all the URL that should be inside the classpath. This includes the jar itself if any.
-     * 
+     *
      * @throws JqmPayloadException
      */
     private URL[] getClasspath(JobInstance ji, JobRunnerCallback cb) throws JqmPayloadException
@@ -257,7 +257,7 @@ class ClassloaderManager
         if (hasPlugins && pluginClassLoader == null)
         {
             File extDir = new File("plugins/");
-            List<URL> urls = new ArrayList<URL>();
+            List<URL> urls = new ArrayList<>();
             if (extDir.isDirectory())
             {
                 for (File f : extDir.listFiles())

@@ -8,15 +8,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobInstance;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A tracker and launcher for running payloads inside a {@link JqmSingleRunner} running in a new process.
@@ -38,7 +37,7 @@ class RunningExternalJobInstance implements Runnable
         this.ji = job;
         this.qp = qp;
         opts = job.getJD().getJavaOpts() == null
-                ? GlobalParameter.getParameter(cnx, "defaultExternalOpts", "-Xms32m -Xmx128m -XX:MaxPermSize=64m")
+                ? GlobalParameter.getParameter(cnx, "defaultExternalOpts", "-Xms32m -Xmx128m -XX:MaxMetaspaceSize=64m")
                 : job.getJD().getJavaOpts();
         killCheckPeriodMs = Integer.parseInt(GlobalParameter.getParameter(cnx, "internalPollingPeriodMs", "1000"));
 
@@ -51,12 +50,13 @@ class RunningExternalJobInstance implements Runnable
     {
         jqmlogger.debug("Starting external loader for job " + jobId);
         String java_path = FilenameUtils.concat(System.getProperty("java.home"), "bin/java");
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
 
         args.add(java_path);
         args.addAll(Arrays.asList(opts.split(" ")));
         args.add("com.enioka.jqm.tools.Main");
-        args.add("-s");
+        args.add("Start-Single");
+        args.add("--id");
         args.add("" + this.jobId);
 
         ProcessBuilder pb = new ProcessBuilder(args);
@@ -78,18 +78,13 @@ class RunningExternalJobInstance implements Runnable
 
         // Wait for end, flushing logs.
         int res = -1;
-        InputStreamReader isr = null;
-        BufferedReader br = null;
         String buf = "";
-        FileWriter f = null;
         String linesep = System.getProperty("line.separator");
 
-        try
+        try (InputStreamReader isr = new InputStreamReader(p.getInputStream(), "UTF8");
+                FileWriter f = new FileWriter(logFile);
+                BufferedReader br = new BufferedReader(isr);)
         {
-            isr = new InputStreamReader(p.getInputStream(), "UTF8");
-            f = new FileWriter(logFile);
-            br = new BufferedReader(isr);
-
             while (true)
             {
                 // Dump log file
@@ -126,10 +121,6 @@ class RunningExternalJobInstance implements Runnable
         }
         finally
         {
-            IOUtils.closeQuietly(br);
-            IOUtils.closeQuietly(f);
-            IOUtils.closeQuietly(isr);
-
             qp.releaseResources(this.ji);
         }
 

@@ -78,7 +78,7 @@ public class RRole implements Serializable
 
     public static List<RRole> select(DbConn cnx, String query_key, Object... args)
     {
-        List<RRole> res = new ArrayList<RRole>();
+        List<RRole> res = new ArrayList<>();
         try
         {
             ResultSet rs = cnx.runSelect(query_key, args);

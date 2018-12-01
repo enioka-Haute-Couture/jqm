@@ -745,7 +745,7 @@ final class JerseyClient implements JqmClient
     @Override
     public List<InputStream> getJobDeliverablesContent(int idJob)
     {
-        List<InputStream> res = new ArrayList<InputStream>();
+        List<InputStream> res = new ArrayList<>();
         for (Deliverable d : getJobDeliverables(idJob))
         {
             res.add(getDeliverableContent(d));

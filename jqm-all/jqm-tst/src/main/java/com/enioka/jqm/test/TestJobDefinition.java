@@ -30,7 +30,7 @@ public class TestJobDefinition
     boolean highlander = false;
 
     // Parameters
-    Map<String, String> parameters = new HashMap<String, String>();
+    Map<String, String> parameters = new HashMap<>();
 
     // Optional classifiers
     String application, module, keyword1, keyword2, keyword3;
@@ -38,7 +38,7 @@ public class TestJobDefinition
     // Class loading options
     String specificIsolationContext;
     boolean childFirstClassLoader = false;
-    List<String> hiddenJavaClasses = new ArrayList<String>();
+    List<String> hiddenJavaClasses = new ArrayList<>();
     boolean classLoaderTracing = false;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -191,7 +191,7 @@ public class TestJobDefinition
 
     List<JobDefParameter> getParameters()
     {
-        List<JobDefParameter> prms = new ArrayList<JobDefParameter>(this.parameters.size());
+        List<JobDefParameter> prms = new ArrayList<>(this.parameters.size());
         for (Map.Entry<String, String> e : this.parameters.entrySet())
         {
             JobDefParameter prm = new JobDefParameter();

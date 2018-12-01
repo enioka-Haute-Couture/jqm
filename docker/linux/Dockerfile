@@ -50,7 +50,7 @@ VOLUME /jqm/hotdeploy/ \
 WORKDIR /jqm
 
 # Import initial config
-RUN java -jar jqm.jar -u ; java -jar jqm.jar -c selfConfig.single.xml ; java -jar jqm.jar -importjobdef ./jobs/jqm-demo ; rm -f .\logs\*
+RUN java -jar jqm.jar Update-Schema ; java -jar jqm.jar Import-ClusterConfiguration -f selfConfig.single.xml ; java -jar jqm.jar Import-JobDef -f ./jobs/jqm-demo ; rm -f .\logs\*
 
 # Run node on startup
 ENTRYPOINT /jqm/bin/node.sh

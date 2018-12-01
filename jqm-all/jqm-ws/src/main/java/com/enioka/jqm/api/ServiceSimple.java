@@ -20,15 +20,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Set;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import javax.management.ReflectionException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -43,22 +41,21 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.ReversedLinesFileReader;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.Deliverable;
 import com.enioka.jqm.model.Node;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.input.ReversedLinesFileReader;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A minimal API designed to interact well with CLI tools such as schedulers. Some of its methods (file retrieval) are also used by the two
  * other sets of APIs.
- * 
+ *
  */
 @Path("/simple")
 public class ServiceSimple
@@ -205,11 +202,9 @@ public class ServiceSimple
             latest = 10000;
         }
 
-        ReversedLinesFileReader r = null;
-        try
+        File f = new File(FilenameUtils.concat("./logs/", "jqm-" + context.getInitParameter("jqmnode") + ".log"));
+        try(ReversedLinesFileReader r =  new ReversedLinesFileReader(f, Charset.defaultCharset()))
         {
-            File f = new File(FilenameUtils.concat("./logs/", "jqm-" + context.getInitParameter("jqmnode") + ".log"));
-            r = new ReversedLinesFileReader(f);
             StringBuilder sb = new StringBuilder(latest);
             String buf = r.readLine();
             int i = 1;
@@ -225,10 +220,6 @@ public class ServiceSimple
         catch (Exception e)
         {
             throw new ErrorDto("Could not return the desired file", 8, e, Status.NO_CONTENT);
-        }
-        finally
-        {
-            IOUtils.closeQuietly(r);
         }
     }
 

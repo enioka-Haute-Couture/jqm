@@ -15,16 +15,16 @@
  */
 package com.enioka.jqm.tools;
 
+import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.test.helpers.CreationTools;
+import com.enioka.jqm.test.helpers.TestHelpers;
+
 import org.jboss.shrinkwrap.resolver.api.NoResolvedResultException;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenRemoteRepositories;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-
-import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.test.helpers.CreationTools;
-import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class PackageTest extends JqmBaseTest
 {

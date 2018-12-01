@@ -42,7 +42,7 @@ public class JndiObjectResourceDto implements Serializable
 
     @XmlElementWrapper(name = "parameters")
     @XmlElement(name = "parameter")
-    private Map<String, String> parameters = new HashMap<String, String>(10);
+    private Map<String, String> parameters = new HashMap<>(10);
 
     public Integer getId()
     {

@@ -35,6 +35,7 @@ Windows without Docker
 Prerequisites:
 
 * A directory where JQM will be installed, named JQM_ROOT afterwards.
+* A supported JRE, with java in the path.
 * An account with full permissions in JQM_ROOT. Not need for admin or special rights - it just needs to be able to open a PowerShell session.
 
 The following script will download and copy the binaries (adapt the first two lines). ::
@@ -52,7 +53,7 @@ The following script will create a database and reference the test jobs (i.e. :t
 
 	./jqm.ps1 createnode # This will create a new node named after the computer name
 	./jqm.ps1 allxml  # This will import all the test job definitions
-    
+
 The following script will enable the web console with account root/test (do not use this in production!)::
 
     ./jqm.ps1 enablegui -RootPassword test
@@ -77,6 +78,7 @@ Linux / Unix without Docker
 Prerequisites:
 
 * A directory where JQM will be installed, named JQM_ROOT afterwards.
+* A supported JRE, with java in the path.
 * An account with full permissions in JQM_ROOT. Not need for administrative or special permissions.
 
 The following script will download and install the binaries (adapt the first two lines). ::
@@ -94,7 +96,7 @@ The following script will create a database and reference the test jobs (i.e. :t
 The following script will enable the web console with account root/test (do not use this in production!)::
 
         ./jqm.sh enablegui test
-    
+
 The following script will :term:`enqueue` an execution request for one of the test jobs::
 
         ./jqm.sh enqueue DemoEcho
@@ -113,6 +115,6 @@ Next steps...
 
 To exit the engine, simply do Ctrl+C or close your console.
 
-*To go further*: engines under Windows should be installed as services. This is easily done and explained in the :doc:`full 
-install documentation<admin/install>`. Moreover, this test install is using a very limited (and limiting) database - the full doc also 
+*To go further*: engines under Windows should be installed as services. This is easily done and explained in the :doc:`full
+install documentation<admin/install>`. Moreover, this test install is using a very limited (and limiting) database - the full doc also
 explains how to use fully fledged databases.

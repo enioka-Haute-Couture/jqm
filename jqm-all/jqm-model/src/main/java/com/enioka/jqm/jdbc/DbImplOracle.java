@@ -60,7 +60,7 @@ public class DbImplOracle extends DbAdapter
             }
 
             int nbList = 0;
-            ArrayList<Object> newParams = new ArrayList<Object>(q.parameters.size() + 10);
+            ArrayList<Object> newParams = new ArrayList<>(q.parameters.size() + 10);
             for (Object o : q.parameters)
             {
                 if (o instanceof List<?>)

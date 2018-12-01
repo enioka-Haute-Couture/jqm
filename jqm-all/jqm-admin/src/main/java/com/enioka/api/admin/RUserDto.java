@@ -41,7 +41,7 @@ public class RUserDto implements Serializable
 
     @XmlElementWrapper(name = "roles")
     @XmlElement(name = "role", type = Integer.class)
-    private List<Integer> roles = new ArrayList<Integer>();
+    private List<Integer> roles = new ArrayList<>();
 
     public Integer getId()
     {

@@ -60,7 +60,7 @@ class LibraryResolverMaven
         // Retrieve resolver configuration
         if (REPO_LIST == null)
         {
-            REPO_LIST = new ArrayList<String>(5);
+            REPO_LIST = new ArrayList<>(5);
             for (String gp : mavenRepos)
             {
                 REPO_LIST.add(gp);
@@ -70,38 +70,32 @@ class LibraryResolverMaven
             MAVEN_SETTINGS_FILE = mavenSettingsFilePath;
         }
 
-        boolean withCentral = false;
-        String withCustomSettings = null;
-        String withCustomSettingsFile = null;
+        // Resolver
+        ConfigurableMavenResolverSystem resolver = Maven.configureResolver();
+
+        // settings.xml?
         if (MAVEN_SETTINGS_CL != null && MAVEN_SETTINGS_FILE == null)
         {
-            jqmlogger.trace("Custom settings file will be used: " + MAVEN_SETTINGS_CL);
-            withCustomSettings = MAVEN_SETTINGS_CL;
+            jqmlogger.trace("Custom settings file from class-path will be used: " + MAVEN_SETTINGS_CL);
+            resolver.fromClassloaderResource(MAVEN_SETTINGS_CL);
         }
         if (MAVEN_SETTINGS_FILE != null)
         {
-            jqmlogger.trace("Custom settings file will be used: " + MAVEN_SETTINGS_FILE);
-            withCustomSettingsFile = MAVEN_SETTINGS_FILE;
+            jqmlogger.trace("Custom settings file from file system will be used: " + MAVEN_SETTINGS_FILE);
+            resolver.fromFile(MAVEN_SETTINGS_FILE);
         }
 
-        // Configure resolver
-        ConfigurableMavenResolverSystem resolver = Maven.configureResolver();
-        if (withCustomSettings != null && withCustomSettingsFile == null)
-        {
-            resolver.fromClassloaderResource(withCustomSettings);
-        }
-        if (withCustomSettingsFile != null)
-        {
-            resolver.fromFile(withCustomSettingsFile);
-        }
-
+        // Repositories to use.
+        boolean withCentral = false;
         for (String repo : REPO_LIST)
         {
             if (repo.contains("repo1.maven.org"))
             {
                 withCentral = true;
+                jqmlogger.trace("Using Maven central as a Maven repository");
                 continue;
             }
+            jqmlogger.trace("Using Maven repository {}", repo);
             resolver = resolver
                     .withRemoteRepo(MavenRemoteRepositories.createRemoteRepository("repo" + Math.abs(repo.hashCode()), repo, "default")
                             .setUpdatePolicy(MavenUpdatePolicy.UPDATE_POLICY_NEVER));

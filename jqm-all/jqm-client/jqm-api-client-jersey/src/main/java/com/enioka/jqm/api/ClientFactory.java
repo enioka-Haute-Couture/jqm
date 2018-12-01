@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentMap;
 class ClientFactory implements IClientFactory
 {
     private static JqmClient defaultClient;
-    private static ConcurrentMap<String, JqmClient> clients = new ConcurrentHashMap<String, JqmClient>();
+    private static ConcurrentMap<String, JqmClient> clients = new ConcurrentHashMap<>();
 
     @Override
     public JqmClient getClient()

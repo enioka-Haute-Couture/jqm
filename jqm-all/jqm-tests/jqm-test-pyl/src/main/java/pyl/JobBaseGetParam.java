@@ -23,6 +23,7 @@ import com.enioka.jqm.api.JobBase;
 /**
  * Simple call to getParameters and check value is as expected.
  */
+@SuppressWarnings("deprecation")
 public class JobBaseGetParam extends JobBase
 {
     @Override

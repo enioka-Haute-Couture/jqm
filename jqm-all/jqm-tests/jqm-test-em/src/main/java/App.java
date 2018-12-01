@@ -26,6 +26,7 @@ import com.enioka.jqm.api.JobBase;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 
+@SuppressWarnings("deprecation")
 public class App extends JobBase
 {
     private static final Logger log = Logger.getLogger(App.class);

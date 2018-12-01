@@ -64,7 +64,7 @@ import com.enioka.jqm.model.RUser;
 
 /**
  * This is a helper class for internal use only.
- * 
+ *
  */
 final class Helpers
 {
@@ -83,7 +83,7 @@ final class Helpers
 
     /**
      * Get a fresh connection on the engine database.
-     * 
+     *
      * @return a DbConn.
      */
     static DbConn getNewDbSession()
@@ -191,17 +191,17 @@ final class Helpers
 
     /**
      * Create a Deliverable inside the database that will track a file created by a JobInstance Must be called from inside a transaction
-     * 
+     *
      * @param path
-     *            FilePath (relative to a root directory - cf. Node)
+     *                             FilePath (relative to a root directory - cf. Node)
      * @param originalFileName
-     *            FileName
+     *                             FileName
      * @param fileFamily
-     *            File family (may be null). E.g.: "daily report"
+     *                             File family (may be null). E.g.: "daily report"
      * @param jobId
-     *            Job Instance ID
+     *                             Job Instance ID
      * @param cnx
-     *            the DbConn to use.
+     *                             the DbConn to use.
      */
     static int createDeliverable(String path, String originalFileName, String fileFamily, Integer jobId, DbConn cnx)
     {
@@ -300,11 +300,11 @@ final class Helpers
      * Creates or updates a node.<br>
      * This method makes the assumption metadata is valid. e.g. there MUST be a single default queue.<br>
      * Call {@link #updateConfiguration(EntityManager)} before to be sure if necessary.
-     * 
+     *
      * @param nodeName
-     *            name of the node that should be created or updated (if incompletely defined only)
+     *                     name of the node that should be created or updated (if incompletely defined only)
      * @param em
-     *            an EntityManager on which a transaction will be opened.
+     *                     an EntityManager on which a transaction will be opened.
      */
     static void updateNodeConfiguration(String nodeName, DbConn cnx, int port)
     {
@@ -403,7 +403,7 @@ final class Helpers
         i = cnx.runSelectSingle("jndi_select_count_for_key", Integer.class, "mail/default");
         if (i == 0)
         {
-            Map<String, String> prms = new HashMap<String, String>();
+            Map<String, String> prms = new HashMap<>();
             prms.put("smtpServerHost", "smtp.gmail.com");
 
             JndiObjectResource.create(cnx, "mail/default", "javax.mail.Session", "com.enioka.jqm.providers.MailSessionFactory",
@@ -427,11 +427,11 @@ final class Helpers
 
     /**
      * Creates a new user if does not exist. If it exists, it is unlocked and roles are reset (password is untouched).
-     * 
+     *
      * @param cnx
      * @param login
      * @param password
-     *            the raw password. it will be hashed.
+     *                        the raw password. it will be hashed.
      * @param description
      * @param roles
      */
@@ -533,7 +533,7 @@ final class Helpers
      * Send a mail message using a JNDI resource.<br>
      * As JNDI resource providers are inside the EXT class loader, this uses reflection. This method is basically a bonus on top of the
      * MailSessionFactory offered to payloads, making it accessible also to the engine.
-     * 
+     *
      * @param to
      * @param subject
      * @param body

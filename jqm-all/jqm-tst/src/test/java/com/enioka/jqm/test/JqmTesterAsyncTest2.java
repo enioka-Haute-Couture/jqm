@@ -2,6 +2,7 @@ package com.enioka.jqm.test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -89,7 +90,7 @@ public class JqmTesterAsyncTest2
         Deliverable file = files.get(0);
         InputStream is = tester.getDeliverableContent(file);
         String nl = System.getProperty("line.separator");
-        Assert.assertEquals("Hello World!" + nl, IOUtils.toString(is));
+        Assert.assertEquals("Hello World!" + nl, IOUtils.toString(is, Charset.forName("UTF8")));
 
         tester.stop();
     }

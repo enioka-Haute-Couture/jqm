@@ -9,11 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.enioka.jqm.model.JobInstance;
-import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.Queue;
 
 /**
@@ -25,14 +21,12 @@ import com.enioka.jqm.model.Queue;
  */
 public abstract class DbAdapter
 {
-    private static Logger jqmlogger = LoggerFactory.getLogger(DbAdapter.class);
-
     protected String[] IDS = new String[] { "ID" };
 
     /**
      * Query cache.
      */
-    protected Map<String, String> queries = new HashMap<String, String>();
+    protected Map<String, String> queries = new HashMap<>();
 
     /**
      * Prefix to use for all tables and views.
@@ -73,7 +67,7 @@ public abstract class DbAdapter
      */
     public List<String> preSchemaCreationScripts()
     {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     /**

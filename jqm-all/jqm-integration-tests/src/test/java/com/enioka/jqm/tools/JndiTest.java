@@ -221,7 +221,7 @@ public class JndiTest extends JqmBaseTest
     public void testJndiJdbcPoolLeakWithHunter() throws Exception
     {
         // Create a connection with our custom interceptor
-        Map<String, String> prms = new HashMap<String, String>(1);
+        Map<String, String> prms = new HashMap<>(1);
         prms.put("jdbcInterceptors", "com.enioka.jqm.providers.PayloadInterceptor");
         CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", prms);

@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
@@ -190,11 +189,11 @@ public class Cl implements Serializable
         return tmp;
     }
 
-    private List<ClHandler> handlerCache = new ArrayList<ClHandler>();
+    private List<ClHandler> handlerCache = new ArrayList<>();
 
     public static List<Cl> select(DbConn cnx, String query_key, Object... args)
     {
-        List<Cl> res = new ArrayList<Cl>();
+        List<Cl> res = new ArrayList<>();
         try
         {
             ResultSet rs = cnx.runSelect(query_key, args);

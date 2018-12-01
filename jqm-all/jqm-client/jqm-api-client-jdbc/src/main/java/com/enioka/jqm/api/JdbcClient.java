@@ -52,10 +52,10 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -407,11 +407,11 @@ final class JdbcClient implements JqmClient
      * Internal helper to create a new execution request from an History row.<br>
      * To be called for a single row only, not for converting multiple History elements.<br>
      * Does not create a transaction, and no need for an active transaction.
-     * 
+     *
      * @param launchId
-     *            the ID of the launch (was the ID of the JI, now the ID of the History object)
+     *                     the ID of the launch (was the ID of the JI, now the ID of the History object)
      * @param cnx
-     *            an open DB session
+     *                     an open DB session
      * @return a new execution request
      */
     private JobRequest getJobRequest(int launchId, DbConn cnx)
@@ -1185,10 +1185,10 @@ final class JdbcClient implements JqmClient
         try
         {
             cnx = getDbSession();
-            Map<Integer, com.enioka.jqm.api.JobInstance> res = new LinkedHashMap<Integer, com.enioka.jqm.api.JobInstance>();
+            Map<Integer, com.enioka.jqm.api.JobInstance> res = new LinkedHashMap<>();
 
             String wh = "";
-            List<Object> prms = new ArrayList<Object>();
+            List<Object> prms = new ArrayList<>();
 
             String q = "", q1 = "", q2 = "";
             String filterCountQuery = "SELECT ";
@@ -1343,7 +1343,7 @@ final class JdbcClient implements JqmClient
 
             ///////////////////////////////////////////////
             // Set pagination parameters
-            List<Object> paginatedParameters = new ArrayList<Object>(prms);
+            List<Object> paginatedParameters = new ArrayList<>(prms);
             if (query.getFirstRow() != null || query.getPageSize() != null)
             {
                 int start = query.getFirstRow() != null ? query.getFirstRow() : 0;
@@ -1377,14 +1377,14 @@ final class JdbcClient implements JqmClient
             // Fetch messages and parameters in batch
 
             // Optimization: fetch messages and parameters in batches of 50 (limit accepted by most databases for IN clauses).
-            List<List<Integer>> ids = new ArrayList<List<Integer>>();
+            List<List<Integer>> ids = new ArrayList<>();
             List<Integer> currentList = null;
             int i = 0;
             for (com.enioka.jqm.api.JobInstance ji : res.values())
             {
                 if (currentList == null || i % IN_CLAUSE_LIMIT == 0)
                 {
-                    currentList = new ArrayList<Integer>(IN_CLAUSE_LIMIT);
+                    currentList = new ArrayList<>(IN_CLAUSE_LIMIT);
                     ids.add(currentList);
                 }
                 currentList.add(ji.getId());
@@ -1412,7 +1412,7 @@ final class JdbcClient implements JqmClient
 
             ///////////////////////////////////////////////
             // DONE AT LAST
-            query.setResults(new ArrayList<com.enioka.jqm.api.JobInstance>(res.values()));
+            query.setResults(new ArrayList<>(res.values()));
             return query.getResults();
         }
         catch (Exception e)
@@ -1591,7 +1591,7 @@ final class JdbcClient implements JqmClient
 
             // TODO: no intermediate entity here: directly SQL => API object.
             List<Deliverable> deliverables = Deliverable.select(cnx, "deliverable_select_all_for_ji", idJob);
-            List<com.enioka.jqm.api.Deliverable> res = new ArrayList<com.enioka.jqm.api.Deliverable>();
+            List<com.enioka.jqm.api.Deliverable> res = new ArrayList<>();
             for (Deliverable d : deliverables)
             {
                 res.add(new com.enioka.jqm.api.Deliverable(d.getFilePath(), d.getFileFamily(), d.getId(), d.getOriginalFileName()));
@@ -1613,7 +1613,7 @@ final class JdbcClient implements JqmClient
     public List<InputStream> getJobDeliverablesContent(int idJob)
     {
         DbConn cnx = null;
-        ArrayList<InputStream> streams = new ArrayList<InputStream>();
+        ArrayList<InputStream> streams = new ArrayList<>();
 
         try
         {
@@ -1827,7 +1827,7 @@ final class JdbcClient implements JqmClient
                                 // Nothing to do.
                             }
                         }
-                        ctx = SSLContexts.custom().loadTrustMaterial(trust).build();
+                        ctx = SSLContexts.custom().loadTrustMaterial(trust, null).build();
                     }
                     else
                     {
@@ -1840,7 +1840,7 @@ final class JdbcClient implements JqmClient
                     jqmlogger.error("An supposedly impossible error has happened. Downloading files through the API may not work.", e);
                 }
             }
-            cl = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setSslcontext(ctx).build();
+            cl = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setSSLContext(ctx).build();
 
             // Run HTTP request
             HttpUriRequest rq = new HttpGet(url.toString());
@@ -1977,7 +1977,7 @@ final class JdbcClient implements JqmClient
     @Override
     public List<com.enioka.jqm.api.Queue> getQueues()
     {
-        List<com.enioka.jqm.api.Queue> res = new ArrayList<com.enioka.jqm.api.Queue>();
+        List<com.enioka.jqm.api.Queue> res = new ArrayList<>();
         DbConn cnx = null;
         com.enioka.jqm.api.Queue tmp = null;
 
@@ -2113,7 +2113,8 @@ final class JdbcClient implements JqmClient
     }
 
     @Override
-    public int getQueueEnabledCapacity(com.enioka.jqm.api.Queue q) {
+    public int getQueueEnabledCapacity(com.enioka.jqm.api.Queue q)
+    {
         int capacity = 0;
         DbConn cnx = null;
         try
@@ -2123,7 +2124,7 @@ final class JdbcClient implements JqmClient
 
             while (rs.next())
             {
-               capacity = rs.getInt(1);
+                capacity = rs.getInt(1);
             }
         }
         catch (Exception e)
@@ -2190,7 +2191,7 @@ final class JdbcClient implements JqmClient
 
     private List<com.enioka.jqm.api.JobDef> getJobDefinitionsInternal(String queryName, String... args)
     {
-        List<com.enioka.jqm.api.JobDef> res = new ArrayList<com.enioka.jqm.api.JobDef>();
+        List<com.enioka.jqm.api.JobDef> res = new ArrayList<>();
         DbConn cnx = null;
         List<JobDef> dbr = null;
         List<Integer> ids = null;
@@ -2207,19 +2208,19 @@ final class JdbcClient implements JqmClient
 
             if (!dbr.isEmpty())
             {
-                queues = new HashMap<Integer, com.enioka.jqm.api.Queue>();
+                queues = new HashMap<>();
                 for (com.enioka.jqm.api.Queue q : getQueues())
                 {
                     queues.put(q.getId(), q);
                 }
 
-                ids = new ArrayList<Integer>();
+                ids = new ArrayList<>();
                 for (JobDef jd : dbr)
                 {
                     ids.add(jd.getId());
                 }
                 sjs = ScheduledJob.select(cnx, "sj_select_for_jd_list", ids);
-                allParams = JobDefParameter.select_all(cnx,"jdprm_select_all_for_jd_list", ids);
+                allParams = JobDefParameter.select_all(cnx, "jdprm_select_all_for_jd_list", ids);
             }
 
             for (JobDef jd : dbr)
@@ -2244,7 +2245,8 @@ final class JdbcClient implements JqmClient
                 List<JobDefParameter> parameters = allParams.get(jd.getId());
                 if (parameters != null)
                 {
-                    for (JobDefParameter jdf : parameters) {
+                    for (JobDefParameter jdf : parameters)
+                    {
                         tmp.addParameter(jdf.getKey(), jdf.getValue());
                     }
                 }

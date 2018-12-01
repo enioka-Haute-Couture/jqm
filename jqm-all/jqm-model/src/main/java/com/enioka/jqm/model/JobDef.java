@@ -94,8 +94,6 @@ public class JobDef implements Serializable
     private boolean external = false;
     private String javaOpts;
 
-    private List<JobDefParameter> parameters = new ArrayList<JobDefParameter>();
-
     private Integer classLoader;
 
     /**
@@ -457,7 +455,7 @@ public class JobDef implements Serializable
 
     /**
      * ResultSet is not modified (no rs.next called).
-     * 
+     *
      * @param rs
      * @return
      */
@@ -497,7 +495,7 @@ public class JobDef implements Serializable
 
     public static List<JobDef> select(DbConn cnx, String query_key, Object... args)
     {
-        List<JobDef> res = new ArrayList<JobDef>();
+        List<JobDef> res = new ArrayList<>();
         try
         {
             ResultSet rs = cnx.runSelect(query_key, args);

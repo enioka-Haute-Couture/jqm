@@ -3,55 +3,22 @@ Command Line Interface (CLI)
 
 .. highlight:: bash
 
-.. versionadded:: 1.1.3
-	Once a purely debug feature, JQM now offers a standard CLI for basic operations.
+The CLI has commands to:
 
-.. program jqm-engine.jar
+* create a new node inside the cluster
+* export and import job definitions (deployment descriptors)
+* import queues
+* import cluster configuration
+* create a new execution request
+* get the status of an execution request
+* create or reset user accounts, including root
+* apply a configuration template to a node
+* enable or disable web APIs, using TLS or not
+* update the database
 
-::
+To get all details, use `java -jar jqm.jar --help`.
 
-	java -jar jqm-engine.jar -createnode <nodeName> [-port <portNumber>] | -enqueue <applicationname> | -exportallqueues <xmlpath> | -h | -importjobdef <xmlpath> | -importqueuefile <xmlpath> | -startnode <nodeName> | -v
+The most useful options are exposed in a more user friendly way with the
+script jqm.sh (or jqm.ps1 under Windows).
 
-.. option:: -createnode <nodeName>
-
-	create a JQM node of this name (init the database if needed)
-
-.. option:: -port <portNumber>
-
-	port to use for the newly created node
-
-.. option:: -enqueue <applicationname>   
-	
-	name of the application to launch
- 
-.. option:: -exportallqueues <xmlpath>
-	
-	export all queue definitions into an XML file
-
-.. option:: -h, --help
-	
-	display help
-
-.. option::	-importjobdef <xmlpath>      
-
-	path of the XML configuration file to import
- 
-.. option:: -importqueuefile <xmlpath>   
-	
-	import all queue definitions from an XML file
-
-.. option:: -startnode <nodeName>        
-	
-	name of the JQM node to start
-
-.. option:: -v, --version               
-	
-	display JQM engine version
-
-.. option:: -p, --resources
-
-	use specified resource.xml file (the file containing the database connection string). Default is JQM_HOME/config/resources.xml
-
-.. note:: Common options like start, createnode, importxml etc. can be used with convenience script jqm.sh / jqm.ps1
-
-.. warning:: a few options exist which are not documented here. They are internal and are not part the API (may change without notice, etc).
+.. warning:: a few options exist which are not listed here. They are internal and are not part the API (may change without notice, etc).

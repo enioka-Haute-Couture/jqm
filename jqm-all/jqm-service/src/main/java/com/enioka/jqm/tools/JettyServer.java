@@ -17,42 +17,41 @@ package com.enioka.jqm.tools;
 
 import java.io.File;
 import java.net.BindException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.eclipse.jetty.annotations.AnnotationConfiguration;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.server.ssl.SslSocketConnector;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.eclipse.jetty.webapp.Configuration;
-import org.eclipse.jetty.webapp.FragmentConfiguration;
-import org.eclipse.jetty.webapp.MetaInfConfiguration;
-import org.eclipse.jetty.webapp.WebAppContext;
-import org.eclipse.jetty.webapp.WebInfConfiguration;
-import org.eclipse.jetty.webapp.WebXmlConfiguration;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.pki.JdbcCa;
 
+import org.eclipse.jetty.annotations.AnnotationConfiguration;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.NetworkConnector;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.webapp.Configuration;
+import org.eclipse.jetty.webapp.FragmentConfiguration;
+import org.eclipse.jetty.webapp.MetaInfConfiguration;
+import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.webapp.WebInfConfiguration;
+import org.eclipse.jetty.webapp.WebXmlConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Every engine has an embedded Jetty engine that serves the different web service APIs.
  */
 class JettyServer
 {
-    private static Logger jqmlogger = Logger.getLogger(JettyServer.class);
+    private static Logger jqmlogger = LoggerFactory.getLogger(JettyServer.class);
 
     private Server server = null;
-    private HandlerCollection h = new HandlerCollection();
+    private HandlerCollection handlers = new HandlerCollection();
     private Node node;
     WebAppContext webAppContext = null;
 
@@ -60,6 +59,10 @@ class JettyServer
     {
         // Start is also a restart method
         this.stop();
+
+        ///////////////////////////////////////////////////////////////////////
+        // Configuration checks
+        ///////////////////////////////////////////////////////////////////////
 
         // Only load Jetty if web APIs are allowed in the cluster
         boolean startJetty = !Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "disableWsApi", "false"));
@@ -88,13 +91,43 @@ class JettyServer
         boolean useSsl = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableWsApiSsl", "true"));
         boolean useInternalPki = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableInternalPki", "true"));
         String pfxPassword = GlobalParameter.getParameter(cnx, "pfxPassword", "SuperPassword");
+        String bindTo = node.getDns().trim().toLowerCase();
 
-        server = new Server();
+        ///////////////////////////////////////////////////////////////////////
+        // Jetty configuration
+        ///////////////////////////////////////////////////////////////////////
 
+        // Setup thread pool
+        QueuedThreadPool threadPool = new QueuedThreadPool();
+        threadPool.setMaxThreads(10);
+
+        // Create server
+        server = new Server(threadPool);
+
+        server.setDumpAfterStart(false);
+        server.setDumpBeforeStop(false);
+        server.setStopAtShutdown(true);
+
+        // HTTP configuration
+        HttpConfiguration httpConfig = new HttpConfiguration();
+        httpConfig.setSecureScheme("https");
+        httpConfig.setOutputBufferSize(32768);
+        httpConfig.setRequestHeaderSize(8192);
+        httpConfig.setResponseHeaderSize(8192);
+        httpConfig.setSendServerVersion(false);
+        httpConfig.setSendDateHeader(false);
+        if (useSsl)
+        {
+            httpConfig.setSecurePort(node.getPort());
+        }
+
+        // TLS configuration
         SslContextFactory scf = null;
         if (useSsl)
         {
-            jqmlogger.info("JQM will use SSL for all HTTP communications as parameter enableWsApiSsl is 'true'");
+            jqmlogger.info("JQM will use TLS for all HTTP communications as parameter enableWsApiSsl is 'true'");
+
+            // Certificates
             if (useInternalPki)
             {
                 jqmlogger.info("JQM will use its internal PKI for all certificates as parameter enableInternalPki is 'true'");
@@ -102,75 +135,51 @@ class JettyServer
                         node.getDns(), "./conf/server.cer", "./conf/ca.cer");
             }
             scf = new SslContextFactory("./conf/keystore.pfx");
+
             scf.setKeyStorePassword(pfxPassword);
             scf.setKeyStoreType("PKCS12");
 
-            scf.setTrustStore("./conf/trusted.jks");
+            scf.setTrustStorePath("./conf/trusted.jks");
             scf.setTrustStorePassword(pfxPassword);
             scf.setTrustStoreType("JKS");
 
+            // Ciphers
+            scf.setExcludeCipherSuites("SSL_RSA_WITH_DES_CBC_SHA", "SSL_DHE_RSA_WITH_DES_CBC_SHA", "SSL_DHE_DSS_WITH_DES_CBC_SHA",
+                    "SSL_RSA_EXPORT_WITH_RC4_40_MD5", "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA", "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
+                    "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA");
+
+            // We allow client certificate authentication.
             scf.setWantClientAuth(true);
+
+            // Servlet TLS attributes
+            httpConfig = new HttpConfiguration(httpConfig);
+            httpConfig.addCustomizer(new SecureRequestCustomizer());
+
+            // Connectors.
+            ServerConnector https = new ServerConnector(server, scf, new HttpConnectionFactory(httpConfig));
+            https.setPort(node.getPort());
+            https.setIdleTimeout(30000);
+            https.setHost(bindTo);
+            server.addConnector(https);
+
+            jqmlogger.debug("Jetty will bind on interface {} on port {} with HTTPS", bindTo, node.getPort());
         }
         else
         {
-            jqmlogger.info("JQM will use plain HTTP for all communications (no SSL)");
-        }
+            jqmlogger.info("JQM will use plain HTTP for all communications (no TLS)");
 
-        // Connectors.
-        List<Connector> ls = new ArrayList<Connector>();
-        try
-        {
-            InetAddress[] adresses = InetAddress.getAllByName(node.getDns());
-            for (InetAddress s : adresses)
-            {
-                if (s instanceof Inet4Address)
-                {
-                    Connector connector = null;
-                    if (useSsl)
-                    {
-                        connector = new SslSocketConnector(scf);
-                    }
-                    else
-                    {
-                        connector = new SelectChannelConnector();
-                    }
+            // Connectors.
+            ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(httpConfig));
+            http.setPort(node.getPort());
+            http.setIdleTimeout(30000);
+            http.setHost(bindTo);
+            server.addConnector(http);
 
-                    if (node.getDns().equals("0.0.0.0"))
-                    {
-                        connector.setHost("0.0.0.0");
-                        connector.setPort(node.getPort());
-                        ls.add(connector);
-                        jqmlogger.debug("Jetty will bind on all interfaces on port " + node.getPort());
-                    }
-                    else if (s.isLoopbackAddress() || "localhost".equals(node.getDns()))
-                    {
-                        connector.setHost("localhost");
-                        connector.setPort(node.getPort());
-                        ls.add(connector);
-                        jqmlogger.debug("Jetty will bind on loopback - localhost:" + node.getPort());
-                    }
-                    else
-                    {
-                        connector.setHost(s.getHostAddress());
-                        connector.setPort(node.getPort());
-                        ls.add(connector);
-                        jqmlogger.debug("Jetty will bind on " + s.getHostAddress() + ":" + node.getPort());
-                    }
-                }
-            }
+            jqmlogger.debug("Jetty will bind on interface {} on port {} with HTTP", bindTo, node.getPort());
         }
-        catch (UnknownHostException e1)
-        {
-            jqmlogger.warn("Could not resolve name " + node.getDns() + ". Will bind on all interfaces.");
-            Connector connector = new SelectChannelConnector();
-            connector.setHost(null);
-            connector.setPort(node.getPort());
-            ls.add(connector);
-        }
-        server.setConnectors(ls.toArray(new Connector[ls.size()]));
 
         // Collection handler
-        server.setHandler(h);
+        server.setHandler(handlers);
 
         // Load the webapp context
         loadWar();
@@ -197,6 +206,7 @@ class JettyServer
         {
             // New nodes are created with a non-assigned port.
             cnx.runUpdate("node_update_port_by_id", getActualPort(), node.getId());
+            node.setPort(getActualPort()); // refresh in-memory object too.
             cnx.commit();
         }
 
@@ -210,7 +220,7 @@ class JettyServer
         {
             return 0;
         }
-        return server.getConnectors()[0].getLocalPort();
+        return ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
     }
 
     void stop()
@@ -226,7 +236,7 @@ class JettyServer
             {
                 ha.stop();
                 ha.destroy();
-                h.removeHandler(ha);
+                handlers.removeHandler(ha);
             }
 
             this.server.stop();
@@ -280,6 +290,6 @@ class JettyServer
         webAppContext.setConfigurations(new Configuration[] { new WebInfConfiguration(), new WebXmlConfiguration(),
                 new MetaInfConfiguration(), new FragmentConfiguration(), new AnnotationConfiguration() });
 
-        h.addHandler(webAppContext);
+        handlers.addHandler(webAppContext);
     }
 }

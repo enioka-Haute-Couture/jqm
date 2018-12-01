@@ -33,6 +33,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 
 import com.enioka.jqm.api.JobBase;
 
+@SuppressWarnings("deprecation")
 public class SuperTestPayload extends JobBase
 {
 

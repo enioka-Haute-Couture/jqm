@@ -30,7 +30,7 @@ public class ScheduledJob
 
     private Integer queue;
 
-    private Map<String, String> parametersCache = new HashMap<String, String>();
+    private Map<String, String> parametersCache = new HashMap<>();
 
     public int getId()
     {
@@ -99,9 +99,9 @@ public class ScheduledJob
 
     public static List<ScheduledJob> select(DbConn cnx, String query_key, Object... args)
     {
-        List<ScheduledJob> res = new ArrayList<ScheduledJob>();
+        List<ScheduledJob> res = new ArrayList<>();
         List<Integer> currentIdList = null;
-        List<List<Integer>> allIdLists = new ArrayList<List<Integer>>();
+        List<List<Integer>> allIdLists = new ArrayList<>();
         ScheduledJob tmp = null;
         try
         {
@@ -121,7 +121,7 @@ public class ScheduledJob
 
                 if (currentIdList == null || currentIdList.size() >= 500)
                 {
-                    currentIdList = new ArrayList<Integer>();
+                    currentIdList = new ArrayList<>();
                     allIdLists.add(currentIdList);
                 }
                 currentIdList.add(tmp.id);

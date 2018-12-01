@@ -25,7 +25,7 @@ public class PayloadInterceptor extends JdbcInterceptor
         public PooledConnection conn;
     }
 
-    private static Map<ConnectionPool, Set<ConnPair>> conns = new ConcurrentHashMap<ConnectionPool, Set<ConnPair>>();
+    private static Map<ConnectionPool, Set<ConnPair>> conns = new ConcurrentHashMap<>();
 
     private PooledConnection trackedPooledCon;
     private ConnectionPool trackedConnPool;
@@ -81,7 +81,7 @@ public class PayloadInterceptor extends JdbcInterceptor
     @Override
     public void poolStarted(ConnectionPool pool)
     {
-        conns.put(pool, Collections.newSetFromMap(new ConcurrentHashMap<ConnPair, Boolean>()));
+        conns.put(pool, Collections.newSetFromMap(new ConcurrentHashMap<>()));
         super.poolStarted(pool);
     }
 

@@ -25,7 +25,13 @@ import java.util.Properties;
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
-import org.apache.commons.io.IOUtils;
+import com.enioka.jqm.api.JobInstance;
+import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.Query;
+import com.enioka.jqm.jdbc.Db;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.test.helpers.TestHelpers;
+
 import org.hsqldb.Server;
 import org.junit.After;
 import org.junit.Assume;
@@ -36,20 +42,13 @@ import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.enioka.jqm.api.JobInstance;
-import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.api.Query;
-import com.enioka.jqm.jdbc.Db;
-import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.test.helpers.TestHelpers;
-
 public class JqmBaseTest
 {
     public static Logger jqmlogger = LoggerFactory.getLogger(JqmBaseTest.class);
     public static Server s;
     protected static Db db;
-    public Map<String, JqmEngineOperations> engines = new HashMap<String, JqmEngineOperations>();
-    public List<DbConn> cnxs = new ArrayList<DbConn>();
+    public Map<String, JqmEngineOperations> engines = new HashMap<>();
+    public List<DbConn> cnxs = new ArrayList<>();
 
     protected DbConn cnx;
 
@@ -64,14 +63,13 @@ public class JqmBaseTest
             JndiContext.createJndiContext();
 
             // If needed, create an HSQLDB server.
-            InputStream fis = null;
             Properties p = new Properties();
-            fis = Helpers.class.getClassLoader().getResourceAsStream("jqm.properties");
-            if (fis != null)
+            try (InputStream fis = Helpers.class.getClassLoader().getResourceAsStream("jqm.properties"))
             {
-                p.load(fis);
-                IOUtils.closeQuietly(fis);
-                fis.close();
+                if (fis != null)
+                {
+                    p.load(fis);
+                }
             }
             if (p.isEmpty() || !p.containsKey("com.enioka.jqm.jdbc.datasource") || (p.containsKey("com.enioka.jqm.jdbc.datasource")
                     && p.getProperty("com.enioka.jqm.jdbc.datasource").contains("hsql")))

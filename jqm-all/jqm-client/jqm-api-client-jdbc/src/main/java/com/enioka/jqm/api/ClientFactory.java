@@ -26,7 +26,7 @@ class ClientFactory implements IClientFactory
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(ClientFactory.class);
     private static JqmClient defaultClient;
-    private static ConcurrentMap<String, JqmClient> clients = new ConcurrentHashMap<String, JqmClient>();
+    private static ConcurrentMap<String, JqmClient> clients = new ConcurrentHashMap<>();
 
     @Override
     public JqmClient getClient()

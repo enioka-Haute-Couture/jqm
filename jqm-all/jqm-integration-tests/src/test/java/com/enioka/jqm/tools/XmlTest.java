@@ -46,7 +46,7 @@ public class XmlTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
                 "DateTime", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
-        ArrayList<String> tmp = new ArrayList<String>();
+        ArrayList<String> tmp = new ArrayList<>();
         tmp.add("VIPQueue");
         tmp.add("NormalQueue");
 
@@ -180,7 +180,7 @@ public class XmlTest extends JqmBaseTest
     @Test
     public void testExportJobDef() throws Exception
     {
-        Map<String, String> jdp = new HashMap<String, String>();
+        Map<String, String> jdp = new HashMap<>();
         jdp.put("test-key", "test-value");
         CreationTools.createJobDef("My Description", true, "com.enioka.jqm.tests.App", jdp, "jqm-tests/jqm-test-fibo/target/test.jar",
                 TestHelpers.qVip, 42, "Fibo", "App", "ModuleMachin", "other1", "other2", null, false, cnx, "Isolation", true, "HIDDEN");

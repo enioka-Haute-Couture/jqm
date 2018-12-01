@@ -47,9 +47,9 @@ import com.enioka.jqm.tools.JqmEngineOperations;
  */
 public class JqmAsyncTester
 {
-    private Map<String, JqmEngineOperations> engines = new HashMap<String, JqmEngineOperations>();
-    private Map<String, Node> nodes = new HashMap<String, Node>();
-    private Map<String, Integer> queues = new HashMap<String, Integer>();
+    private Map<String, JqmEngineOperations> engines = new HashMap<>();
+    private Map<String, Node> nodes = new HashMap<>();
+    private Map<String, Integer> queues = new HashMap<>();
 
     private Db db = null;
     private DbConn cnx = null;

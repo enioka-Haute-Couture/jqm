@@ -75,7 +75,7 @@ public class ClHandlerParameter implements Serializable
 
     public static Map<String, String> select_map(DbConn cnx, String query_key, Object... args)
     {
-        Map<String, String> res = new HashMap<String, String>();
+        Map<String, String> res = new HashMap<>();
         try
         {
             ResultSet rs = cnx.runSelect(query_key, args);

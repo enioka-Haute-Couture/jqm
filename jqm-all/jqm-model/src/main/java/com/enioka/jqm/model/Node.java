@@ -389,7 +389,7 @@ public class Node implements Serializable
 
     public static List<Node> select(DbConn cnx, String query_key, Object... args)
     {
-        List<Node> res = new ArrayList<Node>();
+        List<Node> res = new ArrayList<>();
         try
         {
             ResultSet rs = cnx.runSelect(query_key, args);

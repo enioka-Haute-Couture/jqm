@@ -36,21 +36,19 @@ package com.enioka.jqm.test.helpers;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.shiro.crypto.SecureRandomNumberGenerator;
-import org.apache.shiro.crypto.hash.Sha512Hash;
-import org.apache.shiro.util.ByteSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.Cl;
 import com.enioka.jqm.model.JndiObjectResource;
 import com.enioka.jqm.model.JobDef;
+import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.RUser;
-import com.enioka.jqm.model.JobDef.PathType;
+
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.crypto.hash.Sha512Hash;
+import org.apache.shiro.util.ByteSource;
 
 /**
  * A set of static methods which help creating test data for automated tests.<br>
@@ -58,7 +56,7 @@ import com.enioka.jqm.model.JobDef.PathType;
  */
 public class CreationTools
 {
-    private static Logger jqmlogger = LoggerFactory.getLogger(CreationTools.class);
+    // private static Logger jqmlogger = LoggerFactory.getLogger(CreationTools.class);
 
     private CreationTools()
     {}
@@ -133,7 +131,7 @@ public class CreationTools
             }
         }
 
-        int i = JobDef.create(cnx, description, javaClassName, parameters == null ? new HashMap<String, String>() : parameters, jp, queueId,
+        int i = JobDef.create(cnx, description, javaClassName, parameters == null ? new HashMap<>() : parameters, jp, queueId,
                 maxTimeRunning, applicationName, application, module, keyword1, keyword2, keyword3, highlander, clId, pathType);
 
         cnx.commit();
@@ -151,7 +149,7 @@ public class CreationTools
     public static int createDatabaseProp(String name, String driver, String url, String user, String pwd, DbConn cnx,
             String validationQuery, Map<String, String> parameters, boolean singleton)
     {
-        HashMap<String, String> prms = new HashMap<String, String>();
+        HashMap<String, String> prms = new HashMap<>();
         prms.put("testWhileIdle", "true");
         prms.put("testOnBorrow", "false");
         prms.put("testOnReturn", "true");
@@ -177,7 +175,7 @@ public class CreationTools
     public static void createMailSession(DbConn cnx, String name, String hostname, int port, boolean useTls, String username,
             String password)
     {
-        HashMap<String, String> prms = new HashMap<String, String>();
+        HashMap<String, String> prms = new HashMap<>();
         prms.put("smtpServerHost", hostname);
         prms.put("smtpServerPort", String.valueOf(port));
         prms.put("smtpUser", username);
@@ -199,7 +197,7 @@ public class CreationTools
     public static void createJndiQcfMQSeries(DbConn cnx, String jndiAlias, String description, String hostname, String queueManagerName,
             Integer port, String channel, HashMap<String, String> optionalParameters)
     {
-        HashMap<String, String> prms = new HashMap<String, String>();
+        HashMap<String, String> prms = new HashMap<>();
         prms.put("HOST", hostname);
         prms.put("PORT", port.toString());
         prms.put("CHAN", channel);
@@ -217,7 +215,7 @@ public class CreationTools
     public static void createJndiQueueMQSeries(DbConn cnx, String jndiAlias, String description, String queueName,
             HashMap<String, String> optionalParameters)
     {
-        HashMap<String, String> prms = new HashMap<String, String>();
+        HashMap<String, String> prms = new HashMap<>();
         prms.put("QU", queueName);
         if (optionalParameters != null)
         {
@@ -230,7 +228,7 @@ public class CreationTools
     public static void createJndiQcfActiveMQ(DbConn cnx, String jndiAlias, String description, String Url,
             HashMap<String, String> optionalParameters)
     {
-        HashMap<String, String> prms = new HashMap<String, String>();
+        HashMap<String, String> prms = new HashMap<>();
         prms.put("brokerURL", Url);
         if (optionalParameters != null)
         {
@@ -244,7 +242,7 @@ public class CreationTools
     public static void createJndiQueueActiveMQ(DbConn cnx, String jndiAlias, String description, String queueName,
             HashMap<String, String> optionalParameters)
     {
-        HashMap<String, String> prms = new HashMap<String, String>();
+        HashMap<String, String> prms = new HashMap<>();
         prms.put("physicalName", queueName);
         if (optionalParameters != null)
         {
@@ -257,14 +255,14 @@ public class CreationTools
 
     public static void createJndiFile(DbConn cnx, String jndiAlias, String description, String path)
     {
-        HashMap<String, String> prms = new HashMap<String, String>();
+        HashMap<String, String> prms = new HashMap<>();
         prms.put("PATH", path);
         JndiObjectResource.create(cnx, jndiAlias, "java.io.File.File", "com.enioka.jqm.providers.FileFactory", description, true, prms);
     }
 
     public static void createJndiUrl(DbConn cnx, String jndiAlias, String description, String url)
     {
-        HashMap<String, String> prms = new HashMap<String, String>();
+        HashMap<String, String> prms = new HashMap<>();
         prms.put("URL", url);
         JndiObjectResource.create(cnx, jndiAlias, "java.io.URL", "com.enioka.jqm.providers.UrlFactory", description, true, prms);
     }

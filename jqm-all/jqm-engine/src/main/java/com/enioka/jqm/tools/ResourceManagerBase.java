@@ -94,7 +94,7 @@ abstract class ResourceManagerBase
     {
         this.definition = configuration;
         this.key = configuration.getKey().toLowerCase();
-        this.currentProperties = new HashMap<String, String>();
+        this.currentProperties = new HashMap<>();
 
         // Add hard-coded defaults to properties
         setDefaultProperties();

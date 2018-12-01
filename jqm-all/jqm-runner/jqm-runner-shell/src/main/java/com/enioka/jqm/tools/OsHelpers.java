@@ -28,7 +28,7 @@ final class OsHelpers
 
     private static List<String> getSh(String commandLine, Map<String, String> prms)
     {
-        List<String> res = new ArrayList<String>(10);
+        List<String> res = new ArrayList<>(10);
         res.add("/bin/sh");
         res.add("-c");
         addAllParametersAsSingleString(res, commandLine, prms);
@@ -37,7 +37,7 @@ final class OsHelpers
 
     private static List<String> getCmdShell(String commandLine, Map<String, String> prms)
     {
-        List<String> res = new ArrayList<String>(10);
+        List<String> res = new ArrayList<>(10);
         res.add("cmd.exe");
         res.add("/C");
         addAllParametersAsSingleString(res, commandLine, prms);
@@ -46,7 +46,7 @@ final class OsHelpers
 
     private static List<String> getPowerShell(String commandLine, Map<String, String> prms)
     {
-        List<String> res = new ArrayList<String>(10);
+        List<String> res = new ArrayList<>(10);
         res.add("powershell");
         res.add("-NoLogo");
         res.add("-NonInteractive");
@@ -80,13 +80,13 @@ final class OsHelpers
      */
     private static void addAllParametersAsSingleString(List<String> resultList, String commandLine, Map<String, String> prms)
     {
-        List<String> raw = new ArrayList<String>(prms.size() * 2);
+        List<String> raw = new ArrayList<>(prms.size() * 2);
 
         // Command itself
         raw.add(commandLine);
 
         // Parameters, ordered by key
-        List<String> keys = new ArrayList<String>(prms.keySet());
+        List<String> keys = new ArrayList<>(prms.keySet());
         Collections.sort(keys, prmComparator);
         for (String p : keys)
         {
@@ -110,7 +110,7 @@ final class OsHelpers
      */
     private static List<String> getSimpleProcess(String processPath, Map<String, String> prms)
     {
-        List<String> res = new ArrayList<String>(10);
+        List<String> res = new ArrayList<>(10);
 
         // Process itself
         res.add(processPath);
@@ -121,7 +121,7 @@ final class OsHelpers
             return res;
         }
 
-        List<String> keys = new ArrayList<String>(prms.keySet());
+        List<String> keys = new ArrayList<>(prms.keySet());
         Collections.sort(keys, prmComparator);
         for (String p : keys)
         {

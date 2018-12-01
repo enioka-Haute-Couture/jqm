@@ -272,7 +272,7 @@ class XmlConfigurationParser
                 boolean singleton = Boolean.parseBoolean(srcElement.getElementsByTagName("singleton").item(0).getTextContent().trim());
 
                 NodeList prmList = srcElement.getElementsByTagName("parameter");
-                Map<String, String> prms = new HashMap<String, String>();
+                Map<String, String> prms = new HashMap<>();
                 for (int prmIndex = 0; prmIndex < prmList.getLength(); prmIndex++)
                 {
                     Node prmNode = prmList.item(prmIndex);

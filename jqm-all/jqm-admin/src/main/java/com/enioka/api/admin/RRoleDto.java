@@ -30,7 +30,7 @@ public class RRoleDto implements Serializable
     private String name;
     private String description;
 
-    private List<String> permissions = new ArrayList<String>();
+    private List<String> permissions = new ArrayList<>();
 
     public Integer getId()
     {

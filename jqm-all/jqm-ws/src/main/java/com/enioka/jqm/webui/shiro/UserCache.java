@@ -92,7 +92,7 @@ public class UserCache<K, V> implements Cache<K, V>
 
     public Set<K> keys()
     {
-        Set<K> keys = new HashSet<K>();
+        Set<K> keys = new HashSet<>();
         for (Map.Entry<K, TimeCacheEntry<V>> e : cache.entrySet())
         {
             if (e.getValue().isValid())
@@ -109,7 +109,7 @@ public class UserCache<K, V> implements Cache<K, V>
 
     public Collection<V> values()
     {
-        Collection<V> values = new ArrayList<V>();
+        Collection<V> values = new ArrayList<>();
         for (TimeCacheEntry<V> e : this.cache.values())
         {
             if (e.isValid())

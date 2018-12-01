@@ -81,7 +81,7 @@ public class ClHandler implements Serializable
         return ClHandlerParameter.select_map(cnx, "cleh_select_all_for_cleh", this.id);
     }
 
-    private Map<String, String> prmCache = new HashMap<String, String>();
+    private Map<String, String> prmCache = new HashMap<>();
 
     /**
      * A set of key/value pairs (without order) which are passed to the handler at runtime. The content of this dictionary is only used by
@@ -112,7 +112,7 @@ public class ClHandler implements Serializable
 
     public static List<ClHandler> select(DbConn cnx, String query_key, Object... args)
     {
-        List<ClHandler> res = new ArrayList<ClHandler>();
+        List<ClHandler> res = new ArrayList<>();
         try
         {
             ResultSet rs = cnx.runSelect(query_key, args);

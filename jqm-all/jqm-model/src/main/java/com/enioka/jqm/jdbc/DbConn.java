@@ -18,12 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Queue;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.enioka.jqm.model.JobInstance;
-import com.enioka.jqm.model.Node;
-import com.enioka.jqm.model.Queue;
 
 //TODO: better way to close statements and RS.
 
@@ -38,7 +37,7 @@ public class DbConn implements Closeable
     Connection _cnx;
     private boolean transac_open = false;
     private boolean rollbackOnly = false;
-    private List<Statement> toClose = new ArrayList<Statement>();
+    private List<Statement> toClose = new ArrayList<>();
 
     DbConn(Db parent, Connection cnx)
     {
@@ -85,7 +84,7 @@ public class DbConn implements Closeable
     private QueryPreparation adapterPreparation(String query_key, boolean forUpdate, Object... params)
     {
         QueryPreparation qp = new QueryPreparation();
-        qp.parameters = new ArrayList<Object>(Arrays.asList(params));
+        qp.parameters = new ArrayList<>(Arrays.asList(params));
         qp.queryKey = query_key;
         qp.sqlText = parent.getQuery(query_key);
         qp.forUpdate = forUpdate;
@@ -162,7 +161,7 @@ public class DbConn implements Closeable
     {
         PreparedStatement ps = null;
         QueryPreparation q = new QueryPreparation();
-        q.parameters = new ArrayList<Object>(Arrays.asList(params));
+        q.parameters = new ArrayList<>(Arrays.asList(params));
         q.sqlText = this.parent.getAdapter().adaptSql(rawQuery);
         this.parent.getAdapter().beforeUpdate(_cnx, q);
 
@@ -232,7 +231,7 @@ public class DbConn implements Closeable
 
     public Map<String, Object> runSelectSingleRow(String query_key, Object... params)
     {
-        HashMap<String, Object> res = new HashMap<String, Object>();
+        HashMap<String, Object> res = new HashMap<>();
         ResultSet rs = null;
         try
         {
@@ -348,7 +347,7 @@ public class DbConn implements Closeable
     @SuppressWarnings("unchecked")
     public <T> List<T> runSelectColumn(String query_key, int column, Class<T> clazz, Object... params)
     {
-        ArrayList<T> resList = new ArrayList<T>();
+        ArrayList<T> resList = new ArrayList<>();
         ResultSet rs = runSelect(query_key, params);
         try
         {

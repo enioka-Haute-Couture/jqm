@@ -2,13 +2,10 @@ package com.enioka.jqm.tools;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
 
-import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.JobDef.PathType;
 
 import org.jvnet.winp.WinProcess;
@@ -134,7 +131,7 @@ class KillHelpers
 
     private static void killByPidGeneric(long pid, String command)
     {
-        List<String> args = OsHelpers.getProcessArguments(command, new HashMap<String, String>(), PathType.DEFAULTSHELLCOMMAND);
+        List<String> args = OsHelpers.getProcessArguments(command, new HashMap<>(), PathType.DEFAULTSHELLCOMMAND);
         ProcessBuilder pb = new ProcessBuilder(args);
         Process process;
         try

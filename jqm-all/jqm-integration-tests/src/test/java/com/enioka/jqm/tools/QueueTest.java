@@ -210,7 +210,7 @@ public class QueueTest extends JqmBaseTest
         int qId = Queue.create(cnx, "testqueue", " ", false);
         DeploymentParameter.create(cnx, TestHelpers.node.getId(), 2, 1, qId); // 2 slots
 
-        Map<String, String> prms = new HashMap<String, String>(1);
+        Map<String, String> prms = new HashMap<>(1);
         prms.put("com.enioka.jqm.rm.quantity.thread.consumption", "2"); // using fully qualified RM with RM name 'thread' - not the generic
                                                                         // key
         CreationTools.createJobDef(null, true, "pyl.Wait", prms, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", qId, 42,
@@ -247,7 +247,7 @@ public class QueueTest extends JqmBaseTest
         int qId = Queue.create(cnx, "testqueue", " ", false);
         DeploymentParameter.create(cnx, TestHelpers.node.getId(), 2, 1, qId); // 2 slots
 
-        Map<String, String> prms = new HashMap<String, String>(1);
+        Map<String, String> prms = new HashMap<>(1);
         prms.put("com.enioka.jqm.rm.quantity.thread.consumption", "2");
         prms.put("whatever", "value");
         CreationTools.createJobDef(null, true, "pyl.MessagePerParameter", prms, "jqm-tests/jqm-test-pyl/target/test.jar", qId, 42,
@@ -282,7 +282,7 @@ public class QueueTest extends JqmBaseTest
         GlobalParameter.setParameter(cnx, "discreteRmName", "ports");
         GlobalParameter.setParameter(cnx, "discreteRmList", "port01,port02");
 
-        Map<String, String> prms = new HashMap<String, String>(1);
+        Map<String, String> prms = new HashMap<>(1);
         prms.put("com.enioka.jqm.rm.discrete.consumption", "1");
         CreationTools.createJobDef(null, true, "pyl.KillMe", prms, "jqm-tests/jqm-test-pyl/target/test.jar", qId, 42, "jqm-test-kill", null,
                 "Franquin", "ModuleMachin", "other", "other", false, cnx);

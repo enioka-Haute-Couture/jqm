@@ -177,7 +177,7 @@ public class RUser implements Serializable
 
     public static List<RUser> select(DbConn cnx, String query_key, Object... args)
     {
-        List<RUser> res = new ArrayList<RUser>();
+        List<RUser> res = new ArrayList<>();
         try
         {
             ResultSet rs = cnx.runSelect(query_key, args);
@@ -228,7 +228,7 @@ public class RUser implements Serializable
     public static void set_roles(DbConn cnx, int userId, String... role_names)
     {
         cnx.runUpdate("user_remove_all_roles_by_id", userId);
-        Set<String> roles = new HashSet<String>();
+        Set<String> roles = new HashSet<>();
         for (String s : role_names)
         {
             roles.add(s);

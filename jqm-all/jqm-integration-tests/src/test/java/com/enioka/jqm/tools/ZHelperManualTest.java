@@ -1,12 +1,11 @@
 package com.enioka.jqm.tools;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
+
+import org.junit.Assert;
 
 /**
  * A set of configuration launches helpful for some bug inquiries.
@@ -14,7 +13,7 @@ import com.enioka.jqm.test.helpers.TestHelpers;
  */
 public class ZHelperManualTest extends JqmBaseTest
 {
-    //@Test
+    // @Test
     public void testDbFailureUnderLoadWithExternalDb() throws Exception
     {
         // Many starting jobs simultaneously
@@ -27,10 +26,8 @@ public class ZHelperManualTest extends JqmBaseTest
 
         JobRequest j = new JobRequest("TestJqmApplication", "TestUser");
 
-        int ji = 0;
         for (int i = 0; i < 1000; i++)
         {
-            ++ji;
             JqmClientFactory.getClient().enqueue(j);
         }
 
@@ -40,7 +37,7 @@ public class ZHelperManualTest extends JqmBaseTest
         this.sleep(1000);
     }
 
-    //@Test
+    // @Test
     public void testNoDuplicateLaunchesUnderLoad() throws Exception
     {
         // Many starting jobs simultaneously

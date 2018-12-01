@@ -23,6 +23,7 @@ import java.util.Map;
 
 import com.enioka.jqm.api.JobBase;
 
+@SuppressWarnings("deprecation")
 public class StressFibo extends JobBase
 {
     @Override
@@ -30,7 +31,7 @@ public class StressFibo extends JobBase
     {
         System.out.println("PARAMETRE FIBO 2: " + this.getParameters().get("p2"));
 
-        Map<String, String> p = new HashMap<String, String>();
+        Map<String, String> p = new HashMap<>();
 
         p.put("p1", this.getParameters().get("p2"));
         p.put("p2", (Integer.parseInt(this.getParameters().get("p1")) + Integer.parseInt(this.getParameters().get("p2")) + ""));

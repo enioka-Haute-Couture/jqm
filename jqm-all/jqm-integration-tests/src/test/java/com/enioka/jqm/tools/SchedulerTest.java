@@ -187,7 +187,7 @@ public class SchedulerTest extends JqmBaseTest
         Assert.assertEquals(State.HOLDED, Query.create().setQueryLiveInstances(true).run().get(0).getState());
 
         // Resume at will.
-        JqmClientFactory.getClient().resumeJob(i);
+        JqmClientFactory.getClient().resumeQueuedJob(i);
         TestHelpers.waitFor(1, 10000, cnx);
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
     }
