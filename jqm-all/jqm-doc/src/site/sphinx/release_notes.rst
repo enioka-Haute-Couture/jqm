@@ -1,6 +1,47 @@
 Release notes
 ######################
 
+3.0.0
+*************
+
+Release goal
+++++++++++++++++
+
+We are excited to present JQM 3.0.0, the first release in the 3.x line.
+It brings major new functionalities in how to optimize running job instances according to available resources (memory, TCP ports...), going far beyond the "simple" FIFO queueing of previous versions.
+It also deals with the obsolescence of many components: Java 6 & 7 are dropped, new TLS ciphers are supported, IPv6 is now supported, the CLI was rewritten...
+
+Major changes
+++++++++++++++++++++++++++++
+
+* All libraries have been updated to their latest versions. This is particularly important for anyone exposing JQM web services, as this comes with much increased security.
+* Web APIs: added IPv6 compatibility and latest TLS versions (on Java version supporting them).
+* Web APIs: better multiple interface handling.
+* CLI: entirely re-written using a more understandable `verb-noun --options` style for commands (and a far more maintainable code behind this).
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Engine: Updated to latest Maven engine, adding latest pom.xml format compatibility.
+
+Breaking changes
++++++++++++++++++++
+
+As the semantic versioning designation entails, this version contains a few breaking changes. However, it should be noted that the code API (the Java interfaces) themselves have no breaking changes from version 2.x, so impact should be minimal - most changes are behind the scenes, and have consequences for the administrators only.
+
+The breaking changes are:
+
+* Java 1.6 and 1.7 are dropped in all JQM components - either for the JQM engine or the provided Java libraries. Note that JQM actively uses the newer Java features: there is no hope to recompile this version with 1.6. 1.6 and 1.7 users should either migrate to 1.8 (or 1.11) or stays with JQM 2.x.
+* Web APIs: SSL and encryptions and broken ciphers have been dropped. Only recent TLS with recent ciphers are now supported.
+* CLI : the internal CLI (the one called with `java -jar jqm.jar options…`) has been fully revamped. All scripts using it should be revised with the new, clearer options. If you use the .sh or .ps1 provided scripts, no changes.
+
+Deprecated
++++++++++++++++
+
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
+* JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs).
+
+
 2.2.0
 *************
 
@@ -139,7 +180,7 @@ Minor additions
 Breaking changes
 +++++++++++++++++++
 
-As the semantic versioning designation entails, this version conatains a few breaking changes. However, it should be noted that the code API (the Java interfaces) themselves have no breaking changes from version 1.4, so impact should be minimal - most changes are behind the scenes, and have consequences for the administrators only.
+As the semantic versioning designation entails, this version contains a few breaking changes. However, it should be noted that the code API (the Java interfaces) themselves have no breaking changes from version 1.4, so impact should be minimal - most changes are behind the scenes, and have consequences for the administrators only.
 
 The breaking changes are:
 
