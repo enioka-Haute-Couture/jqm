@@ -10,6 +10,8 @@
         "**/.classpath": true,
         "**/.project": true,
         "**/.settings/": true,
+        "**/.settings": true,
+        "**/.factorypath": true
     },
     "LineCount.includes": [
         "**/*.java",
@@ -50,4 +52,5 @@
     "maven.executable.options": "",
     "javascript.format.placeOpenBraceOnNewLineForFunctions": true,
     "javascript.format.placeOpenBraceOnNewLineForControlBlocks": true,
+    "restructuredtext.confPath": "${workspaceFolder}\\jqm-all\\jqm-doc\\src\\site\\sphinx",
 }
