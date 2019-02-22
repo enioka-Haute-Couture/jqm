@@ -175,14 +175,25 @@ final class JdbcClient implements JqmClient
         }
         runRequest.setParameters(runRequest.getParameters()); // This will validate parameters.
 
-        DbConn cnx = getDbSession();
+        DbConn cnx = null;
+        try
+        {
+            cnx = getDbSession();
+            return enqueueWithCnx(runRequest, cnx);
+        }
+        finally
+        {
+            closeQuietly(cnx);
+        }
+    }
 
+    private int enqueueWithCnx(JobRequest runRequest, DbConn cnx)
+    {
         // New schedule?
         if (runRequest.getRecurrence() != null && !runRequest.getRecurrence().trim().isEmpty())
         {
             int res = createSchedule(runRequest, cnx);
             cnx.commit();
-            cnx.close();
             return res;
         }
 
@@ -217,13 +228,11 @@ final class JdbcClient implements JqmClient
             {
                 jqmlogger.error(
                         "There are multiple Job definition named " + runRequest.getApplicationName() + ". Inconsistent configuration.");
-                closeQuietly(cnx);
                 throw new JqmInvalidRequestException("There are multiple Job definition named " + runRequest.getApplicationName());
             }
             catch (NoResultException ex)
             {
                 jqmlogger.error("Job definition named " + runRequest.getApplicationName() + " does not exist");
-                closeQuietly(cnx);
                 throw new JqmInvalidRequestException("no job definition named " + runRequest.getApplicationName());
             }
         }
@@ -249,7 +258,6 @@ final class JdbcClient implements JqmClient
         Integer existing = highlanderMode(jobDef, cnx);
         if (existing != null)
         {
-            closeQuietly(cnx);
             jqmlogger.trace("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + existing);
             return existing;
         }
@@ -266,11 +274,18 @@ final class JdbcClient implements JqmClient
         prms.putAll(runRequest.getParameters());
 
         // On which queue?
-        Integer queue_id;
+        Integer queue_id = null;
         if (runRequest.getQueueName() != null)
         {
             // use requested key if given.
-            queue_id = cnx.runSelectSingle("q_select_by_key", 1, Integer.class, runRequest.getQueueName());
+            try
+            {
+                queue_id = cnx.runSelectSingle("q_select_by_key", 1, Integer.class, runRequest.getQueueName());
+            }
+            catch (NoResultException e)
+            {
+                throw new JqmInvalidRequestException("Requested queue " + runRequest.getQueueName() + " does not exist", e);
+            }
         }
         else if (sj != null && sj.getQueue() != null)
         {
@@ -327,10 +342,6 @@ final class JdbcClient implements JqmClient
         catch (Exception e)
         {
             throw new JqmClientException("Could not create new JobInstance", e);
-        }
-        finally
-        {
-            closeQuietly(cnx);
         }
     }
 
