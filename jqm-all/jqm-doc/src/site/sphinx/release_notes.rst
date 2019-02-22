@@ -1,6 +1,24 @@
 Release notes
 ######################
 
+2.2.1
+*************
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Client API: fixed connection leak and missing error message when enqueueing a job request on a queue which does not exists (#344)
+
+
 2.2.0
 *************
 
