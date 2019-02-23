@@ -1,5 +1,6 @@
 package com.enioka.jqm.jdbc;
 
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
@@ -22,9 +23,9 @@ public class DbImplPg extends DbAdapter
     }
 
     @Override
-    public boolean compatibleWith(String product)
+    public boolean compatibleWith(DatabaseMetaData product) throws SQLException
     {
-        return product.contains("postgresql");
+        return product.getDatabaseProductName().toLowerCase().contains("postgresql");
     }
 
     @Override
