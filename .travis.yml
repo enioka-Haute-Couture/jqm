@@ -7,7 +7,7 @@ before_install:
   - cd jqm-all
   - export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"
   - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then mysql -e "create database jqm; grant all privileges on jqm.* to jqm@'%' identified by 'jqm'; flush privileges;"; fi
-  - if [[ "$DB" == "postgresql ]]; then psql -c "create database jqm; create user jqm with password 'jqm'; grant all privileges on database jqm to jqm;" -U postgres; fi
+  - if [[ "$DB" == "postgresql" ]]; then psql -c "create database jqm; create user jqm with password 'jqm'; grant all privileges on database jqm to jqm;" -U postgres; fi
 
 jdk:
 #  - openjdk8
