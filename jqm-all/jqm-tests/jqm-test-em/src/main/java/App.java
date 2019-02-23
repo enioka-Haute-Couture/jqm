@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import java.util.Properties;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -43,6 +45,14 @@ public class App extends JobBase
 
         if (this.getParameters().size() == 0)
         {
+            // We use non-standard datasource names during tests
+            Properties p = new Properties();
+            String dbName = System.getenv("DB");
+            dbName = (dbName == null ? "hsqldb" : dbName);
+            p.put("javax.persistence.nonJtaDataSource", "jdbc/" + dbName);
+            JqmClientFactory.setProperties(p);
+            // End of datasource name change
+
             log.info("Queuing again - with parameter and through the full API");
             JobRequest jd = new JobRequest("jqm-test-em", "marsu");
             jd.addParameter("stop", "1");
