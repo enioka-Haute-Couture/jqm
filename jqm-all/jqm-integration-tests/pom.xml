@@ -43,12 +43,17 @@
 								<artifactItem>
 									<groupId>org.postgresql</groupId>
 									<artifactId>postgresql</artifactId>
-									<version>42.1.1.jre6</version>
+									<version>42.2.5</version>
 								</artifactItem>
 								<artifactItem>
 									<groupId>mysql</groupId>
 									<artifactId>mysql-connector-java</artifactId>
-									<version>5.1.41</version>
+									<version>8.0.15</version>
+								</artifactItem>
+                                <artifactItem>
+									<groupId>org.mariadb.jdbc</groupId>
+									<artifactId>mariadb-java-client</artifactId>
+									<version>2.4.0</version>
 								</artifactItem>
 								<artifactItem>
 									<groupId>com.h2database</groupId>
@@ -236,13 +241,18 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.1.1.jre6</version>
+			<version>42.2.5</version>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.11</version>
+			<version>8.0.15</version>
 		</dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.4.0</version>
+        </dependency>
 
 	</dependencies>
 </project>

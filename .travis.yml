@@ -1,20 +1,54 @@
+os: linux
+dist: xenial
 language: java
-sudo: false
+# travis has retired container-based builds and is now fully VM-based, so no more sudo=false.
+
 before_install:
   - cd jqm-all
   - export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"
+  - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then mysql -e "create database jqm; grant all privileges on jqm.* to jqm@'%' identified by 'jqm'; flush privileges;"; fi
+  - if [[ "$DB" == "postgresql ]]; then psql -c "create database jqm; create user jqm with password 'jqm'; grant all privileges on database jqm to jqm;" -U postgres; fi
+
 jdk:
-  - openjdk8
-  - openjdk9
+#  - openjdk8
+#  - openjdk9
   - openjdk10
-  - oraclejdk8
-  - oraclejdk9
+#  - oraclejdk8
+#  - oraclejdk9
+
 env:
   global:
-  - secure: ZI6QQDf1rjLK+ZiYh8SPuVlvTJ3nq/JgbFJsFz4pqpEVr30UjcBpICdwauktgPa7dakIfaCbZzBB5SwAayg9CLQ5eOcoiEjUVOVlLvMiUesKIY6B50QE9E/r/MDJddDlLlVbwBnMdovYh9+Cwu7ny7tbS6ueU9D7pKX+FfCkEns=
-  - secure: dbcqjCXTsiNqPW0sSqA1DfYgzRAD6MK+lkCmBocTl0InimKFlM211j4rDt80talVl7HGPkS910S/twV2VfTUexYy5oZcqVvzfRST6ShLwnBmVz2rm78r/W+te3KmGY8w+RucLSM+M0DCfN74JnY7EI0dLCd1IberLkzCecxXOxw=
+    - secure: ZI6QQDf1rjLK+ZiYh8SPuVlvTJ3nq/JgbFJsFz4pqpEVr30UjcBpICdwauktgPa7dakIfaCbZzBB5SwAayg9CLQ5eOcoiEjUVOVlLvMiUesKIY6B50QE9E/r/MDJddDlLlVbwBnMdovYh9+Cwu7ny7tbS6ueU9D7pKX+FfCkEns=
+    - secure: dbcqjCXTsiNqPW0sSqA1DfYgzRAD6MK+lkCmBocTl0InimKFlM211j4rDt80talVl7HGPkS910S/twV2VfTUexYy5oZcqVvzfRST6ShLwnBmVz2rm78r/W+te3KmGY8w+RucLSM+M0DCfN74JnY7EI0dLCd1IberLkzCecxXOxw=
+    - DB=hsqldb
+
 # addons:
 #   sauce_connect: true
+
 branches:
   except:
   - controller
+
+# In addition to the matrix created by jdk entries, we want a build on latest java for each DB.
+jobs:
+  includes:
+    - stage: db_tests
+      env:
+        - DB=mariadb
+      addons:
+        - mariadb: '10.0'
+      jdk: openjdk10
+
+    - stage: db_tests
+      env:
+        - DB=postgresql
+      services:
+        - postgresql
+      jdk: openjdk10
+
+    - stage: db_tests
+      env:
+        - DB=mysql
+      services:
+        - mysql
+      jdk: openjdk10

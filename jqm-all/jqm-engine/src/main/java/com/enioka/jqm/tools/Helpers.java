@@ -115,7 +115,17 @@ final class Helpers
     {
         try
         {
+            // Load optional properties file
             Properties p = Db.loadProperties();
+
+            // Overload the datasource name from environment variable if any (tests only).
+            String dbName = System.getenv("DB");
+            if (dbName != null)
+            {
+                p.put("com.enioka.jqm.jdbc.datasource", "jdbc/" + dbName);
+            }
+
+            // Connect to DB.
             Db n = new Db(p);
             p.put("com.enioka.jqm.jdbc.contextobject", n); // Share the DataSource in engine and client.
             JqmClientFactory.setProperties(p);
