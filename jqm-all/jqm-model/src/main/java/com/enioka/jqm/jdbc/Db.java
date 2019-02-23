@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,11 +58,11 @@ public class Db
 
     /**
      * Constructor for cases when a DataSource is readily available (and not retrieved through JNDI).
-     * 
+     *
      * @param ds
-     *            the existing DataSource.
+     *                         the existing DataSource.
      * @param updateSchema
-     *            set to true if the database schema should upgrade (if needed) during initialization
+     *                         set to true if the database schema should upgrade (if needed) during initialization
      */
     public Db(DataSource ds, boolean updateSchema)
     {
@@ -72,7 +73,7 @@ public class Db
 
     /**
      * Main constructor. Properties may be null. Properties are not documented on purpose, as this is a private JQM API.
-     * 
+     *
      * @param props
      */
     @SuppressWarnings("unchecked")
@@ -203,7 +204,7 @@ public class Db
 
     /**
      * Helper method to load the standard JQM property files from class path.
-     * 
+     *
      * @return a Properties object, which may be empty but not null.
      */
     public static Properties loadProperties()
@@ -213,11 +214,11 @@ public class Db
 
     /**
      * Helper method to load a property file from class path.
-     * 
+     *
      * @param filesToLoad
-     *            an array of paths (class path paths) designating where the files may be. All files are loaded, in the order given. Missing
-     *            files are silently ignored.
-     * 
+     *                        an array of paths (class path paths) designating where the files may be. All files are loaded, in the order
+     *                        given. Missing files are silently ignored.
+     *
      * @return a Properties object, which may be empty but not null.
      */
     public static Properties loadProperties(String[] filesToLoad)
@@ -429,10 +430,14 @@ public class Db
     private void initAdapter()
     {
         Connection tmp = null;
+        DatabaseMetaData meta = null;
         try
         {
             tmp = _ds.getConnection();
-            product = tmp.getMetaData().getDatabaseProductName().toLowerCase();
+            meta = tmp.getMetaData();
+            product = meta.getDatabaseProductName().toLowerCase();
+            jqmlogger.warn("Database reports it is " + meta.getDatabaseProductName() + " " + meta.getDatabaseMajorVersion() + "."
+                    + meta.getDatabaseMinorVersion());
         }
         catch (SQLException e)
         {
@@ -453,8 +458,6 @@ public class Db
             }
         }
 
-        jqmlogger.info("Database reports it is " + product);
-
         DbAdapter newAdpt = null;
         for (String s : ADAPTERS)
         {
@@ -462,7 +465,7 @@ public class Db
             {
                 Class<? extends DbAdapter> clazz = Db.class.getClassLoader().loadClass(s).asSubclass(DbAdapter.class);
                 newAdpt = clazz.newInstance();
-                if (newAdpt.compatibleWith(product))
+                if (newAdpt.compatibleWith(meta))
                 {
                     adapter = newAdpt;
                     break;
@@ -494,7 +497,7 @@ public class Db
 
     /**
      * A connection to the database. Should be short-lived. No transaction active by default.
-     * 
+     *
      * @return a new open connection.
      */
     public DbConn getConn()
@@ -526,9 +529,9 @@ public class Db
 
     /**
      * Gets the interpolated text of a query from cache. If key does not exist, an exception is thrown.
-     * 
+     *
      * @param key
-     *            name of the query
+     *                name of the query
      * @return the query text
      */
     String getQuery(String key)
@@ -553,9 +556,9 @@ public class Db
 
     /**
      * Close utility method.
-     * 
+     *
      * @param ps
-     *            statement to close.
+     *               statement to close.
      */
     private static void closeQuietly(Closeable ps)
     {

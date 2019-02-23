@@ -2,6 +2,7 @@ package com.enioka.jqm.jdbc;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -40,9 +41,12 @@ public class DbImplMySql extends DbAdapter
     }
 
     @Override
-    public boolean compatibleWith(String product)
+    public boolean compatibleWith(DatabaseMetaData product) throws SQLException
     {
-        return product.contains("mysql");
+        return (product.getDatabaseProductName().contains("MySQL")
+                && ((product.getDatabaseMajorVersion() == 5 && product.getDatabaseMinorVersion() >= 6)
+                        || product.getDatabaseMajorVersion() > 5))
+                || (product.getDatabaseProductName().contains("MariaDB") && product.getDatabaseMajorVersion() >= 10);
     }
 
     @Override

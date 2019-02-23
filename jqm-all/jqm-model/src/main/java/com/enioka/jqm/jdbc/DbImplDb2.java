@@ -1,6 +1,7 @@
 package com.enioka.jqm.jdbc;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -30,9 +31,9 @@ public class DbImplDb2 extends DbAdapter
     }
 
     @Override
-    public boolean compatibleWith(String product)
+    public boolean compatibleWith(DatabaseMetaData product) throws SQLException
     {
-        return product.contains("db2");
+        return product.getDatabaseProductName().toLowerCase().contains("db2");
     }
 
     @Override
