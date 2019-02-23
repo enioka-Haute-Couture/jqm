@@ -9,10 +9,10 @@ before_install:
   - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then mysql -e "create database jqm; grant all privileges on jqm.* to jqm@'%' identified by 'jqm'; flush privileges;"; fi
   - if [[ "$DB" == "postgresql" ]]; then psql -c "create database jqm; create user jqm with password 'jqm'; grant all privileges on database jqm to jqm;" -U postgres; fi
 
-jdk:
+#jdk:
 #  - openjdk8
 #  - openjdk9
-  - openjdk10
+#  - openjdk10
 #  - oraclejdk8
 #  - oraclejdk9
 
@@ -25,30 +25,30 @@ env:
 # addons:
 #   sauce_connect: true
 
-branches:
-  except:
-  - controller
-
 # In addition to the matrix created by jdk entries, we want a build on latest java for each DB.
 jobs:
-  includes:
+  include:
     - stage: db_tests
       env:
         - DB=mariadb
       addons:
-        - mariadb: '10.0'
+        mariadb: '10.0'
       jdk: openjdk10
 
-    - stage: db_tests
-      env:
-        - DB=postgresql
-      services:
-        - postgresql
-      jdk: openjdk10
+    # - stage: db_tests
+    #   env:
+    #     - DB=postgresql
+    #   services:
+    #     - postgresql
+    #   jdk: openjdk10
 
-    - stage: db_tests
-      env:
-        - DB=mysql
-      services:
-        - mysql
-      jdk: openjdk10
+    # - stage: db_tests
+    #   env:
+    #     - DB=mysql
+    #   services:
+    #     - mysql
+    #   jdk: openjdk10
+
+branches:
+  except:
+  - controller
