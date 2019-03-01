@@ -67,30 +67,51 @@ class ResourceFactory implements ObjectFactory
             throw ex;
         }
 
-        try
+        // Some providers use the CCL to load resources (especially when using ServiceProvider, as in tomcat-juli) so avoid
+        // mixing CLs by explicitly setting it when using the context from the engine or tests. (not needed from payloads as they
+        // already use a CL with ext as parent CL).
+        ClassLoader prev = Thread.currentThread().getContextClassLoader();
+        boolean changedCl = false;
+        if (prev != this.clResourceClasses && prev.getParent() != this.clResourceClasses)
         {
-            factory = (ObjectFactory) factoryClass.newInstance();
-        }
-        catch (Exception e)
-        {
-            NamingException ex = new NamingException("Could not create resource factory instance");
-            ex.initCause(e);
-            throw ex;
+            Thread.currentThread().setContextClassLoader(this.clResourceClasses);
+            changedCl = true;
         }
 
         Object result = null;
         try
         {
-            result = factory.getObjectInstance(obj, name, nameCtx, environment);
+            try
+            {
+                factory = (ObjectFactory) factoryClass.newInstance();
+            }
+            catch (Exception e)
+            {
+                NamingException ex = new NamingException("Could not create resource factory instance");
+                ex.initCause(e);
+                throw ex;
+            }
+
+            try
+            {
+                result = factory.getObjectInstance(obj, name, nameCtx, environment);
+            }
+            catch (Exception e)
+            {
+                NamingException ex = new NamingException(
+                        "Could not create object resource from resource factory. JNDI definition & parameters may be incorrect.");
+                ex.initCause(e);
+                throw ex;
+            }
         }
-        catch (Exception e)
+        finally
         {
-            NamingException ex = new NamingException(
-                    "Could not create object resource from resource factory. JNDI definition & parameters may be incorrect.");
-            ex.initCause(e);
-            throw ex;
+            if (changedCl)
+            {
+                Thread.currentThread().setContextClassLoader(prev);
+            }
         }
+
         return result;
     }
-
 }

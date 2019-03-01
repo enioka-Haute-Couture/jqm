@@ -17,29 +17,6 @@
 		<argLine>-Xms256m -Xmx1024m -XX:MaxPermSize=512m</argLine>
 	</properties>
 
-	<profiles>
-		<!-- The WS client is not really compatible with newer Java versions due 
-			to old Jersey. For now, skip WS tests. -->
-		<profile>
-			<id>noTests</id>
-			<activation>
-				<jdk>[1.9,20)</jdk>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<version>${surefire.version}</version>
-						<configuration>
-							<skipTests>true</skipTests>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
-
 	<dependencies>
 		<!-- The very goal of this artifact is to run tests with the other API 
 			implementation -->
@@ -103,12 +80,17 @@
 								<artifactItem>
 									<groupId>org.postgresql</groupId>
 									<artifactId>postgresql</artifactId>
-									<version>42.1.1.jre6</version>
+									<version>${postgresql.client.version}</version>
 								</artifactItem>
 								<artifactItem>
 									<groupId>mysql</groupId>
 									<artifactId>mysql-connector-java</artifactId>
-									<version>5.1.41</version>
+									<version>${mysql.client.version}</version>
+								</artifactItem>
+                                <artifactItem>
+									<groupId>org.mariadb.jdbc</groupId>
+									<artifactId>mariadb-java-client</artifactId>
+									<version>${mariadb.client.version}</version>
 								</artifactItem>
 								<artifactItem>
 									<groupId>com.h2database</groupId>

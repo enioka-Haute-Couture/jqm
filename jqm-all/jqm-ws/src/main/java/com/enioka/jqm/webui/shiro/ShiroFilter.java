@@ -19,27 +19,44 @@ import com.enioka.jqm.api.Helpers;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This filter extends the usual ShiroFilter by checking in the database if security should be enabled or not.
- * 
+ *
  */
 public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter
 {
+    private static Logger jqmlogger = LoggerFactory.getLogger(ShiroFilter.class);
+
     @Override
     public void init() throws Exception
     {
-        DbConn cnx = null;
+        String enableWsApiAuth = this.getContextInitParam("enableWsApiAuth");
         boolean load = true;
-        try
+
+        if (enableWsApiAuth != null)
         {
-            cnx = Helpers.getDbSession();
-            load = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableWsApiAuth", "true"));
+            // Self-hosted mode: parameter is given by the server
+            load = Boolean.parseBoolean(enableWsApiAuth);
         }
-        finally
+        else
         {
-            Helpers.closeQuietly(cnx);
+            // Hosted in a standard servlet container - fetch from db.
+            DbConn cnx = null;
+            try
+            {
+                cnx = Helpers.getDbSession();
+                load = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableWsApiAuth", "true"));
+            }
+            finally
+            {
+                Helpers.closeQuietly(cnx);
+            }
         }
 
+        jqmlogger.debug("Shiro filter enabled: " + load + " - " + enableWsApiAuth);
         setEnabled(load);
         super.init();
     }

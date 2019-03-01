@@ -218,6 +218,12 @@
             <groupId>org.glassfish.jersey.inject</groupId>
             <artifactId>jersey-hk2</artifactId>
             <version>${jersey-version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.inject</groupId>
+                    <artifactId>javax.inject</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Security -->
@@ -244,11 +250,13 @@
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-xml</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-admin</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

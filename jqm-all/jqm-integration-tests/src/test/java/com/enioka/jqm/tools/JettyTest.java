@@ -92,7 +92,7 @@ public class JettyTest extends JqmBaseTest
         }
 
         SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(trustStore, null).build();
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1" }, null,
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1.2" }, null,
                 new DefaultHostnameVerifier());
 
         CloseableHttpClient cl = HttpClients.custom().setSSLSocketFactory(sslsf).build();
@@ -113,7 +113,9 @@ public class JettyTest extends JqmBaseTest
     {
         Helpers.setSingleParam("enableWsApiSsl", "true", cnx);
         Helpers.setSingleParam("disableWsApi", "false", cnx);
-        Helpers.setSingleParam("enableWsApiAuth", "false", cnx);
+        Helpers.setSingleParam("enableWsApiAuth", "true", cnx);
+        Helpers.createUserIfMissing(cnx, "testuser", null, "test user", "client read only");
+        cnx.commit();
 
         addAndStartEngine();
 
@@ -151,15 +153,15 @@ public class JettyTest extends JqmBaseTest
 
         SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(trustStore, null)
                 .loadKeyMaterial(clientStore, "SuperPassword".toCharArray()).build();
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1" }, null,
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1.2" }, null,
                 new DefaultHostnameVerifier());
 
         CloseableHttpClient cl = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 
         int port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
         HttpUriRequest rq = new HttpGet("https://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + i);
-        CloseableHttpResponse rs = cl.execute(rq);
         jqmlogger.debug(rq.getURI().toString());
+        CloseableHttpResponse rs = cl.execute(rq);
         jqmlogger.debug(IOUtils.toString(rs.getEntity().getContent(), StandardCharsets.UTF_8));
         Assert.assertEquals(200, rs.getStatusLine().getStatusCode());
 
