@@ -190,6 +190,7 @@ public class QueueTest extends JqmBaseTest
         int i2 = JobRequest.create("jqm-test-wait", "test").addParameter("ms", "100").setPriority(null).submit();
 
         addAndStartEngine();
+        displayAllQueueTable();
 
         TestHelpers.waitFor(2, 60000, cnx);
 
@@ -200,6 +201,7 @@ public class QueueTest extends JqmBaseTest
         JobInstance ji1 = Query.create().setJobInstanceId(i1).run().get(0);
         JobInstance ji2 = Query.create().setJobInstanceId(i2).run().get(0);
 
+        displayAllHistoryTable();
         Assert.assertTrue(ji1.getBeganRunningDate().compareTo(ji2.getEndDate()) <= 0);
     }
 

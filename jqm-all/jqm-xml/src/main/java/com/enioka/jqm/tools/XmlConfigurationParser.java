@@ -63,7 +63,7 @@ class XmlConfigurationParser
 
     /**
      * Will import all configuration from an XML file. Creates and commits a transaction.
-     * 
+     *
      * @param path
      * @param cnx
      * @throws JqmEngineException
@@ -295,23 +295,21 @@ class XmlConfigurationParser
                             src.getId(), "CONTAINER", description, srcFactory, alias, singleton, null, type);
 
                     // Sync parameters too
+                    List<String> existingKeys = cnx.runSelectColumn("jndiprm_select_all_in_jndisrc", 2, String.class, src.getId());
                     for (Map.Entry<String, String> e : prms.entrySet())
                     {
-                        QueryResult qr2 = cnx.runUpdate("jndiprm_update_changed_by_id", e.getValue(), src.getId(), e.getKey(),
-                                e.getValue());
-                        if (qr2.nbUpdated == 0)
+                        if (existingKeys.contains(e.getKey()))
                         {
-                            // Two possibilities: exists but no update to do (OK!) or does not exist. Try to create it.
-                            try
-                            {
-                                cnx.runUpdate("jndiprm_insert", e.getKey(), e.getValue(), src.getId());
-                            }
-                            catch (DatabaseException e2)
-                            {
-                                // Nothing to do.
-                            }
+                            // Update
+                            cnx.runUpdate("jndiprm_update_changed_by_id", e.getValue(), src.getId(), e.getKey(), e.getValue());
+                        }
+                        else
+                        {
+                            // Insert
+                            cnx.runUpdate("jndiprm_insert", e.getKey(), e.getValue(), src.getId());
                         }
                     }
+
                     ResultSet rs = cnx.runSelect("jndiprm_select_all_in_jndisrc", src.getId());
                     while (rs.next())
                     {

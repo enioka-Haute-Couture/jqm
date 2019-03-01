@@ -254,4 +254,18 @@ public class JqmBaseTest
         }
         jqmlogger.debug("==========================================================================================");
     }
+
+    protected void displayAllQueueTable()
+    {
+        java.text.SimpleDateFormat format = new java.text.SimpleDateFormat("HH:mm:ss.SSS");
+        jqmlogger.debug("==========================================================================================");
+        for (JobInstance h : Query.create().setQueryHistoryInstances(false).setQueryLiveInstances(true).run())
+        {
+            jqmlogger.debug("JobInstance Id: " + h.getId() + " | " + h.getState() + " | JD: " + h.getApplicationName() + " | "
+                    + h.getQueueName() + " | enqueue: " + format.format(h.getEnqueueDate().getTime()) + " | exec: "
+                    + (h.getBeganRunningDate() != null ? format.format(h.getBeganRunningDate().getTime()) : null) + " | position: "
+                    + h.getPosition());
+        }
+        jqmlogger.debug("==========================================================================================");
+    }
 }
