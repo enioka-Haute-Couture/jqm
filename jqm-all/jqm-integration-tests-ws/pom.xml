@@ -38,6 +38,7 @@
 			<artifactId>jqm-api-client-jersey</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 		<!-- needed by war -->
 		<dependency>
 			<groupId>commons-logging</groupId>

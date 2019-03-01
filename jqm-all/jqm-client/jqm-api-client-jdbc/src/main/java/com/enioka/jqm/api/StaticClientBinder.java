@@ -33,7 +33,7 @@ class StaticClientBinder implements IClientFactoryBinder
     @Override
     public String getClientFactoryName()
     {
-        return "hibernate";
+        return "jdbc";
     }
 
 }
