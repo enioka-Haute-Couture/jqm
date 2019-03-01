@@ -35,19 +35,19 @@ jobs:
         mariadb: '10.0'
       jdk: openjdk10
 
-    # - stage: db_tests
-    #   env:
-    #     - DB=postgresql
-    #   services:
-    #     - postgresql
-    #   jdk: openjdk10
+    - stage: db_tests
+      env:
+        - DB=postgresql
+      services:
+        - postgresql
+      jdk: openjdk10
 
-    # - stage: db_tests
-    #   env:
-    #     - DB=mysql
-    #   services:
-    #     - mysql
-    #   jdk: openjdk10
+    - stage: db_tests
+      env:
+        - DB=mysql
+      services:
+        - mysql
+      jdk: openjdk10
 
 branches:
   except:
