@@ -245,20 +245,18 @@ public class MetaService
             }
 
             // Sync parameters too
+            List<String> existingKeys = cnx.runSelectColumn("jndiprm_select_all_in_jndisrc", 2, String.class, dto.getId());
             for (Map.Entry<String, String> e : dto.getParameters().entrySet())
             {
-                QueryResult qr2 = cnx.runUpdate("jndiprm_update_changed_by_id", e.getValue(), dto.getId(), e.getKey(), e.getValue());
-                if (qr2.nbUpdated == 0)
+                if (existingKeys.contains(e.getKey()))
                 {
-                    // Two possibilities: exists but no update to do (OK!) or does not exist. Try to create it.
-                    try
-                    {
-                        cnx.runUpdate("jndiprm_insert", e.getKey(), e.getValue(), dto.getId());
-                    }
-                    catch (DatabaseException e2)
-                    {
-                        // Nothing to do.
-                    }
+                    // Update
+                    cnx.runUpdate("jndiprm_update_changed_by_id", e.getValue(), dto.getId(), e.getKey(), e.getValue());
+                }
+                else
+                {
+                    // Insert
+                    cnx.runUpdate("jndiprm_insert", e.getKey(), e.getValue(), dto.getId());
                 }
             }
             ResultSet rs = cnx.runSelect("jndiprm_select_all_in_jndisrc", dto.getId());
