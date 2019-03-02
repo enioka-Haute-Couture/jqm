@@ -4,14 +4,15 @@ language: java
 # travis has retired container-based builds and is now fully VM-based, so no more sudo=false.
 
 before_install:
-  - cd jqm-all
-  - export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"
   - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then mysql -e "create database jqm; grant all privileges on jqm.* to jqm@'%' identified by 'jqm'; flush privileges;"; fi
   - if [[ "$DB" == "postgresql" ]]; then psql -c "create database jqm;" -U postgres; fi
   - if [[ "$DB" == "postgresql" ]]; then psql -c "create user jqm with password 'jqm'; grant all privileges on database jqm to jqm;" -U postgres; fi
   - if [[ "$DB" == "db2" || "$DB" == "oracle" ]]; then echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin; fi
   - if [[ "$DB" == "db2" ]]; then docker run --rm --name db2 --detach -v db2_data_volume:/share -p 50000:50000 -e "LICENSE=accept" -e "DB2INST1_PASSWORD=superpassword" ibmcom/db2express-c db2start; while true; do docker logs db2 2>&1 | grep "DB2START processing was successful." >/dev/null 2>&1; if [[ $? -eq 0 ]]; then break; fi; sleep 1; done; docker exec -it db2 /bin/bash -c 'useradd -G db2inst1 jqm; echo "jqm:jqm" | chpasswd' ; docker exec --user db2inst1 -it db2 /bin/bash -c 'printf "create database jqm\n connect to jqm\n create schema jqm AUTHORIZATION jqm\n " | ~/sqllib/bin/db2 -' ; fi
 #  - if [[ "$DB" == "db2" ]]; then docker run --rm --name db2 --detach -v db2_data_volume:/database -v db2_hadr_volume:/hadr -p 50000:50000 -e "LICENSE=accept" -e "BLU=false" -e "UPDATEAVAIL=false" -e "ENABLE_ORACLE_COMPATIBILITY=false" -e "DB2INSTANCE=db2inst1" -e "DB2INST1_PASSWORD=jqm" -e "DBNAME=jqm" -e "HADR_ENABLED=false" store/ibmcorp/db2_developer_c:11.1.2.2b-x86_64; while true; do docker logs db2 2>&1 | grep "Setup has completed." >/dev/null 2>&1; if [[ $? -eq 0 ]]; then break; fi; sleep 1; done ; fi
+  - if [[ "$DB" == "oracle" ]]; then mkdir -p $HOME/.m2 ; cp .travis.settings.xml $HOME/.m2/settings.xml; docker run --detach --rm -p 1521:1521 --name oracle -e "DB_SID=JQM" store/oracle/database-enterprise:12.2.0.1-slim; while true; do  docker ps | grep oracle | grep "(healthy)" 2>&1 >/dev/null; if [[ $? -eq 0 ]]; then break; fi; sleep 1; done; docker exec -it oracle /bin/bash -c ". /home/oracle/.bashrc ; printf 'alter session set \"_ORACLE_SCRIPT\"=true; \n CREATE USER JQM IDENTIFIED BY jqm DEFAULT TABLESPACE SYSAUX QUOTA UNLIMITED ON SYSAUX ACCOUNT UNLOCK;\n GRANT CONNECT, RESOURCE TO JQM;\n' | sqlplus / as sysdba" ; fi;
+  - cd jqm-all
+  - export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"
 
 #jdk:
 #  - openjdk8
@@ -65,6 +66,15 @@ jobs:
     - stage: db_tests_private
       env:
         - DB=db2
+      services:
+        - docker
+      jdk: openjdk10
+
+    - stage: db_tests_private
+      env:
+        - DB=oracle
+        - secure: e7UrcA3NOA4mriLZK2BsVIY+6Qxspgpdb8cBAMSrPFjUPUd03oHOeFGHDs1E9DIAanLYtWAcI6bzwMDA0PkmBzDlvQ6Lm1ifw9/IMyaOS8U6i5jbzZE6bW9iFdmmb30o2gwwWPBDfsyNFB8cU3ZExG7kW6UMEwmeh/Ky8YcFjgs=
+        - secure: acx6z+K5zMMGKZ/SuDjSjAjbf2Oks6xUeDukNdyncWH+0tgO7N5lQIM+7Gh81e7N2JIoWWVCwcpYO4GNbo2mgSxQp8MFzgcRQ3qCMNhmgmIV2DZD3VNzToVV8nemForLZuhBTcDGkLZh+2/EIJUBbULkicAuTZDsKlpf4PBowOU=
       services:
         - docker
       jdk: openjdk10

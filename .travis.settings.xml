@@ -1,0 +1,27 @@
+<Settings Xmlns="Http://Maven.Apache.Org/SETTINGS/1.0.0" Xmlns:Xsi="Http://Www.W3.Org/2001/XMLSchema-Instance" Xsi:SchemaLocation="Http://Maven.Apache.Org/SETTINGS/1.0.0
+                      Http://Maven.Apache.Org/Xsd/Settings-1.0.0.Xsd">
+    <Servers>
+        <server>
+            <id>maven.oracle.com</id>
+            <username>${env.ORACLE_MVN_REPO_USERNAME}</username>
+            <password>${env.ORACLE_MVN_REPO_PASSWORD}</password>
+            <configuration>
+                <basicAuthScope>
+                    <host>ANY</host>
+                    <port>ANY</port>
+                    <realm>OAM 11g</realm>
+                </basicAuthScope>
+                <httpConfiguration>
+                    <all>
+                        <params>
+                            <property>
+                                <name>http.protocol.allow-circular-redirects</name>
+                                <value>%b,true</value>
+                            </property>
+                        </params>
+                    </all>
+                </httpConfiguration>
+            </configuration>
+        </server>
+    </Servers>
+</Settings>
