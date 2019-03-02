@@ -93,6 +93,11 @@
 									<artifactId>mariadb-java-client</artifactId>
 									<version>${mariadb.client.version}</version>
 								</artifactItem>
+                                <dependency>
+                                    <groupId>com.ibm.db2</groupId>
+                                    <artifactId>jcc</artifactId>
+                                    <version>${db2.client.version}</version>
+                                </dependency>
 								<artifactItem>
 									<groupId>com.h2database</groupId>
 									<artifactId>h2</artifactId>
