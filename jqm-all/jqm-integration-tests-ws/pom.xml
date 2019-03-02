@@ -176,7 +176,8 @@
             <id>oracle</id>
             <activation>
                 <property>
-                    <name>env.ORACLE_MVN_REPO_PASSWORD</name>
+                    <name>env.DB</name>
+                    <value>oracle</value>
                 </property>
             </activation>
             <repositories>
