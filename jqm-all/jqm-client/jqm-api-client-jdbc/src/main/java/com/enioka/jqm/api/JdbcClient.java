@@ -1367,7 +1367,7 @@ final class JdbcClient implements JqmClient
             ResultSet rs = cnx.runRawSelect(q, paginatedParameters.toArray());
             while (rs.next())
             {
-                com.enioka.jqm.api.JobInstance tmp = getJob(rs);
+                com.enioka.jqm.api.JobInstance tmp = getJob(rs, cnx);
                 res.put(tmp.getId(), tmp);
             }
             rs.close();
@@ -1436,7 +1436,7 @@ final class JdbcClient implements JqmClient
         }
     }
 
-    private com.enioka.jqm.api.JobInstance getJob(ResultSet rs) throws SQLException
+    private com.enioka.jqm.api.JobInstance getJob(ResultSet rs, DbConn cnx) throws SQLException
     {
         com.enioka.jqm.api.JobInstance res = new com.enioka.jqm.api.JobInstance();
 
@@ -1444,9 +1444,9 @@ final class JdbcClient implements JqmClient
         // res.setApplication(rs.getString(2));
         res.setApplicationName(rs.getString(3));
         res.setEmail(rs.getString(5));
-        res.setEndDate(getCal(rs, 6));
-        res.setEnqueueDate(getCal(rs, 7));
-        res.setBeganRunningDate(getCal(rs, 8));
+        res.setEndDate(cnx.getCal(rs, 6));
+        res.setEnqueueDate(cnx.getCal(rs, 7));
+        res.setBeganRunningDate(cnx.getCal(rs, 8));
         res.setHighlander(rs.getBoolean(9));
         res.setApplication(rs.getString(10));
         res.setKeyword1(rs.getString(11));
@@ -1473,20 +1473,9 @@ final class JdbcClient implements JqmClient
         res.setFromSchedule(rs.getBoolean(31));
         res.setPriority(rs.getInt(32) > 0 ? rs.getInt(32) : null);
 
-        res.setRunAfter(getCal(rs, 33));
+        res.setRunAfter(cnx.getCal(rs, 33));
 
         return res;
-    }
-
-    private Calendar getCal(ResultSet rs, int colIdx) throws SQLException
-    {
-        Calendar c = null;
-        if (rs.getTimestamp(colIdx) != null)
-        {
-            c = Calendar.getInstance();
-            c.setTimeInMillis(rs.getTimestamp(colIdx).getTime());
-        }
-        return c;
     }
 
     @Override
