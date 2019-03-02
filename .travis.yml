@@ -9,6 +9,9 @@ before_install:
   - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then mysql -e "create database jqm; grant all privileges on jqm.* to jqm@'%' identified by 'jqm'; flush privileges;"; fi
   - if [[ "$DB" == "postgresql" ]]; then psql -c "create database jqm;" -U postgres; fi
   - if [[ "$DB" == "postgresql" ]]; then psql -c "create user jqm with password 'jqm'; grant all privileges on database jqm to jqm;" -U postgres; fi
+  - if [[ "$DB" == "db2" || "$DB" == "oracle" ]]; then docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}; fi
+  - if [[ "$DB" == "db2" ]]; then docker run --rm --name db2 --detach -v db2_data_volume:/share -p 50000:50000 -e "LICENSE=accept" -e "DB2INST1_PASSWORD=superpassword" ibmcom/db2express-c db2start; while true; do docker logs db2 2>&1 | grep "DB2START processing was successful." >/dev/null 2>&1; if [[ $? -eq 0 ]]; then break; fi; sleep 1; done; docker exec -it db2 /bin/bash -c 'useradd -G db2inst1 jqm; echo "jqm:jqm" | chpasswd' ; docker exec --user db2inst1 -it db2 /bin/bash -c 'printf "create database jqm\n connect to jqm\n create schema jqm AUTHORIZATION jqm\n " | ~/sqllib/bin/db2 -' ; fi
+#  - if [[ "$DB" == "db2" ]]; then docker run --rm --name db2 --detach -v db2_data_volume:/database -v db2_hadr_volume:/hadr -p 50000:50000 -e "LICENSE=accept" -e "BLU=false" -e "UPDATEAVAIL=false" -e "ENABLE_ORACLE_COMPATIBILITY=false" -e "DB2INSTANCE=db2inst1" -e "DB2INST1_PASSWORD=jqm" -e "DBNAME=jqm" -e "HADR_ENABLED=false" store/ibmcorp/db2_developer_c:11.1.2.2b-x86_64; while true; do docker logs db2 2>&1 | grep "Setup has completed." >/dev/null 2>&1; if [[ $? -eq 0 ]]; then break; fi; sleep 1; done ; fi
 
 #jdk:
 #  - openjdk8
@@ -21,12 +24,21 @@ env:
   global:
     - secure: ZI6QQDf1rjLK+ZiYh8SPuVlvTJ3nq/JgbFJsFz4pqpEVr30UjcBpICdwauktgPa7dakIfaCbZzBB5SwAayg9CLQ5eOcoiEjUVOVlLvMiUesKIY6B50QE9E/r/MDJddDlLlVbwBnMdovYh9+Cwu7ny7tbS6ueU9D7pKX+FfCkEns=
     - secure: dbcqjCXTsiNqPW0sSqA1DfYgzRAD6MK+lkCmBocTl0InimKFlM211j4rDt80talVl7HGPkS910S/twV2VfTUexYy5oZcqVvzfRST6ShLwnBmVz2rm78r/W+te3KmGY8w+RucLSM+M0DCfN74JnY7EI0dLCd1IberLkzCecxXOxw=
+    - secure: "JuqRdiJiVMnKDx/DlmisSxHSed1QFyR+bJE0V1YEu9E1KQuNmB8MolmsmIiyH+M+K2BERV5aHZaxAbPR8gXKP4DcOcb/DBd4H5hoTR4eDV7gUWimbNzxhXmyIXtDmFzAZoGFDTxV5mn8Y2m/M68A/664Rs/5LBXlEg6o1aK6fJ0="
+    - secure: "L6/dE2RhXKI7dIKSRot9NPlVmN4USyFp5tJJHlOLl4JfsbA2iOW/tRZO8QZQKkFT/9YsV21P7K/7P2ZIg76Y8sfM4Ej9RVEguAfs+sDNg7YMc6JfG9TB0d/1jkt3uHy4VDVVAHO+gZay+ngNlVPQ/GaHMfJ0I6GcdfZvPiE4Rzk="
     - DB=hsqldb
 
 # addons:
 #   sauce_connect: true
 
 # In addition to the matrix created by jdk entries, we want a build on latest java for each DB.
+stages:
+  - name: test
+  - name: db_tests
+  - name: db_tests_private
+    # pull requests do not have access to the secrets needed for these builds. (private Oracle and IBM repos)
+    if: type != pull_request
+
 jobs:
   include:
     - stage: db_tests
@@ -48,6 +60,13 @@ jobs:
         - DB=mysql
       services:
         - mysql
+      jdk: openjdk10
+
+    - stage: db_tests_private
+      env:
+        - DB=db2
+      services:
+        - docker
       jdk: openjdk10
 
 branches:

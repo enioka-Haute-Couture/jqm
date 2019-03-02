@@ -88,6 +88,7 @@
         <mysql.client.version>8.0.15</mysql.client.version>
         <mariadb.client.version>2.4.0</mariadb.client.version>
         <postgresql.client.version>42.2.5</postgresql.client.version>
+        <db2.client.version>11.1.4.4</db2.client.version>
         <shrinkwrap.resolver.version>3.1.3</shrinkwrap.resolver.version>
 
         <sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
