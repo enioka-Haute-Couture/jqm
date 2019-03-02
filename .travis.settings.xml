@@ -1,6 +1,5 @@
-<Settings Xmlns="Http://Maven.Apache.Org/SETTINGS/1.0.0" Xmlns:Xsi="Http://Www.W3.Org/2001/XMLSchema-Instance" Xsi:SchemaLocation="Http://Maven.Apache.Org/SETTINGS/1.0.0
-                      Http://Maven.Apache.Org/Xsd/Settings-1.0.0.Xsd">
-    <Servers>
+<settings>
+    <servers>
         <server>
             <id>maven.oracle.com</id>
             <username>${env.ORACLE_MVN_REPO_USERNAME}</username>
@@ -23,5 +22,5 @@
                 </httpConfiguration>
             </configuration>
         </server>
-    </Servers>
-</Settings>
+    </servers>
+</settings>
