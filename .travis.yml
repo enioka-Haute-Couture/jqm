@@ -5,9 +5,9 @@ language: java
 
 before_install:
   - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then mysql -e "create database jqm; grant all privileges on jqm.* to jqm@'%' identified by 'jqm'; flush privileges;"; fi
-  - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('new_password') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"; fi
-  - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; sudo mysql_upgrade -u root -pnew_password; fi
-  - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; sudo service mysql restart; fi
+  - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('new_password') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"; fi
+  - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then sudo mysql_upgrade -u root -pnew_password; fi
+  - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then sudo service mysql restart; fi
   - if [[ "$DB" == "postgresql" ]]; then psql -c "create database jqm;" -U postgres; fi
   - if [[ "$DB" == "postgresql" ]]; then psql -c "create user jqm with password 'jqm'; grant all privileges on database jqm to jqm;" -U postgres; fi
   - if [[ "$DB" == "db2" || "$DB" == "oracle" ]]; then echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin; fi
@@ -36,8 +36,8 @@ env:
     # Oracle
     - secure: e7UrcA3NOA4mriLZK2BsVIY+6Qxspgpdb8cBAMSrPFjUPUd03oHOeFGHDs1E9DIAanLYtWAcI6bzwMDA0PkmBzDlvQ6Lm1ifw9/IMyaOS8U6i5jbzZE6bW9iFdmmb30o2gwwWPBDfsyNFB8cU3ZExG7kW6UMEwmeh/Ky8YcFjgs=
     - secure: acx6z+K5zMMGKZ/SuDjSjAjbf2Oks6xUeDukNdyncWH+0tgO7N5lQIM+7Gh81e7N2JIoWWVCwcpYO4GNbo2mgSxQp8MFzgcRQ3qCMNhmgmIV2DZD3VNzToVV8nemForLZuhBTcDGkLZh+2/EIJUBbULkicAuTZDsKlpf4PBowOU=
-    # Default for logs
-    - DB=hsqldb
+  # Default for logs
+  - DB=hsqldb
 
 # addons:
 #   sauce_connect: true
