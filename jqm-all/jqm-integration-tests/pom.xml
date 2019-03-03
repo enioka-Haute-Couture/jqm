@@ -13,7 +13,7 @@
 	<description>Test suite for the JQM engine + service</description>
 
 	<properties>
-		<argLine>-Xms256m -Xmx1024m -XX:MaxPermSize=512m</argLine>
+		<argLine>-Xms256m -Xmx1024m -XX:MaxMetaspaceSize=512m</argLine>
 	</properties>
 
 	<build>
