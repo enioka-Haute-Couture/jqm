@@ -36,8 +36,9 @@ env:
     # Oracle
     - secure: e7UrcA3NOA4mriLZK2BsVIY+6Qxspgpdb8cBAMSrPFjUPUd03oHOeFGHDs1E9DIAanLYtWAcI6bzwMDA0PkmBzDlvQ6Lm1ifw9/IMyaOS8U6i5jbzZE6bW9iFdmmb30o2gwwWPBDfsyNFB8cU3ZExG7kW6UMEwmeh/Ky8YcFjgs=
     - secure: acx6z+K5zMMGKZ/SuDjSjAjbf2Oks6xUeDukNdyncWH+0tgO7N5lQIM+7Gh81e7N2JIoWWVCwcpYO4GNbo2mgSxQp8MFzgcRQ3qCMNhmgmIV2DZD3VNzToVV8nemForLZuhBTcDGkLZh+2/EIJUBbULkicAuTZDsKlpf4PBowOU=
-  # Default for logs
-  - DB=hsqldb
+  matrix:
+    # Default for logs
+    - DB=hsqldb
 
 # addons:
 #   sauce_connect: true
