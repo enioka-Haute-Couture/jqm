@@ -445,7 +445,7 @@ public class Db
             tmp = _ds.getConnection();
             meta = tmp.getMetaData();
             product = meta.getDatabaseProductName().toLowerCase();
-            jqmlogger.warn("Database reports it is " + meta.getDatabaseProductName() + " " + meta.getDatabaseMajorVersion() + "."
+            jqmlogger.info("Database reports it is " + meta.getDatabaseProductName() + " " + meta.getDatabaseMajorVersion() + "."
                     + meta.getDatabaseMinorVersion());
         }
         catch (SQLException e)

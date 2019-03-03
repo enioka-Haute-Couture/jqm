@@ -1,11 +1,12 @@
 package com.enioka.jqm.jdbc;
 
+import java.io.Console;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -15,6 +16,8 @@ import com.enioka.jqm.model.Queue;
 
 public class DbImplMySql extends DbAdapter
 {
+    private String sequenceSql, sequenceSqlRetrieval;
+
     @Override
     public void prepare(Properties p, Connection cnx)
     {
@@ -22,6 +25,9 @@ public class DbImplMySql extends DbAdapter
 
         // We do NOT want to use paginateQuery on each poll query as we want polling to be as painless as possible, so we pre-paginate it.
         queries.put("ji_select_poll", queries.get("ji_select_poll") + " LIMIT ?");
+
+        sequenceSqlRetrieval = adaptSql("SELECT next FROM __T__JQM_SEQUENCE WHERE name = ?");
+        sequenceSql = adaptSql("UPDATE __T__JQM_SEQUENCE SET next = next + 1 WHERE name = ?");
     }
 
     @Override
@@ -60,8 +66,6 @@ public class DbImplMySql extends DbAdapter
     @Override
     public void beforeUpdate(Connection cnx, QueryPreparation q)
     {
-        List<Object> params = q.parameters;
-
         // There is no way to do parameterized IN(?) queries with MySQL so we must rewrite these queries as IN(?, ?, ?...)
         // This cannot be done at startup, as the ? count may be different for each call.
         if (q.sqlText.contains("IN(?)"))
@@ -119,26 +123,32 @@ public class DbImplMySql extends DbAdapter
         {
             return;
         }
-        CallableStatement s = null;
+        PreparedStatement s = null;
+        PreparedStatement s2 = null;
         try
         {
-            s = cnx.prepareCall("{? = CALL NEXTVAL(?)}");
+            s = cnx.prepareStatement(sequenceSql);
+            s.setString(1, "MAIN");
+            s.executeUpdate();
 
-            s.registerOutParameter(1, Types.INTEGER);
-            s.setString(2, "MAIN");
-            s.execute();
-            int res = s.getInt(1);
-            params.add(0, res);
-            s.close();
-            q.preGeneratedKey = res;
+            s2 = cnx.prepareStatement(sequenceSqlRetrieval);
+            s2.setString(1, "MAIN");
+            ResultSet rs = s2.executeQuery();
+            if (!rs.next())
+            {
+                throw new NoResultException("The query returned zero rows when one was expected.");
+            }
+            q.preGeneratedKey = rs.getInt(1);
+            q.parameters.add(0, q.preGeneratedKey);
         }
         catch (SQLException e)
         {
-            throw new DatabaseException(q.sqlText, e);
+            throw new DatabaseException(q.sqlText + " - " + sequenceSql + " - while fetching new ID from table sequence", e);
         }
         finally
         {
             DbHelper.closeQuietly(s);
+            DbHelper.closeQuietly(s2);
         }
     }
 
