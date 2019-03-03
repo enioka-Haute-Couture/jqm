@@ -1,6 +1,7 @@
 package com.enioka.jqm.jdbc;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,11 +13,10 @@ import com.enioka.jqm.model.Queue;
 
 public class DbImplOracle extends DbAdapter
 {
-
     @Override
-    public boolean compatibleWith(String product)
+    public boolean compatibleWith(DatabaseMetaData product) throws SQLException
     {
-        return product.contains("oracle");
+        return product.getDatabaseProductName().toLowerCase().contains("oracle");
     }
 
     @Override

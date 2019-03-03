@@ -146,10 +146,17 @@ class JettyServer
             // Ciphers
             scf.setExcludeCipherSuites("SSL_RSA_WITH_DES_CBC_SHA", "SSL_DHE_RSA_WITH_DES_CBC_SHA", "SSL_DHE_DSS_WITH_DES_CBC_SHA",
                     "SSL_RSA_EXPORT_WITH_RC4_40_MD5", "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA", "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
-                    "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA");
+                    "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA", "SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA", "TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA",
+                    "SSL_RSA_WITH_3DES_EDE_CBC_SHA", "TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA", "TLS_RSA_WITH_AES_128_GCM_SHA256",
+                    "TLS_RSA_WITH_AES_128_CBC_SHA256", "SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA", "TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA",
+                    "TLS_ECDH_RSA_WITH_AES_128_CBC_SHA", "TLS_RSA_WITH_AES_128_CBC_SHA", "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
+                    "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA", "TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA", "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
+                    "TLS_DHE_DSS_WITH_AES_128_CBC_SHA", "TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA");
 
             // We allow client certificate authentication.
             scf.setWantClientAuth(true);
+            scf.setEndpointIdentificationAlgorithm(null); // Means no hostname check, as client certificates do not sign a hostname but an
+                                                          // identity.
 
             // Servlet TLS attributes
             httpConfig = new HttpConfiguration(httpConfig);
@@ -182,7 +189,7 @@ class JettyServer
         server.setHandler(handlers);
 
         // Load the webapp context
-        loadWar();
+        loadWar(cnx);
 
         // Start the server
         jqmlogger.trace("Starting Jetty (port " + node.getPort() + ")");
@@ -253,7 +260,7 @@ class JettyServer
         }
     }
 
-    private void loadWar()
+    private void loadWar(DbConn cnx)
     {
         File war = new File("./webapp/jqm-ws.war");
         if (!war.exists() || !war.isFile())
@@ -267,24 +274,17 @@ class JettyServer
         webAppContext.setDisplayName("JqmWebServices");
 
         // Hide server classes from the web app
-        final int nbEx = 5;
-        String[] defExcl = webAppContext.getDefaultServerClasses();
-        String[] exclusions = new String[defExcl.length + nbEx];
-        for (int i = nbEx; i <= defExcl.length; i++)
-        {
-            exclusions[i] = defExcl[i - nbEx];
-        }
-        exclusions[0] = "com.enioka.jqm.tools.";
-        exclusions[1] = "com.enioka.jqm.api.";
-        // exclusions[2] = "org.slf4j.";
-        // exclusions[3] = "org.apache.log4j.";
-        exclusions[4] = "org.glassfish."; // Jersey
-        webAppContext.setServerClasses(exclusions);
+        webAppContext.getServerClasspathPattern().add("com.enioka.jqm.api."); // engine and webapp can have different API implementations
+                                                                              // (during tests mostly)
+        webAppContext.getServerClasspathPattern().add("com.enioka.jqm.tools.");
+        webAppContext.getServerClasspathPattern().add("-com.enioka.jqm.tools.JqmXmlException"); // inside XML bundle, not engine.
+        webAppContext.getServerClasspathPattern().add("-com.enioka.jqm.tools.XmlJobDefExporter");
 
         // JQM configuration should be on the class path
         webAppContext.setExtraClasspath("conf/jqm.properties");
         webAppContext.setInitParameter("jqmnode", node.getName());
         webAppContext.setInitParameter("jqmnodeid", node.getId().toString());
+        webAppContext.setInitParameter("enableWsApiAuth", GlobalParameter.getParameter(cnx, "enableWsApiAuth", "true"));
 
         // Set configurations (order is important: need to unpack war before reading web.xml)
         webAppContext.setConfigurations(new Configuration[] { new WebInfConfiguration(), new WebXmlConfiguration(),

@@ -1,5 +1,6 @@
 package com.enioka.jqm.jdbc;
 
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
@@ -15,16 +16,16 @@ public class DbImplPg extends DbAdapter
     public String adaptSql(String sql)
     {
         return sql.replace("MEMORY TABLE", "TABLE").replace("JQM_PK.nextval", "nextval('JQM_PK')").replace(" DOUBLE", " DOUBLE PRECISION")
-                .replace("UNIX_MILLIS()", "extract('epoch' from current_timestamp)*1000").replace("IN(UNNEST(?))", "=ANY(?)")
-                .replace("CURRENT_TIMESTAMP - 1 MINUTE", "NOW() - INTERVAL '1 MINUTES'")
+                .replace(" REAL", " DOUBLE PRECISION").replace("UNIX_MILLIS()", "extract('epoch' from current_timestamp)*1000")
+                .replace("IN(UNNEST(?))", "=ANY(?)").replace("CURRENT_TIMESTAMP - 1 MINUTE", "NOW() - INTERVAL '1 MINUTES'")
                 .replace("CURRENT_TIMESTAMP - ? SECOND", "(NOW() - (? || ' SECONDS')::interval)").replace("FROM (VALUES(0))", "")
                 .replace("__T__", this.tablePrefix);
     }
 
     @Override
-    public boolean compatibleWith(String product)
+    public boolean compatibleWith(DatabaseMetaData product) throws SQLException
     {
-        return product.contains("postgresql");
+        return product.getDatabaseProductName().toLowerCase().contains("postgresql");
     }
 
     @Override

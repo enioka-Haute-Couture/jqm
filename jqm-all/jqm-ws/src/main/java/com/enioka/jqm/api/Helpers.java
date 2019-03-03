@@ -16,17 +16,24 @@
 package com.enioka.jqm.api;
 
 import java.io.Closeable;
+import java.util.Properties;
 
+import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 
 public final class Helpers
 {
+    private static Db db = null;
+
     static
     {
-        // Properties p = new Properties();
-        // p.put("javax.persistence.nonJtaDataSource", "jdbc/jqm");
-        // p.put("hibernate.show_sql", "true");
-        // JqmClientFactory.setProperties(p);
+        // Load optional properties file
+        Properties p = Db.loadProperties();
+
+        // Connect to DB.
+        db = new Db(p);
+        p.put("com.enioka.jqm.jdbc.contextobject", db); // Share the DataSource in engine and client.
+        JqmClientFactory.setProperties(p);
     }
 
     private Helpers()
@@ -36,7 +43,7 @@ public final class Helpers
 
     public static DbConn getDbSession()
     {
-        return ((JdbcClient) JqmClientFactory.getClient()).getDbSession();
+        return db.getConn();
     }
 
     public static void closeQuietly(Closeable closeable)

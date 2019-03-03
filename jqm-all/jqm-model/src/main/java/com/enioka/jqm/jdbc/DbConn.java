@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 public class DbConn implements Closeable
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(DbConn.class);
+    private static Calendar utcZone = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
     private Db parent;
     Connection _cnx;
@@ -541,7 +543,7 @@ public class DbConn implements Closeable
             else if (Boolean.class == value.getClass())
                 s.setBoolean(position, (Boolean) value);
             else if (value instanceof Calendar)
-                s.setTimestamp(position, new Timestamp(((Calendar) value).getTimeInMillis()));
+                s.setTimestamp(position, new Timestamp(((Calendar) value).getTimeInMillis()), utcZone);
             else if (value instanceof List<?>)
             {
                 Array a;
@@ -587,7 +589,7 @@ public class DbConn implements Closeable
         if (rs.getTimestamp(colIdx) != null)
         {
             c = Calendar.getInstance();
-            c.setTimeInMillis(rs.getTimestamp(colIdx).getTime());
+            c.setTimeInMillis(rs.getTimestamp(colIdx, utcZone).getTime());
         }
         return c;
     }

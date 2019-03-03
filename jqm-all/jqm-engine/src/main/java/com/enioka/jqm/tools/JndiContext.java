@@ -53,7 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class implements a basic JNDI context
+ * This class implements a basic JNDI context, using a class loader seeing only JQM_ROOT/ext.
  *
  */
 class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory, NameParser

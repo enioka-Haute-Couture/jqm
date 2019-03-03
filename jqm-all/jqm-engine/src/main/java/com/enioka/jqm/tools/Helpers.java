@@ -115,7 +115,10 @@ final class Helpers
     {
         try
         {
+            // Load optional properties file
             Properties p = Db.loadProperties();
+
+            // Connect to DB.
             Db n = new Db(p);
             p.put("com.enioka.jqm.jdbc.contextobject", n); // Share the DataSource in engine and client.
             JqmClientFactory.setProperties(p);
@@ -445,9 +448,14 @@ final class Helpers
         }
         catch (NoResultException e)
         {
-            ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
-            String hash = new Sha512Hash(password, salt, 100000).toHex();
-            String saltS = salt.toHex();
+            String saltS = null;
+            String hash = null;
+            if (null != password && !"".equals(password))
+            {
+                ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
+                hash = new Sha512Hash(password, salt, 100000).toHex();
+                saltS = salt.toHex();
+            }
 
             RUser.create(cnx, login, hash, saltS, roles);
         }

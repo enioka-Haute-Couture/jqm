@@ -1,20 +1,114 @@
+os: linux
+dist: xenial
 language: java
-sudo: false
+# travis has retired container-based builds and is now fully VM-based, so no more sudo=false.
+
 before_install:
+  - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then mysql -e "create database jqm; grant all privileges on jqm.* to jqm@'%' identified by 'jqm'; flush privileges;"; fi
+  - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('new_password') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"; fi
+  - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then sudo mysql_upgrade -u root -pnew_password; fi
+  - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then sudo service mysql restart; fi
+  - if [[ "$DB" == "postgresql" ]]; then psql -c "create database jqm;" -U postgres; fi
+  - if [[ "$DB" == "postgresql" ]]; then psql -c "create user jqm with password 'jqm'; grant all privileges on database jqm to jqm;" -U postgres; fi
+  - if [[ "$DB" == "db2" || "$DB" == "oracle" ]]; then echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin; fi
+  - if [[ "$DB" == "db2" ]]; then docker run --rm --name db2 --detach -v db2_data_volume:/share -p 50000:50000 -e "LICENSE=accept" -e "DB2INST1_PASSWORD=superpassword" ibmcom/db2express-c db2start; while true; do docker logs db2 2>&1 | grep "DB2START processing was successful." >/dev/null 2>&1; if [[ $? -eq 0 ]]; then break; fi; sleep 1; done; docker exec -it db2 /bin/bash -c 'useradd -G db2inst1 jqm; echo "jqm:jqm" | chpasswd' ; docker exec --user db2inst1 -it db2 /bin/bash -c 'printf "create database jqm\n connect to jqm\n create schema jqm AUTHORIZATION jqm\n " | ~/sqllib/bin/db2 -' ; fi
+#  - if [[ "$DB" == "db2" ]]; then docker run --rm --name db2 --detach -v db2_data_volume:/database -v db2_hadr_volume:/hadr -p 50000:50000 -e "LICENSE=accept" -e "BLU=false" -e "UPDATEAVAIL=false" -e "ENABLE_ORACLE_COMPATIBILITY=false" -e "DB2INSTANCE=db2inst1" -e "DB2INST1_PASSWORD=jqm" -e "DBNAME=jqm" -e "HADR_ENABLED=false" store/ibmcorp/db2_developer_c:11.1.2.2b-x86_64; while true; do docker logs db2 2>&1 | grep "Setup has completed." >/dev/null 2>&1; if [[ $? -eq 0 ]]; then break; fi; sleep 1; done ; fi
+  - if [[ "$DB" == "oracle" ]]; then mkdir -p $HOME/.m2 ; cp .travis.settings.xml $HOME/.m2/settings.xml; docker run --detach --rm -p 1521:1521 --name oracle -e "DB_SID=JQM" store/oracle/database-enterprise:12.2.0.1-slim; while true; do  docker ps | grep oracle | grep "(healthy)" 2>&1 >/dev/null; if [[ $? -eq 0 ]]; then break; fi; sleep 1; done; docker exec -it oracle /bin/bash -c ". /home/oracle/.bashrc ; printf 'alter session set \"_ORACLE_SCRIPT\"=true; \n CREATE USER JQM IDENTIFIED BY jqm DEFAULT TABLESPACE SYSAUX QUOTA UNLIMITED ON SYSAUX ACCOUNT UNLOCK;\n GRANT CONNECT, RESOURCE TO JQM;\n' | sqlplus / as sysdba" ; fi;
   - cd jqm-all
-  - export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"
+  - export MAVEN_OPTS="-Xmx512m -XX:MaxMetaspaceSize=256m"
+
 jdk:
   - openjdk8
   - openjdk9
   - openjdk10
-  - oraclejdk8
-  - oraclejdk9
+  #- openjdk11
+  #- oraclejdk8
+  #- oraclejdk9
+
 env:
   global:
-  - secure: ZI6QQDf1rjLK+ZiYh8SPuVlvTJ3nq/JgbFJsFz4pqpEVr30UjcBpICdwauktgPa7dakIfaCbZzBB5SwAayg9CLQ5eOcoiEjUVOVlLvMiUesKIY6B50QE9E/r/MDJddDlLlVbwBnMdovYh9+Cwu7ny7tbS6ueU9D7pKX+FfCkEns=
-  - secure: dbcqjCXTsiNqPW0sSqA1DfYgzRAD6MK+lkCmBocTl0InimKFlM211j4rDt80talVl7HGPkS910S/twV2VfTUexYy5oZcqVvzfRST6ShLwnBmVz2rm78r/W+te3KmGY8w+RucLSM+M0DCfN74JnY7EI0dLCd1IberLkzCecxXOxw=
+    # Selenium
+    - secure: ZI6QQDf1rjLK+ZiYh8SPuVlvTJ3nq/JgbFJsFz4pqpEVr30UjcBpICdwauktgPa7dakIfaCbZzBB5SwAayg9CLQ5eOcoiEjUVOVlLvMiUesKIY6B50QE9E/r/MDJddDlLlVbwBnMdovYh9+Cwu7ny7tbS6ueU9D7pKX+FfCkEns=
+    - secure: dbcqjCXTsiNqPW0sSqA1DfYgzRAD6MK+lkCmBocTl0InimKFlM211j4rDt80talVl7HGPkS910S/twV2VfTUexYy5oZcqVvzfRST6ShLwnBmVz2rm78r/W+te3KmGY8w+RucLSM+M0DCfN74JnY7EI0dLCd1IberLkzCecxXOxw=
+    # Docker
+    - secure: VQgWWdamSLRvw0kCGP7SPwzSS7wa2DQrimUueAnPh7rQbgSOgrcN/aJM50HJGELE4ZRMUF7UylH8U7x6l0tf99Is+HxgPyX5I+J/3rFj73Vxa4JH9XxsPq23BCw4pn+fvVgMwAryXFh0dNJSCCEtKEa6RwTA/OGjkZs1ubTFfNc=
+    - secure: ENaR0RFk5WuzLYMu0lYUCS7IPxnttU2Nz1XWuCJ6SBGhQGm4S7eFitwJHhPaEHW92K0RtPe9FKKPxu8waI6/8NDNhhQrNn31/gpHXZfLhMtDeLtCiHRcipC8baah+Gs19PT8DN9pYUBCTKErtLciFaKKzfj4dw0KidYtO803RVg=
+    # Oracle
+    - secure: e7UrcA3NOA4mriLZK2BsVIY+6Qxspgpdb8cBAMSrPFjUPUd03oHOeFGHDs1E9DIAanLYtWAcI6bzwMDA0PkmBzDlvQ6Lm1ifw9/IMyaOS8U6i5jbzZE6bW9iFdmmb30o2gwwWPBDfsyNFB8cU3ZExG7kW6UMEwmeh/Ky8YcFjgs=
+    - secure: acx6z+K5zMMGKZ/SuDjSjAjbf2Oks6xUeDukNdyncWH+0tgO7N5lQIM+7Gh81e7N2JIoWWVCwcpYO4GNbo2mgSxQp8MFzgcRQ3qCMNhmgmIV2DZD3VNzToVV8nemForLZuhBTcDGkLZh+2/EIJUBbULkicAuTZDsKlpf4PBowOU=
+  matrix:
+    # Default for logs
+    - DB=hsqldb
+
 # addons:
 #   sauce_connect: true
+
+# In addition to the matrix created by jdk entries, we want a build on latest java for each DB.
+stages:
+  - name: test
+  - name: db_tests
+  - name: db_tests_private
+    # pull requests do not have access to the secrets needed for these builds. (private Oracle and IBM repos)
+    if: type != pull_request
+
+jobs:
+  include:
+    - stage: db_tests
+      env:
+        - DB=mariadb
+        - DB_VERSION=10.0
+      addons:
+        mariadb: '10.0'
+      jdk: openjdk10
+
+    - stage: db_tests
+      env:
+        - DB=mariadb
+        - DB_VERSION=10.3
+      addons:
+        mariadb: '10.3'
+      jdk: openjdk10
+
+    - stage: db_tests
+      env:
+        - DB=postgresql
+        - DB_VERSION=9.6
+      addons:
+        postgresql: '9.6'
+      jdk: openjdk10
+
+    - stage: db_tests
+      env:
+        - DB=postgresql
+        - DB_VERSION=10
+      addons:
+        postgresql: '10'
+      jdk: openjdk10
+
+    - stage: db_tests
+      env:
+        - DB=mysql
+        - DB_VERSION=5.7
+      services:
+        - mysql
+      jdk: openjdk10
+
+    - stage: db_tests_private
+      env:
+        - DB=db2
+        - DB_VERSION=10.5
+      services:
+        - docker
+      jdk: openjdk10
+
+    - stage: db_tests_private
+      env:
+        - DB=oracle
+        - DB_VERSION=12.2
+      services:
+        - docker
+      jdk: openjdk10
+
 branches:
   except:
   - controller

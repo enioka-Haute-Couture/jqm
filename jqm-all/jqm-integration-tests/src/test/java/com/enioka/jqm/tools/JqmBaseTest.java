@@ -63,16 +63,8 @@ public class JqmBaseTest
             JndiContext.createJndiContext();
 
             // If needed, create an HSQLDB server.
-            Properties p = new Properties();
-            try (InputStream fis = Helpers.class.getClassLoader().getResourceAsStream("jqm.properties"))
-            {
-                if (fis != null)
-                {
-                    p.load(fis);
-                }
-            }
-            if (p.isEmpty() || !p.containsKey("com.enioka.jqm.jdbc.datasource") || (p.containsKey("com.enioka.jqm.jdbc.datasource")
-                    && p.getProperty("com.enioka.jqm.jdbc.datasource").contains("hsql")))
+            String dbName = System.getenv("DB");
+            if (dbName == null || "hsqldb".equals(dbName))
             {
                 s = new Server();
                 s.setDatabaseName(0, "testdbengine");
@@ -249,6 +241,20 @@ public class JqmBaseTest
                     + h.getQueueName() + " | enqueue: " + format.format(h.getEnqueueDate().getTime()) + " | exec: "
                     + (h.getBeganRunningDate() != null ? format.format(h.getBeganRunningDate().getTime()) : null) + " | end: "
                     + (h.getEndDate() != null ? format.format(h.getEndDate().getTime()) : null));
+        }
+        jqmlogger.debug("==========================================================================================");
+    }
+
+    protected void displayAllQueueTable()
+    {
+        java.text.SimpleDateFormat format = new java.text.SimpleDateFormat("HH:mm:ss.SSS");
+        jqmlogger.debug("==========================================================================================");
+        for (JobInstance h : Query.create().setQueryHistoryInstances(false).setQueryLiveInstances(true).run())
+        {
+            jqmlogger.debug("JobInstance Id: " + h.getId() + " | " + h.getState() + " | JD: " + h.getApplicationName() + " | "
+                    + h.getQueueName() + " | enqueue: " + format.format(h.getEnqueueDate().getTime()) + " | exec: "
+                    + (h.getBeganRunningDate() != null ? format.format(h.getBeganRunningDate().getTime()) : null) + " | position: "
+                    + h.getPosition());
         }
         jqmlogger.debug("==========================================================================================");
     }

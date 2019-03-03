@@ -29,10 +29,10 @@ Refer to JqmTester javadoc for further details, including how to specify JNDI re
 Integration tests
 ************************
 
-If you have to test interactions between jobs (for example, one job instance queueing another), it may be necessary to use a full JQM engine. JQM provides another embedded 
+If you have to test interactions between jobs (for example, one job instance queueing another), it may be necessary to use a full JQM engine. JQM provides another embedded
 tester class to do so. It is inside the same jqm-tst library.
 
-These are the steps to follow to launch an integration test: 
+These are the steps to follow to launch an integration test:
 
 * create the tester object
 * add at least on node (engine)
@@ -65,7 +65,7 @@ When using test frameworks like JUnit, all the node creation stuff is usually in
             // Only stop the cluster when all tests are done. This means there is no reboot or cleanup between tests if tester.cleanupAllJobDefinitions() is not explicitely called.
             tester.stop();
         }
-        
+
         @Before
         public void before()
         {
@@ -81,7 +81,7 @@ When using test frameworks like JUnit, all the node creation stuff is usually in
 
             // Request a launch of this new job definition. Note we could simply use the JqmClient API.
             tester.enqueue("Payload1");
-            
+
             // Launches are asynchronous, so wait for results (with a timeout).
             tester.waitForResults(1, 10000);
 
@@ -89,17 +89,17 @@ When using test frameworks like JUnit, all the node creation stuff is usually in
             Assert.assertEquals(1, tester.getOkCount());
             Assert.assertEquals(1, tester.getHistoryAllCount());
         }
-        
+
         @Test
         public void testTwo()
         {
-            // Quickly create a job definition from a class present in a jar. This is the way production JQM nodes really work - they load jar stored on the local file system. 
+            // Quickly create a job definition from a class present in a jar. This is the way production JQM nodes really work - they load jar stored on the local file system.
             tester.addSimpleJobDefinitionFromLibrary("payload1", "App", "../jqm-tests/jqm-test-datetimemaven/target/test.jar")
 
             tester.enqueue("payload1");
             tester.waitForResults(1, 10000, 0);
 
-            Assert.assertTrue(tester.testCounts(1, 0));       
+            Assert.assertTrue(tester.testCounts(1, 0));
         }
     }
 
@@ -108,4 +108,4 @@ Refer to JqmAsyncTester javadoc for further details, including how to specify JN
 .. note:: the tester outputs logs on stdout using log4j. You can set set log level through a tester method. If you use other loggers, this may result in a mix of different logger outputs.
 
 .. warning:: the nodes run inside the current JVM. So if you start too many nodes, or allow too many concurrent jobs to run, you may run out of memory and need to set higher JVM -Xmx parameters.
-    If using Maven, you may for example set the environment variable `export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"`
+    If using Maven, you may for example set the environment variable `export MAVEN_OPTS="-Xmx512m -XX:MaxMetaspaceSize=256m"`

@@ -1,6 +1,7 @@
 package com.enioka.jqm.jdbc;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public abstract class DbAdapter
      *                    the product code (from Connection.getMetaData().getDatabaseProductName()) in lower case.
      * @return true if compatible, false otherwise.
      */
-    public abstract boolean compatibleWith(String product);
+    public abstract boolean compatibleWith(DatabaseMetaData product) throws SQLException;
 
     /**
      * Adapt the given query template to enable it to run on the target database. This is only called on startup, and the results are
@@ -80,7 +81,8 @@ public abstract class DbAdapter
      * @return a generated ID or null;
      */
     public void beforeUpdate(Connection cnx, QueryPreparation q)
-    {}
+    {
+    }
 
     /**
      * Called after creating the first connection. The adapter should create its caches and do all initialization it requires. Most

@@ -44,6 +44,17 @@
         "**/webapp/dist/"
     ],
     "java.autobuild.enabled": true,
+    "java.test.defaultConfig": "it",
+    "java.test.config": [
+        {
+            "name": "it",
+            "workingDirectory": "${workspaceFolder}/jqm-all/jqm-integration-tests"
+        },
+        {
+            "name": "web",
+            "workingDirectory": "${workspaceFolder}/jqm-all/jqm-integration-tests-ws"
+        }
+    ],
     "maven.excludedFolders": [
         "**/.*", // exclude hidden folders
         "**/node_modules", // exclude node modules to speed up
