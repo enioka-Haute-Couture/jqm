@@ -74,7 +74,7 @@ jobs:
         - DB=postgresql
         - DB_VERSION=9.6
       addons:
-        - postgresql: '9.6'
+        postgresql: '9.6'
       jdk: openjdk10
 
     - stage: db_tests
@@ -82,7 +82,7 @@ jobs:
         - DB=postgresql
         - DB_VERSION=10
       addons:
-        - postgresql: '10'
+        postgresql: '10'
       jdk: openjdk10
 
     - stage: db_tests
