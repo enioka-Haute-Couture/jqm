@@ -40,6 +40,7 @@ public class SchedulerTest extends JqmBaseTest
         Assert.assertEquals("5 * * * *", dto2.getSchedules().get(0).getCronExpression());
         Assert.assertEquals(0, dto2.getSchedules().get(0).getParameters().size());
         Calendar update = dto2.getSchedules().get(0).getLastUpdated();
+        sleepms(1);
 
         // Update the dto without modifying anything - update date should stay the same.
         MetaService.upsertJobDef(cnx, dto);

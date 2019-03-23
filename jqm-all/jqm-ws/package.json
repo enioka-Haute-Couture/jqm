@@ -35,7 +35,7 @@
         "file-loader": "x",
         "raw-loader": "x",
         "html-webpack-plugin": "x",
-        "clean-webpack-plugin": "x",
+        "clean-webpack-plugin": "1.x",
         "webpack-dev-server": "x",
         "webpack-merge": "x"
     },
