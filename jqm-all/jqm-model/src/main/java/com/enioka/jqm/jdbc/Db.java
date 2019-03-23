@@ -40,7 +40,8 @@ public class Db
      * The list of different database adapters. We are using reflection for loading them for future extensibility.
      */
     private static String[] ADAPTERS = new String[] { "com.enioka.jqm.jdbc.DbImplPg", "com.enioka.jqm.jdbc.DbImplHsql",
-            "com.enioka.jqm.jdbc.DbImplOracle", "com.enioka.jqm.jdbc.DbImplMySql", "com.enioka.jqm.jdbc.DbImplDb2" };
+            "com.enioka.jqm.jdbc.DbImplOracle", "com.enioka.jqm.jdbc.DbImplMySql8", "com.enioka.jqm.jdbc.DbImplMySql",
+            "com.enioka.jqm.jdbc.DbImplDb2" };
 
     private DataSource _ds = null;
     private DbAdapter adapter = null;
@@ -445,8 +446,6 @@ public class Db
             tmp = _ds.getConnection();
             meta = tmp.getMetaData();
             product = meta.getDatabaseProductName().toLowerCase();
-            jqmlogger.info("Database reports it is " + meta.getDatabaseProductName() + " " + meta.getDatabaseMajorVersion() + "."
-                    + meta.getDatabaseMinorVersion());
         }
         catch (SQLException e)
         {
@@ -490,8 +489,10 @@ public class Db
         {
             throw new DatabaseException("Unsupported database! There is no JQM database adapter compatible with product name " + product);
         }
-
-        // TODO: go to DS metadata and check supported versions of databases.
+        else
+        {
+            jqmlogger.info("Using database adapter {}", adapter.getClass().getCanonicalName());
+        }
     }
 
     /**

@@ -24,6 +24,7 @@ Minor changes
 ++++++++++++++++++++++++++++
 
 * Engine: Updated to latest Maven engine, adding latest pom.xml format compatibility.
+* Engine: MySQL >= 8 and MariaDB >= 10.3 do not use a special ID generator anymore, thanks to improvements in InnoDB.
 * Test: client-side certificate authentication is now properly tested.
 * Test: MariaDB, MySQL and PostgreSQL have been added to the already present HSQLDB in the automated test suite run on each commit or PR.
 

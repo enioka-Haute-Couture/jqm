@@ -106,7 +106,7 @@ public class DbConn implements Closeable
             QueryResult qr = new QueryResult();
             qr.nbUpdated = ps.executeUpdate();
             qr.generatedKey = qp.preGeneratedKey;
-            if (query_key.contains("insert") && !query_key.equals("history_insert_with_end_date"))
+            if (qr.generatedKey == null && query_key.contains("insert") && !query_key.equals("history_insert_with_end_date"))
             {
                 ResultSet gen = ps.getGeneratedKeys();
                 if (gen.next())
@@ -120,7 +120,7 @@ public class DbConn implements Closeable
                     }
             }
 
-            jqmlogger.debug("Updated rows: {}", qr.nbUpdated);
+            jqmlogger.debug("Updated rows: {}. Key: {}. Generated ID: {}", qr.nbUpdated, query_key, qr.generatedKey);
             return qr;
         }
         catch (SQLException e)
@@ -502,9 +502,13 @@ public class DbConn implements Closeable
         try
         {
             if (q.forUpdate)
+            {
                 ps = _cnx.prepareStatement(q.sqlText, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
+            }
             else
+            {
                 ps = _cnx.prepareStatement(q.sqlText, this.parent.getAdapter().keyRetrievalColumn());
+            }
         }
         catch (SQLException e)
         {
@@ -604,8 +608,9 @@ public class DbConn implements Closeable
         try
         {
             DatabaseMetaData m = this._cnx.getMetaData();
-            log.info("Database driver {} version {} on database {} version {}.{} (product {})", m.getDriverName(), m.getDriverVersion(),
-                    m.getDatabaseProductName(), m.getDatabaseMajorVersion(), m.getDatabaseMinorVersion(), m.getDatabaseProductVersion());
+            log.info("Database driver {} version {} on database {} version {}.{} (product {}). Adapter is {}.", m.getDriverName(),
+                    m.getDriverVersion(), m.getDatabaseProductName(), m.getDatabaseMajorVersion(), m.getDatabaseMinorVersion(),
+                    m.getDatabaseProductVersion(), parent.getAdapter().getClass().getName());
         }
         catch (SQLException e1)
         {
