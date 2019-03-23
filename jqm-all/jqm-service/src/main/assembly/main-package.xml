@@ -1,5 +1,4 @@
-<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
     <id>main-package</id>
     <formats>
         <format>tar.gz</format>
@@ -7,7 +6,6 @@
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
     <baseDirectory>jqm-${project.version}</baseDirectory>
-
     <fileSets>
         <fileSet>
             <directory>${project.basedir}/..</directory>
@@ -93,22 +91,26 @@
                 <exclude>*</exclude>
             </excludes>
         </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/src/main/scripts/empty</directory>
+            <outputDirectory>jobs/jqm-demo/jqm-test-pyl/lib</outputDirectory>
+            <excludes>
+                <exclude>*</exclude>
+            </excludes>
+        </fileSet>
     </fileSets>
-
     <files>
         <file>
             <source>${project.build.directory}/${project.artifactId}-${project.version}.jar</source>
             <outputDirectory>/</outputDirectory>
             <destName>jqm.jar</destName>
         </file>
-
         <file>
             <source>${project.parent.basedir}/jqm-ws/target/jqm-ws-${project.version}.war</source>
             <outputDirectory>/webapp</outputDirectory>
             <destName>jqm-ws.war</destName>
         </file>
     </files>
-
     <dependencySets>
         <dependencySet>
             <outputDirectory>/lib</outputDirectory>
@@ -125,7 +127,6 @@
                 <exclude>com.sun.mail</exclude>
             </excludes>
         </dependencySet>
-
         <dependencySet>
             <outputDirectory>/jobs/jqm-demo/${artifact.artifactId}</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
@@ -137,7 +138,6 @@
             </includes>
             <scope>test</scope>
         </dependencySet>
-
         <dependencySet>
             <outputDirectory>/ext</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
@@ -153,7 +153,6 @@
             </includes>
             <scope>test</scope>
         </dependencySet>
-
         <dependencySet>
             <outputDirectory>/plugins</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
