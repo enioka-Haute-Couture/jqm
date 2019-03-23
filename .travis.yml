@@ -21,7 +21,8 @@ jdk:
   - openjdk8
   - openjdk9
   - openjdk10
-  #- openjdk11
+  - openjdk11
+  - openjdk12
   #- oraclejdk8
   #- oraclejdk9
 
@@ -59,7 +60,7 @@ jobs:
         - DB_VERSION=10.0
       addons:
         mariadb: '10.0'
-      jdk: openjdk10
+      jdk: openjdk11
 
     - stage: db_tests
       env:
@@ -67,7 +68,7 @@ jobs:
         - DB_VERSION=10.3
       addons:
         mariadb: '10.3'
-      jdk: openjdk10
+      jdk: openjdk11
 
     - stage: db_tests
       env:
@@ -75,7 +76,7 @@ jobs:
         - DB_VERSION=9.6
       addons:
         postgresql: '9.6'
-      jdk: openjdk10
+      jdk: openjdk11
 
     - stage: db_tests
       env:
@@ -83,7 +84,7 @@ jobs:
         - DB_VERSION=10
       addons:
         postgresql: '10'
-      jdk: openjdk10
+      jdk: openjdk11
 
     - stage: db_tests
       env:
@@ -91,7 +92,7 @@ jobs:
         - DB_VERSION=5.7
       services:
         - mysql
-      jdk: openjdk10
+      jdk: openjdk11
 
     - stage: db_tests_private
       env:
@@ -99,7 +100,7 @@ jobs:
         - DB_VERSION=10.5
       services:
         - docker
-      jdk: openjdk10
+      jdk: openjdk11
 
     - stage: db_tests_private
       env:
@@ -107,7 +108,7 @@ jobs:
         - DB_VERSION=12.2
       services:
         - docker
-      jdk: openjdk10
+      jdk: openjdk11
 
 branches:
   except:

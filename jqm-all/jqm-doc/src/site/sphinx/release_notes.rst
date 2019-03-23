@@ -15,6 +15,7 @@ Major changes
 ++++++++++++++++++++++++++++
 
 * All libraries have been updated to their latest versions. This is particularly important for anyone exposing JQM web services, as this comes with much increased security.
+* Engine: added Java 11 and 12 support. Please consider using 11 for long term projects as it is a LTS release.
 * Web APIs: added IPv6 compatibility and latest TLS versions (on Java versions supporting them).
 * Web APIs: better multiple interface handling.
 * CLI: entirely re-written using a more understandable `verb-noun --options` style for commands (and a far more maintainable code behind this).

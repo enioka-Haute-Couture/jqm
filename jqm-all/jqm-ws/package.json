@@ -19,7 +19,7 @@
         "angular-sanitize": "1.7.x",
         "angular-touch": "1.7.x",
         "angular-ui-grid": "4.6.x",
-        "bootstrap": "4.1.x",
+        "bootstrap": "4.3.x",
         "bootstrap-datepicker": "1.8.x",
         "jquery": "3.3.x",
         "popper.js": "^1.14.4",
@@ -35,7 +35,7 @@
         "file-loader": "x",
         "raw-loader": "x",
         "html-webpack-plugin": "x",
-        "clean-webpack-plugin": "x",
+        "clean-webpack-plugin": "1.x",
         "webpack-dev-server": "x",
         "webpack-merge": "x"
     },
