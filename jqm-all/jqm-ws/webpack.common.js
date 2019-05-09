@@ -5,7 +5,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 module.exports = {
     entry: './src/main/angular/app.js',
     plugins: [
-        new CleanWebpackPlugin(['src/main/webapp/dist']),
+        new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             title: 'JQM administration',
             template: 'src/main/angular/index.wptemplate.html',
