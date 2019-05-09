@@ -21,7 +21,7 @@
         "angular-ui-grid": "4.6.x",
         "bootstrap": "4.1.x",
         "bootstrap-datepicker": "1.8.x",
-        "jquery": "3.3.x",
+        "jquery": "3.4.x",
         "popper.js": "^1.14.4",
         "@fortawesome/fontawesome-free": "5.3.x",
         "select2": "4.0.x",
