@@ -57,9 +57,9 @@ jobs:
     - stage: db_tests
       env:
         - DB=mariadb
-        - DB_VERSION=10.0
+        - DB_VERSION=10.1
       addons:
-        mariadb: '10.0'
+        mariadb: '10.1'
       jdk: openjdk11
 
     - stage: db_tests
