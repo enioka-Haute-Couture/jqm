@@ -10,7 +10,7 @@ exclude_dirnames = ['.git', '.svn']
 extensions = ['sphinx.ext.todo',]
 
 project = 'JQM'
-copyright = '2012-2018, Enioka'
+copyright = '2012-2019, Enioka'
 #release = '1.0'
 hightlight_language = 'java'
 
