@@ -8,7 +8,6 @@ language: java
 before_install:
     - curl "https://raw.githubusercontent.com/DanySK/Gravis-CI/master/.install-jdk-travis.sh" --output ~/.install-jdk-travis.sh
     - source ~/.install-jdk-travis.sh
-    - source .travis/initializedb.sh
     - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then mysql -e "create database jqm; grant all privileges on jqm.* to jqm@'%' identified by 'jqm'; flush privileges;"; fi
     - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('new_password') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"; fi
     - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then sudo mysql_upgrade -u root -pnew_password; fi
@@ -72,15 +71,6 @@ jobs:
               - JDK=openjdk@1.12
 
         ## Tests on different databases
-        - stage: db_tests
-          env:
-              - DB=mysql
-              - DB_VERSION=8.0
-              - MYSQL=mysql:8.0
-              - JDK=openjdk@1.11
-          services:
-              - docker
-
         - stage: db_tests
           env:
               - DB=mariadb
