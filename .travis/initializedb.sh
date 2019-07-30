@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -z "${$MYSQL}" ]; then
+if [ -z "${MYSQL}" ]; then
     exit
 fi
 
