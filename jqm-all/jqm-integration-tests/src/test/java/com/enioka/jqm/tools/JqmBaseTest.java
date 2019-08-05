@@ -233,7 +233,7 @@ public class JqmBaseTest
             Helpers.closeQuietly(cnx);
             cnx = getNewDbSession();
         }
-        else if (db.getProduct().contains("mariadb"))
+        else if (db.getProduct().contains("mariadb") || db.getProduct().contains("mysql"))
         {
             try
             {
