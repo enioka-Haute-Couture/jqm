@@ -26,6 +26,14 @@ import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
 import org.apache.commons.io.IOUtils;
+import com.enioka.jqm.api.JobInstance;
+import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.Query;
+import com.enioka.jqm.jdbc.DatabaseUnreachableException;
+import com.enioka.jqm.jdbc.Db;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.test.helpers.TestHelpers;
+
 import org.hsqldb.Server;
 import org.junit.After;
 import org.junit.Assume;
@@ -162,6 +170,24 @@ public class JqmBaseTest
         return System.getProperty("os.name").toLowerCase().startsWith("win");
     }
 
+    protected void assumeNotDb2()
+    {
+        String dbName = System.getenv("DB");
+        if (dbName != null)
+        {
+            Assume.assumeFalse( "Test not implement for db2.", dbName.contains("db2"));
+        }
+    }
+
+    protected void assumeNotOracle()
+    {
+        String dbName = System.getenv("DB");
+        if (dbName != null)
+        {
+            Assume.assumeFalse("Test not implement for oracle.", dbName.contains("oracle"));
+        }
+    }
+
     protected JqmEngineOperations addAndStartEngine()
     {
         return addAndStartEngine("localhost");
@@ -217,40 +243,31 @@ public class JqmBaseTest
         }
     }
 
-    protected void waitDbStop()
+    protected void simulateDbFailure(int waitTimeBeforeRestart)
     {
-        while (s.getState() != 16)
+        try
         {
-            this.sleepms(1);
+            jqmlogger.info("Send suicide query");
+            cnx.simulateDisconnection();
+            this.sleep(waitTimeBeforeRestart);
+            Helpers.closeQuietly(cnx);
+        }
+        catch (Exception e)
+        {
+            // Nothing to do. Some SGBDR will throw exception because the killing connection was killed.
         }
     }
 
-    protected void simulateDbFailure()
+    protected boolean waitForPollersArePolling()
     {
-        if (db.getProduct().contains("hsql"))
+        int remainingAttempt = 10;
+        while (!this.engines.get("localhost").areAllPollersPolling() && remainingAttempt > 0)
         {
-            jqmlogger.info("DB is going down");
-            s.stop();
-            this.waitDbStop();
-            jqmlogger.info("DB is now fully down");
             this.sleep(1);
-            jqmlogger.info("Restarting DB");
-            s.start();
+            --remainingAttempt;
+            jqmlogger.debug("waitFormPollersArePolling countdown : " + remainingAttempt);
         }
-        else if (db.getProduct().contains("postgresql"))
-        {
-            try
-            {
-                // update pg_database set datallowconn = false where datname = 'jqm' // Cannot run, as we cannot reconnect afterward!
-                cnx.runRawSelect("select pg_terminate_backend(pid) from pg_stat_activity where datname='jqm';");
-            }
-            catch (Exception e)
-            {
-                // Do nothing - the query is a suicide so it cannot work fully.
-            }
-            Helpers.closeQuietly(cnx);
-            cnx = getNewDbSession();
-        }
+        return this.engines.get("localhost").areAllPollersPolling();
     }
 
     protected void displayAllHistoryTable()

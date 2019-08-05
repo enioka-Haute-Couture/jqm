@@ -522,6 +522,10 @@ public class Db
         catch (SQLException e)
         {
             DbHelper.closeQuietly(cnx); // May have been left open when the pool has given us a failed connection.
+            if (this.adapter.testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
     }

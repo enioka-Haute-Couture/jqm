@@ -66,7 +66,7 @@ import com.enioka.jqm.model.RUser;
 
 /**
  * This is a helper class for internal use only.
- * 
+ *
  */
 final class Helpers
 {
@@ -85,7 +85,7 @@ final class Helpers
 
     /**
      * Get a fresh connection on the engine database.
-     * 
+     *
      * @return a DbConn.
      */
     static DbConn getNewDbSession()
@@ -193,7 +193,7 @@ final class Helpers
 
     /**
      * Create a Deliverable inside the database that will track a file created by a JobInstance Must be called from inside a transaction
-     * 
+     *
      * @param path
      *            FilePath (relative to a root directory - cf. Node)
      * @param originalFileName
@@ -302,7 +302,7 @@ final class Helpers
      * Creates or updates a node.<br>
      * This method makes the assumption metadata is valid. e.g. there MUST be a single default queue.<br>
      * Call {@link #updateConfiguration(EntityManager)} before to be sure if necessary.
-     * 
+     *
      * @param nodeName
      *            name of the node that should be created or updated (if incompletely defined only)
      * @param em
@@ -429,7 +429,7 @@ final class Helpers
 
     /**
      * Creates a new user if does not exist. If it exists, it is unlocked and roles are reset (password is untouched).
-     * 
+     *
      * @param cnx
      * @param login
      * @param password
@@ -535,7 +535,7 @@ final class Helpers
      * Send a mail message using a JNDI resource.<br>
      * As JNDI resource providers are inside the EXT class loader, this uses reflection. This method is basically a bonus on top of the
      * MailSessionFactory offered to payloads, making it accessible also to the engine.
-     * 
+     *
      * @param to
      * @param subject
      * @param body
@@ -624,5 +624,27 @@ final class Helpers
                 || (cause != null && cause.getMessage().equals("This connection has been closed"))
                 || (cause instanceof SQLException && e.getMessage().equals("Failed to validate a newly established connection."))
                 || (cause instanceof SQLNonTransientException && cause.getMessage().equals("connection exception: closed"));
+
+    /* TODO Check all conditions are needed
+    static boolean testDbFailure(Exception e)
+    {
+        return (e instanceof SQLTransientException) || (e.getCause() instanceof SQLTransientException)
+                || (e.getCause() != null && e.getCause().getCause() instanceof SQLTransientException)
+                || (e.getCause() != null && e.getCause().getCause() != null
+                        && e.getCause().getCause().getCause() instanceof SQLTransientException)
+                || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() != null
+                        && e.getCause().getCause().getCause().getCause() instanceof SQLTransientException)
+                || (e.getCause() != null && e.getCause() instanceof SQLException
+                    && (e.getMessage().equals("Failed to validate a newly established connection.")
+                    ||  e.getCause().getMessage().equals("FATAL: terminating connection due to administrator command")
+                    ||  e.getCause().getMessage().equals("This connection has been closed")))
+                || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof SocketException)
+                || (e.getCause() != null && e.getCause().getMessage().equals("This connection has been closed"))
+                || (e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
+                || (e.getCause() != null && e.getCause() instanceof SQLNonTransientException
+                        && e.getCause().getMessage().equals("connection exception: closed"))
+                || (e instanceof  DatabaseException && e.getMessage().contains("Communications link failure") || e.getMessage().contains("This connection has been closed") || e.getMessage().contains("Connection is closed"))
+                || (e instanceof DatabaseException && e.getCause().getClass().getSimpleName().equals("CommunicationsException"));
+    */
     }
 }

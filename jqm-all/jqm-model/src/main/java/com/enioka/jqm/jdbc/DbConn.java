@@ -60,6 +60,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
     }
@@ -74,6 +78,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
     }
@@ -93,6 +101,30 @@ public class DbConn implements Closeable
 
         this.parent.getAdapter().beforeUpdate(_cnx, qp);
         return qp;
+    }
+
+    /** For testing purposes only */
+    public void runCommand(String query_key, Object... params)
+    {
+        QueryPreparation qp = adapterPreparation(query_key, false, params);
+        PreparedStatement ps = null;
+        try
+        {
+            ps = prepare(qp);
+            ps.execute();
+        }
+        catch (SQLException e)
+        {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
+            jqmlogger.warn(e.getMessage());
+        }
+        finally
+        {
+            DbHelper.closeQuietly(ps);
+        }
     }
 
     public QueryResult runUpdate(String query_key, Object... params)
@@ -126,6 +158,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(qp.sqlText, e);
         }
         finally
@@ -153,6 +189,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(sql, e);
         }
         finally
@@ -196,6 +236,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(q.sqlText, e);
         }
         finally
@@ -225,6 +269,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(qp.sqlText, e);
         }
         finally
@@ -268,6 +316,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
         finally
@@ -335,6 +387,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
         finally
@@ -395,6 +451,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
         finally
@@ -499,6 +559,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
 
@@ -541,7 +605,7 @@ public class DbConn implements Closeable
                 List<?> vv = (List<?>) value;
                 if (vv.size() == 0)
                 {
-                    throw new DatabaseException("Cannot do a query whith an empty list parameter");
+                    throw new DatabaseException("Cannot do a query with an empty list parameter");
                 }
                 if (vv.get(0) instanceof Integer)
                 {
@@ -570,6 +634,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException("Could not set parameter at position " + position, e);
         }
     }
@@ -600,6 +668,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e1)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e1))
+            {
+                throw new DatabaseUnreachableException(e1);
+            }
             jqmlogger.warn("Could not fetch database version", e1);
         }
     }
@@ -607,5 +679,10 @@ public class DbConn implements Closeable
     public List<JobInstance> poll(Queue queue, int nbSlots)
     {
         return this.parent.getAdapter().poll(this, queue, nbSlots);
+    }
+
+    public void simulateDisconnection()
+    {
+        this.parent.getAdapter().simulateDisconnection(_cnx);
     }
 }
