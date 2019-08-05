@@ -15,22 +15,17 @@ public class DbFailTest extends JqmBaseTest
     @Before
     public void before()
     {
-        // These tests are HSQLDB dependent.
-        Assume.assumeTrue(JqmBaseTest.s != null);
-
-        // TODO: write some tests for PGSQL.
+        if (db.getProduct().contains("hsql"))
+        {
+            Assume.assumeTrue(JqmBaseTest.s != null);
+        }
     }
 
     @Test
     public void testDbFailure() throws Exception
     {
         this.addAndStartEngine();
-        jqmlogger.info("Stopping db");
-        s.stop();
-        this.waitDbStop();
-        this.sleep(2);
-        jqmlogger.info("Restarting DB");
-        s.start();
+        this.simulateDbFailure(2);
         this.sleep(5);
         Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
     }
@@ -39,19 +34,9 @@ public class DbFailTest extends JqmBaseTest
     public void testDbDoubleFailure() throws Exception
     {
         this.addAndStartEngine();
-        jqmlogger.info("Stopping db");
-        s.stop();
-        this.waitDbStop();
-        this.sleep(2);
-        jqmlogger.info("Restarting DB");
-        s.start();
+        this.simulateDbFailure(5);
         this.sleep(5);
-        jqmlogger.info("Stopping db");
-        s.stop();
-        this.waitDbStop();
-        this.sleep(2);
-        jqmlogger.info("Restarting DB");
-        s.start();
+        this.simulateDbFailure(5);
         this.sleep(5);
     }
 
@@ -65,11 +50,7 @@ public class DbFailTest extends JqmBaseTest
         this.addAndStartEngine();
         this.sleep(2); // first poller loop
 
-        jqmlogger.info("Stopping db");
-        s.stop();
-        this.waitDbStop();
-        jqmlogger.info("Restarting DB (as soon as possible)");
-        s.start();
+        this.simulateDbFailure(0);
         this.sleep(5);
     }
 
@@ -80,13 +61,7 @@ public class DbFailTest extends JqmBaseTest
         JqmSimpleTest.create(cnx, "pyl.Wait", "jqm-test-pyl-nodep").addRuntimeParameter("p1", "4000").expectOk(0).run(this);
         this.sleep(2);
 
-        jqmlogger.info("Stopping db");
-        s.stop();
-        this.waitDbStop();
-        this.sleep(5);
-
-        jqmlogger.info("Restarting DB");
-        s.start();
+        this.simulateDbFailure(5);
         TestHelpers.waitFor(1, 10000, this.getNewDbSession());
 
         Assert.assertEquals(1, TestHelpers.getOkCount(this.getNewDbSession()));
@@ -99,14 +74,9 @@ public class DbFailTest extends JqmBaseTest
         JqmSimpleTest.create(cnx, "pyl.KillMe").expectOk(0).run(this);
         this.sleep(2);
 
-        jqmlogger.info("Stopping db");
-        s.stop();
-        this.waitDbStop();
-        this.sleep(5);
-
-        jqmlogger.info("Restarting DB");
-        s.start();
+        this.simulateDbFailure(5);
         TestHelpers.waitFor(1, 10000, this.getNewDbSession());
+        this.sleep(5);
 
         Assert.assertEquals(1, TestHelpers.getNonOkCount(this.getNewDbSession()));
     }
@@ -133,9 +103,10 @@ public class DbFailTest extends JqmBaseTest
 
         this.sleep(1);
         jqmlogger.info("Stopping db");
-        simulateDbFailure();
+        this.simulateDbFailure(2);
 
         TestHelpers.waitFor(1000, 120000, this.getNewDbSession());
+        this.sleep(5);
 
         Assert.assertEquals(1000, TestHelpers.getOkCount(this.getNewDbSession()));
         // Assert.assertTrue(this.engines.get("localhost").isAllPollersPolling());

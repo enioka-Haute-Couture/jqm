@@ -32,6 +32,7 @@ import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.hsqldb.Server;
 import org.junit.After;
 import org.junit.Assume;
@@ -197,13 +198,16 @@ public class JqmBaseTest
 
     protected void waitDbStop()
     {
-        while (s.getState() != 16)
+        if (db.getProduct().contains("hsql"))
         {
-            this.sleepms(1);
+            while (s.getState() != 16)
+            {
+                this.sleepms(1);
+            }
         }
     }
 
-    protected void simulateDbFailure()
+    protected void simulateDbFailure(int waitTimeBeforeRestart)
     {
         if (db.getProduct().contains("hsql"))
         {
@@ -211,7 +215,7 @@ public class JqmBaseTest
             s.stop();
             this.waitDbStop();
             jqmlogger.info("DB is now fully down");
-            this.sleep(1);
+            this.sleep(waitTimeBeforeRestart);
             jqmlogger.info("Restarting DB");
             s.start();
         }
@@ -228,6 +232,25 @@ public class JqmBaseTest
             }
             Helpers.closeQuietly(cnx);
             cnx = getNewDbSession();
+        }
+        else if (db.getProduct().contains("mariadb"))
+        {
+            try
+            {
+                jqmlogger.info("Send suicide query");
+                // TODO : move this statement to DB adapter, and create suicideCommand()
+                cnx.runRawCommand("KILL USER jqm;");
+                this.sleep(waitTimeBeforeRestart);
+            }
+            catch (Exception e)
+            {
+                // Nothing to do
+            }
+            Helpers.closeQuietly(cnx);
+        }
+        else
+        {
+            throw new NotImplementedException("Not support database.");
         }
     }
 

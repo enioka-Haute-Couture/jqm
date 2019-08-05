@@ -95,6 +95,22 @@ public class DbConn implements Closeable
         return qp;
     }
 
+    public void runRawCommand(String query)
+    {
+        PreparedStatement ps = null;
+        try
+        {
+            ps = _cnx.prepareStatement(query);
+            ps.executeQuery();
+            ps.close();
+        }
+        catch (SQLException e)
+        {
+            // duno what to do
+        }
+
+    }
+
     public QueryResult runUpdate(String query_key, Object... params)
     {
         transac_open = true;
