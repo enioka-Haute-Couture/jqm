@@ -630,7 +630,9 @@ final class Helpers
                 || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() != null
                         && e.getCause().getCause().getCause().getCause() instanceof SQLTransientException)
                 || (e.getCause() != null && e.getCause() instanceof SQLException
-                        && e.getMessage().equals("Failed to validate a newly established connection."))
+                    && (e.getMessage().equals("Failed to validate a newly established connection.")
+                    ||  e.getCause().getMessage().equals("FATAL: terminating connection due to administrator command")
+                    ||  e.getCause().getMessage().equals("This connection has been closed.")))
                 || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof SocketException)
                 || (e.getCause() != null && e.getCause().getMessage().equals("This connection has been closed"))
                 || (e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)

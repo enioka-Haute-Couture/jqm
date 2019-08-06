@@ -224,14 +224,14 @@ public class JqmBaseTest
             try
             {
                 // update pg_database set datallowconn = false where datname = 'jqm' // Cannot run, as we cannot reconnect afterward!
-                cnx.runRawSelect("select pg_terminate_backend(pid) from pg_stat_activity where datname='jqm';");
+                jqmlogger.info("Send suicide query");
+                cnx.runRawCommand("select pg_terminate_backend(pid) from pg_stat_activity where datname='jqm';");
             }
             catch (Exception e)
             {
                 // Do nothing - the query is a suicide so it cannot work fully.
             }
             Helpers.closeQuietly(cnx);
-            cnx = getNewDbSession();
         }
         else if (db.getProduct().contains("mariadb") || db.getProduct().contains("mysql"))
         {
