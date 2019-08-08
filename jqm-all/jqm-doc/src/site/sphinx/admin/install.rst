@@ -216,6 +216,8 @@ MariaDB
 
 MariaDB 10.1+ is supported. Since MariaDB is a fork of MySQL, it works like MySQL aforementioned. No specific configuration is required in JQM: no options inside jqm.properties (or absent file).
 
+These commands can be used to setup a database.::
+
     $ mysql -u root -p
     mysql> create database jqm;
     mysql> grant all privileges on jqm.* to jqm@'%' identified by 'jqm';
