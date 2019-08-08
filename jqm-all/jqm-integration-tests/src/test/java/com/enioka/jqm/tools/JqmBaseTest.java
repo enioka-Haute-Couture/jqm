@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import java.sql.ResultSet;
+
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
@@ -248,8 +250,36 @@ public class JqmBaseTest
             }
             Helpers.closeQuietly(cnx);
         }
+        else if (db.getProduct().contains("oracle"))
+        {
+            try
+            {
+                // Oracle :
+                // SELECT SID,SERIAL#,STATUS,SERVER FROM V$SESSION WHERE USERNAME = 'JWARD';
+                // ALTER SYSTEM KILL SESSION 'sid,serial#';
+                ResultSet res = cnx.runRawSelect("SELECT SID,SERIAL# FROM V$SESSION WHERE USERNAME = 'jqm';");
+
+                int sid = 0;
+                int serial = 0;
+                while (res.next())
+                {
+                    sid = res.getInt("SID");
+                    serial = res.getInt("SERIAL#");
+                    jqmlogger.debug(String.format("SID : %d - SERIAL# : %d", sid, serial));
+                }
+                String killReq = String.format("ALTER SYSTEM KILL SESSION '%d,%d;'", sid, serial);
+                cnx.runRawCommand(killReq);
+                this.sleep(waitTimeBeforeRestart);
+            }
+            catch (Exception e)
+            {
+                jqmlogger.warn("Failed to send Oracle kill comand.");
+            }
+            Helpers.closeQuietly(cnx);
+        }
         else
         {
+            // DB2 : CALL SYSPROC.ADMIN_CMD('FORCE APPLICATION (774)');
             throw new NotImplementedException("Not support database.");
         }
     }
