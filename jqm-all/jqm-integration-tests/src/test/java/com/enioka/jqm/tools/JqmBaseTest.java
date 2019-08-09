@@ -262,8 +262,6 @@ public class JqmBaseTest
 
                 while (res.next())
                 {
-                    jqmlogger.debug(res.getInt("SID") + " - " + res.getInt("SERIAL#") + " - " + res.getString("USERNAME"));
-
                     String killReq = "ALTER SYSTEM KILL SESSION '" + res.getInt("SID") + "," + res.getInt("SERIAL#") + "'";
                     jqmlogger.debug(killReq);
                     cnx.runRawCommand(killReq);
