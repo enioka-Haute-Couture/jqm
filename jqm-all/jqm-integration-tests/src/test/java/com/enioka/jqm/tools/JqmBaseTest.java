@@ -257,6 +257,7 @@ public class JqmBaseTest
                 // Oracle :
                 // SELECT SID,SERIAL#,STATUS,SERVER FROM V$SESSION WHERE USERNAME = 'JWARD';
                 // ALTER SYSTEM KILL SESSION 'sid,serial#';
+                jqmlogger.info("Send select sid, serial query");
                 ResultSet res = cnx.runRawSelect("SELECT SID,SERIAL# FROM GV$SESSION WHERE USERNAME = 'jqm'");
 
                 int sid = 0;
@@ -267,13 +268,16 @@ public class JqmBaseTest
                     serial = res.getInt("SERIAL#");
                     jqmlogger.debug(String.format("SID : %d - SERIAL# : %d", sid, serial));
                 }
+
+                jqmlogger.info("Send suicide query");
                 String killReq = String.format("ALTER SYSTEM KILL SESSION '%d,%d'", sid, serial);
+                jqmlogger.debug(killReq);
                 cnx.runRawCommand(killReq);
                 this.sleep(waitTimeBeforeRestart);
             }
             catch (Exception e)
             {
-                jqmlogger.warn("Failed to send Oracle kill comand : " + e.getMessage());
+                jqmlogger.warn("Failed to kill oracle session : " + e.getMessage());
                 e.printStackTrace();
             }
             Helpers.closeQuietly(cnx);
@@ -290,6 +294,8 @@ public class JqmBaseTest
 
                 CALL SYSPROC.ADMIN_CMD('FORCE APPLICATION (774)');
 */
+
+                jqmlogger.info("Send select application_handle query");
                 ResultSet res = cnx.runRawSelect("SELECT APPLICATION_HANDLE, CLIENT_IPADDR, CLIENT_PORT_NUMBER, SESSION_AUTH_ID,\n" +
                         "CURRENT_SERVER, APPLICATION_NAME, CLIENT_PROTOCOL, CLIENT_PLATFORM, CLIENT_HOSTNAME, CONNECTION_START_TIME, APPLICATION_ID, EXECUTION_ID \n" +
                         "FROM TABLE(MON_GET_CONNECTION(cast(NULL as bigint), -2))\n");
@@ -301,18 +307,17 @@ public class JqmBaseTest
                     jqmlogger.debug("App handle : %d");
                     cnx.runRawCommand(String.format("CALL SYSPROC.ADMIN_CMD('FORCE APPLICATION (%d)')", appHandle));
                 }
-
             }
             catch (Exception e)
             {
-                jqmlogger.warn("Failed to send Oracle kill comand : " + e.getMessage());
+                jqmlogger.warn("Failed to kill db2 session : " + e.getMessage());
                 e.printStackTrace();
             }
             Helpers.closeQuietly(cnx);
         }
         else
         {
-            throw new NotImplementedException("Not support database.");
+            throw new NotImplementedException("Database not supported.");
         }
     }
 
