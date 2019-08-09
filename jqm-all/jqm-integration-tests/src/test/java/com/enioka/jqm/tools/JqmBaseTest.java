@@ -274,7 +274,7 @@ public class JqmBaseTest
             catch (Exception e)
             {
                 jqmlogger.warn("Failed to send Oracle kill comand : " + e.getMessage());
-                jqmlogger.warn(e.getStackTrace().toString());
+                e.printStackTrace();
             }
             Helpers.closeQuietly(cnx);
         }
