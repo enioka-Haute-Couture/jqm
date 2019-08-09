@@ -258,30 +258,19 @@ public class JqmBaseTest
                 // SELECT SID,SERIAL#,STATUS,SERVER FROM V$SESSION WHERE USERNAME = 'JWARD';
                 // ALTER SYSTEM KILL SESSION 'sid,serial#';
                 jqmlogger.info("Send select sid, serial query");
-//                ResultSet res = cnx.runRawSelect("SELECT SID,SERIAL# FROM GV$SESSION WHERE USERNAME = 'jqm'");
-                ResultSet res = cnx.runRawSelect("SELECT SID,SERIAL#,USERNAME FROM GV$SESSION");
+                ResultSet res = cnx.runRawSelect("SELECT SID,SERIAL# FROM GV$SESSION WHERE USERNAME = 'JQM'");
 
-                // Testing purpose
                 while (res.next())
                 {
                     jqmlogger.debug(res.getInt("SID") + " - " + res.getInt("SERIAL#") + " - " + res.getString("USERNAME"));
-                }
 
-                if (res.first())
-                {
-                    int sid = res.getInt("SID");
-                    int serial = res.getInt("SERIAL#");
-                    jqmlogger.debug(String.format("SID : %d - SERIAL# : %d", sid, serial));
-
-                    jqmlogger.info("Send suicide query");
-                    String killReq = String.format("ALTER SYSTEM KILL SESSION '%d,%d'", sid, serial);
+                    String killReq = "ALTER SYSTEM KILL SESSION '" + res.getInt("SID") + "," + res.getInt("SERIAL#") + "'";
                     jqmlogger.debug(killReq);
                     cnx.runRawCommand(killReq);
-                    this.sleep(waitTimeBeforeRestart);
-
-                    Helpers.closeQuietly(cnx);
                 }
 
+                this.sleep(waitTimeBeforeRestart);
+                Helpers.closeQuietly(cnx);
             }
             catch (Exception e)
             {
