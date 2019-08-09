@@ -278,9 +278,40 @@ public class JqmBaseTest
             }
             Helpers.closeQuietly(cnx);
         }
+        else if (db.getProduct().contains("db2"))
+        {
+            try
+            {
+                // DB2 : CALL SYSPROC.ADMIN_CMD('FORCE APPLICATION (774)');
+/*
+                SELECT APPLICATION_HANDLE, CLIENT_IPADDR, CLIENT_PORT_NUMBER, SESSION_AUTH_ID,
+                        CURRENT_SERVER, APPLICATION_NAME, CLIENT_PROTOCOL, CLIENT_PLATFORM, CLIENT_HOSTNAME, CONNECTION_START_TIME, APPLICATION_ID, EXECUTION_ID
+                FROM TABLE(MON_GET_CONNECTION(cast(NULL as bigint), -2))
+
+                CALL SYSPROC.ADMIN_CMD('FORCE APPLICATION (774)');
+*/
+                ResultSet res = cnx.runRawSelect("SELECT APPLICATION_HANDLE, CLIENT_IPADDR, CLIENT_PORT_NUMBER, SESSION_AUTH_ID,\n" +
+                        "CURRENT_SERVER, APPLICATION_NAME, CLIENT_PROTOCOL, CLIENT_PLATFORM, CLIENT_HOSTNAME, CONNECTION_START_TIME, APPLICATION_ID, EXECUTION_ID \n" +
+                        "FROM TABLE(MON_GET_CONNECTION(cast(NULL as bigint), -2))\n");
+
+                int appHandle = 0;
+                while (res.next())
+                {
+                    appHandle = res.getInt("APPLICATION_HANDLE");
+                    jqmlogger.debug("App handle : %d");
+                    cnx.runRawCommand(String.format("CALL SYSPROC.ADMIN_CMD('FORCE APPLICATION (%d)')", appHandle));
+                }
+
+            }
+            catch (Exception e)
+            {
+                jqmlogger.warn("Failed to send Oracle kill comand : " + e.getMessage());
+                e.printStackTrace();
+            }
+            Helpers.closeQuietly(cnx);
+        }
         else
         {
-            // DB2 : CALL SYSPROC.ADMIN_CMD('FORCE APPLICATION (774)');
             throw new NotImplementedException("Not support database.");
         }
     }
