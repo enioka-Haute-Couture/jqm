@@ -257,7 +257,7 @@ public class JqmBaseTest
                 // Oracle :
                 // SELECT SID,SERIAL#,STATUS,SERVER FROM V$SESSION WHERE USERNAME = 'JWARD';
                 // ALTER SYSTEM KILL SESSION 'sid,serial#';
-                ResultSet res = cnx.runRawSelect("SELECT SID,SERIAL# FROM V$SESSION WHERE USERNAME = 'jqm';");
+                ResultSet res = cnx.runRawSelect("SELECT SID,SERIAL# FROM V$SESSION WHERE USERNAME = 'jqm'");
 
                 int sid = 0;
                 int serial = 0;
@@ -267,7 +267,7 @@ public class JqmBaseTest
                     serial = res.getInt("SERIAL#");
                     jqmlogger.debug(String.format("SID : %d - SERIAL# : %d", sid, serial));
                 }
-                String killReq = String.format("ALTER SYSTEM KILL SESSION '%d,%d;'", sid, serial);
+                String killReq = String.format("ALTER SYSTEM KILL SESSION '%d,%d'", sid, serial);
                 cnx.runRawCommand(killReq);
                 this.sleep(waitTimeBeforeRestart);
             }
