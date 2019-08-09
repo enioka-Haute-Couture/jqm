@@ -257,7 +257,7 @@ public class JqmBaseTest
                 // Oracle :
                 // SELECT SID,SERIAL#,STATUS,SERVER FROM V$SESSION WHERE USERNAME = 'JWARD';
                 // ALTER SYSTEM KILL SESSION 'sid,serial#';
-                ResultSet res = cnx.runRawSelect("SELECT SID,SERIAL# FROM V$SESSION WHERE USERNAME = 'jqm'");
+                ResultSet res = cnx.runRawSelect("SELECT SID,SERIAL# FROM GV$SESSION WHERE USERNAME = 'jqm'");
 
                 int sid = 0;
                 int serial = 0;
