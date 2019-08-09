@@ -257,12 +257,18 @@ public class JqmBaseTest
                 // Oracle :
                 // SELECT SID,SERIAL#,STATUS,SERVER FROM V$SESSION WHERE USERNAME = 'JWARD';
                 // ALTER SYSTEM KILL SESSION 'sid,serial#';
+
+                if (cnx == null)
+                {
+                    return;
+                }
+
                 jqmlogger.info("Send select sid, serial query");
                 ResultSet res = cnx.runRawSelect("SELECT SID,SERIAL# FROM GV$SESSION WHERE USERNAME = 'JQM'");
 
                 while (res.next())
                 {
-                    String killReq = "ALTER SYSTEM KILL SESSION '" + res.getInt("SID") + "," + res.getInt("SERIAL#") + "'";
+                    String killReq = "ALTER SYSTEM DISCONNECT SESSION '" + res.getInt("SID") + "," + res.getInt("SERIAL#") + "' IMMEDIATE";
                     jqmlogger.debug(killReq);
                     cnx.runRawCommand(killReq);
                 }
