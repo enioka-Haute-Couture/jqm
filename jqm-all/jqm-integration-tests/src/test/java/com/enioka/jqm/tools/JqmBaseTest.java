@@ -254,13 +254,14 @@ public class JqmBaseTest
         }
         else if (db.getProduct().contains("mysql"))
         {
+            ResultSet res = null;
             try
             {
                 jqmlogger.info("Send suicide query");
                 // mysql 5.7, 8.0
                 // SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST WHERE USER = 'jqm'
                 // KILL [CONNECTION | QUERY] processlist_id
-                ResultSet res = cnx.runRawSelect("SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST WHERE USER = 'jqm'");
+                res = cnx.runRawSelect("SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST WHERE USER = 'jqm'");
 
                 while (res.next())
                 {
@@ -275,6 +276,20 @@ public class JqmBaseTest
             {
                 jqmlogger.warn("Failed to kill mysql : " + e.getMessage());
                 e.printStackTrace();
+            }
+            finally
+            {
+                if (res != null)
+                {
+                    try
+                    {
+                        res.close();
+                    }
+                    catch (Exception e)
+                    {
+                        res = null;
+                    }
+                }
             }
         }
         else if (db.getProduct().contains("oracle"))
@@ -294,7 +309,6 @@ public class JqmBaseTest
                     jqmlogger.debug(killReq);
                     cnx.runRawCommand(killReq);
                 }
-
                 this.sleep(waitTimeBeforeRestart);
                 Helpers.closeQuietly(cnx);
             }
