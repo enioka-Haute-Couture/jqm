@@ -237,7 +237,7 @@ public class JqmBaseTest
                 jqmlogger.warn("Failed to kill postgresql : " + e.getMessage());
             }
         }
-        else if (db.getProduct().contains("mariadb") || db.getProduct().contains("mysql"))
+        else if (db.getProduct().contains("mariadb"))
         {
             try
             {
@@ -249,7 +249,32 @@ public class JqmBaseTest
             }
             catch (Exception e)
             {
-                jqmlogger.warn("Failed to kill mariadb/mysql : " + e.getMessage());
+                jqmlogger.warn("Failed to kill mariadb : " + e.getMessage());
+            }
+        }
+        else if (db.getProduct().contains("mysql"))
+        {
+            try
+            {
+                jqmlogger.info("Send suicide query");
+                // mysql 5.7, 8.0
+                // SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST WHERE USER = 'jqm'
+                // KILL [CONNECTION | QUERY] processlist_id
+                ResultSet res = cnx.runRawSelect("SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST WHERE USER = 'jqm'");
+
+                while (res.next())
+                {
+                    String query = "KILL CONNECTION " + res.getInt("ID");
+                    jqmlogger.debug(query);
+                    cnx.runRawCommand(query);
+                }
+                this.sleep(waitTimeBeforeRestart);
+                Helpers.closeQuietly(cnx);
+            }
+            catch (Exception e)
+            {
+                jqmlogger.warn("Failed to kill mysql : " + e.getMessage());
+                e.printStackTrace();
             }
         }
         else if (db.getProduct().contains("oracle"))
