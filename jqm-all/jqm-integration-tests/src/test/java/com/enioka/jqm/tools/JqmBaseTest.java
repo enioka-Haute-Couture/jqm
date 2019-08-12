@@ -228,12 +228,14 @@ public class JqmBaseTest
                 // update pg_database set datallowconn = false where datname = 'jqm' // Cannot run, as we cannot reconnect afterward!
                 jqmlogger.info("Send suicide query");
                 cnx.runRawCommand("select pg_terminate_backend(pid) from pg_stat_activity where datname='jqm';");
+                this.sleep(waitTimeBeforeRestart);
+                Helpers.closeQuietly(cnx);
             }
             catch (Exception e)
             {
                 // Do nothing - the query is a suicide so it cannot work fully.
+                jqmlogger.warn("Failed to kill postgresql : " + e.getMessage());
             }
-            Helpers.closeQuietly(cnx);
         }
         else if (db.getProduct().contains("mariadb") || db.getProduct().contains("mysql"))
         {
@@ -243,12 +245,12 @@ public class JqmBaseTest
                 // TODO : move this statement to DB adapter, and create suicideCommand()
                 cnx.runRawCommand("KILL USER jqm;");
                 this.sleep(waitTimeBeforeRestart);
+                Helpers.closeQuietly(cnx);
             }
             catch (Exception e)
             {
-                // Nothing to do
+                jqmlogger.warn("Failed to kill mariadb/mysql : " + e.getMessage());
             }
-            Helpers.closeQuietly(cnx);
         }
         else if (db.getProduct().contains("oracle"))
         {
@@ -257,11 +259,6 @@ public class JqmBaseTest
                 // Oracle :
                 // SELECT SID,SERIAL#,STATUS,SERVER FROM V$SESSION WHERE USERNAME = 'JWARD';
                 // ALTER SYSTEM KILL SESSION 'sid,serial#';
-
-                if (cnx == null)
-                {
-                    return;
-                }
 
                 jqmlogger.info("Send select sid, serial query");
                 ResultSet res = cnx.runRawSelect("SELECT SID,SERIAL# FROM GV$SESSION WHERE USERNAME = 'JQM'");
@@ -300,20 +297,20 @@ public class JqmBaseTest
                         "CURRENT_SERVER, APPLICATION_NAME, CLIENT_PROTOCOL, CLIENT_PLATFORM, CLIENT_HOSTNAME, CONNECTION_START_TIME, APPLICATION_ID, EXECUTION_ID \n" +
                         "FROM TABLE(MON_GET_CONNECTION(cast(NULL as bigint), -2))\n");
 
-                int appHandle = 0;
                 while (res.next())
                 {
-                    appHandle = res.getInt("APPLICATION_HANDLE");
-                    jqmlogger.debug("App handle : %d");
-                    cnx.runRawCommand(String.format("CALL SYSPROC.ADMIN_CMD('FORCE APPLICATION (%d)')", appHandle));
+                    String query = "CALL SYSPROC.ADMIN_CMD('FORCE APPLICATION (" + res.getInt("APPLICATION_HANDLE") + ")')";
+                    jqmlogger.debug(query);
+                    cnx.runRawCommand(query);
                 }
+                this.sleep(waitTimeBeforeRestart);
+                Helpers.closeQuietly(cnx);
             }
             catch (Exception e)
             {
                 jqmlogger.warn("Failed to kill db2 session : " + e.getMessage());
                 e.printStackTrace();
             }
-            Helpers.closeQuietly(cnx);
         }
         else
         {
