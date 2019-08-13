@@ -16,11 +16,7 @@
 package com.enioka.jqm.tools;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import java.sql.ResultSet;
 
@@ -257,18 +253,27 @@ public class JqmBaseTest
             ResultSet res = null;
             try
             {
-                jqmlogger.info("Send suicide query");
+                jqmlogger.info("Retrieve process id list.");
                 // mysql 5.7, 8.0
                 // SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST WHERE USER = 'jqm'
                 // KILL [CONNECTION | QUERY] processlist_id
                 res = cnx.runRawSelect("SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST WHERE USER = 'jqm'");
 
+                ArrayList<Integer> processIdList = new ArrayList<Integer>();
                 while (res.next())
                 {
-                    String query = "KILL CONNECTION " + res.getInt("ID");
+                    processIdList.add(res.getInt("ID"));
+                }
+
+                jqmlogger.info("Kill all connection (" + processIdList.size() + ").");
+                Iterator it = processIdList.iterator();
+                while (it.hasNext())
+                {
+                    String query = "KILL CONNECTION " + it.next();
                     jqmlogger.debug(query);
                     cnx.runRawCommand(query);
                 }
+
                 this.sleep(waitTimeBeforeRestart);
                 Helpers.closeQuietly(cnx);
             }
