@@ -233,7 +233,7 @@ public class JqmBaseTest
                 jqmlogger.warn("Failed to kill postgresql : " + e.getMessage());
             }
         }
-        else if (db.getProduct().contains("mariadbzzz")) // mariadb
+        else if (db.getProduct().contains("mariadb")) // mariadb
         {
             try
             {
@@ -248,7 +248,7 @@ public class JqmBaseTest
                 jqmlogger.warn("Failed to kill mariadb : " + e.getMessage());
             }
         }
-        else if (db.getProduct().contains("mariadb")) // mysql
+        else if (db.getProduct().contains("mysql")) // mysql
         {
             ResultSet res = null;
             try
