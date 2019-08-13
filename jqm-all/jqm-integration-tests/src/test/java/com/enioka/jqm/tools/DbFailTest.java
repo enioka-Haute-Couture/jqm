@@ -28,7 +28,6 @@ public class DbFailTest extends JqmBaseTest
         this.simulateDbFailure(2);
 
         // DB connection lost will stop pollers
-        Assert.assertTrue(this.waitForPollersStopped());
 
         this.sleep(5);
 
@@ -41,7 +40,7 @@ public class DbFailTest extends JqmBaseTest
     {
         this.addAndStartEngine();
         this.simulateDbFailure(2);
-        Assert.assertTrue(this.waitForPollersStopped());
+
         this.sleep(2);
         Assert.assertTrue(this.waitFormPollersArePolling());
 
@@ -49,7 +48,6 @@ public class DbFailTest extends JqmBaseTest
         cnx = getNewDbSession();
 
         this.simulateDbFailure(2);
-        Assert.assertTrue(this.waitForPollersStopped());
 
         this.sleep(2);
 
@@ -66,10 +64,11 @@ public class DbFailTest extends JqmBaseTest
         this.addAndStartEngine();
         this.sleep(2); // first poller loop
 
-        this.simulateDbFailure(0);
+        this.simulateDbFailure(2);
+
         this.sleep(5);
 
-        // TODO : check something ...
+        Assert.assertTrue(this.waitFormPollersArePolling());
     }
 
     // Job ends OK during db failure.
