@@ -713,6 +713,19 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     }
 
     @Override
+    public boolean areAllPollersStopped()
+    {
+        for (QueuePoller p : this.pollers.values())
+        {
+            if (p.isRunning())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
     public boolean isFull()
     {
         for (QueuePoller p : this.pollers.values())

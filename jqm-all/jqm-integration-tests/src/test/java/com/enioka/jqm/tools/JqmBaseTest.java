@@ -233,7 +233,7 @@ public class JqmBaseTest
                 jqmlogger.warn("Failed to kill postgresql : " + e.getMessage());
             }
         }
-        else if (db.getProduct().contains("mariadb"))
+        else if (db.getProduct().contains("mariadbzzz")) // mariadb
         {
             try
             {
@@ -248,7 +248,7 @@ public class JqmBaseTest
                 jqmlogger.warn("Failed to kill mariadb : " + e.getMessage());
             }
         }
-        else if (db.getProduct().contains("mysql"))
+        else if (db.getProduct().contains("mariadb")) // mysql
         {
             ResultSet res = null;
             try
@@ -257,6 +257,7 @@ public class JqmBaseTest
                 // mysql 5.7, 8.0
                 // SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST WHERE USER = 'jqm'
                 // KILL [CONNECTION | QUERY] processlist_id
+
                 res = cnx.runRawSelect("SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST WHERE USER = 'jqm'");
 
                 ArrayList<Integer> processIdList = new ArrayList<Integer>();
@@ -360,6 +361,30 @@ public class JqmBaseTest
         {
             throw new NotImplementedException("Database not supported.");
         }
+    }
+
+    protected boolean waitForPollersStopped()
+    {
+        int remainingAttempt = 10;
+        while (!this.engines.get("localhost").areAllPollersStopped() && remainingAttempt > 0)
+        {
+            this.sleep(1);
+            --remainingAttempt;
+            jqmlogger.debug("waitForPollersStopped countdown : " + remainingAttempt);
+        }
+        return this.engines.get("localhost").areAllPollersStopped();
+    }
+
+    protected boolean waitFormPollersArePolling()
+    {
+        int remainingAttempt = 10;
+        while (!this.engines.get("localhost").areAllPollersPolling() && remainingAttempt > 0)
+        {
+            this.sleep(1);
+            --remainingAttempt;
+            jqmlogger.debug("waitFormPollersArePolling countdown : " + remainingAttempt);
+        }
+        return this.engines.get("localhost").areAllPollersPolling();
     }
 
     protected void displayAllHistoryTable()

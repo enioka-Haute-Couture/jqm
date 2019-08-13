@@ -26,18 +26,34 @@ public class DbFailTest extends JqmBaseTest
     {
         this.addAndStartEngine();
         this.simulateDbFailure(2);
+
+        // DB connection lost will stop pollers
+        Assert.assertTrue(this.waitForPollersStopped());
+
         this.sleep(5);
-        Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
+
+        // Once DB connection is restored all pollers restarted
+        Assert.assertTrue(this.waitFormPollersArePolling());
     }
 
     @Test
     public void testDbDoubleFailure() throws Exception
     {
         this.addAndStartEngine();
-        this.simulateDbFailure(5);
-        this.sleep(5);
-        this.simulateDbFailure(5);
-        this.sleep(5);
+        this.simulateDbFailure(2);
+        Assert.assertTrue(this.waitForPollersStopped());
+        this.sleep(2);
+        Assert.assertTrue(this.waitFormPollersArePolling());
+
+        // cnx was closed in previous simulateDbFailure()
+        cnx = getNewDbSession();
+
+        this.simulateDbFailure(2);
+        Assert.assertTrue(this.waitForPollersStopped());
+
+        this.sleep(2);
+
+        Assert.assertTrue(this.waitFormPollersArePolling());
     }
 
     @Test
@@ -52,6 +68,8 @@ public class DbFailTest extends JqmBaseTest
 
         this.simulateDbFailure(0);
         this.sleep(5);
+
+        // TODO : check something ...
     }
 
     // Job ends OK during db failure.
@@ -72,10 +90,11 @@ public class DbFailTest extends JqmBaseTest
     public void testDbFailureWithRunningJobKo() throws Exception
     {
         JqmSimpleTest.create(cnx, "pyl.KillMe").expectOk(0).run(this);
-        this.sleep(2);
+        this.sleep(5);
 
         this.simulateDbFailure(5);
         TestHelpers.waitFor(1, 10000, this.getNewDbSession());
+        this.sleep(2);
 
         Assert.assertEquals(1, TestHelpers.getNonOkCount(this.getNewDbSession()));
     }
@@ -108,6 +127,7 @@ public class DbFailTest extends JqmBaseTest
         this.sleep(5);
 
         Assert.assertEquals(1000, TestHelpers.getOkCount(this.getNewDbSession()));
+
         // Assert.assertTrue(this.engines.get("localhost").isAllPollersPolling());
     }
 }
