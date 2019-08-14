@@ -318,7 +318,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 }
                 else
                 {
-                    jqmlogger.error("Queue poller has failed! It will stop.", e);
+                    jqmlogger.error("Queue poller has failed! It will stop (RuntimeException).", e);
                     this.run = false;
                     this.hasStopped = true;
                     break;
@@ -326,7 +326,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
             }
             catch (Exception e)
             {
-                jqmlogger.error("Queue poller has failed! It will stop.", e);
+                jqmlogger.error("Queue poller has failed! It will stop (Exception).", e);
                 this.run = false;
                 this.hasStopped = true;
                 break;
