@@ -375,7 +375,7 @@ public class JqmBaseTest
         return this.engines.get("localhost").areAllPollersStopped();
     }
 
-    protected boolean waitFormPollersArePolling()
+    protected boolean waitForPollersArePolling()
     {
         int remainingAttempt = 10;
         while (!this.engines.get("localhost").areAllPollersPolling() && remainingAttempt > 0)

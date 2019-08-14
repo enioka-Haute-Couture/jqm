@@ -32,7 +32,7 @@ public class DbFailTest extends JqmBaseTest
         this.sleep(5);
 
         // Once DB connection is restored all pollers restarted
-        Assert.assertTrue(this.waitFormPollersArePolling());
+        Assert.assertTrue(this.waitForPollersArePolling());
     }
 
     @Test
@@ -42,7 +42,7 @@ public class DbFailTest extends JqmBaseTest
         this.simulateDbFailure(2);
 
         this.sleep(2);
-        Assert.assertTrue(this.waitFormPollersArePolling());
+        Assert.assertTrue(this.waitForPollersArePolling());
 
         // cnx was closed in previous simulateDbFailure()
         cnx = getNewDbSession();
@@ -51,7 +51,7 @@ public class DbFailTest extends JqmBaseTest
 
         this.sleep(2);
 
-        Assert.assertTrue(this.waitFormPollersArePolling());
+        Assert.assertTrue(this.waitForPollersArePolling());
     }
 
     @Test
@@ -68,7 +68,7 @@ public class DbFailTest extends JqmBaseTest
 
         this.sleep(5);
 
-        Assert.assertTrue(this.waitFormPollersArePolling());
+        Assert.assertTrue(this.waitForPollersArePolling());
     }
 
     // Job ends OK during db failure.
@@ -121,6 +121,8 @@ public class DbFailTest extends JqmBaseTest
         this.sleep(1);
         jqmlogger.info("Stopping db");
         this.simulateDbFailure(2);
+
+        Assert.assertTrue(this.waitForPollersArePolling());
 
         TestHelpers.waitFor(1000, 120000, this.getNewDbSession());
         this.sleep(5);

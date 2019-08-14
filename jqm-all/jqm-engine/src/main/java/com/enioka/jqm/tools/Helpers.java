@@ -37,6 +37,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
+import com.enioka.jqm.jdbc.*;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.util.ByteSource;
@@ -45,11 +46,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.jdbc.Db;
-import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jdbc.NoResultException;
-import com.enioka.jqm.jdbc.NonUniqueResultException;
-import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JndiObjectResource;
@@ -637,6 +633,7 @@ final class Helpers
                 || (e.getCause() != null && e.getCause().getMessage().equals("This connection has been closed"))
                 || (e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
                 || (e.getCause() != null && e.getCause() instanceof SQLNonTransientException
-                        && e.getCause().getMessage().equals("connection exception: closed"));
+                        && e.getCause().getMessage().equals("connection exception: closed"))
+                || (e instanceof  DatabaseException);
     }
 }
