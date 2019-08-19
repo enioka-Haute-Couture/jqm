@@ -548,7 +548,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     public boolean isActuallyPolling()
     {
         // 1000ms is a rough estimate of the time taken to do the actual poll. If it's more, there is a huge issue elsewhere.
-        return (Calendar.getInstance().getTimeInMillis() - this.lastLoop.getTimeInMillis()) <= pollingInterval + 1000;
+        return this.lastLoop != null && (Calendar.getInstance().getTimeInMillis() - this.lastLoop.getTimeInMillis()) <= pollingInterval + 1000;
     }
 
     @Override
