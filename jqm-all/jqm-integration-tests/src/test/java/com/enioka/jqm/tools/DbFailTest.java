@@ -128,6 +128,6 @@ public class DbFailTest extends JqmBaseTest
 
         Assert.assertEquals(1000, TestHelpers.getOkCount(this.getNewDbSession()));
 
-        // Assert.assertTrue(this.engines.get("localhost").isAllPollersPolling());
+        Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
     }
 }

@@ -9,8 +9,6 @@ public interface JqmEngineOperations
 
     public boolean areAllPollersPolling();
 
-    public boolean areAllPollersStopped();
-
     public void resume();
 
     public void pause();

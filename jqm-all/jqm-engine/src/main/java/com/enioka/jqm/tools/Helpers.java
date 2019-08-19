@@ -634,7 +634,7 @@ final class Helpers
                 || (e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
                 || (e.getCause() != null && e.getCause() instanceof SQLNonTransientException
                         && e.getCause().getMessage().equals("connection exception: closed"))
-                || (e instanceof  DatabaseException && e.getMessage().contains("Communications link failure") || e.getMessage().contains("This connection has been closed"))
+                || (e instanceof  DatabaseException && e.getMessage().contains("Communications link failure") || e.getMessage().contains("This connection has been closed") || e.getMessage().contains("Connection is closed"))
                 || (e instanceof DatabaseException && e.getCause().getClass().getSimpleName().equals("CommunicationsException"));
     }
 }

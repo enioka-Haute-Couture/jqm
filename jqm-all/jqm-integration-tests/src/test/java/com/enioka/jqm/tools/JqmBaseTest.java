@@ -221,7 +221,6 @@ public class JqmBaseTest
         {
             try
             {
-                // update pg_database set datallowconn = false where datname = 'jqm' // Cannot run, as we cannot reconnect afterward!
                 jqmlogger.info("Send suicide query");
                 cnx.runRawCommand("select pg_terminate_backend(pid) from pg_stat_activity where datname='jqm';");
                 this.sleep(waitTimeBeforeRestart);
@@ -229,16 +228,14 @@ public class JqmBaseTest
             }
             catch (Exception e)
             {
-                // Do nothing - the query is a suicide so it cannot work fully.
                 jqmlogger.warn("Failed to kill postgresql : " + e.getMessage());
             }
         }
-        else if (db.getProduct().contains("mariadb")) // mariadb
+        else if (db.getProduct().contains("mariadb"))
         {
             try
             {
                 jqmlogger.info("Send suicide query");
-                // TODO : move this statement to DB adapter, and create suicideCommand()
                 cnx.runRawCommand("KILL USER jqm;");
                 this.sleep(waitTimeBeforeRestart);
                 Helpers.closeQuietly(cnx);
@@ -248,16 +245,13 @@ public class JqmBaseTest
                 jqmlogger.warn("Failed to kill mariadb : " + e.getMessage());
             }
         }
-        else if (db.getProduct().contains("mysql")) // mysql
+        else if (db.getProduct().contains("mysql"))
         {
             ResultSet res = null;
             try
             {
-                jqmlogger.info("Retrieve process id list.");
                 // mysql 5.7, 8.0
-                // SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST WHERE USER = 'jqm'
-                // KILL [CONNECTION | QUERY] processlist_id
-
+                jqmlogger.info("Retrieve process id list.");
                 res = cnx.runRawSelect("SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST WHERE USER = 'jqm'");
 
                 ArrayList<Integer> processIdList = new ArrayList<Integer>();
@@ -280,7 +274,7 @@ public class JqmBaseTest
             }
             catch (Exception e)
             {
-                jqmlogger.warn("Failed to kill mysql : " + e.getMessage());
+                jqmlogger.warn("Failed to kill mysql connections : " + e.getMessage());
                 e.printStackTrace();
             }
             finally
@@ -302,10 +296,6 @@ public class JqmBaseTest
         {
             try
             {
-                // Oracle :
-                // SELECT SID,SERIAL#,STATUS,SERVER FROM V$SESSION WHERE USERNAME = 'JWARD';
-                // ALTER SYSTEM KILL SESSION 'sid,serial#';
-
                 jqmlogger.info("Send select sid, serial query");
                 ResultSet res = cnx.runRawSelect("SELECT SID,SERIAL# FROM GV$SESSION WHERE USERNAME = 'JQM'");
 
@@ -328,15 +318,6 @@ public class JqmBaseTest
         {
             try
             {
-                // DB2 : CALL SYSPROC.ADMIN_CMD('FORCE APPLICATION (774)');
-/*
-                SELECT APPLICATION_HANDLE, CLIENT_IPADDR, CLIENT_PORT_NUMBER, SESSION_AUTH_ID,
-                        CURRENT_SERVER, APPLICATION_NAME, CLIENT_PROTOCOL, CLIENT_PLATFORM, CLIENT_HOSTNAME, CONNECTION_START_TIME, APPLICATION_ID, EXECUTION_ID
-                FROM TABLE(MON_GET_CONNECTION(cast(NULL as bigint), -2))
-
-                CALL SYSPROC.ADMIN_CMD('FORCE APPLICATION (774)');
-*/
-
                 jqmlogger.info("Send select application_handle query");
                 ResultSet res = cnx.runRawSelect("SELECT APPLICATION_HANDLE, CLIENT_IPADDR, CLIENT_PORT_NUMBER, SESSION_AUTH_ID,\n" +
                         "CURRENT_SERVER, APPLICATION_NAME, CLIENT_PROTOCOL, CLIENT_PLATFORM, CLIENT_HOSTNAME, CONNECTION_START_TIME, APPLICATION_ID, EXECUTION_ID \n" +
@@ -361,18 +342,6 @@ public class JqmBaseTest
         {
             throw new NotImplementedException("Database not supported.");
         }
-    }
-
-    protected boolean waitForPollersStopped()
-    {
-        int remainingAttempt = 10;
-        while (!this.engines.get("localhost").areAllPollersStopped() && remainingAttempt > 0)
-        {
-            this.sleep(1);
-            --remainingAttempt;
-            jqmlogger.debug("waitForPollersStopped countdown : " + remainingAttempt);
-        }
-        return this.engines.get("localhost").areAllPollersStopped();
     }
 
     protected boolean waitForPollersArePolling()
