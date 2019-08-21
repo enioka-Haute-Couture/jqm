@@ -33,7 +33,7 @@ import com.enioka.jqm.jdbc.QueryResult;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
- * Persistence class for storing the definition of the different nodes that are member of the JMQ cluster.<br>
+ * Persistence class for storing the definition of the different nodes that are member of the JQM cluster.<br>
  * There can be some confusion between terms: an <code>engine</code> is a Java process that represents a {@link Node}. There can only be one
  * engine running the same Node at the same time.<br>
  * <br>
@@ -414,7 +414,7 @@ public class Node implements Serializable
         }
         if (nn.size() > 1)
         {
-            throw new NonUniqueResultException("COnfiguration is broken: multiple nodes with the same ID");
+            throw new NonUniqueResultException("Configuration is broken: multiple nodes with the same ID");
         }
         return nn.get(0);
     }

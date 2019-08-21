@@ -114,7 +114,7 @@ The only situations when it is recommended to build your own WS client are:
 Server side
 ********************
 
-The web service is not active on any engine by default. To activate it, see the administration guide.
+The web service is not active on any engine by default. To activate it, see the :doc:`administration guide<admin/gui>`.
 
 It is not necessary to enable the service on all JQM nodes. It is actually recommended to dedicate a node that will not host jobs (or few) to the WS.
 Moreover, it is a standard web application with purely stateless sessions,
@@ -201,7 +201,7 @@ The body of the response contains an XML or JSON item giving details on the erro
 Script sample
 ****************
 
-PowerShell script. Logics is the same in any language, script or compiled.::
+PowerShell script. Logics is the same in any language, script or compiled::
     
     # Note: we use JSON as a demonstration of how to use it over the default XML. Obviously, PowerShell deals with XML very well and does not need this.
     

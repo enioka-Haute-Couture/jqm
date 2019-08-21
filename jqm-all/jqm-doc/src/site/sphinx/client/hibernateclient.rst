@@ -8,7 +8,7 @@ before this chapter, as it gives the definition of many terms used here as well 
 JQM is very database-centric, with (nearly) all communications going through the database. It was therefore
 logical for the first client implementation to be a direct to database API, using the same ORM named Hibernate as in the engine.
 
-.. note:: actually, even if this API uses a direct connection to the database for nearly everything, there is one API method 
+.. note:: Actually, even if this API uses a direct connection to the database for nearly everything, there is one API method
 	which does not work that way: file retrieval.
 	Files produced by job instances (business files or simply logs) are stored locally on each node - therefore retrieving these files requires
 	connecting directly (HTTP GET) to the nodes. Therefore, talk of HTTP connection parameters should not come as a surprise.
@@ -24,7 +24,7 @@ jdbc/jqm to connect to the database. This name can be overloaded.
 It is possible to overload persistence unit properties either:
 
 * (specific to this client) with a jqm.properties file inside the META-INF directory
-* (as for every other client)by using Java code, before creating any client::
+* (as for every other client) by using Java code, before creating any client::
 
 	Properties p = new Properties();
 	p.put("javax.persistence.nonJtaDataSource", "jdbc/houbahop");
@@ -34,7 +34,7 @@ The different properties possible are JPA2 properties (http://download.oracle.co
 Hibernate properties (http://docs.jboss.org/hibernate/orm/4.2/manual/en-US/html/ch03.html#configuration-optional). 
 The preceding example changed (or set in the first place) the <non-jta-datasource\> to some JNDI alias. Dafault is jdbc/jqm.
 
-If the file retrieval abilities are used, some connection data may also be provided through the same systems when SSL is used:
+If the file retrieval abilities are used, some connection data may also be provided through the same system when SSL is used:
 
 * com.enioka.jqm.ws.truststoreFile: in case SSL is used, this will be the trustStore to use. Default is: system trust store (inside Java installation).
 * com.enioka.jqm.ws.truststoreType: same as above - type of the store. Default is JKS.
@@ -80,9 +80,9 @@ If logs are needed, an implementation must be provided (such as slf4j-log4j12) a
 For example, this may be used as an implementation::
 
 	<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>${slf4j.version}</version>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-log4j12</artifactId>
+		<version>${slf4j.version}</version>
 	</dependency>
 
 and then the following log4j configuration file will set reasonable log levels on the console standard output::
@@ -108,7 +108,7 @@ In a JNDI-enabled container without other JPA use
 
 Hypothesis: 
 
-* deployment inside an EE6 container such as WebSphere, JBoss, Glassfish, or deployment inside a JSE container with
+* Deployment inside an EE6 container such as WebSphere, JBoss, Glassfish, or deployment inside a JSE container with
   JNDI abilities (Tomcat, **JQM itself**, ...)
 * There is no use of any JPA provider in the application (no persistence.xml)
 
@@ -127,12 +127,12 @@ and the API is ready to use. There is no need for parameters in this case (every
 With other JPA use
 ++++++++++++++++++++++++++++
 
-.. warning:: this paragraph is not needed for recent versions of Hibernate (4.x) as they extend the JPA specification by allowing
+.. warning:: This paragraph is not needed for recent versions of Hibernate (4.x) as they extend the JPA specification by allowing
 	multiple persistence units. Therefore, only the previous paragraph applies.
 
 Hypothesis: 
 
-* deployment inside an EE6 container such as WebSphere, JBoss, Glassfish, or deployment inside a JSE container with
+* Deployment inside an EE6 container such as WebSphere, JBoss, Glassfish, or deployment inside a JSE container with
   JNDI abilities (Tomcat, **JQM itself**, ...), or no JNDI abilities (plain Sun JVM)
 * There is already a persistence.xml in the project that will use the client API
 
@@ -166,14 +166,14 @@ always be "jobqueue-api-pu". The **file path inside the jar tag must be adapted 
 version**. The non-jta-datasource alias can be named anything you want (you may even want to redefine completely the datasource here,
 not using JNDI - see the Hibernate reference for the properties to set to do so).
 
-.. warning:: the use of the <jar-file> tag is only allowed if the application package is an ear file, not a war.
+.. warning:: The use of the <jar-file> tag is only allowed if the application package is an ear file, not a war.
 
 Making it work with both Tomcat and Glassfish/WebSphere
 ***************************************************************
 
 Servlet containers such as Tomcat have a different way of handling JNDI alias contexts than full JEE containers. Basically, a developper would use java:/comp/env/jdbc/datasource inside Tomcat
 and simply jdbc/datasource in Glassfish. JQM implements a hack to make it work anyway in both cases. To enable it, it is compulsory to specify the JNDI alias inside the configuration file
-or inside the Properrty object, just like above.
+or inside the Property object, just like above.
 
 TL;DR: to make it work in both cases, don't write anything specific inside your web.xml and use this in your code before making any API call::
 
