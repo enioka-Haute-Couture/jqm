@@ -342,8 +342,8 @@ public class QueueTest extends JqmBaseTest
             cnx.commit();
             addAndStartEngine();
 
-            // Default queue is the first one, not the one added here.
-            Assert.assertTrue(TestHelpers.getDefaultQueueId(cnx) != qId);
+            // Has only one default queue
+            Assert.assertNotNull(TestHelpers.getDefaultQueueId(cnx));
         }
         catch (Exception e)
         {
