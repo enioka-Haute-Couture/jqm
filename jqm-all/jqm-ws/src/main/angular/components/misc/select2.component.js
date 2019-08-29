@@ -106,7 +106,7 @@ Select2Controller.$inject = ['$scope',];
 
 export const select2Component = {
     controller: Select2Controller,
-    template: '<div id="{{$ctrl.parentId}}"><select id="{{$ctrl.selectId}}"><option></option></select></div>',
+    template: '<div id="{{$ctrl.parentId}}"><select id="{{$ctrl.selectId}}" style="width: 100%" data-placeholder="{{$ctrl.placeholder}}"><option></option></select></div>',
     bindings: {
         'data': '<',
         'ngModel': '=',
