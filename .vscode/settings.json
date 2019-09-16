@@ -58,10 +58,14 @@
     "maven.excludedFolders": [
         "**/.*", // exclude hidden folders
         "**/node_modules", // exclude node modules to speed up
-        "**/target", // exclude duplicated pom file in target folder
+        "**/target" // exclude duplicated pom file in target folder
     ],
     "maven.executable.options": "",
     "javascript.format.placeOpenBraceOnNewLineForFunctions": true,
     "javascript.format.placeOpenBraceOnNewLineForControlBlocks": true,
     "restructuredtext.confPath": "${workspaceFolder}\\jqm-all\\jqm-doc\\src\\site\\sphinx",
+    "prettier.printWidth": 180,
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    }
 }
