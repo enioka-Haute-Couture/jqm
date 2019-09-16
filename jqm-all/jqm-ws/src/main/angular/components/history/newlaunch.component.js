@@ -13,9 +13,7 @@ class NewLaunchController
         this.me = µPermManager;
 
         this.data = {
-            selectedJd: null,
-            newKey: null,
-            newValue: null
+            selectedJd: null
         };
 
         var $ctrl = this;
@@ -31,12 +29,21 @@ class NewLaunchController
 
     addPrm()
     {
-        var np = {};
-        np.key = this.data.newKey;
-        np.value = this.data.newValue;
-        this.request.parameters.push(np);
-        this.data.newKey = null;
-        this.data.newValue = null;
+        this.request.parameters.push({ key: "", value: "" });
+    };
+
+
+    removePrm(p)
+    {
+        this.request.parameters = this.request.parameters.filter(function (x) { return x !== p; });
+    };
+
+    canAdd(p)
+    {
+        return this.request.parameters.every(function (x)
+        {
+            return x.key && x.value;
+        });
     };
 
     postOk(response)
