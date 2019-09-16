@@ -75,38 +75,33 @@
         <label for="txtUser" class="col-sm-5 col-form-label">{{$ctrl.selectedJd.parameters.length > 0 ? "Override or
             new parameters" : "Job instance parameters"}}</label>
         <div class="col-sm-7">
-            <div class="form-row">
+            <div class="form-group form-row" ng-repeat="p in $ctrl.request.parameters">
                 <div class="col-sm-4">
-                    <input id="txtKey" class="form-control" type="text" ng-model="$ctrl.data.newKey" placeholder="key" />
+                    <input id="txtKey" class="form-control" type="text" ng-model="p.key" placeholder="key" />
                 </div>
                 <div class="col-sm-4">
-                    <input id="txtValue" class="form-control" type="text" ng-model="$ctrl.data.newValue" placeholder="value" />
+                    <input id="txtValue" class="form-control" type="text" ng-model="p.value" placeholder="value" />
                 </div>
                 <div class="col-sm-4">
-                    <button class="btn btn-outline-success" ng-click="$ctrl.addPrm()" ng-disabled="!$ctrl.data.newKey || !$ctrl.data.newValue">
-                        <span class="fas fa-plus-circle"></span>
-                        Add
+                    <button class="btn btn-outline-danger" ng-click="$ctrl.removePrm(p)">
+                        <span class="fas fa-minus-circle"></span>
+                        Remove
                     </button>
                 </div>
             </div>
-            <small class="form-text text-muted">
-                Enter here additional key/value pairs
-            </small>
-        </div>
-    </div>
-
-    <div class="form-group row">
-        <label for="additionalPrms" class="col-sm-5 col-form-label"></label>
-        <div class="col-sm-7">
-            <div class="form-row" id="additionalPrms" ng-repeat="p in $ctrl.request.parameters | orderBy:'key'">
-                <div class="col-sm-4">{{p.key}}</div>
-                <div class="col-sm-4">{{p.value}}</div>
+            <div class="form-row align-items-center">
+                <div class="col-auto">
+                    <button class="btn btn-outline-success" ng-click="$ctrl.addPrm()" ng-disabled="!$ctrl.canAdd()"><span class="fas fa-plus-circle">&nbsp;</span>Add</button>
+                </div>
+                <small class="form-text text-muted col-auto m-0">
+                    Add additional key/value pairs
+                </small>
             </div>
         </div>
     </div>
 
     <modal-footer>
-        <button class="btn btn-outline-dark" ng-click="$ctrl.ok()" ng-disabled="!$ctrl.selectedJd || !$ctrl.request.user">
+        <button class="btn btn-outline-dark" ng-click="$ctrl.ok()" ng-disabled="!$ctrl.selectedJd || !$ctrl.request.user || !$ctrl.canAdd()">
             <span class="fas fa-check"></span>
             OK
         </button>
