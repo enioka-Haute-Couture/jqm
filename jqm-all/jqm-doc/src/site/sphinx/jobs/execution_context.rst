@@ -106,7 +106,7 @@ Class loading order
 A normal JSE class loader is parent first - that is, if a class exists in a lower layer of the class loading hierarchy, 
 it will be loaded even if your own jar provides a class of the same package + name.
 
-For example, if you jar contains a java.util.String class, it will never be loaded as it defined in the JDK itself, 
+For example, if your jar contains a java.util.String class, it will never be loaded as it's defined in the JDK itself,
 the lowest level and therefore the highest priority.
 
 Sometimes, you will want to give priority to your own classes. This is done by setting "childFirst" to "true". In that case,
