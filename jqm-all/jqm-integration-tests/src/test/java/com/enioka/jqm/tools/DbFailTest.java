@@ -5,6 +5,7 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
+
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.test.helpers.CreationTools;
@@ -15,10 +16,8 @@ public class DbFailTest extends JqmBaseTest
     @Before
     public void before()
     {
-        if (db.getProduct().contains("hsql"))
-        {
-            Assume.assumeTrue(JqmBaseTest.s != null);
-        }
+        assumeNotDb2();
+        assumeNotOracle();
     }
 
     @Test

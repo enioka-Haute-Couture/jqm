@@ -139,6 +139,24 @@ public class JqmBaseTest
         return System.getProperty("os.name").toLowerCase().startsWith("win");
     }
 
+    protected void assumeNotDb2()
+    {
+        String dbName = System.getenv("DB");
+        if (dbName != null)
+        {
+            Assume.assumeFalse( "Test not implement for db2.", dbName.contains("db2"));
+        }
+    }
+
+    protected void assumeNotOracle()
+    {
+        String dbName = System.getenv("DB");
+        if (dbName != null)
+        {
+            Assume.assumeFalse("Test not implement for oracle.", dbName.contains("oracle"));
+        }
+    }
+
     protected JqmEngineOperations addAndStartEngine()
     {
         return addAndStartEngine("localhost");
@@ -196,12 +214,9 @@ public class JqmBaseTest
 
     protected void waitDbStop()
     {
-        if (db.getProduct().contains("hsql"))
+        while (s.getState() != 16)
         {
-            while (s.getState() != 16)
-            {
-                this.sleepms(1);
-            }
+            this.sleepms(1);
         }
     }
 
