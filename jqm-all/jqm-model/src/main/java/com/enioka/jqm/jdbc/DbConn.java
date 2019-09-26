@@ -95,6 +95,7 @@ public class DbConn implements Closeable
         return qp;
     }
 
+    /** For testing purpose only */
     public void runRawCommand(String query)
     {
         PreparedStatement ps = null;
