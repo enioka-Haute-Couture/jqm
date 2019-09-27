@@ -119,7 +119,7 @@ function Remove-JqmService {
 
 function Import-AllXml {
     Set-Location $PSScriptRoot
-    & $java -jar jqm.jar Import-JobDef -f ((Get-ChildItem $PSScriptRoot/jobs -Recurse -Filter *.xml -Exclude pom.xml | % FullName) -join ',')
+    & $java -jar jqm.jar Import-JobDef -f ((Get-ChildItem $PSScriptRoot/jobs -Recurse -Filter *.xml -Exclude pom.xml | % FullName) -join ' ')
 }
 
 function Register-JqmNode {
