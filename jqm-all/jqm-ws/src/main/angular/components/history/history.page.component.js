@@ -38,7 +38,7 @@ class HistoryPageCtrl
         this.query = {};
 
         this.pagingOptions = {
-            pageSize: 15,
+            pageSize: 20,
             currentPage: 1
         };
 
@@ -95,7 +95,7 @@ class HistoryPageCtrl
             showFooter: true,
 
             paginationPageSizes: [10, 15, 20, 30, 40, 50, 100],
-            paginationPageSize: 20,
+            paginationPageSize: ctrl.pagingOptions.pageSize,
             useExternalPagination: true,
             useExternalSorting: true,
 
@@ -344,8 +344,8 @@ class HistoryPageCtrl
 
             // Reset table data to default.
             this.pagingOptions = {
-                pageSize: 15,
-                currentPage: 1
+                pageSize: this.gridOptions.paginationPageSize,
+                currentPage: this.gridOptions.paginationCurrentPage
             };
 
             this.sortInfo = [
