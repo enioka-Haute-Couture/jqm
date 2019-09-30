@@ -66,35 +66,34 @@ final class ResourceParser
     private static JndiResourceDescriptor fromDatabase(String alias) throws NamingException
     {
         JndiObjectResource resource = null;
-        DbConn cnx = null;
+
         try
         {
             if (!Helpers.isDbInitialized())
             {
                 throw new IllegalStateException("cannot fetch a JNDI resource from DB when DB is not initialized");
             }
-            cnx = Helpers.getNewDbSession();
-            resource = JndiObjectResource.select_alias(cnx, alias);
 
-            JndiResourceDescriptor d = new JndiResourceDescriptor(resource.getType(), resource.getDescription(), null, resource.getAuth(),
-                    resource.getFactory(), resource.getSingleton());
-            for (JndiObjectResourceParameter prm : resource.getParameters(cnx))
+            try (DbConn cnx = Helpers.getNewDbSession())
             {
-                d.add(new StringRefAddr(prm.getKey(), prm.getValue() != null ? prm.getValue() : ""));
-                // null values forbidden (but equivalent to "" in Oracle!)
-            }
+                resource = JndiObjectResource.select_alias(cnx, alias);
 
-            return d;
+                JndiResourceDescriptor d = new JndiResourceDescriptor(resource.getType(), resource.getDescription(), null, resource.getAuth(),
+                        resource.getFactory(), resource.getSingleton());
+                for (JndiObjectResourceParameter prm : resource.getParameters(cnx))
+                {
+                    d.add(new StringRefAddr(prm.getKey(), prm.getValue() != null ? prm.getValue() : ""));
+                    // null values forbidden (but equivalent to "" in Oracle!)
+                }
+
+                return d;
+            }
         }
         catch (Exception e)
         {
             NamingException ex = new NamingException("Could not find a JNDI object resource of name " + alias);
             ex.setRootCause(e);
             throw ex;
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
     }
 

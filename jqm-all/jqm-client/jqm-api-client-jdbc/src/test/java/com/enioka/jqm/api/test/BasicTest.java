@@ -200,11 +200,8 @@ public class BasicTest
         Properties p = new Properties();
         p.putAll(Db.loadProperties());
         Db db = new Db(p);
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = db.getConn())
         {
-            cnx = db.getConn();
-
             int qId = Queue.create(cnx, "q1", "q1 description", true);
             int jobDefdId = JobDef.create(cnx, "test description", "class", null, "jar", qId, 1, "appName", null, null, null, null, null,
                     false, null, PathType.FS);
@@ -222,13 +219,6 @@ public class BasicTest
                             .setPageSize(1).setApplicationName("appName"));
 
             Assert.assertEquals(1, res.size());
-        }
-        finally
-        {
-            if (cnx != null)
-            {
-                cnx.closeQuietly(cnx);
-            }
         }
     }
 }

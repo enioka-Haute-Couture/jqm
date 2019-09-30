@@ -135,11 +135,8 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
         tracker = jr.getTracker(this.ji, new JobInstanceEngineApi(this.ji), this);
 
         // Block needing the database
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
-            cnx = Helpers.getNewDbSession();
-
             // Cache heating & co, loader-specific.
             tracker.initialize(cnx);
 
@@ -168,10 +165,6 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
         {
             firstBlockDbFailureAnalysis(e);
             return;
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
 
         // Actual launch
@@ -291,12 +284,8 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
      */
     void endOfRunDb()
     {
-        DbConn cnx = null;
-
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
-            cnx = Helpers.getNewDbSession();
-
             // Done: put inside history & remove instance from queue.
             History.create(cnx, this.ji, this.resultStatus, endDate);
             jqmlogger.trace("An History was just created for job instance " + this.ji.getId());
@@ -306,10 +295,6 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
         catch (RuntimeException e)
         {
             endBlockDbFailureAnalysis(e);
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
     }
 

@@ -445,20 +445,14 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         this.intPoller.stop();
 
         // Reset the stop counter - we may want to restart one day
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
-            cnx = Helpers.getNewDbSession();
             cnx.runUpdate("node_update_has_stopped_by_id", node.getId());
             cnx.commit();
         }
         catch (Exception e)
         {
             jqmlogger.error("Could not store node new state in database during node shutdown", e);
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
 
         // JMX
@@ -751,16 +745,10 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     @Override
     public void pause()
     {
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
-            cnx = Helpers.getNewDbSession();
             cnx.runUpdate("node_update_enabled_by_id", Boolean.FALSE, node.getId());
             cnx.commit();
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
 
         refreshConfiguration();
@@ -769,16 +757,10 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     @Override
     public void resume()
     {
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
-            cnx = Helpers.getNewDbSession();
             cnx.runUpdate("node_update_enabled_by_id", Boolean.TRUE, node.getId());
             cnx.commit();
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
 
         refreshConfiguration();
