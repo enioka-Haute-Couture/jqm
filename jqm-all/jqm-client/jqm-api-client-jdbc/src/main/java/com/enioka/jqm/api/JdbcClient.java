@@ -498,35 +498,25 @@ final class JdbcClient implements JqmClient
     public void cancelJob(int idJob)
     {
         jqmlogger.trace("Job instance number " + idJob + " will be cancelled");
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             QueryResult res = cnx.runUpdate("jj_update_cancel_by_id", idJob);
             if (res.nbUpdated != 1)
             {
                 throw new JqmClientException("the job is already running, has already finished or never existed to begin with");
             }
-        }
-        catch (RuntimeException e)
-        {
-            closeQuietly(cnx);
-            throw e;
-        }
 
-        try
-        {
             History.create(cnx, idJob, State.CANCELLED, null);
             JobInstance.delete_id(cnx, idJob);
             cnx.commit();
         }
+        catch (RuntimeException e)
+        {
+            throw e;
+        }
         catch (Exception e)
         {
             throw new JqmClientException("could not historise the job instance after it was cancelled", e);
-        }
-        finally
-        {
-            closeQuietly(cnx);
         }
     }
 

@@ -137,9 +137,8 @@ public class CertificateRequest
 
     public void writePemPublicToFile(String path)
     {
-        FileWriter fw = null;
-        JcaPEMWriter wr = null;
-        try
+        try (FileWriter fw = new FileWriter(path);
+             JcaPEMWriter wr = new JcaPEMWriter(fw))
         {
             File f = new File(path);
             if (!f.getParentFile().isDirectory() && !f.getParentFile().mkdir())
@@ -147,30 +146,21 @@ public class CertificateRequest
                 throw new PkiException(
                         "couldn't create directory " + f.getParentFile().getAbsolutePath() + " for storing the SSL keystore");
             }
-            fw = new FileWriter(path);
-            wr = new JcaPEMWriter(fw);
+
             wr.writeObject(holder);
             wr.flush();
         }
         catch (Exception e)
         {
             throw new PkiException(e);
-        }
-        finally
-        {
-            closeQuietly(wr);
-            closeQuietly(fw);
         }
     }
 
     public String writePemPublicToString()
     {
-        StringWriter sw = null;
-        JcaPEMWriter wr = null;
-        try
+        try (StringWriter sw = new StringWriter();
+             JcaPEMWriter wr = new JcaPEMWriter(sw))
         {
-            sw = new StringWriter();
-            wr = new JcaPEMWriter(sw);
             wr.writeObject(holder);
             wr.flush();
             return sw.toString();
@@ -179,21 +169,13 @@ public class CertificateRequest
         {
             throw new PkiException(e);
         }
-        finally
-        {
-            closeQuietly(wr);
-            closeQuietly(sw);
-        }
     }
 
     public void writePemPrivateToFile(String path)
     {
-        FileWriter fw = null;
-        JcaPEMWriter wr = null;
-        try
+        try (FileWriter fw = new FileWriter(path);
+             JcaPEMWriter wr = new JcaPEMWriter(fw))
         {
-            fw = new FileWriter(path);
-            wr = new JcaPEMWriter(fw);
             wr.writeObject(privateKey);
             wr.flush();
         }
@@ -201,21 +183,13 @@ public class CertificateRequest
         {
             throw new PkiException(e);
         }
-        finally
-        {
-            closeQuietly(wr);
-            closeQuietly(fw);
-        }
     }
 
     public String writePemPrivateToString()
     {
-        StringWriter sw = null;
-        JcaPEMWriter wr = null;
-        try
+        try (StringWriter sw = new StringWriter();
+             JcaPEMWriter wr = new JcaPEMWriter(sw))
         {
-            sw = new StringWriter();
-            wr = new JcaPEMWriter(sw);
             wr.writeObject(privateKey);
             wr.flush();
             return sw.toString();
@@ -223,11 +197,6 @@ public class CertificateRequest
         catch (Exception e)
         {
             throw new PkiException(e);
-        }
-        finally
-        {
-            closeQuietly(wr);
-            closeQuietly(sw);
         }
     }
 
