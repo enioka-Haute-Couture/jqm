@@ -1614,7 +1614,10 @@ final class JdbcClient implements JqmClient
 
     private InputStream getFile(String url)
     {
+        DbConn cnx = getDbSession();
         File file = null;
+        FileOutputStream fos = null;
+        CloseableHttpClient cl = null;
         CloseableHttpResponse rs = null;
         String nameHint = null;
 
@@ -1625,7 +1628,7 @@ final class JdbcClient implements JqmClient
         }
         jqmlogger.trace("File will be copied into " + destDir);
 
-        try (DbConn cnx = getDbSession())
+        try
         {
             file = new File(destDir + "/" + UUID.randomUUID().toString());
 
@@ -1699,18 +1702,16 @@ final class JdbcClient implements JqmClient
                     jqmlogger.error("An supposedly impossible error has happened. Downloading files through the API may not work.", e);
                 }
             }
+            cl = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setSSLContext(ctx).build();
 
-            try (CloseableHttpClient cl = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setSSLContext(ctx).build())
+            // Run HTTP request
+            HttpUriRequest rq = new HttpGet(url.toString());
+            rs = cl.execute(rq);
+            if (rs.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
             {
-                // Run HTTP request
-                HttpUriRequest rq = new HttpGet(url.toString());
-                rs = cl.execute(rq);
-                if (rs.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
-                {
-                    throw new JqmClientException(
-                            "Could not retrieve file from JQM node. The file may have been purged, or the node may be unreachable. HTTP code was: "
-                                    + rs.getStatusLine().getStatusCode());
-                }
+                throw new JqmClientException(
+                        "Could not retrieve file from JQM node. The file may have been purged, or the node may be unreachable. HTTP code was: "
+                                + rs.getStatusLine().getStatusCode());
             }
 
             // There may be a filename hint inside the response
@@ -1724,12 +1725,10 @@ final class JdbcClient implements JqmClient
                 }
             }
 
-            try (FileOutputStream fos = new FileOutputStream(file))
-            {
-                // Save the file to a temp local file
-                rs.getEntity().writeTo(fos);
-                jqmlogger.trace("File was downloaded to " + file.getAbsolutePath());
-            }
+            // Save the file to a temp local file
+            fos = new FileOutputStream(file);
+            rs.getEntity().writeTo(fos);
+            jqmlogger.trace("File was downloaded to " + file.getAbsolutePath());
         }
         catch (IOException e)
         {
@@ -1737,7 +1736,10 @@ final class JdbcClient implements JqmClient
         }
         finally
         {
+            closeQuietly(cnx);
+            closeQuietly(fos);
             closeQuietly(rs);
+            closeQuietly(cl);
         }
 
         SelfDestructFileStream res = null;
