@@ -1614,11 +1614,7 @@ final class JdbcClient implements JqmClient
 
     private InputStream getFile(String url)
     {
-        DbConn cnx = getDbSession();
         File file = null;
-        FileOutputStream fos = null;
-        CloseableHttpClient cl = null;
-        CloseableHttpResponse rs = null;
         String nameHint = null;
 
         File destDir = new File(System.getProperty("java.io.tmpdir"));
@@ -1628,7 +1624,7 @@ final class JdbcClient implements JqmClient
         }
         jqmlogger.trace("File will be copied into " + destDir);
 
-        try
+        try (DbConn cnx = getDbSession())
         {
             file = new File(destDir + "/" + UUID.randomUUID().toString());
 
@@ -1647,7 +1643,6 @@ final class JdbcClient implements JqmClient
                     if (p.containsKey("com.enioka.jqm.ws.truststoreFile"))
                     {
                         KeyStore trust = null;
-                        InputStream trustIs = null;
 
                         try
                         {
@@ -1659,36 +1654,22 @@ final class JdbcClient implements JqmClient
                                     + this.p.getProperty("com.enioka.jqm.ws.truststoreType", "JKS") + "] is invalid", e);
                         }
 
-                        try
+                        try (InputStream trustIs = new FileInputStream(this.p.getProperty("com.enioka.jqm.ws.truststoreFile")))
                         {
-                            trustIs = new FileInputStream(this.p.getProperty("com.enioka.jqm.ws.truststoreFile"));
+
+                            String trustp = this.p.getProperty("com.enioka.jqm.ws.truststorePass", null);
+                            trust.load(trustIs, (trustp == null ? null : trustp.toCharArray()));
                         }
                         catch (FileNotFoundException e)
                         {
                             throw new JqmInvalidRequestException(
                                     "Trust store file [" + this.p.getProperty("com.enioka.jqm.ws.truststoreFile") + "] cannot be found", e);
                         }
-
-                        String trustp = this.p.getProperty("com.enioka.jqm.ws.truststorePass", null);
-                        try
-                        {
-                            trust.load(trustIs, (trustp == null ? null : trustp.toCharArray()));
-                        }
                         catch (Exception e)
                         {
                             throw new JqmInvalidRequestException("Could not load the trust store file", e);
                         }
-                        finally
-                        {
-                            try
-                            {
-                                trustIs.close();
-                            }
-                            catch (IOException e)
-                            {
-                                // Nothing to do.
-                            }
-                        }
+
                         ctx = SSLContexts.custom().loadTrustMaterial(trust, null).build();
                     }
                     else
@@ -1702,44 +1683,44 @@ final class JdbcClient implements JqmClient
                     jqmlogger.error("An supposedly impossible error has happened. Downloading files through the API may not work.", e);
                 }
             }
-            cl = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setSSLContext(ctx).build();
 
-            // Run HTTP request
-            HttpUriRequest rq = new HttpGet(url.toString());
-            rs = cl.execute(rq);
-            if (rs.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
+            //CloseableHttpResponse rs = null;
+            try (CloseableHttpClient cl = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setSSLContext(ctx).build())
             {
-                throw new JqmClientException(
-                        "Could not retrieve file from JQM node. The file may have been purged, or the node may be unreachable. HTTP code was: "
-                                + rs.getStatusLine().getStatusCode());
-            }
-
-            // There may be a filename hint inside the response
-            Header[] hs = rs.getHeaders("Content-Disposition");
-            if (hs.length == 1)
-            {
-                Header h = hs[0];
-                if (h.getValue().contains("filename="))
+                // Run HTTP request
+                HttpUriRequest rq = new HttpGet(url.toString());
+                try (CloseableHttpResponse rs = cl.execute(rq))
                 {
-                    nameHint = h.getValue().split("=")[1];
+                    if (rs.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
+                    {
+                        throw new JqmClientException(
+                                "Could not retrieve file from JQM node. The file may have been purged, or the node may be unreachable. HTTP code was: "
+                                        + rs.getStatusLine().getStatusCode());
+                    }
+
+                    // There may be a filename hint inside the response
+                    Header[] hs = rs.getHeaders("Content-Disposition");
+                    if (hs.length == 1)
+                    {
+                        Header h = hs[0];
+                        if (h.getValue().contains("filename="))
+                        {
+                            nameHint = h.getValue().split("=")[1];
+                        }
+                    }
+
+                    try (FileOutputStream fos = new FileOutputStream(file))
+                    {
+                        // Save the file to a temp local file
+                        rs.getEntity().writeTo(fos);
+                        jqmlogger.trace("File was downloaded to " + file.getAbsolutePath());
+                    }
                 }
             }
-
-            // Save the file to a temp local file
-            fos = new FileOutputStream(file);
-            rs.getEntity().writeTo(fos);
-            jqmlogger.trace("File was downloaded to " + file.getAbsolutePath());
         }
         catch (IOException e)
         {
             throw new JqmClientException("Could not create a webserver-local copy of the file. The remote node may be down. " + url, e);
-        }
-        finally
-        {
-            closeQuietly(cnx);
-            closeQuietly(fos);
-            closeQuietly(rs);
-            closeQuietly(cl);
         }
 
         SelfDestructFileStream res = null;
