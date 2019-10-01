@@ -217,34 +217,31 @@ public class CertificateRequest
 
     private void generatePem()
     {
-        Writer osw = null;
-        JcaPEMWriter wr = null;
         try
         {
             // PEM public key
             pemPublicFile = new ByteArrayOutputStream();
-            osw = new OutputStreamWriter(pemPublicFile);
-            wr = new JcaPEMWriter(osw);
-            wr.writeObject(holder);
-            wr.flush();
-            wr.close();
+
+            try (Writer osw = new OutputStreamWriter(pemPublicFile);
+                 JcaPEMWriter wr = new  JcaPEMWriter(osw))
+            {
+                wr.writeObject(holder);
+                wr.flush();
+            }
 
             // PEM private key
             pemPrivateFile = new ByteArrayOutputStream();
-            osw = new OutputStreamWriter(pemPrivateFile);
-            wr = new JcaPEMWriter(osw);
-            wr.writeObject(privateKey);
-            wr.flush();
-            wr.close();
+
+            try (Writer osw = new OutputStreamWriter(pemPrivateFile);
+                 JcaPEMWriter wr = new JcaPEMWriter(osw))
+            {
+                wr.writeObject(privateKey);
+                wr.flush();
+            }
         }
         catch (Exception e)
         {
             throw new PkiException(e);
-        }
-        finally
-        {
-            closeQuietly(wr);
-            closeQuietly(osw);
         }
     }
 
@@ -407,20 +404,5 @@ public class CertificateRequest
     public PrivateKey getPrivateKey()
     {
         return privateKey;
-    }
-
-    private void closeQuietly(Writer fw)
-    {
-        if (fw != null)
-        {
-            try
-            {
-                fw.close();
-            }
-            catch (Exception e)
-            {
-                // Do nothing.
-            }
-        }
     }
 }
