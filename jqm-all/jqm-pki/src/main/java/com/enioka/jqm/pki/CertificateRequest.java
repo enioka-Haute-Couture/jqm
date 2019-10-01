@@ -137,8 +137,7 @@ public class CertificateRequest
 
     public void writePemPublicToFile(String path)
     {
-        try (FileWriter fw = new FileWriter(path);
-             JcaPEMWriter wr = new JcaPEMWriter(fw))
+        try
         {
             File f = new File(path);
             if (!f.getParentFile().isDirectory() && !f.getParentFile().mkdir())
@@ -146,9 +145,12 @@ public class CertificateRequest
                 throw new PkiException(
                         "couldn't create directory " + f.getParentFile().getAbsolutePath() + " for storing the SSL keystore");
             }
-
-            wr.writeObject(holder);
-            wr.flush();
+            try (FileWriter fw = new FileWriter(path);
+                 JcaPEMWriter wr = new JcaPEMWriter(fw))
+            {
+                wr.writeObject(holder);
+                wr.flush();
+            }
         }
         catch (Exception e)
         {
