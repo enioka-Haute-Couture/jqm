@@ -164,16 +164,10 @@ class DirectoryScanner implements Runnable
 
     private void importDeploymentUnit(File deploymentDescriptor)
     {
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
-            cnx = Helpers.getNewDbSession();
             // Target remapped path is relative to repository root.
             XmlJobDefParser.parse(deploymentDescriptor.getAbsolutePath(), cnx, deploymentDescriptor.getParentFile().getName());
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
     }
 }

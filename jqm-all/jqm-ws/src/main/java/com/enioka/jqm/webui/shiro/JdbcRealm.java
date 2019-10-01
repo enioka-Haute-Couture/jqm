@@ -88,10 +88,8 @@ public class JdbcRealm extends AuthorizingRealm
 
     private SimpleAccount getUser(String login)
     {
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = Helpers.getDbSession())
         {
-            cnx = Helpers.getDbSession();
             RUser user = RUser.selectlogin(cnx, login);
 
             // Credential is a password - in token, it is as a char array
@@ -141,10 +139,6 @@ public class JdbcRealm extends AuthorizingRealm
         {
             log.error("Could not retrieve user from database", e);
             throw e;
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
     }
 

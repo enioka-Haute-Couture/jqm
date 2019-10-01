@@ -46,18 +46,4 @@ public final class Helpers
         return db.getConn();
     }
 
-    public static void closeQuietly(Closeable closeable)
-    {
-        try
-        {
-            if (closeable != null)
-            {
-                closeable.close();
-            }
-        }
-        catch (Exception e)
-        {
-            // fail silently
-        }
-    }
 }
