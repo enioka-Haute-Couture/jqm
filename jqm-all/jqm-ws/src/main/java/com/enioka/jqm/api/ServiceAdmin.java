@@ -36,7 +36,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import com.enioka.admin.MetaService;
-import com.enioka.api.admin.GlobalParameterDto;
 import com.enioka.api.admin.JndiObjectResourceDto;
 import com.enioka.api.admin.JobDefDto;
 import com.enioka.api.admin.NodeDto;
@@ -449,13 +448,13 @@ public class ServiceAdmin
     @Path("prm")
     @Produces(MediaType.APPLICATION_JSON)
     @HttpCache
-    public List<GlobalParameterDto> getGlobalParameters()
+    public List<GlobalParameter> getGlobalParameters()
     {
         DbConn cnx = null;
         try
         {
             cnx = Helpers.getDbSession();
-            return MetaService.getGlobalParameter(cnx);
+            return GlobalParameter.selectAll(cnx);
         }
         finally
         {
@@ -466,7 +465,7 @@ public class ServiceAdmin
     @PUT
     @Path("prm")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setGlobalParameters(List<GlobalParameterDto> dtos)
+    public void setGlobalParameters(List<GlobalParameter> dtos)
     {
         DbConn cnx = null;
         try
@@ -485,13 +484,13 @@ public class ServiceAdmin
     @Path("prm/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @HttpCache
-    public GlobalParameterDto getGlobalParameter(@PathParam("id") int id)
+    public GlobalParameter getGlobalParameter(@PathParam("id") int id)
     {
         DbConn cnx = null;
         try
         {
             cnx = Helpers.getDbSession();
-            return MetaService.getGlobalParameter(cnx, id);
+            return GlobalParameter.getParameter(cnx, id);
         }
         finally
         {
@@ -502,7 +501,7 @@ public class ServiceAdmin
     @PUT
     @Path("prm/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setGlobalParameter(@PathParam("id") Integer id, GlobalParameterDto dto)
+    public void setGlobalParameter(@PathParam("id") Integer id, GlobalParameter dto)
     {
         dto.setId(id);
         setGlobalParameter(dto);
@@ -511,13 +510,13 @@ public class ServiceAdmin
     @POST
     @Path("prm")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setGlobalParameter(GlobalParameterDto dto)
+    public void setGlobalParameter(GlobalParameter dto)
     {
         DbConn cnx = null;
         try
         {
             cnx = Helpers.getDbSession();
-            MetaService.upsertGlobalParameter(cnx, dto);
+            dto.upsert(cnx);
             cnx.commit();
         }
         finally
@@ -534,7 +533,7 @@ public class ServiceAdmin
         try
         {
             cnx = Helpers.getDbSession();
-            MetaService.deleteGlobalParameter(cnx, id);
+            GlobalParameter.deleteGlobalParameter(cnx, id);
             cnx.commit();
         }
         finally
