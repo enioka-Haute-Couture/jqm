@@ -154,10 +154,6 @@ public class GlobalParameter implements Serializable
         try
         {
             ResultSet rs = cnx.runSelect(query, arg);
-            if (rs.getFetchSize() == 0)
-            {
-                throw new NoResultException("no item with " + arg);
-            }
             if (rs.next())
             {
                 this.id = rs.getInt(1);
@@ -166,6 +162,10 @@ public class GlobalParameter implements Serializable
                 Calendar c = Calendar.getInstance();
                 c.setTimeInMillis(rs.getTimestamp(4).getTime());
                 this.lastModified = c;
+            }
+            else
+            {
+                throw new NoResultException("no item with " + arg);
             }
         }
         catch (SQLException e)
