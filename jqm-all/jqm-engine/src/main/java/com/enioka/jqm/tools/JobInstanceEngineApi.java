@@ -56,15 +56,10 @@ class JobInstanceEngineApi implements JobManager
     @Override
     public void sendMsg(String msg)
     {
-        DbConn cnx = Helpers.getNewDbSession();
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
             Message.create(cnx, msg, ji.getId());
             cnx.commit();
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
     }
 
@@ -77,16 +72,11 @@ class JobInstanceEngineApi implements JobManager
     @Override
     public void sendProgress(Integer msg)
     {
-        DbConn cnx = Helpers.getNewDbSession();
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
             this.ji.setProgress(msg); // Not persisted, but useful to the Loader.
             cnx.runUpdate("jj_update_progress_by_id", msg, ji.getId());
             cnx.commit();
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
     }
 
@@ -167,8 +157,7 @@ class JobInstanceEngineApi implements JobManager
     @Override
     public Integer addDeliverable(String path, String fileLabel)
     {
-        DbConn cnx = Helpers.getNewDbSession();
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
             String outputRoot = this.ji.getNode().getDlRepo();
             String ext = FilenameUtils.getExtension(path);
@@ -186,10 +175,6 @@ class JobInstanceEngineApi implements JobManager
         catch (IOException e)
         {
             throw new JqmClientException(e);
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
     }
 
@@ -214,14 +199,9 @@ class JobInstanceEngineApi implements JobManager
     @Override
     public String defaultConnect()
     {
-        DbConn cnx = Helpers.getNewDbSession();
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
             return GlobalParameter.getParameter(cnx, "defaultConnection", null);
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
     }
 
@@ -235,8 +215,7 @@ class JobInstanceEngineApi implements JobManager
     @Override
     public boolean hasEnded(int jobId)
     {
-        DbConn cnx = Helpers.getNewDbSession();
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
             cnx.runSelectSingle("ji_select_instruction_by_id", String.class, jobId);
             return false;
@@ -245,17 +224,12 @@ class JobInstanceEngineApi implements JobManager
         {
             return true;
         }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
-        }
     }
 
     @Override
     public Boolean hasSucceeded(int requestId)
     {
-        DbConn cnx = Helpers.getNewDbSession();
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
             State s = State.valueOf(cnx.runSelectSingle("history_select_state_by_id", String.class, requestId));
             return s.equals(State.ENDED);
@@ -263,10 +237,6 @@ class JobInstanceEngineApi implements JobManager
         catch (NoResultException e)
         {
             return null;
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
     }
 
@@ -307,8 +277,7 @@ class JobInstanceEngineApi implements JobManager
             return;
         }
 
-        DbConn cnx = Helpers.getNewDbSession();
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
             Instruction s = Instruction.valueOf(cnx.runSelectSingle("ji_select_instruction_by_id", String.class, ji.getId()));
             jqmlogger.trace("Analysis: should JI " + ji.getId() + " get killed or paused? Current instruction is " + s);
@@ -353,7 +322,6 @@ class JobInstanceEngineApi implements JobManager
         }
         finally
         {
-            Helpers.closeQuietly(cnx);
             lastPeek = Calendar.getInstance();
         }
     }

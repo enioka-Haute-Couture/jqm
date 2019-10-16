@@ -500,29 +500,19 @@ class QueuePoller implements Runnable, QueuePollerMBean
     @Override
     public long getCumulativeJobInstancesCount()
     {
-        DbConn em2 = Helpers.getNewDbSession();
-        try
+        try (DbConn em2 = Helpers.getNewDbSession())
         {
             return em2.runSelectSingle("history_select_count_for_poller", Long.class, this.queue.getId(), this.engine.getNode().getId());
-        }
-        finally
-        {
-            Helpers.closeQuietly(em2);
         }
     }
 
     @Override
     public float getJobsFinishedPerSecondLastMinute()
     {
-        DbConn em2 = Helpers.getNewDbSession();
-        try
+        try (DbConn em2 = Helpers.getNewDbSession())
         {
             return em2.runSelectSingle("history_select_count_last_mn_for_poller", Float.class, this.queue.getId(),
                     this.engine.getNode().getId());
-        }
-        finally
-        {
-            Helpers.closeQuietly(em2);
         }
     }
 

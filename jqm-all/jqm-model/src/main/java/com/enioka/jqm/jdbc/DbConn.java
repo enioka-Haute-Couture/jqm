@@ -98,11 +98,9 @@ public class DbConn implements Closeable
     public QueryResult runUpdate(String query_key, Object... params)
     {
         transac_open = true;
-        PreparedStatement ps = null;
         QueryPreparation qp = adapterPreparation(query_key, false, params);
-        try
+        try (PreparedStatement ps = prepare(qp))
         {
-            ps = prepare(qp);
             QueryResult qr = new QueryResult();
             qr.nbUpdated = ps.executeUpdate();
             qr.generatedKey = qp.preGeneratedKey;
@@ -110,6 +108,7 @@ public class DbConn implements Closeable
             {
                 ResultSet gen = ps.getGeneratedKeys();
                 if (gen.next())
+                {
                     try
                     {
                         qr.generatedKey = gen.getInt(1);
@@ -118,6 +117,7 @@ public class DbConn implements Closeable
                     {
                         // nothing to do.
                     }
+                }
             }
 
             jqmlogger.debug("Updated rows: {}. Key: {}. Generated ID: {}", qr.nbUpdated, query_key, qr.generatedKey);
@@ -127,18 +127,13 @@ public class DbConn implements Closeable
         {
             throw new DatabaseException(qp.sqlText, e);
         }
-        finally
-        {
-            closeQuietly(ps);
-        }
     }
 
     void runRawUpdate(String query_sql)
     {
         transac_open = true;
-        Statement s = null;
         String sql = null;
-        try
+        try (Statement s = _cnx.createStatement())
         {
             sql = parent.getAdapter().adaptSql(query_sql);
             if (sql.trim().isEmpty())
@@ -146,16 +141,11 @@ public class DbConn implements Closeable
                 return;
             }
             jqmlogger.debug(sql);
-            s = _cnx.createStatement();
             s.executeUpdate(sql);
         }
         catch (SQLException e)
         {
             throw new DatabaseException(sql, e);
-        }
-        finally
-        {
-            closeQuietly(s);
         }
     }
 
@@ -234,11 +224,8 @@ public class DbConn implements Closeable
     public Map<String, Object> runSelectSingleRow(String query_key, Object... params)
     {
         HashMap<String, Object> res = new HashMap<>();
-        ResultSet rs = null;
-        try
+        try (ResultSet rs = runSelect(query_key, params))
         {
-            rs = runSelect(query_key, params);
-
             if (!rs.next())
             {
                 throw new NoResultException("The query returned zero rows when one was expected.");
@@ -268,10 +255,6 @@ public class DbConn implements Closeable
         {
             throw new DatabaseException(e);
         }
-        finally
-        {
-            closeQuietly(rs);
-        }
         return res;
     }
 
@@ -283,8 +266,7 @@ public class DbConn implements Closeable
     @SuppressWarnings("unchecked")
     public <T> T runSelectSingle(String query_key, int column, Class<T> clazz, Object... params)
     {
-        ResultSet rs = runSelect(query_key, params);
-        try
+        try (ResultSet rs = runSelect(query_key, params))
         {
             if (rs.getMetaData().getColumnCount() < 1)
             {
@@ -335,10 +317,6 @@ public class DbConn implements Closeable
         {
             throw new DatabaseException(e);
         }
-        finally
-        {
-            closeQuietly(rs);
-        }
     }
 
     public <T> List<T> runSelectColumn(String query_key, Class<T> clazz, Object... params)
@@ -350,8 +328,7 @@ public class DbConn implements Closeable
     public <T> List<T> runSelectColumn(String query_key, int column, Class<T> clazz, Object... params)
     {
         ArrayList<T> resList = new ArrayList<>();
-        ResultSet rs = runSelect(query_key, params);
-        try
+        try (ResultSet rs = runSelect(query_key, params))
         {
             if (rs.getMetaData().getColumnCount() < column)
             {
@@ -394,10 +371,6 @@ public class DbConn implements Closeable
         catch (SQLException e)
         {
             throw new DatabaseException(e);
-        }
-        finally
-        {
-            closeQuietly(rs);
         }
     }
 

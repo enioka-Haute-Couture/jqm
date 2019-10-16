@@ -77,11 +77,8 @@ public class ServiceSimple
         if (context.getInitParameter("jqmnodeid") != null)
         {
             // Running on a JQM node, not a standard servlet container.
-            DbConn cnx = null;
-            try
+            try (DbConn cnx = Helpers.getDbSession())
             {
-                cnx = Helpers.getDbSession();
-
                 try
                 {
                     n = Node.select_single(cnx, "node_select_by_id", Integer.parseInt(context.getInitParameter("jqmnodeid")));
@@ -90,10 +87,6 @@ public class ServiceSimple
                 {
                     throw new RuntimeException("invalid configuration: no node of ID " + context.getInitParameter("jqmnodeid"));
                 }
-            }
-            finally
-            {
-                Helpers.closeQuietly(cnx);
             }
         }
     }
@@ -143,10 +136,8 @@ public class ServiceSimple
         }
 
         Deliverable d = null;
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = Helpers.getDbSession())
         {
-            cnx = Helpers.getDbSession();
             List<Deliverable> dd = Deliverable.select(cnx, "deliverable_select_by_randomid", randomId);
             if (dd.isEmpty())
             {
@@ -162,10 +153,6 @@ public class ServiceSimple
         catch (Exception e)
         {
             throw new ErrorDto("Could not retrieve Deliverable metadata from database", 9, e, Status.INTERNAL_SERVER_ERROR);
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
 
         String ext = FilenameUtils.getExtension(d.getOriginalFileName());

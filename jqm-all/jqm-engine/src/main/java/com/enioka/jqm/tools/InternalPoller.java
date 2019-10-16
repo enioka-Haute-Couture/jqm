@@ -75,7 +75,6 @@ class InternalPoller implements Runnable
     {
         Thread.currentThread().setName("INTERNAL_POLLER;polling orders;");
         jqmlogger.info("Start of the internal poller");
-        DbConn cnx = null;
         Calendar lastJndiPurge = Calendar.getInstance();
 
         // Launch main loop
@@ -94,11 +93,9 @@ class InternalPoller implements Runnable
                 break;
             }
 
-            try
+            // Get session
+            try (DbConn cnx = Helpers.getNewDbSession())
             {
-                // Get session
-                cnx = Helpers.getNewDbSession();
-
                 // Check if stop order
                 try
                 {
@@ -192,11 +189,6 @@ class InternalPoller implements Runnable
                 {
                     throw e;
                 }
-            }
-            finally
-            {
-                // Loop is done, let session go
-                Helpers.closeQuietly(cnx);
             }
         }
 

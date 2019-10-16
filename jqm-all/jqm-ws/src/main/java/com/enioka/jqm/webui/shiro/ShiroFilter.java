@@ -44,15 +44,9 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter
         else
         {
             // Hosted in a standard servlet container - fetch from db.
-            DbConn cnx = null;
-            try
+            try (DbConn cnx = Helpers.getDbSession())
             {
-                cnx = Helpers.getDbSession();
                 load = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableWsApiAuth", "true"));
-            }
-            finally
-            {
-                Helpers.closeQuietly(cnx);
             }
         }
 

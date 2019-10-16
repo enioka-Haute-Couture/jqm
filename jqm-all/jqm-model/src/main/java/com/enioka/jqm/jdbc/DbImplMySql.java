@@ -123,15 +123,12 @@ public class DbImplMySql extends DbAdapter
         {
             return;
         }
-        PreparedStatement s = null;
-        PreparedStatement s2 = null;
-        try
+
+        try (PreparedStatement s = cnx.prepareStatement(sequenceSql); PreparedStatement s2 = cnx.prepareStatement(sequenceSqlRetrieval))
         {
-            s = cnx.prepareStatement(sequenceSql);
             s.setString(1, "MAIN");
             s.executeUpdate();
 
-            s2 = cnx.prepareStatement(sequenceSqlRetrieval);
             s2.setString(1, "MAIN");
             ResultSet rs = s2.executeQuery();
             if (!rs.next())
@@ -144,11 +141,6 @@ public class DbImplMySql extends DbAdapter
         catch (SQLException e)
         {
             throw new DatabaseException(q.sqlText + " - " + sequenceSql + " - while fetching new ID from table sequence", e);
-        }
-        finally
-        {
-            DbHelper.closeQuietly(s);
-            DbHelper.closeQuietly(s2);
         }
     }
 

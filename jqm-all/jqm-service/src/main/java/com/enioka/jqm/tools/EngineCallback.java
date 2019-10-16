@@ -44,10 +44,8 @@ public class EngineCallback implements JqmEngineHandler
         {
             nodePrms = np;
         }
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
-            cnx = Helpers.getNewDbSession();
             int i = cnx.runSelectSingle("globalprm_select_count_modified_jetty", Integer.class, latestJettyRestart);
             if (i > 0 || !np.equals(nodePrms))
             {
@@ -55,10 +53,6 @@ public class EngineCallback implements JqmEngineHandler
                 latestJettyRestart = bflkpm;
                 nodePrms = np;
             }
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
     }
 
