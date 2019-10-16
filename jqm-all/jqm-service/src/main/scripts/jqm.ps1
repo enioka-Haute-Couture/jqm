@@ -119,7 +119,8 @@ function Remove-JqmService {
 
 function Import-AllXml {
     Set-Location $PSScriptRoot
-    & $java -jar jqm.jar Import-JobDef -f ((Get-ChildItem $PSScriptRoot/jobs -Recurse -Filter *.xml -Exclude pom.xml | % FullName) -join ',')
+    $args = @(Get-ChildItem $PSScriptRoot/jobs -Recurse -Filter *.xml -Exclude pom.xml | % { "-f"; $_.FullName; })
+    & $java -jar jqm.jar Import-JobDef @args
 }
 
 function Register-JqmNode {
@@ -156,14 +157,14 @@ function Get-Role {
 switch ($Command) {
     "start" { & .\bin\jqmservice-64.exe //ES//$ServiceName }
     "stop" { & .\bin\jqmservice-64.exe //SS//$ServiceName }
-    "status" { (Get-Service $ServiceName).Status}
+    "status" { (Get-Service $ServiceName).Status }
     "startconsole" { Set-Location $PSScriptRoot; & $java $env:JAVA_OPTS.split(" ") $JAVA_OOM_ACTION -jar jqm.jar Start-Node -n $NodeName }
     "createnode" { Register-JqmNode }
-    "allxml" { Import-AllXml}
+    "allxml" { Import-AllXml }
     "installservice" { New-JqmService }
     "removeservice" { Remove-JqmService }
     "enqueue" { Submit-JqmRequest -JobDef $JobDef }
-    "resetpassword" {Reset-RootPassword $RootPassword}
-    "enablegui" {Enable-Gui}
-    "getrole" {Get-Role}
+    "resetpassword" { Reset-RootPassword $RootPassword }
+    "enablegui" { Enable-Gui }
+    "getrole" { Get-Role }
 }
