@@ -1,21 +1,62 @@
+os: linux
+dist: bionic
 language: java
-sudo: false
+# travis has retired container-based builds and is now fully VM-based, so no more sudo=false.
+
+# Now using https://github.com/DanySK/Gravis-CI (Jabba script) to avoid unreliable jdk support from Tavis.
+
 before_install:
-  - cd jqm-all
-  - export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"
-jdk:
-  - openjdk7
-  - openjdk8
-  - openjdk9
-  - openjdk10
-  - oraclejdk8
-  - oraclejdk9
+    - curl "https://raw.githubusercontent.com/DanySK/Gravis-CI/master/.install-jdk-travis.sh" --output ~/.install-jdk-travis.sh
+    - source ~/.install-jdk-travis.sh
+    - cd jqm-all
+    - export MAVEN_OPTS="-Xmx512m -XX:MaxMetaspaceSize=256m"
+
 env:
-  global:
-  - secure: ZI6QQDf1rjLK+ZiYh8SPuVlvTJ3nq/JgbFJsFz4pqpEVr30UjcBpICdwauktgPa7dakIfaCbZzBB5SwAayg9CLQ5eOcoiEjUVOVlLvMiUesKIY6B50QE9E/r/MDJddDlLlVbwBnMdovYh9+Cwu7ny7tbS6ueU9D7pKX+FfCkEns=
-  - secure: dbcqjCXTsiNqPW0sSqA1DfYgzRAD6MK+lkCmBocTl0InimKFlM211j4rDt80talVl7HGPkS910S/twV2VfTUexYy5oZcqVvzfRST6ShLwnBmVz2rm78r/W+te3KmGY8w+RucLSM+M0DCfN74JnY7EI0dLCd1IberLkzCecxXOxw=
+    global:
+        # Selenium
+        - secure: ZI6QQDf1rjLK+ZiYh8SPuVlvTJ3nq/JgbFJsFz4pqpEVr30UjcBpICdwauktgPa7dakIfaCbZzBB5SwAayg9CLQ5eOcoiEjUVOVlLvMiUesKIY6B50QE9E/r/MDJddDlLlVbwBnMdovYh9+Cwu7ny7tbS6ueU9D7pKX+FfCkEns=
+        - secure: dbcqjCXTsiNqPW0sSqA1DfYgzRAD6MK+lkCmBocTl0InimKFlM211j4rDt80talVl7HGPkS910S/twV2VfTUexYy5oZcqVvzfRST6ShLwnBmVz2rm78r/W+te3KmGY8w+RucLSM+M0DCfN74JnY7EI0dLCd1IberLkzCecxXOxw=
+        # Docker
+        - secure: VQgWWdamSLRvw0kCGP7SPwzSS7wa2DQrimUueAnPh7rQbgSOgrcN/aJM50HJGELE4ZRMUF7UylH8U7x6l0tf99Is+HxgPyX5I+J/3rFj73Vxa4JH9XxsPq23BCw4pn+fvVgMwAryXFh0dNJSCCEtKEa6RwTA/OGjkZs1ubTFfNc=
+        - secure: ENaR0RFk5WuzLYMu0lYUCS7IPxnttU2Nz1XWuCJ6SBGhQGm4S7eFitwJHhPaEHW92K0RtPe9FKKPxu8waI6/8NDNhhQrNn31/gpHXZfLhMtDeLtCiHRcipC8baah+Gs19PT8DN9pYUBCTKErtLciFaKKzfj4dw0KidYtO803RVg=
+        # Oracle
+        - secure: e7UrcA3NOA4mriLZK2BsVIY+6Qxspgpdb8cBAMSrPFjUPUd03oHOeFGHDs1E9DIAanLYtWAcI6bzwMDA0PkmBzDlvQ6Lm1ifw9/IMyaOS8U6i5jbzZE6bW9iFdmmb30o2gwwWPBDfsyNFB8cU3ZExG7kW6UMEwmeh/Ky8YcFjgs=
+        - secure: acx6z+K5zMMGKZ/SuDjSjAjbf2Oks6xUeDukNdyncWH+0tgO7N5lQIM+7Gh81e7N2JIoWWVCwcpYO4GNbo2mgSxQp8MFzgcRQ3qCMNhmgmIV2DZD3VNzToVV8nemForLZuhBTcDGkLZh+2/EIJUBbULkicAuTZDsKlpf4PBowOU=
+
 # addons:
 #   sauce_connect: true
+
+stages:
+    - name: jdk_tests
+
+jobs:
+    include:
+        ## Tests on all openjdk supported versions
+        - stage: jdk_tests
+          env:
+              - DB=hsqldb
+              - JDK=zulu@1.8
+
+        - stage: jdk_tests
+          env:
+              - DB=hsqldb
+              - JDK=zulu@1.9
+
+        - stage: jdk_tests
+          env:
+              - DB=hsqldb
+              - JDK=zulu@1.10
+
+        - stage: jdk_tests
+          env:
+              - DB=hsqldb
+              - JDK=openjdk@1.11
+
+        - stage: jdk_tests
+          env:
+              - DB=hsqldb
+              - JDK=openjdk@1.12
+
 branches:
-  except:
-  - controller
+    except:
+        - controller

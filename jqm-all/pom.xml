@@ -1,416 +1,417 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.enioka.jqm</groupId>
-	<artifactId>jqm-all</artifactId>
-	<version>2.2.2-SNAPSHOT</version>
-	<packaging>pom</packaging>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.enioka.jqm</groupId>
+    <artifactId>jqm-all</artifactId>
+    <version>2.2.2-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-	<name>jqm-all</name>
-	<url>http://jqm.readthedocs.org</url>
-	<description>JQM is an asynchronous batch job manager in Java</description>
+    <name>jqm-all</name>
+    <url>http://jqm.readthedocs.org</url>
+    <description>JQM is an asynchronous batch job manager in Java</description>
 
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
-	<organization>
-		<name>Enioka</name>
-		<url>http://www.enioka.com</url>
-	</organization>
+    <organization>
+        <name>Enioka</name>
+        <url>http://www.enioka.com</url>
+    </organization>
 
-	<developers>
-		<developer>
-			<id>mag</id>
-			<name>Marc-Antoine Gouillart</name>
-			<email>mag@enioka.com</email>
-			<url>http://www.oxymores.org</url>
-			<organization>Enioka</organization>
-			<roles>
-				<role>architect</role>
-				<role>maintainer</role>
-			</roles>
-			<timezone>Europe/Paris</timezone>
-			<properties>
-			</properties>
-		</developer>
-		<developer>
-			<id>pco</id>
-			<name>Pierre Coppée</name>
-			<email>pco@enioka.com</email>
-			<organization>Enioka</organization>
-			<roles>
-				<role>developer</role>
-			</roles>
-			<timezone>Europe/Paris</timezone>
-			<properties>
-			</properties>
-		</developer>
-		<developer>
-			<id>sre</id>
-			<name>Sébastien Renard</name>
-			<email>sre@enioka.com</email>
-			<organization>Enioka</organization>
-			<roles>
-				<role>developer</role>
-			</roles>
-			<timezone>Europe/Paris</timezone>
-			<properties>
-			</properties>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <id>mag</id>
+            <name>Marc-Antoine Gouillart</name>
+            <email>mag@enioka.com</email>
+            <url>http://www.oxymores.org</url>
+            <organization>Enioka</organization>
+            <roles>
+                <role>architect</role>
+                <role>maintainer</role>
+            </roles>
+            <timezone>Europe/Paris</timezone>
+            <properties>
+            </properties>
+        </developer>
+        <developer>
+            <id>pco</id>
+            <name>Pierre Coppée</name>
+            <email>pco@enioka.com</email>
+            <organization>Enioka</organization>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>Europe/Paris</timezone>
+            <properties>
+            </properties>
+        </developer>
+        <developer>
+            <id>sre</id>
+            <name>Sébastien Renard</name>
+            <email>sre@enioka.com</email>
+            <organization>Enioka</organization>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>Europe/Paris</timezone>
+            <properties>
+            </properties>
+        </developer>
+    </developers>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<hibernate.version>4.2.21.Final</hibernate.version>
-		<junit.version>4.12</junit.version>
-		<hsqldb.version>2.3.4</hsqldb.version>
-		<jersey-version>2.6</jersey-version>
-		<jetty.version>8.1.22.v20160922</jetty.version>
-		<slf4j.version>1.7.19</slf4j.version>
-		<shiro.version>1.3.2</shiro.version>
-		<surefire.version>2.19.1</surefire.version>
-		<javadoc.version>2.10.3</javadoc.version>
-		<httpclient.version>4.5.2</httpclient.version>
-		<pool.version>7.0.77</pool.version>
-		<bc.version>1.54</bc.version>
-		<mail.version>1.5.2</mail.version>
-		<commons.logging.version>1.2</commons.logging.version>
-		<commons.io.version>2.5</commons.io.version>
-		<commons.lang.version>2.6</commons.lang.version>
-		<h2.version>1.4.191</h2.version>		<!-- Very last Java 6 version - https://github.com/h2database/h2database/issues/300 -->
-		<shrinkwrap.resolver.version>2.2.2</shrinkwrap.resolver.version>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <hibernate.version>4.2.21.Final</hibernate.version>
+        <junit.version>4.12</junit.version>
+        <hsqldb.version>2.3.4</hsqldb.version>
+        <jersey-version>2.6</jersey-version>
+        <jetty.version>8.1.22.v20160922</jetty.version>
+        <slf4j.version>1.7.19</slf4j.version>
+        <shiro.version>1.3.2</shiro.version>
+        <surefire.version>2.19.1</surefire.version>
+        <javadoc.version>2.10.3</javadoc.version>
+        <httpclient.version>4.5.2</httpclient.version>
+        <pool.version>7.0.77</pool.version>
+        <bc.version>1.54</bc.version>
+        <mail.version>1.5.2</mail.version>
+        <commons.logging.version>1.2</commons.logging.version>
+        <commons.io.version>2.5</commons.io.version>
+        <commons.lang.version>2.6</commons.lang.version>
+        <h2.version>1.4.191</h2.version>        <!-- Very last Java 6 version - https://github.com/h2database/h2database/issues/300 -->
+        <shrinkwrap.resolver.version>2.2.2</shrinkwrap.resolver.version>
 
-		<sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
+        <sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
 
-		<!-- Sonar coverage -->
-		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-		<sonar.jacoco.reportPaths>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPaths>
-	</properties>
+        <!-- Sonar coverage -->
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+        <sonar.jacoco.reportPaths>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPaths>
+    </properties>
 
-	<modules>
-		<module>jqm-doc</module>
-		<module>jqm-runner</module>
-		<module>jqm-tests</module>
-		<module>jqm-model</module>
-		<module>jqm-api</module>
-		<module>jqm-ws</module>
-		<module>jqm-client</module>
-		<module>jqm-test-helpers</module>
-		<module>jqm-engine</module>
-		<!--<module>jqm-jsfsample</module> -->
-		<module>jqm-providers</module>
-		<module>jqm-pki</module>
-		<module>jqm-tst</module>
-		<module>jqm-admin</module>
-		<module>jqm-handlers</module>
-		<module>jqm-service</module>
-		<module>jqm-xml</module>
-		<module>jqm-integration-tests</module>
-		<module>jqm-integration-tests-ws</module>
-	</modules>
+    <modules>
+        <module>jqm-doc</module>
+        <module>jqm-runner</module>
+        <module>jqm-tests</module>
+        <module>jqm-model</module>
+        <module>jqm-api</module>
+        <module>jqm-ws</module>
+        <module>jqm-client</module>
+        <module>jqm-test-helpers</module>
+        <module>jqm-engine</module>
+        <!--<module>jqm-jsfsample</module> -->
+        <module>jqm-providers</module>
+        <module>jqm-pki</module>
+        <module>jqm-tst</module>
+        <module>jqm-admin</module>
+        <module>jqm-handlers</module>
+        <module>jqm-service</module>
+        <module>jqm-xml</module>
+        <module>jqm-integration-tests</module>
+        <module>jqm-integration-tests-ws</module>
+    </modules>
 
-	<scm>
-		<developerConnection>scm:git:ssh://git@github.com:enioka/jqm.git</developerConnection>
-		<connection>scm:git:https://github.com/enioka/jqm.git</connection>
-		<url>https://github.com/enioka/jqm/</url>
-		<tag>jqm-all-2.2.0</tag>
-	</scm>
+    <scm>
+        <developerConnection>scm:git:ssh://git@github.com:enioka/jqm.git</developerConnection>
+        <connection>scm:git:https://github.com/enioka/jqm.git</connection>
+        <url>https://github.com/enioka/jqm/</url>
+        <tag>jqm-all-2.2.0</tag>
+    </scm>
 
-	<profiles>
-		<profile>
-			<id>release</id>
-			<activation>
-				<property>
-					<name>performRelease</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
+    <profiles>
+        <profile>
+            <id>release</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
 
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>2.4</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.4</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
 
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>${javadoc.version}</version>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<show>private</show>
-							<additionalparam>${javadoc.opts}</additionalparam>
-						</configuration>
-					</plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${javadoc.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <show>private</show>
+                            <additionalparam>${javadoc.opts}</additionalparam>
+                        </configuration>
+                    </plugin>
 
-				</plugins>
-			</build>
-		</profile>
+                </plugins>
+            </build>
+        </profile>
 
-		<profile>
-			<!-- Disabled by default. Runs Selenium tests on the admin GUI. -->
-			<id>selenium</id>
-			<activation>
-				<!-- Activate if Travis-like variables are set. Or force it inside settings.xml 
+        <profile>
+            <!-- Disabled by default. Runs Selenium tests on the admin GUI. -->
+            <id>selenium</id>
+            <activation>
+                <!-- Activate if Travis-like variables are set. Or force it inside settings.xml
 					for development environments if needed. -->
-				<property>
-					<name>env.SAUCE_ACCESS_KEYDISABLED</name>
-				</property>
-			</activation>
-			<modules>
-				<module>jqm-wstst</module>
-			</modules>
-			<properties>
-				<!-- These are default values. They should always be overridden either 
+                <property>
+                    <name>env.SAUCE_ACCESS_KEYDISABLED</name>
+                </property>
+            </activation>
+            <modules>
+                <module>jqm-wstst</module>
+            </modules>
+            <properties>
+                <!-- These are default values. They should always be overridden either
 					in settings.xml or in environment variables -->
-				<SAUCE_USERNAME>${env.SAUCE_USERNAME}</SAUCE_USERNAME>
-				<SAUCE_ACCESS_KEY>${env.SAUCE_ACCESS_KEY}</SAUCE_ACCESS_KEY>
-				<SAUCE_URL>localhost:4445/wd/hub</SAUCE_URL>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<version>${surefire.version}</version>
-						<configuration>
-							<systemPropertyVariables>
-								<SAUCE_URL>${SAUCE_URL}</SAUCE_URL>
-								<SAUCE_ACCESS_KEY>${SAUCE_ACCESS_KEY}</SAUCE_ACCESS_KEY>
-								<SAUCE_USERNAME>${SAUCE_USERNAME}</SAUCE_USERNAME>
-							</systemPropertyVariables>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+                <SAUCE_USERNAME>${env.SAUCE_USERNAME}</SAUCE_USERNAME>
+                <SAUCE_ACCESS_KEY>${env.SAUCE_ACCESS_KEY}</SAUCE_ACCESS_KEY>
+                <SAUCE_URL>localhost:4445/wd/hub</SAUCE_URL>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${surefire.version}</version>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <SAUCE_URL>${SAUCE_URL}</SAUCE_URL>
+                                <SAUCE_ACCESS_KEY>${SAUCE_ACCESS_KEY}</SAUCE_ACCESS_KEY>
+                                <SAUCE_USERNAME>${SAUCE_USERNAME}</SAUCE_USERNAME>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
-		<!-- This will disable DocLint on Java >=8. -->
-		<profile>
-			<id>disable-doclint</id>
-			<activation>
-				<jdk>[1.8,)</jdk>
-			</activation>
-			<properties>
-				<javadoc.opts>-Xdoclint:none</javadoc.opts>
-			</properties>
-		</profile>
+        <!-- This will disable DocLint on Java >=8. -->
+        <profile>
+            <id>disable-doclint</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <properties>
+                <javadoc.opts>-Xdoclint:none</javadoc.opts>
+            </properties>
+        </profile>
 
 
-		<profile>
-			<id>sonar</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>0.8.2</version>
-						<configuration>
-							<destFile>${sonar.jacoco.reportPaths}</destFile>
-							<append>true</append>
-						</configuration>
-						<executions>
-							<execution>
-								<id>agent</id>
-								<goals>
-									<goal>prepare-agent</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+        <profile>
+            <id>sonar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>0.8.2</version>
+                        <configuration>
+                            <destFile>${sonar.jacoco.reportPaths}</destFile>
+                            <append>true</append>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.6</version>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.1</version>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
-				<configuration>
-					<!-- Only use local Git repository, push will be manual -->
-					<localCheckout>true</localCheckout>
-					<pushChanges>false</pushChanges>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <!-- Only use local Git repository, push will be manual -->
+                    <localCheckout>true</localCheckout>
+                    <pushChanges>false</pushChanges>
 
-					<!-- One version to rule them all -->
-					<autoVersionSubmodules>true</autoVersionSubmodules>
+                    <!-- One version to rule them all -->
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
 
-					<!-- Use custom release profile -->
-					<useReleaseProfile>false</useReleaseProfile>
-					<releaseProfiles>release</releaseProfiles>
-				</configuration>
-			</plugin>
+                    <!-- Use custom release profile -->
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>2.6.1</version>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>ext</directory>
-						</fileset>
-						<fileset>
-							<directory>webapp</directory>
-						</fileset>
-						<fileset>
-							<directory>logs</directory>
-						</fileset>
-						<fileset>
-							<directory>plugins</directory>
-						</fileset>
-						<fileset>
-							<directory>target</directory>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.6.1</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>ext</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>webapp</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>logs</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>plugins</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>target</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>${surefire.version}</version>
-				<configuration>
-					<trimStackTrace>false</trimStackTrace>
-					<systemProperties>
-						<property>
-							<name>mavenVersion</name>
-							<value>${project.version}</value>
-						</property>
-					</systemProperties>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire.version}</version>
+                <configuration>
+                    <trimStackTrace>false</trimStackTrace>
+                    <systemProperties>
+                        <property>
+                            <name>mavenVersion</name>
+                            <value>${project.version}</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
 
-		</plugins>
+        </plugins>
 
-		<pluginManagement>
-			<plugins>
-				<!-- Stupid M2E stuff, no influence on build -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.apache.maven.plugins</groupId>
-										<artifactId>maven-enforcer-plugin</artifactId>
-										<versionRange>[1.0.0,)</versionRange>
-										<goals>
-											<goal>enforce</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
+        <pluginManagement>
+            <plugins>
+                <!-- Stupid M2E stuff, no influence on build -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-enforcer-plugin</artifactId>
+                                        <versionRange>[1.0.0,)</versionRange>
+                                        <goals>
+                                            <goal>enforce</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
 											org.apache.maven.plugins
-										</groupId>
-										<artifactId>
+                                        </groupId>
+                                        <artifactId>
 											maven-dependency-plugin
-										</artifactId>
-										<versionRange>
+                                        </artifactId>
+                                        <versionRange>
 											[2.8,)
-										</versionRange>
-										<goals>
-											<goal>copy</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+                                        </versionRange>
+                                        <goals>
+                                            <goal>copy</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
-	<dependencies>
-	</dependencies>
+    <dependencies>
+    </dependencies>
 
-	<issueManagement>
-		<system>GitHub</system>
-		<url>https://github.com/enioka/jqm/issues</url>
-	</issueManagement>
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/enioka/jqm/issues</url>
+    </issueManagement>
 
-	<ciManagement>
-		<system>Travis</system>
-		<url>https://travis-ci.org/enioka/jqm</url>
-	</ciManagement>
+    <ciManagement>
+        <system>Travis</system>
+        <url>https://travis-ci.org/enioka/jqm</url>
+    </ciManagement>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>sonatype-nexus-snapshots</id>
-			<name>Sonatype Nexus Snapshots</name>
-			<url>${sonatypeOssDistMgmtSnapshotsUrl}</url>
-		</snapshotRepository>
-		<repository>
-			<id>sonatype-nexus-staging</id>
-			<name>Nexus Release Repository</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>${sonatypeOssDistMgmtSnapshotsUrl}</url>
+        </snapshotRepository>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Nexus Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 </project>
