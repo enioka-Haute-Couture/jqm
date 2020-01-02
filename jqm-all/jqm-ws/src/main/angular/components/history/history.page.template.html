@@ -32,9 +32,11 @@
                 <input ng-model="$ctrl.query.nodeName" class="form-control" placeholder="node name" type="text"
                     ng-change="$ctrl.getDataAsync();" ng-required="true" style="width: 8em;" data-toggle="popover"
                     data-content="Use % as wildcard" data-trigger="hover" ng-model-options='{debounce: 200}' />
-                <select ng-cell-input ng-model="$ctrl.query.queueId" class="form-control" placeholder="parent id"
+                <select ng-cell-input ng-model="$ctrl.query.queueId" class="form-control"
                     ng-options="q.id as q.name for q in $ctrl.queues" ng-change="$ctrl.getDataAsync();" data-toggle="popover"
-                    data-content="filter by queue" data-trigger="hover"></select>
+                    data-content="filter by queue" data-trigger="hover">
+                    <option value="">parent id</option>
+                </select>
 
                 <jqm-date-picker ng-model="$ctrl.query.enqueuedAfter" ng-change="$ctrl.getDataAsync" ng-title="Created after"></jqm-date-picker>
                 <jqm-date-picker ng-model="$ctrl.query.enqueuedBefore" ng-change="$ctrl.getDataAsync" ng-title="Created before"></jqm-date-picker>
