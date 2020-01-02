@@ -1,6 +1,21 @@
 Release notes
 ######################
 
+2.2.2
+*************
+
+Maintenance release, mostly consisting in backports from version 3.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+* Engine: added Java 11 support - for engines without web APIs only. java 12 and later are not tested.
+
+
 2.2.1
 *************
 
