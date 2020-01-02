@@ -4,7 +4,7 @@ Release notes
 2.2.2
 *************
 
-Maintenace release.
+Maintenance release, mostly consisting in backports from version 3.
 
 Upgrade notes
 +++++++++++++++++++
@@ -13,9 +13,7 @@ No API breaking changes.
 
 No database modification in this release - upgrade can be done by simply replacing engine files.
 
-* All libraries have been updated to their latest versions. This is particularly important for anyone exposing JQM web services, as this comes with much increased security.
-* Engine: added Java 11 and 12 support for engine without web APIs only.
-* Web APIs: added IPv6 compatibility and latest TLS versions (on Java versions supporting them).
+* Engine: added Java 11 support - for engines without web APIs only. java 12 and later are not tested.
 
 
 2.2.1

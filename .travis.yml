@@ -35,12 +35,17 @@ jobs:
         - stage: jdk_tests
           env:
               - DB=hsqldb
-              - JDK=zulu@1.8
+              - JDK=zulu@1.6
 
         - stage: jdk_tests
           env:
               - DB=hsqldb
-              - JDK=zulu@1.9
+              - JDK=zulu@1.7
+
+        - stage: jdk_tests
+          env:
+              - DB=hsqldb
+              - JDK=zulu@1.8
 
         - stage: jdk_tests
           env:
@@ -52,10 +57,11 @@ jobs:
               - DB=hsqldb
               - JDK=openjdk@1.11
 
-        - stage: jdk_tests
-          env:
-              - DB=hsqldb
-              - JDK=openjdk@1.12
+# JDK 12 does not support target source 1.6 compilation anymore.
+#        - stage: jdk_tests
+#          env:
+#              - DB=hsqldb
+#              - JDK=openjdk@1.12
 
 branches:
     except:
