@@ -146,7 +146,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                     + " seconds ago. Either stop the other node, or if it already stopped, please wait " + (toWait - r) / 1000
                     + " seconds");
         }
-        SimpleDateFormat ft = new SimpleDateFormat("dd/MM/YYYY hh:mm:ss");
+        SimpleDateFormat ft = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
         jqmlogger.debug("The last time an engine with this name was seen was: "
                 + (node.getLastSeenAlive() == null ? "" : ft.format(node.getLastSeenAlive().getTime())));
 

@@ -88,6 +88,9 @@
         <shrinkwrap.resolver.version>2.2.2</shrinkwrap.resolver.version>
 
         <sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
+        <plugin.jar.version>3.2.0</plugin.jar.version>
+        <plugin.war.version>3.2.3</plugin.war.version>
+        <plugin.resources.version>3.1.0</plugin.resources.version>
 
         <!-- Sonar coverage -->
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
@@ -235,6 +238,18 @@
             </properties>
         </profile>
 
+        <profile>
+            <id>java6</id>
+            <activation>
+                <jdk>1.6</jdk>
+            </activation>
+            <properties>
+                <plugin.jar.version>2.6</plugin.jar.version>
+                <plugin.war.version>2.6</plugin.war.version>
+                <plugin.resources.version>2.7</plugin.resources.version>
+            </properties>
+        </profile>
+
 
         <profile>
             <id>sonar</id>
@@ -277,7 +292,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>${plugin.jar.version}</version>
             </plugin>
 
             <plugin>
