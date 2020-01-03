@@ -326,7 +326,7 @@ class DbImplBase
         
         // GLOBAL PRM
         queries.put("globalprm_insert", "INSERT INTO __T__GLOBAL_PARAMETER(ID, KEYNAME, VALUE, LAST_MODIFIED) VALUES(JQM_PK.nextval, ?, ?, CURRENT_TIMESTAMP)");
-        queries.put("globalprm_update_value_by_key", "UPDATE __T__GLOBAL_PARAMETER SET VALUE=? WHERE KEYNAME=?");
+        queries.put("globalprm_update_value_by_key", "UPDATE __T__GLOBAL_PARAMETER SET VALUE=?, LAST_MODIFIED=CURRENT_TIMESTAMP WHERE KEYNAME=?");
         queries.put("globalprm_delete_all", "DELETE FROM __T__GLOBAL_PARAMETER");
         queries.put("globalprm_delete_by_id", "DELETE FROM __T__GLOBAL_PARAMETER WHERE ID=?");
         queries.put("globalprm_select_all", "SELECT ID, KEYNAME, VALUE, LAST_MODIFIED FROM __T__GLOBAL_PARAMETER");
