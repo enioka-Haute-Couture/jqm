@@ -175,15 +175,9 @@ final class JdbcClient implements JqmClient
         }
         runRequest.setParameters(runRequest.getParameters()); // This will validate parameters.
 
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             return enqueueWithCnx(runRequest, cnx);
-        }
-        finally
-        {
-            closeQuietly(cnx);
         }
     }
 
@@ -354,19 +348,13 @@ final class JdbcClient implements JqmClient
     @Override
     public int enqueueFromHistory(int jobIdToCopy)
     {
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             return enqueue(getJobRequest(jobIdToCopy, cnx));
         }
         catch (NoResultException e)
         {
             throw new JqmInvalidRequestException("No job for this ID in the history");
-        }
-        finally
-        {
-            closeQuietly(cnx);
         }
     }
 
@@ -510,35 +498,25 @@ final class JdbcClient implements JqmClient
     public void cancelJob(int idJob)
     {
         jqmlogger.trace("Job instance number " + idJob + " will be cancelled");
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             QueryResult res = cnx.runUpdate("jj_update_cancel_by_id", idJob);
             if (res.nbUpdated != 1)
             {
                 throw new JqmClientException("the job is already running, has already finished or never existed to begin with");
             }
-        }
-        catch (RuntimeException e)
-        {
-            closeQuietly(cnx);
-            throw e;
-        }
 
-        try
-        {
             History.create(cnx, idJob, State.CANCELLED, null);
             JobInstance.delete_id(cnx, idJob);
             cnx.commit();
         }
+        catch (RuntimeException e)
+        {
+            throw e;
+        }
         catch (Exception e)
         {
             throw new JqmClientException("could not historise the job instance after it was cancelled", e);
-        }
-        finally
-        {
-            closeQuietly(cnx);
         }
     }
 
@@ -546,12 +524,9 @@ final class JdbcClient implements JqmClient
     public void deleteJob(int idJob)
     {
         jqmlogger.trace("Job instance number " + idJob + " will be deleted");
-        DbConn cnx = null;
 
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
-
             // Two transactions against deadlock.
             QueryResult res = cnx.runUpdate("jj_update_cancel_by_id", idJob);
             cnx.commit();
@@ -574,10 +549,6 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("could not delete a job (internal error)", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     @Override
@@ -596,11 +567,8 @@ final class JdbcClient implements JqmClient
             // Nothing to do - this is thrown if already running. Just go on, this is a standard kill.
         }
 
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
-
             QueryResult res = cnx.runUpdate("jj_update_kill_by_id", idJob);
             if (res.nbUpdated != 1)
             {
@@ -618,20 +586,13 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("Could not kill a job (internal error)", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     @Override
     public void removeRecurrence(int scheduleId)
     {
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
-
             cnx.runUpdate("sjprm_delete_all_for_sj", scheduleId);
             QueryResult res = cnx.runUpdate("sj_delete_by_id", scheduleId);
             if (res.nbUpdated != 1)
@@ -648,10 +609,6 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("Could not kill a job (internal error)", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -662,11 +619,9 @@ final class JdbcClient implements JqmClient
     public void pauseQueuedJob(int idJob)
     {
         jqmlogger.trace("Job instance number " + idJob + " status will be set to HOLDED");
-        DbConn cnx = null;
 
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             QueryResult qr = cnx.runUpdate("jj_update_pause_by_id", idJob);
             if (qr.nbUpdated != 1)
             {
@@ -678,10 +633,6 @@ final class JdbcClient implements JqmClient
         catch (Exception e)
         {
             throw new JqmClientException("could not pause a job (internal error)", e);
-        }
-        finally
-        {
-            closeQuietly(cnx);
         }
     }
 
@@ -695,11 +646,9 @@ final class JdbcClient implements JqmClient
     public void resumeQueuedJob(int idJob)
     {
         jqmlogger.trace("Job status number " + idJob + " will be resumed");
-        DbConn cnx = null;
 
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             QueryResult qr = cnx.runUpdate("jj_update_resume_by_id", idJob);
             if (qr.nbUpdated != 1)
             {
@@ -711,20 +660,13 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("could not resume a job (internal error)", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     public int restartCrashedJob(int idJob)
     {
-        DbConn cnx = null;
-
         // History and Job ID have the same ID.
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             ResultSet rs = cnx.runSelect("history_select_reenqueue_by_id", idJob);
 
             if (!rs.next())
@@ -763,21 +705,15 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("could not restart a job (internal error)", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     @Override
     public void pauseRunningJob(int jobId)
     {
         jqmlogger.trace("Job instance number " + jobId + " will receive a PAUSE instruction");
-        DbConn cnx = null;
 
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             QueryResult qr = cnx.runUpdate("jj_update_instruction_pause_by_id", jobId);
             if (qr.nbUpdated != 1)
             {
@@ -789,21 +725,15 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("could not pause a job (internal error)", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     @Override
     public void resumeRunningJob(int jobId)
     {
         jqmlogger.trace("Job instance number {}, supposed to be paused, will receive a RUN instruction", jobId);
-        DbConn cnx = null;
 
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             QueryResult qr = cnx.runUpdate("jj_update_instruction_resume_by_id", jobId);
             if (qr.nbUpdated != 1)
             {
@@ -815,10 +745,6 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("could not resume a job (internal error)", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -828,11 +754,8 @@ final class JdbcClient implements JqmClient
     @Override
     public void setJobQueue(int idJob, int idQueue)
     {
-        DbConn cnx = null;
-
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             QueryResult qr = cnx.runUpdate("jj_update_queue_by_id", idQueue, idJob);
 
             if (qr.nbUpdated != 1)
@@ -852,10 +775,6 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("could not change the queue of a job (internal error)", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     @Override
@@ -867,11 +786,9 @@ final class JdbcClient implements JqmClient
     @Override
     public void setJobQueuePosition(int idJob, int position)
     {
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
             // Step 1 : get the queue of this job.
-            cnx = getDbSession();
             ResultSet rs1 = cnx.runSelect("ji_select_changequeuepos_by_id", idJob);
             if (!rs1.next())
             {
@@ -931,19 +848,13 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("could not change the queue position of a job (internal error)", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     @Override
     public void setJobPriority(int jobId, int priority)
     {
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             QueryResult qr = cnx.runUpdate("jj_update_priority_by_id", priority, jobId);
 
             if (qr.nbUpdated != 1)
@@ -960,19 +871,13 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("could not change the priority of a job (internal error)", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     @Override
     public void setJobRunAfter(int jobId, Calendar whenToRun)
     {
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             QueryResult qr = cnx.runUpdate("jj_update_notbefore_by_id", whenToRun, jobId);
 
             if (qr.nbUpdated != 1)
@@ -989,19 +894,13 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("could not change the 'not before time' of a job (internal error)", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     @Override
     public void setScheduleRecurrence(int scheduleId, String cronExpression)
     {
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             QueryResult qr = cnx.runUpdate("sj_update_cron_by_id", cronExpression, scheduleId);
 
             if (qr.nbUpdated != 1)
@@ -1018,19 +917,13 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("could not change the cron expression of a schedule (internal error)", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     @Override
     public void setScheduleQueue(int scheduleId, int queueId)
     {
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             QueryResult qr = cnx.runUpdate("sj_update_queue_by_id", queueId, scheduleId);
 
             if (qr.nbUpdated != 1)
@@ -1047,19 +940,13 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("could not change the queue of a schedule (internal error)", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     @Override
     public void setSchedulePriority(int scheduleId, int priority)
     {
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             QueryResult qr = cnx.runUpdate("sj_update_priority_by_id", priority, scheduleId);
 
             if (qr.nbUpdated != 1)
@@ -1075,10 +962,6 @@ final class JdbcClient implements JqmClient
         catch (Exception e)
         {
             throw new JqmClientException("could not change the priority of a schedule (internal error)", e);
-        }
-        finally
-        {
-            closeQuietly(cnx);
         }
     }
 
@@ -1192,10 +1075,8 @@ final class JdbcClient implements JqmClient
                     "cannot query nothing - either query live instances, historical instances or both, but not nothing");
         }
 
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             Map<Integer, com.enioka.jqm.api.JobInstance> res = new LinkedHashMap<>();
 
             String wh = "";
@@ -1430,10 +1311,6 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("an error occured during query execution", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     private com.enioka.jqm.api.JobInstance getJob(ResultSet rs, DbConn cnx) throws SQLException
@@ -1583,11 +1460,8 @@ final class JdbcClient implements JqmClient
     @Override
     public List<com.enioka.jqm.api.Deliverable> getJobDeliverables(int idJob)
     {
-        DbConn cnx = null;
-
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
 
             // TODO: no intermediate entity here: directly SQL => API object.
             List<Deliverable> deliverables = Deliverable.select(cnx, "deliverable_select_all_for_ji", idJob);
@@ -1603,21 +1477,14 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("Could not query files for job instance " + idJob, e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     @Override
     public List<InputStream> getJobDeliverablesContent(int idJob)
     {
-        DbConn cnx = null;
         ArrayList<InputStream> streams = new ArrayList<>();
-
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             for (Deliverable del : Deliverable.select(cnx, "deliverable_select_all_for_ji", idJob))
             {
                 streams.add(getDeliverableContent(del));
@@ -1626,10 +1493,6 @@ final class JdbcClient implements JqmClient
         catch (Exception e)
         {
             throw new JqmClientException("could not retrieve file streams", e);
-        }
-        finally
-        {
-            closeQuietly(cnx);
         }
         return streams;
     }
@@ -1643,12 +1506,10 @@ final class JdbcClient implements JqmClient
     @Override
     public InputStream getDeliverableContent(int delId)
     {
-        DbConn cnx = null;
         Deliverable deliverable = null;
 
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             List<Deliverable> dd = Deliverable.select(cnx, "deliverable_select_by_id", delId);
             if (dd.size() == 0)
             {
@@ -1660,20 +1521,15 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmInvalidRequestException("Could not get find deliverable description inside DB - your ID may be wrong", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
 
         return getDeliverableContent(deliverable);
     }
 
     InputStream getEngineLog(String nodeName, int latest)
     {
-        DbConn cnx = getDbSession();
         URL url = null;
 
-        try
+        try (DbConn cnx = getDbSession())
         {
             ResultSet rs = cnx.runSelect("node_select_connectdata_by_key", nodeName);
             if (!rs.next())
@@ -1702,10 +1558,6 @@ final class JdbcClient implements JqmClient
         catch (Exception e)
         {
             throw new JqmClientException("Could not process request", e);
-        }
-        finally
-        {
-            closeQuietly(cnx);
         }
 
         return getFile(url.toString());
@@ -1752,11 +1604,7 @@ final class JdbcClient implements JqmClient
 
     private InputStream getFile(String url)
     {
-        DbConn cnx = getDbSession();
         File file = null;
-        FileOutputStream fos = null;
-        CloseableHttpClient cl = null;
-        CloseableHttpResponse rs = null;
         String nameHint = null;
 
         File destDir = new File(System.getProperty("java.io.tmpdir"));
@@ -1766,7 +1614,7 @@ final class JdbcClient implements JqmClient
         }
         jqmlogger.trace("File will be copied into " + destDir);
 
-        try
+        try (DbConn cnx = getDbSession())
         {
             file = new File(destDir + "/" + UUID.randomUUID().toString());
 
@@ -1785,7 +1633,6 @@ final class JdbcClient implements JqmClient
                     if (p.containsKey("com.enioka.jqm.ws.truststoreFile"))
                     {
                         KeyStore trust = null;
-                        InputStream trustIs = null;
 
                         try
                         {
@@ -1797,36 +1644,22 @@ final class JdbcClient implements JqmClient
                                     + this.p.getProperty("com.enioka.jqm.ws.truststoreType", "JKS") + "] is invalid", e);
                         }
 
-                        try
+                        try (InputStream trustIs = new FileInputStream(this.p.getProperty("com.enioka.jqm.ws.truststoreFile")))
                         {
-                            trustIs = new FileInputStream(this.p.getProperty("com.enioka.jqm.ws.truststoreFile"));
+
+                            String trustp = this.p.getProperty("com.enioka.jqm.ws.truststorePass", null);
+                            trust.load(trustIs, (trustp == null ? null : trustp.toCharArray()));
                         }
                         catch (FileNotFoundException e)
                         {
                             throw new JqmInvalidRequestException(
                                     "Trust store file [" + this.p.getProperty("com.enioka.jqm.ws.truststoreFile") + "] cannot be found", e);
                         }
-
-                        String trustp = this.p.getProperty("com.enioka.jqm.ws.truststorePass", null);
-                        try
-                        {
-                            trust.load(trustIs, (trustp == null ? null : trustp.toCharArray()));
-                        }
                         catch (Exception e)
                         {
                             throw new JqmInvalidRequestException("Could not load the trust store file", e);
                         }
-                        finally
-                        {
-                            try
-                            {
-                                trustIs.close();
-                            }
-                            catch (IOException e)
-                            {
-                                // Nothing to do.
-                            }
-                        }
+
                         ctx = SSLContexts.custom().loadTrustMaterial(trust, null).build();
                     }
                     else
@@ -1840,44 +1673,44 @@ final class JdbcClient implements JqmClient
                     jqmlogger.error("An supposedly impossible error has happened. Downloading files through the API may not work.", e);
                 }
             }
-            cl = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setSSLContext(ctx).build();
 
-            // Run HTTP request
-            HttpUriRequest rq = new HttpGet(url.toString());
-            rs = cl.execute(rq);
-            if (rs.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
+            //CloseableHttpResponse rs = null;
+            try (CloseableHttpClient cl = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setSSLContext(ctx).build())
             {
-                throw new JqmClientException(
-                        "Could not retrieve file from JQM node. The file may have been purged, or the node may be unreachable. HTTP code was: "
-                                + rs.getStatusLine().getStatusCode());
-            }
-
-            // There may be a filename hint inside the response
-            Header[] hs = rs.getHeaders("Content-Disposition");
-            if (hs.length == 1)
-            {
-                Header h = hs[0];
-                if (h.getValue().contains("filename="))
+                // Run HTTP request
+                HttpUriRequest rq = new HttpGet(url.toString());
+                try (CloseableHttpResponse rs = cl.execute(rq))
                 {
-                    nameHint = h.getValue().split("=")[1];
+                    if (rs.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
+                    {
+                        throw new JqmClientException(
+                                "Could not retrieve file from JQM node. The file may have been purged, or the node may be unreachable. HTTP code was: "
+                                        + rs.getStatusLine().getStatusCode());
+                    }
+
+                    // There may be a filename hint inside the response
+                    Header[] hs = rs.getHeaders("Content-Disposition");
+                    if (hs.length == 1)
+                    {
+                        Header h = hs[0];
+                        if (h.getValue().contains("filename="))
+                        {
+                            nameHint = h.getValue().split("=")[1];
+                        }
+                    }
+
+                    try (FileOutputStream fos = new FileOutputStream(file))
+                    {
+                        // Save the file to a temp local file
+                        rs.getEntity().writeTo(fos);
+                        jqmlogger.trace("File was downloaded to " + file.getAbsolutePath());
+                    }
                 }
             }
-
-            // Save the file to a temp local file
-            fos = new FileOutputStream(file);
-            rs.getEntity().writeTo(fos);
-            jqmlogger.trace("File was downloaded to " + file.getAbsolutePath());
         }
         catch (IOException e)
         {
             throw new JqmClientException("Could not create a webserver-local copy of the file. The remote node may be down. " + url, e);
-        }
-        finally
-        {
-            closeQuietly(cnx);
-            closeQuietly(fos);
-            closeQuietly(rs);
-            closeQuietly(cl);
         }
 
         SelfDestructFileStream res = null;
@@ -1908,10 +1741,8 @@ final class JdbcClient implements JqmClient
     private String getHostForLaunch(int launchId)
     {
         String host;
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             try
             {
                 host = cnx.runSelectSingle("history_select_cnx_data_by_id", String.class, launchId);
@@ -1944,10 +1775,6 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("Could not process request", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     private InputStream getJobLog(int jobId, String extension, String param)
@@ -1978,12 +1805,10 @@ final class JdbcClient implements JqmClient
     public List<com.enioka.jqm.api.Queue> getQueues()
     {
         List<com.enioka.jqm.api.Queue> res = new ArrayList<>();
-        DbConn cnx = null;
         com.enioka.jqm.api.Queue tmp = null;
 
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             for (Queue q : Queue.select(cnx, "q_select_all"))
             {
                 tmp = getQueue(q);
@@ -1995,19 +1820,13 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("could not query queues", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     @Override
     public void pauseQueue(com.enioka.jqm.api.Queue q)
     {
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             cnx.runUpdate("dp_update_enable_by_queue_id", Boolean.FALSE, q.getId());
             cnx.commit();
             jqmlogger.info("Queue {} has been paused", q.getId());
@@ -2016,19 +1835,13 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("could not pause queue", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     @Override
     public void resumeQueue(com.enioka.jqm.api.Queue q)
     {
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             cnx.runUpdate("dp_update_enable_by_queue_id", Boolean.TRUE, q.getId());
             cnx.commit();
             jqmlogger.info("Queue {} has been resumed", q.getId());
@@ -2037,19 +1850,13 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("could not pause queue", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     @Override
     public void clearQueue(com.enioka.jqm.api.Queue q)
     {
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             QueryResult qr = cnx.runUpdate("ji_delete_waiting_in_queue_id", q.getId());
             cnx.commit();
             jqmlogger.info("{} waiting job instances were removed from queue {}", qr.nbUpdated, q.getId());
@@ -2058,19 +1865,13 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("could not clear queue", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     @Override
     public QueueStatus getQueueStatus(com.enioka.jqm.api.Queue q)
     {
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             ResultSet rs = cnx.runSelect("dp_select_enabled_for_queue", q.getId());
 
             int nbEnabled = 0, nbDisabled = 0;
@@ -2106,20 +1907,14 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("could not query queue status", e);
         }
-        finally
-        {
-            closeQuietly(cnx);
-        }
     }
 
     @Override
     public int getQueueEnabledCapacity(com.enioka.jqm.api.Queue q)
     {
         int capacity = 0;
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = getDbSession())
         {
-            cnx = getDbSession();
             ResultSet rs = cnx.runSelect("dp_select_sum_queue_capacity", q.getId());
 
             while (rs.next())
@@ -2130,10 +1925,6 @@ final class JdbcClient implements JqmClient
         catch (Exception e)
         {
             throw new JqmClientException("could not query queue capacity around nodes", e);
-        }
-        finally
-        {
-            closeQuietly(cnx);
         }
 
         return capacity;
@@ -2192,18 +1983,16 @@ final class JdbcClient implements JqmClient
     private List<com.enioka.jqm.api.JobDef> getJobDefinitionsInternal(String queryName, String... args)
     {
         List<com.enioka.jqm.api.JobDef> res = new ArrayList<>();
-        DbConn cnx = null;
         List<JobDef> dbr = null;
         List<Integer> ids = null;
         Map<Integer, com.enioka.jqm.api.Queue> queues = null;
         Map<Integer, List<JobDefParameter>> allParams = null;
         List<ScheduledJob> sjs = null;
 
-        try
+        try (DbConn cnx = getDbSession())
         {
             // TODO: remove model objects and go directly from RS to API objects. Also, join to avoid multiple queries.
 
-            cnx = getDbSession();
             dbr = JobDef.select(cnx, queryName, (Object[]) args);
 
             if (!dbr.isEmpty())
@@ -2267,10 +2056,6 @@ final class JdbcClient implements JqmClient
         catch (Exception e)
         {
             throw new JqmClientException("could not query JobDef", e);
-        }
-        finally
-        {
-            closeQuietly(cnx);
         }
     }
 }

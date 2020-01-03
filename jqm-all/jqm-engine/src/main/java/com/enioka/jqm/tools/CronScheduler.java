@@ -81,13 +81,10 @@ class CronScheduler implements Runnable, TaskCollector
         jqmlogger.info("Start of the manager of the scheduler (not the scheduler itself)");
         while (run)
         {
-            DbConn cnx = null;
             QueryResult qr = null;
 
-            try
+            try (DbConn cnx = Helpers.getNewDbSession())
             {
-                cnx = Helpers.getNewDbSession();
-
                 // Try to take the lead.
                 qr = cnx.runUpdate("w_update_take", this.node.getId(), this.node.getId(), this.node.getId(),
                         (int) (schedulerKeepAlive * 1.2 / 1000));
@@ -100,10 +97,6 @@ class CronScheduler implements Runnable, TaskCollector
                 stopScheduler();
                 waits();
                 continue;
-            }
-            finally
-            {
-                Helpers.closeQuietly(cnx);
             }
 
             if (qr.nbUpdated == 1)
@@ -177,11 +170,8 @@ class CronScheduler implements Runnable, TaskCollector
     {
         TaskTable res = new TaskTable();
 
-        DbConn cnx = null;
-
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
-            cnx = Helpers.getNewDbSession();
             for (ScheduledJob sj : ScheduledJob.select(cnx, "sj_select_all"))
             {
                 res.add(new SchedulingPattern(sj.getCronExpression()), new JqmTask(sj));
@@ -190,10 +180,6 @@ class CronScheduler implements Runnable, TaskCollector
             // Also check delayed jobs
             cnx.runUpdate("ji_update_delayed");
             cnx.commit();
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
 
         return res;

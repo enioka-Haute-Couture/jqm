@@ -144,21 +144,6 @@ final class Helpers
         }
     }
 
-    static void closeQuietly(ZipFile zf)
-    {
-        if (zf != null)
-        {
-            try
-            {
-                zf.close();
-            }
-            catch (Exception e)
-            {
-                jqmlogger.warn("could not close jar file", e);
-            }
-        }
-    }
-
     static void registerJndiIfNeeded()
     {
         try

@@ -46,20 +46,14 @@ public class JqmEngineFactory
     public static void initializeMetadata()
     {
         // TODO: merge inside meta API.
-        DbConn cnx = null;
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
-            cnx = Helpers.getNewDbSession();
             Helpers.updateConfiguration(cnx);
             cnx.commit();
         }
         catch (Exception e)
         {
             throw new JqmRuntimeException("Could not set metadata", e);
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
     }
 }

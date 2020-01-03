@@ -220,11 +220,11 @@ jqm_import_queues() {
 }
 
 jqm_import_all_xml() {
-    $JAVA -jar $JQM_JAR Import-JobFef -f $(find jobs -name "*xml" -type f | grep -v pom.xml | tr "\\n" ",")
+    $JAVA -jar $JQM_JAR Import-JobDef $(find jobs -name "*xml" -type f -printf " -f %p " | grep -v pom.xml)
 }
 
 jqm_export_job_def_xml() {
-    $JAVA -jar $JQM_JAR Export-jobdef -f $1
+    $JAVA -jar $JQM_JAR Export-jobDef -f $1
 }
 
 jqm_enable_gui() {

@@ -112,12 +112,12 @@ The server listens to a random free port shown in the main log. It can be change
 Windows
 =========
 
-./jqm.ps1 enablegui -RootPassword mypassword
+    ./jqm.ps1 enablegui -RootPassword mypassword
 
 Linux
 =========
 
-./jqm.sh enablegui mypassword
+    ./jqm.sh enablegui mypassword
 
 
 Database configuration
@@ -133,7 +133,7 @@ Just edit JQM_ROOT/conf/resources.xml file to reference your own database.
 It contains by default sample configuration for Oracle, PostgreSQL, HSQLDB, DB2 and MySQL which are the supported databases. (HSQLDB is not supported
 in production environments)
 
-.. note:: the database is intended to be shared by all JQM nodes - you should not create a schema/database per node.
+.. note:: The database is intended to be shared by all JQM nodes - you should not create a schema/database per node.
 
 Afterwards, place your JDBC driver inside the "ext" directory.
 
@@ -169,7 +169,7 @@ Database support
 Oracle
 ------------------
 
-Oracle 10gR2 & 11gR2 && 12c are supported. No specific configuration is required in JQM: no options inside jqm.properties (or absent file). No specific database configuration is required.
+Oracle 10gR2 & 11gR2 & 12c are supported. No specific configuration is required in JQM: no options inside jqm.properties (or absent file). No specific database configuration is required.
 
 A typical schema creation would be::
 
@@ -202,7 +202,7 @@ MySQL
 
 MySQL 5.6+ is supported with InnoDB (the default). No specific configuration is required in JQM: no options inside jqm.properties (or absent file).
 
-These commands can be used to setup a database.::
+These commands can be used to setup a database::
 
     $ mysql -u root -p
     mysql> create database jqm;

@@ -46,7 +46,7 @@ Pagination
 **************
 
 The history can grow very large - it depends on the activity inside your cluster. Therefore, doing a query that 
-returns the full history dataset would be quite a catastrophy as far as performance is concerned (and would
+returns the full history dataset would be quite a catastrophe as far as performance is concerned (and would
 probably fail miserably out of memory).
 
 The API implements pagination for this case, with the usual first row and page size. ::
@@ -86,4 +86,4 @@ with all the capabilities detailed above: filtering, sorting, pagination, etc.
 
 It lives inside jqm-all/jqm-webui/jqm-webui-war.
 
-.. note:: this application is but **a sample**. It is not a production ready UI, it is not supported, etc.
+.. note:: this application is just **a sample**. It is not a production ready UI, it is not supported, etc.

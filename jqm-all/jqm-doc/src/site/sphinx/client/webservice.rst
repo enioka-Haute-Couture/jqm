@@ -49,25 +49,25 @@ Interrogating the API is then also exactly the same as with any other client. Fo
 
 The specific parameters are:
 
-+----------------------------------+------------+----------------------------------------------+------------------------------+
-| Name                             | Compulsory | Description                                  | Example                      |
-+==================================+============+==============================================+==============================+
-| com.enioka.jqm.ws.url            | YES        | The base URL of the web service              | http://localhost:1789/api/ws |
-+----------------------------------+------------+----------------------------------------------+------------------------------+
-| com.enioka.jqm.ws.login          |            | If auth is used only.                        | mylogin                      |
-+----------------------------------+------------+----------------------------------------------+------------------------------+
-| com.enioka.jqm.ws.password       | if login   |                                              | password                     |
-+----------------------------------+------------+----------------------------------------------+------------------------------+
-| com.enioka.jqm.ws.keystoreFile   | if CSA     | Store for client certificates authentication | ./conf/client.pfx            |
-+----------------------------------+------------+----------------------------------------------+------------------------------+
-| com.enioka.jqm.ws.keystoreType   |            | Type of the previous store                   | PKCS12                       |
-+----------------------------------+------------+----------------------------------------------+------------------------------+
-| com.enioka.jqm.ws.keystorePass   |            | Password of the store                        | MyPassword                   |
-+----------------------------------+------------+----------------------------------------------+------------------------------+
-| com.enioka.jqm.ws.truststoreFile | if SSL     | Trust roots for server certificates          | ./conf/client.pfx            |
-+----------------------------------+------------+----------------------------------------------+------------------------------+
-| com.enioka.jqm.ws.truststorePass |            | Password of the store                        | NoPassword                   |
-+----------------------------------+------------+----------------------------------------------+------------------------------+
++----------------------------------+------------+----------------------------------------------+------------------------------------+
+| Name                             | Compulsory | Description                                  | Example                            |
++==================================+============+==============================================+====================================+
+| com.enioka.jqm.ws.url            | YES        | The base URL of the web service              | http://localhost:1789/ws/client    |
++----------------------------------+------------+----------------------------------------------+------------------------------------+
+| com.enioka.jqm.ws.login          |            | If auth is used only.                        | mylogin                            |
++----------------------------------+------------+----------------------------------------------+------------------------------------+
+| com.enioka.jqm.ws.password       | if login   |                                              | password                           |
++----------------------------------+------------+----------------------------------------------+------------------------------------+
+| com.enioka.jqm.ws.keystoreFile   | if CSA     | Store for client certificates authentication | ./conf/client.pfx                  |
++----------------------------------+------------+----------------------------------------------+------------------------------------+
+| com.enioka.jqm.ws.keystoreType   |            | Type of the previous store                   | PKCS12                             |
++----------------------------------+------------+----------------------------------------------+------------------------------------+
+| com.enioka.jqm.ws.keystorePass   |            | Password of the store                        | MyPassword                         |
++----------------------------------+------------+----------------------------------------------+------------------------------------+
+| com.enioka.jqm.ws.truststoreFile | if SSL     | Trust roots for server certificates          | ./conf/client.pfx                  |
++----------------------------------+------------+----------------------------------------------+------------------------------------+
+| com.enioka.jqm.ws.truststorePass |            | Password of the store                        | NoPassword                         |
++----------------------------------+------------+----------------------------------------------+------------------------------------+
 
 and can be set:
 
@@ -114,7 +114,7 @@ The only situations when it is recommended to build your own WS client are:
 Server side
 ********************
 
-The web service is not active on any engine by default. To activate it, see the administration guide.
+The web service is not active on any engine by default. To activate it, see the :doc:`administration guide<admin/gui>`.
 
 It is not necessary to enable the service on all JQM nodes. It is actually recommended to dedicate a node that will not host jobs (or few) to the WS.
 Moreover, it is a standard web application with purely stateless sessions,
@@ -201,7 +201,7 @@ The body of the response contains an XML or JSON item giving details on the erro
 Script sample
 ****************
 
-PowerShell script. Logics is the same in any language, script or compiled.::
+PowerShell script. Logics is the same in any language, script or compiled::
     
     # Note: we use JSON as a demonstration of how to use it over the default XML. Obviously, PowerShell deals with XML very well and does not need this.
     

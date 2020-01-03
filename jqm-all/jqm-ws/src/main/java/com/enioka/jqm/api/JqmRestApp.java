@@ -47,11 +47,9 @@ public class JqmRestApp extends ResourceConfig
         boolean loadApiSimple;
         boolean loadApiClient;
         boolean loadApiAdmin;
-        DbConn cnx = null;
 
-        try
+        try (DbConn cnx = Helpers.getDbSession())
         {
-            cnx = Helpers.getDbSession();
             if (context.getInitParameter("jqmnodeid") != null)
             {
                 // The application is running hosted by a JQM node.
@@ -84,10 +82,6 @@ public class JqmRestApp extends ResourceConfig
                 loadApiAdmin = true;
                 loadApiClient = true;
             }
-        }
-        finally
-        {
-            Helpers.closeQuietly(cnx);
         }
 
         // Load the APIs

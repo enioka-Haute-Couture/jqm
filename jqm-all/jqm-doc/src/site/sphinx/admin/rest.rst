@@ -1,7 +1,7 @@
 Administration web services
 ###########################
 
-.. warning:: the admin REST web service is a **private** JQM API. It should never be accessed directly. Either use the web administration console or the future 
+.. warning:: The admin REST web service is a **private** JQM API. It should never be accessed directly. Either use the web administration console or the future
 	CLI. The service is only described here for reference and as a private specification.
 
 The web console is actually only an HTML5 client built on top of some generic administration web services - it has no priviledged access
@@ -24,7 +24,7 @@ In accordance to the most used REST convention, the HTTP verbs are used this way
 | DELETE | Not used                                                                                  | removes the object for ever                                    |
 +--------+-------------------------------------------------------------------------------------------+----------------------------------------------------------------+
 
-.. note:: the API never returns anything on POST/PUT/DELETE operations. On GET, it will output JSON (application/json). By setting the "accept" header in the request, it is 
+.. note:: The API never returns anything on POST/PUT/DELETE operations. On GET, it will output JSON (application/json). By setting the "accept" header in the request, it is
 	also possible to obtain application/xml.
 
 +------------------------+-----+------+-----+--------+------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -93,5 +93,5 @@ In accordance to the most used REST convention, the HTTP verbs are used this way
 | /user/{id}/certificate | X   |      |     |        | A zip file containing a new set of certificates allowing the deignated user to authantify. Only used when internal PKI is used.                      |
 +------------------------+-----+------+-----+--------+------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-.. note:: queues and job definitions are also available through the client API. However, the client version is different with less data exposed and no
+.. note:: Queues and job definitions are also available through the client API. However, the client version is different with less data exposed and no
   possibility to update anything.

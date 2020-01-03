@@ -80,7 +80,7 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.4.8.v20180619</version>
+                <version>${jetty.version}</version>
                 <configuration>
                     <scanIntervalSeconds>10</scanIntervalSeconds>
                     <useProvidedScope>true</useProvidedScope>
@@ -95,6 +95,28 @@
                         <overrideDescriptor>${project.basedir}/src/test/resources/web-jetty.xml</overrideDescriptor>
                     </webApp>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.eclipse.persistence</groupId>
+                        <artifactId>org.eclipse.persistence.moxy</artifactId>
+                        <version>2.7.4</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>jul-to-slf4j</artifactId>
+                        <version>${slf4j.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                        <version>${commons.logging.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                        <version>${slf4j.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>
@@ -163,11 +185,8 @@
                             <async>true</async>
                             <asyncDestroyOnShutdown>true</asyncDestroyOnShutdown>
                             <commandlineArgs>${node.dir}/node_modules/npm/bin/npm-cli.js run watch</commandlineArgs>
-                            <executable>node</executable>
+                            <executable>${node.dir}/node</executable>
                             <workingDirectory>${project.basedir}</workingDirectory>
-                            <environmentVariables>
-                                <PATH>${node.dir}</PATH>
-                            </environmentVariables>
                         </configuration>
                     </execution>
 
@@ -252,6 +271,12 @@
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-api-client-jdbc</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-model</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.enioka.jqm</groupId>
