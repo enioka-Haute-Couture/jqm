@@ -15,7 +15,6 @@
  */
 package com.enioka.jqm.tools;
 
-import java.io.InputStream;
 import java.util.*;
 
 import java.sql.ResultSet;
@@ -144,7 +143,7 @@ public class JqmBaseTest
         String dbName = System.getenv("DB");
         if (dbName != null)
         {
-            Assume.assumeFalse( "Test not implement for db2.", dbName.contains("db2"));
+            Assume.assumeFalse("Test not implemented for db2.", dbName.contains("db2"));
         }
     }
 
@@ -153,7 +152,7 @@ public class JqmBaseTest
         String dbName = System.getenv("DB");
         if (dbName != null)
         {
-            Assume.assumeFalse("Test not implement for oracle.", dbName.contains("oracle"));
+            Assume.assumeFalse("Test not implemented for oracle.", dbName.contains("oracle"));
         }
     }
 
@@ -276,7 +275,7 @@ public class JqmBaseTest
                 }
 
                 jqmlogger.info("Kill all connection (" + processIdList.size() + ").");
-                Iterator it = processIdList.iterator();
+                Iterator<Integer> it = processIdList.iterator();
                 while (it.hasNext())
                 {
                     String query = "KILL CONNECTION " + it.next();
@@ -334,9 +333,9 @@ public class JqmBaseTest
             try
             {
                 jqmlogger.info("Send select application_handle query");
-                ResultSet res = cnx.runRawSelect("SELECT APPLICATION_HANDLE, CLIENT_IPADDR, CLIENT_PORT_NUMBER, SESSION_AUTH_ID,\n" +
-                        "CURRENT_SERVER, APPLICATION_NAME, CLIENT_PROTOCOL, CLIENT_PLATFORM, CLIENT_HOSTNAME, CONNECTION_START_TIME, APPLICATION_ID, EXECUTION_ID \n" +
-                        "FROM TABLE(MON_GET_CONNECTION(cast(NULL as bigint), -2))\n");
+                ResultSet res = cnx.runRawSelect("SELECT APPLICATION_HANDLE, CLIENT_IPADDR, CLIENT_PORT_NUMBER, SESSION_AUTH_ID,\n"
+                        + "CURRENT_SERVER, APPLICATION_NAME, CLIENT_PROTOCOL, CLIENT_PLATFORM, CLIENT_HOSTNAME, CONNECTION_START_TIME, APPLICATION_ID, EXECUTION_ID \n"
+                        + "FROM TABLE(MON_GET_CONNECTION(cast(NULL as bigint), -2))\n");
 
                 while (res.next())
                 {

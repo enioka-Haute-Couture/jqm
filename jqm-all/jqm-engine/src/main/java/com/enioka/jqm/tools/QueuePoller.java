@@ -318,7 +318,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 }
                 else
                 {
-                    jqmlogger.error("Queue poller has failed! It will stop (RuntimeException).", e);
+                    jqmlogger.error("Queue poller has failed! It will stop.", e);
                     this.run = false;
                     this.hasStopped = true;
                     break;
@@ -326,7 +326,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
             }
             catch (Exception e)
             {
-                jqmlogger.error("Queue poller has failed! It will stop (Exception).", e);
+                jqmlogger.error("Queue poller has failed! It will stop.", e);
                 this.run = false;
                 this.hasStopped = true;
                 break;
@@ -538,7 +538,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
     public boolean isActuallyPolling()
     {
         // 1000ms is a rough estimate of the time taken to do the actual poll. If it's more, there is a huge issue elsewhere.
-        return this.lastLoop != null && (Calendar.getInstance().getTimeInMillis() - this.lastLoop.getTimeInMillis()) <= pollingInterval + 1000;
+        return this.lastLoop != null
+                && (Calendar.getInstance().getTimeInMillis() - this.lastLoop.getTimeInMillis()) <= pollingInterval + 1000;
     }
 
     @Override
