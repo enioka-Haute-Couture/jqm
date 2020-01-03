@@ -2,13 +2,13 @@
 <!-- This file is versioned and specific to each branch. It specifies which OS can be built by the branch, and how -->
 <targets>
     <target>
-        <description>Windows Server 1709</description>
-        <tag>windows-1709</tag>
+        <description>Windows Server 1803</description>
+        <tag>windows-1803</tag>
         <compose>windows/docker-compose.yml</compose>
         <buildArgs>
             <arg>
                 <key>WINDOWS_TAG</key>
-                <value>1709</value>
+                <value>1803</value>
             </arg>
         </buildArgs>
         <subTargets>
@@ -18,13 +18,13 @@
         </subTargets>
     </target>
     <target>
-        <description>Windows Server 1803</description>
-        <tag>windows-1803</tag>
+        <description>Windows Server 1809 / 2019</description>
+        <tag>windows-1809</tag>
         <compose>windows/docker-compose.yml</compose>
         <buildArgs>
             <arg>
                 <key>WINDOWS_TAG</key>
-                <value>1803</value>
+                <value>1809</value>
             </arg>
         </buildArgs>
         <subTargets>
