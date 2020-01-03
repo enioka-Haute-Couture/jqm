@@ -1,20 +1,17 @@
 ARG WINDOWS_TAG
 
-FROM microsoft/powershell:nanoserver-${WINDOWS_TAG} as installer
+FROM mcr.microsoft.com/powershell:nanoserver-${WINDOWS_TAG} as installer
 
 SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 # https://github.com/ojdkbuild/ojdkbuild/releases
-ARG JAVA_VERSION=1.8.0
-ARG OJDK_VERSION
-ARG OJDK_BUILD
+ARG OJDK_URL
 ARG OJDK_SHA256
 
-ENV JAVA_HOME=C:\\ojdk \
-    OJDK_ZIP=java-${JAVA_VERSION}-openjdk-${JAVA_VERSION}.${OJDK_VERSION}.${OJDK_BUILD}.ojdkbuild.windows.x86_64.zip
+ENV JAVA_HOME=C:\\ojdk
 
 RUN  mkdir /TEMP >$null; \
-    $url = ('https://github.com/ojdkbuild/ojdkbuild/releases/download/{0}.{1}/{2}' -f $env:JAVA_VERSION, $env:OJDK_VERSION, $env:OJDK_ZIP); \
+    $url = $env:OJDK_URL; \
     Write-Host "Downloading [${url}]"; \
     Invoke-WebRequest -Uri $url -OutFile '/TEMP/ojdkbuild.zip' -UseBasicParsing ; \
     Write-Host ('Verifying sha256 ({0}) ...' -f $env:OJDK_SHA256); \
@@ -37,11 +34,12 @@ RUN	Write-Host "Expanding ..."; \
 
 
 
-FROM microsoft/nanoserver:${WINDOWS_TAG}
+FROM mcr.microsoft.com/windows/nanoserver:${WINDOWS_TAG}
 
 COPY --from=installer C:/ojdk/ C:/ojdk/
 
-RUN setx JAVA_HOME C:\\ojdk && setx PATH %PATH%;C:\\ojdk\\bin
+ENV PATH="C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\ojdk\bin" \
+    JAVA_HOME="C:\ojdk"
 
 LABEL maintainer="Enioka" \
     readme.md="https://github.com/enioka/jqm/blob/master/README.md" \
