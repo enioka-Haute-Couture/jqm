@@ -64,14 +64,15 @@ foreach (${Target} in ${targets}.targets.target) {
         # Helper build
         if (-not $SkipSubImages) {
             foreach ($preBuild in @($Target.subTargets.target)) {
-                if (-not $preBuild) { continue }
+                if ((-not $preBuild) -or (-not $preBuild.service)) { continue }
+                $service = $preBuild.service
 
                 $buildArgsPre = @($buildArgs | % $_)
                 if (($preBuild.pull -eq "true") -or (-not $preBuild.pull)) { $pull += "--pull" }
 
-                Write-Progress "$Description build on ${LogHost} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building image $preBuild"
-                if ($PSCmdlet.ShouldProcess($preBuild, 'Compose Build')) {
-                    docker-compose -f $Compose --log-level warning build @buildArgsPre $preBuild >>$LogFile
+                Write-Progress "$Description build on ${LogHost} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building image ${service})"
+                if ($PSCmdlet.ShouldProcess(${service}, 'Compose Build')) {
+                    docker-compose -f $Compose --log-level warning build @buildArgsPre ${service} >>$LogFile
                     if (-not $?) {
                         throw "Build error"
                     }
