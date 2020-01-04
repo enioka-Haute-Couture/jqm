@@ -4,7 +4,7 @@ ARG JAVA_VERSION=1.8.0
 ###############################################################################
 ## Build inside full JDK image.
 ###############################################################################
-FROM enioka/buildhelpers:maven-3-${WINDOWS_TAG} AS builder
+FROM buildhelpers:maven-3-${WINDOWS_TAG} AS builder
 
 ARG MVN_SETTINGS=" "
 ARG SKIP_TESTS=true
@@ -52,7 +52,7 @@ COPY ./docker/config/selfConfig*.xml C:/jqm/
 ###############################################################################
 ## Actual image, based on minimal JRE.
 ###############################################################################
-FROM enioka/buildhelpers:jre-${JAVA_VERSION}-${WINDOWS_TAG}
+FROM buildhelpers:jre-${JAVA_VERSION}-${WINDOWS_TAG}
 
 # We gave up using ContainerUser - in that case, volume mounts ACLs are respected on the host... which require some icacls on the host. Sigh. Docker is still mostly for root.
 USER ContainerAdministrator
