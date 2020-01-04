@@ -34,6 +34,22 @@
         </subTargets>
     </target>
     <target>
+        <description>Windows Server 1903</description>
+        <tag>windows-1903</tag>
+        <compose>windows/docker-compose.yml</compose>
+        <buildArgs>
+            <arg>
+                <key>WINDOWS_TAG</key>
+                <value>1903</value>
+            </arg>
+        </buildArgs>
+        <subTargets>
+            <target>jre</target>
+            <target>jdk</target>
+            <target>mvn</target>
+        </subTargets>
+    </target>
+    <target>
         <description>Linux x64</description>
         <tag>linux-alpine</tag>
         <dockerfile>linux/Dockerfile</dockerfile>
