@@ -7,7 +7,15 @@
     </server>
     <server>
         <tag>windows-1809</tag>
-        <url>sw1809a:2375</url>
+        <url>localhost</url>
+    </server>
+    <server>
+        <tag>windows-1903</tag>
+        <url>localhost</url>
+    </server>
+    <server>
+        <tag>windows-1909</tag>
+        <url>localhost</url>
     </server>
     <server>
         <tag>linux-alpine</tag>
