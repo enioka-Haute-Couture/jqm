@@ -14,7 +14,7 @@
         <subTargets>
             <target>jre</target>
             <target>jdk</target>
-            <target>mvn</target>
+            <target pull="false">mvn</target>
         </subTargets>
     </target>
     <target>
@@ -30,7 +30,7 @@
         <subTargets>
             <target>jre</target>
             <target>jdk</target>
-            <target>mvn</target>
+            <target pull="false">mvn</target>
         </subTargets>
     </target>
     <target>
@@ -46,7 +46,7 @@
         <subTargets>
             <target>jre</target>
             <target>jdk</target>
-            <target>mvn</target>
+            <target pull="false">mvn</target>
         </subTargets>
     </target>
     <target>

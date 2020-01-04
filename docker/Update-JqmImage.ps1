@@ -65,21 +65,15 @@ foreach (${Target} in ${targets}.targets.target) {
         if (-not $SkipSubImages) {
             foreach ($preBuild in @($Target.subTargets.target)) {
                 if (-not $preBuild) { continue }
+
+                $buildArgsPre = @($buildArgs | % $_)
+                if (($preBuild.pull -eq "true") -or (-not $preBuild.pull)) { $pull += "--pull" }
+
                 Write-Progress "$Description build on ${LogHost} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building image $preBuild"
                 if ($PSCmdlet.ShouldProcess($preBuild, 'Compose Build')) {
-                    docker-compose -f $Compose --log-level warning build --pull @buildArgs $preBuild >>$LogFile
+                    docker-compose -f $Compose --log-level warning build @buildArgsPre $preBuild >>$LogFile
                     if (-not $?) {
                         throw "Build error"
-                    }
-                }
-
-                if ($Push) {
-                    Write-Progress "$Description build on ${LogHost} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Pushing image $preBuild"
-                    if ($PSCmdlet.ShouldProcess($preBuild, 'Compose Push')) {
-                        docker-compose -f $Compose --log-level warning push $preBuild >>$LogFile
-                        if (-not $?) {
-                            throw "Push error"
-                        }
                     }
                 }
             }
@@ -88,7 +82,8 @@ foreach (${Target} in ${targets}.targets.target) {
         # JQM build
         Write-Progress "$Description build on ${LogHost} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building JQM image"
         if ($PSCmdlet.ShouldProcess("JQM", 'Compose Build')) {
-            docker-compose -f $Compose --log-level warning build --pull @buildArgs jqm >>$LogFile
+            # Note there is no pull here - we rely on the pulls done in the helper images.
+            docker-compose -f $Compose --log-level warning build @buildArgs jqm >>$LogFile
             if (-not $?) {
                 throw "Build error"
             }

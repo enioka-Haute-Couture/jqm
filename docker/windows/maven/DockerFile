@@ -33,7 +33,7 @@ RUN	Write-Host 'Expanding ...'; \
 
 
 
-FROM enioka/buildhelpers:jdk-${JAVA_VERSION}-${WINDOWS_TAG}
+FROM buildhelpers:jdk-${JAVA_VERSION}-${WINDOWS_TAG}
 
 COPY --from=installer C:/mvn/ C:/mvn/
 
