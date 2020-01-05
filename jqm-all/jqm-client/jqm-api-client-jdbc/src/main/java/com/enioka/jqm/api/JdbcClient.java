@@ -418,11 +418,11 @@ final class JdbcClient implements JqmClient
      * Internal helper to create a new execution request from an History row.<br>
      * To be called for a single row only, not for converting multiple History elements.<br>
      * Does not create a transaction, and no need for an active transaction.
-     * 
+     *
      * @param launchId
-     *            the ID of the launch (was the ID of the JI, now the ID of the History object)
+     *                     the ID of the launch (was the ID of the JI, now the ID of the History object)
      * @param cnx
-     *            an open DB session
+     *                     an open DB session
      * @return a new execution request
      */
     private JobRequest getJobRequest(int launchId, DbConn cnx)
@@ -1300,7 +1300,7 @@ final class JdbcClient implements JqmClient
                         + "DATE_END, DATE_ENQUEUE, DATE_START, HIGHLANDER, INSTANCE_APPLICATION, "
                         + "INSTANCE_KEYWORD1, INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, "
                         + "JD_KEYWORD1, JD_KEYWORD2, JD_KEYWORD3, " + "JD_MODULE, NODE_NAME, PARENT, PROGRESS, QUEUE_NAME, "
-                        + "RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION, FROM_SCHEDULE, PRIORITY AS PRIORITY, NULL AS DATE_NOT_BEFORE FROM __T__HISTORY ";
+                        + "RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, NODE, QUEUE, 0 as POSITION, FROM_SCHEDULE, PRIORITY AS PRIORITY, DATE_NOT_BEFORE FROM __T__HISTORY ";
 
                 if (wh.length() > 3)
                 {
@@ -2113,7 +2113,8 @@ final class JdbcClient implements JqmClient
     }
 
     @Override
-    public int getQueueEnabledCapacity(com.enioka.jqm.api.Queue q) {
+    public int getQueueEnabledCapacity(com.enioka.jqm.api.Queue q)
+    {
         int capacity = 0;
         DbConn cnx = null;
         try
@@ -2123,7 +2124,7 @@ final class JdbcClient implements JqmClient
 
             while (rs.next())
             {
-               capacity = rs.getInt(1);
+                capacity = rs.getInt(1);
             }
         }
         catch (Exception e)
@@ -2219,7 +2220,7 @@ final class JdbcClient implements JqmClient
                     ids.add(jd.getId());
                 }
                 sjs = ScheduledJob.select(cnx, "sj_select_for_jd_list", ids);
-                allParams = JobDefParameter.select_all(cnx,"jdprm_select_all_for_jd_list", ids);
+                allParams = JobDefParameter.select_all(cnx, "jdprm_select_all_for_jd_list", ids);
             }
 
             for (JobDef jd : dbr)
@@ -2244,7 +2245,8 @@ final class JdbcClient implements JqmClient
                 List<JobDefParameter> parameters = allParams.get(jd.getId());
                 if (parameters != null)
                 {
-                    for (JobDefParameter jdf : parameters) {
+                    for (JobDefParameter jdf : parameters)
+                    {
                         tmp.addParameter(jdf.getKey(), jdf.getValue());
                     }
                 }

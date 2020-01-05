@@ -567,7 +567,7 @@ public class History implements Serializable
 
     /**
      * Create an History object from a {@link JobInstance}.
-     * 
+     *
      */
     public static void create(DbConn cnx, JobInstance ji, State finalState, Calendar endDate)
     {
@@ -582,7 +582,7 @@ public class History implements Serializable
                     ji.getKeyword2(), ji.getKeyword3(), ji.getModule(), jd.getKeyword1(), jd.getKeyword2(), jd.getKeyword3(),
                     jd.getModule(), n == null ? null : n.getName(), ji.getParentId(), ji.getProgress(), q == null ? null : q.getName(), 0,
                     ji.getSessionID(), finalState.toString(), ji.getUserName(), ji.getJdId(), n == null ? null : n.getId(), ji.getQueue(),
-                    ji.isFromSchedule(), ji.getPriority());
+                    ji.isFromSchedule(), ji.getPriority(), ji.getNotBefore());
         }
         else
         {
@@ -591,13 +591,13 @@ public class History implements Serializable
                     ji.getKeyword1(), ji.getKeyword2(), ji.getKeyword3(), ji.getModule(), jd.getKeyword1(), jd.getKeyword2(),
                     jd.getKeyword3(), jd.getModule(), n.getName(), ji.getParentId(), ji.getProgress(), q.getName(), 0, ji.getSessionID(),
                     finalState.toString(), ji.getUserName(), ji.getJdId(), ji.getNode().getId(), ji.getQueue(), ji.isFromSchedule(),
-                    ji.getPriority());
+                    ji.getPriority(), ji.getNotBefore());
         }
     }
 
     /**
      * Create an History object from a {@link JobInstance}. (if it does not exist, exception).
-     * 
+     *
      */
     public static void create(DbConn cnx, int launchId, State finalState, Calendar endDate)
     {
