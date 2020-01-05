@@ -182,6 +182,7 @@
                         <configuration>
                             <show>private</show>
                             <additionalparam>${javadoc.opts}</additionalparam>
+                            <source>8</source>
                         </configuration>
                     </plugin>
 
