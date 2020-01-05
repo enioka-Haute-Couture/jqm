@@ -111,6 +111,10 @@
                         <td>{{$ctrl.ji.progress}}</td>
                     </tr>
                     <tr>
+                        <td>Should only start after</td>
+                        <td>{{$ctrl.ji.runAfter | date : "dd/MM HH:mm:ss"}}</td>
+                    </tr>
+                    <tr>
                         <td>Enqueue time</td>
                         <td>{{$ctrl.ji.enqueueDate | date : "dd/MM HH:mm:ss"}}</td>
                     </tr>
