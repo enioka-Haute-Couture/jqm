@@ -4,16 +4,54 @@ Release notes
 2.2.2
 *************
 
+Release goal
+++++++++++++++++
+
 Maintenance release, mostly consisting in backports from version 3.
 
 Upgrade notes
 +++++++++++++++++++
 
-No API breaking changes.
+No API breaking changes (nor any API changes for that matter).
 
-No database modification in this release - upgrade can be done by simply replacing engine files.
+There is one database modification in this release: a column was added to the History table. Migration is applied
+when running `jqm(.sh|.ps1) createnode`. Note this is the first time the migration mechnanism is used in JQM.
 
-* Engine: added Java 11 support - for engines without web APIs only. java 12 and later are not tested.
+Upgrade procedure for standard installation is therefore:
+* Stop all nodes to avoid locks on DB tables (which could prevent schema upgrades)
+* Replace all binaries with new version (keep your resources.xml configuration file!)
+* Run `jqm(.sh|.ps1) createnode` (only once for the whole cluster) - this will not recreate existing nodes, simply upgrade the schema
+* Restart all nodes
+
+For those using the Docker images in a cluster, refer yourself to the Docker-specific documentation.
+
+Major changes
+++++++++++++++++++++++++++++
+
+* All components: Java compatibility from 1.6 to 1.11 included, with automated tests (1.12 and later are not tested on the 2.x branch) (#381).
+* All components: older mysql/mariadb versions do not use stored procedures anymore for sequence emulation and can now run on instances with binary logging enabled (newer versions already use sequences).
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* All components: better version detection for mariadb and mysql.
+* Engine: fixed DB timezone issue which could cause unwanted Jetty restarts.
+* CLI: fixed XML import error on postgresql.
+* Admin API: fixed global cluster parameter update date not being updated.
+* Admin GUI: fixed application name dropdown width in new launch dialog box (#366).
+* Admin GUI: added runAfter to job instance history dialog box (#369).
+* Packaging: sample job definitions can now be run without access to Maven Central at runtime (#347).
+* Packaging: Docker images for Windows 1809, 1903.
+* Packaging: Docker images were updated with latest Java 8 version.
+
+Deprecated
++++++++++++++++
+
+No new entries - same list as for 2.0.x.
+
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
+* JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs).
+* Java 6 & 7, which are no longer supported, are considered deprecated in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
 
 
 2.2.1
@@ -32,6 +70,15 @@ Minor changes
 ++++++++++++++++++++++++++++
 
 * Client API: fixed connection leak and missing error message when enqueueing a job request on a queue which does not exists (#344)
+
+Deprecated
++++++++++++++++
+
+No new entries - same list as for 2.0.x.
+
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
+* JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs).
+* Java 6 & 7, which are no longer supported, are considered deprecated in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
 
 
 2.2.0
