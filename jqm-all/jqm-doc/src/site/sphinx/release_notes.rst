@@ -18,6 +18,7 @@ There is one database modification in this release: a column was added to the Hi
 when running `jqm(.sh|.ps1) createnode`. Note this is the first time the migration mechnanism is used in JQM.
 
 Upgrade procedure for standard installation is therefore:
+
 * Stop all nodes to avoid locks on DB tables (which could prevent schema upgrades)
 * Replace all binaries with new version (keep your resources.xml configuration file!)
 * Run `jqm(.sh|.ps1) createnode` (only once for the whole cluster) - this will not recreate existing nodes, simply upgrade the schema
