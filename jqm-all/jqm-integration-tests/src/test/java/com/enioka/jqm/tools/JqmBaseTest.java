@@ -221,42 +221,18 @@ public class JqmBaseTest
 
     protected void simulateDbFailure(int waitTimeBeforeRestart)
     {
-        if (db.getProduct().contains("hsql"))
-        {
-            jqmlogger.info("DB is going down");
-            s.stop();
-            this.waitDbStop();
-            jqmlogger.info("DB is now fully down");
-            this.sleep(waitTimeBeforeRestart);
-            jqmlogger.info("Restarting DB");
-            s.start();
-        }
-        else if (db.getProduct().contains("postgresql"))
+        if (db.getProduct().contains("hsql") || db.getProduct().contains("postgresql") || db.getProduct().contains("mariadb"))
         {
             try
             {
                 jqmlogger.info("Send suicide query");
-                cnx.runRawCommand("select pg_terminate_backend(pid) from pg_stat_activity where datname='jqm';");
+                cnx.runCommand("log_off");
                 this.sleep(waitTimeBeforeRestart);
                 Helpers.closeQuietly(cnx);
             }
             catch (Exception e)
             {
-                jqmlogger.warn("Failed to kill postgresql : " + e.getMessage());
-            }
-        }
-        else if (db.getProduct().contains("mariadb"))
-        {
-            try
-            {
-                jqmlogger.info("Send suicide query");
-                cnx.runRawCommand("KILL USER jqm;");
-                this.sleep(waitTimeBeforeRestart);
-                Helpers.closeQuietly(cnx);
-            }
-            catch (Exception e)
-            {
-                jqmlogger.warn("Failed to kill mariadb : " + e.getMessage());
+                jqmlogger.warn("Failed to kill connections : " + e.getMessage());
             }
         }
         else if (db.getProduct().contains("mysql"))

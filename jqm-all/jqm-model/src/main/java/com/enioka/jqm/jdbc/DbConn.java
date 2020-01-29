@@ -107,9 +107,26 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
-            // duno what to do
+            // nothing to do
         }
 
+    }
+
+    /** For testing purposes only */
+    public void runCommand(String query_key, Object... params)
+    {
+        PreparedStatement ps = null;
+        QueryPreparation qp = adapterPreparation(query_key, false, params);
+        try
+        {
+            ps = prepare(qp);
+            toClose.add(ps);
+            ps.executeQuery();
+        }
+        catch (SQLException e)
+        {
+            // nothing to do
+        }
     }
 
     public QueryResult runUpdate(String query_key, Object... params)
