@@ -96,36 +96,16 @@ public class DbConn implements Closeable
     }
 
     /** For testing purposes only */
-    public void runRawCommand(String query)
-    {
-        PreparedStatement ps = null;
-        try
-        {
-            ps = _cnx.prepareStatement(query);
-            ps.executeQuery();
-            ps.close();
-        }
-        catch (SQLException e)
-        {
-            // nothing to do
-        }
-
-    }
-
-    /** For testing purposes only */
     public void runCommand(String query_key, Object... params)
     {
-        PreparedStatement ps = null;
         QueryPreparation qp = adapterPreparation(query_key, false, params);
-        try
+        try (PreparedStatement ps = prepare(qp))
         {
-            ps = prepare(qp);
-            toClose.add(ps);
-            ps.executeQuery();
+            ps.execute();
         }
         catch (SQLException e)
         {
-            // nothing to do
+            jqmlogger.warn(e.getMessage());
         }
     }
 

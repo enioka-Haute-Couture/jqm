@@ -79,7 +79,7 @@ public class DbImplMySql8 extends DbAdapter
                     List<?> vv = (List<?>) o;
                     if (vv.size() == 0)
                     {
-                        throw new DatabaseException("Cannot do a query whith an empty list parameter");
+                        throw new DatabaseException("Cannot do a query with an empty list parameter");
                     }
 
                     newParams.addAll(vv);

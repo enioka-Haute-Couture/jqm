@@ -221,116 +221,16 @@ public class JqmBaseTest
 
     protected void simulateDbFailure(int waitTimeBeforeRestart)
     {
-        if (db.getProduct().contains("hsql") || db.getProduct().contains("postgresql") || db.getProduct().contains("mariadb"))
+        try
         {
-            try
-            {
-                jqmlogger.info("Send suicide query");
-                cnx.runCommand("log_off");
-                this.sleep(waitTimeBeforeRestart);
-                Helpers.closeQuietly(cnx);
-            }
-            catch (Exception e)
-            {
-                jqmlogger.warn("Failed to kill connections : " + e.getMessage());
-            }
+            jqmlogger.info("Send suicide query");
+            cnx.runCommand("log_off");
+            this.sleep(waitTimeBeforeRestart);
+            Helpers.closeQuietly(cnx);
         }
-        else if (db.getProduct().contains("mysql"))
+        catch (Exception e)
         {
-            ResultSet res = null;
-            try
-            {
-                // mysql 5.7, 8.0
-                jqmlogger.info("Retrieve process id list.");
-                res = cnx.runRawSelect("SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST WHERE USER = 'jqm'");
-
-                ArrayList<Integer> processIdList = new ArrayList<Integer>();
-                while (res.next())
-                {
-                    processIdList.add(res.getInt("ID"));
-                }
-
-                jqmlogger.info("Kill all connection (" + processIdList.size() + ").");
-                Iterator<Integer> it = processIdList.iterator();
-                while (it.hasNext())
-                {
-                    String query = "KILL CONNECTION " + it.next();
-                    jqmlogger.debug(query);
-                    cnx.runRawCommand(query);
-                }
-
-                this.sleep(waitTimeBeforeRestart);
-                Helpers.closeQuietly(cnx);
-            }
-            catch (Exception e)
-            {
-                jqmlogger.warn("Failed to kill mysql connections : " + e.getMessage());
-                e.printStackTrace();
-            }
-            finally
-            {
-                if (res != null)
-                {
-                    try
-                    {
-                        res.close();
-                    }
-                    catch (Exception e)
-                    {
-                        res = null;
-                    }
-                }
-            }
-        }
-        else if (db.getProduct().contains("oracle"))
-        {
-            try
-            {
-                jqmlogger.info("Send select sid, serial query");
-                ResultSet res = cnx.runRawSelect("SELECT SID,SERIAL# FROM GV$SESSION WHERE USERNAME = 'JQM'");
-
-                while (res.next())
-                {
-                    String killReq = "ALTER SYSTEM DISCONNECT SESSION '" + res.getInt("SID") + "," + res.getInt("SERIAL#") + "' IMMEDIATE";
-                    jqmlogger.debug(killReq);
-                    cnx.runRawCommand(killReq);
-                }
-                this.sleep(waitTimeBeforeRestart);
-                Helpers.closeQuietly(cnx);
-            }
-            catch (Exception e)
-            {
-                jqmlogger.warn("Failed to kill oracle session : " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-        else if (db.getProduct().contains("db2"))
-        {
-            try
-            {
-                jqmlogger.info("Send select application_handle query");
-                ResultSet res = cnx.runRawSelect("SELECT APPLICATION_HANDLE, CLIENT_IPADDR, CLIENT_PORT_NUMBER, SESSION_AUTH_ID,\n"
-                        + "CURRENT_SERVER, APPLICATION_NAME, CLIENT_PROTOCOL, CLIENT_PLATFORM, CLIENT_HOSTNAME, CONNECTION_START_TIME, APPLICATION_ID, EXECUTION_ID \n"
-                        + "FROM TABLE(MON_GET_CONNECTION(cast(NULL as bigint), -2))\n");
-
-                while (res.next())
-                {
-                    String query = "CALL SYSPROC.ADMIN_CMD('FORCE APPLICATION (" + res.getInt("APPLICATION_HANDLE") + ")')";
-                    jqmlogger.debug(query);
-                    cnx.runRawCommand(query);
-                }
-                this.sleep(waitTimeBeforeRestart);
-                Helpers.closeQuietly(cnx);
-            }
-            catch (Exception e)
-            {
-                jqmlogger.warn("Failed to kill db2 session : " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-        else
-        {
-            throw new NotImplementedException("Database not supported.");
+            jqmlogger.warn("Failed to kill connections : " + e.getMessage());
         }
     }
 

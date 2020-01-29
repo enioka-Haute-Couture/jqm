@@ -1,15 +1,14 @@
 package com.enioka.jqm.jdbc;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 public class DbImplDb2 extends DbAdapter
 {
+    private String sequenceSqlAppHandle;
+
     @Override
     public void prepare(Properties p, Connection cnx)
     {
@@ -20,6 +19,10 @@ public class DbImplDb2 extends DbAdapter
                 "UPDATE __T__JOB_INSTANCE j1 SET NODE=?, STATUS='ATTRIBUTED', DATE_ATTRIBUTION=CURRENT_TIMESTAMP WHERE j1.STATUS='SUBMITTED' AND j1.ID IN "
                         + "(SELECT j2.ID FROM __T__JOB_INSTANCE j2 WHERE j2.STATUS='SUBMITTED' AND j2.QUEUE=? "
                         + "AND (j2.HIGHLANDER=0 OR (j2.HIGHLANDER=1 AND (SELECT COUNT(1) FROM __T__JOB_INSTANCE j3 WHERE j3.STATUS IN('ATTRIBUTED', 'RUNNING') AND j3.JOBDEF=j2.JOBDEF)=0 )) ORDER BY PRIORITY DESC, INTERNAL_POSITION FETCH FIRST ? ROWS ONLY)"));
+
+        sequenceSqlAppHandle = "SELECT APPLICATION_HANDLE, CLIENT_IPADDR, CLIENT_PORT_NUMBER, SESSION_AUTH_ID,"
+            + "CURRENT_SERVER, APPLICATION_NAME, CLIENT_PROTOCOL, CLIENT_PLATFORM, CLIENT_HOSTNAME, CONNECTION_START_TIME, APPLICATION_ID, EXECUTION_ID"
+            + " FROM TABLE(MON_GET_CONNECTION(cast(NULL as bigint), -2))";
     }
 
     @Override
@@ -27,7 +30,8 @@ public class DbImplDb2 extends DbAdapter
     {
         return sql.replace("MEMORY TABLE", "TABLE").replace("UNIX_MILLIS()", "JQM_PK.nextval").replace("IN(UNNEST(?))", "IN(?)")
                 .replace("FROM (VALUES(0))", "FROM SYSIBM.SYSDUMMY1").replace("BOOLEAN", "SMALLINT").replace("__T__", this.tablePrefix)
-                .replace("true", "1").replace("false", "0");
+                .replace("true", "1").replace("false", "0")
+                .replace("DISCONNECT", "CALL SYSPROC.ADMIN_CMD('FORCE APPLICATION (?)')");
     }
 
     @Override
@@ -68,7 +72,7 @@ public class DbImplDb2 extends DbAdapter
                     List<?> vv = (List<?>) o;
                     if (vv.size() == 0)
                     {
-                        throw new DatabaseException("Cannot do a query whith an empty list parameter");
+                        throw new DatabaseException("Cannot do a query with an empty list parameter");
                     }
 
                     newParams.addAll(vv);
@@ -95,6 +99,24 @@ public class DbImplDb2 extends DbAdapter
             if (nbList != nbIn)
             {
                 throw new DatabaseException("Mismatch: count of list parameters and of IN clauses is different.");
+            }
+        }
+
+        // log_off query : Retrieve application handle
+        if (q.sqlText.startsWith("CALL SYSPROC"))
+        {
+            try (PreparedStatement s = cnx.prepareStatement(sequenceSqlAppHandle))
+            {
+                ResultSet rs = s.executeQuery();
+                if (!rs.next())
+                {
+                    throw new NoResultException("The query returned zero rows when one was expected.");
+                }
+                q.parameters.add(0, rs.getInt(1));
+            }
+            catch (SQLException e)
+            {
+                throw new DatabaseException(q.sqlText + " - " + sequenceSqlAppHandle + " - while fetching Application handle from TABLE(MON_GET_CONNECTION)", e);
             }
         }
     }

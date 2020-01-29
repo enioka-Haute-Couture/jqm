@@ -1,9 +1,6 @@
 package com.enioka.jqm.jdbc;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -13,6 +10,8 @@ import com.enioka.jqm.model.Queue;
 
 public class DbImplOracle extends DbAdapter
 {
+    private String sequenceSqlSid;
+
     @Override
     public boolean compatibleWith(DatabaseMetaData product) throws SQLException
     {
@@ -30,6 +29,7 @@ public class DbImplOracle extends DbAdapter
         // See poll method for everything which is wrong with Oracle and queues.
         queries.put("ji_select_poll",
                 String.format("SELECT /*+ FIRST_ROWS */ a.* FROM (%s) a WHERE ROWNUM < ?", queries.get("ji_select_poll")));
+        sequenceSqlSid = "SELECT SID,SERIAL# FROM GV$SESSION WHERE USERNAME = 'JQM'";
     }
 
     @Override
@@ -39,7 +39,8 @@ public class DbImplOracle extends DbAdapter
                 .replace("UNIX_MILLIS()", "JQM_PK.currval").replace("IN(UNNEST(?))", "IN(?)")
                 .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(CURRENT_TIMESTAMP - 1/1440)")
                 .replace("CURRENT_TIMESTAMP - ? SECOND", "(CURRENT_TIMESTAMP - ?/86400)").replace("FROM (VALUES(0))", "FROM DUAL")
-                .replace("BOOLEAN", "NUMBER(1)").replace("true", "1").replace("false", "0").replace("__T__", this.tablePrefix);
+                .replace("BOOLEAN", "NUMBER(1)").replace("true", "1").replace("false", "0").replace("__T__", this.tablePrefix)
+                .replace("DISCONNECT", "ALTER SYSTEM DISCONNECT SESSION '?,?' IMMEDIATE");
     }
 
     @Override
@@ -69,7 +70,7 @@ public class DbImplOracle extends DbAdapter
                     List<?> vv = (List<?>) o;
                     if (vv.size() == 0)
                     {
-                        throw new DatabaseException("Cannot do a query whith an empty list parameter");
+                        throw new DatabaseException("Cannot do a query with an empty list parameter");
                     }
 
                     newParams.addAll(vv);
@@ -96,6 +97,24 @@ public class DbImplOracle extends DbAdapter
             if (nbList != nbIn)
             {
                 throw new DatabaseException("Mismatch: count of list parameters and of IN clauses is different.");
+            }
+        }
+
+        if (q.sqlText.startsWith("ALTER SYSTEM"))
+        {
+            try (PreparedStatement s = cnx.prepareStatement(sequenceSqlSid))
+            {
+                ResultSet rs = s.executeQuery();
+                if (!rs.next())
+                {
+                    throw new NoResultException("The query returned zero rows when one was expected.");
+                }
+                q.parameters.add(0, rs.getInt(1));
+                q.parameters.add(1, rs.getInt(2));
+            }
+            catch (SQLException e)
+            {
+                throw new DatabaseException(q.sqlText + " - " + sequenceSqlSid + " - while fetching SID, SERIAL# from GV$SESSION)", e);
             }
         }
     }
