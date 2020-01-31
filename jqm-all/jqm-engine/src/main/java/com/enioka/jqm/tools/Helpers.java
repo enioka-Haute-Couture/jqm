@@ -601,25 +601,4 @@ final class Helpers
             return null;
         }
     }
-
-    static boolean testDbFailure(Exception e)
-    {
-        return (e instanceof SQLTransientException) || (e.getCause() instanceof SQLTransientException)
-                || (e.getCause() != null && e.getCause().getCause() instanceof SQLTransientException)
-                || (e.getCause() != null && e.getCause().getCause() != null
-                        && e.getCause().getCause().getCause() instanceof SQLTransientException)
-                || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() != null
-                        && e.getCause().getCause().getCause().getCause() instanceof SQLTransientException)
-                || (e.getCause() != null && e.getCause() instanceof SQLException
-                    && (e.getMessage().equals("Failed to validate a newly established connection.")
-                    ||  e.getCause().getMessage().equals("FATAL: terminating connection due to administrator command")
-                    ||  e.getCause().getMessage().equals("This connection has been closed")))
-                || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof SocketException)
-                || (e.getCause() != null && e.getCause().getMessage().equals("This connection has been closed"))
-                || (e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
-                || (e.getCause() != null && e.getCause() instanceof SQLNonTransientException
-                        && e.getCause().getMessage().equals("connection exception: closed"))
-                || (e instanceof  DatabaseException && e.getMessage().contains("Communications link failure") || e.getMessage().contains("This connection has been closed") || e.getMessage().contains("Connection is closed"))
-                || (e instanceof DatabaseException && e.getCause().getClass().getSimpleName().equals("CommunicationsException"));
-    }
 }

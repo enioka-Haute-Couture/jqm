@@ -1,6 +1,7 @@
 package com.enioka.jqm.jdbc;
 
 import java.io.Closeable;
+import java.net.SocketException;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -8,6 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLNonTransientConnectionException;
+import java.sql.SQLNonTransientException;
+import java.sql.SQLTransientException;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -60,6 +64,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
     }
@@ -74,6 +82,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
     }
@@ -105,6 +117,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             jqmlogger.warn(e.getMessage());
         }
     }
@@ -139,6 +155,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(qp.sqlText, e);
         }
     }
@@ -159,6 +179,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(sql, e);
         }
     }
@@ -198,6 +222,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(q.sqlText, e);
         }
         finally
@@ -227,6 +255,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(qp.sqlText, e);
         }
         finally
@@ -267,6 +299,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
         return res;
@@ -329,6 +365,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
     }
@@ -384,6 +424,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
     }
@@ -499,6 +543,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
 
@@ -541,7 +589,7 @@ public class DbConn implements Closeable
                 List<?> vv = (List<?>) value;
                 if (vv.size() == 0)
                 {
-                    throw new DatabaseException("Cannot do a query whith an empty list parameter");
+                    throw new DatabaseException("Cannot do a query with an empty list parameter");
                 }
                 if (vv.get(0) instanceof Integer)
                 {
@@ -570,6 +618,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException("Could not set parameter at position " + position, e);
         }
     }
@@ -601,6 +653,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e1)
         {
+            if (testDbUnreachable(e1))
+            {
+                throw new DatabaseUnreachableException(e1);
+            }
             jqmlogger.warn("Could not fetch database version", e1);
         }
     }
@@ -608,5 +664,26 @@ public class DbConn implements Closeable
     public List<JobInstance> poll(Queue queue, int nbSlots)
     {
         return this.parent.getAdapter().poll(this, queue, nbSlots);
+    }
+
+    static boolean testDbUnreachable(Exception e)
+    {
+        return (e instanceof SQLTransientException) || (e.getCause() instanceof SQLTransientException)
+            || (e.getCause() != null && e.getCause().getCause() instanceof SQLTransientException)
+            || (e.getCause() != null && e.getCause().getCause() != null
+            && e.getCause().getCause().getCause() instanceof SQLTransientException)
+            || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() != null
+            && e.getCause().getCause().getCause().getCause() instanceof SQLTransientException)
+            || (e.getCause() != null && e.getCause() instanceof SQLException
+            && (e.getMessage().equals("Failed to validate a newly established connection.")
+            ||  e.getMessage().contains("FATAL: terminating connection due to administrator command")
+            ||  e.getMessage().contains("This connection has been closed")))
+            || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof SocketException)
+            || (e.getCause() != null && e.getCause().getMessage().equals("This connection has been closed"))
+            || (e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
+            || (e.getCause() != null && e.getCause() instanceof SQLNonTransientException
+            && e.getCause().getMessage().equals("connection exception: closed"))
+            || (e instanceof  DatabaseException && e.getMessage().contains("Communications link failure") || e.getMessage().contains("This connection has been closed") || e.getMessage().contains("Connection is closed"))
+            || (e instanceof DatabaseException && e.getCause().getClass().getSimpleName().equals("CommunicationsException"));
     }
 }
