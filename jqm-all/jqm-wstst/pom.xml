@@ -134,7 +134,7 @@
     <repositories>
         <repository>
             <id>saucelabs-repository</id>
-            <url>http://repository-saucelabs.forge.cloudbees.com/release</url>
+            <url>https://repository-saucelabs.forge.cloudbees.com/release</url>
             <releases>
             </releases>
             <snapshots>
