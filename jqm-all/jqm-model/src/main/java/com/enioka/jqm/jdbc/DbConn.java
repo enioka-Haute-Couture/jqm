@@ -668,22 +668,59 @@ public class DbConn implements Closeable
 
     static boolean testDbUnreachable(Exception e)
     {
-        return (e instanceof SQLTransientException) || (e.getCause() instanceof SQLTransientException)
-            || (e.getCause() != null && e.getCause().getCause() instanceof SQLTransientException)
-            || (e.getCause() != null && e.getCause().getCause() != null
-            && e.getCause().getCause().getCause() instanceof SQLTransientException)
-            || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() != null
+        if ((e instanceof SQLTransientException) || (e.getCause() instanceof SQLTransientException))
+        {
+            return true;
+        }
+        if (e.getCause() != null && e.getCause().getCause() instanceof SQLTransientException)
+        {
+            return true;
+        }
+        if (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() instanceof SQLTransientException)
+        {
+            return true;
+        }
+        if (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() != null
             && e.getCause().getCause().getCause().getCause() instanceof SQLTransientException)
-            || (e.getCause() != null && e.getCause() instanceof SQLException
+        {
+            return true;
+        }
+
+        if (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof SocketException)
+        {
+            return true;
+        }
+        if (e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
+        {
+            return true;
+        }
+        if (e.getCause() != null && e.getCause() instanceof SQLNonTransientException
+            && e.getCause().getMessage().equals("connection exception: closed"))
+        {
+            return true;
+        }
+
+        if (e instanceof SQLException
             && (e.getMessage().equals("Failed to validate a newly established connection.")
             ||  e.getMessage().contains("FATAL: terminating connection due to administrator command")
-            ||  e.getMessage().contains("This connection has been closed")))
-            || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof SocketException)
-            || (e.getCause() != null && e.getCause().getMessage().equals("This connection has been closed"))
-            || (e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
-            || (e.getCause() != null && e.getCause() instanceof SQLNonTransientException
-            && e.getCause().getMessage().equals("connection exception: closed"))
-            || (e instanceof  DatabaseException && e.getMessage().contains("Communications link failure") || e.getMessage().contains("This connection has been closed") || e.getMessage().contains("Connection is closed"))
-            || (e instanceof DatabaseException && e.getCause().getClass().getSimpleName().equals("CommunicationsException"));
+            ||  e.getMessage().contains("This connection has been closed")
+            || e.getMessage().contains("Communications link failure")
+            || e.getMessage().contains("Connection is closed")))
+        {
+            return true;
+        }
+        if (e.getCause() != null
+            && (e.getCause().getMessage().equals("This connection has been closed.")
+            || e.getCause().getMessage().contains("Communications link failure")
+            || e.getCause().getMessage().contains("Connection is closed")))
+        {
+            return true;
+        }
+        if (e.getCause() != null && e.getCause().getClass().getSimpleName().equals("CommunicationsException"))
+        {
+            return true;
+        }
+
+        return false;
     }
 }
