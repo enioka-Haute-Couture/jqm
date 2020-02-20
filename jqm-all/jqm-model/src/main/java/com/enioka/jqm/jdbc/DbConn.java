@@ -668,7 +668,11 @@ public class DbConn implements Closeable
 
     static boolean testDbUnreachable(Exception e)
     {
-        if ((e instanceof SQLTransientException) || (e.getCause() instanceof SQLTransientException))
+        if ((e instanceof SQLTransientException) || (e.getCause() != null && e.getCause() instanceof SQLTransientException))
+        {
+            return true;
+        }
+        if (e instanceof SQLNonTransientConnectionException || e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
         {
             return true;
         }
@@ -690,10 +694,7 @@ public class DbConn implements Closeable
         {
             return true;
         }
-        if (e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
-        {
-            return true;
-        }
+
         if (e.getCause() != null && e.getCause() instanceof SQLNonTransientException
             && e.getCause().getMessage().equals("connection exception: closed"))
         {
@@ -716,7 +717,9 @@ public class DbConn implements Closeable
         {
             return true;
         }
-        if (e.getCause() != null && e.getCause().getClass().getSimpleName().equals("CommunicationsException"))
+        // MySQL error : CommunicationsException : Communications link failure
+        if (e.getClass().getSimpleName().equals("CommunicationsException")
+            || e.getClass().getSimpleName().equals("MySQLQueryInterruptedException"))
         {
             return true;
         }

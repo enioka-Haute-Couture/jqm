@@ -230,7 +230,7 @@ public class JqmBaseTest
         }
         catch (Exception e)
         {
-            jqmlogger.warn("Failed to kill connections : " + e.getMessage());
+            // Nothing to do. Some SGBDR will throw exception because the kill connection was killed.
         }
     }
 

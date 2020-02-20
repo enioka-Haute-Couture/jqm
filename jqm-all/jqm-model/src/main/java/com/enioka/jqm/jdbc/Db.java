@@ -506,7 +506,24 @@ public class Db
         }
         catch (SQLException e)
         {
-            DbHelper.closeQuietly(cnx); // May have been left open when the pool has given us a failed connection.
+            if (DbConn.testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
+            else
+            {
+                try
+                {
+                    DbHelper.closeQuietly(cnx); // May have been left open when the pool has given us a failed connection.
+                }
+                catch (Exception ee)
+                {
+                    if (DbConn.testDbUnreachable(ee))
+                    {
+                        throw new DatabaseUnreachableException(ee);
+                    }
+                }
+            }
             throw new DatabaseException(e);
         }
     }
