@@ -25,6 +25,7 @@ import javax.naming.spi.NamingManager;
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
+import com.enioka.jqm.jdbc.DatabaseUnreachableException;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -189,9 +190,32 @@ public class JqmBaseTest
 
     protected DbConn getNewDbSession()
     {
-        DbConn cnx = db.getConn();
-        cnxs.add(cnx);
-        return cnx;
+        int retryCount = 5;
+        for (int i = retryCount; i >= 0; --i)
+        {
+            try
+            {
+                DbConn cnx = db.getConn();
+                cnxs.add(cnx);
+                return cnx;
+            }
+            catch (DatabaseUnreachableException e)
+            {
+                // Failed to get a connection, let's try again
+                jqmlogger.warn("Fail to get new session : " + e.getMessage());
+                if (i > 0)
+                {
+                    jqmlogger.warn("Will retry. (retry count : " + i + ")");
+                    sleep(2);
+                    continue;
+                }
+                else
+                {
+                    throw e;
+                }
+            }
+        }
+        return null;
     }
 
     protected void sleep(int s)
@@ -208,14 +232,6 @@ public class JqmBaseTest
         catch (InterruptedException e)
         {
             // not an issue in tests
-        }
-    }
-
-    protected void waitDbStop()
-    {
-        while (s.getState() != 16)
-        {
-            this.sleepms(1);
         }
     }
 
