@@ -15,9 +15,10 @@
  */
 package com.enioka.jqm.tools;
 
-import java.util.*;
-
-import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
@@ -30,7 +31,6 @@ import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.hsqldb.Server;
 import org.junit.After;
 import org.junit.Assume;
@@ -246,7 +246,7 @@ public class JqmBaseTest
         }
         catch (Exception e)
         {
-            // Nothing to do. Some SGBDR will throw exception because the kill connection was killed.
+            // Nothing to do. Some SGBDR will throw exception because the killing connection was killed.
         }
     }
 
