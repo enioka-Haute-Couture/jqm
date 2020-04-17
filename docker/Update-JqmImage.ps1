@@ -70,7 +70,7 @@ foreach (${Target} in ${targets}.targets.target) {
                 $buildArgsPre = @($buildArgs | % $_)
                 if (($preBuild.pull -eq "true") -or (-not $preBuild.pull)) { $pull += "--pull" }
 
-                Write-Progress "$Description build on ${LogHost} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building image ${service})"
+                Write-Progress "$Description build on ${LogHost} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building image ${service}"
                 if ($PSCmdlet.ShouldProcess(${service}, 'Compose Build')) {
                     docker-compose -f $Compose --log-level warning build @buildArgsPre ${service} >>$LogFile
                     if (-not $?) {
