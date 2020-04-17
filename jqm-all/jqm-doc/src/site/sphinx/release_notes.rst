@@ -1,6 +1,40 @@
 Release notes
 ######################
 
+2.2.3
+*************
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+Due to bug #390, users of the Spring Runner should stop using bean named runtimeParameters and instead use a new bean named runtimeParametersProvider.
+Users who do not use Spring, the runtimeParameters bean and a persistent execution context (all three needed) are not concerned by this.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Engine: fixed injected Spring execution parameters could be shared between instances and never change after the first run (#390)
+* Engine: fixed rare crash on startup when trying to determine database type (#384)
+* Engine: fixed shell runner which did not allow an empty "module name" tag in job instances on some platforms and Java versions (#383)
+* Packaging: added Windows 1909 image
+
+Deprecated
++++++++++++++++
+
+Only last entry is new since 2.0.x.
+
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
+* JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs).
+* Java 6 & 7, which are no longer supported, are considered deprecated in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
+* The Spring runner will soon no longer set the runtimeParameters bean. Use runtimeParametersProvider instead (see the JQM+Spring doc page for details).
+
+
 2.2.2
 *************
 
