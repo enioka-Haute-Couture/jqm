@@ -3,19 +3,19 @@
 <servers>
     <server>
         <tag>windows-1803</tag>
-        <url>docker:2375</url>
+        <url>JEUX:2375</url>
     </server>
     <server>
         <tag>windows-1809</tag>
-        <url>localhost</url>
+        <url>JEUX:2375</url>
     </server>
     <server>
         <tag>windows-1903</tag>
-        <url>localhost</url>
+        <url>JEUX:2375</url>
     </server>
     <server>
         <tag>windows-1909</tag>
-        <url>localhost</url>
+        <url>JEUX:2375</url>
     </server>
     <server>
         <tag>linux-alpine</tag>
