@@ -84,7 +84,7 @@ public class ShellRunnerTest extends JqmBaseTest
         String command1 = "/bin/sh -c \"echo 'aa bb'\""; // this will be called within another /bin/sh!
         if (onWindows())
         {
-            command1 = "cmd.exe /C \"echo 'aa bb'\"";
+            command1 = "cmd.exe /C echo 'aa bb'";
         }
 
         CreationTools.createJobDef("test job", true, "none", new HashMap<String, String>(), command1, TestHelpers.qNormal, 0, "TestApp1",
@@ -191,7 +191,7 @@ public class ShellRunnerTest extends JqmBaseTest
                     "TestApp2", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
 
             String script = "ls env: ; $c = New-Object System.Management.Automation.PSCredential ($env:JQM_API_LOGIN, (ConvertTo-SecureString $env:JQM_API_PASSWORD -AsPlainText -Force) ) ;"
-                    + "Invoke-webrequest $env:JQM_API_LOCAL_URL/ws/simple/ji -Method Post -Body @{applicationname='TestApp2';parentid=$env:JQM_JI_ID}  -credential $c";
+                    + "Invoke-webrequest $env:JQM_API_LOCAL_URL/ws/simple/ji -Method Post -Body @{applicationname='TestApp2';parentid=$env:JQM_JI_ID}  -credential $c -UseBasicParsing";
 
             CreationTools.createJobDef("test job", true, "none", new HashMap<String, String>(), script, TestHelpers.qNormal, 0, "TestApp1",
                     null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.POWERSHELLCOMMAND);
