@@ -65,7 +65,7 @@ public class ShellRunnerTest extends JqmBaseTest
         }
 
         CreationTools.createJobDef("test job", true, "none", new HashMap<String, String>(), command1, TestHelpers.qNormal, 0, "TestApp1",
-                null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
+                null, null, "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
         CreationTools.createJobDef("failing test job", true, "none", new HashMap<String, String>(), command2, TestHelpers.qNormal, 0,
                 "TestApp2", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
         JobRequest.create("TestApp1", "TestUser").submit();
