@@ -430,14 +430,32 @@ public class Db
     private void initAdapter()
     {
         Connection tmp = null;
-        DatabaseMetaData meta = null;
         try
         {
             tmp = _ds.getConnection();
-            meta = tmp.getMetaData();
+            DatabaseMetaData meta = tmp.getMetaData();
             product = meta.getDatabaseProductName().toLowerCase();
             jqmlogger.info("Database reports it is " + meta.getDatabaseProductName() + " " + meta.getDatabaseMajorVersion() + "."
                     + meta.getDatabaseMinorVersion());
+
+            DbAdapter newAdpt = null;
+            for (String s : ADAPTERS)
+            {
+                try
+                {
+                    Class<? extends DbAdapter> clazz = Db.class.getClassLoader().loadClass(s).asSubclass(DbAdapter.class);
+                    newAdpt = clazz.newInstance();
+                    if (newAdpt.compatibleWith(meta))
+                    {
+                        adapter = newAdpt;
+                        break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new DatabaseException("Issue when loading database adapter named: " + s, e);
+                }
+            }
         }
         catch (SQLException e)
         {
@@ -455,25 +473,6 @@ public class Db
             catch (SQLException e)
             {
                 // Nothing to do.
-            }
-        }
-
-        DbAdapter newAdpt = null;
-        for (String s : ADAPTERS)
-        {
-            try
-            {
-                Class<? extends DbAdapter> clazz = Db.class.getClassLoader().loadClass(s).asSubclass(DbAdapter.class);
-                newAdpt = clazz.newInstance();
-                if (newAdpt.compatibleWith(meta))
-                {
-                    adapter = newAdpt;
-                    break;
-                }
-            }
-            catch (Exception e)
-            {
-                throw new DatabaseException("Issue when loading database adapter named: " + s, e);
             }
         }
 
