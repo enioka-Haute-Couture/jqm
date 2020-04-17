@@ -4,11 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.Scope;
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.SimpleThreadScope;
 
 import com.enioka.jqm.api.JobInstanceStartedHandler;
 import com.enioka.jqm.api.JobManager;
@@ -21,12 +19,17 @@ import com.enioka.jqm.api.JobManager;
  */
 public class AnnotationSpringContextBootstrapHandler implements JobInstanceStartedHandler
 {
+    /**
+     * The main goal of this handler is to share this Spring context. As it is loaded inside the payload CL, there is one per execution
+     * context.
+     */
     private static AnnotationConfigApplicationContext ctx;
     private static volatile Boolean refreshed = false;
 
     private final static String THREAD_SCOPE_NAME = "thread";
 
     final static ThreadLocal<JobManager> localJm = new ThreadLocal<>();
+    final static ThreadScope threadScope;
 
     static
     {
@@ -35,7 +38,7 @@ public class AnnotationSpringContextBootstrapHandler implements JobInstanceStart
 
         // There is no "request" scope in an AnnotationConfigApplicationContext, as we are not inside a web container.
         // For JQM, we register a "thread" scope as one job instance = one thread, so it can be most useful.
-        Scope threadScope = new SimpleThreadScope();
+        threadScope = new ThreadScope();
         ctx.getBeanFactory().registerScope(THREAD_SCOPE_NAME, threadScope);
     }
 
@@ -46,6 +49,12 @@ public class AnnotationSpringContextBootstrapHandler implements JobInstanceStart
     public static void setJm(JobManager jm)
     {
         localJm.set(jm);
+    }
+
+    public static void cleanThread()
+    {
+        localJm.remove();
+        threadScope.closeThread();
     }
 
     public static Object getBean(String beanName)
@@ -129,9 +138,13 @@ public class AnnotationSpringContextBootstrapHandler implements JobInstanceStart
                     }
 
                     // Create a holder for the parameters.
-                    BeanDefinition def = new RootBeanDefinition(HashMap.class);
+                    BeanDefinition def = new RootBeanDefinition(HashMap.class); // TODO: remove this in v3
                     def.setScope(THREAD_SCOPE_NAME);
                     ctx.registerBeanDefinition("runtimeParameters", def);
+
+                    def = new RootBeanDefinition(ParametersProvider.class);
+                    def.setScope(BeanDefinition.SCOPE_SINGLETON);
+                    ctx.registerBeanDefinition("runtimeParametersProvider", def);
 
                     // This is a factory to retrieve the JobManager. We cannot just inject the JM, as it is created at runtime, long after
                     // the context has been created!

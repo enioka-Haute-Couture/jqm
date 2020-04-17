@@ -1,53 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jqm>
-	<jar>
-		<path>jqm-tests/jqm-test-spring-2/target/test.jar</path>
-		<jobdefinitions>
-			<jobDefinition>
-				<name>Job1</name>
-				<description>Does something</description>
-				<canBeRestarted>true</canBeRestarted>
-				<javaClassName>com.enioka.jqm.spring.job.Job1</javaClassName>
-				<module>BatchJobs</module>
-				<highlander>false</highlander>
-				<executionContext>MainSharedSpringContext</executionContext>
-			</jobDefinition>
-			
-			<jobDefinition>
-				<name>Job2</name>
-				<description>Does something</description>
-				<canBeRestarted>true</canBeRestarted>
-				<javaClassName>com.enioka.jqm.spring.job.Job2</javaClassName>
-				<module>BatchJobs</module>
-				<highlander>false</highlander>
-				<executionContext>MainSharedSpringContext</executionContext>
-			</jobDefinition>
-		</jobdefinitions>
-	</jar>
+    <jar>
+        <path>jqm-tests/jqm-test-spring-2/target/test.jar</path>
+        <jobdefinitions>
+            <jobDefinition>
+                <name>Job1</name>
+                <description>Does something</description>
+                <canBeRestarted>true</canBeRestarted>
+                <javaClassName>com.enioka.jqm.spring.job.Job1</javaClassName>
+                <module>BatchJobs</module>
+                <highlander>false</highlander>
+                <executionContext>MainSharedSpringContext</executionContext>
+            </jobDefinition>
 
-	<context>
-		<name>MainSharedSpringContext</name>
-		<childFirst>false</childFirst>
-		<hiddenJavaClasses></hiddenJavaClasses>
-		<tracingEnabled>false</tracingEnabled>
-		<persistent>true</persistent>
+            <jobDefinition>
+                <name>Job2</name>
+                <description>Does something</description>
+                <canBeRestarted>true</canBeRestarted>
+                <javaClassName>com.enioka.jqm.spring.job.Job2</javaClassName>
+                <module>BatchJobs</module>
+                <highlander>false</highlander>
+                <executionContext>MainSharedSpringContext</executionContext>
+                <parameters>
+                    <parameter>
+                        <key>key1</key>
+                        <value>valueKey1FromDefinition</value>
+                    </parameter>
+                    <parameter>
+                        <key>key2</key>
+                        <value>valueKey2FromDefinition</value>
+                    </parameter>
+                </parameters>
+            </jobDefinition>
+        </jobdefinitions>
+    </jar>
 
-		<runners>com.enioka.jqm.runner.spring.AnnotationSpringRunner</runners>
-		<eventHandlers>
-			<handler>
-				<className>com.enioka.jqm.handler.AnnotationSpringContextBootstrapHandler</className>
-				<event>JI_STARTING</event>
-				<parameters>
-					<parameter>
-						<key>additionalScan</key>
-						<value>com.enioka.jqm.spring</value>
-					</parameter>
-					<parameter>
-						<key>beanNameGenerator</key>
-						<value>com.enioka.jqm.spring.config.CustomBeanNameGenerator</value>
-					</parameter>
-				</parameters>
-			</handler>
-		</eventHandlers>
-	</context>
+    <context>
+        <name>MainSharedSpringContext</name>
+        <childFirst>false</childFirst>
+        <hiddenJavaClasses></hiddenJavaClasses>
+        <tracingEnabled>false</tracingEnabled>
+        <persistent>true</persistent>
+
+        <runners>com.enioka.jqm.runner.spring.AnnotationSpringRunner</runners>
+        <eventHandlers>
+            <handler>
+                <className>com.enioka.jqm.handler.AnnotationSpringContextBootstrapHandler</className>
+                <event>JI_STARTING</event>
+                <parameters>
+                    <parameter>
+                        <key>additionalScan</key>
+                        <value>com.enioka.jqm.spring</value>
+                    </parameter>
+                    <parameter>
+                        <key>beanNameGenerator</key>
+                        <value>com.enioka.jqm.spring.config.CustomBeanNameGenerator</value>
+                    </parameter>
+                </parameters>
+            </handler>
+        </eventHandlers>
+    </context>
 </jqm>
