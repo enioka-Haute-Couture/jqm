@@ -429,34 +429,34 @@ public class Db
      */
     private void initAdapter()
     {
-        DatabaseMetaData meta = null;
+        DbAdapter newAdpt = null;
+
         try (Connection tmp = _ds.getConnection())
         {
-            meta = tmp.getMetaData();
+            DatabaseMetaData meta = tmp.getMetaData();
             product = meta.getDatabaseProductName().toLowerCase();
+
+            for (String s : ADAPTERS)
+            {
+                try
+                {
+                    Class<? extends DbAdapter> clazz = Db.class.getClassLoader().loadClass(s).asSubclass(DbAdapter.class);
+                    newAdpt = clazz.newInstance();
+                    if (newAdpt.compatibleWith(meta))
+                    {
+                        adapter = newAdpt;
+                        break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new DatabaseException("Issue when loading database adapter named: " + s, e);
+                }
+            }
         }
         catch (SQLException e)
         {
             throw new DatabaseException("Cannot connect to the database", e);
-        }
-
-        DbAdapter newAdpt = null;
-        for (String s : ADAPTERS)
-        {
-            try
-            {
-                Class<? extends DbAdapter> clazz = Db.class.getClassLoader().loadClass(s).asSubclass(DbAdapter.class);
-                newAdpt = clazz.newInstance();
-                if (newAdpt.compatibleWith(meta))
-                {
-                    adapter = newAdpt;
-                    break;
-                }
-            }
-            catch (Exception e)
-            {
-                throw new DatabaseException("Issue when loading database adapter named: " + s, e);
-            }
         }
 
         if (adapter == null)
