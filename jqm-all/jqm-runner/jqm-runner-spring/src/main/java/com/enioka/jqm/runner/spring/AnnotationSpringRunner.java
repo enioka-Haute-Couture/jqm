@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import com.enioka.jqm.api.JavaJobRunner;
+import com.enioka.jqm.api.JobRunnerException;
 
 /**
  * A very simple Spring context creation and maintenance. Designed to be used in shared class loaders, but also works with standard "use
@@ -58,6 +59,7 @@ public class AnnotationSpringRunner implements JavaJobRunner
     {
         // Retrieve the context from event handler. It is of course inside the payload class loader.
         Runnable o;
+        Method handlerCleanUpMethod;
         try
         {
             Class handlerClass = Class.forName("com.enioka.jqm.handler.AnnotationSpringContextBootstrapHandler", true,
@@ -75,14 +77,31 @@ public class AnnotationSpringRunner implements JavaJobRunner
             Class<? extends Object> jmClass = Class.forName("com.enioka.jqm.api.JobManager", true, toRun.getClassLoader());
             Method contextBeanLoaderJ = handlerClass.getMethod("setJm", jmClass);
             contextBeanLoaderJ.invoke(null, handlerProxy);
+
+            // Prepare cleanup
+            handlerCleanUpMethod = handlerClass.getMethod("cleanThread");
+
         }
         catch (Exception e)
         {
             e.printStackTrace(System.err);
             return;
         }
-        o.run();
 
+        try
+        {
+            o.run();
+        }
+        finally
+        {
+            try
+            {
+                handlerCleanUpMethod.invoke(null);
+            }
+            catch (Exception e)
+            {
+                throw new JobRunnerException(e);
+            }
+        }
     }
-
 }
