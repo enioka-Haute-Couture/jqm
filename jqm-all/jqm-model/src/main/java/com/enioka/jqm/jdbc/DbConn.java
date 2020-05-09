@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.model.JobInstance;
-import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.Queue;
 
 //TODO: better way to close statements and RS.

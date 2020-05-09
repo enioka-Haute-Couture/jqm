@@ -94,9 +94,10 @@ public class JobDefParameter implements Serializable
     public static List<JobDefParameter> select(DbConn cnx, String query_key, Object... args)
     {
         List<JobDefParameter> res = new ArrayList<JobDefParameter>();
+        ResultSet rs = null;
         try
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
+            rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 JobDefParameter tmp = new JobDefParameter();
@@ -113,15 +114,20 @@ public class JobDefParameter implements Serializable
         {
             throw new DatabaseException(e);
         }
+        finally
+        {
+            cnx.closeQuietly(rs);
+        }
         return res;
     }
 
     public static Map<Integer, List<JobDefParameter>> select_all(DbConn cnx, String query_key, Object... args)
     {
         Map<Integer, List<JobDefParameter>> res = new HashMap<Integer, List<JobDefParameter>>();
+        ResultSet rs = null;
         try
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
+            rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 JobDefParameter tmp = new JobDefParameter();
@@ -145,15 +151,20 @@ public class JobDefParameter implements Serializable
         {
             throw new DatabaseException(e);
         }
+        finally
+        {
+            cnx.closeQuietly(rs);
+        }
         return res;
     }
 
     public static Map<String, String> select_map(DbConn cnx, String query_key, Object... args)
     {
         Map<String, String> res = new HashMap<String, String>();
+        ResultSet rs = null;
         try
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
+            rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 res.put(rs.getString(2), rs.getString(3));
@@ -162,6 +173,10 @@ public class JobDefParameter implements Serializable
         catch (SQLException e)
         {
             throw new DatabaseException(e);
+        }
+        finally
+        {
+            cnx.closeQuietly(rs);
         }
         return res;
     }

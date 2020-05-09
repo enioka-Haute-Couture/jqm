@@ -163,9 +163,10 @@ public class Queue implements Serializable
     public static List<Queue> select(DbConn cnx, String query_key, Object... args)
     {
         List<Queue> res = new ArrayList<Queue>();
+        ResultSet rs = null;
         try
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
+            rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 Queue tmp = map(rs, 0);
@@ -175,6 +176,10 @@ public class Queue implements Serializable
         catch (SQLException e)
         {
             throw new DatabaseException(e);
+        }
+        finally
+        {
+            cnx.closeQuietly(rs);
         }
         return res;
     }

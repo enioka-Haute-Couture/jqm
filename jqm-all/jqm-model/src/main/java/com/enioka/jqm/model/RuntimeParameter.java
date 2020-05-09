@@ -109,9 +109,10 @@ public class RuntimeParameter implements Serializable
     public static Map<String, String> select_map(DbConn cnx, String query_key, Object... args)
     {
         Map<String, String> res = new HashMap<String, String>();
+        ResultSet rs = null;
         try
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
+            rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 res.put(rs.getString(3), rs.getString(4));
@@ -120,6 +121,10 @@ public class RuntimeParameter implements Serializable
         catch (SQLException e)
         {
             throw new DatabaseException(e);
+        }
+        finally
+        {
+            cnx.closeQuietly(rs);
         }
         return res;
     }

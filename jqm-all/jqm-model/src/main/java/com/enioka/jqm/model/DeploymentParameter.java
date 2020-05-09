@@ -207,9 +207,10 @@ public class DeploymentParameter
     public static List<DeploymentParameter> select(DbConn cnx, String query_key, Object... args)
     {
         List<DeploymentParameter> res = new ArrayList<DeploymentParameter>();
+        ResultSet rs = null;
         try
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
+            rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 DeploymentParameter tmp = new DeploymentParameter();
@@ -232,6 +233,10 @@ public class DeploymentParameter
         catch (SQLException e)
         {
             throw new DatabaseException(e);
+        }
+        finally
+        {
+            cnx.closeQuietly(rs);
         }
         return res;
     }

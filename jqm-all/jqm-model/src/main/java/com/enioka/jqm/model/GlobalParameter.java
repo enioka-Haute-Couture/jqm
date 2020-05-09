@@ -120,9 +120,10 @@ public class GlobalParameter implements Serializable
     public static List<GlobalParameter> select(DbConn cnx, String query_key, Object... args)
     {
         List<GlobalParameter> res = new ArrayList<GlobalParameter>();
+        ResultSet rs = null;
         try
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
+            rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 GlobalParameter tmp = new GlobalParameter();
@@ -141,12 +142,16 @@ public class GlobalParameter implements Serializable
         {
             throw new DatabaseException(e);
         }
+        finally
+        {
+            cnx.closeQuietly(rs);
+        }
         return res;
     }
 
     /**
      * Retrieve the value of a single-valued parameter.
-     * 
+     *
      * @param key
      * @param defaultValue
      * @param cnx

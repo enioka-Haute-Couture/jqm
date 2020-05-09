@@ -103,9 +103,10 @@ public class ScheduledJob
         List<Integer> currentIdList = null;
         List<List<Integer>> allIdLists = new ArrayList<List<Integer>>();
         ScheduledJob tmp = null;
+        ResultSet rs = null;
         try
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
+            rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 // ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED
@@ -151,6 +152,10 @@ public class ScheduledJob
         catch (SQLException e)
         {
             throw new DatabaseException(e);
+        }
+        finally
+        {
+            cnx.closeQuietly(rs);
         }
         return res;
     }

@@ -457,7 +457,7 @@ public class JobDef implements Serializable
 
     /**
      * ResultSet is not modified (no rs.next called).
-     * 
+     *
      * @param rs
      * @return
      */
@@ -498,9 +498,10 @@ public class JobDef implements Serializable
     public static List<JobDef> select(DbConn cnx, String query_key, Object... args)
     {
         List<JobDef> res = new ArrayList<JobDef>();
+        ResultSet rs = null;
         try
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
+            rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 JobDef tmp = map(rs, 0);
@@ -512,6 +513,10 @@ public class JobDef implements Serializable
         catch (SQLException e)
         {
             throw new DatabaseException(e);
+        }
+        finally
+        {
+            cnx.closeQuietly(rs);
         }
         return res;
     }

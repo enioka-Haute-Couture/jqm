@@ -191,6 +191,10 @@ public class JndiObjectResource implements Serializable
         {
             throw new DatabaseException(e);
         }
+        finally
+        {
+            cnx.closeQuietly(rs);
+        }
         return res;
     }
 
@@ -242,9 +246,10 @@ public class JndiObjectResource implements Serializable
     public static List<JndiObjectResource> select(DbConn cnx, String query_key, Object... args)
     {
         List<JndiObjectResource> res = new ArrayList<JndiObjectResource>();
+        ResultSet rs = null;
         try
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
+            rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 JndiObjectResource tmp = new JndiObjectResource();
@@ -265,6 +270,10 @@ public class JndiObjectResource implements Serializable
         catch (SQLException e)
         {
             throw new DatabaseException(e);
+        }
+        finally
+        {
+            cnx.closeQuietly(rs);
         }
         return res;
     }
