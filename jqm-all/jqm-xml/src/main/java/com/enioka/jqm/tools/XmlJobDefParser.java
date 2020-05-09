@@ -57,11 +57,11 @@ class XmlJobDefParser
 
     /**
      * Will import all JobDef from an XML file. Creates and commits a transaction.
-     * 
+     *
      * @param path
-     *            full or relative path to the deployment descriptor to read.
+     *                 full or relative path to the deployment descriptor to read.
      * @param cnx
-     *            a database connection to use with no active transaction.
+     *                 a database connection to use with no active transaction.
      * @throws JqmEngineException
      */
     static void parse(String path, DbConn cnx) throws JqmXmlException
@@ -71,13 +71,14 @@ class XmlJobDefParser
 
     /**
      * Will import all JobDef from an XML file. Creates and commits a transaction.
-     * 
+     *
      * @param path
-     *            full or relative path to the deployment descriptor to read.
+     *                                full or relative path to the deployment descriptor to read.
      * @param cnx
-     *            a database connection to use with no active transaction.
+     *                                a database connection to use with no active transaction.
      * @param overrideJarBasePath
-     *            ignore the base path of the jar in the deployment descriptor and use this one. It must be relative to to repository root.
+     *                                ignore the base path of the jar in the deployment descriptor and use this one. It must be relative to
+     *                                to repository root.
      * @throws JqmEngineException
      */
     static void parse(String path, DbConn cnx, String overrideJarBasePath) throws JqmXmlException
@@ -264,9 +265,9 @@ class XmlJobDefParser
                     {
                         // Nothing.
                     }
-                    if (q == null && jdElement.getElementsByTagName("queue").getLength() != 0)
+                    if (jdElement.getElementsByTagName("queue").getLength() != 0)
                     {
-                        // Specified inside the XML,nothing yet in DB. Does the queue already exist?
+                        // Specified inside the XML. Does the specified queue already exist?
                         String qname = jdElement.getElementsByTagName("queue").item(0).getTextContent().trim();
                         try
                         {
@@ -289,7 +290,7 @@ class XmlJobDefParser
                     }
                     else if (q == null)
                     {
-                        // Not specified (and no queue specified inside DB) => default queue
+                        // Queue not specified in XML (and no queue already specified inside DB) => default queue
                         queueId = cnx.runSelectSingle("q_select_default", Integer.class);
                         jd.setQueue(queueId);
                     }
