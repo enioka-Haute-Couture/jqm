@@ -1,6 +1,35 @@
 Release notes
 ######################
 
+2.2.4
+*************
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* CLI: fixed import of XML files with a lot of job definitions, which opened too many database cursors.
+* CLI: fixed update of JobDef default queue during XML import (was not updated by new value).
+
+Deprecated
++++++++++++++++
+
+No new entries - same list as for 2.2.3.
+
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
+* JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs).
+* Java 6 & 7, which are no longer supported, are considered deprecated in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
+* The Spring runner will soon no longer set the runtimeParameters bean. Use runtimeParametersProvider instead (see the JQM+Spring doc page for details).
+
+
 2.2.3
 *************
 
