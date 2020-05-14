@@ -505,7 +505,7 @@ public class Db
         }
         catch (SQLException e)
         {
-            if (DbConn.testDbUnreachable(e))
+            if (this.adapter.testDbUnreachable(e))
             {
                 throw new DatabaseUnreachableException(e);
             }
@@ -517,7 +517,7 @@ public class Db
                 }
                 catch (Exception ee)
                 {
-                    if (DbConn.testDbUnreachable(ee))
+                    if (this.adapter.testDbUnreachable(ee))
                     {
                         throw new DatabaseUnreachableException(ee);
                     }
