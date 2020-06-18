@@ -11,7 +11,7 @@
         "url": "https://github.com/enioka/jqm.git"
     },
     "dependencies": {
-        "angular": "1.7.x",
+        "angular": "1.8.x",
         "angular-animate": "1.7.x",
         "angular-cookies": "1.7.x",
         "angular-resource": "1.7.x",
