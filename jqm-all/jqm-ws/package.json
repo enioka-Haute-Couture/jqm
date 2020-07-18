@@ -11,21 +11,21 @@
         "url": "https://github.com/enioka/jqm.git"
     },
     "dependencies": {
-        "angular": "1.7.x",
-        "angular-animate": "1.7.x",
-        "angular-cookies": "1.7.x",
-        "angular-resource": "1.7.x",
-        "angular-route": "1.7.x",
-        "angular-sanitize": "1.7.x",
-        "angular-touch": "1.7.x",
-        "angular-ui-grid": "4.6.x",
+        "angular": "1.8.x",
+        "angular-animate": "1.8.x",
+        "angular-cookies": "1.8.x",
+        "angular-resource": "1.8.x",
+        "angular-route": "1.8.x",
+        "angular-sanitize": "1.8.x",
+        "angular-touch": "1.8.x",
+        "angular-ui-grid": "4.8.x",
         "bootstrap": "4.3.x",
         "bootstrap-datepicker": "1.8.x",
-        "jquery": "3.4.x",
-        "popper.js": "^1.14.4",
-        "@fortawesome/fontawesome-free": "5.3.x",
+        "jquery": "3.5.x",
+        "popper.js": "1.16.x",
+        "@fortawesome/fontawesome-free": "5.14.x",
         "select2": "4.0.x",
-        "svg.js": "2.6.x"
+        "svg.js": "2.7.x"
     },
     "devDependencies": {
         "webpack": "4.x",
