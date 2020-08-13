@@ -10,6 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
+import { NavLink } from "react-router-dom";
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ListItem from '@material-ui/core/ListItem';
@@ -150,8 +151,8 @@ export default function MenuWrapper(props: any) {
                 <Divider />
                 <List>
                     <ListItem button key={"home"}
-                    // component={NavLink}
-                    // to="/"
+                        component={NavLink}
+                        to="/"
                     // activeClassName={classes.active}
                     >
                         <ListItemIcon><HomeIcon /></ListItemIcon>
@@ -164,14 +165,14 @@ export default function MenuWrapper(props: any) {
                         <ListItemText primary={"Nodes"} />
                     </ListItem>
 
-                    <ListItem button key={"queues"}
-                        disabled
+                    <ListItem
+                        button key={"queues"}
+                        component={NavLink}
+                        to="/queues"
                     >
                         <ListItemIcon><FormatListBulletedIcon /></ListItemIcon>
                         <ListItemText primary={"Queues"} />
                     </ListItem>
-
-
                 </List>
                 <Divider />
                 <List>

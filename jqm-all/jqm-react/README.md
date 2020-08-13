@@ -7,6 +7,8 @@
 
 ## Technical TODOs
 
-* add Roboto font
+* fix formatting in vscode, add settings
+* add Roboto font ?
 * declare theme
 * 2 or 4 tab spaces
+* https://webpack.js.org/guides/hot-module-replacement/
