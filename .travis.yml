@@ -8,6 +8,7 @@ language: java
 before_install:
     - curl "https://raw.githubusercontent.com/DanySK/Gravis-CI/master/.install-jdk-travis.sh" --output ~/.install-jdk-travis.sh
     - source ~/.install-jdk-travis.sh
+    - if [[ "$DB" == "mariadb" ]]; then sudo apt-get remove --purge mysql-server mysql-client mysql-common -y; fi
     - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then mysql -e "create database jqm; grant all privileges on jqm.* to jqm@'%' identified by 'jqm'; flush privileges;"; fi
     - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('new_password') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"; fi
     - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then sudo mysql_upgrade -u root -pnew_password; fi
@@ -36,7 +37,7 @@ env:
 #   sauce_connect: true
 
 stages:
-    - name: jdk_tests
+    #- name: jdk_tests
     - name: db_tests
     - name: db_tests_private
       # pull requests do not have access to the secrets needed for these builds. (private Oracle and IBM repos)
@@ -44,32 +45,6 @@ stages:
 
 jobs:
     include:
-        ## Tests on all openjdk supported versions
-        - stage: jdk_tests
-          env:
-              - DB=hsqldb
-              - JDK=zulu@1.8
-
-        - stage: jdk_tests
-          env:
-              - DB=hsqldb
-              - JDK=zulu@1.9
-
-        - stage: jdk_tests
-          env:
-              - DB=hsqldb
-              - JDK=zulu@1.10
-
-        - stage: jdk_tests
-          env:
-              - DB=hsqldb
-              - JDK=openjdk@1.11
-
-        - stage: jdk_tests
-          env:
-              - DB=hsqldb
-              - JDK=openjdk@1.12
-
         ## Tests on different databases
         - stage: db_tests
           env:
@@ -86,22 +61,6 @@ jobs:
               - JDK=openjdk@1.11
           addons:
               mariadb: "10.3"
-
-        - stage: db_tests
-          env:
-              - DB=postgresql
-              - DB_VERSION=9.6
-              - JDK=openjdk@1.11
-          addons:
-              postgresql: "9.6"
-
-        - stage: db_tests
-          env:
-              - DB=postgresql
-              - DB_VERSION=10
-              - JDK=openjdk@1.11
-          addons:
-              postgresql: "10"
 
         - stage: db_tests
           env:
