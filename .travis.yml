@@ -8,7 +8,7 @@ language: java
 before_install:
     - curl "https://raw.githubusercontent.com/DanySK/Gravis-CI/master/.install-jdk-travis.sh" --output ~/.install-jdk-travis.sh
     - source ~/.install-jdk-travis.sh
-    - if [[ "$DB" == "mariadb" && "$DB_VERSION" == "10.1" ]]; then sudo service mysql stop; sudo apt-get remove --purge mysql-server mysql-client mysql-common -y; sudo rm -rf /etc/mysql; sudo apt-get install -y mariadb-server-10.1; sudo ls /etc; echo "*****"; sudo ls /etc/mysql; sudo cat /etc/mysql/my.cnf; sudo sh -c 'echo "binlog_format=row;" >> /etc/mysql/conf.d/60-test.cnf'; sudo cat /etc/mysql/my.cnf; sudo service mysql restart; fi
+    - if [[ "$DB" == "mariadb" && "$DB_VERSION" == "10.1" ]]; then sudo service mysql stop; sudo apt-get remove --purge mysql-server mysql-client mysql-common -y; sudo rm -rf /etc/mysql; sudo apt-get install -y mariadb-server-10.1; sudo ls /etc; echo "*****"; sudo ls /etc/mysql; sudo cat /etc/mysql/my.cnf; sudo sh -c 'echo -e "[mysqld]\nbinlog_format = ROW;" >> /etc/mysql/conf.d/60-test.cnf'; sudo cat /etc/mysql/my.cnf; sudo service mysql restart; fi
     - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then mysql -e "create database jqm; grant all privileges on jqm.* to jqm@'%' identified by 'jqm'; flush privileges;"; fi
     - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('new_password') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"; fi
     - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then sudo mysql_upgrade -u root -pnew_password; fi
