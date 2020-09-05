@@ -90,7 +90,7 @@
 
                 <table class='table table-sm table-striped table-hover'>
                     <caption><strong>Files created</strong></caption>
-                    <tr ng-repeat="d in dels">
+                    <tr ng-repeat="d in $ctrl.dels">
                         <td>ID</td>
                         <td>{{d.id}}</td>
                         <td><a href="{{'./ws/client/ji/files/' + d.id}}">{{d.fileFamily}}</a></td>
