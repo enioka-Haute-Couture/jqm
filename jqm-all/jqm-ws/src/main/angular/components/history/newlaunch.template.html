@@ -87,6 +87,10 @@
                         <span class="fas fa-plus-circle"></span>
                         Add
                     </button>
+                    <button class="btn btn-outline-danger" ng-click="$ctrl.clearPrm()" ng-disabled="!$ctrl.request.parameters.length">
+                        <span class="fas fa-ban"></span>
+                        Clear
+                    </button>
                 </div>
             </div>
             <small class="form-text text-muted">

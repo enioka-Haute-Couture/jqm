@@ -39,6 +39,11 @@ class NewLaunchController
         this.data.newValue = null;
     };
 
+    clearPrm()
+    {
+        this.request.parameters.length = 0;
+    }
+
     postOk(response)
     {
         this.show = false;
