@@ -9,7 +9,7 @@ before_install:
     - curl "https://raw.githubusercontent.com/DanySK/Gravis-CI/master/.install-jdk-travis.sh" --output ~/.install-jdk-travis.sh
     - source ~/.install-jdk-travis.sh
     - cd jqm-all
-    - if [[ "$JDK" == "zulu@1.6" || "$JDK" == "zulu@1.7" ]]; then export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"; wget http://apache.mirror.gtcomm.net/maven/maven-3/3.2.5/binaries/apache-maven-3.2.5-bin.tar.gz; tar xzvf apache-maven-3.2.5-bin.tar.gz; export PATH=`pwd`/apache-maven-3.2.5/bin:$PATH; else export MAVEN_OPTS="-Xmx512m -XX:MaxMetaspaceSize=256m"; fi
+    - if [[ "$JDK" == "zulu@1.6" || "$JDK" == "zulu@1.7" ]]; then export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"; wget https://archive.apache.org/dist/maven/maven-3/3.2.5/binaries/apache-maven-3.2.5-bin.tar.gz; tar xzvf apache-maven-3.2.5-bin.tar.gz; export PATH=`pwd`/apache-maven-3.2.5/bin:$PATH; else export MAVEN_OPTS="-Xmx512m -XX:MaxMetaspaceSize=256m"; fi
 
 env:
     global:
