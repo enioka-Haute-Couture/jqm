@@ -14,9 +14,9 @@ public class DbHelper
 
     /**
      * Close utility method.
-     * 
+     *
      * @param ps
-     *            statement to close.
+     *               statement to close.
      */
     static void closeQuietly(Closeable ps)
     {
@@ -35,9 +35,9 @@ public class DbHelper
 
     /**
      * Close utility method.
-     * 
+     *
      * @param ps
-     *            statement to close (through a RS).
+     *               statement to close (through a RS).
      */
     static void closeQuietly(ResultSet ps)
     {
@@ -45,8 +45,8 @@ public class DbHelper
         {
             try
             {
+                ps.close();
                 ps.getStatement().close();
-                // ps.close();
             }
             catch (Exception e)
             {
@@ -58,9 +58,9 @@ public class DbHelper
 
     /**
      * Close utility method.
-     * 
+     *
      * @param ps
-     *            statement to close.
+     *               statement to close.
      */
     static void closeQuietly(Connection ps)
     {
@@ -79,9 +79,9 @@ public class DbHelper
 
     /**
      * Close utility method.
-     * 
+     *
      * @param ps
-     *            statement to close.
+     *               statement to close.
      */
     static void closeQuietly(Statement st)
     {
