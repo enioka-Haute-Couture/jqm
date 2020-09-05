@@ -1,5 +1,5 @@
-<div class="row" style="max-height: calc(100% - 4em);">
-    <div class="col-md-2">
+<div class="row h-100 pt-2">
+    <div class="col-md-2 pb-4">
         <input ng-model=" queryStr" type="text" placeholder="filter definitions..." />
 
         <select class="form-control" style="overflow: auto; height: calc(100% - 4em);" ng-model="$ctrl.selected_jd"
@@ -34,7 +34,7 @@
 
     </div>
 
-    <div class="col-md-10" style="overflow-y: auto;">
+    <div class="col-md-10 overflow-auto h-100 pb-3">
         <jqm-jd-details jd="$ctrl.selected_jd" on-remove="$ctrl.remove"></jqm-jd-details>
     </div>
 </div>

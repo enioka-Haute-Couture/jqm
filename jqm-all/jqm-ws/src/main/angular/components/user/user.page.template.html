@@ -1,8 +1,8 @@
-<div class="row">
-    <div class="col-md-2">
+<div class="row h-100 pt-2">
+    <div class="col-md-2 h-100  pb-4">
         <input ng-model="queryStr" type="text" placeholder="filter users..." />
 
-        <select id="userSelect" class="form-control" style="overflow: auto; width: 100%;" ng-model="$ctrl.selected_user"
+        <select id="userSelect" class="form-control" style="overflow: auto; height: calc(100% - 4em);" ng-model="$ctrl.selected_user"
             size="25" ng-options="o as o.login for o in $ctrl.users | filter: {login: queryStr} | filter: {internal:false} | orderBy: 'login'"">
         </select>
 
@@ -17,7 +17,7 @@
             </button>
     </div>
 
-    <div ng-show="$ctrl.selected_user" class="col-md-10">
+    <div ng-show="$ctrl.selected_user" class="col-md-10 h-100 overflow-auto">
         <jqm-user-edit user="$ctrl.selected_user" roles="$ctrl.roles"></jqm-user-edit>
 
         <div class="form-group row">
