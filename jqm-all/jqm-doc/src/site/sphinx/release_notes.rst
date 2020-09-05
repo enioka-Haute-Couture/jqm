@@ -1,6 +1,39 @@
 Release notes
 ######################
 
+2.2.5
+*************
+
+Maintenance release, with both fixes and small quality of life improvements.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Admin GUI: the logout button now redirects to the login page on all browsers (#398)
+* Admin GUI: the redirection after a valid login could fail (#399)
+* Admin GUI: files created by job instances (deliverables) were not listed in the job instance detail dialog (#402)
+* Admin GUI: added an option to clear job parameters in the new job instance launch dialog (#411)
+* Engine: on Oracle DB, there was a timezone inconsistency (JQM normally only deals with UTC times) (#400)
+* Client API: when used with the Wildfly/JBoss JDBC pool, the JDBC implementation triggered pool warnings due to statement caching (#403)
+
+Deprecated
++++++++++++++++
+
+No new entries - same list as for 2.2.4.
+
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
+* JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs).
+* Java 6 & 7, which are no longer supported, are considered deprecated in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
+* The Spring runner will soon no longer set the runtimeParameters bean. Use runtimeParametersProvider instead (see the JQM+Spring doc page for details).
+
+
 2.2.4
 *************
 
