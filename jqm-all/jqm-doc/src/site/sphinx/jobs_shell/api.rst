@@ -18,7 +18,7 @@ The account is garanteed to stay valid at least 24 hours and should not be used 
 
 For example, a bash script may use this command to request the execution of a child job::
 
-  curl --user "${JQM_API_LOGIN}:${JQM_API_PASSWORD}" --url "${JQM_API_LOCAL_URL}/ws/simple/ji" -XPOST -d "applicationname=ChildAppName&parentid=${JQM_JI_ID}" -H "Content-Type: application/x-www-form-urlencoded" 
+  curl --user "${JQM_API_LOGIN}:${JQM_API_PASSWORD}" --url "${JQM_API_LOCAL_URL}/ws/simple/ji" -d "applicationname=ChildAppName&parentid=${JQM_JI_ID}" -H "Content-Type: application/x-www-form-urlencoded" 
 
 
 Creating temp files
