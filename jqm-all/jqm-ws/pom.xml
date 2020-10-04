@@ -28,7 +28,7 @@
             <activation>
                 <property>
                     <!-- Also disable this build when inside eclipse or vs code. -->
-                    <name>!m2e.version</name>
+                    <name>m2e.version</name>
                 </property>
             </activation>
             <build>
