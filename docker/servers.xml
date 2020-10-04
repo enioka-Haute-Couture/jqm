@@ -18,6 +18,10 @@
         <url>JEUX:2375</url>
     </server>
     <server>
+        <tag>windows-2004</tag>
+        <url>JEUX:2375</url>
+    </server>
+    <server>
         <tag>linux-alpine</tag>
         <url>dockerubnt:2376</url>
     </server>

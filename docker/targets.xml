@@ -66,6 +66,22 @@
         </subTargets>
     </target>
     <target>
+        <description>Windows Server 2004</description>
+        <tag>windows-2004</tag>
+        <compose>windows/docker-compose.yml</compose>
+        <buildArgs>
+            <arg>
+                <key>WINDOWS_TAG</key>
+                <value>2004</value>
+            </arg>
+        </buildArgs>
+        <subTargets>
+            <target service="jre" />
+            <target service="jdk" />
+            <target service="mvn" pull="false" />
+        </subTargets>
+    </target>
+    <target>
         <description>Linux x64</description>
         <tag>linux-alpine</tag>
         <dockerfile>linux/Dockerfile</dockerfile>
