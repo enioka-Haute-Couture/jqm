@@ -34,19 +34,19 @@ public class DbHelper
     }
 
     /**
-     * Close utility method.
+     * Close utility method for statement & resultset.
      *
-     * @param ps
-     *               statement to close (through a RS).
+     * @param rs
+     *               statement to close (through its RS).
      */
-    static void closeQuietly(ResultSet ps)
+    static void closeQuietly(ResultSet rs)
     {
-        if (ps != null)
+        if (rs != null)
         {
             try
             {
-                ps.close();
-                ps.getStatement().close();
+                rs.close();
+                rs.getStatement().close();
             }
             catch (Exception e)
             {
@@ -62,13 +62,13 @@ public class DbHelper
      * @param ps
      *               statement to close.
      */
-    static void closeQuietly(Connection ps)
+    static void closeQuietly(Connection connection)
     {
-        if (ps != null)
+        if (connection != null)
         {
             try
             {
-                ps.close();
+                connection.close();
             }
             catch (Exception e)
             {
