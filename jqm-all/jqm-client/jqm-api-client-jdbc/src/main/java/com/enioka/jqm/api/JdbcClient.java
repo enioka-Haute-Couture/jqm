@@ -150,6 +150,21 @@ final class JdbcClient implements JqmClient
         }
     }
 
+    private void closeQuietly(ResultSet closeable)
+    {
+        try
+        {
+            if (closeable != null)
+            {
+                closeable.close();
+            }
+        }
+        catch (SQLException ioe)
+        {
+            // ignore
+        }
+    }
+
     @Override
     public void dispose()
     {
@@ -255,12 +270,15 @@ final class JdbcClient implements JqmClient
         jqmlogger.trace("Job to enqueue is from JobDef " + jobDef.getId());
 
         // Then check Highlander.
-        Integer existing = highlanderMode(jobDef, cnx);
-        if (existing != null)
+        Object highlanderResult = highlanderMode(jobDef, cnx); // Returns Integer if already exists, a resultset otherwise. The RS thing is
+                                                               // to allow to explicitely close it as required by some pools (against the
+                                                               // spec).
+        if (highlanderResult != null && highlanderResult instanceof Integer)
         {
-            jqmlogger.trace("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + existing);
-            return existing;
+            jqmlogger.trace("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + highlanderResult);
+            return (Integer) highlanderResult;
         }
+        ResultSet highlanderRs = (ResultSet) highlanderResult;
 
         // If here, need to enqueue a new execution request.
         jqmlogger.trace("Not in highlander mode or no currently enqueued instance");
@@ -284,6 +302,7 @@ final class JdbcClient implements JqmClient
             }
             catch (NoResultException e)
             {
+                closeQuietly(highlanderRs);
                 throw new JqmInvalidRequestException("Requested queue " + runRequest.getQueueName() + " does not exist", e);
             }
         }
@@ -343,6 +362,10 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("Could not create new JobInstance", e);
         }
+        finally
+        {
+            closeQuietly(highlanderRs);
+        }
     }
 
     @Override
@@ -371,7 +394,7 @@ final class JdbcClient implements JqmClient
     }
 
     // Helper. Current transaction is committed in some cases.
-    private Integer highlanderMode(JobDef jd, DbConn cnx)
+    private Object highlanderMode(JobDef jd, DbConn cnx)
     {
         if (!jd.isHighlander())
         {
@@ -411,7 +434,7 @@ final class JdbcClient implements JqmClient
         }
 
         jqmlogger.trace("Highlander mode analysis is done: nor existing JO, must create a new one. Lock is hold.");
-        return null;
+        return rs;
     }
 
     /**
@@ -1382,6 +1405,7 @@ final class JdbcClient implements JqmClient
                 rs2.next();
 
                 query.setResultSize(rs2.getInt(1));
+                rs2.close();
             }
 
             ///////////////////////////////////////////////
@@ -1417,7 +1441,7 @@ final class JdbcClient implements JqmClient
                     {
                         res.get(msg.getInt(2)).getMessages().add(msg.getString(3));
                     }
-                    run.close();
+                    msg.close();
                 }
             }
 
