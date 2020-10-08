@@ -1382,6 +1382,7 @@ final class JdbcClient implements JqmClient
                 rs2.next();
 
                 query.setResultSize(rs2.getInt(1));
+                rs2.close();
             }
 
             ///////////////////////////////////////////////
@@ -1417,7 +1418,7 @@ final class JdbcClient implements JqmClient
                     {
                         res.get(msg.getInt(2)).getMessages().add(msg.getString(3));
                     }
-                    run.close();
+                    msg.close();
                 }
             }
 

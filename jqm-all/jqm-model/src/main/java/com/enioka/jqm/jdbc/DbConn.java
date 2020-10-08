@@ -100,6 +100,7 @@ public class DbConn implements Closeable
         transac_open = true;
         PreparedStatement ps = null;
         QueryPreparation qp = adapterPreparation(query_key, false, params);
+        ResultSet gen = null;
         try
         {
             ps = prepare(qp);
@@ -108,7 +109,7 @@ public class DbConn implements Closeable
             qr.generatedKey = qp.preGeneratedKey;
             if (query_key.contains("insert") && !query_key.equals("history_insert_with_end_date"))
             {
-                ResultSet gen = ps.getGeneratedKeys();
+                gen = ps.getGeneratedKeys();
                 if (gen.next())
                     try
                     {
@@ -129,7 +130,8 @@ public class DbConn implements Closeable
         }
         finally
         {
-            closeQuietly(ps);
+            DbHelper.closeQuietly(gen);
+            DbHelper.closeQuietly(ps);
         }
     }
 
@@ -155,7 +157,7 @@ public class DbConn implements Closeable
         }
         finally
         {
-            closeQuietly(s);
+            DbHelper.closeQuietly(s);
         }
     }
 
@@ -420,7 +422,7 @@ public class DbConn implements Closeable
 
         for (Statement s : toClose)
         {
-            closeQuietly(s);
+            DbHelper.closeQuietly(s);
         }
         toClose.clear();
 
@@ -457,17 +459,6 @@ public class DbConn implements Closeable
      *               statement to close.
      */
     public void closeQuietly(Connection ps)
-    {
-        DbHelper.closeQuietly(ps);
-    }
-
-    /**
-     * Close utility method.
-     *
-     * @param ps
-     *               statement to close.
-     */
-    public void closeQuietly(Statement ps)
     {
         DbHelper.closeQuietly(ps);
     }
