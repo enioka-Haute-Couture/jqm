@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.enioka.jqm</groupId>
-        <artifactId>jqm-model</artifactId>
+        <artifactId>jqm-dbadapter</artifactId>
         <version>3.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>jqm-impl-hsql</artifactId>
@@ -33,8 +33,8 @@
         </dependency>
         <dependency>
             <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-core</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
+            <artifactId>jqm-model</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

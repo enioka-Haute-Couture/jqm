@@ -1,4 +1,4 @@
-package com.enioka.jqm.implhsql;
+package com.enioka.jqm.adapterapi;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -10,10 +10,11 @@ public class Activator implements BundleActivator
 
     public void start(BundleContext context) throws Exception
     {
-        System.out.println("Hello");
+        System.out.println("Hello adapterapi");
     }
 
     public void stop(BundleContext context) throws Exception
     {
+        System.out.println("Bye adapterapi");
     }
 }
