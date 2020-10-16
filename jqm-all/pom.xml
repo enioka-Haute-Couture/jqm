@@ -120,7 +120,7 @@
         <module>jqm-xml</module>
         <module>jqm-integration-tests</module>
         <module>jqm-integration-tests-ws</module>
-        <!--<module>jqm-dbadapter</module>-->
+        <module>jqm-dbadapter</module>
     </modules>
 
     <scm>

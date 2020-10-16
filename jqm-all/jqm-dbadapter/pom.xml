@@ -13,7 +13,6 @@
     <url>http://jqm.readthedocs.org</url>
 
     <modules>
-        <module>jqm-adapter-api</module>
         <module>jqm-impl-hsql</module>
     </modules>
 </project>
