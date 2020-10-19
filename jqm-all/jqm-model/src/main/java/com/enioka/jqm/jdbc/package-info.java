@@ -7,4 +7,5 @@
  */
 @org.osgi.annotation.bundle.Export
 @org.osgi.annotation.versioning.Version("3.0.0")
+@org.osgi.annotation.bundle.Header(name = "Import-Package", value = "")
 package com.enioka.jqm.jdbc;
