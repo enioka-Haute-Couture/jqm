@@ -7,24 +7,24 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 
-public class Loader implements ServiceListener
+public class Loader<TYPE> implements ServiceListener
 {
     public BundleContext context;
-    public String interfaceName;
     public String filter;
+    public Class<TYPE> type;
     public ArrayList<ServiceReference<?>> references;
 
-    public Loader(BundleContext context, String interfaceName, String filter) throws Exception
+    public Loader(BundleContext context, Class<TYPE> type, String filter) throws Exception
     {
         this.context = context;
-        this.interfaceName = interfaceName;
+        this.type = type;
         this.filter = filter;
         references = new ArrayList<ServiceReference<?>>();
     }
 
     public void start() throws Exception
     {
-        ServiceReference<?>[] tmp = context.getAllServiceReferences(interfaceName, filter);
+        ServiceReference<?>[] tmp = context.getAllServiceReferences(type.getName(), filter);
 
         if (tmp == null)
             return;
@@ -43,14 +43,15 @@ public class Loader implements ServiceListener
         }
     }
 
-    public void useService()
+    public TYPE getService()
     {
         while (references.isEmpty())
             continue;
 
         ServiceReference<?> sr = references.get(0);
-        // Do Something
-        context.ungetService(sr);
+        TYPE res = (TYPE) context.getService(sr);
+
+        return res;
     }
 
     @Override

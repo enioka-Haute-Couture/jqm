@@ -101,6 +101,9 @@
     </properties>
 
     <modules>
+        <module>jqm-loader</module>
+        <module>jqm-dbadapter</module>
+
         <module>jqm-doc</module>
         <module>jqm-runner</module>
         <module>jqm-tests</module>
@@ -120,8 +123,6 @@
         <module>jqm-xml</module>
         <module>jqm-integration-tests</module>
         <module>jqm-integration-tests-ws</module>
-        <module>jqm-loader</module>
-        <module>jqm-dbadapter</module>
     </modules>
 
     <scm>
