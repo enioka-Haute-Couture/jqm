@@ -2,6 +2,8 @@ package com.enioka.jqm.loader;
 
 import com.enioka.jqm.jdbc.DbAdapter;
 
+import java.util.Properties;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.annotation.bundle.Header;
@@ -17,10 +19,13 @@ public class Activator implements BundleActivator
         loader.start();
         DbAdapter adapter = loader.getService();
 
-        if (adapter != null)
+        if (adapter == null)
         {
-            System.out.println("Found");
+            System.out.println("Not Found");
+            return;
         }
+
+        System.out.println("Found");
     }
 
     public void stop(BundleContext context) throws Exception
