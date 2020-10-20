@@ -2,8 +2,6 @@ package com.enioka.jqm.loader;
 
 import com.enioka.jqm.jdbc.DbAdapter;
 
-import java.util.Properties;
-
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.annotation.bundle.Header;
