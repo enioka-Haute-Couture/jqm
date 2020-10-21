@@ -1,9 +1,14 @@
-package com.enioka.jqm.jdbc;
+package com.enioka.jqm.implpg;
 
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+
+import com.enioka.jqm.jdbc.DbAdapter;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.model.Queue;
 
 public class DbImplPg extends DbAdapter
 {
