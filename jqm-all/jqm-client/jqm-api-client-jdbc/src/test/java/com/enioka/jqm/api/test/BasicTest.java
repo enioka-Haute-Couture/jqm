@@ -64,6 +64,7 @@ public class BasicTest
     public Option[] config()
     {
         return options(
+            mavenBundle("com.enioka.jqm", "jqm-api-client-core", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-model", "3.0.0-SNAPSHOT"),
             junitBundles()
             );
