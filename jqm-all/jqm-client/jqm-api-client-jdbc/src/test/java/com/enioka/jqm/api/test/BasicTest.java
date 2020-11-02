@@ -23,6 +23,18 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.BeforeClass;
+
+import static org.ops4j.pax.exam.CoreOptions.*;
+import javax.inject.Inject;
+import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
+import org.ops4j.pax.exam.spi.reactors.PerMethod;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
@@ -39,9 +51,30 @@ import com.enioka.jqm.model.Queue;
 /**
  * Simple tests for checking query syntax (no data)
  */
+@RunWith(PaxExam.class)
+@ExamReactorStrategy(PerMethod.class)
 public class BasicTest
 {
     private static Logger jqmlogger = Logger.getLogger(BasicTest.class);
+
+    @Inject
+    private BundleContext context;
+
+    @Configuration
+    public Option[] config()
+    {
+        return options(
+            mavenBundle("com.enioka.jqm", "jqm-model", "3.0.0-SNAPSHOT"),
+            junitBundles()
+            );
+    }
+
+    @BeforeClass
+    public static void init()
+    {
+        systemProperty("org.ops4j.pax.url.mvn.repositories").value("https://repo1.maven.org/maven2@id=central");
+        systemProperty("org.ops4j.pax.url.mvn.useFallbackRepositories").value("false");
+    }
 
     @Test
     public void testChain()
