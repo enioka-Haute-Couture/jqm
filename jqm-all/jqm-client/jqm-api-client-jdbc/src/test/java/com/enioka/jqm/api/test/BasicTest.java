@@ -64,7 +64,10 @@ public class BasicTest
     public Option[] config()
     {
         return options(
-            mavenBundle("com.enioka.jqm", "jqm-api-client-jdbc", "3.0.0-SNAPSHOT"),
+            wrappedBundle(mavenBundle("javax.activation", "activation", "1.1.1")),
+            mavenBundle("javax.xml.stream", "stax-api", "1.0-2"),
+            mavenBundle("javax.xml.bind", "jaxb-api", "2.3.1"),
+            mavenBundle("com.enioka.jqm", "jqm-api-client-core", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-model", "3.0.0-SNAPSHOT"),
             junitBundles()
             );
