@@ -64,6 +64,14 @@ public class BasicTest
     public Option[] config()
     {
         return options(
+            mavenBundle("org.osgi", "org.osgi.service.cm", "1.6.0"),
+            wrappedBundle(mavenBundle("commons-codec", "commons-codec", "1.15")),
+            wrappedBundle(mavenBundle("org.apache.httpcomponents", "httpcore", "4.4.11")),
+            wrappedBundle(mavenBundle("org.apache.httpcomponents", "httpmime", "4.5.7")),
+            wrappedBundle(mavenBundle("org.apache.httpcomponents", "httpclient-cache", "4.5.7")),
+            wrappedBundle(mavenBundle("org.apache.httpcomponents", "fluent-hc", "4.5.7")),
+            wrappedBundle(mavenBundle("org.apache.httpcomponents", "httpclient", "4.5.7")),
+            mavenBundle("org.apache.httpcomponents", "httpclient-osgi", "4.5.7"),
             wrappedBundle(mavenBundle("javax.activation", "activation", "1.1.1")),
             mavenBundle("javax.xml.stream", "stax-api", "1.0-2"),
             mavenBundle("javax.xml.bind", "jaxb-api", "2.3.1"),
@@ -93,6 +101,16 @@ public class BasicTest
     @Test
     public void testQuery()
     {
+        // DELETE ME
+        // ========================
+        System.out.println("===============");
+        for (Bundle bundle : context.getBundles())
+        {
+            System.out.println(bundle.getSymbolicName() + " " + bundle.getVersion() + " " + bundle.getState());
+        }
+        System.out.println("===============");
+        // ========================
+
         Query q = new Query("toto", null);
         q.setInstanceApplication("marsu");
         q.setInstanceKeyword2("pouet");

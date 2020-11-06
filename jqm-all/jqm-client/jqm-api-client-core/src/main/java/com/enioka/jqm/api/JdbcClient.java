@@ -1674,7 +1674,7 @@ final class JdbcClient implements JqmClient
                 }
             }
 
-            //CloseableHttpResponse rs = null;
+            // CloseableHttpResponse rs = null;
             try (CloseableHttpClient cl = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setSSLContext(ctx).build())
             {
                 // Run HTTP request
