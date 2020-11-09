@@ -73,6 +73,7 @@ public class BasicTest
             wrappedBundle(mavenBundle("org.apache.httpcomponents", "fluent-hc", "4.5.7")),
             wrappedBundle(mavenBundle("org.apache.httpcomponents", "httpclient", "4.5.7")),
             mavenBundle("org.apache.httpcomponents", "httpclient-osgi", "4.5.7"),
+            wrappedBundle(mavenBundle("org.hsqldb", "hsqldb", "2.3.4")),
             wrappedBundle(mavenBundle("javax.servlet", "servlet-api", "2.5")),
             wrappedBundle(mavenBundle("org.apache.shiro", "shiro-core", "1.3.2")),
             wrappedBundle(mavenBundle("org.apache.shiro", "shiro-web", "1.3.2")),
