@@ -73,6 +73,8 @@ public class BasicTest
             wrappedBundle(mavenBundle("org.apache.httpcomponents", "fluent-hc", "4.5.7")),
             wrappedBundle(mavenBundle("org.apache.httpcomponents", "httpclient", "4.5.7")),
             mavenBundle("org.apache.httpcomponents", "httpclient-osgi", "4.5.7"),
+            wrappedBundle(mavenBundle("javax.servlet", "servlet-api", "2.5")),
+            wrappedBundle(mavenBundle("org.apache.shiro", "shiro-core", "1.3.2")),
             wrappedBundle(mavenBundle("org.apache.shiro", "shiro-web", "1.3.2")),
             wrappedBundle(mavenBundle("javax.activation", "activation", "1.1.1")),
             mavenBundle("javax.xml.stream", "stax-api", "1.0-2"),
@@ -103,16 +105,6 @@ public class BasicTest
     @Test
     public void testQuery()
     {
-        // DELETE ME
-        // ========================
-        System.out.println("===============");
-        for (Bundle bundle : context.getBundles())
-        {
-            System.out.println(bundle.getSymbolicName() + " " + bundle.getVersion() + " " + bundle.getState());
-        }
-        System.out.println("===============");
-        // ========================
-
         Query q = new Query("toto", null);
         q.setInstanceApplication("marsu");
         q.setInstanceKeyword2("pouet");
