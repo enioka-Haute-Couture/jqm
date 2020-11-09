@@ -157,6 +157,21 @@ public final class JqmClientFactory
     public static JqmClient getClient(String name, Properties p, boolean cached)
     {
         Properties p2 = null;
+        if (p == null)
+        {
+            p2 = props;
+        }
+        else
+        {
+            p2 = new Properties(props);
+            p2.putAll(p);
+        }
+
+        ClientFactory factory = new ClientFactory();
+        return factory.getClient(name, p2, cached);
+
+        /*
+        Properties p2 = null;
         if (binder == null)
         {
             bind();
@@ -171,6 +186,7 @@ public final class JqmClientFactory
             p2.putAll(p);
         }
         return binder.getClientFactory().getClient(name, p2, cached);
+        */
     }
 
     /**
