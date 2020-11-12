@@ -228,7 +228,7 @@ public class Db
 
         for (String path : filesToLoad)
         {
-            try (InputStream fis = Db.class.getClassLoader().getResourceAsStream(path))
+            try (InputStream fis = Db.class.getClassLoader().getSystemResourceAsStream(path))
             {
                 if (fis != null)
                 {
