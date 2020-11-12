@@ -6,7 +6,7 @@ import java.util.Map;
  * Note: this is not a public API yet. It is not stable enough yet.<br>
  * <br>
  * For plugin writers only.<br>
- * This interface is implemented by the different job runners spcieliazed in running Java payloads, i.e. the agents which actually launch
+ * This interface is implemented by the different job runners specialized in running Java payloads, i.e. the agents which actually launch
  * the job instances. The java job runners must be placed in the plugins directory of the engine.<br>
  * <br>
  * Implementors should always specify a no-args constructor for runners.
@@ -16,7 +16,7 @@ public interface JavaJobRunner
     /**
      * Called when a new job instance reaches the running state, to determine which runner should be used to actually launch it.<br>
      * This method should have no side effect and be thread safe.
-     * 
+     *
      * @param toRun
      *                  the class designated as the one to run inside the job definition.
      * @return true of this runner can run it. Returning true is not a guarantee that this specific runner will be selected for the actual
@@ -32,7 +32,7 @@ public interface JavaJobRunner
      * context of the payload which it should run. However, the class of the runner itself is loaded through a specific plugin class loader
      * which only has access to the "plugin" jar files. Also, a runner has no access whatsoever to the engine classes (same as a payload).
      * So a lot of care is needed when doing operations on the payload class, to avoid class loader mismatches.
-     * 
+     *
      * @param toRun
      *                           the class designated as the job to run inside the job definition.
      * @param metaParameters

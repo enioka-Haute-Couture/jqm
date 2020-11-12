@@ -99,3 +99,8 @@ div.dropdown-item {
 table > caption {
 	caption-side: top;
 }
+
+/* Fix for Select2 initial width when starting in a hidden pane */
+.select2-container {
+    width: 100% !important;
+}

@@ -24,7 +24,7 @@ Optional rich Java integration:
 * Specific API to handle file creation and easy retrieval (a file can be created on any server and retrieved from another in a single call)
 * Embedded standard JNDI directory with JDBC connection pooling for jobs needing database connectivity
 * Jobs can be tested as if they were running inside a JQM node thanks to a test library which can be
-  used in jQuery tests.
+  used in JUnit tests.
 * Can easily report an advancement status to users or administrators
 * All JQM artifacts (optional libraries developers may want to use in some cases) are published on Maven Central and therefore easily
   integrate with most build systems

@@ -1,4 +1,4 @@
-version: "3.4"
+version: "3.6"
 services:
     jre:
         build:
@@ -7,12 +7,12 @@ services:
             labels:
                 com.enioka.description: "build helper - OpenJDK JRE for windows nano"
             args:
-                - OJDK_VERSION=181-1
-                - OJDK_BUILD=b13
-                - OJDK_SHA256=dd7d2ea7951c06857523e95359e5e94630039a1eae5b5223e4b8c308afc95ebb
+                - OJDK_URL=https://github.com/ojdkbuild/ojdkbuild/releases/download/java-1.8.0-openjdk-1.8.0.232-2.b09/java-1.8.0-openjdk-1.8.0.232-2.b09.ojdkbuild.windows.x86_64.zip
+                - OJDK_SHA256=eccdb4ea463e661b2aae81da29ec9baa669c9a24ad27e2e05d877cec36e00c2c
                 - WINDOWS_TAG=${WINDOWS_TAG}
-        image: enioka/buildhelpers:jre-1.8.0-${WINDOWS_TAG:?tag must be given}
+        image: buildhelpers:jre-1.8.0-${WINDOWS_TAG:?tag must be given}
         hostname: jre
+        isolation: hyperv
 
     jdk:
         build:
@@ -21,12 +21,12 @@ services:
             labels:
                 com.enioka.description: "build helper - OpenJDK JDK for windows nano"
             args:
-                - OJDK_VERSION=181-1
-                - OJDK_BUILD=b13
-                - OJDK_SHA256=dd7d2ea7951c06857523e95359e5e94630039a1eae5b5223e4b8c308afc95ebb
+                - OJDK_URL=https://github.com/ojdkbuild/ojdkbuild/releases/download/java-1.8.0-openjdk-1.8.0.232-2.b09/java-1.8.0-openjdk-1.8.0.232-2.b09.ojdkbuild.windows.x86_64.zip
+                - OJDK_SHA256=eccdb4ea463e661b2aae81da29ec9baa669c9a24ad27e2e05d877cec36e00c2c
                 - WINDOWS_TAG=${WINDOWS_TAG}
-        image: enioka/buildhelpers:jdk-1.8.0-${WINDOWS_TAG:?tag must be given}
+        image: buildhelpers:jdk-1.8.0-${WINDOWS_TAG:?tag must be given}
         hostname: jdk
+        isolation: hyperv
 
     mvn:
         build:
@@ -38,8 +38,9 @@ services:
                 - WINDOWS_TAG=${WINDOWS_TAG}
                 - MVN_VERSION=3.5.4
                 - MVN_MD5=235db716537989e9e949e5bf23f965c0
-        image: enioka/buildhelpers:maven-3-${WINDOWS_TAG:?tag must be given}
+        image: buildhelpers:maven-3-${WINDOWS_TAG:?tag must be given}
         hostname: maven
+        isolation: hyperv
 
     jqm:
         build:
@@ -50,3 +51,4 @@ services:
             args:
                 - WINDOWS_TAG=${WINDOWS_TAG}
         image: ${JQM_IMAGE_NAME}
+        isolation: hyperv

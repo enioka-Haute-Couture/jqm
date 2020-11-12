@@ -1,7 +1,7 @@
 ARG WINDOWS_TAG
 ARG JAVA_VERSION=1.8.0
 
-FROM microsoft/powershell:nanoserver-${WINDOWS_TAG} as installer
+FROM mcr.microsoft.com/powershell:nanoserver-${WINDOWS_TAG} as installer
 
 SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
@@ -12,33 +12,33 @@ ARG MVN_MD5
 ENV MVN_URL http://www-us.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.zip
 
 RUN Write-Host ('Downloading {0} ...' -f $env:MVN_URL); \
-	mkdir /TEMP >$null; \
-	Invoke-WebRequest -Uri $env:MVN_URL -OutFile '/TEMP/mvn.zip' -UseBasicParsing ; \
-	Write-Host ('Verifying md5 ({0}) ...' -f $env:MVN_MD5); \
-	if ((Get-FileHash /TEMP/mvn.zip -Algorithm md5).Hash -ne $env:MVN_MD5) { \
-	Write-Host 'FAILED!'; \
-	exit 1; \
-	};
+    mkdir /TEMP >$null; \
+    Invoke-WebRequest -Uri $env:MVN_URL -OutFile '/TEMP/mvn.zip' -UseBasicParsing ; \
+    Write-Host ('Verifying md5 ({0}) ...' -f $env:MVN_MD5); \
+    if ((Get-FileHash /TEMP/mvn.zip -Algorithm md5).Hash -ne $env:MVN_MD5) { \
+    Write-Host 'FAILED!'; \
+    exit 1; \
+    };
 
 RUN	Write-Host 'Expanding ...'; \
-	Expand-Archive /TEMP/mvn.zip -DestinationPath C:\; \
-	\
-	Write-Host 'Renaming ...'; \
-	Move-Item apache* C:/mvn; \
-	\
-	Write-Host 'Removing ...'; \
-	Remove-Item /TEMP/mvn.zip -Force; \
-	\
-	Write-Host 'Complete.';
+    Expand-Archive /TEMP/mvn.zip -DestinationPath C:\; \
+    \
+    Write-Host 'Renaming ...'; \
+    Move-Item apache* C:/mvn; \
+    \
+    Write-Host 'Removing ...'; \
+    Remove-Item /TEMP/mvn.zip -Force; \
+    \
+    Write-Host 'Complete.';
 
 
 
-FROM enioka/buildhelpers:jdk-${JAVA_VERSION}-${WINDOWS_TAG}
+FROM buildhelpers:jdk-${JAVA_VERSION}-${WINDOWS_TAG}
 
 COPY --from=installer C:/mvn/ C:/mvn/
 
-RUN setx PATH %PATH%;C:\mvn\bin
+ENV PATH="C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\mvn\bin"
 
 LABEL maintainer="Enioka" \
-	readme.md="https://github.com/enioka/jqm/blob/master/README.md" \
-	description="Maven packaging"
+    readme.md="https://github.com/enioka/jqm/blob/master/README.md" \
+    description="Maven packaging"

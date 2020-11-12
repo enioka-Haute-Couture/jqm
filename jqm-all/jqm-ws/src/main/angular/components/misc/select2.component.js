@@ -64,8 +64,7 @@ class Select2Controller
         this.jqCompo.select2({
             allowClear: this.clearable,
             multiple: false,
-            placeholder: this.placeholder,
-            width: '100%',
+            width: "resolve",
             dropdownParent: $("#" + this.parentId),
             data: this.data2 || [],
         });
@@ -106,7 +105,7 @@ Select2Controller.$inject = ['$scope',];
 
 export const select2Component = {
     controller: Select2Controller,
-    template: '<div id="{{$ctrl.parentId}}"><select id="{{$ctrl.selectId}}"><option></option></select></div>',
+    template: '<div id="{{$ctrl.parentId}}"><select id="{{$ctrl.selectId}}" data-placeholder="{{$ctrl.placeholder}}"><option></option></select></div>',
     bindings: {
         'data': '<',
         'ngModel': '=',

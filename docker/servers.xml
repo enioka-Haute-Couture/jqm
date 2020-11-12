@@ -2,12 +2,20 @@
 <!-- This is a sample mapping file. It maps the tags used in targets.xml and actual build servers (DOCKER_HOST) -->
 <servers>
     <server>
-        <tag>windows-1709</tag>
-        <url>docker1709:2375</url>
+        <tag>windows-1803</tag>
+        <url>JEUX:2375</url>
     </server>
     <server>
-        <tag>windows-1803</tag>
-        <url>docker:2375</url>
+        <tag>windows-1809</tag>
+        <url>JEUX:2375</url>
+    </server>
+    <server>
+        <tag>windows-1903</tag>
+        <url>JEUX:2375</url>
+    </server>
+    <server>
+        <tag>windows-1909</tag>
+        <url>JEUX:2375</url>
     </server>
     <server>
         <tag>linux-alpine</tag>

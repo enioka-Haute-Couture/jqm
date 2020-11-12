@@ -223,8 +223,8 @@ class DbImplBase
                 + "DATE_END, DATE_ENQUEUE, DATE_START, HIGHLANDER, INSTANCE_APPLICATION, INSTANCE_KEYWORD1, "
                 + "INSTANCE_KEYWORD2, INSTANCE_KEYWORD3, INSTANCE_MODULE, JD_KEYWORD1, JD_KEYWORD2, JD_KEYWORD3, JD_MODULE, "
                 + "NODE_NAME, PARENT, PROGRESS, QUEUE_NAME, RETURN_CODE, SESSION_KEY, STATUS, USERNAME, JOBDEF, "
-                + "NODE, QUEUE, FROM_SCHEDULE, PRIORITY) "
-                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                + "NODE, QUEUE, FROM_SCHEDULE, PRIORITY, DATE_NOT_BEFORE) "
+                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         queries.put("history_insert", queries.get("history_insert_with_end_date").replace("(?, ?, ?, ?, ?, ?",  "(?, ?, ?, ?, ?, CURRENT_TIMESTAMP"));
 
         queries.put("history_delete_all", "DELETE FROM __T__HISTORY");
@@ -326,7 +326,7 @@ class DbImplBase
 
         // GLOBAL PRM
         queries.put("globalprm_insert", "INSERT INTO __T__GLOBAL_PARAMETER(ID, KEYNAME, VALUE, LAST_MODIFIED) VALUES(JQM_PK.nextval, ?, ?, CURRENT_TIMESTAMP)");
-        queries.put("globalprm_update_value_by_key", "UPDATE __T__GLOBAL_PARAMETER SET VALUE=? WHERE KEYNAME=?");
+        queries.put("globalprm_update_value_by_key", "UPDATE __T__GLOBAL_PARAMETER SET VALUE=?, LAST_MODIFIED=CURRENT_TIMESTAMP WHERE KEYNAME=?");
         queries.put("globalprm_delete_all", "DELETE FROM __T__GLOBAL_PARAMETER");
         queries.put("globalprm_delete_by_id", "DELETE FROM __T__GLOBAL_PARAMETER WHERE ID=?");
         queries.put("globalprm_select_all", "SELECT ID, KEYNAME, VALUE, LAST_MODIFIED FROM __T__GLOBAL_PARAMETER");

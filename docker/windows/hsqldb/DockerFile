@@ -3,7 +3,7 @@ ARG JDK_VERSION=1.8.0.151-1
 FROM enioka/jqm:latest as jqm
 RUN move C:\jqm\ext\hsqldb* C:\hsqldb.jar
 
-FROM enioka/buildhelpers:jdk-${JDK_VERSION}
+FROM buildhelpers:jdk-${JDK_VERSION}
 
 COPY --from=jqm C:/hsqldb.jar ./
 EXPOSE 9001

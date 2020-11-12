@@ -40,9 +40,13 @@ foreach (${Target} in ${targets}.targets.target) {
     $Compose = $Target.compose
     $Dockerfile = $Target.dockerfile
 
-    ${env:DOCKER_HOST} = ${servers}.servers.server |? {$_.tag -eq ${Architecture}} | % {$_.url}
+    ${env:DOCKER_HOST} = ${servers}.servers.server | ? { $_.tag -eq ${Architecture} } | % { $_.url }
+    $LogHost = ${env:DOCKER_HOST}
+    if (${env:DOCKER_HOST} -eq "localhost") {
+        Remove-Item env:/DOCKER_HOST
+    }
 
-    Write-Progress -Activity "$Description build on ${env:DOCKER_HOST} - sub-tag is ${Architecture}" -id 1
+    Write-Progress -Activity "$Description build on ${LogHost} - sub-tag is ${Architecture}" -id 1
 
     $buildArgs = @()
     foreach ($var in @($Target.buildArgs.arg)) {
@@ -60,31 +64,27 @@ foreach (${Target} in ${targets}.targets.target) {
         # Helper build
         if (-not $SkipSubImages) {
             foreach ($preBuild in @($Target.subTargets.target)) {
-                if (-not $preBuild) { continue }
-                Write-Progress "$Description build on ${env:DOCKER_HOST} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building image $preBuild"
-                if ($PSCmdlet.ShouldProcess($preBuild, 'Compose Build')) {
-                    docker-compose -f $Compose --log-level warning build --pull @buildArgs $preBuild >>$LogFile
+                if ((-not $preBuild) -or (-not $preBuild.service)) { continue }
+                $service = $preBuild.service
+
+                $buildArgsPre = @($buildArgs | % $_)
+                if (($preBuild.pull -eq "true") -or (-not $preBuild.pull)) { $pull += "--pull" }
+
+                Write-Progress "$Description build on ${LogHost} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building image ${service}"
+                if ($PSCmdlet.ShouldProcess(${service}, 'Compose Build')) {
+                    docker-compose -f $Compose --log-level warning build @buildArgsPre ${service} >>$LogFile
                     if (-not $?) {
                         throw "Build error"
-                    }
-                }
-
-                if ($Push) {
-                    Write-Progress "$Description build on ${env:DOCKER_HOST} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Pushing image $preBuild"
-                    if ($PSCmdlet.ShouldProcess($preBuild, 'Compose Push')) {
-                        docker-compose -f $Compose --log-level warning push $preBuild >>$LogFile
-                        if (-not $?) {
-                            throw "Push error"
-                        }
                     }
                 }
             }
         }
 
         # JQM build
-        Write-Progress "$Description build on ${env:DOCKER_HOST} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building JQM image"
+        Write-Progress "$Description build on ${LogHost} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building JQM image"
         if ($PSCmdlet.ShouldProcess("JQM", 'Compose Build')) {
-            docker-compose -f $Compose --log-level warning build --pull @buildArgs jqm >>$LogFile
+            # Note there is no pull here - we rely on the pulls done in the helper images.
+            docker-compose -f $Compose --log-level warning build @buildArgs jqm >>$LogFile
             if (-not $?) {
                 throw "Build error"
             }
@@ -92,7 +92,7 @@ foreach (${Target} in ${targets}.targets.target) {
 
         # Push!
         if ($Push) {
-            Write-Progress "$Description build on ${env:DOCKER_HOST} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Pushing JQM image"
+            Write-Progress "$Description build on ${LogHost} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Pushing JQM image"
             if ($PSCmdlet.ShouldProcess("JQM", 'Compose Push')) {
                 docker-compose -f $Compose --log-level warning push jqm >>$LogFile
                 if (-not $?) {
@@ -102,7 +102,7 @@ foreach (${Target} in ${targets}.targets.target) {
         }
     }
     elseif ($Dockerfile) {
-        Write-Progress "$Description build on ${env:DOCKER_HOST} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building JQM image"
+        Write-Progress "$Description build on ${LogHost} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building JQM image"
         if ($PSCmdlet.ShouldProcess("JQM", 'Build')) {
             docker build --rm --pull -t $env:JQM_IMAGE_NAME @buildArgs -f (Join-Path $PSScriptRoot  $DockerFile) $PSScriptRoot/../ 2>&1 >>$LogFile
             if (-not $?) {
@@ -111,7 +111,7 @@ foreach (${Target} in ${targets}.targets.target) {
         }
 
         if ($Push) {
-            Write-Progress "$Description build on ${env:DOCKER_HOST} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Pushing JQM image"
+            Write-Progress "$Description build on ${LogHost} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Pushing JQM image"
             if ($PSCmdlet.ShouldProcess("JQM", 'Push')) {
                 docker push $env:JQM_IMAGE_NAME 2>&1 >>$LogFile
                 if (-not $?) {
@@ -122,5 +122,5 @@ foreach (${Target} in ${targets}.targets.target) {
     }
 
     # Publish tags so as to allow manifest creation
-    @{"LocalImage" = $env:JQM_IMAGE_NAME; "ManifestImage" = "${ImageName}:${TagRoot}"}
+    @{"LocalImage" = $env:JQM_IMAGE_NAME; "ManifestImage" = "${ImageName}:${TagRoot}" }
 }

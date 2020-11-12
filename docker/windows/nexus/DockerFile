@@ -1,39 +1,37 @@
-FROM microsoft/powershell:nanoserver as installer
+ARG WINDOWS_TAG
+
+
+
+FROM mcr.microsoft.com/powershell:nanoserver-${WINDOWS_TAG} as installer
 
 SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 #ENV DOWNLOAD_URL https://download.sonatype.com/nexus/3/latest-win64.zip # redirection issue (HTTPS -> HTTP -> HTTPS...)
-ENV DOWNLOAD_URL http://download.sonatype.com/nexus/3/nexus-3.7.1-02-win64.zip
+ENV DOWNLOAD_URL http://download.sonatype.com/nexus/3/nexus-3.20.1-01-win64.zip
 
 WORKDIR /nexus
 
 RUN invoke-webrequest $env:DOWNLOAD_URL -OutFile nexus.zip -UseBasicParsing -MaximumRedirection 3
 RUN Expand-Archive nexus* -DestinationPath .; \
-    rm *.zip; \
-    mv sonatype-work sonatype-work-template; \
-	mkdir -force sonatype-work-template/nexus3/etc; \
-    mkdir sonatype-work; \
-	mv nexus* nexus ; \
-    echo "nexus-edition=nexus-oss-edition`nnexus-features=nexus-oss-feature" > C:/nexus/sonatype-work-template/nexus3/etc/nexus.properties ;
+    mkdir -force sonatype-work/nexus3/etc >$null; \
+    mkdir -force sonatype-work/nexus3/log >$null; \
+    mv nexus* nexus ; \
+    echo "nexus-edition=nexus-oss-edition`nnexus-features=nexus-oss-feature" >> C:/nexus/sonatype-work/nexus3/etc/nexus.properties ;
 
 COPY nexus.vmoptions C:/nexus/nexus/bin/
 
 
 
-FROM microsoft/nanoserver:1709
+FROM mcr.microsoft.com/windows/nanoserver:${WINDOWS_TAG}
 
+USER ContainerAdministrator
 COPY --from=installer C:/nexus/ C:/nexus/
 
 LABEL maintainer="Enioka" \
-      readme.md="https://github.com/enioka/jqm/blob/master/README.md" \
-      description="Unofficial Sonatype Nexus OSS image for Docker for Windows Nano. (official images are for Linux). Sometimes updated. Build helper for enioka projects - please use official images and not this if yo need a Nexus."
+    readme.md="https://github.com/enioka/jqm/blob/master/README.md" \
+    description="Unofficial Sonatype Nexus OSS image for Docker for Windows Nano. (official images are for Linux). Sometimes updated. Build helper for enioka projects - please use official images and not this if you need a Nexus."
 
 VOLUME c:/nexus/sonatype-work/
 EXPOSE 8081
-
-# Hack  - due to OpenJDK issues with symlinks (and volumes are symlinks in Docker) - https://bugs.openjdk.java.net/browse/JDK-8172711
-USER ContainerAdministrator
-RUN REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\DOS Devices" /v "G:" /t REG_SZ /d \??\C:\nexus\sonatype-work
-USER ContainerUser
 
 ENTRYPOINT C:\nexus\nexus\bin\nexus.exe /run

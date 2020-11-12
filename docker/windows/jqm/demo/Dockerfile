@@ -1,2 +1,2 @@
-FROM microsoft/powershell:nanoserver AS installer
+FROM mcr.microsoft.com/powershell:nanoserver AS installer
 

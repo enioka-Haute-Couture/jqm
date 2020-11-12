@@ -1,4 +1,4 @@
-<# 
+<#
     .DESCRIPTION
     Main entry point for the docker build. It checks out branches and calls their respective Update-JqmImage.ps1 scripts.
     In the end, it updates the manifests.
@@ -8,10 +8,10 @@
 [CmdletBinding(SupportsShouldProcess)]
 param(
     # Branches/tags to build (on all architectures). (tag, git branch name) list.
-    [hashtable]$Branches = @{"nightly" = "master"},
+    [hashtable]$Branches = @{"nightly" = "master" },
     # Set to use a different repository and image name when pushing.
     [string]$ImageName = "enioka/jqm",
-    # Mapping betwwen build tags and corresponding Docker hosts.
+    # Mapping between build tags and corresponding Docker hosts.
     [string]$ServerFile = "$PSScriptRoot/servers.xml",
     # Push the created images to Docker hub.
     [switch]$Push
@@ -25,10 +25,10 @@ $args = @{
     "Push" = $Push
 }
 
-$manifestData = @{}
+$manifestData = @{ }
 
 foreach ($BranchTag in $Branches.Keys) {
-    if (-not $BranchTag) {continue}
+    if (-not $BranchTag) { continue }
     $BranchName = $Branches[$BranchTag]
 
     # Work in temp directory
@@ -67,7 +67,8 @@ foreach ($manifestName in $manifestData.Keys) {
 
     if ($PSCmdlet.ShouldProcess($manifestName, "Create manifest")) {
         # bug 954 too
-        rm -Recurse ~/.docker/manifests/*
+        if (Test-Path ~/.docker/manifests/) { rm -Recurse ~/.docker/manifests/* }
+        $env:DOCKER_CLI_EXPERIMENTAL = "enabled"
         docker manifest create $manifestName @imageList --amend
         if ($LASTEXITCODE -ne 0) {
             throw "Manifest creation error"

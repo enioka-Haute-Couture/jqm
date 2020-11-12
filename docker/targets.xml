@@ -2,22 +2,6 @@
 <!-- This file is versioned and specific to each branch. It specifies which OS can be built by the branch, and how -->
 <targets>
     <target>
-        <description>Windows Server 1709</description>
-        <tag>windows-1709</tag>
-        <compose>windows/docker-compose.yml</compose>
-        <buildArgs>
-            <arg>
-                <key>WINDOWS_TAG</key>
-                <value>1709</value>
-            </arg>
-        </buildArgs>
-        <subTargets>
-            <target>jre</target>
-            <target>jdk</target>
-            <target>mvn</target>
-        </subTargets>
-    </target>
-    <target>
         <description>Windows Server 1803</description>
         <tag>windows-1803</tag>
         <compose>windows/docker-compose.yml</compose>
@@ -28,9 +12,57 @@
             </arg>
         </buildArgs>
         <subTargets>
-            <target>jre</target>
-            <target>jdk</target>
-            <target>mvn</target>
+            <target service="jre" />
+            <target service="jdk" />
+            <target service="mvn" pull="false" />
+        </subTargets>
+    </target>
+    <target>
+        <description>Windows Server 1809 / 2019</description>
+        <tag>windows-1809</tag>
+        <compose>windows/docker-compose.yml</compose>
+        <buildArgs>
+            <arg>
+                <key>WINDOWS_TAG</key>
+                <value>1809</value>
+            </arg>
+        </buildArgs>
+        <subTargets>
+            <target service="jre" />
+            <target service="jdk" />
+            <target service="mvn" pull="false" />
+        </subTargets>
+    </target>
+    <target>
+        <description>Windows Server 1903</description>
+        <tag>windows-1903</tag>
+        <compose>windows/docker-compose.yml</compose>
+        <buildArgs>
+            <arg>
+                <key>WINDOWS_TAG</key>
+                <value>1903</value>
+            </arg>
+        </buildArgs>
+        <subTargets>
+            <target service="jre" />
+            <target service="jdk" />
+            <target service="mvn" pull="false" />
+        </subTargets>
+    </target>
+    <target>
+        <description>Windows Server 1909</description>
+        <tag>windows-1909</tag>
+        <compose>windows/docker-compose.yml</compose>
+        <buildArgs>
+            <arg>
+                <key>WINDOWS_TAG</key>
+                <value>1909</value>
+            </arg>
+        </buildArgs>
+        <subTargets>
+            <target service="jre" />
+            <target service="jdk" />
+            <target service="mvn" pull="false" />
         </subTargets>
     </target>
     <target>

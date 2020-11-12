@@ -94,7 +94,7 @@ class ShellJobInstanceTracker implements JobInstanceTracker, ShellJobInstanceTra
         env.put("JQM_JD_KEYWORD_1", this.ji.getJD().getKeyword1() != null ? this.ji.getJD().getKeyword1() : "");
         env.put("JQM_JD_KEYWORD_2", this.ji.getJD().getKeyword2() != null ? this.ji.getJD().getKeyword2() : "");
         env.put("JQM_JD_KEYWORD_3", this.ji.getJD().getKeyword3() != null ? this.ji.getJD().getKeyword3() : "");
-        env.put("JQM_JD_MODULE", this.ji.getJD().getModule() != null ? this.ji.getJD().getModule() : null);
+        env.put("JQM_JD_MODULE", this.ji.getJD().getModule() != null ? this.ji.getJD().getModule() : "");
         env.put("JQM_JD_PRIORITY", this.ji.getJD().getPriority() != null ? this.ji.getJD().getPriority().toString() : "0");
 
         env.put("JQM_JI_ID", this.ji.getId() + "");
