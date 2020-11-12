@@ -163,8 +163,12 @@ public abstract class DbAdapter
         return JobInstance.select(cnx, "ji_select_poll", queue.getId());
     }
 
+    // TODO : Doc
+    // TODO : Break down in DbAdapter implementation
     public boolean testDbUnreachable(Exception e)
     {
+        System.out.println("testDbUnreachable : class: " + e.getClass().getName() + " - message: " + e.getMessage());
+
         if ((e instanceof SQLTransientException) || (e.getCause() != null && e.getCause() instanceof SQLTransientException))
         {
             return true;
@@ -214,13 +218,8 @@ public abstract class DbAdapter
         {
             return true;
         }
-        // MySQL error : CommunicationsException : Communications link failure
-        if (e.getClass().getSimpleName().equals("CommunicationsException")
-            || e.getClass().getSimpleName().equals("MySQLQueryInterruptedException"))
-        {
-            return true;
-        }
 
+        System.out.println("\treturn false");
         return false;
     }
 

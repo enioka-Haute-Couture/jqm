@@ -39,22 +39,22 @@ public class DbImplMySql extends DbAdapter
             return "";
         }
         return sql.replace("MEMORY TABLE", "TABLE").replace("JQM_PK.nextval", "?").replace(" DOUBLE", " DOUBLE PRECISION")
-                .replace("UNIX_MILLIS()", "ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000)").replace("IN(UNNEST(?))", "IN(?)")
-                .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(UNIX_TIMESTAMP() - 60)")
-                .replace("CURRENT_TIMESTAMP - ? SECOND", "(NOW() - INTERVAL ? SECOND)").replace("FROM (VALUES(0))", "FROM DUAL")
-                .replace("DNS||':'||PORT", "CONCAT(DNS, ':', PORT)").replace(" TIMESTAMP ", " TIMESTAMP(3) ")
-                .replace("CURRENT_TIMESTAMP", "FFFFFFFFFFFFFFFFF@@@@").replace("FFFFFFFFFFFFFFFFF@@@@", "CURRENT_TIMESTAMP(3)")
-                .replace("TIMESTAMP(3) NOT NULL", "TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)").replace("__T__", this.tablePrefix)
-                .replace("DISCONNECT", "KILL CONNECTION ?");
+            .replace("UNIX_MILLIS()", "ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000)").replace("IN(UNNEST(?))", "IN(?)")
+            .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(UNIX_TIMESTAMP() - 60)")
+            .replace("CURRENT_TIMESTAMP - ? SECOND", "(NOW() - INTERVAL ? SECOND)").replace("FROM (VALUES(0))", "FROM DUAL")
+            .replace("DNS||':'||PORT", "CONCAT(DNS, ':', PORT)").replace(" TIMESTAMP ", " TIMESTAMP(3) ")
+            .replace("CURRENT_TIMESTAMP", "FFFFFFFFFFFFFFFFF@@@@").replace("FFFFFFFFFFFFFFFFF@@@@", "CURRENT_TIMESTAMP(3)")
+            .replace("TIMESTAMP(3) NOT NULL", "TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)").replace("__T__", this.tablePrefix)
+            .replace("DISCONNECT", "KILL CONNECTION ?");
     }
 
     @Override
     public boolean compatibleWith(DatabaseMetaData product) throws SQLException
     {
         return (product.getDatabaseProductName().contains("MySQL")
-                && ((product.getDatabaseMajorVersion() == 5 && product.getDatabaseMinorVersion() >= 6)
-                        || product.getDatabaseMajorVersion() > 5))
-                || (product.getDatabaseProductName().contains("MariaDB") && product.getDatabaseMajorVersion() >= 10);
+            && ((product.getDatabaseMajorVersion() == 5 && product.getDatabaseMinorVersion() >= 6)
+            || product.getDatabaseMajorVersion() > 5))
+            || (product.getDatabaseProductName().contains("MariaDB") && product.getDatabaseMajorVersion() >= 10);
     }
 
     @Override
@@ -106,8 +106,7 @@ public class DbImplMySql extends DbAdapter
                         sb.append("?,");
                     }
                     q.sqlText = q.sqlText.replaceFirst("IN\\(\\?\\)", "IN(" + sb.substring(0, sb.length() - 1) + ")");
-                }
-                else
+                } else
                 {
                     newParams.add(o);
                 }
@@ -131,8 +130,7 @@ public class DbImplMySql extends DbAdapter
                     throw new NoResultException("The query returned zero rows when one was expected.");
                 }
                 q.parameters.add(0, rs.getInt(1));
-            }
-            catch (SQLException e)
+            } catch (SQLException e)
             {
                 throw new DatabaseException(q.sqlText + " - " + sequenceSqlProcessList + " - while fetching ID from information schema processlist", e);
             }
@@ -158,8 +156,7 @@ public class DbImplMySql extends DbAdapter
             }
             q.preGeneratedKey = rs.getInt(1);
             q.parameters.add(0, q.preGeneratedKey);
-        }
-        catch (SQLException e)
+        } catch (SQLException e)
         {
             throw new DatabaseException(q.sqlText + " - " + sequenceSql + " - while fetching new ID from table sequence", e);
         }
@@ -186,5 +183,17 @@ public class DbImplMySql extends DbAdapter
     public List<JobInstance> poll(DbConn cnx, Queue queue, int headSize)
     {
         return JobInstance.select(cnx, "ji_select_poll", queue.getId(), headSize);
+    }
+
+    @Override
+    public boolean testDbUnreachable(Exception e)
+    {
+        // MySQL error : CommunicationsException : Communications link failure
+        if (e.getClass().getSimpleName().equals("CommunicationsException")
+            || e.getClass().getSimpleName().equals("MySQLQueryInterruptedException"))
+        {
+            return true;
+        }
+        return false;
     }
 }
