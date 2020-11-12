@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Grid, IconButton, Tooltip } from '@material-ui/core';
 import CircularProgress from "@material-ui/core/CircularProgress";
-import APIService from '../utils/APIService';
+import APIService from '../../utils/APIService';
 import MUIDataTable from "mui-datatables";
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import DoneIcon from "@material-ui/icons/Done";
@@ -12,7 +12,7 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 import HelpIcon from '@material-ui/icons/Help';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import { useSnackbar } from 'notistack';
-import {QueueType} from "../types/QueueType";
+import {QueueType} from "./QueueType";
 import { Queue } from '@material-ui/icons';
 
 
@@ -106,7 +106,7 @@ const QueuesPage: React.FC = () => {
 
     const deleteQueue = async (queueId: String, queueName: String) => {
         if(queues && queueId) {
-            APIService.delete("/q/" + queueId)
+            await APIService.delete("/q/" + queueId)
             .then(() => {
                 const updatedQueus = queues.filter(q => q.id !== queueId);
                 console.log(updatedQueus);
