@@ -138,7 +138,7 @@ const QueuesPage: React.FC = () => {
                         console.log(e.currentTarget);
                         handleEdit(editingCellRowId);
                     }}>
-                        <SaveIcon onClick={() => console.log(tableMeta.rowIndex)}/>
+                        <SaveIcon />
                     </IconButton>
                 </ Tooltip>
                 <Tooltip title={"Cancel changes"}>
