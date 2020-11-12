@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Grid, IconButton, Tooltip } from '@material-ui/core';
+import { Container, createStyles, Grid, IconButton, Switch, Theme, Tooltip } from '@material-ui/core';
 import CircularProgress from "@material-ui/core/CircularProgress";
 import APIService from '../utils/APIService';
 import MUIDataTable from "mui-datatables";
@@ -8,47 +8,30 @@ import DoneIcon from "@material-ui/icons/Done";
 import BlockIcon from "@material-ui/icons/Block";
 import DeleteIcon from '@material-ui/icons/Delete';
 import CreateIcon from '@material-ui/icons/Create';
-import RefreshIcon from '@material-ui/icons/Refresh';
 import HelpIcon from '@material-ui/icons/Help';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
+import RefreshIcon from "@material-ui/icons/Refresh";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
+import SaveIcon from "@material-ui/icons/Save";
+import CancelIcon from "@material-ui/icons/Cancel";
 import { useSnackbar } from 'notistack';
+import TextField from '@material-ui/core/TextField/TextField';
 import {QueueType} from "./Queue/QueueType";
 
 
-const useStyles = makeStyles({
-});
-
-
-/**
- * Render cell containing boolean value
- */
-const renderBooleanCell = (value: any, tableMeta: any, updateValue: any) => {
-    return value ? <DoneIcon /> : <BlockIcon />;
-};
-
-/**
-* Render cell with action buttons
- */
-const renderActionsCell = (onEdit: any, onDelete: any) => {
-    return (value: any, tableMeta: any, updateValue: any) => {
-        return (<>
-            <Tooltip title={"Edit line"}>
-                <IconButton color="default" aria-label={"edit"} onClick={() => onEdit(value, tableMeta)}>
-                    <CreateIcon />
-                </IconButton>
-            </ Tooltip>
-            <Tooltip title={"Delete line"}>
-                <IconButton color="default" aria-label={"delete"} onClick={() => onDelete(value, tableMeta)}>
-                    <DeleteIcon />
-                </IconButton>
-            </ Tooltip>
-        </>
-    )}
-}
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        fab: {
+            position: 'absolute',
+            bottom: theme.spacing(2),
+            right: theme.spacing(2),
+        },
+    })
+);
 
 const QueuesPage: React.FC = () => {
     const { enqueueSnackbar } = useSnackbar();
     const [queues, setQueues] = useState<any[] | null>();
+    const [editingCellRowId, setEditingCellRowId] = useState<number | null>(null);
     const classes = useStyles();
 
     const handleCreate = (value: String, newQueue: QueueType) => {
@@ -61,14 +44,18 @@ const QueuesPage: React.FC = () => {
                 });
 
             })
+        }
+    }
+
+    const fetchQueues = () => {
+        APIService.get("/q")
+            .then((response) => { setQueues(response) })
             .catch((reason) => {
                 console.log(reason);
                 enqueueSnackbar("An error occured, please contact support after-party@enioka.com for help.", {
                     variant: 'error',
                 })
-            })
-        }
-    }
+            })}
 
     // edit action
     const handleEdit = (value: String, {rowData}: {rowData: any[]} ) => {
@@ -123,15 +110,101 @@ const QueuesPage: React.FC = () => {
         }
     }
 
+
     useEffect(() => {
-        APIService.get("/q")
-        .then((response) => { setQueues(response) })
-        .catch((reason) => {
-            console.log(reason);
-            enqueueSnackbar("An error occured, please contact support for help.", {
-                variant: 'error',
-                persist: true})});
+        fetchQueues();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+
+    /*
+    * Render cell containing boolean value
+    */
+    const renderBooleanCell = (value: any, tableMeta: any, updateValue: any) => {
+        if (editingCellRowId === tableMeta.rowIndex) {
+            return <Switch
+            //checked={state.checkedA}
+            //onChange={handleChange}
+            //name="checkedA"
+            />
+        } else {
+            return value ? <DoneIcon /> : <BlockIcon />;
+        }
+    };
+
+    /**
+    * Render cell with action buttons
+    */
+    const renderActionsCell = (value: any, tableMeta: any, updateValue: any) => {
+        if (editingCellRowId === tableMeta.rowIndex) {
+            return (<>
+                <Tooltip title={"Save changes"}>
+                    <IconButton color="default" aria-label={"save"} onClick={() => {
+                        setEditingCellRowId(null);
+                    }}>
+                        <SaveIcon />
+                    </IconButton>
+                </ Tooltip>
+                <Tooltip title={"Cancel changes"}>
+                    <IconButton color="default" aria-label={"cancel"} onClick={() => {
+                        setEditingCellRowId(null);
+                    }}>
+                        <CancelIcon />
+                    </IconButton>
+                </ Tooltip>
+            </>)
+        } else {
+            return (<>
+                <Tooltip title={"Edit line"}>
+                    <IconButton color="default" aria-label={"edit"} onClick={() => {
+                        setEditingCellRowId(tableMeta.rowIndex)
+                        //
+                    }}>
+                        {/* <CreateIcon onclick={() => handleEdit()}/> */}
+                        <CreateIcon />
+                    </IconButton>
+                </ Tooltip>
+                <Tooltip title={"Delete line"}>
+                    <IconButton
+                        color="default"
+                        aria-label={"delete"}
+                        onClick={
+                            () => handleDelete(value, tableMeta)}
+                        >
+                        <DeleteIcon />
+                    </IconButton>
+                </ Tooltip>
+            </>
+            );
+        }
+    }
+
+    /*
+    * Render cell containing string value
+    */
+    const renderStringCell = (value: any, tableMeta: any, updateValue: any) => {
+        if (editingCellRowId === tableMeta.rowIndex) {
+            return (
+                <TextField
+                    //className={this.props.classes.editedCell}
+                    defaultValue={value}
+                    //onKeyDown={this.cellInputHandleKeyDown}
+                    //onChange={this.cellInputOnChange(this.props.columns[tableMeta.columnIndex].type)}
+                    fullWidth={true}
+                    //error={this.state.editedValueError}
+                    inputProps={{
+                        style: {
+                            //textAlign: "center",
+                            fontSize: "0.8125rem"
+                        }
+                    }}
+                />
+            );
+        } else {
+            return value;
+        }
+    };
+
 
     const columns = [
         {
@@ -140,6 +213,7 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                customBodyRender: renderStringCell
             }
         },
         {
@@ -148,6 +222,7 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                customBodyRender: renderStringCell
             }
         },
         {
@@ -165,17 +240,15 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderActionsCell(handleEdit, handleDelete),
+                customBodyRender: renderActionsCell,
             }
         }
     ]
 
-    // TODO: header buttons
-    // TODO: editable fields
-
     const options = {
         download: false,
         print: false,
+        //filterType: 'checkbox',
         customToolbar: () => {
             return (
                 <>
@@ -193,9 +266,7 @@ const QueuesPage: React.FC = () => {
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={"Refresh"}>
-                        <IconButton color="default" aria-label={"refresh"} onClick={() => {
-                            // fetchQueues();
-                        }}>
+                        <IconButton color="default" aria-label={"refresh"} onClick={() => fetchQueues()}>
                             <RefreshIcon />
                         </IconButton>
                     </Tooltip>
@@ -232,7 +303,8 @@ const QueuesPage: React.FC = () => {
                 columns={columns}
                 options={options}
             />
-        </Container>);
+        </Container>
+        );
     } else {
         return (
             <Grid container justify="center">
