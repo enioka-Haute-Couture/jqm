@@ -7,7 +7,7 @@ import {
     Route,
     Redirect,
 } from "react-router-dom";
-import QueuesPage from './components/QueuesPage';
+import QueuesPage from './components/Queue/QueuesPage';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { SnackbarProvider } from 'notistack';
 

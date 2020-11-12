@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Grid, IconButton, Tooltip } from '@material-ui/core';
+import { Container, createStyles, Grid, IconButton, Switch, Theme, Tooltip } from '@material-ui/core';
 import CircularProgress from "@material-ui/core/CircularProgress";
 import APIService from '../../utils/APIService';
 import MUIDataTable from "mui-datatables";
@@ -8,48 +8,30 @@ import DoneIcon from "@material-ui/icons/Done";
 import BlockIcon from "@material-ui/icons/Block";
 import DeleteIcon from '@material-ui/icons/Delete';
 import CreateIcon from '@material-ui/icons/Create';
-import RefreshIcon from '@material-ui/icons/Refresh';
 import HelpIcon from '@material-ui/icons/Help';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
+import RefreshIcon from "@material-ui/icons/Refresh";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
+import SaveIcon from "@material-ui/icons/Save";
+import CancelIcon from "@material-ui/icons/Cancel";
 import { useSnackbar } from 'notistack';
+import TextField from '@material-ui/core/TextField/TextField';
 import {QueueType} from "./QueueType";
-import { Queue } from '@material-ui/icons';
 
 
-const useStyles = makeStyles({
-});
-
-
-/**
- * Render cell containing boolean value
- */
-const renderBooleanCell = (value: any, tableMeta: any, updateValue: any) => {
-    return value ? <DoneIcon /> : <BlockIcon />;
-};
-
-/**
-* Render cell with action buttons
- */
-const renderActionsCell = (onEdit: any, onDelete: any) => {
-    return (value: any, tableMeta: any, updateValue: any) => {
-        return (<>
-            <Tooltip title={"Edit line"}>
-                <IconButton color="default" aria-label={"edit"} onClick={() => onEdit(value, tableMeta)}>
-                    <CreateIcon />
-                </IconButton>
-            </ Tooltip>
-            <Tooltip title={"Delete line"}>
-                <IconButton color="default" aria-label={"delete"} onClick={() => onDelete(value, tableMeta)}>
-                    <DeleteIcon />
-                </IconButton>
-            </ Tooltip>
-        </>
-    )}
-}
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        fab: {
+            position: 'absolute',
+            bottom: theme.spacing(2),
+            right: theme.spacing(2),
+        },
+    })
+);
 
 const QueuesPage: React.FC = () => {
     const { enqueueSnackbar } = useSnackbar();
     const [queues, setQueues] = useState<any[] | null>();
+    const [editingCellRowId, setEditingCellRowId] = useState<number | null>(null);
     const classes = useStyles();
 
     const handleCreate = (value: String, newQueue: QueueType) => {
@@ -57,82 +39,165 @@ const QueuesPage: React.FC = () => {
         if(queues && value && newQueue){
             APIService.post("/q", newQueue)
             .then(() => {
+                // todo, modal or something to insert data
+                fetchQueues();
                 enqueueSnackbar("Queue successfully created queue: " + newQueue.name + "" + " - party time!", {
                     variant: 'success',
                 });
-
             })
+        }
+    }
+
+    const fetchQueues = () => {
+        APIService.get("/q")
+            .then((response) => { setQueues(response) })
             .catch((reason) => {
                 console.log(reason);
                 enqueueSnackbar("An error occured, please contact support after-party@enioka.com for help.", {
                     variant: 'error',
                 })
-            })
-        }
-    }
+            })}
 
     // edit action
-    const handleEdit = (value: String, {rowData}: {rowData: any[]} ) => {
-        console.info(rowData)
-        if(queues && value && rowData){
-            const updatedQueueObj = {
-                name: rowData[0],
-                description: rowData[1],
-                defaultQueue: rowData[2],
-                id: rowData[3]
-            };
-            APIService.put("/q/" + value, updatedQueueObj)
-            .then(() => {
-                const updatedQueues = queues.map(q => q.id === value ? updatedQueueObj : q);
-                setQueues(updatedQueues)
-                enqueueSnackbar("Queue successfully edited queue: " + rowData ? rowData[0] : "" + " - party time!", {
-                    variant: 'success',
-                });
-            })
-            .catch((reason) => {
-                console.log(reason);
-                enqueueSnackbar("An error occured, please contact support after-party@enioka.com for help.", {
-                    variant: 'error',
-                })
-            })
-        }
+    // const handleEdit = (value: String, {rowData}: {rowData: any[]} ) => {
+    const handleEdit = (dataIndex: any) => {
+        console.log("edit party");
+        console.log(columns[dataIndex]);
+        // const updatedQueueObj = getIT HERE
+        // APIService.put("/q/" + value, updatedQueueObj)
+        // .then(() => {
+        //     const updatedQueues = queues.map(q => q.id === value ? updatedQueueObj : q);
+        //     setQueues(updatedQueues)
+        //     enqueueSnackbar("Queue successfully edited queue: " + rowData ? rowData[0] : "" + " - party time!", {
+        //         variant: 'success',
+        //     });
+        // })
+        // .catch((reason) => {
+        //     console.log(reason);
+        //     enqueueSnackbar("An error occured, please contact support after-party@enioka.com for help.", {
+        //         variant: 'error',
+        //     })
+        // })
     }
 
-    // delete action
-    const handleDelete = async (queueId: String, {rowData}: { rowData: any[]} ) => {
-        const queueName = rowData ? rowData[0] : "";
-        await deleteQueue(queueId, queueName);
-    }
+    // // delete action
+    // const deleteQueue = async (queueId: String, {rowData}: { rowData: any[]} ) => {
+    //     await deleteQueues([queueId])
+    // }
 
-    const deleteQueue = async (queueId: String, queueName: String) => {
-        if(queues && queueId) {
-            await APIService.delete("/q/" + queueId)
-            .then(() => {
-                const updatedQueus = queues.filter(q => q.id !== queueId);
-                console.log(updatedQueus);
-                setQueues(updatedQueus);
-                enqueueSnackbar("Queue successfully deleted queue: " + queueName + "- party time!", {
-                    variant: 'success',
-                });
-            })
-            .catch((reason) => {
-                console.log(reason);
-                enqueueSnackbar("An error occured, please contact support after-party@enioka.com for help.", {
-                    variant: 'error',
-                })
-            })
-        }
+    const deleteQueues = async (queueIds : any[]) => {
+        const lookup = new Set();
+        const deletePromises = queueIds.map(id => {
+            lookup.add(id);
+            return APIService.delete("/q/" + id);
+        });
+        const newQueues = queues?.filter(q => !lookup.has(q.id));
+        await Promise.all(deletePromises).then(() => {
+            setQueues(newQueues)
+            enqueueSnackbar("Queue successfully deleted queue" + (queueIds.length > 1 ? "s" : ""), {
+                variant: 'success',
+            });
+        })
+        .catch((reason) => {
+            console.log(reason);
+            enqueueSnackbar("An error occured, please contact support after-party@enioka.com for help.", {
+                variant: 'error',
+            });
+        });
     }
 
     useEffect(() => {
-        APIService.get("/q")
-        .then((response) => { setQueues(response) })
-        .catch((reason) => {
-            console.log(reason);
-            enqueueSnackbar("An error occured, please contact support for help.", {
-                variant: 'error',
-                persist: true})});
+        fetchQueues();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    /*
+    * Render cell containing boolean value
+    */
+    const renderBooleanCell = (value: any, tableMeta: any, updateValue: any) => {
+        if (editingCellRowId === tableMeta.rowIndex) {
+            return <Switch
+            //checked={state.checkedA}
+            //onChange={handleChange}
+            //name="checkedA"
+            />
+        } else {
+            return value ? <DoneIcon /> : <BlockIcon />;
+        }
+    };
+
+    /**
+    * Render cell with action buttons
+    */
+    const renderActionsCell = (value: any, tableMeta: any, updateValue: any) => {
+        if (editingCellRowId === tableMeta.rowIndex) {
+            return (<>
+                <Tooltip title={"Save changes"}>
+                    <IconButton color="default" aria-label={"save"} onClick={(e) => {
+                        setEditingCellRowId(null);
+                        console.log(e.currentTarget);
+                        handleEdit(editingCellRowId);
+                    }}>
+                        <SaveIcon onClick={() => console.log(tableMeta.rowIndex)}/>
+                    </IconButton>
+                </ Tooltip>
+                <Tooltip title={"Cancel changes"}>
+                    <IconButton color="default" aria-label={"cancel"} onClick={() => {
+                        setEditingCellRowId(null);
+                    }}>
+                        <CancelIcon />
+                    </IconButton>
+                </ Tooltip>
+            </>)
+        } else {
+            return (<>
+                <Tooltip title={"Edit line"}>
+                    <IconButton color="default" aria-label={"edit"} onClick={() => {
+                        setEditingCellRowId(tableMeta.rowIndex)
+                    }}>
+                        <CreateIcon />
+                    </IconButton>
+                </ Tooltip>
+                <Tooltip title={"Delete line"}>
+                    <IconButton
+                        color="default"
+                        aria-label={"delete"}
+                        onClick={async () => await deleteQueues([value])}
+                    >
+                        <DeleteIcon />
+                    </IconButton>
+                </ Tooltip>
+            </>
+            );
+        }
+    }
+
+    /*
+    * Render cell containing string value
+    */
+    const renderStringCell = (value: any, tableMeta: any, updateValue: any) => {
+        if (editingCellRowId === tableMeta.rowIndex) {
+            return (
+                <TextField
+                    //className={this.props.classes.editedCell}
+                    defaultValue={value}
+                    //onKeyDown={this.cellInputHandleKeyDown}
+                    //onChange={this.cellInputOnChange(this.props.columns[tableMeta.columnIndex].type)}
+                    fullWidth={true}
+                    //error={this.state.editedValueError}
+                    inputProps={{
+                        style: {
+                            //textAlign: "center",
+                            fontSize: "0.8125rem"
+                        }
+                    }}
+                />
+            );
+        } else {
+            return value;
+        }
+    };
+
 
     const columns = [
         {
@@ -141,6 +206,7 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                customBodyRender: renderStringCell
             }
         },
         {
@@ -149,6 +215,7 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
+                customBodyRender: renderStringCell
             }
         },
         {
@@ -166,17 +233,15 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderActionsCell(handleEdit, handleDelete),
+                customBodyRender: renderActionsCell,
             }
         }
     ]
 
-    // TODO: header buttons
-    // TODO: editable fields
-
     const options = {
         download: false,
         print: false,
+        //filterType: 'checkbox',
         customToolbar: () => {
             return (
                 <>
@@ -194,9 +259,7 @@ const QueuesPage: React.FC = () => {
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={"Refresh"}>
-                        <IconButton color="default" aria-label={"refresh"} onClick={() => {
-                            // fetchQueues();
-                        }}>
+                        <IconButton color="default" aria-label={"refresh"} onClick={() => fetchQueues()}>
                             <RefreshIcon />
                         </IconButton>
                     </Tooltip>
@@ -210,19 +273,17 @@ const QueuesPage: React.FC = () => {
                 </>
             )
         },
-        onRowsDelete: ({data} : {data: any[]}) => {
-            // get all rows by index
-            data.forEach(async ({index}) => {
-                console.log(index);
-                const currentQueue = queues ? queues[index] : null;
-                console.log(currentQueue);
-                if(currentQueue){
-                    await deleteQueue(currentQueue.id, currentQueue.name);
-                }
+        onRowsDelete: async ({data} : {data: any[]}) => {
+            // delete all rows by index
+            console.info(data);
+            const queueIds = data.map(({index}) => {
+                const queue = queues ? queues[index] : null;
+                return queue ? queue.id : null;
             });
+            console.info(queueIds);
+            await deleteQueues(queueIds);
         },
-
-            //filterType: 'checkbox',
+        //filterType: 'checkbox',
     };
 
     if (queues) {
@@ -233,7 +294,8 @@ const QueuesPage: React.FC = () => {
                 columns={columns}
                 options={options}
             />
-        </Container>);
+        </Container>
+        );
     } else {
         return (
             <Grid container justify="center">
