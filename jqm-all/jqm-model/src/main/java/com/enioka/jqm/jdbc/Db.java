@@ -16,6 +16,7 @@ import javax.naming.NameNotFoundException;
 import javax.sql.DataSource;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -444,7 +445,17 @@ public class Db
                 BundleContext context = org.osgi.framework.FrameworkUtil.getBundle(getClass()).getBundleContext();
                 Loader<DbAdapter> loader = new Loader<DbAdapter>(context, DbAdapter.class, null);
                 loader.start();
-                adapter = loader.getService();
+
+                // Works but not ideal
+                for (ServiceReference<?> ref : loader.references)
+                {
+                    DbAdapter newAdapter = (DbAdapter)context.getService(ref);
+                    if (newAdapter.compatibleWith(meta))
+                    {
+                        adapter = newAdapter;
+                        break;
+                    }
+                }
             }
             catch (Exception e)
             {

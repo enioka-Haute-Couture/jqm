@@ -84,6 +84,7 @@ public class BasicTest
             mavenBundle("com.enioka.jqm", "jqm-api-client-core", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-model", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-impl-hsql", "3.0.0-SNAPSHOT"),
+            mavenBundle("com.enioka.jqm", "jqm-impl-pg", "3.0.0-SNAPSHOT"),
             junitBundles()
             );
     }
