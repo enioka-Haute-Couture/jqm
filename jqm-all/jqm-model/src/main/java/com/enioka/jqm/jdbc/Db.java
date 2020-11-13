@@ -15,8 +15,11 @@ import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.sql.DataSource;
 
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.enioka.jqm.loader.Loader;
 
 /**
  * Entry point for all database-related operations, from initialization to schema upgrade, as well as creating sessions for querying the
@@ -436,6 +439,19 @@ public class Db
             DatabaseMetaData meta = tmp.getMetaData();
             product = meta.getDatabaseProductName().toLowerCase();
 
+            try
+            {
+                BundleContext context = org.osgi.framework.FrameworkUtil.getBundle(getClass()).getBundleContext();
+                Loader<DbAdapter> loader = new Loader<DbAdapter>(context, DbAdapter.class, null);
+                loader.start();
+                adapter = loader.getService();
+            }
+            catch (Exception e)
+            {
+                throw new DatabaseException("Issue when loading database adapter");
+            }
+
+            /* XXX DELETE ME (dead code)
             for (String s : ADAPTERS)
             {
                 try
@@ -453,6 +469,7 @@ public class Db
                     throw new DatabaseException("Issue when loading database adapter named: " + s, e);
                 }
             }
+            */
         }
         catch (SQLException e)
         {

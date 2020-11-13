@@ -3,6 +3,7 @@ package com.enioka.jqm.loader;
 import java.util.ArrayList;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
@@ -22,16 +23,23 @@ public class Loader<TYPE> implements ServiceListener
         references = new ArrayList<ServiceReference<?>>();
     }
 
-    public void start() throws Exception
+    public void start()
     {
-        ServiceReference<?>[] tmp = context.getAllServiceReferences(type.getName(), filter);
-
-        if (tmp == null)
-            return;
-
-        for (ServiceReference<?> ref : tmp)
+        try
         {
-            references.add(ref);
+            ServiceReference<?>[] tmp = context.getAllServiceReferences(type.getName(), filter);
+
+            if (tmp == null)
+                return;
+
+            for (ServiceReference<?> ref : tmp)
+            {
+                references.add(ref);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 
@@ -45,8 +53,8 @@ public class Loader<TYPE> implements ServiceListener
 
     public TYPE getService()
     {
-        while (references.isEmpty())
-            continue;
+        if (references.isEmpty())
+            return null;
 
         ServiceReference<?> sr = references.get(0);
         TYPE res = (TYPE) context.getService(sr);

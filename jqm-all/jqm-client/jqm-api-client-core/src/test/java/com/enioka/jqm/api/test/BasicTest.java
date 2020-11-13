@@ -32,7 +32,7 @@ import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerMethod;
+import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
@@ -52,7 +52,7 @@ import com.enioka.jqm.model.Queue;
  * Simple tests for checking query syntax (no data)
  */
 @RunWith(PaxExam.class)
-@ExamReactorStrategy(PerMethod.class)
+@ExamReactorStrategy(PerClass.class)
 public class BasicTest
 {
     private static Logger jqmlogger = Logger.getLogger(BasicTest.class);
@@ -80,8 +80,10 @@ public class BasicTest
             wrappedBundle(mavenBundle("javax.activation", "activation", "1.1.1")),
             mavenBundle("javax.xml.stream", "stax-api", "1.0-2"),
             mavenBundle("javax.xml.bind", "jaxb-api", "2.3.1"),
+            mavenBundle("com.enioka.jqm", "jqm-loader", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-api-client-core", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-model", "3.0.0-SNAPSHOT"),
+            mavenBundle("com.enioka.jqm", "jqm-impl-hsql", "3.0.0-SNAPSHOT"),
             junitBundles()
             );
     }
