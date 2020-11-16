@@ -26,15 +26,12 @@ import org.junit.Test;
 import org.junit.BeforeClass;
 
 import static org.ops4j.pax.exam.CoreOptions.*;
-import javax.inject.Inject;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
@@ -56,9 +53,6 @@ import com.enioka.jqm.model.Queue;
 public class BasicTest
 {
     private static Logger jqmlogger = Logger.getLogger(BasicTest.class);
-
-    @Inject
-    private BundleContext context;
 
     @Configuration
     public Option[] config()

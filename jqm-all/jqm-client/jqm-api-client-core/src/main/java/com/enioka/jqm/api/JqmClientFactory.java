@@ -170,7 +170,7 @@ public final class JqmClientFactory
         ClientFactory factory = new ClientFactory();
         return factory.getClient(name, p2, cached);
 
-        /*
+        /* TODO : Temporary solution, should work on it to allow both types of clients
         Properties p2 = null;
         if (binder == null)
         {

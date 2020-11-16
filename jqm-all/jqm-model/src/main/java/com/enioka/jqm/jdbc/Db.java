@@ -461,26 +461,6 @@ public class Db
             {
                 throw new DatabaseException("Issue when loading database adapter");
             }
-
-            /* XXX DELETE ME (dead code)
-            for (String s : ADAPTERS)
-            {
-                try
-                {
-                    Class<? extends DbAdapter> clazz = Db.class.getClassLoader().loadClass(s).asSubclass(DbAdapter.class);
-                    newAdpt = clazz.newInstance();
-                    if (newAdpt.compatibleWith(meta))
-                    {
-                        adapter = newAdpt;
-                        break;
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw new DatabaseException("Issue when loading database adapter named: " + s, e);
-                }
-            }
-            */
         }
         catch (SQLException e)
         {
