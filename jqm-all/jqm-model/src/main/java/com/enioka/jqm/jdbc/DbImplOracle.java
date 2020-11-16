@@ -30,6 +30,9 @@ public class DbImplOracle extends DbAdapter
         // See poll method for everything which is wrong with Oracle and queues.
         queries.put("ji_select_poll",
                 String.format("SELECT /*+ FIRST_ROWS */ a.* FROM (%s) a WHERE ROWNUM < ?", queries.get("ji_select_poll")));
+
+        // Sad: Oracle needs this inside the SQL text in addition to standard JDBC flags...
+        queries.put("jd_select_by_id_lock", queries.get("jd_select_by_id_lock") + " FOR UPDATE");
     }
 
     @Override

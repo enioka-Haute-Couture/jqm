@@ -413,7 +413,7 @@ final class JdbcClient implements JqmClient
 
         // Now we need to actually synchronize through the database to avoid double posting
         // TODO: use a dedicated table, not the JobDef one. Will avoid locking the configuration.
-        ResultSet rs = cnx.runSelect(true, "jd_select_by_id", jd.getId());
+        ResultSet rs = cnx.runSelect(true, "jd_select_by_id_lock", jd.getId());
 
         // Now we have a lock, just retry - some other client may have created a job instance recently.
         try
