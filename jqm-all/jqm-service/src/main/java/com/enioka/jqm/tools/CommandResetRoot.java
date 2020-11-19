@@ -3,6 +3,7 @@ package com.enioka.jqm.tools;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.enioka.admin.MetaService;
+import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.jdbc.DbConn;
 
 @Parameters(commandNames = "Reset-Root", commandDescription = "Create or reset the 'root' account password and permissions.")

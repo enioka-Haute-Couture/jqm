@@ -18,6 +18,7 @@ package com.enioka.jqm.tools;
 import java.io.File;
 import java.net.BindException;
 
+import com.enioka.jqm.engine.JqmInitError;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;

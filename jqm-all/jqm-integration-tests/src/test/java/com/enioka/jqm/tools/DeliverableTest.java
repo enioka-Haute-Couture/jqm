@@ -22,6 +22,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 import org.apache.commons.io.FileUtils;

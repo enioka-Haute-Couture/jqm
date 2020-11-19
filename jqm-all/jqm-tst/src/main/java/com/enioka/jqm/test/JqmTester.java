@@ -8,6 +8,7 @@ import org.hsqldb.Server;
 import org.hsqldb.jdbc.JDBCDataSource;
 
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.engine.JqmSingleRunner;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
@@ -19,7 +20,6 @@ import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.RuntimeParameter;
 import com.enioka.jqm.model.State;
 import com.enioka.jqm.model.JobDef.PathType;
-import com.enioka.jqm.tools.JqmSingleRunner;
 
 /**
  * This class allows to start a stripped-down version of the JQM engine and run a payload synchronously inside it.<br>
@@ -39,7 +39,7 @@ import com.enioka.jqm.tools.JqmSingleRunner;
  * </ul>
  * <br>
  * For example, a simple JUnit test could be:
- * 
+ *
  * <pre>
  * {@code public void testOne()
  * {

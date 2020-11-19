@@ -9,6 +9,8 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.RollingFileAppender;
 
+import com.enioka.jqm.engine.Helpers;
+import com.enioka.jqm.engine.JqmEngineHandler;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobInstance;

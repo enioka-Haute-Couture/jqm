@@ -4,6 +4,7 @@ import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
+import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.jdbc.DbConn;
 
 @Parameters(commandNames = "Set-WebConfiguration", commandDescription = "Changes the way JQM exposes its web services and GUI.")

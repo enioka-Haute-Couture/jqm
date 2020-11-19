@@ -26,6 +26,7 @@ import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
+import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -66,8 +67,8 @@ public class ShellRunnerTest extends JqmBaseTest
 
         CreationTools.createJobDef("test job", true, "none", new HashMap<>(), command1, TestHelpers.qNormal, 0, "TestApp1", null, null,
                 "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
-        CreationTools.createJobDef("failing test job", true, "none", new HashMap<>(), command2, TestHelpers.qNormal, 0,
-                "TestApp2", null, "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
+        CreationTools.createJobDef("failing test job", true, "none", new HashMap<>(), command2, TestHelpers.qNormal, 0, "TestApp2", null,
+                "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
         JobRequest.create("TestApp1", "TestUser").submit();
         JobRequest.create("TestApp2", "TestUser").submit();
 

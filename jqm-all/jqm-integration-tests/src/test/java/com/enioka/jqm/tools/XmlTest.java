@@ -28,6 +28,7 @@ import com.enioka.admin.MetaService;
 import com.enioka.api.admin.NodeDto;
 import com.enioka.api.admin.QueueDto;
 import com.enioka.api.admin.QueueMappingDto;
+import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.Queue;

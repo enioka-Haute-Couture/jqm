@@ -35,6 +35,7 @@ import org.junit.Test;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.Query;
 import com.enioka.jqm.api.State;
+import com.enioka.jqm.engine.JndiContext;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 

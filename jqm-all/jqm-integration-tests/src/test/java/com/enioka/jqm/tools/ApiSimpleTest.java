@@ -40,6 +40,7 @@ import org.junit.Test;
 
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.State;
 import com.enioka.jqm.test.helpers.CreationTools;

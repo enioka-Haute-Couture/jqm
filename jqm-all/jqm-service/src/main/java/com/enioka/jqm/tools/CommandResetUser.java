@@ -6,6 +6,7 @@ import java.util.List;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.enioka.admin.MetaService;
+import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.jdbc.DbConn;
 
 @Parameters(commandNames = "Reset-User", commandDescription = "Create or reset a user account.")

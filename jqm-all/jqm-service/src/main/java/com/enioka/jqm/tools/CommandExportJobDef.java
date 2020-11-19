@@ -2,6 +2,7 @@ package com.enioka.jqm.tools;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.jdbc.DbConn;
 
 @Parameters(commandNames = "Export-JobDef", commandDescription = "Export all job definitions inside central configuration as a single deployment descriptor.")

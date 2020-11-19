@@ -27,6 +27,7 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.enioka.jqm.engine.JqmInitError;
 import com.enioka.jqm.model.GlobalParameter;
 
 import org.apache.commons.io.FilenameUtils;

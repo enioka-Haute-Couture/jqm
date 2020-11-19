@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -34,7 +35,7 @@ public class EngineCLIsolationTest extends JqmBaseTest
 
     /**
      * Run test without any change in the default configuration (i.e. jobs are isolated).
-     * 
+     *
      * Expected : isolation
      */
     @Test
@@ -53,7 +54,7 @@ public class EngineCLIsolationTest extends JqmBaseTest
 
     /**
      * Run test setting global parameter launch_isolation_default to Isolated.
-     * 
+     *
      * Expected : Isolation
      */
     @Test
@@ -75,7 +76,7 @@ public class EngineCLIsolationTest extends JqmBaseTest
 
     /**
      * Run test setting global parameter launch_isolation_default to SharedJar with two jobs inside the same jar.
-     * 
+     *
      * Expected : shared CL
      */
     @Test
@@ -97,7 +98,7 @@ public class EngineCLIsolationTest extends JqmBaseTest
 
     /**
      * Run test setting global parameter launch_isolation_default to SharedJar with two jobs in different jars.
-     * 
+     *
      * Expected : isolation
      */
     @Test
@@ -122,7 +123,7 @@ public class EngineCLIsolationTest extends JqmBaseTest
 
     /**
      * Run test setting global parameter launch_isolation_default to Shared with two jobs in the same jar.
-     * 
+     *
      * Expected : shared CL
      */
     @Test
@@ -144,7 +145,7 @@ public class EngineCLIsolationTest extends JqmBaseTest
 
     /**
      * Run test setting global parameter launch_isolation_default to Shared with two jobs in the different jars.
-     * 
+     *
      * Expected : shared CL
      */
     @Test
@@ -170,7 +171,7 @@ public class EngineCLIsolationTest extends JqmBaseTest
     /**
      * Run test using JobDef parameter specific_isolation_context with two jobs with same specific_isolation_context values using default
      * engine parameters.
-     * 
+     *
      * Expected : shared CL
      */
     @Test
@@ -190,7 +191,7 @@ public class EngineCLIsolationTest extends JqmBaseTest
     /**
      * Run test using JobDef parameter specific_isolation_context with two jobs using different specific_isolation_context values using
      * default engine parameters.
-     * 
+     *
      * Expected : isolation
      */
     @Test
@@ -210,7 +211,7 @@ public class EngineCLIsolationTest extends JqmBaseTest
     /**
      * Run test using JobDef parameter specific_isolation_context with two jobs using different specific_isolation_context values setting
      * launch_isolation_default to Shared.
-     * 
+     *
      * Expected : isolation
      */
     @Test

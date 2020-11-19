@@ -19,6 +19,7 @@
 package com.enioka.jqm.tools;
 
 import com.beust.jcommander.JCommander;
+import com.enioka.jqm.engine.Helpers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

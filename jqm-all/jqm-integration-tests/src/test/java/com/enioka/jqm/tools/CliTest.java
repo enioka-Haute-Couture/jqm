@@ -8,6 +8,7 @@ import org.junit.Test;
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.NodeDto;
 import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.RUser;
 import com.enioka.jqm.test.helpers.CreationTools;

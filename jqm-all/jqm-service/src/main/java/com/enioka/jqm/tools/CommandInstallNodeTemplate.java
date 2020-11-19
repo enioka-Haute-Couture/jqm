@@ -8,6 +8,7 @@ import com.beust.jcommander.Parameters;
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.NodeDto;
 import com.enioka.api.admin.QueueMappingDto;
+import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.jdbc.DbConn;
 
 @Parameters(commandNames = "Install-NodeTemplate", commandDescription = "Apply a template, i.e. the configuration of a node, to another node.")

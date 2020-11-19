@@ -11,6 +11,7 @@ import org.junit.Test;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.JqmInvalidRequestException;
 import com.enioka.jqm.api.Query;
+import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.test.helpers.TestHelpers;
 

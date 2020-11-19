@@ -2,6 +2,7 @@ package com.enioka.jqm.tools;
 
 import com.beust.jcommander.Parameters;
 import com.enioka.admin.MetaService;
+import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.jdbc.DbConn;
 
 @Parameters(commandNames = "Get-NodeCount", commandDescription = "Get how many nodes are declared inside the central configuration.")

@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import com.beust.jcommander.Parameters;
 import com.enioka.admin.MetaService;
+import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 
