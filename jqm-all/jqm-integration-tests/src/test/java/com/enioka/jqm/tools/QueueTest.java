@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.enioka.jqm.api.JobInstance;
-import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.api.JqmInvalidRequestException;
-import com.enioka.jqm.api.Query;
-import com.enioka.jqm.api.State;
+import com.enioka.jqm.api.client.core.JobInstance;
+import com.enioka.jqm.api.client.core.JobRequest;
+import com.enioka.jqm.api.client.core.JqmClientFactory;
+import com.enioka.jqm.api.client.core.JqmInvalidRequestException;
+import com.enioka.jqm.api.client.core.Query;
+import com.enioka.jqm.api.client.core.State;
 import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Queue;
@@ -50,9 +50,9 @@ public class QueueTest extends JqmBaseTest
         jqmlogger.debug("COUNT RUNNING " + cnx.runSelectSingle("ji_select_count_running", Integer.class));
         jqmlogger.debug("COUNT ALL     " + cnx.runSelectSingle("ji_select_count_all", Integer.class));
         Assert.assertEquals(3, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
-                .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run().size());
+                .addStatusFilter(com.enioka.jqm.api.client.core.State.RUNNING).run().size());
         Assert.assertEquals(2, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
-                .addStatusFilter(com.enioka.jqm.api.State.SUBMITTED).run().size());
+                .addStatusFilter(com.enioka.jqm.api.client.core.State.SUBMITTED).run().size());
 
         JqmClientFactory.getClient().killJob(i1);
         JqmClientFactory.getClient().killJob(i2);
@@ -60,9 +60,9 @@ public class QueueTest extends JqmBaseTest
         Thread.sleep(2000);
 
         Assert.assertEquals(3, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
-                .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run().size());
+                .addStatusFilter(com.enioka.jqm.api.client.core.State.RUNNING).run().size());
         Assert.assertEquals(0, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
-                .addStatusFilter(com.enioka.jqm.api.State.SUBMITTED).run().size());
+                .addStatusFilter(com.enioka.jqm.api.client.core.State.SUBMITTED).run().size());
 
         JqmClientFactory.getClient().killJob(i3);
         JqmClientFactory.getClient().killJob(i4);
@@ -98,26 +98,26 @@ public class QueueTest extends JqmBaseTest
 
         // Check 3 running (max queue size).
         Assert.assertEquals(3, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
-                .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run().size());
+                .addStatusFilter(com.enioka.jqm.api.client.core.State.RUNNING).run().size());
         Assert.assertEquals(1, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
-                .addStatusFilter(com.enioka.jqm.api.State.SUBMITTED).run().size());
+                .addStatusFilter(com.enioka.jqm.api.client.core.State.SUBMITTED).run().size());
 
         // Kill 1.
         List<JobInstance> running = Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
-                .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run();
+                .addStatusFilter(com.enioka.jqm.api.client.core.State.RUNNING).run();
         JqmClientFactory.getClient().killJob(running.get(0).getId());
         TestHelpers.waitFor(1, 10000, cnx);
         TestHelpers.waitForRunning(3, 10000, cnx);
 
         // Check the two waiting jobs have started.
         Assert.assertEquals(3, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
-                .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run().size());
+                .addStatusFilter(com.enioka.jqm.api.client.core.State.RUNNING).run().size());
         Assert.assertEquals(0, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
-                .addStatusFilter(com.enioka.jqm.api.State.SUBMITTED).run().size());
+                .addStatusFilter(com.enioka.jqm.api.client.core.State.SUBMITTED).run().size());
 
         // Kill remaining
         running = Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
-                .addStatusFilter(com.enioka.jqm.api.State.RUNNING).run();
+                .addStatusFilter(com.enioka.jqm.api.client.core.State.RUNNING).run();
         JqmClientFactory.getClient().killJob(running.get(0).getId());
         JqmClientFactory.getClient().killJob(running.get(1).getId());
         JqmClientFactory.getClient().killJob(running.get(2).getId());
@@ -125,7 +125,7 @@ public class QueueTest extends JqmBaseTest
         // Check all jobs are killed (and not cancelled as they would have been if not started)).
         TestHelpers.waitFor(4, 10000, cnx);
         this.displayAllHistoryTable();
-        Assert.assertEquals(4, Query.create().addStatusFilter(com.enioka.jqm.api.State.CRASHED).run().size());
+        Assert.assertEquals(4, Query.create().addStatusFilter(com.enioka.jqm.api.client.core.State.CRASHED).run().size());
     }
 
     @Test

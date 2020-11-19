@@ -2,7 +2,7 @@ package com.enioka.jqm.tools;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.client.core.JqmClientFactory;
 
 @Parameters(commandNames = "Get-JiStatus", commandDescription = "Fetch the status of a running or ended job instance.")
 class CommandGetJiStatus extends CommandBase

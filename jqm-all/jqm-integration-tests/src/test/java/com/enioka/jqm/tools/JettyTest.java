@@ -23,8 +23,8 @@ import java.security.KeyStore;
 
 import javax.net.ssl.SSLContext;
 
-import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.client.core.JobRequest;
+import com.enioka.jqm.api.client.core.JqmClientFactory;
 import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.pki.JdbcCa;

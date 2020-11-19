@@ -12,8 +12,8 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-import com.enioka.jqm.api.JobInstance;
-import com.enioka.jqm.api.State;
+import com.enioka.jqm.api.client.core.JobInstance;
+import com.enioka.jqm.api.client.core.State;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)

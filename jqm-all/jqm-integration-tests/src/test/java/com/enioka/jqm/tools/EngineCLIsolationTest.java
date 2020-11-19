@@ -3,7 +3,7 @@ package com.enioka.jqm.tools;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.client.core.JobRequest;
 import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;

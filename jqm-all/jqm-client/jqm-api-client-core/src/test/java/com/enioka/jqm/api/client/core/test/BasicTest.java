@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.api.test;
+package com.enioka.jqm.api.client.core.test;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -33,10 +33,10 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.api.Query;
-import com.enioka.jqm.api.Query.Sort;
-import com.enioka.jqm.api.State;
+import com.enioka.jqm.api.client.core.JqmClientFactory;
+import com.enioka.jqm.api.client.core.Query;
+import com.enioka.jqm.api.client.core.Query.Sort;
+import com.enioka.jqm.api.client.core.State;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Instruction;
@@ -261,7 +261,7 @@ public class BasicTest
 
             Properties p2 = new Properties();
             p2.put("com.enioka.jqm.jdbc.contextobject", db);
-            List<com.enioka.jqm.api.JobInstance> res = JqmClientFactory.getClient("test", p2, false)
+            List<com.enioka.jqm.api.client.core.JobInstance> res = JqmClientFactory.getClient("test", p2, false)
                     .getJobs(Query.create().setQueryHistoryInstances(false).setQueryLiveInstances(true).addSortDesc(Query.Sort.ID)
                             .setPageSize(1).setApplicationName("appName"));
 

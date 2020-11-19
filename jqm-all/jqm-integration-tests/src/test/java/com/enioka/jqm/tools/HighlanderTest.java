@@ -24,13 +24,13 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.api.Query;
-import com.enioka.jqm.api.Query.Sort;
+import com.enioka.jqm.api.client.core.JobRequest;
+import com.enioka.jqm.api.client.core.JqmClientFactory;
+import com.enioka.jqm.api.client.core.Query;
+import com.enioka.jqm.api.client.core.Query.Sort;
 import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.Queue;
-import com.enioka.jqm.api.State;
+import com.enioka.jqm.api.client.core.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -59,14 +59,14 @@ public class HighlanderTest extends JqmBaseTest
 
         Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
 
-        List<com.enioka.jqm.api.JobInstance> res = Query.create().addSortAsc(Sort.ID).run();
+        List<com.enioka.jqm.api.client.core.JobInstance> res = Query.create().addSortAsc(Sort.ID).run();
 
         Assert.assertEquals(State.ENDED, res.get(0).getState());
         Assert.assertEquals(State.ENDED, res.get(1).getState());
         Assert.assertEquals(true, res.get(0).isHighlander());
 
         Calendar prevEnd = null;
-        for (com.enioka.jqm.api.JobInstance h : res)
+        for (com.enioka.jqm.api.client.core.JobInstance h : res)
         {
             if (h.getBeganRunningDate().before(prevEnd))
             {
@@ -115,7 +115,7 @@ public class HighlanderTest extends JqmBaseTest
         JqmClientFactory.getClient().killJob(JqmClientFactory.getClient().getUserActiveJobs("TestUser").get(0).getId());
         TestHelpers.waitFor(2, 10000, cnx);
 
-        List<com.enioka.jqm.api.JobInstance> res = Query.create().addSortAsc(Sort.ID).run();
+        List<com.enioka.jqm.api.client.core.JobInstance> res = Query.create().addSortAsc(Sort.ID).run();
         Assert.assertEquals(2, res.size());
         Assert.assertEquals(State.CRASHED, res.get(0).getState());
         Assert.assertEquals(State.CRASHED, res.get(1).getState());
@@ -163,7 +163,7 @@ public class HighlanderTest extends JqmBaseTest
         TestHelpers.waitForRunning(2, 5000, cnx);
         sleep(1); // Additional - check no more than two running!
 
-        List<com.enioka.jqm.api.JobInstance> res = Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
+        List<com.enioka.jqm.api.client.core.JobInstance> res = Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
                 .addSortAsc(Sort.ID).run();
 
         Assert.assertEquals(State.RUNNING, res.get(0).getState());

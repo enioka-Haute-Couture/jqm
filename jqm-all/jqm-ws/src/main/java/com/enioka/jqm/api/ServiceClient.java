@@ -31,6 +31,18 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import com.enioka.jqm.api.client.core.Deliverable;
+import com.enioka.jqm.api.client.core.JobDef;
+import com.enioka.jqm.api.client.core.JobInstance;
+import com.enioka.jqm.api.client.core.JobRequest;
+import com.enioka.jqm.api.client.core.JqmClient;
+import com.enioka.jqm.api.client.core.JqmClientFactory;
+import com.enioka.jqm.api.client.core.Query;
+import com.enioka.jqm.api.client.core.Queue;
+import com.enioka.jqm.api.client.core.QueueStatus;
+import com.enioka.jqm.api.client.core.SelfDestructFileStream;
+import com.enioka.jqm.api.client.core.State;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

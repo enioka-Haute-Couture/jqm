@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.junit.Assert;
 
-import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.client.core.JobRequest;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.JobDefParameter;
 import com.enioka.jqm.test.helpers.CreationTools;

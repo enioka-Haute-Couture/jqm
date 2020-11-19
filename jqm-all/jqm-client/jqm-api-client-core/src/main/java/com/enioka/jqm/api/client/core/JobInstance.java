@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.api;
+package com.enioka.jqm.api.client.core;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.enioka.jqm.api.State;
+import com.enioka.jqm.api.client.core.State;
 
 /**
  * Represents the result of a job execution request - either a queued request, or a running job, or the result of said execution.
@@ -69,7 +69,7 @@ public class JobInstance
         return id;
     }
 
-    void setId(Integer id)
+    public void setId(Integer id)
     {
         this.id = id;
     }
@@ -82,7 +82,7 @@ public class JobInstance
         return parent;
     }
 
-    void setParent(Integer parent)
+    public void setParent(Integer parent)
     {
         this.parent = parent;
     }
@@ -95,7 +95,7 @@ public class JobInstance
         return user;
     }
 
-    void setUser(String user)
+    public void setUser(String user)
     {
         this.user = user;
     }
@@ -108,7 +108,7 @@ public class JobInstance
         return sessionID;
     }
 
-    void setSessionID(String sessionID)
+    public void setSessionID(String sessionID)
     {
         this.sessionID = sessionID;
     }
@@ -121,7 +121,7 @@ public class JobInstance
         return state;
     }
 
-    void setState(State state)
+    public void setState(State state)
     {
         this.state = state;
     }
@@ -135,7 +135,7 @@ public class JobInstance
         return position;
     }
 
-    void setPosition(Long position)
+    public void setPosition(Long position)
     {
         this.position = position;
     }
@@ -178,7 +178,7 @@ public class JobInstance
         return parameters;
     }
 
-    void setParameters(Map<String, String> parameters)
+    public void setParameters(Map<String, String> parameters)
     {
         this.parameters = parameters;
     }
@@ -221,7 +221,7 @@ public class JobInstance
         return keyword1;
     }
 
-    void setKeyword1(String keyword1)
+    public void setKeyword1(String keyword1)
     {
         this.keyword1 = keyword1;
     }
@@ -234,7 +234,7 @@ public class JobInstance
         return keyword2;
     }
 
-    void setKeyword2(String keyword2)
+    public void setKeyword2(String keyword2)
     {
         this.keyword2 = keyword2;
     }
@@ -247,7 +247,7 @@ public class JobInstance
         return keyword3;
     }
 
-    void setKeyword3(String keyword3)
+    public void setKeyword3(String keyword3)
     {
         this.keyword3 = keyword3;
     }
@@ -299,7 +299,7 @@ public class JobInstance
         return application;
     }
 
-    void setApplication(String application)
+    public void setApplication(String application)
     {
         this.application = application;
     }

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.api;
+package com.enioka.jqm.api.client.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.api;
+package com.enioka.jqm.api.client.core;
 
 import java.io.Closeable;
 import java.io.File;
@@ -59,8 +59,8 @@ import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.enioka.jqm.api.Query.Sort;
-import com.enioka.jqm.api.Query.SortSpec;
+import com.enioka.jqm.api.client.core.Query.Sort;
+import com.enioka.jqm.api.client.core.Query.SortSpec;
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
@@ -83,7 +83,7 @@ import com.enioka.jqm.model.State;
 /**
  * Main JQM client API entry point.
  */
-final class JdbcClient implements JqmClient
+public final class JdbcClient implements JqmClient
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(JdbcClient.class);
     private static final int IN_CLAUSE_LIMIT = 500;
@@ -778,7 +778,7 @@ final class JdbcClient implements JqmClient
     }
 
     @Override
-    public void setJobQueue(int idJob, com.enioka.jqm.api.Queue queue)
+    public void setJobQueue(int idJob, com.enioka.jqm.api.client.core.Queue queue)
     {
         setJobQueue(idJob, queue.getId());
     }
@@ -1046,7 +1046,7 @@ final class JdbcClient implements JqmClient
         }
     }
 
-    private String getStatusPredicate(String fieldName, List<com.enioka.jqm.api.State> status, List<Object> prms)
+    private String getStatusPredicate(String fieldName, List<com.enioka.jqm.api.client.core.State> status, List<Object> prms)
     {
         if (status == null || status.isEmpty())
         {
@@ -1059,7 +1059,7 @@ final class JdbcClient implements JqmClient
     }
 
     @Override
-    public List<com.enioka.jqm.api.JobInstance> getJobs(Query query)
+    public List<com.enioka.jqm.api.client.core.JobInstance> getJobs(Query query)
     {
         if ((query.getFirstRow() != null || query.getPageSize() != null) && query.isQueryLiveInstances() && query.isQueryHistoryInstances())
         {
@@ -1077,7 +1077,7 @@ final class JdbcClient implements JqmClient
 
         try (DbConn cnx = getDbSession())
         {
-            Map<Integer, com.enioka.jqm.api.JobInstance> res = new LinkedHashMap<>();
+            Map<Integer, com.enioka.jqm.api.client.core.JobInstance> res = new LinkedHashMap<>();
 
             String wh = "";
             List<Object> prms = new ArrayList<>();
@@ -1248,7 +1248,7 @@ final class JdbcClient implements JqmClient
             ResultSet rs = cnx.runRawSelect(q, paginatedParameters.toArray());
             while (rs.next())
             {
-                com.enioka.jqm.api.JobInstance tmp = getJob(rs, cnx);
+                com.enioka.jqm.api.client.core.JobInstance tmp = getJob(rs, cnx);
                 res.put(tmp.getId(), tmp);
             }
             rs.close();
@@ -1272,7 +1272,7 @@ final class JdbcClient implements JqmClient
             List<List<Integer>> ids = new ArrayList<>();
             List<Integer> currentList = null;
             int i = 0;
-            for (com.enioka.jqm.api.JobInstance ji : res.values())
+            for (com.enioka.jqm.api.client.core.JobInstance ji : res.values())
             {
                 if (currentList == null || i % IN_CLAUSE_LIMIT == 0)
                 {
@@ -1313,9 +1313,9 @@ final class JdbcClient implements JqmClient
         }
     }
 
-    private com.enioka.jqm.api.JobInstance getJob(ResultSet rs, DbConn cnx) throws SQLException
+    private com.enioka.jqm.api.client.core.JobInstance getJob(ResultSet rs, DbConn cnx) throws SQLException
     {
-        com.enioka.jqm.api.JobInstance res = new com.enioka.jqm.api.JobInstance();
+        com.enioka.jqm.api.client.core.JobInstance res = new com.enioka.jqm.api.client.core.JobInstance();
 
         res.setId(rs.getInt(1));
         // res.setApplication(rs.getString(2));
@@ -1338,10 +1338,10 @@ final class JdbcClient implements JqmClient
         res.setProgress(rs.getInt(21));
         res.setQueueName(rs.getString(22));
         res.setSessionID(rs.getString(24));
-        res.setState(com.enioka.jqm.api.State.valueOf(rs.getString(25)));
+        res.setState(com.enioka.jqm.api.client.core.State.valueOf(rs.getString(25)));
         res.setUser(rs.getString(26));
 
-        com.enioka.jqm.api.Queue q = new com.enioka.jqm.api.Queue();
+        com.enioka.jqm.api.client.core.Queue q = new com.enioka.jqm.api.client.core.Queue();
         q.setId(rs.getInt(29));
         q.setName(rs.getString(22));
         res.setQueue(q);
@@ -1356,7 +1356,7 @@ final class JdbcClient implements JqmClient
     }
 
     @Override
-    public com.enioka.jqm.api.JobInstance getJob(int idJob)
+    public com.enioka.jqm.api.client.core.JobInstance getJob(int idJob)
     {
         // TODO: direct queries following previous logic, but after we have common table structures.
         return Query.create().setJobInstanceId(idJob).setQueryHistoryInstances(true).setQueryLiveInstances(true).run().get(0);
@@ -1415,19 +1415,19 @@ final class JdbcClient implements JqmClient
     }
 
     @Override
-    public List<com.enioka.jqm.api.JobInstance> getJobs()
+    public List<com.enioka.jqm.api.client.core.JobInstance> getJobs()
     {
         return Query.create().setQueryHistoryInstances(true).setQueryLiveInstances(true).run();
     }
 
     @Override
-    public List<com.enioka.jqm.api.JobInstance> getActiveJobs()
+    public List<com.enioka.jqm.api.client.core.JobInstance> getActiveJobs()
     {
         return Query.create().setQueryHistoryInstances(false).setQueryLiveInstances(true).addSortAsc(Sort.ID).run();
     }
 
     @Override
-    public List<com.enioka.jqm.api.JobInstance> getUserActiveJobs(String user)
+    public List<com.enioka.jqm.api.client.core.JobInstance> getUserActiveJobs(String user)
     {
         if (user == null || user.isEmpty())
         {
@@ -1458,17 +1458,17 @@ final class JdbcClient implements JqmClient
     // /////////////////////////////////////////////////////////////////////
 
     @Override
-    public List<com.enioka.jqm.api.Deliverable> getJobDeliverables(int idJob)
+    public List<com.enioka.jqm.api.client.core.Deliverable> getJobDeliverables(int idJob)
     {
         try (DbConn cnx = getDbSession())
         {
 
             // TODO: no intermediate entity here: directly SQL => API object.
             List<Deliverable> deliverables = Deliverable.select(cnx, "deliverable_select_all_for_ji", idJob);
-            List<com.enioka.jqm.api.Deliverable> res = new ArrayList<>();
+            List<com.enioka.jqm.api.client.core.Deliverable> res = new ArrayList<>();
             for (Deliverable d : deliverables)
             {
-                res.add(new com.enioka.jqm.api.Deliverable(d.getFilePath(), d.getFileFamily(), d.getId(), d.getOriginalFileName()));
+                res.add(new com.enioka.jqm.api.client.core.Deliverable(d.getFilePath(), d.getFileFamily(), d.getId(), d.getOriginalFileName()));
             }
 
             return res;
@@ -1498,7 +1498,7 @@ final class JdbcClient implements JqmClient
     }
 
     @Override
-    public InputStream getDeliverableContent(com.enioka.jqm.api.Deliverable d)
+    public InputStream getDeliverableContent(com.enioka.jqm.api.client.core.Deliverable d)
     {
         return getDeliverableContent(d.getId());
     }
@@ -1525,7 +1525,7 @@ final class JdbcClient implements JqmClient
         return getDeliverableContent(deliverable);
     }
 
-    InputStream getEngineLog(String nodeName, int latest)
+    public InputStream getEngineLog(String nodeName, int latest)
     {
         URL url = null;
 
@@ -1802,10 +1802,10 @@ final class JdbcClient implements JqmClient
     // /////////////////////////////////////////////////////////////////////
 
     @Override
-    public List<com.enioka.jqm.api.Queue> getQueues()
+    public List<com.enioka.jqm.api.client.core.Queue> getQueues()
     {
-        List<com.enioka.jqm.api.Queue> res = new ArrayList<>();
-        com.enioka.jqm.api.Queue tmp = null;
+        List<com.enioka.jqm.api.client.core.Queue> res = new ArrayList<>();
+        com.enioka.jqm.api.client.core.Queue tmp = null;
 
         try (DbConn cnx = getDbSession())
         {
@@ -1823,7 +1823,7 @@ final class JdbcClient implements JqmClient
     }
 
     @Override
-    public void pauseQueue(com.enioka.jqm.api.Queue q)
+    public void pauseQueue(com.enioka.jqm.api.client.core.Queue q)
     {
         try (DbConn cnx = getDbSession())
         {
@@ -1838,7 +1838,7 @@ final class JdbcClient implements JqmClient
     }
 
     @Override
-    public void resumeQueue(com.enioka.jqm.api.Queue q)
+    public void resumeQueue(com.enioka.jqm.api.client.core.Queue q)
     {
         try (DbConn cnx = getDbSession())
         {
@@ -1853,7 +1853,7 @@ final class JdbcClient implements JqmClient
     }
 
     @Override
-    public void clearQueue(com.enioka.jqm.api.Queue q)
+    public void clearQueue(com.enioka.jqm.api.client.core.Queue q)
     {
         try (DbConn cnx = getDbSession())
         {
@@ -1868,7 +1868,7 @@ final class JdbcClient implements JqmClient
     }
 
     @Override
-    public QueueStatus getQueueStatus(com.enioka.jqm.api.Queue q)
+    public QueueStatus getQueueStatus(com.enioka.jqm.api.client.core.Queue q)
     {
         try (DbConn cnx = getDbSession())
         {
@@ -1910,7 +1910,7 @@ final class JdbcClient implements JqmClient
     }
 
     @Override
-    public int getQueueEnabledCapacity(com.enioka.jqm.api.Queue q)
+    public int getQueueEnabledCapacity(com.enioka.jqm.api.client.core.Queue q)
     {
         int capacity = 0;
         try (DbConn cnx = getDbSession())
@@ -1934,9 +1934,9 @@ final class JdbcClient implements JqmClient
     // Parameters retrieval
     // /////////////////////////////////////////////////////////////////////
 
-    private static com.enioka.jqm.api.Queue getQueue(Queue queue)
+    private static com.enioka.jqm.api.client.core.Queue getQueue(Queue queue)
     {
-        com.enioka.jqm.api.Queue q = new com.enioka.jqm.api.Queue();
+        com.enioka.jqm.api.client.core.Queue q = new com.enioka.jqm.api.client.core.Queue();
 
         q.setDescription(queue.getDescription());
         q.setId(queue.getId());
@@ -1945,7 +1945,7 @@ final class JdbcClient implements JqmClient
         return q;
     }
 
-    private static Schedule getSchedule(ScheduledJob s, Map<Integer, com.enioka.jqm.api.Queue> queues)
+    private static Schedule getSchedule(ScheduledJob s, Map<Integer, com.enioka.jqm.api.client.core.Queue> queues)
     {
         Schedule res = new Schedule();
         res.setCronExpression(s.getCronExpression());
@@ -1958,21 +1958,21 @@ final class JdbcClient implements JqmClient
     }
 
     @Override
-    public List<com.enioka.jqm.api.JobDef> getJobDefinitions()
+    public List<com.enioka.jqm.api.client.core.JobDef> getJobDefinitions()
     {
         return getJobDefinitionsInternal("jd_select_all");
     }
 
     @Override
-    public List<com.enioka.jqm.api.JobDef> getJobDefinitions(String application)
+    public List<com.enioka.jqm.api.client.core.JobDef> getJobDefinitions(String application)
     {
         return getJobDefinitionsInternal("jd_select_by_tag_app", application);
     }
 
     @Override
-    public com.enioka.jqm.api.JobDef getJobDefinition(String name)
+    public com.enioka.jqm.api.client.core.JobDef getJobDefinition(String name)
     {
-        List<com.enioka.jqm.api.JobDef> res = getJobDefinitionsInternal("jd_select_by_key", name);
+        List<com.enioka.jqm.api.client.core.JobDef> res = getJobDefinitionsInternal("jd_select_by_key", name);
         if (res.isEmpty())
         {
             throw new JqmInvalidRequestException("No job definition named " + name);
@@ -1980,12 +1980,12 @@ final class JdbcClient implements JqmClient
         return res.get(0);
     }
 
-    private List<com.enioka.jqm.api.JobDef> getJobDefinitionsInternal(String queryName, String... args)
+    private List<com.enioka.jqm.api.client.core.JobDef> getJobDefinitionsInternal(String queryName, String... args)
     {
-        List<com.enioka.jqm.api.JobDef> res = new ArrayList<>();
+        List<com.enioka.jqm.api.client.core.JobDef> res = new ArrayList<>();
         List<JobDef> dbr = null;
         List<Integer> ids = null;
-        Map<Integer, com.enioka.jqm.api.Queue> queues = null;
+        Map<Integer, com.enioka.jqm.api.client.core.Queue> queues = null;
         Map<Integer, List<JobDefParameter>> allParams = null;
         List<ScheduledJob> sjs = null;
 
@@ -1998,7 +1998,7 @@ final class JdbcClient implements JqmClient
             if (!dbr.isEmpty())
             {
                 queues = new HashMap<>();
-                for (com.enioka.jqm.api.Queue q : getQueues())
+                for (com.enioka.jqm.api.client.core.Queue q : getQueues())
                 {
                     queues.put(q.getId(), q);
                 }
@@ -2014,7 +2014,7 @@ final class JdbcClient implements JqmClient
 
             for (JobDef jd : dbr)
             {
-                com.enioka.jqm.api.JobDef tmp = new com.enioka.jqm.api.JobDef();
+                com.enioka.jqm.api.client.core.JobDef tmp = new com.enioka.jqm.api.client.core.JobDef();
 
                 // Basic fields
                 tmp.setApplication(jd.getApplication());

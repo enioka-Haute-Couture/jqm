@@ -9,9 +9,9 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.enioka.jqm.api.Deliverable;
-import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.client.core.Deliverable;
+import com.enioka.jqm.api.client.core.JobRequest;
+import com.enioka.jqm.api.client.core.JqmClientFactory;
 
 /**
  * Testing the tester... The main demo test using before and after is in the other file.

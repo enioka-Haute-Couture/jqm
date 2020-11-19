@@ -13,22 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.api;
+package com.enioka.jqm.api.client.core;
 
-/**
- * Denotes an input error from the user of the API. The message gives the detail of his error.
- */
-public class JqmInvalidRequestException extends JqmException
+class StaticClientBinder implements IClientFactoryBinder
 {
-    private static final long serialVersionUID = 2248971878792826983L;
+    private static final StaticClientBinder SINGLETON = new StaticClientBinder();
 
-    public JqmInvalidRequestException(String msg, Exception e)
+    public static StaticClientBinder getSingleton()
     {
-        super(msg, e);
+        return SINGLETON;
     }
 
-    public JqmInvalidRequestException(String msg)
+    @Override
+    public IClientFactory getClientFactory()
     {
-        super(msg);
+        return new ClientFactory();
     }
+
+    @Override
+    public String getClientFactoryName()
+    {
+        return "jdbc";
+    }
+
 }

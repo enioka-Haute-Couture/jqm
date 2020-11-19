@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.api;
+package com.enioka.jqm.api.client.core;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -256,7 +256,7 @@ public final class Query
         }
     }
 
-    void setResultSize(Integer resultSize)
+    public void setResultSize(Integer resultSize)
     {
         this.resultSize = resultSize;
     }
@@ -270,7 +270,7 @@ public final class Query
         return results;
     }
 
-    void setResults(List<JobInstance> results)
+    public void setResults(List<JobInstance> results)
     {
         this.results = results;
     }

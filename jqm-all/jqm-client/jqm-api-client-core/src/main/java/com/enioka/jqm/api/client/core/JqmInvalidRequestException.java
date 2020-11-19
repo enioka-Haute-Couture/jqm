@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.api;
+package com.enioka.jqm.api.client.core;
 
 /**
- * Base class for all JQM API exceptions
+ * Denotes an input error from the user of the API. The message gives the detail of his error.
  */
-public class JqmException extends RuntimeException
+public class JqmInvalidRequestException extends JqmException
 {
-    private static final long serialVersionUID = -2937310125732117976L;
+    private static final long serialVersionUID = 2248971878792826983L;
 
-    JqmException(String message)
+    public JqmInvalidRequestException(String msg, Exception e)
     {
-        super(message);
+        super(msg, e);
     }
 
-    JqmException(String message, Throwable cause)
+    public JqmInvalidRequestException(String msg)
     {
-        super(message, cause);
+        super(msg);
     }
 }

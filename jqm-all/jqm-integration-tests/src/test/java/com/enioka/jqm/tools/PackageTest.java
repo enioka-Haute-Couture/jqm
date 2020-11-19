@@ -15,7 +15,7 @@
  */
 package com.enioka.jqm.tools;
 
-import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.client.core.JobRequest;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 

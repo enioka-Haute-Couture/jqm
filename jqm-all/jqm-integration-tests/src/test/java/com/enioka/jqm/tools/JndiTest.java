@@ -32,9 +32,9 @@ import javax.naming.spi.NamingManager;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.api.Query;
-import com.enioka.jqm.api.State;
+import com.enioka.jqm.api.client.core.JobRequest;
+import com.enioka.jqm.api.client.core.Query;
+import com.enioka.jqm.api.client.core.State;
 import com.enioka.jqm.engine.JndiContext;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;

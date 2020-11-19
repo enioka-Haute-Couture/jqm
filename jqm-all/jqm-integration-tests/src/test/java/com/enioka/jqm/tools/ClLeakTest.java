@@ -9,7 +9,7 @@ import javax.management.ObjectName;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.client.core.JqmClientFactory;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class ClLeakTest extends JqmBaseTest

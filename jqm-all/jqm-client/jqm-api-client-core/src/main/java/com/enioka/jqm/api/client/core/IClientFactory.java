@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.api;
+package com.enioka.jqm.api.client.core;
 
 import java.util.Properties;
 
@@ -21,7 +21,7 @@ import java.util.Properties;
  * This interface must be implemented by all client providers. It simply defines the "create client" interface.
  * 
  */
-interface IClientFactory
+public interface IClientFactory
 {
     /**
      * Return the default client. Note this client is shared in the static context. (said otherwise: the same client is always returned

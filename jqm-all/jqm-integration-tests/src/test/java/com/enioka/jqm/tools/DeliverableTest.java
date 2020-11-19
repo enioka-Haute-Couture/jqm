@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.client.core.JqmClientFactory;
 import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -77,7 +77,7 @@ public class DeliverableTest extends JqmBaseTest
         File f = new File(TestHelpers.node.getDlRepo() + "jqm-test-deliverable2.txt");
         Assert.assertEquals(false, f.exists()); // file should have been moved
 
-        List<com.enioka.jqm.api.Deliverable> files = JqmClientFactory.getClient().getJobDeliverables(jobId);
+        List<com.enioka.jqm.api.client.core.Deliverable> files = JqmClientFactory.getClient().getJobDeliverables(jobId);
         Assert.assertEquals(1, files.size());
 
         InputStream tmp = JqmClientFactory.getClient().getDeliverableContent(files.get(0));
@@ -105,7 +105,7 @@ public class DeliverableTest extends JqmBaseTest
         File f = new File(TestHelpers.node.getDlRepo() + "jqm-test-deliverable3.txt");
         Assert.assertEquals(false, f.exists()); // file should have been moved
 
-        List<com.enioka.jqm.api.Deliverable> files = JqmClientFactory.getClient().getJobDeliverables(jobId);
+        List<com.enioka.jqm.api.client.core.Deliverable> files = JqmClientFactory.getClient().getJobDeliverables(jobId);
         Assert.assertEquals(1, files.size());
 
         InputStream tmp = JqmClientFactory.getClient().getDeliverableContent(files.get(0));
@@ -136,7 +136,7 @@ public class DeliverableTest extends JqmBaseTest
         File f = new File(TestHelpers.node.getDlRepo() + "jqm-test-deliverable4.txt");
         Assert.assertEquals(false, f.exists()); // file should have been moved
 
-        List<com.enioka.jqm.api.Deliverable> files = JqmClientFactory.getClient().getJobDeliverables(jobId);
+        List<com.enioka.jqm.api.client.core.Deliverable> files = JqmClientFactory.getClient().getJobDeliverables(jobId);
         Assert.assertEquals(1, files.size());
 
         InputStream tmp = JqmClientFactory.getClient().getDeliverableContent(files.get(0));
@@ -156,7 +156,7 @@ public class DeliverableTest extends JqmBaseTest
         int jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
                 .addDefParameter("fileName", "jqm-test-deliverable5.txt").run(this);
 
-        List<com.enioka.jqm.api.Deliverable> tmp = JqmClientFactory.getClient().getJobDeliverables(jobId);
+        List<com.enioka.jqm.api.client.core.Deliverable> tmp = JqmClientFactory.getClient().getJobDeliverables(jobId);
         Assert.assertEquals(1, tmp.size());
     }
 }

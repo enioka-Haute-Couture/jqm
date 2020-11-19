@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.api;
+package com.enioka.jqm.api.client.core;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

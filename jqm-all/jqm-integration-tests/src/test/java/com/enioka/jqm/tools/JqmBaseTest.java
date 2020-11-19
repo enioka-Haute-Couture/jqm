@@ -25,9 +25,9 @@ import java.util.Properties;
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
-import com.enioka.jqm.api.JobInstance;
-import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.api.Query;
+import com.enioka.jqm.api.client.core.JobInstance;
+import com.enioka.jqm.api.client.core.JqmClientFactory;
+import com.enioka.jqm.api.client.core.Query;
 import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.engine.JndiContext;
 import com.enioka.jqm.engine.JqmEngineFactory;

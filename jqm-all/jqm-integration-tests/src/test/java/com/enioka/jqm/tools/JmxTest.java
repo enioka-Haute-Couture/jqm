@@ -30,7 +30,7 @@ import javax.management.remote.JMXServiceURL;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.client.core.JobRequest;
 import com.enioka.jqm.engine.JqmEngineMBean;
 import com.enioka.jqm.engine.QueuePollerMBean;
 import com.enioka.jqm.runner.java.JavaJobInstanceTrackerMBean;

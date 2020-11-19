@@ -11,12 +11,12 @@ import javax.naming.spi.NamingManager;
 import javax.sql.DataSource;
 
 import com.enioka.jqm.api.JobManager;
-import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.api.JqmClient;
-import com.enioka.jqm.api.JqmClientException;
-import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.client.core.JobRequest;
+import com.enioka.jqm.api.client.core.JqmClient;
+import com.enioka.jqm.api.client.core.JqmClientException;
+import com.enioka.jqm.api.client.core.JqmClientFactory;
 import com.enioka.jqm.runner.api.JqmKillException;
-import com.enioka.jqm.api.Query;
+import com.enioka.jqm.api.client.core.Query;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.GlobalParameter;

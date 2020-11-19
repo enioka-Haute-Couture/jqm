@@ -13,27 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.api;
+package com.enioka.jqm.api.client.core;
 
-class StaticClientBinder implements IClientFactoryBinder
+/**
+ * Base class for all JQM API exceptions
+ */
+public class JqmException extends RuntimeException
 {
-    private static final StaticClientBinder SINGLETON = new StaticClientBinder();
+    private static final long serialVersionUID = -2937310125732117976L;
 
-    public static StaticClientBinder getSingleton()
+    JqmException(String message)
     {
-        return SINGLETON;
+        super(message);
     }
 
-    @Override
-    public IClientFactory getClientFactory()
+    JqmException(String message, Throwable cause)
     {
-        return new ClientFactory();
+        super(message, cause);
     }
-
-    @Override
-    public String getClientFactoryName()
-    {
-        return "jdbc";
-    }
-
 }

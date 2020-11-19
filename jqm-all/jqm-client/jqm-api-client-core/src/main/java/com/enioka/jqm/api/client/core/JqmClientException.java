@@ -13,37 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.api;
+package com.enioka.jqm.api.client.core;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-class SelfDestructFileStream extends FileInputStream
+/**
+ * Denotes an internal error that happened inside the JQM API. It is not due to bad user input, but to configuration issues or bugs.
+ */
+public class JqmClientException extends JqmException
 {
-    File f = null;
-    String nameHint = null;
+    private static final long serialVersionUID = 338795021501465434L;
 
-    SelfDestructFileStream(File file) throws FileNotFoundException
+    public JqmClientException(String message)
     {
-        super(file);
-        this.f = file;
+        super(message);
     }
 
-    @Override
-    public void close() throws IOException
+    public JqmClientException(String message, Throwable cause)
     {
-        super.close();
+        super(message, cause);
+    }
 
-        try
-        {
-            f.delete();
-        }
-        catch (Exception e)
-        {
-            // Nothing
-        }
-        f = null;
+    public JqmClientException(Throwable cause)
+    {
+        super("an internal JQM client exception occured", cause);
     }
 }

@@ -21,10 +21,10 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.enioka.jqm.api.JobInstance;
-import com.enioka.jqm.api.Query;
-import com.enioka.jqm.api.Query.Sort;
-import com.enioka.jqm.api.State;
+import com.enioka.jqm.api.client.core.JobInstance;
+import com.enioka.jqm.api.client.core.Query;
+import com.enioka.jqm.api.client.core.Query.Sort;
+import com.enioka.jqm.api.client.core.State;
 
 public class EngineApiTest extends JqmBaseTest
 {

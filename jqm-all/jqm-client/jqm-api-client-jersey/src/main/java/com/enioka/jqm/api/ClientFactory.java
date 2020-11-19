@@ -19,6 +19,9 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import com.enioka.jqm.api.client.core.JqmClient;
+import com.enioka.jqm.api.client.core.IClientFactory;
+
 class ClientFactory implements IClientFactory
 {
     private static JqmClient defaultClient;

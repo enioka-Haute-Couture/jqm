@@ -1,4 +1,4 @@
-package com.enioka.jqm.api;
+package com.enioka.jqm.api.client.core;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.api;
+package com.enioka.jqm.api.client.core;
 
 import java.io.Serializable;
 
@@ -47,7 +47,7 @@ public class Queue implements Serializable
         return id;
     }
 
-    void setId(int id)
+    public void setId(int id)
     {
         this.id = id;
     }

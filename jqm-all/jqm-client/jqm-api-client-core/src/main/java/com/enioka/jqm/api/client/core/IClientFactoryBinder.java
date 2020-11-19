@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.api;
+package com.enioka.jqm.api.client.core;
 
 /**
  * A Binder is a class inside a client implementation that gives the name of a class implementing {@link IClientFactory}. Every client
  * implementation should have a class named <code>com.enioka.jqm.api.StaticClientBinder</code> implementing this interface for the static
  * binding system to work. This system was copied from slf4j.
  */
-interface IClientFactoryBinder
+public interface IClientFactoryBinder
 {
     /**
      * Return the {@link IClientFactory} that the {@link JqmClientFactory} should bind to.

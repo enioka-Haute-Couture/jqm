@@ -3,9 +3,9 @@ package com.enioka.jqm.engine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.enioka.jqm.api.JobInstance;
-import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.api.JqmInvalidRequestException;
+import com.enioka.jqm.api.client.core.JobInstance;
+import com.enioka.jqm.api.client.core.JqmClientFactory;
+import com.enioka.jqm.api.client.core.JqmInvalidRequestException;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;

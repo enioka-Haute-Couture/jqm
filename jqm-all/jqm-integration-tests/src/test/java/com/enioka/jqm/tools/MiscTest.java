@@ -33,9 +33,9 @@ import org.junit.Test;
 
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.JndiObjectResourceDto;
-import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.api.Query;
+import com.enioka.jqm.api.client.core.JobRequest;
+import com.enioka.jqm.api.client.core.JqmClientFactory;
+import com.enioka.jqm.api.client.core.Query;
 import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.engine.JqmEngine;
 import com.enioka.jqm.engine.JqmInitErrorTooSoon;
@@ -246,9 +246,9 @@ public class MiscTest extends JqmBaseTest
         jqmlogger.debug("COUNT RUNNING " + cnx.runSelectSingle("ji_select_count_running", Integer.class));
         jqmlogger.debug("COUNT ALL     " + cnx.runSelectSingle("ji_select_count_all", Integer.class));
         Assert.assertEquals(0, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
-                .addStatusFilter(com.enioka.jqm.api.State.RUNNING).addStatusFilter(com.enioka.jqm.api.State.ENDED).run().size());
+                .addStatusFilter(com.enioka.jqm.api.client.core.State.RUNNING).addStatusFilter(com.enioka.jqm.api.client.core.State.ENDED).run().size());
         Assert.assertEquals(5, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
-                .addStatusFilter(com.enioka.jqm.api.State.SUBMITTED).run().size());
+                .addStatusFilter(com.enioka.jqm.api.client.core.State.SUBMITTED).run().size());
     }
 
     @Test

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.enioka.jqm.api.JqmClient;
+import com.enioka.jqm.api.client.core.JqmClient;
 import com.enioka.jqm.model.JobDefParameter;
 import com.enioka.jqm.model.JobDef.PathType;
 
