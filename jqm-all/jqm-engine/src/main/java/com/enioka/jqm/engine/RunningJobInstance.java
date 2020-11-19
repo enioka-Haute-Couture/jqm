@@ -11,9 +11,9 @@ import java.util.Properties;
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
-import com.enioka.jqm.api.JobInstanceTracker;
-import com.enioka.jqm.api.JobRunner;
-import com.enioka.jqm.api.JobRunnerCallback;
+import com.enioka.jqm.runner.api.JobInstanceTracker;
+import com.enioka.jqm.runner.api.JobRunner;
+import com.enioka.jqm.runner.api.JobRunnerCallback;
 import com.enioka.jqm.api.JobRunnerException;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.SimpleApiSecurity;

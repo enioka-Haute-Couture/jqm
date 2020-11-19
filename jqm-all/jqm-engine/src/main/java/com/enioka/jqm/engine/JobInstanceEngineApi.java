@@ -15,7 +15,7 @@ import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClient;
 import com.enioka.jqm.api.JqmClientException;
 import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.api.JqmKillException;
+import com.enioka.jqm.runner.api.JqmKillException;
 import com.enioka.jqm.api.Query;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;

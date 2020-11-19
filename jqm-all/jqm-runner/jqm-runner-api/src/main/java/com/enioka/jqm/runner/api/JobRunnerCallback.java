@@ -1,4 +1,4 @@
-package com.enioka.jqm.api;
+package com.enioka.jqm.runner.api;
 
 import java.util.Map;
 

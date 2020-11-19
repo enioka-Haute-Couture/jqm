@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.enioka.jqm.api.JobRunnerCallback;
+import com.enioka.jqm.runner.api.JobRunnerCallback;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Cl;
 import com.enioka.jqm.model.GlobalParameter;

@@ -11,9 +11,9 @@ import java.util.Map;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import com.enioka.jqm.api.JobInstanceTracker;
+import com.enioka.jqm.runner.api.JobInstanceTracker;
 import com.enioka.jqm.api.JobManager;
-import com.enioka.jqm.api.JobRunnerCallback;
+import com.enioka.jqm.runner.api.JobRunnerCallback;
 import com.enioka.jqm.api.JobRunnerException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Instruction;

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.api;
+package com.enioka.jqm.runner.api;
 
 /**
  * The KILL JOB JQM exception class.
