@@ -202,11 +202,16 @@ public final class JqmClientFactory
      */
     public static void resetClient(String name)
     {
+        ClientFactory factory = new ClientFactory();
+        factory.resetClient(name);
+
+        /* TODO : Temporary solution, should work on it to allow both types of clients
         if (binder == null)
         {
             bind();
         }
         binder.getClientFactory().resetClient(name);
+        */
     }
 
     /**
