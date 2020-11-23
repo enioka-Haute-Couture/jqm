@@ -1,4 +1,4 @@
-package com.enioka.jqm.jdbc;
+package com.enioka.jqm.impldb2;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -7,6 +7,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import com.enioka.jqm.jdbc.DatabaseException;
+import com.enioka.jqm.jdbc.DbAdapter;
+import com.enioka.jqm.jdbc.QueryPreparation;
 
 public class DbImplDb2 extends DbAdapter
 {

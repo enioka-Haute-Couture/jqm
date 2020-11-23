@@ -30,7 +30,7 @@ public class QueryPreparation
      */
     boolean forUpdate = false;
 
-    boolean isKey(String key)
+    public boolean isKey(String key)
     {
         return queryKey != null && this.queryKey.equals(key);
     }
