@@ -15,6 +15,7 @@
     <modules>
         <module>jqm-impl-hsql</module>
         <module>jqm-impl-mysql</module>
+        <module>jqm-impl-mysql8</module>
         <module>jqm-impl-pg</module>
     </modules>
 </project>
