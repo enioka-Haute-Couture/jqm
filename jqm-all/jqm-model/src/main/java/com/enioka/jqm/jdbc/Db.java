@@ -443,10 +443,9 @@ public class Db
             try
             {
                 BundleContext context = org.osgi.framework.FrameworkUtil.getBundle(getClass()).getBundleContext();
-                Loader<DbAdapter> loader = new Loader<DbAdapter>(context, DbAdapter.class, null);
+                Loader<DbAdapter> loader = new Loader<DbAdapter>(context, DbAdapter.class, "(Adapter-Type=*)");
                 loader.start();
 
-                // Works but not ideal
                 for (ServiceReference<?> ref : loader.references)
                 {
                     DbAdapter newAdapter = (DbAdapter)context.getService(ref);

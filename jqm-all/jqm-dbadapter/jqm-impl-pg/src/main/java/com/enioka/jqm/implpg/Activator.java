@@ -19,7 +19,7 @@ public class Activator implements BundleActivator
     {
         Dictionary<String, String> properties = new Hashtable<String, String>();
         properties.put("Plugin-Type", "DbAdapter");
-        properties.put("Adapter-Type", "pg");
+        properties.put("Adapter-Type", "postgresql");
         registration = context.registerService(DbAdapter.class, new DbImplPg(), properties);
     }
 
