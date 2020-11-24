@@ -9,8 +9,7 @@ import com.enioka.jqm.api.client.core.JqmInvalidRequestException;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
-import com.enioka.jqm.runner.java.JavaRunner;
-import com.enioka.jqm.runner.java.SecurityManagerPayload;
+import com.enioka.jqm.runner.api.SecurityManagerPayload;
 
 /**
  * This is a dumbed down version of the JQM engine that, instead of checking jobs from a database, will run at once a specified job
@@ -76,7 +75,7 @@ public class JqmSingleRunner
         }
 
         // Create run container
-        final RunningJobInstance l = new RunningJobInstance(job, new JavaRunner(cnx));
+        final RunningJobInstance l = new RunningJobInstance(job, new QueuePoller(null, null, null)); // TODO : Use a Runner (used to be `new JavaRunner(cnx)`)
 
         // Kill signal handler
         final Thread mainT = Thread.currentThread();

@@ -45,7 +45,7 @@ import com.enioka.jqm.model.Message;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.ResourceManager;
 import com.enioka.jqm.model.State;
-import com.enioka.jqm.runner.java.SecurityManagerPayload;
+import com.enioka.jqm.runner.api.SecurityManagerPayload;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

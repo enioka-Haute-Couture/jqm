@@ -47,7 +47,7 @@ import javax.naming.spi.InitialContextFactory;
 import javax.naming.spi.InitialContextFactoryBuilder;
 import javax.naming.spi.NamingManager;
 
-import com.enioka.jqm.runner.java.PayloadClassLoader;
+import com.enioka.jqm.runner.api.PayloadClassLoader;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -204,7 +204,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
                 try
                 {
                     ResourceFactory rf = new ResourceFactory(
-                            Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.runner.java.PayloadClassLoader
+                            Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.runner.api.PayloadClassLoader
                                     ? Thread.currentThread().getContextClassLoader()
                                     : extResources);
                     res = rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
@@ -257,7 +257,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
             // We use the current thread loader to find the resource and resource factory class - ext is inside that CL.
             // This is done only for payload CL - engine only need ext, not its own CL (as its own CL does NOT include ext).
             ResourceFactory rf = new ResourceFactory(
-                    Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.runner.java.PayloadClassLoader
+                    Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.runner.api.PayloadClassLoader
                             ? Thread.currentThread().getContextClassLoader()
                             : extResources);
             return rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());

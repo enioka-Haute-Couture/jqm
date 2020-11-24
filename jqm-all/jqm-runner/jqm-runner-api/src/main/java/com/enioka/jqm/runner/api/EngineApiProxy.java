@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.runner.java;
+package com.enioka.jqm.runner.api;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -27,13 +27,13 @@ import org.slf4j.LoggerFactory;
 /**
  * This is the implementation behind the proxy described in the <code>JobManager</code> interface inside the jqm-api artifact.
  */
-class EngineApiProxy implements InvocationHandler
+public class EngineApiProxy implements InvocationHandler
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(EngineApiProxy.class);
 
     private JobManager api;
 
-    EngineApiProxy(JobManager api)
+    public EngineApiProxy(JobManager api)
     {
         this.api = api;
     }

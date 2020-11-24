@@ -8,8 +8,6 @@ import java.util.Map;
 import com.enioka.jqm.runner.api.JobRunner;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.JobInstance;
-import com.enioka.jqm.runner.java.JavaRunner;
-import com.enioka.jqm.runner.shell.ShellRunner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +25,9 @@ public class RunnerManager
 
     RunnerManager(DbConn cnx)
     {
-        jqmlogger.info("Registering java runner");
-        runners.add(new JavaRunner(cnx));
-        runners.add(new ShellRunner(cnx));
+        jqmlogger.info("Registering the runners");
+        
+        // TODO : Loading
     }
 
     /**

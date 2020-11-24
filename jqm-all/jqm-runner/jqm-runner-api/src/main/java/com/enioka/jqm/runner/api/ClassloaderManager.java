@@ -1,4 +1,4 @@
-package com.enioka.jqm.runner.java;
+package com.enioka.jqm.runner.api;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.enioka.jqm.runner.api.JobRunnerCallback;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Cl;
 import com.enioka.jqm.model.GlobalParameter;
@@ -27,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * We use a specific object rather than static objects in the {@link JavaJobInstanceTracker} class to allow multiple engine instantiations.
  * It also allows to centralise all CL creation methods and have cleaner code in Loader and in JCL.
  */
-class ClassloaderManager
+public class ClassloaderManager
 {
     private Logger jqmlogger = LoggerFactory.getLogger(ClassloaderManager.class);
 
@@ -65,7 +64,7 @@ class ClassloaderManager
     private final LibraryResolverFS fsResolver;
     private final LibraryResolverMaven mavenResolver;
 
-    ClassloaderManager(DbConn cnx)
+    public ClassloaderManager(DbConn cnx)
     {
         this.mavenResolver = new LibraryResolverMaven(cnx);
         this.fsResolver = new LibraryResolverFS(this.mavenResolver);
@@ -85,7 +84,7 @@ class ClassloaderManager
         }
     }
 
-    PayloadClassLoader getClassloader(JobInstance ji, JobRunnerCallback cb)
+    public PayloadClassLoader getClassloader(JobInstance ji, JobRunnerCallback cb)
             throws MalformedURLException, JqmPayloadException, RuntimeException
     {
         final PayloadClassLoader jobClassLoader;

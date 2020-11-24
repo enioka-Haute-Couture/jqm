@@ -1,4 +1,4 @@
-package com.enioka.jqm.runner.java;
+package com.enioka.jqm.runner.api;
 
 import java.io.File;
 import java.net.MalformedURLException;

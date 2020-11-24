@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.enioka.jqm.runner.java;
+package com.enioka.jqm.runner.api;
 
 import com.enioka.jqm.api.JobRunnerException;
 

@@ -27,6 +27,24 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons.lang.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.resolver</groupId>
+            <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+            <version>${shrinkwrap.resolver.version}</version>
+        </dependency>
+
 		<!-- JQM APIs -->
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
@@ -41,18 +59,6 @@
 		<dependency>
 			<groupId>com.enioka.jqm</groupId>
 			<artifactId>jqm-runner-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<!-- Runners -->
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-runner-java</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-runner-shell</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

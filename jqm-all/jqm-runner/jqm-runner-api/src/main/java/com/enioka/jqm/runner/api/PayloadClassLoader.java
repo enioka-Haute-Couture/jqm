@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.runner.java;
+package com.enioka.jqm.runner.api;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -91,7 +91,7 @@ class PayloadClassLoader extends URLClassLoader
      *                       given as parameter because its constructor needs the database.
      * @throws JqmEngineException
      */
-    void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, EngineApiProxy h) throws JobRunnerException
+    public void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, EngineApiProxy h) throws JobRunnerException
     {
         // 1 - Create the proxy.
         Object proxy = null;
@@ -378,7 +378,7 @@ class PayloadClassLoader extends URLClassLoader
      * handlers.<br>
      * Shared class loaders are left open.
      */
-    void tryClose()
+    public void tryClose()
     {
         if (!mayBeShared)
         {
