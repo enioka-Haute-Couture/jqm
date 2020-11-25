@@ -20,6 +20,12 @@
 		</dependency>
 
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-runner-java</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
             <version>6.0.0</version>

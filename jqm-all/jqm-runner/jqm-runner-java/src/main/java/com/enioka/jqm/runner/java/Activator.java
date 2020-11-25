@@ -19,7 +19,7 @@ public class Activator implements BundleActivator
     public void start(BundleContext context) throws Exception
     {
         Dictionary<String, String> properties = new Hashtable<String, String>();
-        properties.put("Plugin-Type", "Runner");
+        properties.put("Plugin-Type", "JobRunner");
         properties.put("Runner-Type", "java");
         registration = context.registerService(JobRunner.class, new JavaRunner(Helpers.getNewDbSession()), properties);
     }

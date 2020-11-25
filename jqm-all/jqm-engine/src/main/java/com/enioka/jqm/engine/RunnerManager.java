@@ -30,6 +30,7 @@ public class RunnerManager
     {
         jqmlogger.info("Registering the runners");
 
+        // Use the loader to get all the JobRunners available in the environment and add them to the list of runners.
         try
         {
             BundleContext context = org.osgi.framework.FrameworkUtil.getBundle(getClass()).getBundleContext();
