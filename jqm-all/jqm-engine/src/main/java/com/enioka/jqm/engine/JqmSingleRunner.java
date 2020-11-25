@@ -75,7 +75,8 @@ public class JqmSingleRunner
         }
 
         // Create run container
-        final RunningJobInstance l = new RunningJobInstance(job, new QueuePoller(null, null, null)); // TODO : Use a Runner (used to be `new JavaRunner(cnx)`)
+        RunnerManager manager = new RunnerManager(cnx);
+        final RunningJobInstance l = new RunningJobInstance(job, manager.getRunner(job));
 
         // Kill signal handler
         final Thread mainT = Thread.currentThread();
