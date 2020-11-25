@@ -48,17 +48,17 @@ public class JqmTesterTest
             mavenBundle("javax.xml.stream", "stax-api", "1.0-2"),
             mavenBundle("javax.xml.bind", "jaxb-api", "2.3.1"),
             mavenBundle("com.enioka.jqm", "jqm-tst", "3.0.0-SNAPSHOT"),
-            mavenBundle("com.enioka.jqm", "jqm-engine", "3.0.0-SNAPSHOT"),
-            mavenBundle("com.enioka.jqm", "jqm-runner-api", "3.0.0-SNAPSHOT"),
-            mavenBundle("com.enioka.jqm", "jqm-runner-basic", "3.0.0-SNAPSHOT"),
-            mavenBundle("com.enioka.jqm", "jqm-runner-java", "3.0.0-SNAPSHOT"),
-            mavenBundle("com.enioka.jqm", "jqm-runner-shell", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-api", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-loader", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-api-client-core", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-model", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-impl-hsql", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-impl-pg", "3.0.0-SNAPSHOT"),
+            mavenBundle("com.enioka.jqm", "jqm-engine", "3.0.0-SNAPSHOT"),
+            mavenBundle("com.enioka.jqm", "jqm-runner-api", "3.0.0-SNAPSHOT"),
+            //mavenBundle("com.enioka.jqm", "jqm-runner-basic", "3.0.0-SNAPSHOT"),
+            mavenBundle("com.enioka.jqm", "jqm-runner-java", "3.0.0-SNAPSHOT"),
+            //mavenBundle("com.enioka.jqm", "jqm-runner-shell", "3.0.0-SNAPSHOT"),
             junitBundles()
             );
     }
