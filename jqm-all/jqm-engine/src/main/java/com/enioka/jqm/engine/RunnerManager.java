@@ -7,8 +7,11 @@ import java.util.Map;
 
 import com.enioka.jqm.runner.api.JobRunner;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.loader.Loader;
 import com.enioka.jqm.model.JobInstance;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +29,21 @@ public class RunnerManager
     RunnerManager(DbConn cnx)
     {
         jqmlogger.info("Registering the runners");
-        
-        // TODO : Loading
+
+        try
+        {
+            BundleContext context = org.osgi.framework.FrameworkUtil.getBundle(getClass()).getBundleContext();
+            Loader<JobRunner> loader = new Loader<JobRunner>(context, JobRunner.class, null);
+            loader.start();
+            for (ServiceReference<?> ref : loader.references)
+            {
+                runners.add((JobRunner)context.getService(ref));
+            }
+        }
+        catch (Exception e)
+        {
+            throw new JqmRuntimeException("Issue when loading the runners");
+        }
     }
 
     /**
