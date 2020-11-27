@@ -1,4 +1,4 @@
-package com.enioka.jqm.runner.basic;
+package com.enioka.jqm.runner.java;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

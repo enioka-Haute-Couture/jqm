@@ -76,7 +76,7 @@ public class ClassloaderManager
     {
         this.launchIsolationDefault = GlobalParameter.getParameter(cnx, "launch_isolation_default", "Isolated");
         String rns = GlobalParameter.getParameter(cnx, "job_runners",
-                "com.enioka.jqm.tools.LegacyRunner,com.enioka.jqm.tools.MainRunner,com.enioka.jqm.tools.RunnableRunner");
+                "com.enioka.jqm.runner.java.LegacyRunner,com.enioka.jqm.runner.java.MainRunner,com.enioka.jqm.runner.java.RunnableRunner");
         for (String s : rns.split(","))
         {
             runnerClasses.add(s);
