@@ -4,7 +4,6 @@ import com.enioka.jqm.api.JobManager;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.model.JobInstance;
-import com.enioka.jqm.runner.api.ClassloaderManager;
 import com.enioka.jqm.runner.api.JobInstanceTracker;
 import com.enioka.jqm.runner.api.JobRunner;
 import com.enioka.jqm.runner.api.JobRunnerCallback;
@@ -16,6 +15,14 @@ import com.enioka.jqm.runner.api.JobRunnerCallback;
 public class JavaRunner implements JobRunner
 {
     private ClassloaderManager classloaderManager;
+
+    static
+    {
+        if (System.getSecurityManager() == null)
+        {
+            System.setSecurityManager(new SecurityManagerPayload());
+        }
+    }
 
     public JavaRunner(DbConn cnx)
     {

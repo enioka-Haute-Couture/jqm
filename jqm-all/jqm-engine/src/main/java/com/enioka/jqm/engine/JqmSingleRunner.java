@@ -9,7 +9,6 @@ import com.enioka.jqm.api.client.core.JqmInvalidRequestException;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
-import com.enioka.jqm.runner.api.SecurityManagerPayload;
 
 /**
  * This is a dumbed down version of the JQM engine that, instead of checking jobs from a database, will run at once a specified job
@@ -67,12 +66,6 @@ public class JqmSingleRunner
         // Parameters
         final int poll = Integer.parseInt(GlobalParameter.getParameter(cnx, "internalPollingPeriodMs", "10000"));
         final int jobId = job.getId();
-
-        // Security
-        if (System.getSecurityManager() == null)
-        {
-            System.setSecurityManager(new SecurityManagerPayload());
-        }
 
         // Create run container
         RunnerManager manager = new RunnerManager(cnx);

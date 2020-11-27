@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.runner.api;
+package com.enioka.jqm.runner.java;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

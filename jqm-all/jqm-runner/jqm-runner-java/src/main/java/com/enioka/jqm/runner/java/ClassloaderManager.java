@@ -1,4 +1,4 @@
-package com.enioka.jqm.runner.api;
+package com.enioka.jqm.runner.java;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -16,6 +16,7 @@ import com.enioka.jqm.model.Cl;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.runner.api.JobRunnerCallback;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;

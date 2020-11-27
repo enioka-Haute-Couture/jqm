@@ -45,7 +45,6 @@ import com.enioka.jqm.model.Message;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.ResourceManager;
 import com.enioka.jqm.model.State;
-import com.enioka.jqm.runner.api.SecurityManagerPayload;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -204,13 +203,6 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             loadJmxBeans = false;
             jqmlogger.info("JMX management beans will not be loaded as JMX server port is null or zero");
         }
-
-        // Security
-        if (System.getSecurityManager() == null)
-        {
-            System.setSecurityManager(new SecurityManagerPayload());
-        }
-        jqmlogger.info("Security manager was registered");
 
         // Scheduler
         scheduler = new CronScheduler(this);

@@ -30,12 +30,9 @@ import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.State;
-import com.enioka.jqm.runner.api.ClassloaderManager;
-import com.enioka.jqm.runner.api.EngineApiProxy;
 import com.enioka.jqm.runner.api.JobInstanceTracker;
 import com.enioka.jqm.runner.api.JobRunnerCallback;
 import com.enioka.jqm.runner.api.JqmKillException;
-import com.enioka.jqm.runner.api.PayloadClassLoader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

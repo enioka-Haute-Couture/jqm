@@ -1,4 +1,4 @@
-package com.enioka.jqm.runner.api;
+package com.enioka.jqm.runner.java ;
 
 import java.beans.Introspector;
 import java.lang.management.ManagementFactory;

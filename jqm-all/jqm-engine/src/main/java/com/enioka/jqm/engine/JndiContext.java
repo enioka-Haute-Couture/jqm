@@ -47,8 +47,6 @@ import javax.naming.spi.InitialContextFactory;
 import javax.naming.spi.InitialContextFactoryBuilder;
 import javax.naming.spi.NamingManager;
 
-import com.enioka.jqm.runner.api.PayloadClassLoader;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -204,9 +202,10 @@ public class JndiContext extends InitialContext implements InitialContextFactory
                 try
                 {
                     ResourceFactory rf = new ResourceFactory(
+                        /* TODO : check
                             Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.runner.api.PayloadClassLoader
                                     ? Thread.currentThread().getContextClassLoader()
-                                    : extResources);
+                                    : */extResources);
                     res = rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
                 }
                 catch (Exception e)
@@ -218,7 +217,8 @@ public class JndiContext extends InitialContext implements InitialContextFactory
                 }
 
                 // Cache result
-                if (res.getClass().getClassLoader() instanceof PayloadClassLoader)
+                // TODO: check
+                if (res.getClass().getClassLoader() != null) // instanceof PayloadClassLoader)
                 {
                     jqmlogger.warn(
                             "A JNDI resource was defined as singleton but was loaded by a payload class loader - it won't be cached to avoid class loader leaks");
@@ -257,9 +257,10 @@ public class JndiContext extends InitialContext implements InitialContextFactory
             // We use the current thread loader to find the resource and resource factory class - ext is inside that CL.
             // This is done only for payload CL - engine only need ext, not its own CL (as its own CL does NOT include ext).
             ResourceFactory rf = new ResourceFactory(
+                /* TODO : check
                     Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.runner.api.PayloadClassLoader
                             ? Thread.currentThread().getContextClassLoader()
-                            : extResources);
+                            : */extResources);
             return rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
         }
         catch (Exception e)
