@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.enioka.jqm</groupId>
 		<artifactId>jqm-runner</artifactId>
-		<version>2.2.6-SNAPSHOT</version>
+		<version>2.2.6</version>
 	</parent>
 	<artifactId>jqm-runner-basic</artifactId>
 
