@@ -17,7 +17,7 @@ import com.enioka.jqm.api.client.core.JqmClientFactory;
  * Testing the tester... The main demo test using before and after is in the other file.
  *
  */
-public class JqmTesterAsyncTest2
+public class JqmTesterAsyncTest2 extends JqmTesterBase
 {
     // Simple no-nonsense test
     @Test
