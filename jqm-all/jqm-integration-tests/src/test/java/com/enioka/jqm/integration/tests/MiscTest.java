@@ -54,25 +54,8 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 import com.enioka.jqm.tools.MultiplexPrintStream;
 import com.enioka.jqm.tools.XmlJobDefParser;
 
-@RunWith(PaxExam.class)
-@ExamReactorStrategy(PerClass.class)
 public class MiscTest extends JqmBaseTest
-{
-    @Configuration
-    public Option[] config()
-    {
-        return options(
-            junitBundles()
-            );
-    }
-
-    @BeforeClass
-    public static void init()
-    {
-        systemProperty("org.ops4j.pax.url.mvn.repositories").value("https://repo1.maven.org/maven2@id=central");
-        systemProperty("org.ops4j.pax.url.mvn.useFallbackRepositories").value("false");
-    }
-    
+{    
     @Test
     public void testEmail() throws Exception
     {
