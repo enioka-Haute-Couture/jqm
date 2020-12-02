@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class manages all the {@link JobRunner} instances inside an engine.
  */
-public class RunnerManager
+class RunnerManager
 {
     private Logger jqmlogger = LoggerFactory.getLogger(RunnerManager.class);
 

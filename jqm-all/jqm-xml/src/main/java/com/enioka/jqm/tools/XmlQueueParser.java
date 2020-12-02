@@ -32,7 +32,7 @@ import org.w3c.dom.NodeList;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Queue;
 
-class XmlQueueParser
+public class XmlQueueParser
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(XmlQueueParser.class);
 
@@ -41,7 +41,7 @@ class XmlQueueParser
         // Utility class.
     }
 
-    static void parse(String path, DbConn cnx) throws JqmXmlException
+    public static void parse(String path, DbConn cnx) throws JqmXmlException
     {
         // Argument checks
         jqmlogger.trace(path);

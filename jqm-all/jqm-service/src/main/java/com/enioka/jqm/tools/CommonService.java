@@ -5,7 +5,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.RollingFileAppender;
 
-final class CommonService
+public final class CommonService
 {
     private static final Logger jqmlogger = Logger.getLogger(CommonService.class);
 
@@ -21,7 +21,7 @@ final class CommonService
         r.activateOptions();
     }
 
-    static void setLogLevel(String level)
+    public static void setLogLevel(String level)
     {
         try
         {

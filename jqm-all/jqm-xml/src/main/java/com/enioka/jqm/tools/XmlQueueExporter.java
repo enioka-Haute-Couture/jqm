@@ -28,7 +28,7 @@ import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.Queue;
 
-class XmlQueueExporter
+public class XmlQueueExporter
 {
     private XmlQueueExporter()
     {
@@ -63,7 +63,7 @@ class XmlQueueExporter
     /**
      * Exports all available queues to an XML file.
      */
-    static void export(String path, DbConn cnx) throws JqmXmlException
+    public static void export(String path, DbConn cnx) throws JqmXmlException
     {
         if (cnx == null)
         {
@@ -75,7 +75,7 @@ class XmlQueueExporter
     /**
      * Exports all available queues to an XML file.
      */
-    static void export(String path, DbConn cnx, List<String> qNames) throws JqmXmlException
+    public static void export(String path, DbConn cnx, List<String> qNames) throws JqmXmlException
     {
         if (cnx == null)
         {

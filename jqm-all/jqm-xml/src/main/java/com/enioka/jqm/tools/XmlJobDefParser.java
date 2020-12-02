@@ -46,7 +46,7 @@ import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.model.Queue;
 
-class XmlJobDefParser
+public class XmlJobDefParser
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(XmlJobDefParser.class);
 
@@ -64,7 +64,7 @@ class XmlJobDefParser
      *            a database connection to use with no active transaction.
      * @throws JqmEngineException
      */
-    static void parse(String path, DbConn cnx) throws JqmXmlException
+    public static void parse(String path, DbConn cnx) throws JqmXmlException
     {
         parse(path, cnx, null);
     }

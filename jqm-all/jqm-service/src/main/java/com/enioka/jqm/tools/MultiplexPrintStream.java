@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
  * Should a payload create a new thread, its stdout would go to the global log as the multiplexing key is the Thread. But is not a big deal
  * as creating threads inside an app server is not a good idea anyway.
  */
-class MultiplexPrintStream extends PrintStream
+public class MultiplexPrintStream extends PrintStream
 {
     private static Logger jqmlogger = Logger.getLogger(MultiplexPrintStream.class);
     private static Logger alljobslogger = Logger.getLogger("alljobslogger");
@@ -50,7 +50,7 @@ class MultiplexPrintStream extends PrintStream
     private boolean useCommonLogFile = false;
 
     private Map<String, BufferedWriter> writers = new HashMap<>();
-    String rootLogDir;
+    public String rootLogDir;
 
     MultiplexPrintStream(OutputStream out, String rootLogDir, boolean alsoWriteToCommonLog)
     {

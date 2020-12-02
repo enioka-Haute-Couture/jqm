@@ -12,6 +12,7 @@ import com.enioka.jqm.api.client.core.JqmClientFactory;
 import com.enioka.jqm.api.client.core.JqmInvalidRequestException;
 import com.enioka.jqm.api.client.core.Query;
 import com.enioka.jqm.engine.Helpers;
+import com.enioka.jqm.integration.tests.ClientApiTest;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.test.helpers.TestHelpers;
 

@@ -47,7 +47,7 @@ public class XmlJobDefExporter
     /**
      * Exports all available queues to an XML file.
      */
-    static void export(String path, DbConn cnx) throws JqmXmlException
+    public static void export(String path, DbConn cnx) throws JqmXmlException
     {
         if (cnx == null)
         {

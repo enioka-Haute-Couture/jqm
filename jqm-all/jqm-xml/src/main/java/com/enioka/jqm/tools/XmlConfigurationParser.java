@@ -52,7 +52,7 @@ import com.enioka.jqm.model.Queue;
  * Highly non-efficient way to import cluster parameters. Created to make it easier to configure Docker containers. Should not be used
  * otherwise.
  */
-class XmlConfigurationParser
+public class XmlConfigurationParser
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(XmlConfigurationParser.class);
 
@@ -68,7 +68,7 @@ class XmlConfigurationParser
      * @param cnx
      * @throws JqmEngineException
      */
-    static void parse(String path, DbConn cnx) throws JqmXmlException
+    public static void parse(String path, DbConn cnx) throws JqmXmlException
     {
         // Argument checks
         jqmlogger.trace(path);
