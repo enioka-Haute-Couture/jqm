@@ -101,7 +101,7 @@ public final class ResourceParser
     {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 
-        try (InputStream is = ResourceParser.class.getClassLoader().getResourceAsStream(Helpers.resourceFile))
+        try (InputStream is = ResourceParser.class.getClassLoader().getSystemResourceAsStream(Helpers.resourceFile))
         {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(is);
