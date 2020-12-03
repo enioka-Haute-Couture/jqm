@@ -1,4 +1,4 @@
-package com.enioka.jqm.tools;
+package com.enioka.jqm.service;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +13,7 @@ import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.engine.JqmInitError;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Node;
+import com.enioka.jqm.tools.XmlJobDefParser;
 
 /**
  * A mode of deployment where a directory is scanned for job definitions. <br>

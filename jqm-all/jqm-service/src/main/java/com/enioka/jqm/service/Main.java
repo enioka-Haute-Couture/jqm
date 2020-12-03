@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.tools;
+package com.enioka.jqm.service;
 
 import com.beust.jcommander.JCommander;
 import com.enioka.jqm.engine.Helpers;

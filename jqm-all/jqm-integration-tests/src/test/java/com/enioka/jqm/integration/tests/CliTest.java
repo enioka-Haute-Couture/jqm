@@ -11,9 +11,9 @@ import com.enioka.jqm.api.client.core.JobRequest;
 import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.RUser;
+import com.enioka.jqm.service.Main;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
-import com.enioka.jqm.tools.Main;
 
 public class CliTest extends JqmBaseTest
 {

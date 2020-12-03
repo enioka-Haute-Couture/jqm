@@ -1,4 +1,4 @@
-package com.enioka.jqm.tools;
+package com.enioka.jqm.service;
 
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.Parameter;

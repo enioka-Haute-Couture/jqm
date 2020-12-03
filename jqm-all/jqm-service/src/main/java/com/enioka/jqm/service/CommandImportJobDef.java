@@ -1,4 +1,4 @@
-package com.enioka.jqm.tools;
+package com.enioka.jqm.service;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -9,6 +9,7 @@ import com.beust.jcommander.Parameters;
 import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
+import com.enioka.jqm.tools.XmlJobDefParser;
 
 import org.apache.commons.io.FileUtils;
 

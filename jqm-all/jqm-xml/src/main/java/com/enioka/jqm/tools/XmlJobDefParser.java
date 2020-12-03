@@ -80,7 +80,7 @@ public class XmlJobDefParser
      *            ignore the base path of the jar in the deployment descriptor and use this one. It must be relative to to repository root.
      * @throws JqmEngineException
      */
-    static void parse(String path, DbConn cnx, String overrideJarBasePath) throws JqmXmlException
+    public static void parse(String path, DbConn cnx, String overrideJarBasePath) throws JqmXmlException
     {
         // Argument checks
         jqmlogger.trace(path);

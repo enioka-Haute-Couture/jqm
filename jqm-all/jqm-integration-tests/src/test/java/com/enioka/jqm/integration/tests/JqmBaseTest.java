@@ -42,8 +42,8 @@ import com.enioka.jqm.engine.JqmEngineFactory;
 import com.enioka.jqm.engine.JqmEngineOperations;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.service.EngineCallback;
 import com.enioka.jqm.test.helpers.TestHelpers;
-import com.enioka.jqm.tools.EngineCallback;
 
 import org.hsqldb.Server;
 import org.junit.After;
@@ -101,6 +101,7 @@ public class JqmBaseTest
             mavenBundle("com.enioka.jqm", "jqm-impl-pg", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-engine", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-runner-api", "3.0.0-SNAPSHOT"),
+            mavenBundle("com.enioka.jqm", "jqm-test-helpers", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-integration-tests", "3.0.0-SNAPSHOT"),
             junitBundles()
             );

@@ -29,8 +29,8 @@ import org.junit.Test;
 import com.enioka.jqm.api.client.core.JobInstance;
 import com.enioka.jqm.api.client.core.Query;
 import com.enioka.jqm.api.client.core.Query.Sort;
+import com.enioka.jqm.service.CommonService;
 import com.enioka.jqm.test.helpers.TestHelpers;
-import com.enioka.jqm.tools.CommonService;
 
 public class FiboTest extends JqmBaseTest
 {

@@ -1,4 +1,4 @@
-package com.enioka.jqm.tools;
+package com.enioka.jqm.service;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;

@@ -1,9 +1,10 @@
-package com.enioka.jqm.tools;
+package com.enioka.jqm.service;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.tools.XmlQueueParser;
 
 @Parameters(commandNames = "Import-Queue", commandDescription = "Import one or multiple queue mapping files.")
 class CommandImportQueue extends CommandBase

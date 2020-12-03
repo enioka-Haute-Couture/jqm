@@ -1,4 +1,4 @@
-package com.enioka.jqm.tools;
+package com.enioka.jqm.service;
 
 import com.beust.jcommander.Parameters;
 import com.enioka.admin.MetaService;

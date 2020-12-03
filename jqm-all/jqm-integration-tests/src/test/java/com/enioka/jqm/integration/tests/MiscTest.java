@@ -40,9 +40,9 @@ import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.engine.JqmEngine;
 import com.enioka.jqm.engine.JqmInitErrorTooSoon;
 import com.enioka.jqm.model.JobDef.PathType;
+import com.enioka.jqm.service.MultiplexPrintStream;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
-import com.enioka.jqm.tools.MultiplexPrintStream;
 import com.enioka.jqm.tools.XmlJobDefParser;
 
 public class MiscTest extends JqmBaseTest
