@@ -16,18 +16,12 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.engine;
+package com.enioka.jqm.jndi;
 
-import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.rmi.Remote;
 import java.rmi.registry.Registry;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,9 +39,9 @@ import javax.naming.NameParser;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 import javax.naming.spi.InitialContextFactoryBuilder;
-import javax.naming.spi.NamingManager;
 
-import org.apache.commons.io.FileUtils;
+import com.enioka.jqm.cl.ExtClassLoader;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,88 +57,16 @@ public class JndiContext extends InitialContext implements InitialContextFactory
     private Map<String, Object> singletons = new HashMap<>();
     private List<ObjectName> jmxNames = new ArrayList<>();
     private Registry r = null;
-    private ClassLoader extResources;
-
-    /**
-     * Will create a JNDI Context and register it as the initial context factory builder
-     *
-     * @return the context
-     * @throws NamingException
-     *                             on any issue during initial context factory builder registration
-     */
-    public static JndiContext createJndiContext() throws NamingException
-    {
-        try
-        {
-            if (!NamingManager.hasInitialContextFactoryBuilder())
-            {
-                JndiContext ctx = new JndiContext();
-                NamingManager.setInitialContextFactoryBuilder(ctx);
-                return ctx;
-            }
-            else
-            {
-                return (JndiContext) NamingManager.getInitialContext(null);
-            }
-        }
-        catch (Exception e)
-        {
-            jqmlogger.error("Could not create JNDI context: " + e.getMessage());
-            NamingException ex = new NamingException("Could not initialize JNDI Context");
-            ex.setRootCause(e);
-            throw ex;
-        }
-    }
+    private ClassLoader extResources = ExtClassLoader.instance;
 
     /**
      * Create a new Context
      *
      * @throws NamingException
      */
-    private JndiContext() throws NamingException
+    JndiContext() throws NamingException
     {
         super();
-
-        // List all jars inside ext directory
-        File extDir = new File("ext/");
-        List<URL> urls = new ArrayList<>();
-        if (extDir.isDirectory())
-        {
-            for (File f : FileUtils.listFiles(extDir, new String[] { "jar", "war", "bar" }, true))
-            {
-                if (!f.canRead())
-                {
-                    throw new NamingException("can't access file " + f.getAbsolutePath());
-                }
-                try
-                {
-                    urls.add(f.toURI().toURL());
-                }
-                catch (MalformedURLException e)
-                {
-                    jqmlogger.error("Error when parsing the content of ext directory. File will be ignored", e);
-                }
-            }
-
-            // Create classloader
-            final URL[] aUrls = urls.toArray(new URL[0]);
-            for (URL u : aUrls)
-            {
-                jqmlogger.trace(u.toString());
-            }
-            extResources = AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>()
-            {
-                @Override
-                public URLClassLoader run()
-                {
-                    return new URLClassLoader(aUrls, getParentCl());
-                }
-            });
-        }
-        else
-        {
-            throw new NamingException("JQM_ROOT/ext directory does not exist or cannot be read");
-        }
     }
 
     @Override
@@ -172,7 +94,9 @@ public class JndiContext extends InitialContext implements InitialContextFactory
         }
         if (name.endsWith("serverName"))
         {
-            return JqmEngine.latestNodeStartedName;
+            // TODO: this was a hack anyway. Should be removed soon.
+            // return JqmEngine.latestNodeStartedName;
+            return "not implemented";
         }
 
         // If in cache...
@@ -202,10 +126,10 @@ public class JndiContext extends InitialContext implements InitialContextFactory
                 try
                 {
                     ResourceFactory rf = new ResourceFactory(
-                        /* TODO : check
-                            Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.runner.api.PayloadClassLoader
-                                    ? Thread.currentThread().getContextClassLoader()
-                                    : */extResources);
+                            /*
+                             * TODO : check Thread.currentThread().getContextClassLoader() instanceof
+                             * com.enioka.jqm.runner.api.PayloadClassLoader ? Thread.currentThread().getContextClassLoader() :
+                             */extResources);
                     res = rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
                 }
                 catch (Exception e)
@@ -257,10 +181,10 @@ public class JndiContext extends InitialContext implements InitialContextFactory
             // We use the current thread loader to find the resource and resource factory class - ext is inside that CL.
             // This is done only for payload CL - engine only need ext, not its own CL (as its own CL does NOT include ext).
             ResourceFactory rf = new ResourceFactory(
-                /* TODO : check
-                    Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.runner.api.PayloadClassLoader
-                            ? Thread.currentThread().getContextClassLoader()
-                            : */extResources);
+                    /*
+                     * TODO : check Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.runner.api.PayloadClassLoader ?
+                     * Thread.currentThread().getContextClassLoader() :
+                     */extResources);
             return rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
         }
         catch (Exception e)
@@ -427,7 +351,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
         }
         catch (Exception e)
         {
-            throw new JqmInitError("Could not fetch Platform Class Loader", e);
+            throw new RuntimeException("Could not fetch Platform Class Loader", e);
         }
     }
 }

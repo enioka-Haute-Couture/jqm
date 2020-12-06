@@ -8,6 +8,7 @@ import com.enioka.jqm.api.client.core.JqmClientFactory;
 import com.enioka.jqm.api.client.core.JqmInvalidRequestException;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.model.GlobalParameter;
 
 /**
@@ -54,9 +55,6 @@ public class JqmSingleRunner
 
         // Set thread name - used in audits
         Thread.currentThread().setName("JQM single runner;;" + job.getId());
-
-        // JNDI first - the engine itself uses JNDI to fetch its connections!
-        Helpers.registerJndiIfNeeded();
 
         // Get a copy of the instance, to be sure to get a non detached item.
         DbConn cnx = Helpers.getNewDbSession();
@@ -174,6 +172,6 @@ public class JqmSingleRunner
      */
     public static void setConnection(Db db)
     {
-        Helpers.setDb(db);
+        DbManager.setDb(db);
     }
 }

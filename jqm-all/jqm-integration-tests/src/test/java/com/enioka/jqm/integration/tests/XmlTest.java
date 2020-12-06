@@ -34,11 +34,11 @@ import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
-import com.enioka.jqm.tools.XmlConfigurationParser;
-import com.enioka.jqm.tools.XmlJobDefExporter;
-import com.enioka.jqm.tools.XmlJobDefParser;
-import com.enioka.jqm.tools.XmlQueueExporter;
-import com.enioka.jqm.tools.XmlQueueParser;
+import com.enioka.jqm.xml.XmlConfigurationParser;
+import com.enioka.jqm.xml.XmlJobDefExporter;
+import com.enioka.jqm.xml.XmlJobDefParser;
+import com.enioka.jqm.xml.XmlQueueExporter;
+import com.enioka.jqm.xml.XmlQueueParser;
 
 public class XmlTest extends JqmBaseTest
 {

@@ -51,9 +51,10 @@ public final class JmxAgent
         jqmlogger.trace("registering remote agent");
         try
         {
+            // TODO: transform this into a service using a JNDI service for resgistration
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            JndiContext ctx = (JndiContext) NamingManager.getInitialContext(null);
-            ctx.registerRmiContext(LocateRegistry.createRegistry(registryPort));
+            // JndiContext ctx = (JndiContext) NamingManager.getInitialContext(null);
+            // ctx.registerRmiContext(LocateRegistry.createRegistry(registryPort));
 
             JMXServiceURL url = new JMXServiceURL(
                     "service:jmx:rmi://" + hostname + ":" + serverPort + "/jndi/rmi://" + hostname + ":" + registryPort + "/jmxrmi");

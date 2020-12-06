@@ -43,10 +43,10 @@ import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.service.MultiplexPrintStream;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
-import com.enioka.jqm.tools.XmlJobDefParser;
+import com.enioka.jqm.xml.XmlJobDefParser;
 
 public class MiscTest extends JqmBaseTest
-{    
+{
     @Test
     public void testEmail() throws Exception
     {
@@ -247,8 +247,10 @@ public class MiscTest extends JqmBaseTest
 
         jqmlogger.debug("COUNT RUNNING " + cnx.runSelectSingle("ji_select_count_running", Integer.class));
         jqmlogger.debug("COUNT ALL     " + cnx.runSelectSingle("ji_select_count_all", Integer.class));
-        Assert.assertEquals(0, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
-                .addStatusFilter(com.enioka.jqm.api.client.core.State.RUNNING).addStatusFilter(com.enioka.jqm.api.client.core.State.ENDED).run().size());
+        Assert.assertEquals(0,
+                Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
+                        .addStatusFilter(com.enioka.jqm.api.client.core.State.RUNNING)
+                        .addStatusFilter(com.enioka.jqm.api.client.core.State.ENDED).run().size());
         Assert.assertEquals(5, Query.create().setQueryLiveInstances(true).setQueryHistoryInstances(false)
                 .addStatusFilter(com.enioka.jqm.api.client.core.State.SUBMITTED).run().size());
     }

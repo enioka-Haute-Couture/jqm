@@ -24,6 +24,7 @@ import java.util.Properties;
 
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
+import javax.xml.stream.XMLStreamException;
 
 import static org.ops4j.pax.exam.CoreOptions.*;
 import org.junit.runner.RunWith;
@@ -37,11 +38,11 @@ import com.enioka.jqm.api.client.core.JobInstance;
 import com.enioka.jqm.api.client.core.JqmClientFactory;
 import com.enioka.jqm.api.client.core.Query;
 import com.enioka.jqm.engine.Helpers;
-import com.enioka.jqm.engine.JndiContext;
 import com.enioka.jqm.engine.JqmEngineFactory;
 import com.enioka.jqm.engine.JqmEngineOperations;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.service.EngineCallback;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -74,37 +75,90 @@ public class JqmBaseTest
     public Option[] config()
     {
         return options(
-            wrappedBundle(mavenBundle("org.hsqldb", "hsqldb", "2.3.4")),
-            wrappedBundle(mavenBundle("commons-io", "commons-io", "2.6")),
-            wrappedBundle(mavenBundle("commons-lang", "commons-lang", "2.6")),
-            wrappedBundle(mavenBundle("org.apache.commons", "commons-lang3", "3.11")),
-            wrappedBundle(mavenBundle("it.sauronsoftware.cron4j", "cron4j", "2.2.5")),
-            wrappedBundle(mavenBundle("javax.servlet", "servlet-api", "2.5")),
-            wrappedBundle(mavenBundle("org.apache.shiro", "shiro-core", "1.3.2")),
-            wrappedBundle(mavenBundle("org.apache.shiro", "shiro-web", "1.3.2")),
-            mavenBundle("org.osgi", "org.osgi.service.cm", "1.6.0"),
-            wrappedBundle(mavenBundle("org.apache.httpcomponents", "httpcore", "4.4.11")),
-            mavenBundle("org.apache.httpcomponents", "httpcore-osgi", "4.4.11"),
-            wrappedBundle(mavenBundle("org.apache.httpcomponents", "httpmime", "4.5.7")),
-            wrappedBundle(mavenBundle("org.apache.httpcomponents", "httpclient-cache", "4.5.7")),
-            wrappedBundle(mavenBundle("org.apache.httpcomponents", "fluent-hc", "4.5.7")),
-            wrappedBundle(mavenBundle("org.apache.httpcomponents", "httpclient", "4.5.7")),
-            mavenBundle("org.apache.httpcomponents", "httpclient-osgi", "4.5.7"),
-            wrappedBundle(mavenBundle("javax.activation", "activation", "1.1.1")),
-            mavenBundle("javax.xml.stream", "stax-api", "1.0-2"),
-            mavenBundle("javax.xml.bind", "jaxb-api", "2.3.1"),
-            mavenBundle("com.enioka.jqm", "jqm-api", "3.0.0-SNAPSHOT"),
-            mavenBundle("com.enioka.jqm", "jqm-loader", "3.0.0-SNAPSHOT"),
-            mavenBundle("com.enioka.jqm", "jqm-api-client-core", "3.0.0-SNAPSHOT"),
-            mavenBundle("com.enioka.jqm", "jqm-model", "3.0.0-SNAPSHOT"),
-            mavenBundle("com.enioka.jqm", "jqm-impl-hsql", "3.0.0-SNAPSHOT"),
-            mavenBundle("com.enioka.jqm", "jqm-impl-pg", "3.0.0-SNAPSHOT"),
-            mavenBundle("com.enioka.jqm", "jqm-engine", "3.0.0-SNAPSHOT"),
-            mavenBundle("com.enioka.jqm", "jqm-runner-api", "3.0.0-SNAPSHOT"),
-            mavenBundle("com.enioka.jqm", "jqm-test-helpers", "3.0.0-SNAPSHOT"),
-            mavenBundle("com.enioka.jqm", "jqm-integration-tests", "3.0.0-SNAPSHOT"),
-            junitBundles()
-            );
+                // OSGI DECLARATIVE SERVICES
+                mavenBundle("org.osgi", "org.osgi.service.cm").versionAsInProject(),
+                mavenBundle("org.apache.felix", "org.apache.felix.scr", "2.1.24"),
+                mavenBundle("org.osgi", "org.osgi.util.promise", "1.1.1"), mavenBundle("org.osgi", "org.osgi.util.function", "1.1.0"),
+
+                // Our test database (for most tests)
+                mavenBundle("org.hsqldb", "hsqldb").versionAsInProject(),
+
+                // Apache commons
+                mavenBundle("commons-io", "commons-io").versionAsInProject(),
+                mavenBundle("commons-lang", "commons-lang", "2.6").versionAsInProject(),
+                mavenBundle("org.apache.commons", "commons-lang3", "3.11").versionAsInProject(),
+                mavenBundle("org.apache.httpcomponents", "httpclient-osgi", "4.5.13"),
+                mavenBundle("org.apache.httpcomponents", "httpcore-osgi", "4.4.14"),
+
+                // Cron
+                wrappedBundle(mavenBundle("it.sauronsoftware.cron4j", "cron4j").versionAsInProject()),
+
+                // Everything for Jetty
+                mavenBundle("javax.servlet", "javax.servlet-api").versionAsInProject(),
+                mavenBundle("javax.annotation", "javax.annotation-api").versionAsInProject(),
+                mavenBundle("javax.transaction", "javax.transaction-api", "1.2"),
+                mavenBundle("javax.interceptor", "javax.interceptor-api", "1.2.2"),
+                mavenBundle("jakarta.activation", "jakarta.activation-api", "1.2.2"),
+                wrappedBundle(mavenBundle("javax.enterprise", "cdi-api", "1.0")), // versions should resolve once service is OK
+                mavenBundle("org.ow2.asm", "asm").versionAsInProject(),
+                mavenBundle("org.eclipse.jetty", "jetty-annotations").versionAsInProject(),
+                mavenBundle("org.eclipse.jetty", "jetty-http").versionAsInProject(),
+                mavenBundle("org.eclipse.jetty", "jetty-io").versionAsInProject(),
+                mavenBundle("org.eclipse.jetty", "jetty-jndi").versionAsInProject(),
+                mavenBundle("org.eclipse.jetty", "jetty-plus").versionAsInProject(),
+                mavenBundle("org.eclipse.jetty", "jetty-security").versionAsInProject(),
+                mavenBundle("org.eclipse.jetty", "jetty-server").versionAsInProject(),
+                mavenBundle("org.eclipse.jetty", "jetty-servlet").versionAsInProject(),
+                mavenBundle("org.eclipse.jetty", "jetty-util").versionAsInProject(),
+                mavenBundle("org.eclipse.jetty", "jetty-webapp").versionAsInProject(),
+                mavenBundle("org.eclipse.jetty", "jetty-xml").versionAsInProject(),
+
+                // Web security
+                mavenBundle("org.apache.shiro", "shiro-core").versionAsInProject(),
+                mavenBundle("org.apache.shiro", "shiro-web").versionAsInProject(),
+                mavenBundle("org.bouncycastle", "bcpkix-jdk15on").versionAsInProject(),
+                mavenBundle("org.bouncycastle", "bcprov-jdk15on").versionAsInProject(),
+
+                // CLI
+                wrappedBundle(mavenBundle("com.beust", "jcommander").versionAsInProject()),
+
+                // LOG
+                mavenBundle("org.slf4j", "jul-to-slf4j").versionAsInProject(),
+                // mavenBundle("org.slf4j", "slf4j-log4j12").versionAsInProject(),
+
+                // XML
+                wrappedBundle(mavenBundle("org.jdom", "jdom").versionAsInProject()), mavenBundle("javax.xml.bind", "jaxb-api", "2.3.1"),
+
+                // Maven resolver libs
+                wrappedBundle(mavenBundle("org.jboss.shrinkwrap.resolver", "shrinkwrap-resolver-api", "3.1.3")),
+                wrappedBundle(mavenBundle("org.jboss.shrinkwrap.resolver", "shrinkwrap-resolver-spi", "3.1.3")),
+                wrappedBundle(mavenBundle("org.jboss.shrinkwrap.resolver", "shrinkwrap-resolver-api-maven", "3.1.3")),
+                wrappedBundle(mavenBundle("org.jboss.shrinkwrap.resolver", "shrinkwrap-resolver-impl-maven", "3.1.3")),
+                wrappedBundle(mavenBundle("org.jvnet.winp", "winp", "1.27")),
+
+                // JQM tested libraries
+                mavenBundle("com.enioka.jqm", "jqm-impl-hsql").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-impl-pg").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-api").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-loader").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-api-client-core").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-xml").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-service").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-pki").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-admin").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-model").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-impl-hsql").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-impl-pg").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-engine").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-runner-api").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-runner-java").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-runner-shell").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-test-helpers").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-jndi-context").versionAsInProject(),
+                mavenBundle("com.enioka.jqm", "jqm-integration-tests").versionAsInProject(),
+
+                // Junit itself
+                junitBundles());
     }
 
     @BeforeClass
@@ -112,10 +166,10 @@ public class JqmBaseTest
     {
         systemProperty("org.ops4j.pax.url.mvn.repositories").value("https://repo1.maven.org/maven2@id=central");
         systemProperty("org.ops4j.pax.url.mvn.useFallbackRepositories").value("false");
-        
+
         if (db == null)
         {
-            JndiContext.createJndiContext();
+            // JndiContext.createJndiContext();
 
             // If needed, create an HSQLDB server.
             String dbName = System.getenv("DB");
@@ -130,7 +184,7 @@ public class JqmBaseTest
             }
 
             // In all cases load the datasource. (the helper itself will load the property file if any).
-            db = Helpers.getDb();
+            db = DbManager.getDb();
         }
     }
 
@@ -140,14 +194,10 @@ public class JqmBaseTest
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test " + testName.getMethodName());
 
-        try
-        {
-            ((JndiContext) NamingManager.getInitialContext(null)).resetSingletons();
-        }
-        catch (NamingException e)
-        {
-            jqmlogger.warn("Could not purge test JNDI context", e);
-        }
+        /*
+         * try { ((JndiContext) NamingManager.getInitialContext(null)).resetSingletons(); } catch (NamingException e) {
+         * jqmlogger.warn("Could not purge test JNDI context", e); }
+         */
         JqmClientFactory.resetClient(null);
         cnx = getNewDbSession();
         TestHelpers.cleanup(cnx);

@@ -11,14 +11,21 @@ public final class CommonService
 
     static void setLogFileName(String name)
     {
-        Appender a = Logger.getRootLogger().getAppender("rollingfile");
-        if (a == null)
+        try
         {
-            return;
+            Appender a = Logger.getRootLogger().getAppender("rollingfile");
+            if (a == null)
+            {
+                return;
+            }
+            RollingFileAppender r = (RollingFileAppender) a;
+            r.setFile("./logs/jqm-" + name + ".log");
+            r.activateOptions();
         }
-        RollingFileAppender r = (RollingFileAppender) a;
-        r.setFile("./logs/jqm-" + name + ".log");
-        r.activateOptions();
+        catch (Error e) // oops - temp while we sort OSGi logging
+        {
+            jqmlogger.warn("Log file could not be set", e);
+        }
     }
 
     public static void setLogLevel(String level)
@@ -29,7 +36,7 @@ public final class CommonService
             Logger.getLogger("com.enioka").setLevel(Level.toLevel(level));
             jqmlogger.info("Setting general log level at " + level + " which translates as log4j level " + Level.toLevel(level));
         }
-        catch (Exception e)
+        catch (Error e)
         {
             jqmlogger.warn("Log level could not be set", e);
         }

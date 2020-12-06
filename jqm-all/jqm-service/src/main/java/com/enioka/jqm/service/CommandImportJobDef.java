@@ -9,7 +9,7 @@ import com.beust.jcommander.Parameters;
 import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
-import com.enioka.jqm.tools.XmlJobDefParser;
+import com.enioka.jqm.xml.XmlJobDefParser;
 
 import org.apache.commons.io.FileUtils;
 

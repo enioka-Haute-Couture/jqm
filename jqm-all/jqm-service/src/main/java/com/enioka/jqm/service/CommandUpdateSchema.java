@@ -7,6 +7,7 @@ import com.enioka.admin.MetaService;
 import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.DbManager;
 
 @Parameters(commandNames = "Update-Schema", commandDescription = "Updates the database schema.")
 class CommandUpdateSchema extends CommandBase
@@ -20,7 +21,7 @@ class CommandUpdateSchema extends CommandBase
             Properties p = Db.loadProperties();
             p.setProperty("com.enioka.jqm.jdbc.allowSchemaUpdate", "true");
             Db db = new Db(p);
-            Helpers.setDb(db);
+            DbManager.setDb(db);
         }
 
         try (DbConn cnx = Helpers.getNewDbSession())

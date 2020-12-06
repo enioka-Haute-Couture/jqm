@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.engine;
+package com.enioka.jqm.jndi;
 
 // Thanks Apache Tomcat!
 

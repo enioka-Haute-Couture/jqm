@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.enioka.jqm.tools;
+package com.enioka.jqm.xml;
 
 import java.io.File;
 import java.sql.ResultSet;

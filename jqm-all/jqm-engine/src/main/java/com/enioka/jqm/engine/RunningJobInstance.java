@@ -17,7 +17,9 @@ import com.enioka.jqm.runner.api.JobRunnerCallback;
 import com.enioka.jqm.api.JobRunnerException;
 import com.enioka.jqm.api.client.core.JqmClientFactory;
 import com.enioka.jqm.api.client.core.SimpleApiSecurity;
+import com.enioka.jqm.cl.ExtClassLoader;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.History;
@@ -228,18 +230,12 @@ public class RunningJobInstance implements Runnable, JobRunnerCallback
             this.manager.signalEndOfRun(this);
         }
 
+        // TODO: remove this fully.
         // Send e-mail before releasing the slot - it may be long
-        if (ji.getEmail() != null)
-        {
-            try
-            {
-                Helpers.sendEndMessage(ji);
-            }
-            catch (Exception e)
-            {
-                jqmlogger.warn("An e-mail could not be sent. No impact on the engine.", e);
-            }
-        }
+        /*
+         * if (ji.getEmail() != null) { try { Helpers.sendEndMessage(ji); } catch (Exception e) {
+         * jqmlogger.warn("An e-mail could not be sent. No impact on the engine.", e); } }
+         */
 
         // Clean temp dir (if it exists)
         File tmpDir = new File(FilenameUtils.concat(this.ji.getNode().getTmpDirectory(), "" + this.ji.getId()));
@@ -360,7 +356,7 @@ public class RunningJobInstance implements Runnable, JobRunnerCallback
     public void killThroughClientApi()
     {
         Properties props = new Properties();
-        props.put("com.enioka.jqm.jdbc.contextobject", Helpers.getDb());
+        props.put("com.enioka.jqm.jdbc.contextobject", DbManager.getDb());
         JqmClientFactory.getClient("uncached", props, false).killJob(this.ji.getId());
     }
 
@@ -398,16 +394,7 @@ public class RunningJobInstance implements Runnable, JobRunnerCallback
     @Override
     public ClassLoader getExtensionClassloader()
     {
-        ClassLoader extLoader = null;
-        try
-        {
-            extLoader = ((JndiContext) NamingManager.getInitialContext(null)).getExtCl();
-        }
-        catch (NamingException e)
-        {
-            jqmlogger.warn("could not find ext directory class loader. Il will not be used", e);
-        }
-        return extLoader;
+        return ExtClassLoader.instance;
     }
 
     @Override

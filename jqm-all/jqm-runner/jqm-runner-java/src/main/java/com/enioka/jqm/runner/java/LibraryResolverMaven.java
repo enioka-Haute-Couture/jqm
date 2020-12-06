@@ -70,8 +70,11 @@ class LibraryResolverMaven
             MAVEN_SETTINGS_FILE = mavenSettingsFilePath;
         }
 
-        // Resolver
+        // Resolver. Sadly Shrinkwrap uses CL hacks and we must take them into account here.
+        ClassLoader currentCl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(LibraryResolverMaven.class.getClassLoader());
         ConfigurableMavenResolverSystem resolver = Maven.configureResolver();
+        Thread.currentThread().setContextClassLoader(currentCl);
 
         // settings.xml?
         if (MAVEN_SETTINGS_CL != null && MAVEN_SETTINGS_FILE == null)

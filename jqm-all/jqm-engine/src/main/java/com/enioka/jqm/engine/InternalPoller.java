@@ -135,7 +135,8 @@ public class InternalPoller implements Runnable
                 {
                     try
                     {
-                        ((JndiContext) NamingManager.getInitialContext(null)).resetSingletons();
+                        // TODO: actually use a signal instead.
+                        // ((JndiContext) NamingManager.getInitialContext(null)).resetSingletons();
                         lastJndiPurge = bflkpm;
                     }
                     catch (Exception e)

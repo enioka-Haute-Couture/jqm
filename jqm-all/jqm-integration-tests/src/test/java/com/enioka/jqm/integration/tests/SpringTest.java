@@ -11,8 +11,8 @@ import org.junit.Test;
 import com.enioka.jqm.api.client.core.JobRequest;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
-import com.enioka.jqm.tools.JqmXmlException;
-import com.enioka.jqm.tools.XmlJobDefParser;
+import com.enioka.jqm.xml.JqmXmlException;
+import com.enioka.jqm.xml.XmlJobDefParser;
 
 public class SpringTest extends JqmBaseTest
 {

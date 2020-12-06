@@ -64,6 +64,7 @@ import com.enioka.jqm.api.client.core.Query.SortSpec;
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.NonUniqueResultException;
 import com.enioka.jqm.jdbc.QueryResult;
@@ -103,6 +104,10 @@ public final class JdbcClient implements JqmClient
         {
             jqmlogger.trace("database context present in properties");
             db = (Db) p.get("com.enioka.jqm.jdbc.contextobject");
+        }
+        else
+        {
+            db = DbManager.getDb();
         }
     }
 
@@ -1468,7 +1473,8 @@ public final class JdbcClient implements JqmClient
             List<com.enioka.jqm.api.client.core.Deliverable> res = new ArrayList<>();
             for (Deliverable d : deliverables)
             {
-                res.add(new com.enioka.jqm.api.client.core.Deliverable(d.getFilePath(), d.getFileFamily(), d.getId(), d.getOriginalFileName()));
+                res.add(new com.enioka.jqm.api.client.core.Deliverable(d.getFilePath(), d.getFileFamily(), d.getId(),
+                        d.getOriginalFileName()));
             }
 
             return res;

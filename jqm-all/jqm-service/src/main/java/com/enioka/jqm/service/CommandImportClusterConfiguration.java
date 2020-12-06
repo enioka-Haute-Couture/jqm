@@ -4,7 +4,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.tools.XmlConfigurationParser;
+import com.enioka.jqm.xml.XmlConfigurationParser;
 
 @Parameters(commandNames = "Import-ClusterConfiguration", commandDescription = "Import cluster configuration, i.e. everything concerning infrastructure.")
 class CommandImportClusterConfiguration extends CommandBase

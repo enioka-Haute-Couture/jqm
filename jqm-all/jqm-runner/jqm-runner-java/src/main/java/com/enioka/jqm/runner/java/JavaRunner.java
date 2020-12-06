@@ -2,16 +2,20 @@ package com.enioka.jqm.runner.java;
 
 import com.enioka.jqm.api.JobManager;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.runner.api.JobInstanceTracker;
 import com.enioka.jqm.runner.api.JobRunner;
 import com.enioka.jqm.runner.api.JobRunnerCallback;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * Being in Java, JQM can have a special relationship with jobs coded in Java. This runner provides the capacity to run classes with
  * advanced CL handling inside the engine process. It itself has multiple plugins allowing it to load different types of classes.
  */
+@Component(property = { "Plugin-Type=JobRunner", "Runner-Type=java" })
 public class JavaRunner implements JobRunner
 {
     private ClassloaderManager classloaderManager;
@@ -24,9 +28,9 @@ public class JavaRunner implements JobRunner
         }
     }
 
-    public JavaRunner(DbConn cnx)
+    public JavaRunner()
     {
-        classloaderManager = new ClassloaderManager(cnx);
+        classloaderManager = new ClassloaderManager(DbManager.getDb().getConn());
     }
 
     @Override

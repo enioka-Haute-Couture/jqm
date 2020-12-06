@@ -56,8 +56,8 @@ import com.enioka.jqm.model.RPermission;
 import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.RUser;
 import com.enioka.jqm.pki.JdbcCa;
-import com.enioka.jqm.tools.JqmXmlException;
-import com.enioka.jqm.tools.XmlJobDefExporter;
+import com.enioka.jqm.xml.JqmXmlException;
+import com.enioka.jqm.xml.XmlJobDefExporter;
 
 @Path("/admin")
 public class ServiceAdmin

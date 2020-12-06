@@ -2,6 +2,7 @@ package com.enioka.jqm.engine;
 
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.DbManager;
 
 /**
  * <strong>Not part of any API - this an internal JQM class and may change without notice.</strong> <br>
@@ -36,7 +37,7 @@ public class JqmEngineFactory
      */
     public static void setDatasource(Db db)
     {
-        Helpers.setDb(db);
+        DbManager.setDb(db);
     }
 
     /**

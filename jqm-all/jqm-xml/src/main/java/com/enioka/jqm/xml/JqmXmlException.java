@@ -1,4 +1,4 @@
-package com.enioka.jqm.tools;
+package com.enioka.jqm.xml;
 
 public class JqmXmlException extends RuntimeException
 {

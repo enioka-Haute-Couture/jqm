@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.osgi.framework.BundleContext;
@@ -128,7 +129,8 @@ public class Db
         }
         else
         {
-            // Standard case: fetch a DataSource from JNDI.
+            // Standard case: fetch a DataSource from our XML file, then JNDI.
+            // (in that order: JNDI depends on the database in out implementation... could be embarassing to do otherwise)
             String dsName = p.getProperty("com.enioka.jqm.jdbc.datasource", "jdbc/jqm");
             int retryCount = Integer.parseInt(p.getProperty("com.enioka.jqm.jdbc.initialRetries", "10"));
             int waitMs = Integer.parseInt(p.getProperty("com.enioka.jqm.jdbc.initialRetryWaitMs", "10000"));
@@ -168,6 +170,17 @@ public class Db
     {
         int retries = 0;
         DataSource res = null;
+
+        // Fom XML file
+        try
+        {
+            res = BootstrapDatasourceLoader.getDatasourceFromXml(dsName);
+        }
+        catch (NamingException e)
+        {
+            return null;
+        }
+
         while (res == null)
         {
             try
@@ -226,7 +239,7 @@ public class Db
      *
      * @return a Properties object, which may be empty but not null.
      */
-    public static Properties loadProperties(String[] filesToLoad)
+    private static Properties loadProperties(String[] filesToLoad)
     {
         Properties p = new Properties();
 
@@ -448,7 +461,7 @@ public class Db
 
                 for (ServiceReference<?> ref : loader.references)
                 {
-                    DbAdapter newAdapter = (DbAdapter)context.getService(ref);
+                    DbAdapter newAdapter = (DbAdapter) context.getService(ref);
                     if (newAdapter.compatibleWith(meta))
                     {
                         adapter = newAdapter;

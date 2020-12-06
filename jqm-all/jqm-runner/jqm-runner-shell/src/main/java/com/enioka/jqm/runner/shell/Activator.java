@@ -21,7 +21,7 @@ public class Activator implements BundleActivator
         Dictionary<String, String> properties = new Hashtable<String, String>();
         properties.put("Plugin-Type", "JobRunner");
         properties.put("Runner-Type", "shell");
-        registration = context.registerService(JobRunner.class, new ShellRunner(Helpers.getNewDbSession()), properties);
+        registration = context.registerService(JobRunner.class, new ShellRunner(), properties);
     }
 
     public void stop(BundleContext context) throws Exception

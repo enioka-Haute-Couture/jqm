@@ -4,7 +4,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.tools.XmlQueueExporter;
+import com.enioka.jqm.xml.XmlQueueExporter;
 
 @Parameters(commandNames = "Export-Queue", commandDescription = "Export all queue definitions inside central configuration as a single file.")
 class CommandExportQueue extends CommandBase

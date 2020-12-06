@@ -35,7 +35,6 @@ import org.junit.Test;
 import com.enioka.jqm.api.client.core.JobRequest;
 import com.enioka.jqm.api.client.core.Query;
 import com.enioka.jqm.api.client.core.State;
-import com.enioka.jqm.engine.JndiContext;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -215,7 +214,7 @@ public class JndiTest extends JqmBaseTest
         Assert.assertEquals(1, nb);
 
         // Clean the pool forcefully so as not to impact other tests
-        JndiContext.createJndiContext().resetSingletons();
+        // JndiContext.createJndiContext().resetSingletons();
     }
 
     @Test

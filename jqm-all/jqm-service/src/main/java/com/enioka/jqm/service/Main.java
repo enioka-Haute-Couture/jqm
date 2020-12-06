@@ -19,7 +19,6 @@
 package com.enioka.jqm.service;
 
 import com.beust.jcommander.JCommander;
-import com.enioka.jqm.engine.Helpers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,11 +113,9 @@ public class Main
         if (command.settingsFile != null)
         {
             jqmlogger.info("Using alternative settings file {}", command.settingsFile);
-            Helpers.resourceFile = command.settingsFile;
+            // TODO: use config service instead.
+            // Helpers.resourceFile = command.settingsFile;
         }
-
-        // Connection
-        Helpers.registerJndiIfNeeded();
 
         // Go.
         return command.doWork();

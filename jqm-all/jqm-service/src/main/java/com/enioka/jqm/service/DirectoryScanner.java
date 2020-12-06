@@ -13,7 +13,7 @@ import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.engine.JqmInitError;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Node;
-import com.enioka.jqm.tools.XmlJobDefParser;
+import com.enioka.jqm.xml.XmlJobDefParser;
 
 /**
  * A mode of deployment where a directory is scanned for job definitions. <br>

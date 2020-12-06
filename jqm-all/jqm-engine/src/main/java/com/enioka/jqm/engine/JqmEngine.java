@@ -119,9 +119,6 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         jqmlogger.info("Java version is " + System.getProperty("java.version") + ". JVM was made by " + System.getProperty("java.vendor")
                 + " as " + System.getProperty("java.vm.name") + " version " + System.getProperty("java.vm.version"));
 
-        // JNDI first - the engine itself uses JNDI to fetch its connections!
-        Helpers.registerJndiIfNeeded();
-
         // Database connection
         DbConn cnx = Helpers.getNewDbSession();
         cnx.logDatabaseInfo(jqmlogger);

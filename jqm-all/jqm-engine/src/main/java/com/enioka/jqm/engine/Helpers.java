@@ -31,22 +31,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.zip.ZipFile;
-
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.naming.spi.NamingManager;
-
-import org.apache.shiro.crypto.SecureRandomNumberGenerator;
-import org.apache.shiro.crypto.hash.Sha512Hash;
-import org.apache.shiro.util.ByteSource;
-import org.apache.shiro.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.api.client.core.JqmClientFactory;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.NonUniqueResultException;
 import com.enioka.jqm.jdbc.QueryResult;
@@ -60,6 +49,13 @@ import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.RUser;
 
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.crypto.hash.Sha512Hash;
+import org.apache.shiro.util.ByteSource;
+import org.apache.shiro.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // TODO: cnx should be first arg.
 
 /**
@@ -71,10 +67,7 @@ public final class Helpers
     private static Logger jqmlogger = LoggerFactory.getLogger(Helpers.class);
 
     // The one and only Database context in the engine.
-    private static Db _db;
-
-    // Resource file contains at least the jqm jdbc connection definition. Static because JNDI root context is common to the whole JVM.
-    public static String resourceFile = "resources.xml";
+    private static Db _db = DbManager.getDb();
 
     private Helpers()
     {
@@ -88,49 +81,12 @@ public final class Helpers
      */
     public static DbConn getNewDbSession()
     {
-        getDb();
         return _db.getConn();
-    }
-
-    public static void setDb(Db db)
-    {
-        _db = db;
-    }
-
-    public static Db getDb()
-    {
-        if (_db == null)
-        {
-            _db = createFactory();
-        }
-        return _db;
     }
 
     public static boolean isDbInitialized()
     {
         return _db != null;
-    }
-
-    private static Db createFactory()
-    {
-        try
-        {
-            // Load optional properties file
-            Properties p = Db.loadProperties();
-
-            // Connect to DB.
-            Db n = new Db(p);
-            p.put("com.enioka.jqm.jdbc.contextobject", n); // Share the DataSource in engine and client.
-            JqmClientFactory.setProperties(p);
-
-            return n;
-        }
-        catch (Exception e)
-        {
-            jqmlogger.error("Unable to connect with the database. Maybe your configuration file is wrong. "
-                    + "Please check the password or the url in the $JQM_DIR/conf/resources.xml", e);
-            throw new JqmInitError("Database connection issue", e);
-        }
     }
 
     public static void closeQuietly(Closeable zf)
@@ -145,18 +101,6 @@ public final class Helpers
             {
                 jqmlogger.warn("could not close closeable item", e);
             }
-        }
-    }
-
-    public static void registerJndiIfNeeded()
-    {
-        try
-        {
-            JndiContext.createJndiContext();
-        }
-        catch (NamingException e)
-        {
-            throw new JqmInitError("Could not register the JNDI provider", e);
         }
     }
 
@@ -519,90 +463,6 @@ public final class Helpers
             jqmlogger.info("JVM parameters are as follow:");
             jqmlogger.info("\tMax usable memory reported by Java runtime, MB: " + (int) (rt.maxMemory() / 1024 / 1024));
             jqmlogger.info("\tJVM arguments are: " + ManagementFactory.getRuntimeMXBean().getInputArguments());
-        }
-    }
-
-    /**
-     * Send a mail message using a JNDI resource.<br>
-     * As JNDI resource providers are inside the EXT class loader, this uses reflection. This method is basically a bonus on top of the
-     * MailSessionFactory offered to payloads, making it accessible also to the engine.
-     *
-     * @param to
-     * @param subject
-     * @param body
-     * @param mailSessionJndiAlias
-     * @throws MessagingException
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    static void sendMessage(String to, String subject, String body, String mailSessionJndiAlias)
-    {
-        jqmlogger.debug("sending mail to " + to + " - subject is " + subject);
-        ClassLoader extLoader = getExtClassLoader();
-        extLoader = extLoader == null ? Helpers.class.getClassLoader() : extLoader;
-        ClassLoader old = Thread.currentThread().getContextClassLoader();
-        Object mailSession = null;
-
-        try
-        {
-            mailSession = InitialContext.doLookup(mailSessionJndiAlias);
-        }
-        catch (NamingException e)
-        {
-            throw new JqmRuntimeException("could not find mail session description", e);
-        }
-
-        try
-        {
-            Thread.currentThread().setContextClassLoader(extLoader);
-            Class transportZ = extLoader.loadClass("javax.mail.Transport");
-            Class sessionZ = extLoader.loadClass("javax.mail.Session");
-            Class mimeMessageZ = extLoader.loadClass("javax.mail.internet.MimeMessage");
-            Class messageZ = extLoader.loadClass("javax.mail.Message");
-            Class recipientTypeZ = extLoader.loadClass("javax.mail.Message$RecipientType");
-            Object msg = mimeMessageZ.getConstructor(sessionZ).newInstance(mailSession);
-
-            mimeMessageZ.getMethod("setRecipients", recipientTypeZ, String.class).invoke(msg, recipientTypeZ.getField("TO").get(null), to);
-            mimeMessageZ.getMethod("setSubject", String.class).invoke(msg, subject);
-            mimeMessageZ.getMethod("setText", String.class).invoke(msg, body);
-
-            transportZ.getMethod("send", messageZ).invoke(null, msg);
-            jqmlogger.trace("Mail was sent");
-        }
-        catch (Exception e)
-        {
-            throw new JqmRuntimeException("an exception occurred during mail sending", e);
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(old);
-        }
-    }
-
-    static void sendEndMessage(JobInstance ji)
-    {
-        try
-        {
-            String message = "The Job number " + ji.getId() + " finished correctly\n\n" + "Job description:\n" + "\n" + "- Parent: "
-                    + ji.getParentId() + "\n" + "- User name: " + ji.getUserName() + "\n" + "- Session ID: " + ji.getSessionID() + "\n"
-                    + "\n" + "Best regards,\n";
-            sendMessage(ji.getEmail(), "[JQM] Job: " + ji.getId() + " ENDED", message, "mail/default");
-        }
-        catch (Exception e)
-        {
-            jqmlogger.warn("Could not send email. Job has nevertheless run correctly", e);
-        }
-    }
-
-    static ClassLoader getExtClassLoader()
-    {
-        try
-        {
-            return ((JndiContext) NamingManager.getInitialContext(null)).getExtCl();
-        }
-        catch (NamingException e)
-        {
-            // Don't do anything - this actually cannot happen. Death to checked exceptions.
-            return null;
         }
     }
 

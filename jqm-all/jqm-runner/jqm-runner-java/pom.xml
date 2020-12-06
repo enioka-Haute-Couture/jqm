@@ -14,6 +14,73 @@
     <url>http://jqm.readthedocs.org</url>
     <description>The Java Job Instance Runner is tasked with running Java classes inside the JQM process</description>
 
+    <build>
+        <plugins>
+            <!-- There are issues with Shrinkwrap resolver in an OSGi environment (use of ServiceRrsolver), so we just bundle it inside the current jar -->
+            <!-- We may want to look at https://docs.osgi.org/specification/osgi.cmpn/7.0.0/service.loader.html instead -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>org.jboss.shrinkwrap.resolver:*</include>
+                                    <include>org.apache.maven*:*</include>
+                                    <include>org.codehaus.plexus</include>
+                                    <include>org.sonatype.plexus</include>
+                                    <include>org.apache.commons:commons-lang3</include>
+                                    <include>javax.xml:*</include>
+                                    <include>com.google.guava:guava</include>
+                                </includes>
+                            </artifactSet>
+                            <filters>
+                                <!--<filter>
+                                    <artifact>${project.groupId}:${project.version}</artifact>
+                                    <includes>
+                                        <include>META-INF/**</include>
+                                    </includes>
+                                </filter>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter> -->
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>biz.aQute.bnd</groupId>
+                <artifactId>bnd-maven-plugin</artifactId>
+                <version>5.1.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>bnd-process</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <bnd><![CDATA[
+Import-Package: \
+ !org.jboss.shrinkwrap.*, !org.codehaus.*, javax.xml.stream, javax.xml.xpath, javax.xml.parsers, * \
+        ]]>
+                    </bnd>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.osgi</groupId>
@@ -21,11 +88,16 @@
             <version>${osgi.core.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi.annotation</artifactId>
             <version>${osgi.annotation.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.component.annotations</artifactId>
+            <version>1.4.0</version>
             <scope>provided</scope>
         </dependency>
 
