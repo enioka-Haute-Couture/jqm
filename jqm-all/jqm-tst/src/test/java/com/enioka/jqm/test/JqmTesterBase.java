@@ -18,6 +18,10 @@ public class JqmTesterBase
     public Option[] config()
     {
         return options(
+            mavenBundle("org.osgi", "org.osgi.service.cm", "1.6.0"),
+            mavenBundle("org.apache.felix", "org.apache.felix.scr", "2.1.24"),
+            mavenBundle("org.osgi", "org.osgi.util.promise", "1.1.1"),
+            mavenBundle("org.osgi", "org.osgi.util.function", "1.1.0"),
             wrappedBundle(mavenBundle("org.hsqldb", "hsqldb", "2.3.4")),
             wrappedBundle(mavenBundle("commons-io", "commons-io", "2.6")),
             wrappedBundle(mavenBundle("commons-lang", "commons-lang", "2.6")),
@@ -27,10 +31,10 @@ public class JqmTesterBase
             wrappedBundle(mavenBundle("org.apache.shiro", "shiro-core", "1.3.2")),
             wrappedBundle(mavenBundle("org.apache.shiro", "shiro-web", "1.3.2")),
             wrappedBundle(mavenBundle("org.jboss.shrinkwrap.resolver", "shrinkwrap-resolver-api", "3.1.3")),
+            wrappedBundle(mavenBundle("org.jboss.shrinkwrap.resolver", "shrinkwrap-resolver-spi", "3.1.3")),
             wrappedBundle(mavenBundle("org.jboss.shrinkwrap.resolver", "shrinkwrap-resolver-api-maven", "3.1.3")),
             wrappedBundle(mavenBundle("org.jboss.shrinkwrap.resolver", "shrinkwrap-resolver-impl-maven", "3.1.3")),
             wrappedBundle(mavenBundle("org.jvnet.winp", "winp", "1.27")),
-            mavenBundle("org.osgi", "org.osgi.service.cm", "1.6.0"),
             wrappedBundle(mavenBundle("commons-codec", "commons-codec", "1.15")),
             wrappedBundle(mavenBundle("org.apache.httpcomponents", "httpcore", "4.4.11")),
             mavenBundle("org.apache.httpcomponents", "httpcore-osgi", "4.4.11"),
@@ -54,6 +58,7 @@ public class JqmTesterBase
             mavenBundle("com.enioka.jqm", "jqm-runner-basic", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-runner-java", "3.0.0-SNAPSHOT"),
             mavenBundle("com.enioka.jqm", "jqm-runner-shell", "3.0.0-SNAPSHOT"),
+            mavenBundle("com.enioka.jqm", "jqm-jndi-context", "3.0.0-SNAPSHOT"),
             junitBundles()
             );
     }
