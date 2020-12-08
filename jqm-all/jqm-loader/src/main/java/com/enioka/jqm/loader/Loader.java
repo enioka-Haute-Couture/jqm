@@ -3,7 +3,6 @@ package com.enioka.jqm.loader;
 import java.util.ArrayList;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
@@ -27,6 +26,7 @@ public class Loader<TYPE> implements ServiceListener
     {
         try
         {
+            context.addServiceListener(this);
             ServiceReference<?>[] tmp = context.getAllServiceReferences(type.getName(), filter);
 
             if (tmp == null)
