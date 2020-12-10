@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from "react";
 import {
     Container,
-    createStyles,
     Grid,
     IconButton,
     Switch,
-    Theme,
     Tooltip,
 } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import APIService from "../../utils/APIService";
 import MUIDataTable from "mui-datatables";
-import makeStyles from "@material-ui/core/styles/makeStyles";
 import DoneIcon from "@material-ui/icons/Done";
 import BlockIcon from "@material-ui/icons/Block";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -24,25 +21,13 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import { useSnackbar } from "notistack";
 import TextField from "@material-ui/core/TextField/TextField";
 import { Queue } from "./Queue";
-import Modal from "@material-ui/core/Modal";
 import { CreateQueueModal } from "./CreateQueueModal";
-
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        fab: {
-            position: "absolute",
-            bottom: theme.spacing(2),
-            right: theme.spacing(2),
-        },
-    })
-);
 
 const QueuesPage: React.FC = () => {
     const { enqueueSnackbar } = useSnackbar();
     const [queues, setQueues] = useState<any[] | null>();
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const [editingLineValues, setEditingLineValues] = useState<any | null>(null);
-    const classes = useStyles();
     const [showModal, setShowModal] = useState(false);
 
 
@@ -70,29 +55,28 @@ const QueuesPage: React.FC = () => {
             });
     };
 
-    const handleCreate = (newQueue: Queue) => {
-        if (newQueue) {
-            APIService.post("/q", newQueue)
-                .then(() => {
-                    fetchQueues();
-                    enqueueSnackbar(
-                        `Successfully created queue: ${newQueue.name}`,
-                        {
-                            variant: "success",
-                        }
-                    );
-                })
-                .catch((reason) => {
-                    console.log(reason);
-                    enqueueSnackbar(
-                        "An error occured, please contact support support@enioka.com for help.",
-                        {
-                            variant: "error",
-                            persist: true,
-                        }
-                    );
-                });
-        }
+    const createQueue = (newQueue: Queue) => {
+        APIService.post("/q", newQueue)
+            .then(() => {
+                setShowModal(false);
+                fetchQueues();
+                enqueueSnackbar(
+                    `Successfully created queue: ${newQueue.name}`,
+                    {
+                        variant: "success",
+                    }
+                );
+            })
+            .catch((reason) => {
+                console.log(reason);
+                enqueueSnackbar(
+                    "An error occured, please contact support support@enioka.com for help.",
+                    {
+                        variant: "error",
+                        persist: true,
+                    }
+                );
+            });
     };
 
     const deleteQueues = async (queueIds: any[]) => {
@@ -123,7 +107,7 @@ const QueuesPage: React.FC = () => {
     /*
     * Render cell containing boolean value
     */
-    const renderBooleanCell = (value: any, tableMeta: any, updateValue: any) => {
+    const renderBooleanCell = (value: any, tableMeta: any) => {
         if (editingRowId === tableMeta.rowIndex) {
             return <Switch
                 checked={editingLineValues[tableMeta.columnIndex]}
@@ -141,7 +125,7 @@ const QueuesPage: React.FC = () => {
     /**
     * Render cell with action buttons
     */
-    const renderActionsCell = (value: any, tableMeta: any, updateValue: any) => {
+    const renderActionsCell = (value: any, tableMeta: any) => {
         if (editingRowId === tableMeta.rowIndex) {
             return (<>
                 <Tooltip title={"Save changes"}>
@@ -186,7 +170,7 @@ const QueuesPage: React.FC = () => {
     * Render cell containing string value
     * TODO: make cell size rigid
     */
-    const renderStringCell = (value: any, tableMeta: any, updateValue: any) => {
+    const renderStringCell = (value: any, tableMeta: any) => {
         if (editingRowId === tableMeta.rowIndex) {
             return (
                 <TextField
@@ -211,11 +195,11 @@ const QueuesPage: React.FC = () => {
     };
 
     const saveQueue = () => {
-        const request = {
-            "id": editingLineValues[0],
-            "name": editingLineValues[1],
-            "description": editingLineValues[2],
-            "defaultQueue": editingLineValues[3],
+        const request: Queue = {
+            id: editingLineValues[0],
+            name: editingLineValues[1],
+            description: editingLineValues[2],
+            defaultQueue: editingLineValues[3],
         }
         APIService.put("/q/" + request["id"], request)
             .then(() => {
@@ -294,11 +278,13 @@ const QueuesPage: React.FC = () => {
                             onClick={() => setShowModal(true)}
                         >
                             <AddCircleIcon />
-                            <CreateQueueModal
-                                showModal={showModal}
-                                setShowModal={setShowModal}
-                                onCreate={handleCreate}
-                            />
+                            {showModal &&
+                                <CreateQueueModal
+                                    showModal={showModal}
+                                    closeModal={() => setShowModal(false)}
+                                    createQueue={createQueue}
+                                />
+                            }
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={"Refresh"}>
