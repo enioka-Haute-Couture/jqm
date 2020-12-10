@@ -20,12 +20,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-loader</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
             <version>${shiro.version}</version>

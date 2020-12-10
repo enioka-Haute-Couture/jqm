@@ -56,8 +56,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +68,6 @@ import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.NonUniqueResultException;
 import com.enioka.jqm.jdbc.QueryResult;
-import com.enioka.jqm.loader.Loader;
 import com.enioka.jqm.model.Deliverable;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.History;
@@ -110,22 +107,7 @@ public final class JdbcClient implements JqmClient
         }
         else
         {
-            try
-            {
-                BundleContext context = org.osgi.framework.FrameworkUtil.getBundle(getClass()).getBundleContext();
-                Loader<DbManager> loader = new Loader<DbManager>(context, DbManager.class, null);
-                loader.start();
-
-                for (ServiceReference<?> ref : loader.references)
-                {
-                    DbManager manager = null;
-                    db = manager.getDb();
-                }
-            }
-            catch (Exception e)
-            {
-                throw new DatabaseException("Issue when loading the DbManager");
-            }
+            db = DbManager.getDb();
         }
     }
 
