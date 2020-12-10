@@ -107,7 +107,21 @@ public final class JdbcClient implements JqmClient
         }
         else
         {
-            db = DbManager.getDb();
+            try
+            {
+                db = DbManager.getDb();
+            }
+            catch (NoClassDefFoundError e)
+            {
+                if (e.getMessage().contains("org/osgi"))
+                {
+                    jqmlogger.info("Non-OSGi environment !");
+                }
+                else
+                {
+                    throw e;
+                }
+            }
         }
     }
 
