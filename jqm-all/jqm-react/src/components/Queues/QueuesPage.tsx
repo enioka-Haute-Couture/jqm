@@ -15,7 +15,7 @@ import SaveIcon from "@material-ui/icons/Save";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { useSnackbar } from 'notistack';
 import TextField from '@material-ui/core/TextField/TextField';
-import {QueueType} from "./QueueType";
+import {Queue} from "./Queue";
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -34,17 +34,24 @@ const QueuesPage: React.FC = () => {
     const [editingCellRowId, setEditingCellRowId] = useState<number | null>(null);
     const classes = useStyles();
 
-    const handleCreate = (value: String, newQueue: QueueType) => {
+    const handleCreate = (value: String, newQueue: Queue) => {
         console.info(newQueue)
         if(queues && value && newQueue){
             APIService.post("/q", newQueue)
             .then(() => {
                 // todo, modal or something to insert data
                 fetchQueues();
-                enqueueSnackbar("Queue successfully created queue: " + newQueue.name + "" + " - party time!", {
+                enqueueSnackbar(`Successfully created queue: ${newQueue.name}`, {
                     variant: 'success',
                 });
             })
+            .catch((reason) =>{
+                console.log(reason);
+                enqueueSnackbar("An error occured, please contact support support@enioka.com for help.", {
+                    variant: 'error',
+                    persist: true
+                });
+            });
         }
     }
 
@@ -53,62 +60,52 @@ const QueuesPage: React.FC = () => {
             .then((response) => { setQueues(response) })
             .catch((reason) => {
                 console.log(reason);
-                enqueueSnackbar("An error occured, please contact support after-party@enioka.com for help.", {
+                enqueueSnackbar("An error occured, please contact support support@enioka.com for help.", {
                     variant: 'error',
+                    persist: true
                 })
             })}
 
     // edit action
     // const handleEdit = (value: String, {rowData}: {rowData: any[]} ) => {
     const handleEdit = (dataIndex: any) => {
-        console.log("edit party");
-        console.log(columns[dataIndex]);
         // const updatedQueueObj = getIT HERE
         // APIService.put("/q/" + value, updatedQueueObj)
         // .then(() => {
         //     const updatedQueues = queues.map(q => q.id === value ? updatedQueueObj : q);
         //     setQueues(updatedQueues)
-        //     enqueueSnackbar("Queue successfully edited queue: " + rowData ? rowData[0] : "" + " - party time!", {
+        //     enqueueSnackbar("Successfully edited queue: " + rowData ? rowData[0] : "" + " - party time!", {
         //         variant: 'success',
         //     });
         // })
         // .catch((reason) => {
         //     console.log(reason);
-        //     enqueueSnackbar("An error occured, please contact support after-party@enioka.com for help.", {
+        //     enqueueSnackbar("An error occured, please contact support support@enioka.com for help.", {
         //         variant: 'error',
         //     })
         // })
     }
 
-    // // delete action
-    // const deleteQueue = async (queueId: String, {rowData}: { rowData: any[]} ) => {
-    //     await deleteQueues([queueId])
-    // }
-
     const deleteQueues = async (queueIds : any[]) => {
-        const lookup = new Set();
-        const deletePromises = queueIds.map(id => {
-            lookup.add(id);
-            return APIService.delete("/q/" + id);
-        });
-        const newQueues = queues?.filter(q => !lookup.has(q.id));
-        await Promise.all(deletePromises).then(() => {
-            setQueues(newQueues)
-            enqueueSnackbar("Queue successfully deleted queue" + (queueIds.length > 1 ? "s" : ""), {
+        await Promise.all(
+            queueIds.map(id => APIService.delete("/q/" + id))
+        ).then(() => {
+            fetchQueues();
+            enqueueSnackbar(`Successfully deleted queue${queueIds.length > 1 ? "s" : ""}`, {
                 variant: 'success',
             });
         })
         .catch((reason) => {
             console.log(reason);
-            enqueueSnackbar("An error occured, please contact support after-party@enioka.com for help.", {
+            enqueueSnackbar("An error occured, please contact support support@enioka.com for help.", {
                 variant: 'error',
+                persist: true
             });
         });
     }
 
     useEffect(() => {
         fetchQueues();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     /*
@@ -162,7 +159,7 @@ const QueuesPage: React.FC = () => {
                     <IconButton
                         color="default"
                         aria-label={"delete"}
-                        onClick={async () => await deleteQueues([value])}
+                        onClick={() => deleteQueues([value])}
                     >
                         <DeleteIcon />
                     </IconButton>
@@ -273,15 +270,13 @@ const QueuesPage: React.FC = () => {
                 </>
             )
         },
-        onRowsDelete: async ({data} : {data: any[]}) => {
+        onRowsDelete: ({data} : {data: any[]}) => {
             // delete all rows by index
-            console.info(data);
             const queueIds = data.map(({index}) => {
                 const queue = queues ? queues[index] : null;
                 return queue ? queue.id : null;
             });
-            console.info(queueIds);
-            await deleteQueues(queueIds);
+            deleteQueues(queueIds);
         },
         //filterType: 'checkbox',
     };

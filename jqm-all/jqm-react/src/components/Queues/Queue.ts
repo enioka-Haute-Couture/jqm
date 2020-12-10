@@ -1,4 +1,4 @@
-export interface QueueType
+export interface Queue
 {
     id?: Number;
     name: String;
