@@ -3,6 +3,7 @@ package com.enioka.jqm.jdbc;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLNonTransientConnectionException;
 import java.util.List;
 
 public class DbImplPg extends DbAdapter
@@ -43,5 +44,24 @@ public class DbImplPg extends DbAdapter
         prms.add(pageSize);
         prms.add(start);
         return sql;
+    }
+
+    @Override
+    public boolean testDbUnreachable(Exception e)
+    {
+        if (e instanceof SQLNonTransientConnectionException || e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
+        {
+            return true;
+        }
+        if (e instanceof SQLException
+            && (e.getMessage().equals("Failed to validate a newly established connection.")
+            || e.getMessage().contains("FATAL: terminating connection due to administrator command")
+            || e.getMessage().contains("This connection has been closed")
+            || e.getMessage().contains("Communications link failure")
+            || e.getMessage().contains("Connection is closed")))
+        {
+            return true;
+        }
+        return false;
     }
 }

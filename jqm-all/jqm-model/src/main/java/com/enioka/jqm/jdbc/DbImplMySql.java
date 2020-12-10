@@ -1,7 +1,5 @@
 package com.enioka.jqm.jdbc;
 
-import java.io.Console;
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -188,12 +186,28 @@ public class DbImplMySql extends DbAdapter
     @Override
     public boolean testDbUnreachable(Exception e)
     {
-        // MySQL error : CommunicationsException : Communications link failure
         if (e.getClass().getSimpleName().equals("CommunicationsException")
             || e.getClass().getSimpleName().equals("MySQLQueryInterruptedException"))
         {
             return true;
         }
+        if (e instanceof SQLException
+            && (e.getMessage().equals("Failed to validate a newly established connection.")
+            ||  e.getMessage().contains("FATAL: terminating connection due to administrator command")
+            ||  e.getMessage().contains("This connection has been closed")
+            || e.getMessage().contains("Communications link failure")
+            || e.getMessage().contains("Connection is closed")))
+        {
+            return true;
+        }
+        if (e.getCause() != null
+            && (e.getCause().getMessage().equals("This connection has been closed.")
+            || e.getCause().getMessage().contains("Communications link failure")
+            || e.getCause().getMessage().contains("Connection is closed")))
+        {
+            return true;
+        }
+
         return false;
     }
 }

@@ -146,4 +146,15 @@ public class DbImplDb2 extends DbAdapter
 
         return sql;
     }
+
+    @Override
+    public boolean testDbUnreachable(Exception e)
+    {
+        if (e.getCause() != null && e.getCause() instanceof SQLNonTransientException
+            && e.getCause().getMessage().equals("connection exception: closed"))
+        {
+            return true;
+        }
+        return false;
+    }
 }
