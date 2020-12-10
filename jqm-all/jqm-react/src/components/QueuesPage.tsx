@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Container, createStyles, Grid, IconButton, Switch, Theme, Tooltip } from '@material-ui/core';
+import { Container, Grid, IconButton, Switch, Tooltip } from '@material-ui/core';
 import CircularProgress from "@material-ui/core/CircularProgress";
 import APIService from '../utils/APIService';
 import MUIDataTable from "mui-datatables";
-import makeStyles from '@material-ui/core/styles/makeStyles';
 import DoneIcon from "@material-ui/icons/Done";
 import BlockIcon from "@material-ui/icons/Block";
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -17,27 +16,21 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import { useSnackbar } from 'notistack';
 import TextField from '@material-ui/core/TextField/TextField';
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        fab: {
-            position: 'absolute',
-            bottom: theme.spacing(2),
-            right: theme.spacing(2),
-        },
-    })
-);
 
 const QueuesPage: React.FC = () => {
     const { enqueueSnackbar } = useSnackbar();
     const [queues, setQueues] = useState<any[] | null>();
-    const [editingCellRowId, setEditingCellRowId] = useState<number | null>(null);
-    const classes = useStyles();
+    const [editingRowId, setEditingRowId] = useState<number | null>(null);
+    const [editingLineValues, setEditingLineValues] = useState<any | null>(null);
 
     const fetchQueues = () => {
         APIService.get("/q")
-            .then((response) => { setQueues(response) })
+            .then((response) => {
+                setQueues(response);
+                setEditingRowId(null);
+                setEditingLineValues(null);
+            })
             .catch((reason) => {
-                console.log(reason);
                 enqueueSnackbar("An error occured, please contact support for help.", {
                     variant: 'error',
                     persist: true
@@ -55,11 +48,14 @@ const QueuesPage: React.FC = () => {
     * Render cell containing boolean value
     */
     const renderBooleanCell = (value: any, tableMeta: any, updateValue: any) => {
-        if (editingCellRowId === tableMeta.rowIndex) {
+        if (editingRowId === tableMeta.rowIndex) {
             return <Switch
-            //checked={state.checkedA}
-            //onChange={handleChange}
-            //name="checkedA"
+                checked={editingLineValues[tableMeta.columnIndex]}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    let values = [...editingLineValues];
+                    values[tableMeta.columnIndex] = event.target.checked;
+                    setEditingLineValues(values);
+                }}
             />
         } else {
             return value ? <DoneIcon /> : <BlockIcon />;
@@ -70,18 +66,19 @@ const QueuesPage: React.FC = () => {
     * Render cell with action buttons
     */
     const renderActionsCell = (value: any, tableMeta: any, updateValue: any) => {
-        if (editingCellRowId === tableMeta.rowIndex) {
+        if (editingRowId === tableMeta.rowIndex) {
             return (<>
                 <Tooltip title={"Save changes"}>
                     <IconButton color="default" aria-label={"save"} onClick={() => {
-                        setEditingCellRowId(null);
+                        saveQueue();
                     }}>
                         <SaveIcon />
                     </IconButton>
                 </ Tooltip>
                 <Tooltip title={"Cancel changes"}>
                     <IconButton color="default" aria-label={"cancel"} onClick={() => {
-                        setEditingCellRowId(null);
+                        setEditingRowId(null);
+                        setEditingLineValues(null);
                     }}>
                         <CancelIcon />
                     </IconButton>
@@ -91,8 +88,8 @@ const QueuesPage: React.FC = () => {
             return (<>
                 <Tooltip title={"Edit line"}>
                     <IconButton color="default" aria-label={"edit"} onClick={() => {
-                        setEditingCellRowId(tableMeta.rowIndex)
-                        //
+                        setEditingRowId(tableMeta.rowIndex)
+                        setEditingLineValues(tableMeta.rowData)
                     }}>
                         <CreateIcon />
                     </IconButton>
@@ -111,17 +108,19 @@ const QueuesPage: React.FC = () => {
 
     /*
     * Render cell containing string value
+    * TODO: make cell size rigid
     */
     const renderStringCell = (value: any, tableMeta: any, updateValue: any) => {
-        if (editingCellRowId === tableMeta.rowIndex) {
+        if (editingRowId === tableMeta.rowIndex) {
             return (
                 <TextField
-                    //className={this.props.classes.editedCell}
-                    defaultValue={value}
-                    //onKeyDown={this.cellInputHandleKeyDown}
-                    //onChange={this.cellInputOnChange(this.props.columns[tableMeta.columnIndex].type)}
+                    value={editingLineValues[tableMeta.columnIndex]}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        let values = [...editingLineValues];
+                        values[tableMeta.columnIndex] = event.target.value;
+                        setEditingLineValues(values);
+                    }}
                     fullWidth={true}
-                    //error={this.state.editedValueError}
                     inputProps={{
                         style: {
                             //textAlign: "center",
@@ -135,8 +134,40 @@ const QueuesPage: React.FC = () => {
         }
     };
 
+    const saveQueue = () => {
+        const request = {
+            "id": editingLineValues[0],
+            "name": editingLineValues[1],
+            "description": editingLineValues[2],
+            "defaultQueue": editingLineValues[3],
+        }
+        APIService.put("/q/" + request["id"], request)
+            .then(() => {
+                fetchQueues();
+                enqueueSnackbar("Successfully saved queue", {
+                    variant: 'success',
+                });
+
+            })
+            .catch((reason) => {
+                console.log(reason);
+                enqueueSnackbar("An error occured, please contact support for help.", {
+                    variant: 'error',
+                    persist: true
+                })
+            })
+    }
+
+
 
     const columns = [
+        {
+            name: "id",
+            label: "id",
+            options: {
+                display: "excluded"
+            }
+        },
         {
             name: "name",
             label: "Name",
@@ -152,7 +183,7 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell
+                customBodyRender: renderStringCell // TODO: renderTextCell for longer content?
             }
         },
         {

@@ -33,3 +33,6 @@ Change the proxy port in package.json for requests to be properly redirected.
 * declare theme
 * 2 or 4 tab spaces
 * https://webpack.js.org/guides/hot-module-replacement/
+* Use absolute import only
+* usememo for rendererer in queuespage
+* renable strict mode ?
