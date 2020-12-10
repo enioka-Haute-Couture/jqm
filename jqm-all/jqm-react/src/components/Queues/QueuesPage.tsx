@@ -27,9 +27,10 @@ const QueuesPage: React.FC = () => {
     const { enqueueSnackbar } = useSnackbar();
     const [queues, setQueues] = useState<any[] | null>();
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
-    const [editingLineValues, setEditingLineValues] = useState<any | null>(null);
+    const [editingLineValues, setEditingLineValues] = useState<any | null>(
+        null
+    );
     const [showModal, setShowModal] = useState(false);
-
 
     useEffect(() => {
         fetchQueues();
@@ -84,7 +85,8 @@ const QueuesPage: React.FC = () => {
             .then(() => {
                 fetchQueues();
                 enqueueSnackbar(
-                    `Successfully deleted queue${queueIds.length > 1 ? "s" : ""
+                    `Successfully deleted queue${
+                        queueIds.length > 1 ? "s" : ""
                     }`,
                     {
                         variant: "success",
@@ -103,73 +105,94 @@ const QueuesPage: React.FC = () => {
             });
     };
 
-
     /*
-    * Render cell containing boolean value
-    */
+     * Render cell containing boolean value
+     */
     const renderBooleanCell = (value: any, tableMeta: any) => {
         if (editingRowId === tableMeta.rowIndex) {
-            return <Switch
-                checked={editingLineValues[tableMeta.columnIndex]}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    let values = [...editingLineValues];
-                    values[tableMeta.columnIndex] = event.target.checked;
-                    setEditingLineValues(values);
-                }}
-            />
+            return (
+                <Switch
+                    checked={editingLineValues[tableMeta.columnIndex]}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        let values = [...editingLineValues];
+                        values[tableMeta.columnIndex] = event.target.checked;
+                        setEditingLineValues(values);
+                    }}
+                />
+            );
         } else {
             return value ? <DoneIcon /> : <BlockIcon />;
         }
     };
 
     /**
-    * Render cell with action buttons
-    */
+     * Render cell with action buttons
+     */
     const renderActionsCell = (value: any, tableMeta: any) => {
         if (editingRowId === tableMeta.rowIndex) {
-            return (<>
-                <Tooltip title={"Save changes"}>
-                    <IconButton color="default" aria-label={"save"} onClick={() => {
-                        saveQueue();
-                    }}>
-                        <SaveIcon />
-                    </IconButton>
-                </ Tooltip>
-                <Tooltip title={"Cancel changes"}>
-                    <IconButton color="default" aria-label={"cancel"} onClick={() => {
-                        setEditingRowId(null);
-                        setEditingLineValues(null);
-                    }}>
-                        <CancelIcon />
-                    </IconButton>
-                </ Tooltip>
-            </>)
+            return (
+                <>
+                    <Tooltip title={"Save changes"}>
+                        <IconButton
+                            color="default"
+                            aria-label={"save"}
+                            onClick={() => {
+                                saveQueue();
+                            }}
+                        >
+                            <SaveIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={"Cancel changes"}>
+                        <IconButton
+                            color="default"
+                            aria-label={"cancel"}
+                            onClick={() => {
+                                setEditingRowId(null);
+                                setEditingLineValues(null);
+                            }}
+                        >
+                            <CancelIcon />
+                        </IconButton>
+                    </Tooltip>
+                </>
+            );
         } else {
-            return (<>
-                <Tooltip title={"Edit line"}>
-                    <IconButton color="default" aria-label={"edit"} onClick={() => {
-                        setEditingRowId(tableMeta.rowIndex)
-                        setEditingLineValues(tableMeta.rowData)
-                    }}>
-                        <CreateIcon />
-                    </IconButton>
-                </ Tooltip>
-                <Tooltip title={"Delete line"}>
-                    <IconButton color="default" aria-label={"delete"} onClick={() => {
-                        //
-                    }}>
-                        <DeleteIcon />
-                    </IconButton>
-                </ Tooltip>
-            </>
+            return (
+                <>
+                    <Tooltip title={"Edit line"}>
+                        <IconButton
+                            color="default"
+                            aria-label={"edit"}
+                            onClick={() => {
+                                setEditingRowId(tableMeta.rowIndex);
+                                setEditingLineValues(tableMeta.rowData);
+                            }}
+                        >
+                            <CreateIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={"Delete line"}>
+                        <IconButton
+                            color="default"
+                            aria-label={"delete"}
+                            onClick={(e) => {
+                                const [queueId] = tableMeta.rowData;
+                                deleteQueues([queueId]);
+                            }}
+                        >
+                            <DeleteIcon />
+                        </IconButton>
+                    </Tooltip>
+                </>
             );
         }
-    }
+    };
 
     /*
-    * Render cell containing string value
-    * TODO: make cell size rigid
-    */
+     * Render cell containing string value
+     * TODO: make cell size rigid
+     */
     const renderStringCell = (value: any, tableMeta: any) => {
         if (editingRowId === tableMeta.rowIndex) {
             return (
@@ -184,8 +207,8 @@ const QueuesPage: React.FC = () => {
                     inputProps={{
                         style: {
                             //textAlign: "center",
-                            fontSize: "0.8125rem"
-                        }
+                            fontSize: "0.8125rem",
+                        },
                     }}
                 />
             );
@@ -200,31 +223,33 @@ const QueuesPage: React.FC = () => {
             name: editingLineValues[1],
             description: editingLineValues[2],
             defaultQueue: editingLineValues[3],
-        }
+        };
         APIService.put("/q/" + request["id"], request)
             .then(() => {
                 fetchQueues();
                 enqueueSnackbar("Successfully saved queue", {
-                    variant: 'success',
+                    variant: "success",
                 });
-
             })
             .catch((reason) => {
                 console.log(reason);
-                enqueueSnackbar("An error occured, please contact support for help.", {
-                    variant: 'error',
-                    persist: true
-                })
-            })
-    }
+                enqueueSnackbar(
+                    "An error occured, please contact support for help.",
+                    {
+                        variant: "error",
+                        persist: true,
+                    }
+                );
+            });
+    };
 
     const columns = [
         {
             name: "id",
             label: "id",
             options: {
-                display: "excluded"
-            }
+                display: "excluded",
+            },
         },
         {
             name: "name",
@@ -232,8 +257,8 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell
-            }
+                customBodyRender: renderStringCell,
+            },
         },
         {
             name: "description",
@@ -241,8 +266,8 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell // TODO: renderTextCell for longer content?
-            }
+                customBodyRender: renderStringCell, // TODO: renderTextCell for longer content?
+            },
         },
         {
             name: "defaultQueue",
@@ -251,7 +276,7 @@ const QueuesPage: React.FC = () => {
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell,
-            }
+            },
         },
         {
             name: "",
@@ -260,9 +285,9 @@ const QueuesPage: React.FC = () => {
                 filter: true,
                 sort: true,
                 customBodyRender: renderActionsCell,
-            }
-        }
-    ]
+            },
+        },
+    ];
 
     const options = {
         download: false,
@@ -278,13 +303,13 @@ const QueuesPage: React.FC = () => {
                             onClick={() => setShowModal(true)}
                         >
                             <AddCircleIcon />
-                            {showModal &&
+                            {showModal && (
                                 <CreateQueueModal
                                     showModal={showModal}
                                     closeModal={() => setShowModal(false)}
                                     createQueue={createQueue}
                                 />
-                            }
+                            )}
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={"Refresh"}>
@@ -311,11 +336,13 @@ const QueuesPage: React.FC = () => {
             );
         },
         onRowsDelete: ({ data }: { data: any[] }) => {
+            console.log("id");
             // delete all rows by index
             const queueIds = data.map(({ index }) => {
                 const queue = queues ? queues[index] : null;
                 return queue ? queue.id : null;
             });
+
             deleteQueues(queueIds);
         },
         //filterType: 'checkbox',
