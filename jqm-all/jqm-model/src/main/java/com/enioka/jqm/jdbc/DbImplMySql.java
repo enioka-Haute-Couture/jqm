@@ -5,6 +5,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLNonTransientConnectionException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -186,6 +187,10 @@ public class DbImplMySql extends DbAdapter
     @Override
     public boolean testDbUnreachable(Exception e)
     {
+        if (e instanceof SQLNonTransientConnectionException || e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
+        {
+            return true;
+        }
         if (e.getClass().getSimpleName().equals("CommunicationsException")
             || e.getClass().getSimpleName().equals("MySQLQueryInterruptedException"))
         {
@@ -203,7 +208,8 @@ public class DbImplMySql extends DbAdapter
         if (e.getCause() != null
             && (e.getCause().getMessage().equals("This connection has been closed.")
             || e.getCause().getMessage().contains("Communications link failure")
-            || e.getCause().getMessage().contains("Connection is closed")))
+            || e.getCause().getMessage().contains("Connection is closed")
+            || e.getCause().getMessage().contains("connection closed")))
         {
             return true;
         }
