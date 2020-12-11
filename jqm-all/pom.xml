@@ -113,6 +113,7 @@
         <module>jqm-runner</module>
         <module>jqm-tests</module>
         <module>jqm-model</module>
+        <module>jqm-model-old</module>
         <module>jqm-api</module>
         <module>jqm-ws</module>
         <module>jqm-client</module>

@@ -116,6 +116,8 @@ public final class JdbcClient implements JqmClient
                 if (e.getMessage().contains("org/osgi"))
                 {
                     jqmlogger.info("Non-OSGi environment !");
+                    //com.enioka.jqm.old.jdbc.Db oldDb = com.enioka.jqm.old.jdbc.DbManager.getDb();
+                    //db = (com.enioka.jqm.jdbc.Db) oldDb;
                 }
                 else
                 {
