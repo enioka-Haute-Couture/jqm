@@ -18,13 +18,7 @@
             <artifactId>jqm-model</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-model-old</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
+        
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>

@@ -455,23 +455,57 @@ public class Db
 
             try
             {
-                BundleContext context = org.osgi.framework.FrameworkUtil.getBundle(getClass()).getBundleContext();
-                Loader<DbAdapter> loader = new Loader<DbAdapter>(context, DbAdapter.class, "(Adapter-Type=*)");
-                loader.start();
-
-                for (ServiceReference<?> ref : loader.references)
+                try
                 {
-                    DbAdapter newAdapter = (DbAdapter) context.getService(ref);
-                    if (newAdapter.compatibleWith(meta))
+                    BundleContext context = org.osgi.framework.FrameworkUtil.getBundle(getClass()).getBundleContext();
+                    Loader<DbAdapter> loader = new Loader<DbAdapter>(context, DbAdapter.class, "(Adapter-Type=*)");
+                    loader.start();
+                
+                    for (ServiceReference<?> ref : loader.references)
                     {
-                        adapter = newAdapter;
-                        break;
+                        DbAdapter newAdapter = (DbAdapter) context.getService(ref);
+                        if (newAdapter.compatibleWith(meta))
+                        {
+                            adapter = newAdapter;
+                            break;
+                        }
                     }
+                }
+                catch (Exception e)
+                {
+                    throw new DatabaseException("Issue when loading database adapter");
+                }
+            }
+            catch (NoClassDefFoundError exception)
+            {
+                if (exception.getMessage().contains("org/osgi"))
+                {
+                    for (String s : ADAPTERS)
+                    {
+                        try
+                        {
+                            Class<? extends DbAdapter> clazz = Db.class.getClassLoader().loadClass(s).asSubclass(DbAdapter.class);
+                            newAdpt = clazz.newInstance();
+                            if (newAdpt.compatibleWith(meta))
+                            {
+                                adapter = newAdpt;
+                                break;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            throw new DatabaseException("Issue when loading database adapter named: " + s, e);
+                        }
+                    }
+                }
+                else
+                {
+                    throw exception;
                 }
             }
             catch (Exception e)
             {
-                throw new DatabaseException("Issue when loading database adapter");
+                throw e;
             }
         }
         catch (SQLException e)

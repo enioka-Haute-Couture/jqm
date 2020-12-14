@@ -107,23 +107,7 @@ public final class JdbcClient implements JqmClient
         }
         else
         {
-            try
-            {
-                db = DbManager.getDb();
-            }
-            catch (NoClassDefFoundError e)
-            {
-                if (e.getMessage().contains("org/osgi"))
-                {
-                    jqmlogger.info("Non-OSGi environment !");
-                    //com.enioka.jqm.old.jdbc.Db oldDb = com.enioka.jqm.old.jdbc.DbManager.getDb();
-                    //db = (com.enioka.jqm.jdbc.Db) oldDb;
-                }
-                else
-                {
-                    throw e;
-                }
-            }
+            db = DbManager.getDb();
         }
     }
 
