@@ -22,8 +22,9 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -51,8 +52,10 @@ public class MultiNodeTest extends JqmBaseTest
     @After
     public void a()
     {
-        Logger.getRootLogger().setLevel(Level.toLevel("DEBUG"));
-        Logger.getLogger("com.enioka").setLevel(Level.toLevel("DEBUG"));
+        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.toLevel("DEBUG"));
+        Logger log = (Logger) LoggerFactory.getLogger("com.enioka");
+        log.setLevel(Level.toLevel("DEBUG"));
     }
 
     @Test

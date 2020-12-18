@@ -77,8 +77,6 @@ public class JqmBaseTest
     {
         return options(
                 // OSGI DECLARATIVE SERVICES
-                // mavenBundle("org.osgi", "org.osgi.core", "4.2.0"),
-                // mavenBundle("org.osgi", "org.osgi.enterprise", "4.2.0"),
                 mavenBundle("org.osgi", "org.osgi.service.cm").versionAsInProject(),
                 mavenBundle("org.apache.felix", "org.apache.felix.scr", "2.1.24"),
                 mavenBundle("org.osgi", "org.osgi.util.promise", "1.1.1"), mavenBundle("org.osgi", "org.osgi.util.function", "1.1.0"),
@@ -126,15 +124,10 @@ public class JqmBaseTest
                 wrappedBundle(mavenBundle("com.beust", "jcommander").versionAsInProject()),
 
                 // LOG
-                // mavenBundle("org.ops4j.pax.logging", "pax-logging-log4j2", "2.0.6"),
-                // mavenBundle("org.ops4j.pax.logging", "pax-logging-api", "2.0.6"),
-                //mavenBundle("log4j", "log4j", "1.2.17"),
-                // mavenBundle("commons-logging", "commons-logging", "1.2"),
-                // mavenBundle("org.slf4j", "slf4j-api").versionAsInProject(),
-                // mavenBundle("org.slf4j", "slf4j-simple", "1.7.25").noStart(),
-                // mavenBundle("org.slf4j", "osgi-over-slf4j", "1.7.25"),
-                mavenBundle("org.slf4j", "jul-to-slf4j").versionAsInProject(),
-                mavenBundle("org.slf4j", "slf4j-log4j12").versionAsInProject().noStart(),
+                mavenBundle("commons-logging", "commons-logging", "1.2"),
+                mavenBundle("org.slf4j", "slf4j-api").versionAsInProject(),
+                mavenBundle("ch.qos.logback", "logback-core").versionAsInProject(),
+                mavenBundle("ch.qos.logback", "logback-classic").versionAsInProject(),
 
                 // XML
                 wrappedBundle(mavenBundle("org.jdom", "jdom").versionAsInProject()), mavenBundle("javax.xml.bind", "jaxb-api", "2.3.1"),

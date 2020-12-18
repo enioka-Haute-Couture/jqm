@@ -1,13 +1,14 @@
 package com.enioka.jqm.service;
 
-import java.io.OutputStreamWriter;
 import java.util.Calendar;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.RollingFileAppender;
+
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.core.ConsoleAppender;
+import ch.qos.logback.core.rolling.RollingFileAppender;
 
 import com.enioka.jqm.engine.Helpers;
 import com.enioka.jqm.engine.JqmEngineHandler;
@@ -67,18 +68,21 @@ public class EngineCallback implements JqmEngineHandler
         CommonService.setLogLevel(node.getRootLogLevel());
         this.logLevel = node.getRootLogLevel();
 
+        /* TODO
         // Log multicasting (& log4j stdout redirect)
         String gp1 = GlobalParameter.getParameter(cnx, "logFilePerLaunch", "true");
         if ("true".equals(gp1) || "both".equals(gp1))
         {
             oneLogPerLaunch = true;
-            RollingFileAppender a = (RollingFileAppender) Logger.getRootLogger().getAppender("rollingfile");
+            Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+            RollingFileAppender a = (RollingFileAppender) root.getAppender("rollingfile");
             MultiplexPrintStream s = new MultiplexPrintStream(System.out, FilenameUtils.getFullPath(a.getFile()), "both".equals(gp1));
             System.setOut(s);
-            ((ConsoleAppender) Logger.getRootLogger().getAppender("consoleAppender")).setWriter(new OutputStreamWriter(s));
+            ((ConsoleAppender) root.getAppender("consoleAppender")).setTarget("System.out");
             s = new MultiplexPrintStream(System.err, FilenameUtils.getFullPath(a.getFile()), "both".equals(gp1));
             System.setErr(s);
         }
+        */
 
         // Jetty
         this.server = new JettyServer();

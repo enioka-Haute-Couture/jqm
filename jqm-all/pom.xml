@@ -96,6 +96,7 @@
         <pax.exam.version>4.13.4</pax.exam.version>
         <pax.url.version>2.6.2</pax.url.version>
         <felix.version>6.0.3</felix.version>
+        <logback.version>1.2.3</logback.version>
 
         <sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
 

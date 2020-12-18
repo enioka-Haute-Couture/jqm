@@ -22,7 +22,6 @@ import com.beust.jcommander.JCommander;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * Starter class & parameter parsing
@@ -30,12 +29,6 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  */
 public class Main
 {
-    static
-    {
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
-    }
-
     private static Logger jqmlogger = LoggerFactory.getLogger(Main.class);
 
     private Main()

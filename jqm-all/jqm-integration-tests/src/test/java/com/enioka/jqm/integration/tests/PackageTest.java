@@ -24,7 +24,6 @@ import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenRemoteRepositories;
 import org.junit.Assert;
 import org.junit.Test;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 public class PackageTest extends JqmBaseTest
 {
@@ -95,8 +94,6 @@ public class PackageTest extends JqmBaseTest
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test testFailingDependency");
-
-        SLF4JBridgeHandler.install();
 
         Maven.configureResolver()
                 .withRemoteRepo(MavenRemoteRepositories.createRemoteRepository("marsu", "http://marsupilami.com", "default"))

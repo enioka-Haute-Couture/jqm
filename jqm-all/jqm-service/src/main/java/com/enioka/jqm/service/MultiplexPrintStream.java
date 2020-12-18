@@ -31,7 +31,9 @@ import com.enioka.jqm.engine.JqmInitError;
 import com.enioka.jqm.model.GlobalParameter;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Logger;
 
 /**
  * The goal of this Stream is to provide a replacement for stdout/err in which every running job instance has its own personal flow. This is
@@ -42,8 +44,8 @@ import org.apache.log4j.Logger;
  */
 public class MultiplexPrintStream extends PrintStream
 {
-    private static Logger jqmlogger = Logger.getLogger(MultiplexPrintStream.class);
-    private static Logger alljobslogger = Logger.getLogger("alljobslogger");
+    private static Logger jqmlogger = (Logger) LoggerFactory.getLogger(MultiplexPrintStream.class);
+    private static Logger alljobslogger = (Logger) LoggerFactory.getLogger("alljobslogger");
     private static String ls = System.getProperty("line.separator");
 
     private BufferedWriter original = null;

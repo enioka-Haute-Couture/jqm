@@ -1,7 +1,5 @@
 package com.enioka.jqm.integration.tests;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.PropertyConfigurator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -60,8 +58,10 @@ public class CliTest extends JqmBaseTest
         Main.runCommand(new String[] { "Start-Single", "--id", String.valueOf(i) });
 
         // This is not really a one shot JVM, so let's reset log4j
+        /* TODO : don't know what to do here
         LogManager.resetConfiguration();
         PropertyConfigurator.configure(this.getClass().getClassLoader().getResource("log4j.properties"));
+        */
 
         Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
