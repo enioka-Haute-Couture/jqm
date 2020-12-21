@@ -24,7 +24,7 @@ public final class CommonService
             r.setFile("./logs/jqm-" + name + ".log");
             r.start();
         }
-        catch (Error e) // oops - temp while we sort OSGi logging
+        catch (Error e)
         {
             jqmlogger.warn("Log file could not be set", e);
         }
