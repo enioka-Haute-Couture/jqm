@@ -54,6 +54,12 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>${commons.lang.version}</version>
+		</dependency>
+
 		<!-- Scheduling -->
 		<dependency>
 			<groupId>it.sauronsoftware.cron4j</groupId>
