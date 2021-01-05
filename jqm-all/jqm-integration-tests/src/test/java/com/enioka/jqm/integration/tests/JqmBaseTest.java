@@ -103,6 +103,7 @@ public class JqmBaseTest
                 wrappedBundle(mavenBundle("javax.enterprise", "cdi-api", "1.0")), // versions should resolve once service is OK
                 mavenBundle("org.ow2.asm", "asm").versionAsInProject(),
                 mavenBundle("org.eclipse.jetty", "jetty-annotations").versionAsInProject(),
+                //mavenBundle("org.eclipse.jetty", "jetty-deploy", "9.4.31.v20200723"),
                 mavenBundle("org.eclipse.jetty", "jetty-http").versionAsInProject(),
                 mavenBundle("org.eclipse.jetty", "jetty-io").versionAsInProject(),
                 mavenBundle("org.eclipse.jetty", "jetty-jndi").versionAsInProject(),
@@ -113,6 +114,12 @@ public class JqmBaseTest
                 mavenBundle("org.eclipse.jetty", "jetty-util").versionAsInProject(),
                 mavenBundle("org.eclipse.jetty", "jetty-webapp").versionAsInProject(),
                 mavenBundle("org.eclipse.jetty", "jetty-xml").versionAsInProject(),
+                //mavenBundle("org.eclipse.jetty.osgi", "jetty-osgi-boot", "9.4.31.v20200723"),
+                //mavenBundle("org.eclipse.jetty.toolchain", "jetty-osgi-servlet-api", "4.0.1"),
+
+                // Eclipse OSGi
+                //mavenBundle("org.eclipse.osgi", "org.eclipse.osgi", "3.6.0.v20100517").noStart(),
+                //mavenBundle("org.eclipse.osgi", "org.eclipse.osgi.services", "3.2.100.v20100503").noStart(),
 
                 // Web security
                 mavenBundle("org.apache.shiro", "shiro-core").versionAsInProject(),
