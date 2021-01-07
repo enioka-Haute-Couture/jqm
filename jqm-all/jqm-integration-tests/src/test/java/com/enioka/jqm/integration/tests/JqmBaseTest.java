@@ -117,6 +117,16 @@ public class JqmBaseTest
                 //mavenBundle("org.eclipse.jetty.osgi", "jetty-osgi-boot", "9.4.31.v20200723"),
                 //mavenBundle("org.eclipse.jetty.toolchain", "jetty-osgi-servlet-api", "4.0.1"),
 
+                // SPI FLY
+                mavenBundle("org.apache.aries.spifly", "org.apache.aries.spifly.dynamic.bundle", "1.3.2"),
+
+                // OW2 ASM
+                mavenBundle("org.ow2.asm", "asm", "9.0"),
+                mavenBundle("org.ow2.asm", "asm-commons", "9.0"),
+                mavenBundle("org.ow2.asm", "asm-util", "9.0"),
+                mavenBundle("org.ow2.asm", "asm-tree", "9.0"),
+                mavenBundle("org.ow2.asm", "asm-analysis", "9.0"),
+
                 // Eclipse OSGi
                 //mavenBundle("org.eclipse.osgi", "org.eclipse.osgi", "3.6.0.v20100517").noStart(),
                 //mavenBundle("org.eclipse.osgi", "org.eclipse.osgi.services", "3.2.100.v20100503").noStart(),

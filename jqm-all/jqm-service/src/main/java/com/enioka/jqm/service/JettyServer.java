@@ -274,6 +274,8 @@ class JettyServer
         webAppContext = new WebAppContext(war.getPath(), "/");
         webAppContext.setDisplayName("JqmWebServices");
 
+        webAppContext.getSystemClasspathPattern().add("javax.servlet.ServletContainerInitializer");
+
         // Hide server classes from the web app
         webAppContext.getServerClasspathPattern().add("com.enioka.jqm.api.", "com.enioka.api.admin."); // engine and webapp can have
                                                                                                        // different API implementations
