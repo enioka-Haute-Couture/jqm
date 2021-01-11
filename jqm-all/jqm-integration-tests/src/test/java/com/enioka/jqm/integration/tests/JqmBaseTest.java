@@ -119,6 +119,7 @@ public class JqmBaseTest
 
                 // SPI FLY
                 mavenBundle("org.apache.aries.spifly", "org.apache.aries.spifly.dynamic.bundle", "1.3.2"),
+                mavenBundle("org.apache.aries", "org.apache.aries.util", "1.1.3"),
 
                 // OW2 ASM
                 mavenBundle("org.ow2.asm", "asm", "9.0"),
