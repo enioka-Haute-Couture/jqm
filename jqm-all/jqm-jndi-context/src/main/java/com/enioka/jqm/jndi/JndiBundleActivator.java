@@ -5,6 +5,7 @@ import javax.naming.spi.NamingManager;
 import org.osgi.annotation.bundle.Header;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 public class JndiBundleActivator implements BundleActivator
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(JndiBundleActivator.class);
+    private ServiceRegistration<?> registration;
 
     @Override
     public void start(BundleContext context) throws Exception
@@ -22,6 +24,7 @@ public class JndiBundleActivator implements BundleActivator
             {
                 JndiContext ctx = new JndiContext();
                 NamingManager.setInitialContextFactoryBuilder(ctx);
+                registration = context.registerService(JndiContext.class, ctx, null);
             }
         }
         catch (Exception e)
@@ -35,6 +38,7 @@ public class JndiBundleActivator implements BundleActivator
     @Override
     public void stop(BundleContext context) throws Exception
     {
+        registration.unregister();
     }
 
 }

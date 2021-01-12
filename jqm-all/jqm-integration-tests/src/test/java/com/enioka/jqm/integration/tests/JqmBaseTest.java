@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.inject.Inject;
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 import javax.xml.stream.XMLStreamException;
@@ -34,6 +35,8 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.junit.PaxExamParameterized;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 import com.enioka.jqm.api.client.core.JobInstance;
 import com.enioka.jqm.api.client.core.JqmClientFactory;
@@ -44,6 +47,7 @@ import com.enioka.jqm.engine.JqmEngineOperations;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
+import com.enioka.jqm.jndi.JndiContext;
 import com.enioka.jqm.service.EngineCallback;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -66,8 +70,12 @@ public class JqmBaseTest
     protected static Db db;
     public Map<String, JqmEngineOperations> engines = new HashMap<>();
     public List<DbConn> cnxs = new ArrayList<>();
+    //public static JndiContext jndiContext = null;
 
     protected DbConn cnx;
+
+    @Inject
+    protected static BundleContext bundleContext;
 
     @Rule
     public TestName testName = new TestName();
@@ -190,8 +198,6 @@ public class JqmBaseTest
 
         if (db == null)
         {
-            // JndiContext.createJndiContext();
-
             // If needed, create an HSQLDB server.
             String dbName = System.getenv("DB");
             if (dbName == null || "hsqldb".equals(dbName))
@@ -224,6 +230,11 @@ public class JqmBaseTest
         TestHelpers.cleanup(cnx);
         TestHelpers.createTestData(cnx);
         cnx.commit();
+
+        ServiceReference ref = bundleContext.getServiceReference(JndiContext.class);
+        JndiContext jndiContext = (JndiContext) bundleContext.getService(ref);
+        jndiContext.resetSingletons();
+        bundleContext.ungetService(ref);
     }
 
     @After
