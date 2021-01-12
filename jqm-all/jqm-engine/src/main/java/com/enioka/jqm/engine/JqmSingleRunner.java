@@ -161,6 +161,7 @@ public class JqmSingleRunner
         Runtime.getRuntime().removeShutdownHook(shutHook);
         cnx.close();
         stopper.interrupt();
+        manager.stop();
 
         // Get result
         return JqmClientFactory.getClient().getJob(job.getId());

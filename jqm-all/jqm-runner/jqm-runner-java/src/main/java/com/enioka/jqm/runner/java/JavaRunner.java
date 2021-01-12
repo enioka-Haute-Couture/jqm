@@ -10,12 +10,13 @@ import com.enioka.jqm.runner.api.JobRunner;
 import com.enioka.jqm.runner.api.JobRunnerCallback;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ServiceScope;
 
 /**
  * Being in Java, JQM can have a special relationship with jobs coded in Java. This runner provides the capacity to run classes with
  * advanced CL handling inside the engine process. It itself has multiple plugins allowing it to load different types of classes.
  */
-@Component(property = { "Plugin-Type=JobRunner", "Runner-Type=java" })
+@Component(property = { "Plugin-Type=JobRunner", "Runner-Type=java" }, scope = ServiceScope.PROTOTYPE)
 public class JavaRunner implements JobRunner
 {
     private ClassloaderManager classloaderManager;

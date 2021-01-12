@@ -256,6 +256,8 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     @Override
     public void stop()
     {
+        runnerManager.stop();
+
         synchronized (killHook)
         {
             jqmlogger.info("JQM engine " + this.node.getName() + " has received a stop order");

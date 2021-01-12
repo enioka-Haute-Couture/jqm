@@ -26,6 +26,8 @@ class RunnerManager
 
     private List<JobRunner> runners = new ArrayList<>(2);
 
+    private ArrayList<ServiceReference> refList = new ArrayList<ServiceReference>();
+
     RunnerManager(DbConn cnx)
     {
         jqmlogger.info("Registering the runners");
@@ -39,6 +41,7 @@ class RunnerManager
             for (ServiceReference<?> ref : loader.references)
             {
                 runners.add((JobRunner)context.getService(ref));
+                refList.add(ref);
             }
         }
         catch (Exception e)
@@ -70,5 +73,14 @@ class RunnerManager
         }
 
         throw new JqmRuntimeException("there is no runner able to run job definition " + ji.getJD().getApplicationName());
+    }
+
+    void stop()
+    {
+        BundleContext context = org.osgi.framework.FrameworkUtil.getBundle(getClass()).getBundleContext();
+        for (ServiceReference ref : refList)
+        {
+            context.ungetService(ref);
+        }
     }
 }
