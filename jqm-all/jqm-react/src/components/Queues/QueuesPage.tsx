@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
     Container,
     Grid,
@@ -25,12 +25,14 @@ import { CreateQueueModal } from "./CreateQueueModal";
 
 const QueuesPage: React.FC = () => {
     const { enqueueSnackbar } = useSnackbar();
+    const [showModal, setShowModal] = useState(false);
     const [queues, setQueues] = useState<any[] | null>();
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
-    const [editingLineValues, setEditingLineValues] = useState<any | null>(
-        null
+    const [editingDefaultQueue, setEditingDefaultQueue] = useState<any | false>(
+        false
     );
-    const [showModal, setShowModal] = useState(false);
+    const editingDescriptionInputRef = useRef(null);
+    const editingQueueNameInputRef = useRef(null);
 
     useEffect(() => {
         fetchQueues();
@@ -41,10 +43,8 @@ const QueuesPage: React.FC = () => {
             .then((response) => {
                 setQueues(response);
                 setEditingRowId(null);
-                setEditingLineValues(null);
             })
             .catch((reason) => {
-                console.log(reason);
                 enqueueSnackbar(
                     "An error occured, please contact support support@enioka.com for help.",
                     {
@@ -69,7 +69,6 @@ const QueuesPage: React.FC = () => {
                     );
                 })
                 .catch((reason) => {
-                    console.log(reason);
                     enqueueSnackbar(
                         "An error occured, please contact support support@enioka.com for help.",
                         {
@@ -82,30 +81,83 @@ const QueuesPage: React.FC = () => {
         [enqueueSnackbar, fetchQueues]
     );
 
-    const deleteQueues = useCallback(async (queueIds: any[]) => {
-        await Promise.all(queueIds.map((id) => APIService.delete("/q/" + id)))
-            .then(() => {
-                fetchQueues();
-                enqueueSnackbar(
-                    `Successfully deleted queue${
-                        queueIds.length > 1 ? "s" : ""
-                    }`,
-                    {
+    const deleteQueues = useCallback(
+        async (queueIds: any[]) => {
+            await Promise.all(
+                queueIds.map((id) => APIService.delete("/q/" + id))
+            )
+                .then(() => {
+                    fetchQueues();
+                    enqueueSnackbar(
+                        `Successfully deleted queue${
+                            queueIds.length > 1 ? "s" : ""
+                        }`,
+                        {
+                            variant: "success",
+                        }
+                    );
+                })
+                .catch((reason) => {
+                    enqueueSnackbar(
+                        "An error occured, please contact support support@enioka.com for help.",
+                        {
+                            variant: "error",
+                            persist: true,
+                        }
+                    );
+                });
+        },
+        [enqueueSnackbar, fetchQueues]
+    );
+
+    const updateQueue = useCallback(
+        (
+            queueId: Number,
+            queueName: string,
+            queueDescription: string,
+            defaultQueue: Boolean
+        ) => {
+            const request: Queue = {
+                id: queueId,
+                name: queueName,
+                description: queueDescription,
+                defaultQueue: defaultQueue,
+            };
+            APIService.put("/q/" + request["id"], request)
+                .then(() => {
+                    fetchQueues();
+                    enqueueSnackbar("Successfully saved queue", {
                         variant: "success",
-                    }
+                    });
+                })
+                .catch((reason) => {
+                    enqueueSnackbar(
+                        "An error occured, please contact support for help.",
+                        {
+                            variant: "error",
+                            persist: true,
+                        }
+                    );
+                });
+        },
+        [fetchQueues, enqueueSnackbar]
+    );
+
+    const updateRow = useCallback(
+        (queueId: number) => {
+            const { value: queueName } = editingQueueNameInputRef.current!;
+            const { value: description } = editingDescriptionInputRef.current!;
+            if (queueId && queueName && description) {
+                updateQueue(
+                    queueId,
+                    queueName,
+                    description,
+                    editingDefaultQueue
                 );
-            })
-            .catch((reason) => {
-                console.log(reason);
-                enqueueSnackbar(
-                    "An error occured, please contact support support@enioka.com for help.",
-                    {
-                        variant: "error",
-                        persist: true,
-                    }
-                );
-            });
-    }, []);
+            }
+        },
+        [updateQueue, editingDefaultQueue]
+    );
 
     /*
      * Render cell containing boolean value
@@ -114,12 +166,10 @@ const QueuesPage: React.FC = () => {
         if (editingRowId === tableMeta.rowIndex) {
             return (
                 <Switch
-                    checked={editingLineValues[tableMeta.columnIndex]}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        let values = [...editingLineValues];
-                        values[tableMeta.columnIndex] = event.target.checked;
-                        setEditingLineValues(values);
-                    }}
+                    checked={editingDefaultQueue}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                        setEditingDefaultQueue(event.target.checked)
+                    }
                 />
             );
         } else {
@@ -132,29 +182,25 @@ const QueuesPage: React.FC = () => {
      */
     const renderActionsCell = (value: any, tableMeta: any) => {
         if (editingRowId === tableMeta.rowIndex) {
+            const queueId = tableMeta.rowData ? tableMeta.rowData[0] : null;
             return (
                 <>
-                    <Tooltip title={"Save changes"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"save"}
-                            onClick={() => {
-                                saveQueue();
-                            }}
-                        >
-                            <SaveIcon />
-                        </IconButton>
-                    </Tooltip>
                     <Tooltip title={"Cancel changes"}>
                         <IconButton
                             color="default"
                             aria-label={"cancel"}
-                            onClick={() => {
-                                setEditingRowId(null);
-                                setEditingLineValues(null);
-                            }}
+                            onClick={() => setEditingRowId(null)}
                         >
                             <CancelIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={"Save changes"}>
+                        <IconButton
+                            color="default"
+                            aria-label={"save"}
+                            onClick={() => updateRow(queueId)}
+                        >
+                            <SaveIcon />
                         </IconButton>
                     </Tooltip>
                 </>
@@ -168,7 +214,7 @@ const QueuesPage: React.FC = () => {
                             aria-label={"edit"}
                             onClick={() => {
                                 setEditingRowId(tableMeta.rowIndex);
-                                setEditingLineValues(tableMeta.rowData);
+                                setEditingDefaultQueue(tableMeta.rowData[3]);
                             }}
                         >
                             <CreateIcon />
@@ -195,54 +241,27 @@ const QueuesPage: React.FC = () => {
      * Render cell containing string value
      * TODO: make cell size rigid
      */
-    const renderStringCell = (value: any, tableMeta: any) => {
+    const renderStringCell = (inputRef: any, rowIndex: number) => (
+        value: any,
+        tableMeta: any
+    ) => {
         if (editingRowId === tableMeta.rowIndex) {
+            const defaultDescription = tableMeta.rowData
+                ? tableMeta.rowData[rowIndex]
+                : "";
             return (
                 <TextField
-                    value={editingLineValues[tableMeta.columnIndex]}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        let values = [...editingLineValues];
-                        values[tableMeta.columnIndex] = event.target.value;
-                        setEditingLineValues(values);
-                    }}
+                    defaultValue={defaultDescription}
+                    inputRef={inputRef}
                     fullWidth={true}
                     inputProps={{
-                        style: {
-                            //textAlign: "center",
-                            fontSize: "0.8125rem",
-                        },
+                        style: { fontSize: "0.8125rem" },
                     }}
                 />
             );
         } else {
             return value;
         }
-    };
-
-    const saveQueue = () => {
-        const request: Queue = {
-            id: editingLineValues[0],
-            name: editingLineValues[1],
-            description: editingLineValues[2],
-            defaultQueue: editingLineValues[3],
-        };
-        APIService.put("/q/" + request["id"], request)
-            .then(() => {
-                fetchQueues();
-                enqueueSnackbar("Successfully saved queue", {
-                    variant: "success",
-                });
-            })
-            .catch((reason) => {
-                console.log(reason);
-                enqueueSnackbar(
-                    "An error occured, please contact support for help.",
-                    {
-                        variant: "error",
-                        persist: true,
-                    }
-                );
-            });
     };
 
     const columns = [
@@ -259,7 +278,7 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell,
+                customBodyRender: renderStringCell(editingQueueNameInputRef, 1),
             },
         },
         {
@@ -268,7 +287,10 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell, // TODO: renderTextCell for longer content?
+                customBodyRender: renderStringCell(
+                    editingDescriptionInputRef,
+                    2
+                ), // TODO: renderTextCell for longer content?
             },
         },
         {
@@ -338,7 +360,6 @@ const QueuesPage: React.FC = () => {
             );
         },
         onRowsDelete: ({ data }: { data: any[] }) => {
-            console.log("id");
             // delete all rows by index
             const queueIds = data.map(({ index }) => {
                 const queue = queues ? queues[index] : null;
