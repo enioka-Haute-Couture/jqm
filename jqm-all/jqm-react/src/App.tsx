@@ -10,6 +10,7 @@ import {
 import QueuesPage from './components/Queues/QueuesPage';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { SnackbarProvider } from 'notistack';
+import UsersPage from './components/Users/UsersPage';
 
 declare module '@material-ui/core/styles/overrides' {
     interface ComponentNameToClassKey {
@@ -75,6 +76,9 @@ function App() {
                             <Route path="/queues" exact={true}>
                                 <QueuesPage />
                             </Route>
+                            <Route path="/users" exact={true}>
+                                <UsersPage />
+                            </Route>
                             <Route path="/" exact={true}>
                                 <HomePage />
                             </Route>
@@ -83,7 +87,7 @@ function App() {
                     </MenuWrapper>
                 </SnackbarProvider>
             </MuiThemeProvider>
-        </Router>
+        </Router >
     );
 }
 

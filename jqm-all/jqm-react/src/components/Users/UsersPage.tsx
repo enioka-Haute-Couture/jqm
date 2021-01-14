@@ -1,97 +1,64 @@
-import React, { useEffect, useState } from "react";
-import {
-    Container,
-    Grid,
-    IconButton,
-    Switch,
-    Tooltip,
-} from "@material-ui/core";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import APIService from "../../utils/APIService";
+
+import { Container, Grid, CircularProgress, IconButton, Tooltip, Switch, TextField, Select, Input, MenuItem } from "@material-ui/core";
 import MUIDataTable from "mui-datatables";
+import React, { useEffect, useState } from "react";
+import HelpIcon from "@material-ui/icons/Help";
+import RefreshIcon from "@material-ui/icons/Refresh";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
 import DoneIcon from "@material-ui/icons/Done";
 import BlockIcon from "@material-ui/icons/Block";
 import DeleteIcon from "@material-ui/icons/Delete";
 import CreateIcon from "@material-ui/icons/Create";
-import HelpIcon from "@material-ui/icons/Help";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
 import SaveIcon from "@material-ui/icons/Save";
 import CancelIcon from "@material-ui/icons/Cancel";
+import APIService from "../../utils/APIService";
+import VpnKeyIcon from "@material-ui/icons/VpnKey";
+import { Role, User } from "./User";
 import { useSnackbar } from "notistack";
-import TextField from "@material-ui/core/TextField/TextField";
-import { Queue } from "./Queue";
-import { CreateQueueModal } from "./CreateQueueModal";
 
-const QueuesPage: React.FC = () => {
+// TODO get roles ws/admin/role
+const UsersPage: React.FC = () => {
     const { enqueueSnackbar } = useSnackbar();
-    const [queues, setQueues] = useState<Queue[] | null>();
+
+    const [users, setUsers] = useState<User[] | null>();
+    const [roles, setRoles] = useState<Role[] | null>();
+
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const [editingLineValues, setEditingLineValues] = useState<any | null>(
         null
     );
-    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
-        fetchQueues();
+        fetchUsers();
+        fetchRoles();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const fetchQueues = () => {
-        APIService.get("/q")
+
+    const fetchRoles = () => {
+        APIService.get("/role")
             .then((response) => {
-                setQueues(response);
+                setRoles(response);
+            })
+            .catch((reason) => {
+                console.log(reason);
+                enqueueSnackbar(
+                    "An error occured, please contact support support@enioka.com for help.",
+                    {
+                        variant: "error",
+                        persist: true,
+                    }
+                );
+            });
+    };
+
+
+    const fetchUsers = () => {
+        APIService.get("/user")
+            .then((response) => {
+                setUsers(response);
                 setEditingRowId(null);
                 setEditingLineValues(null);
-            })
-            .catch((reason) => {
-                console.log(reason);
-                enqueueSnackbar(
-                    "An error occured, please contact support support@enioka.com for help.",
-                    {
-                        variant: "error",
-                        persist: true,
-                    }
-                );
-            });
-    };
-
-    const createQueue = (newQueue: Queue) => {
-        APIService.post("/q", newQueue)
-            .then(() => {
-                setShowModal(false);
-                fetchQueues();
-                enqueueSnackbar(
-                    `Successfully created queue: ${newQueue.name}`,
-                    {
-                        variant: "success",
-                    }
-                );
-            })
-            .catch((reason) => {
-                console.log(reason);
-                enqueueSnackbar(
-                    "An error occured, please contact support support@enioka.com for help.",
-                    {
-                        variant: "error",
-                        persist: true,
-                    }
-                );
-            });
-    };
-
-    const deleteQueues = async (queueIds: any[]) => {
-        await Promise.all(queueIds.map((id) => APIService.delete("/q/" + id)))
-            .then(() => {
-                fetchQueues();
-                enqueueSnackbar(
-                    `Successfully deleted queue${
-                        queueIds.length > 1 ? "s" : ""
-                    }`,
-                    {
-                        variant: "success",
-                    }
-                );
             })
             .catch((reason) => {
                 console.log(reason);
@@ -137,7 +104,7 @@ const QueuesPage: React.FC = () => {
                             color="default"
                             aria-label={"save"}
                             onClick={() => {
-                                saveQueue();
+                                // TODO: saveQueue();
                             }}
                         >
                             <SaveIcon />
@@ -160,6 +127,17 @@ const QueuesPage: React.FC = () => {
         } else {
             return (
                 <>
+                    <Tooltip title={"Change password"}>
+                        <IconButton
+                            color="default"
+                            aria-label={"Change password"}
+                            onClick={() => {
+                                // TODO:
+                            }}
+                        >
+                            <VpnKeyIcon />
+                        </IconButton>
+                    </Tooltip>
                     <Tooltip title={"Edit line"}>
                         <IconButton
                             color="default"
@@ -177,8 +155,8 @@ const QueuesPage: React.FC = () => {
                             color="default"
                             aria-label={"delete"}
                             onClick={(e) => {
-                                const [queueId] = tableMeta.rowData;
-                                deleteQueues([queueId]);
+                                // TODO: const [queueId] = tableMeta.rowData;
+                                // deleteQueues([queueId]);
                             }}
                         >
                             <DeleteIcon />
@@ -189,9 +167,56 @@ const QueuesPage: React.FC = () => {
         }
     };
 
+    /**
+    * Render cell containing date
+    */
+    const renderDateCell = (value: any, tableMeta: any) => {
+        if (editingRowId === tableMeta.rowIndex) {
+            return <></>; // TODO:
+        } else {
+            if (value) {
+                return new Date(value).toDateString();
+            } else return value;
+        }
+    };
+
+
+    const renderArrayCell = (value: any, tableMeta: any) => {
+        if (editingRowId === tableMeta.rowIndex) {
+            return <Select
+                multiple
+                value={editingLineValues[tableMeta.columnIndex]}
+                onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
+                    let values = [...editingLineValues];
+                    values[tableMeta.columnIndex] = event.target.value as number[];
+                    setEditingLineValues(values);
+                }}
+                input={<Input />}
+                MenuProps={{
+                    // TODO: smaller font and fixed width?
+                    PaperProps: {
+                        style: {
+                            //
+                        },
+                    },
+                }}
+            >
+                {roles!.map((role) => (
+                    <MenuItem key={role.id} value={role.id}>
+                        {role.name}
+                    </MenuItem>
+                ))}
+            </Select >;
+        } else {
+            if (value) {
+                return (value as number[]).map(e => roles?.find(x => x.id === e)?.name).join(",");
+            } else return value;
+        }
+
+    };
+
     /*
      * Render cell containing string value
-     * TODO: make cell size rigid
      */
     const renderStringCell = (value: any, tableMeta: any) => {
         if (editingRowId === tableMeta.rowIndex) {
@@ -217,32 +242,6 @@ const QueuesPage: React.FC = () => {
         }
     };
 
-    const saveQueue = () => {
-        const request: Queue = {
-            id: editingLineValues[0],
-            name: editingLineValues[1],
-            description: editingLineValues[2],
-            defaultQueue: editingLineValues[3],
-        };
-        APIService.put("/q/" + request["id"], request)
-            .then(() => {
-                fetchQueues();
-                enqueueSnackbar("Successfully saved queue", {
-                    variant: "success",
-                });
-            })
-            .catch((reason) => {
-                console.log(reason);
-                enqueueSnackbar(
-                    "An error occured, please contact support for help.",
-                    {
-                        variant: "error",
-                        persist: true,
-                    }
-                );
-            });
-    };
-
     const columns = [
         {
             name: "id",
@@ -252,30 +251,61 @@ const QueuesPage: React.FC = () => {
             },
         },
         {
-            name: "name",
-            label: "Name",
+            name: "login",
+            label: "Login",
             options: {
+                hint: "Must be unique. If used, certificates should certify CN=root",
                 filter: true,
                 sort: true,
                 customBodyRender: renderStringCell,
             },
         },
         {
-            name: "description",
-            label: "Description",
+            name: "email",
+            label: "E-mail",
             options: {
+                hint: "Optional contact e-mail address",
                 filter: true,
                 sort: true,
                 customBodyRender: renderStringCell,
             },
         },
         {
-            name: "defaultQueue",
-            label: "Is default",
+            name: "freeText",
+            label: "Full name",
+            options: {
+                hint: "Optional description of the account (real name or service name)",
+                filter: true,
+                sort: true,
+                customBodyRender: renderStringCell,
+            },
+        },
+
+        {
+            name: "locked",
+            label: "Locked",
             options: {
                 filter: true,
                 sort: true,
                 customBodyRender: renderBooleanCell,
+            },
+        },
+        {
+            name: "expirationDate",
+            label: "Expiration date",
+            options: {
+                filter: true,
+                sort: true,
+                customBodyRender: renderDateCell,
+            },
+        },
+        {
+            name: "roles",
+            label: "Roles",
+            options: {
+                filter: false,
+                sort: false,
+                customBodyRender: renderArrayCell,
             },
         },
         {
@@ -289,6 +319,7 @@ const QueuesPage: React.FC = () => {
         },
     ];
 
+
     const options = {
         download: false,
         print: false,
@@ -300,23 +331,23 @@ const QueuesPage: React.FC = () => {
                         <IconButton
                             color="default"
                             aria-label={"add"}
-                            onClick={() => setShowModal(true)}
+                        // onClick={() => setShowModal(true)}
                         >
                             <AddCircleIcon />
-                            {showModal && (
+                            {/* {showModal && (
                                 <CreateQueueModal
                                     showModal={showModal}
                                     closeModal={() => setShowModal(false)}
                                     createQueue={createQueue}
                                 />
-                            )}
+                            )} */}
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={"Refresh"}>
                         <IconButton
                             color="default"
                             aria-label={"refresh"}
-                            onClick={() => fetchQueues()}
+                            onClick={() => fetchUsers()}
                         >
                             <RefreshIcon />
                         </IconButton>
@@ -335,25 +366,26 @@ const QueuesPage: React.FC = () => {
                 </>
             );
         },
+
         onRowsDelete: ({ data }: { data: any[] }) => {
             console.log("id");
             // delete all rows by index
-            const queueIds = data.map(({ index }) => {
-                const queue = queues ? queues[index] : null;
-                return queue ? queue.id : null;
-            });
+            // const queueIds = data.map(({ index }) => {
+            //     const queue = queues ? queues[index] : null;
+            //     return queue ? queue.id : null;
+            // });
 
-            deleteQueues(queueIds);
+            // deleteQueues(queueIds);
         },
         //filterType: 'checkbox',
     };
 
-    if (queues) {
+    if (users && roles) {
         return (
             <Container>
                 <MUIDataTable
-                    title={"Queues"}
-                    data={queues}
+                    title={"Users"}
+                    data={users}
                     columns={columns}
                     options={options}
                 />
@@ -368,4 +400,4 @@ const QueuesPage: React.FC = () => {
     }
 };
 
-export default QueuesPage;
+export default UsersPage;

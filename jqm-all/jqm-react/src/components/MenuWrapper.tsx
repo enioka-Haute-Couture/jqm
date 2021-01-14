@@ -192,7 +192,9 @@ export default function MenuWrapper(props: any) {
                         <ListItemIcon><AssignmentIcon /></ListItemIcon>
                         <ListItemText primary={"Job definitions"} />
                     </ListItem>
-                    <ListItem button key={"users"} disabled>
+                    <ListItem button key={"users"}
+                        component={NavLink}
+                        to="/users">
                         <ListItemIcon><SupervisorAccountIcon /></ListItemIcon>
                         <ListItemText primary={"Users"} />
                     </ListItem>
