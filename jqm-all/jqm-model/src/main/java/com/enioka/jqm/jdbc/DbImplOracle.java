@@ -146,4 +146,22 @@ public class DbImplOracle extends DbAdapter
     {
         return JobInstance.select(cnx, "ji_select_poll", queue.getId(), headSize);
     }
+
+    @Override
+    public boolean testDbUnreachable(Exception e)
+    {
+        if (e instanceof SQLException
+            && (e.getMessage().contains("Connection is closed")
+            || e.getMessage().contains("Closed Connection")))
+        {
+            return true;
+        }
+        if (e.getCause() != null
+            && (e.getCause().getMessage().contains("Connection is closed")
+            || e.getMessage().contains("Closed Connection")))
+        {
+            return true;
+        }
+        return false;
+    }
 }

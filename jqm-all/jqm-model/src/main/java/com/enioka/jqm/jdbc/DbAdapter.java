@@ -163,64 +163,13 @@ public abstract class DbAdapter
         return JobInstance.select(cnx, "ji_select_poll", queue.getId());
     }
 
-    // TODO : Doc
-    // TODO : Break down in DbAdapter implementation
-    public boolean testDbUnreachable(Exception e)
-    {
-        System.out.println("testDbUnreachable : class: " + e.getClass().getName() + " - message: " + e.getMessage());
-
-        if ((e instanceof SQLTransientException) || (e.getCause() != null && e.getCause() instanceof SQLTransientException))
-        {
-            return true;
-        }
-        if (e instanceof SQLNonTransientConnectionException || e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
-        {
-            return true;
-        }
-        if (e.getCause() != null && e.getCause().getCause() instanceof SQLTransientException)
-        {
-            return true;
-        }
-        if (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() instanceof SQLTransientException)
-        {
-            return true;
-        }
-        if (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() != null
-            && e.getCause().getCause().getCause().getCause() instanceof SQLTransientException)
-        {
-            return true;
-        }
-
-        if (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof SocketException)
-        {
-            return true;
-        }
-
-        if (e.getCause() != null && e.getCause() instanceof SQLNonTransientException
-            && e.getCause().getMessage().equals("connection exception: closed"))
-        {
-            return true;
-        }
-
-        if (e instanceof SQLException
-            && (e.getMessage().equals("Failed to validate a newly established connection.")
-            ||  e.getMessage().contains("FATAL: terminating connection due to administrator command")
-            ||  e.getMessage().contains("This connection has been closed")
-            || e.getMessage().contains("Communications link failure")
-            || e.getMessage().contains("Connection is closed")))
-        {
-            return true;
-        }
-        if (e.getCause() != null
-            && (e.getCause().getMessage().equals("This connection has been closed.")
-            || e.getCause().getMessage().contains("Communications link failure")
-            || e.getCause().getMessage().contains("Connection is closed")))
-        {
-            return true;
-        }
-
-        System.out.println("\treturn false");
-        return false;
-    }
+    /**
+     * Test the exception to determine whether the database is offline.
+     * Errors are specific to each type of database
+     *
+     * @param e exception to test
+     * @return true if the database is closed
+     */
+    public abstract boolean testDbUnreachable(Exception e);
 
 }
