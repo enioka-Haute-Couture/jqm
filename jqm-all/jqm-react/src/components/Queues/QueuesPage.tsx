@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
     Container,
     Grid,
@@ -34,10 +34,9 @@ const QueuesPage: React.FC = () => {
 
     useEffect(() => {
         fetchQueues();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const fetchQueues = () => {
+    const fetchQueues = useCallback(() => {
         APIService.get("/q")
             .then((response) => {
                 setQueues(response);
@@ -54,33 +53,36 @@ const QueuesPage: React.FC = () => {
                     }
                 );
             });
-    };
+    }, [enqueueSnackbar]);
 
-    const createQueue = (newQueue: Queue) => {
-        APIService.post("/q", newQueue)
-            .then(() => {
-                setShowModal(false);
-                fetchQueues();
-                enqueueSnackbar(
-                    `Successfully created queue: ${newQueue.name}`,
-                    {
-                        variant: "success",
-                    }
-                );
-            })
-            .catch((reason) => {
-                console.log(reason);
-                enqueueSnackbar(
-                    "An error occured, please contact support support@enioka.com for help.",
-                    {
-                        variant: "error",
-                        persist: true,
-                    }
-                );
-            });
-    };
+    const createQueue = useCallback(
+        (newQueue: Queue) => {
+            APIService.post("/q", newQueue)
+                .then(() => {
+                    setShowModal(false);
+                    fetchQueues();
+                    enqueueSnackbar(
+                        `Successfully created queue: ${newQueue.name}`,
+                        {
+                            variant: "success",
+                        }
+                    );
+                })
+                .catch((reason) => {
+                    console.log(reason);
+                    enqueueSnackbar(
+                        "An error occured, please contact support support@enioka.com for help.",
+                        {
+                            variant: "error",
+                            persist: true,
+                        }
+                    );
+                });
+        },
+        [enqueueSnackbar, fetchQueues]
+    );
 
-    const deleteQueues = async (queueIds: any[]) => {
+    const deleteQueues = useCallback(async (queueIds: any[]) => {
         await Promise.all(queueIds.map((id) => APIService.delete("/q/" + id)))
             .then(() => {
                 fetchQueues();
@@ -103,7 +105,7 @@ const QueuesPage: React.FC = () => {
                     }
                 );
             });
-    };
+    }, []);
 
     /*
      * Render cell containing boolean value
@@ -297,20 +299,20 @@ const QueuesPage: React.FC = () => {
             return (
                 <>
                     <Tooltip title={"Add line"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"add"}
-                            onClick={() => setShowModal(true)}
-                        >
-                            <AddCircleIcon />
-                            {showModal && (
-                                <CreateQueueModal
-                                    showModal={showModal}
-                                    closeModal={() => setShowModal(false)}
-                                    createQueue={createQueue}
-                                />
-                            )}
-                        </IconButton>
+                        <>
+                            <IconButton
+                                color="default"
+                                aria-label={"add"}
+                                onClick={() => setShowModal(true)}
+                            >
+                                <AddCircleIcon />
+                            </IconButton>
+                            <CreateQueueModal
+                                showModal={showModal}
+                                closeModal={() => setShowModal(false)}
+                                createQueue={createQueue}
+                            />
+                        </>
                     </Tooltip>
                     <Tooltip title={"Refresh"}>
                         <IconButton

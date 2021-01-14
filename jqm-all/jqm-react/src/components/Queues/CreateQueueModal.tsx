@@ -1,15 +1,10 @@
 import React, { useState } from "react";
 import { Queue } from "./Queue";
-import {
-    Button,
-    Switch,
-} from "@material-ui/core";
+import { Button, Switch } from "@material-ui/core";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Modal from "@material-ui/core/Modal";
 import TextField from "@material-ui/core/TextField/TextField";
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-
-
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 function getModalStyle() {
     const top = 50;
@@ -43,11 +38,8 @@ export const CreateQueueModal: React.FC<{
     const [queueName, setQueueName] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [defaultQueue, setDefaultQueue] = useState(false);
-
-
-    const classes = useStyles();
-    // getModalStyle is not a pure function, we roll the style only on the first render
     const [modalStyle] = React.useState(getModalStyle);
+    const classes = useStyles();
 
     const body = (
         <div style={modalStyle} className={classes.paper}>
@@ -59,31 +51,52 @@ export const CreateQueueModal: React.FC<{
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setQueueName(event.target.value);
                     }}
-                    fullWidth />
-                <TextField label="Description"
+                    fullWidth
+                />
+                <TextField
+                    label="Description"
                     value={description}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setDescription(event.target.value);
                     }}
-                    fullWidth />
+                    fullWidth
+                />
                 <FormControlLabel
                     control={
                         <Switch
                             checked={defaultQueue}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            onChange={(
+                                event: React.ChangeEvent<HTMLInputElement>
+                            ) => {
                                 setDefaultQueue(event.target.checked);
-                            }} />
+                            }}
+                        />
                     }
                     label="Default queue"
                 />
-
             </form>
-            <Button variant="contained" size="small" onClick={closeModal} style={{ margin: "8px" }}>Cancel</Button>
-            <Button variant="contained" size="small" color="primary" disabled={!queueName || !description}
+            <Button
+                variant="contained"
+                size="small"
+                onClick={closeModal}
+                style={{ margin: "8px" }}
+            >
+                Cancel
+            </Button>
+            <Button
+                variant="contained"
+                size="small"
+                color="primary"
+                disabled={!queueName || !description}
                 style={{ margin: "8px" }}
                 onClick={() => {
-                    createQueue({ name: queueName!, description: description, defaultQueue: defaultQueue });
-                }}>
+                    createQueue({
+                        name: queueName!,
+                        description: description,
+                        defaultQueue: defaultQueue,
+                    });
+                }}
+            >
                 Create
             </Button>
         </div>
@@ -92,7 +105,7 @@ export const CreateQueueModal: React.FC<{
     return (
         <Modal
             open={showModal}
-            onClose={closeModal} // TODO: fix this, doesn't work
+            onClose={closeModal}
             aria-labelledby="simple-modal-title"
         >
             {body}
