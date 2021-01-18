@@ -1,78 +1,83 @@
 version: "3.5"
 services:
-  # Standalone HSQLDB database - we reuse the HSQLDB jar present in the JQM distribution but could use any HSQLDB image instead.
-  # Note we assume there is only one manager - otherwise the task may go from one node to another... and loose data! This is for tests only.
-  db:
-    image: enioka/jqm:${JQM_VERSION:-latest}
-    entrypoint:
-      - java
-      - -classpath
-      - ./ext/*
-      - org.hsqldb.server.Server
-      - --database.0
-      #- file:/jqm/hotdeploy/jqm
-      - file:jqm
-      - -dbname.0
-      - jqm
-    healthcheck:
-      disable: true
-    #volumes:
-      #- dbdata:C:/jqm/hotdeploy/
-    deploy:
-      mode: replicated
-      replicas: 1
-      endpoint_mode: dnsrr
-      placement:
-        constraints:
-          - node.role == manager
+    # Standalone HSQLDB database - we reuse the HSQLDB jar present in the JQM distribution but could use any HSQLDB image instead.
+    # Note we assume there is only one manager - otherwise the task may go from one node to another... and loose data! This is for tests only.
+    db:
+        image: enioka/jqm:${JQM_VERSION:-latest}
+        isolation: ${DOCKER_ISOLATION_MODE:-'process'}
+        entrypoint:
+            - java
+            - -classpath
+            - ./ext/*
+            - org.hsqldb.server.Server
+            - --database.0
+            #- file:/jqm/hotdeploy/jqm
+            - file:jqm
+            - -dbname.0
+            - jqm
+        healthcheck:
+            disable: true
+        #volumes:
+        #- dbdata:C:/jqm/hotdeploy/
+        deploy:
+            mode: replicated
+            replicas: 1
+            endpoint_mode: dnsrr
+            placement:
+                constraints:
+                    - node.role == manager
 
-  # Database schema updater on startup.
-  jqmbootstrap:
-    image: enioka/jqm:${JQM_VERSION:-latest}
-    environment:
-      - JQM_NODE_NAME=_localhost_
-      - JQM_INIT_MODE=UPDATER
-      - JQM_POOL_CONNSTR=jdbc:hsqldb:hsql://db/jqm
-    healthcheck:
-      disable: true
-    deploy:
-      mode: replicated
-      replicas: 1
-      endpoint_mode: dnsrr
-      restart_policy:
-        condition: none
+    # Database schema updater on startup.
+    jqmbootstrap:
+        image: enioka/jqm:${JQM_VERSION:-latest}
+        isolation: ${DOCKER_ISOLATION_MODE:-'process'}
+        environment:
+            - JQM_NODE_NAME=_localhost_
+            - JQM_INIT_MODE=UPDATER
+            - JQM_POOL_CONNSTR=jdbc:hsqldb:hsql://db/jqm
+        healthcheck:
+            disable: true
+        deploy:
+            mode: replicated
+            replicas: 1
+            endpoint_mode: dnsrr
+            restart_policy:
+                condition: none
 
-  # JQM nodes with web administration enabled.
-  jqmweb:
-    image: enioka/jqm:${JQM_VERSION:-latest}
-    environment:
-      - JQM_NODE_NAME=_localhost_
-      - JQM_NODE_WS_INTERFACE=_localhost_
-      - JQM_INIT_MODE=CLUSTER
-      - JQM_CREATE_NODE_TEMPLATE=TEMPLATE_WEB
-      - JQM_POOL_CONNSTR=jdbc:hsqldb:hsql://db/jqm
-    ports:
-      - target: 1789
-        published: 8080
-        protocol: tcp
-        mode: host
-    deploy:
-      mode: replicated
-      replicas: 1
-      endpoint_mode: dnsrr
-  
-  # JQM worker nodes, without web admin enabled.
-  jqmworker:
-    image: enioka/jqm:${JQM_VERSION:-latest}
-    environment:
-      - JQM_NODE_NAME=_localhost_
-      - JQM_INIT_MODE=CLUSTER
-      - JQM_CREATE_NODE_TEMPLATE=TEMPLATE_DRONE
-      - JQM_POOL_CONNSTR=jdbc:hsqldb:hsql://db/jqm
-    deploy:
-      mode: replicated
-      replicas: 2
-      endpoint_mode: dnsrr
+    # JQM nodes with web administration enabled.
+    jqmweb:
+        image: enioka/jqm:${JQM_VERSION:-latest}
+        isolation: ${DOCKER_ISOLATION_MODE:-'process'}
+        environment:
+            - JQM_NODE_NAME=_localhost_
+            - JQM_NODE_WS_INTERFACE=_localhost_
+            - JQM_INIT_MODE=CLUSTER
+            - JQM_CREATE_NODE_TEMPLATE=TEMPLATE_WEB
+            - JQM_POOL_CONNSTR=jdbc:hsqldb:hsql://db/jqm
+        ports:
+            - target: 1789
+              published: 8080
+              protocol: tcp
+              mode: host
+        deploy:
+            mode: replicated
+            replicas: 1
+            endpoint_mode: dnsrr
+
+    # JQM worker nodes, without web admin enabled.
+    jqmworker:
+        image: enioka/jqm:${JQM_VERSION:-latest}
+        isolation: ${DOCKER_ISOLATION_MODE:-'process'}
+        environment:
+            - JQM_NODE_NAME=_localhost_
+            - JQM_NODE_WS_INTERFACE=_localhost_
+            - JQM_INIT_MODE=CLUSTER
+            - JQM_CREATE_NODE_TEMPLATE=TEMPLATE_DRONE
+            - JQM_POOL_CONNSTR=jdbc:hsqldb:hsql://db/jqm
+        deploy:
+            mode: replicated
+            replicas: 2
+            endpoint_mode: dnsrr
 
 volumes:
-  dbdata:
+    dbdata:
