@@ -4,7 +4,7 @@
  * <br>
  * This package is separated from the DTO package as we may one day have a public administration API, and it is a good idea to separate the
  * implementation (this package) from the interface contract (the DTOs).
- * 
+ *
  *
  */
 @org.osgi.annotation.bundle.Export
