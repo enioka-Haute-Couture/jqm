@@ -33,6 +33,7 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -47,7 +48,7 @@ import com.enioka.jqm.jdbc.NoResultException;
 
 /**
  * Starter class & parameter parsing
- * 
+ *
  */
 public class Main
 {
@@ -67,7 +68,7 @@ public class Main
 
     /**
      * Windows service entry point for service start
-     * 
+     *
      * @param args
      */
     static void start(String[] args)
@@ -78,7 +79,7 @@ public class Main
 
     /**
      * Windows service entry point for service stop
-     * 
+     *
      * @param args
      */
     static void stop(String[] args)
@@ -89,9 +90,9 @@ public class Main
 
     /**
      * Startup method for the packaged JAR
-     * 
+     *
      * @param args
-     *            0 is node name
+     *                 0 is node name
      */
     @SuppressWarnings("static-access")
     public static void main(String[] args)
@@ -136,12 +137,10 @@ public class Main
                 .withDescription("Create or update a JQM account. Roles must exist beforehand.").create("U");
         Option o151 = OptionBuilder.withArgName("configXmlFile").hasArg().withDescription("Import this file. JQM internal use only.")
                 .withLongOpt("configXmlFile").create("c");
-        Option o161 = OptionBuilder.withArgName("apply-node-template").hasArg()
-                .withDescription("Copy all queue polling parameters from one node to the another node. Syntax is templatenode,targetnode")
+        Option o161 = OptionBuilder.withArgName("apply-node-template").hasArg().withDescription(
+                "Copy all queue polling parameters from one node to the another node. Syntax is templatenode,targetnode[,targetnode_host]")
                 .withLongOpt("apply-node-template").create("t");
-        Option o171 = OptionBuilder
-                .withDescription("Returns node count")
-                .create("nodecount");
+        Option o171 = OptionBuilder.withDescription("Returns node count").create("nodecount");
 
         Options options = new Options();
         OptionGroup og1 = new OptionGroup();
@@ -282,7 +281,15 @@ public class Main
             // Node re-templating
             else if (line.hasOption(o161.getOpt()))
             {
-                applyTemplate(line.getOptionValue(o161.getOpt()).split(",")[0], line.getOptionValue(o161.getOpt()).split(",")[1]);
+                String[] oargs = line.getOptionValue(o161.getOpt()).split(",");
+                if (oargs.length == 2)
+                {
+                    applyTemplate(oargs[0], oargs[1], null);
+                }
+                else if (oargs.length == 3)
+                {
+                    applyTemplate(oargs[0], oargs[1], oargs[2]);
+                }
             }
             // Node count
             else if (line.hasOption(o171.getOpt()))
@@ -489,7 +496,7 @@ public class Main
         }
     }
 
-    private static void applyTemplate(String templateNode, String targetNode)
+    private static void applyTemplate(String templateNode, String targetNode, String targetNodeHost)
     {
         DbConn cnx = null;
         try
@@ -537,7 +544,7 @@ public class Main
             target.setLoadApiClient(template.getLoadApiClient());
             target.setLoapApiSimple(template.getLoapApiSimple());
             target.setOutputDirectory(template.getOutputDirectory());
-            target.setDns(template.getDns());
+            target.setDns(StringUtils.isNotEmpty(targetNodeHost) ? targetNodeHost : template.getDns());
             target.setPort(template.getPort());
             target.setRootLogLevel(template.getRootLogLevel());
             target.setTmpDirectory(template.getTmpDirectory());
