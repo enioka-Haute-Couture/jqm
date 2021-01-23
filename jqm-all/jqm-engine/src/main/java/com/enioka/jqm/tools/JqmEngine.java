@@ -330,7 +330,8 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             {
                 if (pollers.containsKey(i.getId()))
                 {
-                    // Nothing to do - the poller updates its own parameters.
+                    // Nothing to do - the poller updates its own parameters. Just tell it the node is enabled (idempotent)
+                    pollers.get(i.getId()).resume();
                 }
                 else
                 {
@@ -366,7 +367,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             // Pause all pollers
             for (QueuePoller qp : this.pollers.values())
             {
-                qp.setMaxThreads(0);
+                qp.pause();
             }
         }
     }
