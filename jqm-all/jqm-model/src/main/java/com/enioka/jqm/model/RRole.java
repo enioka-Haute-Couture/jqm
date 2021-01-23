@@ -79,9 +79,10 @@ public class RRole implements Serializable
     public static List<RRole> select(DbConn cnx, String query_key, Object... args)
     {
         List<RRole> res = new ArrayList<RRole>();
+        ResultSet rs = null;
         try
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
+            rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 RRole tmp = new RRole();
@@ -96,6 +97,10 @@ public class RRole implements Serializable
         catch (SQLException e)
         {
             throw new DatabaseException(e);
+        }
+        finally
+        {
+            cnx.closeQuietly(rs);
         }
         return res;
     }

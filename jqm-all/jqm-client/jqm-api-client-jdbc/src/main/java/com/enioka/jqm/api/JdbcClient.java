@@ -488,6 +488,10 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("Could not extract History data for launch " + launchId, e);
         }
+        finally
+        {
+            closeQuietly(rs);
+        }
 
         return jd;
     }
@@ -743,12 +747,13 @@ final class JdbcClient implements JqmClient
     public int restartCrashedJob(int idJob)
     {
         DbConn cnx = null;
+        ResultSet rs = null;
 
         // History and Job ID have the same ID.
         try
         {
             cnx = getDbSession();
-            ResultSet rs = cnx.runSelect("history_select_reenqueue_by_id", idJob);
+            rs = cnx.runSelect("history_select_reenqueue_by_id", idJob);
 
             if (!rs.next())
             {
@@ -788,6 +793,7 @@ final class JdbcClient implements JqmClient
         }
         finally
         {
+            closeQuietly(rs);
             closeQuietly(cnx);
         }
     }
@@ -1696,10 +1702,11 @@ final class JdbcClient implements JqmClient
     {
         DbConn cnx = getDbSession();
         URL url = null;
+        ResultSet rs = null;
 
         try
         {
-            ResultSet rs = cnx.runSelect("node_select_connectdata_by_key", nodeName);
+            rs = cnx.runSelect("node_select_connectdata_by_key", nodeName);
             if (!rs.next())
             {
                 throw new NoResultException("no node named " + nodeName);
@@ -1729,6 +1736,7 @@ final class JdbcClient implements JqmClient
         }
         finally
         {
+            closeQuietly(rs);
             closeQuietly(cnx);
         }
 
@@ -2092,10 +2100,11 @@ final class JdbcClient implements JqmClient
     public QueueStatus getQueueStatus(com.enioka.jqm.api.Queue q)
     {
         DbConn cnx = null;
+        ResultSet rs = null;
         try
         {
             cnx = getDbSession();
-            ResultSet rs = cnx.runSelect("dp_select_enabled_for_queue", q.getId());
+            rs = cnx.runSelect("dp_select_enabled_for_queue", q.getId());
 
             int nbEnabled = 0, nbDisabled = 0;
             while (rs.next())
@@ -2132,6 +2141,7 @@ final class JdbcClient implements JqmClient
         }
         finally
         {
+            closeQuietly(rs);
             closeQuietly(cnx);
         }
     }
@@ -2141,10 +2151,11 @@ final class JdbcClient implements JqmClient
     {
         int capacity = 0;
         DbConn cnx = null;
+        ResultSet rs = null;
         try
         {
             cnx = getDbSession();
-            ResultSet rs = cnx.runSelect("dp_select_sum_queue_capacity", q.getId());
+            rs = cnx.runSelect("dp_select_sum_queue_capacity", q.getId());
 
             while (rs.next())
             {
@@ -2157,6 +2168,7 @@ final class JdbcClient implements JqmClient
         }
         finally
         {
+            closeQuietly(rs);
             closeQuietly(cnx);
         }
 
