@@ -42,7 +42,7 @@ The breaking changes are:
 Deprecated
 +++++++++++++++
 
-* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-client-jdbc" artifact. The redirection will be removed in a future release.
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-client-core" artifact. The redirection will be removed in a future release.
 * JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs).
 
 

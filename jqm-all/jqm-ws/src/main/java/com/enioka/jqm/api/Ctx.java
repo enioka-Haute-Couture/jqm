@@ -4,6 +4,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import com.enioka.jqm.api.client.core.JqmClientFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

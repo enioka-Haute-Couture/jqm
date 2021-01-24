@@ -21,6 +21,8 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import com.enioka.jqm.api.client.core.JqmClientException;
+
 @Provider
 public class JqmInternalExceptionMapper implements ExceptionMapper<JqmClientException>
 {

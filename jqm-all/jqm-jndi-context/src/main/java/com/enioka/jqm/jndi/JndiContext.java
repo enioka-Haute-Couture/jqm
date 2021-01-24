@@ -1,0 +1,357 @@
+/**
+ * Copyright © 2013 enioka. All rights reserved
+ * Authors: Marc-Antoine GOUILLART (marc-antoine.gouillart@enioka.com)
+ *          Pierre COPPEE (pierre.coppee@enioka.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.enioka.jqm.jndi;
+
+import java.lang.management.ManagementFactory;
+import java.lang.reflect.Method;
+import java.rmi.Remote;
+import java.rmi.registry.Registry;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.naming.CompositeName;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.Name;
+import javax.naming.NameParser;
+import javax.naming.NamingException;
+import javax.naming.spi.InitialContextFactory;
+import javax.naming.spi.InitialContextFactoryBuilder;
+
+import com.enioka.jqm.cl.ExtClassLoader;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * This class implements a basic JNDI context, using a class loader seeing only JQM_ROOT/ext.
+ *
+ */
+public class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory, NameParser
+{
+    private static Logger jqmlogger = LoggerFactory.getLogger(JndiContext.class);
+
+    private Map<String, Object> singletons = new HashMap<>();
+    private List<ObjectName> jmxNames = new ArrayList<>();
+    private Registry r = null;
+    private ClassLoader extResources = ExtClassLoader.instance;
+
+    /**
+     * Create a new Context
+     *
+     * @throws NamingException
+     */
+    JndiContext() throws NamingException
+    {
+        super();
+    }
+
+    @Override
+    public Object lookup(String name) throws NamingException
+    {
+        if (name == null)
+        {
+            throw new IllegalArgumentException("name cannot be null");
+        }
+        jqmlogger.trace("Looking up a JNDI element named " + name);
+
+        // Special delegated cases
+        if (name.startsWith("rmi:"))
+        {
+            try
+            {
+                return this.r.lookup(name.split("/")[3]);
+            }
+            catch (Exception e)
+            {
+                NamingException e1 = new NamingException();
+                e1.setRootCause(e);
+                throw e1;
+            }
+        }
+        if (name.endsWith("serverName"))
+        {
+            // TODO: this was a hack anyway. Should be removed soon.
+            // return JqmEngine.latestNodeStartedName;
+            return "not implemented";
+        }
+
+        // If in cache...
+        if (singletons.containsKey(name))
+        {
+            jqmlogger.trace("JNDI element named " + name + " found in cache.");
+            return singletons.get(name);
+        }
+
+        // Retrieve the resource description from the database or the XML file
+        JndiResourceDescriptor d = ResourceParser.getDescriptor(name);
+        jqmlogger.trace("JNDI element named " + name + " not found in cache. Will be created. Singleton status: " + d.isSingleton());
+
+        // Singleton handling is synchronized to avoid double creation
+        if (d.isSingleton())
+        {
+            synchronized (singletons)
+            {
+                if (singletons.containsKey(name))
+                {
+                    return singletons.get(name);
+                }
+
+                // We use the current thread loader to find the resource and resource factory class - ext is inside that CL.
+                // This is done only for payload CL - engine only need ext, not its own CL (as its own CL does NOT include ext).
+                Object res = null;
+                try
+                {
+                    ResourceFactory rf = new ResourceFactory(
+                            /*
+                             * TODO : check Thread.currentThread().getContextClassLoader() instanceof
+                             * com.enioka.jqm.runner.api.PayloadClassLoader ? Thread.currentThread().getContextClassLoader() :
+                             */extResources);
+                    res = rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
+                }
+                catch (Exception e)
+                {
+                    jqmlogger.warn("Could not instanciate singleton JNDI object resource " + name, e);
+                    NamingException ex = new NamingException(e.getMessage());
+                    ex.initCause(e);
+                    throw ex;
+                }
+
+                // Cache result
+                // TODO: check
+                if (res.getClass().getClassLoader() != null) // instanceof PayloadClassLoader)
+                {
+                    jqmlogger.warn(
+                            "A JNDI resource was defined as singleton but was loaded by a payload class loader - it won't be cached to avoid class loader leaks");
+                }
+                else
+                {
+                    singletons.put(name, res);
+
+                    // Pool JMX registration (only if cached - avoids leaks)
+                    if ("org.apache.tomcat.jdbc.pool.DataSourceFactory".equals(d.getFactoryClassName())
+                            && (d.get("jmxEnabled") == null ? true : Boolean.parseBoolean((String) d.get("jmxEnabled").getContent())))
+                    {
+                        try
+                        {
+                            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                            ObjectName jmxname = new ObjectName("com.enioka.jqm:type=JdbcPool,name=" + name);
+                            mbs.registerMBean(res.getClass().getMethod("getPool").invoke(res).getClass().getMethod("getJmxPool")
+                                    .invoke(res.getClass().getMethod("getPool").invoke(res)), jmxname);
+                            jmxNames.add(jmxname);
+                        }
+                        catch (Exception e)
+                        {
+                            jqmlogger.warn("Could not register JMX MBean for resource.", e);
+                        }
+                    }
+                }
+
+                // Done
+                return res;
+            }
+        }
+
+        // Non singleton
+        try
+        {
+            // We use the current thread loader to find the resource and resource factory class - ext is inside that CL.
+            // This is done only for payload CL - engine only need ext, not its own CL (as its own CL does NOT include ext).
+            ResourceFactory rf = new ResourceFactory(
+                    /*
+                     * TODO : check Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.runner.api.PayloadClassLoader ?
+                     * Thread.currentThread().getContextClassLoader() :
+                     */extResources);
+            return rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
+        }
+        catch (Exception e)
+        {
+            jqmlogger.warn("Could not instanciate JNDI object resource " + name, e);
+            NamingException ex = new NamingException(e.getMessage());
+            ex.initCause(e);
+            throw ex;
+        }
+    }
+
+    public void resetSingletons()
+    {
+        jqmlogger.info("Resetting singleton JNDI resource cache");
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        for (ObjectName n : this.jmxNames)
+        {
+            try
+            {
+                mbs.unregisterMBean(n);
+            }
+            catch (Exception e)
+            {
+                jqmlogger.error("could not unregister bean", e);
+            }
+        }
+        this.jmxNames = new ArrayList<>();
+        this.singletons = new HashMap<>();
+    }
+
+    @Override
+    public Object lookup(Name name) throws NamingException
+    {
+        return this.lookup(StringUtils.join(Collections.list(name.getAll()), "/"));
+    }
+
+    @Override
+    public Context getInitialContext(Hashtable<?, ?> environment) throws NamingException
+    {
+        return this;
+    }
+
+    @Override
+    public InitialContextFactory createInitialContextFactory(Hashtable<?, ?> environment) throws NamingException
+    {
+        return this;
+    }
+
+    @Override
+    public NameParser getNameParser(String name) throws NamingException
+    {
+        return this;
+    }
+
+    @Override
+    public Name parse(String name) throws NamingException
+    {
+        return new CompositeName(name);
+    }
+
+    @Override
+    public void close() throws NamingException
+    {
+        // Nothing to do.
+    }
+
+    @Override
+    public void bind(String name, Object obj) throws NamingException
+    {
+        jqmlogger.debug("binding [" + name + "] to a [" + obj.getClass().getCanonicalName() + "]");
+        if (r != null && name.startsWith("rmi://"))
+        {
+            try
+            {
+                jqmlogger.debug("binding [" + name.split("/")[3] + "] to a [" + obj.getClass().getCanonicalName() + "]");
+                this.r.bind(name.split("/")[3], (Remote) obj);
+            }
+            catch (Exception e)
+            {
+                NamingException e1 = new NamingException("could not bind RMI object");
+                e1.setRootCause(e);
+                throw e1;
+            }
+        }
+        else
+        {
+            this.singletons.put(name, obj);
+        }
+    }
+
+    @Override
+    public void bind(Name name, Object obj) throws NamingException
+    {
+        this.bind(StringUtils.join(Collections.list(name.getAll()), "/"), obj);
+    }
+
+    /**
+     * Will register the given Registry as a provider for the RMI: context. If there is already a registered Registry, the call is ignored.
+     *
+     * @param r
+     */
+    void registerRmiContext(Registry r)
+    {
+        if (this.r == null)
+        {
+            this.r = r;
+        }
+    }
+
+    /**
+     * @return the class loader holding the ext directory (or null if no ext directory - should never happen)
+     */
+    ClassLoader getExtCl()
+    {
+        return this.extResources;
+    }
+
+    @Override
+    public void unbind(Name name) throws NamingException
+    {
+        this.unbind(StringUtils.join(Collections.list(name.getAll()), "/"));
+    }
+
+    @Override
+    public void unbind(String name) throws NamingException
+    {
+        if (r != null && name.startsWith("rmi://"))
+        {
+            try
+            {
+                jqmlogger.debug("unbinding RMI name " + name);
+                this.r.unbind(name.split("/")[3]);
+            }
+            catch (Exception e)
+            {
+                NamingException e1 = new NamingException("could not unbind RMI name");
+                e1.setRootCause(e);
+                throw e1;
+            }
+        }
+        else
+        {
+            this.singletons.remove(name);
+        }
+    }
+
+    /**
+     * A helper - in Java 9, the extension CL was renamed to platform CL and hosts all the JDK classes. Before 9, it was useless and we used
+     * bootstrap CL instead.
+     *
+     * @return the base CL to use.
+     */
+    private static ClassLoader getParentCl()
+    {
+        try
+        {
+            Method m = ClassLoader.class.getMethod("getPlatformClassLoader");
+            return (ClassLoader) m.invoke(null);
+        }
+        catch (NoSuchMethodException e)
+        {
+            // Java < 9, just use the bootstrap CL.
+            return null;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Could not fetch Platform Class Loader", e);
+        }
+    }
+}

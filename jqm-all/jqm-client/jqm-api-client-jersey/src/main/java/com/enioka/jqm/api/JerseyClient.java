@@ -38,6 +38,17 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 
+import com.enioka.jqm.api.client.core.Deliverable;
+import com.enioka.jqm.api.client.core.JobDef;
+import com.enioka.jqm.api.client.core.JobInstance;
+import com.enioka.jqm.api.client.core.JobRequest;
+import com.enioka.jqm.api.client.core.JqmClient;
+import com.enioka.jqm.api.client.core.JqmClientException;
+import com.enioka.jqm.api.client.core.JqmInvalidRequestException;
+import com.enioka.jqm.api.client.core.Query;
+import com.enioka.jqm.api.client.core.Queue;
+import com.enioka.jqm.api.client.core.QueueStatus;
+
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -484,7 +495,7 @@ final class JerseyClient implements JqmClient
     }
 
     @Override
-    public void setJobQueue(int idJob, com.enioka.jqm.api.Queue queue)
+    public void setJobQueue(int idJob, com.enioka.jqm.api.client.core.Queue queue)
     {
         setJobQueue(idJob, queue.getId());
     }
@@ -596,7 +607,7 @@ final class JerseyClient implements JqmClient
     ///////////////////////////////////////////////////////////////////////
 
     @Override
-    public com.enioka.jqm.api.JobInstance getJob(int idJob)
+    public com.enioka.jqm.api.client.core.JobInstance getJob(int idJob)
     {
         try
         {
@@ -613,7 +624,7 @@ final class JerseyClient implements JqmClient
     }
 
     @Override
-    public List<com.enioka.jqm.api.JobInstance> getJobs()
+    public List<com.enioka.jqm.api.client.core.JobInstance> getJobs()
     {
         try
         {
@@ -628,7 +639,7 @@ final class JerseyClient implements JqmClient
     }
 
     @Override
-    public List<com.enioka.jqm.api.JobInstance> getActiveJobs()
+    public List<com.enioka.jqm.api.client.core.JobInstance> getActiveJobs()
     {
         try
         {
@@ -643,7 +654,7 @@ final class JerseyClient implements JqmClient
     }
 
     @Override
-    public List<com.enioka.jqm.api.JobInstance> getUserActiveJobs(String user)
+    public List<com.enioka.jqm.api.client.core.JobInstance> getUserActiveJobs(String user)
     {
         try
         {
@@ -724,7 +735,7 @@ final class JerseyClient implements JqmClient
     ///////////////////////////////////////////////////////////////////////
 
     @Override
-    public List<com.enioka.jqm.api.Deliverable> getJobDeliverables(int idJob)
+    public List<com.enioka.jqm.api.client.core.Deliverable> getJobDeliverables(int idJob)
     {
         try
         {
@@ -754,7 +765,7 @@ final class JerseyClient implements JqmClient
     }
 
     @Override
-    public InputStream getDeliverableContent(com.enioka.jqm.api.Deliverable d)
+    public InputStream getDeliverableContent(com.enioka.jqm.api.client.core.Deliverable d)
     {
         try
         {
@@ -826,7 +837,7 @@ final class JerseyClient implements JqmClient
     ///////////////////////////////////////////////////////////////////////
 
     @Override
-    public List<com.enioka.jqm.api.Queue> getQueues()
+    public List<com.enioka.jqm.api.client.core.Queue> getQueues()
     {
         try
         {

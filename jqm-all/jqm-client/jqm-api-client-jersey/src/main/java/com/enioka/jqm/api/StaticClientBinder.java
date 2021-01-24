@@ -15,6 +15,9 @@
  */
 package com.enioka.jqm.api;
 
+import com.enioka.jqm.api.client.core.IClientFactory;
+import com.enioka.jqm.api.client.core.IClientFactoryBinder;
+
 class StaticClientBinder implements IClientFactoryBinder
 {
     private static final StaticClientBinder SINGLETON = new StaticClientBinder();
