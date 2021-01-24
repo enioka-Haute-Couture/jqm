@@ -84,6 +84,31 @@
             <artifactId>jqm-providers</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-jndi-context</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-impl-hsql</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-impl-pg</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-runner-shell</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-runner-java</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- We also integrate the XML import/export functions -->
         <dependency>
@@ -102,6 +127,22 @@
         <!-- LOGGING -->
         <dependency>
             <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <!--
+        <dependency>
+            <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
@@ -110,6 +151,7 @@
             <artifactId>jul-to-slf4j</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
+        -->
 
         <!-- JETTY: this distribution embeds the admin website -->
         <dependency>
@@ -191,6 +233,19 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- ================ OSGI ================== -->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.scr</artifactId>
+            <version>2.1.24</version>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.cm</artifactId>
+            <version>1.6.0</version>
+        </dependency>
+
     </dependencies>
 
 </project>

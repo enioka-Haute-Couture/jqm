@@ -25,8 +25,8 @@ import javax.persistence.Persistence;
 import org.apache.log4j.Logger;
 
 import com.enioka.jqm.api.JobBase;
-import com.enioka.jqm.api.JobRequest;
-import com.enioka.jqm.api.JqmClientFactory;
+import com.enioka.jqm.api.client.core.JobRequest;
+import com.enioka.jqm.api.client.core.JqmClientFactory;
 
 @SuppressWarnings("deprecation")
 public class App extends JobBase

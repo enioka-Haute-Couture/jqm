@@ -41,6 +41,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 
+import com.enioka.jqm.api.client.core.JobRequest;
+import com.enioka.jqm.api.client.core.JqmClientFactory;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.Deliverable;

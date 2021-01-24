@@ -45,6 +45,10 @@ import com.enioka.api.admin.QueueDto;
 import com.enioka.api.admin.QueueMappingDto;
 import com.enioka.api.admin.RRoleDto;
 import com.enioka.api.admin.RUserDto;
+import com.enioka.jqm.api.client.core.JdbcClient;
+import com.enioka.jqm.api.client.core.JqmClientException;
+import com.enioka.jqm.api.client.core.JqmClientFactory;
+import com.enioka.jqm.api.client.core.SelfDestructFileStream;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobDef;
@@ -52,8 +56,8 @@ import com.enioka.jqm.model.RPermission;
 import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.RUser;
 import com.enioka.jqm.pki.JdbcCa;
-import com.enioka.jqm.tools.JqmXmlException;
-import com.enioka.jqm.tools.XmlJobDefExporter;
+import com.enioka.jqm.xml.JqmXmlException;
+import com.enioka.jqm.xml.XmlJobDefExporter;
 
 @Path("/admin")
 public class ServiceAdmin
