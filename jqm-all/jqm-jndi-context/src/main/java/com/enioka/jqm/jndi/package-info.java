@@ -1,3 +1,4 @@
-@org.osgi.annotation.bundle.Export
-@org.osgi.annotation.versioning.Version("3.0.0")
+/**
+ * A simple JNDI directory for use within the JQM engine.
+ */
 package com.enioka.jqm.jndi;

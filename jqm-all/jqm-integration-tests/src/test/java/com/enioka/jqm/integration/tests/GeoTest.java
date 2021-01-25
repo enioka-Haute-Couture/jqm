@@ -18,14 +18,10 @@
 
 package com.enioka.jqm.integration.tests;
 
-import org.slf4j.LoggerFactory;
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import org.junit.After;
+import com.enioka.jqm.test.helpers.TestHelpers;
+
 import org.junit.Before;
 import org.junit.Test;
-
-import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class GeoTest extends JqmBaseTest
 {
@@ -34,15 +30,6 @@ public class GeoTest extends JqmBaseTest
     {
         TestHelpers.setNodesLogLevel("INFO", cnx);
         cnx.commit();
-    }
-
-    @After
-    public void a()
-    {
-        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        root.setLevel(Level.toLevel("DEBUG"));
-        Logger log = (Logger) LoggerFactory.getLogger("com.enioka");
-        log.setLevel(Level.toLevel("DEBUG"));
     }
 
     @Test

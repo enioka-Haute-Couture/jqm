@@ -21,7 +21,7 @@ package com.enioka.jqm.jndi;
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
 
-public class JndiResourceDescriptor extends Reference
+class JndiResourceDescriptor extends Reference
 {
     private static final long serialVersionUID = 3348684996519775949L;
     private boolean singleton = false;

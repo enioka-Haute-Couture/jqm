@@ -1,8 +1,5 @@
 package com.enioka.jqm.jdbc;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -13,15 +10,15 @@ import java.util.Properties;
 
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import com.enioka.jqm.loader.Loader;
+
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.enioka.jqm.loader.Loader;
 
 /**
  * Entry point for all database-related operations, from initialization to schema upgrade, as well as creating sessions for querying the
@@ -41,13 +38,6 @@ public class Db
      */
     private static final int SCHEMA_COMPATIBLE_VERSION = 2;
 
-    /**
-     * The list of different database adapters. We are using reflection for loading them for future extensibility.
-     */
-    private static String[] ADAPTERS = new String[] { "com.enioka.jqm.jdbc.DbImplPg", "com.enioka.jqm.jdbc.DbImplHsql",
-            "com.enioka.jqm.jdbc.DbImplOracle", "com.enioka.jqm.jdbc.DbImplMySql8", "com.enioka.jqm.jdbc.DbImplMySql",
-            "com.enioka.jqm.jdbc.DbImplDb2" };
-
     private DataSource _ds = null;
     private DbAdapter adapter = null;
     private String product;
@@ -66,15 +56,16 @@ public class Db
      * Constructor for cases when a DataSource is readily available (and not retrieved through JNDI).
      *
      * @param ds
-     *                         the existing DataSource.
+     *            the existing DataSource.
      * @param updateSchema
-     *                         set to true if the database schema should upgrade (if needed) during initialization
+     *            set to true if the database schema should upgrade (if needed) during initialization
      */
     public Db(DataSource ds, boolean updateSchema)
     {
         this._ds = ds;
         this.p = new Properties();
-        init(updateSchema);
+        this.p.setProperty("com.enioka.jqm.jdbc.allowSchemaUpdate", updateSchema + "");
+        initAdapterAndSchema(this.p);
     }
 
     /**
@@ -89,16 +80,15 @@ public class Db
 
         if (p.containsKey("com.enioka.jqm.jdbc.url"))
         {
-            // In this case - full JDBC construction, not from JNDI. Only works for HSQLDB.
+            // In this case - full JDBC construction, not from JNDI. Only works for HSQLDB, useful only in tests.
+            // TODO: remove this case, it only brings confusion to this class.
 
             // Allow upgrade by default in this case (this is used only in tests)
-            boolean upgrade = Boolean.parseBoolean(p.getProperty("com.enioka.jqm.jdbc.allowSchemaUpdate", "true"));
             String url = p.getProperty("com.enioka.jqm.jdbc.url");
 
             DataSource ds = null;
             if (url.contains("jdbc:hsqldb"))
             {
-
                 Class<? extends DataSource> dsclass;
                 try
                 {
@@ -111,7 +101,7 @@ public class Db
 
                 try
                 {
-                    ds = dsclass.newInstance();
+                    ds = dsclass.getConstructor().newInstance();
                     dsclass.getMethod("setDatabase", String.class).invoke(ds, "jdbc:hsqldb:mem:testdbengine");
                 }
                 catch (Exception e)
@@ -125,7 +115,7 @@ public class Db
             }
 
             this._ds = ds;
-            init(upgrade);
+            initAdapterAndSchema(p);
         }
         else
         {
@@ -141,8 +131,6 @@ public class Db
             {
                 dsName = oldName;
             }
-
-            boolean upgrade = Boolean.parseBoolean(p.getProperty("com.enioka.jqm.jdbc.allowSchemaUpdate", "false"));
 
             // Try to open the pool.
             this._ds = getDataSource(dsName, retryCount, waitMs);
@@ -162,7 +150,7 @@ public class Db
                 throw new DatabaseException("no data source found");
             }
 
-            init(upgrade);
+            initAdapterAndSchema(p);
         }
     }
 
@@ -171,16 +159,7 @@ public class Db
         int retries = 0;
         DataSource res = null;
 
-        // Fom XML file
-        try
-        {
-            res = BootstrapDatasourceLoader.getDatasourceFromXml(dsName);
-        }
-        catch (NamingException e)
-        {
-            return null;
-        }
-
+        // Get DataSource from JNDI (either JQM self-hosted JNDI directory or the directory of the app server, depending on the use case)
         while (res == null)
         {
             try
@@ -221,63 +200,18 @@ public class Db
     }
 
     /**
-     * Helper method to load the standard JQM property files from class path.
-     *
-     * @return a Properties object, which may be empty but not null.
-     */
-    public static Properties loadProperties()
-    {
-        return loadProperties(new String[] { "META-INF/jqm.properties", "jqm.properties" });
-    }
-
-    /**
-     * Helper method to load a property file from class path.
-     *
-     * @param filesToLoad
-     *                        an array of paths (class path paths) designating where the files may be. All files are loaded, in the order
-     *                        given. Missing files are silently ignored.
-     *
-     * @return a Properties object, which may be empty but not null.
-     */
-    private static Properties loadProperties(String[] filesToLoad)
-    {
-        Properties p = new Properties();
-
-        for (String path : filesToLoad)
-        {
-            try (InputStream fis = Db.class.getClassLoader().getSystemResourceAsStream(path))
-            {
-                if (fis != null)
-                {
-                    p.load(fis);
-                    jqmlogger.info("A jqm.properties file was found at {}", path);
-                }
-            }
-            catch (IOException e)
-            {
-                // We allow no configuration files, but not an unreadable configuration file.
-                throw new DatabaseException("META-INF/jqm.properties file is invalid", e);
-            }
-        }
-
-        // Overload the datasource name from environment variable if any (tests only).
-        String dbName = System.getenv("DB");
-        if (dbName != null)
-        {
-            p.put("com.enioka.jqm.jdbc.datasource", "jdbc/" + dbName);
-        }
-
-        // Done
-        return p;
-    }
-
-    /**
      * Main database initialization. To be called only when _ds is a valid DataSource.
      */
-    private void init(boolean upgrade)
+    private void initAdapterAndSchema(Properties p)
     {
-        initAdapter();
+        // Select a DB adapter
+        initAdapter(p);
+
+        // Adapt and cache all JQM SQL queries with the selected DB adapter.
         initQueries();
+
+        // Create or upgrade schema
+        boolean upgrade = Boolean.parseBoolean(p.getProperty("com.enioka.jqm.jdbc.allowSchemaUpdate", "false"));
         if (upgrade)
         {
             dbUpgrade();
@@ -442,27 +376,34 @@ public class Db
     }
 
     /**
-     * Creates the adapter for the target database.
+     * Creates the adapter for the target database. The list of available adapters comes either from the OSGi service registry or from a
+     * property.
      */
-    private void initAdapter()
+    private void initAdapter(Properties p)
     {
         DbAdapter newAdpt = null;
+
+        String dbAdaptersProp = p.getProperty("com.enioka.jqm.jdbc.adapters");
 
         try (Connection tmp = _ds.getConnection())
         {
             DatabaseMetaData meta = tmp.getMetaData();
             product = meta.getDatabaseProductName().toLowerCase();
 
-            try
+            if (dbAdaptersProp == null || dbAdaptersProp.isEmpty())
             {
+                // OSGi case - always fails outside an OSGi framework with class not found exceptions.
+                jqmlogger.info("Database adapter search: using OSGi services");
                 try
                 {
-                    BundleContext context = org.osgi.framework.FrameworkUtil.getBundle(getClass()).getBundleContext();
+                    BundleContext context = FrameworkUtil.getBundle(getClass()).getBundleContext();
                     Loader<DbAdapter> loader = new Loader<DbAdapter>(context, DbAdapter.class, "(Adapter-Type=*)");
                     loader.start();
-                
+
                     for (ServiceReference<?> ref : loader.references)
                     {
+                        jqmlogger.info("\t\tFound DB adapter plugin {}:{}", ref.getBundle().getSymbolicName(),
+                                ref.getBundle().getVersion());
                         DbAdapter newAdapter = (DbAdapter) context.getService(ref);
                         if (newAdapter.compatibleWith(meta))
                         {
@@ -473,44 +414,37 @@ public class Db
                 }
                 catch (Exception e)
                 {
-                    throw new DatabaseException("Issue when loading database adapter");
+                    throw new DatabaseException("Issue when loading database adapter", e);
                 }
             }
-            catch (NoClassDefFoundError exception)
+            else
             {
-                if (exception.getMessage().contains("org/osgi"))
+                // Standard Java class loading environment.
+                jqmlogger.info("Database adapter search: using initialization property {}", dbAdaptersProp);
+                for (String s : dbAdaptersProp.split(","))
                 {
-                    for (String s : ADAPTERS)
+                    try
                     {
-                        try
+                        // Note this cannot work in an OSGi classloader - it could not see classes outside the current bundle. without
+                        // manifest imports.
+                        Class<? extends DbAdapter> clazz = Db.class.getClassLoader().loadClass(s).asSubclass(DbAdapter.class);
+                        newAdpt = clazz.getConstructor().newInstance();
+                        if (newAdpt.compatibleWith(meta))
                         {
-                            Class<? extends DbAdapter> clazz = Db.class.getClassLoader().loadClass(s).asSubclass(DbAdapter.class);
-                            newAdpt = clazz.newInstance();
-                            if (newAdpt.compatibleWith(meta))
-                            {
-                                adapter = newAdpt;
-                                break;
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            throw new DatabaseException("Issue when loading database adapter named: " + s, e);
+                            adapter = newAdpt;
+                            break;
                         }
                     }
+                    catch (Exception e)
+                    {
+                        throw new DatabaseException("Issue when loading database adapter named: " + s, e);
+                    }
                 }
-                else
-                {
-                    throw exception;
-                }
-            }
-            catch (Exception e)
-            {
-                throw e;
             }
         }
-        catch (SQLException e)
+        catch (SQLException e1)
         {
-            throw new DatabaseException("Cannot connect to the database", e);
+            throw new DatabaseException("Cannot connect to the database", e1);
         }
 
         if (adapter == null)
@@ -569,7 +503,7 @@ public class Db
      * Gets the interpolated text of a query from cache. If key does not exist, an exception is thrown.
      *
      * @param key
-     *                name of the query
+     *            name of the query
      * @return the query text
      */
     String getQuery(String key)

@@ -19,11 +19,28 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire.version}</version>
+                <configuration>
+                    <trimStackTrace>false</trimStackTrace>
+                    <!--<argLine>-XX:MaxMetaspaceSize=128m -Xms150m -Xmx256m -verbose:class</argLine>-->
+                    <systemProperties>
+                        <property>
+                            <name>mavenVersion</name>
+                            <value>${project.version}</value>
+                        </property>
+                    </systemProperties>
+                    <!-- <classpathDependencyScopeExclude>compile</classpathDependencyScopeExclude>-->
+                </configuration>
+            </plugin>
+
             <!-- Create ext and lib directories for tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.10</version>
+                <version>${plugin.dependency.version}</version>
                 <configuration>
                     <skip>false</skip>
                 </configuration>
@@ -96,6 +113,11 @@
                                     <artifactId>smtp</artifactId>
                                     <version>${mail.version}</version>
                                 </dependency>
+                                <dependency>
+                                    <groupId>com.sun.activation</groupId>
+                                    <artifactId>jakarta.activation</artifactId>
+                                    <version>1.2.2</version>
+                                </dependency>                                <!-- Needed by mail for recent Java versions -->
 
                             </artifactItems>
                             <outputDirectory>${project.basedir}/ext</outputDirectory>
@@ -132,6 +154,22 @@
                                 </artifactItem>
                             </artifactItems>
                             <outputDirectory>${project.basedir}/plugins</outputDirectory>
+                        </configuration>
+                    </execution>
+
+                    <!-- Needed for the external runner tests which start a full OSGi framework -->
+                    <execution>
+                        <id>copy-bundles</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/bundle</outputDirectory>
+                            <stripVersion>true</stripVersion>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <excludeGroupIds>org.hsqldb,org.ops4j.pax.url,org.ops4j.pax.exam,biz.aQute.bnd,org.ops4j.pax.swissbox,org.ops4j.pax.tinybundles,org.eclipse.jetty</excludeGroupIds>
+                            <excludeArtifactIds>org.apache.felix.framework,jqm-providers,jqm-runner-basic,jqm-runner-spring,jqm-ws,jqm-test-helpers,tomcat-jdbc,org.apache.felix.framework,osgi.core,osgi.annotation,commons-beanutils,geronimo-jaxrs_2.1_spec,geronimo-osgi-locator</excludeArtifactIds>
                         </configuration>
                     </execution>
                 </executions>
@@ -179,15 +217,16 @@
                 </executions>
             </plugin>
 
-            <!-- Copy test payload XML files -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
+                    <!-- Copy test payload XML files -->
                     <execution>
                         <id>copy-payloads</id>
-                        <phase>compile</phase>
+                        <phase>process-test-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -201,38 +240,27 @@
                             </resources>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
 
-            <!-- Include all tests inside the result jar so as to be able to import
-				the tests in other artifacts -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.1</version>
-                <executions>
+                    <!-- Copy the library version reference from jqm-service -->
                     <execution>
+                        <id>copy-version-file</id>
+                        <phase>process-test-resources</phase>
                         <goals>
-                            <goal>test-jar</goal>
+                            <goal>copy-resources</goal>
                         </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/META-INF/maven</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/../jqm-service/target/classes/META-INF/maven/</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-            <!-- Generate dependency tree for pax exam-->
-            <plugin>
-                <groupId>org.apache.servicemix.tooling</groupId>
-                <artifactId>depends-maven-plugin</artifactId>
-                <version>1.4.0</version>
-                <executions>
-                    <execution>
-                        <id>generate-depends-file</id>
-                        <goals>
-                            <goal>generate-depends-file</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
@@ -263,7 +291,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <version>2.8</version>
+                        <version>${plugin.dependency.version}</version>
                         <configuration>
                             <skip>false</skip>
                         </configuration>
@@ -295,22 +323,173 @@
 
     <dependencies>
         <!-- This project mostly tests the service JQM distribution -->
+        <!-- This is actually going to be inside the OSGi classpath, not the test class path, so it is here mostly for Maven build ordering.-->
         <dependency>
-            <groupId>com.enioka.jqm</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>jqm-service</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-clusternode</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-cli-bootstrap</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-admin</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-xml</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-model-repository</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-pki</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
-        <!-- Tests helpers -->
+        <!-- Need the APIs not present in the service -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-api-client-jdbc</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.shiro</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-api-client-jersey</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-engine-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>            <!-- For the JMX bean API -->
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-runner-java-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-test-helpers</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.shiro</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Tests helpers -->
+        <dependency>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
+            <version>1.0.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.aries.spec</groupId>
+            <artifactId>org.apache.aries.javax.jax.rs-api</artifactId>
+            <version>${jaxrs.api.version}</version>
+            <scope>provided</scope>
+        </dependency>        <!-- needed for exceptions -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>${mail.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.11</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- DB drivers for tests -->
@@ -318,49 +497,66 @@
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <version>${hsqldb.version}</version>
+            <scope>test</scope>
         </dependency>
 
+        <!-- OSGi framework & associated services-->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework</artifactId>
+            <version>${felix.version}</version>
+        </dependency>
+
+        <!-- PAX-EXAM allows us to more easily test OSGi bundles with Apache Felix -->
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-container-native</artifactId>
             <version>${pax.exam.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-junit4</artifactId>
             <version>${pax.exam.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-link-mvn</artifactId>
             <version>${pax.exam.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-aether</artifactId>
             <version>${pax.url.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-wrap</artifactId>
             <version>${pax.url.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.framework</artifactId>
-            <version>${felix.version}</version>
+            <groupId>org.ops4j.pax.url</groupId>
+            <artifactId>pax-url-reference</artifactId>
+            <version>2.6.7</version>
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

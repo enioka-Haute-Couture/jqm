@@ -37,14 +37,14 @@ import org.slf4j.LoggerFactory;
 import com.enioka.jqm.api.JobRunnerException;
 import com.enioka.jqm.model.ClHandler;
 import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.runner.java.api.jndi.JavaPayloadClassLoader;
 
 /**
  * The {@link URLClassLoader} that will load everything related to a payload (the payload jar and all its dependencies).<br>
  * It is also responsible for launching the payload (be it a Runnable, a main function, etc).
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public
-class PayloadClassLoader extends URLClassLoader
+public class PayloadClassLoader extends URLClassLoader implements JavaPayloadClassLoader
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(PayloadClassLoader.class);
 
@@ -80,18 +80,19 @@ class PayloadClassLoader extends URLClassLoader
 
     /**
      * Everything here can run without the database.
-     * 
+     *
      * @param job
-     *                       the JI to run.
+     *            the JI to run.
      * @param parameters
-     *                       already resolved runtime parameters
+     *            already resolved runtime parameters
      * @param clm
-     *                       the CLM having created this CL.
+     *            the CLM having created this CL.
      * @param h
-     *                       given as parameter because its constructor needs the database.
+     *            given as parameter because its constructor needs the database.
      * @throws JqmEngineException
      */
-    public void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, EngineApiProxy h) throws JobRunnerException
+    public void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, EngineApiProxy h)
+            throws JobRunnerException
     {
         // 1 - Create the proxy.
         Object proxy = null;

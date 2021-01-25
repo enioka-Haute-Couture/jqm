@@ -1,18 +1,20 @@
 package com.enioka.jqm.integration.tests;
 
-import com.enioka.jqm.api.client.core.JobRequest;
-import com.enioka.jqm.api.client.core.JqmClientFactory;
+import com.enioka.jqm.client.api.JobRequest;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 
 /**
  * A set of configuration launches helpful for some bug inquiries.
  *
  */
+@Ignore
 public class ZHelperManualTest extends JqmBaseTest
 {
+    @Ignore
     // @Test
     public void testDbFailureUnderLoadWithExternalDb() throws Exception
     {
@@ -24,11 +26,11 @@ public class ZHelperManualTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "pyl.Nothing", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", TestHelpers.qVip, -1,
                 "TestJqmApplication", "appFreeName", "TestModule", "kw1", "kw2", "kw3", false, cnx);
 
-        JobRequest j = new JobRequest("TestJqmApplication", "TestUser");
+        JobRequest j = jqmClient.newJobRequest("TestJqmApplication", "TestUser");
 
         for (int i = 0; i < 1000; i++)
         {
-            JqmClientFactory.getClient().enqueue(j);
+            j.enqueue();
         }
 
         addAndStartEngine();
@@ -48,13 +50,13 @@ public class ZHelperManualTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "pyl.Nothing", null, "jqm-tests/jqm-test-pyl-nodep/target/test.jar", TestHelpers.qVip, -1,
                 "TestJqmApplication", "appFreeName", "TestModule", "kw1", "kw2", "kw3", false, cnx);
 
-        JobRequest j = new JobRequest("TestJqmApplication", "TestUser");
+        JobRequest j = jqmClient.newJobRequest("TestJqmApplication", "TestUser");
 
         int ji = 0;
         for (int i = 0; i < 1000; i++)
         {
             ++ji;
-            JqmClientFactory.getClient().enqueue(j);
+            j.enqueue();
         }
 
         addAndStartEngine();

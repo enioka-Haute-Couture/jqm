@@ -1,16 +1,15 @@
 package com.enioka.jqm.engine;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.enioka.jqm.api.client.core.JobRequest;
-import com.enioka.jqm.api.client.core.JqmClientFactory;
+import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.ScheduledJob;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import it.sauronsoftware.cron4j.Scheduler;
 import it.sauronsoftware.cron4j.SchedulingPattern;
@@ -24,7 +23,7 @@ import it.sauronsoftware.cron4j.TaskTable;
  * thread to check if this node should be the one doing the scheduling in the cluster.
  *
  */
-public class CronScheduler implements Runnable, TaskCollector
+class CronScheduler implements Runnable, TaskCollector
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(CronScheduler.class);
 
@@ -197,8 +196,7 @@ public class CronScheduler implements Runnable, TaskCollector
         @Override
         public void execute(TaskExecutionContext context) throws RuntimeException
         {
-            JobRequest jr = JobRequest.create("", "cron").setScheduleId(sj.getId());
-            JqmClientFactory.getClient().enqueue(jr);
+            JqmClientFactory.getClient().newJobRequest("", "cron").setScheduleId(sj.getId()).enqueue();
         }
 
     }

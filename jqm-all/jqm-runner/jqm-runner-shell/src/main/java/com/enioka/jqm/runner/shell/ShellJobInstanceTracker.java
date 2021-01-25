@@ -11,14 +11,15 @@ import java.util.Map;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import com.enioka.jqm.runner.api.JobInstanceTracker;
 import com.enioka.jqm.api.JobManager;
-import com.enioka.jqm.runner.api.JobRunnerCallback;
 import com.enioka.jqm.api.JobRunnerException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.State;
+import com.enioka.jqm.runner.api.JobInstanceTracker;
+import com.enioka.jqm.runner.api.JobRunnerCallback;
+import com.enioka.jqm.runner.shell.api.jmx.ShellJobInstanceTrackerMBean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

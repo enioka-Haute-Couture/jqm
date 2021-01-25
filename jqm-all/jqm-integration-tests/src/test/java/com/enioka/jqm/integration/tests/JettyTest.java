@@ -17,21 +17,18 @@ package com.enioka.jqm.integration.tests;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 
 import javax.net.ssl.SSLContext;
 
-import com.enioka.jqm.api.client.core.JobRequest;
-import com.enioka.jqm.api.client.core.JqmClientFactory;
-import com.enioka.jqm.engine.Helpers;
+import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.pki.JdbcCa;
+import com.enioka.jqm.repository.UserManagementRepository;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -42,42 +39,56 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.ops4j.pax.exam.Option;
 
 public class JettyTest extends JqmBaseTest
 {
-    @Before
-    public void before() throws IOException
+    private int port;
+
+    @Override
+    protected Option[] moreOsgiconfig()
     {
-        File jar = FileUtils.listFiles(new File("../jqm-ws/target/"), new String[] { "war" }, false).iterator().next();
-        FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war"));
+        return webConfig();
+    }
+
+    private void waitStartup()
+    {
+        serviceWaiter.waitForService("[com.enioka.jqm.ws.api.ServiceSimple]");
+        serviceWaiter.waitForService("[javax.servlet.Servlet]"); // HTTP whiteboard
+        serviceWaiter.waitForService("[javax.servlet.Servlet]"); // JAX-RS whiteboard
+
+        port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
+        jqmlogger.info("Jetty port seen by client is {}", port);
     }
 
     @Test
     public void testSslStartup()
     {
-        Helpers.setSingleParam("enableWsApiSsl", "true", cnx);
-        Helpers.setSingleParam("disableWsApi", "false", cnx);
-        Helpers.setSingleParam("enableWsApiAuth", "false", cnx);
+        GlobalParameter.setParameter(cnx, "enableWsApiSsl", "true");
+        GlobalParameter.setParameter(cnx, "disableWsApi", "false");
+        GlobalParameter.setParameter(cnx, "enableWsApiAuth", "false");
+        cnx.commit();
 
         addAndStartEngine();
+        waitStartup();
     }
 
     @Test
     public void testSslServices() throws Exception
     {
-        Helpers.setSingleParam("enableWsApiSsl", "true", cnx);
-        Helpers.setSingleParam("disableWsApi", "false", cnx);
-        Helpers.setSingleParam("enableWsApiAuth", "false", cnx);
+        GlobalParameter.setParameter(cnx, "enableWsApiSsl", "true");
+        GlobalParameter.setParameter(cnx, "disableWsApi", "false");
+        GlobalParameter.setParameter(cnx, "enableWsApiAuth", "false");
+        cnx.commit();
 
         addAndStartEngine();
+        waitStartup();
 
         // Launch a job so as to be able to query its status later
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
-        JobRequest j = new JobRequest("MarsuApplication", "TestUser");
-        int i = JqmClientFactory.getClient().enqueue(j);
+        int i = jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
         TestHelpers.waitFor(1, 10000, cnx);
 
         // HTTPS client - with
@@ -112,19 +123,19 @@ public class JettyTest extends JqmBaseTest
     @Test
     public void testSslClientCert() throws Exception
     {
-        Helpers.setSingleParam("enableWsApiSsl", "true", cnx);
-        Helpers.setSingleParam("disableWsApi", "false", cnx);
-        Helpers.setSingleParam("enableWsApiAuth", "true", cnx);
-        Helpers.createUserIfMissing(cnx, "testuser", null, "test user", "client read only");
+        GlobalParameter.setParameter(cnx, "enableWsApiSsl", "true");
+        GlobalParameter.setParameter(cnx, "disableWsApi", "false");
+        GlobalParameter.setParameter(cnx, "enableWsApiAuth", "true");
+        UserManagementRepository.createUserIfMissing(cnx, "testuser", null, "test user", "client read only");
         cnx.commit();
 
         addAndStartEngine();
+        waitStartup();
 
         // Launch a job so as to be able to query its status later
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
-        JobRequest j = new JobRequest("MarsuApplication", "TestUser");
-        int i = JqmClientFactory.getClient().enqueue(j);
+        int i = jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
         TestHelpers.waitFor(1, 10000, cnx);
 
         // Server auth against trusted CA root certificate

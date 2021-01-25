@@ -18,7 +18,7 @@ package com.enioka.jqm.engine;
 /**
  * Handler of POSIX-like TERM/INT signals: gracefully shut down.
  */
-public class SignalHandler extends Thread
+class SignalHandler extends Thread
 {
     private JqmEngine e = null;
 

@@ -59,7 +59,8 @@ public class CreationTools
     // private static Logger jqmlogger = LoggerFactory.getLogger(CreationTools.class);
 
     private CreationTools()
-    {}
+    {
+    }
 
     // ------------------ JOB DEFINITION ------------------------
 
@@ -279,5 +280,15 @@ public class CreationTools
         }
 
         RUser.create(cnx, login, new Sha512Hash(password, salt, 100000).toHex(), salt.toHex(), rr);
+    }
+
+    // ---------------------------- STRING -----------------------------------------------------
+
+    public static void createJndiString(DbConn cnx, String jndiAlias, String description, String content)
+    {
+        HashMap<String, String> prms = new HashMap<>();
+        prms.put("STRING", content);
+
+        JndiObjectResource.create(cnx, jndiAlias, "java.lang.String", "com.enioka.jqm.providers.StringFactory", description, false, prms);
     }
 }
