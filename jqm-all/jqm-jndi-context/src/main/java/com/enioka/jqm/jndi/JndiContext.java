@@ -41,16 +41,18 @@ import javax.naming.spi.InitialContextFactory;
 import javax.naming.spi.InitialContextFactoryBuilder;
 
 import com.enioka.jqm.cl.ExtClassLoader;
+import com.enioka.jqm.runner.java.api.jndi.JavaPayloadClassLoader;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class implements a basic JNDI context, using a class loader seeing only JQM_ROOT/ext.
+ * This class implements a basic JNDI context, using a class loader seeing only JQM_ROOT/ext or the payload classloader (which includes
+ * /ext)
  *
  */
-public class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory, NameParser
+class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory, NameParser
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(JndiContext.class);
 
@@ -58,6 +60,7 @@ public class JndiContext extends InitialContext implements InitialContextFactory
     private List<ObjectName> jmxNames = new ArrayList<>();
     private Registry r = null;
     private ClassLoader extResources = ExtClassLoader.instance;
+    private String serverName = null;
 
     /**
      * Create a new Context
@@ -92,11 +95,29 @@ public class JndiContext extends InitialContext implements InitialContextFactory
                 throw e1;
             }
         }
+        // TODO: find a non-hackish way to do give latest server started. (service offered by engine?)
         if (name.endsWith("serverName"))
         {
-            // TODO: this was a hack anyway. Should be removed soon.
-            // return JqmEngine.latestNodeStartedName;
-            return "not implemented";
+            return serverName;
+        }
+        if (name.startsWith("serverName://"))
+        {
+            serverName = name.split("//")[1];
+            return null;
+        }
+        if (name.startsWith("internal://reset")) // For easier tests, as this is a global singleton hard to wire in bundles...
+        {
+            resetSingletons();
+            return null;
+        }
+        if (name.startsWith("internal://xml/"))
+        {
+            ResourceParser.resourceFile = name.substring(15);
+            return null;
+        }
+        if (name.equals("cl://ext")) // special case needed for tests, as the ext CL will always be the same (shared between OSGi runners)
+        {
+            return this.extResources;
         }
 
         // If in cache...
@@ -125,11 +146,10 @@ public class JndiContext extends InitialContext implements InitialContextFactory
                 Object res = null;
                 try
                 {
-                    ResourceFactory rf = new ResourceFactory(
-                            /*
-                             * TODO : check Thread.currentThread().getContextClassLoader() instanceof
-                             * com.enioka.jqm.runner.api.PayloadClassLoader ? Thread.currentThread().getContextClassLoader() :
-                             */extResources);
+                    ResourceFactory rf = new ResourceFactory(Thread.currentThread().getContextClassLoader() != null
+                            && Thread.currentThread().getContextClassLoader() instanceof JavaPayloadClassLoader
+                                    ? Thread.currentThread().getContextClassLoader()
+                                    : extResources);
                     res = rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
                 }
                 catch (Exception e)
@@ -140,9 +160,8 @@ public class JndiContext extends InitialContext implements InitialContextFactory
                     throw ex;
                 }
 
-                // Cache result
-                // TODO: check
-                if (res.getClass().getClassLoader() != null) // instanceof PayloadClassLoader)
+                // Cache result (if loaded by ext CL or below)
+                if (!isLoadedByExtClassloader(res))
                 {
                     jqmlogger.warn(
                             "A JNDI resource was defined as singleton but was loaded by a payload class loader - it won't be cached to avoid class loader leaks");
@@ -180,11 +199,10 @@ public class JndiContext extends InitialContext implements InitialContextFactory
         {
             // We use the current thread loader to find the resource and resource factory class - ext is inside that CL.
             // This is done only for payload CL - engine only need ext, not its own CL (as its own CL does NOT include ext).
-            ResourceFactory rf = new ResourceFactory(
-                    /*
-                     * TODO : check Thread.currentThread().getContextClassLoader() instanceof com.enioka.jqm.runner.api.PayloadClassLoader ?
-                     * Thread.currentThread().getContextClassLoader() :
-                     */extResources);
+            ResourceFactory rf = new ResourceFactory(Thread.currentThread().getContextClassLoader() != null
+                    && Thread.currentThread().getContextClassLoader() instanceof JavaPayloadClassLoader
+                            ? Thread.currentThread().getContextClassLoader()
+                            : extResources);
             return rf.getObjectInstance(d, null, this, new Hashtable<String, Object>());
         }
         catch (Exception e)
@@ -255,11 +273,19 @@ public class JndiContext extends InitialContext implements InitialContextFactory
     public void bind(String name, Object obj) throws NamingException
     {
         jqmlogger.debug("binding [" + name + "] to a [" + obj.getClass().getCanonicalName() + "]");
+
+        if (name.equals("rmi://") && obj instanceof Registry)
+        {
+            jqmlogger.debug("Binding JMX registry inside JNDI directory");
+            this.r = (Registry) obj;
+            return;
+        }
+
         if (r != null && name.startsWith("rmi://"))
         {
             try
             {
-                jqmlogger.debug("binding [" + name.split("/")[3] + "] to a [" + obj.getClass().getCanonicalName() + "]");
+                jqmlogger.debug("Binding [" + name.split("/")[3] + "] to a [" + obj.getClass().getCanonicalName() + "]");
                 this.r.bind(name.split("/")[3], (Remote) obj);
             }
             catch (Exception e)
@@ -292,14 +318,6 @@ public class JndiContext extends InitialContext implements InitialContextFactory
         {
             this.r = r;
         }
-    }
-
-    /**
-     * @return the class loader holding the ext directory (or null if no ext directory - should never happen)
-     */
-    ClassLoader getExtCl()
-    {
-        return this.extResources;
     }
 
     @Override
@@ -353,5 +371,19 @@ public class JndiContext extends InitialContext implements InitialContextFactory
         {
             throw new RuntimeException("Could not fetch Platform Class Loader", e);
         }
+    }
+
+    private boolean isLoadedByExtClassloader(Object o)
+    {
+        ClassLoader cl = extResources;
+        do
+        {
+            if (o.getClass().getClassLoader() == cl)
+            {
+                return true;
+            }
+            cl = cl.getParent();
+        } while (cl != null);
+        return o.getClass().getClassLoader() == null; // special case, as null is in many JVMs the root CL.
     }
 }

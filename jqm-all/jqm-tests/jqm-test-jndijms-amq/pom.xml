@@ -1,44 +1,45 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.enioka.jqm</groupId>
-		<artifactId>jqm-tests</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
-	</parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.enioka.jqm</groupId>
+        <artifactId>jqm-tests</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+    </parent>
 
-	<artifactId>jqm-test-jndijms-amq</artifactId>
-	<name>${project.groupId}:${project.artifactId}</name>
-	<url>http://jqm.readthedocs.org</url>
+    <artifactId>jqm-test-jndijms-amq</artifactId>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <url>http://jqm.readthedocs.org</url>
 
-	<dependencies>
-		<!-- The JQM job API -->
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-api</artifactId>			
-			<version>${project.version}</version>
-		</dependency>
+    <dependencies>
+        <!-- The JQM job API -->
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- **************************************************************** -->
-		<!-- We will use JMS -->
+        <!-- **************************************************************** -->
+        <!-- We will use JMS -->
 
-		<!-- A JMS API definition (alternative is the full EE6 API jar or IBM jms.jar) -->
-		<dependency>
-			<groupId>org.apache.geronimo.specs</groupId>
-			<artifactId>geronimo-jms_1.1_spec</artifactId>
-			<version>1.1.1</version>
-		</dependency>
+        <!-- A JMS API definition (alternative is the full EE6 API jar or IBM jms.jar) -->
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jms_1.1_spec</artifactId>
+            <version>1.1.1</version>
+        </dependency>
 
-		<!-- This tests uses ActiveMQ with an autostart embedded broker -->
-		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-all</artifactId>
-			<version>5.9.0</version>
-		</dependency>
+        <!-- This tests uses ActiveMQ with an autostart embedded broker -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-all</artifactId>
+            <version>5.16.3</version>
+        </dependency>
 
-		<!--End of JMS dependencies -->
-		<!-- **************************************************************** -->
+        <!--End of JMS dependencies -->
+        <!-- **************************************************************** -->
 
 
-	</dependencies>
+    </dependencies>
 
 </project>

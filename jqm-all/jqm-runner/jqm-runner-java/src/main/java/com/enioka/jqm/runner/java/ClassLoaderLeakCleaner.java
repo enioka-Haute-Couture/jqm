@@ -1,4 +1,4 @@
-package com.enioka.jqm.runner.java ;
+package com.enioka.jqm.runner.java;
 
 import java.beans.Introspector;
 import java.lang.management.ManagementFactory;
@@ -29,7 +29,7 @@ class ClassLoaderLeakCleaner
             try
             {
                 domain = mbean.getDomain();
-                if (domain.startsWith("java.") || domain.startsWith("com.sun.") || domain.startsWith("JMI")
+                if (domain.startsWith("java.") || domain.startsWith("com.sun.") || domain.startsWith("jdk.") || domain.startsWith("JMI")
                         || domain.startsWith("com.enioka."))
                 {
                     continue;

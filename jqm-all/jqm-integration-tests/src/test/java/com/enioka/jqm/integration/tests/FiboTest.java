@@ -22,14 +22,11 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.enioka.jqm.api.client.core.JobInstance;
-import com.enioka.jqm.api.client.core.Query;
-import com.enioka.jqm.api.client.core.Query.Sort;
-import com.enioka.jqm.service.CommonService;
+import com.enioka.jqm.client.api.JobInstance;
+import com.enioka.jqm.client.api.Query.Sort;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class FiboTest extends JqmBaseTest
@@ -43,7 +40,7 @@ public class FiboTest extends JqmBaseTest
     @After
     public void a()
     {
-        CommonService.setLogLevel("DEBUG");
+        // CommonService.setLogLevel("DEBUG");
     }
 
     @Test
@@ -51,7 +48,8 @@ public class FiboTest extends JqmBaseTest
     {
         JqmSimpleTest.create(cnx, "pyl.StressFibo").addRuntimeParameter("p1", "1").addRuntimeParameter("p2", "2").addWaitMargin(20000)
                 .expectOk(11).run(this);
-        // 1: (1,2) - 2: (2,3) - 3: (3,5) - 4: (5,8) - 5: (8,13) - 6: (13,21) - 7: (21,34) - 8: (34,55) - 9: (55,89) - 10: (89,144) -
+        // 1: (1,2) - 2: (2,3) - 3: (3,5) - 4: (5,8) - 5: (8,13) - 6: (13,21) - 7:
+        // (21,34) - 8: (34,55) - 9: (55,89) - 10: (89,144) -
         // 11: (134,233)
     }
 
@@ -61,7 +59,7 @@ public class FiboTest extends JqmBaseTest
         JqmSimpleTest.create(cnx, "pyl.StressFiboSync").addRuntimeParameter("p1", "34").addRuntimeParameter("p2", "55").expectOk(4)
                 .run(this);
 
-        List<JobInstance> res = Query.create().addSortAsc(Sort.ID).run();
+        List<JobInstance> res = jqmClient.newQuery().addSortAsc(Sort.ID).invoke();
         JobInstance h1, h2 = null;
         for (JobInstance h : res)
         {
@@ -80,7 +78,7 @@ public class FiboTest extends JqmBaseTest
     @Test
     public void testFiboHib() throws Exception
     {
-        Assume.assumeTrue(JqmBaseTest.s != null);
+        AssumeHsqldb();
         JqmSimpleTest.create(cnx, "pyl.StressFiboHib", "jqm-test-pyl-hibapi").addRuntimeParameter("p1", "1").addRuntimeParameter("p2", "2")
                 .addWaitMargin(60000).expectOk(11).run(this);
     }

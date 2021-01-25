@@ -15,20 +15,34 @@
  */
 package com.enioka.jqm.jndi;
 
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.naming.NamingException;
 import javax.naming.StringRefAddr;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.model.JndiObjectResource;
 import com.enioka.jqm.model.JndiObjectResourceParameter;
+import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Helper class to retrieve a {@link JndiResourceDescriptor} either from the XML resource file or from the database. <br>
  * XML file has priority over database.
  */
-public final class ResourceParser
+final class ResourceParser
 {
+    static String resourceFile = "resources.xml";
+    private static Map<String, JndiResourceDescriptor> xml = null;
 
     private ResourceParser()
     {
@@ -37,7 +51,24 @@ public final class ResourceParser
 
     static JndiResourceDescriptor getDescriptor(String alias) throws NamingException
     {
-        return fromDatabase(alias);
+        if (xml == null)
+        {
+            xml = new HashMap<String, JndiResourceDescriptor>();
+            importXml(resourceFile, false);
+
+            for (String file : System.getProperty("com.enioka.jqm.resourceFiles", ",").split(","))
+            {
+                importXml(file, true);
+            }
+        }
+        if (xml.containsKey(alias))
+        {
+            return xml.get(alias);
+        }
+        else
+        {
+            return fromDatabase(alias);
+        }
     }
 
     private static JndiResourceDescriptor fromDatabase(String alias) throws NamingException
@@ -69,4 +100,91 @@ public final class ResourceParser
         }
     }
 
+    private static void importXml(String fileName, boolean optional) throws NamingException
+    {
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+
+        // The resource file is either inside /conf (added to classpath by packaging) or inside test classpath (Maven resource path).
+        try (InputStream is = ClassLoader.getSystemResourceAsStream(fileName))
+        {
+            if (is == null && !optional)
+            {
+                throw new JqmRuntimeException("Cannot find in class path resource file named " + fileName);
+            }
+            if (is == null && optional)
+            {
+                return;
+            }
+
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(is);
+            doc.getDocumentElement().normalize();
+
+            NodeList nList = doc.getElementsByTagName("resource");
+
+            String jndiAlias = null, resourceClass = null, description = "no description", scope = null, auth = "Container", factory = null;
+            boolean singleton = false;
+
+            for (int i = 0; i < nList.getLength(); i++)
+            {
+                Node n = nList.item(i);
+                Map<String, String> otherParams = new HashMap<String, String>();
+
+                NamedNodeMap attrs = n.getAttributes();
+                for (int j = 0; j < attrs.getLength(); j++)
+                {
+                    Node attr = attrs.item(j);
+                    String key = attr.getNodeName();
+                    String value = attr.getNodeValue();
+
+                    if ("name".equals(key))
+                    {
+                        jndiAlias = value;
+                    }
+                    else if ("type".equals(key))
+                    {
+                        resourceClass = value;
+                    }
+                    else if ("description".equals(key))
+                    {
+                        description = value;
+                    }
+                    else if ("factory".equals(key))
+                    {
+                        factory = value;
+                    }
+                    else if ("auth".equals(key))
+                    {
+                        auth = value;
+                    }
+                    else if ("singleton".equals(key))
+                    {
+                        singleton = Boolean.parseBoolean(value);
+                    }
+                    else
+                    {
+                        otherParams.put(key, value);
+                    }
+                }
+
+                if (resourceClass == null || jndiAlias == null || factory == null)
+                {
+                    throw new NamingException("could not load the resource file " + resourceFile);
+                }
+
+                JndiResourceDescriptor jrd = new JndiResourceDescriptor(resourceClass, description, scope, auth, factory, singleton);
+                for (Map.Entry<String, String> prm : otherParams.entrySet())
+                {
+                    jrd.add(new StringRefAddr(prm.getKey(), prm.getValue()));
+                }
+                xml.put(jndiAlias, jrd);
+            }
+        }
+        catch (Exception e)
+        {
+            NamingException pp = new NamingException("could not initialize the JNDI local resources");
+            pp.setRootCause(e);
+            throw pp;
+        }
+    }
 }

@@ -10,7 +10,7 @@
 
     <artifactId>jqm-ws</artifactId>
     <name>${project.groupId}:${project.artifactId}</name>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <url>http://jqm.readthedocs.org</url>
     <description>JQM web API implementation and administration UI</description>
 
@@ -19,6 +19,7 @@
         <node.dir>${project.basedir}/target/node</node.dir>
         <jsplugin.version>1.6</jsplugin.version>
     </properties>
+
 
     <profiles>
         <!-- Disable webpack prod build when using dev mode -->
@@ -47,48 +48,52 @@
                 </plugins>
             </build>
         </profile>
-
-        <!-- Jersey brings a JAXB API on 11+. It is included in the JDK on 1.8 and below. So 1.9 and  1.10 are an issue. -->
-        <!-- Note we always build for 1.8, so this is only for tests -->
-        <profile>
-            <id>oldjdks</id>
-            <activation>
-                <jdk>[9,11)</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>jakarta.xml.bind</groupId>
-                    <artifactId>jakarta.xml.bind-api</artifactId>
-                    <version>2.3.3</version>
-                </dependency>
-            </dependencies>
-        </profile>
     </profiles>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/webapp</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/dist/main.bundle*.js</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/webapp</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/dist/main.bundle*.js</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
         <plugins>
+            <!-- For OSGi only, copy shiro ini file inside the Shirao-accessible classpath -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.2.2</version>
-                <configuration>
-                    <webResources>
-                        <resource>
-                            <directory>src/main/webapp</directory>
-                            <filtering>true</filtering>
-                            <includes>
-                                <include>**/dist/main.bundle*.js</include>
-                            </includes>
-                        </resource>
-                        <resource>
-                            <directory>src/main/webapp</directory>
-                            <filtering>false</filtering>
-                            <excludes>
-                                <exclude>**/dist/main.bundle*.js</exclude>
-                            </excludes>
-                        </resource>
-                    </webResources>
-                </configuration>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/org/apache/shiro/jqm</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/webapp/WEB-INF</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>shiro.ini</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- run mvn jetty:run to test (with hot deployment) the app on a dev
@@ -226,21 +231,29 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.1</version>
-                <configuration>
-                    <archive combine.self="override">
-                    </archive>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <groupId>biz.aQute.bnd</groupId>
                 <artifactId>bnd-maven-plugin</artifactId>
-                <version>5.1.2</version>
+                <version>${plugin.bnd.version}</version>
                 <configuration>
-                    <skip>true</skip>
+                    <bnd><![CDATA[
+                        # Do not actually deploy this as an OSGi WAR but as JAX-RS whiteboard resources
+                        # Web-ContextPath: /ws
+                        # BND issue with multi version jars. https://github.com/bndtools/bnd/issues/2227
+                        -fixupmessages: "Classes found in the wrong directory";is:=warning
+                        # This is WAB, i.e. a WAR with an OSGi descriptor.
+                        #-wab:
+                        # do not put libs inside META-INF/lib inside Bundle-Classpath - we want to use the same bundles as the rest of the application.
+                        #-wablib:
+                        -removeheaders: Private-Package
+                        #Import-Package: org.apache.shiro.cache,org.apache.shiro.authz,org.apache.shiro.codec,org.apache.shiro.realm,org.apache.shiro.subject,org.apache.shiro.util,org.apache.shiro.authc,org.apache.shiro.web.filter.authc,\
+                        #    javax.servlet,javax.servlet.http,javax.ws.rs,javax.ws.rs.ext,javax.naming,\
+                        #    java.security.cert,java.lang.annotation,\
+                        #    org.slf4j,\
+                        #    org.glassfish.jersey.servlet,org.eclipse.persistence.jaxb,org.glassfish.jersey.server,org.glassfish.jersey.server.monitoring,\
+                        #    com.enioka.jqm.api.client.core,com.enioka.jqm.pki,com.enioka.admin,com.enioka.jqm.model,com.enioka.jqm.jdbc,com.enioka.jqm.xml
+                        # Export-Package: com.enioka.jqm.ws.api,com.enioka.jqm.ws.webui.shiro
+                    ]]>
+                    </bnd>
                 </configuration>
             </plugin>
         </plugins>
@@ -254,35 +267,18 @@
             <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.aries.spec</groupId>
+            <artifactId>org.apache.aries.javax.jax.rs-api</artifactId>
+            <version>${jaxrs.api.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
-        <!-- Jersey 2.x JAX-RS implementation, running inside a servlet, with a
-			JSON mapper, with a specific DI lib -->
         <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet</artifactId>
-            <version>${jersey-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-moxy</artifactId>
-            <version>${jersey-version}</version>
-            <exclusions>
-                <!-- These API are actually not needed as jersey-container-servlet provides the implementation which also contains the API... This would create warnings on Jetty startup. -->
-                <!-- Note they are only provided on Java 11+ by Jersey -->
-                <exclusion>
-                    <groupId>jakarta.activation</groupId>
-                    <artifactId>jakarta.activation-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jakarta.json</groupId>
-                    <artifactId>jakarta.json-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.inject</groupId>
-            <artifactId>jersey-hk2</artifactId>
-            <version>${jersey-version}</version>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.http.whiteboard</artifactId>
+            <version>1.1.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Security -->
@@ -291,18 +287,29 @@
             <artifactId>shiro-web</artifactId>
             <version>${shiro.version}</version>
         </dependency>
+        <!-- Temp - force version as 1.2.3 is OSGi-compliant, not the 1.2.2 coming with Shiro 1.8.0-->
+        <dependency>
+            <groupId>org.owasp.encoder</groupId>
+            <artifactId>encoder</artifactId>
+            <version>1.2.3</version>
+        </dependency>
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-pki</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId> commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.4</version>
+        </dependency>
 
         <!-- For the client API -->
         <!-- This includes HTTPCLIENT, which is used in tests in this project -->
         <dependency>
             <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-api-client-core</artifactId>
+            <artifactId>jqm-api-client-jdbc</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

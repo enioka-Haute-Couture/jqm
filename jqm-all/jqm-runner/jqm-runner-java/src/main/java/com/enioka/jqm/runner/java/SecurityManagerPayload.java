@@ -20,9 +20,7 @@ import java.security.Permission;
 /**
  * A security manager ensuring a minimal good behavior for Java payloads running inside the JQM engine.
  */
-@SuppressWarnings("rawtypes")
-public
-class SecurityManagerPayload extends SecurityManager
+public class SecurityManagerPayload extends SecurityManager
 {
     /**
      * Default is: everything is allowed.
@@ -37,9 +35,15 @@ class SecurityManagerPayload extends SecurityManager
     public void checkPermission(Permission perm, Object context)
     {
         // Default implementation for payloads, no checks for inner code.
-        Class[] stack = getClassContext();
-        if (stack.length > 3 && stack[3].getClassLoader() instanceof PayloadClassLoader)
+        if (isPayloadRequest())
         {
+            // Allow JMX registration, whatever the JVM defaults say.
+            if (perm.toString().equals("(\"javax.management.MBeanTrustPermission\" \"register\")"))
+            {
+                return;
+            }
+
+            // Default case: apply JVM default.
             super.checkPermission(perm, context);
         }
         else
@@ -54,10 +58,15 @@ class SecurityManagerPayload extends SecurityManager
     @Override
     public void checkExit(int status)
     {
-        Class[] stack = getClassContext();
-        if (stack.length > 3 && stack[3].getClassLoader() instanceof PayloadClassLoader)
+        if (isPayloadRequest())
         {
             throw new SecurityException("JQM payloads cannot call System.exit() - this would stop JQM itself!");
         }
+    }
+
+    private boolean isPayloadRequest()
+    {
+        // return Thread.currentThread().getName().contains(";payload;");
+        return Thread.currentThread().getContextClassLoader() instanceof PayloadClassLoader;
     }
 }

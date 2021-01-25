@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Responsible for creating and storing references to the the {@link RunningJobInstance}.
  */
-public class RunningJobInstanceManager
+class RunningJobInstanceManager
 {
     private Logger jqmlogger = LoggerFactory.getLogger(RunningJobInstanceManager.class);
 

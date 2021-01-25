@@ -23,6 +23,7 @@ import java.util.Calendar;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.management.StandardMBean;
 
 import com.enioka.jqm.api.JobManager;
 import com.enioka.jqm.api.JobRunnerException;
@@ -33,7 +34,9 @@ import com.enioka.jqm.model.State;
 import com.enioka.jqm.runner.api.JobInstanceTracker;
 import com.enioka.jqm.runner.api.JobRunnerCallback;
 import com.enioka.jqm.runner.api.JqmKillException;
+import com.enioka.jqm.runner.java.api.jmx.JavaJobInstanceTrackerMBean;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +75,9 @@ class JavaJobInstanceTracker implements JobInstanceTracker, JavaJobInstanceTrack
             try
             {
                 name = new ObjectName(cb.getJmxBeanName());
-                mbs.registerMBean(this, name);
+                // explicitely create mbean as its interface is in another package, so conventions do not apply.
+                StandardMBean mbean = new StandardMBean(this, JavaJobInstanceTrackerMBean.class);
+                mbs.registerMBean(mbean, name);
             }
             catch (Exception e)
             {
@@ -106,6 +111,16 @@ class JavaJobInstanceTracker implements JobInstanceTracker, JavaJobInstanceTrack
     @Override
     public State run()
     {
+        // Logging setup
+        if (System.out instanceof MultiplexPrintStream)
+        {
+            String fileName = StringUtils.leftPad("" + job.getId(), 10, "0");
+            MultiplexPrintStream mps = (MultiplexPrintStream) System.out;
+            mps.registerThread(String.valueOf(fileName + ".stdout.log"));
+            mps = (MultiplexPrintStream) System.err;
+            mps.registerThread(String.valueOf(fileName + ".stderr.log"));
+        }
+
         // Class loader switch
         classLoaderToRestoreAtEnd = Thread.currentThread().getContextClassLoader();
         try
@@ -137,6 +152,16 @@ class JavaJobInstanceTracker implements JobInstanceTracker, JavaJobInstanceTrack
         {
             jqmlogger.info("Job instance " + job.getId() + " has crashed. Exception was:", e);
             return State.CRASHED;
+        }
+        finally
+        {
+            if (System.out instanceof MultiplexPrintStream)
+            {
+                MultiplexPrintStream mps = (MultiplexPrintStream) System.out;
+                mps.unregisterThread();
+                mps = (MultiplexPrintStream) System.err;
+                mps.unregisterThread();
+            }
         }
     }
 

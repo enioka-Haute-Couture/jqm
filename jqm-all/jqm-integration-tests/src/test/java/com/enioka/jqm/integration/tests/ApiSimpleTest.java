@@ -15,7 +15,6 @@
  */
 package com.enioka.jqm.integration.tests;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -23,7 +22,14 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
+import com.enioka.jqm.client.api.JobInstance;
+import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.Node;
+import com.enioka.jqm.model.State;
+import com.enioka.jqm.test.helpers.CreationTools;
+import com.enioka.jqm.test.helpers.TestHelpers;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -37,14 +43,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.enioka.jqm.api.client.core.JobInstance;
-import com.enioka.jqm.api.client.core.JqmClientFactory;
-import com.enioka.jqm.engine.Helpers;
-import com.enioka.jqm.model.Node;
-import com.enioka.jqm.model.State;
-import com.enioka.jqm.test.helpers.CreationTools;
-import com.enioka.jqm.test.helpers.TestHelpers;
+import org.ops4j.pax.exam.Option;
 
 /**
  * Tests of the simple web API.
@@ -52,17 +51,29 @@ import com.enioka.jqm.test.helpers.TestHelpers;
  */
 public class ApiSimpleTest extends JqmBaseTest
 {
+    private int port;
+
+    @Override
+    protected Option[] moreOsgiconfig()
+    {
+        return webConfig();
+    }
+
     @Before
     public void before() throws IOException
     {
-        Helpers.setSingleParam("disableWsApi", "false", cnx);
-        Helpers.setSingleParam("enableWsApiAuth", "false", cnx);
-
-        File jar = FileUtils.listFiles(new File("../jqm-ws/target/"), new String[] { "war" }, false).iterator().next();
-        FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war"));
+        GlobalParameter.setParameter(cnx, "disableWsApi", "false");
+        GlobalParameter.setParameter(cnx, "enableWsApiAuth", "false");
+        cnx.commit();
 
         addAndStartEngine();
-        TestHelpers.node = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId());
+
+        serviceWaiter.waitForService("[com.enioka.jqm.ws.api.ServiceSimple]");
+        serviceWaiter.waitForService("[javax.servlet.Servlet]"); // HTTP whiteboard
+        serviceWaiter.waitForService("[javax.servlet.Servlet]"); // JAX-RS whiteboard
+
+        port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
+        jqmlogger.info("Jetty port seen by client is {}", port);
     }
 
     @Test
@@ -71,7 +82,7 @@ public class ApiSimpleTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "pyl.EngineApiSend3Msg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip,
                 42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
-        HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + TestHelpers.node.getPort() + "/ws/simple/ji");
+        HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/ji");
         List<NameValuePair> nvps = new ArrayList<>();
         nvps.add(new BasicNameValuePair("applicationname", "Marsu-Application"));
         nvps.add(new BasicNameValuePair("user", "testuser"));
@@ -109,7 +120,7 @@ public class ApiSimpleTest extends JqmBaseTest
 
         // Check run is OK & parameters have been correctly processed
         JobInstance ji = JqmClientFactory.getClient().getJob(jid);
-        Assert.assertEquals(com.enioka.jqm.api.client.core.State.ENDED, ji.getState());
+        Assert.assertEquals(com.enioka.jqm.client.api.State.ENDED, ji.getState());
         Assert.assertEquals(2, ji.getParameters().size());
         Assert.assertEquals("newvalue2", ji.getParameters().get("arg2"));
         Assert.assertEquals("overridevalue", ji.getParameters().get("arg"));
@@ -121,7 +132,7 @@ public class ApiSimpleTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "pyl.EngineApiSend3Msg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip,
                 42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
-        HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + TestHelpers.node.getPort() + "/ws/simple/ji");
+        HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/ji");
         List<NameValuePair> nvps = new ArrayList<>();
         nvps.add(new BasicNameValuePair("applicationname", "Marsu-Application"));
         nvps.add(new BasicNameValuePair("user", "testuser"));
@@ -155,7 +166,7 @@ public class ApiSimpleTest extends JqmBaseTest
 
         TestHelpers.waitFor(1, 10000, cnx);
 
-        HttpGet rq = new HttpGet("http://" + TestHelpers.node.getDns() + ":" + TestHelpers.node.getPort() + "/ws/simple/status?id=" + jid);
+        HttpGet rq = new HttpGet("http://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + jid);
         res = client.execute(rq);
         Assert.assertEquals(200, res.getStatusLine().getStatusCode());
 

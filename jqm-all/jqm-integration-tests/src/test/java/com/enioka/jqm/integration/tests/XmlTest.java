@@ -21,14 +21,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.NodeDto;
 import com.enioka.api.admin.QueueDto;
 import com.enioka.api.admin.QueueMappingDto;
-import com.enioka.jqm.engine.Helpers;
+import com.enioka.jqm.configservices.DefaultConfigurationService;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.Queue;
@@ -39,6 +36,9 @@ import com.enioka.jqm.xml.XmlJobDefExporter;
 import com.enioka.jqm.xml.XmlJobDefParser;
 import com.enioka.jqm.xml.XmlQueueExporter;
 import com.enioka.jqm.xml.XmlQueueParser;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 public class XmlTest extends JqmBaseTest
 {
@@ -128,7 +128,7 @@ public class XmlTest extends JqmBaseTest
     public void testXmlParser()
     {
         // Init the default queue (don't start the engine!)
-        Helpers.updateConfiguration(cnx);
+        DefaultConfigurationService.updateConfiguration(cnx);
 
         XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmltest.xml", cnx);
         cnx.commit();
@@ -154,7 +154,7 @@ public class XmlTest extends JqmBaseTest
     public void testUpdateJobDef()
     {
         // Init the default queue (don't start the engine!)
-        Helpers.updateConfiguration(cnx);
+        DefaultConfigurationService.updateConfiguration(cnx);
 
         XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmltest.xml", cnx);
         cnx.commit();
@@ -244,7 +244,7 @@ public class XmlTest extends JqmBaseTest
     public void testImportThenReimportJobDefWithPrms()
     {
         // Init the default queue (don't start the engine!)
-        Helpers.updateConfiguration(cnx);
+        DefaultConfigurationService.updateConfiguration(cnx);
 
         // First import
         XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmltest.xml", cnx);
@@ -272,7 +272,7 @@ public class XmlTest extends JqmBaseTest
     public void testImportJobdefWithQueue()
     {
         // Init the default queue (don't start the engine!)
-        Helpers.updateConfiguration(cnx);
+        DefaultConfigurationService.updateConfiguration(cnx);
 
         XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmltestnewqueue.xml", cnx);
         cnx.commit();

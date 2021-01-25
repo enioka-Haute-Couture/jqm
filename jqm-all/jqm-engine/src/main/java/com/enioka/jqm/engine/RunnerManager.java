@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.enioka.jqm.runner.api.JobRunner;
+import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.loader.Loader;
 import com.enioka.jqm.model.JobInstance;
@@ -40,7 +41,7 @@ class RunnerManager
             loader.start();
             for (ServiceReference<?> ref : loader.references)
             {
-                runners.add((JobRunner)context.getService(ref));
+                runners.add((JobRunner) context.getService(ref));
                 refList.add(ref);
             }
         }

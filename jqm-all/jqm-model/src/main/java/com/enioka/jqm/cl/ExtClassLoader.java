@@ -23,14 +23,13 @@ public final class ExtClassLoader
     public static ClassLoader instance = initClassLoader();
 
     private ExtClassLoader()
-    {
-    }
+    {}
 
     private static ClassLoader initClassLoader()
     {
         ClassLoader extClassLoader;
 
-        // Java 8 ?
+        // Java 8?
         boolean tmpBool = false;
         try
         {
@@ -45,6 +44,18 @@ public final class ExtClassLoader
             // Ignore.
         }
         final boolean java8 = tmpBool;
+
+        // Parent for the ext CL?
+        final ClassLoader parentCl;
+        if (System.getProperty("com.enioka.jqm.cl.allow_system_cl", "false").equals("true"))
+        {
+            jqmlogger.debug("As allow_system_cl is true, some JQM classes may be visible to payloads");
+            parentCl = ClassLoader.getSystemClassLoader(); // itself has the platform CL as parent.
+        }
+        else
+        {
+            parentCl = java8 ? null : ClassLoader.getPlatformClassLoader();
+        }
 
         // List all jars inside ext directory
         File extDir = new File("ext/");
@@ -63,14 +74,14 @@ public final class ExtClassLoader
                 {
                     // Java 8 : parent is default system CL, also called bootstrap CL which has all JDK classes.
                     // Java 9 and above: parent is the platform CL, which holds the same classes.
-                    return new URLClassLoader(aUrls, java8 ? null : ClassLoader.getPlatformClassLoader());
+                    return new URLClassLoader(aUrls, parentCl);
                 }
             });
         }
         else
         {
             // No /ext directory means nothing to load.
-            return null;
+            return parentCl;
         }
 
         return extClassLoader;

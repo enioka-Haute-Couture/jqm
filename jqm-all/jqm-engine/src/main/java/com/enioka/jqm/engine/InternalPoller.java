@@ -21,11 +21,6 @@ import java.util.Calendar;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import javax.naming.spi.NamingManager;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
@@ -33,12 +28,15 @@ import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.Node;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The internal poller is responsible for doing all the repetitive tasks of an engine (excluding polling queues). Namely: check if
  * {@link Node#isStop()} has become true (stop order) and update {@link Node#setLastSeenAlive(java.util.Calendar)} to make visible to the
  * whole cluster that the engine is still alive and that no other engine should start with the same node name.
  */
-public class InternalPoller implements Runnable
+class InternalPoller implements Runnable
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(InternalPoller.class);
     private boolean run = true;

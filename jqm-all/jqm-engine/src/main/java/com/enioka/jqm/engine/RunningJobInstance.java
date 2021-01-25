@@ -8,16 +8,12 @@ import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.naming.spi.NamingManager;
 
-import com.enioka.jqm.runner.api.JobInstanceTracker;
-import com.enioka.jqm.runner.api.JobRunner;
-import com.enioka.jqm.runner.api.JobRunnerCallback;
 import com.enioka.jqm.api.JobRunnerException;
-import com.enioka.jqm.api.client.core.JqmClientFactory;
-import com.enioka.jqm.api.client.core.SimpleApiSecurity;
-import com.enioka.jqm.cl.ExtClassLoader;
+import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.client.shared.SimpleApiSecurity;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.jdbc.QueryResult;
@@ -27,6 +23,9 @@ import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.State;
+import com.enioka.jqm.runner.api.JobInstanceTracker;
+import com.enioka.jqm.runner.api.JobRunner;
+import com.enioka.jqm.runner.api.JobRunnerCallback;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -37,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * The role of this class is to track the actual run of a JI. An instance is created when the engine decides a JI should run. It delegates
  * the running stuff to a {@link com.enioka.jqm.api.JobRunner}s it selects and concentrates itself on plumbing common to all job instances.
  */
-public class RunningJobInstance implements Runnable, JobRunnerCallback
+class RunningJobInstance implements Runnable, JobRunnerCallback
 {
     private Logger jqmlogger = LoggerFactory.getLogger(RunningJobInstance.class);
 
@@ -230,12 +229,18 @@ public class RunningJobInstance implements Runnable, JobRunnerCallback
             this.manager.signalEndOfRun(this);
         }
 
-        // TODO: remove this fully.
         // Send e-mail before releasing the slot - it may be long
-        /*
-         * if (ji.getEmail() != null) { try { Helpers.sendEndMessage(ji); } catch (Exception e) {
-         * jqmlogger.warn("An e-mail could not be sent. No impact on the engine.", e); } }
-         */
+        if (ji.getEmail() != null)
+        {
+            try
+            {
+                Helpers.sendEndMessage(ji);
+            }
+            catch (Exception e)
+            {
+                jqmlogger.warn("An e-mail could not be sent. No impact on the engine.", e);
+            }
+        }
 
         // Clean temp dir (if it exists)
         File tmpDir = new File(FilenameUtils.concat(this.ji.getNode().getTmpDirectory(), "" + this.ji.getId()));
@@ -394,7 +399,14 @@ public class RunningJobInstance implements Runnable, JobRunnerCallback
     @Override
     public ClassLoader getExtensionClassloader()
     {
-        return ExtClassLoader.instance;
+        try
+        {
+            return (ClassLoader) InitialContext.doLookup("cl://ext");
+        }
+        catch (NamingException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

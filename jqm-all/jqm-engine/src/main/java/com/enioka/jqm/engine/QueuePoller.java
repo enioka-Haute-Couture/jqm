@@ -33,9 +33,8 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.enioka.jqm.engine.api.exceptions.JqmInitError;
+import com.enioka.jqm.engine.api.jmx.QueuePollerMBean;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.DeploymentParameter;
@@ -44,11 +43,15 @@ import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.ResourceManager;
 import com.enioka.jqm.model.State;
+import com.enioka.jqm.shared.misc.Closer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A thread that polls a queue according to the parameters defined inside a {@link DeploymentParameter}.
  */
-public class QueuePoller implements Runnable, QueuePollerMBean
+class QueuePoller implements Runnable, QueuePollerMBean
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(QueuePoller.class);
 
@@ -338,7 +341,7 @@ public class QueuePoller implements Runnable, QueuePollerMBean
                 {
                     run = false;
                 }
-                Helpers.closeQuietly(cnx);
+                Closer.closeQuietly(cnx);
             }
 
             // Wait according to the deploymentParameter

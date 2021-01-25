@@ -73,21 +73,21 @@
                                     <artifactId>mariadb-java-client</artifactId>
                                     <version>${mariadb.client.version}</version>
                                 </artifactItem>
-                                <artifactItem>
+                                <dependency>
                                     <groupId>com.ibm.db2</groupId>
                                     <artifactId>jcc</artifactId>
                                     <version>${db2.client.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.oracle.database.jdbc</groupId>
-                                    <artifactId>ojdbc8</artifactId>
-                                    <version>${oracle.client.version}</version>
-                                </artifactItem>
+                                </dependency>
                                 <artifactItem>
                                     <groupId>com.h2database</groupId>
                                     <artifactId>h2</artifactId>
                                     <version>${h2.version}</version>
                                 </artifactItem>
+                                <dependency>
+                                    <groupId>com.oracle.database.jdbc</groupId>
+                                    <artifactId>ojdbc8</artifactId>
+                                    <version>${oracle.client.version}</version>
+                                </dependency>
                                 <artifactItem>
                                     <groupId>org.apache.tomcat</groupId>
                                     <artifactId>tomcat-jdbc</artifactId>

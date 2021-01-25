@@ -15,13 +15,9 @@
  */
 package com.enioka.jqm.integration.tests;
 
-import com.enioka.jqm.api.client.core.JobRequest;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-import org.jboss.shrinkwrap.resolver.api.NoResolvedResultException;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
-import org.jboss.shrinkwrap.resolver.api.maven.repository.MavenRemoteRepositories;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,7 +28,7 @@ public class PackageTest extends JqmBaseTest
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemavennopom/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
-        JobRequest.create("MarsuApplication", "TestUser").submit();
+        jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
 
         addAndStartEngine();
         TestHelpers.waitFor(1, 10000, cnx);
@@ -46,7 +42,7 @@ public class PackageTest extends JqmBaseTest
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemavennopomlib/target/test.jar", TestHelpers.qVip,
                 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
-        JobRequest.create("MarsuApplication", "TestUser").submit();
+        jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
 
         addAndStartEngine();
         TestHelpers.waitFor(1, 10000, cnx);
@@ -60,7 +56,7 @@ public class PackageTest extends JqmBaseTest
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemavenjarinlib/target/test.jar", TestHelpers.qVip,
                 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
-        JobRequest.create("MarsuApplication", "TestUser").submit();
+        jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
 
         addAndStartEngine();
         TestHelpers.waitFor(1, 10000, cnx);
@@ -74,7 +70,7 @@ public class PackageTest extends JqmBaseTest
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemavennolibdef/target/test.jar", TestHelpers.qVip,
                 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
-        JobRequest.create("MarsuApplication", "TestUser").submit();
+        jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
 
         addAndStartEngine();
         TestHelpers.waitFor(1, 10000, cnx);
@@ -87,16 +83,5 @@ public class PackageTest extends JqmBaseTest
     public void testInheritedLegacyPayload() throws Exception
     {
         JqmSimpleTest.create(cnx, "pyl.PckJBInheritance").run(this);
-    }
-
-    @Test(expected = NoResolvedResultException.class)
-    public void testFailingDependency() throws Exception
-    {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test testFailingDependency");
-
-        Maven.configureResolver()
-                .withRemoteRepo(MavenRemoteRepositories.createRemoteRepository("marsu", "http://marsupilami.com", "default"))
-                .withMavenCentralRepo(false).resolve("com.enioka.jqm:marsu:1.1.4").withTransitivity().asFile();
     }
 }

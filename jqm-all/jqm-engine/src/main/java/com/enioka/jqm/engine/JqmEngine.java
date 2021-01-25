@@ -32,7 +32,15 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
+import com.enioka.jqm.configservices.OsgiBundleLogger;
+import com.enioka.jqm.engine.api.exceptions.JqmInitError;
+import com.enioka.jqm.engine.api.exceptions.JqmInitErrorTooSoon;
+import com.enioka.jqm.engine.api.jmx.JqmEngineMBean;
+import com.enioka.jqm.engine.api.lifecycle.JqmEngineHandler;
+import com.enioka.jqm.engine.api.lifecycle.JqmEngineOperations;
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
@@ -45,13 +53,19 @@ import com.enioka.jqm.model.Message;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.ResourceManager;
 import com.enioka.jqm.model.State;
+import com.enioka.jqm.repository.VersionRepository;
+import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
+import com.enioka.jqm.shared.misc.Closer;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ServiceScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * The engine itself. Everything starts in this class.
  */
+@Component(service = JqmEngineOperations.class, scope = ServiceScope.PROTOTYPE)
 public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(JqmEngine.class);
@@ -93,7 +107,7 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
      * Starts the engine
      *
      * @param nodeName
-     *                     the name of the node to start, as in the NODE table of the database.
+     *            the name of the node to start, as in the NODE table of the database.
      * @throws JqmInitError
      */
     public void start(String nodeName, JqmEngineHandler h)
@@ -118,6 +132,7 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         jqmlogger.info("JQM engine version " + this.getVersion() + " for node " + nodeName + " is starting");
         jqmlogger.info("Java version is " + System.getProperty("java.version") + ". JVM was made by " + System.getProperty("java.vendor")
                 + " as " + System.getProperty("java.vm.name") + " version " + System.getProperty("java.vm.version"));
+        OsgiBundleLogger.logAllBundles();
 
         // Database connection
         DbConn cnx = Helpers.getNewDbSession();
@@ -199,6 +214,17 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         {
             loadJmxBeans = false;
             jqmlogger.info("JMX management beans will not be loaded as JMX server port is null or zero");
+        }
+
+        // Hack to set global server name
+        try
+        {
+            InitialContext.doLookup("serverName://" + node.getName());
+        }
+        catch (NamingException e)
+        {
+            // no one cares.
+            jqmlogger.warn("Could not register server name inside JNDI registry", e);
         }
 
         // Scheduler
@@ -579,7 +605,7 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                     }
                     finally
                     {
-                        Helpers.closeQuietly(cnx);
+                        Closer.closeQuietly(cnx);
                     }
                 }
 
@@ -731,7 +757,7 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     @Override
     public String getVersion()
     {
-        return Helpers.getMavenVersion();
+        return VersionRepository.getMavenVersion();
     }
 
     @Override

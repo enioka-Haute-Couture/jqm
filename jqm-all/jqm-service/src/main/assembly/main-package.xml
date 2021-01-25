@@ -1,4 +1,5 @@
-<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
     <id>main-package</id>
     <formats>
         <format>tar.gz</format>
@@ -9,7 +10,7 @@
     <fileSets>
         <fileSet>
             <directory>${project.basedir}/..</directory>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory></outputDirectory>
             <includes>
                 <include>README*</include>
                 <include>LICENSE*</include>
@@ -18,7 +19,7 @@
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/src/main/scripts</directory>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory></outputDirectory>
             <includes>
                 <include>jqm.sh</include>
                 <include>*.ps1</include>
@@ -28,28 +29,28 @@
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/src/main/scripts/conf</directory>
-            <outputDirectory>/conf</outputDirectory>
+            <outputDirectory>conf</outputDirectory>
             <includes>
                 <include>*</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/src/main/scripts</directory>
-            <outputDirectory>/jobs/jqm-demo/xml</outputDirectory>
+            <outputDirectory>jobs/jqm-demo/xml</outputDirectory>
             <includes>
                 <include>*.xml</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/lib/</directory>
-            <outputDirectory>/lib</outputDirectory>
+            <outputDirectory>lib</outputDirectory>
             <includes>
                 <include>*.xsd</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/src/main/scripts</directory>
-            <outputDirectory>/bin</outputDirectory>
+            <outputDirectory>bin</outputDirectory>
             <includes>
                 <include>*.exe</include>
                 <include>permissions.sh</include>
@@ -102,46 +103,77 @@
     <files>
         <file>
             <source>${project.build.directory}/${project.artifactId}-${project.version}.jar</source>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory></outputDirectory>
             <destName>jqm.jar</destName>
-        </file>
-        <file>
-            <source>${project.parent.basedir}/jqm-ws/target/jqm-ws-${project.version}.war</source>
-            <outputDirectory>/webapp</outputDirectory>
-            <destName>jqm-ws.war</destName>
         </file>
     </files>
     <dependencySets>
         <dependencySet>
-            <outputDirectory>/lib</outputDirectory>
+            <outputDirectory>lib</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
             <unpack>false</unpack>
             <scope>runtime</scope>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.apache.felix:org.apache.felix.framework</include>
+                <include>org.slf4j:slf4j-api</include>
+                <include>ch.qos.logback:*</include>
+                <include>com.enioka.jqm:jqm-cli-bootstrap</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>bundle/level1</outputDirectory>
+            <useProjectArtifact>false</useProjectArtifact>
+            <unpack>false</unpack>
+            <scope>runtime</scope>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
             <excludes>
-                <exclude>com.enioka.jqm:jqm-ws</exclude>
-                <exclude>com.enioka.jqm:jqm-providers</exclude>
-                <exclude>com.enioka.jqm:jqm-runner-basic</exclude>
-                <exclude>com.enioka.jqm:jqm-runner-spring</exclude>
-                <exclude>org.apache.tomcat</exclude>
-                <exclude>org.hsqldb</exclude>
-                <exclude>com.sun.mail</exclude>
+                <exclude>org.apache.felix:org.apache.felix.framework</exclude>
+                <exclude>org.slf4j:slf4j-api</exclude>
+                <exclude>ch.qos.logback:*</exclude>
+                <exclude>com.enioka.jqm:jqm-cli-bootstrap</exclude>
             </excludes>
         </dependencySet>
         <dependencySet>
-            <outputDirectory>/jobs/jqm-demo/${artifact.artifactId}</outputDirectory>
+            <outputDirectory>bundle</outputDirectory>
+            <useProjectArtifact>false</useProjectArtifact>
+            <unpack>false</unpack>
+            <scope>provided</scope>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <excludes>
+                <exclude>org.hsqldb</exclude>
+                <exclude>org.apache.tomcat</exclude>
+                <exclude>com.sun.mail</exclude>
+                <exclude>org.osgi:osgi.*</exclude>                <!-- OSGi APIs are actually provided by the framework -->
+                <exclude>org.osgi:org.osgi.service.c*</exclude>
+                <exclude>junit:junit</exclude>
+                <exclude>org.glassfish.jaxb:jaxb-runtime</exclude>                <!-- WHY OH WHY CXF WHITEBOARD???? -->
+                <exclude>com.enioka.jqm:jqm-providers</exclude>
+                <exclude>org.apache.shiro:shiro-cache</exclude>
+                <exclude>org.apache.shiro:shiro-crypto-cipher</exclude>                <!-- We prefer using the "all in one" bundles coming from jqm-web-->
+                <exclude>org.apache.shiro:shiro-config-core</exclude>
+                <exclude>org.apache.shiro:shiro-config-ogdl</exclude>
+                <exclude>org.apache.shiro:shiro-crypto-hash</exclude>
+                <exclude>org.apache.shiro:shiro-lang</exclude>
+                <exclude>org.apache.shiro:shiro-crypto-core</exclude>
+            </excludes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>jobs/jqm-demo/${artifact.artifactId}</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
             <unpack>false</unpack>
             <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+            <scope>test</scope>
             <includes>
                 <include>com.enioka.jqm:jqm-test-pyl:jar</include>
                 <include>com.enioka.jqm:jqm-test-pyl-nodep:jar</include>
             </includes>
-            <scope>test</scope>
         </dependencySet>
         <dependencySet>
-            <outputDirectory>/ext</outputDirectory>
+            <outputDirectory>ext</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
             <unpack>false</unpack>
+            <scope>provided</scope>
             <includes>
                 <include>org.hsqldb:hsqldb</include>
                 <include>org.apache.tomcat:tomcat-jdbc</include>
@@ -149,20 +181,9 @@
                 <include>com.enioka.jqm:jqm-providers</include>
                 <include>com.enioka.jqm:jqm-api</include>
                 <include>com.sun.mail:javax.mail</include>
+                <include>com.sun.activation:jakarta.activation</include>
                 <include>com.sun.mail:smtp</include>
             </includes>
-            <scope>test</scope>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>/plugins</outputDirectory>
-            <useProjectArtifact>false</useProjectArtifact>
-            <unpack>false</unpack>
-            <includes>
-                <include>com.enioka.jqm:jqm-api</include>
-                <include>com.enioka.jqm:jqm-runner-basic</include>
-                <include>com.enioka.jqm:jqm-runner-spring</include>
-            </includes>
-            <scope>test</scope>
         </dependencySet>
     </dependencySets>
 </assembly>

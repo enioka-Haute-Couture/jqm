@@ -1,27 +1,29 @@
 package com.enioka.jqm.engine;
 
+import com.enioka.jqm.client.api.JqmInvalidRequestException;
+import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.engine.api.lifecycle.JqmSingleRunnerOperations;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.JobInstance;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ServiceScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.enioka.jqm.api.client.core.JobInstance;
-import com.enioka.jqm.api.client.core.JqmClientFactory;
-import com.enioka.jqm.api.client.core.JqmInvalidRequestException;
-import com.enioka.jqm.jdbc.Db;
-import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jdbc.DbManager;
-import com.enioka.jqm.model.GlobalParameter;
 
 /**
  * This is a dumbed down version of the JQM engine that, instead of checking jobs from a database, will run at once a specified job
  * instance.
  */
-public class JqmSingleRunner
+@Component(service = JqmSingleRunnerOperations.class, scope = ServiceScope.SINGLETON)
+public class JqmSingleRunner implements JqmSingleRunnerOperations
 {
     private final static Logger jqmlogger = LoggerFactory.getLogger(JqmSingleRunner.class);
 
-    private JqmSingleRunner()
+    public JobInstance runAtOnce(int jobInstanceId)
     {
-        // Static class
+        return JqmSingleRunner.run(jobInstanceId);
     }
 
     public static JobInstance run(int jobInstanceId)
@@ -42,7 +44,7 @@ public class JqmSingleRunner
      *
      * @param job
      * @param logFile
-     *                    the file to which output the run log. if null, only stdout will be used.
+     *            the file to which output the run log. if null, only stdout will be used.
      * @return the result of the run
      */
     public static JobInstance run(com.enioka.jqm.model.JobInstance job)
@@ -164,15 +166,6 @@ public class JqmSingleRunner
         manager.stop();
 
         // Get result
-        return JqmClientFactory.getClient().getJob(job.getId());
-    }
-
-    /**
-     * <strong>Not part of any API - for JQM internal tests only</strong><br>
-     * Sets the connection that will be used by the engine and its APIs.
-     */
-    public static void setConnection(Db db)
-    {
-        DbManager.setDb(db);
+        return job;
     }
 }

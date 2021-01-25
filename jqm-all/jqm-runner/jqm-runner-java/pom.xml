@@ -62,7 +62,7 @@
             <plugin>
                 <groupId>biz.aQute.bnd</groupId>
                 <artifactId>bnd-maven-plugin</artifactId>
-                <version>5.1.2</version>
+                <version>${plugin.bnd.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -73,7 +73,7 @@
                 <configuration>
                     <bnd><![CDATA[
 Import-Package: \
- !org.jboss.shrinkwrap.*, !org.codehaus.*, javax.xml.stream, javax.xml.xpath, javax.xml.parsers, * \
+ !org.jboss.shrinkwrap.*, !org.codehaus.*, !org.apache.commons.lang3.*, javax.xml.stream;version="[0.0,1)", javax.xml.xpath;version="[0.0,1)", javax.xml.parsers;version="[0.0,1)", * \
         ]]>
                     </bnd>
                 </configuration>
@@ -82,41 +82,15 @@ Import-Package: \
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <version>${osgi.core.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.annotation</artifactId>
-            <version>${osgi.annotation.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.component.annotations</artifactId>
-            <version>1.4.0</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- JQM internal APIs -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jqm-runner-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jqm-api-client-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jqm-engine</artifactId>
+            <artifactId>jqm-runner-java-api</artifactId>
             <version>${project.version}</version>
         </dependency>
 

@@ -27,24 +27,23 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.enioka.jqm.api.client.core.JobRequest;
-import com.enioka.jqm.engine.JqmEngineMBean;
-import com.enioka.jqm.engine.QueuePollerMBean;
+import com.enioka.jqm.engine.api.jmx.JqmEngineMBean;
+import com.enioka.jqm.engine.api.jmx.QueuePollerMBean;
+import com.enioka.jqm.runner.java.api.jmx.JavaJobInstanceTrackerMBean;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 public class JmxTest extends JqmBaseTest
 {
-    /* TODO
     @Test
     public void jmxRemoteTest() throws Exception
     {
         CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
                 "KillApp", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
-        int i = JobRequest.create("KillApp", "TestUser").submit();
+        int i = jqmClient.newJobRequest("KillApp", "TestUser").enqueue();
 
         // Set JMX server on free ports
         ServerSocket s1 = new ServerSocket(0);
@@ -142,5 +141,4 @@ public class JmxTest extends JqmBaseTest
         // Done
         cntor.close();
     }
-    */
 }
