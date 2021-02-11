@@ -15,7 +15,7 @@ import com.enioka.jqm.model.Queue;
 
 public class DbImplMySql extends DbAdapter
 {
-    private String sequenceSql, sequenceSqlRetrieval, sequenceSqlProcessList;
+    private String sequenceSql, sequenceSqlRetrieval;
 
     @Override
     public void prepare(Properties p, Connection cnx)
@@ -27,7 +27,6 @@ public class DbImplMySql extends DbAdapter
 
         sequenceSqlRetrieval = adaptSql("SELECT next FROM __T__JQM_SEQUENCE WHERE name = ?");
         sequenceSql = adaptSql("UPDATE __T__JQM_SEQUENCE SET next = next + 1 WHERE name = ?");
-        sequenceSqlProcessList = "SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST WHERE USER = 'jqm'";
     }
 
     @Override
@@ -43,8 +42,7 @@ public class DbImplMySql extends DbAdapter
             .replace("CURRENT_TIMESTAMP - ? SECOND", "(NOW() - INTERVAL ? SECOND)").replace("FROM (VALUES(0))", "FROM DUAL")
             .replace("DNS||':'||PORT", "CONCAT(DNS, ':', PORT)").replace(" TIMESTAMP ", " TIMESTAMP(3) ")
             .replace("CURRENT_TIMESTAMP", "FFFFFFFFFFFFFFFFF@@@@").replace("FFFFFFFFFFFFFFFFF@@@@", "CURRENT_TIMESTAMP(3)")
-            .replace("TIMESTAMP(3) NOT NULL", "TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)").replace("__T__", this.tablePrefix)
-            .replace("DISCONNECT", "KILL CONNECTION ?");
+            .replace("TIMESTAMP(3) NOT NULL", "TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)").replace("__T__", this.tablePrefix);
     }
 
     @Override
@@ -105,7 +103,8 @@ public class DbImplMySql extends DbAdapter
                         sb.append("?,");
                     }
                     q.sqlText = q.sqlText.replaceFirst("IN\\(\\?\\)", "IN(" + sb.substring(0, sb.length() - 1) + ")");
-                } else
+                }
+                else
                 {
                     newParams.add(o);
                 }
@@ -116,24 +115,6 @@ public class DbImplMySql extends DbAdapter
             {
                 throw new DatabaseException("Mismatch: count of list parameters and of IN clauses is different.");
             }
-        }
-
-        // log_off query : Retrieve ID list for KILL CONNECTION
-        if (q.sqlText.startsWith("KILL CONNECTION"))
-        {
-            try (PreparedStatement s = cnx.prepareStatement(sequenceSqlProcessList))
-            {
-                ResultSet rs = s.executeQuery();
-                if (!rs.next())
-                {
-                    throw new NoResultException("The query returned zero rows when one was expected.");
-                }
-                q.parameters.add(0, rs.getInt(1));
-            } catch (SQLException e)
-            {
-                throw new DatabaseException(q.sqlText + " - " + sequenceSqlProcessList + " - while fetching ID from information schema processlist", e);
-            }
-            return;
         }
 
         // Manually generate a new ID for INSERT orders. (with one exception - history inserts do not need a generated ID)
@@ -155,7 +136,8 @@ public class DbImplMySql extends DbAdapter
             }
             q.preGeneratedKey = rs.getInt(1);
             q.parameters.add(0, q.preGeneratedKey);
-        } catch (SQLException e)
+        }
+        catch (SQLException e)
         {
             throw new DatabaseException(q.sqlText + " - " + sequenceSql + " - while fetching new ID from table sequence", e);
         }
@@ -215,5 +197,25 @@ public class DbImplMySql extends DbAdapter
         }
 
         return false;
+    }
+
+    @Override
+    public void simulateDisconnection(Connection cnx)
+    {
+        try (PreparedStatement s = cnx.prepareStatement("SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST WHERE USER = 'jqm'"))
+        {
+            ResultSet rs = s.executeQuery();
+            if (!rs.next())
+            {
+                throw new NoResultException("The query returned zero rows when one was expected.");
+            }
+            String sql = "KILL CONNECTION " + rs.getInt(1);
+            PreparedStatement ns = cnx.prepareStatement(sql);
+            ns.execute();
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
     }
 }

@@ -172,4 +172,15 @@ public abstract class DbAdapter
      */
     public abstract boolean testDbUnreachable(Exception e);
 
+    /**
+     * Trigger a connection close from the DB.
+     * Used in tests to simulate a DB failure.
+     *
+     * @param cnx
+     *                an open ready to use connection to the database.
+     */
+    public void simulateDisconnection(Connection cnx)
+    {
+    }
+
 }

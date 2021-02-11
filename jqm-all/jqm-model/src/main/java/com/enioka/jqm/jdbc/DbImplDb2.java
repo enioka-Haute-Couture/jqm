@@ -30,8 +30,7 @@ public class DbImplDb2 extends DbAdapter
     {
         return sql.replace("MEMORY TABLE", "TABLE").replace("UNIX_MILLIS()", "JQM_PK.nextval").replace("IN(UNNEST(?))", "IN(?)")
                 .replace("FROM (VALUES(0))", "FROM SYSIBM.SYSDUMMY1").replace("BOOLEAN", "SMALLINT").replace("__T__", this.tablePrefix)
-                .replace("true", "1").replace("false", "0")
-                .replace("DISCONNECT", "CALL SYSPROC.ADMIN_CMD('FORCE APPLICATION (?)')");
+                .replace("true", "1").replace("false", "0");
     }
 
     @Override
@@ -101,24 +100,6 @@ public class DbImplDb2 extends DbAdapter
                 throw new DatabaseException("Mismatch: count of list parameters and of IN clauses is different.");
             }
         }
-
-        // log_off query : Retrieve application handle
-        if (q.sqlText.startsWith("CALL SYSPROC"))
-        {
-            try (PreparedStatement s = cnx.prepareStatement(sequenceSqlAppHandle))
-            {
-                ResultSet rs = s.executeQuery();
-                if (!rs.next())
-                {
-                    throw new NoResultException("The query returned zero rows when one was expected.");
-                }
-                q.parameters.add(0, rs.getInt(1));
-            }
-            catch (SQLException e)
-            {
-                throw new DatabaseException(q.sqlText + " - " + sequenceSqlAppHandle + " - while fetching Application handle from TABLE(MON_GET_CONNECTION)", e);
-            }
-        }
     }
 
     @Override
@@ -157,4 +138,26 @@ public class DbImplDb2 extends DbAdapter
         }
         return false;
     }
+
+    @Override
+    public void simulateDisconnection(Connection cnx)
+    {
+        try (PreparedStatement s = cnx.prepareStatement(sequenceSqlAppHandle))
+        {
+            ResultSet rs = s.executeQuery();
+            if (!rs.next())
+            {
+                throw new NoResultException("The query returned zero rows when one was expected.");
+            }
+
+            String sql = "CALL SYSPROC.ADMIN_CMD('FORCE APPLICATION (" + rs.getInt(1) + ")')";
+            PreparedStatement ns = cnx.prepareStatement(sql);
+            ns.execute();
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+    }
+
 }

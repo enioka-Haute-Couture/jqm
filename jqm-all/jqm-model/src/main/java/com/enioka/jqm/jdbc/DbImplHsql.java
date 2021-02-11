@@ -68,4 +68,19 @@ public class DbImplHsql extends DbAdapter
         }
         return false;
     }
+
+    @Override
+    public void simulateDisconnection(Connection cnx)
+    {
+        try
+        {
+            PreparedStatement s = cnx.prepareStatement("DISCONNECT");
+            s.execute();
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+    }
+
 }

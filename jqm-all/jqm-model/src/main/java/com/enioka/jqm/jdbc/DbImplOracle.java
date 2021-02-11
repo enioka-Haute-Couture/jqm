@@ -1,6 +1,10 @@
 package com.enioka.jqm.jdbc;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -10,8 +14,6 @@ import com.enioka.jqm.model.Queue;
 
 public class DbImplOracle extends DbAdapter
 {
-    private String sequenceSqlSid;
-
     @Override
     public boolean compatibleWith(DatabaseMetaData product) throws SQLException
     {
@@ -29,7 +31,6 @@ public class DbImplOracle extends DbAdapter
         // See poll method for everything which is wrong with Oracle and queues.
         queries.put("ji_select_poll",
                 String.format("SELECT /*+ FIRST_ROWS */ a.* FROM (%s) a WHERE ROWNUM < ?", queries.get("ji_select_poll")));
-        sequenceSqlSid = "SELECT SID,SERIAL# FROM GV$SESSION WHERE USERNAME = 'JQM'";
     }
 
     @Override
@@ -39,8 +40,7 @@ public class DbImplOracle extends DbAdapter
                 .replace("UNIX_MILLIS()", "JQM_PK.currval").replace("IN(UNNEST(?))", "IN(?)")
                 .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(CURRENT_TIMESTAMP - 1/1440)")
                 .replace("CURRENT_TIMESTAMP - ? SECOND", "(CURRENT_TIMESTAMP - ?/86400)").replace("FROM (VALUES(0))", "FROM DUAL")
-                .replace("BOOLEAN", "NUMBER(1)").replace("true", "1").replace("false", "0").replace("__T__", this.tablePrefix)
-                .replace("DISCONNECT", "ALTER SYSTEM DISCONNECT SESSION '?,?' IMMEDIATE");
+                .replace("BOOLEAN", "NUMBER(1)").replace("true", "1").replace("false", "0").replace("__T__", this.tablePrefix);
     }
 
     @Override
@@ -99,24 +99,6 @@ public class DbImplOracle extends DbAdapter
                 throw new DatabaseException("Mismatch: count of list parameters and of IN clauses is different.");
             }
         }
-
-        if (q.sqlText.startsWith("ALTER SYSTEM"))
-        {
-            try (PreparedStatement s = cnx.prepareStatement(sequenceSqlSid))
-            {
-                ResultSet rs = s.executeQuery();
-                if (!rs.next())
-                {
-                    throw new NoResultException("The query returned zero rows when one was expected.");
-                }
-                q.parameters.add(0, rs.getInt(1));
-                q.parameters.add(1, rs.getInt(2));
-            }
-            catch (SQLException e)
-            {
-                throw new DatabaseException(q.sqlText + " - " + sequenceSqlSid + " - while fetching SID, SERIAL# from GV$SESSION)", e);
-            }
-        }
     }
 
     @Override
@@ -164,4 +146,26 @@ public class DbImplOracle extends DbAdapter
         }
         return false;
     }
+
+    @Override
+    public void simulateDisconnection(Connection cnx)
+    {
+        try (PreparedStatement s = cnx.prepareStatement("SELECT SID,SERIAL# FROM GV$SESSION WHERE USERNAME = 'JQM'"))
+        {
+            ResultSet rs = s.executeQuery();
+            if (!rs.next())
+            {
+                throw new NoResultException("The query returned zero rows when one was expected.");
+            }
+
+            String sql = "ALTER SYSTEM DISCONNECT SESSION '" + rs.getInt(1) + ","+ rs.getInt(2) + "' IMMEDIATE";
+            PreparedStatement ns = cnx.prepareStatement(sql);
+            ns.execute();
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+    }
+
 }

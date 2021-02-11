@@ -1,5 +1,6 @@
 package com.enioka.jqm.jdbc;
 
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -20,8 +21,7 @@ public class DbImplPg extends DbAdapter
                 .replace(" REAL", " DOUBLE PRECISION").replace("UNIX_MILLIS()", "extract('epoch' from current_timestamp)*1000")
                 .replace("IN(UNNEST(?))", "=ANY(?)").replace("CURRENT_TIMESTAMP - 1 MINUTE", "NOW() - INTERVAL '1 MINUTES'")
                 .replace("CURRENT_TIMESTAMP - ? SECOND", "(NOW() - (? || ' SECONDS')::interval)").replace("FROM (VALUES(0))", "")
-                .replace("__T__", this.tablePrefix)
-                .replace("DISCONNECT", "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='jqm'");
+                .replace("__T__", this.tablePrefix);
     }
 
     @Override
@@ -64,4 +64,19 @@ public class DbImplPg extends DbAdapter
         }
         return false;
     }
+
+    @Override
+    public void simulateDisconnection(Connection cnx)
+    {
+        try
+        {
+            PreparedStatement s = cnx.prepareStatement("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='jqm'");
+            s.execute();
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
+    }
+
 }
