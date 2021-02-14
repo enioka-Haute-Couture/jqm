@@ -5,6 +5,9 @@ import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Modal from "@material-ui/core/Modal";
 import TextField from "@material-ui/core/TextField/TextField";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Box from "@material-ui/core/Box";
+
+const paddingSize = 2;
 
 function getModalStyle() {
     const top = 50;
@@ -45,35 +48,45 @@ export const CreateQueueModal: React.FC<{
         <div style={modalStyle} className={classes.paper}>
             <h2 id="simple-modal-title">Create queue</h2>
             <form noValidate autoComplete="off">
-                <TextField
-                    label="Name"
-                    value={queueName}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setQueueName(event.target.value);
-                    }}
-                    fullWidth
-                />
-                <TextField
-                    label="Description"
-                    value={description}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setDescription(event.target.value);
-                    }}
-                    fullWidth
-                />
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={defaultQueue}
-                            onChange={(
-                                event: React.ChangeEvent<HTMLInputElement>
-                            ) => {
-                                setDefaultQueue(event.target.checked);
-                            }}
-                        />
-                    }
-                    label="Default queue"
-                />
+                <Box pt={paddingSize} pb={paddingSize}>
+                    <TextField
+                        label="Name"
+                        value={queueName}
+                        onChange={(
+                            event: React.ChangeEvent<HTMLInputElement>
+                        ) => {
+                            setQueueName(event.target.value);
+                        }}
+                        fullWidth
+                    />
+                </Box>
+                <Box pt={paddingSize} pb={paddingSize}>
+                    <TextField
+                        label="Description"
+                        value={description}
+                        onChange={(
+                            event: React.ChangeEvent<HTMLInputElement>
+                        ) => {
+                            setDescription(event.target.value);
+                        }}
+                        fullWidth
+                    />
+                </Box>
+                <Box pt={paddingSize} pb={paddingSize}>
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={defaultQueue}
+                                onChange={(
+                                    event: React.ChangeEvent<HTMLInputElement>
+                                ) => {
+                                    setDefaultQueue(event.target.checked);
+                                }}
+                            />
+                        }
+                        label="Default queue"
+                    />
+                </Box>
             </form>
             <Button
                 variant="contained"
@@ -95,6 +108,10 @@ export const CreateQueueModal: React.FC<{
                         description: description,
                         defaultQueue: defaultQueue,
                     });
+                    closeModal();
+                    setQueueName("");
+                    setDescription("");
+                    setDefaultQueue(false);
                 }}
             >
                 Create

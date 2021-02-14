@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, {
+    useMemo,
+    useEffect,
+    useState,
+    useCallback,
+    useRef,
+} from "react";
 import {
     Container,
     Grid,
@@ -7,7 +13,6 @@ import {
     Tooltip,
 } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import APIService from "../../utils/APIService";
 import MUIDataTable from "mui-datatables";
 import DoneIcon from "@material-ui/icons/Done";
 import BlockIcon from "@material-ui/icons/Block";
@@ -18,15 +23,12 @@ import RefreshIcon from "@material-ui/icons/Refresh";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import SaveIcon from "@material-ui/icons/Save";
 import CancelIcon from "@material-ui/icons/Cancel";
-import { useSnackbar } from "notistack";
 import TextField from "@material-ui/core/TextField/TextField";
-import { Queue } from "./Queue";
+import useQueueCrudApi from "./useQueueCrudApi";
 import { CreateQueueModal } from "./CreateQueueModal";
 
 const QueuesPage: React.FC = () => {
-    const { enqueueSnackbar } = useSnackbar();
     const [showModal, setShowModal] = useState(false);
-    const [queues, setQueues] = useState<any[] | null>();
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const [editingDefaultQueue, setEditingDefaultQueue] = useState<any | false>(
         false
@@ -34,114 +36,17 @@ const QueuesPage: React.FC = () => {
     const editingDescriptionInputRef = useRef(null);
     const editingQueueNameInputRef = useRef(null);
 
+    const {
+        queues,
+        fetchQueues,
+        createQueue,
+        updateQueue,
+        deleteQueues,
+    } = useQueueCrudApi();
+
     useEffect(() => {
         fetchQueues();
     }, []);
-
-    const fetchQueues = useCallback(() => {
-        APIService.get("/q")
-            .then((response) => {
-                setQueues(response);
-                setEditingRowId(null);
-            })
-            .catch((reason) => {
-                enqueueSnackbar(
-                    "An error occured, please contact support support@enioka.com for help.",
-                    {
-                        variant: "error",
-                        persist: true,
-                    }
-                );
-            });
-    }, [enqueueSnackbar]);
-
-    const createQueue = useCallback(
-        (newQueue: Queue) => {
-            APIService.post("/q", newQueue)
-                .then(() => {
-                    setShowModal(false);
-                    fetchQueues();
-                    enqueueSnackbar(
-                        `Successfully created queue: ${newQueue.name}`,
-                        {
-                            variant: "success",
-                        }
-                    );
-                })
-                .catch((reason) => {
-                    enqueueSnackbar(
-                        "An error occured, please contact support support@enioka.com for help.",
-                        {
-                            variant: "error",
-                            persist: true,
-                        }
-                    );
-                });
-        },
-        [enqueueSnackbar, fetchQueues]
-    );
-
-    const deleteQueues = useCallback(
-        async (queueIds: any[]) => {
-            await Promise.all(
-                queueIds.map((id) => APIService.delete("/q/" + id))
-            )
-                .then(() => {
-                    fetchQueues();
-                    enqueueSnackbar(
-                        `Successfully deleted queue${
-                            queueIds.length > 1 ? "s" : ""
-                        }`,
-                        {
-                            variant: "success",
-                        }
-                    );
-                })
-                .catch((reason) => {
-                    enqueueSnackbar(
-                        "An error occured, please contact support support@enioka.com for help.",
-                        {
-                            variant: "error",
-                            persist: true,
-                        }
-                    );
-                });
-        },
-        [enqueueSnackbar, fetchQueues]
-    );
-
-    const updateQueue = useCallback(
-        (
-            queueId: Number,
-            queueName: string,
-            queueDescription: string,
-            defaultQueue: Boolean
-        ) => {
-            const request: Queue = {
-                id: queueId,
-                name: queueName,
-                description: queueDescription,
-                defaultQueue: defaultQueue,
-            };
-            APIService.put("/q/" + request["id"], request)
-                .then(() => {
-                    fetchQueues();
-                    enqueueSnackbar("Successfully saved queue", {
-                        variant: "success",
-                    });
-                })
-                .catch((reason) => {
-                    enqueueSnackbar(
-                        "An error occured, please contact support for help.",
-                        {
-                            variant: "error",
-                            persist: true,
-                        }
-                    );
-                });
-        },
-        [fetchQueues, enqueueSnackbar]
-    );
 
     const updateRow = useCallback(
         (queueId: number) => {
@@ -153,7 +58,7 @@ const QueuesPage: React.FC = () => {
                     queueName,
                     description,
                     editingDefaultQueue
-                );
+                ).then(() => setEditingRowId(null));
             }
         },
         [updateQueue, editingDefaultQueue]
@@ -224,7 +129,7 @@ const QueuesPage: React.FC = () => {
                         <IconButton
                             color="default"
                             aria-label={"delete"}
-                            onClick={(e) => {
+                            onClick={() => {
                                 const [queueId] = tableMeta.rowData;
                                 deleteQueues([queueId]);
                             }}
@@ -237,30 +142,46 @@ const QueuesPage: React.FC = () => {
         }
     };
 
-    /*
-     * Render cell containing string value
-     * TODO: make cell size rigid
-     */
-    const renderStringCell = (inputRef: any, rowIndex: number) => (
+    const renderStringCell = (inputRef: any) => (
         value: any,
         tableMeta: any
     ) => {
+        const key = tableMeta.rowData[0];
         if (editingRowId === tableMeta.rowIndex) {
             const defaultDescription = tableMeta.rowData
-                ? tableMeta.rowData[rowIndex]
+                ? tableMeta.rowData[tableMeta.columnIndex]
                 : "";
             return (
                 <TextField
+                    key={key}
+                    id="standard-basic"
                     defaultValue={defaultDescription}
                     inputRef={inputRef}
-                    fullWidth={true}
+                    fullWidth
+                    margin="normal"
                     inputProps={{
-                        style: { fontSize: "0.8125rem" },
+                        style: { fontSize: "0.875rem" },
                     }}
                 />
             );
         } else {
-            return value;
+            return (
+                <TextField
+                    key={key}
+                    defaultValue={value}
+                    fullWidth
+                    margin="normal"
+                    InputProps={{ disableUnderline: true }}
+                    inputProps={{
+                        // the actual input element
+                        readOnly: true,
+                        style: {
+                            cursor: "default",
+                            fontSize: "0.875rem",
+                        },
+                    }}
+                />
+            );
         }
     };
 
@@ -278,7 +199,7 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell(editingQueueNameInputRef, 1),
+                customBodyRender: renderStringCell(editingQueueNameInputRef),
             },
         },
         {
@@ -287,10 +208,7 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell(
-                    editingDescriptionInputRef,
-                    2
-                ), // TODO: renderTextCell for longer content?
+                customBodyRender: renderStringCell(editingDescriptionInputRef),
             },
         },
         {
@@ -314,9 +232,9 @@ const QueuesPage: React.FC = () => {
     ];
 
     const options = {
+        setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
         download: false,
         print: false,
-        //filterType: 'checkbox',
         customToolbar: () => {
             return (
                 <>
@@ -346,13 +264,7 @@ const QueuesPage: React.FC = () => {
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={"Help"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"help"}
-                            onClick={() => {
-                                //
-                            }}
-                        >
+                        <IconButton color="default" aria-label={"help"}>
                             <HelpIcon />
                         </IconButton>
                     </Tooltip>
@@ -365,30 +277,25 @@ const QueuesPage: React.FC = () => {
                 const queue = queues ? queues[index] : null;
                 return queue ? queue.id : null;
             });
-
             deleteQueues(queueIds);
         },
         //filterType: 'checkbox',
     };
 
-    if (queues) {
-        return (
-            <Container>
-                <MUIDataTable
-                    title={"Queues"}
-                    data={queues}
-                    columns={columns}
-                    options={options}
-                />
-            </Container>
-        );
-    } else {
-        return (
-            <Grid container justify="center">
-                <CircularProgress />
-            </Grid>
-        );
-    }
+    return queues ? (
+        <Container>
+            <MUIDataTable
+                title={"Queues"}
+                data={queues}
+                columns={columns}
+                options={options}
+            />
+        </Container>
+    ) : (
+        <Grid container justify="center">
+            <CircularProgress />
+        </Grid>
+    );
 };
 
 export default QueuesPage;
