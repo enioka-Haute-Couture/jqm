@@ -240,7 +240,7 @@ public class JqmBaseTest
         try
         {
             jqmlogger.info("Send suicide query");
-            cnx.runCommand("log_off");
+            cnx.simulateDisconnection();
             this.sleep(waitTimeBeforeRestart);
             Helpers.closeQuietly(cnx);
         }

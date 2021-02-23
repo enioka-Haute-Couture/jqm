@@ -661,4 +661,9 @@ public class DbConn implements Closeable
     {
         return this.parent.getAdapter().poll(this, queue, nbSlots);
     }
+
+    public void simulateDisconnection()
+    {
+        this.parent.getAdapter().simulateDisconnection(_cnx);
+    }
 }
