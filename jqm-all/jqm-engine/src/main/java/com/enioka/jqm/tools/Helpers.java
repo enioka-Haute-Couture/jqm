@@ -22,6 +22,7 @@ import java.io.Closeable;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.sql.SQLNonTransientException;
@@ -37,6 +38,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.util.ByteSource;
@@ -613,20 +615,14 @@ final class Helpers
         }
     }
 
-    static boolean testDbFailure(Exception e)
-    {
-        return (e instanceof SQLTransientException) || (e.getCause() instanceof SQLTransientException)
-                || (e.getCause() != null && e.getCause().getCause() instanceof SQLTransientException)
-                || (e.getCause() != null && e.getCause().getCause() != null
-                        && e.getCause().getCause().getCause() instanceof SQLTransientException)
-                || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause().getCause() != null
-                        && e.getCause().getCause().getCause().getCause() instanceof SQLTransientException)
-                || (e.getCause() != null && e.getCause() instanceof SQLException
-                        && e.getMessage().equals("Failed to validate a newly established connection."))
-                || (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof SocketException)
-                || (e.getCause() != null && e.getCause().getMessage().equals("This connection has been closed"))
-                || (e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
-                || (e.getCause() != null && e.getCause() instanceof SQLNonTransientException
-                        && e.getCause().getMessage().equals("connection exception: closed"));
+    static boolean testDbFailure(Exception e) {
+        Throwable cause = e.getCause();
+        return (ExceptionUtils.indexOfType(e, SQLTransientException.class) != -1)
+                || (ExceptionUtils.indexOfType(e, SQLNonTransientConnectionException.class) != -1)
+                || (ExceptionUtils.indexOfType(e, SocketException.class) != -1)
+                || (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1)
+                || (cause != null && cause.getMessage().equals("This connection has been closed"))
+                || (cause instanceof SQLException && e.getMessage().equals("Failed to validate a newly established connection."))
+                || (cause instanceof SQLNonTransientException && cause.getMessage().equals("connection exception: closed"));
     }
 }
