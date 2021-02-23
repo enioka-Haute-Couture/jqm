@@ -24,8 +24,10 @@ public class DbImplHsql extends DbAdapter
     @Override
     public String adaptSql(String sql)
     {
-        return sql.replace("JQM_PK.nextval", "NEXT VALUE FOR JQM_PK").replace("FOR UPDATE LIMIT", "LIMIT").replace("__T__",
-                this.tablePrefix);
+        return sql.replace("JQM_PK.nextval", "NEXT VALUE FOR JQM_PK")
+                .replace("FOR UPDATE LIMIT", "LIMIT")
+                .replace("CURRENT_TIMESTAMP", "CURRENT_TIMESTAMP AT TIME ZONE INTERVAL '0:00' HOUR TO MINUTE")
+                .replace("__T__", this.tablePrefix);
     }
 
     @Override
