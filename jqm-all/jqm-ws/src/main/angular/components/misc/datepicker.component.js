@@ -23,7 +23,7 @@ class DatePickerController
         this.dp.datepicker().on('changeDate', function (e)
         {
             e.stopPropagation();
-            if ((!$ctrl.ngModel && !$ctrl.dp.datepicker('getDate')) || ($ctrl.ngModel && $ctrl.dp.datepicker('getDate').getTime() === $ctrl.ngModel.getTime()))
+            if ((!$ctrl.ngModel && !$ctrl.dp.datepicker('getDate')) || ($ctrl.ngModel && $ctrl.dp.datepicker('getDate') && $ctrl.dp.datepicker('getDate').getTime() === $ctrl.ngModel.getTime()))
             {
                 return; // Already at the right value - the event likely comes from the $doCheck.
             }
@@ -63,7 +63,7 @@ DatePickerController.$inject = ['$scope',];
 export const datepickerComponent = {
     controller: DatePickerController,
     template: ' ' +
-        '<div id={{$ctrl.id}} class="input-group date" style="max-width: 10em;" data-provide="datepicker" data-date-autoclose="true" data-date-week-start="1" data-date-calendar-weeks="true" data-date-clear-btn="true" data-date-max-view-mode="years" data-date-title="{{$ctrl.ngTitle}}" data-date-format="dd/mm/yyyy" data-date-today-btn="true" data-date-today-highlight="true"> ' +
+        '<div id={{$ctrl.id}} class="input-group date" style="max-width: 10em;" data-provide="datepicker" data-date-autoclose="true" data-date-week-start="1" data-date-calendar-weeks="true" data-date-clear-btn="true" data-date-max-view-mode="years" data-date-title="{{$ctrl.ngTitle}}" data-date-format="dd/mm/yyyy" data-date-today-btn="linked" data-date-today-highlight="true"> ' +
         '   <input type="text" class="form-control">' +
         '   <div class="input-group-addon input-group-append">' +
         '      <span class="input-group-text fas fa-th"></span>' +

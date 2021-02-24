@@ -55,6 +55,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     private Queue queue = null;
     private JqmEngine engine;
     private int maxNbThread = 10;
+    private boolean paused = false;
     private int pollingInterval = 10000;
     private int dpId;
     private boolean strictPollingPeriod = false;
@@ -135,7 +136,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     void applyDeploymentParameter(DeploymentParameter dp)
     {
         this.pollingInterval = dp.getPollingInterval();
-        this.maxNbThread = dp.getEnabled() ? dp.getNbThread() : 0;
+        this.maxNbThread = !this.paused && dp.getEnabled() ? dp.getNbThread() : 0;
         this.dpId = dp.getId();
 
         jqmlogger.info("Engine {}" + " will poll JobInstances on queue {} every {} s", engine.getNode().getName(), queue.getName(),
@@ -158,8 +159,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
         }
 
         DeploymentParameter p = prms.get(0);
-        if (p.getPollingInterval() != this.pollingInterval || (p.getEnabled() && this.maxNbThread != p.getNbThread())
-                || (this.maxNbThread > 0 && !p.getEnabled()) || (this.maxNbThread == 0 && p.getEnabled()))
+        if (p.getPollingInterval() != this.pollingInterval || (p.getEnabled() && !this.paused && this.maxNbThread != p.getNbThread())
+                || (this.maxNbThread > 0 && (!p.getEnabled() || this.paused)) || (this.maxNbThread == 0 && p.getEnabled() && !this.paused))
         {
             applyDeploymentParameter(p);
         }
@@ -475,17 +476,22 @@ class QueuePoller implements Runnable, QueuePollerMBean
         return this.engine;
     }
 
-    void setMaxThreads(int max)
+    void pause()
     {
-        if (this.maxNbThread > 0 && max == 0)
+        if (!paused)
         {
+            paused = true;
             jqmlogger.info("Poller is being paused - it won't fetch any new job instances until it is resumed.");
         }
-        else if (this.maxNbThread == 0 && max > 0)
+    }
+
+    void resume()
+    {
+        if (paused)
         {
             jqmlogger.info("Poller is being resumed");
+            paused = false;
         }
-        this.maxNbThread = max;
     }
 
     void setPollingInterval(int ms)

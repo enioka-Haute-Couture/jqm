@@ -60,6 +60,21 @@ public class MetaService
         }
     }
 
+    private static void closeQuietly(ResultSet closeable)
+    {
+        try
+        {
+            if (closeable != null)
+            {
+                closeable.close();
+            }
+        }
+        catch (Exception e)
+        {
+            // fail silently
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // GLOBAL DELETE
     ///////////////////////////////////////////////////////////////////////////
@@ -591,6 +606,10 @@ public class MetaService
         {
             throw new DatabaseException(e);
         }
+        finally
+        {
+            closeQuietly(rs);
+        }
     }
 
     public static void upsertJobDef(DbConn cnx, JobDefDto dto)
@@ -840,6 +859,10 @@ public class MetaService
         {
             throw new DatabaseException(e);
         }
+        finally
+        {
+            closeQuietly(rs);
+        }
     }
 
     public static NodeDto getNode(DbConn cnx, String nodeName)
@@ -858,6 +881,10 @@ public class MetaService
         catch (SQLException e)
         {
             throw new DatabaseException(e);
+        }
+        finally
+        {
+            closeQuietly(rs);
         }
     }
 
@@ -988,6 +1015,10 @@ public class MetaService
         catch (SQLException e)
         {
             throw new DatabaseException(e);
+        }
+        finally
+        {
+            closeQuietly(rs);
         }
     }
 

@@ -1,6 +1,64 @@
 Release notes
 ######################
 
+2.2.7
+*************
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Major changes
+++++++++++++++++++++++++++++
+
+* Build: it is now possible to use the JQM web services, including job logs retrieval, inside a Swarm or Kubernetes cluster. A new environment variable must be set (#425)
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Admin GUI: the page selection sliders in "runs" page had a weird interaction with the date criterions of the query (#424)
+* Build: updated Docker base images
+* Client API (JDBC only): when used with the Wildfly/JBoss JDBC pool, the JDBC implementation triggered pool warnings due to statement caching (#403 - new fix, thanks Mr Pool)
+* Engine: the "disable node" function failed since the introduction of resource managers in 2.2.0 (#427)
+* Engine: workaround for MariaDB 10.4 bug MDEV-20695 (#391)
+
+
+2.2.6
+*************
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Build: updated docker base images
+* Client API: fixed a concurrency issue when using highlander mode
+* Client API (JDBC only): when used with the Wildfly/JBoss JDBC pool, the JDBC implementation triggered pool warnings due to statement caching (#403 - new fix)
+* Engine: JMX "late jobs count" counter was wrong (#413)
+
+Deprecated
++++++++++++++++
+
+No new entries - same list as for 2.2.5.
+
+* The Maven artifact named "jqm-api-client-hibernate" has been removed, and replaced by a redirection to the jqm-api-cient-jdbc" artifact. The redirection will be removed in a future release.
+* JqmClient.resumeJob is deprecated in favor of the strictly equivalent resumeQueuedJob (to avoid confusion between the different pause/resume verbs).
+* Java 6 & 7, which are no longer supported, are considered deprecated in this release. Support for these versions will be removed in the next major version. The 2.x release is the last JQM version to fully support Java 6 & 7.
+* The Spring runner will soon no longer set the runtimeParameters bean. Use runtimeParametersProvider instead (see the JQM+Spring doc page for details).
+
+
 2.2.5
 *************
 

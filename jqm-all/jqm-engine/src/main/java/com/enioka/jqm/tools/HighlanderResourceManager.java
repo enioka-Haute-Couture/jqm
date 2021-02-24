@@ -41,7 +41,7 @@ class HighlanderResourceManager extends ResourceManagerBase
         }
 
         // Lock the definition in the DB - this is a convention for highlander JI between clients and engine.
-        ResultSet rs = cnx.runSelect(true, "jd_select_by_id", ji.getJD().getId());
+        ResultSet rs = cnx.runSelect(true, "jd_select_by_id_lock", ji.getJD().getId());
 
         // We have the lock. Check if there are already running instances.
         Integer runningCount = cnx.runSelectSingle("ji_select_existing_highlander_2", Integer.class, ji.getJD().getId());

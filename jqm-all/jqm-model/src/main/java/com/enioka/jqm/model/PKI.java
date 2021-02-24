@@ -84,9 +84,10 @@ public class PKI implements Serializable
     public static List<PKI> select(DbConn cnx, String query_key, Object... args)
     {
         List<PKI> res = new ArrayList<PKI>();
+        ResultSet rs = null;
         try
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
+            rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 PKI tmp = new PKI();
@@ -102,6 +103,10 @@ public class PKI implements Serializable
         catch (SQLException e)
         {
             throw new DatabaseException(e);
+        }
+        finally
+        {
+            cnx.closeQuietly(rs);
         }
         return res;
     }

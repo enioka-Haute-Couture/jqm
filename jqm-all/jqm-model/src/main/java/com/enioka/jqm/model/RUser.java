@@ -199,6 +199,7 @@ public class RUser implements Serializable
 
                 res.add(tmp);
             }
+            rs.close();
         }
         catch (SQLException e)
         {

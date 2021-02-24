@@ -6,39 +6,43 @@
 
 
 # set resource file from env variables
-echo "<resource 
-    name='jdbc/jqm' 
-    auth='Container' 
-    type='javax.sql.DataSource' 
-    factory='org.apache.tomcat.jdbc.pool.DataSourceFactory' 
-    testWhileIdle='true' 
-    testOnBorrow='false' 
-    testOnReturn='true' 
-    validationQuery='${JQM_POOL_VALIDATION_QUERY}' 
-    validationInterval='1000' 
-    timeBetweenEvictionRunsMillis='60000' 
-    maxActive='${JQM_POOL_MAX}' 
+echo "<resource
+    name='jdbc/jqm'
+    auth='Container'
+    type='javax.sql.DataSource'
+    factory='org.apache.tomcat.jdbc.pool.DataSourceFactory'
+    testWhileIdle='true'
+    testOnBorrow='false'
+    testOnReturn='true'
+    validationQuery='${JQM_POOL_VALIDATION_QUERY}'
+    validationInterval='1000'
+    timeBetweenEvictionRunsMillis='60000'
+    maxActive='${JQM_POOL_MAX}'
     minIdle='2'
-    maxIdle='5' 
-    maxWait='30000' 
-    initialSize='5' 
-    removeAbandonedTimeout='3600' 
-    removeAbandoned='true' 
-    logAbandoned='true' 
-    minEvictableIdleTimeMillis='60000' 
-    jmxEnabled='true' 
-    username='${JQM_POOL_USER}' 
-    password='${JQM_POOL_PASSWORD}' 
+    maxIdle='5'
+    maxWait='30000'
+    initialSize='5'
+    removeAbandonedTimeout='3600'
+    removeAbandoned='true'
+    logAbandoned='true'
+    minEvictableIdleTimeMillis='60000'
+    jmxEnabled='true'
+    username='${JQM_POOL_USER}'
+    password='${JQM_POOL_PASSWORD}'
     driverClassName='${JQM_POOL_DRIVER}'
-    url='${JQM_POOL_CONNSTR}' 
-    connectionProperties='v\$session.program=JQM;' 
-    singleton='true' 
+    url='${JQM_POOL_CONNSTR}'
+    connectionProperties='v\$session.program=JQM;'
+    singleton='true'
 />" > ${JQM_ROOT}/conf/resources.xml
 
 # helper for swarm deployment - use local host name for node name.
 if [ "${JQM_NODE_NAME}" = "_localhost_" ]
 then
     export JQM_NODE_NAME=$(hostname)
+fi
+if [ "${JQM_NODE_WS_INTERFACE}" = "_localhost_" ]
+then
+    export JQM_NODE_WS_INTERFACE=$(hostname)
 fi
 
 if [ "${JQM_INIT_MODE}" = "SINGLE" ]
@@ -60,7 +64,7 @@ then
         if [ ! "${JQM_CREATE_NODE_TEMPLATE}" = "" ]
         then
             echo "#### Applying template ${JQM_CREATE_NODE_TEMPLATE} to new JQM node"
-            java -jar jqm.jar -t ${JQM_CREATE_NODE_TEMPLATE},${JQM_NODE_NAME}
+            java -jar jqm.jar -t ${JQM_CREATE_NODE_TEMPLATE},${JQM_NODE_NAME},${JQM_NODE_WS_INTERFACE}
         fi
 
         # Jobs
@@ -94,7 +98,7 @@ then
         if [ ! "${JQM_CREATE_NODE_TEMPLATE}" = "" ]
         then
             echo "#### Applying template ${JQM_CREATE_NODE_TEMPLATE} to new JQM node"
-            java -jar jqm.jar -t ${JQM_CREATE_NODE_TEMPLATE},${JQM_NODE_NAME}
+            java -jar jqm.jar -t ${JQM_CREATE_NODE_TEMPLATE},${JQM_NODE_NAME},${JQM_NODE_WS_INTERFACE}
         fi
     fi
 fi

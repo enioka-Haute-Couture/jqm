@@ -69,9 +69,10 @@ public class RPermission implements Serializable
     public static List<RPermission> select(DbConn cnx, String query_key, Object... args)
     {
         List<RPermission> res = new ArrayList<RPermission>();
+        ResultSet rs = null;
         try
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
+            rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 RPermission tmp = new RPermission();
@@ -85,6 +86,10 @@ public class RPermission implements Serializable
         catch (SQLException e)
         {
             throw new DatabaseException(e);
+        }
+        finally
+        {
+            cnx.closeQuietly(rs);
         }
         return res;
     }

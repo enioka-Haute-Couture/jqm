@@ -33,6 +33,7 @@ RUN apk add curl
 ENV JAVA_OPTS="-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m" \
     JQM_ROOT="/jqm" \
     JQM_NODE_NAME="ContainerNode" \
+    JQM_NODE_WS_INTERFACE="0.0.0.0" \
     JQM_CREATE_NODE_IF_MISSING=0 \
     JQM_CREATE_NODE_TEMPLATE=TEMPLATE_WEB \
     JQM_POOL_CONNSTR="jdbc:hsqldb:file:db/jqmdatabase;shutdown=true;hsqldb.write_delay=false" \

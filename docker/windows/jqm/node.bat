@@ -7,6 +7,9 @@ rem helper for swarm deployment - use local host name for node name.
 IF "%JQM_NODE_NAME%" == "_localhost_" (
     set JQM_NODE_NAME=%COMPUTERNAME%
 )
+IF "%JQM_NODE_WS_INTERFACE%" == "_localhost_" (
+    set JQM_NODE_WS_INTERFACE=%COMPUTERNAME%
+)
 
 IF "%JQM_INIT_MODE%" == "SINGLE" (
     IF NOT EXIST C:\jqm\db\%JQM_NODE_NAME% (
@@ -24,7 +27,7 @@ IF "%JQM_INIT_MODE%" == "SINGLE" (
         rem Apply template
         IF defined JQM_CREATE_NODE_TEMPLATE (
             echo #### Applying template %JQM_CREATE_NODE_TEMPLATE% to new JQM node
-            java -jar jqm.jar -t %JQM_CREATE_NODE_TEMPLATE%,%JQM_NODE_NAME%
+            java -jar jqm.jar -t %JQM_CREATE_NODE_TEMPLATE%,%JQM_NODE_NAME%,%JQM_NODE_WS_INTERFACE%
         )
 
         rem Jobs
@@ -56,7 +59,7 @@ IF "%JQM_INIT_MODE%" == "CLUSTER" (
         rem Apply template
         IF defined JQM_CREATE_NODE_TEMPLATE (
             echo #### Applying template %JQM_CREATE_NODE_TEMPLATE% to new JQM node
-            java -jar jqm.jar -t %JQM_CREATE_NODE_TEMPLATE%,%JQM_NODE_NAME%
+            java -jar jqm.jar -t %JQM_CREATE_NODE_TEMPLATE%,%JQM_NODE_NAME%,%JQM_NODE_WS_INTERFACE%
         )
     )
 )

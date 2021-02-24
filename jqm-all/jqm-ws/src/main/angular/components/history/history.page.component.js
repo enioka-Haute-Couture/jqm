@@ -18,7 +18,6 @@ class HistoryPageCtrl
         this.target = "hist";
         this.table = true;
         this.image = false;
-        this.filterDate = false;
         this.showDetails = false;
         this.algo = 0;
 
@@ -36,6 +35,8 @@ class HistoryPageCtrl
 
         // Query
         this.query = {};
+        this.createdBeforeCriterion = null;
+        this.createdAfterCriterion = null;
 
         this.pagingOptions = {
             pageSize: 15,
@@ -235,10 +236,26 @@ class HistoryPageCtrl
         // Sort options
         this.query.sortby = this.sortInfo;
 
-        // Time filters: add a day to "started before" to be inclusive.
-        if (this.query.enqueuedBefore)
+        // Time filters: check consistency && add a day to "started before" to be inclusive.
+        if (this.createdAfterCriterion)
         {
-            this.query.enqueuedBefore = new Date(this.query.enqueuedBefore.getTime() + 86400000);
+            if (this.createdBeforeCriterion && this.createdAfterCriterion > this.createdBeforeCriterion)
+            {
+                this.createdAfterCriterion = this.createdBeforeCriterion;
+            }
+            this.query.enqueuedAfter = this.createdAfterCriterion;
+        }
+        else
+        {
+            this.query.enqueuedAfter = null;
+        }
+        if (this.createdBeforeCriterion)
+        {
+            this.query.enqueuedBefore = new Date(this.createdBeforeCriterion.getTime() + 86400000);
+        }
+        else
+        {
+            this.query.enqueuedBefore = null;
         }
 
         // Lists

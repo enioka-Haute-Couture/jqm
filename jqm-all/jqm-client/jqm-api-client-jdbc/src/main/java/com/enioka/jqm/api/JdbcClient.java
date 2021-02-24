@@ -150,6 +150,21 @@ final class JdbcClient implements JqmClient
         }
     }
 
+    private void closeQuietly(ResultSet closeable)
+    {
+        try
+        {
+            if (closeable != null)
+            {
+                closeable.close();
+            }
+        }
+        catch (SQLException ioe)
+        {
+            // ignore
+        }
+    }
+
     @Override
     public void dispose()
     {
@@ -255,12 +270,15 @@ final class JdbcClient implements JqmClient
         jqmlogger.trace("Job to enqueue is from JobDef " + jobDef.getId());
 
         // Then check Highlander.
-        Integer existing = highlanderMode(jobDef, cnx);
-        if (existing != null)
+        Object highlanderResult = highlanderMode(jobDef, cnx); // Returns Integer if already exists, a resultset otherwise. The RS thing is
+                                                               // to allow to explicitely close it as required by some pools (against the
+                                                               // spec).
+        if (highlanderResult != null && highlanderResult instanceof Integer)
         {
-            jqmlogger.trace("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + existing);
-            return existing;
+            jqmlogger.trace("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + highlanderResult);
+            return (Integer) highlanderResult;
         }
+        ResultSet highlanderRs = (ResultSet) highlanderResult;
 
         // If here, need to enqueue a new execution request.
         jqmlogger.trace("Not in highlander mode or no currently enqueued instance");
@@ -284,6 +302,7 @@ final class JdbcClient implements JqmClient
             }
             catch (NoResultException e)
             {
+                closeQuietly(highlanderRs);
                 throw new JqmInvalidRequestException("Requested queue " + runRequest.getQueueName() + " does not exist", e);
             }
         }
@@ -343,6 +362,10 @@ final class JdbcClient implements JqmClient
         {
             throw new JqmClientException("Could not create new JobInstance", e);
         }
+        finally
+        {
+            closeQuietly(highlanderRs);
+        }
     }
 
     @Override
@@ -371,7 +394,7 @@ final class JdbcClient implements JqmClient
     }
 
     // Helper. Current transaction is committed in some cases.
-    private Integer highlanderMode(JobDef jd, DbConn cnx)
+    private Object highlanderMode(JobDef jd, DbConn cnx)
     {
         if (!jd.isHighlander())
         {
@@ -390,7 +413,7 @@ final class JdbcClient implements JqmClient
 
         // Now we need to actually synchronize through the database to avoid double posting
         // TODO: use a dedicated table, not the JobDef one. Will avoid locking the configuration.
-        ResultSet rs = cnx.runSelect(true, "jd_select_by_id", jd.getId());
+        ResultSet rs = cnx.runSelect(true, "jd_select_by_id_lock", jd.getId());
 
         // Now we have a lock, just retry - some other client may have created a job instance recently.
         try
@@ -411,7 +434,7 @@ final class JdbcClient implements JqmClient
         }
 
         jqmlogger.trace("Highlander mode analysis is done: nor existing JO, must create a new one. Lock is hold.");
-        return null;
+        return rs;
     }
 
     /**
@@ -464,6 +487,10 @@ final class JdbcClient implements JqmClient
         catch (SQLException e)
         {
             throw new JqmClientException("Could not extract History data for launch " + launchId, e);
+        }
+        finally
+        {
+            closeQuietly(rs);
         }
 
         return jd;
@@ -720,12 +747,13 @@ final class JdbcClient implements JqmClient
     public int restartCrashedJob(int idJob)
     {
         DbConn cnx = null;
+        ResultSet rs = null;
 
         // History and Job ID have the same ID.
         try
         {
             cnx = getDbSession();
-            ResultSet rs = cnx.runSelect("history_select_reenqueue_by_id", idJob);
+            rs = cnx.runSelect("history_select_reenqueue_by_id", idJob);
 
             if (!rs.next())
             {
@@ -765,6 +793,7 @@ final class JdbcClient implements JqmClient
         }
         finally
         {
+            closeQuietly(rs);
             closeQuietly(cnx);
         }
     }
@@ -1673,10 +1702,11 @@ final class JdbcClient implements JqmClient
     {
         DbConn cnx = getDbSession();
         URL url = null;
+        ResultSet rs = null;
 
         try
         {
-            ResultSet rs = cnx.runSelect("node_select_connectdata_by_key", nodeName);
+            rs = cnx.runSelect("node_select_connectdata_by_key", nodeName);
             if (!rs.next())
             {
                 throw new NoResultException("no node named " + nodeName);
@@ -1706,6 +1736,7 @@ final class JdbcClient implements JqmClient
         }
         finally
         {
+            closeQuietly(rs);
             closeQuietly(cnx);
         }
 
@@ -2069,10 +2100,11 @@ final class JdbcClient implements JqmClient
     public QueueStatus getQueueStatus(com.enioka.jqm.api.Queue q)
     {
         DbConn cnx = null;
+        ResultSet rs = null;
         try
         {
             cnx = getDbSession();
-            ResultSet rs = cnx.runSelect("dp_select_enabled_for_queue", q.getId());
+            rs = cnx.runSelect("dp_select_enabled_for_queue", q.getId());
 
             int nbEnabled = 0, nbDisabled = 0;
             while (rs.next())
@@ -2109,6 +2141,7 @@ final class JdbcClient implements JqmClient
         }
         finally
         {
+            closeQuietly(rs);
             closeQuietly(cnx);
         }
     }
@@ -2118,10 +2151,11 @@ final class JdbcClient implements JqmClient
     {
         int capacity = 0;
         DbConn cnx = null;
+        ResultSet rs = null;
         try
         {
             cnx = getDbSession();
-            ResultSet rs = cnx.runSelect("dp_select_sum_queue_capacity", q.getId());
+            rs = cnx.runSelect("dp_select_sum_queue_capacity", q.getId());
 
             while (rs.next())
             {
@@ -2134,6 +2168,7 @@ final class JdbcClient implements JqmClient
         }
         finally
         {
+            closeQuietly(rs);
             closeQuietly(cnx);
         }
 
