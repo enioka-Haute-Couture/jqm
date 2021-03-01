@@ -16,7 +16,7 @@ module.exports = {
     output: {
         filename: '[name].bundle.[contenthash].js',
         path: path.resolve(__dirname, 'src/main/webapp/dist'),
-        publicPath: '/dist/'
+        publicPath: './dist/'
     },
     module: {
         rules: [{
