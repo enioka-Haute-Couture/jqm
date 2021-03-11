@@ -145,7 +145,7 @@ public class DbImplMySql8 extends DbAdapter
             return true;
         }
 
-        return false;
+        return super.testDbUnreachable(e);
     }
 
     @Override

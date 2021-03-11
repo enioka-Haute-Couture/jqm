@@ -66,7 +66,7 @@ public class DbImplHsql extends DbAdapter
         {
             return true;
         }
-        return false;
+        return super.testDbUnreachable(e);
     }
 
     @Override

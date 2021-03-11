@@ -18,6 +18,9 @@ import java.util.Properties;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The interface to implement to create a new database adapter. Adapters contain all the database-specific stuff for running JQM on a
  * specific database brand.<br>
@@ -27,6 +30,7 @@ import com.enioka.jqm.model.Queue;
  */
 public abstract class DbAdapter
 {
+    public static Logger jqmlogger = LoggerFactory.getLogger(DbAdapter.class);
     protected String[] IDS = new String[] { "ID" };
 
     /**
@@ -170,7 +174,11 @@ public abstract class DbAdapter
      * @param e exception to test
      * @return true if the database is closed
      */
-    public abstract boolean testDbUnreachable(Exception e);
+    public boolean testDbUnreachable(Exception e)
+    {
+        jqmlogger.debug("testDbUnreachable - Exception : " + e.getClass() + e.getMessage() + e.getCause());
+        return false;
+    }
 
     /**
      * Trigger a connection close from the DB.
