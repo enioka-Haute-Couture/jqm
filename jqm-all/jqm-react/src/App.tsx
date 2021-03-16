@@ -11,6 +11,8 @@ import QueuesPage from './components/Queues/QueuesPage';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { SnackbarProvider } from 'notistack';
 import UsersPage from './components/Users/UsersPage';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
 
 declare module '@material-ui/core/styles/overrides' {
     interface ComponentNameToClassKey {
@@ -24,6 +26,7 @@ declare module '@material-ui/core/styles/overrides' {
 }
 const getMuiTheme = () => createMuiTheme({
     overrides: {
+        // TODO: better display when editing row
         // MUIDataTableHeadCell: {
         //     root: {
         //         flexGrow: 1,
@@ -32,7 +35,6 @@ const getMuiTheme = () => createMuiTheme({
         // },
         // MUIDataTableBodyCell: {
         //     root: {
-        //         cursor: "pointer",
         //         flexGrow: 1,
         //         textAlign: "center"
         //     }
@@ -55,9 +57,7 @@ const getMuiTheme = () => createMuiTheme({
             light: "#7b96a3"
         }
     },
-    // typography: {
-    //     useNextVariants: true
-    // }
+
 });
 
 
@@ -65,28 +65,31 @@ function App() {
 
     return (
         <Router>
-            <MuiThemeProvider theme={getMuiTheme()}>
-                <SnackbarProvider
-                    maxSnack={3} anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                    }}>
-                    <MenuWrapper>
-                        <Switch>
-                            <Route path="/queues" exact={true}>
-                                <QueuesPage />
-                            </Route>
-                            <Route path="/users" exact={true}>
-                                <UsersPage />
-                            </Route>
-                            <Route path="/" exact={true}>
-                                <HomePage />
-                            </Route>
-                            <Redirect to="/" />
-                        </Switch>
-                    </MenuWrapper>
-                </SnackbarProvider>
-            </MuiThemeProvider>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+
+                <MuiThemeProvider theme={getMuiTheme()}>
+                    <SnackbarProvider
+                        maxSnack={3} anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}>
+                        <MenuWrapper>
+                            <Switch>
+                                <Route path="/queues" exact={true}>
+                                    <QueuesPage />
+                                </Route>
+                                <Route path="/users" exact={true}>
+                                    <UsersPage />
+                                </Route>
+                                <Route path="/" exact={true}>
+                                    <HomePage />
+                                </Route>
+                                <Redirect to="/" />
+                            </Switch>
+                        </MenuWrapper>
+                    </SnackbarProvider>
+                </MuiThemeProvider>
+            </MuiPickersUtilsProvider>
         </Router >
     );
 }

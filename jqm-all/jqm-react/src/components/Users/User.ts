@@ -3,9 +3,9 @@ export interface User {
     login: string;
     email?: string;
     freeText?: string
-    internal: boolean;
+    internal?: boolean;
     locked: boolean;
-    creationDate: Date;
+    creationDate?: Date;
     expirationDate?: Date;
     roles: Array<number>
 }

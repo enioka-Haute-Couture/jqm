@@ -1,6 +1,6 @@
 
 import { Container, Grid, CircularProgress, IconButton, Tooltip, Switch, TextField, Select, Input, MenuItem } from "@material-ui/core";
-import MUIDataTable from "mui-datatables";
+import MUIDataTable, { MUIDataTableColumnDef } from "mui-datatables";
 import React, { useEffect, useState } from "react";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
@@ -11,66 +11,26 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import CreateIcon from "@material-ui/icons/Create";
 import SaveIcon from "@material-ui/icons/Save";
 import CancelIcon from "@material-ui/icons/Cancel";
-import APIService from "../../utils/APIService";
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
-import { Role, User } from "./User";
-import { useSnackbar } from "notistack";
+import { KeyboardDatePicker } from "@material-ui/pickers";
+import { ChangePasswordDialog } from "./ChangePasswordDialog";
+import useUserAPI from "./useUserAPI";
 
-// TODO get roles ws/admin/role
+
 const UsersPage: React.FC = () => {
-    const { enqueueSnackbar } = useSnackbar();
-
-    const [users, setUsers] = useState<User[] | null>();
-    const [roles, setRoles] = useState<Role[] | null>();
 
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const [editingLineValues, setEditingLineValues] = useState<any | null>(
         null
     );
+    const [changePasswordRowId, setChangePasswordRowId] = useState<string | null>(null);
+    const { users, roles, fetchUsers, fetchRoles, createUser, updateUser, deleteUsers } = useUserAPI();
 
     useEffect(() => {
         fetchUsers();
         fetchRoles();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-
-    const fetchRoles = () => {
-        APIService.get("/role")
-            .then((response) => {
-                setRoles(response);
-            })
-            .catch((reason) => {
-                console.log(reason);
-                enqueueSnackbar(
-                    "An error occured, please contact support support@enioka.com for help.",
-                    {
-                        variant: "error",
-                        persist: true,
-                    }
-                );
-            });
-    };
-
-
-    const fetchUsers = () => {
-        APIService.get("/user")
-            .then((response) => {
-                setUsers(response);
-                setEditingRowId(null);
-                setEditingLineValues(null);
-            })
-            .catch((reason) => {
-                console.log(reason);
-                enqueueSnackbar(
-                    "An error occured, please contact support support@enioka.com for help.",
-                    {
-                        variant: "error",
-                        persist: true,
-                    }
-                );
-            });
-    };
 
     /*
      * Render cell containing boolean value
@@ -103,8 +63,19 @@ const UsersPage: React.FC = () => {
                         <IconButton
                             color="default"
                             aria-label={"save"}
-                            onClick={() => {
-                                // TODO: saveQueue();
+                            onClick={async () => {
+                                await updateUser({
+                                    id: editingLineValues[0],
+                                    login: editingLineValues[1],
+                                    email: editingLineValues[2],
+                                    freeText: editingLineValues[3],
+                                    locked: editingLineValues[4],
+                                    expirationDate: editingLineValues[5],
+                                    roles: editingLineValues[6]
+                                })
+                                setEditingRowId(null);
+                                setEditingLineValues(null);
+                                // TODO: validation ?
                             }}
                         >
                             <SaveIcon />
@@ -132,7 +103,7 @@ const UsersPage: React.FC = () => {
                             color="default"
                             aria-label={"Change password"}
                             onClick={() => {
-                                // TODO:
+                                setChangePasswordRowId(tableMeta.rowIndex);
                             }}
                         >
                             <VpnKeyIcon />
@@ -155,8 +126,8 @@ const UsersPage: React.FC = () => {
                             color="default"
                             aria-label={"delete"}
                             onClick={(e) => {
-                                // TODO: const [queueId] = tableMeta.rowData;
-                                // deleteQueues([queueId]);
+                                const [queueId] = tableMeta.rowData;
+                                deleteUsers([queueId]);
                             }}
                         >
                             <DeleteIcon />
@@ -172,7 +143,22 @@ const UsersPage: React.FC = () => {
     */
     const renderDateCell = (value: any, tableMeta: any) => {
         if (editingRowId === tableMeta.rowIndex) {
-            return <></>; // TODO:
+            return <KeyboardDatePicker
+                disableToolbar
+                variant="inline"
+                format="dd/MM/yyyy"
+                margin="normal"
+                id="date-picker-inline"
+                value={new Date(editingLineValues[tableMeta.columnIndex])}
+                onChange={(date, value) => {
+                    let values = [...editingLineValues];
+                    values[tableMeta.columnIndex] = date?.toISOString(); // TODO: find format that fits
+                    setEditingLineValues(values);
+                }}
+                KeyboardButtonProps={{
+                    'aria-label': 'change date',
+                }}
+            />
         } else {
             if (value) {
                 return new Date(value).toDateString();
@@ -242,7 +228,7 @@ const UsersPage: React.FC = () => {
         }
     };
 
-    const columns = [
+    const columns: MUIDataTableColumnDef[] = [
         {
             name: "id",
             label: "id",
@@ -321,9 +307,9 @@ const UsersPage: React.FC = () => {
 
 
     const options = {
+        setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }), // TODO: ?
         download: false,
         print: false,
-        //filterType: 'checkbox',
         customToolbar: () => {
             return (
                 <>
@@ -368,16 +354,13 @@ const UsersPage: React.FC = () => {
         },
 
         onRowsDelete: ({ data }: { data: any[] }) => {
-            console.log("id");
             // delete all rows by index
-            // const queueIds = data.map(({ index }) => {
-            //     const queue = queues ? queues[index] : null;
-            //     return queue ? queue.id : null;
-            // });
-
-            // deleteQueues(queueIds);
+            const userIds = data.map(({ index }) => {
+                const user = users ? users[index] : null;
+                return user ? user.id : null;
+            });
+            deleteUsers(userIds);
         },
-        //filterType: 'checkbox',
     };
 
     if (users && roles) {
@@ -389,7 +372,16 @@ const UsersPage: React.FC = () => {
                     columns={columns}
                     options={options}
                 />
+                {changePasswordRowId !== null &&
+                    <ChangePasswordDialog
+                        closeDialog={() => setChangePasswordRowId(null)}
+                        changePassword={async (password: string) => {
+                            console.log(password, changePasswordRowId);
+                        }}
+                    />
+                }
             </Container>
+
         );
     } else {
         return (
