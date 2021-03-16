@@ -1,0 +1,105 @@
+name: JQM CI
+
+on:
+    push:
+        branches:
+            - master
+    pull_request:
+
+defaults:
+    run:
+        working-directory: ./jqm-all
+
+jobs:
+    jdk_tests:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                java: [8, 9, 10, 11, 12]
+        steps:
+            - uses: actions/checkout@v2
+            - name: Set up java
+              uses: actions/setup-java@v1
+              with:
+                  java-version: ${{ matrix.java }}
+            - name: Build
+              run: mvn install -DskipTests
+            - name: Test
+              run: mvn test
+    postgres_tests:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                postgres: [9.6, 10]
+        steps:
+            - uses: actions/checkout@v2
+            - name: Set up java
+              uses: actions/setup-java@v1
+              with:
+                  java-version: 11
+            - uses: harmon758/postgresql-action@v1
+              with:
+                  postgresql version: ${{ matrix.postgres }}
+                  postgresql db: "jqm"
+                  postgresql user: "jqm"
+                  postgresql password: "jqm"
+            - name: Build
+              run: mvn install -DskipTests
+            - name: Test
+              run: mvn test
+              env:
+                  DB: postgresql
+                  DB_VERSION: ${{ matrix.postgres }}
+    mysql_tests:
+        runs-on: ubuntu-latest
+        services:
+            mysql:
+                image: mysql:5.7
+                env:
+                    MYSQL_ROOT_PASSWORD: password
+                    MYSQL_DATABASE: jqm
+                    MYSQL_USER: jqm
+                    MYSQL_PASSWORD: jqm
+                ports:
+                    - 3306:3306
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+        steps:
+            - uses: actions/checkout@v2
+            - name: Set up java
+              uses: actions/setup-java@v1
+              with:
+                  java-version: 11
+            - name: Build
+              run: mvn install -DskipTests
+            - name: Test
+              run: mvn test
+              env:
+                  DB: mysql
+                  DB_VERSION: 5.7
+    mariadb_tests:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                mariadb: [10.1, 10.3]
+        steps:
+            - uses: actions/checkout@v2
+            - name: Set up java
+              uses: actions/setup-java@v1
+              with:
+                  java-version: 11
+            - uses: getong/mariadb-action@v1.1
+              with:
+                  mariadb version: ${{matrix.mariadb}}
+                  mysql database: "jqm"
+                  mysql user: "jqm"
+                  mysql password: "jqm"
+            - name: Build
+              run: mvn install -DskipTests
+            - name: Test
+              run: mvn test
+              env:
+                  DB: mariadb
+                  DB_VERSION: ${{matrix.mariadb}}

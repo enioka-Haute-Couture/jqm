@@ -1,6 +1,6 @@
-import React from 'react';
-import MenuWrapper from './components/MenuWrapper';
-import HomePage from './components/HomePage';
+import React from "react";
+import MenuWrapper from "./components/MenuWrapper";
+import HomePage from "./components/HomePage";
 import {
     BrowserRouter as Router,
     Switch,
@@ -14,14 +14,14 @@ import UsersPage from './components/Users/UsersPage';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 
-declare module '@material-ui/core/styles/overrides' {
+declare module "@material-ui/core/styles/overrides" {
     interface ComponentNameToClassKey {
         MUIDataTableBodyCell?: {
-            root: any
-        }
+            root: any;
+        };
         MUIDataTableHeadCell?: {
-            root: any
-        }
+            root: any;
+        };
     }
 }
 const getMuiTheme = () => createMuiTheme({
@@ -62,11 +62,9 @@ const getMuiTheme = () => createMuiTheme({
 
 
 function App() {
-
     return (
         <Router>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
-
                 <MuiThemeProvider theme={getMuiTheme()}>
                     <SnackbarProvider
                         maxSnack={3} anchorOrigin={{

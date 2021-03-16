@@ -274,9 +274,10 @@ class JettyServer
         webAppContext.setDisplayName("JqmWebServices");
 
         // Hide server classes from the web app
-        webAppContext.getServerClasspathPattern().add("com.enioka.jqm.api."); // engine and webapp can have different API implementations
-                                                                              // (during tests mostly)
-        webAppContext.getServerClasspathPattern().add("com.enioka.jqm.tools.");
+        webAppContext.getServerClasspathPattern().add("com.enioka.jqm.api.", "com.enioka.api.admin."); // engine and webapp can have
+                                                                                                       // different API implementations
+                                                                                                       // (during tests mostly)
+        webAppContext.getServerClasspathPattern().add("com.enioka.jqm.tools."); // The engine itself should not be exposed to the webapp.
         webAppContext.getServerClasspathPattern().add("-com.enioka.jqm.tools.JqmXmlException"); // inside XML bundle, not engine.
         webAppContext.getServerClasspathPattern().add("-com.enioka.jqm.tools.XmlJobDefExporter");
 
