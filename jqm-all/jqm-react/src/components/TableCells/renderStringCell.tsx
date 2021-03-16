@@ -12,7 +12,7 @@ export const renderStringCell = (
             : "";
         return (
             <TextField
-                key={key}
+                key={key + 1}
                 id="standard-basic"
                 defaultValue={defaultDescription}
                 inputRef={inputRef}
@@ -26,8 +26,8 @@ export const renderStringCell = (
     } else {
         return (
             <TextField
-                key={key}
-                defaultValue={value}
+                key={key + 2}
+                value={value}
                 fullWidth
                 margin="normal"
                 InputProps={{ disableUnderline: true }}
