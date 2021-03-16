@@ -12,6 +12,11 @@ public class SessionEvaluator implements SessionStorageEvaluator
     @Override
     public boolean isSessionStorageEnabled(Subject subject)
     {
+        if (subject == null)
+        {
+            return false;
+        }
+
         // If disabled in request (e.g. by using the noSessionCreation filter, it stays disabled.
         if (WebUtils.isWeb(subject))
         {

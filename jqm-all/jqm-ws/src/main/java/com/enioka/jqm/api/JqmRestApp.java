@@ -42,6 +42,7 @@ public class JqmRestApp extends ResourceConfig
         // These two properties ensure lists are properly named in JSON objects
         this.property(MarshallerProperties.JSON_WRAPPER_AS_ARRAY_NAME, true);
         this.property(UnmarshallerProperties.JSON_WRAPPER_AS_ARRAY_NAME, true);
+        this.property("jersey.config.server.wadl.disableWadl", "true");
 
         // Determine which of the three APIs should be loaded
         boolean loadApiSimple;

@@ -201,7 +201,7 @@ public class ShellRunnerTest extends JqmBaseTest
             CreationTools.createJobDef("test job 2", true, "none", new HashMap<>(), "echo 'aa'", TestHelpers.qNormal, 0, "TestApp2", null,
                     "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
 
-            String script = "curl --user \"${JQM_API_LOGIN}:${JQM_API_PASSWORD}\" --url \"${JQM_API_LOCAL_URL}/ws/simple/ji\" -XPOST -d \"applicationname=TestApp2&parentid=${JQM_JI_ID}\" -H 'Content-Type: application/x-www-form-urlencoded' -s ";
+            String script = "curl --user \"${JQM_API_LOGIN}:${JQM_API_PASSWORD}\" --url \"${JQM_API_LOCAL_URL}/ws/simple/ji\" -d \"applicationname=TestApp2&parentid=${JQM_JI_ID}\" -H 'Content-Type: application/x-www-form-urlencoded' -s ";
 
             CreationTools.createJobDef("test job", true, "none", new HashMap<>(), script, TestHelpers.qNormal, 0, "TestApp1", null,
                     "module1", "kw1", "kw2", null, false, cnx, null, false, null, false, PathType.DEFAULTSHELLCOMMAND);
