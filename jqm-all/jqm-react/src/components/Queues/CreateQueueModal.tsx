@@ -2,33 +2,22 @@ import React, { useState } from "react";
 import { Queue } from "./Queue";
 import { Button, Switch } from "@material-ui/core";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
-import Modal from "@material-ui/core/Modal";
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogActions from "@material-ui/core/DialogActions";
 import TextField from "@material-ui/core/TextField/TextField";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Box from "@material-ui/core/Box";
-
-const paddingSize = 2;
-
-function getModalStyle() {
-    const top = 50;
-    const left = 50;
-
-    return {
-        top: `${top}%`,
-        left: `${left}%`,
-        transform: `translate(-${top}%, -${left}%)`,
-    };
-}
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
-        paper: {
-            position: "absolute",
-            width: 400,
-            backgroundColor: theme.palette.background.paper,
-            border: "2px solid #000",
-            boxShadow: theme.shadows[5],
-            padding: theme.spacing(2, 4, 3),
+        TextField: {
+            padding: theme.spacing(0, 0, 3),
+        },
+        FormControlLabel: {
+            padding: theme.spacing(0, 0, 0),
+            margin: theme.spacing(0, 0, 0, 0),
+            alignItems: "start",
         },
     })
 );
@@ -41,91 +30,79 @@ export const CreateQueueModal: React.FC<{
     const [queueName, setQueueName] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [defaultQueue, setDefaultQueue] = useState(false);
-    const [modalStyle] = React.useState(getModalStyle);
     const classes = useStyles();
-
-    const body = (
-        <div style={modalStyle} className={classes.paper}>
-            <h2 id="simple-modal-title">Create queue</h2>
-            <form noValidate autoComplete="off">
-                <Box pt={paddingSize} pb={paddingSize}>
-                    <TextField
-                        label="Name"
-                        value={queueName}
-                        onChange={(
-                            event: React.ChangeEvent<HTMLInputElement>
-                        ) => {
-                            setQueueName(event.target.value);
-                        }}
-                        fullWidth
-                    />
-                </Box>
-                <Box pt={paddingSize} pb={paddingSize}>
-                    <TextField
-                        label="Description"
-                        value={description}
-                        onChange={(
-                            event: React.ChangeEvent<HTMLInputElement>
-                        ) => {
-                            setDescription(event.target.value);
-                        }}
-                        fullWidth
-                    />
-                </Box>
-                <Box pt={paddingSize} pb={paddingSize}>
-                    <FormControlLabel
-                        control={
-                            <Switch
-                                checked={defaultQueue}
-                                onChange={(
-                                    event: React.ChangeEvent<HTMLInputElement>
-                                ) => {
-                                    setDefaultQueue(event.target.checked);
-                                }}
-                            />
-                        }
-                        label="Default queue"
-                    />
-                </Box>
-            </form>
-            <Button
-                variant="contained"
-                size="small"
-                onClick={closeModal}
-                style={{ margin: "8px" }}
-            >
-                Cancel
-            </Button>
-            <Button
-                variant="contained"
-                size="small"
-                color="primary"
-                disabled={!queueName || !description}
-                style={{ margin: "8px" }}
-                onClick={() => {
-                    createQueue({
-                        name: queueName!,
-                        description: description,
-                        defaultQueue: defaultQueue,
-                    });
-                    closeModal();
-                    setQueueName("");
-                    setDescription("");
-                    setDefaultQueue(false);
-                }}
-            >
-                Create
-            </Button>
-        </div>
-    );
-
     return (
-        <Modal
+        <Dialog
             open={showModal}
             onClose={closeModal}
-            aria-labelledby="simple-modal-title"
+            aria-labelledby="form-dialog-title"
         >
-            {body}
-        </Modal>
+            <DialogTitle>Create queue</DialogTitle>
+            <DialogContent>
+                <TextField
+                    className={classes.TextField}
+                    label="Name"
+                    value={queueName}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setQueueName(event.target.value);
+                    }}
+                    fullWidth
+                />
+                <TextField
+                    className={classes.TextField}
+                    label="Description"
+                    value={description}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setDescription(event.target.value);
+                    }}
+                    fullWidth
+                />
+                <FormControlLabel
+                    className={classes.FormControlLabel}
+                    control={
+                        <Switch
+                            checked={defaultQueue}
+                            onChange={(
+                                event: React.ChangeEvent<HTMLInputElement>
+                            ) => {
+                                setDefaultQueue(event.target.checked);
+                            }}
+                        />
+                    }
+                    label="Default queue"
+                    labelPlacement="top"
+                />
+            </DialogContent>
+            <DialogActions>
+                <Button
+                    variant="contained"
+                    size="small"
+                    onClick={closeModal}
+                    style={{ margin: "8px" }}
+                >
+                    Cancel
+                </Button>
+                <Button
+                    variant="contained"
+                    size="small"
+                    color="primary"
+                    disabled={!queueName || !description}
+                    style={{ margin: "8px" }}
+                    onClick={() => {
+                        createQueue({
+                            name: queueName!,
+                            description: description,
+                            defaultQueue: defaultQueue,
+                        });
+                        closeModal();
+                        setQueueName("");
+                        setDescription("");
+                        setDefaultQueue(false);
+                    }}
+                >
+                    Create
+                </Button>
+            </DialogActions>
+        </Dialog>
     );
 };

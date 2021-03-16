@@ -1,21 +1,7 @@
-import React, {
-    useMemo,
-    useEffect,
-    useState,
-    useCallback,
-    useRef,
-} from "react";
-import {
-    Container,
-    Grid,
-    IconButton,
-    Switch,
-    Tooltip,
-} from "@material-ui/core";
+import React, { useEffect, useState, useCallback, useRef } from "react";
+import { Container, Grid, IconButton, Tooltip } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import MUIDataTable from "mui-datatables";
-import DoneIcon from "@material-ui/icons/Done";
-import BlockIcon from "@material-ui/icons/Block";
 import DeleteIcon from "@material-ui/icons/Delete";
 import CreateIcon from "@material-ui/icons/Create";
 import HelpIcon from "@material-ui/icons/Help";
@@ -23,9 +9,9 @@ import RefreshIcon from "@material-ui/icons/Refresh";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import SaveIcon from "@material-ui/icons/Save";
 import CancelIcon from "@material-ui/icons/Cancel";
-import TextField from "@material-ui/core/TextField/TextField";
 import useQueueCrudApi from "./useQueueCrudApi";
 import { CreateQueueModal } from "./CreateQueueModal";
+import { renderStringCell, renderBooleanCell } from "../TableCells";
 
 const QueuesPage: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
@@ -63,24 +49,6 @@ const QueuesPage: React.FC = () => {
         },
         [updateQueue, editingDefaultQueue]
     );
-
-    /*
-     * Render cell containing boolean value
-     */
-    const renderBooleanCell = (value: any, tableMeta: any) => {
-        if (editingRowId === tableMeta.rowIndex) {
-            return (
-                <Switch
-                    checked={editingDefaultQueue}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                        setEditingDefaultQueue(event.target.checked)
-                    }
-                />
-            );
-        } else {
-            return value ? <DoneIcon /> : <BlockIcon />;
-        }
-    };
 
     /**
      * Render cell with action buttons
@@ -142,49 +110,6 @@ const QueuesPage: React.FC = () => {
         }
     };
 
-    const renderStringCell = (inputRef: any) => (
-        value: any,
-        tableMeta: any
-    ) => {
-        const key = tableMeta.rowData[0];
-        if (editingRowId === tableMeta.rowIndex) {
-            const defaultDescription = tableMeta.rowData
-                ? tableMeta.rowData[tableMeta.columnIndex]
-                : "";
-            return (
-                <TextField
-                    key={key}
-                    id="standard-basic"
-                    defaultValue={defaultDescription}
-                    inputRef={inputRef}
-                    fullWidth
-                    margin="normal"
-                    inputProps={{
-                        style: { fontSize: "0.875rem" },
-                    }}
-                />
-            );
-        } else {
-            return (
-                <TextField
-                    key={key}
-                    defaultValue={value}
-                    fullWidth
-                    margin="normal"
-                    InputProps={{ disableUnderline: true }}
-                    inputProps={{
-                        // the actual input element
-                        readOnly: true,
-                        style: {
-                            cursor: "default",
-                            fontSize: "0.875rem",
-                        },
-                    }}
-                />
-            );
-        }
-    };
-
     const columns = [
         {
             name: "id",
@@ -199,7 +124,10 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell(editingQueueNameInputRef),
+                customBodyRender: renderStringCell(
+                    editingQueueNameInputRef,
+                    editingRowId
+                ),
             },
         },
         {
@@ -208,7 +136,10 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell(editingDescriptionInputRef),
+                customBodyRender: renderStringCell(
+                    editingDescriptionInputRef,
+                    editingRowId
+                ),
             },
         },
         {
@@ -217,7 +148,11 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderBooleanCell,
+                customBodyRender: renderBooleanCell(
+                    editingRowId,
+                    editingDefaultQueue,
+                    setEditingDefaultQueue
+                ),
             },
         },
         {
@@ -279,7 +214,6 @@ const QueuesPage: React.FC = () => {
             });
             deleteQueues(queueIds);
         },
-        //filterType: 'checkbox',
     };
 
     return queues ? (
