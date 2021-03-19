@@ -1,5 +1,5 @@
 export interface Node {
-    id: number | null;
+    id: number;
     name: string;
     dns: string;
     port: number;

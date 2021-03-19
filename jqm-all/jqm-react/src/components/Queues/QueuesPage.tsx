@@ -30,6 +30,7 @@ const QueuesPage: React.FC = () => {
 
     useEffect(() => {
         fetchQueues();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleOnDelete = useCallback(

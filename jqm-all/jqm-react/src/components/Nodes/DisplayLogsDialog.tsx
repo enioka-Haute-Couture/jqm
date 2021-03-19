@@ -1,12 +1,10 @@
-import React, { useState } from "react";
-import { Button, Switch } from "@material-ui/core";
+import React from "react";
+import { Button } from "@material-ui/core";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
-import TextField from "@material-ui/core/TextField/TextField";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -24,9 +22,8 @@ const useStyles = makeStyles((theme: Theme) =>
 export const DisplayLogsDialog: React.FC<{
     showDialog: boolean;
     closeDialog: any;
-    nodeName: string;
-    nodeId: number;
-}> = ({ showDialog, closeDialog, nodeName, nodeId }) => {
+    logs: string[] | null | undefined;
+}> = ({ showDialog, closeDialog, logs }) => {
     const classes = useStyles();
     return (
         <Dialog
@@ -35,7 +32,11 @@ export const DisplayLogsDialog: React.FC<{
             aria-labelledby="form-dialog-title"
         >
             <DialogTitle>Logs</DialogTitle>
-            <DialogContent></DialogContent>
+            <DialogContent>
+                {logs?.map((log) => (
+                    <p>{log}</p>
+                ))}
+            </DialogContent>
             <DialogActions>
                 <Button
                     variant="contained"

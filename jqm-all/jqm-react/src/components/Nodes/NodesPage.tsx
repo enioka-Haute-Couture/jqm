@@ -4,15 +4,19 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import MUIDataTable from "mui-datatables";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
+import DescriptionIcon from "@material-ui/icons/Description";
+import { Node } from "./Node";
 import {
     renderInputCell,
     renderBooleanCell,
     renderActionsCell,
 } from "../TableCells";
 import useNodesApi from "./useNodesApi";
+import { Filter } from "@material-ui/icons";
+import { DisplayLogsDialog } from "./DisplayLogsDialog";
 
 export const NodesPage: React.FC = () => {
-    const [showDialog, setShowDialog] = useState(false);
+    const [showLogsDialog, setShowLogsDialog] = useState(false);
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const nameInputRef = useRef(null);
     const dnsInputRef = useRef(null);
@@ -45,10 +49,18 @@ export const NodesPage: React.FC = () => {
     const handleOnDelete = useCallback(
         (tableMeta) => {
             const [nodeId] = tableMeta.rowData;
-            deleteNodes([nodeId]);
+            const newNodes = nodes?.filter((node) => node.id !== nodeId);
+            if (newNodes) {
+                deleteNodes(newNodes);
+            }
         },
-        [deleteNodes]
+        [deleteNodes, nodes]
     );
+
+    const handleOnViewLogs = useCallback((tableMeta) => {
+        fetchNodeLogs(tableMeta.rowData[3]);
+        setShowLogsDialog(true);
+    }, []);
 
     const handleOnSave = useCallback(
         (tableMeta) => {
@@ -90,8 +102,6 @@ export const NodesPage: React.FC = () => {
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
     const handleOnEdit = useCallback(
         (tableMeta) => {
-            console.log(nodes);
-            console.log(tableMeta.rowData);
             setEnabled(tableMeta.rowData[12]);
             setLoapApiSimple(tableMeta.rowData[13]);
             setLoadApiClient(tableMeta.rowData[14]);
@@ -302,7 +312,14 @@ export const NodesPage: React.FC = () => {
                     handleOnSave,
                     handleOnDelete,
                     editingRowId,
-                    handleOnEdit
+                    handleOnEdit,
+                    [
+                        {
+                            title: "View node logs",
+                            icon: <DescriptionIcon />,
+                            action: handleOnViewLogs,
+                        },
+                    ]
                 ),
             },
         },
@@ -333,17 +350,29 @@ export const NodesPage: React.FC = () => {
             );
         },
         onRowsDelete: ({ data }: { data: any[] }) => {
-            // delete all rows by index
-            const nodeIds = data.map(({ index }) => {
+            const nodeIdsToDelete: { [id: string]: number } = {};
+            data.forEach(({ index }) => {
                 const node = nodes ? nodes[index] : null;
-                return node ? node.id : null;
+                if (node) {
+                    nodeIdsToDelete[node.id] = node.id;
+                }
             });
-            deleteNodes(nodeIds);
+            const newNodes = nodes?.filter(
+                (node) => nodeIdsToDelete[node.id] !== node.id
+            );
+            if (newNodes) {
+                deleteNodes(newNodes);
+            }
         },
     };
 
     return nodes ? (
         <Container>
+            <DisplayLogsDialog
+                showDialog={showLogsDialog}
+                closeDialog={() => setShowLogsDialog(false)}
+                logs={nodeLogs}
+            />
             <MUIDataTable
                 title={"Nodes"}
                 data={nodes}

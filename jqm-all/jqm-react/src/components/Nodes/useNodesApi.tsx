@@ -49,32 +49,7 @@ const useNodesApi = () => {
     );
 
     const deleteNodes = useCallback(
-        async (nodeIds: any[]) => {
-            return await Promise.all(
-                nodeIds.map((id) => APIService.delete("/node/" + id))
-            )
-                .then(() => {
-                    fetchNodes();
-                    enqueueSnackbar(
-                        `Successfully deleted node${
-                            nodeIds.length > 1 ? "s" : ""
-                        }`,
-                        {
-                            variant: "success",
-                        }
-                    );
-                })
-                .catch((reason) => {
-                    console.debug(reason);
-                    enqueueSnackbar(
-                        "An error occured, please contact support support@enioka.com for help.",
-                        {
-                            variant: "error",
-                            persist: true,
-                        }
-                    );
-                });
-        },
+        async (nodes: Node[]) => updateNodes(nodes),
         [enqueueSnackbar, fetchNodes]
     );
 
@@ -103,8 +78,8 @@ const useNodesApi = () => {
     );
 
     const fetchNodeLogs = useCallback(
-        async (nodeId: number, latest: number) => {
-            return APIService.get(`/node/${nodeId}/log?latest=${latest}`)
+        async (nodeName: string, latest: number = 200) => {
+            return APIService.get(`/node/${nodeName}/log?latest=${latest}`)
                 .then((logs) => setNodeLogs(logs))
                 .catch((reason) => {
                     console.debug(reason);
