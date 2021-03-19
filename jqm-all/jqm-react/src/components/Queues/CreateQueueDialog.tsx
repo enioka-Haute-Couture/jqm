@@ -22,19 +22,19 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
-export const CreateQueueModal: React.FC<{
-    showModal: boolean;
-    closeModal: any;
+export const CreateQueueDialog: React.FC<{
+    showDialog: boolean;
+    closeDialog: any;
     createQueue: (queue: Queue) => void;
-}> = ({ showModal, closeModal, createQueue }) => {
+}> = ({ showDialog, closeDialog, createQueue }) => {
     const [queueName, setQueueName] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [defaultQueue, setDefaultQueue] = useState(false);
     const classes = useStyles();
     return (
         <Dialog
-            open={showModal}
-            onClose={closeModal}
+            open={showDialog}
+            onClose={closeDialog}
             aria-labelledby="form-dialog-title"
         >
             <DialogTitle>Create queue</DialogTitle>
@@ -77,7 +77,7 @@ export const CreateQueueModal: React.FC<{
                 <Button
                     variant="contained"
                     size="small"
-                    onClick={closeModal}
+                    onClick={closeDialog}
                     style={{ margin: "8px" }}
                 >
                     Cancel
@@ -94,7 +94,7 @@ export const CreateQueueModal: React.FC<{
                             description: description,
                             defaultQueue: defaultQueue,
                         });
-                        closeModal();
+                        closeDialog();
                         setQueueName("");
                         setDescription("");
                         setDefaultQueue(false);
