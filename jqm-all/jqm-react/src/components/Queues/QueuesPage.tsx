@@ -5,7 +5,7 @@ import MUIDataTable from "mui-datatables";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
-import useQueueCrudApi from "./useQueueCrudApi";
+import { useQueueAPI } from "./QueueAPI";
 import { CreateQueueModal } from "./CreateQueueModal";
 import {
     renderStringCell,
@@ -28,10 +28,11 @@ const QueuesPage: React.FC = () => {
         createQueue,
         updateQueue,
         deleteQueues,
-    } = useQueueCrudApi();
+    } = useQueueAPI();
 
     useEffect(() => {
         fetchQueues();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const updateRow = useCallback(

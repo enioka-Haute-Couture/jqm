@@ -1,30 +1,32 @@
 
-import { Container, Grid, CircularProgress, IconButton, Tooltip, Switch, TextField, Select, Input, MenuItem } from "@material-ui/core";
+import { Container, Grid, CircularProgress, IconButton, Tooltip, MenuItem } from "@material-ui/core";
 import MUIDataTable, { MUIDataTableColumnDef } from "mui-datatables";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
-import DoneIcon from "@material-ui/icons/Done";
-import BlockIcon from "@material-ui/icons/Block";
-import DeleteIcon from "@material-ui/icons/Delete";
-import CreateIcon from "@material-ui/icons/Create";
-import SaveIcon from "@material-ui/icons/Save";
-import CancelIcon from "@material-ui/icons/Cancel";
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
-import { KeyboardDatePicker } from "@material-ui/pickers";
 import { ChangePasswordDialog } from "./ChangePasswordDialog";
-import useUserAPI from "./useUserAPI";
+import { useUserAPI } from "./UserAPI";
+import { renderActionsCell, renderBooleanCell, renderStringCell } from "../TableCells";
+import { renderArrayCell } from "../TableCells/renderArrayCell";
+import { renderDateCell } from "../TableCells/renderDateCell";
+import { Role } from "./User";
+import { CreateUserDialog } from "./CreateUserDialog";
 
 
 const UsersPage: React.FC = () => {
 
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
-    const [editingLineValues, setEditingLineValues] = useState<any | null>(
-        null
-    );
-    const [changePasswordRowId, setChangePasswordRowId] = useState<string | null>(null);
-    const { users, roles, fetchUsers, fetchRoles, createUser, updateUser, deleteUsers } = useUserAPI();
+    const loginInputRef = useRef(null);
+    const emailInputRef = useRef(null);
+    const fullNameInputRef = useRef(null);
+    const [locked, setLocked] = useState<boolean | null>(null);
+    const [expirationDate, setExpirationDate] = useState<Date | null>(null);
+    const [userRoles, setUserRoles] = useState<number[] | null>(null);
+    const [changePasswordUserId, setChangePasswordUserId] = useState<string | null>(null);
+    const { users, roles, fetchUsers, fetchRoles, createUser, updateUser, deleteUsers, changePassword } = useUserAPI();
+    const [showCreateDialog, setShowCreateDialog] = useState(false);
 
     useEffect(() => {
         fetchUsers();
@@ -32,201 +34,56 @@ const UsersPage: React.FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    /*
-     * Render cell containing boolean value
-     */
-    const renderBooleanCell = (value: any, tableMeta: any) => {
-        if (editingRowId === tableMeta.rowIndex) {
-            return (
-                <Switch
-                    checked={editingLineValues[tableMeta.columnIndex]}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        let values = [...editingLineValues];
-                        values[tableMeta.columnIndex] = event.target.checked;
-                        setEditingLineValues(values);
-                    }}
-                />
-            );
-        } else {
-            return value ? <DoneIcon /> : <BlockIcon />;
-        }
-    };
+    const updateRow = useCallback(
+        (id: number) => {
+            if (!editingRowId) {
+                return;
+            }
+            const { value: login } = loginInputRef.current!;
+            const { value: email } = emailInputRef.current!;
+            const { value: fullName } = fullNameInputRef.current!;
+            if (id && login && email && fullName && locked != null && expirationDate != null && userRoles != null) {
+                updateUser({
+                    id: id,
+                    login: login,
+                    email: email,
+                    freeText: fullName,
+                    locked: locked,
+                    expirationDate: expirationDate!!,
+                    roles: userRoles!!
+                }).then(() => setEditingRowId(null));
+            }
+        },
+        [updateUser, editingRowId, locked, expirationDate, userRoles]
+    );
 
-    /**
-     * Render cell with action buttons
-     */
-    const renderActionsCell = (value: any, tableMeta: any) => {
-        if (editingRowId === tableMeta.rowIndex) {
-            return (
-                <>
-                    <Tooltip title={"Save changes"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"save"}
-                            onClick={async () => {
-                                await updateUser({
-                                    id: editingLineValues[0],
-                                    login: editingLineValues[1],
-                                    email: editingLineValues[2],
-                                    freeText: editingLineValues[3],
-                                    locked: editingLineValues[4],
-                                    expirationDate: editingLineValues[5],
-                                    roles: editingLineValues[6]
-                                })
-                                setEditingRowId(null);
-                                setEditingLineValues(null);
-                                // TODO: validation ?
-                            }}
-                        >
-                            <SaveIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title={"Cancel changes"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"cancel"}
-                            onClick={() => {
-                                setEditingRowId(null);
-                                setEditingLineValues(null);
-                            }}
-                        >
-                            <CancelIcon />
-                        </IconButton>
-                    </Tooltip>
-                </>
-            );
-        } else {
-            return (
-                <>
-                    <Tooltip title={"Change password"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"Change password"}
-                            onClick={() => {
-                                setChangePasswordRowId(tableMeta.rowIndex);
-                            }}
-                        >
-                            <VpnKeyIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title={"Edit line"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"edit"}
-                            onClick={() => {
-                                setEditingRowId(tableMeta.rowIndex);
-                                setEditingLineValues(tableMeta.rowData);
-                            }}
-                        >
-                            <CreateIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title={"Delete line"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"delete"}
-                            onClick={(e) => {
-                                const [queueId] = tableMeta.rowData;
-                                deleteUsers([queueId]);
-                            }}
-                        >
-                            <DeleteIcon />
-                        </IconButton>
-                    </Tooltip>
-                </>
-            );
-        }
-    };
+    const handleOnDelete = useCallback(
+        (tableMeta) => {
+            const [userId] = tableMeta.rowData;
+            deleteUsers([userId]);
+        },
+        [deleteUsers]
+    );
 
-    /**
-    * Render cell containing date
-    */
-    const renderDateCell = (value: any, tableMeta: any) => {
-        if (editingRowId === tableMeta.rowIndex) {
-            return <KeyboardDatePicker
-                disableToolbar
-                variant="inline"
-                format="dd/MM/yyyy"
-                margin="normal"
-                id="date-picker-inline"
-                value={new Date(editingLineValues[tableMeta.columnIndex])}
-                onChange={(date, value) => {
-                    let values = [...editingLineValues];
-                    values[tableMeta.columnIndex] = date?.toISOString(); // TODO: find format that fits
-                    setEditingLineValues(values);
-                }}
-                KeyboardButtonProps={{
-                    'aria-label': 'change date',
-                }}
-            />
-        } else {
-            if (value) {
-                return new Date(value).toDateString();
-            } else return value;
-        }
-    };
+    const handleOnSave = useCallback(
+        (tableMeta) => {
+            const [userId] = tableMeta.rowData;
+            updateRow(userId);
+        },
+        [updateRow]
+    );
 
+    const handleOnCancel = useCallback(() => setEditingRowId(null), []);
 
-    const renderArrayCell = (value: any, tableMeta: any) => {
-        if (editingRowId === tableMeta.rowIndex) {
-            return <Select
-                multiple
-                value={editingLineValues[tableMeta.columnIndex]}
-                onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
-                    let values = [...editingLineValues];
-                    values[tableMeta.columnIndex] = event.target.value as number[];
-                    setEditingLineValues(values);
-                }}
-                input={<Input />}
-                MenuProps={{
-                    // TODO: smaller font and fixed width?
-                    PaperProps: {
-                        style: {
-                            //
-                        },
-                    },
-                }}
-            >
-                {roles!.map((role) => (
-                    <MenuItem key={role.id} value={role.id}>
-                        {role.name}
-                    </MenuItem>
-                ))}
-            </Select >;
-        } else {
-            if (value) {
-                return (value as number[]).map(e => roles?.find(x => x.id === e)?.name).join(",");
-            } else return value;
-        }
-
-    };
-
-    /*
-     * Render cell containing string value
-     */
-    const renderStringCell = (value: any, tableMeta: any) => {
-        if (editingRowId === tableMeta.rowIndex) {
-            return (
-                <TextField
-                    value={editingLineValues[tableMeta.columnIndex]}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        let values = [...editingLineValues];
-                        values[tableMeta.columnIndex] = event.target.value;
-                        setEditingLineValues(values);
-                    }}
-                    fullWidth={true}
-                    inputProps={{
-                        style: {
-                            //textAlign: "center",
-                            fontSize: "0.8125rem",
-                        },
-                    }}
-                />
-            );
-        } else {
-            return value;
-        }
-    };
+    const handleOnEdit = useCallback(
+        (tableMeta) => {
+            setEditingRowId(tableMeta.rowIndex)
+            setLocked(tableMeta.rowData[4]);
+            setExpirationDate(tableMeta.rowData[5]);
+            setUserRoles(tableMeta.rowData[6]);
+        },
+        []
+    );
 
     const columns: MUIDataTableColumnDef[] = [
         {
@@ -243,7 +100,10 @@ const UsersPage: React.FC = () => {
                 hint: "Must be unique. If used, certificates should certify CN=root",
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell,
+                customBodyRender: renderStringCell(
+                    loginInputRef,
+                    editingRowId
+                ),
             },
         },
         {
@@ -253,7 +113,10 @@ const UsersPage: React.FC = () => {
                 hint: "Optional contact e-mail address",
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell,
+                customBodyRender: renderStringCell(
+                    emailInputRef,
+                    editingRowId
+                ),
             },
         },
         {
@@ -263,7 +126,10 @@ const UsersPage: React.FC = () => {
                 hint: "Optional description of the account (real name or service name)",
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell,
+                customBodyRender: renderStringCell(
+                    fullNameInputRef,
+                    editingRowId
+                ),
             },
         },
 
@@ -273,7 +139,11 @@ const UsersPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderBooleanCell,
+                customBodyRender: renderBooleanCell(
+                    editingRowId,
+                    locked,
+                    setLocked
+                ),
             },
         },
         {
@@ -282,7 +152,11 @@ const UsersPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderDateCell,
+                customBodyRender: renderDateCell(
+                    editingRowId,
+                    expirationDate,
+                    setExpirationDate
+                ),
             },
         },
         {
@@ -291,7 +165,17 @@ const UsersPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
-                customBodyRender: renderArrayCell,
+                customBodyRender: renderArrayCell(
+                    editingRowId,
+                    roles ? roles!.map((role: Role) => (
+                        <MenuItem key={role.id} value={role.id}>
+                            {role.name}
+                        </MenuItem>
+                    )) : [],
+                    (element: number) => roles?.find(x => x.id === element)?.name || "",
+                    userRoles,
+                    setUserRoles
+                )
             },
         },
         {
@@ -300,14 +184,28 @@ const UsersPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderActionsCell,
+                customBodyRender: renderActionsCell(
+                    handleOnCancel,
+                    handleOnSave,
+                    handleOnDelete,
+                    editingRowId,
+                    handleOnEdit,
+                    [{
+                        title: "Change password",
+                        icon: <VpnKeyIcon />,
+                        action: (tableMeta: any) => {
+                            const [userId] = tableMeta.rowData;
+                            setChangePasswordUserId(userId)
+                        }
+                    }]
+                ),
             },
         },
     ];
 
 
     const options = {
-        setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }), // TODO: ?
+        setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
         download: false,
         print: false,
         customToolbar: () => {
@@ -317,16 +215,9 @@ const UsersPage: React.FC = () => {
                         <IconButton
                             color="default"
                             aria-label={"add"}
-                        // onClick={() => setShowModal(true)}
+                            onClick={() => setShowCreateDialog(true)}
                         >
                             <AddCircleIcon />
-                            {/* {showModal && (
-                                <CreateQueueModal
-                                    showModal={showModal}
-                                    closeModal={() => setShowModal(false)}
-                                    createQueue={createQueue}
-                                />
-                            )} */}
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={"Refresh"}>
@@ -372,14 +263,19 @@ const UsersPage: React.FC = () => {
                     columns={columns}
                     options={options}
                 />
-                {changePasswordRowId !== null &&
+                {changePasswordUserId !== null &&
                     <ChangePasswordDialog
-                        closeDialog={() => setChangePasswordRowId(null)}
-                        changePassword={async (password: string) => {
-                            console.log(password, changePasswordRowId);
-                        }}
+                        closeDialog={() => setChangePasswordUserId(null)}
+                        changePassword={changePassword(changePasswordUserId)}
                     />
                 }
+                {showCreateDialog && (
+                    <CreateUserDialog
+                        closeDialog={() => setShowCreateDialog(false)}
+                        createUser={createUser}
+                        roles={roles}
+                    />
+                )}
             </Container>
 
         );

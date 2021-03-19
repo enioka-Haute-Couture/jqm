@@ -12,7 +12,7 @@ export const ChangePasswordDialog: React.FC<{
         <DialogContent>
             <DialogContentText>
                 Passwords are ignored if a certificate is used. An empty password forces the use of a certificate.
-          </DialogContentText>
+            </DialogContentText>
             <TextField
                 autoFocus
                 margin="dense"
@@ -28,13 +28,21 @@ export const ChangePasswordDialog: React.FC<{
             />
         </DialogContent>
         <DialogActions>
-            <Button onClick={closeDialog} color="secondary">
+            <Button
+                variant="contained"
+                size="small"
+                style={{ margin: "8px" }}
+                onClick={closeDialog}>
                 Cancel
             </Button>
-            <Button onClick={async () => {
-                await changePassword(password);
-                closeDialog();
-            }} color="primary">
+            <Button variant="contained"
+                size="small"
+                style={{ margin: "8px" }}
+                onClick={async () => {
+                    await changePassword(password);
+                    closeDialog();
+                }}
+                color="primary">
                 Save
           </Button>
         </DialogActions>

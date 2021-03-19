@@ -5,13 +5,13 @@ import BlockIcon from "@material-ui/icons/Block";
 
 export const renderBooleanCell = (
     editingRowId: number | null,
-    isChecked: boolean,
+    isChecked: boolean | null,
     setBoolean: Function
 ) => (value: any, tableMeta: any) => {
     if (editingRowId === tableMeta.rowIndex) {
         return (
             <Switch
-                checked={isChecked}
+                checked={isChecked!!}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                     setBoolean(event.target.checked)
                 }

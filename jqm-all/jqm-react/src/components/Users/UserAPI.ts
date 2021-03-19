@@ -1,33 +1,12 @@
 import { useState, useCallback } from "react";
-import { useSnackbar } from "notistack";
 import APIService from "../../utils/APIService";
+import { useNotificationService } from "../../utils/NotificationService";
 import { Role, User } from "./User";
 
-const useUserAPI = () => {
-    const { enqueueSnackbar } = useSnackbar();
-    const [users, setUsers] = useState<any[] | null>();
-    const [roles, setRoles] = useState<Role[] | null>();
-
-    const displayError = useCallback((reason: any) => {
-        console.log(reason);
-        enqueueSnackbar(
-            "An error occured, please contact support support@enioka.com for help.",
-            {
-                variant: "error",
-                persist: true,
-            }
-        );
-    }, [enqueueSnackbar]);
-
-    const displaySuccess = useCallback((message: string) => {
-        enqueueSnackbar(
-            message,
-            {
-                variant: "success",
-            }
-        );
-    }, [enqueueSnackbar]);
-
+export const useUserAPI = () => {
+    const [users, setUsers] = useState<any[] | null>(null);
+    const [roles, setRoles] = useState<Role[] | null>(null);
+    const { displayError, displaySuccess } = useNotificationService();
     const fetchRoles = useCallback(async () => {
         APIService.get("/role")
             .then((response) => {
@@ -83,9 +62,18 @@ const useUserAPI = () => {
         [displayError, displaySuccess, fetchUsers]
     );
 
-    // TODO: change password
+    const changePassword = useCallback(
+        (userId: string) =>
+            async (password: string) => {
+                return APIService.put("/user/" + userId, { newPassword: password })
+                    .then(() => {
+                        displaySuccess(`Successfully updated password of user`);
+                    })
+                    .catch(displayError)
+            },
+        [displayError, displaySuccess]
+    );
 
-    return { users, roles, fetchUsers, fetchRoles, createUser, updateUser, deleteUsers };
+
+    return { users, roles, fetchUsers, fetchRoles, createUser, updateUser, deleteUsers, changePassword };
 };
-
-export default useUserAPI;

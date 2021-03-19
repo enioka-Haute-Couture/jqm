@@ -5,15 +5,15 @@ export const renderStringCell = (
     inputRef: React.MutableRefObject<null>,
     editingRowId: number | null
 ) => (value: any, tableMeta: any) => {
-    const key = tableMeta.rowData[0];
+    const id = `${tableMeta.rowIndex}-${tableMeta.columnIndex}`
     if (editingRowId === tableMeta.rowIndex) {
         const defaultDescription = tableMeta.rowData
             ? tableMeta.rowData[tableMeta.columnIndex]
             : "";
         return (
             <TextField
-                key={`${key}-1`}
-                id="standard-basic"
+                key={`${id}-edit`}
+                id={id}
                 defaultValue={defaultDescription}
                 inputRef={inputRef}
                 fullWidth
@@ -25,8 +25,10 @@ export const renderStringCell = (
         );
     } else {
         return (
+            // TODO: hides everything if too long
             <TextField
-                key={`${key}-2`}
+                key={`${id}-display`}
+                id={id}
                 value={value}
                 fullWidth
                 margin="normal"
