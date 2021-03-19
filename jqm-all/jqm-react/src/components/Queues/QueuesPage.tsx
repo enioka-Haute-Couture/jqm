@@ -2,23 +2,23 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Container, Grid, IconButton, Tooltip } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import MUIDataTable from "mui-datatables";
-import DeleteIcon from "@material-ui/icons/Delete";
-import CreateIcon from "@material-ui/icons/Create";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
-import SaveIcon from "@material-ui/icons/Save";
-import CancelIcon from "@material-ui/icons/Cancel";
 import useQueueCrudApi from "./useQueueCrudApi";
 import { CreateQueueModal } from "./CreateQueueModal";
-import { renderStringCell, renderBooleanCell } from "../TableCells";
+import {
+    renderStringCell,
+    renderBooleanCell,
+    renderActionsCell,
+} from "../TableCells";
 
 const QueuesPage: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
-    const [editingDefaultQueue, setEditingDefaultQueue] = useState<any | false>(
-        false
-    );
+    const [editingDefaultQueue, setEditingDefaultQueue] = useState<
+        boolean | false
+    >(false);
     const editingDescriptionInputRef = useRef(null);
     const editingQueueNameInputRef = useRef(null);
 
@@ -35,81 +35,40 @@ const QueuesPage: React.FC = () => {
     }, []);
 
     const updateRow = useCallback(
-        (queueId: number) => {
-            const { value: queueName } = editingQueueNameInputRef.current!;
+        (id: number) => {
+            const { value: name } = editingQueueNameInputRef.current!;
             const { value: description } = editingDescriptionInputRef.current!;
-            if (queueId && queueName && description) {
+            if (id && name && description) {
                 updateQueue({
-                    id: queueId,
-                    name: queueName,
-                    description: description,
-                    defaultQueue: editingDefaultQueue
-                }
-                ).then(() => setEditingRowId(null));
+                    id: id,
+                    name,
+                    description,
+                    defaultQueue: editingDefaultQueue,
+                }).then(() => setEditingRowId(null));
             }
         },
         [updateQueue, editingDefaultQueue]
     );
 
-    /**
-     * Render cell with action buttons
-     */
-    const renderActionsCell = (value: any, tableMeta: any) => {
-        if (editingRowId === tableMeta.rowIndex) {
-            const queueId = tableMeta.rowData ? tableMeta.rowData[0] : null;
-            return (
-                <>
-                    <Tooltip title={"Cancel changes"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"cancel"}
-                            onClick={() => setEditingRowId(null)} // TODO: how to fix cancel ?
-                        >
-                            <CancelIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title={"Save changes"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"save"}
-                            onClick={() => updateRow(queueId)}
-                        >
-                            <SaveIcon />
-                        </IconButton>
-                    </Tooltip>
-                </>
-            );
-        } else {
-            return (
-                <>
-                    <Tooltip title={"Edit line"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"edit"}
-                            onClick={() => {
-                                setEditingRowId(tableMeta.rowIndex);
-                                setEditingDefaultQueue(tableMeta.rowData[3]);
-                            }}
-                        >
-                            <CreateIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title={"Delete line"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"delete"}
-                            onClick={() => {
-                                const [queueId] = tableMeta.rowData;
-                                deleteQueues([queueId]);
-                            }}
-                        >
-                            <DeleteIcon />
-                        </IconButton>
-                    </Tooltip>
-                </>
-            );
-        }
-    };
+    const handleOnDelete = useCallback(
+        (tableMeta) => {
+            const [queueId] = tableMeta.rowData;
+            deleteQueues([queueId]);
+        },
+        [deleteQueues]
+    );
+    const handleOnSave = useCallback(
+        (tableMeta) => {
+            const [queueId] = tableMeta.rowData;
+            updateRow(queueId);
+        },
+        [updateRow]
+    );
+    const handleOnCancel = useCallback(() => setEditingRowId(null), []);
+    const handleOnEdit = useCallback(
+        (tableMeta) => setEditingRowId(tableMeta.rowIndex),
+        []
+    );
 
     const columns = [
         {
@@ -162,7 +121,13 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderActionsCell,
+                customBodyRender: renderActionsCell(
+                    handleOnCancel,
+                    handleOnSave,
+                    handleOnDelete,
+                    editingRowId,
+                    handleOnEdit
+                ),
             },
         },
     ];

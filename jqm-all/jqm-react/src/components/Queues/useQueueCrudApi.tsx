@@ -9,10 +9,7 @@ const useQueueCrudApi = () => {
 
     const fetchQueues = useCallback(async () => {
         return APIService.get("/q")
-            .then((response) => {
-                console.log(response);
-                setQueues(response);
-            })
+            .then((queues) => setQueues(queues))
             .catch((reason) => {
                 enqueueSnackbar(
                     "An error occured, please contact support support@enioka.com for help.",
@@ -101,7 +98,13 @@ const useQueueCrudApi = () => {
         },
         [fetchQueues, enqueueSnackbar]
     );
-    return { queues, fetchQueues, createQueue, updateQueue, deleteQueues };
+    return {
+        queues,
+        fetchQueues,
+        createQueue,
+        updateQueue,
+        deleteQueues,
+    };
 };
 
 export default useQueueCrudApi;
