@@ -7,12 +7,13 @@ import {
     Route,
     Redirect,
 } from "react-router-dom";
-import QueuesPage from './components/Queues/QueuesPage';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { SnackbarProvider } from 'notistack';
 import UsersPage from './components/Users/UsersPage';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
+import QueuesPage from "./components/Queues/QueuesPage";
+import { NodesPage } from "./components/Nodes/NodesPage";
 
 declare module "@material-ui/core/styles/overrides" {
     interface ComponentNameToClassKey {
@@ -64,31 +65,34 @@ const getMuiTheme = () => createMuiTheme({
 function App() {
     return (
         <Router>
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <MuiThemeProvider theme={getMuiTheme()}>
-                    <SnackbarProvider
-                        maxSnack={3} anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}>
-                        <MenuWrapper>
-                            <Switch>
-                                <Route path="/queues" exact={true}>
-                                    <QueuesPage />
-                                </Route>
-                                <Route path="/users" exact={true}>
-                                    <UsersPage />
-                                </Route>
-                                <Route path="/" exact={true}>
-                                    <HomePage />
-                                </Route>
-                                <Redirect to="/" />
-                            </Switch>
-                        </MenuWrapper>
-                    </SnackbarProvider>
-                </MuiThemeProvider>
-            </MuiPickersUtilsProvider>
-        </Router >
+            <MuiThemeProvider theme={getMuiTheme()}>
+                <SnackbarProvider
+                    maxSnack={3}
+                    anchorOrigin={{
+                        vertical: "top",
+                        horizontal: "right",
+                    }}
+                >
+                    <MenuWrapper>
+                        <Switch>
+                            <Route path="/nodes" exact={true}>
+                                <NodesPage />
+                            </Route>
+                            <Route path="/queues" exact={true}>
+                                <QueuesPage />
+                            </Route>
+                            <Route path="/users" exact={true}>
+                                <UsersPage />
+                            </Route>
+                            <Route path="/" exact={true}>
+                                <HomePage />
+                            </Route>
+                            <Redirect to="/" />
+                        </Switch>
+                    </MenuWrapper>
+                </SnackbarProvider>
+            </MuiThemeProvider>
+        </Router>
     );
 }
 

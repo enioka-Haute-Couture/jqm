@@ -5,22 +5,20 @@ import MUIDataTable from "mui-datatables";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
-import { useQueueAPI } from "./QueueAPI";
-import { CreateQueueModal } from "./CreateQueueModal";
 import {
     renderInputCell,
     renderBooleanCell,
     renderActionsCell,
 } from "../TableCells";
+import { CreateQueueDialog } from "./CreateQueueDialog";
+import useQueueAPI from "./QueueAPI";
 
 const QueuesPage: React.FC = () => {
-    const [showModal, setShowModal] = useState(false);
+    const [showDialog, setShowDialog] = useState(false);
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
-    const [editingDefaultQueue, setEditingDefaultQueue] = useState<
-        boolean | false
-    >(false);
-    const editingDescriptionInputRef = useRef(null);
-    const editingQueueNameInputRef = useRef(null);
+    const [defaultQueue, setDefaultQueue] = useState<boolean>(false);
+    const descriptionInputRef = useRef(null);
+    const queueNameInputRef = useRef(null);
 
     const {
         queues,
@@ -35,21 +33,6 @@ const QueuesPage: React.FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const updateRow = useCallback(
-        (id: number) => {
-            const { value: name } = editingQueueNameInputRef.current!;
-            const { value: description } = editingDescriptionInputRef.current!;
-            if (id && name) {
-                updateQueue({
-                    id: id,
-                    name,
-                    description,
-                    defaultQueue: editingDefaultQueue,
-                }).then(() => setEditingRowId(null));
-            }
-        },
-        [updateQueue, editingDefaultQueue]
-    );
 
     const handleOnDelete = useCallback(
         (tableMeta) => {
@@ -58,18 +41,30 @@ const QueuesPage: React.FC = () => {
         },
         [deleteQueues]
     );
+
     const handleOnSave = useCallback(
         (tableMeta) => {
             const [queueId] = tableMeta.rowData;
-            updateRow(queueId);
+            const { value: name } = queueNameInputRef.current!;
+            const { value: description } = descriptionInputRef.current!;
+            if (queueId && name) {
+                updateQueue({
+                    id: queueId,
+                    name,
+                    description,
+                    defaultQueue: defaultQueue,
+                }).then(() => setEditingRowId(null));
+            }
         },
-        [updateRow]
+        [updateQueue, defaultQueue]
     );
+
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
-    const handleOnEdit = useCallback(
-        (tableMeta) => setEditingRowId(tableMeta.rowIndex),
-        []
-    );
+    const handleOnEdit = useCallback((tableMeta) => {
+        console.log("setDefaultQueue" + tableMeta.rowData[3]);
+        setDefaultQueue(tableMeta.rowData[3]);
+        setEditingRowId(tableMeta.rowIndex);
+    }, []);
 
     const columns = [
         {
@@ -86,7 +81,7 @@ const QueuesPage: React.FC = () => {
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
-                    editingQueueNameInputRef,
+                    queueNameInputRef,
                     editingRowId
                 ),
             },
@@ -98,7 +93,7 @@ const QueuesPage: React.FC = () => {
                 filter: true,
                 sort: true,
                 customBodyRender: renderInputCell(
-                    editingDescriptionInputRef,
+                    descriptionInputRef,
                     editingRowId
                 ),
             },
@@ -111,8 +106,8 @@ const QueuesPage: React.FC = () => {
                 sort: true,
                 customBodyRender: renderBooleanCell(
                     editingRowId,
-                    editingDefaultQueue,
-                    setEditingDefaultQueue
+                    defaultQueue,
+                    setDefaultQueue
                 ),
             },
         },
@@ -145,13 +140,13 @@ const QueuesPage: React.FC = () => {
                             <IconButton
                                 color="default"
                                 aria-label={"add"}
-                                onClick={() => setShowModal(true)}
+                                onClick={() => setShowDialog(true)}
                             >
                                 <AddCircleIcon />
                             </IconButton>
-                            <CreateQueueModal
-                                showModal={showModal}
-                                closeModal={() => setShowModal(false)}
+                            <CreateQueueDialog
+                                showDialog={showDialog}
+                                closeDialog={() => setShowDialog(false)}
                                 createQueue={createQueue}
                             />
                         </>

@@ -1,18 +1,18 @@
 export interface Node {
-    id?: number;
-    port: number;
-    lastSeenAlive: Date;
+    id: number;
     name: string;
-    tmpDirectory: string;
     dns: string;
+    port: number;
+    outputDirectory: string;
+    jobRepoDirectory: string;
+    rootLogLevel: string;
+    lastSeenAlive: Date;
     jmxRegistryPort: number;
     jmxServerPort: number;
-    jobRepoDirectory: string;
-    outputDirectory: string;
-    rootLogLevel: string;
+    tmpDirectory: string;
     loadApiAdmin: boolean;
     loadApiClient: boolean;
     loapApiSimple: boolean;
-    stop: boolean;
-    enabled: boolean;
+    stop: boolean | null;
+    enabled: boolean | null;
 }
