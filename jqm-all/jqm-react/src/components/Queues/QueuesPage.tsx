@@ -8,7 +8,7 @@ import AddCircleIcon from "@material-ui/icons/AddCircle";
 import { useQueueAPI } from "./QueueAPI";
 import { CreateQueueModal } from "./CreateQueueModal";
 import {
-    renderStringCell,
+    renderInputCell,
     renderBooleanCell,
     renderActionsCell,
 } from "../TableCells";
@@ -39,7 +39,7 @@ const QueuesPage: React.FC = () => {
         (id: number) => {
             const { value: name } = editingQueueNameInputRef.current!;
             const { value: description } = editingDescriptionInputRef.current!;
-            if (id && name && description) {
+            if (id && name) {
                 updateQueue({
                     id: id,
                     name,
@@ -81,11 +81,11 @@ const QueuesPage: React.FC = () => {
         },
         {
             name: "name",
-            label: "Name",
+            label: "Name*",
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell(
+                customBodyRender: renderInputCell(
                     editingQueueNameInputRef,
                     editingRowId
                 ),
@@ -97,7 +97,7 @@ const QueuesPage: React.FC = () => {
             options: {
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell(
+                customBodyRender: renderInputCell(
                     editingDescriptionInputRef,
                     editingRowId
                 ),

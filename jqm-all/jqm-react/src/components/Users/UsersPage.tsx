@@ -8,7 +8,7 @@ import AddCircleIcon from "@material-ui/icons/AddCircle";
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
 import { ChangePasswordDialog } from "./ChangePasswordDialog";
 import { useUserAPI } from "./UserAPI";
-import { renderActionsCell, renderBooleanCell, renderStringCell } from "../TableCells";
+import { renderActionsCell, renderBooleanCell, renderInputCell } from "../TableCells";
 import { renderArrayCell } from "../TableCells/renderArrayCell";
 import { renderDateCell } from "../TableCells/renderDateCell";
 import { Role } from "./User";
@@ -42,7 +42,7 @@ const UsersPage: React.FC = () => {
             const { value: login } = loginInputRef.current!;
             const { value: email } = emailInputRef.current!;
             const { value: fullName } = fullNameInputRef.current!;
-            if (id && login && email && fullName && locked != null && expirationDate != null && userRoles != null) {
+            if (id && login && locked != null && expirationDate != null && userRoles != null) {
                 updateUser({
                     id: id,
                     login: login,
@@ -95,14 +95,15 @@ const UsersPage: React.FC = () => {
         },
         {
             name: "login",
-            label: "Login",
+            label: "Login*",
             options: {
                 hint: "Must be unique. If used, certificates should certify CN=root",
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell(
+                customBodyRender: renderInputCell(
                     loginInputRef,
-                    editingRowId
+                    editingRowId,
+                    true
                 ),
             },
         },
@@ -113,9 +114,11 @@ const UsersPage: React.FC = () => {
                 hint: "Optional contact e-mail address",
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell(
+                customBodyRender: renderInputCell(
                     emailInputRef,
-                    editingRowId
+                    editingRowId,
+                    true,
+                    "email"
                 ),
             },
         },
@@ -126,9 +129,10 @@ const UsersPage: React.FC = () => {
                 hint: "Optional description of the account (real name or service name)",
                 filter: true,
                 sort: true,
-                customBodyRender: renderStringCell(
+                customBodyRender: renderInputCell(
                     fullNameInputRef,
-                    editingRowId
+                    editingRowId,
+                    true
                 ),
             },
         },
@@ -148,7 +152,7 @@ const UsersPage: React.FC = () => {
         },
         {
             name: "expirationDate",
-            label: "Expiration date",
+            label: "Expiration date*",
             options: {
                 filter: true,
                 sort: true,
