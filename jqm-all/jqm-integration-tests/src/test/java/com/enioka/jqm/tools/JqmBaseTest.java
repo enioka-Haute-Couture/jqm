@@ -190,32 +190,9 @@ public class JqmBaseTest
 
     protected DbConn getNewDbSession()
     {
-        int retryCount = 5;
-        for (int i = retryCount; i >= 0; --i)
-        {
-            try
-            {
-                DbConn cnx = db.getConn();
-                cnxs.add(cnx);
-                return cnx;
-            }
-            catch (DatabaseUnreachableException e)
-            {
-                // Failed to get a connection, let's try again
-                jqmlogger.warn("Fail to get new session : " + e.getMessage());
-                if (i > 0)
-                {
-                    jqmlogger.warn("Will retry. (retry count : " + i + ")");
-                    sleep(2);
-                    continue;
-                }
-                else
-                {
-                    throw e;
-                }
-            }
-        }
-        return null;
+        DbConn cnx = db.getConn();
+        cnxs.add(cnx);
+        return cnx;
     }
 
     protected void sleep(int s)
