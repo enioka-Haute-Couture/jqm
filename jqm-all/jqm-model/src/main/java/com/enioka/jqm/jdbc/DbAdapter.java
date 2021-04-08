@@ -176,7 +176,6 @@ public abstract class DbAdapter
      */
     public boolean testDbUnreachable(Exception e)
     {
-        jqmlogger.debug("testDbUnreachable - Exception : " + e.getClass() + e.getMessage() + e.getCause());
         return false;
     }
 
