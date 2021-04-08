@@ -6,7 +6,7 @@ export const useNotificationService = () => {
     const { enqueueSnackbar } = useSnackbar();
 
     const displayError = useCallback((reason: any) => {
-        console.log(reason);
+        console.error(reason);
         enqueueSnackbar(
             "An error occured, please contact support support@enioka.com for help.",
             {

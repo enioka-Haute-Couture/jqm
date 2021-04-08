@@ -61,7 +61,6 @@ const QueuesPage: React.FC = () => {
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
     const handleOnEdit = useCallback((tableMeta) => {
-        console.log("setDefaultQueue" + tableMeta.rowData[3]);
         setDefaultQueue(tableMeta.rowData[3]);
         setEditingRowId(tableMeta.rowIndex);
     }, []);
@@ -179,7 +178,7 @@ const QueuesPage: React.FC = () => {
     };
 
     return queues ? (
-        <Container>
+        <Container maxWidth={false}>
             <MUIDataTable
                 title={"Queues"}
                 data={queues}

@@ -260,7 +260,7 @@ const UsersPage: React.FC = () => {
 
     if (users && roles) {
         return (
-            <Container>
+            <Container maxWidth={false}>
                 <MUIDataTable
                     title={"Users"}
                     data={users}

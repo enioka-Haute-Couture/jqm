@@ -366,7 +366,7 @@ export const NodesPage: React.FC = () => {
     };
 
     return nodes ? (
-        <Container>
+        <Container maxWidth={false}>
             <DisplayLogsDialog
                 showDialog={showLogsDialog}
                 closeDialog={() => setShowLogsDialog(false)}

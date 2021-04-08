@@ -1,6 +1,7 @@
-import { Select, Input, FormControl } from "@material-ui/core";
+import { Select, Input, FormControl, Tooltip, Typography } from "@material-ui/core";
 import React from "react";
 
+const MAX_DISPLAY_SIZE = 50
 
 export const renderArrayCell = (
     editingRowId: number | null,
@@ -10,7 +11,7 @@ export const renderArrayCell = (
     setEditingValue: Function
 ) => (value: any, tableMeta: any) => {
     if (editingRowId === tableMeta.rowIndex) {
-        return <FormControl fullWidth style={{ maxWidth: "150px" }} >
+        return <FormControl fullWidth style={{ maxWidth: "300px" }} >
             <Select
                 multiple
                 fullWidth
@@ -25,7 +26,21 @@ export const renderArrayCell = (
         </FormControl>;
     } else {
         if (value) {
-            return (value as number[]).map(displayFunction).join(","); // TODO: ellipsis if too long
+            var strValue = (value as number[]).map(displayFunction).join(", ");
+            return (strValue.length > MAX_DISPLAY_SIZE) ? (
+                <Tooltip title={strValue}>
+                    <Typography
+                        style={{ fontSize: "0.875rem" }}
+                    >
+                        {strValue.slice(0, MAX_DISPLAY_SIZE) + "..."}
+                    </Typography>
+                </Tooltip >
+            ) : (
+                <Typography
+                    style={{ fontSize: "0.875rem" }}
+                >
+                    {strValue}</Typography>
+            )
         } else return "";
     }
 

@@ -21,7 +21,6 @@ export const renderActionsCell = (
     extraActionItems: extraActionItem[] = []
 ) => (value: any, tableMeta: any) => {
     if (editingRowId === tableMeta.rowIndex) {
-        console.log(extraActionItems);
         return (
             <>
                 <Tooltip title={"Cancel changes"}>

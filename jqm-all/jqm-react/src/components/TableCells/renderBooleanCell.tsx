@@ -9,7 +9,6 @@ export const renderBooleanCell = (
     setBoolean: Function
 ) => (value: any, tableMeta: any) => {
     if (editingRowId === tableMeta.rowIndex) {
-        console.log(isChecked);
         return (
             <Switch
                 checked={isChecked!!}

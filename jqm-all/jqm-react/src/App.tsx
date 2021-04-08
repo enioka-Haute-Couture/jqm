@@ -27,7 +27,7 @@ declare module "@material-ui/core/styles/overrides" {
 }
 const getMuiTheme = () => createMuiTheme({
     overrides: {
-        // TODO: better display when editing row
+        // TODO: center head and body ?
         // MUIDataTableHeadCell: {
         //     root: {
         //         flexGrow: 1,
@@ -65,33 +65,36 @@ const getMuiTheme = () => createMuiTheme({
 function App() {
     return (
         <Router>
-            <MuiThemeProvider theme={getMuiTheme()}>
-                <SnackbarProvider
-                    maxSnack={3}
-                    anchorOrigin={{
-                        vertical: "top",
-                        horizontal: "right",
-                    }}
-                >
-                    <MenuWrapper>
-                        <Switch>
-                            <Route path="/nodes" exact={true}>
-                                <NodesPage />
-                            </Route>
-                            <Route path="/queues" exact={true}>
-                                <QueuesPage />
-                            </Route>
-                            <Route path="/users" exact={true}>
-                                <UsersPage />
-                            </Route>
-                            <Route path="/" exact={true}>
-                                <HomePage />
-                            </Route>
-                            <Redirect to="/" />
-                        </Switch>
-                    </MenuWrapper>
-                </SnackbarProvider>
-            </MuiThemeProvider>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+
+                <MuiThemeProvider theme={getMuiTheme()}>
+                    <SnackbarProvider
+                        maxSnack={3}
+                        anchorOrigin={{
+                            vertical: "top",
+                            horizontal: "right",
+                        }}
+                    >
+                        <MenuWrapper>
+                            <Switch>
+                                <Route path="/nodes" exact={true}>
+                                    <NodesPage />
+                                </Route>
+                                <Route path="/queues" exact={true}>
+                                    <QueuesPage />
+                                </Route>
+                                <Route path="/users" exact={true}>
+                                    <UsersPage />
+                                </Route>
+                                <Route path="/" exact={true}>
+                                    <HomePage />
+                                </Route>
+                                <Redirect to="/" />
+                            </Switch>
+                        </MenuWrapper>
+                    </SnackbarProvider>
+                </MuiThemeProvider>
+            </MuiPickersUtilsProvider>
         </Router>
     );
 }
