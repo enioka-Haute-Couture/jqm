@@ -72,10 +72,16 @@ public class DbImplPg extends DbAdapter
         {
             PreparedStatement s = cnx.prepareStatement("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='jqm'");
             s.execute();
+            // pg_terminate_backend sends a SIGTERM signal to backend process, leave some time to terminate the preocess
+            Thread.sleep(5000);
         }
         catch (SQLException e)
         {
             throw new DatabaseException(e);
+        }
+        catch (InterruptedException e)
+        {
+            // not an issue in tests
         }
     }
 
