@@ -28,9 +28,14 @@ const UsersPage: React.FC = () => {
     const { users, roles, fetchUsers, fetchRoles, createUser, updateUser, deleteUsers, changePassword } = useUserAPI();
     const [showCreateDialog, setShowCreateDialog] = useState(false);
 
-    useEffect(() => {
+
+    const refresh = () => {
         fetchUsers();
         fetchRoles();
+    }
+
+    useEffect(() => {
+        refresh();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -228,7 +233,7 @@ const UsersPage: React.FC = () => {
                         <IconButton
                             color="default"
                             aria-label={"refresh"}
-                            onClick={() => fetchUsers()}
+                            onClick={() => refresh()}
                         >
                             <RefreshIcon />
                         </IconButton>

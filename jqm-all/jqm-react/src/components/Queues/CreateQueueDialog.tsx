@@ -41,7 +41,7 @@ export const CreateQueueDialog: React.FC<{
             <DialogContent>
                 <TextField
                     className={classes.TextField}
-                    label="Name"
+                    label="Name*"
                     value={queueName}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setQueueName(event.target.value);
@@ -86,7 +86,7 @@ export const CreateQueueDialog: React.FC<{
                     variant="contained"
                     size="small"
                     color="primary"
-                    disabled={!queueName || !description}
+                    disabled={!queueName}
                     style={{ margin: "8px" }}
                     onClick={() => {
                         createQueue({
