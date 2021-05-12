@@ -5,6 +5,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
+import { LocalGasStationTwoTone } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -22,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export const DisplayLogsDialog: React.FC<{
     showDialog: boolean;
     closeDialog: any;
-    logs: string[] | null | undefined;
+    logs: { nodeName: string; data: string } | undefined;
 }> = ({ showDialog, closeDialog, logs }) => {
     const classes = useStyles();
     return (
@@ -30,12 +31,12 @@ export const DisplayLogsDialog: React.FC<{
             open={showDialog}
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
+            fullWidth
+            maxWidth="lg"
         >
-            <DialogTitle>Logs</DialogTitle>
+            <DialogTitle>Latest logs for node {logs?.nodeName}</DialogTitle>
             <DialogContent>
-                {logs?.map((log) => (
-                    <p>{log}</p>
-                ))}
+                <p>{logs?.data}</p>
             </DialogContent>
             <DialogActions>
                 <Button

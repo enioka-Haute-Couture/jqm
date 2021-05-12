@@ -6,7 +6,11 @@ import { Node } from "./Node";
 const useNodesApi = () => {
     const { enqueueSnackbar } = useSnackbar();
     const [nodes, setNodes] = useState<Node[] | null>();
-    const [nodeLogs, setNodeLogs] = useState<string[] | null>();
+    const [nodeLogs, setNodeLogs] =
+        useState<{
+            nodeName: string;
+            data: string;
+        }>();
 
     const fetchNodes = useCallback(async () => {
         return APIService.get("/node")
@@ -79,10 +83,20 @@ const useNodesApi = () => {
 
     const fetchNodeLogs = useCallback(
         async (nodeName: string, latest: number = 200) => {
-            return APIService.get(`/node/${nodeName}/log?latest=${latest}`)
-                .then((logs) => setNodeLogs(logs))
+            return APIService.get(
+                `/node/${nodeName}/log?latest=${latest}`,
+                {
+                    headers: {
+                        Accept: "application/octet-stream",
+                    },
+                },
+                false
+            )
+                .then((response) => response.text())
+                .then((textData) =>
+                    setNodeLogs({ nodeName: nodeName, data: textData })
+                )
                 .catch((reason) => {
-                    console.debug(reason);
                     enqueueSnackbar(
                         "An error occured, please contact support support@enioka.com for help.",
                         {
@@ -92,7 +106,7 @@ const useNodesApi = () => {
                     );
                 });
         },
-        [enqueueSnackbar]
+        [enqueueSnackbar, updateNodes]
     );
 
     return {
