@@ -1,6 +1,6 @@
 export interface Queue {
-    id?: Number;
+    id?: number;
     name: string;
-    defaultQueue: Boolean;
+    defaultQueue: boolean;
     description?: string;
 }
