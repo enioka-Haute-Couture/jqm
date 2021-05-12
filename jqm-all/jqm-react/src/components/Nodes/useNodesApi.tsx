@@ -52,13 +52,6 @@ const useNodesApi = () => {
         [enqueueSnackbar, fetchNodes]
     );
 
-    const deleteNodes = useCallback(
-        async (nodes: Node[]) => updateNodes(nodes),
-        [enqueueSnackbar, fetchNodes]
-    );
-
-    const updateNode = useCallback((node: Node) => updateNodes([node]), []);
-
     const updateNodes = useCallback(
         async (nodes: Node[]) => {
             return APIService.put("/node", nodes)
@@ -79,6 +72,16 @@ const useNodesApi = () => {
                 });
         },
         [fetchNodes, enqueueSnackbar]
+    );
+
+    const updateNode = useCallback(
+        (node: Node) => updateNodes([node]),
+        [updateNodes]
+    );
+
+    const deleteNodes = useCallback(
+        async (nodes: Node[]) => updateNodes(nodes),
+        [updateNodes]
     );
 
     const fetchNodeLogs = useCallback(
@@ -106,7 +109,7 @@ const useNodesApi = () => {
                     );
                 });
         },
-        [enqueueSnackbar, updateNodes]
+        [enqueueSnackbar]
     );
 
     return {

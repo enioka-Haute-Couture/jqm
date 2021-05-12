@@ -5,7 +5,6 @@ import MUIDataTable from "mui-datatables";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import DescriptionIcon from "@material-ui/icons/Description";
-import { Node } from "./Node";
 import {
     renderInputCell,
     renderBooleanCell,
@@ -29,7 +28,6 @@ export const NodesPage: React.FC = () => {
     const [loadApiAdmin, setLoadApiAdmin] = useState<boolean | null>(null);
     const [loadApiClient, setLoadApiClient] = useState<boolean | null>(null);
     const [loapApiSimple, setLoapApiSimple] = useState<boolean | null>(null);
-    const [stop, setStop] = useState<boolean | null>(null);
     const [enabled, setEnabled] = useState<boolean | null>(null);
 
     const {
@@ -43,6 +41,7 @@ export const NodesPage: React.FC = () => {
 
     useEffect(() => {
         fetchNodes();
+        // eslint-disable-next-line
     }, []);
 
     const handleOnDelete = useCallback(
@@ -56,10 +55,13 @@ export const NodesPage: React.FC = () => {
         [deleteNodes, nodes]
     );
 
-    const handleOnViewLogs = useCallback((tableMeta) => {
-        fetchNodeLogs(tableMeta.rowData[3]);
-        setShowLogsDialog(true);
-    }, []);
+    const handleOnViewLogs = useCallback(
+        (tableMeta) => {
+            fetchNodeLogs(tableMeta.rowData[3]);
+            setShowLogsDialog(true);
+        },
+        [fetchNodeLogs]
+    );
 
     const handleOnSave = useCallback(
         (tableMeta) => {
@@ -95,20 +97,17 @@ export const NodesPage: React.FC = () => {
                 }).then(() => setEditingRowId(null));
             }
         },
-        [updateNode, loadApiAdmin, loadApiClient, loapApiSimple, stop, enabled]
+        [updateNode, loadApiAdmin, loadApiClient, loapApiSimple, enabled]
     );
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
-    const handleOnEdit = useCallback(
-        (tableMeta) => {
-            setEnabled(tableMeta.rowData[12]);
-            setLoapApiSimple(tableMeta.rowData[13]);
-            setLoadApiClient(tableMeta.rowData[14]);
-            setLoadApiAdmin(tableMeta.rowData[15]);
-            setEditingRowId(tableMeta.rowIndex);
-        },
-        [nodes]
-    );
+    const handleOnEdit = useCallback((tableMeta) => {
+        setEnabled(tableMeta.rowData[12]);
+        setLoapApiSimple(tableMeta.rowData[13]);
+        setLoadApiClient(tableMeta.rowData[14]);
+        setLoadApiAdmin(tableMeta.rowData[15]);
+        setEditingRowId(tableMeta.rowIndex);
+    }, []);
 
     const columns = [
         {
