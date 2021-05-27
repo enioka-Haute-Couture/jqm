@@ -1,6 +1,36 @@
 Release notes
 ######################
 
+2.2.8
+*************
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Users of MySQL/MariaDB beware: after the application of this patch JQM will always store times in UTC inside the database, as it was always intended.
+It used to be imposed through a connection property set in resources.xml and not through code.
+If that property was not present before, you will have time zone inconsistencies inside the database after upgrade.
+This will not hamper JQM operations at all, but may produce weird reports in the administration GUI on the day of upgrade.
+
+Major changes
+++++++++++++++++++++++++++++
+
+* Admin GUI: can now be deployed in a subdirectory (for example a reverse proxy may expose the GUI on domain.com/jqm instead of simply domain.com)
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Engine: MySQL/MariaDB now enforce UTC in code. Configuration files were updated to remove the previous method. Thanks to Ihor Herasymenko for this PR.
+* Engine: better MySQL/MariaDB connection failure handling. Thanks to Eugene Echipachenko for this PR.
+* Engine: fixed a nasty random database deadlock when using Highlander mode. (#432)
+
+
 2.2.7
 *************
 

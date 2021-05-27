@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<resources>	
-	<resource 
+<resources>
+	<resource
 	      name="jdbc/jqm"
           auth="Container"
           type="javax.sql.DataSource"
@@ -19,15 +19,15 @@
           removeAbandonedTimeout="3600"
           removeAbandoned="true"
           logAbandoned="true"
-          minEvictableIdleTimeMillis="30000"
+          minEvictableIdleTimeMillis="60000"
           jmxEnabled="true"
           username="SA"
           password=""
           driverClassName="org.hsqldb.jdbcDriver"
           url="jdbc:hsqldb:hsql://localhost/testdbengine"
           singleton="true"/>
-          
-     <resource 
+
+     <resource
 	      name="jdbc/pgsql"
           auth="Container"
           type="javax.sql.DataSource"
@@ -37,7 +37,7 @@
           testOnReturn="false"
           validationQuery="SELECT 1"
           validationInterval="1000"
-          timeBetweenEvictionRunsMillis="30000"
+          timeBetweenEvictionRunsMillis="1000"
           maxActive="80"
           maxIdle="40"
           minIdle="3"
@@ -46,15 +46,15 @@
           removeAbandonedTimeout="3600"
           removeAbandoned="true"
           logAbandoned="true"
-          minEvictableIdleTimeMillis="30000"
+          minEvictableIdleTimeMillis="60000"
           jmxEnabled="true"
           username="jqm"
           password="jqm"
           driverClassName="org.postgresql.Driver"
           url="jdbc:postgresql://localhost/jqm"
           singleton="true"/>
-          
-     <resource 
+
+     <resource
 	      name="jdbc/oracle"
           auth="Container"
           type="javax.sql.DataSource"
@@ -63,8 +63,8 @@
           testOnBorrow="true"
           testOnReturn="false"
           validationQuery="CALL DBMS_APPLICATION_INFO.SET_MODULE('CONNECTION POOL', 'IDLE IN POOL')"
-          validationInterval="5000"
-          timeBetweenEvictionRunsMillis="60000"
+          validationInterval="1000"
+          timeBetweenEvictionRunsMillis="30000"
           maxActive="10"
           minIdle="1"
           maxIdle="4"
@@ -73,18 +73,18 @@
           removeAbandonedTimeout="3600"
           removeAbandoned="true"
           logAbandoned="true"
-          minEvictableIdleTimeMillis="30000"
+          minEvictableIdleTimeMillis="60000"
           jmxEnabled="true"
           username="jqm"
-          password="JQM"
+          password="jqm"
           driverClassName="oracle.jdbc.OracleDriver"
           url="jdbc:oracle:thin:@localhost:1521/JQM.localdomain"
           connectionProperties="v$session.program=JQM;"
           singleton="true"
           initSQL="CALL DBMS_APPLICATION_INFO.SET_MODULE('CONNECTION POOL', 'IDLE IN POOL')"
           jdbcInterceptors="com.enioka.jqm.providers.Interceptor"/>
-          
-	<resource 
+
+	<resource
 	      name="jdbc/mysql"
           auth="Container"
           type="javax.sql.DataSource"
@@ -110,8 +110,8 @@
           driverClassName="com.mysql.cj.jdbc.Driver"
           url="jdbc:mysql://localhost:3306/jqm?useSSL=false&amp;disableMariaDbDriver&amp;allowPublicKeyRetrieval=true"
           singleton="true"
-          connectionProperties="connectionAttributes=program_name:jqm;useLegacyDatetimeCode=false;serverTimezone=UTC;"/>
-          
+          connectionProperties="connectionAttributes=program_name:jqm;useLegacyDatetimeCode=false;"/>
+
     <resource
 	      name="jdbc/mariadb"
           auth="Container"
@@ -138,7 +138,7 @@
           driverClassName="org.mariadb.jdbc.Driver"
           url="jdbc:mariadb://localhost:3306/jqm?useSSL=false"
           singleton="true"
-          connectionProperties="connectionAttributes=program_name:jqm;useLegacyDatetimeCode=false;serverTimezone=UTC;"/>
+          connectionProperties="connectionAttributes=program_name:jqm;useLegacyDatetimeCode=false;"/>
 
     <resource
 	      name="jdbc/db2"
