@@ -27,31 +27,6 @@ const useNodesApi = () => {
             });
     }, [enqueueSnackbar]);
 
-    const createNode = useCallback(
-        async (node: Node) => {
-            return APIService.post("/node", node)
-                .then(() => {
-                    fetchNodes();
-                    enqueueSnackbar(
-                        `Successfully created queue: ${node.name}`,
-                        {
-                            variant: "success",
-                        }
-                    );
-                })
-                .catch((reason) => {
-                    enqueueSnackbar(
-                        "An error occured, please contact support support@enioka.com for help.",
-                        {
-                            variant: "error",
-                            persist: true,
-                        }
-                    );
-                });
-        },
-        [enqueueSnackbar, fetchNodes]
-    );
-
     const updateNodes = useCallback(
         async (nodes: Node[]) => {
             return APIService.put("/node", nodes)
@@ -116,7 +91,6 @@ const useNodesApi = () => {
         nodes,
         nodeLogs,
         fetchNodes,
-        createNode,
         updateNode,
         deleteNodes,
         fetchNodeLogs,
