@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 public class DbImplMySql extends DbAdapter
 {
@@ -169,7 +170,7 @@ public class DbImplMySql extends DbAdapter
     @Override
     public boolean testDbUnreachable(Exception e)
     {
-        if (e instanceof SQLNonTransientConnectionException || e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
+        if (ExceptionUtils.indexOfType(e,SQLNonTransientConnectionException.class) != -1)
         {
             return true;
         }
@@ -180,18 +181,19 @@ public class DbImplMySql extends DbAdapter
         }
         if (e instanceof SQLException
             && (e.getMessage().equals("Failed to validate a newly established connection.")
-            ||  e.getMessage().contains("FATAL: terminating connection due to administrator command")
-            ||  e.getMessage().contains("This connection has been closed")
+            || e.getMessage().contains("FATAL: terminating connection due to administrator command")
+            || e.getMessage().contains("This connection has been closed")
             || e.getMessage().contains("Communications link failure")
             || e.getMessage().contains("Connection is closed")))
         {
             return true;
         }
-        if (e.getCause() != null
-            && (e.getCause().getMessage().equals("This connection has been closed.")
-            || e.getCause().getMessage().contains("Communications link failure")
-            || e.getCause().getMessage().contains("Connection is closed")
-            || e.getCause().getMessage().contains("connection closed")))
+        Throwable cause = e.getCause();
+        if (cause != null
+            && (cause.getMessage().equals("This connection has been closed.")
+            || cause.getMessage().contains("Communications link failure")
+            || cause.getMessage().contains("Connection is closed")
+            || cause.getMessage().contains("connection closed")))
         {
             return true;
         }

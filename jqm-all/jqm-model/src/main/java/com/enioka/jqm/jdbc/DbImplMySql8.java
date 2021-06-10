@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
 
@@ -133,14 +135,15 @@ public class DbImplMySql8 extends DbAdapter
     @Override
     public boolean testDbUnreachable(Exception e)
     {
-        if (e instanceof SQLNonTransientConnectionException || e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
+        if (ExceptionUtils.indexOfType(e, SQLNonTransientConnectionException.class) != -1)
         {
             return true;
         }
-        if (e.getCause() != null
-            && (e.getCause().getMessage().equals("This connection has been closed.")
-            || e.getCause().getMessage().contains("Communications link failure")
-            || e.getCause().getMessage().contains("Connection is closed")))
+        Throwable cause = e.getCause();
+        if (cause != null
+            && (cause.getMessage().contains("This connection has been closed")
+            || cause.getMessage().contains("Communications link failure")
+            || cause.getMessage().contains("Connection is closed")))
         {
             return true;
         }

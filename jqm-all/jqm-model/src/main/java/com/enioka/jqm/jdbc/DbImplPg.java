@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.List;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 public class DbImplPg extends DbAdapter
 {
     public DbImplPg()
@@ -49,7 +51,7 @@ public class DbImplPg extends DbAdapter
     @Override
     public boolean testDbUnreachable(Exception e)
     {
-        if (e instanceof SQLNonTransientConnectionException || e.getCause() != null && e.getCause() instanceof SQLNonTransientConnectionException)
+        if (ExceptionUtils.indexOfType(e, SQLNonTransientConnectionException.class) != -1)
         {
             return true;
         }
