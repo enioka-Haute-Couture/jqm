@@ -39,11 +39,11 @@ const ClusterwideParametersPage: React.FC = () => {
 
     const handleOnSave = useCallback(
         (tableMeta) => {
-            console.log(tableMeta);
             const [paramId] = tableMeta.rowData;
             const { value: key } = paramKeyInputRef.current!;
             const { value } = paramValueInputRef.current!;
 
+            // filter out existing param with id and replace with edited values
             const updatedParamsList = tableMeta.currentTableData.map(
                 ({ data }: { data: any[] }) => {
                     if (data[0] === paramId) {
