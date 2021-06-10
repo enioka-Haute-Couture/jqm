@@ -4,16 +4,16 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.SQLNonTransientConnectionException;
-import java.sql.SQLNonTransientException;
-import java.sql.SQLTransientException;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
@@ -176,7 +176,11 @@ public abstract class DbAdapter
      */
     public boolean testDbUnreachable(Exception e)
     {
-        return false;
+        Throwable cause = e.getCause();
+        return (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1)
+            || (ExceptionUtils.indexOfType(e, SocketException.class) != -1)
+            || (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1)
+            || (cause instanceof SQLException && e.getMessage().equals("Failed to validate a newly established connection."));
     }
 
     /**
