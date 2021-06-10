@@ -47,9 +47,9 @@ export const useParametersApi = () => {
         [fetchParameters, displayError, displaySuccess]
     );
 
-    const updateParameters = useCallback(
-        async (parameters: Parameter[]) => {
-            return APIService.put(apiUrl, parameters)
+    const updateParameter = useCallback(
+        async (parameter: Parameter) => {
+            return APIService.put(`${apiUrl}/${parameter.id}`, parameter)
                 .then(() => {
                     fetchParameters();
                     displaySuccess("Successfully saved parameter");
@@ -63,7 +63,7 @@ export const useParametersApi = () => {
         parameters,
         fetchParameters,
         createParameter,
-        updateParameters,
+        updateParameter,
         deleteParameter,
     };
 };

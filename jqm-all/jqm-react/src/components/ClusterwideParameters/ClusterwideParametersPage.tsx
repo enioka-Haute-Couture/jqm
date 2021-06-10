@@ -8,7 +8,6 @@ import AddCircleIcon from "@material-ui/icons/AddCircle";
 import { renderInputCell, renderActionsCell } from "../TableCells";
 import { CreateParameterDialog } from "./CreateParameterDialog";
 import useParametersApi from "./ParametersApi";
-import { Parameter } from "./Parameter";
 
 const ClusterwideParametersPage: React.FC = () => {
     const [showDialog, setShowDialog] = useState(false);
@@ -20,14 +19,13 @@ const ClusterwideParametersPage: React.FC = () => {
         parameters,
         fetchParameters,
         createParameter,
-        updateParameters,
+        updateParameter,
         deleteParameter,
     } = useParametersApi();
 
     useEffect(() => {
         fetchParameters();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [fetchParameters]);
 
     const handleOnDelete = useCallback(
         (tableMeta) => {
@@ -42,23 +40,13 @@ const ClusterwideParametersPage: React.FC = () => {
             const [paramId] = tableMeta.rowData;
             const { value: key } = paramKeyInputRef.current!;
             const { value } = paramValueInputRef.current!;
-
-            // filter out existing param with id and replace with edited values
-            const updatedParamsList = tableMeta.currentTableData.map(
-                ({ data }: { data: any[] }) => {
-                    if (data[0] === paramId) {
-                        return { id: paramId, key: key, value: value };
-                    }
-                    return { id: data[0], key: data[1], value: data[2] };
-                }
-            );
-            if (updatedParamsList) {
-                updateParameters(updatedParamsList).then(() =>
-                    setEditingRowId(null)
+            if (paramId && (key || value)) {
+                updateParameter({ id: paramId, key: key, value: value }).then(
+                    () => setEditingRowId(null)
                 );
             }
         },
-        [updateParameters]
+        [updateParameter]
     );
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
