@@ -6,7 +6,7 @@ import { Mapping } from "./Mapping";
 export const useMappingAPI = () => {
     const { displayError, displaySuccess } = useNotificationService();
 
-    const [mappings, setMappings] = useState<any[] | null>();
+    const [mappings, setMappings] = useState<Mapping[] | null>();
 
     const fetchMappings = useCallback(async () => {
         return APIService.get("/qmapping")
@@ -28,7 +28,7 @@ export const useMappingAPI = () => {
     );
 
     const deleteMappings = useCallback(
-        async (mappingIds: any[]) => {
+        async (mappingIds: number[]) => {
             return await Promise.all(
                 mappingIds.map((id) => APIService.delete("/qmapping/" + id))
             )

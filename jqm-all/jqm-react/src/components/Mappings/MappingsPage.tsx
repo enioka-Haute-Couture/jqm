@@ -260,9 +260,12 @@ const MappingsPage: React.FC = () => {
         },
         onRowsDelete: ({ data }: { data: any[] }) => {
             // delete all rows by index
-            const mappingIds = data.map(({ index }) => {
+            const mappingIds: number[] = [];
+            data.forEach(({ index }) => {
                 const mapping = mappings ? mappings[index] : null;
-                return mapping ? mapping.id : null;
+                if (mapping) {
+                    mappingIds.push(mapping.id!);
+                }
             });
             deleteMappings(mappingIds);
         },

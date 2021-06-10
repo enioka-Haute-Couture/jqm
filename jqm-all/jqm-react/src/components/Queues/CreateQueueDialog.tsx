@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const CreateQueueDialog: React.FC<{
     showDialog: boolean;
-    closeDialog: any;
+    closeDialog: () => void;
     createQueue: (queue: Queue) => void;
 }> = ({ showDialog, closeDialog, createQueue }) => {
     const [queueName, setQueueName] = useState<string>("");

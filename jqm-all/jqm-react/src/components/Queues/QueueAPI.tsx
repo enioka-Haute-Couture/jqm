@@ -6,7 +6,7 @@ import { Queue } from "./Queue";
 export const useQueueAPI = () => {
     const { displayError, displaySuccess } = useNotificationService();
 
-    const [queues, setQueues] = useState<any[] | null>();
+    const [queues, setQueues] = useState<Queue[] | null>();
 
     const fetchQueues = useCallback(async () => {
         return APIService.get("/q")
@@ -27,7 +27,7 @@ export const useQueueAPI = () => {
     );
 
     const deleteQueues = useCallback(
-        async (queueIds: any[]) => {
+        async (queueIds: number[]) => {
             return await Promise.all(
                 queueIds.map((id) => APIService.delete("/q/" + id))
             )

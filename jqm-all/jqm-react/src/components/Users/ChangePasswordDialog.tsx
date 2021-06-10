@@ -2,7 +2,7 @@ import { Dialog, DialogTitle, DialogContent, DialogContentText, TextField, Dialo
 import React, { useState } from "react";
 
 export const ChangePasswordDialog: React.FC<{
-    closeDialog: any;
+    closeDialog: () => void;
     changePassword: (password: string) => Promise<void>;
 }> = ({ closeDialog, changePassword }) => {
     const [password, setPassword] = useState<string>("");

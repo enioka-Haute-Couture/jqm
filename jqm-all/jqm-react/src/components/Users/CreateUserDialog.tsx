@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const CreateUserDialog: React.FC<{
-    closeDialog: any;
+    closeDialog: () => void;
     createUser: (user: User) => void;
     roles: Role[];
 }> = ({ closeDialog, createUser, roles }) => {

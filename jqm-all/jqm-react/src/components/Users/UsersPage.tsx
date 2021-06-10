@@ -255,9 +255,12 @@ const UsersPage: React.FC = () => {
 
         onRowsDelete: ({ data }: { data: any[] }) => {
             // delete all rows by index
-            const userIds = data.map(({ index }) => {
+            const userIds: number[] = [];
+            data.forEach(({ index }) => {
                 const user = users ? users[index] : null;
-                return user ? user.id : null;
+                if (user) {
+                    userIds.push(user.id!);
+                }
             });
             deleteUsers(userIds);
         },

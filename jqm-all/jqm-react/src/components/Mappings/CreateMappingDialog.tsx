@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Mapping } from "./Mapping";
 import { Button, FormControl, Input, InputLabel, MenuItem, Select, Switch } from "@material-ui/core";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
@@ -8,6 +7,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import TextField from "@material-ui/core/TextField/TextField";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+import { Mapping } from "./Mapping";
 import { Queue } from "../Queues/Queue";
 import { Node } from "../Nodes/Node";
 
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const CreateMappingDialog: React.FC<{
-    closeDialog: any;
+    closeDialog: () => void;
     createMapping: (mapping: Mapping) => void;
     nodes: Node[],
     queues: Queue[]

@@ -4,7 +4,7 @@ import { useNotificationService } from "../../utils/NotificationService";
 import { Role, User } from "./User";
 
 export const useUserAPI = () => {
-    const [users, setUsers] = useState<any[] | null>(null);
+    const [users, setUsers] = useState<User[] | null>(null);
     const [roles, setRoles] = useState<Role[] | null>(null);
     const { displayError, displaySuccess } = useNotificationService();
     const fetchRoles = useCallback(async () => {
@@ -37,7 +37,7 @@ export const useUserAPI = () => {
     );
 
     const deleteUsers = useCallback(
-        async (userIds: any[]) => {
+        async (userIds: number[]) => {
             return await Promise.all(
                 userIds.map((id) => APIService.delete("/user/" + id))
             )
