@@ -10,14 +10,19 @@ export default class APIService {
     static get(
         url: string,
         { headers = {} } = {},
+        jsonResponse: boolean = true
     ) {
-        return this.request(url, {
-            method: "GET",
-            headers: {
-                ...this.headers(),
-                ...headers,
+        return this.request(
+            url,
+            {
+                method: "GET",
+                headers: {
+                    ...this.headers(),
+                    ...headers,
+                },
             },
-        });
+            jsonResponse
+        );
     }
 
     static delete(url: string, { headers = {} } = {}) {
@@ -59,7 +64,7 @@ export default class APIService {
         });
     }
 
-    static async request(url: string, init: any) {
+    static async request(url: string, init: any, jsonResponse: boolean = true) {
         var res = await fetch(API_URL + url, {
             credentials: "same-origin",
             ...init,
@@ -67,14 +72,17 @@ export default class APIService {
 
         if (res.ok) {
             if (res.status === 200 || res.status === 201) {
-                return await res.json();
+                return jsonResponse ? await res.json() : res;
             }
             return init.method !== "GET";
         }
 
         let error: any;
         try {
-            error = { code: res.status, details: await res.json() };
+            error = {
+                code: res.status,
+                details: jsonResponse ? await res.json() : res,
+            };
         } catch {
             error = { code: res.status, message: res.statusText };
         }
