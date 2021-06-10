@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { Parameter } from "./Parameter";
-import { Button, Switch } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import TextField from "@material-ui/core/TextField/TextField";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
