@@ -154,12 +154,7 @@ export default function MenuWrapper(props: any) {
                 </div>
                 <Divider />
                 <List>
-                    <ListItem
-                        button
-                        key={"home"}
-                        component={NavLink}
-                        to="/"
-                    >
+                    <ListItem button key={"home"} component={NavLink} to="/">
                         <ListItemIcon>
                             <HomeIcon />
                         </ListItemIcon>
@@ -195,7 +190,8 @@ export default function MenuWrapper(props: any) {
                         button
                         key={"mappings"}
                         component={NavLink}
-                        to="/mappings">
+                        to="/mappings"
+                    >
                         <ListItemIcon>
                             <SyncAltIcon />
                         </ListItemIcon>
@@ -207,7 +203,12 @@ export default function MenuWrapper(props: any) {
                         </ListItemIcon>
                         <ListItemText primary={"JNDI ressources"} />
                     </ListItem>
-                    <ListItem button key={"clusterWideParameters"} disabled>
+                    <ListItem
+                        button
+                        key={"clusterWideParameters"}
+                        component={NavLink}
+                        to="/clusterwide-parameters"
+                    >
                         <ListItemIcon>
                             <GroupWorkIcon />
                         </ListItemIcon>
@@ -223,8 +224,11 @@ export default function MenuWrapper(props: any) {
                         button
                         key={"users"}
                         component={NavLink}
-                        to="/users">
-                        <ListItemIcon><SupervisorAccountIcon /></ListItemIcon>
+                        to="/users"
+                    >
+                        <ListItemIcon>
+                            <SupervisorAccountIcon />
+                        </ListItemIcon>
                         <ListItemText primary={"Users"} />
                     </ListItem>
                     <ListItem button key={"roles"} disabled>
