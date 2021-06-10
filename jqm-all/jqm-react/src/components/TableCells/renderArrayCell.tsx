@@ -12,7 +12,7 @@ export const renderArrayCell = (
     multiple: boolean = true
 ) => (value: any, tableMeta: any) => {
     if (editingRowId === tableMeta.rowIndex) {
-        return <FormControl fullWidth style={{ maxWidth: "300px" }} >
+        return <FormControl fullWidth style={{ maxWidth: "300px", paddingTop: "5px" }} >
             <Select
                 multiple={multiple}
                 fullWidth
@@ -36,14 +36,14 @@ export const renderArrayCell = (
             return (strValue.length > MAX_DISPLAY_SIZE) ? (
                 <Tooltip title={strValue}>
                     <Typography
-                        style={{ fontSize: "0.875rem" }}
+                        style={{ fontSize: "0.875rem", paddingTop: "5px" }}
                     >
                         {strValue.slice(0, MAX_DISPLAY_SIZE) + "..."}
                     </Typography>
                 </Tooltip >
             ) : (
                 <Typography
-                    style={{ fontSize: "0.875rem" }}
+                    style={{ fontSize: "0.875rem", paddingTop: "5px" }}
                 >
                     {strValue}</Typography>
             )

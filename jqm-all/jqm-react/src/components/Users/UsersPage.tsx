@@ -11,7 +11,7 @@ import { useUserAPI } from "./UserAPI";
 import { renderActionsCell, renderBooleanCell, renderInputCell } from "../TableCells";
 import { renderArrayCell } from "../TableCells/renderArrayCell";
 import { renderDateCell } from "../TableCells/renderDateCell";
-import { Role } from "./User";
+import { Role } from "../Roles/Role";
 import { CreateUserDialog } from "./CreateUserDialog";
 
 
