@@ -7,17 +7,22 @@ export const renderArrayCell = (
     editingRowId: number | null,
     menuItems: JSX.Element[],
     displayFunction: (element: number) => string,
-    editingValue: number[] | null,
-    setEditingValue: Function
+    editingValue: number[] | number | null,
+    setEditingValue: Function,
+    multiple: boolean = true
 ) => (value: any, tableMeta: any) => {
     if (editingRowId === tableMeta.rowIndex) {
         return <FormControl fullWidth style={{ maxWidth: "300px" }} >
             <Select
-                multiple
+                multiple={multiple}
                 fullWidth
                 value={editingValue ? editingValue!! : []}
                 onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
-                    setEditingValue(event.target.value as number[]);
+                    if (multiple) {
+                        setEditingValue(event.target.value as number[]);
+                    } else {
+                        setEditingValue(event.target.value as number);
+                    }
                 }}
                 input={<Input />}
             >
@@ -26,7 +31,8 @@ export const renderArrayCell = (
         </FormControl>;
     } else {
         if (value) {
-            var strValue = (value as number[]).map(displayFunction).join(", ");
+            var strValue = multiple ? (value as number[]).map(displayFunction).join(", ") : displayFunction(value as number)
+
             return (strValue.length > MAX_DISPLAY_SIZE) ? (
                 <Tooltip title={strValue}>
                     <Typography

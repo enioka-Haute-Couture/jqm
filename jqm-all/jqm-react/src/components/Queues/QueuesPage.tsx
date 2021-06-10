@@ -169,9 +169,12 @@ const QueuesPage: React.FC = () => {
         },
         onRowsDelete: ({ data }: { data: any[] }) => {
             // delete all rows by index
-            const queueIds = data.map(({ index }) => {
+            const queueIds: number[] = [];
+            data.forEach(({ index }) => {
                 const queue = queues ? queues[index] : null;
-                return queue ? queue.id : null;
+                if (queue) {
+                    queueIds.push(queue.id!);
+                }
             });
             deleteQueues(queueIds);
         },

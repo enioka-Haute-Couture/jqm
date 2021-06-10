@@ -14,6 +14,7 @@ import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import QueuesPage from "./components/Queues/QueuesPage";
 import { NodesPage } from "./components/Nodes/NodesPage";
+import MappingsPage from "./components/Mappings/MappingsPage";
 
 declare module "@material-ui/core/styles/overrides" {
     interface ComponentNameToClassKey {
@@ -85,6 +86,9 @@ function App() {
                                 </Route>
                                 <Route path="/users" exact={true}>
                                     <UsersPage />
+                                </Route>
+                                <Route path="/mappings" exact={true}>
+                                    <MappingsPage />
                                 </Route>
                                 <Route path="/" exact={true}>
                                     <HomePage />

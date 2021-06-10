@@ -28,9 +28,14 @@ const UsersPage: React.FC = () => {
     const { users, roles, fetchUsers, fetchRoles, createUser, updateUser, deleteUsers, changePassword } = useUserAPI();
     const [showCreateDialog, setShowCreateDialog] = useState(false);
 
-    useEffect(() => {
+
+    const refresh = () => {
         fetchUsers();
         fetchRoles();
+    }
+
+    useEffect(() => {
+        refresh();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -228,7 +233,7 @@ const UsersPage: React.FC = () => {
                         <IconButton
                             color="default"
                             aria-label={"refresh"}
-                            onClick={() => fetchUsers()}
+                            onClick={() => refresh()}
                         >
                             <RefreshIcon />
                         </IconButton>
@@ -250,9 +255,12 @@ const UsersPage: React.FC = () => {
 
         onRowsDelete: ({ data }: { data: any[] }) => {
             // delete all rows by index
-            const userIds = data.map(({ index }) => {
+            const userIds: number[] = [];
+            data.forEach(({ index }) => {
                 const user = users ? users[index] : null;
-                return user ? user.id : null;
+                if (user) {
+                    userIds.push(user.id!);
+                }
             });
             deleteUsers(userIds);
         },

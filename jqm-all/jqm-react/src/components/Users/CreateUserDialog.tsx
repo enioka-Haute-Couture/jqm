@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const CreateUserDialog: React.FC<{
-    closeDialog: any;
+    closeDialog: () => void;
     createUser: (user: User) => void;
     roles: Role[];
 }> = ({ closeDialog, createUser, roles }) => {
@@ -41,7 +41,7 @@ export const CreateUserDialog: React.FC<{
             <DialogContent>
                 <TextField
                     className={classes.TextField}
-                    label="Login"
+                    label="Login*"
                     value={login}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setLogin(event.target.value);

@@ -159,7 +159,6 @@ export default function MenuWrapper(props: any) {
                         key={"home"}
                         component={NavLink}
                         to="/"
-                    // activeClassName={classes.active}
                     >
                         <ListItemIcon>
                             <HomeIcon />
@@ -192,7 +191,11 @@ export default function MenuWrapper(props: any) {
                 </List>
                 <Divider />
                 <List>
-                    <ListItem button key={"mappings"} disabled>
+                    <ListItem
+                        button
+                        key={"mappings"}
+                        component={NavLink}
+                        to="/mappings">
                         <ListItemIcon>
                             <SyncAltIcon />
                         </ListItemIcon>
@@ -216,7 +219,9 @@ export default function MenuWrapper(props: any) {
                         </ListItemIcon>
                         <ListItemText primary={"Job definitions"} />
                     </ListItem>
-                    <ListItem button key={"users"}
+                    <ListItem
+                        button
+                        key={"users"}
                         component={NavLink}
                         to="/users">
                         <ListItemIcon><SupervisorAccountIcon /></ListItemIcon>
