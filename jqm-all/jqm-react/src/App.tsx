@@ -7,15 +7,16 @@ import {
     Route,
     Redirect,
 } from "react-router-dom";
-import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import { SnackbarProvider } from 'notistack';
-import UsersPage from './components/Users/UsersPage';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import DateFnsUtils from '@date-io/date-fns';
+import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
+import { SnackbarProvider } from "notistack";
+import UsersPage from "./components/Users/UsersPage";
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import DateFnsUtils from "@date-io/date-fns";
 import QueuesPage from "./components/Queues/QueuesPage";
 import { NodesPage } from "./components/Nodes/NodesPage";
 import MappingsPage from "./components/Mappings/MappingsPage";
 import RolesPage from "./components/Roles/RolesPage";
+import ClusterwideParametersPage from "./components/ClusterwideParameters/ClusterwideParametersPage";
 
 declare module "@material-ui/core/styles/overrides" {
     interface ComponentNameToClassKey {
@@ -27,48 +28,46 @@ declare module "@material-ui/core/styles/overrides" {
         };
     }
 }
-const getMuiTheme = () => createMuiTheme({
-    overrides: {
-        // TODO: center head and body ?
-        // MUIDataTableHeadCell: {
-        //     root: {
-        //         flexGrow: 1,
-        //         textAlign: "center"
-        //     }
-        // },
-        // MUIDataTableBodyCell: {
-        //     root: {
-        //         flexGrow: 1,
-        //         textAlign: "center"
-        //     }
-        // },
-        // MuiTableCell: {
-        //     root: {
-        //         padding: 0,
-        //         "&:last-child": {
-        //             paddingRight: 0
-        //         }
-        //     }
-        // }
-    },
-    palette: {
-        primary: {
-            main: "#607D8B"
+const getMuiTheme = () =>
+    createMuiTheme({
+        overrides: {
+            // TODO: center head and body ?
+            // MUIDataTableHeadCell: {
+            //     root: {
+            //         flexGrow: 1,
+            //         textAlign: "center"
+            //     }
+            // },
+            // MUIDataTableBodyCell: {
+            //     root: {
+            //         flexGrow: 1,
+            //         textAlign: "center"
+            //     }
+            // },
+            // MuiTableCell: {
+            //     root: {
+            //         padding: 0,
+            //         "&:last-child": {
+            //             paddingRight: 0
+            //         }
+            //     }
+            // }
         },
-        secondary: {
-            main: "#7b96a3", // FIXME: choose secondary color
-            light: "#7b96a3"
-        }
-    },
-
-});
-
+        palette: {
+            primary: {
+                main: "#607D8B",
+            },
+            secondary: {
+                main: "#7b96a3", // FIXME: choose secondary color
+                light: "#7b96a3",
+            },
+        },
+    });
 
 function App() {
     return (
         <Router>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
-
                 <MuiThemeProvider theme={getMuiTheme()}>
                     <SnackbarProvider
                         maxSnack={3}
@@ -84,6 +83,12 @@ function App() {
                                 </Route>
                                 <Route path="/queues" exact={true}>
                                     <QueuesPage />
+                                </Route>
+                                <Route
+                                    path="/clusterwide-parameters"
+                                    exact={true}
+                                >
+                                    <ClusterwideParametersPage />
                                 </Route>
                                 <Route path="/users" exact={true}>
                                     <UsersPage />
