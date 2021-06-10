@@ -7,7 +7,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 
 export const DisplayLogsDialog: React.FC<{
     showDialog: boolean;
-    closeDialog: any;
+    closeDialog: () => void;
     logs: { nodeName: string; data: string } | undefined;
 }> = ({ showDialog, closeDialog, logs }) => {
     return (

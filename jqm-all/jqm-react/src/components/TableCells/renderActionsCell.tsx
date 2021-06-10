@@ -15,7 +15,7 @@ export const renderActionsCell =
     (
         onCancel: Function,
         onSave: Function,
-        onDelete: Function,
+        onDelete: Function | null,
         editingRowId: number | null,
         onEdit: Function,
         extraActionItems: extraActionItem[] = []
@@ -72,15 +72,17 @@ export const renderActionsCell =
                             <CreateIcon />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title={"Delete line"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"delete"}
-                            onClick={() => onDelete(tableMeta)}
-                        >
-                            <DeleteIcon />
-                        </IconButton>
-                    </Tooltip>
+                    {onDelete && (
+                        <Tooltip title={"Delete line"}>
+                            <IconButton
+                                color="default"
+                                aria-label={"delete"}
+                                onClick={() => onDelete(tableMeta)}
+                            >
+                                <DeleteIcon />
+                            </IconButton>
+                        </Tooltip>
+                    )}
                 </>
             );
         }

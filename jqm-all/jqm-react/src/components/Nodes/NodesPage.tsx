@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Container, Grid, IconButton, Tooltip } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import MUIDataTable from "mui-datatables";
+import MUIDataTable, { SelectableRows } from "mui-datatables";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import DescriptionIcon from "@material-ui/icons/Description";
@@ -30,30 +30,13 @@ export const NodesPage: React.FC = () => {
     const [loapApiSimple, setLoapApiSimple] = useState<boolean | null>(null);
     const [enabled, setEnabled] = useState<boolean | null>(null);
 
-    const {
-        nodes,
-        nodeLogs,
-        fetchNodes,
-        updateNode,
-        deleteNodes,
-        fetchNodeLogs,
-    } = useNodesApi();
+    const { nodes, nodeLogs, fetchNodes, updateNode, fetchNodeLogs } =
+        useNodesApi();
 
     useEffect(() => {
         fetchNodes();
         // eslint-disable-next-line
     }, []);
-
-    const handleOnDelete = useCallback(
-        (tableMeta) => {
-            const [nodeId] = tableMeta.rowData;
-            const newNodes = nodes?.filter((node) => node.id !== nodeId);
-            if (newNodes) {
-                deleteNodes(newNodes);
-            }
-        },
-        [deleteNodes, nodes]
-    );
 
     const handleOnViewLogs = useCallback(
         (tableMeta) => {
@@ -308,7 +291,7 @@ export const NodesPage: React.FC = () => {
                 customBodyRender: renderActionsCell(
                     handleOnCancel,
                     handleOnSave,
-                    handleOnDelete,
+                    null,
                     editingRowId,
                     handleOnEdit,
                     [
@@ -327,6 +310,7 @@ export const NodesPage: React.FC = () => {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
         download: false,
         print: false,
+        selectableRows: "none" as SelectableRows,
         customToolbar: () => {
             return (
                 <>
@@ -346,21 +330,6 @@ export const NodesPage: React.FC = () => {
                     </Tooltip>
                 </>
             );
-        },
-        onRowsDelete: ({ data }: { data: any[] }) => {
-            const nodeIdsToDelete: { [id: string]: number } = {};
-            data.forEach(({ index }) => {
-                const node = nodes ? nodes[index] : null;
-                if (node) {
-                    nodeIdsToDelete[node.id] = node.id;
-                }
-            });
-            const newNodes = nodes?.filter(
-                (node) => nodeIdsToDelete[node.id] !== node.id
-            );
-            if (newNodes) {
-                deleteNodes(newNodes);
-            }
         },
     };
 

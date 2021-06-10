@@ -54,11 +54,6 @@ const useNodesApi = () => {
         [updateNodes]
     );
 
-    const deleteNodes = useCallback(
-        async (nodes: Node[]) => updateNodes(nodes),
-        [updateNodes]
-    );
-
     const fetchNodeLogs = useCallback(
         async (nodeName: string, latest: number = 200) => {
             return APIService.get(
@@ -92,7 +87,6 @@ const useNodesApi = () => {
         nodeLogs,
         fetchNodes,
         updateNode,
-        deleteNodes,
         fetchNodeLogs,
     };
 };
