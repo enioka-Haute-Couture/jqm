@@ -1,7 +1,9 @@
 import { useState, useCallback } from "react";
 import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
-import { Role, User } from "./User";
+import { Role } from "../Roles/Role";
+import { User } from "./User";
+
 
 export const useUserAPI = () => {
     const [users, setUsers] = useState<User[] | null>(null);

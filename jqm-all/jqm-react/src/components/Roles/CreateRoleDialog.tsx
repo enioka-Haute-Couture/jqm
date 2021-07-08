@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Parameter } from "./Parameter";
 import { Button } from "@material-ui/core";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
@@ -7,6 +6,8 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import TextField from "@material-ui/core/TextField/TextField";
+import { Role } from "./Role";
+import { PermissionsForm } from "./EditPermissionsDialog";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -21,40 +22,46 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
-export const CreateParameterDialog: React.FC<{
-    showDialog: boolean;
+export const CreateRoleDialog: React.FC<{
     closeDialog: () => void;
-    createParameter: (parameter: Parameter) => void;
-}> = ({ showDialog, closeDialog, createParameter }) => {
-    const [parameterName, setParameterName] = useState<string>("");
-    const [parameterValue, setParameterValue] = useState<string>("");
+    createRole: (role: Role) => void;
+}> = ({ closeDialog, createRole }) => {
+
+    const [name, setName] = useState<string>("");
+    const [description, setDescription] = useState<string>("");
+    const [permissions, setPermissions] = useState<string[]>([]);
+
     const classes = useStyles();
     return (
         <Dialog
-            open={showDialog}
+            open={true}
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
+            fullWidth
+            maxWidth={"md"}
         >
-            <DialogTitle>Create parameter</DialogTitle>
+            <DialogTitle>Create role</DialogTitle>
             <DialogContent>
+
                 <TextField
                     className={classes.TextField}
                     label="Name*"
-                    value={parameterName}
+                    value={name}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setParameterName(event.target.value);
+                        setName(event.target.value);
                     }}
                     fullWidth
                 />
                 <TextField
                     className={classes.TextField}
-                    label="Value"
-                    value={parameterValue}
+                    label="Description"
+                    value={description}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setParameterValue(event.target.value);
+                        setDescription(event.target.value);
                     }}
                     fullWidth
                 />
+                <PermissionsForm permissions={permissions} setPermissions={setPermissions} />
             </DialogContent>
             <DialogActions>
                 <Button
@@ -69,16 +76,15 @@ export const CreateParameterDialog: React.FC<{
                     variant="contained"
                     size="small"
                     color="primary"
-                    disabled={!parameterName}
+                    disabled={!name}
                     style={{ margin: "8px" }}
                     onClick={() => {
-                        createParameter({
-                            key: parameterName!,
-                            value: parameterValue,
+                        createRole({
+                            name: name,
+                            description: description,
+                            permissions: permissions
                         });
                         closeDialog();
-                        setParameterName("");
-                        setParameterValue("");
                     }}
                 >
                     Create

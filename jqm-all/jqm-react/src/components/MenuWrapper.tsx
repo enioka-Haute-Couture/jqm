@@ -22,7 +22,7 @@ import SettingsIcon from "@material-ui/icons/Settings";
 import ScatterPlotIcon from "@material-ui/icons/ScatterPlot";
 import AssignmentIcon from "@material-ui/icons/Assignment";
 import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
-import LockIcon from "@material-ui/icons/Lock";
+import SecurityIcon from "@material-ui/icons/Security";
 import GroupWorkIcon from "@material-ui/icons/GroupWork";
 import QueryBuilderIcon from "@material-ui/icons/QueryBuilder";
 import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
@@ -231,9 +231,13 @@ export default function MenuWrapper(props: any) {
                         </ListItemIcon>
                         <ListItemText primary={"Users"} />
                     </ListItem>
-                    <ListItem button key={"roles"} disabled>
+                    <ListItem
+                        button
+                        key={"roles"}
+                        component={NavLink}
+                        to="/roles">
                         <ListItemIcon>
-                            <LockIcon />
+                            <SecurityIcon />
                         </ListItemIcon>
                         <ListItemText primary={"Roles"} />
                     </ListItem>

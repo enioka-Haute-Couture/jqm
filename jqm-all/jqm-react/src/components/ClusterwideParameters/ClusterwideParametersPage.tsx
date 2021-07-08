@@ -148,9 +148,9 @@ const ClusterwideParametersPage: React.FC = () => {
             // delete all rows by index
             const paramIds: number[] = [];
             data.forEach(({ index }) => {
-                const queue = parameters ? parameters[index] : null;
-                if (queue) {
-                    paramIds.push(queue.id!);
+                const parameter = parameters ? parameters[index] : null;
+                if (parameter) {
+                    paramIds.push(parameter.id!);
                 }
             });
             deleteParameter(paramIds);

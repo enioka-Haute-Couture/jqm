@@ -7,8 +7,9 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import TextField from "@material-ui/core/TextField/TextField";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import { Role, User } from "./User";
+import { User } from "./User";
 import { KeyboardDatePicker } from "@material-ui/pickers";
+import { Role } from "../Roles/Role";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
