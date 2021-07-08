@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, FormControl, Input, InputLabel, MenuItem, Select } from "@material-ui/core";
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
 import React, { useState } from "react";
 import DeleteIcon from "@material-ui/icons/Delete";
 
@@ -46,7 +46,6 @@ export const PermissionsForm: React.FC<{
             onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
                 setNewAction(event.target.value as string);
             }}
-            input={<Input />}
         >
             {Object.entries(PERMISSION_ACTIONS).map(([actionCode, actionLabel]) => (
                 <MenuItem key={actionCode} value={actionCode}>
@@ -67,7 +66,6 @@ export const PermissionsForm: React.FC<{
                 onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
                     setNewObjectType(event.target.value as string);
                 }}
-                input={<Input />}
             >
                 {Object.entries(PERMISSION_OBJECT_TYPES).map(([objectTypeCode, objectTypeLabel]) => (
                     <MenuItem key={objectTypeCode} value={objectTypeCode}>
@@ -83,7 +81,7 @@ export const PermissionsForm: React.FC<{
             onClick={() => { setPermissions([...permissions, `${newObjectType}:${newAction}`]) }}
             color="primary">
             Add permission
-          </Button>
+        </Button>
         <TableContainer component={Paper}>
             <Table size="small" aria-label="a dense table">
                 <TableHead>
@@ -149,13 +147,13 @@ export const EditPermissionsDialog: React.FC<{
             <Button variant="contained"
                 size="small"
                 style={{ margin: "8px" }}
-                onClick={async () => {
-                    await setPermissions(editedPermissions);
+                onClick={() => {
+                    setPermissions(editedPermissions);
                     closeDialog();
                 }}
                 color="primary">
                 Save
-          </Button>
+            </Button>
         </DialogActions>
     </Dialog>
 }

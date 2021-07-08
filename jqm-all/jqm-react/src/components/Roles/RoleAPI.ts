@@ -7,7 +7,7 @@ import { Role } from "./Role";
 export const useRoleAPI = () => {
     const [roles, setRoles] = useState<Role[] | null>(null);
     const { displayError, displaySuccess } = useNotificationService();
-    const fetchRoles = useCallback(async () => {
+    const fetchRoles = useCallback(() => {
         APIService.get("/role")
             .then((response) => {
                 setRoles(response);

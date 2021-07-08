@@ -21,15 +21,9 @@ const RolesPage: React.FC = () => {
     const [permissions, setPermissions] = useState<string[] | null>(null);
     const [editPermissionsRoleId, setEditPermissionsRoleId] = useState<string | null>(null);
 
-
-    const refresh = () => {
-        fetchRoles();
-    }
-
     useEffect(() => {
-        refresh();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        fetchRoles();
+    }, [fetchRoles]);
 
     const updateRow = useCallback(
         (id: number) => {
@@ -183,7 +177,7 @@ const RolesPage: React.FC = () => {
                         <IconButton
                             color="default"
                             aria-label={"refresh"}
-                            onClick={() => refresh()}
+                            onClick={() => fetchRoles()}
                         >
                             <RefreshIcon />
                         </IconButton>
