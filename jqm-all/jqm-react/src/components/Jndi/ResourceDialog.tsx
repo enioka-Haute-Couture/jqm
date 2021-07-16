@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
-export const JndiResourceDialog: React.FC<{
+export const ResourceDialog: React.FC<{
     showDialog: boolean;
     closeDialog: () => void;
     // createParameter: (parameter: Parameter) => void;

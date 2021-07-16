@@ -16,13 +16,14 @@ import {
     renderBooleanCell,
     renderActionsCell,
 } from "../TableCells";
-import { JndiResourceDialog } from "./JndiResourceDialog";
+import { ResourceDialog } from "./ResourceDialog";
 import useJndiApi from "./useJndiApi";
-import { JndiResource, jndiParameter } from "./JndiResource";
-import { resourceTemplates } from "./resourceTemplates";
+import { JndiResource } from "./JndiResource";
+import { ResourceDropDownMenu } from "./ResourceDropDownMenu";
 
 export const JndiPage: React.FC = () => {
-    const [showDialog, setShowDialog] = useState(false);
+    const [showDropDown, setShowDropDown] = useState(false);
+    const dropDownMenuPositionRef = useRef(null);
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const selectedNameRef = useRef(null);
     const selectedTypeRef = useRef(null);
@@ -78,7 +79,7 @@ export const JndiPage: React.FC = () => {
                 }).then(() => setEditingRowId(null));
             }
         },
-        [updateResource]
+        [updateResource, isSingleton]
     );
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
@@ -192,19 +193,27 @@ export const JndiPage: React.FC = () => {
         customToolbar: () => {
             return (
                 <>
-                    <Tooltip title={"Add line"}>
+                    <Tooltip title={"Create new JNDI resource"}>
                         <>
                             <IconButton
                                 color="default"
-                                aria-label={"add"}
-                                onClick={() => setShowDialog(true)}
+                                aria-label={"Create new JNDI resource"}
+                                onClick={() => setShowDropDown(true)}
                             >
                                 <AddCircleIcon />
                             </IconButton>
-                            <JndiResourceDialog
-                                showDialog={showDialog}
-                                closeDialog={() => setShowDialog(false)}
-                                // createParameter={createParameter}
+                            <ResourceDropDownMenu
+                                menuPositiontRef={dropDownMenuPositionRef}
+                                show={showDropDown}
+                                handleSet={setShowDropDown}
+                                onOpen={() => setShowDropDown(true)}
+                                onClose={() => setShowDropDown(false)}
+                                onSelectResource={(res: JndiResource) => {
+                                    const newArr = [...inMemoryResources];
+                                    newArr.push(res);
+                                    setInMemoryResources(newArr);
+                                    setShowDropDown(false);
+                                }}
                             />
                         </>
                     </Tooltip>
