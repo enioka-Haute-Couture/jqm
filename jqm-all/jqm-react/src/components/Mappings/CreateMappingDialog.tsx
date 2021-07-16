@@ -30,8 +30,8 @@ export const CreateMappingDialog: React.FC<{
     nodes: Node[],
     queues: Queue[]
 }> = ({ closeDialog, createMapping, nodes, queues }) => {
-    const [nodeId, setNodeId] = useState<number | null>(null);
-    const [queueId, setQueueId] = useState<number | null>(null);
+    const [nodeId, setNodeId] = useState<number>(nodes[0].id!);
+    const [queueId, setQueueId] = useState<number>(queues[0].id!);
 
     const [pollingInterval, setPollingInterval] = useState<string>("");
     const [nbThread, setNbThread] = useState<string>("")
