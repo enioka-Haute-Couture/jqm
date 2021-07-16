@@ -1,16 +1,11 @@
-import React, {
-    useEffect,
-    useState,
-    useCallback,
-    useRef,
-    useMemo,
-} from "react";
-import { Container, Grid, IconButton, Tooltip } from "@material-ui/core";
+import React, { useState, useCallback, useRef, useMemo } from "react";
+import { Container, Grid, IconButton, Tooltip, Badge } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import MUIDataTable from "mui-datatables";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
+import SettingsIcon from "@material-ui/icons/Settings";
 import {
     renderInputCell,
     renderBooleanCell,
@@ -24,6 +19,8 @@ import { ResourceDropDownMenu } from "./ResourceDropDownMenu";
 export const JndiPage: React.FC = () => {
     const [showDropDown, setShowDropDown] = useState(false);
     const dropDownMenuPositionRef = useRef(null);
+    const [currentSelectedResource, setCurrentSelectedResource] =
+        useState<JndiResource | null>(null);
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const selectedNameRef = useRef(null);
     const selectedTypeRef = useRef(null);
@@ -180,7 +177,27 @@ export const JndiPage: React.FC = () => {
                     handleOnSave,
                     handleOnDelete,
                     editingRowId,
-                    handleOnEdit
+                    handleOnEdit,
+                    [
+                        {
+                            title: "Edit Parameters",
+                            addIcon: (tableMeta: any) => {
+                                const parameters = tableMeta.rowData[2];
+                                return (
+                                    <Badge
+                                        badgeContent={
+                                            parameters ? parameters.length : 0
+                                        }
+                                        color="primary"
+                                    >
+                                        <SettingsIcon />
+                                    </Badge>
+                                );
+                            },
+                            action: (tableMeta: any) =>
+                                setCurrentSelectedResource(tableMeta.rowData),
+                        },
+                    ]
                 ),
             },
         },
@@ -193,8 +210,8 @@ export const JndiPage: React.FC = () => {
         customToolbar: () => {
             return (
                 <>
-                    <Tooltip title={"Create new JNDI resource"}>
-                        <>
+                    <>
+                        <Tooltip title={"Create new JNDI resource"}>
                             <IconButton
                                 color="default"
                                 aria-label={"Create new JNDI resource"}
@@ -202,21 +219,22 @@ export const JndiPage: React.FC = () => {
                             >
                                 <AddCircleIcon />
                             </IconButton>
-                            <ResourceDropDownMenu
-                                menuPositiontRef={dropDownMenuPositionRef}
-                                show={showDropDown}
-                                handleSet={setShowDropDown}
-                                onOpen={() => setShowDropDown(true)}
-                                onClose={() => setShowDropDown(false)}
-                                onSelectResource={(res: JndiResource) => {
-                                    const newArr = [...inMemoryResources];
-                                    newArr.push(res);
-                                    setInMemoryResources(newArr);
-                                    setShowDropDown(false);
-                                }}
-                            />
-                        </>
-                    </Tooltip>
+                        </Tooltip>
+                        <ResourceDropDownMenu
+                            menuPositiontRef={dropDownMenuPositionRef}
+                            show={showDropDown}
+                            handleSet={setShowDropDown}
+                            onOpen={() => setShowDropDown(true)}
+                            onClose={() => setShowDropDown(false)}
+                            onSelectResource={(newResource: JndiResource) => {
+                                const newArr = [...inMemoryResources];
+                                newArr.push(newResource);
+                                setInMemoryResources(newArr);
+                                setShowDropDown(false);
+                            }}
+                        />
+                    </>
+
                     <Tooltip title={"Refresh"}>
                         <IconButton
                             color="default"
@@ -254,6 +272,14 @@ export const JndiPage: React.FC = () => {
                 data={resourcesesMemo}
                 columns={columns}
                 options={options}
+            />
+            <ResourceDialog
+                selectedResource={currentSelectedResource}
+                onChangeResource={(resource: JndiResource) => {
+                    const val = inMemoryResources.find((e) => resource.name);
+                    const newArr = [...inMemoryResources];
+                }}
+                closeDialog={() => setCurrentSelectedResource(null)}
             />
         </Container>
     ) : (

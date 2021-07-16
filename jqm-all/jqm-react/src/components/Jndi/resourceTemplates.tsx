@@ -1,4 +1,4 @@
-import { JndiResource, jndiParameter } from "./JndiResource";
+import { JndiResource } from "./JndiResource";
 
 export const resourceTemplates: { [key: string]: JndiResource } = {};
 

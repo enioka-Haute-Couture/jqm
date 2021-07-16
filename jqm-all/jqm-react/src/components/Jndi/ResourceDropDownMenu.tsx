@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React from "react";
 import MenuItem from "@material-ui/core/MenuItem";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import FormControl from "@material-ui/core/FormControl";
@@ -59,7 +59,7 @@ export const ResourceDropDownMenu: React.FC<{
 }> = ({ menuPositiontRef, show, onClose, onOpen, onSelectResource }) => {
     const getSelectGroupList = () => {
         const res: any[] = [];
-        resourceTemplatesList.map(({ title, resources }) => {
+        resourceTemplatesList.forEach(({ title, resources }) => {
             res.push(
                 <ListSubheader key={title} disableSticky>
                     {title}

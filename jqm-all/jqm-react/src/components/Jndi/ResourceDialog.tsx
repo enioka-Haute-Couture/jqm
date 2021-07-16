@@ -6,6 +6,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import TextField from "@material-ui/core/TextField/TextField";
+import { JndiResource } from "./JndiResource";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -21,20 +22,20 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const ResourceDialog: React.FC<{
-    showDialog: boolean;
+    selectedResource: JndiResource | null;
     closeDialog: () => void;
-    // createParameter: (parameter: Parameter) => void;
-}> = ({ showDialog, closeDialog }) => {
+    onChangeResource: (newResource: JndiResource) => void;
+}> = ({ selectedResource, closeDialog, onChangeResource }) => {
     const [parameterName, setParameterName] = useState<string>("");
     const [parameterValue, setParameterValue] = useState<string>("");
     const classes = useStyles();
     return (
         <Dialog
-            open={showDialog}
+            open={selectedResource !== null}
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
         >
-            <DialogTitle>Create parameter</DialogTitle>
+            <DialogTitle>Parameters</DialogTitle>
             <DialogContent>
                 <TextField
                     className={classes.TextField}

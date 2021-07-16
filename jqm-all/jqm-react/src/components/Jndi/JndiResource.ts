@@ -6,10 +6,10 @@ export interface JndiResource {
     description: string;
     singleton: boolean;
     factory: string;
-    parameters: jndiParameter[];
+    parameters: JndiParameter[];
 }
 
-export interface jndiParameter {
+export interface JndiParameter {
     id?: number;
     key: string;
     value: string | number | boolean;
