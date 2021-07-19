@@ -71,8 +71,7 @@ public class JmxTest extends JqmBaseTest
         this.sleep(1); // time to actually run, not only Loader start.
 
         // Connect to JMX server
-        JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://" + hn + ":" + port1 + "/jndi/rmi://" + hn + ":"
-                + port2 + "/jmxrmi");
+        JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://" + hn + ":" + port1 + "/jndi/rmi://" + hn + ":" + port2 + "/jmxrmi");
         JMXConnector cntor = JMXConnectorFactory.connect(url, null);
         MBeanServerConnection mbsc = cntor.getMBeanServerConnection();
         int count = mbsc.getMBeanCount();
@@ -96,8 +95,7 @@ public class JmxTest extends JqmBaseTest
 
         // /////////////////
         // Loader beans
-        ObjectName killBean = new ObjectName("com.enioka.jqm:type=Node.Queue.JobInstance,Node="
-                + TestHelpers.node.getName() + ",Queue=VIPQueue,name=" + i);
+        ObjectName killBean = new ObjectName("com.enioka.jqm:type=Node.Queue.JobInstance,Node=" + TestHelpers.node.getName() + ",Queue=VIPQueue,name=" + i);
         System.out.println("Name to kill: " + killBean.toString());
         mbeans = mbsc.queryMBeans(killBean, null);
         if (mbeans.isEmpty())
@@ -128,8 +126,7 @@ public class JmxTest extends JqmBaseTest
         // Engine bean
         ObjectName engine = new ObjectName("com.enioka.jqm:type=Node,name=" + TestHelpers.node.getName());
         JqmEngineMBean proxyEngine = JMX.newMBeanProxy(mbsc, engine, JqmEngineMBean.class);
-        Assert.assertEquals(1, proxyEngine.getCumulativeJobInstancesCount()
-                + proxyEngine.getCurrentlyRunningJobCount());
+        Assert.assertEquals(1, proxyEngine.getCumulativeJobInstancesCount() + proxyEngine.getCurrentlyRunningJobCount());
         Assert.assertTrue(proxyEngine.getUptime() > 0);
         proxyEngine.getVersion();
         Assert.assertTrue(proxyEngine.isAllPollersPolling());
@@ -137,11 +134,9 @@ public class JmxTest extends JqmBaseTest
 
         // //////////////////
         // Poller bean
-        ObjectName poller = new ObjectName("com.enioka.jqm:type=Node.Queue,Node=" + TestHelpers.node.getName()
-                + ",name=VIPQueue");
+        ObjectName poller = new ObjectName("com.enioka.jqm:type=Node.Queue,Node=" + TestHelpers.node.getName() + ",name=VIPQueue");
         QueuePollerMBean proxyPoller = JMX.newMBeanProxy(mbsc, poller, QueuePollerMBean.class);
-        Assert.assertEquals(1, proxyPoller.getCumulativeJobInstancesCount()
-                + proxyPoller.getCurrentActiveThreadCount());
+        Assert.assertEquals(1, proxyPoller.getCumulativeJobInstancesCount() + proxyPoller.getCurrentActiveThreadCount());
         proxyPoller.getCurrentlyRunningJobCount();
         proxyPoller.getJobsFinishedPerSecondLastMinute();
         Assert.assertEquals((Integer) 40, proxyPoller.getMaxConcurrentJobInstanceCount());
@@ -182,15 +177,14 @@ public class JmxTest extends JqmBaseTest
      *                            store when connecting to the JMX Agent "remotely"
      * @throws Exception
      */
-    public static void jmxRemoteSslTest(JqmBaseTest testInstance, boolean enableJmxSsl, boolean enableJmxSslAuth,
-            boolean useClientTrustStore, boolean useClientKeyStore) throws Exception
+    public static void jmxRemoteSslTest(JqmBaseTest testInstance, boolean enableJmxSsl, boolean enableJmxSslAuth, boolean useClientTrustStore, boolean useClientKeyStore)
+            throws Exception
     {
         DbConn cnx = testInstance.cnx;
         JmxAgent.unregisterAgent();
 
-        System.out.println("Starting a JMX Remote SSL Test with enableJmxSsl: " + enableJmxSsl + ", enableJmxSslAuth: "
-                + enableJmxSslAuth + ", useClientTrustStore: " + useClientTrustStore + ", useClientKeyStore: "
-                + useClientKeyStore);
+        System.out.println("Starting a JMX Remote SSL Test with enableJmxSsl: " + enableJmxSsl + ", enableJmxSslAuth: " + enableJmxSslAuth + ", useClientTrustStore: "
+                + useClientTrustStore + ", useClientKeyStore: " + useClientKeyStore);
         Helpers.setSingleParam("enableJmxSsl", Boolean.toString(enableJmxSsl), cnx);
         Helpers.setSingleParam("enableJmxSslAuth", Boolean.toString(enableJmxSslAuth), cnx);
 
@@ -228,8 +222,7 @@ public class JmxTest extends JqmBaseTest
         String pfxPassword = GlobalParameter.getParameter(cnx, "pfxPassword", "SuperPassword");
 
         // From JettyTest class:
-        JdbcCa.prepareClientStore(cnx, "CN="
-                + userName, "./conf/client.pfx", pfxPassword, "client-cert", "./conf/client.cer");
+        JdbcCa.prepareClientStore(cnx, "CN=" + userName, "./conf/client.pfx", pfxPassword, "client-cert", "./conf/client.cer");
 
         String trustStorePath = "./conf/trusted.jks";
         String keyStorePath = "./conf/client.pfx";
@@ -259,8 +252,7 @@ public class JmxTest extends JqmBaseTest
         }
 
         // From JmxTest#jmxRemoteTest method:
-        JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://" + hn + ":" + port1 + "/jndi/rmi://" + hn + ":"
-                + port2 + "/jmxrmi");
+        JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://" + hn + ":" + port1 + "/jndi/rmi://" + hn + ":" + port2 + "/jmxrmi");
         JMXConnector cntor = JMXConnectorFactory.connect(url, env);
         MBeanServerConnection mbsc = cntor.getMBeanServerConnection();
 
@@ -295,8 +287,7 @@ public class JmxTest extends JqmBaseTest
 
         // /////////////////
         // Loader beans
-        ObjectName killBean = new ObjectName("com.enioka.jqm:type=Node.Queue.JobInstance,Node="
-                + TestHelpers.node.getName() + ",Queue=VIPQueue,name=" + i);
+        ObjectName killBean = new ObjectName("com.enioka.jqm:type=Node.Queue.JobInstance,Node=" + TestHelpers.node.getName() + ",Queue=VIPQueue,name=" + i);
         System.out.println("Name to kill: " + killBean.toString());
         mbeans = mbsc.queryMBeans(killBean, null);
         if (mbeans.isEmpty())
@@ -327,8 +318,7 @@ public class JmxTest extends JqmBaseTest
         // Engine bean
         ObjectName engine = new ObjectName("com.enioka.jqm:type=Node,name=" + TestHelpers.node.getName());
         JqmEngineMBean proxyEngine = JMX.newMBeanProxy(mbsc, engine, JqmEngineMBean.class);
-        Assert.assertEquals(1, proxyEngine.getCumulativeJobInstancesCount()
-                + proxyEngine.getCurrentlyRunningJobCount());
+        Assert.assertEquals(1, proxyEngine.getCumulativeJobInstancesCount() + proxyEngine.getCurrentlyRunningJobCount());
         Assert.assertTrue(proxyEngine.getUptime() > 0);
         proxyEngine.getVersion();
         Assert.assertTrue(proxyEngine.isAllPollersPolling());
@@ -336,12 +326,10 @@ public class JmxTest extends JqmBaseTest
 
         // //////////////////
         // Poller bean
-        ObjectName poller = new ObjectName("com.enioka.jqm:type=Node.Queue,Node=" + TestHelpers.node.getName()
-                + ",name=VIPQueue");
+        ObjectName poller = new ObjectName("com.enioka.jqm:type=Node.Queue,Node=" + TestHelpers.node.getName() + ",name=VIPQueue");
         QueuePollerMBean proxyPoller = JMX.newMBeanProxy(mbsc, poller, QueuePollerMBean.class);
 
-        // Assert.assertEquals(1, proxyPoller.getCumulativeJobInstancesCount() +
-        // proxyPoller.getCurrentActiveThreadCount());
+        Assert.assertEquals(1, proxyPoller.getCumulativeJobInstancesCount() + proxyPoller.getCurrentActiveThreadCount());
         proxyPoller.getCurrentlyRunningJobCount();
         proxyPoller.getJobsFinishedPerSecondLastMinute();
         Assert.assertEquals((Integer) 40, proxyPoller.getMaxConcurrentJobInstanceCount());
