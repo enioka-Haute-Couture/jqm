@@ -37,7 +37,8 @@ import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.PKI;
 
 /**
- * This class is the link between the X509 methods in CertificateRequest and the database store.
+ * This class is the link between the X509 methods in CertificateRequest and the
+ * database store.
  * 
  */
 public class JdbcCa
@@ -98,8 +99,8 @@ public class JdbcCa
         return cr;
     }
 
-    public static void prepareWebServerStores(DbConn cnx, String subject, String serverPfxPath, String trustPfxPath, String pfxPassword,
-            String serverCertPrettyName, String serverCerPath, String caCerPath)
+    public static void prepareWebServerStores(DbConn cnx, String subject, String serverPfxPath, String trustPfxPath, String pfxPassword, String serverCertPrettyName,
+            String serverCerPath, String caCerPath)
     {
         File pfx = new File(serverPfxPath);
 

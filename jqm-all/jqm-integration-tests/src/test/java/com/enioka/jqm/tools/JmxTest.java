@@ -153,6 +153,16 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
+     * See
+     * {@link #jmxRemoteSslTest(JqmBaseTest, boolean, boolean, boolean, boolean, Runnable)}
+     */
+    public static void jmxRemoteSslTest(JqmBaseTest testInstance, boolean enableJmxSsl, boolean enableJmxSslAuth, boolean useClientTrustStore, boolean useClientKeyStore)
+            throws Exception
+    {
+        jmxRemoteSslTest(testInstance, enableJmxSsl, enableJmxSslAuth, useClientTrustStore, useClientKeyStore, null);
+    }
+
+    /**
      * Test registration of a remote JMX with or without SSL and users
      * authentication and test connection to this remote JMX with or without a trust
      * store (containing the certificate of the internal PKI certification authority
@@ -176,10 +186,16 @@ public class JmxTest extends JqmBaseTest
      *                            store when connecting to the JMX Agent "remotely"
      * @param useClientKeyStore   = true if the test must use the valid client key
      *                            store when connecting to the JMX Agent "remotely"
+     * @param createClientStore   the runnable executed to create the client key
+     *                            store. If null, a default valid client key store
+     *                            is created. In any case, the client key store used
+     *                            by this test is stored in the ./conf/client.pfx
+     *                            file, therefore the client key store must be
+     *                            created there to be used.
      * @throws Exception
      */
-    public static void jmxRemoteSslTest(JqmBaseTest testInstance, boolean enableJmxSsl, boolean enableJmxSslAuth, boolean useClientTrustStore, boolean useClientKeyStore)
-            throws Exception
+    public static void jmxRemoteSslTest(JqmBaseTest testInstance, boolean enableJmxSsl, boolean enableJmxSslAuth, boolean useClientTrustStore, boolean useClientKeyStore,
+            Runnable createClientStore) throws Exception
     {
         DbConn cnx = testInstance.cnx;
         JmxAgent.unregisterAgent();
@@ -222,33 +238,51 @@ public class JmxTest extends JqmBaseTest
 
         String pfxPassword = GlobalParameter.getParameter(cnx, "pfxPassword", "SuperPassword");
 
-        // From JettyTest class:
-        JdbcCa.prepareClientStore(cnx, "CN=" + userName, "./conf/client.pfx", pfxPassword, "client-cert", "./conf/client.cer");
-
         String trustStorePath = "./conf/trusted.jks";
         String keyStorePath = "./conf/client.pfx";
 
+        if (createClientStore != null)
+        {
+            createClientStore.run(); // The client key store is created here using a runnable to be able to create
+                                     // the file in the conf folder which is created after the engine is started if
+                                     // it doesn't exist. The conf folder and the client key store could be created
+                                     // before executing this test function but that could induce bad consequences if
+                                     // the existence of the conf folder affects the engine setup. Indeed, the
+                                     // natural behaviour of an user of JQM is to start the engine a first time, then
+                                     // the conf folder is created by the JQM setup, then the user can customize
+                                     // settings in this conf folder. Therefore, it wouldn't be surprising that the
+                                     // existence of the conf folder affects or not the initialization of JQM.
+        }
+        else
+        {
+            // From JettyTest class:
+            JdbcCa.prepareClientStore(cnx, "CN=" + userName, keyStorePath, pfxPassword, "client-cert", "./conf/client.cer");
+        }
         // System properties are JVM related, they are lost at the end of execution
         // (https://stackoverflow.com/questions/21204334/system-setproperty-and-system-getproperty):
         if (useClientTrustStore)
         {
             System.setProperty("javax.net.ssl.trustStore", trustStorePath);
+            System.setProperty("javax.net.ssl.trustStoreType", "JKS");
             System.setProperty("javax.net.ssl.trustStorePassword", pfxPassword);
         }
         else
         {
             System.clearProperty("javax.net.ssl.trustStore");
+            System.clearProperty("javax.net.ssl.trustStoreType");
             System.clearProperty("javax.net.ssl.trustStorePassword");
         }
 
         if (useClientKeyStore)
         {
             System.setProperty("javax.net.ssl.keyStore", keyStorePath);
+            System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
             System.setProperty("javax.net.ssl.keyStorePassword", pfxPassword);
         }
         else
         {
             System.clearProperty("javax.net.ssl.keyStore");
+            System.clearProperty("javax.net.ssl.keyStoreType");
             System.clearProperty("javax.net.ssl.keyStorePassword");
         }
 
