@@ -41,6 +41,7 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class JmxTest extends JqmBaseTest
 {
+
     /**
      * Test registration of a remote JMX using default settings (no SSL) and test
      * connection to this remote JMX.

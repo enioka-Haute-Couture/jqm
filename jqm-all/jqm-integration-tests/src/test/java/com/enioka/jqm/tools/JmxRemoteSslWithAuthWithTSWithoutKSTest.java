@@ -21,6 +21,7 @@ import org.junit.Test;
 
 public class JmxRemoteSslWithAuthWithTSWithoutKSTest extends JqmBaseTest
 {
+
     /**
      * Test registration of a remote JMX using SSL with users authentication for
      * connections and test connection to this remote JMX with a client not having

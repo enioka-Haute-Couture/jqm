@@ -19,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.server.RMIServerSocketFactory;
 import java.security.KeyStore;
 import java.util.HashMap;
 
@@ -32,7 +33,6 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
-import javax.rmi.ssl.SslRMIServerSocketFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,8 +55,17 @@ final class JmxAgent
         // Utility class
     }
 
-    static synchronized void registerAgent(int registryPort, int serverPort, String hostname, DbConn cnx)
-            throws JqmInitError
+    /**
+     * Register the JMX Agent with or without SSL and client authentication
+     * depending on settings in the database (provided by the DbConn instance).
+     * 
+     * @param registryPort the port of the JMX remote registry
+     * @param serverPort the port of the JMX remote server
+     * @param hostname the hostname of the JMX remote server
+     * @param cnx a connection to the database
+     * @throws JqmInitError
+     */
+    static synchronized void registerAgent(int registryPort, int serverPort, String hostname, DbConn cnx) throws JqmInitError
     {
         if (connectorServer != null)
         {
@@ -99,11 +108,8 @@ final class JmxAgent
                 System.setProperty("com.sun.management.jmxremote.registry.ssl", Boolean.toString(useSsl));
                 System.setProperty("com.sun.management.jmxremote.ssl.need.client.auth", Boolean.toString(sslNeedClientAuth));
 
-                SslRMIServerSocketFactory ssf = null;
+                RMIServerSocketFactory ssf = null;
                 // System.setProperty("javax.net.debug", "all");
-
-                String[] enabledCipherSuites = null;
-                String[] enabledProtocols = null;
 
                 try
                 {
@@ -147,7 +153,7 @@ final class JmxAgent
                     {
                         jqmlogger.info("JQM will use client authentication through SSL for all communications with the JMX remote agent as parameter enableJmxSslAuth is 'true'");
                     }
-                    ssf = new SslRMIServerSocketFactory(sslctx, enabledCipherSuites, enabledProtocols, sslNeedClientAuth);
+                    ssf = new ContextfulSslRMIServerSocketFactory(sslctx, sslNeedClientAuth);
                 }
                 catch (Exception e)
                 {
@@ -158,8 +164,7 @@ final class JmxAgent
                 env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, ssf);
             }
 
-            JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://" + hostname + ":" + serverPort + "/jndi/rmi://"
-                    + hostname + ":" + registryPort + "/jmxrmi");
+            JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://" + hostname + ":" + serverPort + "/jndi/rmi://" + hostname + ":" + registryPort + "/jmxrmi");
             connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, mbs);
 
             connectorServer.start();
@@ -171,6 +176,10 @@ final class JmxAgent
         }
     }
 
+    /**
+     * Unregister the JMX Agent if it is registered. Allows to register it again
+     * with other settings with {@link #registerAgent(int, int, String, DbConn)}.
+     */
     static synchronized void unregisterAgent()
     {
         if (connectorServer != null)
