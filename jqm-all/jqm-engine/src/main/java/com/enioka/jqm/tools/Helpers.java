@@ -79,8 +79,7 @@ final class Helpers
     // The one and only Database context in the engine.
     private static Db _db;
 
-    // Resource file contains at least the jqm jdbc connection definition. Static
-    // because JNDI root context is common to the whole JVM.
+    // Resource file contains at least the jqm jdbc connection definition. Static because JNDI root context is common to the whole JVM.
     static String resourceFile = "resources.xml";
 
     private Helpers()
@@ -189,8 +188,7 @@ final class Helpers
     }
 
     /**
-     * Create a text message that will be stored in the database. Must be called
-     * inside a transaction.
+     * Create a text message that will be stored in the database. Must be called inside a transaction.
      */
     static void createMessage(String textMessage, JobInstance jobInstance, DbConn cnx)
     {
@@ -198,14 +196,18 @@ final class Helpers
     }
 
     /**
-     * Create a Deliverable inside the database that will track a file created by a
-     * JobInstance Must be called from inside a transaction
+     * Create a Deliverable inside the database that will track a file created by a JobInstance Must be called from inside a transaction
      * 
-     * @param path             FilePath (relative to a root directory - cf. Node)
-     * @param originalFileName FileName
-     * @param fileFamily       File family (may be null). E.g.: "daily report"
-     * @param jobId            Job Instance ID
-     * @param cnx              the DbConn to use.
+     * @param path
+     *            FilePath (relative to a root directory - cf. Node)
+     * @param originalFileName
+     *            FileName
+     * @param fileFamily
+     *            File family (may be null). E.g.: "daily report"
+     * @param jobId
+     *            Job Instance ID
+     * @param cnx
+     *            the DbConn to use.
      */
     static int createDeliverable(String path, String originalFileName, String fileFamily, Integer jobId, DbConn cnx)
     {
@@ -214,9 +216,8 @@ final class Helpers
     }
 
     /**
-     * Checks if a parameter exists. If it exists, it is left untouched. If it
-     * doesn't, it is created. Only works for parameters which key is unique. Must
-     * be called from within an open transaction.
+     * Checks if a parameter exists. If it exists, it is left untouched. If it doesn't, it is created. Only works for parameters which key
+     * is unique. Must be called from within an open transaction.
      */
     static void initSingleParam(String key, String initValue, DbConn cnx)
     {
@@ -236,9 +237,8 @@ final class Helpers
     }
 
     /**
-     * Checks if a parameter exists. If it exists, it is updated. If it doesn't, it
-     * is created. Only works for parameters which key is unique. Will create a
-     * transaction on the given entity manager.
+     * Checks if a parameter exists. If it exists, it is updated. If it doesn't, it is created. Only works for parameters which key is
+     * unique. Will create a transaction on the given entity manager.
      */
     static void setSingleParam(String key, String value, DbConn cnx)
     {
@@ -262,7 +262,8 @@ final class Helpers
 
         if (!StringUtils.hasText(nn.getDlRepo()) || !StringUtils.hasText(nn.getRepo()) || !StringUtils.hasText(nn.getTmpDirectory()))
         {
-            throw new JqmInitError("The node does not have all its paths specified. Check node configuration (or recreate it with the CLI).");
+            throw new JqmInitError(
+                    "The node does not have all its paths specified. Check node configuration (or recreate it with the CLI).");
         }
 
         // Default queue
@@ -273,14 +274,16 @@ final class Helpers
         }
         if (defaultQueues.size() > 1)
         {
-            throw new JqmInitError("There is more than one default queue. Correct this (for example with CLI option -u, or with the web admin)");
+            throw new JqmInitError(
+                    "There is more than one default queue. Correct this (for example with CLI option -u, or with the web admin)");
         }
 
         // Deployment parameters
         int i = cnx.runSelectSingle("dp_select_count_for_node", Integer.class, nn.getId());
         if (i == 0)
         {
-            jqmlogger.warn("This node is not bound to any queue. Either use the GUI to bind it or use CLI option -u to bind it to the default queue");
+            jqmlogger.warn(
+                    "This node is not bound to any queue. Either use the GUI to bind it or use CLI option -u to bind it to the default queue");
         }
 
         // Roles
@@ -301,14 +304,13 @@ final class Helpers
 
     /**
      * Creates or updates a node.<br>
-     * This method makes the assumption metadata is valid. e.g. there MUST be a
-     * single default queue.<br>
-     * Call {@link #updateConfiguration(EntityManager)} before to be sure if
-     * necessary.
+     * This method makes the assumption metadata is valid. e.g. there MUST be a single default queue.<br>
+     * Call {@link #updateConfiguration(EntityManager)} before to be sure if necessary.
      * 
-     * @param nodeName name of the node that should be created or updated (if
-     *                 incompletely defined only)
-     * @param em       an EntityManager on which a transaction will be opened.
+     * @param nodeName
+     *            name of the node that should be created or updated (if incompletely defined only)
+     * @param em
+     *            an EntityManager on which a transaction will be opened.
      */
     static void updateNodeConfiguration(String nodeName, DbConn cnx, int port)
     {
@@ -322,8 +324,8 @@ final class Helpers
         {
             jqmlogger.info("Node " + nodeName + " does not exist in the configuration and will be created with default values");
 
-            nodeId = Node.create(cnx, nodeName, port, System.getProperty("user.dir") + "/jobs/", System.getProperty("user.dir") + "/jobs/", System.getProperty("user.dir")
-                    + "/tmp/", "localhost", "INFO").getId();
+            nodeId = Node.create(cnx, nodeName, port, System.getProperty("user.dir") + "/jobs/", System.getProperty("user.dir") + "/jobs/",
+                    System.getProperty("user.dir") + "/tmp/", "localhost", "INFO").getId();
             cnx.commit();
         }
 
@@ -340,10 +342,8 @@ final class Helpers
     }
 
     /**
-     * Creates or updates metadata common to all nodes: default queue, global
-     * parameters, roles...<br>
-     * It is idempotent. It also has the effect of making broken metadata viable
-     * again.
+     * Creates or updates metadata common to all nodes: default queue, global parameters, roles...<br>
+     * It is idempotent. It also has the effect of making broken metadata viable again.
      */
     static void updateConfiguration(DbConn cnx)
     {
@@ -391,11 +391,16 @@ final class Helpers
 
         // Roles
         RRole adminr = createRoleIfMissing(cnx, "administrator", "all permissions without exception", "*:*");
-        createRoleIfMissing(cnx, "config admin", "can read and write all configuration, except security configuration", "node:*", "queue:*", "qmapping:*", "jndi:*", "prm:*", "jd:*");
-        createRoleIfMissing(cnx, "config viewer", "can read all configuration except for security configuration", "node:read", "queue:read", "qmapping:read", "jndi:read", "prm:read", "jd:read");
-        createRoleIfMissing(cnx, "client", "can use the full client API except reading logs, files and altering position", "node:read", "queue:read", "job_instance:*", "jd:read");
-        createRoleIfMissing(cnx, "client power user", "can use the full client API", "node:read", "queue:read", "job_instance:*", "jd:read", "logs:read", "queue_position:create", "files:read");
-        createRoleIfMissing(cnx, "client read only", "can query job instances and get their files", "queue:read", "job_instance:read", "logs:read", "files:read");
+        createRoleIfMissing(cnx, "config admin", "can read and write all configuration, except security configuration", "node:*", "queue:*",
+                "qmapping:*", "jndi:*", "prm:*", "jd:*");
+        createRoleIfMissing(cnx, "config viewer", "can read all configuration except for security configuration", "node:read", "queue:read",
+                "qmapping:read", "jndi:read", "prm:read", "jd:read");
+        createRoleIfMissing(cnx, "client", "can use the full client API except reading logs, files and altering position", "node:read",
+                "queue:read", "job_instance:*", "jd:read");
+        createRoleIfMissing(cnx, "client power user", "can use the full client API", "node:read", "queue:read", "job_instance:*", "jd:read",
+                "logs:read", "queue_position:create", "files:read");
+        createRoleIfMissing(cnx, "client read only", "can query job instances and get their files", "queue:read", "job_instance:read",
+                "logs:read", "files:read");
 
         // Users
         createUserIfMissing(cnx, "root", new SecureRandomNumberGenerator().nextBytes().toHex(), "all powerful user", adminr.getName());
@@ -407,7 +412,8 @@ final class Helpers
             Map<String, String> prms = new HashMap<String, String>();
             prms.put("smtpServerHost", "smtp.gmail.com");
 
-            JndiObjectResource.create(cnx, "mail/default", "javax.mail.Session", "com.enioka.jqm.providers.MailSessionFactory", "default parameters used to send e-mails", true, prms);
+            JndiObjectResource.create(cnx, "mail/default", "javax.mail.Session", "com.enioka.jqm.providers.MailSessionFactory",
+                    "default parameters used to send e-mails", true, prms);
         }
 
         // Done
@@ -426,12 +432,12 @@ final class Helpers
     }
 
     /**
-     * Creates a new user if does not exist. If it exists, it is unlocked and roles
-     * are reset (password is untouched).
+     * Creates a new user if does not exist. If it exists, it is unlocked and roles are reset (password is untouched).
      * 
      * @param cnx
      * @param login
-     * @param password    the raw password. it will be hashed.
+     * @param password
+     *            the raw password. it will be hashed.
      * @param description
      * @param roles
      */
@@ -445,14 +451,9 @@ final class Helpers
         }
         catch (NoResultException e)
         {
-            String saltS = null;
-            String hash = null;
-            if (null != password && !"".equals(password))
-            {
-                ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
-                hash = new Sha512Hash(password, salt, 100000).toHex();
-                saltS = salt.toHex();
-            }
+            ByteSource salt = new SecureRandomNumberGenerator().nextBytes();
+            String hash = new Sha512Hash(password, salt, 100000).toHex();
+            String saltS = salt.toHex();
 
             RUser.create(cnx, login, hash, saltS, roles);
         }
@@ -522,7 +523,8 @@ final class Helpers
             for (DeploymentParameter dp : dps)
             {
                 String q = cnx.runSelectSingle("q_select_by_id", String.class, dp.getQueue()); // TODO: avoid this query with a join.
-                jqmlogger.info("\t" + q + " - every " + dp.getPollingInterval() + "ms - maximum " + dp.getNbThread() + " concurrent threads");
+                jqmlogger.info(
+                        "\t" + q + " - every " + dp.getPollingInterval() + "ms - maximum " + dp.getNbThread() + " concurrent threads");
             }
 
             // Some technical data from the JVM hosting the node
@@ -535,9 +537,8 @@ final class Helpers
 
     /**
      * Send a mail message using a JNDI resource.<br>
-     * As JNDI resource providers are inside the EXT class loader, this uses
-     * reflection. This method is basically a bonus on top of the MailSessionFactory
-     * offered to payloads, making it accessible also to the engine.
+     * As JNDI resource providers are inside the EXT class loader, this uses reflection. This method is basically a bonus on top of the
+     * MailSessionFactory offered to payloads, making it accessible also to the engine.
      * 
      * @param to
      * @param subject
@@ -594,8 +595,9 @@ final class Helpers
     {
         try
         {
-            String message = "The Job number " + ji.getId() + " finished correctly\n\n" + "Job description:\n" + "\n" + "- Parent: " + ji.getParentId() + "\n"
-                    + "- User name: " + ji.getUserName() + "\n" + "- Session ID: " + ji.getSessionID() + "\n" + "\n" + "Best regards,\n";
+            String message = "The Job number " + ji.getId() + " finished correctly\n\n" + "Job description:\n" + "\n" + "- Parent: "
+                    + ji.getParentId() + "\n" + "- User name: " + ji.getUserName() + "\n" + "- Session ID: " + ji.getSessionID() + "\n"
+                    + "\n" + "Best regards,\n";
             sendMessage(ji.getEmail(), "[JQM] Job: " + ji.getId() + " ENDED", message, "mail/default");
         }
         catch (Exception e)
@@ -617,22 +619,25 @@ final class Helpers
         }
     }
 
-    static boolean testDbFailure(Exception e)
-    {
+    static boolean testDbFailure(Exception e) {
         Throwable cause = e.getCause();
-        return (ExceptionUtils.indexOfType(e, SQLTransientException.class) != -1) || (ExceptionUtils.indexOfType(e, SQLNonTransientConnectionException.class) != -1)
-                || (ExceptionUtils.indexOfType(e, SocketException.class) != -1) || (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1) || (cause != null
-                        && cause.getMessage().equals("This connection has been closed")) || (cause instanceof SQLException
-                                && e.getMessage().equals("Failed to validate a newly established connection.")) || (cause instanceof SQLNonTransientException
-                                        && cause.getMessage().equals("connection exception: closed"));
+        return (ExceptionUtils.indexOfType(e, SQLTransientException.class) != -1)
+                || (ExceptionUtils.indexOfType(e, SQLNonTransientConnectionException.class) != -1)
+                || (ExceptionUtils.indexOfType(e, SocketException.class) != -1)
+                || (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1)
+                || (cause != null && cause.getMessage().equals("This connection has been closed"))
+                || (cause instanceof SQLException && e.getMessage().equals("Failed to validate a newly established connection."))
+                || (cause instanceof SQLNonTransientException && cause.getMessage().equals("connection exception: closed"));
     }
 
     /**
      * If there is no file at {@code targetPath}, creates a new file at this
      * location copying the resource located at {@code resourcePath}.
      * 
-     * @param resourcePath the path relative to the resources folder
-     * @param targetPath   the path relative to the system explorer
+     * @param resourcePath
+     *                     the path relative to the resources folder
+     * @param targetPath
+     *                     the path relative to the system explorer
      * @throws Exception
      */
     static void initializeConfigFile(String resourcePath, String targetPath, ClassLoader cl) throws Exception

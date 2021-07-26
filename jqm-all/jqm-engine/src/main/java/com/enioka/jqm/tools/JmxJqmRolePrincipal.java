@@ -22,7 +22,7 @@ package com.enioka.jqm.tools;
 public class JmxJqmRolePrincipal extends JmxJqmPrincipal implements java.io.Serializable
 {
 
-    private static final long serialVersionUID = -249610078176888599L;
+    private static final long serialVersionUID = -6971104914547880174L;
 
     public JmxJqmRolePrincipal(String name)
     {

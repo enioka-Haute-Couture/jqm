@@ -180,33 +180,43 @@ public class JmxTest extends JqmBaseTest
      * never reloads the files where they come from. This cache is lost when using a
      * new JVM. That is the reason why this test must be executed in its own JVM.
      * 
-     * @param testInstance        the instance of the running test
-     * @param enableJmxSsl        = true if the test must register the remote JMX
+     * @param testInstance
+     *                            the instance of the running test
+     * @param enableJmxSsl
+     *                            = true if the test must register the remote JMX
      *                            Agent with SSL enabled
-     * @param enableJmxSslAuth    = true if the test must register the remote JMX
+     * @param enableJmxSslAuth
+     *                            = true if the test must register the remote JMX
      *                            Agent with SSL authentication
-     * @param useClientTrustStore = true if the test must use the valid client trust
+     * @param useClientTrustStore
+     *                            = true if the test must use the valid client trust
      *                            store when connecting to the JMX Agent "remotely"
-     * @param useClientKeyStore   = true if the test must use the valid client key
+     * @param useClientKeyStore
+     *                            = true if the test must use the valid client key
      *                            store when connecting to the JMX Agent "remotely"
-     * @param createClientStore   = true if the test must create a default valid
+     * @param createClientStore
+     *                            = true if the test must create a default valid
      *                            client key store. In any case, the client key
      *                            store used by this test is stored in the
      *                            ./conf/client.pfx file, therefore the client key
      *                            store must be created there to be used.
-     * @param useCredentials      = true if the test must provide username and
+     * @param useCredentials
+     *                            = true if the test must provide username and
      *                            password while trying to connect to the JMX Agent
      *                            "remotely".
-     * @param useExistingUsername = true if the test must provide an existing
+     * @param useExistingUsername
+     *                            = true if the test must provide an existing
      *                            username while trying to connect to the JMX Agent
      *                            "remotely".
-     * @param useCorrectPassword  = true if the test must provide the correct
+     * @param useCorrectPassword
+     *                            = true if the test must provide the correct
      *                            password corresponding to the test user (if
      *                            {@code useExistingUsername} is false, then no
      *                            password is correct and this setting has no
      *                            effect) while trying to connect to the JMX Agent
      *                            "remotely".
-     * @param roles               the list of roles to give to the test user.
+     * @param roles
+     *                            the list of roles to give to the test user.
      * @throws Exception
      */
     public static void jmxRemoteSslTest(JqmBaseTest testInstance, boolean enableJmxSsl, boolean enableJmxSslAuth, boolean useClientTrustStore, boolean useClientKeyStore,

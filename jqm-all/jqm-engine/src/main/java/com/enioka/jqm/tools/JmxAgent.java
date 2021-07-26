@@ -77,10 +77,14 @@ final class JmxAgent
      * JMX permissions are configurable in the conf/jmxremote.policy config file for
      * each role and each user.
      * 
-     * @param registryPort the port of the JMX remote registry
-     * @param serverPort   the port of the JMX remote server
-     * @param hostname     the hostname of the JMX remote server
-     * @param cnx          a connection to the database
+     * @param registryPort
+     *                     the port of the JMX remote registry
+     * @param serverPort
+     *                     the port of the JMX remote server
+     * @param hostname
+     *                     the hostname of the JMX remote server
+     * @param cnx
+     *                     a connection to the database
      * @throws JqmInitError
      */
     static synchronized void registerAgent(int registryPort, int serverPort, String hostname, DbConn cnx) throws JqmInitError
