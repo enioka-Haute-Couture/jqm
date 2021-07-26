@@ -15,20 +15,27 @@
  */
 package com.enioka.jqm.tools;
 
+import java.security.AccessControlException;
+
 import org.junit.Test;
 
-public class JmxRemoteSslWithoutAuthWithTSTest extends JqmBaseTest
+public class JmxRemoteSslWithoutAuthMissingPermissionsTest extends JqmBaseTest
 {
-
     /**
      * Test registration of a remote JMX using SSL without clients authentication
      * for connections and test connection to this remote JMX with a client having
-     * valid stuff to connect (the client trusts the server).
+     * valid stuff to connect (the client trusts the server) and having one role not
+     * giving all the JMX permissions required to execute the
+     * {@link JmxTest#jmxRemoteSslTest(JqmBaseTest, boolean, boolean, boolean, boolean, Runnable, boolean, boolean, boolean, String...)}
+     * test successfully.
+     * 
+     * @throws AccessControlException
      */
-    @Test
-    public void jmxRemoteSslWithoutAuthWithTrustStoreTest() throws Exception
+    @Test(expected = AccessControlException.class)
+    public void jmxRemoteSslWithoutAuthMissingPermissionsTest() throws Exception
     {
-        JmxTest.jmxRemoteSslTest(this, true, false, true, false);
+        Helpers.createRoleIfMissing(cnx, "role1", "Some JMX permissions");
+        JmxTest.jmxRemoteSslTest(this, true, false, true, false, true, true, true, true, "role1");
     }
 
 }

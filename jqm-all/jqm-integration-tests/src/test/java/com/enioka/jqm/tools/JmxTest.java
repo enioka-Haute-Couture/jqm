@@ -15,6 +15,7 @@
  */
 package com.enioka.jqm.tools;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.HashMap;
@@ -43,8 +44,8 @@ public class JmxTest extends JqmBaseTest
 {
 
     /**
-     * Test registration of a remote JMX using default settings (no SSL) and test
-     * connection to this remote JMX.
+     * Test registration of a remote JMX using default settings (no SSL and no
+     * authentication) and test connection to this remote JMX.
      */
     @Test
     public void jmxRemoteTest() throws Exception
@@ -159,17 +160,19 @@ public class JmxTest extends JqmBaseTest
     public static void jmxRemoteSslTest(JqmBaseTest testInstance, boolean enableJmxSsl, boolean enableJmxSslAuth, boolean useClientTrustStore, boolean useClientKeyStore)
             throws Exception
     {
-        jmxRemoteSslTest(testInstance, enableJmxSsl, enableJmxSslAuth, useClientTrustStore, useClientKeyStore, null);
+        jmxRemoteSslTest(testInstance, enableJmxSsl, enableJmxSslAuth, useClientTrustStore, useClientKeyStore, true, true, true, true);
     }
 
     /**
-     * Test registration of a remote JMX with or without SSL and users
+     * Test registration of a remote JMX with or without SSL and clients
      * authentication and test connection to this remote JMX with or without a trust
      * store (containing the certificate of the internal PKI certification authority
-     * which signed the certificate of the remote JMX) and a key store (containing
-     * the certificate of a test user trusted by the previous certification
-     * authority).
-     * 
+     * which signed the certificate of the remote JMX), a key store (containing the
+     * certificate of a test user trusted by the previous certification authority)
+     * and correct credentials. <br>
+     * SSL client authentication and credentials authentication are independent as
+     * explained in {@link JmxAgent#registerAgent(int, int, String, DbConn)}. <br>
+     * <br>
      * Each test must be executed in its own JVM. Indeed, the connection to JMX uses
      * the default SSL Context manager because it doesn't seem that it is (anymore
      * ?) possible to use a custom one despite informations that we can find on the
@@ -186,29 +189,48 @@ public class JmxTest extends JqmBaseTest
      *                            store when connecting to the JMX Agent "remotely"
      * @param useClientKeyStore   = true if the test must use the valid client key
      *                            store when connecting to the JMX Agent "remotely"
-     * @param createClientStore   the runnable executed to create the client key
-     *                            store. If null, a default valid client key store
-     *                            is created. In any case, the client key store used
-     *                            by this test is stored in the ./conf/client.pfx
-     *                            file, therefore the client key store must be
-     *                            created there to be used.
+     * @param createClientStore   = true if the test must create a default valid
+     *                            client key store. In any case, the client key
+     *                            store used by this test is stored in the
+     *                            ./conf/client.pfx file, therefore the client key
+     *                            store must be created there to be used.
+     * @param useCredentials      = true if the test must provide username and
+     *                            password while trying to connect to the JMX Agent
+     *                            "remotely".
+     * @param useExistingUsername = true if the test must provide an existing
+     *                            username while trying to connect to the JMX Agent
+     *                            "remotely".
+     * @param useCorrectPassword  = true if the test must provide the correct
+     *                            password corresponding to the test user (if
+     *                            {@code useExistingUsername} is false, then no
+     *                            password is correct and this setting has no
+     *                            effect) while trying to connect to the JMX Agent
+     *                            "remotely".
+     * @param roles               the list of roles to give to the test user.
      * @throws Exception
      */
     public static void jmxRemoteSslTest(JqmBaseTest testInstance, boolean enableJmxSsl, boolean enableJmxSslAuth, boolean useClientTrustStore, boolean useClientKeyStore,
-            Runnable createClientStore) throws Exception
+            boolean createClientStore, boolean useCredentials, boolean useExistingUsername, boolean useCorrectPassword, String... roles) throws Exception
     {
         DbConn cnx = testInstance.cnx;
         JmxAgent.unregisterAgent();
 
-        System.out.println("Starting a JMX Remote SSL Test with enableJmxSsl: " + enableJmxSsl + ", enableJmxSslAuth: " + enableJmxSslAuth + ", useClientTrustStore: "
-                + useClientTrustStore + ", useClientKeyStore: " + useClientKeyStore);
         Helpers.setSingleParam("enableJmxSsl", Boolean.toString(enableJmxSsl), cnx);
         Helpers.setSingleParam("enableJmxSslAuth", Boolean.toString(enableJmxSslAuth), cnx);
 
         String userName = "testuser";
-        Helpers.createUserIfMissing(cnx, userName, "password", "test user", "client read only");
+        String userPass = "password";
+        new File("./conf").mkdir();
+        Helpers.initializeConfigFile("jmxremote.policy", "./conf/jmxremote.policy", JmxTest.class.getClassLoader()); // Needed for the "alljmx" role giving all JMX
+                                                                                                                     // permissions, but also for other roles.
+        if (roles == null || roles.length == 0)
+        {
+            Helpers.createRoleIfMissing(cnx, "alljmx", "All JMX permissions");
+            roles = new String[] { "client read only", "alljmx" };
+        }
+        Helpers.createUserIfMissing(cnx, userName, userPass, "test user", roles);
 
-        // System.setProperty("javax.net.debug", "all");
+//        System.setProperty("javax.net.debug", "all");
 
         // From JmxTest#jmxRemoteTest method:
         // Set JMX server on free ports
@@ -236,24 +258,26 @@ public class JmxTest extends JqmBaseTest
         HashMap<String, Object> env = new HashMap<String, Object>();
         env.put("com.sun.jndi.rmi.factory.socket", new SslRMIClientSocketFactory());
 
+        if (useCredentials)
+        {
+            String[] credentials = new String[] { userName, userPass };
+            if (!useExistingUsername)
+            {
+                credentials[0] += "unknown";
+            }
+            if (!useCorrectPassword)
+            {
+                credentials[1] += "wrong";
+            }
+            env.put(JMXConnector.CREDENTIALS, credentials);
+        }
+
         String pfxPassword = GlobalParameter.getParameter(cnx, "pfxPassword", "SuperPassword");
 
         String trustStorePath = "./conf/trusted.jks";
         String keyStorePath = "./conf/client.pfx";
 
-        if (createClientStore != null)
-        {
-            createClientStore.run(); // The client key store is created here using a runnable to be able to create
-                                     // the file in the conf folder which is created after the engine is started if
-                                     // it doesn't exist. The conf folder and the client key store could be created
-                                     // before executing this test function but that could induce bad consequences if
-                                     // the existence of the conf folder affects the engine setup. Indeed, the
-                                     // natural behaviour of an user of JQM is to start the engine a first time, then
-                                     // the conf folder is created by the JQM setup, then the user can customize
-                                     // settings in this conf folder. Therefore, it wouldn't be surprising that the
-                                     // existence of the conf folder affects or not the initialization of JQM.
-        }
-        else
+        if (createClientStore)
         {
             // From JettyTest class:
             JdbcCa.prepareClientStore(cnx, "CN=" + userName, keyStorePath, pfxPassword, "client-cert", "./conf/client.cer");
@@ -294,10 +318,10 @@ public class JmxTest extends JqmBaseTest
         int count = mbsc.getMBeanCount();
         System.out.println(count);
 
-        // Create the job only if the connection to "remote" JMX is succesful.
-        // Otherwise, if the job is created and the remote JMX doesn't receive the kill
-        // order because the connection isn't established, the job takes a lot of time
-        // to stop by himself.
+        // Create the job now and not before in order to create it only if the
+        // connection to "remote" JMX is succesful. Otherwise, if the job is created and
+        // the remote JMX doesn't receive the kill order because the connection isn't
+        // established, the job takes a lot of time to stop by itself.
         CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42, "KillApp", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
         int i = JobRequest.create("KillApp", "TestUser").submit();
 
@@ -380,7 +404,7 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test registration of a remote JMX using SSL and authentication of users for
+     * Test registration of a remote JMX using SSL and authentication of clients for
      * connections and test connection to this remote JMX with a client having valid
      * stuff to connect (the client trusts the server and the server trusts him).
      */

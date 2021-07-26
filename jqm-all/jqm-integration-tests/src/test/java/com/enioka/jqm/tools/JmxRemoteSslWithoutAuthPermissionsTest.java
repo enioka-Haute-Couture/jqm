@@ -17,18 +17,23 @@ package com.enioka.jqm.tools;
 
 import org.junit.Test;
 
-public class JmxRemoteSslWithoutAuthWithTSTest extends JqmBaseTest
+public class JmxRemoteSslWithoutAuthPermissionsTest extends JqmBaseTest
 {
 
     /**
      * Test registration of a remote JMX using SSL without clients authentication
      * for connections and test connection to this remote JMX with a client having
-     * valid stuff to connect (the client trusts the server).
+     * valid stuff to connect (the client trusts the server) and roles giving all
+     * the JMX permissions required to execute the
+     * {@link JmxTest#jmxRemoteSslTest(JqmBaseTest, boolean, boolean, boolean, boolean, Runnable, boolean, boolean, boolean, String...)}
+     * test successfully.
      */
     @Test
-    public void jmxRemoteSslWithoutAuthWithTrustStoreTest() throws Exception
+    public void jmxRemoteSslWithoutAuthPermissionsTest() throws Exception
     {
-        JmxTest.jmxRemoteSslTest(this, true, false, true, false);
+        Helpers.createRoleIfMissing(cnx, "role1", "Some JMX permissions");
+        Helpers.createRoleIfMissing(cnx, "role2", "Some JMX permissions");
+        JmxTest.jmxRemoteSslTest(this, true, false, true, false, true, true, true, true, "role1", "role2");
     }
 
 }

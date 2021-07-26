@@ -15,6 +15,7 @@
  */
 package com.enioka.jqm.tools;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -57,12 +58,29 @@ final class JmxAgent
 
     /**
      * Register the JMX Agent with or without SSL and client authentication
-     * depending on settings in the database (provided by the DbConn instance).
+     * depending on settings in the database (provided by the DbConn instance). <br>
+     * <br>
+     * Authentication with (username, password) credentials is enabled when SSL is
+     * enabled, supposing that when an user enables SSL, he wants a minimum of
+     * access security. This authentication, managed by {@link JmxLoginModule}, is
+     * independent of SSL client authentication (that can be disabled with
+     * enableJmxSslAuth global parameter) and gives permissions to an authenticated
+     * user depending on his roles. This allows to delete an account from the
+     * database and prevent his (previous) owner from continuing to connect to the
+     * remote JMX and being authenticated with his trusted certificate. Indeed, it
+     * isn't easy to make a trusted certificate no longer trusted, but it is easy to
+     * delete an account from the database. Currently, any trusted client
+     * certificate can be used to connect to the remote JMX with SSL and SSL client
+     * authentification with a valid (username, password) couple, the provided
+     * username isn't compared to the username written in the certificate. It would
+     * be good to find a way to check that they are the same. <br>
+     * JMX permissions are configurable in the conf/jmxremote.policy config file for
+     * each role and each user.
      * 
      * @param registryPort the port of the JMX remote registry
-     * @param serverPort the port of the JMX remote server
-     * @param hostname the hostname of the JMX remote server
-     * @param cnx a connection to the database
+     * @param serverPort   the port of the JMX remote server
+     * @param hostname     the hostname of the JMX remote server
+     * @param cnx          a connection to the database
      * @throws JqmInitError
      */
     static synchronized void registerAgent(int registryPort, int serverPort, String hostname, DbConn cnx) throws JqmInitError
@@ -91,6 +109,28 @@ final class JmxAgent
             if (useSsl)
             {
                 jqmlogger.info("JQM will use SSL for all communications with the JMX remote agent as parameter enableJmxSsl is 'true'");
+
+                String jaasConfigPath = "./conf/jaas.config";
+                String policyPath = "./conf/jmxremote.policy";
+
+                try
+                {
+                    new File("./conf").mkdir();
+                    Helpers.initializeConfigFile("jmx/jaas.config", jaasConfigPath, null);
+                    Helpers.initializeConfigFile("jmx/jmxremote.policy", policyPath, null);
+                }
+                catch (Exception e)
+                {
+                    jqmlogger.error("An error occurred while initializing config files for the JMX remote agent authentication", e);
+                }
+
+                System.setProperty("java.security.auth.login.config", jaasConfigPath);
+                System.setProperty("java.security.policy", policyPath); // Can force to use only this policy file by appending a "=" before policyPath.
+                if (System.getSecurityManager() == null)
+                {
+                    System.setSecurityManager(new SecurityManager());
+                }
+
                 env = new HashMap<String, Object>();
 
                 // From JettyServer class:
@@ -162,6 +202,10 @@ final class JmxAgent
 
                 env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, new SslRMIClientSocketFactory());
                 env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, ssf);
+
+                // Used in Java 6:
+                env.put("jmx.remote.x.authenticate", true);
+                env.put("jmx.remote.x.login.config", "JmxLoginConfig");
             }
 
             JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://" + hostname + ":" + serverPort + "/jndi/rmi://" + hostname + ":" + registryPort + "/jmxrmi");

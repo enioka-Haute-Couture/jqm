@@ -15,20 +15,18 @@
  */
 package com.enioka.jqm.tools;
 
-import org.junit.Test;
-
-public class JmxRemoteSslWithoutAuthWithTSTest extends JqmBaseTest
+/**
+ * Allows to give the set of permissions of a certain JQM role (defined in the
+ * jmxremote.policy config file) to an authenticated subject.
+ */
+public class JmxJqmRolePrincipal extends JmxJqmPrincipal implements java.io.Serializable
 {
 
-    /**
-     * Test registration of a remote JMX using SSL without clients authentication
-     * for connections and test connection to this remote JMX with a client having
-     * valid stuff to connect (the client trusts the server).
-     */
-    @Test
-    public void jmxRemoteSslWithoutAuthWithTrustStoreTest() throws Exception
+    private static final long serialVersionUID = -249610078176888599L;
+
+    public JmxJqmRolePrincipal(String name)
     {
-        JmxTest.jmxRemoteSslTest(this, true, false, true, false);
+        super(name);
     }
 
 }

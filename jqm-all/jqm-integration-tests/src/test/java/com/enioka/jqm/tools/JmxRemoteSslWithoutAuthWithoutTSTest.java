@@ -23,7 +23,7 @@ public class JmxRemoteSslWithoutAuthWithoutTSTest extends JqmBaseTest
 {
 
     /**
-     * Test registration of a remote JMX using SSL without authentication of users
+     * Test registration of a remote JMX using SSL without authentication of clients
      * for connections and test connection to this remote JMX with a client not
      * having valid stuff to connect (the client doesn't trust the server).
      * 

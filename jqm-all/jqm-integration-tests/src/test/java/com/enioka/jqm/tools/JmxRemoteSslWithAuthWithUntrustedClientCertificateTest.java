@@ -46,17 +46,9 @@ public class JmxRemoteSslWithAuthWithUntrustedClientCertificateTest extends JqmB
     @Test(expected = ConnectIOException.class)
     public void jmxRemoteSslWithAuthWithUntrustedClientCertificateTest() throws Exception
     {
-        // System.setProperty("javax.net.debug", "all");
-        JmxTest.jmxRemoteSslTest(this, true, true, true, true, new Runnable()
-        {
-
-            @Override
-            public void run()
-            {
-                prepareClientStoreWithUntrustedCA("CN=testuser", "./conf/client.pfx", "SuperPassword", "client-cert");
-            }
-
-        });
+        new File("./conf").mkdir();
+        prepareClientStoreWithUntrustedCA("CN=testuser", "./conf/client.pfx", "SuperPassword", "client-cert");
+        JmxTest.jmxRemoteSslTest(this, true, true, true, true, false, true, true, true);
     }
 
     /**

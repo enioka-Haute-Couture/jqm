@@ -17,18 +17,21 @@ package com.enioka.jqm.tools;
 
 import org.junit.Test;
 
-public class JmxRemoteSslWithoutAuthWithTSTest extends JqmBaseTest
+public class JmxRemoteSslWithoutAuthWithoutCredentialsTest extends JqmBaseTest
 {
 
     /**
      * Test registration of a remote JMX using SSL without clients authentication
      * for connections and test connection to this remote JMX with a client having
-     * valid stuff to connect (the client trusts the server).
+     * valid SSL stuff to connect (the client trusts the server) but not providing
+     * credentials.
+     * 
+     * @throws SecurityException
      */
-    @Test
-    public void jmxRemoteSslWithoutAuthWithTrustStoreTest() throws Exception
+    @Test(expected = SecurityException.class)
+    public void jmxRemoteSslWithoutAuthWithoutCredentialsTest() throws Exception
     {
-        JmxTest.jmxRemoteSslTest(this, true, false, true, false);
+        JmxTest.jmxRemoteSslTest(this, true, false, true, false, true, false, false, false);
     }
 
 }
