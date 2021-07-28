@@ -34,7 +34,7 @@ public class JmxRemoteSslWithoutAuthMissingPermissionsTest extends JqmBaseTest
     @Test(expected = AccessControlException.class)
     public void jmxRemoteSslWithoutAuthMissingPermissionsTest() throws Exception
     {
-        Helpers.createRoleIfMissing(cnx, "role1", "Some JMX permissions");
+        Helpers.createRoleIfMissing(cnx, "role1", "Some JMX permissions", "jmx:javax.management.MBeanPermission \"com.enioka.jqm.*#*[com.enioka.jqm:*]\", \"queryMBeans\"");
         JmxTest.jmxRemoteSslTest(this, true, false, true, false, true, true, true, true, "role1");
     }
 

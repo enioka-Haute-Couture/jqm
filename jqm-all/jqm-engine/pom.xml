@@ -41,6 +41,11 @@
 			<artifactId>jqm-runner-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-pki</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 		<!-- Runners -->
 		<dependency>

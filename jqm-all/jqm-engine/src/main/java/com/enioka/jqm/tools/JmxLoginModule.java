@@ -48,7 +48,7 @@ import com.enioka.jqm.model.RUser;
 public class JmxLoginModule implements LoginModule
 {
 
-    private Logger jqmlogger = null;
+    private Logger jqmlogger;
 
     private Subject subject;
     private CallbackHandler callbackHandler;
@@ -58,8 +58,9 @@ public class JmxLoginModule implements LoginModule
 
     private String userName;
     private RUser user;
-    private List<RRole> userRoles;
     private Set<Principal> userPrincipals;
+
+    private DbConn cnx;
 
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState, Map<String, ?> options)
     {
@@ -119,10 +120,8 @@ public class JmxLoginModule implements LoginModule
 
         try
         {
-            DbConn cnx = Helpers.getNewDbSession();
+            cnx = Helpers.getNewDbSession();
             user = RUser.selectlogin(cnx, userName);
-            userRoles = user.getRoles(cnx);
-            cnx.close();
         }
         catch (NoResultException e)
         {
@@ -194,41 +193,53 @@ public class JmxLoginModule implements LoginModule
 
         if (!loginSucceeded)
         {
+            if (cnx != null)
+                cnx.close();
             return false;
         }
 
         if (subject == null)
         {
+            if (cnx != null)
+                cnx.close();
             throw new LoginException("Subject cannot be null"); // Otherwise we cannot assign him his principals and therefore his permissions.
         }
 
         userPrincipals = new HashSet<Principal>();
         userPrincipals.add(new JmxJqmUsernamePrincipal(userName)); // To allow specific JMX permissions for specific users.
 
-        if (userRoles != null)
+        if (cnx != null && user != null)
         {
-            for (RRole r : userRoles)
+            List<RRole> userRoles = user.getRoles(cnx);
+            JmxAgent.updatePolicyFile(JmxAgent.getJmxPermissionsOfRoles(userRoles, cnx));
+            cnx.close();
+
+            if (userRoles != null)
             {
-                if (r != null)
+                for (RRole r : userRoles)
                 {
-                    String roleName = r.getName();
-                    if (roleName != null)
+                    if (r != null)
                     {
-                        userPrincipals.add(new JmxJqmRolePrincipal(roleName));
+                        String roleName = r.getName();
+                        if (roleName != null)
+                        {
+                            userPrincipals.add(new JmxJqmRolePrincipal(roleName));
+                        }
                     }
                 }
             }
-        }
-        if (!user.getInternal()) // Code taken from com.enioka.jqm.webui.shiro.JdbcRealm#getUser(String)
-        {
-            userPrincipals.add(new JmxJqmRolePrincipal("human"));
+            if (!user.getInternal()) // Code taken from com.enioka.jqm.webui.shiro.JdbcRealm#getUser(String)
+            {
+                userPrincipals.add(new JmxJqmRolePrincipal("human"));
+            }
         }
 
+        Set<Principal> subjectPrincipals = subject.getPrincipals();
         for (Principal principal : userPrincipals)
         {
-            if (!subject.getPrincipals().contains(principal))
+            if (!subjectPrincipals.contains(principal))
             {
-                subject.getPrincipals().add(principal);
+                subjectPrincipals.add(principal);
                 if (jqmlogger != null)
                 {
                     jqmlogger.debug("Added " + principal + " to subject[userName: " + userName + "]");
@@ -249,6 +260,8 @@ public class JmxLoginModule implements LoginModule
 
         if (!loginSucceeded)
         {
+            if (cnx != null)
+                cnx.close();
             return false;
         }
         else
@@ -265,6 +278,9 @@ public class JmxLoginModule implements LoginModule
             jqmlogger.debug("Logout subject[userName: " + userName + "]");
         }
 
+        if (cnx != null)
+            cnx.close();
+
         if (subject != null && userPrincipals != null)
         {
             subject.getPrincipals().removeAll(userPrincipals);
@@ -272,6 +288,7 @@ public class JmxLoginModule implements LoginModule
         loginSucceeded = false;
         commitSucceeded = false;
         userName = null;
+        user = null;
         userPrincipals = null;
         return true;
     }

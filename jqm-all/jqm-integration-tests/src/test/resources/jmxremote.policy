@@ -21,6 +21,11 @@ grant principal com.enioka.jqm.tools.JmxJqmRolePrincipal "role2" {
 		permission javax.management.MBeanPermission "com.enioka.jqm.*#*[com.enioka.jqm:*]", "queryMBeans";
 };
 
+grant principal com.enioka.jqm.tools.JmxJqmRolePrincipal "role4" {
+        permission java.net.SocketPermission "localhost:4444", "listen";
+        permission java.net.SocketPermission "localhost:5555", "listen";
+};
+
 grant principal com.enioka.jqm.tools.JmxJqmRolePrincipal "alljmx" {
 		permission javax.management.MBeanPermission "*", "*";
 };

@@ -18,8 +18,20 @@ package com.enioka.jqm.tools;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.security.CodeSigner;
+import java.security.CodeSource;
+import java.security.Permission;
+import java.security.Policy;
+import java.security.Principal;
+import java.security.ProtectionDomain;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.management.JMX;
 import javax.management.MBeanServerConnection;
@@ -36,6 +48,8 @@ import org.junit.Test;
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.RRole;
+import com.enioka.jqm.model.RUser;
 import com.enioka.jqm.pki.JdbcCa;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -154,16 +168,6 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * See
-     * {@link #jmxRemoteSslTest(JqmBaseTest, boolean, boolean, boolean, boolean, Runnable)}
-     */
-    public static void jmxRemoteSslTest(JqmBaseTest testInstance, boolean enableJmxSsl, boolean enableJmxSslAuth, boolean useClientTrustStore, boolean useClientKeyStore)
-            throws Exception
-    {
-        jmxRemoteSslTest(testInstance, enableJmxSsl, enableJmxSslAuth, useClientTrustStore, useClientKeyStore, true, true, true, true);
-    }
-
-    /**
      * Test registration of a remote JMX with or without SSL and clients
      * authentication and test connection to this remote JMX with or without a trust
      * store (containing the certificate of the internal PKI certification authority
@@ -235,7 +239,7 @@ public class JmxTest extends JqmBaseTest
                                                                                                                      // permissions, but also for other roles.
         if (roles == null || roles.length == 0)
         {
-            Helpers.createRoleIfMissing(cnx, "alljmx", "All JMX permissions");
+            Helpers.createRoleIfMissing(cnx, "alljmx", "All JMX permissions", "jmx:javax.management.MBeanPermission \"*\", \"*\"");
             roles = new String[] { "client read only", "alljmx" };
         }
         Helpers.createUserIfMissing(cnx, userName, userPass, "test user", roles);
@@ -328,22 +332,27 @@ public class JmxTest extends JqmBaseTest
         int count = mbsc.getMBeanCount();
         System.out.println(count);
 
-        // Create the job now and not before in order to create it only if the
-        // connection to "remote" JMX is succesful. Otherwise, if the job is created and
-        // the remote JMX doesn't receive the kill order because the connection isn't
-        // established, the job takes a lot of time to stop by itself.
-        CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42, "KillApp", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
-        int i = JobRequest.create("KillApp", "TestUser").submit();
-
-        TestHelpers.waitForRunning(1, 10000, cnx);
-        testInstance.sleep(1); // time to actually run, not only Loader start.
-
         String[] domains = mbsc.getDomains();
         System.out.println("*** domains:");
         for (String d : domains)
         {
             System.out.println(d);
         }
+
+        // Create the job now and not before in order to create it only if the
+        // connection to "remote" JMX is succesful and the authenticated user (if there
+        // is one) has the JMX permission to call MBeanServerConnection#getDomains().
+        // Otherwise, if the job is created and the remote JMX doesn't receive the kill
+        // order because the connection isn't established or because the authenticated
+        // user hasn't enough JMX permissions (like in
+        // JmxRemoteSslWithoutAuthMissingPermissionsTest), the job takes a lot of time
+        // to stop by itself.
+        CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42, "KillApp", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
+        int i = JobRequest.create("KillApp", "TestUser").submit();
+
+        TestHelpers.waitForRunning(1, 10000, cnx);
+        testInstance.sleep(1); // time to actually run, not only Loader start.
+
         Set<ObjectInstance> mbeans = mbsc.queryMBeans(new ObjectName("com.enioka.jqm:*"), null);
         System.out.println("*** beans in com.enioka.jqm:*: ");
         for (ObjectInstance oi : mbeans)
@@ -414,6 +423,16 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
+     * See
+     * {@link #jmxRemoteSslTest(JqmBaseTest, boolean, boolean, boolean, boolean, Runnable)}
+     */
+    public static void jmxRemoteSslTest(JqmBaseTest testInstance, boolean enableJmxSsl, boolean enableJmxSslAuth, boolean useClientTrustStore, boolean useClientKeyStore)
+            throws Exception
+    {
+        jmxRemoteSslTest(testInstance, enableJmxSsl, enableJmxSslAuth, useClientTrustStore, useClientKeyStore, true, true, true, true);
+    }
+
+    /**
      * Test registration of a remote JMX using SSL and authentication of clients for
      * connections and test connection to this remote JMX with a client having valid
      * stuff to connect (the client trusts the server and the server trusts him).
@@ -422,6 +441,212 @@ public class JmxTest extends JqmBaseTest
     public void jmxRemoteSslWithAuthWithTrustStoreAndKeyStoreTest() throws Exception
     {
         jmxRemoteSslTest(this, true, true, true, true);
+    }
+
+    /**
+     * Get the permissions of the {@code roleName} role from the current Java
+     * policy.
+     * 
+     * @param roleName
+     *                 the name of the role whose permissions are collected
+     * @return the enumeration of the permissions of the {@code roleName} role
+     */
+    static Enumeration<Permission> getRolePolicyPermissions(String roleName)
+    {
+        Principal[] principals = new Principal[] { new JmxJqmRolePrincipal(roleName) };
+        ProtectionDomain pDomain = new ProtectionDomain(new CodeSource(null, (CodeSigner[]) null), null, null, principals);
+        return Policy.getPolicy().getPermissions(pDomain).elements();
+    }
+
+    /**
+     * Check if the current Java policy gives to the {@code roleName} role all the
+     * {@code rolePerms} permissions.
+     * 
+     * @param roleName
+     *                  the name of the role whose permissions are checked
+     * @param rolePerms
+     *                  the permissions that the role is meant to have
+     * @return true if the role has all the {@code rolePerms} permissions
+     */
+    static boolean checkRolePolicyPermissions(String roleName, String[] rolePerms)
+    {
+        Enumeration<Permission> rolePolicyPerms = getRolePolicyPermissions(roleName);
+        System.out.println("# Checking policy permissions for " + roleName + " role...");
+        Map<String, List<String>> policyPerms = new HashMap<String, List<String>>();
+        while (rolePolicyPerms.hasMoreElements())
+        {
+            Permission perm = rolePolicyPerms.nextElement();
+
+            String permName = getPermissionName(perm);
+            List<String> permActions = getPermissionActions(perm);
+
+            List<String> savedPermActions = policyPerms.get(permName);
+            if (savedPermActions == null)
+            {
+                policyPerms.put(permName, permActions);
+            }
+            else
+            {
+                savedPermActions.addAll(permActions); // May have actions put several times, but it's not a problem.
+            }
+        }
+
+        boolean missingPerm = false;
+        for (String perm : rolePerms)
+        {
+            String formattedPermName = formatJmxPermission(perm);
+            if (formattedPermName == null) // Not a JMX permission, ignored
+                continue;
+
+            String permName;
+            List<String> permActions;
+            if (perm.contains("\",")) // Perm has actions
+            {
+                int nameDelimiterIndex = formattedPermName.lastIndexOf(" ");
+                permName = formattedPermName.substring(0, nameDelimiterIndex);
+                permActions = getActionsList(formattedPermName.substring(nameDelimiterIndex + 1));
+            }
+            else
+            {
+                permName = formattedPermName;
+                permActions = new ArrayList<String>();
+            }
+
+            List<String> policyPermActions = policyPerms.get(permName);
+            if (policyPermActions == null)
+            {
+                missingPerm = true;
+                System.out.println("Missing permission [" + formattedPermName + "] in policy");
+            }
+            else if (!policyPermActions.containsAll(permActions))
+            {
+                missingPerm = true;
+                System.out.println("Missing at least one action of [" + formattedPermName + "] permission in policy");
+            }
+        }
+        return !missingPerm;
+    }
+
+    /**
+     * Get the name of the given permission in a certain format.
+     * 
+     * @param perm
+     *             the permission from which the name is collected
+     * @return the name of the permission in a certain format
+     */
+    private static String getPermissionName(Permission perm)
+    {
+        return perm.getClass().getName() + " " + perm.getName();
+    }
+
+    /**
+     * Get the list of actions of the given permission
+     * 
+     * @param perm
+     *             the permission from which the actions are collected
+     * @return the list of actions of the given permission, that list is empty if
+     *         the permission has no action.
+     */
+    private static List<String> getPermissionActions(Permission perm)
+    {
+        return getActionsList(perm.getActions());
+    }
+
+    /**
+     * Get the list of actions from {@code actions} string.
+     * 
+     * @param actions
+     *                the actions separated by a ","
+     * @return the list of actions, can be empty but never null.
+     */
+    private static List<String> getActionsList(String actions)
+    {
+        return actions != null && actions.length() > 0 ? new ArrayList<String>(Arrays.asList(actions.split(","))) : new ArrayList<String>(); // A permission can have no
+                                                                                                                                             // action
+    }
+
+    private static final Pattern PERMISSION_USELESS_CHARS = Pattern.compile("[\";,]");
+
+    /**
+     * Format the {@code jqmPermName} permission name to suit the format of
+     * {@link #getPermissionName(Permission)} and {@link #getActionsList(String)} if
+     * it is a JMX permission ("jmx:" prefix), otherwise return null.
+     * 
+     * @param jqmPermName
+     *                    the name of the JQM permission saved in the database
+     * @return the formatted JMX permission, or null if the permission isn't a JMX
+     *         permission.
+     */
+    private static String formatJmxPermission(String jqmPermName)
+    {
+        return jqmPermName.startsWith("jmx:") ? PERMISSION_USELESS_CHARS.matcher(jqmPermName.substring(4)).replaceAll("").trim() : null;
+    }
+
+    /**
+     * Test {@link JmxAgent#updatePolicyFile(Map)} method, checking that the
+     * permissions saved in the JQM database are correctly added to the roles by the
+     * Java policy.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void jmxPolicyPermissionsUpdateTest() throws Exception
+    {
+        new File("./conf").mkdir();
+        new File(JmxAgent.POLICY_PATH).delete();
+        Helpers.initializeConfigFile("jmxremote.policy", JmxAgent.POLICY_PATH, JmxTest.class.getClassLoader());
+        System.setProperty("java.security.policy", JmxAgent.POLICY_PATH); // Can force to use only this policy file by appending a "=" before policyPath.
+        if (System.getSecurityManager() == null)
+        {
+            System.setSecurityManager(new SecurityManager());
+        }
+
+        String[] role1Perms = new String[] { "jmx:javax.management.MBeanPermission \"com.enioka.jqm.*#*[com.enioka.jqm:*]\", \"getDomains\"",
+                "jmx:java.net.SocketPermission \"localhost:1111\", \"listen\"" };
+        String[] role2Perms = new String[] { "jmx:javax.management.MBeanPermission \"com.enioka.jqm.*#*[com.enioka.jqm:*]\", \"queryMBeans\"",
+                "jmx:java.net.SocketPermission \"localhost:2222\", \"resolve\"", "jmx:java.lang.reflect.ReflectPermission \"suppressAccessChecks\"" };
+        String[] role3Perms = new String[] { "jmx:java.net.SocketPermission \"localhost:3333\", \"listen\"" };
+        String[] role4Perms = new String[] { "jmx:java.net.SocketPermission \"localhost:4444\", \"listen\"" };
+        Helpers.createRoleIfMissing(cnx, "role1", "Some JMX permissions", role1Perms);
+        Helpers.createRoleIfMissing(cnx, "role2", "Some JMX permissions", role2Perms);
+        Helpers.createRoleIfMissing(cnx, "role3", "Some JMX permissions", role3Perms);
+        Helpers.createRoleIfMissing(cnx, "role4", "Some JMX permissions", role4Perms);
+
+        // Get roles from the database and update policy the same way that
+        // JmxLoginModule does, ie with an user:
+        String userName = "testuser";
+        String userPass = "password";
+        Helpers.createUserIfMissing(cnx, userName, userPass, "test user", "role1", "role2", "role3", "role4");
+        List<RRole> roles = RUser.selectlogin(cnx, userName).getRoles(cnx);
+        JmxAgent.updatePolicyFile(JmxAgent.getJmxPermissionsOfRoles(roles, cnx));
+        cnx.close();
+
+        // Role 1 is defined in jmxremote.policy test file, some permissions are added
+        // from the database (defined in role1Perms) and should be present after
+        // updating the policy file:
+        Assert.assertTrue(JmxTest.checkRolePolicyPermissions("role1", role1Perms));
+
+        // Role 2 is defined in jmxremote.policy test file, some permissions are added
+        // from the database (defined in role2Perms) and some permissions are not added
+        // but checked if they are present after updating the policy file (to check that
+        // JmxTest#checkRolePolicyPermissions works)
+        // (java.lang.reflect.ReflectPermission "suppressAccessChecks" permission has no
+        // action, but should be added without problem):
+        Assert.assertTrue(JmxTest.checkRolePolicyPermissions("role2", role2Perms));
+        Assert.assertFalse(JmxTest.checkRolePolicyPermissions("role2", new String[] {
+                "jmx:javax.management.MBeanPermission \"com.enioka.jqm.*#*[com.enioka.jqm:*]\", \"queryMBeans\"",
+                "jmx:java.net.SocketPermission \"localhost:2222\", \"resolve\"", "jmx:java.lang.reflect.ReflectPermission \"suppressAccessChecks\"",
+                "jmx:java.net.SocketPermission \"localhost:2222\", \"listen\"", "jmx:java.net.SocketPermission \"localhost:4444\", \"resolve\"" }));
+
+        // Role 3 is not defined in jmxremote.policy test file, it is completely created
+        // from database after updating the policy file:
+        Assert.assertTrue(JmxTest.checkRolePolicyPermissions("role3", role3Perms));
+
+        // Role 4 is defined in jmxremote.policy test file, it has permission
+        // [java.net.SocketPermission "localhost:5555", "listen"] that isn't in the
+        // database, it should be removed after updating the policy file:
+        Assert.assertTrue(JmxTest.checkRolePolicyPermissions("role4", role4Perms));
+        Assert.assertFalse(JmxTest.checkRolePolicyPermissions("role4", new String[] { "jmx:java.net.SocketPermission \"localhost:5555\", \"listen\"" }));
     }
 
 }
