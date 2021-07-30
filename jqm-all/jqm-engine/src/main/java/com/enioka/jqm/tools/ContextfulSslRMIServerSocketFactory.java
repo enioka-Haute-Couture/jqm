@@ -60,15 +60,7 @@ public class ContextfulSslRMIServerSocketFactory implements RMIServerSocketFacto
 
     public boolean equals(Object obj)
     {
-        if (obj == this)
-        {
-            return true;
-        }
-        else if (obj == null || getClass() != obj.getClass())
-        {
-            return false;
-        }
-        return true;
+        return obj == this || (obj != null && getClass() == obj.getClass());
     }
 
 }

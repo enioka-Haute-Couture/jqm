@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.NonUniqueResultException;
+import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.RUser;
 
@@ -121,7 +122,26 @@ public class JmxLoginModule implements LoginModule
         try
         {
             cnx = Helpers.getNewDbSession();
+
+            boolean useSsl = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableJmxSsl", "false"));
+            boolean sslNeedClientAuth = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "enableJmxSslAuth", "false"));
+
+            if (useSsl)
+            {
+                if (sslNeedClientAuth && !JmxSslHandshakeListener.getInstance().userSucceededSslHandshake(userName))
+                {
+                    throw new LoginException("Provided username does not match provided SSL client certificate Common Name if any was provided");
+                    // In reality, no client certificate, with the Common Name equal to the provided
+                    // username, has been used for a successful SSL handshake before this method
+                    // call.
+                }
+            }
+
             user = RUser.selectlogin(cnx, userName);
+        }
+        catch (LoginException e)
+        {
+            throw e;
         }
         catch (NoResultException e)
         {

@@ -42,7 +42,6 @@ import javax.naming.spi.NamingManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
-import javax.rmi.ssl.SslRMIClientSocketFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,7 +167,7 @@ final class JmxAgent
                 System.setProperty("com.sun.management.jmxremote.ssl.need.client.auth", Boolean.toString(sslNeedClientAuth));
 
                 RMIServerSocketFactory ssf = null;
-                // System.setProperty("javax.net.debug", "all");
+//                System.setProperty("javax.net.debug", "all");
 
                 try
                 {
@@ -219,7 +218,7 @@ final class JmxAgent
                     jqmlogger.error("JQM could not setup correctly the SSL context for the JMX remote agent", e);
                 }
 
-                env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, new SslRMIClientSocketFactory());
+                env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, new ListenedSslRMIClientSocketFactory());
                 env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, ssf);
 
                 // Used from Java 6 to Java 10 (not tested with greater versions):

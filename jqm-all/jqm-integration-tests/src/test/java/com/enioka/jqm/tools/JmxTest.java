@@ -286,10 +286,10 @@ public class JmxTest extends JqmBaseTest
             env.put(JMXConnector.CREDENTIALS, credentials);
         }
 
-        String pfxPassword = GlobalParameter.getParameter(cnx, "pfxPassword", "SuperPassword");
+        final String pfxPassword = GlobalParameter.getParameter(cnx, "pfxPassword", "SuperPassword");
 
-        String trustStorePath = "./conf/trusted.jks";
-        String keyStorePath = "./conf/client.pfx";
+        final String trustStorePath = "./conf/trusted.jks";
+        final String keyStorePath = "./conf/client.pfx";
 
         if (createClientStore)
         {
