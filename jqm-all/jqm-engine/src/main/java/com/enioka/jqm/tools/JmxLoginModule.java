@@ -268,6 +268,11 @@ public class JmxLoginModule implements LoginModule
         }
 
         commitSucceeded = true;
+
+        // A new SSL session will be established by JMX after JmxLoginModule process.
+        // Ignoring its success for authentication check. See
+        // JmxSslHandshakeListener#SSL_SUCCESS_IGNORE_TIME for more explanations.
+        JmxSslHandshakeListener.getInstance().ignoreUserSslHandshakeSuccesses(userName);
         return commitSucceeded;
     }
 
@@ -282,6 +287,7 @@ public class JmxLoginModule implements LoginModule
         {
             if (cnx != null)
                 cnx.close();
+            JmxSslHandshakeListener.getInstance().clearUserSslHandshakeSuccess(userName);
             return false;
         }
         else
@@ -307,6 +313,7 @@ public class JmxLoginModule implements LoginModule
         }
         loginSucceeded = false;
         commitSucceeded = false;
+        JmxSslHandshakeListener.getInstance().clearUserSslHandshakeSuccess(userName);
         userName = null;
         user = null;
         userPrincipals = null;
