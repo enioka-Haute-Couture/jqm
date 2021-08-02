@@ -79,18 +79,29 @@ final class JmxAgent
      * enabled, supposing that when an user enables SSL, he wants a minimum of
      * access security. This authentication, managed by {@link JmxLoginModule}, is
      * independent of SSL client authentication (that can be disabled with
-     * enableJmxSslAuth global parameter) and gives permissions to an authenticated
-     * user depending on his roles. This allows to delete an account from the
-     * database and prevent his (previous) owner from continuing to connect to the
-     * remote JMX and being authenticated with his trusted certificate. Indeed, it
-     * isn't easy to make a trusted certificate no longer trusted, but it is easy to
-     * delete an account from the database. Currently, any trusted client
-     * certificate can be used to connect to the remote JMX with SSL and SSL client
-     * authentification with a valid (username, password) couple, the provided
-     * username isn't compared to the username written in the certificate. It would
-     * be good to find a way to check that they are the same. <br>
-     * JMX permissions are configurable in the conf/jmxremote.policy config file for
-     * each role and each user.
+     * {@code enableJmxSslAuth} global parameter) and gives permissions to an
+     * authenticated user depending on his roles. This allows to delete an account
+     * from the database and prevent his (previous) owner from continuing to connect
+     * to the remote JMX and being authenticated with his trusted certificate.
+     * Indeed, it isn't easy to make a trusted certificate no longer trusted, but it
+     * is easy to delete an account from the database. <br>
+     * Currently, to connect to the remote JMX with SSL and SSL client
+     * authentication with a valid (username, password) credentials couple, the
+     * provided username must be the Common Name of a recently provided SSL client
+     * certificate. Idealy, we could find a way to get the client certificate used
+     * for the SSL connection from {@link JmxLoginModule}. But for now we only save
+     * the time of last successful SSL handshake for each username and check that
+     * the process of {@link JmxLoginModule} for an user happens shortly after his
+     * last successful SSL handshake. <br>
+     * See {@link JmxLoginModule} and {@link JmxSslHandshakeListener} for more
+     * details.<br>
+     * <br>
+     * JMX permissions are saved in the {@code conf/jmxremote.policy} config file
+     * for each role and each user. These permissions are updated with the database,
+     * using {@link #updatePolicyFile(Map)}. Therefore, any Java policy permission
+     * can be specified in the {@code conf/jmxremote.policy} file, but permissions
+     * of JQM roles must be changed in the database (prefix "jmx:"), otherwise they
+     * will be lost.
      * 
      * @param registryPort
      *                     the port of the JMX remote registry
@@ -149,14 +160,14 @@ final class JmxAgent
                     System.setSecurityManager(new SecurityManager());
                 }
 
-                env = new HashMap<String, Object>();
+                final String keyStorePath = "./conf/keystore.pfx";
+                final String trustStorePath = "./conf/trusted.jks";
 
                 // From JettyServer class:
                 if (useInternalPki)
                 {
                     jqmlogger.info("JQM will use its internal PKI for all certificates as parameter enableInternalPki is 'true'");
-                    JdbcCa.prepareWebServerStores(cnx, "CN="
-                            + hostname, "./conf/keystore.pfx", "./conf/trusted.jks", pfxPassword, hostname, "./conf/server.cer", "./conf/ca.cer");
+                    JdbcCa.prepareWebServerStores(cnx, "CN=" + hostname, keyStorePath, trustStorePath, pfxPassword, hostname, "./conf/server.cer", "./conf/ca.cer");
                 }
 
                 // Following instructions of
@@ -174,7 +185,6 @@ final class JmxAgent
                     // Load the SSL keystore properties
                     char[] pfxPasswordChars = pfxPassword != null ? pfxPassword.toCharArray() : null;
 
-                    final String keyStorePath = "./conf/keystore.pfx";
                     KeyStore ks = null;
                     ks = KeyStore.getInstance("PKCS12");
                     FileInputStream ksfis = new FileInputStream(keyStorePath);
@@ -189,7 +199,6 @@ final class JmxAgent
                     KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
                     kmf.init(ks, pfxPasswordChars);
 
-                    final String trustStorePath = "./conf/trusted.jks";
                     KeyStore ts = null;
                     ts = KeyStore.getInstance("JKS");
                     FileInputStream tsfis = new FileInputStream(trustStorePath);
@@ -218,10 +227,11 @@ final class JmxAgent
                     jqmlogger.error("JQM could not setup correctly the SSL context for the JMX remote agent", e);
                 }
 
+                env = new HashMap<String, Object>();
                 env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, new ListenedSslRMIClientSocketFactory());
                 env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE, ssf);
 
-                // Used from Java 6 to Java 10 (not tested with greater versions):
+                // Used from Java 6 to Java 10 (not tested with lower or greater versions):
                 env.put("jmx.remote.x.authenticate", true);
                 env.put("jmx.remote.x.login.config", "JmxLoginConfig");
             }

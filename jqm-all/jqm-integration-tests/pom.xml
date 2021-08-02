@@ -205,21 +205,6 @@
 						</execution>
 					</executions>
 				</plugin>
-
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<version>${surefire.version}</version>
-					<configuration>
-						<systemPropertyVariables>
-							<SAUCE_URL>${SAUCE_URL}</SAUCE_URL>
-							<SAUCE_ACCESS_KEY>${SAUCE_ACCESS_KEY}</SAUCE_ACCESS_KEY>
-							<SAUCE_USERNAME>${SAUCE_USERNAME}</SAUCE_USERNAME>
-						</systemPropertyVariables>
-						<forkCount>1</forkCount>
-						<reuseForks>false</reuseForks>
-					</configuration>
-				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>

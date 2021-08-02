@@ -210,4 +210,12 @@ public class JmxSslHandshakeListener implements HandshakeCompletedListener
         }
     }
 
+    /**
+     * Reset all data of {@link #sslSuccessClientsUsernames};
+     */
+    public void reset()
+    {
+        sslSuccessClientsUsernames.clear();
+    }
+
 }

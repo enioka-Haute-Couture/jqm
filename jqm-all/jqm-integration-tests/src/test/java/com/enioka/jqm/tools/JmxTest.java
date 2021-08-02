@@ -16,14 +16,22 @@
 package com.enioka.jqm.tools;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.StringReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.rmi.ConnectIOException;
+import java.security.AccessControlException;
 import java.security.CodeSigner;
 import java.security.CodeSource;
+import java.security.KeyFactory;
+import java.security.KeyStore;
 import java.security.Permission;
 import java.security.Policy;
 import java.security.Principal;
 import java.security.ProtectionDomain;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -40,8 +48,15 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.util.io.pem.PemReader;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -50,7 +65,9 @@ import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.model.RUser;
+import com.enioka.jqm.pki.CertificateRequest;
 import com.enioka.jqm.pki.JdbcCa;
+import com.enioka.jqm.pki.PkiException;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
@@ -175,17 +192,8 @@ public class JmxTest extends JqmBaseTest
      * certificate of a test user trusted by the previous certification authority)
      * and correct credentials. <br>
      * SSL client authentication and credentials authentication are independent as
-     * explained in {@link JmxAgent#registerAgent(int, int, String, DbConn)}. <br>
-     * <br>
-     * Each test must be executed in its own JVM. Indeed, the connection to JMX uses
-     * the default SSL Context manager because it doesn't seem that it is (anymore
-     * ?) possible to use a custom one despite informations that we can find on the
-     * internet. This default SSL Context saves trust and key stores in cache and
-     * never reloads the files where they come from. This cache is lost when using a
-     * new JVM. That is the reason why this test must be executed in its own JVM.
+     * explained in {@link JmxAgent#registerAgent(int, int, String, DbConn)}.
      * 
-     * @param testInstance
-     *                            the instance of the running test
      * @param enableJmxSsl
      *                            = true if the test must register the remote JMX
      *                            Agent with SSL enabled
@@ -223,11 +231,11 @@ public class JmxTest extends JqmBaseTest
      *                            the list of roles to give to the test user.
      * @throws Exception
      */
-    public static void jmxRemoteSslTest(JqmBaseTest testInstance, boolean enableJmxSsl, boolean enableJmxSslAuth, boolean useClientTrustStore, boolean useClientKeyStore,
-            boolean createClientStore, boolean useCredentials, boolean useExistingUsername, boolean useCorrectPassword, String... roles) throws Exception
+    public void jmxRemoteSslTest(boolean enableJmxSsl, boolean enableJmxSslAuth, boolean useClientTrustStore, boolean useClientKeyStore, boolean createClientStore,
+            boolean useCredentials, boolean useExistingUsername, boolean useCorrectPassword, String... roles) throws Exception
     {
-        DbConn cnx = testInstance.cnx;
         JmxAgent.unregisterAgent();
+        JmxSslHandshakeListener.getInstance().reset();
 
         Helpers.setSingleParam("enableJmxSsl", Boolean.toString(enableJmxSsl), cnx);
         Helpers.setSingleParam("enableJmxSslAuth", Boolean.toString(enableJmxSslAuth), cnx);
@@ -260,9 +268,9 @@ public class JmxTest extends JqmBaseTest
         cnx.commit();
 
         // Go
-        testInstance.addAndStartEngine();
+        addAndStartEngine();
         TestHelpers.waitForRunning(1, 10000, cnx);
-        testInstance.sleep(1); // time to actually run, not only Loader start.
+        sleep(1); // time to actually run, not only Loader start.
 
         // Connect to JMX server
         // following instructions of
@@ -296,33 +304,48 @@ public class JmxTest extends JqmBaseTest
             // From JettyTest class:
             JdbcCa.prepareClientStore(cnx, "CN=" + userName, keyStorePath, pfxPassword, "client-cert", "./conf/client.cer");
         }
-        // System properties are JVM related, they are lost at the end of execution
-        // (https://stackoverflow.com/questions/21204334/system-setproperty-and-system-getproperty):
-        if (useClientTrustStore)
-        {
-            System.setProperty("javax.net.ssl.trustStore", trustStorePath);
-            System.setProperty("javax.net.ssl.trustStoreType", "JKS");
-            System.setProperty("javax.net.ssl.trustStorePassword", pfxPassword);
-        }
-        else
-        {
-            System.clearProperty("javax.net.ssl.trustStore");
-            System.clearProperty("javax.net.ssl.trustStoreType");
-            System.clearProperty("javax.net.ssl.trustStorePassword");
-        }
 
+        char[] pfxPasswordChars = pfxPassword != null ? pfxPassword.toCharArray() : null;
+
+        KeyStore ks = null;
+        KeyManagerFactory kmf = null;
         if (useClientKeyStore)
         {
-            System.setProperty("javax.net.ssl.keyStore", keyStorePath);
-            System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
-            System.setProperty("javax.net.ssl.keyStorePassword", pfxPassword);
+            ks = KeyStore.getInstance("PKCS12");
+            FileInputStream ksfis = new FileInputStream(keyStorePath);
+            try
+            {
+                ks.load(ksfis, pfxPasswordChars);
+            }
+            finally
+            {
+                ksfis.close();
+            }
+            kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(ks, pfxPasswordChars);
         }
-        else
+
+        KeyStore ts = null;
+        TrustManagerFactory tmf = null;
+        if (useClientTrustStore)
         {
-            System.clearProperty("javax.net.ssl.keyStore");
-            System.clearProperty("javax.net.ssl.keyStoreType");
-            System.clearProperty("javax.net.ssl.keyStorePassword");
+            ts = KeyStore.getInstance("JKS");
+            FileInputStream tsfis = new FileInputStream(trustStorePath);
+            try
+            {
+                ts.load(tsfis, pfxPasswordChars);
+            }
+            finally
+            {
+                tsfis.close();
+            }
+            tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init((KeyStore) ts);
         }
+
+        SSLContext sslctx = SSLContext.getInstance("TLSv1");
+        sslctx.init(useClientKeyStore ? kmf.getKeyManagers() : null, useClientTrustStore ? tmf.getTrustManagers() : null, null);
+        SSLContext.setDefault(sslctx);
 
         // From JmxTest#jmxRemoteTest method:
         JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://" + hn + ":" + port1 + "/jndi/rmi://" + hn + ":" + port2 + "/jmxrmi");
@@ -351,7 +374,7 @@ public class JmxTest extends JqmBaseTest
         int i = JobRequest.create("KillApp", "TestUser").submit();
 
         TestHelpers.waitForRunning(1, 10000, cnx);
-        testInstance.sleep(1); // time to actually run, not only Loader start.
+        sleep(1); // time to actually run, not only Loader start.
 
         Set<ObjectInstance> mbeans = mbsc.queryMBeans(new ObjectName("com.enioka.jqm:*"), null);
         System.out.println("*** beans in com.enioka.jqm:*: ");
@@ -426,10 +449,9 @@ public class JmxTest extends JqmBaseTest
      * See
      * {@link #jmxRemoteSslTest(JqmBaseTest, boolean, boolean, boolean, boolean, Runnable)}
      */
-    public static void jmxRemoteSslTest(JqmBaseTest testInstance, boolean enableJmxSsl, boolean enableJmxSslAuth, boolean useClientTrustStore, boolean useClientKeyStore)
-            throws Exception
+    public void jmxRemoteSslTest(boolean enableJmxSsl, boolean enableJmxSslAuth, boolean useClientTrustStore, boolean useClientKeyStore) throws Exception
     {
-        jmxRemoteSslTest(testInstance, enableJmxSsl, enableJmxSslAuth, useClientTrustStore, useClientKeyStore, true, true, true, true);
+        jmxRemoteSslTest(enableJmxSsl, enableJmxSslAuth, useClientTrustStore, useClientKeyStore, true, true, true, true);
     }
 
     /**
@@ -440,8 +462,311 @@ public class JmxTest extends JqmBaseTest
     @Test
     public void jmxRemoteSslWithAuthWithTrustStoreAndKeyStoreTest() throws Exception
     {
-        jmxRemoteSslTest(this, true, true, true, true);
+        jmxRemoteSslTest(true, true, true, true);
     }
+
+    /**
+     * Test registration of a remote JMX using SSL without clients authentication
+     * for connections and test connection to this remote JMX with a client having
+     * valid stuff to connect (the client trusts the server).
+     */
+    @Test
+    public void jmxRemoteSslWithoutAuthWithTrustStoreTest() throws Exception
+    {
+        jmxRemoteSslTest(true, false, true, false);
+    }
+
+    /**
+     * Test registration of a remote JMX using SSL and authentication of clients for
+     * connections and test connection to this remote JMX with a client having valid
+     * SSL stuff to connect (the client trusts the server and the server trusts him)
+     * but not providing credentials.
+     * 
+     * @throws SecurityException
+     */
+    @Test(expected = SecurityException.class)
+    public void jmxRemoteSslWithAuthWithoutCredentialsTest() throws Exception
+    {
+        jmxRemoteSslTest(true, true, true, true, true, false, false, false);
+    }
+
+    /**
+     * Test registration of a remote JMX using SSL and authentication of clients for
+     * connections and test connection to this remote JMX with a client having valid
+     * SSL stuff to connect (the client trusts the server and the server trusts him)
+     * but not providing an existing username in credentials.
+     * 
+     * @throws SecurityException
+     */
+    @Test(expected = SecurityException.class)
+    public void jmxRemoteSslWithAuthWithoutExistingUsernameTest() throws Exception
+    {
+        jmxRemoteSslTest(true, true, true, true, true, true, false, false);
+    }
+
+    /**
+     * Test registration of a remote JMX using SSL without clients authentication
+     * for connections and test connection to this remote JMX with a client not
+     * having valid stuff to connect (the client doesn't trust the server and
+     * doesn't provide his key store to connect).
+     * 
+     * @throws ConnectIOException
+     */
+    @Test(expected = ConnectIOException.class)
+    public void jmxRemoteSslWithAuthWithoutTrustStoreAndKeyStoreTest() throws Exception
+    {
+        jmxRemoteSslTest(true, true, false, false);
+    }
+
+    /**
+     * Test registration of a remote JMX using SSL without clients authentication
+     * for connections and test connection to this remote JMX with a client not
+     * having valid stuff to connect (the client doesn't trust the server).
+     * 
+     * @throws ConnectIOException
+     */
+    @Test(expected = ConnectIOException.class)
+    public void jmxRemoteSslWithAuthWithoutTrustStoreWithKeyStoreTest() throws Exception
+    {
+        jmxRemoteSslTest(true, true, false, true);
+    }
+
+    /**
+     * Test registration of a remote JMX using SSL with clients authentication for
+     * connections and test connection to this remote JMX with a client not having
+     * valid stuff to connect (the client trusts the server but doesn't provide his
+     * key store to connect, therefore he can not prove that he is the owner of a
+     * trusted certificate).
+     * 
+     * @throws ConnectIOException
+     */
+    @Test(expected = ConnectIOException.class)
+    public void jmxRemoteSslWithAuthWithTrustStoreWithoutKeyStoreTest() throws Exception
+    {
+        jmxRemoteSslTest(true, true, true, false);
+    }
+
+    // -----
+
+    /**
+     * Code taken from {@link JdbcCa} class of JQM internal PKI.
+     */
+    static CertificateRequest generateUntrustedCA()
+    {
+        String caAlias = "JQM-UNTRUSTED-CA";
+
+        CertificateRequest cr = new CertificateRequest();
+
+        // Create the CA certificate and PK
+        cr.generateCA(caAlias);
+
+        try
+        {
+            // Public (X509 certificate)
+            String pemCert = cr.writePemPublicToString();
+            StringReader sr = new StringReader(pemCert);
+            PemReader pr = new PemReader(sr);
+            cr.setHolder(new X509CertificateHolder(pr.readPemObject().getContent()));
+            pr.close();
+
+            // Private key
+            String pemPrivate = cr.writePemPrivateToString();
+            sr = new StringReader(pemPrivate);
+            PEMParser pp = new PEMParser(sr);
+            PEMKeyPair caKeyPair = (PEMKeyPair) pp.readObject();
+            pp.close();
+            byte[] encodedPrivateKey = caKeyPair.getPrivateKeyInfo().getEncoded();
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(encodedPrivateKey);
+            cr.setPrivateKey(keyFactory.generatePrivate(privateKeySpec));
+        }
+        catch (Exception e)
+        {
+            throw new PkiException(e);
+        }
+
+        return cr;
+    }
+
+    /**
+     * Code taken from {@link JdbcCa} class of JQM internal PKI.
+     */
+    static void prepareClientStoreWithUntrustedCA(String subject, String pfxPath, String pfxPassword, String prettyName)
+    {
+        File pfx = new File(pfxPath);
+
+        if (pfx.canRead())
+        {
+            return;
+        }
+
+        CertificateRequest ca = generateUntrustedCA();
+
+        CertificateRequest srv = new CertificateRequest();
+        srv.generateClientCert(prettyName, ca.getHolder(), ca.getPrivateKey(), subject);
+        try
+        {
+            FileOutputStream pfxStore = new FileOutputStream(pfxPath);
+            srv.writePfxToFile(pfxStore, pfxPassword);
+            pfxStore.close();
+        }
+        catch (Exception e)
+        {
+            throw new PkiException(e);
+        }
+
+        // srv.writePemPublicToFile(cerPath); Not useful for this test.
+    }
+
+    /**
+     * Test registration of a remote JMX using SSL with authentication of users for
+     * connections and test connection to this remote JMX with a client not having
+     * valid stuff to connect (the client uses an untrusted certificate to
+     * authenticate).
+     * 
+     * @throws ConnectIOException
+     */
+    @Test(expected = ConnectIOException.class)
+    public void jmxRemoteSslWithAuthWithUntrustedClientCertificateTest() throws Exception
+    {
+        new File("./conf").mkdir();
+        prepareClientStoreWithUntrustedCA("CN=testuser", "./conf/client.pfx", "SuperPassword", "client-cert");
+        jmxRemoteSslTest(true, true, true, true, false, true, true, true);
+    }
+
+    // -----
+
+    /**
+     * Test registration of a remote JMX using SSL and authentication of clients for
+     * connections and test connection to this remote JMX with a client not having
+     * valid stuff to connect (the client trusts the server and the server trusts
+     * him but the client certificate used has a Common Name different from the
+     * username provided in credentials).
+     */
+    @Test(expected = SecurityException.class)
+    public void jmxRemoteSslWithAuthWithWrongClientCertificateTest() throws Exception
+    {
+        new File("./conf").mkdir();
+        JdbcCa.prepareClientStore(cnx, "CN=wrongUsername", "./conf/client.pfx", "SuperPassword", "client-cert", "./conf/client.cer");
+        jmxRemoteSslTest(true, true, true, true, false, true, true, true);
+    }
+
+    /**
+     * Test registration of a remote JMX using SSL and authentication of clients for
+     * connections and test connection to this remote JMX with a client having valid
+     * SSL stuff to connect (the client trusts the server and the server trusts him)
+     * but not providing the correct password in credentials.
+     * 
+     * @throws SecurityException
+     */
+    @Test(expected = SecurityException.class)
+    public void jmxRemoteSslWithAuthWithWrongPasswordTest() throws Exception
+    {
+        jmxRemoteSslTest(true, true, true, true, true, true, true, false);
+    }
+
+    /**
+     * Test registration of a remote JMX using SSL without clients authentication
+     * for connections and test connection to this remote JMX with a client having
+     * valid stuff to connect (the client trusts the server) and having one role not
+     * giving all the JMX permissions required to execute the
+     * {@link JmxTest#jmxRemoteSslTest(JqmBaseTest, boolean, boolean, boolean, boolean, Runnable, boolean, boolean, boolean, String...)}
+     * test successfully.
+     * 
+     * @throws AccessControlException
+     */
+    @Test(expected = AccessControlException.class)
+    public void jmxRemoteSslWithoutAuthMissingPermissionsTest() throws Exception
+    {
+        Helpers.createRoleIfMissing(cnx, "role1", "Some JMX permissions", "jmx:javax.management.MBeanPermission \"com.enioka.jqm.*#*[com.enioka.jqm:*]\", \"queryMBeans\"");
+        jmxRemoteSslTest(true, false, true, false, true, true, true, true, "role1");
+    }
+
+    /**
+     * Test registration of a remote JMX using SSL without clients authentication
+     * for connections and test connection to this remote JMX with a client having
+     * valid stuff to connect (the client trusts the server) and roles giving all
+     * the JMX permissions required to execute the
+     * {@link JmxTest#jmxRemoteSslTest(JqmBaseTest, boolean, boolean, boolean, boolean, Runnable, boolean, boolean, boolean, String...)}
+     * test successfully.
+     */
+    @Test
+    public void jmxRemoteSslWithoutAuthPermissionsTest() throws Exception
+    {
+        String[] role1Perms = new String[] { "jmx:javax.management.MBeanPermission \"com.enioka.jqm.*#*[com.enioka.jqm:*]\", \"getDomains\"",
+                "jmx:java.net.SocketPermission \"localhost:1111\", \"resolve\"" };
+        String[] role2Perms = new String[] { "jmx:javax.management.MBeanPermission \"com.enioka.jqm.*#*[com.enioka.jqm:*]\", \"queryMBeans\"",
+                "jmx:java.net.SocketPermission \"localhost:2222\", \"listen\"", "jmx:java.lang.reflect.ReflectPermission \"suppressAccessChecks\"" };
+        String[] role3Perms = new String[] { "jmx:java.net.SocketPermission \"localhost:3333\", \"listen\"" };
+        Helpers.createRoleIfMissing(cnx, "role1", "Some JMX permissions", role1Perms);
+        Helpers.createRoleIfMissing(cnx, "role2", "Some JMX permissions", role2Perms);
+        Helpers.createRoleIfMissing(cnx, "role3", "Some JMX permissions", role3Perms);
+
+        jmxRemoteSslTest(true, false, true, false, true, true, true, true, "role1", "role2", "role3");
+        Assert.assertTrue(JmxTest.checkRolePolicyPermissions("role1", role1Perms));
+        Assert.assertTrue(JmxTest.checkRolePolicyPermissions("role2", role2Perms));
+
+        // Role 3 is not defined in jmxremote.policy test file, it is completely created
+        // from database after updating the policy file:
+        Assert.assertTrue(JmxTest.checkRolePolicyPermissions("role3", role3Perms));
+    }
+
+    /**
+     * Test registration of a remote JMX using SSL without clients authentication
+     * for connections and test connection to this remote JMX with a client having
+     * valid SSL stuff to connect (the client trusts the server) but not providing
+     * credentials.
+     * 
+     * @throws SecurityException
+     */
+    @Test(expected = SecurityException.class)
+    public void jmxRemoteSslWithoutAuthWithoutCredentialsTest() throws Exception
+    {
+        jmxRemoteSslTest(true, false, true, false, true, false, false, false);
+    }
+
+    /**
+     * Test registration of a remote JMX using SSL without clients authentication
+     * for connections and test connection to this remote JMX with a client having
+     * valid SSL stuff to connect (the client trusts the server) but not providing
+     * an existing username in credentials.
+     * 
+     * @throws SecurityException
+     */
+    @Test(expected = SecurityException.class)
+    public void jmxRemoteSslWithoutAuthWithoutExistingUsernameTest() throws Exception
+    {
+        jmxRemoteSslTest(true, true, true, true, true, true, false, false);
+    }
+
+    /**
+     * Test registration of a remote JMX using SSL without authentication of clients
+     * for connections and test connection to this remote JMX with a client not
+     * having valid stuff to connect (the client doesn't trust the server).
+     * 
+     * @throws ConnectIOException
+     */
+    @Test(expected = ConnectIOException.class)
+    public void jmxRemoteSslWithoutAuthWithoutTrustStoreTest() throws Exception
+    {
+        jmxRemoteSslTest(true, false, false, false);
+    }
+
+    /**
+     * Test registration of a remote JMX using SSL without clients authentication
+     * for connections and test connection to this remote JMX with a client having
+     * valid SSL stuff to connect (the client trusts the server) but not providing
+     * the correct password in credentials.
+     * 
+     * @throws SecurityException
+     */
+    @Test(expected = SecurityException.class)
+    public void jmxRemoteSslWithoutAuthWithWrongPasswordTest() throws Exception
+    {
+        jmxRemoteSslTest(true, true, true, true, true, true, true, false);
+    }
+
+    // -----
 
     /**
      * Get the permissions of the {@code roleName} role from the current Java
