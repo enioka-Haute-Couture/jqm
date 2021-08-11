@@ -1,5 +1,12 @@
 import React, { useState, useCallback, useRef, useMemo } from "react";
-import { Container, Grid, IconButton, Tooltip, Badge } from "@material-ui/core";
+import {
+    Container,
+    Grid,
+    IconButton,
+    Tooltip,
+    Badge,
+    Typography,
+} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import MUIDataTable from "mui-datatables";
 import HelpIcon from "@material-ui/icons/Help";
@@ -80,10 +87,10 @@ export const JndiPage: React.FC = () => {
     );
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
-    const handleOnEdit = useCallback(
-        (tableMeta) => setEditingRowId(tableMeta.rowIndex),
-        []
-    );
+    const handleOnEdit = useCallback((tableMeta) => {
+        setIsSingleton(tableMeta.rowData[7]);
+        setEditingRowId(tableMeta.rowIndex);
+    }, []);
 
     const columns = [
         {
@@ -167,6 +174,48 @@ export const JndiPage: React.FC = () => {
             },
         },
         {
+            name: "parameters",
+            label: "Parameters",
+            options: {
+                filter: true,
+                sort: false,
+                customBodyRender: (value: any, tableMeta: any) => {
+                    const parameters = tableMeta.rowData[2];
+                    const badge = (
+                        <Badge
+                            badgeContent={parameters ? parameters.length : 0}
+                            color="primary"
+                        >
+                            <SettingsIcon />
+                        </Badge>
+                    );
+                    return editingRowId === tableMeta.rowIndex ? (
+                        <Tooltip
+                            title={
+                                editingRowId === tableMeta.rowIndex
+                                    ? "Click to edit parameters"
+                                    : ""
+                            }
+                        >
+                            <span
+                                style={{ cursor: "pointer" }}
+                                onClick={() => {
+                                    const [roleId] = tableMeta.rowData;
+                                    setCurrentSelectedResource(
+                                        tableMeta.rowData
+                                    );
+                                }}
+                            >
+                                {badge}
+                            </span>
+                        </Tooltip>
+                    ) : (
+                        badge
+                    );
+                },
+            },
+        },
+        {
             name: "",
             label: "Actions",
             options: {
@@ -177,27 +226,28 @@ export const JndiPage: React.FC = () => {
                     handleOnSave,
                     handleOnDelete,
                     editingRowId,
-                    handleOnEdit,
-                    [
-                        {
-                            title: "Edit Parameters",
-                            addIcon: (tableMeta: any) => {
-                                const parameters = tableMeta.rowData[2];
-                                return (
-                                    <Badge
-                                        badgeContent={
-                                            parameters ? parameters.length : 0
-                                        }
-                                        color="primary"
-                                    >
-                                        <SettingsIcon />
-                                    </Badge>
-                                );
-                            },
-                            action: (tableMeta: any) =>
-                                setCurrentSelectedResource(tableMeta.rowData),
-                        },
-                    ]
+                    handleOnEdit
+                    // [
+                    //     {
+                    //         title: "Edit Parameters",
+                    //         addIcon: (tableMeta: any) => {
+                    //             const parameters = tableMeta.rowData[2];
+                    //             setCurrentSelectedResource(tableMeta.rowData);
+                    //             return (
+                    //                 <Badge
+                    //                     badgeContent={
+                    //                         parameters ? parameters.length : 0
+                    //                     }
+                    //                     color="primary"
+                    //                 >
+                    //                     <SettingsIcon />
+                    //                 </Badge>
+                    //             );
+                    //         },
+                    //         action: (tableMeta: any) =>
+                    //             setCurrentSelectedResource(tableMeta.rowData),
+                    //     },
+                    // ]
                 ),
             },
         },
