@@ -736,7 +736,7 @@ public class JmxTest extends JqmBaseTest
     @Test(expected = SecurityException.class)
     public void jmxRemoteSslWithoutAuthWithoutExistingUsernameTest() throws Exception
     {
-        jmxRemoteSslTest(true, true, true, true, true, true, false, false);
+        jmxRemoteSslTest(true, false, true, true, true, true, false, false);
     }
 
     /**
@@ -763,7 +763,7 @@ public class JmxTest extends JqmBaseTest
     @Test(expected = SecurityException.class)
     public void jmxRemoteSslWithoutAuthWithWrongPasswordTest() throws Exception
     {
-        jmxRemoteSslTest(true, true, true, true, true, true, true, false);
+        jmxRemoteSslTest(true, false, true, true, true, true, true, false);
     }
 
     // -----
