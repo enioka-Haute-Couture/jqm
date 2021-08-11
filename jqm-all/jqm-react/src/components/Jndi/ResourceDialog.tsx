@@ -23,9 +23,9 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const ResourceDialog: React.FC<{
     selectedResource: JndiResource | null;
-    closeDialog: () => void;
     onChangeResource: (newResource: JndiResource) => void;
-}> = ({ selectedResource, closeDialog, onChangeResource }) => {
+    closeDialog: () => void;
+}> = ({ selectedResource, onChangeResource, closeDialog }) => {
     const [parameterName, setParameterName] = useState<string>("");
     const [parameterValue, setParameterValue] = useState<string>("");
     const classes = useStyles();

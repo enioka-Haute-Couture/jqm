@@ -18,13 +18,14 @@ import {
     renderBooleanCell,
     renderActionsCell,
 } from "../TableCells";
-import { ResourceDialog } from "./ResourceDialog";
+import { EditParametersDialog } from "./EditParametersDialog";
 import useJndiApi from "./useJndiApi";
 import { JndiResource } from "./JndiResource";
 import { ResourceDropDownMenu } from "./ResourceDropDownMenu";
 
 export const JndiPage: React.FC = () => {
     const [showDropDown, setShowDropDown] = useState(false);
+    const [showParameters, setShowParameters] = useState(false);
     const dropDownMenuPositionRef = useRef(null);
     const [currentSelectedResource, setCurrentSelectedResource] =
         useState<JndiResource | null>(null);
@@ -38,13 +39,8 @@ export const JndiPage: React.FC = () => {
         []
     );
 
-    const {
-        resources,
-        fetchResources,
-        createResource,
-        updateResource,
-        deleteResource,
-    } = useJndiApi();
+    const { resources, fetchResources, saveResource, deleteResource } =
+        useJndiApi();
 
     // useEffect(() => {
     //     fetchResources();
@@ -70,8 +66,13 @@ export const JndiPage: React.FC = () => {
             const { value: factory } = selectedFactoryRef.current!;
             const { value: description } = selectedDescriptionRef.current!;
 
-            if (resourceId && name && type && factory) {
-                updateResource({
+            const updatedParams =
+                currentSelectedResource && currentSelectedResource.parameters
+                    ? currentSelectedResource.parameters
+                    : parameters;
+
+            if (name && type && factory) {
+                saveResource({
                     id: resourceId,
                     name: name,
                     type: type,
@@ -79,17 +80,31 @@ export const JndiPage: React.FC = () => {
                     description: description,
                     factory: factory,
                     singleton: isSingleton,
-                    parameters: parameters,
+                    parameters: updatedParams,
                 }).then(() => setEditingRowId(null));
             }
+            setCurrentSelectedResource(null);
         },
-        [updateResource, isSingleton]
+        [saveResource, isSingleton]
     );
 
-    const handleOnCancel = useCallback(() => setEditingRowId(null), []);
+    const handleOnCancel = useCallback(() => {
+        setEditingRowId(null);
+        setCurrentSelectedResource(null);
+    }, []);
+
     const handleOnEdit = useCallback((tableMeta) => {
-        setIsSingleton(tableMeta.rowData[7]);
+        setIsSingleton(tableMeta.rowData[6]);
         setEditingRowId(tableMeta.rowIndex);
+        setCurrentSelectedResource({
+            auth: tableMeta.rowData[1],
+            name: tableMeta.rowData[2],
+            type: tableMeta.rowData[3],
+            factory: tableMeta.rowData[4],
+            description: tableMeta.rowData[5],
+            singleton: tableMeta.rowData[6],
+            parameters: tableMeta.rowData[7],
+        });
     }, []);
 
     const columns = [
@@ -102,12 +117,6 @@ export const JndiPage: React.FC = () => {
         },
         {
             name: "auth",
-            options: {
-                display: "excluded",
-            },
-        },
-        {
-            name: "parameters",
             options: {
                 display: "excluded",
             },
@@ -180,15 +189,13 @@ export const JndiPage: React.FC = () => {
                 filter: true,
                 sort: false,
                 customBodyRender: (value: any, tableMeta: any) => {
-                    const parameters = tableMeta.rowData[2];
-                    const badge = (
-                        <Badge
-                            badgeContent={parameters ? parameters.length : 0}
-                            color="primary"
-                        >
+                    const parameters = tableMeta.rowData[7];
+                    const getBadge = (count: number) => (
+                        <Badge badgeContent={count} color="primary">
                             <SettingsIcon />
                         </Badge>
                     );
+
                     return editingRowId === tableMeta.rowIndex ? (
                         <Tooltip
                             title={
@@ -199,18 +206,18 @@ export const JndiPage: React.FC = () => {
                         >
                             <span
                                 style={{ cursor: "pointer" }}
-                                onClick={() => {
-                                    const [roleId] = tableMeta.rowData;
-                                    setCurrentSelectedResource(
-                                        tableMeta.rowData
-                                    );
-                                }}
+                                onClick={() => setShowParameters(true)}
                             >
-                                {badge}
+                                {getBadge(
+                                    currentSelectedResource
+                                        ? currentSelectedResource.parameters
+                                              .length
+                                        : 0
+                                )}
                             </span>
                         </Tooltip>
                     ) : (
-                        badge
+                        getBadge(parameters ? parameters.length : 0)
                     );
                 },
             },
@@ -227,27 +234,6 @@ export const JndiPage: React.FC = () => {
                     handleOnDelete,
                     editingRowId,
                     handleOnEdit
-                    // [
-                    //     {
-                    //         title: "Edit Parameters",
-                    //         addIcon: (tableMeta: any) => {
-                    //             const parameters = tableMeta.rowData[2];
-                    //             setCurrentSelectedResource(tableMeta.rowData);
-                    //             return (
-                    //                 <Badge
-                    //                     badgeContent={
-                    //                         parameters ? parameters.length : 0
-                    //                     }
-                    //                     color="primary"
-                    //                 >
-                    //                     <SettingsIcon />
-                    //                 </Badge>
-                    //             );
-                    //         },
-                    //         action: (tableMeta: any) =>
-                    //             setCurrentSelectedResource(tableMeta.rowData),
-                    //     },
-                    // ]
                 ),
             },
         },
@@ -323,13 +309,13 @@ export const JndiPage: React.FC = () => {
                 columns={columns}
                 options={options}
             />
-            <ResourceDialog
+            <EditParametersDialog
+                showDialog={showParameters}
                 selectedResource={currentSelectedResource}
-                onChangeResource={(resource: JndiResource) => {
-                    const val = inMemoryResources.find((e) => resource.name);
-                    const newArr = [...inMemoryResources];
-                }}
-                closeDialog={() => setCurrentSelectedResource(null)}
+                setSelectedResource={(resource: JndiResource) =>
+                    setCurrentSelectedResource(resource)
+                }
+                closeDialog={() => setShowParameters(false)}
             />
         </Container>
     ) : (

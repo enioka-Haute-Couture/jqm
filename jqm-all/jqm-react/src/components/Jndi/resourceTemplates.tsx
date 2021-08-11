@@ -56,11 +56,11 @@ resourceTemplates["jndiOracle"] = {
         },
         {
             key: "removeAbandoned",
-            value: true,
+            value: "true",
         },
         {
             key: "logAbandoned",
-            value: true,
+            value: "true",
         },
         {
             key: "minEvictableIdleTimeMillis",
@@ -68,7 +68,7 @@ resourceTemplates["jndiOracle"] = {
         },
         {
             key: "jmxEnabled",
-            value: true,
+            value: "true",
         },
         {
             key: "username",
@@ -155,11 +155,11 @@ resourceTemplates["jndiPs"] = {
         },
         {
             key: "removeAbandoned",
-            value: true,
+            value: "true",
         },
         {
             key: "logAbandoned",
-            value: true,
+            value: "true",
         },
         {
             key: "minEvictableIdleTimeMillis",
@@ -167,7 +167,7 @@ resourceTemplates["jndiPs"] = {
         },
         {
             key: "jmxEnabled",
-            value: true,
+            value: "true",
         },
         {
             key: "username",
@@ -242,11 +242,11 @@ resourceTemplates["jndiMySql"] = {
         },
         {
             key: "removeAbandoned",
-            value: true,
+            value: "true",
         },
         {
             key: "logAbandoned",
-            value: true,
+            value: "true",
         },
         {
             key: "minEvictableIdleTimeMillis",
@@ -254,7 +254,7 @@ resourceTemplates["jndiMySql"] = {
         },
         {
             key: "jmxEnabled",
-            value: true,
+            value: "true",
         },
         {
             key: "username",
@@ -344,11 +344,11 @@ resourceTemplates["jndiHsqlDb"] = {
         },
         {
             key: "removeAbandoned",
-            value: true,
+            value: "true",
         },
         {
             key: "logAbandoned",
-            value: true,
+            value: "true",
         },
         {
             key: "minEvictableIdleTimeMillis",
@@ -356,7 +356,7 @@ resourceTemplates["jndiHsqlDb"] = {
         },
         {
             key: "jmxEnabled",
-            value: true,
+            value: "true",
         },
         {
             key: "username",
@@ -411,11 +411,11 @@ resourceTemplates["jndiOtherDb"] = {
         },
         {
             key: "removeAbandoned",
-            value: true,
+            value: "true",
         },
         {
             key: "logAbandoned",
-            value: true,
+            value: "true",
         },
         {
             key: "minEvictableIdleTimeMillis",
@@ -423,7 +423,7 @@ resourceTemplates["jndiOtherDb"] = {
         },
         {
             key: "jmxEnabled",
-            value: true,
+            value: "true",
         },
         {
             key: "username",

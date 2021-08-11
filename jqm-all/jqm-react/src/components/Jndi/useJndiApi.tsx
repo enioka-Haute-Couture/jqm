@@ -15,13 +15,13 @@ export const useJndiApi = () => {
             .catch(displayError);
     }, [displayError]);
 
-    const createResource = useCallback(
-        async (newResource: JndiResource) => {
-            return APIService.post(apiUrl, newResource)
+    const saveResource = useCallback(
+        async (resource: JndiResource) => {
+            return APIService.post(apiUrl, resource)
                 .then(() => {
                     fetchResources();
                     displaySuccess(
-                        `Successfully created new resource: ${newResource.name}`
+                        `Successfully saved resource: ${resource.name}`
                     );
                 })
                 .catch(displayError);
@@ -45,23 +45,11 @@ export const useJndiApi = () => {
         },
         [fetchResources, displayError, displaySuccess]
     );
-    const updateResource = useCallback(
-        async (resource: JndiResource) => {
-            return APIService.put(`${apiUrl}/${resource.id}`, resource)
-                .then(() => {
-                    fetchResources();
-                    displaySuccess("Successfully saved resource");
-                })
-                .catch(displayError);
-        },
-        [fetchResources, displayError, displaySuccess]
-    );
 
     return {
         resources,
         fetchResources,
-        createResource,
-        updateResource,
+        saveResource,
         deleteResource,
     };
 };

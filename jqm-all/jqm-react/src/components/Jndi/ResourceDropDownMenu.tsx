@@ -57,24 +57,21 @@ export const ResourceDropDownMenu: React.FC<{
     onClose: () => void;
     onSelectResource: (resource: JndiResource) => void;
 }> = ({ menuPositiontRef, show, onClose, onOpen, onSelectResource }) => {
-    const getSelectGroupList = () => {
-        const res: any[] = [];
-        resourceTemplatesList.forEach(({ title, resources }) => {
-            res.push(
-                <ListSubheader key={title} disableSticky>
-                    {title}
-                </ListSubheader>
-            );
-            resources.map(({ name, resourceKey }) =>
-                res.push(
-                    <MenuItem key={resourceKey} value={resourceKey}>
-                        New {name}
-                    </MenuItem>
-                )
-            );
-        });
-        return res;
-    };
+    const selectGroupList: any[] = [];
+    resourceTemplatesList.forEach(({ title, resources }) => {
+        selectGroupList.push(
+            <ListSubheader key={title} disableSticky>
+                {title}
+            </ListSubheader>
+        );
+        resources.map(({ name, resourceKey }) =>
+            selectGroupList.push(
+                <MenuItem key={resourceKey} value={resourceKey}>
+                    New {name}
+                </MenuItem>
+            )
+        );
+    });
 
     return (
         <FormControl ref={menuPositiontRef}>
@@ -95,7 +92,7 @@ export const ResourceDropDownMenu: React.FC<{
                     style: { marginTop: "5rem" },
                 }}
             >
-                {getSelectGroupList()}
+                {selectGroupList}
             </Select>
         </FormControl>
     );
