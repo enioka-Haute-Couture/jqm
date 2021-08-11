@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     Dialog,
     DialogTitle,
@@ -18,7 +18,6 @@ import {
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { JndiParameter, JndiResource } from "./JndiResource";
-import { isParameter } from "typescript";
 
 export const JndiParametersTable: React.FC<{
     parameters: JndiParameter[];
@@ -29,7 +28,7 @@ export const JndiParametersTable: React.FC<{
             <Table size="small" aria-label="a dense table">
                 <TableHead>
                     <TableRow>
-                        <TableCell>Key</TableCell>
+                        <TableCell>Name</TableCell>
                         <TableCell>Value</TableCell>
                         <TableCell align="right"></TableCell>
                     </TableRow>
@@ -106,6 +105,7 @@ export const EditParametersDialog: React.FC<{
     setSelectedResource: (newResource: JndiResource) => void;
 }> = ({ showDialog, closeDialog, selectedResource, setSelectedResource }) => {
     const [tmpParams, setTmpParams] = useState<JndiParameter[]>([]);
+    const scollToRef = useRef<null | HTMLDivElement>(null);
 
     useEffect(() => {
         if (selectedResource) {
@@ -113,10 +113,15 @@ export const EditParametersDialog: React.FC<{
         }
     }, [selectedResource]);
 
+    const onCancel = () => {
+        closeDialog();
+        setTmpParams(selectedResource ? [...selectedResource.parameters] : []);
+    };
+
     return selectedResource !== null ? (
         <Dialog
             open={showDialog}
-            onClose={() => closeDialog()}
+            onClose={onCancel}
             aria-labelledby="form-dialog-title"
             fullWidth
             maxWidth={"md"}
@@ -130,17 +135,23 @@ export const EditParametersDialog: React.FC<{
                     parameters={tmpParams}
                     setParameters={setTmpParams}
                 />
+                <div ref={scollToRef} />
             </DialogContent>
             <DialogActions>
                 <Button
                     variant="contained"
                     size="small"
-                    style={{ marginTop: "16px", marginBottom: "1rem" }}
+                    style={{
+                        alignSelf: "flex-start",
+                        marginTop: "16px",
+                        marginBottom: "1rem",
+                    }}
                     onClick={() => {
                         setTmpParams([
                             ...tmpParams,
                             { key: "name", value: "value" },
                         ]);
+                        scollToRef.current!.scrollIntoView();
                     }}
                     color="primary"
                 >
@@ -150,7 +161,7 @@ export const EditParametersDialog: React.FC<{
                     variant="contained"
                     size="small"
                     style={{ margin: "8px" }}
-                    onClick={closeDialog}
+                    onClick={onCancel}
                 >
                     Cancel
                 </Button>

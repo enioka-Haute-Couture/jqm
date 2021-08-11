@@ -1,12 +1,5 @@
 import React, { useState, useCallback, useRef, useMemo } from "react";
-import {
-    Container,
-    Grid,
-    IconButton,
-    Tooltip,
-    Badge,
-    Typography,
-} from "@material-ui/core";
+import { Container, Grid, IconButton, Tooltip, Badge } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import MUIDataTable from "mui-datatables";
 import HelpIcon from "@material-ui/icons/Help";
@@ -85,7 +78,7 @@ export const JndiPage: React.FC = () => {
             }
             setCurrentSelectedResource(null);
         },
-        [saveResource, isSingleton]
+        [saveResource, isSingleton, currentSelectedResource]
     );
 
     const handleOnCancel = useCallback(() => {
