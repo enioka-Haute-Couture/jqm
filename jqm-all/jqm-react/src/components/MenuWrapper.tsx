@@ -197,7 +197,12 @@ export default function MenuWrapper(props: any) {
                         </ListItemIcon>
                         <ListItemText primary={"Mappings"} />
                     </ListItem>
-                    <ListItem button key={"jndiRessources"} disabled>
+                    <ListItem
+                        button
+                        component={NavLink}
+                        to="/jndi"
+                        key={"jndiRessources"}
+                    >
                         <ListItemIcon>
                             <SettingsIcon />
                         </ListItemIcon>
@@ -235,7 +240,8 @@ export default function MenuWrapper(props: any) {
                         button
                         key={"roles"}
                         component={NavLink}
-                        to="/roles">
+                        to="/roles"
+                    >
                         <ListItemIcon>
                             <SecurityIcon />
                         </ListItemIcon>

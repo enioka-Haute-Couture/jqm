@@ -1,5 +1,11 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { Container, Grid, IconButton, MenuItem, Tooltip } from "@material-ui/core";
+import {
+    Container,
+    Grid,
+    IconButton,
+    MenuItem,
+    Tooltip,
+} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import MUIDataTable from "mui-datatables";
 import HelpIcon from "@material-ui/icons/Help";
@@ -17,7 +23,6 @@ import useNodesApi from "../Nodes/useNodesApi";
 import useQueueAPI from "../Queues/QueueAPI";
 import { Node } from "../Nodes/Node";
 import { Queue } from "../Queues/Queue";
-
 
 const MappingsPage: React.FC = () => {
     const [showDialog, setShowDialog] = useState(false);
@@ -37,27 +42,20 @@ const MappingsPage: React.FC = () => {
         deleteMappings,
     } = useMappingAPI();
 
-    const {
-        nodes,
-        fetchNodes,
-    } = useNodesApi();
+    const { nodes, fetchNodes } = useNodesApi();
 
-    const {
-        queues,
-        fetchQueues,
-    } = useQueueAPI();
+    const { queues, fetchQueues } = useQueueAPI();
 
     const refresh = () => {
         fetchNodes();
         fetchQueues();
         fetchMappings();
-    }
+    };
 
     useEffect(() => {
-        refresh()
+        refresh();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
 
     const handleOnDelete = useCallback(
         (tableMeta) => {
@@ -72,9 +70,17 @@ const MappingsPage: React.FC = () => {
             const [mappingId] = tableMeta.rowData;
             const { value: pollingInterval } = pollingIntervalInputRef.current!;
             const { value: nbThread } = nbThreadInputRef.current!;
-            const nodeName = nodes?.find(x => x.id === nodeId)?.name
-            const queueName = queues?.find(x => x.id === queueId)?.name
-            if (mappingId && pollingInterval && nbThread && nodeId && queueId && queueName && nodeName) {
+            const nodeName = nodes?.find((x) => x.id === nodeId)?.name;
+            const queueName = queues?.find((x) => x.id === queueId)?.name;
+            if (
+                mappingId &&
+                pollingInterval &&
+                nbThread &&
+                nodeId &&
+                queueId &&
+                queueName &&
+                nodeName
+            ) {
                 updateMapping({
                     id: mappingId,
                     enabled: enabled,
@@ -83,7 +89,7 @@ const MappingsPage: React.FC = () => {
                     nodeName: nodeName,
                     queueName: queueName,
                     nbThread: +nbThread,
-                    pollingInterval: +pollingInterval
+                    pollingInterval: +pollingInterval,
                 }).then(() => setEditingRowId(null));
             }
         },
@@ -92,16 +98,12 @@ const MappingsPage: React.FC = () => {
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
 
-    const handleOnEdit = useCallback(
-        (tableMeta) => {
-            console.log(tableMeta)
-            setNodeId(tableMeta.rowData[1]);
-            setQueueId(tableMeta.rowData[2]);
-            setEnabled(tableMeta.rowData[5]);
-            setEditingRowId(tableMeta.rowIndex);
-        },
-        []
-    );
+    const handleOnEdit = useCallback((tableMeta) => {
+        setNodeId(tableMeta.rowData[1]);
+        setQueueId(tableMeta.rowData[2]);
+        setEnabled(tableMeta.rowData[5]);
+        setEditingRowId(tableMeta.rowIndex);
+    }, []);
 
     const columns = [
         {
@@ -120,17 +122,19 @@ const MappingsPage: React.FC = () => {
                 sort: false,
                 customBodyRender: renderArrayCell(
                     editingRowId,
-                    nodes ? nodes!.map((node: Node) => (
-                        <MenuItem key={node.id} value={node.id}>
-                            {node.name}
-                        </MenuItem>
-                    )) : [],
-                    (element: number) => nodes?.find(x => x.id === element)?.name || "",
+                    nodes
+                        ? nodes!.map((node: Node) => (
+                              <MenuItem key={node.id} value={node.id}>
+                                  {node.name}
+                              </MenuItem>
+                          ))
+                        : [],
+                    (element: number) =>
+                        nodes?.find((x) => x.id === element)?.name || "",
                     nodeId,
                     setNodeId,
                     false
-                )
-
+                ),
             },
         },
         {
@@ -142,17 +146,19 @@ const MappingsPage: React.FC = () => {
                 sort: false,
                 customBodyRender: renderArrayCell(
                     editingRowId,
-                    queues ? queues!.map((queue: Queue) => (
-                        <MenuItem key={queue.id} value={queue.id}>
-                            {queue.name}
-                        </MenuItem>
-                    )) : [],
-                    (element: number) => queues?.find(x => x.id === element)?.name || "",
+                    queues
+                        ? queues!.map((queue: Queue) => (
+                              <MenuItem key={queue.id} value={queue.id}>
+                                  {queue.name}
+                              </MenuItem>
+                          ))
+                        : [],
+                    (element: number) =>
+                        queues?.find((x) => x.id === element)?.name || "",
                     queueId,
                     setQueueId,
                     false
-                )
-
+                ),
             },
         },
         {

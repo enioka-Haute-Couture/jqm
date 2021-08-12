@@ -16,6 +16,7 @@ import QueuesPage from "./components/Queues/QueuesPage";
 import { NodesPage } from "./components/Nodes/NodesPage";
 import MappingsPage from "./components/Mappings/MappingsPage";
 import RolesPage from "./components/Roles/RolesPage";
+import { JndiPage } from "./components/Jndi/JndiPage";
 import ClusterwideParametersPage from "./components/ClusterwideParameters/ClusterwideParametersPage";
 
 declare module "@material-ui/core/styles/overrides" {
@@ -98,6 +99,9 @@ function App() {
                                 </Route>
                                 <Route path="/roles" exact={true}>
                                     <RolesPage />
+                                </Route>
+                                <Route path="/jndi" exact={true}>
+                                    <JndiPage />
                                 </Route>
                                 <Route path="/" exact={true}>
                                     <HomePage />
