@@ -26,62 +26,56 @@ import javax.security.auth.login.LoginException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Listen SSL Handshake completion for remote JMX connection attempts.<br>
+ * Save in {@link sslSuccessClientsUsernames} usernames written in client certificate provided in SSL sessions and the
+ * time where the handshake succeed.
+ * 
+ * Reason of the use of {@link #SSL_SUCCESS_EXPIRE_TIME}: <br>
+ * There is no direct mean to know which client certificate corresponds to the user processed in
+ * {@link JmxLoginModule}
+ * 
+ * Reason of the use of {@link #SSL_SUCCESS_IGNORE_TIME}: <br>
+ * JMX establish a new SSL session after {@link JmxLoginModule} process succeed authentication, and its success is
+ * useless for authentication check (ie in {@link JmxSslHandshakeListener}) because authentication has already been made
+ * (by {@link JmxLoginModule}). <br>
+ * Because there is no known link between this new SSL session and the authenticated user, new SSL handshake successes
+ * are ignored for a small period of time: {@link #SSL_SUCCESS_IGNORE_TIME} milliseconds. <br>
+ * Without this, a new SSL handshake success would be saved just after {@link JmxLoginModule} process succeed, and would
+ * be kept for {@link #SSL_SUCCESS_EXPIRE_TIME} milliseconds, allowing any user with any trusted certificate to attempt
+ * to authenticate with credentials of the processed user. <br>
+ * This security reduce the risk of somebody that could authenticate with (username, password) credentials without the
+ * client certificate corresponding to the user (with another trusted client certificate). The risk is still possible
+ * between time when the SSL handshake success is detected by {@link #handshakeCompleted(HandshakeCompletedEvent)} and
+ * time when {@link JmxLoginModule} ends its authentication process.
+ *
+ */
 public class JmxSslHandshakeListener implements HandshakeCompletedListener
 {
     private static JmxSslHandshakeListener instance;
     private Logger jqmlogger = LoggerFactory.getLogger(JmxSslHandshakeListener.class);
 
     /**
-     * Time in milliseconds during which a SSL handshake success is saved for an
-     * user. <br>
-     * During this time, considering an user who attempted to connect with SSL
-     * client authentication providing the certificate of an existing user named
-     * USERNAME (Common Name of the certificate), any client certificate can be used
-     * to authenticate with the (USERNAME, password of USERNAME) credentials,
-     * because it doesn't seem that we have a mean to know which client certificate
-     * corresponds to the user processed in {@link JmxLoginModule}.
+     * Time in milliseconds during which a SSL handshake success is saved for an user (named {@code USERNAME}). <br>
+     * During this time, any trusted client certificate can be used to authenticate with the ({@code USERNAME}, password of
+     * {@code USERNAME}) credentials.
      */
     private static final long SSL_SUCCESS_EXPIRE_TIME = 3000L;
 
     /**
-     * Time in milliseconds during which all SSL handshake successes of an user
-     * won't be saved (used when a successful authentication of this user is made).
-     * New authentication for the user won't be possible for this time. <br>
-     * Reason of the use of this time: <br>
-     * A new SSL session will be established by JMX after {@link JmxLoginModule}
-     * process. The success of the handshake of that new SSL session should be
-     * ignored for authentication check (ie in {@link JmxSslHandshakeListener})
-     * because authentication has already been made by {@link JmxLoginModule}. <br>
-     * Because we don't know how to link this new SSL session to the authenticated
-     * user, we can just ignore new SSL handshake successes for a small period of
-     * time: SSL_SUCCESS_IGNORE_TIME milliseconds. That means that any connection
-     * attempt with credentials of that user will be refused for that time. <br>
-     * If we don't do this, a new SSL handshake success would be saved just after
-     * {@link JmxLoginModule} process, and would be kept for
-     * {@link #SSL_SUCCESS_EXPIRE_TIME} milliseconds, allowing any user with any
-     * trusted certificate to attempt to authenticate with credentials of the
-     * processed user. <br>
-     * By ignoring the next SSL handshake success of an user after a successful
-     * authentication of that user, we reduce the risk of somebody that could
-     * authenticate with (username, password) credentials without the client
-     * certificate corresponding to the user (with another trusted client
-     * certificate). The risk isn't completely gone, it is still possible between
-     * time when the SSL handshake success is detected by
-     * {@link JmxSslHandshakeListener#handshakeCompleted(HandshakeCompletedEvent)}
-     * and time when {@link JmxLoginModule} ends its authentication process.
+     * Time in milliseconds during which all SSL handshake successes of an user won't be saved (used when a successful
+     * authentication of this user is made by {@link JmxLoginModule}). <br>
+     * New authentication of the user won't be possible for this time.
      */
     private static final long SSL_SUCCESS_IGNORE_TIME = 3000L;
 
     /**
-     * List of clients's username for which the SSL handshake succeeded, saved in
-     * keys of this map, values of this map are the time when the SSL handshake
-     * succeeded for the last time for the given user. <br>
-     * If there are several connection attempts for a same user, only the last SSL
-     * handshake success time is kept. <br>
-     * If saved time is positive, then the last SSL handshake success is valid for
-     * {@link #SSL_SUCCESS_EXPIRE_TIME} milliseconds from the saved time. <br>
-     * If saved time is negative, then it means the SSL handshake successes won't be
-     * saved for {@link #SSL_SUCCESS_IGNORE_TIME} milliseconds from the saved time.
+     * List of clients's username for which the SSL handshake succeeded, saved in keys of this map, values of this map are
+     * the time when the SSL handshake succeeded for the last time for the given user. <br>
+     * If saved time is positive, then the last SSL handshake success is valid for {@link #SSL_SUCCESS_EXPIRE_TIME}
+     * milliseconds from the saved time. <br>
+     * If saved time is negative, then the SSL handshake successes won't be saved for {@link #SSL_SUCCESS_IGNORE_TIME}
+     * milliseconds from the saved time.
      */
     static Map<String, Long> sslSuccessClientsUsernames = new HashMap<String, Long>();
 
@@ -116,15 +110,12 @@ public class JmxSslHandshakeListener implements HandshakeCompletedListener
 
     /**
      * Save the SSL handshake success for the given user. <br>
-     * If there are several connection attempts for a same user, only the last SSL
-     * handshake success time is kept. <br>
-     * If the user with the provided username has been successfully authenticated
-     * recently (in last {@link #SSL_SUCCESS_EXPIRE_TIME} milliseconds) by
-     * {@link JmxLoginModule}, this SSL handshake success won't be saved.
+     * If there are several connection attempts for a same user, only the last SSL handshake success time is kept. <br>
+     * If the user with the provided username has been successfully authenticated recently (in last
+     * {@link #SSL_SUCCESS_IGNORE_TIME} milliseconds) by {@link JmxLoginModule}, this SSL handshake success won't be saved.
      * 
      * @param username
-     *                 the Common Name of the client certificate, meant to be equal
-     *                 to JQM username
+     *                 the Common Name of the client certificate, meant to be equal to JQM username
      */
     private void addUserSuccessfulSslHandshake(String username)
     {
@@ -136,16 +127,13 @@ public class JmxSslHandshakeListener implements HandshakeCompletedListener
     }
 
     /**
-     * Check if the specified username corresponds to a client certificate for which
-     * an SSL handshake succeeded in last {@link #SSL_SUCCESS_EXPIRE_TIME}
-     * milliseconds.
+     * Check if the specified username corresponds to a client certificate for which an SSL handshake succeeded in last
+     * {@link #SSL_SUCCESS_EXPIRE_TIME} milliseconds.
      * 
      * @param username
-     *                 the Common Name of the client certificate, meant to be equal
-     *                 to JQM username
-     * @return true if the specified username is the Common Name of a client
-     *         certificate for which an SSL handshake succeeded before calling this
-     *         method in last {@link #SSL_SUCCESS_EXPIRE_TIME} milliseconds.
+     *                 the Common Name of the client certificate, meant to be equal to JQM username
+     * @return true if the specified username is the Common Name of a client certificate for which an SSL handshake
+     *         succeeded before calling this method in last {@link #SSL_SUCCESS_EXPIRE_TIME} milliseconds.
      * @throws LoginException
      *                        if new SSL handshake successes are being ignored.
      */
@@ -179,12 +167,10 @@ public class JmxSslHandshakeListener implements HandshakeCompletedListener
     }
 
     /**
-     * Ignore future SSL handshake successes of the given user for
-     * {@link #SSL_SUCCESS_IGNORE_TIME} milliseconds.
+     * Ignore future SSL handshake successes of the given user for {@link #SSL_SUCCESS_IGNORE_TIME} milliseconds.
      * 
      * @param username
-     *                 the Common Name of the client certificate, meant to be equal
-     *                 to JQM username
+     *                 the Common Name of the client certificate, meant to be equal to JQM username
      * @see #SSL_SUCCESS_IGNORE_TIME
      */
     public void ignoreUserSslHandshakeSuccesses(String username)
@@ -193,12 +179,10 @@ public class JmxSslHandshakeListener implements HandshakeCompletedListener
     }
 
     /**
-     * Clear last SSL handshake success information for the given user if it is not
-     * useful for any other connection attempt.
+     * Clear last SSL handshake success information for the given user if it is not useful for any other connection attempt.
      * 
      * @param username
-     *                 the Common Name of the client certificate, meant to be equal
-     *                 to JQM username
+     *                 the Common Name of the client certificate, meant to be equal to JQM username
      */
     public void clearUserSslHandshakeSuccess(String username)
     {

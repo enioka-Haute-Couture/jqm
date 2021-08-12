@@ -53,8 +53,8 @@ import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.pki.JdbcCa;
 
 /**
- * The JMX Agent is (JVM-wide) RMI for serving remote JMX requests. It is
- * compulsory because JQM uses fixed ports for the JMX server.
+ * The JMX Agent is (JVM-wide) RMI for serving remote JMX requests. It is compulsory because JQM uses fixed ports for
+ * the JMX server.
  */
 final class JmxAgent
 {
@@ -72,36 +72,27 @@ final class JmxAgent
     }
 
     /**
-     * Register the JMX Agent with or without SSL and client authentication
-     * depending on settings in the database (provided by the DbConn instance). <br>
+     * Register the JMX Agent with or without SSL and client authentication depending on settings in the database (provided
+     * by the DbConn instance). <br>
      * <br>
-     * Authentication with (username, password) credentials is enabled when SSL is
-     * enabled, supposing that when an user enables SSL, he wants a minimum of
-     * access security. This authentication, managed by {@link JmxLoginModule}, is
-     * independent of SSL client authentication (that can be disabled with
-     * {@code enableJmxSslAuth} global parameter) and gives permissions to an
-     * authenticated user depending on his roles. This allows to delete an account
-     * from the database and prevent his (previous) owner from continuing to connect
-     * to the remote JMX and being authenticated with his trusted certificate.
-     * Indeed, it isn't easy to make a trusted certificate no longer trusted, but it
-     * is easy to delete an account from the database. <br>
-     * Currently, to connect to the remote JMX with SSL and SSL client
-     * authentication with a valid (username, password) credentials couple, the
-     * provided username must be the Common Name of a recently provided SSL client
-     * certificate. Idealy, we could find a way to get the client certificate used
-     * for the SSL connection from {@link JmxLoginModule}. But for now we only save
-     * the time of last successful SSL handshake for each username and check that
-     * the process of {@link JmxLoginModule} for an user happens shortly after his
-     * last successful SSL handshake. <br>
-     * See {@link JmxLoginModule} and {@link JmxSslHandshakeListener} for more
-     * details.<br>
+     * Authentication with (username, password) credentials is enabled when SSL is enabled, supposing that when an user
+     * enables SSL, he wants a minimum of access security. This authentication, managed by {@link JmxLoginModule}, is
+     * independent of SSL client authentication (that can be disabled with {@code enableJmxSslAuth} global parameter) and
+     * gives permissions to an authenticated user depending on his roles. This allows to delete an account from the database
+     * and prevent his (previous) owner from continuing to connect to the remote JMX and being authenticated with his
+     * trusted certificate. Indeed, it isn't easy to make a trusted certificate no longer trusted, but it is easy to delete
+     * an account from the database. <br>
+     * Currently, to connect to the remote JMX with SSL and SSL client authentication with a valid (username, password)
+     * credentials couple, the provided username must be the Common Name of a recently provided SSL client certificate.
+     * Idealy, we could find a way to get the client certificate used for the SSL connection from {@link JmxLoginModule}.
+     * But for now we only save the time of last successful SSL handshake for each username and check that the process of
+     * {@link JmxLoginModule} for an user happens shortly after his last successful SSL handshake. <br>
+     * See {@link JmxLoginModule} and {@link JmxSslHandshakeListener} for more details.<br>
      * <br>
-     * JMX permissions are saved in the {@code conf/jmxremote.policy} config file
-     * for each role and each user. These permissions are updated with the database,
-     * using {@link #updatePolicyFile(Map)}. Therefore, any Java policy permission
-     * can be specified in the {@code conf/jmxremote.policy} file, but permissions
-     * of JQM roles must be changed in the database (prefix "jmx:"), otherwise they
-     * will be lost.
+     * JMX permissions are saved in the {@code conf/jmxremote.policy} config file for each role and each user. These
+     * permissions are updated with the database, using {@link #updatePolicyFile(Map)}. Therefore, any Java policy
+     * permission can be specified in the {@code conf/jmxremote.policy} file, but permissions of JQM roles must be changed
+     * in the database (prefix "jmx:"), otherwise they will be lost.
      * 
      * @param registryPort
      *                     the port of the JMX remote registry
@@ -213,7 +204,7 @@ final class JmxAgent
                     TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                     tmf.init((KeyStore) ts);
 
-                    SSLContext sslctx = SSLContext.getInstance("TLSv1");
+                    SSLContext sslctx = SSLContext.getInstance("TLSv1.2");
                     sslctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 
                     if (sslNeedClientAuth)
@@ -249,8 +240,8 @@ final class JmxAgent
     }
 
     /**
-     * Unregister the JMX Agent if it is registered. Allows to register it again
-     * with other settings with {@link #registerAgent(int, int, String, DbConn)}.
+     * Unregister the JMX Agent if it is registered. Allows to register it again with other settings with
+     * {@link #registerAgent(int, int, String, DbConn)}.
      */
     static synchronized void unregisterAgent()
     {
@@ -274,15 +265,13 @@ final class JmxAgent
     }
 
     /**
-     * Get all JMX permissions ("jmx:" prefix) of the JQM roles provided in
-     * {@code roles} list.
+     * Get all JMX permissions ("jmx:" prefix) of the JQM roles provided in {@code roles} list.
      * 
      * @param roles
      *              the list of roles from which the permissions are collected
      * @param cnx
      *              a connection to the database
-     * @return a map containing, for a JQM role name key, the list of JMX
-     *         permissions of this role as value.
+     * @return a map containing, for a JQM role name key, the list of JMX permissions of this role as value.
      */
     static Map<String, List<String>> getJmxPermissionsOfRoles(List<RRole> roles, DbConn cnx)
     {
@@ -318,19 +307,15 @@ final class JmxAgent
     }
 
     /**
-     * Update the policy file (located at {@link #POLICY_PATH}) and then the current
-     * Java policy (that should use the policy file) with the permissions of roles
-     * provided in {@code rolesPerms}. <br>
-     * All other permissions not provided in {@code rolesPerms} are kept, therefore
-     * if a role is missing in {@code rolesPerms}, its permissions won't be updated
-     * for the current policy and in the policy file.<br>
-     * Permissions given in {@code rolesPerms} are considered as up to date. For a
-     * given role, all permissions that were present in the policy file but are
-     * missing in {@code rolesPerms} will be removed from the policy file.
+     * Update the policy file (located at {@link #POLICY_PATH}) and then the current Java policy (that should use the policy
+     * file) with the permissions of roles provided in {@code rolesPerms}. <br>
+     * All other permissions not provided in {@code rolesPerms} are kept, therefore if a role is missing in
+     * {@code rolesPerms}, its permissions won't be updated for the current policy and in the policy file.<br>
+     * Permissions given in {@code rolesPerms} are considered as up to date. For a given role, all permissions that were
+     * present in the policy file but are missing in {@code rolesPerms} will be removed from the policy file.
      * 
      * @param rolesPerms
-     *                   the permissions of the roles to update, saved as the value
-     *                   for the corresponding role name key.
+     *                   the permissions of the roles to update, saved as the value for the corresponding role name key.
      */
     static void updatePolicyFile(Map<String, List<String>> rolesPerms)
     {
@@ -478,7 +463,7 @@ final class JmxAgent
             }
             catch (IOException e)
             {
-                jqmlogger.debug("Could not close correctly one or more files managers", e);
+                jqmlogger.debug("Could not close correctly one or more file managers", e);
             }
         }
 

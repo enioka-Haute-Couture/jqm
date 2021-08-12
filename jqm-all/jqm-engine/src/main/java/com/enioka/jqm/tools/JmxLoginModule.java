@@ -17,9 +17,12 @@
  */
 package com.enioka.jqm.tools;
 
-import java.util.*;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.security.auth.*;
 import javax.security.auth.callback.*;
@@ -49,7 +52,8 @@ import com.enioka.jqm.model.RUser;
 public class JmxLoginModule implements LoginModule
 {
 
-    private Logger jqmlogger;
+    private static Logger jqmlogger = LoggerFactory.getLogger(JmxLoginModule.class);
+    private boolean debug = false;
 
     private Subject subject;
     private CallbackHandler callbackHandler;
@@ -68,12 +72,12 @@ public class JmxLoginModule implements LoginModule
         this.subject = subject;
         this.callbackHandler = callbackHandler;
 
-        jqmlogger = "true".equalsIgnoreCase((String) options.get("debug")) ? LoggerFactory.getLogger(JmxLoginModule.class) : null;
+        debug = "true".equalsIgnoreCase((String) options.get("debug"));
     }
 
     public boolean login() throws LoginException
     {
-        if (jqmlogger != null)
+        if (debug)
         {
             jqmlogger.debug("Logging in...");
         }
@@ -92,7 +96,7 @@ public class JmxLoginModule implements LoginModule
         catch (IOException e)
         {
             String error = "IOException calling handle on callbackHandler";
-            if (jqmlogger != null)
+            if (debug)
             {
                 jqmlogger.error(error, e);
             }
@@ -101,7 +105,7 @@ public class JmxLoginModule implements LoginModule
         catch (UnsupportedCallbackException e)
         {
             String error = "UnsupportedCallbackException calling handle on callbackHandler";
-            if (jqmlogger != null)
+            if (debug)
             {
                 jqmlogger.error(error, e);
             }
@@ -146,7 +150,7 @@ public class JmxLoginModule implements LoginModule
         catch (NoResultException e)
         {
             String error = "User[" + userName + "] does not exist in the database";
-            if (jqmlogger != null)
+            if (debug)
             {
                 jqmlogger.debug(error, e);
             }
@@ -155,7 +159,7 @@ public class JmxLoginModule implements LoginModule
         catch (NonUniqueResultException e)
         {
             String error = "User[" + userName + "] has multiple entries in the database";
-            if (jqmlogger != null)
+            if (debug)
             {
                 jqmlogger.debug(error, e);
             }
@@ -164,7 +168,7 @@ public class JmxLoginModule implements LoginModule
         catch (Exception e)
         {
             String error = "Error while querying the database";
-            if (jqmlogger != null)
+            if (debug)
             {
                 jqmlogger.error(error, e);
             }
@@ -176,7 +180,7 @@ public class JmxLoginModule implements LoginModule
         // Code taken from com.enioka.jqm.tools.Helpers#createUserIfMissing(DbConn,
         // String, String, String, String...):
         String passwordHash = null;
-        if (password != null && !"".equals(password))
+        if (password != null && !password.isEmpty())
         {
             ByteSource salt = ByteSource.Util.bytes(Hex.decode(user.getHashSalt())); // Code taken from com.enioka.jqm.webui.shiro.JdbcRealm#getUser(String)
             passwordHash = new Sha512Hash(password, salt, 100000).toHex();
@@ -184,7 +188,7 @@ public class JmxLoginModule implements LoginModule
 
         if (userPasswordHash != null && userPasswordHash.equals(passwordHash))
         {
-            if (jqmlogger != null)
+            if (debug)
             {
                 jqmlogger.debug("Login accepted");
             }
@@ -194,7 +198,7 @@ public class JmxLoginModule implements LoginModule
         }
         else
         {
-            if (jqmlogger != null)
+            if (debug)
             {
                 jqmlogger.debug("Login refused");
             }
@@ -206,7 +210,7 @@ public class JmxLoginModule implements LoginModule
 
     public boolean commit() throws LoginException
     {
-        if (jqmlogger != null)
+        if (debug)
         {
             jqmlogger.debug("Committing...");
         }
@@ -214,14 +218,18 @@ public class JmxLoginModule implements LoginModule
         if (!loginSucceeded)
         {
             if (cnx != null)
+            {
                 cnx.close();
+            }
             return false;
         }
 
         if (subject == null)
         {
             if (cnx != null)
+            {
                 cnx.close();
+            }
             throw new LoginException("Subject cannot be null"); // Otherwise we cannot assign him his principals and therefore his permissions.
         }
 
@@ -260,7 +268,7 @@ public class JmxLoginModule implements LoginModule
             if (!subjectPrincipals.contains(principal))
             {
                 subjectPrincipals.add(principal);
-                if (jqmlogger != null)
+                if (debug)
                 {
                     jqmlogger.debug("Added " + principal + " to subject[userName: " + userName + "]");
                 }
@@ -278,7 +286,7 @@ public class JmxLoginModule implements LoginModule
 
     public boolean abort() throws LoginException
     {
-        if (jqmlogger != null)
+        if (debug)
         {
             jqmlogger.debug("Received abort request");
         }
@@ -286,7 +294,9 @@ public class JmxLoginModule implements LoginModule
         if (!loginSucceeded)
         {
             if (cnx != null)
+            {
                 cnx.close();
+            }
             JmxSslHandshakeListener.getInstance().clearUserSslHandshakeSuccess(userName);
             return false;
         }
@@ -299,13 +309,15 @@ public class JmxLoginModule implements LoginModule
 
     public boolean logout() throws LoginException
     {
-        if (jqmlogger != null)
+        if (debug)
         {
             jqmlogger.debug("Logout subject[userName: " + userName + "]");
         }
 
         if (cnx != null)
+        {
             cnx.close();
+        }
 
         if (subject != null && userPrincipals != null)
         {

@@ -75,8 +75,8 @@ public class JmxTest extends JqmBaseTest
 {
 
     /**
-     * Test registration of a remote JMX using default settings (no SSL and no
-     * authentication) and test connection to this remote JMX.
+     * Test registration of a remote JMX using default settings (no SSL and no authentication) and test connection to this
+     * remote JMX.
      */
     @Test
     public void jmxRemoteTest() throws Exception
@@ -123,8 +123,7 @@ public class JmxTest extends JqmBaseTest
             System.out.println(oi.getObjectName());
         }
         Assert.assertTrue(mbeans.size() >= 5);
-        // 1 node, 3 pollers, 1 running instance, 1 JDBC pool. The pool may not be
-        // visible due to a call to resetSingletons.
+        // 1 node, 3 pollers, 1 running instance, 1 JDBC pool. The pool may not be visible due to a call to resetSingletons.
 
         // /////////////////
         // Loader beans
@@ -140,8 +139,7 @@ public class JmxTest extends JqmBaseTest
         Assert.assertEquals((Integer) i, proxy.getId());
         Assert.assertEquals("TestUser", proxy.getUser());
 
-        // Elements that are not set or testable reproductibly, but should not raise any
-        // exception
+        // Elements that are not set or testable reproductibly, but should not raise any exception
         proxy.getEnqueueDate();
         proxy.getKeyword1();
         proxy.getKeyword2();
@@ -185,48 +183,37 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test registration of a remote JMX with or without SSL and clients
-     * authentication and test connection to this remote JMX with or without a trust
-     * store (containing the certificate of the internal PKI certification authority
-     * which signed the certificate of the remote JMX), a key store (containing the
-     * certificate of a test user trusted by the previous certification authority)
-     * and correct credentials. <br>
-     * SSL client authentication and credentials authentication are independent as
-     * explained in {@link JmxAgent#registerAgent(int, int, String, DbConn)}.
+     * Test registration of a remote JMX with or without SSL and clients authentication and test connection to this remote
+     * JMX with or without a trust store (containing the certificate of the internal PKI certification authority which
+     * signed the certificate of the remote JMX), a key store (containing the certificate of a test user trusted by the
+     * previous certification authority) and correct credentials. <br>
+     * SSL client authentication and credentials authentication are independent as explained in
+     * {@link JmxAgent#registerAgent(int, int, String, DbConn)}.
      * 
      * @param enableJmxSsl
-     *                            = true if the test must register the remote JMX
-     *                            Agent with SSL enabled
+     *                            = true if the test must register the remote JMX Agent with SSL enabled
      * @param enableJmxSslAuth
-     *                            = true if the test must register the remote JMX
-     *                            Agent with SSL authentication
+     *                            = true if the test must register the remote JMX Agent with SSL authentication
      * @param useClientTrustStore
-     *                            = true if the test must use the valid client trust
-     *                            store when connecting to the JMX Agent "remotely"
+     *                            = true if the test must use the valid client trust store when connecting to the JMX Agent
+     *                            "remotely"
      * @param useClientKeyStore
-     *                            = true if the test must use the valid client key
-     *                            store when connecting to the JMX Agent "remotely"
+     *                            = true if the test must use the valid client key store when connecting to the JMX Agent
+     *                            "remotely"
      * @param createClientStore
-     *                            = true if the test must create a default valid
-     *                            client key store. In any case, the client key
-     *                            store used by this test is stored in the
-     *                            ./conf/client.pfx file, therefore the client key
-     *                            store must be created there to be used.
+     *                            = true if the test must create a default valid client key store. In any case, the client
+     *                            key store used by this test is stored in the ./conf/client.pfx file, therefore the client
+     *                            key store must be created there to be used.
      * @param useCredentials
-     *                            = true if the test must provide username and
-     *                            password while trying to connect to the JMX Agent
-     *                            "remotely".
+     *                            = true if the test must provide username and password while trying to connect to the JMX
+     *                            Agent "remotely".
      * @param useExistingUsername
-     *                            = true if the test must provide an existing
-     *                            username while trying to connect to the JMX Agent
-     *                            "remotely".
+     *                            = true if the test must provide an existing username while trying to connect to the JMX
+     *                            Agent "remotely".
      * @param useCorrectPassword
-     *                            = true if the test must provide the correct
-     *                            password corresponding to the test user (if
-     *                            {@code useExistingUsername} is false, then no
-     *                            password is correct and this setting has no
-     *                            effect) while trying to connect to the JMX Agent
-     *                            "remotely".
+     *                            = true if the test must provide the correct password corresponding to the test user (if
+     *                            {@code useExistingUsername} is false, then no password is correct and this setting has no
+     *                            effect) while trying to connect to the JMX Agent "remotely".
      * @param roles
      *                            the list of roles to give to the test user.
      * @throws Exception
@@ -383,8 +370,7 @@ public class JmxTest extends JqmBaseTest
             System.out.println(oi.getObjectName());
         }
         Assert.assertTrue(mbeans.size() >= 5);
-        // 1 node, 3 pollers, 1 running instance, 1 JDBC pool. The pool may not be
-        // visible due to a call to resetSingletons.
+        // 1 node, 3 pollers, 1 running instance, 1 JDBC pool. The pool may not be visible due to a call to resetSingletons.
 
         // /////////////////
         // Loader beans
@@ -400,8 +386,7 @@ public class JmxTest extends JqmBaseTest
         Assert.assertEquals((Integer) i, proxy.getId());
         Assert.assertEquals("TestUser", proxy.getUser());
 
-        // Elements that are not set or testable reproductibly, but should not raise any
-        // exception
+        // Elements that are not set or testable reproductibly, but should not raise any exception
         proxy.getEnqueueDate();
         proxy.getKeyword1();
         proxy.getKeyword2();
@@ -446,8 +431,7 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * See
-     * {@link #jmxRemoteSslTest(JqmBaseTest, boolean, boolean, boolean, boolean, Runnable)}
+     * See {@link #jmxRemoteSslTest(JqmBaseTest, boolean, boolean, boolean, boolean, Runnable)}
      */
     public void jmxRemoteSslTest(boolean enableJmxSsl, boolean enableJmxSslAuth, boolean useClientTrustStore, boolean useClientKeyStore) throws Exception
     {
@@ -455,9 +439,8 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test registration of a remote JMX using SSL and authentication of clients for
-     * connections and test connection to this remote JMX with a client having valid
-     * stuff to connect (the client trusts the server and the server trusts him).
+     * Test registration of a remote JMX using SSL and authentication of clients for connections and test connection to this
+     * remote JMX with a client having valid stuff to connect (the client trusts the server and the server trusts him).
      */
     @Test
     public void jmxRemoteSslWithAuthWithTrustStoreAndKeyStoreTest() throws Exception
@@ -466,9 +449,8 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test registration of a remote JMX using SSL without clients authentication
-     * for connections and test connection to this remote JMX with a client having
-     * valid stuff to connect (the client trusts the server).
+     * Test registration of a remote JMX using SSL without clients authentication for connections and test connection to
+     * this remote JMX with a client having valid stuff to connect (the client trusts the server).
      */
     @Test
     public void jmxRemoteSslWithoutAuthWithTrustStoreTest() throws Exception
@@ -477,9 +459,8 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test registration of a remote JMX using SSL and authentication of clients for
-     * connections and test connection to this remote JMX with a client having valid
-     * SSL stuff to connect (the client trusts the server and the server trusts him)
+     * Test registration of a remote JMX using SSL and authentication of clients for connections and test connection to this
+     * remote JMX with a client having valid SSL stuff to connect (the client trusts the server and the server trusts him)
      * but not providing credentials.
      * 
      * @throws SecurityException
@@ -491,9 +472,8 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test registration of a remote JMX using SSL and authentication of clients for
-     * connections and test connection to this remote JMX with a client having valid
-     * SSL stuff to connect (the client trusts the server and the server trusts him)
+     * Test registration of a remote JMX using SSL and authentication of clients for connections and test connection to this
+     * remote JMX with a client having valid SSL stuff to connect (the client trusts the server and the server trusts him)
      * but not providing an existing username in credentials.
      * 
      * @throws SecurityException
@@ -505,10 +485,9 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test registration of a remote JMX using SSL without clients authentication
-     * for connections and test connection to this remote JMX with a client not
-     * having valid stuff to connect (the client doesn't trust the server and
-     * doesn't provide his key store to connect).
+     * Test registration of a remote JMX using SSL without clients authentication for connections and test connection to
+     * this remote JMX with a client not having valid stuff to connect (the client doesn't trust the server and doesn't
+     * provide his key store to connect).
      * 
      * @throws ConnectIOException
      */
@@ -519,9 +498,8 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test registration of a remote JMX using SSL without clients authentication
-     * for connections and test connection to this remote JMX with a client not
-     * having valid stuff to connect (the client doesn't trust the server).
+     * Test registration of a remote JMX using SSL without clients authentication for connections and test connection to
+     * this remote JMX with a client not having valid stuff to connect (the client doesn't trust the server).
      * 
      * @throws ConnectIOException
      */
@@ -532,11 +510,9 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test registration of a remote JMX using SSL with clients authentication for
-     * connections and test connection to this remote JMX with a client not having
-     * valid stuff to connect (the client trusts the server but doesn't provide his
-     * key store to connect, therefore he can not prove that he is the owner of a
-     * trusted certificate).
+     * Test registration of a remote JMX using SSL with clients authentication for connections and test connection to this
+     * remote JMX with a client not having valid stuff to connect (the client trusts the server but doesn't provide his key
+     * store to connect, therefore he can not prove that he is the owner of a trusted certificate).
      * 
      * @throws ConnectIOException
      */
@@ -619,9 +595,8 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test registration of a remote JMX using SSL with authentication of users for
-     * connections and test connection to this remote JMX with a client not having
-     * valid stuff to connect (the client uses an untrusted certificate to
+     * Test registration of a remote JMX using SSL with authentication of users for connections and test connection to this
+     * remote JMX with a client not having valid stuff to connect (the client uses an untrusted certificate to
      * authenticate).
      * 
      * @throws ConnectIOException
@@ -637,11 +612,9 @@ public class JmxTest extends JqmBaseTest
     // -----
 
     /**
-     * Test registration of a remote JMX using SSL and authentication of clients for
-     * connections and test connection to this remote JMX with a client not having
-     * valid stuff to connect (the client trusts the server and the server trusts
-     * him but the client certificate used has a Common Name different from the
-     * username provided in credentials).
+     * Test registration of a remote JMX using SSL and authentication of clients for connections and test connection to this
+     * remote JMX with a client not having valid stuff to connect (the client trusts the server and the server trusts him
+     * but the client certificate used has a Common Name different from the username provided in credentials).
      */
     @Test(expected = SecurityException.class)
     public void jmxRemoteSslWithAuthWithWrongClientCertificateTest() throws Exception
@@ -652,9 +625,8 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test registration of a remote JMX using SSL and authentication of clients for
-     * connections and test connection to this remote JMX with a client having valid
-     * SSL stuff to connect (the client trusts the server and the server trusts him)
+     * Test registration of a remote JMX using SSL and authentication of clients for connections and test connection to this
+     * remote JMX with a client having valid SSL stuff to connect (the client trusts the server and the server trusts him)
      * but not providing the correct password in credentials.
      * 
      * @throws SecurityException
@@ -666,9 +638,8 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test registration of a remote JMX using SSL without clients authentication
-     * for connections and test connection to this remote JMX with a client having
-     * valid stuff to connect (the client trusts the server) and having one role not
+     * Test registration of a remote JMX using SSL without clients authentication for connections and test connection to
+     * this remote JMX with a client having valid stuff to connect (the client trusts the server) and having one role not
      * giving all the JMX permissions required to execute the
      * {@link JmxTest#jmxRemoteSslTest(JqmBaseTest, boolean, boolean, boolean, boolean, Runnable, boolean, boolean, boolean, String...)}
      * test successfully.
@@ -683,10 +654,9 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test registration of a remote JMX using SSL without clients authentication
-     * for connections and test connection to this remote JMX with a client having
-     * valid stuff to connect (the client trusts the server) and roles giving all
-     * the JMX permissions required to execute the
+     * Test registration of a remote JMX using SSL without clients authentication for connections and test connection to
+     * this remote JMX with a client having valid stuff to connect (the client trusts the server) and roles giving all the
+     * JMX permissions required to execute the
      * {@link JmxTest#jmxRemoteSslTest(JqmBaseTest, boolean, boolean, boolean, boolean, Runnable, boolean, boolean, boolean, String...)}
      * test successfully.
      */
@@ -706,15 +676,14 @@ public class JmxTest extends JqmBaseTest
         Assert.assertTrue(JmxTest.checkRolePolicyPermissions("role1", role1Perms));
         Assert.assertTrue(JmxTest.checkRolePolicyPermissions("role2", role2Perms));
 
-        // Role 3 is not defined in jmxremote.policy test file, it is completely created
-        // from database after updating the policy file:
+        // Role 3 is not defined in jmxremote.policy test file, it is completely created from database
+        // after updating the policy file:
         Assert.assertTrue(JmxTest.checkRolePolicyPermissions("role3", role3Perms));
     }
 
     /**
-     * Test registration of a remote JMX using SSL without clients authentication
-     * for connections and test connection to this remote JMX with a client having
-     * valid SSL stuff to connect (the client trusts the server) but not providing
+     * Test registration of a remote JMX using SSL without clients authentication for connections and test connection to
+     * this remote JMX with a client having valid SSL stuff to connect (the client trusts the server) but not providing
      * credentials.
      * 
      * @throws SecurityException
@@ -726,10 +695,9 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test registration of a remote JMX using SSL without clients authentication
-     * for connections and test connection to this remote JMX with a client having
-     * valid SSL stuff to connect (the client trusts the server) but not providing
-     * an existing username in credentials.
+     * Test registration of a remote JMX using SSL without clients authentication for connections and test connection to
+     * this remote JMX with a client having valid SSL stuff to connect (the client trusts the server) but not providing an
+     * existing username in credentials.
      * 
      * @throws SecurityException
      */
@@ -740,9 +708,8 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test registration of a remote JMX using SSL without authentication of clients
-     * for connections and test connection to this remote JMX with a client not
-     * having valid stuff to connect (the client doesn't trust the server).
+     * Test registration of a remote JMX using SSL without authentication of clients for connections and test connection to
+     * this remote JMX with a client not having valid stuff to connect (the client doesn't trust the server).
      * 
      * @throws ConnectIOException
      */
@@ -753,10 +720,9 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test registration of a remote JMX using SSL without clients authentication
-     * for connections and test connection to this remote JMX with a client having
-     * valid SSL stuff to connect (the client trusts the server) but not providing
-     * the correct password in credentials.
+     * Test registration of a remote JMX using SSL without clients authentication for connections and test connection to
+     * this remote JMX with a client having valid SSL stuff to connect (the client trusts the server) but not providing the
+     * correct password in credentials.
      * 
      * @throws SecurityException
      */
@@ -769,8 +735,7 @@ public class JmxTest extends JqmBaseTest
     // -----
 
     /**
-     * Get the permissions of the {@code roleName} role from the current Java
-     * policy.
+     * Get the permissions of the {@code roleName} role from the current Java policy.
      * 
      * @param roleName
      *                 the name of the role whose permissions are collected
@@ -784,8 +749,7 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Check if the current Java policy gives to the {@code roleName} role all the
-     * {@code rolePerms} permissions.
+     * Check if the current Java policy gives to the {@code roleName} role all the {@code rolePerms} permissions.
      * 
      * @param roleName
      *                  the name of the role whose permissions are checked
@@ -869,8 +833,7 @@ public class JmxTest extends JqmBaseTest
      * 
      * @param perm
      *             the permission from which the actions are collected
-     * @return the list of actions of the given permission, that list is empty if
-     *         the permission has no action.
+     * @return the list of actions of the given permission, that list is empty if the permission has no action.
      */
     private static List<String> getPermissionActions(Permission perm)
     {
@@ -893,14 +856,12 @@ public class JmxTest extends JqmBaseTest
     private static final Pattern PERMISSION_USELESS_CHARS = Pattern.compile("[\";,]");
 
     /**
-     * Format the {@code jqmPermName} permission name to suit the format of
-     * {@link #getPermissionName(Permission)} and {@link #getActionsList(String)} if
-     * it is a JMX permission ("jmx:" prefix), otherwise return null.
+     * Format the {@code jqmPermName} permission name to suit the format of {@link #getPermissionName(Permission)} and
+     * {@link #getActionsList(String)} if it is a JMX permission ("jmx:" prefix), otherwise return null.
      * 
      * @param jqmPermName
      *                    the name of the JQM permission saved in the database
-     * @return the formatted JMX permission, or null if the permission isn't a JMX
-     *         permission.
+     * @return the formatted JMX permission, or null if the permission isn't a JMX permission.
      */
     private static String formatJmxPermission(String jqmPermName)
     {
@@ -908,9 +869,8 @@ public class JmxTest extends JqmBaseTest
     }
 
     /**
-     * Test {@link JmxAgent#updatePolicyFile(Map)} method, checking that the
-     * permissions saved in the JQM database are correctly added to the roles by the
-     * Java policy.
+     * Test {@link JmxAgent#updatePolicyFile(Map)} method, checking that the permissions saved in the JQM database are
+     * correctly added to the roles by the Java policy.
      * 
      * @throws Exception
      */
@@ -937,8 +897,7 @@ public class JmxTest extends JqmBaseTest
         Helpers.createRoleIfMissing(cnx, "role3", "Some JMX permissions", role3Perms);
         Helpers.createRoleIfMissing(cnx, "role4", "Some JMX permissions", role4Perms);
 
-        // Get roles from the database and update policy the same way that
-        // JmxLoginModule does, ie with an user:
+        // Get roles from the database and update policy the same way that JmxLoginModule does, ie with an user:
         String userName = "testuser";
         String userPass = "password";
         Helpers.createUserIfMissing(cnx, userName, userPass, "test user", "role1", "role2", "role3", "role4");

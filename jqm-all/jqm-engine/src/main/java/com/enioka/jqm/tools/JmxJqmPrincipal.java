@@ -45,11 +45,17 @@ public abstract class JmxJqmPrincipal implements Principal, java.io.Serializable
     public boolean equals(Object o)
     {
         if (this == o)
+        {
             return true;
+        }
         if (o == null)
+        {
             return false;
+        }
         if (getClass() != o.getClass())
+        {
             return false;
+        }
 
         JmxJqmPrincipal that = (JmxJqmPrincipal) o;
         return getName().equals(that.getName());
