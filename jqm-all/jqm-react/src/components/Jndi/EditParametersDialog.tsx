@@ -135,17 +135,13 @@ export const EditParametersDialog: React.FC<{
                     parameters={tmpParams}
                     setParameters={setTmpParams}
                 />
-                <div ref={scollToRef} />
+                <div ref={scollToRef}></div>
             </DialogContent>
             <DialogActions>
                 <Button
                     variant="contained"
                     size="small"
-                    style={{
-                        alignSelf: "flex-start",
-                        marginTop: "16px",
-                        marginBottom: "1rem",
-                    }}
+                    style={{ margin: "8px" }}
                     onClick={() => {
                         setTmpParams([
                             ...tmpParams,
