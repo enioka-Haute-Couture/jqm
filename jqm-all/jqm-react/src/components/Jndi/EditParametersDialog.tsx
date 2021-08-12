@@ -16,6 +16,7 @@ import {
     IconButton,
     TextField,
 } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { JndiParameter, JndiResource } from "./JndiResource";
 
@@ -98,6 +99,13 @@ export const JndiParametersTable: React.FC<{
     );
 };
 
+const useStyles = makeStyles({
+    root: {
+        justifyContent: "flex-start",
+        margin: "1rem",
+    },
+});
+
 export const EditParametersDialog: React.FC<{
     showDialog: boolean;
     closeDialog: () => void;
@@ -105,7 +113,10 @@ export const EditParametersDialog: React.FC<{
     setSelectedResource: (newResource: JndiResource) => void;
 }> = ({ showDialog, closeDialog, selectedResource, setSelectedResource }) => {
     const [tmpParams, setTmpParams] = useState<JndiParameter[]>([]);
+    const [newParamName, setNewParamName] = useState<string>("");
+    const [newParamValue, setNewParamValue] = useState<string>("");
     const scollToRef = useRef<null | HTMLDivElement>(null);
+    const classes = useStyles();
 
     useEffect(() => {
         if (selectedResource) {
@@ -113,9 +124,15 @@ export const EditParametersDialog: React.FC<{
         }
     }, [selectedResource]);
 
+    const clearNewParamValues = () => {
+        setNewParamName("");
+        setNewParamValue("");
+    };
+
     const onCancel = () => {
         closeDialog();
         setTmpParams(selectedResource ? [...selectedResource.parameters] : []);
+        clearNewParamValues();
     };
 
     return selectedResource !== null ? (
@@ -137,22 +154,40 @@ export const EditParametersDialog: React.FC<{
                 />
                 <div ref={scollToRef}></div>
             </DialogContent>
-            <DialogActions>
+            <DialogActions classes={{ root: classes.root }}>
+                <TextField
+                    label="Name"
+                    value={newParamName}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setNewParamName(event.target.value);
+                    }}
+                />
+                <TextField
+                    label="Value"
+                    value={newParamValue}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setNewParamValue(event.target.value);
+                    }}
+                />
                 <Button
                     variant="contained"
                     size="small"
-                    style={{ margin: "8px" }}
+                    style={{ margin: "1rem" }}
+                    disabled={!newParamName || !newParamValue}
                     onClick={() => {
                         setTmpParams([
                             ...tmpParams,
-                            { key: "name", value: "value" },
+                            { key: newParamName, value: newParamValue },
                         ]);
                         scollToRef.current!.scrollIntoView();
+                        clearNewParamValues();
                     }}
                     color="primary"
                 >
                     Add new parameter
                 </Button>
+            </DialogActions>
+            <DialogActions>
                 <Button
                     variant="contained"
                     size="small"

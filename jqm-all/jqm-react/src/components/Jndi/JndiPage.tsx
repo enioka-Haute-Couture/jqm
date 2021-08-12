@@ -32,6 +32,7 @@ export const JndiPage: React.FC = () => {
         []
     );
 
+    // TODO: VERIFY API CALLS WHEN API IS WORKING CORRECTLY
     const { resources, fetchResources, saveResource, deleteResource } =
         useJndiApi();
 
@@ -246,7 +247,9 @@ export const JndiPage: React.FC = () => {
                                 aria-label={"Create new JNDI resource"}
                                 onClick={() => setShowDropDown(true)}
                             >
-                                <AddCircleIcon />
+                                <AddCircleIcon
+                                    innerRef={dropDownMenuPositionRef}
+                                />
                             </IconButton>
                         </Tooltip>
                         <ResourceDropDownMenu

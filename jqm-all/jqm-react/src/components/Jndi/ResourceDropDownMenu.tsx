@@ -67,14 +67,14 @@ export const ResourceDropDownMenu: React.FC<{
         resources.map(({ name, resourceKey }) =>
             selectGroupList.push(
                 <MenuItem key={resourceKey} value={resourceKey}>
-                    New {name}
+                    {name}
                 </MenuItem>
             )
         );
     });
 
     return (
-        <FormControl ref={menuPositiontRef}>
+        <FormControl>
             <Select
                 id="select"
                 style={{ display: "none" }}
@@ -85,11 +85,14 @@ export const ResourceDropDownMenu: React.FC<{
                 onClose={() => onClose()}
                 onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
                     const val = event.target.value as string;
-                    onSelectResource(resourceTemplates[val]);
+                    const resource = resourceTemplates[val];
+                    if (resource && resource.name) {
+                        onSelectResource(resourceTemplates[val]);
+                    }
                 }}
                 MenuProps={{
                     anchorEl: menuPositiontRef.current,
-                    style: { marginTop: "5rem" },
+                    style: { marginTop: "3.5rem" },
                 }}
             >
                 {selectGroupList}
