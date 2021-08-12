@@ -64,10 +64,10 @@ export const ResourceDropDownMenu: React.FC<{
                 {title}
             </ListSubheader>
         );
-        resources.map(({ name, resourceKey }) =>
+        resources.map(({ uiName, resourceKey }) =>
             selectGroupList.push(
                 <MenuItem key={resourceKey} value={resourceKey}>
-                    {name}
+                    {uiName}
                 </MenuItem>
             )
         );

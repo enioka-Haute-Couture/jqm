@@ -1,4 +1,5 @@
 export interface JndiResource {
+    uiName?: string; // simply for ui usage
     id?: number;
     auth: string;
     name: string;
