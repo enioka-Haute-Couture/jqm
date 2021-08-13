@@ -1,4 +1,4 @@
-const API_URL = "/ws/admin";
+const API_URL = "/ws";
 
 export default class APIService {
     static headers() {

@@ -1,10 +1,13 @@
 import { useState, useCallback } from "react";
-import { useSnackbar } from "notistack";
 import APIService from "../../utils/APIService";
 import { Node } from "./Node";
+import { useNotificationService } from "../../utils/NotificationService";
+
+const API_URL = "/admin/node"
 
 const useNodesApi = () => {
-    const { enqueueSnackbar } = useSnackbar();
+    const { displayError, displaySuccess } = useNotificationService();
+
     const [nodes, setNodes] = useState<Node[] | null>();
     const [nodeLogs, setNodeLogs] =
         useState<{
@@ -13,40 +16,21 @@ const useNodesApi = () => {
         }>();
 
     const fetchNodes = useCallback(async () => {
-        return APIService.get("/node")
+        return APIService.get(API_URL)
             .then((nodes) => setNodes(nodes))
-            .catch((reason) => {
-                console.debug(reason);
-                enqueueSnackbar(
-                    "An error occured, please contact support support@enioka.com for help.",
-                    {
-                        variant: "error",
-                        persist: true,
-                    }
-                );
-            });
-    }, [enqueueSnackbar]);
+            .catch(displayError);
+    }, [displayError]);
 
     const updateNodes = useCallback(
         async (nodes: Node[]) => {
-            return APIService.put("/node", nodes)
+            return APIService.put(API_URL, nodes)
                 .then(() => {
                     fetchNodes();
-                    enqueueSnackbar("Successfully updated node", {
-                        variant: "success",
-                    });
+                    displaySuccess("Successfully updated node");
                 })
-                .catch((reason) => {
-                    enqueueSnackbar(
-                        "An error occured, please contact support for help.",
-                        {
-                            variant: "error",
-                            persist: true,
-                        }
-                    );
-                });
+                .catch(displayError);
         },
-        [fetchNodes, enqueueSnackbar]
+        [fetchNodes, displaySuccess, displayError]
     );
 
     const updateNode = useCallback(
@@ -57,7 +41,7 @@ const useNodesApi = () => {
     const fetchNodeLogs = useCallback(
         async (nodeName: string, latest: number = 200) => {
             return APIService.get(
-                `/node/${nodeName}/log?latest=${latest}`,
+                `${API_URL}/${nodeName}/log?latest=${latest}`,
                 {
                     headers: {
                         Accept: "application/octet-stream",
@@ -69,17 +53,9 @@ const useNodesApi = () => {
                 .then((textData) =>
                     setNodeLogs({ nodeName: nodeName, data: textData })
                 )
-                .catch((reason) => {
-                    enqueueSnackbar(
-                        "An error occured, please contact support support@enioka.com for help.",
-                        {
-                            variant: "error",
-                            persist: true,
-                        }
-                    );
-                });
+                .catch(displayError);
         },
-        [enqueueSnackbar]
+        [displayError]
     );
 
     return {

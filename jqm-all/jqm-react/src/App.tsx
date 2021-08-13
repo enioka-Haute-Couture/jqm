@@ -18,6 +18,7 @@ import MappingsPage from "./components/Mappings/MappingsPage";
 import RolesPage from "./components/Roles/RolesPage";
 import { JndiPage } from "./components/Jndi/JndiPage";
 import ClusterwideParametersPage from "./components/ClusterwideParameters/ClusterwideParametersPage";
+import RunsPage from "./components/Runs/RunsPage";
 
 declare module "@material-ui/core/styles/overrides" {
     interface ComponentNameToClassKey {
@@ -102,6 +103,9 @@ function App() {
                                 </Route>
                                 <Route path="/jndi" exact={true}>
                                     <JndiPage />
+                                </Route>
+                                <Route path="/runs" exact={true}>
+                                    <RunsPage />
                                 </Route>
                                 <Route path="/" exact={true}>
                                     <HomePage />

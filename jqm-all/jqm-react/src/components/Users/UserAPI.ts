@@ -4,13 +4,14 @@ import { useNotificationService } from "../../utils/NotificationService";
 import { Role } from "../Roles/Role";
 import { User } from "./User";
 
+const API_URL = "/admin/user";
 
 export const useUserAPI = () => {
     const [users, setUsers] = useState<User[] | null>(null);
     const [roles, setRoles] = useState<Role[] | null>(null);
     const { displayError, displaySuccess } = useNotificationService();
     const fetchRoles = useCallback(async () => {
-        APIService.get("/role")
+        APIService.get("/admin/role")
             .then((response) => {
                 setRoles(response);
             })
@@ -19,7 +20,7 @@ export const useUserAPI = () => {
 
 
     const fetchUsers = useCallback(async () => {
-        APIService.get("/user")
+        APIService.get(API_URL)
             .then((response) => {
                 setUsers(response);
             })
@@ -28,7 +29,7 @@ export const useUserAPI = () => {
 
     const createUser = useCallback(
         async (newUser: User) => {
-            return APIService.post("/user", newUser)
+            return APIService.post(API_URL, newUser)
                 .then(() => {
                     fetchUsers();
                     displaySuccess(`Successfully created user: ${newUser.login}`);
@@ -41,7 +42,7 @@ export const useUserAPI = () => {
     const deleteUsers = useCallback(
         async (userIds: number[]) => {
             return await Promise.all(
-                userIds.map((id) => APIService.delete("/user/" + id))
+                userIds.map((id) => APIService.delete(`${API_URL}/${id}`))
             )
                 .then(() => {
                     fetchUsers();
@@ -54,7 +55,7 @@ export const useUserAPI = () => {
 
     const updateUser = useCallback(
         async (user: User) => {
-            return APIService.put("/user/" + user.id, user)
+            return APIService.put(`${API_URL}/${user.id}`, user)
                 .then(() => {
                     fetchUsers();
                     displaySuccess(`Successfully updated user ${user.login}`);
@@ -67,7 +68,7 @@ export const useUserAPI = () => {
     const changePassword = useCallback(
         (userId: string) =>
             async (password: string) => {
-                return APIService.put("/user/" + userId, { newPassword: password })
+                return APIService.put(`${API_URL}/${userId}`, { newPassword: password })
                     .then(() => {
                         displaySuccess(`Successfully updated password of user`);
                     })
