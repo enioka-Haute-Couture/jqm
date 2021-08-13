@@ -16,6 +16,7 @@ import QueuesPage from "./components/Queues/QueuesPage";
 import { NodesPage } from "./components/Nodes/NodesPage";
 import MappingsPage from "./components/Mappings/MappingsPage";
 import RolesPage from "./components/Roles/RolesPage";
+import { JndiPage } from "./components/Jndi/JndiPage";
 import ClusterwideParametersPage from "./components/ClusterwideParameters/ClusterwideParametersPage";
 import { JobDefinitionsPage } from "./components/JobDefinitions/JobDefinitionsPage";
 
@@ -102,6 +103,9 @@ function App() {
                                 </Route>
                                 <Route path="/roles" exact={true}>
                                     <RolesPage />
+                                </Route>
+                                <Route path="/jndi" exact={true}>
+                                    <JndiPage />
                                 </Route>
                                 <Route path="/" exact={true}>
                                     <HomePage />

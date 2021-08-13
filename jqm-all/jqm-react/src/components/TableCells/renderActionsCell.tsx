@@ -7,7 +7,7 @@ import CancelIcon from "@material-ui/icons/Cancel";
 
 export interface extraActionItem {
     title: string;
-    icon: JSX.Element;
+    addIcon: Function;
     action: Function;
 }
 
@@ -59,7 +59,7 @@ export const renderActionsCell =
                                     extraActionItem.action(tableMeta)
                                 }
                             >
-                                {extraActionItem.icon}
+                                {extraActionItem.addIcon(tableMeta)}
                             </IconButton>
                         </Tooltip>
                     ))}

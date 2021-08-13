@@ -297,7 +297,7 @@ export const NodesPage: React.FC = () => {
                     [
                         {
                             title: "View node logs",
-                            icon: <DescriptionIcon />,
+                            addIcon: () => <DescriptionIcon />,
                             action: handleOnViewLogs,
                         },
                     ]
