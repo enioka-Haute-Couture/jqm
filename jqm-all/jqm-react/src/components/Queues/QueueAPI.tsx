@@ -22,7 +22,9 @@ export const useQueueAPI = () => {
             return APIService.post(API_URL, newQueue)
                 .then(() => {
                     fetchQueues();
-                    displaySuccess(`Successfully created queue: ${newQueue.name}`);
+                    displaySuccess(
+                        `Successfully created queue: ${newQueue.name}`
+                    );
                 })
                 .catch(displayError);
         },
@@ -37,7 +39,9 @@ export const useQueueAPI = () => {
                 .then(() => {
                     fetchQueues();
                     displaySuccess(
-                        `Successfully deleted queue${queueIds.length > 1 ? "s" : ""}`);
+                        `Successfully deleted queue${queueIds.length > 1 ? "s" : ""
+                        }`
+                    );
                 })
                 .catch(displayError);
         },

@@ -3,7 +3,7 @@ import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
 import { Role } from "./Role";
 
-const API_URL = "/admin/role"
+const API_URL = "/admin/role";
 
 export const useRoleAPI = () => {
     const [roles, setRoles] = useState<Role[] | null>(null);
@@ -21,7 +21,9 @@ export const useRoleAPI = () => {
             return APIService.post(API_URL, newRole)
                 .then(() => {
                     fetchRoles();
-                    displaySuccess(`Successfully created role: ${newRole.name}`);
+                    displaySuccess(
+                        `Successfully created role: ${newRole.name}`
+                    );
                 })
                 .catch(displayError);
         },
@@ -35,7 +37,11 @@ export const useRoleAPI = () => {
             )
                 .then(() => {
                     fetchRoles();
-                    displaySuccess(`Successfully deleted role${roleIds.length > 1 ? "s" : ""}`);
+                    displaySuccess(
+                        `Successfully deleted role${
+                            roleIds.length > 1 ? "s" : ""
+                        }`
+                    );
                 })
                 .catch(displayError);
         },
@@ -49,7 +55,7 @@ export const useRoleAPI = () => {
                     fetchRoles();
                     displaySuccess(`Successfully updated role ${role.name}`);
                 })
-                .catch(displayError)
+                .catch(displayError);
         },
         [displayError, displaySuccess, fetchRoles]
     );

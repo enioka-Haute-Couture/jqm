@@ -19,6 +19,7 @@ import RolesPage from "./components/Roles/RolesPage";
 import { JndiPage } from "./components/Jndi/JndiPage";
 import ClusterwideParametersPage from "./components/ClusterwideParameters/ClusterwideParametersPage";
 import RunsPage from "./components/Runs/RunsPage";
+import { JobDefinitionsPage } from "./components/JobDefinitions/JobDefinitionsPage";
 
 declare module "@material-ui/core/styles/overrides" {
     interface ComponentNameToClassKey {
@@ -33,7 +34,6 @@ declare module "@material-ui/core/styles/overrides" {
 const getMuiTheme = () =>
     createMuiTheme({
         overrides: {
-            // TODO: center head and body ?
             // MUIDataTableHeadCell: {
             //     root: {
             //         flexGrow: 1,
@@ -57,11 +57,10 @@ const getMuiTheme = () =>
         },
         palette: {
             primary: {
-                main: "#607D8B",
+                main: "#355759",
             },
             secondary: {
-                main: "#7b96a3", // FIXME: choose secondary color
-                light: "#7b96a3",
+                main: "#147C94",
             },
         },
     });
@@ -91,6 +90,9 @@ function App() {
                                     exact={true}
                                 >
                                     <ClusterwideParametersPage />
+                                </Route>
+                                <Route path="/job-definitions" exact={true}>
+                                    <JobDefinitionsPage />
                                 </Route>
                                 <Route path="/users" exact={true}>
                                     <UsersPage />

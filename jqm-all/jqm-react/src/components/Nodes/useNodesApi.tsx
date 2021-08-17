@@ -9,11 +9,10 @@ const useNodesApi = () => {
     const { displayError, displaySuccess } = useNotificationService();
 
     const [nodes, setNodes] = useState<Node[] | null>();
-    const [nodeLogs, setNodeLogs] =
-        useState<{
-            nodeName: string;
-            data: string;
-        }>();
+    const [nodeLogs, setNodeLogs] = useState<{
+        nodeName: string;
+        data: string;
+    }>();
 
     const fetchNodes = useCallback(async () => {
         return APIService.get(API_URL)

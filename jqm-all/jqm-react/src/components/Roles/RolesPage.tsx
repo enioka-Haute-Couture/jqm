@@ -1,5 +1,10 @@
-
-import { Container, Grid, CircularProgress, IconButton, Tooltip, Typography } from "@material-ui/core";
+import {
+    Container,
+    Grid,
+    CircularProgress,
+    IconButton,
+    Tooltip,
+} from "@material-ui/core";
 import MUIDataTable, { MUIDataTableColumnDef } from "mui-datatables";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import HelpIcon from "@material-ui/icons/Help";
@@ -9,17 +14,19 @@ import { useRoleAPI } from "./RoleAPI";
 import { renderActionsCell, renderInputCell } from "../TableCells";
 import { EditPermissionsDialog } from "./EditPermissionsDialog";
 import { CreateRoleDialog } from "./CreateRoleDialog";
-
+import { renderDialogCell } from "../TableCells/renderDialogCell";
 
 const RolesPage: React.FC = () => {
-
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const nameInputRef = useRef(null);
     const descriptionInputRef = useRef(null);
-    const { roles, fetchRoles, createRole, updateRole, deleteRoles } = useRoleAPI();
+    const { roles, fetchRoles, createRole, updateRole, deleteRoles } =
+        useRoleAPI();
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [permissions, setPermissions] = useState<string[] | null>(null);
-    const [editPermissionsRoleId, setEditPermissionsRoleId] = useState<string | null>(null);
+    const [editPermissionsRoleId, setEditPermissionsRoleId] = useState<
+        string | null
+    >(null);
 
     useEffect(() => {
         fetchRoles();
@@ -37,7 +44,7 @@ const RolesPage: React.FC = () => {
                     id: id,
                     name: name,
                     description: description,
-                    permissions: permissions!!
+                    permissions: permissions!!,
                 }).then(() => setEditingRowId(null));
             }
         },
@@ -62,13 +69,10 @@ const RolesPage: React.FC = () => {
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
 
-    const handleOnEdit = useCallback(
-        (tableMeta) => {
-            setEditingRowId(tableMeta.rowIndex)
-            setPermissions(tableMeta.rowData[3]);
-        },
-        []
-    );
+    const handleOnEdit = useCallback((tableMeta) => {
+        setEditingRowId(tableMeta.rowIndex);
+        setPermissions(tableMeta.rowData[3]);
+    }, []);
 
     const columns: MUIDataTableColumnDef[] = [
         {
@@ -102,7 +106,7 @@ const RolesPage: React.FC = () => {
                 customBodyRender: renderInputCell(
                     descriptionInputRef,
                     editingRowId,
-                    true,
+                    true
                 ),
             },
         },
@@ -112,32 +116,14 @@ const RolesPage: React.FC = () => {
             options: {
                 filter: false,
                 sort: false,
-                customBodyRender:
-                    (value: any, tableMeta: any) =>
-
-                        (editingRowId === tableMeta.rowIndex) ?
-                            <Tooltip title={(editingRowId === tableMeta.rowIndex) ? "Click to edit permissions" : ""}>
-                                <Typography
-                                    onClick={() => {
-                                        const [roleId] = tableMeta.rowData;
-                                        setEditPermissionsRoleId(roleId);
-                                    }}
-                                    style={{
-                                        fontSize: "0.875rem", paddingTop: "13px", cursor: "pointer",
-                                        paddingBottom: "6px"
-                                        , borderBottom: "1px solid black"
-                                    }}
-                                >
-                                    {permissions!.join(", ")}
-                                </Typography>
-                            </Tooltip>
-                            :
-                            <Typography
-                                style={{ fontSize: "0.875rem", paddingTop: "5px" }}
-                            >
-                                {(value as string[]).join(", ")}
-                            </Typography>
-            }
+                customBodyRender: renderDialogCell(
+                    editingRowId,
+                    "Click to edit permissions",
+                    permissions,
+                    (value: any[]) => (value as string[]).join(", "),
+                    setEditPermissionsRoleId
+                ),
+            },
         },
         {
             name: "",
@@ -155,7 +141,6 @@ const RolesPage: React.FC = () => {
             },
         },
     ];
-
 
     const options = {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
@@ -219,13 +204,15 @@ const RolesPage: React.FC = () => {
                     columns={columns}
                     options={options}
                 />
-                {editPermissionsRoleId !== null &&
+                {editPermissionsRoleId !== null && (
                     <EditPermissionsDialog
                         closeDialog={() => setEditPermissionsRoleId(null)}
                         permissions={permissions!!}
-                        setPermissions={(permissions: string[]) => setPermissions(permissions)}
+                        setPermissions={(permissions: string[]) =>
+                            setPermissions(permissions)
+                        }
                     />
-                }
+                )}
                 {showCreateDialog && (
                     <CreateRoleDialog
                         closeDialog={() => setShowCreateDialog(false)}
@@ -233,7 +220,6 @@ const RolesPage: React.FC = () => {
                     />
                 )}
             </Container>
-
         );
     } else {
         return (

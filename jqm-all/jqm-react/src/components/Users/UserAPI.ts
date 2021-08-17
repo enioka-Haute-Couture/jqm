@@ -18,7 +18,6 @@ export const useUserAPI = () => {
             .catch(displayError);
     }, [displayError]);
 
-
     const fetchUsers = useCallback(async () => {
         APIService.get(API_URL)
             .then((response) => {
@@ -32,7 +31,9 @@ export const useUserAPI = () => {
             return APIService.post(API_URL, newUser)
                 .then(() => {
                     fetchUsers();
-                    displaySuccess(`Successfully created user: ${newUser.login}`);
+                    displaySuccess(
+                        `Successfully created user: ${newUser.login}`
+                    );
                 })
                 .catch(displayError);
         },
@@ -46,7 +47,11 @@ export const useUserAPI = () => {
             )
                 .then(() => {
                     fetchUsers();
-                    displaySuccess(`Successfully deleted user${userIds.length > 1 ? "s" : ""}`);
+                    displaySuccess(
+                        `Successfully deleted user${
+                            userIds.length > 1 ? "s" : ""
+                        }`
+                    );
                 })
                 .catch(displayError);
         },
@@ -60,23 +65,32 @@ export const useUserAPI = () => {
                     fetchUsers();
                     displaySuccess(`Successfully updated user ${user.login}`);
                 })
-                .catch(displayError)
+                .catch(displayError);
         },
         [displayError, displaySuccess, fetchUsers]
     );
 
     const changePassword = useCallback(
-        (userId: string) =>
-            async (password: string) => {
-                return APIService.put(`${API_URL}/${userId}`, { newPassword: password })
-                    .then(() => {
-                        displaySuccess(`Successfully updated password of user`);
-                    })
-                    .catch(displayError)
-            },
+        (userId: string) => async (password: string) => {
+            return APIService.put(`${API_URL}/${userId}`, {
+                newPassword: password,
+            })
+                .then(() => {
+                    displaySuccess(`Successfully updated password of user`);
+                })
+                .catch(displayError);
+        },
         [displayError, displaySuccess]
     );
 
-
-    return { users, roles, fetchUsers, fetchRoles, createUser, updateUser, deleteUsers, changePassword };
+    return {
+        users,
+        roles,
+        fetchUsers,
+        fetchRoles,
+        createUser,
+        updateUser,
+        deleteUsers,
+        changePassword,
+    };
 };

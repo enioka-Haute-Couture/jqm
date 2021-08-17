@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Button, FormControl, Input, InputLabel, MenuItem, Select, Switch } from "@material-ui/core";
+import {
+    Button,
+    FormControl,
+    Input,
+    InputLabel,
+    MenuItem,
+    Select,
+    Switch,
+} from "@material-ui/core";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -27,14 +35,14 @@ const useStyles = makeStyles((theme: Theme) =>
 export const CreateMappingDialog: React.FC<{
     closeDialog: () => void;
     createMapping: (mapping: Mapping) => void;
-    nodes: Node[],
-    queues: Queue[]
+    nodes: Node[];
+    queues: Queue[];
 }> = ({ closeDialog, createMapping, nodes, queues }) => {
-    const [nodeId, setNodeId] = useState<number | null>(null);
-    const [queueId, setQueueId] = useState<number | null>(null);
+    const [nodeId, setNodeId] = useState<number>(nodes[0].id!);
+    const [queueId, setQueueId] = useState<number>(queues[0].id!);
 
     const [pollingInterval, setPollingInterval] = useState<string>("");
-    const [nbThread, setNbThread] = useState<string>("")
+    const [nbThread, setNbThread] = useState<string>("");
     const [enabled, setEnabled] = useState(false);
     const classes = useStyles();
     return (
@@ -51,7 +59,9 @@ export const CreateMappingDialog: React.FC<{
                         labelId="node-id-select-label"
                         fullWidth
                         value={nodeId}
-                        onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
+                        onChange={(
+                            event: React.ChangeEvent<{ value: unknown }>
+                        ) => {
                             setNodeId(event.target.value as number);
                         }}
                         input={<Input />}
@@ -69,7 +79,9 @@ export const CreateMappingDialog: React.FC<{
                         labelId="queue-id-select-label"
                         fullWidth
                         value={queueId}
-                        onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
+                        onChange={(
+                            event: React.ChangeEvent<{ value: unknown }>
+                        ) => {
                             setQueueId(event.target.value as number);
                         }}
                         input={<Input />}
@@ -130,11 +142,15 @@ export const CreateMappingDialog: React.FC<{
                     variant="contained"
                     size="small"
                     color="primary"
-                    disabled={!queueId || !nodeId || !pollingInterval || !nbThread}
+                    disabled={
+                        !queueId || !nodeId || !pollingInterval || !nbThread
+                    }
                     style={{ margin: "8px" }}
                     onClick={() => {
-                        const nodeName = nodes?.find(x => x.id === nodeId)?.name!
-                        const queueName = queues?.find(x => x.id === queueId)?.name!
+                        const nodeName = nodes?.find((x) => x.id === nodeId)
+                            ?.name!;
+                        const queueName = queues?.find((x) => x.id === queueId)
+                            ?.name!;
                         createMapping({
                             enabled: enabled,
                             nodeId: nodeId!,
@@ -142,7 +158,7 @@ export const CreateMappingDialog: React.FC<{
                             nodeName: nodeName,
                             queueName: queueName,
                             nbThread: +nbThread,
-                            pollingInterval: +pollingInterval
+                            pollingInterval: +pollingInterval,
                         });
                         closeDialog();
                     }}

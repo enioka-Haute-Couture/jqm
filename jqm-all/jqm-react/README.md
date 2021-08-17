@@ -25,12 +25,3 @@ Change the proxy port in package.json for requests to be properly redirected.
 
 * Use `yarn install` to install dependencies
 * Use `yarn start`to start development server
-
-## Technical TODOs
-
-* fix formatting in vscode, add settings
-* add Roboto font ?
-* 2 or 4 tab spaces
-* https://webpack.js.org/guides/hot-module-replacement/
-* Use absolute import only
-* renable strict mode ?
