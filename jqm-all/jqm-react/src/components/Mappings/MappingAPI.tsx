@@ -20,7 +20,9 @@ export const useMappingAPI = () => {
             return APIService.post("/qmapping", newMapping)
                 .then(() => {
                     fetchMappings();
-                    displaySuccess(`Successfully created mapping between ${newMapping.nodeName} and ${newMapping.queueName}`);
+                    displaySuccess(
+                        `Successfully created mapping between ${newMapping.nodeName} and ${newMapping.queueName}`
+                    );
                 })
                 .catch(displayError);
         },
@@ -35,7 +37,10 @@ export const useMappingAPI = () => {
                 .then(() => {
                     fetchMappings();
                     displaySuccess(
-                        `Successfully deleted mapping${mappingIds.length > 1 ? "s" : ""}`);
+                        `Successfully deleted mapping${
+                            mappingIds.length > 1 ? "s" : ""
+                        }`
+                    );
                 })
                 .catch(displayError);
         },
@@ -44,9 +49,7 @@ export const useMappingAPI = () => {
 
     const updateMapping = useCallback(
         // TODO: handle 400 when https://github.com/enioka/jqm/issues/446 is done
-        async (
-            mapping: Mapping
-        ) => {
+        async (mapping: Mapping) => {
             return APIService.put("/qmapping/" + mapping.id, mapping)
                 .then(() => {
                     fetchMappings();

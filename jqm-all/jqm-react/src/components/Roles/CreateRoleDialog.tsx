@@ -26,7 +26,6 @@ export const CreateRoleDialog: React.FC<{
     closeDialog: () => void;
     createRole: (role: Role) => void;
 }> = ({ closeDialog, createRole }) => {
-
     const [name, setName] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [permissions, setPermissions] = useState<string[]>([]);
@@ -42,7 +41,6 @@ export const CreateRoleDialog: React.FC<{
         >
             <DialogTitle>Create role</DialogTitle>
             <DialogContent>
-
                 <TextField
                     className={classes.TextField}
                     label="Name*"
@@ -61,7 +59,10 @@ export const CreateRoleDialog: React.FC<{
                     }}
                     fullWidth
                 />
-                <PermissionsForm permissions={permissions} setPermissions={setPermissions} />
+                <PermissionsForm
+                    permissions={permissions}
+                    setPermissions={setPermissions}
+                />
             </DialogContent>
             <DialogActions>
                 <Button
@@ -82,7 +83,7 @@ export const CreateRoleDialog: React.FC<{
                         createRole({
                             name: name,
                             description: description,
-                            permissions: permissions
+                            permissions: permissions,
                         });
                         closeDialog();
                     }}

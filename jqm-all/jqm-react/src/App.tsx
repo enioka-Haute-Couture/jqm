@@ -90,9 +90,7 @@ function App() {
                                 >
                                     <ClusterwideParametersPage />
                                 </Route>
-                                <Route
-                                    path="/job-definitions"
-                                    exact={true}>
+                                <Route path="/job-definitions" exact={true}>
                                     <JobDefinitionsPage />
                                 </Route>
                                 <Route path="/users" exact={true}>

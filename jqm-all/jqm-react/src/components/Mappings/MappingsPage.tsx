@@ -124,10 +124,10 @@ const MappingsPage: React.FC = () => {
                     editingRowId,
                     nodes
                         ? nodes!.map((node: Node) => (
-                            <MenuItem key={node.id} value={node.id}>
-                                {node.name}
-                            </MenuItem>
-                        ))
+                              <MenuItem key={node.id} value={node.id}>
+                                  {node.name}
+                              </MenuItem>
+                          ))
                         : [],
                     (element: number) =>
                         nodes?.find((x) => x.id === element)?.name || "",
@@ -148,10 +148,10 @@ const MappingsPage: React.FC = () => {
                     editingRowId,
                     queues
                         ? queues!.map((queue: Queue) => (
-                            <MenuItem key={queue.id} value={queue.id}>
-                                {queue.name}
-                            </MenuItem>
-                        ))
+                              <MenuItem key={queue.id} value={queue.id}>
+                                  {queue.name}
+                              </MenuItem>
+                          ))
                         : [],
                     (element: number) =>
                         queues?.find((x) => x.id === element)?.name || "",

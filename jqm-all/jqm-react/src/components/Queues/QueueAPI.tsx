@@ -19,7 +19,9 @@ export const useQueueAPI = () => {
             return APIService.post("/q", newQueue)
                 .then(() => {
                     fetchQueues();
-                    displaySuccess(`Successfully created queue: ${newQueue.name}`);
+                    displaySuccess(
+                        `Successfully created queue: ${newQueue.name}`
+                    );
                 })
                 .catch(displayError);
         },
@@ -34,7 +36,10 @@ export const useQueueAPI = () => {
                 .then(() => {
                     fetchQueues();
                     displaySuccess(
-                        `Successfully deleted queue${queueIds.length > 1 ? "s" : ""}`);
+                        `Successfully deleted queue${
+                            queueIds.length > 1 ? "s" : ""
+                        }`
+                    );
                 })
                 .catch(displayError);
         },
@@ -42,9 +47,7 @@ export const useQueueAPI = () => {
     );
 
     const updateQueue = useCallback(
-        async (
-            queue: Queue
-        ) => {
+        async (queue: Queue) => {
             return APIService.put("/q/" + queue.id, queue)
                 .then(() => {
                     fetchQueues();

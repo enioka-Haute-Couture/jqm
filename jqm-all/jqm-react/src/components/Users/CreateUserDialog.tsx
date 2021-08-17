@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { Button, FormControl, FormGroup, Input, InputLabel, MenuItem, Select, Switch } from "@material-ui/core";
+import {
+    Button,
+    FormControl,
+    FormGroup,
+    Input,
+    InputLabel,
+    MenuItem,
+    Select,
+    Switch,
+} from "@material-ui/core";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -91,7 +100,9 @@ export const CreateUserDialog: React.FC<{
                         labelId="user-roles-select-label"
                         fullWidth
                         value={userRoles}
-                        onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
+                        onChange={(
+                            event: React.ChangeEvent<{ value: unknown }>
+                        ) => {
                             setUserRoles(event.target.value as number[]);
                         }}
                         input={<Input />}
@@ -112,10 +123,10 @@ export const CreateUserDialog: React.FC<{
                     id="date-picker-inline"
                     value={expirationDate}
                     onChange={(date) => {
-                        setExpirationDate(date)
+                        setExpirationDate(date);
                     }}
                     KeyboardButtonProps={{
-                        'aria-label': 'change date',
+                        "aria-label": "change date",
                     }}
                 />
             </DialogContent>
@@ -140,8 +151,10 @@ export const CreateUserDialog: React.FC<{
                             email: email,
                             freeText: fullName,
                             locked: locked,
-                            expirationDate: expirationDate ? expirationDate : undefined,
-                            roles: userRoles
+                            expirationDate: expirationDate
+                                ? expirationDate
+                                : undefined,
+                            roles: userRoles,
                         });
                         closeDialog();
                     }}

@@ -7,7 +7,7 @@ export interface JobDefinitionSchedule {
     id?: number;
     cronExpression: string; // * * * * *
     queue?: number;
-    parameters: Array<JobDefinitionParameter>
+    parameters: Array<JobDefinitionParameter>;
 }
 
 export interface JobDefinitionTags {
@@ -29,8 +29,8 @@ export interface JobDefinitionSpecificProperties {
 export enum JobType {
     java = "java",
     shell = "shell",
-    process = "process"
-};
+    process = "process",
+}
 
 export interface JobDefinition {
     // Identity
@@ -45,7 +45,7 @@ export interface JobDefinition {
     // Tags
     tags: JobDefinitionTags;
     jobType?: JobType;
-    properties: JobDefinitionSpecificProperties,
+    properties: JobDefinitionSpecificProperties;
     // Parameters
-    parameters: Array<JobDefinitionParameter>
+    parameters: Array<JobDefinitionParameter>;
 }
