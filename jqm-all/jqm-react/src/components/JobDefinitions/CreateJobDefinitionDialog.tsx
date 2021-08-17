@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { Button, FormControl, FormGroup, Input, InputLabel, MenuItem, Select, Switch } from "@material-ui/core";
+import {
+    Button,
+    FormControl,
+    FormGroup,
+    Input,
+    InputLabel,
+    MenuItem,
+    Select,
+    Switch,
+} from "@material-ui/core";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -31,7 +40,7 @@ export const CreateJobDefinitionDialog: React.FC<{
 }> = ({ closeDialog, createJobDefinition, queues }) => {
     const [queueId, setQueueId] = useState<number>(queues[0].id!);
     const [applicationName, setApplicationName] = useState("");
-    const [description, setDescription] = useState("")
+    const [description, setDescription] = useState("");
     const [enabled, setEnabled] = useState(true);
     const [highlander, setHighlander] = useState(false);
     const [jobType, setJobType] = useState<JobType>(JobType.java);
@@ -39,18 +48,17 @@ export const CreateJobDefinitionDialog: React.FC<{
     const [jarPath, setJarPath] = useState<string>("");
     const [pathType, setPathType] = useState<string>("");
 
-
     const classes = useStyles();
     return (
         <Dialog
             open={true}
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
-            fullWidth maxWidth={"md"}
+            fullWidth
+            maxWidth={"md"}
         >
             <DialogTitle>Create job definition</DialogTitle>
             <DialogContent>
-
                 <TextField
                     className={classes.TextField}
                     label="Name*"
@@ -76,7 +84,9 @@ export const CreateJobDefinitionDialog: React.FC<{
                         labelId="queue-id-select-label"
                         fullWidth
                         value={queueId}
-                        onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
+                        onChange={(
+                            event: React.ChangeEvent<{ value: unknown }>
+                        ) => {
                             setQueueId(event.target.value as number);
                         }}
                         input={<Input />}
@@ -125,31 +135,36 @@ export const CreateJobDefinitionDialog: React.FC<{
                 </FormGroup>
 
                 <FormControl fullWidth style={{ marginBottom: "16px" }}>
-                    <InputLabel id="job-type-select-label">Job type*</InputLabel>
+                    <InputLabel id="job-type-select-label">
+                        Job type*
+                    </InputLabel>
                     <Select
                         labelId="job-type-select-label"
                         fullWidth
                         value={jobType}
-                        onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
-                            let jobType = event.target.value as JobType
+                        onChange={(
+                            event: React.ChangeEvent<{ value: unknown }>
+                        ) => {
+                            let jobType = event.target.value as JobType;
                             if (jobType === JobType.shell) {
                                 setPathType("DEFAULTSHELLCOMMAND");
                             } else {
                                 setPathType("");
                             }
-                            setJarPath("")
-                            setJavaClassName("")
+                            setJarPath("");
+                            setJavaClassName("");
                             setJobType(jobType);
                         }}
                         input={<Input />}
                     >
-                        {Object.keys(JobType).map(key => {
+                        {Object.keys(JobType).map((key) => {
                             // console.log(key);
-                            return <MenuItem key={key} value={key}>
-                                {key}
-                            </MenuItem>
-                        }
-                        )}
+                            return (
+                                <MenuItem key={key} value={key}>
+                                    {key}
+                                </MenuItem>
+                            );
+                        })}
                     </Select>
                 </FormControl>
                 <SpecificPropertiesForm
@@ -175,7 +190,12 @@ export const CreateJobDefinitionDialog: React.FC<{
                     variant="contained"
                     size="small"
                     color="primary"
-                    disabled={!queueId || !applicationName || !jarPath || (jobType === JobType.java && !javaClassName)}
+                    disabled={
+                        !queueId ||
+                        !applicationName ||
+                        !jarPath ||
+                        (jobType === JobType.java && !javaClassName)
+                    }
                     style={{ margin: "8px" }}
                     onClick={() => {
                         createJobDefinition({
@@ -186,14 +206,20 @@ export const CreateJobDefinitionDialog: React.FC<{
                             highlander: highlander,
                             canBeRestarted: true,
                             parameters: [],
-                            tags: { application: undefined, module: undefined, keyword1: undefined, keyword2: undefined, keyword3: undefined },
+                            tags: {
+                                application: undefined,
+                                module: undefined,
+                                keyword1: undefined,
+                                keyword2: undefined,
+                                keyword3: undefined,
+                            },
                             schedules: [],
                             properties: {
                                 jobType: jobType,
                                 pathType: pathType,
                                 jarPath: jarPath,
-                                javaClassName: javaClassName
-                            }
+                                javaClassName: javaClassName,
+                            },
                         });
                         closeDialog();
                     }}

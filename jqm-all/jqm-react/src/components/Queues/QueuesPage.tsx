@@ -20,19 +20,13 @@ const QueuesPage: React.FC = () => {
     const descriptionInputRef = useRef(null);
     const queueNameInputRef = useRef(null);
 
-    const {
-        queues,
-        fetchQueues,
-        createQueue,
-        updateQueue,
-        deleteQueues,
-    } = useQueueAPI();
+    const { queues, fetchQueues, createQueue, updateQueue, deleteQueues } =
+        useQueueAPI();
 
     useEffect(() => {
         fetchQueues();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
 
     const handleOnDelete = useCallback(
         (tableMeta) => {

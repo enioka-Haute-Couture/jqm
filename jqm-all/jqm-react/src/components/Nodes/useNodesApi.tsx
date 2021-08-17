@@ -6,11 +6,10 @@ import { Node } from "./Node";
 const useNodesApi = () => {
     const { enqueueSnackbar } = useSnackbar();
     const [nodes, setNodes] = useState<Node[] | null>();
-    const [nodeLogs, setNodeLogs] =
-        useState<{
-            nodeName: string;
-            data: string;
-        }>();
+    const [nodeLogs, setNodeLogs] = useState<{
+        nodeName: string;
+        data: string;
+    }>();
 
     const fetchNodes = useCallback(async () => {
         return APIService.get("/node")
