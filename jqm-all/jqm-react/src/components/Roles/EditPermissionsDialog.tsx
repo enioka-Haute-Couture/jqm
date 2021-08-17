@@ -83,13 +83,13 @@ export const PermissionsForm: React.FC<{
             Add permission
         </Button>
         <TableContainer component={Paper}>
-            <Table size="small" aria-label="a dense table">
+            <Table size="small" aria-label="Permissions">
                 <TableHead>
                     <TableRow>
                         <TableCell>Code</TableCell>
                         <TableCell>Action</TableCell>
                         <TableCell>Object type</TableCell>
-                        <TableCell align="right"></TableCell>
+                        <TableCell>Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
