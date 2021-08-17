@@ -13,11 +13,7 @@
         "**/.settings": true,
         "**/.factorypath": true
     },
-    "LineCount.includes": [
-        "**/*.java",
-        "**/*.js",
-        "**/*.html",
-    ],
+    "LineCount.includes": ["**/*.java", "**/*.js", "**/*.html"],
     "LineCount.excludes": [
         "**/.vscode/**",
         "**/node_modules/**",
@@ -66,6 +62,25 @@
     "restructuredtext.confPath": "${workspaceFolder}\\jqm-all\\jqm-doc\\src\\site\\sphinx",
     "prettier.printWidth": 180,
     "[javascript]": {
-        "editor.defaultFormatter": "vscode.typescript-language-features"
-    }
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    "eslint.workingDirectories": ["./jqm-all/jqm-react"]
 }
