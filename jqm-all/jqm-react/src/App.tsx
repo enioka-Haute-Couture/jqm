@@ -7,7 +7,7 @@ import {
     Route,
     Redirect,
 } from "react-router-dom";
-import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
+import { createTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import { SnackbarProvider } from "notistack";
 import UsersPage from "./components/Users/UsersPage";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
@@ -32,7 +32,7 @@ declare module "@material-ui/core/styles/overrides" {
     }
 }
 const getMuiTheme = () =>
-    createMuiTheme({
+    createTheme({
         overrides: {
             // MUIDataTableHeadCell: {
             //     root: {

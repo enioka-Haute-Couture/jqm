@@ -3,8 +3,7 @@ import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
 import { Queue } from "./Queue";
 
-const API_URL = "/admin/q"
-
+const API_URL = "/admin/q";
 
 export const useQueueAPI = () => {
     const { displayError, displaySuccess } = useNotificationService();
@@ -39,7 +38,8 @@ export const useQueueAPI = () => {
                 .then(() => {
                     fetchQueues();
                     displaySuccess(
-                        `Successfully deleted queue${queueIds.length > 1 ? "s" : ""
+                        `Successfully deleted queue${
+                            queueIds.length > 1 ? "s" : ""
                         }`
                     );
                 })
@@ -49,9 +49,7 @@ export const useQueueAPI = () => {
     );
 
     const updateQueue = useCallback(
-        async (
-            queue: Queue
-        ) => {
+        async (queue: Queue) => {
             return APIService.put(`${API_URL}/${queue.id}`, queue)
                 .then(() => {
                     fetchQueues();
