@@ -19,7 +19,8 @@
         <sonar.exclusions>src/main/react/build/**</sonar.exclusions>
         <node.dir>${project.basedir}/target/node</node.dir>
         <jsplugin.version>1.12.0</jsplugin.version>
-        <spa.build.repo>src/main/react/build</spa.build.repo>
+        <spa.build.repo>src/main/react/build/</spa.build.repo>
+        <spa.output.dist>src/main/webapp/dist</spa.output.dist>
     </properties>
 
     <profiles>
@@ -52,52 +53,7 @@
     </profiles>
 
     <build>
-        <resources>
-            <resource>
-                <!-- TODO: Verify if this is correct? -->
-                <directory>src/main/webapp</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>${spa.build.repo}/**</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/webapp</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>${spa.build.repo}/**</exclude>
-                </excludes>
-            </resource>
-        </resources>
-
         <plugins>
-            <!-- For OSGi only, copy shiro ini file inside the Shirao-accessible classpath -->
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/classes/org/apache/shiro/jqm</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/webapp/WEB-INF</directory>
-                                    <filtering>true</filtering>
-                                    <includes>
-                                        <include>shiro.ini</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- run mvn jetty:run to test (with hot deployment) the app on a dev
 				computer. localhost:8080 -->
             <plugin>
@@ -168,6 +124,9 @@
                         <goals>
                             <goal>yarn</goal>
                         </goals>
+                        <configuration>
+                            <arguments>build</arguments>
+                        </configuration>
                         <phase>generate-resources</phase>
                     </execution>
 
@@ -176,44 +135,98 @@
                         <goals>
                             <goal>yarn</goal>
                         </goals>
-                        <phase>generate-resources</phase>
                         <configuration>
                             <arguments>build</arguments>
+                        </configuration>
+                        <phase>generate-resources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- For OSGi: copy shiro ini file inside the Shirao-accessible classpath -->
+            <!-- For react: copy build into dist folder -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources-osgi</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/org/apache/shiro/jqm</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/webapp/WEB-INF</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>shiro.ini</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-react</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/dist</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${spa.build.repo}</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>**/**</include>
+                                    </includes>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
+
+            <!-- <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+
+                </executions>
+            </plugin> -->
+
             <!-- Used for creating a viable autoreload dev environment. 1) launch
-				the webpack build in background. 2) Create a compound goal exec:exec to run
+				the yarn build in background. 2) Create a compound goal exec:exec to run
 				jetty+ webpack. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
                 <executions>
-                    <!-- <execution>
-                        <id>startwebpacksrv</id>
+                    <execution>
+                        <id>yarn start</id>
                         <goals>
                             <goal>exec</goal>
                         </goals>
-
                         <configuration>
                             <addOutputToClasspath>false</addOutputToClasspath>
                             <async>true</async>
                             <asyncDestroyOnShutdown>true</asyncDestroyOnShutdown>
-                            <commandlineArgs>${node.dir}/node_modules/npm/bin/npm-cli.js run watch</commandlineArgs>
-                            <executable>${node.dir}/node</executable>
-                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <commandlineArgs>${node.dir}/yarn/bin/dist/yarn.js start</commandlineArgs>
+                            <executable>${node.dir}/yarn/bin/dist/yarn</executable>
+                            <workingDirectory>${project.basedir}/src/main/react/build</workingDirectory>
                         </configuration>
-                    </execution> -->
+                    </execution>
 
                     <execution>
                         <id>default-cli</id>
                         <goals>
                             <goal>exec</goal>
                         </goals>
-
                         <configuration>
                             <executable>mvn</executable>
                             <asyncDestroyOnShutdown>true</asyncDestroyOnShutdown>

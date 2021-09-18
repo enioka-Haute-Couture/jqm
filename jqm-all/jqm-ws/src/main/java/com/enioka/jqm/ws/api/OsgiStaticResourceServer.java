@@ -9,8 +9,7 @@ import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardResource;
 @Component(service = OsgiStaticResourceServer.class, property = {
         org.osgi.framework.Constants.SERVICE_RANKING + ":Integer=" + Integer.MIN_VALUE,
         "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=MAIN_HTTP_CTX)" })
-@HttpWhiteboardResource(pattern = "/*", prefix = "/")
+@HttpWhiteboardResource(pattern = "/", prefix = "dist/index.html")
 public class OsgiStaticResourceServer
 {
-
 }
