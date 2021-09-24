@@ -16,7 +16,7 @@ There are three sets of engine parameters:
   of parameters to access the database and start.
 
 .. note:: also of interest in regard to engine configuration is the :doc:`queues configuration<queues>`.
-  
+
 Bootstrap
 +++++++++
 
@@ -106,13 +106,17 @@ have to be altered directly inside the database with your tool of choice or thro
 | pfxPassword             | Password of the private key file (if not using internal PKI).                                       | SuperPassword | No      | Yes          |
 +-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
 
-Here, nullable means the parameter can be absent from the table.
+Here, nullable means the parameter can be absent from the table. New values are taken into account asynchronously by running engines.
 
 Parameter name is case-sensitive.
 
 .. note:: There must be at least one Maven repository specified.
 	If using Maven central, please specify 'http://repo1.maven.org/maven2/' and not one the numerous other aliases that exist.
 	Maven Central is only used if explicitly specified (which is the default).
+
+.. note:: Some parameters about web service or web interface do not require node reboot. However, as they actually change how the
+    services are exposed (HTTP to HTTPS, certificate root...) they will trigger a very short service interruption of the web
+    services. This should be taken into account especially by script writers.
 
 Also, as a side note, mail notifications use the JNDI resource named mail/default, which is created on node startup if it does not exist.
 See resource documentation to set it up.
