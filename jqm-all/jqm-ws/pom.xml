@@ -15,7 +15,6 @@
     <description>JQM web API implementation and administration UI</description>
 
     <properties>
-        <!-- TODO: ensure same path for react repo -->
         <sonar.exclusions>src/main/react/build/**</sonar.exclusions>
         <node.dir>${project.basedir}/target/node</node.dir>
         <jsplugin.version>1.12.0</jsplugin.version>
@@ -54,50 +53,6 @@
 
     <build>
         <plugins>
-            <!-- run mvn jetty:run to test (with hot deployment) the app on a dev
-				computer. localhost:8080 -->
-            <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>${jetty.version}</version>
-                <configuration>
-                    <scanIntervalSeconds>10</scanIntervalSeconds>
-                    <useProvidedScope>true</useProvidedScope>
-                    <useTestScope>true</useTestScope>
-                    <jettyXml>${project.basedir}/src/test/resources/jetty.xml</jettyXml>
-                    <httpConnector>
-                        <port>8080</port>
-                        <name>testConnector</name>
-                    </httpConnector>
-                    <webApp>
-                        <contextPath>/</contextPath>
-                        <overrideDescriptor>${project.basedir}/src/test/resources/web-jetty.xml</overrideDescriptor>
-                    </webApp>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.eclipse.persistence</groupId>
-                        <artifactId>org.eclipse.persistence.moxy</artifactId>
-                        <version>2.7.6</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>jul-to-slf4j</artifactId>
-                        <version>${slf4j.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                        <version>${commons.logging.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-api</artifactId>
-                        <version>${slf4j.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
@@ -185,56 +140,6 @@
                                     </includes>
                                 </resource>
                             </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-
-            <!-- <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-
-                </executions>
-            </plugin> -->
-
-            <!-- Used for creating a viable autoreload dev environment. 1) launch
-				the yarn build in background. 2) Create a compound goal exec:exec to run
-				jetty+ webpack. -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
-                <executions>
-                    <execution>
-                        <id>yarn start</id>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <addOutputToClasspath>false</addOutputToClasspath>
-                            <async>true</async>
-                            <asyncDestroyOnShutdown>true</asyncDestroyOnShutdown>
-                            <commandlineArgs>${node.dir}/yarn/bin/dist/yarn.js start</commandlineArgs>
-                            <executable>${node.dir}/yarn/bin/dist/yarn</executable>
-                            <workingDirectory>${project.basedir}/src/main/react/build</workingDirectory>
-                        </configuration>
-                    </execution>
-
-                    <execution>
-                        <id>default-cli</id>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>mvn</executable>
-                            <asyncDestroyOnShutdown>true</asyncDestroyOnShutdown>
-                            <arguments>
-                                <argument>exec:exec@startwebpacksrv</argument>
-                                <argument>jetty:run</argument>
-                                <argument>-Pdev</argument>
-                            </arguments>
                         </configuration>
                     </execution>
                 </executions>
