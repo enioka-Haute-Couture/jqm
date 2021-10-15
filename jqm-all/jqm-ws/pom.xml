@@ -98,12 +98,11 @@
                 </executions>
             </plugin>
 
-            <!-- For OSGi: copy shiro ini file inside the Shirao-accessible classpath -->
-            <!-- For react: copy build into dist folder -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.2.0</version>
                 <executions>
+                    <!-- For OSGi: copy shiro ini file inside the Shirao-accessible classpath -->
                     <execution>
                         <id>copy-resources-osgi</id>
                         <phase>process-resources</phase>
@@ -123,6 +122,7 @@
                             </resources>
                         </configuration>
                     </execution>
+                    <!-- For react: copy build into dist folder -->
                     <execution>
                         <id>copy-resources-react</id>
                         <phase>process-resources</phase>
