@@ -95,7 +95,8 @@ public class DbImplMySql8 extends DbAdapter
                         sb.append("?,");
                     }
                     q.sqlText = q.sqlText.replaceFirst("IN\\(\\?\\)", "IN(" + sb.substring(0, sb.length() - 1) + ")");
-                } else
+                }
+                else
                 {
                     newParams.add(o);
                 }

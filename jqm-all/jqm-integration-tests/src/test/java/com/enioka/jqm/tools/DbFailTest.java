@@ -92,9 +92,7 @@ public class DbFailTest extends JqmBaseTest
         this.simulateDbFailure(5);
         TestHelpers.waitFor(1, 10000, this.getNewDbSession());
 
-        Assert.assertEquals(0, TestHelpers.getOkCount(this.getNewDbSession()));
-        // TODO
-        //Assert.assertEquals(1, TestHelpers.getNonOkCount(this.getNewDbSession()));
+        Assert.assertEquals(1, TestHelpers.getOkCount(this.getNewDbSession()));
     }
 
     // Many jobs starting & running during failure
