@@ -8,7 +8,7 @@ import org.junit.Test;
 /**
  * Tests as they should be: with a node stared once, closed at the end.
  */
-public class JqmTesterAsyncTest
+public class JqmTesterAsyncTest extends JqmTesterBase
 {
     public static JqmAsyncTester tester;
 

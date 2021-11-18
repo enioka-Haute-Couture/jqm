@@ -5,4 +5,6 @@
  * The classes are XML annotated, so their XML and JSON representation are part of the API.
  *
  */
+@org.osgi.annotation.bundle.Export
+@org.osgi.annotation.versioning.Version("3.0.0")
 package com.enioka.api.admin;
