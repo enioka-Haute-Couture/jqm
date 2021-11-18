@@ -1,12 +1,12 @@
 package com.enioka.jqm.test;
 
+import com.enioka.jqm.client.api.JobInstance;
+import com.enioka.jqm.client.api.State;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.enioka.jqm.api.JobInstance;
-import com.enioka.jqm.api.State;
-
-public class JqmTesterTest
+public class JqmTesterTest extends JqmTesterBase
 {
     // Simple run
     @Test

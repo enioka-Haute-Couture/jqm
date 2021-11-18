@@ -21,6 +21,7 @@ import java.util.TimeZone;
 
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
+import com.enioka.jqm.shared.misc.Closer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -409,7 +410,7 @@ public class DbConn implements Closeable
      */
     public void closeQuietly(Closeable ps)
     {
-        DbHelper.closeQuietly(ps);
+        Closer.closeQuietly(ps);
     }
 
     /**

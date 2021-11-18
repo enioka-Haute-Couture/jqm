@@ -1,65 +1,75 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.enioka.jqm</groupId>
-		<artifactId>jqm-all</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
-	</parent>
-	<artifactId>jqm-engine</artifactId>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.enioka.jqm</groupId>
+        <artifactId>jqm-all</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>jqm-engine</artifactId>
 
-	<name>${project.groupId}:${project.artifactId}</name>
-	<url>http://jqm.readthedocs.org</url>
-	<description>A library containing the JQM engine. Cannot be used alone.</description>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <url>http://jqm.readthedocs.org</url>
+    <description>A library containing the JQM engine. Cannot be used alone.</description>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-loader</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-	<build>
-		<plugins>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-resources-plugin</artifactId> 
-				<version>2.6</version> <executions> <execution> <id>copy-payloads</id> <phase>compile</phase> 
-				<goals> <goal>copy-resources</goal> </goals> <configuration> <outputDirectory>${basedir}/target/payloads</outputDirectory> 
-				<resources> <resource> <directory>${basedir}/src/test/resources/payloads</directory> 
-				<filtering>false</filtering> </resource> </resources> </configuration> </execution> 
-				</executions> </plugin> -->
-		</plugins>
-	</build>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+        </dependency>
 
-	<dependencies>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons.lang.version}</version>
+        </dependency>
 
-		<!-- JQM APIs -->
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-api-client-jdbc</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-admin</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-runner-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- JQM APIs -->
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-engine-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-api-client-jdbc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-admin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-model-repository</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-runner-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Runners -->
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-runner-java</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.enioka.jqm</groupId>
-			<artifactId>jqm-runner-shell</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Scheduling -->
+        <dependency>
+            <groupId>it.sauronsoftware.cron4j</groupId>
+            <artifactId>cron4j</artifactId>
+            <version>2.2.5</version>
+        </dependency>
 
-		<!-- Scheduling -->
-		<dependency>
-			<groupId>it.sauronsoftware.cron4j</groupId>
-			<artifactId>cron4j</artifactId>
-			<version>2.2.5</version>
-		</dependency>
+    </dependencies>
 
-	</dependencies>
+    <build>
+        <plugins>
+
+        </plugins>
+    </build>
 </project>

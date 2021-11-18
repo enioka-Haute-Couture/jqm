@@ -14,6 +14,73 @@
     <url>http://jqm.readthedocs.org</url>
     <description>The Java Job Instance Runner is tasked with running Java classes inside the JQM process</description>
 
+    <build>
+        <plugins>
+            <!-- There are issues with Shrinkwrap resolver in an OSGi environment (use of ServiceRrsolver), so we just bundle it inside the current jar -->
+            <!-- We may want to look at https://docs.osgi.org/specification/osgi.cmpn/7.0.0/service.loader.html instead -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>org.jboss.shrinkwrap.resolver:*</include>
+                                    <include>org.apache.maven*:*</include>
+                                    <include>org.codehaus.plexus</include>
+                                    <include>org.sonatype.plexus</include>
+                                    <include>org.apache.commons:commons-lang3</include>
+                                    <include>javax.xml:*</include>
+                                    <include>com.google.guava:guava</include>
+                                </includes>
+                            </artifactSet>
+                            <filters>
+                                <!--<filter>
+                                    <artifact>${project.groupId}:${project.version}</artifact>
+                                    <includes>
+                                        <include>META-INF/**</include>
+                                    </includes>
+                                </filter>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter> -->
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>biz.aQute.bnd</groupId>
+                <artifactId>bnd-maven-plugin</artifactId>
+                <version>${maven.bnd.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>bnd-process</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <bnd><![CDATA[
+Import-Package: \
+ !org.jboss.shrinkwrap.*, !org.codehaus.*, !org.apache.commons.lang3.*, javax.xml.stream;version="[0.0,1)", javax.xml.xpath;version="[0.0,1)", javax.xml.parsers;version="[0.0,1)", * \
+        ]]>
+                    </bnd>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <!-- JQM internal APIs -->
         <dependency>
@@ -21,10 +88,9 @@
             <artifactId>jqm-runner-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jqm-api-client-core</artifactId>
+            <artifactId>jqm-runner-java-api</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -54,6 +120,12 @@
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-    </dependencies>
 
+        <!-- Needed for log multiplexing -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+    </dependencies>
 </project>

@@ -33,7 +33,7 @@
 
         <dependency>
             <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-api-client-jdbc</artifactId>
+            <artifactId>jqm-api-client-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 
