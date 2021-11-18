@@ -13,12 +13,7 @@
         "**/.settings": true,
         "**/.factorypath": true
     },
-
-    "LineCount.includes": [
-        "**/*.java",
-        "**/*.js",
-        "**/*.html",
-    ],
+    "LineCount.includes": ["**/*.java", "**/*.js", "**/*.html"],
     "LineCount.excludes": [
         "**/.vscode/**",
         "**/node_modules/**",
@@ -32,9 +27,7 @@
         "md": false,
         "outdir": "jqm-all/jqm-service/target/count/"
     },
-
     "editor.formatOnSave": true,
-
     "java.format.settings.url": "jqm-all/jqm-doc/src/site/sphinx/files/format_eclipse_modified_java.xml",
     "java.configuration.updateBuildConfiguration": "automatic",
     "java.import.exclusions": [
@@ -58,19 +51,17 @@
             "workingDirectory": "${workspaceFolder}/jqm-all/jqm-integration-tests-ws"
         }
     ],
-
     "maven.excludedFolders": [
         "**/.*", // exclude hidden folders
         "**/node_modules", // exclude node modules to speed up
         "**/target" // exclude duplicated pom file in target folder
     ],
     "maven.executable.options": "",
-    "restructuredtext.confPath": "${workspaceFolder}\\jqm-all\\jqm-doc\\src\\site\\sphinx",
     "javascript.format.placeOpenBraceOnNewLineForFunctions": true,
     "javascript.format.placeOpenBraceOnNewLineForControlBlocks": true,
     "prettier.printWidth": 180,
     "[javascript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[javascriptreact]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -91,4 +82,5 @@
         "typescriptreact"
     ],
     "eslint.workingDirectories": ["./jqm-all/jqm-react"],
+    "restructuredtext.confPath": "${workspaceFolder}\\jqm-all\\jqm-doc\\src\\site\\sphinx",
 }
