@@ -92,7 +92,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
      * Starts the engine
      *
      * @param nodeName
-     *                     the name of the node to start, as in the NODE table of the database.
+     *            the name of the node to start, as in the NODE table of the database.
      * @throws JqmInitError
      */
     void start(String nodeName, JqmEngineHandler h)
@@ -204,11 +204,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         }
 
         // Security
-        if (System.getSecurityManager() == null)
-        {
-            System.setSecurityManager(new SecurityManagerPayload());
-        }
-        jqmlogger.info("Security manager was registered");
+        SecurityManagerPayloadLoader.registerIfPossible();
 
         // Scheduler
         scheduler = new CronScheduler(this);

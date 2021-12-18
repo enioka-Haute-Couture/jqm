@@ -1,6 +1,28 @@
 Release notes
 ######################
 
+2.2.9
+*************
+
+Maintenance release.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+No database modification in this release - upgrade can be done by simply replacing engine files.
+
+Major changes
+++++++++++++++++++++++++++++
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Engine: the `System.exit` check is now disabled in Java versions above 17 as Security Managers are now deprecated. (#471)
+* Admin GUI: global parameter latest change date no longer change if saving with the same value, preventing some useless engine restarts. (#472)
+
+
 2.2.8
 *************
 

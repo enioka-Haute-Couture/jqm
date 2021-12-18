@@ -2,15 +2,14 @@ package com.enioka.jqm.tools;
 
 import java.io.File;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
+
+import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class SpringTest extends JqmBaseTest
 {
@@ -26,9 +25,7 @@ public class SpringTest extends JqmBaseTest
     @Test
     public void testSimpleSingleLaunch()
     {
-        String ver = System.getProperty("java.version");
-        double javaVersion = Double.parseDouble(ver.substring(0, ver.indexOf('.') + 2));
-        Assume.assumeTrue(javaVersion < 1.9); // The tested version of Spring is not really compatible with Java 9+.
+        AssumeJavaVersionStrictlyBelow(1.9); // The tested version of Spring is not really compatible with Java 9+.
 
         CreationTools.createDatabaseProp("jdbc/spring_ds", "org.h2.Driver", "jdbc:h2:./target/TEST.db;DB_CLOSE_ON_EXIT=FALSE", "sa", "sa",
                 cnx, "SELECT 1", null, true);
@@ -57,9 +54,7 @@ public class SpringTest extends JqmBaseTest
     @Test
     public void testSpringRunner()
     {
-        String ver = System.getProperty("java.version");
-        double javaVersion = Double.parseDouble(ver.substring(0, ver.indexOf('.') + 2));
-        Assume.assumeTrue(javaVersion < 1.9); // The tested version of Spring is not really compatible with Java 9+.
+        AssumeJavaVersionStrictlyBelow(1.9); // The tested version of Spring is not really compatible with Java 9+.
 
         try
         {

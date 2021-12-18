@@ -145,6 +145,18 @@ public class JqmBaseTest
         Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
+    /**
+     * 1.6, 1.7, 1.8, 9.0, 11.0, 17.0
+     *
+     * @param version
+     */
+    protected void AssumeJavaVersionStrictlyBelow(double version)
+    {
+        String ver = System.getProperty("java.version");
+        double javaVersion = Double.parseDouble(ver.substring(0, ver.indexOf('.') + 2));
+        Assume.assumeTrue(javaVersion < version);
+    }
+
     protected boolean onWindows()
     {
         return System.getProperty("os.name").toLowerCase().startsWith("win");

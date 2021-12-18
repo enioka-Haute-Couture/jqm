@@ -38,10 +38,10 @@ public class JqmSingleRunner
 
     /**
      * Runs an existing JobInstance.
-     * 
+     *
      * @param job
      * @param logFile
-     *                    the file to which output the run log. if null, only stdout will be used.
+     *            the file to which output the run log. if null, only stdout will be used.
      * @return the result of the run
      */
     public static JobInstance run(com.enioka.jqm.model.JobInstance job)
@@ -68,10 +68,7 @@ public class JqmSingleRunner
         final int jobId = job.getId();
 
         // Security
-        if (System.getSecurityManager() == null)
-        {
-            System.setSecurityManager(new SecurityManagerPayload());
-        }
+        SecurityManagerPayloadLoader.registerIfPossible();
 
         // Create run container
         final RunningJobInstance l = new RunningJobInstance(job, new JavaRunner(cnx));
