@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.enioka.jqm</groupId>
@@ -13,7 +14,7 @@
     <description>Test suite for the JQM engine + service</description>
 
     <properties>
-        <argLine>-Xms256m -Xmx1024m -XX:MaxPermSize=512m</argLine>
+        <argLine>-Xms256m -Xmx1024m -Djava.security.properties=./src/test/resources/java.security</argLine>
     </properties>
 
     <build>
@@ -236,12 +237,12 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.1.1.jre6</version>
+            <version> 42.2.24.jre6</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.16</version>
+            <version>8.0.27</version>
         </dependency>
 
     </dependencies>
