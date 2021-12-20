@@ -22,6 +22,14 @@
         <url>JEUX:2375</url>
     </server>
     <server>
+        <tag>windows-20H2</tag>
+        <url>JEUX:2375</url>
+    </server>
+    <server>
+        <tag>windows-ltsc2022</tag>
+        <url>JEUX:2375</url>
+    </server>
+    <server>
         <tag>linux-alpine</tag>
         <url>dockerubnt:2376</url>
     </server>

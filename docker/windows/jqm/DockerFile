@@ -1,4 +1,5 @@
 ARG WINDOWS_TAG
+ARG POSH_WINDOWS_TAG
 ARG JAVA_VERSION=1.8.0
 
 ###############################################################################
@@ -29,7 +30,7 @@ RUN mvn install -DskipTests=%SKIP_TESTS% %MVN_SETTINGS% && mkdir C:\TEMP && echo
 ###############################################################################
 ## Powershell so as to unzip
 ###############################################################################
-FROM mcr.microsoft.com/powershell:nanoserver-${WINDOWS_TAG} AS installer
+FROM mcr.microsoft.com/powershell:nanoserver-${POSH_WINDOWS_TAG:-${WINDOWS_TAG}} AS installer
 
 SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 

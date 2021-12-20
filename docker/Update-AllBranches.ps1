@@ -65,17 +65,17 @@ foreach ($manifestName in $manifestData.Keys) {
 
     Write-Progress -Activity "Updating manifests" -CurrentOperation "Manifest $manifestName" -id 0
 
-    if ($PSCmdlet.ShouldProcess($manifestName, "Create manifest")) {
-        # bug 954 too
-        if (Test-Path ~/.docker/manifests/) { rm -Recurse ~/.docker/manifests/* }
-        $env:DOCKER_CLI_EXPERIMENTAL = "enabled"
-        docker manifest create $manifestName @imageList --amend
-        if ($LASTEXITCODE -ne 0) {
-            throw "Manifest creation error"
-        }
-    }
-
     if ($Push) {
+        if ($PSCmdlet.ShouldProcess($manifestName, "Create manifest")) {
+            # bug 954 too
+            if (Test-Path ~/.docker/manifests/) { rm -Recurse ~/.docker/manifests/* }
+            $env:DOCKER_CLI_EXPERIMENTAL = "enabled"
+            docker manifest create $manifestName @imageList --amend
+            if ($LASTEXITCODE -ne 0) {
+                throw "Manifest creation error"
+            }
+        }
+
         if ($PSCmdlet.ShouldProcess($manifestName, "Push manifest")) {
             # bug https://github.com/docker/cli/issues/954 - we must clean the cached manifest with --purge
             docker manifest push --purge ${manifestName}

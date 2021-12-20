@@ -1,6 +1,7 @@
 ARG WINDOWS_TAG
+ARG POSH_WINDOWS_TAG
 
-FROM mcr.microsoft.com/powershell:nanoserver-${WINDOWS_TAG} as installer
+FROM mcr.microsoft.com/powershell:nanoserver-${POSH_WINDOWS_TAG:-${WINDOWS_TAG}} as installer
 
 SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
