@@ -51,7 +51,8 @@
     "java.test.config": [
         {
             "name": "it",
-            "workingDirectory": "${workspaceFolder}/jqm-all/jqm-integration-tests"
+            "workingDirectory": "${workspaceFolder}/jqm-all/jqm-integration-tests",
+            "vmargs": [ "--add-opens", "java.naming/javax.naming.spi=ALL-UNNAMED" ],
         },
         {
             "name": "web",
