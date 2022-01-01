@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,10 +30,11 @@ class RunningExternalJobInstance implements Runnable
     JobInstance ji;
     String opts;
     String logFile;
+    String rootPath;
     int killCheckPeriodMs = 1000;
     QueuePoller qp = null;
 
-    public RunningExternalJobInstance(DbConn cnx, JobInstance job, QueuePoller qp)
+    public RunningExternalJobInstance(DbConn cnx, JobInstance job, QueuePoller qp) throws IOException
     {
         this.jobId = job.getId();
         this.ji = job;
@@ -41,8 +44,15 @@ class RunningExternalJobInstance implements Runnable
                 : job.getJD().getJavaOpts();
         killCheckPeriodMs = Integer.parseInt(GlobalParameter.getParameter(cnx, "internalPollingPeriodMs", "1000"));
 
-        logFile = "./logs";
+        rootPath = GlobalParameter.getParameter(cnx, "alternateJqmRoot", ".");
+
+        logFile = FilenameUtils.concat(rootPath, "./logs");
         logFile = FilenameUtils.concat(logFile, StringUtils.leftPad("" + jobId, 10, "0") + ".log");
+
+        if (!Files.isDirectory(Path.of(FilenameUtils.getFullPath(logFile))))
+        {
+            Files.createDirectories(Path.of(FilenameUtils.getFullPath(logFile)));
+        }
     }
 
     @Override
@@ -53,16 +63,16 @@ class RunningExternalJobInstance implements Runnable
         List<String> args = new ArrayList<>();
 
         args.add(java_path);
-        args.add("-Dcom.enioka.jqm.service.osgi.rootdir=.");
+        args.add("-Dcom.enioka.jqm.service.osgi.rootdir=" + rootPath);
         args.addAll(Arrays.asList(opts.split(" ")));
-        args.add("com.enioka.jqm.service.Main");
+        args.add("-jar");
+        args.add(FilenameUtils.concat(rootPath, "jqm.jar"));
         args.add("Start-Single");
         args.add("--id");
         args.add("" + this.jobId);
 
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.redirectErrorStream(true);
-        pb.environment().put("CLASSPATH", System.getProperty("java.class.path"));
 
         Process p = null;
         try
@@ -113,7 +123,7 @@ class RunningExternalJobInstance implements Runnable
                 }
 
                 // Wait between loops.
-                Thread.sleep(1000);
+                Thread.sleep(100);
             }
         }
         catch (Exception e)

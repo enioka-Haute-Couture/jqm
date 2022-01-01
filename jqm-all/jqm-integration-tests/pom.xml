@@ -159,17 +159,23 @@
 
                     <!-- Needed for the external runner tests which start a full OSGi framework -->
                     <execution>
-                        <id>copy-bundles</id>
-                        <phase>process-test-classes</phase>
+                        <id>unpack-full-server</id>
+                        <phase>process-test-sources</phase>
                         <goals>
-                            <goal>copy-dependencies</goal>
+                            <goal>unpack</goal>
                         </goals>
+
                         <configuration>
-                            <outputDirectory>${project.basedir}/bundle</outputDirectory>
-                            <stripVersion>true</stripVersion>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <excludeGroupIds>org.hsqldb,org.ops4j.pax.url,org.ops4j.pax.exam,biz.aQute.bnd,org.ops4j.pax.swissbox,org.ops4j.pax.tinybundles,org.eclipse.jetty</excludeGroupIds>
-                            <excludeArtifactIds>org.apache.felix.framework,jqm-providers,jqm-runner-basic,jqm-runner-spring,jqm-ws,jqm-test-helpers,tomcat-jdbc,org.apache.felix.framework,osgi.core,osgi.annotation,commons-beanutils,geronimo-jaxrs_2.1_spec,geronimo-osgi-locator</excludeArtifactIds>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>jqm-service</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
@@ -253,6 +259,41 @@
                             <resources>
                                 <resource>
                                     <directory>${basedir}/../jqm-service/target/classes/META-INF/maven/</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+
+                    <!-- Copy (move) the server distribution to target root (to have a fixed name) -->
+                    <execution>
+                        <id>copy-server</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/server</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/target/jqm-${project.version}</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-server-config</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/server/conf</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/test/resources/</directory>
                                     <filtering>false</filtering>
                                 </resource>
                             </resources>

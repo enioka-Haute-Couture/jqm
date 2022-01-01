@@ -23,7 +23,7 @@ public class JqmSingleRunner implements JqmSingleRunnerOperations
 {
     private final static Logger jqmlogger = LoggerFactory.getLogger(JqmSingleRunner.class);
 
-    private JqmSingleRunner()
+    public JqmSingleRunner()
     {
         // Static class
     }

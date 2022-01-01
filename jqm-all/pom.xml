@@ -448,7 +448,7 @@ Import-Package: *, ${additionnalBndImports}
 											maven-dependency-plugin
                                         </artifactId>
                                         <versionRange>
-											[2.8,)
+											[3.2,)
                                         </versionRange>
                                         <goals>
                                             <goal>copy</goal>
