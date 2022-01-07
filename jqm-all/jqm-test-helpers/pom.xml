@@ -38,7 +38,7 @@
         <!-- Shiro security -->
         <dependency>
             <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-web</artifactId>
+            <artifactId>shiro-crypto-hash</artifactId>
             <version>${shiro.version}</version>
         </dependency>
 

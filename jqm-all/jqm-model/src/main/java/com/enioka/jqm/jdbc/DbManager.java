@@ -49,11 +49,6 @@ public final class DbManager
         return db;
     }
 
-    public static void setDb(Db db)
-    {
-        DbManager.db = db;
-    }
-
     private static boolean isOsgiContext()
     {
         try

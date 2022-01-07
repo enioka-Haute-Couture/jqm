@@ -1,11 +1,9 @@
-package com.enioka.jqm.test;
+package com.enioka.jqm.tester;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
-
-import org.hsqldb.Server;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.Cl;
@@ -41,18 +39,7 @@ final class Common
         return (temp);
     }
 
-    static Server createHsqlServer()
-    {
-        Server s = new Server();
-        String dbName = "testdb_" + Math.random();
-        s.setDatabaseName(0, dbName);
-        s.setDatabasePath(0, "mem:" + dbName);
-        s.setLogWriter(null);
-        s.setSilent(true);
-        return s;
-    }
-
-    static Properties dbProperties(Server s)
+    static Properties dbProperties()
     {
         Properties p = new Properties();
         p.put("com.enioka.jqm.jdbc.allowSchemaUpdate", "true");
@@ -60,7 +47,7 @@ final class Common
         return p;
     }
 
-    static void createJobDef(DbConn cnx, TestJobDefinition d, Map<String, Integer> queues)
+    static void createJobDef(DbConn cnx, TestJobDefinitionImpl d, Map<String, Integer> queues)
     {
         int clId = Cl.create(cnx, d.getSpecificIsolationContext() == null ? d.getName() : d.getSpecificIsolationContext(),
                 d.isChildFirstClassLoader(), d.getHiddenJavaClasses(), d.isClassLoaderTracing(), false, null);
@@ -70,4 +57,5 @@ final class Common
                 d.getApplication(), d.getModule(), d.getKeyword1(), d.getKeyword2(), d.getKeyword3(), d.isHighlander(), clId,
                 d.getPathType());
     }
+
 }

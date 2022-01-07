@@ -1,18 +1,16 @@
 package com.enioka.jqm.engine;
 
+import com.enioka.jqm.client.api.JqmInvalidRequestException;
+import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.engine.api.lifecycle.JqmSingleRunnerOperations;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.GlobalParameter;
+import com.enioka.jqm.model.JobInstance;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.enioka.jqm.client.api.JqmInvalidRequestException;
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
-import com.enioka.jqm.engine.api.lifecycle.JqmSingleRunnerOperations;
-import com.enioka.jqm.jdbc.Db;
-import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jdbc.DbManager;
-import com.enioka.jqm.model.GlobalParameter;
-import com.enioka.jqm.model.JobInstance;
 
 /**
  * This is a dumbed down version of the JQM engine that, instead of checking jobs from a database, will run at once a specified job
@@ -22,11 +20,6 @@ import com.enioka.jqm.model.JobInstance;
 public class JqmSingleRunner implements JqmSingleRunnerOperations
 {
     private final static Logger jqmlogger = LoggerFactory.getLogger(JqmSingleRunner.class);
-
-    public JqmSingleRunner()
-    {
-        // Static class
-    }
 
     public JobInstance runAtOnce(int jobInstanceId)
     {
@@ -174,14 +167,5 @@ public class JqmSingleRunner implements JqmSingleRunnerOperations
 
         // Get result
         return job;
-    }
-
-    /**
-     * <strong>Not part of any API - for JQM internal tests only</strong><br>
-     * Sets the connection that will be used by the engine and its APIs.
-     */
-    public static void setConnection(Db db)
-    {
-        DbManager.setDb(db);
     }
 }

@@ -154,6 +154,7 @@
         <module>jqm-providers</module>
         <module>jqm-pki</module>
         <module>jqm-tst</module>
+        <module>jqm-tst-osgi</module>
         <module>jqm-admin</module>
         <module>jqm-handlers</module>
         <module>jqm-cli</module>

@@ -240,7 +240,7 @@ public class ClassloaderManager
         case MAVEN:
             return cb.getExtensionClassloader();
         case MEMORY:
-            return Thread.currentThread().getContextClassLoader();
+            return ClassLoader.getSystemClassLoader();
         default:
         case FS:
             return cb.getExtensionClassloader();
