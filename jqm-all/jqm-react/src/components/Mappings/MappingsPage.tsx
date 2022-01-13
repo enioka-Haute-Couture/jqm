@@ -7,7 +7,7 @@ import {
     Tooltip,
 } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import MUIDataTable from "mui-datatables";
+import MUIDataTable, { Display } from "mui-datatables";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
@@ -110,7 +110,7 @@ const MappingsPage: React.FC = () => {
             name: "id",
             label: "id",
             options: {
-                display: "excluded",
+                display: "excluded" as Display,
             },
         },
         {
@@ -287,7 +287,7 @@ const MappingsPage: React.FC = () => {
             />
         </Container>
     ) : (
-        <Grid container justify="center">
+        <Grid container justifyContent="center">
             <CircularProgress />
         </Grid>
     );

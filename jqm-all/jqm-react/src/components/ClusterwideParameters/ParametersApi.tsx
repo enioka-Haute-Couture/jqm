@@ -3,7 +3,7 @@ import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
 import { Parameter } from "./Parameter";
 
-const apiUrl = "/prm";
+const apiUrl = "/admin/prm";
 
 export const useParametersApi = () => {
     const { displayError, displaySuccess } = useNotificationService();
@@ -37,8 +37,7 @@ export const useParametersApi = () => {
                 .then(() => {
                     fetchParameters();
                     displaySuccess(
-                        `Successfully deleted parameter${
-                            paramIds.length > 1 ? "s" : ""
+                        `Successfully deleted parameter${paramIds.length > 1 ? "s" : ""
                         }`
                     );
                 })

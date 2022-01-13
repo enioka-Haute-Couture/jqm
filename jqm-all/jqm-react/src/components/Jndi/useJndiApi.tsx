@@ -3,7 +3,7 @@ import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
 import { JndiResource } from "./JndiResource";
 
-const apiUrl = "/jndi";
+const apiUrl = "/admin/jndi";
 
 export const useJndiApi = () => {
     const { displayError, displaySuccess } = useNotificationService();
@@ -36,8 +36,7 @@ export const useJndiApi = () => {
                 .then(() => {
                     fetchResources();
                     displaySuccess(
-                        `Successfully deleted resource${
-                            resourceIds.length > 1 ? "s" : ""
+                        `Successfully deleted resource${resourceIds.length > 1 ? "s" : ""
                         }`
                     );
                 })

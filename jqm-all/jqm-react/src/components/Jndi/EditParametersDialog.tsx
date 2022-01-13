@@ -26,7 +26,7 @@ export const JndiParametersTable: React.FC<{
 }> = ({ parameters, setParameters }) => {
     return (
         <TableContainer component={Paper}>
-            <Table size="small" aria-label="a dense table">
+            <Table size="small">
                 <TableHead>
                     <TableRow>
                         <TableCell>Name</TableCell>
