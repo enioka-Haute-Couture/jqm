@@ -317,7 +317,7 @@ const UsersPage: React.FC = () => {
         );
     } else {
         return (
-            <Grid container justify="center">
+            <Grid container justifyContent="center">
                 <CircularProgress />
             </Grid>
         );

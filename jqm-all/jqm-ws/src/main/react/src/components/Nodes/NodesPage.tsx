@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Container, Grid, IconButton, Tooltip } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import MUIDataTable, { SelectableRows } from "mui-datatables";
+import MUIDataTable, { Display, SelectableRows } from "mui-datatables";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import DescriptionIcon from "@material-ui/icons/Description";
@@ -97,21 +97,21 @@ export const NodesPage: React.FC = () => {
             name: "id",
             label: "id",
             options: {
-                display: "excluded",
+                display: "excluded" as Display,
             },
         },
         {
             name: "stop",
             label: "stop",
             options: {
-                display: "excluded",
+                display: "excluded" as Display,
             },
         },
         {
             name: "lastSeenAlive",
             label: "lastSeenAlive",
             options: {
-                display: "excluded",
+                display: "excluded" as Display,
             },
         },
         {
@@ -348,7 +348,7 @@ export const NodesPage: React.FC = () => {
             />
         </Container>
     ) : (
-        <Grid container justify="center">
+        <Grid container justifyContent="center">
             <CircularProgress />
         </Grid>
     );

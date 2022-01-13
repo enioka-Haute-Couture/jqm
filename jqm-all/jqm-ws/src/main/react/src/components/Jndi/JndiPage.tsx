@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useMemo } from "react";
 import { Container, Grid, IconButton, Tooltip, Badge } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import MUIDataTable from "mui-datatables";
+import MUIDataTable, { Display } from "mui-datatables";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
@@ -106,13 +106,13 @@ export const JndiPage: React.FC = () => {
             name: "id",
             label: "id",
             options: {
-                display: "excluded",
+                display: "excluded" as Display,
             },
         },
         {
             name: "auth",
             options: {
-                display: "excluded",
+                display: "excluded" as Display,
             },
         },
         {
@@ -315,7 +315,7 @@ export const JndiPage: React.FC = () => {
             />
         </Container>
     ) : (
-        <Grid container justify="center">
+        <Grid container justifyContent="center">
             <CircularProgress />
         </Grid>
     );

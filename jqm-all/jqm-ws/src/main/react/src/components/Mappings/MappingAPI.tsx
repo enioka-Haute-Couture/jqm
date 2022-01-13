@@ -3,13 +3,15 @@ import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
 import { Mapping } from "./Mapping";
 
+const API_URL = "/admin/qmapping";
+
 export const useMappingAPI = () => {
     const { displayError, displaySuccess } = useNotificationService();
 
     const [mappings, setMappings] = useState<Mapping[] | null>();
 
     const fetchMappings = useCallback(async () => {
-        return APIService.get("/qmapping")
+        return APIService.get(API_URL)
             .then((mappings) => setMappings(mappings))
             .catch(displayError);
     }, [displayError]);
@@ -17,7 +19,7 @@ export const useMappingAPI = () => {
     const createMapping = useCallback(
         // TODO: handle 400 when https://github.com/enioka/jqm/issues/446 is done
         async (newMapping: Mapping) => {
-            return APIService.post("/qmapping", newMapping)
+            return APIService.post(API_URL, newMapping)
                 .then(() => {
                     fetchMappings();
                     displaySuccess(
@@ -32,7 +34,7 @@ export const useMappingAPI = () => {
     const deleteMappings = useCallback(
         async (mappingIds: number[]) => {
             return await Promise.all(
-                mappingIds.map((id) => APIService.delete("/qmapping/" + id))
+                mappingIds.map((id) => APIService.delete(`${API_URL}/${id}`))
             )
                 .then(() => {
                     fetchMappings();
@@ -50,7 +52,7 @@ export const useMappingAPI = () => {
     const updateMapping = useCallback(
         // TODO: handle 400 when https://github.com/enioka/jqm/issues/446 is done
         async (mapping: Mapping) => {
-            return APIService.put("/qmapping/" + mapping.id, mapping)
+            return APIService.put(`${API_URL}/${mapping.id}`, mapping)
                 .then(() => {
                     fetchMappings();
                     displaySuccess("Successfully saved mapping");

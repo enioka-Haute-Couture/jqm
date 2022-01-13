@@ -7,7 +7,7 @@ import {
     Route,
     Redirect,
 } from "react-router-dom";
-import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
+import { createTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import { SnackbarProvider } from "notistack";
 import UsersPage from "./components/Users/UsersPage";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
@@ -18,6 +18,7 @@ import MappingsPage from "./components/Mappings/MappingsPage";
 import RolesPage from "./components/Roles/RolesPage";
 import { JndiPage } from "./components/Jndi/JndiPage";
 import ClusterwideParametersPage from "./components/ClusterwideParameters/ClusterwideParametersPage";
+import RunsPage from "./components/Runs/RunsPage";
 import { JobDefinitionsPage } from "./components/JobDefinitions/JobDefinitionsPage";
 
 declare module "@material-ui/core/styles/overrides" {
@@ -31,7 +32,7 @@ declare module "@material-ui/core/styles/overrides" {
     }
 }
 const getMuiTheme = () =>
-    createMuiTheme({
+    createTheme({
         overrides: {
             // MUIDataTableHeadCell: {
             //     root: {
@@ -104,6 +105,9 @@ function App() {
                                 </Route>
                                 <Route path="/jndi" exact={true}>
                                     <JndiPage />
+                                </Route>
+                                <Route path="/runs" exact={true}>
+                                    <RunsPage />
                                 </Route>
                                 <Route path="/" exact={true}>
                                     <HomePage />

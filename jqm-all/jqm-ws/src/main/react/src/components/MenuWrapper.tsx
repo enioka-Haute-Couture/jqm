@@ -252,8 +252,12 @@ export default function MenuWrapper(props: any) {
                         </ListItemIcon>
                         <ListItemText primary={"Roles"} />
                     </ListItem>
-
-                    <ListItem button key={"runs"} disabled>
+                    <ListItem
+                        button
+                        key={"runs"}
+                        component={NavLink}
+                        to="/runs"
+                    >
                         <ListItemIcon>
                             <QueryBuilderIcon />
                         </ListItemIcon>
