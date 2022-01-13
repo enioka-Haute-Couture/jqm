@@ -22,43 +22,41 @@ class CommandSetWebConfiguration extends CommandBase
         {
             switch (action)
             {
-                case ENABLE_HTTP_GUI:
-                    GlobalParameter.setParameter(cnx, "disableWsApi", "false");
-                    GlobalParameter.setParameter(cnx, "enableWsApiSsl", "false");
-                    GlobalParameter.setParameter(cnx, "enableWsApiAuth", "true");
-                    GlobalParameter.setParameter(cnx, "disableWsApiSimple", "false");
-                    GlobalParameter.setParameter(cnx, "disableWsApiClient", "false");
-                    GlobalParameter.setParameter(cnx, "disableWsApiAdmin", "false");
-                    GlobalParameter.setParameter(cnx, "enableInternalPki", "true");
+            case ENABLE_HTTP_GUI:
+                GlobalParameter.setParameter(cnx, "disableWsApi", "false");
+                GlobalParameter.setParameter(cnx, "enableWsApiSsl", "false");
+                GlobalParameter.setParameter(cnx, "enableWsApiAuth", "true");
+                GlobalParameter.setParameter(cnx, "disableWsApiSimple", "false");
+                GlobalParameter.setParameter(cnx, "disableWsApiClient", "false");
+                GlobalParameter.setParameter(cnx, "disableWsApiAdmin", "false");
+                GlobalParameter.setParameter(cnx, "enableInternalPki", "true");
 
-                    cnx.runUpdate("node_update_all_enable_ws");
-                    cnx.commit();
-                    break;
-                case DISABLE_ALL:
-                    GlobalParameter.setParameter(cnx, "disableWsApi", "true");
-                    cnx.runUpdate("node_update_all_disable_ws");
-                    cnx.commit();
-                    break;
-                case ENABLE_TLS:
-                    GlobalParameter.setParameter(cnx, "enableWsApiSsl", "true");
-                    break;
-                case DISABLE_TLS:
-                    GlobalParameter.setParameter(cnx, "enableWsApiSsl", "false");
-                    break;
-                case ENABLE_INTERNAL_PKI:
-                    GlobalParameter.setParameter(cnx, "enableInternalPki", "true");
-                    break;
-                case DISABLE_INTERNAL_PKI:
-                    GlobalParameter.setParameter(cnx, "enableInternalPki", "false");
-                    break;
-                case ENABLE_AUTHENTICATION:
-                    GlobalParameter.setParameter(cnx, "enableWsApiAuth", "true");
-                    break;
-                case DISABLE_AUTHENTICATION:
-                    GlobalParameter.setParameter(cnx, "enableWsApiAuth", "false");
-                    cnx.commit();
-                    break;
+                cnx.runUpdate("node_update_all_enable_ws");
+                break;
+            case DISABLE_ALL:
+                GlobalParameter.setParameter(cnx, "disableWsApi", "true");
+                cnx.runUpdate("node_update_all_disable_ws");
+                break;
+            case ENABLE_TLS:
+                GlobalParameter.setParameter(cnx, "enableWsApiSsl", "true");
+                break;
+            case DISABLE_TLS:
+                GlobalParameter.setParameter(cnx, "enableWsApiSsl", "false");
+                break;
+            case ENABLE_INTERNAL_PKI:
+                GlobalParameter.setParameter(cnx, "enableInternalPki", "true");
+                break;
+            case DISABLE_INTERNAL_PKI:
+                GlobalParameter.setParameter(cnx, "enableInternalPki", "false");
+                break;
+            case ENABLE_AUTHENTICATION:
+                GlobalParameter.setParameter(cnx, "enableWsApiAuth", "true");
+                break;
+            case DISABLE_AUTHENTICATION:
+                GlobalParameter.setParameter(cnx, "enableWsApiAuth", "false");
+                break;
             }
+            cnx.commit();
         }
         return 0;
     }

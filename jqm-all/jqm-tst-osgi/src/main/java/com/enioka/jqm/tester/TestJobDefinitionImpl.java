@@ -1,4 +1,4 @@
-package com.enioka.jqm.test;
+package com.enioka.jqm.tester;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,13 +8,13 @@ import java.util.Map;
 import com.enioka.jqm.client.api.JqmClient;
 import com.enioka.jqm.model.JobDefParameter;
 import com.enioka.jqm.model.JobDef.PathType;
+import com.enioka.jqm.tester.api.JqmAsynchronousTester;
+import com.enioka.jqm.tester.api.TestJobDefinition;
 
 /**
- * Helper class to define a new payload. This will help create an actual job definition, as if it had been imported from an XML deployment
- * descriptor.<br>
- * There are two possibilities to create a job definition: from a class inside the current class path, or from an external Jar.
+ * See {@link TestJobDefinition}
  */
-public class TestJobDefinition
+class TestJobDefinitionImpl implements TestJobDefinition
 {
     // Identity
     String description;
@@ -41,12 +41,17 @@ public class TestJobDefinition
     List<String> hiddenJavaClasses = new ArrayList<>();
     boolean classLoaderTracing = false;
 
+    // Internal
+    JqmAsynchronousTesterOsgi tester;
+
     ///////////////////////////////////////////////////////////////////////////
     // CONSTRUCTION
     ///////////////////////////////////////////////////////////////////////////
 
-    private TestJobDefinition()
-    {}
+    private TestJobDefinitionImpl(JqmAsynchronousTesterOsgi tester)
+    {
+        this.tester = tester;
+    }
 
     /**
      * This creates a job definition from a given class. This class must be present inside the current class path, and will be loaded by the
@@ -62,9 +67,10 @@ public class TestJobDefinition
      *            the class containing the job to run.
      * @return the object itself (fluid API)
      */
-    public static TestJobDefinition createFromClassPath(String name, String description, Class<? extends Object> testedClass)
+    public static TestJobDefinitionImpl createFromClassPath(String name, String description, Class<? extends Object> testedClass,
+            JqmAsynchronousTesterOsgi tester)
     {
-        TestJobDefinition res = new TestJobDefinition();
+        TestJobDefinitionImpl res = new TestJobDefinitionImpl(tester);
         res.name = name;
         res.description = description;
         res.javaClassName = testedClass.getCanonicalName();
@@ -88,9 +94,10 @@ public class TestJobDefinition
      *            path to the jar file, relative to the current directory.
      * @return
      */
-    public static TestJobDefinition createFromJar(String name, String description, String testedClassCanonicalName, String jarPath)
+    public static TestJobDefinitionImpl createFromJar(String name, String description, String testedClassCanonicalName, String jarPath,
+            JqmAsynchronousTesterOsgi tester)
     {
-        TestJobDefinition res = new TestJobDefinition();
+        TestJobDefinitionImpl res = new TestJobDefinitionImpl(tester);
         res.name = name;
         res.description = description;
         res.javaClassName = testedClassCanonicalName;
@@ -102,6 +109,13 @@ public class TestJobDefinition
     ///////////////////////////////////////////////////////////////////////////
     // FLUID API
     ///////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public JqmAsynchronousTester addJobDefinition()
+    {
+        tester.addJobDefinition(this);
+        return tester;
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // Compulsory parameters
@@ -121,9 +135,15 @@ public class TestJobDefinition
         return name;
     }
 
-    void setName(String name)
+    @Override
+    public TestJobDefinition setName(String name)
     {
+        if (name == null || name.isEmpty())
+        {
+            throw new IllegalArgumentException("name cannot be null or empty");
+        }
         this.name = name;
+        return this;
     }
 
     String getJavaClassName()
@@ -164,11 +184,7 @@ public class TestJobDefinition
     // end compulsory parameters
     ///////////////////////////////////////////////////////////////////////////
 
-    /**
-     * The jobs will run on this queue. If no set (or set to null) will run on the default queue.
-     *
-     * @param queueName
-     */
+    @Override
     public TestJobDefinition setQueueName(String queueName)
     {
         this.queueName = queueName;
@@ -180,9 +196,7 @@ public class TestJobDefinition
         return highlander;
     }
 
-    /**
-     * This enables Highlander mode. See the documentation on Highlander jobs.
-     */
+    @Override
     public TestJobDefinition enableHighlander()
     {
         this.highlander = true;
@@ -202,13 +216,7 @@ public class TestJobDefinition
         return prms;
     }
 
-    /**
-     * Add a parameter.
-     *
-     * @param key
-     *            must be unique
-     * @param value
-     */
+    @Override
     public TestJobDefinition addParameter(String key, String value)
     {
         this.parameters.put(key, value);
@@ -220,11 +228,7 @@ public class TestJobDefinition
         return application;
     }
 
-    /**
-     * An optional classifier.
-     *
-     * @param application
-     */
+    @Override
     public TestJobDefinition setApplication(String application)
     {
         this.application = application;
@@ -236,11 +240,7 @@ public class TestJobDefinition
         return module;
     }
 
-    /**
-     * An optional classifier.
-     *
-     * @param module
-     */
+    @Override
     public TestJobDefinition setModule(String module)
     {
         this.module = module;
@@ -252,11 +252,7 @@ public class TestJobDefinition
         return keyword1;
     }
 
-    /**
-     * An optional classifier.
-     *
-     * @param keyword1
-     */
+    @Override
     public TestJobDefinition setKeyword1(String keyword1)
     {
         this.keyword1 = keyword1;
@@ -268,11 +264,7 @@ public class TestJobDefinition
         return keyword2;
     }
 
-    /**
-     * An optional classifier.
-     *
-     * @param keyword2
-     */
+    @Override
     public TestJobDefinition setKeyword2(String keyword2)
     {
         this.keyword2 = keyword2;
@@ -284,11 +276,7 @@ public class TestJobDefinition
         return keyword3;
     }
 
-    /**
-     * An optional classifier.
-     *
-     * @param keyword3
-     */
+    @Override
     public TestJobDefinition setKeyword3(String keyword3)
     {
         this.keyword3 = keyword3;
@@ -300,14 +288,7 @@ public class TestJobDefinition
         return specificIsolationContext;
     }
 
-    /**
-     * By default jobs run inside a dedicated class loader thrown out after the run. By setting this to a non null value, this job will run
-     * inside a re-used class loader. All jobs using the same specificIsolationContext share the same class loader. See documentation on
-     * class loading inside JQM.
-     *
-     * @param specificIsolationContext
-     *            name of the class loader to use or null to use default behaviour.
-     */
+    @Override
     public TestJobDefinition setSpecificIsolationContext(String specificIsolationContext)
     {
         this.specificIsolationContext = specificIsolationContext;
@@ -319,13 +300,7 @@ public class TestJobDefinition
         return childFirstClassLoader;
     }
 
-    /**
-     * This enables child-first class loading.<br>
-     * Note that if the payload is actually inside your unit test class path, this won't do much. See documentation on class loading inside
-     * JQM.
-     *
-     * @param childFirstClassLoader
-     */
+    @Override
     public TestJobDefinition setChildFirstClassLoader(boolean childFirstClassLoader)
     {
         this.childFirstClassLoader = childFirstClassLoader;
@@ -346,12 +321,7 @@ public class TestJobDefinition
         return "";
     }
 
-    /**
-     * This prevents the given class from being loaded by a parent class loader. Id es: if the class is not directly available to the
-     * payload (inside the payload libraries for example) it will not be loaded.
-     *
-     * @param canonicalClassName
-     */
+    @Override
     public TestJobDefinition addHiddenJavaClasses(String canonicalClassName)
     {
         this.hiddenJavaClasses.add(canonicalClassName);
@@ -363,13 +333,10 @@ public class TestJobDefinition
         return classLoaderTracing;
     }
 
-    /**
-     * Enable verbose class loading fot his payload.
-     */
+    @Override
     public TestJobDefinition enableClassLoaderTracing()
     {
         this.classLoaderTracing = true;
         return this;
     }
-
 }

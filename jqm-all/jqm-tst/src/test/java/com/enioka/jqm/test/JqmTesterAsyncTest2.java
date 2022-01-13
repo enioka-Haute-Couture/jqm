@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.enioka.jqm.client.api.Deliverable;
 import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.tester.api.JqmAsynchronousTester;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -16,13 +17,14 @@ import org.junit.Test;
  * Testing the tester... The main demo test using before and after is in the other file.
  *
  */
-public class JqmTesterAsyncTest2 extends JqmTesterBase
+public class JqmTesterAsyncTest2
 {
     // Simple no-nonsense test
     @Test
     public void testOne()
     {
-        JqmAsyncTester tester = JqmAsyncTester.createSingleNodeOneQueue().addSimpleJobDefinitionFromClasspath(Payload1.class).start();
+        JqmAsynchronousTester tester = JqmAsynchonousTesterJse.createSingleNodeOneQueue()
+                .addSimpleJobDefinitionFromClasspath(Payload1.class).start();
 
         tester.enqueue("Payload1");
         tester.waitForResults(1, 10000, 0);
@@ -37,7 +39,8 @@ public class JqmTesterAsyncTest2 extends JqmTesterBase
     @Test
     public void testTwo()
     {
-        JqmAsyncTester tester = JqmAsyncTester.createSingleNodeOneQueue().addSimpleJobDefinitionFromClasspath(Payload1.class).start();
+        JqmAsynchronousTester tester = JqmAsynchonousTesterJse.createSingleNodeOneQueue()
+                .addSimpleJobDefinitionFromClasspath(Payload1.class).start();
 
         tester.enqueue("Payload1");
         tester.enqueue("Payload1");
@@ -55,7 +58,7 @@ public class JqmTesterAsyncTest2 extends JqmTesterBase
     @Test
     public void testThree()
     {
-        JqmAsyncTester tester = JqmAsyncTester.createSingleNodeOneQueue()
+        JqmAsynchronousTester tester = JqmAsynchonousTesterJse.createSingleNodeOneQueue()
                 .addSimpleJobDefinitionFromLibrary("payload1", "App", "../jqm-tests/jqm-test-datetimemaven/target/test.jar").start();
 
         tester.enqueue("payload1");
@@ -72,7 +75,7 @@ public class JqmTesterAsyncTest2 extends JqmTesterBase
     @Test
     public void testFour() throws IOException
     {
-        JqmAsyncTester tester = JqmAsyncTester.createSingleNodeOneQueue().setNodesLogLevel("TRACE")
+        JqmAsynchronousTester tester = JqmAsynchonousTesterJse.createSingleNodeOneQueue().setNodesLogLevel("TRACE")
                 .addSimpleJobDefinitionFromLibrary("payload1", "pyl.EngineApiSendDeliverable", "../jqm-tests/jqm-test-pyl/target/test.jar")
                 .start();
 
@@ -99,7 +102,8 @@ public class JqmTesterAsyncTest2 extends JqmTesterBase
     @Test
     public void testFive()
     {
-        JqmAsyncTester tester = JqmAsyncTester.createSingleNodeOneQueue().addSimpleJobDefinitionFromClasspath(Payload3.class).start();
+        JqmAsynchronousTester tester = JqmAsynchonousTesterJse.createSingleNodeOneQueue()
+                .addSimpleJobDefinitionFromClasspath(Payload3.class).start();
         tester.enqueue("Payload3");
 
         tester.waitForResults(1, 10000);

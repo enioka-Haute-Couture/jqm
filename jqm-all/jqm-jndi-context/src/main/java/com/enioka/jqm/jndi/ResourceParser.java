@@ -28,6 +28,7 @@ import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.model.JndiObjectResource;
 import com.enioka.jqm.model.JndiObjectResourceParameter;
+import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -53,7 +54,12 @@ final class ResourceParser
         if (xml == null)
         {
             xml = new HashMap<String, JndiResourceDescriptor>();
-            importXml();
+            importXml(resourceFile, false);
+
+            for (String file : System.getProperty("com.enioka.jqm.resourceFiles", ",").split(","))
+            {
+                importXml(file, true);
+            }
         }
         if (xml.containsKey(alias))
         {
@@ -94,13 +100,22 @@ final class ResourceParser
         }
     }
 
-    private static void importXml() throws NamingException
+    private static void importXml(String fileName, boolean optional) throws NamingException
     {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 
         // The resource file is either inside /conf (added to classpath by packaging) or inside test classpath (Maven resource path).
-        try (InputStream is = ClassLoader.getSystemResourceAsStream(resourceFile))
+        try (InputStream is = ClassLoader.getSystemResourceAsStream(fileName))
         {
+            if (is == null && !optional)
+            {
+                throw new JqmRuntimeException("Cannot find in class path resource file named " + fileName);
+            }
+            if (is == null && optional)
+            {
+                return;
+            }
+
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(is);
             doc.getDocumentElement().normalize();
