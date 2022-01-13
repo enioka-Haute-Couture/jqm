@@ -33,14 +33,8 @@
 
         <dependency>
             <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-core</artifactId>
+            <artifactId>shiro-crypto-hash</artifactId>
             <version>${shiro.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>        <!-- For random generator -->
 
     </dependencies>

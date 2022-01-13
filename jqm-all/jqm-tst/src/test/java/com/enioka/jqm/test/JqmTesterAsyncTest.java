@@ -1,5 +1,7 @@
 package com.enioka.jqm.test;
 
+import com.enioka.jqm.tester.api.JqmAsynchronousTester;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -8,14 +10,14 @@ import org.junit.Test;
 /**
  * Tests as they should be: with a node stared once, closed at the end.
  */
-public class JqmTesterAsyncTest extends JqmTesterBase
+public class JqmTesterAsyncTest
 {
-    public static JqmAsyncTester tester;
+    public static JqmAsynchronousTester tester;
 
     @BeforeClass
     public static void beforeClass()
     {
-        tester = JqmAsyncTester.create().addNode("node1").addNode("node2").addQueue("queue1").addQueue("queue2").addQueue("queue3")
+        tester = JqmAsynchonousTesterJse.create().addNode("node1").addNode("node2").addQueue("queue1").addQueue("queue2").addQueue("queue3")
                 .deployQueueToNode("queue1", 10, 100, "node1").deployQueueToNode("queue2", 10, 100, "node2")
                 .deployQueueToNode("queue3", 10, 100, "node1", "node2").start();
     }
@@ -43,7 +45,7 @@ public class JqmTesterAsyncTest extends JqmTesterBase
     public void testTwo()
     {
         tester.cleanupAllJobDefinitions();
-        tester.addJobDefinition(TestJobDefinition.createFromClassPath("payload2", "description", Payload1.class));
+        tester.createJobDefinitionFromClassPath(Payload1.class).setName("payload2").addJobDefinition();
 
         tester.enqueue("payload2");
         tester.enqueue("payload2");

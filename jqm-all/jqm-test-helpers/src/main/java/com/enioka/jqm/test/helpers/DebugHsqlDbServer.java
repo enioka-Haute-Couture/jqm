@@ -1,25 +1,52 @@
 package com.enioka.jqm.test.helpers;
 
+import java.util.Map;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.hsqldb.Server;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.ServiceScope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An HSQLDB server listening in-memory only.
  */
-@Component(immediate = false, service = DebugHsqlDbServer.class)
+@Component(immediate = false, service = DebugHsqlDbServer.class, scope = ServiceScope.SINGLETON, configurationPolicy = ConfigurationPolicy.OPTIONAL, configurationPid = "com.enioka.jqm.test.helpers.DebugHsqlDbServer", property = {
+        "dbName=testdbengine", "dbPath=mem:testdbengine" })
 public class DebugHsqlDbServer
 {
+    private Logger jqmlogger = LoggerFactory.getLogger(DebugHsqlDbServer.class);
+
     private Server s;
+    private String dbName, dbPath;
+
+    @Activate
+    public void activate(Map<String, Object> properties)
+    {
+        jqmlogger.debug("HSQLDB configuration initialized to {}", properties);
+        this.dbName = properties.get("dbName").toString();
+        this.dbPath = properties.get("dbPath").toString();
+        this.start();
+    }
+
+    @Modified
+    public void modifiedConfiguration(Map<String, Object> properties)
+    {
+        jqmlogger.debug("HSQLDB configuration modified to {}", properties);
+        stop();
+        start();
+    }
 
     /**
      * Idempotent. Start or restart the server.
      */
-    @Activate
     public void start()
     {
         if (s == null)
@@ -30,8 +57,8 @@ public class DebugHsqlDbServer
                 s = new Server();
                 s.setLogWriter(null);
                 s.setSilent(true);
-                s.setDatabaseName(0, "testdbengine");
-                s.setDatabasePath(0, "mem:testdbengine");
+                s.setDatabaseName(0, this.dbName);
+                s.setDatabasePath(0, this.dbPath);
             }
 
             // Reset the caches - the database has changed.
@@ -61,6 +88,7 @@ public class DebugHsqlDbServer
         {
             s.stop();
             waitDbStop();
+            s = null;
         }
     }
 

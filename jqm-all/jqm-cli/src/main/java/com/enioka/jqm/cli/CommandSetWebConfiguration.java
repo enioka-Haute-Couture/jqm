@@ -32,12 +32,10 @@ class CommandSetWebConfiguration extends CommandBase
                 GlobalParameter.setParameter(cnx, "enableInternalPki", "true");
 
                 cnx.runUpdate("node_update_all_enable_ws");
-                cnx.commit();
                 break;
             case DISABLE_ALL:
                 GlobalParameter.setParameter(cnx, "disableWsApi", "true");
                 cnx.runUpdate("node_update_all_disable_ws");
-                cnx.commit();
                 break;
             case ENABLE_TLS:
                 GlobalParameter.setParameter(cnx, "enableWsApiSsl", "true");
@@ -58,6 +56,7 @@ class CommandSetWebConfiguration extends CommandBase
                 GlobalParameter.setParameter(cnx, "enableWsApiAuth", "false");
                 break;
             }
+            cnx.commit();
         }
         return 0;
     }

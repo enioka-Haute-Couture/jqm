@@ -15,14 +15,15 @@
     <description>JQM web API implementation and administration UI</description>
 
     <properties>
-        <sonar.exclusions>src/main/webapp/dist/**</sonar.exclusions>
+        <sonar.exclusions>src/main/react/build/**</sonar.exclusions>
         <node.dir>${project.basedir}/target/node</node.dir>
-        <jsplugin.version>1.6</jsplugin.version>
+        <jsplugin.version>1.12.0</jsplugin.version>
+        <spa.build.repo>src/main/react/build/</spa.build.repo>
+        <spa.output.dist>src/main/webapp/dist</spa.output.dist>
     </properties>
 
-
     <profiles>
-        <!-- Disable webpack prod build when using dev mode -->
+        <!-- Disable yarn prod build when using dev mode -->
         <!-- It is enabled inside the exec:exec goal -->
         <profile>
             <id>dev</id>
@@ -40,7 +41,7 @@
                         <version>${jsplugin.version}</version>
                         <executions>
                             <execution>
-                                <id>webpack build</id>
+                                <id>yarn build</id>
                                 <phase>none</phase>
                             </execution>
                         </executions>
@@ -51,31 +52,59 @@
     </profiles>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/webapp</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/dist/main.bundle*.js</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/webapp</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>**/dist/main.bundle*.js</exclude>
-                </excludes>
-            </resource>
-        </resources>
-
         <plugins>
-            <!-- For OSGi only, copy shiro ini file inside the Shirao-accessible classpath -->
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>${jsplugin.version}</version>
+
+                <configuration>
+                    <nodeVersion>v16.9.0</nodeVersion>
+                    <yarnVersion>v1.22.10</yarnVersion>
+                    <installDirectory>target/</installDirectory>
+                    <workingDirectory>src/main/react</workingDirectory>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>install node and yarn</id>
+                        <goals>
+                            <goal>install-node-and-yarn</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                    </execution>
+
+                    <execution>
+                        <id>yarn install</id>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                        <phase>generate-resources</phase>
+                    </execution>
+
+                    <execution>
+                        <id>yarn build</id>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>build</arguments>
+                        </configuration>
+                        <phase>generate-resources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.2.0</version>
                 <executions>
+                    <!-- For OSGi: copy shiro ini file inside the Shirao-accessible classpath -->
                     <execution>
-                        <id>copy-resources</id>
+                        <id>copy-resources-osgi</id>
                         <phase>process-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -93,138 +122,24 @@
                             </resources>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
-
-            <!-- run mvn jetty:run to test (with hot deployment) the app on a dev
-				computer. localhost:8080 -->
-            <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>${jetty.version}</version>
-                <configuration>
-                    <scanIntervalSeconds>10</scanIntervalSeconds>
-                    <useProvidedScope>true</useProvidedScope>
-                    <useTestScope>true</useTestScope>
-                    <jettyXml>${project.basedir}/src/test/resources/jetty.xml</jettyXml>
-                    <httpConnector>
-                        <port>8080</port>
-                        <name>testConnector</name>
-                    </httpConnector>
-                    <webApp>
-                        <contextPath>/</contextPath>
-                        <overrideDescriptor>${project.basedir}/src/test/resources/web-jetty.xml</overrideDescriptor>
-                    </webApp>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.eclipse.persistence</groupId>
-                        <artifactId>org.eclipse.persistence.moxy</artifactId>
-                        <version>2.7.6</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>jul-to-slf4j</artifactId>
-                        <version>${slf4j.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                        <version>${commons.logging.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-api</artifactId>
-                        <version>${slf4j.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-            <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <version>${jsplugin.version}</version>
-
-                <configuration>
-                    <nodeVersion>v8.11.4</nodeVersion>
-                    <installDirectory>target/</installDirectory>
-                </configuration>
-
-                <executions>
+                    <!-- For react: copy build into dist folder -->
                     <execution>
-                        <id>install node and npm</id>
+                        <id>copy-resources-react</id>
+                        <phase>process-resources</phase>
                         <goals>
-                            <goal>install-node-and-npm</goal>
+                            <goal>copy-resources</goal>
                         </goals>
-                        <phase>initialize</phase>
-                    </execution>
-
-                    <execution>
-                        <id>npm install</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-
-                        <phase>generate-resources</phase>
-
                         <configuration>
-                            <arguments>install --no-optional</arguments>
-                        </configuration>
-                    </execution>
-
-                    <execution>
-                        <id>webpack build</id>
-                        <goals>
-                            <goal>webpack</goal>
-                        </goals>
-
-                        <phase>generate-resources</phase>
-
-                        <configuration>
-                            <arguments>--config webpack.prod.js</arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Used for creating a viable autoreload dev environment. 1) launch
-				the webpack build in background. 2) Create a compound goal exec:exec to run
-				jetty+ webpack. -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
-                <executions>
-                    <execution>
-                        <id>startwebpacksrv</id>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-
-                        <configuration>
-                            <addOutputToClasspath>false</addOutputToClasspath>
-                            <async>true</async>
-                            <asyncDestroyOnShutdown>true</asyncDestroyOnShutdown>
-                            <commandlineArgs>${node.dir}/node_modules/npm/bin/npm-cli.js run watch</commandlineArgs>
-                            <executable>${node.dir}/node</executable>
-                            <workingDirectory>${project.basedir}</workingDirectory>
-                        </configuration>
-                    </execution>
-
-                    <execution>
-                        <id>default-cli</id>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-
-                        <configuration>
-                            <executable>mvn</executable>
-                            <asyncDestroyOnShutdown>true</asyncDestroyOnShutdown>
-                            <arguments>
-                                <argument>exec:exec@startwebpacksrv</argument>
-                                <argument>jetty:run</argument>
-                                <argument>-Pdev</argument>
-                            </arguments>
+                            <outputDirectory>${basedir}/target/classes/dist</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${spa.build.repo}</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>**/**</include>
+                                    </includes>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
@@ -286,12 +201,6 @@
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
             <version>${shiro.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.shiro</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.enioka.jqm</groupId>
