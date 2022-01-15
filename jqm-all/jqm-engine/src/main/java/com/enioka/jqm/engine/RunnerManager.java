@@ -47,7 +47,7 @@ class RunnerManager
         }
         catch (Exception e)
         {
-            throw new JqmRuntimeException("Issue when loading the runners");
+            throw new JqmRuntimeException("Issue when loading the runners", e);
         }
     }
 

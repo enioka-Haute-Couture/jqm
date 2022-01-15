@@ -1,7 +1,6 @@
 package com.enioka.jqm.jndi;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InaccessibleObjectException;
 
 import javax.naming.spi.InitialContextFactoryBuilder;
 import javax.naming.spi.NamingManager;
@@ -71,16 +70,20 @@ public class JndiBundleActivator implements BundleActivator
                 }
             }
         }
-        catch (InaccessibleObjectException e)
-        {
-            jqmlogger.info(
-                    "Cannot access singleton InitialContextFactoryBuilder on this JRE - JNDI context cannot be properly unloaded but it is only an issue during tests");
-        }
         catch (Throwable t)
         {
-            jqmlogger.warn(
-                    "Unexpected error resetting InitialContextFactoryBuilder. Only an issue in tests but please report it toi maintainer",
-                    t);
+            // Not using the class, as it only exists in Java 9+ not Java 8.
+            if (t.getClass().getName().endsWith("InaccessibleObjectException"))
+            {
+                jqmlogger.info(
+                        "Cannot access singleton InitialContextFactoryBuilder on this JRE - JNDI context cannot be properly unloaded but it is only an issue during tests");
+            }
+            else
+            {
+                jqmlogger.warn(
+                        "Unexpected error resetting InitialContextFactoryBuilder. Only an issue in tests but please report it to maintainer",
+                        t);
+            }
         }
     }
 }
