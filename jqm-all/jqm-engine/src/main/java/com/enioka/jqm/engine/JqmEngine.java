@@ -135,114 +135,116 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         OsgiBundleLogger.logAllBundles();
 
         // Database connection
-        DbConn cnx = Helpers.getNewDbSession();
-        cnx.logDatabaseInfo(jqmlogger);
-
-        // Node configuration is in the database
-        try
+        try (DbConn cnx = Helpers.getNewDbSession())
         {
-            node = Node.select_single(cnx, "node_select_by_key", nodeName);
-        }
-        catch (NoResultException e)
-        {
-            throw new JqmRuntimeException("the specified node name [" + nodeName
-                    + "] does not exist in the configuration. Please create this node before starting it", e);
-        }
+            cnx.logDatabaseInfo(jqmlogger);
 
-        // Check if double-start
-        long toWait = (long) (1.1 * Long.parseLong(GlobalParameter.getParameter(cnx, "internalPollingPeriodMs", "60000")));
-        if (node.getLastSeenAlive() != null
-                && Calendar.getInstance().getTimeInMillis() - node.getLastSeenAlive().getTimeInMillis() <= toWait)
-        {
-            long r = Calendar.getInstance().getTimeInMillis() - node.getLastSeenAlive().getTimeInMillis();
-            throw new JqmInitErrorTooSoon("Another engine named " + nodeName + " was running less than " + r / 1000
-                    + " seconds ago. Either stop the other node, or if it already stopped, please wait " + (toWait - r) / 1000
-                    + " seconds");
-        }
-        SimpleDateFormat ft = new SimpleDateFormat("dd/MM/YYYY hh:mm:ss");
-        jqmlogger.debug("The last time an engine with this name was seen was: "
-                + (node.getLastSeenAlive() == null ? "" : ft.format(node.getLastSeenAlive().getTime())));
-
-        // Prevent very quick multiple starts by immediately setting the keep-alive
-        QueryResult qr = cnx.runUpdate("node_update_alive_by_id", node.getId());
-        cnx.commit();
-        if (qr.nbUpdated == 0)
-        {
-            throw new JqmInitErrorTooSoon("Another engine named " + nodeName + " is running");
-        }
-
-        // Only start if the node configuration seems OK
-        Helpers.checkConfiguration(nodeName, cnx);
-
-        // Log parameters
-        Helpers.dumpParameters(cnx, node);
-
-        // The handler may take any actions it wishes here - such as setting log levels, starting Jetty...
-        if (this.handler != null)
-        {
-            this.handler.onNodeConfigurationRead(node);
-        }
-
-        // Remote JMX server
-        if (node.getJmxRegistryPort() != null && node.getJmxServerPort() != null && node.getJmxRegistryPort() > 0
-                && node.getJmxServerPort() > 0)
-        {
-            JmxAgent.registerAgent(node.getJmxRegistryPort(), node.getJmxServerPort(), node.getDns());
-        }
-        else
-        {
-            jqmlogger.info(
-                    "JMX remote listener will not be started as JMX registry port and JMX server port parameters are not both defined");
-        }
-
-        // JMX
-        if (node.getJmxServerPort() != null && node.getJmxServerPort() > 0)
-        {
+            // Node configuration is in the database
             try
             {
-                MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-                name = new ObjectName("com.enioka.jqm:type=Node,name=" + this.node.getName());
-                mbs.registerMBean(this, name);
+                node = Node.select_single(cnx, "node_select_by_key", nodeName);
             }
-            catch (Exception e)
+            catch (NoResultException e)
             {
-                throw new JqmInitError("Could not create JMX beans", e);
+                throw new JqmRuntimeException("the specified node name [" + nodeName
+                        + "] does not exist in the configuration. Please create this node before starting it", e);
             }
-            jqmlogger.info("JMX management bean for the engine was registered");
+
+            // Check if double-start
+            long toWait = (long) (1.1 * Long.parseLong(GlobalParameter.getParameter(cnx, "internalPollingPeriodMs", "60000")));
+            if (node.getLastSeenAlive() != null
+                    && Calendar.getInstance().getTimeInMillis() - node.getLastSeenAlive().getTimeInMillis() <= toWait)
+            {
+                long r = Calendar.getInstance().getTimeInMillis() - node.getLastSeenAlive().getTimeInMillis();
+                throw new JqmInitErrorTooSoon("Another engine named " + nodeName + " was running less than " + r / 1000
+                        + " seconds ago. Either stop the other node, or if it already stopped, please wait " + (toWait - r) / 1000
+                        + " seconds");
+            }
+            SimpleDateFormat ft = new SimpleDateFormat("dd/MM/YYYY hh:mm:ss");
+            jqmlogger.debug("The last time an engine with this name was seen was: "
+                    + (node.getLastSeenAlive() == null ? "" : ft.format(node.getLastSeenAlive().getTime())));
+
+            // Prevent very quick multiple starts by immediately setting the keep-alive
+            QueryResult qr = cnx.runUpdate("node_update_alive_by_id", node.getId());
+            cnx.commit();
+            if (qr.nbUpdated == 0)
+            {
+                throw new JqmInitErrorTooSoon("Another engine named " + nodeName + " is running");
+            }
+
+            // Only start if the node configuration seems OK
+            Helpers.checkConfiguration(nodeName, cnx);
+
+            // Log parameters
+            Helpers.dumpParameters(cnx, node);
+
+            // The handler may take any actions it wishes here - such as setting log levels, starting Jetty...
+            if (this.handler != null)
+            {
+                this.handler.onNodeConfigurationRead(node);
+            }
+
+            // Remote JMX server
+            if (node.getJmxRegistryPort() != null && node.getJmxServerPort() != null && node.getJmxRegistryPort() > 0
+                    && node.getJmxServerPort() > 0)
+            {
+                JmxAgent.registerAgent(node.getJmxRegistryPort(), node.getJmxServerPort(), node.getDns());
+            }
+            else
+            {
+                jqmlogger.info(
+                        "JMX remote listener will not be started as JMX registry port and JMX server port parameters are not both defined");
+            }
+
+            // JMX
+            if (node.getJmxServerPort() != null && node.getJmxServerPort() > 0)
+            {
+                try
+                {
+                    MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                    name = new ObjectName("com.enioka.jqm:type=Node,name=" + this.node.getName());
+                    mbs.registerMBean(this, name);
+                }
+                catch (Exception e)
+                {
+                    throw new JqmInitError("Could not create JMX beans", e);
+                }
+                jqmlogger.info("JMX management bean for the engine was registered");
+            }
+            else
+            {
+                loadJmxBeans = false;
+                jqmlogger.info("JMX management beans will not be loaded as JMX server port is null or zero");
+            }
+
+            // Hack to set global server name
+            try
+            {
+                InitialContext.doLookup("serverName://" + node.getName());
+            }
+            catch (NamingException e)
+            {
+                // no one cares.
+                jqmlogger.warn("Could not register server name inside JNDI registry", e);
+            }
+
+            // Scheduler
+            scheduler = new CronScheduler(this);
+
+            // Cleanup
+            purgeDeadJobInstances(cnx, this.node);
+
+            // Runners
+            runningJobInstanceManager = new RunningJobInstanceManager();
+            runnerManager = new RunnerManager(cnx);
+
+            // Resource managers
+            initResourceManagers(cnx);
+
+            // Pollers
+            syncPollers(cnx, this.node);
+            jqmlogger.info("All required queues are now polled");
         }
-        else
-        {
-            loadJmxBeans = false;
-            jqmlogger.info("JMX management beans will not be loaded as JMX server port is null or zero");
-        }
-
-        // Hack to set global server name
-        try
-        {
-            InitialContext.doLookup("serverName://" + node.getName());
-        }
-        catch (NamingException e)
-        {
-            // no one cares.
-            jqmlogger.warn("Could not register server name inside JNDI registry", e);
-        }
-
-        // Scheduler
-        scheduler = new CronScheduler(this);
-
-        // Cleanup
-        purgeDeadJobInstances(cnx, this.node);
-
-        // Runners
-        runningJobInstanceManager = new RunningJobInstanceManager();
-        runnerManager = new RunnerManager(cnx);
-
-        // Resource managers
-        initResourceManagers(cnx);
-
-        // Pollers
-        syncPollers(cnx, this.node);
-        jqmlogger.info("All required queues are now polled");
 
         // Internal poller (stop notifications, keep alive)
         intPoller = new InternalPoller(this);
@@ -253,9 +255,6 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         killHook = new SignalHandler(this);
         Runtime.getRuntime().addShutdownHook(killHook);
 
-        // Done
-        cnx.close();
-        cnx = null;
         JqmEngine.latestNodeStartedName = node.getName();
         if (this.handler != null)
         {
