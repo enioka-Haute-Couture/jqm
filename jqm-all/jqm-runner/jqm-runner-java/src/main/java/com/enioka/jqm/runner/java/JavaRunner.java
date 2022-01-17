@@ -80,7 +80,7 @@ public class JavaRunner implements JobRunner
 
     public JavaRunner()
     {
-        classloaderManager = new ClassloaderManager(DbManager.getDb().getConn());
+        classloaderManager = new ClassloaderManager();
     }
 
     @Override

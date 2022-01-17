@@ -60,9 +60,9 @@
 
         <!-- Scheduling -->
         <dependency>
-            <groupId>it.sauronsoftware.cron4j</groupId>
-            <artifactId>cron4j</artifactId>
-            <version>2.2.5</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-osgi-repackaging-cron4j</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
     </dependencies>

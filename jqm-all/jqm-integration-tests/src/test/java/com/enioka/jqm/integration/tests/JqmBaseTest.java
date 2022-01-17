@@ -20,7 +20,6 @@ import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.options;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.url;
-import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -145,13 +144,13 @@ public class JqmBaseTest
                 mavenBundle("org.apache.httpcomponents", "httpcore-osgi").versionAsInProject(),
 
                 // Cron
-                wrappedBundle(mavenBundle("it.sauronsoftware.cron4j", "cron4j").versionAsInProject()),
+                mavenBundle("com.enioka.jqm", "jqm-osgi-repackaging-cron4j").versionAsInProject(),
 
                 // CLI
-                wrappedBundle(mavenBundle("com.beust", "jcommander").versionAsInProject()),
+                mavenBundle("com.enioka.jqm", "jqm-osgi-repackaging-jcommander").versionAsInProject(),
 
                 // XML & binding through annotations APIs
-                wrappedBundle(mavenBundle("org.jdom", "jdom").versionAsInProject()), //
+                mavenBundle("com.enioka.jqm", "jqm-osgi-repackaging-jdom").versionAsInProject(), //
                 mavenBundle("jakarta.activation", "jakarta.activation-api").versionAsInProject(),
                 mavenBundle("jakarta.xml.bind", "jakarta.xml.bind-api").versionAsInProject(), // JAXB
 
@@ -159,7 +158,7 @@ public class JqmBaseTest
                 mavenBundle("com.sun.mail", "javax.mail").versionAsInProject(),
 
                 // Needed on Java8 to kill processes properly (inside shell runner)
-                wrappedBundle(mavenBundle("org.jvnet.winp", "winp").versionAsInProject()),
+                mavenBundle("com.enioka.jqm", "jqm-osgi-repackaging-winp").versionAsInProject(),
 
                 // Shiro is needed by test helpers & client lib for password generation
                 mavenBundle("org.apache.shiro", "shiro-core").versionAsInProject(), //
@@ -270,7 +269,7 @@ public class JqmBaseTest
                 // Web security
                 // mavenBundle("org.apache.shiro", "shiro-core", "1.7.1"), // core is already present above.
                 mavenBundle("org.apache.shiro", "shiro-web", "1.7.1"), //
-                wrappedBundle(mavenBundle("org.owasp.encoder", "encoder").versionAsInProject()),
+                mavenBundle("org.owasp.encoder", "encoder").versionAsInProject(),
 
                 // Our web app project
                 mavenBundle("com.enioka.jqm", "jqm-ws").versionAsInProject(), // Used to be a war.

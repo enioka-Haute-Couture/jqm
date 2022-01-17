@@ -15,9 +15,9 @@
     <dependencies>
         <!-- CLI parsing -->
         <dependency>
-            <groupId>com.beust</groupId>
-            <artifactId>jcommander</artifactId>
-            <version>1.81</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-osgi-repackaging-jcommander</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- We directly integrate the XML import/export functions in some commands -->

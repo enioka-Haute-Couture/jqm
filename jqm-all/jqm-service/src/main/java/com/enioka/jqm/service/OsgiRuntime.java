@@ -219,7 +219,9 @@ class OsgiRuntime
             }
             else
             {
+                jqmlogger.error("This bundle is not an OSGi bundle and cannot be installed");
                 b = ctx.installBundle("wrap:" + path);
+                System.exit(995);
             }
             b.adapt(BundleStartLevel.class).setStartLevel(startLevel);
 

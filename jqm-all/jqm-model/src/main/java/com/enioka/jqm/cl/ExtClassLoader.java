@@ -1,6 +1,7 @@
 package com.enioka.jqm.cl;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -8,6 +9,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +34,10 @@ public final class ExtClassLoader
 
         // Java 8?
         boolean tmpBool = false;
+        Method getPlatformClassLoaderMethod = null;
         try
         {
-            ClassLoader.class.getMethod("getPlatformClassLoader");
+            getPlatformClassLoaderMethod = ClassLoader.class.getMethod("getPlatformClassLoader");
         }
         catch (NoSuchMethodException e)
         {
@@ -54,7 +58,14 @@ public final class ExtClassLoader
         }
         else
         {
-            parentCl = java8 ? null : ClassLoader.getPlatformClassLoader();
+            try
+            {
+                parentCl = java8 ? null : (ClassLoader) getPlatformClassLoaderMethod.invoke(null);
+            }
+            catch (Exception e)
+            {
+                throw new JqmRuntimeException("Could not get parent classloader", e);
+            }
         }
 
         // List all jars inside ext directory

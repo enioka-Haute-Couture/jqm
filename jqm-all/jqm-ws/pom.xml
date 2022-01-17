@@ -22,6 +22,7 @@
         <spa.output.dist>src/main/webapp/dist</spa.output.dist>
     </properties>
 
+
     <profiles>
         <!-- Disable yarn prod build when using dev mode -->
         <!-- It is enabled inside the exec:exec goal -->
@@ -53,6 +54,77 @@
 
     <build>
         <plugins>
+            <!-- For OSGi only, copy shiro ini file inside the Shiro-accessible classpath -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/org/apache/shiro/jqm</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/webapp/WEB-INF</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>shiro.ini</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- run mvn jetty:run to test (with hot deployment) the app on a dev
+				computer. localhost:8080 -->
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>${jetty.version}</version>
+                <configuration>
+                    <scanIntervalSeconds>10</scanIntervalSeconds>
+                    <useProvidedScope>true</useProvidedScope>
+                    <useTestScope>true</useTestScope>
+                    <jettyXml>${project.basedir}/src/test/resources/jetty.xml</jettyXml>
+                    <httpConnector>
+                        <port>8080</port>
+                        <name>testConnector</name>
+                    </httpConnector>
+                    <webApp>
+                        <contextPath>/</contextPath>
+                        <overrideDescriptor>${project.basedir}/src/test/resources/web-jetty.xml</overrideDescriptor>
+                    </webApp>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.eclipse.persistence</groupId>
+                        <artifactId>org.eclipse.persistence.moxy</artifactId>
+                        <version>2.7.6</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>jul-to-slf4j</artifactId>
+                        <version>${slf4j.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                        <version>${commons.logging.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                        <version>${slf4j.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
@@ -148,7 +220,7 @@
             <plugin>
                 <groupId>biz.aQute.bnd</groupId>
                 <artifactId>bnd-maven-plugin</artifactId>
-                <version>${maven.bnd.plugin.version}</version>
+                <version>${plugin.bnd.version}</version>
                 <configuration>
                     <bnd><![CDATA[
                         # Do not actually deploy this as an OSGi WAR but as JAX-RS whiteboard resources
@@ -201,6 +273,12 @@
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
             <version>${shiro.version}</version>
+        </dependency>
+        <!-- Temp - force version as 1.2.3 is OSGi-compliant, not the 1.2.2 coming with Shiro 1.8.0-->
+        <dependency>
+            <groupId>org.owasp.encoder</groupId>
+            <artifactId>encoder</artifactId>
+            <version>1.2.3</version>
         </dependency>
         <dependency>
             <groupId>com.enioka.jqm</groupId>

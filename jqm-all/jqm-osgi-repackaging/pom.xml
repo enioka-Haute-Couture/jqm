@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.enioka.jqm</groupId>
+        <artifactId>jqm-all</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>jqm-osgi-repackaging</artifactId>
+    <packaging>pom</packaging>
+
+    <name>${project.groupId}:${project.artifactId}</name>
+    <url>http://jqm.readthedocs.org</url>
+    <description>Some libraries are not packaged as OSGi bundles. We should create one module per library under this parent module in order to repackage them.</description>
+
+    <modules>
+        <module>jqm-osgi-repackaging-winp</module>
+        <module>jqm-osgi-repackaging-jdom</module>
+        <module>jqm-osgi-repackaging-cron4j</module>
+        <module>jqm-osgi-repackaging-jcommander</module>
+    </modules>
+</project>

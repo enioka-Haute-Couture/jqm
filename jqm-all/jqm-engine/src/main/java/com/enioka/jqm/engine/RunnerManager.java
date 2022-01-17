@@ -2,17 +2,18 @@ package com.enioka.jqm.engine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.runner.api.JobRunner;
 import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
-import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.loader.Loader;
-import com.enioka.jqm.model.JobInstance;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,30 +26,44 @@ class RunnerManager
 
     private Map<Integer, JobRunner> runnerCache = new HashMap<>();
 
-    private List<JobRunner> runners = new ArrayList<>(2);
+    private ConcurrentLinkedQueue<JobRunner> runners = new ConcurrentLinkedQueue<>();
 
-    private ArrayList<ServiceReference> refList = new ArrayList<ServiceReference>();
+    private ArrayList<ServiceReference<JobRunner>> refList = new ArrayList<ServiceReference<JobRunner>>();
+
+    private ServiceTracker<JobRunner, JobRunner> jobRunnerServiceTracker;
 
     RunnerManager(DbConn cnx)
     {
         jqmlogger.info("Registering the runners");
 
         // Use the loader to get all the JobRunners available in the environment and add them to the list of runners.
-        try
+        BundleContext context = org.osgi.framework.FrameworkUtil.getBundle(getClass()).getBundleContext();
+        jobRunnerServiceTracker = new ServiceTracker<>(context, JobRunner.class, new ServiceTrackerCustomizer<JobRunner, JobRunner>()
         {
-            BundleContext context = org.osgi.framework.FrameworkUtil.getBundle(getClass()).getBundleContext();
-            Loader<JobRunner> loader = new Loader<JobRunner>(context, JobRunner.class, null);
-            loader.start();
-            for (ServiceReference<?> ref : loader.references)
+            @Override
+            public JobRunner addingService(ServiceReference<JobRunner> reference)
             {
-                runners.add((JobRunner) context.getService(ref));
-                refList.add(ref);
+                refList.add(reference);
+                JobRunner runner = context.getService(reference);
+                runners.add(runner);
+                return runner;
             }
-        }
-        catch (Exception e)
-        {
-            throw new JqmRuntimeException("Issue when loading the runners");
-        }
+
+            @Override
+            public void modifiedService(ServiceReference<JobRunner> reference, JobRunner service)
+            {
+                // Nothing to do
+            }
+
+            @Override
+            public void removedService(ServiceReference<JobRunner> reference, JobRunner service)
+            {
+                refList.remove(reference);
+                runners.remove(service);
+                context.ungetService(reference);
+            }
+        });
+        jobRunnerServiceTracker.open();
     }
 
     /**
@@ -79,9 +94,10 @@ class RunnerManager
     void stop()
     {
         BundleContext context = org.osgi.framework.FrameworkUtil.getBundle(getClass()).getBundleContext();
-        for (ServiceReference ref : refList)
+        for (ServiceReference<JobRunner> ref : refList)
         {
             context.ungetService(ref);
         }
+        jobRunnerServiceTracker.close();
     }
 }

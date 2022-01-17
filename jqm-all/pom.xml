@@ -73,17 +73,15 @@
         <plugin.war.version>3.3.1</plugin.war.version>
         <plugin.assembly.version>2.6</plugin.assembly.version>
         <plugin.resources.version>3.2.0</plugin.resources.version>
-        <plugin.bnd.version>5.2.0</plugin.bnd.version>
+        <plugin.bnd.version>6.1.0</plugin.bnd.version>
         <plugin.dependency.version>3.1.2</plugin.dependency.version>
         <surefire.version>2.22.1</surefire.version>
         <maven.jar.plugin.version>3.2.0</maven.jar.plugin.version>
-        <maven.bnd.plugin.version>5.2.0</maven.bnd.plugin.version>
         <javadoc.version>2.10.3</javadoc.version>
 
         <junit.version>4.12</junit.version>
 
         <hibernate.version>4.2.21.Final</hibernate.version>
-        <hsqldb.version>2.3.4</hsqldb.version>
         <jersey-version>2.34</jersey-version>
         <jetty.version>9.4.31.v20200723</jetty.version>
 
@@ -91,6 +89,7 @@
         <commons.logging.version>1.2</commons.logging.version>
         <logback.version>1.2.3</logback.version>
 
+        <hsqldb.version>2.3.4</hsqldb.version>
         <h2.version>1.4.197</h2.version>
         <mysql.client.version>8.0.15</mysql.client.version>
         <mariadb.client.version>2.4.0</mariadb.client.version>
@@ -109,6 +108,10 @@
         <shrinkwrap.resolver.version>3.1.3</shrinkwrap.resolver.version>
         <jaxb.impl.version>2.3.3</jaxb.impl.version>        <!-- BEWARE: 2.3.4 is buggy, missing service -->
         <jaxrs.api.version>1.0.4</jaxrs.api.version>
+        <jdom.version>1.1.3</jdom.version>
+        <cron4j.version>2.2.5</cron4j.version>
+        <jcommander.version>1.82</jcommander.version>
+        <winp.version>1.27</winp.version>
 
         <osgi.core.version>7.0.0</osgi.core.version>
         <osgi.annotation.version>7.0.0</osgi.annotation.version>
@@ -163,6 +166,7 @@
         <module>jqm-service</module>
         <module>jqm-xml</module>
         <module>jqm-integration-tests</module>
+        <module>jqm-osgi-repackaging</module>
     </modules>
 
     <scm>
@@ -336,7 +340,7 @@
             <plugin>
                 <groupId>biz.aQute.bnd</groupId>
                 <artifactId>bnd-maven-plugin</artifactId>
-                <version>${maven.bnd.plugin.version}</version>
+                <version>${plugin.bnd.version}</version>
                 <executions>
                     <execution>
                         <id>PROCESS_BUNDLES</id>
@@ -350,6 +354,7 @@
 -noclassforname: true
 Bundle-SymbolicName: com.enioka.jqm.${project.artifactId}
 Import-Package: *, ${additionnalBndImports}
+-fixupmessages: "The default package "
         ]]>
                     </bnd>
                 </configuration>

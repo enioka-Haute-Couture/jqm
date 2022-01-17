@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<resources>	
-	<resource 
+<resources>
+	<resource
 	      name="jdbc/hsqldb"
           auth="Container"
           type="javax.sql.DataSource"
@@ -26,8 +26,8 @@
           driverClassName="org.hsqldb.jdbcDriver"
           url="jdbc:hsqldb:hsql://localhost/testdbengine"
           singleton="true"/>
-          
-     <resource 
+
+     <resource
 	      name="jdbc/postgresql"
           auth="Container"
           type="javax.sql.DataSource"
@@ -53,8 +53,8 @@
           driverClassName="org.postgresql.Driver"
           url="jdbc:postgresql://localhost/jqm"
           singleton="true"/>
-          
-     <resource 
+
+     <resource
 	      name="jdbc/oracle"
           auth="Container"
           type="javax.sql.DataSource"
@@ -83,8 +83,9 @@
           singleton="true"
           initSQL="CALL DBMS_APPLICATION_INFO.SET_MODULE('CONNECTION POOL', 'IDLE IN POOL')"
           jdbcInterceptors="com.enioka.jqm.providers.Interceptor"/>
-          
-	<resource 
+
+    <!-- docker run -it - -rm -e "MYSQL_USER=jqm" -e "MYSQL_PASSWORD=jqm" -e "MYSQL_ROOT_PASSWORD=root" -e "MYSQL_DATABASE=jqm" -p 3306:3306 mysql -->
+	<resource
 	      name="jdbc/mysql"
           auth="Container"
           type="javax.sql.DataSource"
@@ -107,11 +108,11 @@
           jmxEnabled="true"
           username="jqm"
           password="jqm"
-          driverClassName="com.mysql.jdbc.Driver"
-          url="jdbc:mysql://localhost:3306/jqm?useSSL=false&amp;disableMariaDbDriver"
+          driverClassName="com.mysql.cj.jdbc.Driver"
+          url="jdbc:mysql://localhost:3306/jqm?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;disableMariaDbDriver"
           singleton="true"
           connectionProperties="connectionAttributes=program_name:jqm;useLegacyDatetimeCode=false;serverTimezone=UTC;"/>
-          
+
     <resource
 	      name="jdbc/mariadb"
           auth="Container"

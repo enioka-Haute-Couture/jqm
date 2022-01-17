@@ -2,17 +2,16 @@ package com.enioka.jqm.integration.tests;
 
 import java.util.Calendar;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.enioka.admin.MetaService;
 import com.enioka.api.admin.JobDefDto;
 import com.enioka.api.admin.ScheduledJob;
 import com.enioka.jqm.client.api.JobDef;
-import com.enioka.jqm.client.api.JobRequest;
 import com.enioka.jqm.client.api.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Tests for the cron integration.

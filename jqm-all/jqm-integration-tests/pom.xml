@@ -17,6 +17,21 @@
         <argLine>-Xms256m -Xmx1024m -XX:MaxMetaspaceSize=512m --add-opens java.naming/javax.naming.spi=ALL-UNNAMED</argLine>
     </properties>
 
+
+    <profiles>
+        <!-- Cannot open modules on JDK8 as there are no modules... -->
+        <profile>
+            <id>jdk8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+
+            <properties>
+                <argLine>-Xms256m -Xmx1024m -XX:MaxMetaspaceSize=512m</argLine>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <plugin>
@@ -83,6 +98,11 @@
                                     <artifactId>h2</artifactId>
                                     <version>${h2.version}</version>
                                 </artifactItem>
+                                <dependency>
+                                    <groupId>com.oracle.database.jdbc</groupId>
+                                    <artifactId>ojdbc8</artifactId>
+                                    <version>${oracle.client.version}</version>
+                                </dependency>
                                 <artifactItem>
                                     <groupId>org.apache.tomcat</groupId>
                                     <artifactId>tomcat-jdbc</artifactId>
@@ -304,63 +324,6 @@
 
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>oracle</id>
-            <activation>
-                <property>
-                    <name>env.DB</name>
-                    <value>oracle</value>
-                </property>
-            </activation>
-            <repositories>
-                <repository>
-                    <id>maven.oracle.com</id>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                    <url>https://maven.oracle.com</url>
-                    <layout>default</layout>
-                </repository>
-            </repositories>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <version>${plugin.dependency.version}</version>
-                        <configuration>
-                            <skip>false</skip>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>copy3</id>
-                                <phase>process-test-classes</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>com.oracle.jdbc</groupId>
-                                            <artifactId>ojdbc8</artifactId>
-                                            <version>${oracle.client.version}</version>
-                                        </artifactItem>
-                                    </artifactItems>
-                                    <outputDirectory>${project.basedir}/ext</outputDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
 
     <dependencies>
         <!-- This project mostly tests the service JQM distribution -->

@@ -30,9 +30,9 @@
 
         <!-- OS specific libraries, Java 6-8 only -->
         <dependency>
-            <groupId>org.jvnet.winp</groupId>
-            <artifactId>winp</artifactId>
-            <version>1.27</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-osgi-repackaging-winp</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Helpers -->

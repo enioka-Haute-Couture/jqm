@@ -149,6 +149,13 @@
                 <exclude>junit:junit</exclude>
                 <exclude>org.glassfish.jaxb:jaxb-runtime</exclude>                <!-- WHY OH WHY CXF WHITEBOARD???? -->
                 <exclude>com.enioka.jqm:jqm-providers</exclude>
+                <exclude>org.apache.shiro:shiro-cache</exclude>
+                <exclude>org.apache.shiro:shiro-crypto-cipher</exclude>                <!-- We prefer using the "all in one" bundles coming from jqm-web-->
+                <exclude>org.apache.shiro:shiro-config-core</exclude>
+                <exclude>org.apache.shiro:shiro-config-ogdl</exclude>
+                <exclude>org.apache.shiro:shiro-crypto-hash</exclude>
+                <exclude>org.apache.shiro:shiro-lang</exclude>
+                <exclude>org.apache.shiro:shiro-crypto-core</exclude>
             </excludes>
         </dependencySet>
         <dependencySet>

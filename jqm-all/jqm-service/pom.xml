@@ -41,7 +41,7 @@
             <plugin>
                 <groupId>biz.aQute.bnd</groupId>
                 <artifactId>bnd-maven-plugin</artifactId>
-                <version>${maven.bnd.plugin.version}</version>
+                <version>${plugin.bnd.version}</version>
                 <configuration>
                     <skip>true</skip>
                 </configuration>
@@ -167,6 +167,12 @@
             <artifactId>org.apache.aries.jax.rs.whiteboard</artifactId>
             <version>${felix.jaxrs.whiteboard.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.spec.javax.rmi</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.woodstox</groupId>
@@ -199,7 +205,6 @@
             <version>1.3.4</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.util.promise</artifactId>
@@ -211,13 +216,6 @@
             <artifactId>org.osgi.util.function</artifactId>
             <version>${osgi.function.version}</version>
             <scope>provided</scope>
-        </dependency>
-
-        <!-- Compatibility helper for the last non-OSGi jar files -->
-        <dependency>
-            <groupId>org.ops4j.pax.url</groupId>
-            <artifactId>pax-url-wrap</artifactId>
-            <version>${pax.url.version}</version>
         </dependency>
 
         <!-- APIs implemented by CXF/Whiteboard - clean OSGi versions from the official source -->
@@ -247,12 +245,6 @@
             <version>1.1</version>
             <scope>provided</scope>
         </dependency>
-        <!--<dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-annotation_1.3_spec</artifactId>
-            <version>1.3</version>
-            <scope>provided</scope>
-        </dependency>-->
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.http.servlet-api</artifactId>
