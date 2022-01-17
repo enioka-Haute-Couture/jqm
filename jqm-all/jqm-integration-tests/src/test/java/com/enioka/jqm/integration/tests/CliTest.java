@@ -12,7 +12,6 @@ import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class CliTest extends JqmBaseTest
@@ -52,7 +51,6 @@ public class CliTest extends JqmBaseTest
     }
 
     @Test
-    @Ignore
     public void testSingleLauncher() throws Exception
     {
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip, 42,
