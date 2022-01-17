@@ -17,6 +17,21 @@
         <argLine>-Xms256m -Xmx1024m -XX:MaxMetaspaceSize=512m --add-opens java.naming/javax.naming.spi=ALL-UNNAMED</argLine>
     </properties>
 
+
+    <profiles>
+        <!-- Cannot open modules on JDK8 as there are no modules... -->
+        <profile>
+            <id>jdk8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+
+            <properties>
+                <argLine>-Xms256m -Xmx1024m -XX:MaxMetaspaceSize=512m</argLine>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <plugin>

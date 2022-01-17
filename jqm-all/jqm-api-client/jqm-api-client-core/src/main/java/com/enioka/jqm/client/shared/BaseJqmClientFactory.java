@@ -159,7 +159,7 @@ public class BaseJqmClientFactory<T extends JqmClient>
         }
         else
         {
-            p2 = new Properties(props.size());
+            p2 = new Properties();
             p2.putAll(props);
             p2.putAll(p);
         }

@@ -1,5 +1,7 @@
 package com.enioka.jqm.jdbc;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -524,5 +526,42 @@ public class Db
     public String getProduct()
     {
         return this.product;
+    }
+
+    /**
+     * For tests we allow trying to close the datasource. As it is often a pooled connection, we may need to free the pool between tests.
+     */
+    void close()
+    {
+        if (_ds == null)
+        {
+            return;
+        }
+
+        try
+        {
+            Method m = _ds.getClass().getMethod("close", boolean.class);
+            m.invoke(_ds, true);
+            jqmlogger.info("Connection pool was closed with purge");
+        }
+        catch (NoSuchMethodException e)
+        {
+            try
+            {
+                Method m = _ds.getClass().getMethod("close");
+                m.invoke(_ds);
+                jqmlogger.info("Connection pool was closed without purge");
+            }
+            catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException |
+                   InvocationTargetException e1)
+            {
+                // nothing to do - this DS cannot be closed.
+            }
+        }
+        catch (Exception e)
+        {
+            // nothing to do - this DS cannot be closed.
+        }
+        _ds = null;
     }
 }

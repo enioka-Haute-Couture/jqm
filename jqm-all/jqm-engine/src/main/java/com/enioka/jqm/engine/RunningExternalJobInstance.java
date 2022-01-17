@@ -1,15 +1,15 @@
 package com.enioka.jqm.engine;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.enioka.jqm.engine.api.exceptions.JqmInitError;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobInstance;
@@ -29,7 +29,7 @@ class RunningExternalJobInstance implements Runnable
     int jobId;
     JobInstance ji;
     String opts;
-    String logFile;
+    String logFilePath;
     String rootPath;
     int killCheckPeriodMs = 1000;
     QueuePoller qp = null;
@@ -46,12 +46,15 @@ class RunningExternalJobInstance implements Runnable
 
         rootPath = GlobalParameter.getParameter(cnx, "alternateJqmRoot", ".");
 
-        logFile = FilenameUtils.concat(rootPath, "./logs");
-        logFile = FilenameUtils.concat(logFile, StringUtils.leftPad("" + jobId, 10, "0") + ".log");
+        logFilePath = FilenameUtils.concat(rootPath, "./logs");
+        logFilePath = FilenameUtils.concat(logFilePath, StringUtils.leftPad("" + jobId, 10, "0") + ".log");
+        jqmlogger.debug("Using {} as log path", logFilePath);
 
-        if (!Files.isDirectory(Path.of(FilenameUtils.getFullPath(logFile))))
+        File logFileDir = new File(FilenameUtils.getFullPath(logFilePath));
+
+        if (!logFileDir.isDirectory() && !logFileDir.mkdirs())
         {
-            Files.createDirectories(Path.of(FilenameUtils.getFullPath(logFile)));
+            throw new JqmInitError("Could not create directory " + logFileDir.getAbsolutePath());
         }
     }
 
@@ -93,7 +96,7 @@ class RunningExternalJobInstance implements Runnable
         String linesep = System.getProperty("line.separator");
 
         try (InputStreamReader isr = new InputStreamReader(p.getInputStream(), "UTF8");
-                FileWriter f = new FileWriter(logFile);
+                FileWriter f = new FileWriter(logFilePath);
                 BufferedReader br = new BufferedReader(isr);)
         {
             while (true)

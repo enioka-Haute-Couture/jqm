@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.model.Cl;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobDef;
@@ -65,12 +66,15 @@ public class ClassloaderManager
     private final LibraryResolverFS fsResolver;
     private final LibraryResolverMaven mavenResolver;
 
-    public ClassloaderManager(DbConn cnx)
+    public ClassloaderManager()
     {
-        this.mavenResolver = new LibraryResolverMaven(cnx);
-        this.fsResolver = new LibraryResolverFS(this.mavenResolver);
+        try (DbConn cnx = DbManager.getDb().getConn())
+        {
+            this.mavenResolver = new LibraryResolverMaven(cnx);
+            this.fsResolver = new LibraryResolverFS(this.mavenResolver);
 
-        setIsolationDefault(cnx);
+            setIsolationDefault(cnx);
+        }
     }
 
     private void setIsolationDefault(DbConn cnx)
