@@ -18,7 +18,7 @@ public interface JavaJobRunner
      * This method should have no side effect and be thread safe.
      *
      * @param toRun
-     *                  the class designated as the one to run inside the job definition.
+     *            the class designated as the one to run inside the job definition.
      * @return true of this runner can run it. Returning true is not a guarantee that this specific runner will be selected for the actual
      *         launch, as others may be able to launch it too.
      */
@@ -29,19 +29,17 @@ public interface JavaJobRunner
      * RuntimeException thrown by the payload are expected to bubble up. Exceptions due to the plugin itself should be reported as
      * {@link JobRunnerException}.<br>
      * When this method is called, the context class loader is already the payload class loader, so a runner has access to the full static
-     * context of the payload which it should run. However, the class of the runner itself is loaded through a specific plugin class loader
-     * which only has access to the "plugin" jar files. Also, a runner has no access whatsoever to the engine classes (same as a payload).
-     * So a lot of care is needed when doing operations on the payload class, to avoid class loader mismatches.
+     * context of the payload which it should run. However, the class of the <code>JavaJobRunner</code> itself is loaded through the engine
+     * class loader. So a lot of care is needed when doing operations on the payload class, to avoid class loader mismatches.
      *
      * @param toRun
-     *                           the class designated as the job to run inside the job definition.
+     *            the class designated as the job to run inside the job definition.
      * @param metaParameters
-     *                           a set of parameters given by then engine. These are to be documented.
+     *            a set of parameters given by then engine. These are to be documented.
      * @param jobParameters
-     *                           the actual parameters the job instance should use.
+     *            the actual parameters the job instance should use.
      * @param handlerProxy
-     *                           a pre-configured proxy containing the JobManager API - it should be injected if needed inside the job
-     *                           instance itself
+     *            a pre-configured proxy containing the JobManager API - it should be injected if needed inside the job instance itself
      */
     public void run(Class<? extends Object> toRun, Map<String, String> metaParameters, Map<String, String> jobParameters,
             Object handlerProxy);

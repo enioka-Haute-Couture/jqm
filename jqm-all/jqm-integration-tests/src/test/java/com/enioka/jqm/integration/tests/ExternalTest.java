@@ -17,7 +17,6 @@ public class ExternalTest extends JqmBaseTest
         int jdId = CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip,
                 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
         JobDef.setExternal(cnx, jdId);
-        GlobalParameter.setParameter(cnx, "alternateJqmRoot", "./target/server");
         cnx.commit();
         jqmClient.newJobRequest("MarsuApplication", "TestUser").enqueue();
 
@@ -32,7 +31,6 @@ public class ExternalTest extends JqmBaseTest
     public void testExternalKill() throws Exception
     {
         GlobalParameter.setParameter(cnx, "internalPollingPeriodMs", "100");
-        GlobalParameter.setParameter(cnx, "alternateJqmRoot", "./target/server");
         cnx.commit();
 
         int i = JqmSimpleTest.create(cnx, "pyl.KillMeNot").setExternal().expectNonOk(0).expectOk(0).run(this);

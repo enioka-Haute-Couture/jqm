@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.enioka.jqm.cl.ExtClassLoader;
 import com.enioka.jqm.engine.api.exceptions.JqmInitError;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
@@ -44,7 +45,7 @@ class RunningExternalJobInstance implements Runnable
                 : job.getJD().getJavaOpts();
         killCheckPeriodMs = Integer.parseInt(GlobalParameter.getParameter(cnx, "internalPollingPeriodMs", "1000"));
 
-        rootPath = GlobalParameter.getParameter(cnx, "alternateJqmRoot", ".");
+        rootPath = ExtClassLoader.getRootDir();
 
         logFilePath = FilenameUtils.concat(rootPath, "./logs");
         logFilePath = FilenameUtils.concat(logFilePath, StringUtils.leftPad("" + jobId, 10, "0") + ".log");

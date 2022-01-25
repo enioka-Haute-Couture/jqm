@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.enioka.jqm</groupId>
@@ -102,8 +104,8 @@
                 <version>${jsplugin.version}</version>
 
                 <configuration>
-                    <nodeVersion>v16.9.0</nodeVersion>
-                    <yarnVersion>v1.22.10</yarnVersion>
+                    <nodeVersion>v20.12.2</nodeVersion>
+                    <yarnVersion>v1.22.22</yarnVersion>
                     <installDirectory>target/</installDirectory>
                     <workingDirectory>src/main/react</workingDirectory>
                 </configuration>
@@ -266,7 +268,8 @@
             <artifactId>shiro-web</artifactId>
             <version>${shiro.version}</version>
         </dependency>
-        <!-- Temp - force version as 1.2.3 is OSGi-compliant, not the 1.2.2 coming with Shiro 1.8.0-->
+        <!-- Temp - force version as 1.2.3 is OSGi-compliant, not the 1.2.2 coming with Shiro
+        1.8.0-->
         <dependency>
             <groupId>org.owasp.encoder</groupId>
             <artifactId>encoder</artifactId>

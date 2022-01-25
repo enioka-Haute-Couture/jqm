@@ -18,26 +18,25 @@
 
 package com.enioka.jqm.runner.java;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.enioka.jqm.api.JavaJobRunner;
 import com.enioka.jqm.api.JobRunnerException;
 import com.enioka.jqm.model.ClHandler;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.runner.java.api.jndi.JavaPayloadClassLoader;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link URLClassLoader} that will load everything related to a payload (the payload jar and all its dependencies).<br>
@@ -128,63 +127,42 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
         jqmlogger.trace("Class " + classQualifiedName + " was correctly loaded");
 
         // 4 - Determine which job runner should take the job and launch!
-        List<String> allowedRunners = clm.getJobRunnerClasses();
+        List<JavaJobRunner> allAvailableRunners = clm.getAllJavaJobRunners();
+        List<JavaJobRunner> allowedRunners = allAvailableRunners;
         if (job.getJD().getClassLoader() != null && job.getJD().getClassLoader().getAllowedRunners() != null
                 && !job.getJD().getClassLoader().getAllowedRunners().isEmpty())
         {
-            allowedRunners = Arrays.asList(job.getJD().getClassLoader().getAllowedRunners().split(","));
+            String[] runnerClassNameList = job.getJD().getClassLoader().getAllowedRunners().split(",");
+
+            allowedRunners = new ArrayList<>(runnerClassNameList.length);
+            boolean found = false;
+            for (String runnerClassName : runnerClassNameList)
+            {
+                for (JavaJobRunner runner : allAvailableRunners)
+                {
+                    if (runner.getClass().getCanonicalName().equals(runnerClassName))
+                    {
+                        allowedRunners.add(runner);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    throw new JobRunnerException("Job instance requested a Java runner type which is not installed: " + runnerClassName);
+                }
+            }
         }
-        for (String runnerClassName : allowedRunners)
+
+        for (JavaJobRunner runner : allowedRunners)
         {
             Boolean canRun = false;
-            Class runnerClass = null;
-            Method run;
-            Object runner;
-            try
-            {
-                // Note we load the runner class inside the engine CL (with plugins), not the payload CL.
-                // NOTHING is allowed inside the payload CL which was not specifically asked for. (ext dir or lib dir)
-                runnerClass = clm.getPluginClassLoader().loadClass(runnerClassName);
-            }
-            catch (Exception e)
-            {
-                throw new JobRunnerException(
-                        "could not load a runner: check your global parameters, or that the plugin for this runner is actually present "
-                                + runnerClassName,
-                        e);
-            }
-            try
-            {
-                runner = runnerClass.newInstance();
-            }
-            catch (Exception e)
-            {
-                throw new JobRunnerException(
-                        "could not create an instance of a runner: it may not have a no-args constructor. " + runnerClassName, e);
-            }
 
-            try
-            {
-                Method m = runnerClass.getMethod("canRun", Class.class);
-                canRun = (Boolean) m.invoke(runner, c);
-            }
-            catch (Exception e)
-            {
-                throw new JobRunnerException("invocation of canRun failed on the runner plugin " + runnerClassName, e);
-            }
+            canRun = runner.canRun(c);
 
             if (canRun)
             {
-                jqmlogger.trace("Payload is of type: " + runnerClassName);
-
-                try
-                {
-                    run = runnerClass.getMethod("run", Class.class, Map.class, Map.class, Object.class);
-                }
-                catch (Exception e)
-                {
-                    throw new JobRunnerException("could not find run method for runner plugin " + runnerClassName, e);
-                }
+                jqmlogger.trace("Payload is of type: " + runner.getClass().getName());
 
                 // We are ready to actually run the job instance. Time for all event handlers.
                 if (job.getJD().getClassLoader() != null)
@@ -214,20 +192,16 @@ public class PayloadClassLoader extends URLClassLoader implements JavaPayloadCla
                 // Go for real.
                 try
                 {
-                    run.invoke(runner, c, metaprms, parameters, proxy);
+                    runner.run(c, metaprms, parameters, proxy);
                     return;
                 }
-                catch (InvocationTargetException e)
+                catch (JobRunnerException e)
                 {
-                    if (e.getCause() instanceof RuntimeException)
-                    {
-                        // it may be a Kill order, or whatever exception...
-                        throw (RuntimeException) e.getCause();
-                    }
-                    else
-                    {
-                        throw new JobRunnerException("Payload has failed", e);
-                    }
+                    throw e;
+                }
+                catch (RuntimeException e)
+                {
+                    throw e;
                 }
                 catch (Exception e)
                 {

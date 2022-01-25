@@ -6,12 +6,16 @@ import java.util.Map;
 
 import com.enioka.jqm.api.JobBase;
 import com.enioka.jqm.api.JobRunnerException;
+
+import org.osgi.service.component.annotations.Component;
+
 import com.enioka.jqm.api.JavaJobRunner;
 
 /**
  * A runner for the deprecated "JobBase" type of jobs.
  */
 @SuppressWarnings("deprecation")
+@Component(service = JavaJobRunner.class, property = { "Plugin-Type=JavaJobRunner", "JavaJobRunner-Type=legacy" })
 public class LegacyRunner implements JavaJobRunner
 {
     public LegacyRunner()

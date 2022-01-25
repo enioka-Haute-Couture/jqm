@@ -2,17 +2,16 @@ package com.enioka.jqm.integration.tests;
 
 import java.io.File;
 
+import com.enioka.jqm.test.helpers.CreationTools;
+import com.enioka.jqm.test.helpers.TestHelpers;
+import com.enioka.jqm.xml.JqmXmlException;
+import com.enioka.jqm.xml.XmlJobDefParser;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.enioka.jqm.client.api.JobRequest;
-import com.enioka.jqm.test.helpers.CreationTools;
-import com.enioka.jqm.test.helpers.TestHelpers;
-import com.enioka.jqm.xml.JqmXmlException;
-import com.enioka.jqm.xml.XmlJobDefParser;
 
 public class SpringTest extends JqmBaseTest
 {
@@ -28,9 +27,7 @@ public class SpringTest extends JqmBaseTest
     @Test
     public void testSimpleSingleLaunch()
     {
-        String ver = System.getProperty("java.version");
-        double javaVersion = Double.parseDouble(ver.substring(0, ver.indexOf('.') + 2));
-        Assume.assumeTrue(javaVersion < 1.9); // The tested version of Spring is not really compatible with Java 9+.
+        this.assumeJavaVersionStrictlyLowerThan(1.9); // The tested version of Spring is not really compatible with Java 9+.
 
         CreationTools.createDatabaseProp("jdbc/spring_ds", "org.h2.Driver", "jdbc:h2:./target/TEST.db;DB_CLOSE_ON_EXIT=FALSE", "sa", "sa",
                 cnx, "SELECT 1", null, true);
@@ -65,7 +62,7 @@ public class SpringTest extends JqmBaseTest
 
         try
         {
-            XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmlspring.xml", cnx);
+            XmlJobDefParser.parse("target/server/payloads/jqm-test-xml/xmlspring.xml", cnx);
         }
         catch (JqmXmlException e)
         {

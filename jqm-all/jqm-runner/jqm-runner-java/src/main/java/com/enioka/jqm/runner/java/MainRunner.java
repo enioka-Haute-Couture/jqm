@@ -12,9 +12,12 @@ import java.util.Map;
 import com.enioka.jqm.api.JavaJobRunner;
 import com.enioka.jqm.api.JobRunnerException;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * The most simple of all runners: this launches a static main method.
  */
+@Component(service = JavaJobRunner.class, property = { "Plugin-Type=JavaJobRunner", "JavaJobRunner-Type=main" })
 public class MainRunner implements JavaJobRunner
 {
     public MainRunner()
