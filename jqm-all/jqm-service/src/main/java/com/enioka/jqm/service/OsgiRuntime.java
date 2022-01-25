@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.ServiceLoader;
+import java.util.concurrent.Semaphore;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -18,10 +19,14 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
+import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Version;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.startlevel.BundleStartLevel;
+import org.osgi.framework.startlevel.FrameworkStartLevel;
 import org.osgi.framework.wiring.BundleCapability;
 import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.BundleWiring;
@@ -57,6 +62,7 @@ class OsgiRuntime
         {
             rootDir = currentJar.getParent();
         }
+        jqmlogger.debug("Using {} as root OSGi deployment directory", rootDir);
 
         String libPath = new File(rootDir, "bundle").getAbsolutePath();
         String levelOneLibPath = new File(libPath, "level1").getAbsolutePath();
@@ -67,7 +73,7 @@ class OsgiRuntime
         osgiConfig.put(Constants.FRAMEWORK_STORAGE, tmpPath);
         osgiConfig.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA,
                 "com.enioka.jqm.cli.bootstrap;version=1.0.0,org.slf4j;version=1.7.32,org.slf4j.spi;version=1.7.32,org.slf4j.helpers;version=1.7.32,ch.qos.logback.classic;version=1.2.0,ch.qos.logback.classic.spi;version=1.2.0,ch.qos.logback.core;version=1.2.0,ch.qos.logback.core.rolling;version=1.2.0");
-        osgiConfig.put("org.osgi.framework.startlevel.beginning", "5"); // 0 is framework, 1 is framework extension, 5 is normal.
+        osgiConfig.put("org.osgi.framework.startlevel.beginning", "1"); // 0 is framework, 1 is framework extension, 5 is normal.
         osgiConfig.put("felix.auto.deploy.action", ""); // Disable auto deploy
         osgiConfig.put("org.apache.aries.jax.rs.whiteboard.default.enabled", "false"); // Do not auto start web server
         osgiConfig.put("org.apache.cxf.osgi.http.transport.disable", "true"); // remove /cxf
@@ -134,6 +140,26 @@ class OsgiRuntime
         }
 
         // Start the bundles
+        Semaphore waitForLevelChange = new Semaphore(0);
+        framework.adapt(FrameworkStartLevel.class).setStartLevel(5, new FrameworkListener()
+        {
+            @Override
+            public void frameworkEvent(FrameworkEvent event)
+            {
+                if (event.getType() == FrameworkEvent.STARTLEVEL_CHANGED)
+                {
+                    waitForLevelChange.release();
+                }
+            }
+        });
+        try
+        {
+            waitForLevelChange.acquire();
+        }
+        catch (InterruptedException e)
+        {
+            jqmlogger.warn("Weird interruption while starting the framework");
+        }
         for (Bundle bundle : ctx.getBundles())
         {
             tryStartBundle(bundle);
@@ -173,6 +199,7 @@ class OsgiRuntime
         }
 
         JarFile jarFile = null;
+        String newJarVersion;
         boolean isBundle = true;
         try
         {
@@ -186,6 +213,7 @@ class OsgiRuntime
             }
 
             isBundle = m.getMainAttributes().getValue("Bundle-SymbolicName") != null;
+            newJarVersion = m.getMainAttributes().getValue("Bundle-Version");
             jqmlogger.debug("Answer is {}", isBundle);
         }
         catch (IOException e)
@@ -212,10 +240,23 @@ class OsgiRuntime
         {
             jqmlogger.debug("\tInstalling bundle {} - it is a {}", path, (isBundle ? "normal bundle" : "simple jar"));
 
-            Bundle b;
-            if (isBundle)
+            Bundle b = ctx.getBundle(path);
+            if (isBundle && b == null)
             {
+                jqmlogger.trace("\tBundle {} is newly installed inside cache", path);
                 b = ctx.installBundle(path);
+            }
+            else if (isBundle && b != null)
+            {
+                if (!b.getVersion().equals(Version.parseVersion(newJarVersion)))
+                {
+                    jqmlogger.trace("\tBundle {} is updated inside cache", path);
+                    b.update(null);
+                }
+                else
+                {
+                    jqmlogger.trace("\tBundle {} is already up-to-date inside cache", path);
+                }
             }
             else
             {

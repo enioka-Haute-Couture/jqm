@@ -69,9 +69,12 @@ public final class ExtClassLoader
         }
 
         // List all jars inside ext directory
-        File extDir = new File("ext/");
+        File extDir = new File(getRootDir(), "ext/");
+        jqmlogger.info("Using {} as JQM_ROOT directory", extDir);
         if (extDir.isDirectory())
         {
+            jqmlogger.debug("Using {} as ext resource directory", extDir.getAbsolutePath());
+
             // Create classloader
             final URL[] aUrls = getJarsInDirectoryRecursive(extDir).toArray(new URL[0]);
             for (URL u : aUrls)
@@ -130,4 +133,30 @@ public final class ExtClassLoader
         return result;
     }
 
+    /**
+     * A helper to retrieve the installation path of JQM. Usually determined by running jar, but can change by property during tests and
+     * non-standard deployments.
+     *
+     * @return
+     */
+    public static String getRootDir()
+    {
+        String rootPath;
+        try
+        {
+            rootPath = System.getProperty("com.enioka.jqm.alternateJqmRoot", null);
+            if (rootPath == null)
+            {
+                // logger class because it is always shared with the host, not ever in an OSGi CL and cannot be unloaded.
+                File currentJar = new File(org.slf4j.Logger.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+                rootPath = currentJar.getParentFile().getParent(); // log lib is always inside JQM_ROOT/lib.
+            }
+        }
+        catch (Exception e)
+        {
+            rootPath = ".";
+        }
+        jqmlogger.debug("Using {} as root JQM directory", rootPath);
+        return rootPath;
+    }
 }

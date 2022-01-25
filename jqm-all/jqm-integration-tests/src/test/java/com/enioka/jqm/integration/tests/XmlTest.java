@@ -130,7 +130,7 @@ public class XmlTest extends JqmBaseTest
         // Init the default queue (don't start the engine!)
         DefaultConfigurationService.updateConfiguration(cnx);
 
-        XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmltest.xml", cnx);
+        XmlJobDefParser.parse("target/server/payloads/jqm-test-xml/xmltest.xml", cnx);
         cnx.commit();
 
         List<JobDef> jd = JobDef.select(cnx, "jd_select_all");
@@ -156,7 +156,7 @@ public class XmlTest extends JqmBaseTest
         // Init the default queue (don't start the engine!)
         DefaultConfigurationService.updateConfiguration(cnx);
 
-        XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmltest.xml", cnx);
+        XmlJobDefParser.parse("target/server/payloads/jqm-test-xml/xmltest.xml", cnx);
         cnx.commit();
 
         // Sanity check
@@ -170,7 +170,7 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals("jvhkdfl", fibo.getKeyword3());
 
         // Import and therefore update the job definitions.
-        XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmltest_update.xml", cnx);
+        XmlJobDefParser.parse("target/server/payloads/jqm-test-xml/xmltest_update.xml", cnx);
         cnx.commit();
 
         jd = JobDef.select(cnx, "jd_select_all");
@@ -247,7 +247,7 @@ public class XmlTest extends JqmBaseTest
         DefaultConfigurationService.updateConfiguration(cnx);
 
         // First import
-        XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmltest.xml", cnx);
+        XmlJobDefParser.parse("target/server/payloads/jqm-test-xml/xmltest.xml", cnx);
         cnx.commit();
 
         List<JobDef> jd = JobDef.select(cnx, "jd_select_all");
@@ -257,7 +257,7 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals("1", fibo.getParametersMap(cnx).get("p1"));
 
         // Second import - parameters are different, note 3 instead of 1
-        XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmltest_np.xml", cnx);
+        XmlJobDefParser.parse("target/server/payloads/jqm-test-xml/xmltest_np.xml", cnx);
         cnx.commit();
 
         jd = JobDef.select(cnx, "jd_select_all");
@@ -274,7 +274,7 @@ public class XmlTest extends JqmBaseTest
         // Init the default queue (don't start the engine!)
         DefaultConfigurationService.updateConfiguration(cnx);
 
-        XmlJobDefParser.parse("target/payloads/jqm-test-xml/xmltestnewqueue.xml", cnx);
+        XmlJobDefParser.parse("target/server/payloads/jqm-test-xml/xmltestnewqueue.xml", cnx);
         cnx.commit();
 
         List<JobDef> jd = JobDef.select(cnx, "jd_select_all");
@@ -296,7 +296,7 @@ public class XmlTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qNormal, 42,
                 "DateTime", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
 
-        XmlQueueParser.parse("target/payloads/jqm-test-xml/xmlqueuetest.xml", cnx);
+        XmlQueueParser.parse("target/server/payloads/jqm-test-xml/xmlqueuetest.xml", cnx);
 
         try
         {
@@ -321,7 +321,7 @@ public class XmlTest extends JqmBaseTest
     public void testImportConfiguration()
     {
         // First import = creation
-        XmlConfigurationParser.parse("target/payloads/jqm-test-xml/xmlnodeimport1.xml", cnx);
+        XmlConfigurationParser.parse("target/server/payloads/jqm-test-xml/xmlnodeimport1.xml", cnx);
         cnx.commit();
 
         List<NodeDto> nodes = MetaService.getNodes(cnx);
@@ -376,7 +376,7 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals("test1", MetaService.getJndiObjectResource(cnx, "string/test1").getParameters().get("STRING"));
 
         // 2nd import (other file) = update
-        XmlConfigurationParser.parse("target/payloads/jqm-test-xml/xmlnodeimport2.xml", cnx);
+        XmlConfigurationParser.parse("target/server/payloads/jqm-test-xml/xmlnodeimport2.xml", cnx);
         cnx.commit();
 
         nodes = MetaService.getNodes(cnx);
@@ -430,7 +430,7 @@ public class XmlTest extends JqmBaseTest
         Assert.assertEquals("test1_2", MetaService.getJndiObjectResource(cnx, "string/test1").getParameters().get("STRING"));
 
         // 3rd import (same file) = stable
-        XmlConfigurationParser.parse("target/payloads/jqm-test-xml/xmlnodeimport2.xml", cnx);
+        XmlConfigurationParser.parse("target/server/payloads/jqm-test-xml/xmlnodeimport2.xml", cnx);
         cnx.commit();
 
         nodes = MetaService.getNodes(cnx);

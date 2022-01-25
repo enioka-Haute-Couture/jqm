@@ -20,7 +20,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.9</version>
+				<version>3.1.2</version>
 				<reportSets>
 					<reportSet>
 						<reports />
@@ -31,29 +31,15 @@
 			<plugin>
 				<groupId>kr.motd.maven</groupId>
 				<artifactId>sphinx-maven-plugin</artifactId>
-				<version>2.2.2</version>
-				<reportSets>
-					<reportSet>
-						<reports>
-							<report>generate</report>
-						</reports>
-					</reportSet>
-				</reportSets>
+				<version>2.10.0</version>
+                <configuration>
+                    <asReport>true</asReport>
+                    <name>Project documentation</name>
+                    <description>JQM documentation</description>
+                  </configuration>
 			</plugin>
 		</plugins>
 	</reporting>
-	<!--<resources>
-			<resource>
-				<directory>src/site/sphinx</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>**/*.rst</include>
-					<include>**/*.py</include>
-				</includes>
-			</resource>
-		</resources>
-
-	</build>-->
 
 	<dependencies>
 	</dependencies>
