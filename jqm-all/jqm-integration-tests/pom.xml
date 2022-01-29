@@ -103,77 +103,9 @@
                                     <artifactId>ojdbc8</artifactId>
                                     <version>${oracle.client.version}</version>
                                 </dependency>
-                                <artifactItem>
-                                    <groupId>org.apache.tomcat</groupId>
-                                    <artifactId>tomcat-jdbc</artifactId>
-                                    <version>${pool.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.tomcat</groupId>
-                                    <artifactId>tomcat-juli</artifactId>
-                                    <version>${pool.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.enioka.jqm</groupId>
-                                    <artifactId>jqm-providers</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.enioka.jqm</groupId>
-                                    <artifactId>jqm-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <dependency>
-                                    <groupId>com.sun.mail</groupId>
-                                    <artifactId>javax.mail</artifactId>
-                                    <version>${mail.version}</version>
-                                </dependency>
-                                <dependency>
-                                    <groupId>com.sun.mail</groupId>
-                                    <artifactId>smtp</artifactId>
-                                    <version>${mail.version}</version>
-                                </dependency>
-                                <dependency>
-                                    <groupId>com.sun.activation</groupId>
-                                    <artifactId>jakarta.activation</artifactId>
-                                    <version>1.2.2</version>
-                                </dependency>                                <!-- Needed by mail for recent Java versions -->
 
                             </artifactItems>
-                            <outputDirectory>${project.basedir}/ext</outputDirectory>
-                        </configuration>
-                    </execution>
-
-                    <execution>
-                        <id>copy2</id>
-                        <phase>process-test-classes</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>jqm-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>jqm-runner-basic</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>jqm-runner-spring</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>jqm-runner-java</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>${project.basedir}/plugins</outputDirectory>
+                            <outputDirectory>${project.basedir}/target/server/ext</outputDirectory>
                         </configuration>
                     </execution>
 
@@ -249,26 +181,8 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
-                    <!-- Copy test payload XML files -->
-                    <execution>
-                        <id>copy-payloads</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/payloads</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/src/test/resources/payloads</directory>
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-
-                    <!-- Copy the library version reference from jqm-service -->
-                    <execution>
+                     <!-- Copy the library version reference from jqm-service -->
+                     <execution>
                         <id>copy-version-file</id>
                         <phase>process-test-resources</phase>
                         <goals>
@@ -279,6 +193,24 @@
                             <resources>
                                 <resource>
                                     <directory>${basedir}/../jqm-service/target/classes/META-INF/maven/</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+
+                    <!-- Copy test payload XML files -->
+                    <execution>
+                        <id>copy-payloads</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/server/payloads</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/test/resources/payloads</directory>
                                     <filtering>false</filtering>
                                 </resource>
                             </resources>

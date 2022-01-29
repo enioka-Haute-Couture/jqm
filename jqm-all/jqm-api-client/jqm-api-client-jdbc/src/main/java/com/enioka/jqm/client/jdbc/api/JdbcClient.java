@@ -1655,7 +1655,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             {
                 try
                 {
-                    if (p.containsKey("com.enioka.jqm.ws.truststoreFile"))
+                    if (p != null && p.containsKey("com.enioka.jqm.ws.truststoreFile"))
                     {
                         KeyStore trust = null;
 

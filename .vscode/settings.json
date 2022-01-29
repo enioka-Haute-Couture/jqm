@@ -52,14 +52,16 @@
         {
             "name": "it",
             "workingDirectory": "${workspaceFolder}/jqm-all/jqm-integration-tests",
-            "vmargs": [ "--add-opens", "java.naming/javax.naming.spi=ALL-UNNAMED" ],
+            "vmargs": [
+                "--add-opens",
+                "java.naming/javax.naming.spi=ALL-UNNAMED"
+            ],
         },
         {
             "name": "web",
             "workingDirectory": "${workspaceFolder}/jqm-all/jqm-integration-tests-ws"
         }
     ],
-
     "maven.excludedFolders": [
         "**/.*", // exclude hidden folders
         "**/node_modules", // exclude node modules to speed up
@@ -73,6 +75,7 @@
     "[javascript]": {
         "editor.defaultFormatter": "vscode.typescript-language-features"
     },
-
     "restructuredtext.confPath": "${workspaceFolder}\\jqm-all\\jqm-doc\\src\\site\\sphinx",
+    "restructuredtext.builtDocumentationPath": "${workspaceFolder}/jqm-all/jqm-doc/src/site/sphinx/_build/html",
+    "restructuredtext.languageServer.disabled": true
 }

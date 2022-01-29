@@ -151,7 +151,7 @@ public class JqmBaseTest
 
                 // XML & binding through annotations APIs
                 mavenBundle("com.enioka.jqm", "jqm-osgi-repackaging-jdom").versionAsInProject(), //
-                mavenBundle("jakarta.activation", "jakarta.activation-api").versionAsInProject(),
+                // mavenBundle("jakarta.activation", "jakarta.activation-api").versionAsInProject(), depends on Java version
                 mavenBundle("jakarta.xml.bind", "jakarta.xml.bind-api").versionAsInProject(), // JAXB
 
                 // Mail session lib
@@ -191,6 +191,7 @@ public class JqmBaseTest
                 url("reference:file:../jqm-dbadapter/jqm-dbadapter-pg/target/classes/"),
                 url("reference:file:../jqm-runner/jqm-runner-api/target/classes/"), //
                 // url("reference:file:../jqm-runner/jqm-runner-java/target/classes/"), //
+                url("reference:file:../jqm-runner/jqm-runner-spring/target/classes/"), //
                 url("reference:file:../jqm-runner/jqm-runner-java-api/target/classes/"), //
                 url("reference:file:../jqm-runner/jqm-runner-shell/target/classes/"), //
                 url("reference:file:../jqm-runner/jqm-runner-shell-api/target/classes/"),
@@ -206,7 +207,15 @@ public class JqmBaseTest
                 systemProperty("org.ops4j.pax.url.mvn.repositories").value("https://repo1.maven.org/maven2@id=central"),
                 systemProperty("org.ops4j.pax.url.mvn.useFallbackRepositories").value("false"),
 
+                systemProperty("com.enioka.jqm.alternateJqmRoot").value("./target/server"),
+
         };
+
+        if (getJavaVersion() > 1.8)
+        {
+            res = java.util.Arrays.copyOf(res, res.length + 1);
+            res[res.length - 1] = mavenBundle("jakarta.activation", "jakarta.activation-api").versionAsInProject();
+        }
 
         Option[] additionnal = moreOsgiconfig();
         int localOptionsCount = res.length;
@@ -355,6 +364,22 @@ public class JqmBaseTest
         Assume.assumeTrue(s.isHsqldb());
     }
 
+    protected void assumeJavaVersionStrictlyGreaterThan(double version)
+    {
+        Assume.assumeTrue(getJavaVersion() > version);
+    }
+
+    protected void assumeJavaVersionStrictlyLowerThan(double version)
+    {
+        Assume.assumeTrue(getJavaVersion() < version);
+    }
+
+    protected double getJavaVersion()
+    {
+        String ver = System.getProperty("java.version");
+        return Double.parseDouble(ver.substring(0, ver.indexOf('.') + 2));
+    }
+
     protected boolean onWindows()
     {
         return System.getProperty("os.name").toLowerCase().startsWith("win");
@@ -417,6 +442,13 @@ public class JqmBaseTest
         {
             // not an issue in tests
         }
+    }
+
+    protected void waitForWsStart()
+    {
+        serviceWaiter.waitForService("[com.enioka.jqm.ws.api.ServiceSimple]");
+        serviceWaiter.waitForService("[javax.servlet.Servlet]"); // HTTP whiteboard
+        serviceWaiter.waitForService("[javax.servlet.Servlet]"); // JAX-RS whiteboard
     }
 
     protected void simulateDbFailure()

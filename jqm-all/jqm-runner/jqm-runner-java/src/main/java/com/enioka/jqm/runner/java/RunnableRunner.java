@@ -5,9 +5,12 @@ import java.util.Map;
 import com.enioka.jqm.api.JavaJobRunner;
 import com.enioka.jqm.api.JobRunnerException;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * A runner for classes which implement Runnable with a no-args constructor.
  */
+@Component(service = JavaJobRunner.class, property = { "Plugin-Type=JavaJobRunner", "JavaJobRunner-Type=runnable" })
 public class RunnableRunner implements JavaJobRunner
 {
     public RunnableRunner()

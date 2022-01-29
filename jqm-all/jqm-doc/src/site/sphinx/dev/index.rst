@@ -15,3 +15,4 @@ Otherwise, it can be skipped without remorse.
     ../release_notes
     classloaders
     tests
+    logging

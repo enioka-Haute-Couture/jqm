@@ -16,7 +16,6 @@
 package com.enioka.jqm.integration.tests;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -25,21 +24,21 @@ import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.ops4j.pax.exam.Option;
 
-@Ignore // TODO
+/**
+ * Test deliverable retrieval through the JDBC API + WS call for the file itself. No client configuration needed as temporary passwords are
+ * automatically created through the DB.
+ */
 public class DeliverableTest extends JqmBaseTest
 {
-    @Before
-    public void before() throws IOException
+    @Override
+    protected Option[] moreOsgiconfig()
     {
-        File jar = FileUtils.listFiles(new File("../jqm-ws/target/"), new String[] { "war" }, false).iterator().next();
-        FileUtils.copyFile(jar, new File("./webapp/jqm-ws.war"));
+        return webConfig();
     }
 
     /**
@@ -51,9 +50,11 @@ public class DeliverableTest extends JqmBaseTest
         GlobalParameter.setParameter(cnx, "disableWsApi", "false");
         GlobalParameter.setParameter(cnx, "enableWsApiAuth", "true");
         GlobalParameter.setParameter(cnx, "enableWsApiSsl", "false");
+        cnx.commit();
 
         int id = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
                 .addDefParameter("fileName", "jqm-test-deliverable1.txt").run(this);
+        this.waitForWsStart();
 
         List<InputStream> tmp = jqmClient.getJobDeliverablesContent(id);
         // Assert.assertTrue(tmp.get(0).available() > 0);
@@ -72,9 +73,11 @@ public class DeliverableTest extends JqmBaseTest
         GlobalParameter.setParameter(cnx, "disableWsApi", "false");
         GlobalParameter.setParameter(cnx, "enableWsApiAuth", "true");
         GlobalParameter.setParameter(cnx, "enableWsApiSsl", "false");
+        cnx.commit();
 
         int jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
                 .addDefParameter("fileName", "jqm-test-deliverable2.txt").run(this);
+        this.waitForWsStart();
 
         File f = new File(TestHelpers.node.getDlRepo() + "jqm-test-deliverable2.txt");
         Assert.assertEquals(false, f.exists()); // file should have been moved
@@ -100,9 +103,11 @@ public class DeliverableTest extends JqmBaseTest
         GlobalParameter.setParameter(cnx, "disableWsApi", "false");
         GlobalParameter.setParameter(cnx, "enableWsApiAuth", "false");
         GlobalParameter.setParameter(cnx, "enableWsApiSsl", "false");
+        cnx.commit();
 
         int jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
                 .addDefParameter("fileName", "jqm-test-deliverable3.txt").run(this);
+        this.waitForWsStart();
 
         File f = new File(TestHelpers.node.getDlRepo() + "jqm-test-deliverable3.txt");
         Assert.assertEquals(false, f.exists()); // file should have been moved
@@ -127,13 +132,16 @@ public class DeliverableTest extends JqmBaseTest
         GlobalParameter.setParameter(cnx, "disableWsApi", "false");
         GlobalParameter.setParameter(cnx, "enableWsApiAuth", "true");
         GlobalParameter.setParameter(cnx, "enableWsApiSsl", "true");
+        cnx.commit();
 
         JqmClientFactory.resetClient(null);
         JqmClientFactory.setProperty("com.enioka.jqm.ws.truststoreFile", "./conf/trusted.jks");
         JqmClientFactory.setProperty("com.enioka.jqm.ws.truststorePass", "SuperPassword");
+        jqmClient = JqmClientFactory.getClient();
 
         int jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
                 .addDefParameter("fileName", "jqm-test-deliverable4.txt").run(this);
+        this.waitForWsStart();
 
         File f = new File(TestHelpers.node.getDlRepo() + "jqm-test-deliverable4.txt");
         Assert.assertEquals(false, f.exists()); // file should have been moved

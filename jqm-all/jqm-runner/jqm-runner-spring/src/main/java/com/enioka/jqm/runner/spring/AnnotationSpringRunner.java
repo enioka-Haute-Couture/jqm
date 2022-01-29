@@ -7,11 +7,14 @@ import java.util.Map;
 import com.enioka.jqm.api.JavaJobRunner;
 import com.enioka.jqm.api.JobRunnerException;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * A very simple Spring context creation and maintenance. Designed to be used in shared class loaders, but also works with standard "use
  * once" class loaders. Will accept any job class which is using a Spring annotation.
  *
  */
+@Component(service = JavaJobRunner.class, property = { "Plugin-Type=JavaJobRunner", "JavaJobRunner-Type=spring" })
 public class AnnotationSpringRunner implements JavaJobRunner
 {
     public AnnotationSpringRunner()
