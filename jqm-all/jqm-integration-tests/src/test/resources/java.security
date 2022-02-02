@@ -1,4 +1,0 @@
-# FOR TESTS ONLY - not in final build. Old Java means old TLS1.0.
-jdk.tls.disabledAlgorithms=SSLv3, RC4, DES, MD5withRSA, \
-    DH keySize < 1024, EC keySize < 224, 3DES_EDE_CBC, anon, NULL, \
-    include jdk.disabled.namedCurves

@@ -14,8 +14,21 @@
     <description>Test suite for the JQM engine + service</description>
 
     <properties>
-        <argLine>-Xms256m -Xmx1024m -Djava.security.properties=./src/test/resources/java.security</argLine>
+        <argLine>-Xms256m -Xmx1024m</argLine>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>old-java</id>
+            <activation>
+                <jdk>(,7]</jdk>
+            </activation>
+            <properties>
+                <!-- Spring tests require loading Spring twice in parallel. -->
+                <argLine>-Xms256m -Xmx1024m -XX:MaxPermSize=128m</argLine>
+            </properties>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>
@@ -242,7 +255,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.27</version>
+            <version>8.0.28</version>
         </dependency>
 
     </dependencies>

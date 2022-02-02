@@ -38,7 +38,8 @@ class RunningExternalJobInstance implements Runnable
         this.ji = job;
         this.qp = qp;
         opts = job.getJD().getJavaOpts() == null
-                ? GlobalParameter.getParameter(cnx, "defaultExternalOpts", "-Xms32m -Xmx128m -XX:MaxPermSize=64m")
+                ? GlobalParameter.getParameter(cnx, "defaultExternalOpts",
+                        getJavaVersion() <= 1.7 ? "-Xms32m -Xmx128m -XX:MaxPermSize=64m" : "-Xms32m -Xmx128m -XX:MaxMetaspaceSize=64m")
                 : job.getJD().getJavaOpts();
         killCheckPeriodMs = Integer.parseInt(GlobalParameter.getParameter(cnx, "internalPollingPeriodMs", "1000"));
 
@@ -137,5 +138,11 @@ class RunningExternalJobInstance implements Runnable
         {
             jqmlogger.error("An external payload has exited with return code " + res + ". Abnormal - it should always be 0.");
         }
+    }
+
+    private double getJavaVersion()
+    {
+        String ver = System.getProperty("java.version");
+        return Double.parseDouble(ver.substring(0, ver.indexOf('.') + 2));
     }
 }
