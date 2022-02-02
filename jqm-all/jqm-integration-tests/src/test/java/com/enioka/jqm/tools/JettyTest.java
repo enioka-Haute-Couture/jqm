@@ -89,7 +89,7 @@ public class JettyTest extends JqmBaseTest
         }
 
         SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(trustStore).build();
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1" }, null,
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1", "TLSv1.1", "TLSv1.2" }, null,
                 SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
 
         CloseableHttpClient cl = HttpClients.custom().setSSLSocketFactory(sslsf).build();
@@ -147,7 +147,7 @@ public class JettyTest extends JqmBaseTest
 
         SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(trustStore)
                 .loadKeyMaterial(clientStore, "SuperPassword".toCharArray()).build();
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1" }, null,
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1", "TLSv1.1", "TLSv1.2" }, null,
                 SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
 
         CloseableHttpClient cl = HttpClients.custom().setSSLSocketFactory(sslsf).build();
