@@ -72,7 +72,8 @@
         <hsqldb.version>2.3.4</hsqldb.version> <!-- Very last Java 6 version -->
         <jersey-version>2.6</jersey-version> <!-- Very last Java 6 version -->
         <jetty.version>8.1.22.v20160922</jetty.version> <!-- Very last Java 6 version -->
-        <slf4j.version>1.7.35</slf4j.version>
+        <!-- 1.7.34/35 are Java 6 compatible but on 1.9 https://bugs.openjdk.java.net/browse/JDK-8193802 -->
+        <slf4j.version>1.7.33</slf4j.version>
         <shiro.version>1.4.2</shiro.version> <!-- Very last Java 6 version -->
         <surefire.version>2.19.1</surefire.version>
         <javadoc.version>2.10.3</javadoc.version>
