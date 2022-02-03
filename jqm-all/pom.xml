@@ -68,23 +68,23 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <hibernate.version>4.2.21.Final</hibernate.version>
-        <junit.version>4.12</junit.version>
-        <hsqldb.version>2.3.4</hsqldb.version>
-        <jersey-version>2.6</jersey-version>
-        <jetty.version>8.1.22.v20160922</jetty.version>
-        <slf4j.version>1.7.19</slf4j.version>
-        <shiro.version>1.3.2</shiro.version>
+        <junit.version>4.13.2</junit.version>
+        <hsqldb.version>2.3.4</hsqldb.version> <!-- Very last Java 6 version -->
+        <jersey-version>2.6</jersey-version> <!-- Very last Java 6 version -->
+        <jetty.version>8.1.22.v20160922</jetty.version> <!-- Very last Java 6 version -->
+        <slf4j.version>1.7.35</slf4j.version>
+        <shiro.version>1.4.2</shiro.version> <!-- Very last Java 6 version -->
         <surefire.version>2.19.1</surefire.version>
         <javadoc.version>2.10.3</javadoc.version>
         <httpclient.version>4.5.13</httpclient.version>
-        <pool.version>7.0.77</pool.version>
-        <bc.version>1.54</bc.version>
+        <pool.version>7.0.109</pool.version>
+        <bc.version>1.70</bc.version>
         <mail.version>1.5.2</mail.version>
         <commons.logging.version>1.2</commons.logging.version>
-        <commons.io.version>2.5</commons.io.version>
+        <commons.io.version>2.5</commons.io.version> <!-- Very last Java 6 version -->
         <commons.lang.version>2.6</commons.lang.version>
         <h2.version>1.4.191</h2.version>        <!-- Very last Java 6 version - https://github.com/h2database/h2database/issues/300 -->
-        <shrinkwrap.resolver.version>2.2.2</shrinkwrap.resolver.version>
+        <shrinkwrap.resolver.version>2.2.6</shrinkwrap.resolver.version>
 
         <sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
         <plugin.jar.version>3.2.0</plugin.jar.version>
