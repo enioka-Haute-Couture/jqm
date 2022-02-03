@@ -278,6 +278,9 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         // Scheduler
         this.scheduler.stop();
 
+        // Runners
+        this.runnerManager.stop();
+
         // Jetty is closed automatically when all pollers are down
 
         // Wait for the end of the world

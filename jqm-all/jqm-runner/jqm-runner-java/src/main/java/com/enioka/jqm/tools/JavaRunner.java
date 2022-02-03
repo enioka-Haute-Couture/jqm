@@ -33,4 +33,13 @@ class JavaRunner implements JobRunner
     {
         return new JavaJobInstanceTracker(toRun, cb, classloaderManager, engineApi);
     }
+
+    @Override
+    public void stop()
+    {
+        if (classloaderManager != null)
+        {
+            classloaderManager.stop();
+        }
+    }
 }
