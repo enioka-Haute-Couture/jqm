@@ -30,4 +30,10 @@ class ShellRunner implements JobRunner
     {
         return new ShellJobInstanceTracker(toRun, cb, engineApi);
     }
+
+    @Override
+    public void stop()
+    {
+        // Nothing to do, stateless runner.
+    }
 }

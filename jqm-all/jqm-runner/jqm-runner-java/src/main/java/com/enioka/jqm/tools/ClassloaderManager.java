@@ -216,7 +216,7 @@ class ClassloaderManager
 
     /**
      * Returns all the URL that should be inside the classpath. This includes the jar itself if any.
-     * 
+     *
      * @throws JqmPayloadException
      */
     private URL[] getClasspath(JobInstance ji, JobRunnerCallback cb) throws JqmPayloadException
@@ -298,5 +298,24 @@ class ClassloaderManager
             }
         }
         return pluginClassLoader;
+    }
+
+    void stop()
+    {
+        jqmlogger.info("Closing class loader manager");
+        if (sharedClassLoader != null)
+        {
+            sharedClassLoader.tryClose();
+        }
+        for (Map.Entry<String, PayloadClassLoader> e : sharedJarClassLoader.entrySet())
+        {
+            jqmlogger.info("Closing persistent jar class loader {}", e.getKey());
+            e.getValue().tryClose();
+        }
+        for (Map.Entry<Integer, PayloadClassLoader> e : persistentClassLoaders.entrySet())
+        {
+            jqmlogger.info("Closing persistent keyed class loader {}", e.getKey());
+            e.getValue().tryClose();
+        }
     }
 }

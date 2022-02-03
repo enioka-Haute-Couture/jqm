@@ -32,7 +32,7 @@ class RunnerManager
 
     /**
      * Retrieves the most adequate {@link JobRunner} for a given {@link JobInstance}. Throws {@link JqmRuntimeException} if none was found.
-     * 
+     *
      * @param ji
      * @return
      */
@@ -53,5 +53,13 @@ class RunnerManager
         }
 
         throw new JqmRuntimeException("there is no runner able to run job definition " + ji.getJD().getApplicationName());
+    }
+
+    void stop()
+    {
+        for (JobRunner runner : runners)
+        {
+            runner.stop();
+        }
     }
 }
