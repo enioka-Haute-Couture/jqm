@@ -365,6 +365,7 @@ public class MiscTest extends JqmBaseTest
         Assert.assertEquals(first, gps.get(0).getLastModified());
 
         // Change the value, date should change
+        sleepms(2);
         GlobalParameter.setParameter(cnx, "houba", "hop hop hop");
         cnx.commit();
 
