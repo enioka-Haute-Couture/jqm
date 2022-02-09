@@ -12,6 +12,7 @@ import {
 } from "../TableCells";
 import { CreateQueueDialog } from "./CreateQueueDialog";
 import useQueueAPI from "./QueueAPI";
+import { useSnackbar } from "notistack";
 
 const QueuesPage: React.FC = () => {
     const [showDialog, setShowDialog] = useState(false);
@@ -22,6 +23,8 @@ const QueuesPage: React.FC = () => {
 
     const { queues, fetchQueues, createQueue, updateQueue, deleteQueues } =
         useQueueAPI();
+
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         fetchQueues();
@@ -41,6 +44,13 @@ const QueuesPage: React.FC = () => {
             const [queueId] = tableMeta.rowData;
             const { value: name } = queueNameInputRef.current!;
             const { value: description } = descriptionInputRef.current!;
+
+            if (defaultQueue && queues?.some(q => q.defaultQueue)) {
+                enqueueSnackbar("Only one default queue can be set", {
+                    variant: "warning",
+                });
+                return;
+            }
             if (queueId && name) {
                 updateQueue({
                     id: queueId,
@@ -50,7 +60,7 @@ const QueuesPage: React.FC = () => {
                 }).then(() => setEditingRowId(null));
             }
         },
-        [updateQueue, defaultQueue]
+        [updateQueue, defaultQueue, queues, enqueueSnackbar]
     );
 
     const handleOnCancel = useCallback(() => setEditingRowId(null), []);
@@ -141,6 +151,7 @@ const QueuesPage: React.FC = () => {
                                 showDialog={showDialog}
                                 closeDialog={() => setShowDialog(false)}
                                 createQueue={createQueue}
+                                canBeDefaultQueue={queues ? !queues.some(q => q.defaultQueue) : true}
                             />
                         </>
                     </Tooltip>
