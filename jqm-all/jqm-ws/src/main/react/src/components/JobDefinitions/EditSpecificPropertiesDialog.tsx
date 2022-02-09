@@ -43,108 +43,108 @@ export const SpecificPropertiesForm: React.FC<{
     pathType,
     setPathType,
 }) => {
-    const classes = useStyles();
+        const classes = useStyles();
 
-    return (
-        <>
-            {jobType === JobType.java && (
-                <>
-                    <TextField
-                        className={classes.TextField}
-                        label="Path to the jar file*"
-                        value={jarPath}
-                        helperText={
-                            "The relative path to the jar containing the class to run. It is relative to the 'directory containing jars' parameter of the different nodes."
-                        }
-                        onChange={(
-                            event: React.ChangeEvent<HTMLInputElement>
-                        ) => {
-                            setJarPath(event.target.value);
-                        }}
-                        fullWidth
-                    />
-                    <TextField
-                        className={classes.TextField}
-                        label="Class to launch*"
-                        value={javaClassName}
-                        helperText={
-                            "The fully qualified name of the class to run. (it must either have a main function, or implement Runnable, or inherit from JobBase)."
-                        }
-                        onChange={(
-                            event: React.ChangeEvent<HTMLInputElement>
-                        ) => {
-                            setJavaClassName(event.target.value);
-                        }}
-                        fullWidth
-                    />
-                </>
-            )}
-            {jobType === JobType.process && (
-                <TextField
-                    className={classes.TextField}
-                    label="Path to executable*"
-                    value={jarPath}
-                    helperText={
-                        "Current path is node job directory. Do not add parameters here, just a path. Process is launched with the value of the provided parameters, sorted by key. Key is only used for sorting."
-                    }
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setJarPath(event.target.value);
-                    }}
-                    fullWidth
-                />
-            )}
-            {jobType === JobType.shell && (
-                <>
-                    <FormControl
-                        component="fieldset"
-                        style={{ marginBottom: "16px" }}
-                    >
-                        <FormLabel component="legend">Shell</FormLabel>
-                        <RadioGroup
-                            aria-label="Shell"
-                            name="shell"
-                            value={pathType}
+        return (
+            <>
+                {jobType === JobType.java && (
+                    <>
+                        <TextField
+                            className={classes.TextField}
+                            label="Path to the jar file*"
+                            value={jarPath}
+                            helperText={
+                                "The relative path to the jar containing the class to run. It is relative to the 'directory containing jars' parameter of the different nodes."
+                            }
                             onChange={(
                                 event: React.ChangeEvent<HTMLInputElement>
                             ) => {
-                                setPathType(event.target.value);
+                                setJarPath(event.target.value);
                             }}
-                        >
-                            <FormControlLabel
-                                value="DEFAULTSHELLCOMMAND"
-                                control={<Radio />}
-                                label="Default OS shell"
-                            />
-                            <FormControlLabel
-                                value="POWERSHELLCOMMAND"
-                                control={<Radio />}
-                                label="Powershell"
-                            />
-                        </RadioGroup>
-                        <FormHelperText>
-                            Default shell is /bin/sh or cmd.exe. Powershell is
-                            Powershell core under Linux and full under Windows.
-                        </FormHelperText>
-                    </FormControl>
+                            fullWidth
+                        />
+                        <TextField
+                            className={classes.TextField}
+                            label="Class to launch*"
+                            value={javaClassName}
+                            helperText={
+                                "The fully qualified name of the class to run. (it must either have a main function, or implement Runnable, or inherit from JobBase)."
+                            }
+                            onChange={(
+                                event: React.ChangeEvent<HTMLInputElement>
+                            ) => {
+                                setJavaClassName(event.target.value);
+                            }}
+                            fullWidth
+                        />
+                    </>
+                )}
+                {jobType === JobType.process && (
                     <TextField
                         className={classes.TextField}
-                        label="Shell command*"
+                        label="Path to executable*"
                         value={jarPath}
                         helperText={
-                            "Current path is node job directory. JQM environment variables (and others) may be used. 1000 max (988 remaining)."
+                            "Current path is node job directory. Do not add parameters here, just a path. Process is launched with the value of the provided parameters, sorted by key. Key is only used for sorting."
                         }
-                        onChange={(
-                            event: React.ChangeEvent<HTMLInputElement>
-                        ) => {
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                             setJarPath(event.target.value);
                         }}
                         fullWidth
                     />
-                </>
-            )}
-        </>
-    );
-};
+                )}
+                {jobType === JobType.shell && (
+                    <>
+                        <FormControl
+                            component="fieldset"
+                            style={{ marginBottom: "16px" }}
+                        >
+                            <FormLabel component="legend">Shell</FormLabel>
+                            <RadioGroup
+                                aria-label="Shell"
+                                name="shell"
+                                value={pathType}
+                                onChange={(
+                                    event: React.ChangeEvent<HTMLInputElement>
+                                ) => {
+                                    setPathType(event.target.value);
+                                }}
+                            >
+                                <FormControlLabel
+                                    value="DEFAULTSHELLCOMMAND"
+                                    control={<Radio />}
+                                    label="Default OS shell"
+                                />
+                                <FormControlLabel
+                                    value="POWERSHELLCOMMAND"
+                                    control={<Radio />}
+                                    label="Powershell"
+                                />
+                            </RadioGroup>
+                            <FormHelperText>
+                                Default shell is /bin/sh or cmd.exe. Powershell is
+                                Powershell core under Linux and full under Windows.
+                            </FormHelperText>
+                        </FormControl>
+                        <TextField
+                            className={classes.TextField}
+                            label="Shell command*"
+                            value={jarPath}
+                            helperText={
+                                "Current path is node job directory. JQM environment variables (and others) may be used. 1000 max (988 remaining)."
+                            }
+                            onChange={(
+                                event: React.ChangeEvent<HTMLInputElement>
+                            ) => {
+                                setJarPath(event.target.value);
+                            }}
+                            fullWidth
+                        />
+                    </>
+                )}
+            </>
+        );
+    };
 
 export const EditSpecificPropertiesDialog: React.FC<{
     closeDialog: () => void;
@@ -207,7 +207,7 @@ export const EditSpecificPropertiesDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    Save
+                    Validate
                 </Button>
             </DialogActions>
         </Dialog>

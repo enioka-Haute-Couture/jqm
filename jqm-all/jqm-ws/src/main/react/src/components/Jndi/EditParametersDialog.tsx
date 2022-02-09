@@ -207,7 +207,7 @@ export const EditParametersDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    Save
+                    Validate
                 </Button>
             </DialogActions>
         </Dialog>
