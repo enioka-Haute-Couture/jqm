@@ -149,14 +149,14 @@ export const PermissionsForm: React.FC<{
                                 <TableCell>
                                     {
                                         PERMISSION_ACTIONS[
-                                            permission.split(":")[1]
+                                        permission.split(":")[1]
                                         ]
                                     }
                                 </TableCell>
                                 <TableCell>
                                     {
                                         PERMISSION_OBJECT_TYPES[
-                                            permission.split(":")[0]
+                                        permission.split(":")[0]
                                         ]
                                     }
                                 </TableCell>
