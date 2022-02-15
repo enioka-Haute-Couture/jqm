@@ -14,7 +14,6 @@ import useNodesApi from "./useNodesApi";
 import { DisplayLogsDialog } from "./DisplayLogsDialog";
 
 export const NodesPage: React.FC = () => {
-    const [showLogsDialog, setShowLogsDialog] = useState(false);
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const nameInputRef = useRef(null);
     const dnsInputRef = useRef(null);
@@ -30,7 +29,7 @@ export const NodesPage: React.FC = () => {
     const [loapApiSimple, setLoapApiSimple] = useState<boolean | null>(null);
     const [enabled, setEnabled] = useState<boolean | null>(null);
 
-    const { nodes, nodeLogs, fetchNodes, updateNode, fetchNodeLogs } =
+    const { nodes, nodeLogs, setNodeLogs, fetchNodes, updateNode, fetchNodeLogs } =
         useNodesApi();
 
     useEffect(() => {
@@ -39,9 +38,8 @@ export const NodesPage: React.FC = () => {
     }, []);
 
     const handleOnViewLogs = useCallback(
-        (tableMeta) => {
+        async (tableMeta) => {
             fetchNodeLogs(tableMeta.rowData[3]);
-            setShowLogsDialog(true);
         },
         [fetchNodeLogs]
     );
@@ -336,8 +334,8 @@ export const NodesPage: React.FC = () => {
     return nodes ? (
         <Container maxWidth={false}>
             <DisplayLogsDialog
-                showDialog={showLogsDialog}
-                closeDialog={() => setShowLogsDialog(false)}
+                showDialog={nodeLogs !== undefined}
+                closeDialog={() => setNodeLogs(undefined)}
                 logs={nodeLogs}
             />
             <MUIDataTable

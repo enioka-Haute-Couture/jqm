@@ -16,10 +16,11 @@ export const useNotificationService = () => {
                     Dismiss
                 </Button>);
             }
-
-            console.error(reason);
             enqueueSnackbar(
-                "An error occured, please contact support support@enioka.com for help.",
+                (reason?.details?.userReadableMessage) ?
+                    reason.details.userReadableMessage :
+                    "An error occured, please contact support support@enioka.com for help"
+                ,
                 {
                     variant: "error",
                     persist: true,
