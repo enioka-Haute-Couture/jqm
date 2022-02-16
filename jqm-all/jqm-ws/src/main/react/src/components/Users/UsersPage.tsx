@@ -23,6 +23,8 @@ import { renderArrayCell } from "../TableCells/renderArrayCell";
 import { renderDateCell } from "../TableCells/renderDateCell";
 import { Role } from "../Roles/Role";
 import { CreateUserDialog } from "./CreateUserDialog";
+import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
+import AccessForbiddenPage from "../AccessForbiddenPage";
 
 const UsersPage: React.FC = () => {
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
@@ -47,13 +49,18 @@ const UsersPage: React.FC = () => {
     } = useUserAPI();
     const [showCreateDialog, setShowCreateDialog] = useState(false);
 
+    const { canUserAccess } = useAuth();
+
     const refresh = () => {
         fetchUsers();
         fetchRoles();
     };
 
     useEffect(() => {
-        refresh();
+        if (canUserAccess(PermissionObjectType.user, PermissionAction.read) &&
+            canUserAccess(PermissionObjectType.role, PermissionAction.read)) {
+            refresh();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -199,10 +206,10 @@ const UsersPage: React.FC = () => {
                     editingRowId,
                     roles
                         ? roles!.map((role: Role) => (
-                              <MenuItem key={role.id} value={role.id}>
-                                  {role.name}
-                              </MenuItem>
-                          ))
+                            <MenuItem key={role.id} value={role.id}>
+                                {role.name}
+                            </MenuItem>
+                        ))
                         : [],
                     (element: number) =>
                         roles?.find((x) => x.id === element)?.name || "",
@@ -223,7 +230,9 @@ const UsersPage: React.FC = () => {
                     handleOnDelete,
                     editingRowId,
                     handleOnEdit,
-                    [
+                    canUserAccess(PermissionObjectType.user, PermissionAction.update),
+                    canUserAccess(PermissionObjectType.user, PermissionAction.delete),
+                    canUserAccess(PermissionObjectType.user, PermissionAction.update) ? [
                         {
                             title: "Change password",
                             addIcon: () => <VpnKeyIcon />,
@@ -232,7 +241,7 @@ const UsersPage: React.FC = () => {
                                 setChangePasswordUserId(userId);
                             },
                         },
-                    ]
+                    ] : []
                 ),
             },
         },
@@ -245,15 +254,17 @@ const UsersPage: React.FC = () => {
         customToolbar: () => {
             return (
                 <>
-                    <Tooltip title={"Add line"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"add"}
-                            onClick={() => setShowCreateDialog(true)}
-                        >
-                            <AddCircleIcon />
-                        </IconButton>
-                    </Tooltip>
+                    {canUserAccess(PermissionObjectType.user, PermissionAction.create) &&
+                        <Tooltip title={"Add line"}>
+                            <IconButton
+                                color="default"
+                                aria-label={"add"}
+                                onClick={() => setShowCreateDialog(true)}
+                            >
+                                <AddCircleIcon />
+                            </IconButton>
+                        </Tooltip>
+                    }
                     <Tooltip title={"Refresh"}>
                         <IconButton
                             color="default"
@@ -290,6 +301,11 @@ const UsersPage: React.FC = () => {
             deleteUsers(userIds);
         },
     };
+
+    if (!(canUserAccess(PermissionObjectType.user, PermissionAction.read) &&
+        canUserAccess(PermissionObjectType.role, PermissionAction.read))) {
+        return <AccessForbiddenPage />
+    }
 
     if (users && roles) {
         return (

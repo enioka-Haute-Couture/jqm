@@ -37,6 +37,9 @@ import { EditSpecificPropertiesDialog } from "./EditSpecificPropertiesDialog";
 import { EditParametersDialog } from "./EditParametersDialog";
 import { CreateJobDefinitionDialog } from "./CreateJobDefinitionDialog";
 import { EditSchedulesDialog } from "./EditSchedulesDialog";
+import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
+import AccessForbiddenPage from "../AccessForbiddenPage";
+
 
 export const JobDefinitionsPage: React.FC = () => {
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
@@ -76,13 +79,17 @@ export const JobDefinitionsPage: React.FC = () => {
 
     const { queues, fetchQueues } = useQueueAPI();
 
+    const { canUserAccess } = useAuth();
+
     const refresh = () => {
         fetchQueues();
         fetchJobDefinitions();
     };
 
     useEffect(() => {
-        refresh();
+        if (canUserAccess(PermissionObjectType.queue, PermissionAction.read) && canUserAccess(PermissionObjectType.jd, PermissionAction.read)) {
+            refresh();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -266,10 +273,10 @@ export const JobDefinitionsPage: React.FC = () => {
                     editingRowId,
                     queues
                         ? queues!.map((queue: Queue) => (
-                              <MenuItem key={queue.id} value={queue.id}>
-                                  {queue.name}
-                              </MenuItem>
-                          ))
+                            <MenuItem key={queue.id} value={queue.id}>
+                                {queue.name}
+                            </MenuItem>
+                        ))
                         : [],
                     (element: number) =>
                         queues?.find((x) => x.id === element)?.name || "",
@@ -419,7 +426,9 @@ export const JobDefinitionsPage: React.FC = () => {
                     handleOnSave,
                     handleOnDelete,
                     editingRowId,
-                    handleOnEdit
+                    handleOnEdit,
+                    canUserAccess(PermissionObjectType.jd, PermissionAction.update),
+                    canUserAccess(PermissionObjectType.jd, PermissionAction.delete)
                 ),
             },
         },
@@ -432,15 +441,17 @@ export const JobDefinitionsPage: React.FC = () => {
         customToolbar: () => {
             return (
                 <>
-                    <Tooltip title={"Add line"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"add"}
-                            onClick={() => setShowCreateDialog(true)}
-                        >
-                            <AddCircleIcon />
-                        </IconButton>
-                    </Tooltip>
+                    {canUserAccess(PermissionObjectType.jd, PermissionAction.create) &&
+                        <Tooltip title={"Add line"}>
+                            <IconButton
+                                color="default"
+                                aria-label={"add"}
+                                onClick={() => setShowCreateDialog(true)}
+                            >
+                                <AddCircleIcon />
+                            </IconButton>
+                        </Tooltip>
+                    }
                     <Tooltip title={"Refresh"}>
                         <IconButton
                             color="default"
@@ -472,6 +483,11 @@ export const JobDefinitionsPage: React.FC = () => {
             deleteJobDefinitions(jobDefinitionIds);
         },
     };
+
+    if (!(canUserAccess(PermissionObjectType.jd, PermissionAction.read) &&
+        canUserAccess(PermissionObjectType.queue, PermissionAction.read))) {
+        return <AccessForbiddenPage />
+    }
 
     return jobDefinitions && queues ? (
         <Container maxWidth={false}>

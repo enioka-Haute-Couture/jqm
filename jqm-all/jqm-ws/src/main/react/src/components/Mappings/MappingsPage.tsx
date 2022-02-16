@@ -23,6 +23,8 @@ import useNodesApi from "../Nodes/useNodesApi";
 import useQueueAPI from "../Queues/QueueAPI";
 import { Node } from "../Nodes/Node";
 import { Queue } from "../Queues/Queue";
+import { PermissionObjectType, PermissionAction, useAuth } from "../../utils/AuthService";
+import AccessForbiddenPage from "../AccessForbiddenPage";
 
 const MappingsPage: React.FC = () => {
     const [showDialog, setShowDialog] = useState(false);
@@ -44,6 +46,8 @@ const MappingsPage: React.FC = () => {
 
     const { nodes, fetchNodes } = useNodesApi();
 
+    const { canUserAccess } = useAuth();
+
     const { queues, fetchQueues } = useQueueAPI();
 
     const refresh = () => {
@@ -53,7 +57,11 @@ const MappingsPage: React.FC = () => {
     };
 
     useEffect(() => {
-        refresh();
+        if ((canUserAccess(PermissionObjectType.qmapping, PermissionAction.read) &&
+            canUserAccess(PermissionObjectType.queue, PermissionAction.read) &&
+            canUserAccess(PermissionObjectType.node, PermissionAction.read))) {
+            refresh();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -124,10 +132,10 @@ const MappingsPage: React.FC = () => {
                     editingRowId,
                     nodes
                         ? nodes!.map((node: Node) => (
-                              <MenuItem key={node.id} value={node.id}>
-                                  {node.name}
-                              </MenuItem>
-                          ))
+                            <MenuItem key={node.id} value={node.id}>
+                                {node.name}
+                            </MenuItem>
+                        ))
                         : [],
                     (element: number) =>
                         nodes?.find((x) => x.id === element)?.name || "",
@@ -148,10 +156,10 @@ const MappingsPage: React.FC = () => {
                     editingRowId,
                     queues
                         ? queues!.map((queue: Queue) => (
-                              <MenuItem key={queue.id} value={queue.id}>
-                                  {queue.name}
-                              </MenuItem>
-                          ))
+                            <MenuItem key={queue.id} value={queue.id}>
+                                {queue.name}
+                            </MenuItem>
+                        ))
                         : [],
                     (element: number) =>
                         queues?.find((x) => x.id === element)?.name || "",
@@ -215,7 +223,9 @@ const MappingsPage: React.FC = () => {
                     handleOnSave,
                     handleOnDelete,
                     editingRowId,
-                    handleOnEdit
+                    handleOnEdit,
+                    canUserAccess(PermissionObjectType.qmapping, PermissionAction.update),
+                    canUserAccess(PermissionObjectType.qmapping, PermissionAction.delete)
                 ),
             },
         },
@@ -228,25 +238,27 @@ const MappingsPage: React.FC = () => {
         customToolbar: () => {
             return (
                 <>
-                    <Tooltip title={"Add line"}>
-                        <>
-                            <IconButton
-                                color="default"
-                                aria-label={"add"}
-                                onClick={() => setShowDialog(true)}
-                            >
-                                <AddCircleIcon />
-                            </IconButton>
-                            {showDialog && (
-                                <CreateMappingDialog
-                                    closeDialog={() => setShowDialog(false)}
-                                    createMapping={createMapping}
-                                    nodes={nodes!!}
-                                    queues={queues!!}
-                                />
-                            )}
-                        </>
-                    </Tooltip>
+                    {canUserAccess(PermissionObjectType.qmapping, PermissionAction.create) &&
+                        <Tooltip title={"Add line"}>
+                            <>
+                                <IconButton
+                                    color="default"
+                                    aria-label={"add"}
+                                    onClick={() => setShowDialog(true)}
+                                >
+                                    <AddCircleIcon />
+                                </IconButton>
+                                {showDialog && (
+                                    <CreateMappingDialog
+                                        closeDialog={() => setShowDialog(false)}
+                                        createMapping={createMapping}
+                                        nodes={nodes!!}
+                                        queues={queues!!}
+                                    />
+                                )}
+                            </>
+                        </Tooltip>
+                    }
                     <Tooltip title={"Refresh"}>
                         <IconButton
                             color="default"
@@ -276,6 +288,13 @@ const MappingsPage: React.FC = () => {
             deleteMappings(mappingIds);
         },
     };
+
+    if (!(canUserAccess(PermissionObjectType.qmapping, PermissionAction.read) &&
+        canUserAccess(PermissionObjectType.queue, PermissionAction.read) &&
+        canUserAccess(PermissionObjectType.node, PermissionAction.read))) {
+        return <AccessForbiddenPage />
+    }
+
 
     return mappings && nodes && queues ? (
         <Container maxWidth={false}>

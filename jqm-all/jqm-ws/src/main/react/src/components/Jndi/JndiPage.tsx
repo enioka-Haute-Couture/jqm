@@ -15,6 +15,8 @@ import { EditParametersDialog } from "./EditParametersDialog";
 import useJndiApi from "./useJndiApi";
 import { JndiResource } from "./JndiResource";
 import { ResourceDropDownMenu } from "./ResourceDropDownMenu";
+import { PermissionObjectType, PermissionAction, useAuth } from "../../utils/AuthService";
+import AccessForbiddenPage from "../AccessForbiddenPage";
 
 export const JndiPage: React.FC = () => {
     const [showDropDown, setShowDropDown] = useState(false);
@@ -31,13 +33,16 @@ export const JndiPage: React.FC = () => {
     const [inMemoryResources, setInMemoryResources] = useState<JndiResource[]>(
         []
     );
+    const { canUserAccess } = useAuth();
 
     // TODO: VERIFY API CALLS WHEN API IS WORKING CORRECTLY
     const { resources, fetchResources, saveResource, deleteResource } =
         useJndiApi();
 
-    // useEffect(() => {
+    // TODO: useEffect(() => {
+    // if (canUserAccess(PermissionObjectType.jndi, PermissionAction.read)) {
     //     fetchResources();
+    // }
     // }, [fetchResources]);
 
     const resourcesesMemo = useMemo(() => {
@@ -205,7 +210,7 @@ export const JndiPage: React.FC = () => {
                                 {getBadge(
                                     currentSelectedResource
                                         ? currentSelectedResource.parameters
-                                              .length
+                                            .length
                                         : 0
                                 )}
                             </span>
@@ -227,7 +232,9 @@ export const JndiPage: React.FC = () => {
                     handleOnSave,
                     handleOnDelete,
                     editingRowId,
-                    handleOnEdit
+                    handleOnEdit,
+                    canUserAccess(PermissionObjectType.jndi, PermissionAction.update),
+                    canUserAccess(PermissionObjectType.jndi, PermissionAction.delete)
                 ),
             },
         },
@@ -240,33 +247,34 @@ export const JndiPage: React.FC = () => {
         customToolbar: () => {
             return (
                 <>
-                    <>
-                        <Tooltip title={"Create new JNDI resource"}>
-                            <IconButton
-                                color="default"
-                                aria-label={"Create new JNDI resource"}
-                                onClick={() => setShowDropDown(true)}
-                            >
-                                <AddCircleIcon
-                                    innerRef={dropDownMenuPositionRef}
-                                />
-                            </IconButton>
-                        </Tooltip>
-                        <ResourceDropDownMenu
-                            menuPositiontRef={dropDownMenuPositionRef}
-                            show={showDropDown}
-                            handleSet={setShowDropDown}
-                            onOpen={() => setShowDropDown(true)}
-                            onClose={() => setShowDropDown(false)}
-                            onSelectResource={(newResource: JndiResource) => {
-                                const newArr = [...inMemoryResources];
-                                newArr.push(newResource);
-                                setInMemoryResources(newArr);
-                                setShowDropDown(false);
-                            }}
-                        />
-                    </>
-
+                    {canUserAccess(PermissionObjectType.jndi, PermissionAction.create) &&
+                        <>
+                            <Tooltip title={"Create new JNDI resource"}>
+                                <IconButton
+                                    color="default"
+                                    aria-label={"Create new JNDI resource"}
+                                    onClick={() => setShowDropDown(true)}
+                                >
+                                    <AddCircleIcon
+                                        innerRef={dropDownMenuPositionRef}
+                                    />
+                                </IconButton>
+                            </Tooltip>
+                            <ResourceDropDownMenu
+                                menuPositiontRef={dropDownMenuPositionRef}
+                                show={showDropDown}
+                                handleSet={setShowDropDown}
+                                onOpen={() => setShowDropDown(true)}
+                                onClose={() => setShowDropDown(false)}
+                                onSelectResource={(newResource: JndiResource) => {
+                                    const newArr = [...inMemoryResources];
+                                    newArr.push(newResource);
+                                    setInMemoryResources(newArr);
+                                    setShowDropDown(false);
+                                }}
+                            />
+                        </>
+                    }
                     <Tooltip title={"Refresh"}>
                         <IconButton
                             color="default"
@@ -296,6 +304,10 @@ export const JndiPage: React.FC = () => {
             deleteResource(paramIds);
         },
     };
+
+    if (!canUserAccess(PermissionObjectType.jndi, PermissionAction.read)) {
+        return <AccessForbiddenPage />
+    }
 
     return resources ? (
         <Container maxWidth={false}>

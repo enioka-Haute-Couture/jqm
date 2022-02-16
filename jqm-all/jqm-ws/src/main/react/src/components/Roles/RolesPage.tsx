@@ -15,6 +15,8 @@ import { renderActionsCell, renderInputCell } from "../TableCells";
 import { EditPermissionsDialog } from "./EditPermissionsDialog";
 import { CreateRoleDialog } from "./CreateRoleDialog";
 import { renderDialogCell } from "../TableCells/renderDialogCell";
+import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
+import AccessForbiddenPage from "../AccessForbiddenPage";
 
 const RolesPage: React.FC = () => {
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
@@ -28,8 +30,12 @@ const RolesPage: React.FC = () => {
         string | null
     >(null);
 
+    const { canUserAccess } = useAuth();
+
     useEffect(() => {
-        fetchRoles();
+        if (canUserAccess(PermissionObjectType.role, PermissionAction.read)) {
+            fetchRoles();
+        }
     }, [fetchRoles]);
 
     const updateRow = useCallback(
@@ -136,7 +142,9 @@ const RolesPage: React.FC = () => {
                     handleOnSave,
                     handleOnDelete,
                     editingRowId,
-                    handleOnEdit
+                    handleOnEdit,
+                    canUserAccess(PermissionObjectType.role, PermissionAction.update),
+                    canUserAccess(PermissionObjectType.role, PermissionAction.delete)
                 ),
             },
         },
@@ -149,15 +157,17 @@ const RolesPage: React.FC = () => {
         customToolbar: () => {
             return (
                 <>
-                    <Tooltip title={"Add line"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"add"}
-                            onClick={() => setShowCreateDialog(true)}
-                        >
-                            <AddCircleIcon />
-                        </IconButton>
-                    </Tooltip>
+                    {canUserAccess(PermissionObjectType.role, PermissionAction.create) &&
+                        <Tooltip title={"Add line"}>
+                            <IconButton
+                                color="default"
+                                aria-label={"add"}
+                                onClick={() => setShowCreateDialog(true)}
+                            >
+                                <AddCircleIcon />
+                            </IconButton>
+                        </Tooltip>
+                    }
                     <Tooltip title={"Refresh"}>
                         <IconButton
                             color="default"
@@ -194,6 +204,10 @@ const RolesPage: React.FC = () => {
             deleteRoles(roleIds);
         },
     };
+
+    if (!canUserAccess(PermissionObjectType.role, PermissionAction.read)) {
+        return <AccessForbiddenPage />
+    }
 
     if (roles) {
         return (

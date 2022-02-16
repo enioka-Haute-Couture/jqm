@@ -12,6 +12,8 @@ import {
 } from "../TableCells";
 import { CreateQueueDialog } from "./CreateQueueDialog";
 import useQueueAPI from "./QueueAPI";
+import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
+import AccessForbiddenPage from "../AccessForbiddenPage";
 
 const QueuesPage: React.FC = () => {
     const [showDialog, setShowDialog] = useState(false);
@@ -24,9 +26,13 @@ const QueuesPage: React.FC = () => {
         useQueueAPI();
 
     useEffect(() => {
-        fetchQueues();
+        if (canUserAccess(PermissionObjectType.queue, PermissionAction.read)) {
+            fetchQueues();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const { canUserAccess } = useAuth();
 
     const handleOnDelete = useCallback(
         (tableMeta) => {
@@ -115,7 +121,9 @@ const QueuesPage: React.FC = () => {
                     handleOnSave,
                     handleOnDelete,
                     editingRowId,
-                    handleOnEdit
+                    handleOnEdit,
+                    canUserAccess(PermissionObjectType.queue, PermissionAction.update),
+                    canUserAccess(PermissionObjectType.queue, PermissionAction.delete)
                 ),
             },
         },
@@ -128,22 +136,23 @@ const QueuesPage: React.FC = () => {
         customToolbar: () => {
             return (
                 <>
-                    <Tooltip title={"Add line"}>
-                        <>
-                            <IconButton
-                                color="default"
-                                aria-label={"add"}
-                                onClick={() => setShowDialog(true)}
-                            >
-                                <AddCircleIcon />
-                            </IconButton>
-                            <CreateQueueDialog
-                                showDialog={showDialog}
-                                closeDialog={() => setShowDialog(false)}
-                                createQueue={createQueue}
-                            />
-                        </>
-                    </Tooltip>
+                    {canUserAccess(PermissionObjectType.queue, PermissionAction.create) &&
+                        <Tooltip title={"Add line"}>
+                            <>
+                                <IconButton
+                                    color="default"
+                                    aria-label={"add"}
+                                    onClick={() => setShowDialog(true)}
+                                >
+                                    <AddCircleIcon />
+                                </IconButton>
+                                <CreateQueueDialog
+                                    showDialog={showDialog}
+                                    closeDialog={() => setShowDialog(false)}
+                                    createQueue={createQueue}
+                                />
+                            </>
+                        </Tooltip>}
                     <Tooltip title={"Refresh"}>
                         <IconButton
                             color="default"
@@ -173,6 +182,10 @@ const QueuesPage: React.FC = () => {
             deleteQueues(queueIds);
         },
     };
+
+    if (!canUserAccess(PermissionObjectType.queue, PermissionAction.read)) {
+        return <AccessForbiddenPage />
+    }
 
     return queues ? (
         <Container maxWidth={false}>

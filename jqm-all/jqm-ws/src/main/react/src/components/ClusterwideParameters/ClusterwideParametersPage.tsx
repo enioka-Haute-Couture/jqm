@@ -8,6 +8,8 @@ import AddCircleIcon from "@material-ui/icons/AddCircle";
 import { renderInputCell, renderActionsCell } from "../TableCells";
 import { CreateParameterDialog } from "./CreateParameterDialog";
 import useParametersApi from "./ParametersApi";
+import { PermissionObjectType, PermissionAction, useAuth } from "../../utils/AuthService";
+import AccessForbiddenPage from "../AccessForbiddenPage";
 
 const ClusterwideParametersPage: React.FC = () => {
     const [showDialog, setShowDialog] = useState(false);
@@ -23,8 +25,12 @@ const ClusterwideParametersPage: React.FC = () => {
         deleteParameter,
     } = useParametersApi();
 
+    const { canUserAccess } = useAuth();
+
     useEffect(() => {
-        fetchParameters();
+        if (canUserAccess(PermissionObjectType.prm, PermissionAction.read)) {
+            fetchParameters();
+        }
     }, [fetchParameters]);
 
     const handleOnDelete = useCallback(
@@ -98,7 +104,9 @@ const ClusterwideParametersPage: React.FC = () => {
                     handleOnSave,
                     handleOnDelete,
                     editingRowId,
-                    handleOnEdit
+                    handleOnEdit,
+                    canUserAccess(PermissionObjectType.prm, PermissionAction.update),
+                    canUserAccess(PermissionObjectType.prm, PermissionAction.delete)
                 ),
             },
         },
@@ -111,22 +119,24 @@ const ClusterwideParametersPage: React.FC = () => {
         customToolbar: () => {
             return (
                 <>
-                    <Tooltip title={"Add line"}>
-                        <>
-                            <IconButton
-                                color="default"
-                                aria-label={"add"}
-                                onClick={() => setShowDialog(true)}
-                            >
-                                <AddCircleIcon />
-                            </IconButton>
-                            <CreateParameterDialog
-                                showDialog={showDialog}
-                                closeDialog={() => setShowDialog(false)}
-                                createParameter={createParameter}
-                            />
-                        </>
-                    </Tooltip>
+                    {canUserAccess(PermissionObjectType.prm, PermissionAction.create) &&
+                        <Tooltip title={"Add line"}>
+                            <>
+                                <IconButton
+                                    color="default"
+                                    aria-label={"add"}
+                                    onClick={() => setShowDialog(true)}
+                                >
+                                    <AddCircleIcon />
+                                </IconButton>
+                                <CreateParameterDialog
+                                    showDialog={showDialog}
+                                    closeDialog={() => setShowDialog(false)}
+                                    createParameter={createParameter}
+                                />
+                            </>
+                        </Tooltip>
+                    }
                     <Tooltip title={"Refresh"}>
                         <IconButton
                             color="default"
@@ -156,6 +166,10 @@ const ClusterwideParametersPage: React.FC = () => {
             deleteParameter(paramIds);
         },
     };
+
+    if (!canUserAccess(PermissionObjectType.prm, PermissionAction.read)) {
+        return <AccessForbiddenPage />
+    }
 
     return parameters ? (
         <Container maxWidth={false}>
