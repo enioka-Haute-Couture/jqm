@@ -19,7 +19,10 @@
 package com.enioka.jqm.tools;
 
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -38,6 +41,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
@@ -624,5 +628,39 @@ final class Helpers
                 || (cause != null && cause.getMessage().equals("This connection has been closed"))
                 || (cause instanceof SQLException && e.getMessage().equals("Failed to validate a newly established connection."))
                 || (cause instanceof SQLNonTransientException && cause.getMessage().equals("connection exception: closed"));
+    }
+
+    /**
+     * If there is no file at {@code targetPath}, creates a new file at this
+     * location copying the resource located at {@code resourcePath}.
+     * 
+     * @param resourcePath
+     *                     the path relative to the resources folder
+     * @param targetPath
+     *                     the path relative to the system explorer
+     * @throws Exception
+     */
+    static void initializeConfigFile(String resourcePath, String targetPath, ClassLoader cl) throws Exception
+    {
+        try
+        {
+            if (new File(targetPath).createNewFile())
+            {
+                InputStream inputStream = (cl != null ? cl : Helpers.class.getClassLoader()).getResourceAsStream(resourcePath);
+                OutputStream outputStream = new FileOutputStream(targetPath);
+                IOUtils.copy(inputStream, outputStream);
+                outputStream.close();
+                inputStream.close();
+                jqmlogger.info(targetPath + " file has been initialized");
+            }
+            else
+            {
+                jqmlogger.info(targetPath + " file already exists, using it");
+            }
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Could not copy config file from " + resourcePath + " to " + targetPath, e);
+        }
     }
 }

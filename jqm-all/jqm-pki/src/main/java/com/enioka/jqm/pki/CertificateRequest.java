@@ -59,8 +59,6 @@ import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.util.BigIntegers;
 
-import com.enioka.jqm.jdbc.DbHelper;
-
 public class CertificateRequest
 {
     // Parameter fields
@@ -85,7 +83,7 @@ public class CertificateRequest
     {
         this.prettyName = prettyName;
 
-        Subject = "CN=JQM-CA,OU=ServerProducts,O=Oxymores,C=FR";
+        Subject = "CN=" + prettyName + ",OU=ServerProducts,O=Oxymores,C=FR";
         size = 4096;
 
         EKU = new KeyPurposeId[4];
@@ -146,8 +144,7 @@ public class CertificateRequest
             File f = new File(path);
             if (!f.getParentFile().isDirectory() && !f.getParentFile().mkdir())
             {
-                throw new PkiException(
-                        "couldn't create directory " + f.getParentFile().getAbsolutePath() + " for storing the SSL keystore");
+                throw new PkiException("couldn't create directory " + f.getParentFile().getAbsolutePath() + " for storing the SSL keystore");
             }
             fw = new FileWriter(path);
             wr = new PEMWriter(fw);
@@ -281,7 +278,7 @@ public class CertificateRequest
         }
     }
 
-    void writePfxToFile(OutputStream out, String password)
+    public void writePfxToFile(OutputStream out, String password)
     {
         try
         {
@@ -369,10 +366,8 @@ public class CertificateRequest
 
         SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
 
-        X509v3CertificateBuilder gen = new X509v3CertificateBuilder(
-                authorityCertificate == null ? dnName : authorityCertificate.getSubject(),
-                BigIntegers.createRandomInRange(BigInteger.ZERO, BigInteger.valueOf(Long.MAX_VALUE), random), new Date(),
-                endValidity.getTime(), dnName, publicKeyInfo);
+        X509v3CertificateBuilder gen = new X509v3CertificateBuilder(authorityCertificate == null ? dnName
+                : authorityCertificate.getSubject(), BigIntegers.createRandomInRange(BigInteger.ZERO, BigInteger.valueOf(Long.MAX_VALUE), random), new Date(), endValidity.getTime(), dnName, publicKeyInfo);
 
         // Public key ID
         DigestCalculator digCalc = new BcDigestCalculatorProvider().get(new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1));
@@ -396,13 +391,12 @@ public class CertificateRequest
         // Authority
         if (authorityCertificate != null)
         {
-            gen.addExtension(Extension.authorityKeyIdentifier, false,
-                    new AuthorityKeyIdentifier(authorityCertificate.getSubjectPublicKeyInfo()));
+            gen.addExtension(Extension.authorityKeyIdentifier, false, new AuthorityKeyIdentifier(authorityCertificate.getSubjectPublicKeyInfo()));
         }
 
         // Signer
-        ContentSigner signer = new JcaContentSignerBuilder("SHA512WithRSAEncryption").setProvider(Constants.JCA_PROVIDER)
-                .build(authorityKey == null ? privateKey : authorityKey);
+        ContentSigner signer = new JcaContentSignerBuilder("SHA512WithRSAEncryption").setProvider(Constants.JCA_PROVIDER).build(authorityKey == null ? privateKey
+                : authorityKey);
 
         // Go
         holder = gen.build(signer);
@@ -427,6 +421,11 @@ public class CertificateRequest
         return pemPrivateFile;
     }
 
+    public void setHolder(X509CertificateHolder holder)
+    {
+        this.holder = holder;
+    }
+
     public X509CertificateHolder getHolder()
     {
         return holder;
@@ -435,6 +434,11 @@ public class CertificateRequest
     public PublicKey getPublicKey()
     {
         return publicKey;
+    }
+
+    public void setPrivateKey(PrivateKey privateKey)
+    {
+        this.privateKey = privateKey;
     }
 
     public PrivateKey getPrivateKey()

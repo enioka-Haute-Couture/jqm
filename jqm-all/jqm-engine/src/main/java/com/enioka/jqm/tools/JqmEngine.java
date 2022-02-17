@@ -174,7 +174,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         if (node.getJmxRegistryPort() != null && node.getJmxServerPort() != null && node.getJmxRegistryPort() > 0
                 && node.getJmxServerPort() > 0)
         {
-            JmxAgent.registerAgent(node.getJmxRegistryPort(), node.getJmxServerPort(), node.getDns());
+            JmxAgent.registerAgent(node.getJmxRegistryPort(), node.getJmxServerPort(), node.getDns(), cnx);
         }
         else
         {
