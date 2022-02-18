@@ -21,16 +21,6 @@ import ClusterwideParametersPage from "./components/ClusterwideParameters/Cluste
 import RunsPage from "./components/Runs/RunsPage";
 import { JobDefinitionsPage } from "./components/JobDefinitions/JobDefinitionsPage";
 
-declare module "@material-ui/core/styles/overrides" {
-    interface ComponentNameToClassKey {
-        MUIDataTableBodyCell?: {
-            root: any;
-        };
-        MUIDataTableHeadCell?: {
-            root: any;
-        };
-    }
-}
 const getMuiTheme = () =>
     createTheme({
         overrides: {
