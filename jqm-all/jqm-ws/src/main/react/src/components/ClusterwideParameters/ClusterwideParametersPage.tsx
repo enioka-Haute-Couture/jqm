@@ -31,7 +31,7 @@ const ClusterwideParametersPage: React.FC = () => {
         if (canUserAccess(PermissionObjectType.prm, PermissionAction.read)) {
             fetchParameters();
         }
-    }, [fetchParameters]);
+    }, [fetchParameters, canUserAccess]);
 
     const handleOnDelete = useCallback(
         (tableMeta) => {

@@ -104,7 +104,7 @@ export default function MenuWrapper(props: any) {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const openUserMenu = Boolean(anchorEl);
 
-    const { userLogin, canUserAccess } = useAuth();
+    const { userLogin, canUserAccess, logout } = useAuth();
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -173,8 +173,7 @@ export default function MenuWrapper(props: any) {
                             open={openUserMenu}
                             onClose={handleClose}
                         >
-                            {/* TODO: link to auth/logout */}
-                            <MenuItem onClick={handleClose}>Log out</MenuItem>
+                            <MenuItem onClick={() => { logout(); handleClose(); }} component="a" href="/auth/logout">Log out</MenuItem>
                         </Menu>
                     </div>
 

@@ -92,7 +92,6 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
             value={{
                 ...authState,
                 canUserAccess: canUserAccess,
-                // TODO: useful? call /auth/logout
                 logout: useCallback(() => setAuthState({ ...defaultAuthState, status: "LOGGED_OUT" }), []),
             }}
         >

@@ -21,7 +21,7 @@ import ClusterwideParametersPage from "./components/ClusterwideParameters/Cluste
 import RunsPage from "./components/Runs/RunsPage";
 import { JobDefinitionsPage } from "./components/JobDefinitions/JobDefinitionsPage";
 import { ForceLogin } from "./utils/ForceLogin";
-import { AuthProvider, useAuth } from "./utils/AuthService";
+import { AuthProvider } from "./utils/AuthService";
 
 const getMuiTheme = () =>
     createTheme({

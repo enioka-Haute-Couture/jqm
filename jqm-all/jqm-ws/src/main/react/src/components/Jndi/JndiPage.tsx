@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useMemo } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Container, Grid, IconButton, Tooltip, Badge } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import MUIDataTable, { Display } from "mui-datatables";
@@ -30,24 +30,17 @@ export const JndiPage: React.FC = () => {
     const selectedFactoryRef = useRef(null);
     const selectedDescriptionRef = useRef(null);
     const [isSingleton, setIsSingleton] = useState<boolean>(false);
-    const [inMemoryResources, setInMemoryResources] = useState<JndiResource[]>(
-        []
-    );
+
     const { canUserAccess } = useAuth();
 
-    // TODO: VERIFY API CALLS WHEN API IS WORKING CORRECTLY
     const { resources, fetchResources, saveResource, deleteResource } =
         useJndiApi();
 
-    // TODO: useEffect(() => {
-    // if (canUserAccess(PermissionObjectType.jndi, PermissionAction.read)) {
-    //     fetchResources();
-    // }
-    // }, [fetchResources]);
-
-    const resourcesesMemo = useMemo(() => {
-        return [...resources, ...inMemoryResources];
-    }, [resources, inMemoryResources]);
+    useEffect(() => {
+        if (canUserAccess(PermissionObjectType.jndi, PermissionAction.read)) {
+            fetchResources();
+        }
+    }, [fetchResources, canUserAccess]);
 
     const handleOnDelete = useCallback(
         (tableMeta) => {
@@ -267,9 +260,8 @@ export const JndiPage: React.FC = () => {
                                 onOpen={() => setShowDropDown(true)}
                                 onClose={() => setShowDropDown(false)}
                                 onSelectResource={(newResource: JndiResource) => {
-                                    const newArr = [...inMemoryResources];
-                                    newArr.push(newResource);
-                                    setInMemoryResources(newArr);
+                                    delete newResource.uiName;
+                                    saveResource(newResource);
                                     setShowDropDown(false);
                                 }}
                             />
@@ -313,7 +305,7 @@ export const JndiPage: React.FC = () => {
         <Container maxWidth={false}>
             <MUIDataTable
                 title={"JNDI Resources"}
-                data={resourcesesMemo}
+                data={resources}
                 columns={columns}
                 options={options}
             />

@@ -36,7 +36,7 @@ const RolesPage: React.FC = () => {
         if (canUserAccess(PermissionObjectType.role, PermissionAction.read)) {
             fetchRoles();
         }
-    }, [fetchRoles]);
+    }, [fetchRoles, canUserAccess]);
 
     const updateRow = useCallback(
         (id: number) => {
