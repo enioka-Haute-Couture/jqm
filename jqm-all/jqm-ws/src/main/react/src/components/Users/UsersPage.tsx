@@ -6,7 +6,7 @@ import {
     Tooltip,
     MenuItem,
 } from "@material-ui/core";
-import MUIDataTable, { MUIDataTableColumnDef } from "mui-datatables";
+import MUIDataTable, { MUIDataTableColumnDef, SelectableRows } from "mui-datatables";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
@@ -251,6 +251,7 @@ const UsersPage: React.FC = () => {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
         download: false,
         print: false,
+        selectableRows: (canUserAccess(PermissionObjectType.user, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return (
                 <>

@@ -21,6 +21,7 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Link from "@material-ui/core/Link";
+import { PermissionObjectType, PermissionAction, useAuth } from "../../utils/AuthService";
 
 const formatDate = (date?: Date) => {
     if (date) {
@@ -37,6 +38,8 @@ export const JobInstanceDetailsDialog: React.FC<{
     fetchLogsStderr: (jobId: number) => Promise<String>;
 }> = ({ closeDialog, jobInstance, fetchLogsStdout, fetchLogsStderr }) => {
     const [logs, setLogs] = useState<String | null>(null);
+    const { canUserAccess } = useAuth();
+
     return (
         <>
             <Dialog
@@ -120,74 +123,76 @@ export const JobInstanceDetailsDialog: React.FC<{
                                     </TableBody>
                                 </Table>
                             </TableContainer>
-                            <Divider
-                                variant="middle"
-                                style={{ marginTop: "16px" }}
-                            />
-                            <Typography variant="h6">Log files</Typography>
-                            <TableContainer component={Paper}>
-                                <Table size="small">
-                                    <TableBody>
-                                        {/* TODO:  */}
-                                        <TableRow>
-                                            <TableCell>Log stdout</TableCell>
-                                            <TableCell>
-                                                <Link
-                                                    href="#"
-                                                    onClick={(event: any) => {
-                                                        event.preventDefault();
-                                                        fetchLogsStdout(
-                                                            jobInstance.id!
-                                                        ).then((response) =>
-                                                            setLogs(response)
-                                                        );
-                                                    }}
-                                                >
-                                                    view
-                                                </Link>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Link
-                                                    href="#"
-                                                    onClick={(event: any) =>
-                                                        event.preventDefault()
-                                                    }
-                                                >
-                                                    download
-                                                </Link>
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell>Log stderr</TableCell>
-                                            <TableCell>
-                                                <Link
-                                                    href="#"
-                                                    onClick={(event: any) => {
-                                                        event.preventDefault();
-                                                        fetchLogsStderr(
-                                                            jobInstance.id!
-                                                        ).then((response) =>
-                                                            setLogs(response)
-                                                        );
-                                                    }}
-                                                >
-                                                    view
-                                                </Link>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Link
-                                                    href="#"
-                                                    onClick={(event: any) =>
-                                                        event.preventDefault()
-                                                    }
-                                                >
-                                                    download
-                                                </Link>
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
+                            {canUserAccess(PermissionObjectType.logs, PermissionAction.read) &&
+                                (<>
+                                    <Divider
+                                        variant="middle"
+                                        style={{ marginTop: "16px" }}
+                                    />
+                                    <Typography variant="h6">Log files</Typography>
+                                    <TableContainer component={Paper}>
+                                        <Table size="small">
+                                            <TableBody>
+                                                <TableRow>
+                                                    <TableCell>Log stdout</TableCell>
+                                                    <TableCell>
+                                                        <Link
+                                                            href="#"
+                                                            onClick={(event: any) => {
+                                                                event.preventDefault();
+                                                                fetchLogsStdout(
+                                                                    jobInstance.id!
+                                                                ).then((response) =>
+                                                                    setLogs(response)
+                                                                );
+                                                            }}
+                                                        >
+                                                            view
+                                                        </Link>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Link
+                                                            href="#"
+                                                            onClick={(event: any) =>
+                                                                event.preventDefault()
+                                                            }
+                                                        >
+                                                            download
+                                                        </Link>
+                                                    </TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                    <TableCell>Log stderr</TableCell>
+                                                    <TableCell>
+                                                        <Link
+                                                            href="#"
+                                                            onClick={(event: any) => {
+                                                                event.preventDefault();
+                                                                fetchLogsStderr(
+                                                                    jobInstance.id!
+                                                                ).then((response) =>
+                                                                    setLogs(response)
+                                                                );
+                                                            }}
+                                                        >
+                                                            view
+                                                        </Link>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Link
+                                                            href="#"
+                                                            onClick={(event: any) =>
+                                                                event.preventDefault()
+                                                            }
+                                                        >
+                                                            download
+                                                        </Link>
+                                                    </TableCell>
+                                                </TableRow>
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                </>)}
                         </Grid>
                         <Grid item xs={4}>
                             <Typography variant="h6">Queue</Typography>
@@ -237,12 +242,17 @@ export const JobInstanceDetailsDialog: React.FC<{
                                     </ListItem>
                                 ))}
                             </List>
-                            <Divider
-                                variant="middle"
-                                style={{ marginTop: "16px" }}
-                            />
-                            <Typography variant="h6">Files created</Typography>
-                            {/* TODO:  */}
+                            {canUserAccess(PermissionObjectType.files, PermissionAction.read) &&
+                                (<>
+                                    <Divider
+                                        variant="middle"
+                                        style={{ marginTop: "16px" }}
+                                    />
+                                    <Typography variant="h6">Files created</Typography>
+
+                                    {/* TODO:  */}
+                                </>)
+                            }
                         </Grid>
                         <Grid item xs={4}>
                             <Typography variant="h6">Progress</Typography>

@@ -23,7 +23,6 @@ export interface JobDefinitionSpecificProperties {
     jarPath: string;
     jobType?: JobType;
     pathType: string;
-    // TODO: Specific class loader
 }
 
 export enum JobType {

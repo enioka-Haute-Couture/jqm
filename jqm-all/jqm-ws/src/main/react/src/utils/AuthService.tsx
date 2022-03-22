@@ -16,7 +16,11 @@ export enum PermissionObjectType {
     prm = "prm",
     jd = "jd",
     user = "user",
-    role = "role"
+    role = "role",
+    job_instance = "job_instance",
+    logs = "logs",
+    queue_position = "queue_position",
+    files = "files"
 }
 
 export enum PermissionAction {
@@ -64,7 +68,6 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     const getProfile = async () => {
         try {
             const result = await APIService.get("/admin/me");
-            console.log(result)
             setAuthState({ userLogin: result.login, userPermissions: result.permissions, status: "LOGGED_IN" });
         } catch (e) {
             setAuthState({ status: "LOGGED_OUT" });
@@ -73,7 +76,6 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     };
 
     const canUserAccess = useCallback((objectType: string, action: PermissionAction) => {
-        console.log(objectType, action, authState.userPermissions);
         if (!authState.userPermissions) {
             return false;
         }

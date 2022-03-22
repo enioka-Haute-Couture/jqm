@@ -80,8 +80,24 @@ export const useJobInstanceAPI = (emptyFilterList: string[][]) => {
             }
 
             var sortColumnName = sortOrder.name.toUpperCase();
+            // For some reason field names and filter names are not the same, so do mapping here
             if (sortColumnName === "STATE") {
                 sortColumnName = "STATUS";
+            }
+            if (sortColumnName === "ENQUEUEDATE") {
+                sortColumnName = "DATEENQUEUE";
+            }
+            if (sortColumnName === "BEGANRUNNINGDATE") {
+                sortColumnName = "DATEEXECUTION";
+            }
+            if (sortColumnName === "ENDDATE") {
+                sortColumnName = "DATEEND";
+            }
+            if (sortColumnName === "USER") {
+                sortColumnName = "USERNAME";
+            }
+            if (sortColumnName === "PARENT") {
+                sortColumnName = "PARENTID";
             }
             const sortBy = [
                 {

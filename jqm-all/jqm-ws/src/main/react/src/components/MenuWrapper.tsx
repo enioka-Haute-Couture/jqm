@@ -321,18 +321,20 @@ export default function MenuWrapper(props: any) {
                             <ListItemText primary={"Roles"} />
                         </ListItem>
                     )}
-                    {/* // TODO:  */}
-                    <ListItem
-                        button
-                        key={"runs"}
-                        component={NavLink}
-                        to="/runs"
-                    >
-                        <ListItemIcon>
-                            <QueryBuilderIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"Runs"} />
-                    </ListItem>
+                    {canUserAccess(PermissionObjectType.job_instance, PermissionAction.read) &&
+                        canUserAccess(PermissionObjectType.queue, PermissionAction.read) && (
+                            <ListItem
+                                button
+                                key={"runs"}
+                                component={NavLink}
+                                to="/runs"
+                            >
+                                <ListItemIcon>
+                                    <QueryBuilderIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={"Runs"} />
+                            </ListItem>
+                        )}
                 </List>
             </Drawer>
             <main className={classes.content}>

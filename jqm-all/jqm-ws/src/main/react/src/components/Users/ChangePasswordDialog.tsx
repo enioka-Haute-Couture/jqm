@@ -35,7 +35,7 @@ export const ChangePasswordDialog: React.FC<{
                     fullWidth
                     value={password}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setPassword(event.target.value); // FIXME: check that no validation is needed
+                        setPassword(event.target.value);
                     }}
                 />
             </DialogContent>
