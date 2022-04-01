@@ -10,7 +10,7 @@ SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPrefer
 ARG MVN_VERSION
 ARG MVN_MD5
 
-ENV MVN_URL https://dlcdn.apache.org/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.zip
+ENV MVN_URL https://archive.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.zip
 
 RUN Write-Host ('Downloading {0} ...' -f $env:MVN_URL); \
     mkdir /TEMP >$null; \
