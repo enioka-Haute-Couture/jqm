@@ -211,6 +211,7 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
 
         // Cleanup
         purgeDeadJobInstances(cnx, this.node);
+        cleanupTransientNodes(cnx);
 
         // Runners
         runningJobInstanceManager = new RunningJobInstanceManager();
