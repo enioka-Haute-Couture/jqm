@@ -41,6 +41,7 @@ ENV JAVA_OPTS="-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m" \
     JQM_POOL_PASSWORD="" \
     JQM_POOL_DRIVER="org.hsqldb.jdbcDriver" \
     JQM_POOL_VALIDATION_QUERY="SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS" \
+    JQM_POOL_INIT_SQL=\
     JQM_POOL_MAX=10 \
     JQM_HEALTHCHECK_URL="http://localhost:1789/ws/simple/localnode/health"
 
