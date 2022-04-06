@@ -6,6 +6,11 @@
 
 
 # set resource file from env variables
+if [ ! "x${JQM_POOL_INIT_SQL}" = "x" ]
+then
+    export JQM_POOL_INIT_SQL="initSQL=\"${JQM_POOL_INIT_SQL}\""
+fi
+
 echo "<resource
     name='jdbc/jqm'
     auth='Container'
@@ -14,7 +19,9 @@ echo "<resource
     testWhileIdle='true'
     testOnBorrow='false'
     testOnReturn='true'
-    validationQuery='${JQM_POOL_VALIDATION_QUERY}'
+    validationQuery=\"${JQM_POOL_VALIDATION_QUERY}\"
+    ${JQM_POOL_INIT_SQL}
+    logValidationErrors='true'
     validationInterval='1000'
     timeBetweenEvictionRunsMillis='60000'
     maxActive='${JQM_POOL_MAX}'
@@ -61,7 +68,7 @@ then
         echo 1 > /jqm/db/${JQM_NODE_NAME}
 
         # Apply template
-        if [ ! "${JQM_CREATE_NODE_TEMPLATE}" = "" ]
+        if [ ! "x${JQM_CREATE_NODE_TEMPLATE}" = "x" ]
         then
             echo "#### Applying template ${JQM_CREATE_NODE_TEMPLATE} to new JQM node"
             java -jar jqm.jar -t ${JQM_CREATE_NODE_TEMPLATE},${JQM_NODE_NAME},${JQM_NODE_WS_INTERFACE}
@@ -95,7 +102,7 @@ then
         echo 1 > /jqm/db/${JQM_NODE_NAME}
 
         # Apply template
-        if [ ! "${JQM_CREATE_NODE_TEMPLATE}" = "" ]
+        if [ ! "x${JQM_CREATE_NODE_TEMPLATE}" = "x" ]
         then
             echo "#### Applying template ${JQM_CREATE_NODE_TEMPLATE} to new JQM node"
             java -jar jqm.jar -t ${JQM_CREATE_NODE_TEMPLATE},${JQM_NODE_NAME},${JQM_NODE_WS_INTERFACE}
