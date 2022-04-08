@@ -135,4 +135,4 @@ fi
 
 # Go!
 echo "### Starting JQM node ${JQM_NODE_NAME}"
-java ${JAVA_OPTS} -jar jqm.jar -startnode ${JQM_NODE_NAME}
+exec java -D"com.enioka.jqm.interface=0.0.0.0" ${JAVA_OPTS} -jar jqm.jar -startnode ${JQM_NODE_NAME}

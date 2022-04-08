@@ -8,6 +8,8 @@ services:
             endpoint_mode: vip
         environment:
             - POSTGRES_PASSWORD=postgres
+        volumes:
+            - jqmdbdata:/var/lib/postgresql/data
 
     jqmbootstrap:
         # Create the database schema on startup and stops.
@@ -76,3 +78,6 @@ services:
             mode: replicated
             replicas: 2
             endpoint_mode: vip
+
+volumes:
+    jqmdbdata:
