@@ -7,8 +7,8 @@ services:
             labels:
                 com.enioka.description: "build helper - OpenJDK JRE for windows nano"
             args:
-                - OJDK_URL=https://github.com/ojdkbuild/ojdkbuild/releases/download/java-1.8.0-openjdk-1.8.0.312-1.b07/java-1.8.0-openjdk-jre-1.8.0.312-1.b07.ojdkbuild.windows.x86_64.zip
-                - OJDK_SHA256=dc028cd45b05b7307ec6ecd5ab9119031d37a1c0fcaa15adc715e40fd4a77ca6
+                - OJDK_URL=https://github.com/ojdkbuild/ojdkbuild/releases/download/java-1.8.0-openjdk-1.8.0.322-1.b06/java-1.8.0-openjdk-jre-1.8.0.322-1.b06.ojdkbuild.windows.x86_64.zip
+                - OJDK_SHA256=a8527a5320e2638f1c706cb8a7cbfd51b1d5dbb41d34ec8745f680b986e9bd4d
                 - WINDOWS_TAG=${WINDOWS_TAG}
         image: buildhelpers:jre-1.8.0-${WINDOWS_TAG:?tag must be given}
         hostname: jre
@@ -21,8 +21,8 @@ services:
             labels:
                 com.enioka.description: "build helper - OpenJDK JDK for windows nano"
             args:
-                - OJDK_URL=https://github.com/ojdkbuild/ojdkbuild/releases/download/java-1.8.0-openjdk-1.8.0.312-1.b07/java-1.8.0-openjdk-1.8.0.312-1.b07.ojdkbuild.windows.x86_64.zip
-                - OJDK_SHA256=ef99bf361e7a7223d1db4caceff7e09b9859bbd0a9e27c6d23f9c067fcdb40f6
+                - OJDK_URL=https://github.com/ojdkbuild/ojdkbuild/releases/download/java-1.8.0-openjdk-1.8.0.322-1.b06/java-1.8.0-openjdk-1.8.0.322-1.b06.ojdkbuild.windows.x86_64.zip
+                - OJDK_SHA256=154e7ec1a86025d9f41eef67ae154536d98919fb419f638e4db16f60d2b245ad
                 - WINDOWS_TAG=${WINDOWS_TAG}
         image: buildhelpers:jdk-1.8.0-${WINDOWS_TAG:?tag must be given}
         hostname: jdk

@@ -23,6 +23,7 @@ WORKDIR /jqm-all
 # Build
 COPY ./docker/windows/nexus/settings.xml ./jqm-all ./
 
+USER ContainerAdministrator
 RUN mvn install -DskipTests=%SKIP_TESTS% %MVN_SETTINGS% && mkdir C:\TEMP && echo F | xcopy /S /Q /Y /F jqm-service\target\jqm-*.zip C:\TEMP\jqm.zip && mvn clean
 
 
@@ -61,7 +62,8 @@ COPY --from=installer --chown=ContainerAdministrator C:/jqm/ C:/jqm/
 
 # Workaround weird Docker DNS resolver TTL of 600s... (moby/moby#30029)
 RUN REG ADD "HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters" /v MaxCacheTtl /t REG_DWORD /d 30 && \
-    REG ADD "HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters" /v MaxNegativeCacheTtl /t REG_DWORD /d 30
+    REG ADD "HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters" /v MaxNegativeCacheTtl /t REG_DWORD /d 30 && \
+    REG ADD "hklm\system\currentcontrolset\services\cexecsvc" /v ProcessShutdownTimeoutSeconds /t REG_DWORD /d 3600
 
 ENV JAVA_OPTS="-Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m" \
     JQM_ROOT="C:\\jqm" \
@@ -88,7 +90,8 @@ WORKDIR C:/jqm
 RUN java -jar jqm.jar -u && java -jar jqm.jar -c selfConfig.single.xml && java -jar jqm.jar -importjobdef ./jobs/jqm-demo && DEL /Q .\logs\*
 
 # Run node on startup
-ENTRYPOINT node.bat <NUL
+ENTRYPOINT [ "node.bat" ]
 
 # Healthcheck is equivalent to calling Node.AllPollersPolling
 HEALTHCHECK --interval=30s --start-period=91s --retries=2 --timeout=10s CMD curl --connect-timeout 2 -q --http1.1 -4 -s -S  %JQM_HEALTHCHECK_URL%
+# STOPSIGNAL SIGINT # not supported on windows

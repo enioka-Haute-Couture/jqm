@@ -135,7 +135,15 @@ class JettyServer
                         connector = new SelectChannelConnector();
                     }
 
-                    if (node.getDns().equals("0.0.0.0"))
+                    String interfaceFromProperty = System.getProperty("com.enioka.jqm.interface");
+                    if (interfaceFromProperty != null && !interfaceFromProperty.isEmpty())
+                    {
+                        connector.setHost(interfaceFromProperty);
+                        connector.setPort(node.getPort());
+                        ls.add(connector);
+                        jqmlogger.info("Jetty will bind on (prop) " + interfaceFromProperty + ":" + node.getPort());
+                    }
+                    else if (node.getDns().equals("0.0.0.0"))
                     {
                         connector.setHost("0.0.0.0");
                         connector.setPort(node.getPort());
