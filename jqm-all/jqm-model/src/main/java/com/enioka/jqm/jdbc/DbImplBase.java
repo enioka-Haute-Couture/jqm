@@ -48,8 +48,9 @@ class DbImplBase
                 + "FROM __T__NODE");
         queries.put("node_select_by_key", queries.get("node_select_all") + " WHERE NAME=?");
         queries.put("node_select_by_id", queries.get("node_select_all") + " WHERE ID=?");
+        queries.put("node_select_dead_nodes", queries.get("node_select_all") + " WHERE LAST_SEEN_ALIVE < ?");
         queries.put("node_select_connectdata_by_key", "SELECT DNS, PORT FROM __T__NODE WHERE NAME=?");
-        
+
         // QUEUE
         queries.put("q_insert", "INSERT INTO __T__QUEUE(ID, DEFAULT_QUEUE, DESCRIPTION, NAME) VALUES(JQM_PK.nextval, ?, ?, ?)");
         queries.put("q_delete_all", "DELETE FROM __T__QUEUE");

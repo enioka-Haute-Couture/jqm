@@ -311,6 +311,24 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             }
         }
 
+        // Potentially remove self from configuration
+        DbConn cnx = null;
+        try
+        {
+            cnx = Helpers.getNewDbSession();
+            cleanupSelfOnShutdown(cnx, node);
+        }
+        catch (Exception e)
+        {
+            jqmlogger.error("Could not clean node on shutdown.", e);
+        }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
+
+        // Done
+        JmxAgent.unregisterAgentIfNoMoreNodes();
         jqmlogger.debug("Stop order was correctly handled. Engine for node " + this.node.getName() + " has stopped.");
     }
 
@@ -496,6 +514,52 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             cnx.runUpdate("ji_delete_by_id", ji.getId());
         }
         cnx.commit();
+    }
+
+    /**
+     * Helper that removes the nodes that were automatically created and removed in some orchestrators (K8s, etc).<br>
+     * They should be removed on shutdown, but in case of crash they remain and should be cleaned at new node restart.
+     */
+    private void cleanupTransientNodes(DbConn cnx)
+    {
+        boolean deleteStoppedNodes = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "deleteStoppedNodes", "false"));
+        if (!deleteStoppedNodes)
+        {
+            return;
+        }
+
+        Calendar limit = Calendar.getInstance();
+        limit.add(Calendar.MINUTE, -3);
+
+        for (Node node : Node.select(cnx, "node_select_dead_nodes", limit))
+        {
+            jqmlogger.info("Node {} was detected as dead and will be removed.", node.getName());
+            purgeDeadJobInstances(cnx, node);
+            cnx.runUpdate("dp_delete_for_node", node.getId());
+            cnx.runUpdate("node_delete_by_id", node.getId());
+            cnx.commit();
+        }
+    }
+
+    /**
+     * In some environments (K8s) nodes are transient and will never restart after being shutdown. This removes the node.
+     *
+     * @param cnx
+     * @param node
+     */
+    private void cleanupSelfOnShutdown(DbConn cnx, Node node)
+    {
+        boolean deleteStoppedNodes = Boolean.parseBoolean(GlobalParameter.getParameter(cnx, "deleteStoppedNodes", "false"));
+        if (!deleteStoppedNodes)
+        {
+            return;
+        }
+
+        jqmlogger.info("As JQM is configured to remove stopped nodes, local node is removed");
+        cnx.runUpdate("dp_delete_for_node", node.getId());
+        cnx.runUpdate("node_delete_by_id", node.getId());
+        cnx.commit();
+        jqmlogger.info("Node removed");
     }
 
     /**

@@ -4,7 +4,7 @@ Release notes
 2.2.9
 *************
 
-Maintenance release.
+Maintenance release, with a lot of fixes oriented towards Kubernetes (and equivalent container orchestrators) hosting.
 
 Upgrade notes
 +++++++++++++++++++
@@ -16,12 +16,21 @@ No database modification in this release - upgrade can be done by simply replaci
 Major changes
 ++++++++++++++++++++++++++++
 
+* Engine: added `deleteStoppedNodes` global parameter, which triggers node deletion from configuration on shutdown. This is used when nodes are transient, like inside an orchestrator. (#435)
+* Build: partial retrofit of GitHub Action automations from 3.0 branch, Travis CI was removed.
+
 Minor changes
 ++++++++++++++++++++++++++++
 
 * Engine: the `System.exit` check is now disabled in Java versions above 17 as Security Managers are now deprecated. (#471)
+* Engine: fixed process not stopping on "engine shutdown" API call due to JMX non-daemon thread.
+* Engine: can now specify the web service listening interface through the command line, overriding the node's "DNS" parameter.
 * Admin GUI: global parameter latest change date no longer change if saving with the same value, preventing some useless engine restarts. (#472)
-
+* Admin GUI: fixed remove node command (SQL error).
+* Packaging: can now specify initSQL for SQL pool configuration in container deployments. Used in HSQLDB demo swarm configuration to set session timezone.
+* Packaging: Docker images now listen to all network interfaces by default. This fixes the image healthcheck in all deployment configurations.
+* Build: fixed Maven URL in Dockerfile (build only).
+* Build: updated supported Windows images.
 
 2.2.8
 *************

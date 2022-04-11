@@ -1,4 +1,14 @@
 @echo OFF
+setlocal EnableDelayedExpansion
+if errorlevel 1 (
+    echo unable to enable delayed expansion
+    exit 1
+)
+setlocal enableextensions
+if errorlevel 1 (
+    echo unable to enable extensions
+    exit 1
+)
 
 rem set resource file from env variables
 IF DEFINED JQM_POOL_INIT_SQL set JQM_POOL_INIT_SQL=initSQL="%JQM_POOL_INIT_SQL%"
@@ -14,7 +24,7 @@ IF "%JQM_NODE_WS_INTERFACE%" == "_localhost_" (
 
 IF "%JQM_INIT_MODE%" == "SINGLE" (
     IF NOT EXIST C:\jqm\db\%JQM_NODE_NAME% (
-        echo #### Node does not exist (as seen by the container^). Single node mode.
+        echo #### Node %JQM_NODE_NAME% does not exist (as seen by the container^). Single node mode.
 
         echo ### Updating database schema
         java -jar jqm.jar -u
@@ -38,30 +48,38 @@ IF "%JQM_INIT_MODE%" == "SINGLE" (
 )
 
 IF "%JQM_INIT_MODE%" == "CLUSTER" (
-    IF NOT EXIST C:\jqm\db\%JQM_NODE_NAME% (
-        echo #### Node does not exist (as seen by the container^). Cluster mode.
+    echo ### Checking configuration in database for node %JQM_NODE_NAME% - Cluster mode.
+    java -jar jqm.jar -nodecount >C:\jqm\tmp\nodes.txt
+    IF ERRORLEVEL 1 (
+        echo cannot check node status, java failure
+        exit 1
+    )
 
-        echo ### Waiting for templates import
-        :loop
+    type C:\jqm\tmp\nodes.txt | findstr /C:"Already existing: %JQM_NODE_NAME%"
+    IF !ERRORLEVEL! EQU 0 (
+        echo ### Node %JQM_NODE_NAME% already exists inside database configuration, skipping config
+        goto startup
+    )
+
+    echo #### Node %JQM_NODE_NAME% does not exist (as seen by the database^). Cluster mode.
+
+    echo ### Waiting for templates import
+    :loop
+    type C:\jqm\tmp\nodes.txt | findstr /C:"Existing nodes: 0"
+    IF !ERRORLEVEL! EQU 0 (
+        rem no templates yet - wait one second and retry
+        ping 127.0.0.1 -n 2 >NUL
         java -jar jqm.jar -nodecount >C:\jqm\tmp\nodes.txt
-        type C:\jqm\tmp\nodes.txt | findstr /C:"Existing nodes: 0"
-        IF %ERRORLEVEL% EQU 0 (
-            rem no templates yet - wait one second and retry
-            ping 127.0.0.1 -n 2 >NUL
-            goto loop
-        )
+        goto loop
+    )
 
-        echo ### Creating node %JQM_NODE_NAME%
-        java -jar jqm.jar -createnode %JQM_NODE_NAME%
+    echo ### Creating node %JQM_NODE_NAME%
+    java -jar jqm.jar -createnode %JQM_NODE_NAME%
 
-        rem mark the node as existing
-        echo 1 > C:\jqm\db\%JQM_NODE_NAME%
-
-        rem Apply template
-        IF defined JQM_CREATE_NODE_TEMPLATE (
-            echo #### Applying template %JQM_CREATE_NODE_TEMPLATE% to new JQM node
-            java -jar jqm.jar -t %JQM_CREATE_NODE_TEMPLATE%,%JQM_NODE_NAME%,%JQM_NODE_WS_INTERFACE%
-        )
+    rem Apply template
+    IF defined JQM_CREATE_NODE_TEMPLATE (
+        echo #### Applying template %JQM_CREATE_NODE_TEMPLATE% to new JQM node
+        java -jar jqm.jar -t %JQM_CREATE_NODE_TEMPLATE%,%JQM_NODE_NAME%,%JQM_NODE_WS_INTERFACE%
     )
 )
 
@@ -88,5 +106,6 @@ IF "%JQM_INIT_MODE%" == "UPDATER" (
 
 
 rem Go!
+:startup
 echo ### Starting JQM node %JQM_NODE_NAME%
 call java -D"com.enioka.jqm.interface=0.0.0.0" %JAVA_OPTS% -jar jqm.jar -startnode %JQM_NODE_NAME%
