@@ -30,9 +30,11 @@ available to any node.
 
 A second file exists, named JQM_ROOT/conf/jqm.properties. It is used specifically for database-specific bootstrap parameters, and is only useful in very specific use cases. It can be - and should be - safely deleted otherwise. The parameters are:
 
-* com.enioka.jqm.jdbc.tablePrefix: a prefix to add to all table names (if value is "MARSU_", tables will be named MARSU_HISTORY, MARSU_NODE...). Default is empty.
+* com.enioka.jqm.jdbc.tablePrefix: a prefix to add to all table names (if value is "MARSU\_", tables will be named MARSU_HISTORY, MARSU_NODE...). Default is empty.
 * com.enioka.jqm.jdbc.datasource: JNDI name of the datasource from resource.xml to use as the main JQM database connection. Default is jdbc/jqm.
 * com.enioka.jqm.jdbc.allowSchemaUpdate: should not be used in normal operations.
+
+Finally, it is possible to change the JQM listening interface (for web services and GUI) by adding `-D"com.enioka.jqm.interface=0.0.0.0"` (or any other value) inside the `JAVA_OPTS` environment variable. If not set, the normal interface choice is done (by choosing all interfaces corresponding to the node's DNS parameter). This is mostly useful in container deployments - inside the official images, this parameter is always set to 0.0.0.0.
 
 **Changes to bootstrap files require an engine restart**.
 
@@ -70,41 +72,44 @@ Global parameters
 These parameters are set inside the JQM database table named GLOBALPARAMETER. There is no CLI to modify these, therefore they
 have to be altered directly inside the database with your tool of choice or through the GUI.
 
-+-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
-| Name                    | Description                                                                                         | Default       | Restart | Nullable     |
-+=========================+=====================================================================================================+===============+=========+==============+
-| mavenRepo               | A comma-separated list of Maven repositories to use for dependency resolution                       | Maven Central | No      | No           |
-+-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
-| mavenSettingsCL         | an alternate Maven settings.xml to use. If absent, the usual file inside ~/.m2 is used.             | NULL          | No      | Yes          |
-+-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
-| defaultConnection       | the JNDI alias returned by the engine API getDefaultConnection method.                              | jdbc/jqm      | No      | No           |
-+-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
-| logFilePerLaunch        | if 'true', one log file will be created per launch. If 'false', job stdout/stderr is lost.          | true          | Yes     | No           |
-|                         | if 'both', one log file will be created per launch PLUS one common file concatening all these files |               |         |              |
-+-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
-| internalPollingPeriodMs | Period in ms for checking stop orders. Also period at which the "I'm a alive" signal is sent.       | 60000         | Yes     | No           |
-|                         | Also used for checking and applying  parameter modifications (new queues, global prm changes...)    |               |         |              |
-+-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
-| disableWsApi            | Disable all HTTP interfaces on all nodes. This takes precedence over node per node settings.        | false         | No      | Yes          |
-|                         | Absent means false, i.e. not forbidden.                                                             |               |         |              |
-+-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
-| enableWsApiSsl          | All HTTP communications will be HTTPS and not HTTP.                                                 | false         | No      | No           |
-+-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
-| enableWsApiAuth         | Use HTTP basic authentication plus RBAC backend for all WS APIs                                     | true          | No      | No           |
-+-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
-| disableWsApiSimple      | Forbids the simple API from loading on any node. This takes precedence over node per node settings. | NULL          | Yes     | Yes          |
-|                         | Absent means false, i.e. not forbidden.                                                             |               |         |              |
-+-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
-| disableWsApiClient      | Forbids the client API from loading on any node. This takes precedence over node per node settings. | NULL          | Yes     | Yes          |
-|                         | Absent means false, i.e. not forbidden.                                                             |               |         |              |
-+-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
-| disableWsApiAdmin       | Forbids the admin API from loading on any node. This takes precedence over node per node settings.  | NULL          | Yes     | Yes          |
-|                         | Absent means false, i.e. not forbidden.                                                             |               |         |              |
-+-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
-| enableInternalPki       | Use the internal (database-backed) PKI for issuing certificates and trusting presented certificates | true          | No      | No           |
-+-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
-| pfxPassword             | Password of the private key file (if not using internal PKI).                                       | SuperPassword | No      | Yes          |
-+-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
++--------------------------+------------------------------------------------------------------------------------------------------+---------------+---------+----------+
+| Name                     | Description                                                                                          | Default       | Restart | Nullable |
++==========================+======================================================================================================+===============+=========+==========+
+| mavenRepo                | A comma-separated list of Maven repositories to use for dependency resolution                        | Maven Central | No      | No       |
++--------------------------+------------------------------------------------------------------------------------------------------+---------------+---------+----------+
+| mavenSettingsCL          | an alternate Maven settings.xml to use. If absent, the usual file inside ~/.m2 is used.              | NULL          | No      | Yes      |
++--------------------------+------------------------------------------------------------------------------------------------------+---------------+---------+----------+
+| defaultConnection        | the JNDI alias returned by the engine API getDefaultConnection method.                               | jdbc/jqm      | No      | No       |
++--------------------------+------------------------------------------------------------------------------------------------------+---------------+---------+----------+
+|| logFilePerLaunch        || if 'true', one log file will be created per launch. If 'false', job stdout/stderr is lost.          || true         || Yes    || No      |
+||                         || if 'both', one log file will be created per launch PLUS one common file concatening all these files ||              ||        ||         |
++--------------------------+------------------------------------------------------------------------------------------------------+---------------+---------+----------+
+|| internalPollingPeriodMs || Period in ms for checking stop orders. Also period at which the "I'm a alive" signal is sent.       || 60000        || Yes    || No      |
+||                         || Also used for checking and applying parameter modifications (new queues, global prm changes...)     ||              ||        ||         |
++--------------------------+------------------------------------------------------------------------------------------------------+---------------+---------+----------+
+|| disableWsApi            || Disable all HTTP interfaces on all nodes. This takes precedence over node per node settings.        || false        || No     || Yes     |
+||                         || Absent means false, i.e. not forbidden.                                                             ||              ||        ||         |
++--------------------------+------------------------------------------------------------------------------------------------------+---------------+---------+----------+
+| enableWsApiSsl           | All HTTP communications will be HTTPS and not HTTP.                                                  | false         | No      | No       |
++--------------------------+------------------------------------------------------------------------------------------------------+---------------+---------+----------+
+| enableWsApiAuth          | Use HTTP basic authentication plus RBAC backend for all WS APIs                                      | true          | No      | No       |
++--------------------------+------------------------------------------------------------------------------------------------------+---------------+---------+----------+
+|| disableWsApiSimple      || Forbids the simple API from loading on any node. This takes precedence over node per node settings. || NULL         || Yes    || Yes     |
+||                         || Absent means false, i.e. not forbidden.                                                             ||              ||        ||         |
++--------------------------+------------------------------------------------------------------------------------------------------+---------------+---------+----------+
+|| disableWsApiClient      || Forbids the client API from loading on any node. This takes precedence over node per node settings. || NULL         || Yes    || Yes     |
+||                         || Absent means false, i.e. not forbidden.                                                             ||              ||        ||         |
++--------------------------+------------------------------------------------------------------------------------------------------+---------------+---------+----------+
+|| disableWsApiAdmin       || Forbids the admin API from loading on any node. This takes precedence over node per node settings.  || NULL         || Yes    || Yes     |
+||                         || Absent means false, i.e. not forbidden.                                                             ||              ||        ||         |
++--------------------------+------------------------------------------------------------------------------------------------------+---------------+---------+----------+
+| enableInternalPki        | Use the internal (database-backed) PKI for issuing certificates and trusting presented certificates  | true          | No      | No       |
++--------------------------+------------------------------------------------------------------------------------------------------+---------------+---------+----------+
+| pfxPassword              | Password of the private key file (if not using internal PKI).                                        | SuperPassword | No      | Yes      |
++--------------------------+------------------------------------------------------------------------------------------------------+---------------+---------+----------+
+| deleteStoppedNodes       | If true, stopped nodes are removed from configuration. Useful when nodes are transient, like in an   | false         | Yes     | Yes      |
+|                          | orchestrator as Kubernetes.                                                                          |               |         |          |
++--------------------------+------------------------------------------------------------------------------------------------------+---------------+---------+----------+
 
 Here, nullable means the parameter can be absent from the table. New values are taken into account asynchronously by running engines.
 

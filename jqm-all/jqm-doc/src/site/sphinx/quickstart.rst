@@ -13,7 +13,7 @@ Docker on Windows or Linux/Mac
 Prerequisites:
 
 * Docker is configured and can access public images
-* A recent Windows (greater or equal to 1709) or Linux (this includes Macs which run containers inside a hidden Linux VM)
+* A recent Windows (greater or equal to 1809) or Linux (this includes Macs which run containers inside a hidden Linux VM)
 
 Just run the very classic::
 
@@ -52,7 +52,7 @@ The following script will create a database and reference the test jobs (i.e. :t
 
 	./jqm.ps1 createnode # This will create a new node named after the computer name
 	./jqm.ps1 allxml  # This will import all the test job definitions
-    
+
 The following script will enable the web console with account root/test (do not use this in production!)::
 
     ./jqm.ps1 enablegui -RootPassword test
@@ -94,7 +94,7 @@ The following script will create a database and reference the test jobs (i.e. :t
 The following script will enable the web console with account root/test (do not use this in production!)::
 
         ./jqm.sh enablegui test
-    
+
 The following script will :term:`enqueue` an execution request for one of the test jobs::
 
         ./jqm.sh enqueue DemoEcho
@@ -113,6 +113,6 @@ Next steps...
 
 To exit the engine, simply do Ctrl+C or close your console.
 
-*To go further*: engines under Windows should be installed as services. This is easily done and explained in the :doc:`full 
-install documentation<admin/install>`. Moreover, this test install is using a very limited (and limiting) database - the full doc also 
+*To go further*: engines under Windows should be installed as services. This is easily done and explained in the :doc:`full
+install documentation<admin/install>`. Moreover, this test install is using a very limited (and limiting) database - the full doc also
 explains how to use fully fledged databases.

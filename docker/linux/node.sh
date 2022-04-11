@@ -82,11 +82,23 @@ fi
 
 if [ "${JQM_INIT_MODE}" = "CLUSTER" ]
 then
-    if [ ! -f /jqm/db/${JQM_NODE_NAME} ]
+    echo "### Checking configuration in database for node ${JQM_NODE_NAME} - Cluster mode."
+    java -jar jqm.jar -nodecount >/jqm/tmp/nodes.txt
+    if [ ! $? -eq 0 ]
     then
-        echo "#### Node does not exist (as seen by the container). Cluster mode."
+        echo "cannot check node status, java failure"
+        return 1
+    fi
+
+    cat /jqm/tmp/nodes.txt | grep "Already existing: ${JQM_NODE_NAME}"
+    if [ $? -eq 0 ]
+    then
+        echo "### Node ${JQM_NODE_NAME} already exists inside database configuration, skipping config"
+    else
+        echo "#### Node ${JQM_NODE_NAME} does not exist (as seen by the database). Cluster mode."
 
         echo "### Waiting for templates import"
+        $(exit 0)
         while [ $? -eq 0 ]
         do
             # no templates yet - wait one second and retry
@@ -97,9 +109,6 @@ then
 
         echo "### Creating node ${JQM_NODE_NAME}"
         java -jar jqm.jar -createnode ${JQM_NODE_NAME}
-
-        # mark the node as existing
-        echo 1 > /jqm/db/${JQM_NODE_NAME}
 
         # Apply template
         if [ ! "x${JQM_CREATE_NODE_TEMPLATE}" = "x" ]

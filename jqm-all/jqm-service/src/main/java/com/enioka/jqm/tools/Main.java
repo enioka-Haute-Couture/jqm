@@ -92,7 +92,7 @@ public class Main
      * Startup method for the packaged JAR
      *
      * @param args
-     *                 0 is node name
+     *            0 is node name
      */
     @SuppressWarnings("static-access")
     public static void main(String[] args)
@@ -695,7 +695,12 @@ public class Main
         try
         {
             cnx = Helpers.getNewDbSession();
-            jqmlogger.info("Existing nodes: " + MetaService.getNodes(cnx).size());
+            List<NodeDto> nodes = MetaService.getNodes(cnx);
+            for (NodeDto node : nodes)
+            {
+                jqmlogger.info("Already existing: " + node.getName());
+            }
+            jqmlogger.info("Existing nodes: " + nodes.size());
         }
         catch (Exception e)
         {
