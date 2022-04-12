@@ -56,7 +56,7 @@
                                 <artifactItem>
                                     <groupId>org.postgresql</groupId>
                                     <artifactId>postgresql</artifactId>
-                                    <version>42.1.1.jre6</version>
+                                    <version>42.2.25.jre6</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>mysql</groupId>
@@ -249,7 +249,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version> 42.2.24.jre6</version>
+            <version>42.2.25.jre6</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
