@@ -19,7 +19,9 @@ export const renderActionsCell =
         onDelete: Function | null,
         editingRowId: number | null,
         onEdit: Function,
-        extraActionItems: extraActionItem[] = []
+        canEdit: boolean,
+        canDelete: boolean,
+        extraActionItems: extraActionItem[] = [],
     ) =>
         (value: any, tableMeta: any) => {
             if (editingRowId === tableMeta.rowIndex) {
@@ -47,65 +49,64 @@ export const renderActionsCell =
                 );
             } else {
                 return (
-                    <>
-                        {extraActionItems.map((extraActionItem) => (
-                            <Tooltip
-                                key={extraActionItem.title}
-                                title={extraActionItem.title}
-                            >
-                                {extraActionItem.getLinkURL ?
-                                    (
-                                        <IconButton
-                                            component={Link}
-                                            href={extraActionItem.getLinkURL!(tableMeta)}
-                                            aria-label={extraActionItem.title}
-                                        >
-                                            {extraActionItem.addIcon(tableMeta)}
-                                        </IconButton>)
-                                    :
-                                    (
-                                        <IconButton
-                                            color="default"
-                                            aria-label={extraActionItem.title}
-                                            onClick={() => {
-                                                if (extraActionItem.action) {
-                                                    extraActionItem.action!(tableMeta)
-                                                }
-                                            }
-                                            }
-                                        >
-                                            {extraActionItem.addIcon(tableMeta)}
-                                        </IconButton>
-                                    )
-
-                                }
-
-                            </Tooltip>
-                        ))
-                        }
-                        <Tooltip title={"Edit line"}>
-                            <IconButton
-                                color="default"
-                                aria-label={"edit"}
-                                onClick={() => onEdit(tableMeta)}
-                            >
-                                <CreateIcon />
-                            </IconButton>
-                        </Tooltip>
-                        {
-                            onDelete && (
-                                <Tooltip title={"Delete line"}>
+                    <> {extraActionItems.map((extraActionItem) => (
+                        <Tooltip
+                            key={extraActionItem.title}
+                            title={extraActionItem.title}
+                        >
+                            {extraActionItem.getLinkURL ?
+                                (
+                                    <IconButton
+                                        component={Link}
+                                        href={extraActionItem.getLinkURL!(tableMeta)}
+                                        aria-label={extraActionItem.title}
+                                    >
+                                        {extraActionItem.addIcon(tableMeta)}
+                                    </IconButton>)
+                                :
+                                (
                                     <IconButton
                                         color="default"
-                                        aria-label={"delete"}
-                                        onClick={() => onDelete(tableMeta)}
+                                        aria-label={extraActionItem.title}
+                                        onClick={() => {
+                                            if (extraActionItem.action) {
+                                                extraActionItem.action!(tableMeta)
+                                            }
+                                        }
+                                        }
                                     >
-                                        <DeleteIcon />
+                                        {extraActionItem.addIcon(tableMeta)}
                                     </IconButton>
-                                </Tooltip>
-                            )
+                                )
+
+                            }
+
+                        </Tooltip>
+                    ))
+                    }
+
+                        {canEdit &&
+                            <Tooltip title={"Edit line"}>
+                                <IconButton
+                                    color="default"
+                                    aria-label={"edit"}
+                                    onClick={() => onEdit(tableMeta)}
+                                >
+                                    <CreateIcon />
+                                </IconButton>
+                            </Tooltip>
                         }
-                    </>
-                );
+                        {onDelete && canDelete && (
+                            <Tooltip title={"Delete line"}>
+                                <IconButton
+                                    color="default"
+                                    aria-label={"delete"}
+                                    onClick={() => onDelete(tableMeta)}
+                                >
+                                    <DeleteIcon />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+                    </>);
             }
         };

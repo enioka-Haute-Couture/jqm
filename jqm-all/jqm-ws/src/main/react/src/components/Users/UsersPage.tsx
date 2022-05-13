@@ -6,7 +6,7 @@ import {
     Tooltip,
     MenuItem,
 } from "@material-ui/core";
-import MUIDataTable, { MUIDataTableColumnDef } from "mui-datatables";
+import MUIDataTable, { MUIDataTableColumnDef, SelectableRows } from "mui-datatables";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
@@ -24,6 +24,8 @@ import { renderArrayCell } from "../TableCells/renderArrayCell";
 import { renderDateCell } from "../TableCells/renderDateCell";
 import { Role } from "../Roles/Role";
 import { CreateUserDialog } from "./CreateUserDialog";
+import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
+import AccessForbiddenPage from "../AccessForbiddenPage";
 
 const UsersPage: React.FC = () => {
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
@@ -49,13 +51,18 @@ const UsersPage: React.FC = () => {
     } = useUserAPI();
     const [showCreateDialog, setShowCreateDialog] = useState(false);
 
+    const { canUserAccess } = useAuth();
+
     const refresh = () => {
         fetchUsers();
         fetchRoles();
     };
 
     useEffect(() => {
-        refresh();
+        if (canUserAccess(PermissionObjectType.user, PermissionAction.read) &&
+            canUserAccess(PermissionObjectType.role, PermissionAction.read)) {
+            refresh();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -225,7 +232,9 @@ const UsersPage: React.FC = () => {
                     handleOnDelete,
                     editingRowId,
                     handleOnEdit,
-                    [
+                    canUserAccess(PermissionObjectType.user, PermissionAction.update),
+                    canUserAccess(PermissionObjectType.user, PermissionAction.delete),
+                    canUserAccess(PermissionObjectType.user, PermissionAction.update) ? [
                         {
                             title: "Download certificate",
                             addIcon: () => <GetAppIcon />,
@@ -242,7 +251,7 @@ const UsersPage: React.FC = () => {
                                 setChangePasswordUserId(userId);
                             },
                         },
-                    ]
+                    ] : []
                 ),
             },
         },
@@ -252,18 +261,21 @@ const UsersPage: React.FC = () => {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
         download: false,
         print: false,
+        selectableRows: (canUserAccess(PermissionObjectType.user, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return (
                 <>
-                    <Tooltip title={"Add line"}>
-                        <IconButton
-                            color="default"
-                            aria-label={"add"}
-                            onClick={() => setShowCreateDialog(true)}
-                        >
-                            <AddCircleIcon />
-                        </IconButton>
-                    </Tooltip>
+                    {canUserAccess(PermissionObjectType.user, PermissionAction.create) &&
+                        <Tooltip title={"Add line"}>
+                            <IconButton
+                                color="default"
+                                aria-label={"add"}
+                                onClick={() => setShowCreateDialog(true)}
+                            >
+                                <AddCircleIcon />
+                            </IconButton>
+                        </Tooltip>
+                    }
                     <Tooltip title={"Refresh"}>
                         <IconButton
                             color="default"
@@ -300,6 +312,11 @@ const UsersPage: React.FC = () => {
             deleteUsers(userIds);
         },
     };
+
+    if (!(canUserAccess(PermissionObjectType.user, PermissionAction.read) &&
+        canUserAccess(PermissionObjectType.role, PermissionAction.read))) {
+        return <AccessForbiddenPage />
+    }
 
     if (users && roles) {
         return (

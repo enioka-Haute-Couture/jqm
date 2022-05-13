@@ -26,6 +26,9 @@ import SecurityIcon from "@material-ui/icons/Security";
 import GroupWorkIcon from "@material-ui/icons/GroupWork";
 import QueryBuilderIcon from "@material-ui/icons/QueryBuilder";
 import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
+import { PermissionAction, PermissionObjectType, useAuth } from "../utils/AuthService";
+import { Button, Menu, MenuItem } from "@material-ui/core";
+import { AccountCircle } from "@material-ui/icons";
 
 const drawerWidth = 240;
 
@@ -89,12 +92,19 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
         padding: theme.spacing(3),
     },
+    title: {
+        flexGrow: 1
+    }
 }));
 
 export default function MenuWrapper(props: any) {
     const classes = useStyles();
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const openUserMenu = Boolean(anchorEl);
+
+    const { userLogin, canUserAccess, logout } = useAuth();
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -103,6 +113,15 @@ export default function MenuWrapper(props: any) {
     const handleDrawerClose = () => {
         setOpen(false);
     };
+
+    const handleMenu = (event: any) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
 
     return (
         <div className={classes.root}>
@@ -125,9 +144,39 @@ export default function MenuWrapper(props: any) {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" noWrap>
+                    <Typography variant="h6" noWrap className={classes.title}>
                         JQM v3
                     </Typography>
+
+                    <div>
+                        <Button
+                            color="inherit"
+                            startIcon={<AccountCircle />}
+                            aria-controls="menu-appbar"
+                            aria-haspopup="true"
+                            onClick={handleMenu}
+                        >
+                            {userLogin}
+                        </Button>
+                        <Menu
+                            id="menu-appbar"
+                            anchorEl={anchorEl}
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            keepMounted
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            open={openUserMenu}
+                            onClose={handleClose}
+                        >
+                            <MenuItem onClick={() => { logout(); handleClose(); }} component="a" href="/auth/logout">Log out</MenuItem>
+                        </Menu>
+                    </div>
+
                 </Toolbar>
             </AppBar>
             <Drawer
@@ -160,115 +209,138 @@ export default function MenuWrapper(props: any) {
                         </ListItemIcon>
                         <ListItemText primary={"Home"} />
                     </ListItem>
-                    <ListItem
-                        button
-                        key={"nodes"}
-                        component={NavLink}
-                        to="/nodes"
-                    >
-                        <ListItemIcon>
-                            <ScatterPlotIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"Nodes"} />
-                    </ListItem>
-
-                    <ListItem
-                        button
-                        key={"queues"}
-                        component={NavLink}
-                        to="/queues"
-                    >
-                        <ListItemIcon>
-                            <FormatListBulletedIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"Queues"} />
-                    </ListItem>
+                    {canUserAccess(PermissionObjectType.node, PermissionAction.read) && (
+                        <ListItem
+                            button
+                            key={"nodes"}
+                            component={NavLink}
+                            to="/nodes"
+                        >
+                            <ListItemIcon>
+                                <ScatterPlotIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={"Nodes"} />
+                        </ListItem>
+                    )}
+                    {canUserAccess(PermissionObjectType.queue, PermissionAction.read) && (
+                        <ListItem
+                            button
+                            key={"queues"}
+                            component={NavLink}
+                            to="/queues"
+                        >
+                            <ListItemIcon>
+                                <FormatListBulletedIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={"Queues"} />
+                        </ListItem>
+                    )}
                 </List>
                 <Divider />
                 <List>
-                    <ListItem
-                        button
-                        key={"mappings"}
-                        component={NavLink}
-                        to="/mappings"
-                    >
-                        <ListItemIcon>
-                            <SyncAltIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"Mappings"} />
-                    </ListItem>
-                    <ListItem
-                        button
-                        component={NavLink}
-                        to="/jndi"
-                        key={"jndiRessources"}
-                    >
-                        <ListItemIcon>
-                            <SettingsIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"JNDI ressources"} />
-                    </ListItem>
-                    <ListItem
-                        button
-                        key={"clusterWideParameters"}
-                        component={NavLink}
-                        to="/clusterwide-parameters"
-                    >
-                        <ListItemIcon>
-                            <GroupWorkIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"Cluster-wide params"} />
-                    </ListItem>
-                    <ListItem
-                        button
-                        key={"jobDefinitions"}
-                        component={NavLink}
-                        to="/job-definitions"
-                    >
-                        <ListItemIcon>
-                            <AssignmentIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"Job definitions"} />
-                    </ListItem>
-                    <ListItem
-                        button
-                        key={"users"}
-                        component={NavLink}
-                        to="/users"
-                    >
-                        <ListItemIcon>
-                            <SupervisorAccountIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"Users"} />
-                    </ListItem>
-                    <ListItem
-                        button
-                        key={"roles"}
-                        component={NavLink}
-                        to="/roles"
-                    >
-                        <ListItemIcon>
-                            <SecurityIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"Roles"} />
-                    </ListItem>
-                    <ListItem
-                        button
-                        key={"runs"}
-                        component={NavLink}
-                        to="/runs"
-                    >
-                        <ListItemIcon>
-                            <QueryBuilderIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"Runs"} />
-                    </ListItem>
+                    {canUserAccess(PermissionObjectType.qmapping, PermissionAction.read) &&
+                        canUserAccess(PermissionObjectType.queue, PermissionAction.read) &&
+                        canUserAccess(PermissionObjectType.node, PermissionAction.read) && (
+                            <ListItem
+                                button
+                                key={"mappings"}
+                                component={NavLink}
+                                to="/mappings"
+                            >
+                                <ListItemIcon>
+                                    <SyncAltIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={"Mappings"} />
+                            </ListItem>
+                        )}
+                    {canUserAccess(PermissionObjectType.jndi, PermissionAction.read) && (
+                        <ListItem
+                            button
+                            component={NavLink}
+                            to="/jndi"
+                            key={"jndiRessources"}
+                        >
+                            <ListItemIcon>
+                                <SettingsIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={"JNDI ressources"} />
+                        </ListItem>
+                    )}
+                    {canUserAccess(PermissionObjectType.prm, PermissionAction.read) && (
+                        <ListItem
+                            button
+                            key={"clusterWideParameters"}
+                            component={NavLink}
+                            to="/clusterwide-parameters"
+                        >
+                            <ListItemIcon>
+                                <GroupWorkIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={"Cluster-wide params"} />
+                        </ListItem>
+                    )}
+                    {canUserAccess(PermissionObjectType.jd, PermissionAction.read) &&
+                        canUserAccess(PermissionObjectType.queue, PermissionAction.read) &&
+                        (
+                            <ListItem
+                                button
+                                key={"jobDefinitions"}
+                                component={NavLink}
+                                to="/job-definitions"
+                            >
+                                <ListItemIcon>
+                                    <AssignmentIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={"Job definitions"} />
+                            </ListItem>
+                        )}
+                    {canUserAccess(PermissionObjectType.user, PermissionAction.read) &&
+                        canUserAccess(PermissionObjectType.role, PermissionAction.read) && (
+                            <ListItem
+                                button
+                                key={"users"}
+                                component={NavLink}
+                                to="/users"
+                            >
+                                <ListItemIcon>
+                                    <SupervisorAccountIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={"Users"} />
+                            </ListItem>
+                        )}
+                    {canUserAccess(PermissionObjectType.role, PermissionAction.read) && (
+                        <ListItem
+                            button
+                            key={"roles"}
+                            component={NavLink}
+                            to="/roles"
+                        >
+                            <ListItemIcon>
+                                <SecurityIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={"Roles"} />
+                        </ListItem>
+                    )}
+                    {canUserAccess(PermissionObjectType.job_instance, PermissionAction.read) &&
+                        canUserAccess(PermissionObjectType.queue, PermissionAction.read) && (
+                            <ListItem
+                                button
+                                key={"runs"}
+                                component={NavLink}
+                                to="/runs"
+                            >
+                                <ListItemIcon>
+                                    <QueryBuilderIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={"Runs"} />
+                            </ListItem>
+                        )}
                 </List>
             </Drawer>
             <main className={classes.content}>
                 <div className={classes.toolbar} />
                 {props.children}
             </main>
-        </div>
+        </div >
     );
 }

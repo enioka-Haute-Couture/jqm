@@ -46,7 +46,7 @@ export const CreateJobDefinitionDialog: React.FC<{
     const [jobType, setJobType] = useState<JobType>(JobType.java);
     const [javaClassName, setJavaClassName] = useState<string>("");
     const [jarPath, setJarPath] = useState<string>("");
-    const [pathType, setPathType] = useState<string>("");
+    const [pathType, setPathType] = useState<string>("FS");
 
     const classes = useStyles();
     return (
@@ -148,8 +148,10 @@ export const CreateJobDefinitionDialog: React.FC<{
                             let jobType = event.target.value as JobType;
                             if (jobType === JobType.shell) {
                                 setPathType("DEFAULTSHELLCOMMAND");
+                            } else if (jobType === JobType.process) {
+                                setPathType("DIRECTEXECUTABLE");
                             } else {
-                                setPathType("");
+                                setPathType("FS");
                             }
                             setJarPath("");
                             setJavaClassName("");

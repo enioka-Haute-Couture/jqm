@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Container, Grid, IconButton, Tooltip } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import MUIDataTable, { Display } from "mui-datatables";
+import MUIDataTable, { Display, SelectableRows } from "mui-datatables";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
@@ -12,6 +12,8 @@ import {
 } from "../TableCells";
 import { CreateQueueDialog } from "./CreateQueueDialog";
 import useQueueAPI from "./QueueAPI";
+import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
+import AccessForbiddenPage from "../AccessForbiddenPage";
 import { useSnackbar } from "notistack";
 
 const QueuesPage: React.FC = () => {
@@ -27,9 +29,13 @@ const QueuesPage: React.FC = () => {
     const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
-        fetchQueues();
+        if (canUserAccess(PermissionObjectType.queue, PermissionAction.read)) {
+            fetchQueues();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const { canUserAccess } = useAuth();
 
     const handleOnDelete = useCallback(
         (tableMeta) => {
@@ -125,7 +131,9 @@ const QueuesPage: React.FC = () => {
                     handleOnSave,
                     handleOnDelete,
                     editingRowId,
-                    handleOnEdit
+                    handleOnEdit,
+                    canUserAccess(PermissionObjectType.queue, PermissionAction.update),
+                    canUserAccess(PermissionObjectType.queue, PermissionAction.delete)
                 ),
             },
         },
@@ -135,26 +143,28 @@ const QueuesPage: React.FC = () => {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
         download: false,
         print: false,
+        selectableRows: (canUserAccess(PermissionObjectType.queue, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return (
                 <>
-                    <Tooltip title={"Add line"}>
-                        <>
-                            <IconButton
-                                color="default"
-                                aria-label={"add"}
-                                onClick={() => setShowDialog(true)}
-                            >
-                                <AddCircleIcon />
-                            </IconButton>
-                            <CreateQueueDialog
-                                showDialog={showDialog}
-                                closeDialog={() => setShowDialog(false)}
-                                createQueue={createQueue}
-                                canBeDefaultQueue={queues ? !queues.some(q => q.defaultQueue) : true}
-                            />
-                        </>
-                    </Tooltip>
+                    {canUserAccess(PermissionObjectType.queue, PermissionAction.create) &&
+                        <Tooltip title={"Add line"}>
+                            <>
+                                <IconButton
+                                    color="default"
+                                    aria-label={"add"}
+                                    onClick={() => setShowDialog(true)}
+                                >
+                                    <AddCircleIcon />
+                                </IconButton>
+                                <CreateQueueDialog
+                                    showDialog={showDialog}
+                                    closeDialog={() => setShowDialog(false)}
+                                    createQueue={createQueue}
+                                    canBeDefaultQueue={queues ? !queues.some(q => q.defaultQueue) : true}
+                                />
+                            </>
+                        </Tooltip>}
                     <Tooltip title={"Refresh"}>
                         <IconButton
                             color="default"
@@ -184,6 +194,10 @@ const QueuesPage: React.FC = () => {
             deleteQueues(queueIds);
         },
     };
+
+    if (!canUserAccess(PermissionObjectType.queue, PermissionAction.read)) {
+        return <AccessForbiddenPage />
+    }
 
     return queues ? (
         <Container maxWidth={false}>

@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useRef, useMemo } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Container, Grid, IconButton, Tooltip, Badge } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import MUIDataTable, { Display } from "mui-datatables";
+import MUIDataTable, { Display, SelectableRows } from "mui-datatables";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
@@ -15,6 +15,8 @@ import { EditParametersDialog } from "./EditParametersDialog";
 import useJndiApi from "./useJndiApi";
 import { JndiResource } from "./JndiResource";
 import { ResourceDropDownMenu } from "./ResourceDropDownMenu";
+import { PermissionObjectType, PermissionAction, useAuth } from "../../utils/AuthService";
+import AccessForbiddenPage from "../AccessForbiddenPage";
 
 export const JndiPage: React.FC = () => {
     const [showDropDown, setShowDropDown] = useState(false);
@@ -28,21 +30,17 @@ export const JndiPage: React.FC = () => {
     const selectedFactoryRef = useRef(null);
     const selectedDescriptionRef = useRef(null);
     const [isSingleton, setIsSingleton] = useState<boolean>(false);
-    const [inMemoryResources, setInMemoryResources] = useState<JndiResource[]>(
-        []
-    );
 
-    // TODO: VERIFY API CALLS WHEN API IS WORKING CORRECTLY
+    const { canUserAccess } = useAuth();
+
     const { resources, fetchResources, saveResource, deleteResource } =
         useJndiApi();
 
-    // useEffect(() => {
-    //     fetchResources();
-    // }, [fetchResources]);
-
-    const resourcesesMemo = useMemo(() => {
-        return [...resources, ...inMemoryResources];
-    }, [resources, inMemoryResources]);
+    useEffect(() => {
+        if (canUserAccess(PermissionObjectType.jndi, PermissionAction.read)) {
+            fetchResources();
+        }
+    }, [fetchResources, canUserAccess]);
 
     const handleOnDelete = useCallback(
         (tableMeta) => {
@@ -227,7 +225,9 @@ export const JndiPage: React.FC = () => {
                     handleOnSave,
                     handleOnDelete,
                     editingRowId,
-                    handleOnEdit
+                    handleOnEdit,
+                    canUserAccess(PermissionObjectType.jndi, PermissionAction.update),
+                    canUserAccess(PermissionObjectType.jndi, PermissionAction.delete)
                 ),
             },
         },
@@ -237,36 +237,37 @@ export const JndiPage: React.FC = () => {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
         download: false,
         print: false,
+        selectableRows: (canUserAccess(PermissionObjectType.jndi, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return (
                 <>
-                    <>
-                        <Tooltip title={"Create new JNDI resource"}>
-                            <IconButton
-                                color="default"
-                                aria-label={"Create new JNDI resource"}
-                                onClick={() => setShowDropDown(true)}
-                            >
-                                <AddCircleIcon
-                                    innerRef={dropDownMenuPositionRef}
-                                />
-                            </IconButton>
-                        </Tooltip>
-                        <ResourceDropDownMenu
-                            menuPositiontRef={dropDownMenuPositionRef}
-                            show={showDropDown}
-                            handleSet={setShowDropDown}
-                            onOpen={() => setShowDropDown(true)}
-                            onClose={() => setShowDropDown(false)}
-                            onSelectResource={(newResource: JndiResource) => {
-                                const newArr = [...inMemoryResources];
-                                newArr.push(newResource);
-                                setInMemoryResources(newArr);
-                                setShowDropDown(false);
-                            }}
-                        />
-                    </>
-
+                    {canUserAccess(PermissionObjectType.jndi, PermissionAction.create) &&
+                        <>
+                            <Tooltip title={"Create new JNDI resource"}>
+                                <IconButton
+                                    color="default"
+                                    aria-label={"Create new JNDI resource"}
+                                    onClick={() => setShowDropDown(true)}
+                                >
+                                    <AddCircleIcon
+                                        innerRef={dropDownMenuPositionRef}
+                                    />
+                                </IconButton>
+                            </Tooltip>
+                            <ResourceDropDownMenu
+                                menuPositiontRef={dropDownMenuPositionRef}
+                                show={showDropDown}
+                                handleSet={setShowDropDown}
+                                onOpen={() => setShowDropDown(true)}
+                                onClose={() => setShowDropDown(false)}
+                                onSelectResource={(newResource: JndiResource) => {
+                                    delete newResource.uiName;
+                                    saveResource(newResource);
+                                    setShowDropDown(false);
+                                }}
+                            />
+                        </>
+                    }
                     <Tooltip title={"Refresh"}>
                         <IconButton
                             color="default"
@@ -297,11 +298,15 @@ export const JndiPage: React.FC = () => {
         },
     };
 
+    if (!canUserAccess(PermissionObjectType.jndi, PermissionAction.read)) {
+        return <AccessForbiddenPage />
+    }
+
     return resources ? (
         <Container maxWidth={false}>
             <MUIDataTable
                 title={"JNDI Resources"}
-                data={resourcesesMemo}
+                data={resources}
                 columns={columns}
                 options={options}
             />

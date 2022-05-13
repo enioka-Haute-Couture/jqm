@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Container, Grid, IconButton, Tooltip } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import MUIDataTable, { Display } from "mui-datatables";
+import MUIDataTable, { Display, SelectableRows } from "mui-datatables";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import { renderInputCell, renderActionsCell } from "../TableCells";
 import { CreateParameterDialog } from "./CreateParameterDialog";
 import useParametersApi from "./ParametersApi";
+import { PermissionObjectType, PermissionAction, useAuth } from "../../utils/AuthService";
+import AccessForbiddenPage from "../AccessForbiddenPage";
 
 const ClusterwideParametersPage: React.FC = () => {
     const [showDialog, setShowDialog] = useState(false);
@@ -23,9 +25,13 @@ const ClusterwideParametersPage: React.FC = () => {
         deleteParameter,
     } = useParametersApi();
 
+    const { canUserAccess } = useAuth();
+
     useEffect(() => {
-        fetchParameters();
-    }, [fetchParameters]);
+        if (canUserAccess(PermissionObjectType.prm, PermissionAction.read)) {
+            fetchParameters();
+        }
+    }, [fetchParameters, canUserAccess]);
 
     const handleOnDelete = useCallback(
         (tableMeta) => {
@@ -98,7 +104,9 @@ const ClusterwideParametersPage: React.FC = () => {
                     handleOnSave,
                     handleOnDelete,
                     editingRowId,
-                    handleOnEdit
+                    handleOnEdit,
+                    canUserAccess(PermissionObjectType.prm, PermissionAction.update),
+                    canUserAccess(PermissionObjectType.prm, PermissionAction.delete)
                 ),
             },
         },
@@ -108,25 +116,28 @@ const ClusterwideParametersPage: React.FC = () => {
         setCellProps: () => ({ fullWidth: "MuiInput-fullWidth" }),
         download: false,
         print: false,
+        selectableRows: (canUserAccess(PermissionObjectType.prm, PermissionAction.delete)) ? "multiple" as SelectableRows : "none" as SelectableRows,
         customToolbar: () => {
             return (
                 <>
-                    <Tooltip title={"Add line"}>
-                        <>
-                            <IconButton
-                                color="default"
-                                aria-label={"add"}
-                                onClick={() => setShowDialog(true)}
-                            >
-                                <AddCircleIcon />
-                            </IconButton>
-                            <CreateParameterDialog
-                                showDialog={showDialog}
-                                closeDialog={() => setShowDialog(false)}
-                                createParameter={createParameter}
-                            />
-                        </>
-                    </Tooltip>
+                    {canUserAccess(PermissionObjectType.prm, PermissionAction.create) &&
+                        <Tooltip title={"Add line"}>
+                            <>
+                                <IconButton
+                                    color="default"
+                                    aria-label={"add"}
+                                    onClick={() => setShowDialog(true)}
+                                >
+                                    <AddCircleIcon />
+                                </IconButton>
+                                <CreateParameterDialog
+                                    showDialog={showDialog}
+                                    closeDialog={() => setShowDialog(false)}
+                                    createParameter={createParameter}
+                                />
+                            </>
+                        </Tooltip>
+                    }
                     <Tooltip title={"Refresh"}>
                         <IconButton
                             color="default"
@@ -156,6 +167,10 @@ const ClusterwideParametersPage: React.FC = () => {
             deleteParameter(paramIds);
         },
     };
+
+    if (!canUserAccess(PermissionObjectType.prm, PermissionAction.read)) {
+        return <AccessForbiddenPage />
+    }
 
     return parameters ? (
         <Container maxWidth={false}>

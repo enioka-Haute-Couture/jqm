@@ -12,6 +12,8 @@ import {
 } from "../TableCells";
 import useNodesApi from "./useNodesApi";
 import { DisplayLogsDialog } from "./DisplayLogsDialog";
+import { PermissionAction, PermissionObjectType, useAuth } from "../../utils/AuthService";
+import AccessForbiddenPage from "../AccessForbiddenPage";
 
 export const NodesPage: React.FC = () => {
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
@@ -29,11 +31,15 @@ export const NodesPage: React.FC = () => {
     const [loapApiSimple, setLoapApiSimple] = useState<boolean | null>(null);
     const [enabled, setEnabled] = useState<boolean | null>(null);
 
+    const { canUserAccess } = useAuth();
+
     const { nodes, nodeLogs, setNodeLogs, fetchNodes, updateNode, fetchNodeLogs } =
         useNodesApi();
 
     useEffect(() => {
-        fetchNodes();
+        if (canUserAccess(PermissionObjectType.node, PermissionAction.read)) {
+            fetchNodes();
+        }
         // eslint-disable-next-line
     }, []);
 
@@ -292,6 +298,8 @@ export const NodesPage: React.FC = () => {
                     null,
                     editingRowId,
                     handleOnEdit,
+                    canUserAccess(PermissionObjectType.node, PermissionAction.update),
+                    canUserAccess(PermissionObjectType.node, PermissionAction.delete),
                     [
                         {
                             title: "View node logs",
@@ -330,6 +338,10 @@ export const NodesPage: React.FC = () => {
             );
         },
     };
+
+    if (!canUserAccess(PermissionObjectType.node, PermissionAction.read)) {
+        return <AccessForbiddenPage />
+    }
 
     return nodes ? (
         <Container maxWidth={false}>

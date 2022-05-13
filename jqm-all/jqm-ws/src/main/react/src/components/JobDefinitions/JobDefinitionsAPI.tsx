@@ -3,7 +3,7 @@ import APIService from "../../utils/APIService";
 import { useNotificationService } from "../../utils/NotificationService";
 import { JobDefinition, JobType } from "./JobDefinition";
 
-function pathTypeToApplicationType(pathType: string): JobType {
+function pathTypeToJobType(pathType: string): JobType {
     switch (pathType) {
         case "DIRECTEXECUTABLE":
             return JobType.process;
@@ -15,6 +15,28 @@ function pathTypeToApplicationType(pathType: string): JobType {
     }
 }
 
+function jobDefinitionToPayload(jobDefinition: JobDefinition): any {
+    let payload: any = jobDefinition;
+
+    payload = {
+        ...payload,
+        application: jobDefinition.tags.application,
+        module: jobDefinition.tags.module,
+        keyword1: jobDefinition.tags.keyword1,
+        keyword2: jobDefinition.tags.keyword2,
+        keyword3: jobDefinition.tags.keyword3,
+        javaClassName: jobDefinition.properties.javaClassName ? jobDefinition.properties.javaClassName : "com.company.product.ClassName",
+        jarPath: jobDefinition.properties.jarPath,
+        pathType: jobDefinition.properties.pathType,
+    }
+    delete payload.tags;
+    delete payload.properties;
+
+    return payload;
+}
+
+const API_URL = "/admin/jd";
+
 export const useJobDefinitionsAPI = () => {
     const { displayError, displaySuccess } = useNotificationService();
 
@@ -23,71 +45,8 @@ export const useJobDefinitionsAPI = () => {
     >();
 
     const fetchJobDefinitions = useCallback(async () => {
-        // return APIService.get("/jd")
-        //     .then((mappings) => setJobDefinitions(mappings))
-        //     .catch(displayError);
-        const response = [
-            {
-                id: 1,
-                description: "what the job does",
-                queueId: 331,
-                javaClassName: "",
-                canBeRestarted: true,
-                highlander: true,
-                jarPath: 'echo "hello"',
-                enabled: true,
-                parameters: [{ key: "test", value: "1234" }],
-                applicationName: "Shell Job",
-                pathType: "POWERSHELLCOMMAND",
-                schedules: [
-                    {
-                        id: 12,
-                        cronExpression: "* * * * * ",
-                        queue: 329,
-                        parameters: [{ key: "Test", value: "1234" }],
-                    },
-                ],
-                application: "application",
-                module: "module",
-                keyword1: "keyword 1",
-                keyword2: "keyword 2",
-                keyword3: "keyword 3",
-            },
-            {
-                id: 2,
-                description: "what the job does",
-                queueId: 2,
-                javaClassName: "com.company.product.ClassName",
-                canBeRestarted: true,
-                highlander: false,
-                jarPath: "relativepath/to/file.jar",
-                enabled: true,
-                parameters: [{ key: "test", value: "1234" }],
-                applicationName: "Java Job",
-                pathType: "FS",
-                schedules: [],
-                module: "module",
-                keyword2: "keyword 2",
-                keyword3: "keyword 3",
-            },
-            {
-                id: 3,
-                description: "what the job does",
-                queueId: 2,
-                javaClassName: "",
-                canBeRestarted: true,
-                highlander: false,
-                jarPath: "path/to/executable",
-                enabled: true,
-                applicationName: "Process Job",
-                pathType: "DIRECTEXECUTABLE",
-                schedules: [],
-                parameters: [],
-            },
-        ];
-
-        setJobDefinitions(
-            response.map((jobDefinition) => {
+        return APIService.get(API_URL)
+            .then((response) => setJobDefinitions(response.map((jobDefinition: any) => {
                 return {
                     ...jobDefinition,
                     tags: {
@@ -97,23 +56,23 @@ export const useJobDefinitionsAPI = () => {
                         keyword2: jobDefinition.keyword2,
                         keyword3: jobDefinition.keyword3,
                     },
-                    jobType: pathTypeToApplicationType(jobDefinition.pathType),
+                    jobType: pathTypeToJobType(jobDefinition.pathType),
                     properties: {
                         javaClassName: jobDefinition.javaClassName,
                         jarPath: jobDefinition.jarPath,
-                        jobType: pathTypeToApplicationType(
+                        jobType: pathTypeToJobType(
                             jobDefinition.pathType
                         ),
                         pathType: jobDefinition.pathType,
                     },
                 };
-            })
-        );
-    }, []);
+            })))
+            .catch(displayError);
+    }, [displayError]);
 
     const createJobDefinition = useCallback(
         async (newJobDefinition: JobDefinition) => {
-            return APIService.post("/jd", newJobDefinition)
+            return APIService.post(API_URL, jobDefinitionToPayload(newJobDefinition))
                 .then(() => {
                     fetchJobDefinitions();
                     displaySuccess(
@@ -128,13 +87,12 @@ export const useJobDefinitionsAPI = () => {
     const deleteJobDefinitions = useCallback(
         async (jobDefinitionsIds: number[]) => {
             return await Promise.all(
-                jobDefinitionsIds.map((id) => APIService.delete("/jd/" + id))
+                jobDefinitionsIds.map((id) => APIService.delete(`${API_URL}/${id}`))
             )
                 .then(() => {
                     fetchJobDefinitions();
                     displaySuccess(
-                        `Successfully deleted job definition${
-                            jobDefinitionsIds.length > 1 ? "s" : ""
+                        `Successfully deleted job definition${jobDefinitionsIds.length > 1 ? "s" : ""
                         }`
                     );
                 })
@@ -145,8 +103,7 @@ export const useJobDefinitionsAPI = () => {
 
     const updateJobDefinition = useCallback(
         async (jobDefinition: JobDefinition) => {
-            // TODO: convert to API format
-            return APIService.put("/jd/" + jobDefinition.id, jobDefinition)
+            return APIService.put(`${API_URL}/${jobDefinition.id}`, jobDefinitionToPayload(jobDefinition))
                 .then(() => {
                     fetchJobDefinitions();
                     displaySuccess("Successfully saved job definition");

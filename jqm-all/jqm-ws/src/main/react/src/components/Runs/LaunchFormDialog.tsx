@@ -87,7 +87,7 @@ export const LaunchFormDialog: React.FC<{
                         }}
                         input={<Input />}
                     >
-                        {jobDefinitions!.map((jobDefinition: JobDefinition) => (
+                        {jobDefinitions?.map((jobDefinition: JobDefinition) => (
                             <MenuItem
                                 key={jobDefinition.applicationName}
                                 value={jobDefinition.applicationName}
