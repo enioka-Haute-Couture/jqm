@@ -72,7 +72,7 @@ export default class APIService {
 
         if (res.ok) {
             if (res.status === 200 || res.status === 201) {
-                return jsonResponse ? await res.json() : res;
+                return jsonResponse ? await res.json() : await res.text();
             }
             return init.method !== "GET";
         }
@@ -81,7 +81,7 @@ export default class APIService {
         try {
             error = {
                 code: res.status,
-                details: jsonResponse ? await res.json() : res,
+                details: jsonResponse || res.headers.get('content-type')?.includes('application/json') ? await res.json() : await res.text(),
             };
         } catch {
             error = { code: res.status, message: res.statusText };

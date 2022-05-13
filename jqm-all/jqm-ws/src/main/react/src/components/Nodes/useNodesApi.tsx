@@ -60,6 +60,7 @@ const useNodesApi = () => {
     return {
         nodes,
         nodeLogs,
+        setNodeLogs,
         fetchNodes,
         updateNode,
         fetchNodeLogs,

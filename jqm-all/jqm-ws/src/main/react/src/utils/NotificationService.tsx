@@ -1,21 +1,34 @@
 import { useCallback } from "react";
 import { useSnackbar } from "notistack";
+import React from "react";
+import { Button } from "@material-ui/core";
+
 
 export const useNotificationService = () => {
-    const { enqueueSnackbar } = useSnackbar();
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
 
     const displayError = useCallback(
         (reason: any) => {
-            console.error(reason);
+
+            const action = (key: any) => {
+                return (<Button onClick={() => { closeSnackbar(key) }}>
+                    Dismiss
+                </Button>);
+            }
             enqueueSnackbar(
-                "An error occured, please contact support support@enioka.com for help.",
+                (reason?.details?.userReadableMessage) ?
+                    reason.details.userReadableMessage :
+                    "An error occured, please contact support support@enioka.com for help"
+                ,
                 {
                     variant: "error",
                     persist: true,
+                    action
                 }
             );
         },
-        [enqueueSnackbar]
+        [enqueueSnackbar, closeSnackbar]
     );
 
     const displaySuccess = useCallback(
