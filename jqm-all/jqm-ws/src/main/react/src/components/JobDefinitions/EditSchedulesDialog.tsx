@@ -24,6 +24,9 @@ import {
     Link,
     Typography,
     Tooltip,
+    List,
+    ListItem,
+    ListItemText,
 } from "@material-ui/core";
 import React, { useState } from "react";
 import { JobDefinitionParameter, JobDefinitionSchedule } from "./JobDefinition";
@@ -31,6 +34,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { Queue } from "../Queues/Queue";
 import { EditParametersDialog } from "./EditParametersDialog";
+import cron from 'cron-validate'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -52,6 +56,7 @@ export const EditSchedulesDialog: React.FC<{
         number | null
     >(null);
     const [cronExpression, setCronExpression] = useState<string>("");
+    const [cronExpressionValidationErrors, setCronExpressionValidationErrors] = useState<Array<string> | null>(null);
     const [queueId, setQueueId] = useState<number>(-1);
 
     const classes = useStyles();
@@ -80,10 +85,26 @@ export const EditSchedulesDialog: React.FC<{
                             className={classes.TextField}
                             label="Cron expression*"
                             value={cronExpression}
+                            error={cronExpressionValidationErrors != null}
+                            helperText={<List dense>
+                                {cronExpressionValidationErrors?.map((error: string) => (
+                                    <ListItem>
+                                        <ListItemText primary={error} />
+                                    </ListItem>
+                                ))}
+                            </List>}
                             onChange={(
                                 event: React.ChangeEvent<HTMLInputElement>
                             ) => {
-                                setCronExpression(event.target.value);
+                                const cronString = event.target.value;
+                                const cronResult = cron(cronString);
+
+                                if (cronResult.isValid()) {
+                                    setCronExpressionValidationErrors(null);
+                                } else {
+                                    setCronExpressionValidationErrors(cronResult.getError());
+                                }
+                                setCronExpression(cronString);
                             }}
                             fullWidth
                         />
@@ -118,7 +139,7 @@ export const EditSchedulesDialog: React.FC<{
                             variant="contained"
                             size="small"
                             style={{ marginBottom: "16px" }}
-                            disabled={!cronExpression}
+                            disabled={!cronExpression || cronExpressionValidationErrors != null}
                             onClick={() => {
                                 setEditedSchedules([
                                     ...editedSchedules,
@@ -236,7 +257,7 @@ export const EditSchedulesDialog: React.FC<{
                         }}
                         color="primary"
                     >
-                        Save
+                        Validate
                     </Button>
                 </DialogActions>
             </Dialog>

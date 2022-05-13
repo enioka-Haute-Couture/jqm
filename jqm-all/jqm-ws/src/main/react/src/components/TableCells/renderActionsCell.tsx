@@ -1,5 +1,5 @@
 import React from "react";
-import { IconButton, Tooltip } from "@material-ui/core";
+import { IconButton, Link, Tooltip } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import CreateIcon from "@material-ui/icons/Create";
 import SaveIcon from "@material-ui/icons/Save";
@@ -8,7 +8,8 @@ import CancelIcon from "@material-ui/icons/Cancel";
 export interface extraActionItem {
     title: string;
     addIcon: Function;
-    action: Function;
+    action?: Function;
+    getLinkURL?: Function;
 }
 
 export const renderActionsCell =
@@ -48,23 +49,42 @@ export const renderActionsCell =
                 );
             } else {
                 return (
-                    <>
-                        {extraActionItems.map((extraActionItem) => (
-                            <Tooltip
-                                key={extraActionItem.title}
-                                title={extraActionItem.title}
-                            >
-                                <IconButton
-                                    color="default"
-                                    aria-label={extraActionItem.title}
-                                    onClick={() =>
-                                        extraActionItem.action(tableMeta)
-                                    }
-                                >
-                                    {extraActionItem.addIcon(tableMeta)}
-                                </IconButton>
-                            </Tooltip>
-                        ))}
+                    <> {extraActionItems.map((extraActionItem) => (
+                        <Tooltip
+                            key={extraActionItem.title}
+                            title={extraActionItem.title}
+                        >
+                            {extraActionItem.getLinkURL ?
+                                (
+                                    <IconButton
+                                        component={Link}
+                                        href={extraActionItem.getLinkURL!(tableMeta)}
+                                        aria-label={extraActionItem.title}
+                                    >
+                                        {extraActionItem.addIcon(tableMeta)}
+                                    </IconButton>)
+                                :
+                                (
+                                    <IconButton
+                                        color="default"
+                                        aria-label={extraActionItem.title}
+                                        onClick={() => {
+                                            if (extraActionItem.action) {
+                                                extraActionItem.action!(tableMeta)
+                                            }
+                                        }
+                                        }
+                                    >
+                                        {extraActionItem.addIcon(tableMeta)}
+                                    </IconButton>
+                                )
+
+                            }
+
+                        </Tooltip>
+                    ))
+                    }
+
                         {canEdit &&
                             <Tooltip title={"Edit line"}>
                                 <IconButton
@@ -87,7 +107,6 @@ export const renderActionsCell =
                                 </IconButton>
                             </Tooltip>
                         )}
-                    </>
-                );
+                    </>);
             }
         };

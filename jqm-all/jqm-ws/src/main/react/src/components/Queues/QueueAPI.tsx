@@ -38,8 +38,7 @@ export const useQueueAPI = () => {
                 .then(() => {
                     fetchQueues();
                     displaySuccess(
-                        `Successfully deleted queue${
-                            queueIds.length > 1 ? "s" : ""
+                        `Successfully deleted queue${queueIds.length > 1 ? "s" : ""
                         }`
                     );
                 })

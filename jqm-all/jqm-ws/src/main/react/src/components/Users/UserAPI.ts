@@ -83,6 +83,14 @@ export const useUserAPI = () => {
         [displayError, displaySuccess]
     );
 
+    const getCertificateDownloadURL = useCallback(
+        (userId: number) => {
+            const baseURL = (process.env.NODE_ENV=== "development") ? "http://localhost:59977" : "";
+                return `${baseURL}/ws${API_URL}/${userId}/certificate`
+            }
+        , []
+    );
+
     return {
         users,
         roles,
@@ -92,5 +100,6 @@ export const useUserAPI = () => {
         updateUser,
         deleteUsers,
         changePassword,
+        getCertificateDownloadURL
     };
 };

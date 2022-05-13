@@ -120,7 +120,7 @@ export const EditTagsDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    Save
+                    Validate
                 </Button>
             </DialogActions>
         </Dialog>

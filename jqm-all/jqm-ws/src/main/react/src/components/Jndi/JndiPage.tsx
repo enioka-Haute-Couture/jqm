@@ -310,14 +310,16 @@ export const JndiPage: React.FC = () => {
                 columns={columns}
                 options={options}
             />
-            <EditParametersDialog
-                showDialog={showParameters}
-                selectedResource={currentSelectedResource}
-                setSelectedResource={(resource: JndiResource) =>
-                    setCurrentSelectedResource(resource)
-                }
-                closeDialog={() => setShowParameters(false)}
-            />
+            {showParameters &&
+                <EditParametersDialog
+                    showDialog={true}
+                    selectedResource={currentSelectedResource}
+                    setSelectedResource={(resource: JndiResource) =>
+                        setCurrentSelectedResource(resource)
+                    }
+                    closeDialog={() => setShowParameters(false)}
+                />
+            }
         </Container>
     ) : (
         <Grid container justifyContent="center">

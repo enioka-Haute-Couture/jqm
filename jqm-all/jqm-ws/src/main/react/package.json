@@ -17,6 +17,7 @@
         "@types/react": "^16.9.0",
         "@types/react-dom": "^16.9.0",
         "@types/react-router-dom": "^5.1.5",
+        "cron-validate": "^1.4.3",
         "date-fns": "^2.19.0",
         "mui-datatables": "^3.5.0",
         "notistack": "^1.0.1",
