@@ -75,4 +75,5 @@
     },
 
     "restructuredtext.confPath": "${workspaceFolder}\\jqm-all\\jqm-doc\\src\\site\\sphinx",
+    "esbonio.sphinx.confDir": "${workspaceFolder}\\jqm-all\\jqm-doc\\src\\site\\sphinx",
 }
