@@ -26,7 +26,8 @@ export const CreateQueueDialog: React.FC<{
     showDialog: boolean;
     closeDialog: () => void;
     createQueue: (queue: Queue) => void;
-}> = ({ showDialog, closeDialog, createQueue }) => {
+    canBeDefaultQueue: boolean;
+}> = ({ showDialog, closeDialog, createQueue, canBeDefaultQueue }) => {
     const [queueName, setQueueName] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [defaultQueue, setDefaultQueue] = useState(false);
@@ -69,7 +70,8 @@ export const CreateQueueDialog: React.FC<{
                             }}
                         />
                     }
-                    label="Default queue"
+                    disabled={!canBeDefaultQueue}
+                    label="Default queue (disabled if one is already set)"
                     labelPlacement="top"
                 />
             </DialogContent>

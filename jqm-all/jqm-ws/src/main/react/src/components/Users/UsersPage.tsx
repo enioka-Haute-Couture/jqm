@@ -11,6 +11,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import HelpIcon from "@material-ui/icons/Help";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
+import GetAppIcon from '@material-ui/icons/GetApp';
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
 import { ChangePasswordDialog } from "./ChangePasswordDialog";
 import { useUserAPI } from "./UserAPI";
@@ -44,6 +45,7 @@ const UsersPage: React.FC = () => {
         updateUser,
         deleteUsers,
         changePassword,
+        getCertificateDownloadURL
     } = useUserAPI();
     const [showCreateDialog, setShowCreateDialog] = useState(false);
 
@@ -199,10 +201,10 @@ const UsersPage: React.FC = () => {
                     editingRowId,
                     roles
                         ? roles!.map((role: Role) => (
-                              <MenuItem key={role.id} value={role.id}>
-                                  {role.name}
-                              </MenuItem>
-                          ))
+                            <MenuItem key={role.id} value={role.id}>
+                                {role.name}
+                            </MenuItem>
+                        ))
                         : [],
                     (element: number) =>
                         roles?.find((x) => x.id === element)?.name || "",
@@ -224,6 +226,14 @@ const UsersPage: React.FC = () => {
                     editingRowId,
                     handleOnEdit,
                     [
+                        {
+                            title: "Download certificate",
+                            addIcon: () => <GetAppIcon />,
+                            getLinkURL: (tableMeta: any) => {
+                                const [userId] = tableMeta.rowData;
+                                return getCertificateDownloadURL(userId);
+                            }
+                        },
                         {
                             title: "Change password",
                             addIcon: () => <VpnKeyIcon />,

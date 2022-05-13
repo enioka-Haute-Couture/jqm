@@ -15,6 +15,8 @@ import {
     TableRow,
     IconButton,
     TextField,
+    createStyles,
+    Theme,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -99,12 +101,13 @@ export const JndiParametersTable: React.FC<{
     );
 };
 
-const useStyles = makeStyles({
-    root: {
-        justifyContent: "flex-start",
-        margin: "1rem",
-    },
-});
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        TextField: {
+            padding: theme.spacing(0, 0, 3),
+        },
+    })
+);
 
 export const EditParametersDialog: React.FC<{
     showDialog: boolean;
@@ -116,7 +119,6 @@ export const EditParametersDialog: React.FC<{
     const [newParamName, setNewParamName] = useState<string>("");
     const [newParamValue, setNewParamValue] = useState<string>("");
     const scollToRef = useRef<null | HTMLDivElement>(null);
-    const classes = useStyles();
 
     useEffect(() => {
         if (selectedResource) {
@@ -124,75 +126,70 @@ export const EditParametersDialog: React.FC<{
         }
     }, [selectedResource]);
 
-    const clearNewParamValues = () => {
-        setNewParamName("");
-        setNewParamValue("");
-    };
-
-    const onCancel = () => {
-        closeDialog();
-        setTmpParams(selectedResource ? [...selectedResource.parameters] : []);
-        clearNewParamValues();
-    };
+    const classes = useStyles();
 
     return selectedResource !== null ? (
         <Dialog
             open={showDialog}
-            onClose={onCancel}
+            onClose={closeDialog}
             aria-labelledby="form-dialog-title"
             fullWidth
             maxWidth={"md"}
         >
             <DialogTitle id="form-dialog-title">Edit Parameters</DialogTitle>
             <DialogContent>
-                <DialogContentText>
-                    Add new or edit existing parameters
-                </DialogContentText>
-                <JndiParametersTable
-                    parameters={tmpParams}
-                    setParameters={setTmpParams}
-                />
-                <div ref={scollToRef}></div>
+                <>
+                    <TextField
+                        className={classes.TextField}
+                        label="Name*"
+                        value={newParamName}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            setNewParamName(event.target.value);
+                        }}
+                        fullWidth
+                    />
+                    <TextField
+                        className={classes.TextField}
+                        label="Value*"
+                        value={newParamValue}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            setNewParamValue(event.target.value);
+                        }}
+                        fullWidth
+
+                    />
+                    <Button
+                        variant="contained"
+                        size="small"
+                        style={{ marginBottom: "16px" }}
+                        disabled={!newParamName || !newParamValue}
+                        onClick={() => {
+                            setTmpParams([
+                                ...tmpParams,
+                                { key: newParamName, value: newParamValue },
+                            ]);
+                            scollToRef.current!.scrollIntoView();
+                        }}
+                        color="primary"
+                    >
+                        Add parameter
+                    </Button>
+                    <DialogContentText>
+                        Add new or edit existing parameters
+                    </DialogContentText>
+                    <JndiParametersTable
+                        parameters={tmpParams}
+                        setParameters={setTmpParams}
+                    />
+                    <div ref={scollToRef}></div>
+                </>
             </DialogContent>
-            <DialogActions classes={{ root: classes.root }}>
-                <TextField
-                    label="Name"
-                    value={newParamName}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setNewParamName(event.target.value);
-                    }}
-                />
-                <TextField
-                    label="Value"
-                    value={newParamValue}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setNewParamValue(event.target.value);
-                    }}
-                />
-                <Button
-                    variant="contained"
-                    size="small"
-                    style={{ margin: "1rem" }}
-                    disabled={!newParamName || !newParamValue}
-                    onClick={() => {
-                        setTmpParams([
-                            ...tmpParams,
-                            { key: newParamName, value: newParamValue },
-                        ]);
-                        scollToRef.current!.scrollIntoView();
-                        clearNewParamValues();
-                    }}
-                    color="primary"
-                >
-                    Add new parameter
-                </Button>
-            </DialogActions>
             <DialogActions>
                 <Button
                     variant="contained"
                     size="small"
                     style={{ margin: "8px" }}
-                    onClick={onCancel}
+                    onClick={closeDialog}
                 >
                     Cancel
                 </Button>
@@ -207,7 +204,7 @@ export const EditParametersDialog: React.FC<{
                     }}
                     color="primary"
                 >
-                    Save
+                    Validate
                 </Button>
             </DialogActions>
         </Dialog>

@@ -257,7 +257,7 @@ export const EditSchedulesDialog: React.FC<{
                         }}
                         color="primary"
                     >
-                        Save
+                        Validate
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.enioka.jqm</groupId>
@@ -19,7 +18,6 @@
         <node.dir>${project.basedir}/target/node</node.dir>
         <jsplugin.version>1.12.0</jsplugin.version>
         <spa.build.repo>src/main/react/build/</spa.build.repo>
-        <spa.output.dist>src/main/webapp/dist</spa.output.dist>
     </properties>
 
 
@@ -54,33 +52,6 @@
 
     <build>
         <plugins>
-            <!-- For OSGi only, copy shiro ini file inside the Shiro-accessible classpath -->
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/classes/org/apache/shiro/jqm</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/webapp/WEB-INF</directory>
-                                    <filtering>true</filtering>
-                                    <includes>
-                                        <include>shiro.ini</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- run mvn jetty:run to test (with hot deployment) the app on a dev
 				computer. localhost:8080 -->
             <plugin>
@@ -174,7 +145,7 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.2.0</version>
                 <executions>
-                    <!-- For OSGi: copy shiro ini file inside the Shirao-accessible classpath -->
+                    <!-- For OSGi: copy shiro ini file inside the Shiro-accessible classpath -->
                     <execution>
                         <id>copy-resources-osgi</id>
                         <phase>process-resources</phase>
@@ -202,13 +173,33 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/classes/dist</outputDirectory>
+                            <outputDirectory>${project.basedir}/target/classes/dist</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${spa.build.repo}</directory>
                                     <filtering>true</filtering>
                                     <includes>
                                         <include>**/**</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <!-- For auth (webapp content is not automatically copied in a jar) -->
+                    <execution>
+                        <id>copy-resources-authstatic</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/target/classes/auth</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/src/main/webapp/auth</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>*</include>
                                     </includes>
                                 </resource>
                             </resources>
@@ -222,7 +213,8 @@
                 <artifactId>bnd-maven-plugin</artifactId>
                 <version>${plugin.bnd.version}</version>
                 <configuration>
-                    <bnd><![CDATA[
+                    <bnd>
+                        <![CDATA[
                         # Do not actually deploy this as an OSGi WAR but as JAX-RS whiteboard resources
                         # Web-ContextPath: /ws
                         # BND issue with multi version jars. https://github.com/bndtools/bnd/issues/2227
