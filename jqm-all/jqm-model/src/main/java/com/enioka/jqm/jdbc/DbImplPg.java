@@ -19,7 +19,8 @@ public class DbImplPg extends DbAdapter
                 .replace(" REAL", " DOUBLE PRECISION").replace("UNIX_MILLIS()", "extract('epoch' from current_timestamp)*1000")
                 .replace("IN(UNNEST(?))", "=ANY(?)").replace("CURRENT_TIMESTAMP - 1 MINUTE", "NOW() - INTERVAL '1 MINUTES'")
                 .replace("CURRENT_TIMESTAMP - ? SECOND", "(NOW() - (? || ' SECONDS')::interval)").replace("FROM (VALUES(0))", "")
-                .replace("__T__", this.tablePrefix);
+                .replace("__T__", this.tablePrefix)
+                .replace("CURRENT_TIMESTAMP", "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
     }
 
     @Override
