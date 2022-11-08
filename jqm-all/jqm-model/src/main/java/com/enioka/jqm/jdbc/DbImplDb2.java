@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 public class DbImplDb2 extends DbAdapter
 {
     private String sequenceSqlAppHandle;
@@ -136,8 +138,8 @@ public class DbImplDb2 extends DbAdapter
     @Override
     public boolean testDbUnreachable(Exception e)
     {
-        if (e.getCause() != null && e.getCause() instanceof SQLNonTransientException
-            && e.getCause().getMessage().equals("connection exception: closed"))
+        if (ExceptionUtils.indexOfType(e, SQLNonTransientException.class) != -1
+            && ExceptionUtils.getMessage(e).contains("connection exception: closed"))
         {
             return true;
         }

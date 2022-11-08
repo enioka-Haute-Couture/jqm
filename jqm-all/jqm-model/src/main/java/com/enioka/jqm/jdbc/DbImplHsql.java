@@ -10,6 +10,7 @@ import java.util.Properties;
 
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 public class DbImplHsql extends DbAdapter
 {
@@ -61,8 +62,8 @@ public class DbImplHsql extends DbAdapter
     @Override
     public boolean testDbUnreachable(Exception e)
     {
-        if (e.getCause() != null && e.getCause() instanceof SQLNonTransientException
-            && e.getCause().getMessage().equals("connection exception: closed"))
+        if (ExceptionUtils.indexOfType(e, SQLNonTransientException.class) != -1
+            && ExceptionUtils.getMessage(e).contains("connection exception: closed"))
         {
             return true;
         }

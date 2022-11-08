@@ -13,6 +13,8 @@ import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.jdbc.DbHelper;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 public class DbImplOracle extends DbAdapter
 {
     @Override
@@ -137,15 +139,15 @@ public class DbImplOracle extends DbAdapter
     @Override
     public boolean testDbUnreachable(Exception e)
     {
+        String msg = ExceptionUtils.getMessage(e);
         if (e instanceof SQLException
-            && (e.getMessage().contains("Connection is closed")
-            || e.getMessage().contains("Closed Connection")))
+            && (msg.contains("Connection is closed")
+            || msg.contains("Closed Connection")))
         {
             return true;
         }
-        if (e.getCause() != null
-            && (e.getCause().getMessage().contains("Connection is closed")
-            || e.getMessage().contains("Closed Connection")))
+        msg = ExceptionUtils.getMessage(e.getCause());
+        if (msg.contains("Connection is closed") || msg.contains("Closed Connection"))
         {
             return true;
         }

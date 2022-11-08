@@ -187,21 +187,21 @@ public class DbImplMySql extends DbAdapter
         {
             return true;
         }
+        String msg = ExceptionUtils.getMessage(e);
         if (e instanceof SQLException
-            && (e.getMessage().equals("Failed to validate a newly established connection.")
-            || e.getMessage().contains("FATAL: terminating connection due to administrator command")
-            || e.getMessage().contains("This connection has been closed")
-            || e.getMessage().contains("Communications link failure")
-            || e.getMessage().contains("Connection is closed")))
+            && (msg.contains("Failed to validate a newly established connection.")
+            || msg.contains("FATAL: terminating connection due to administrator command")
+            || msg.contains("This connection has been closed")
+            || msg.contains("Communications link failure")
+            || msg.contains("Connection is closed")))
         {
             return true;
         }
-        Throwable cause = e.getCause();
-        if (cause != null
-            && (cause.getMessage().equals("This connection has been closed.")
-            || cause.getMessage().contains("Communications link failure")
-            || cause.getMessage().contains("Connection is closed")
-            || cause.getMessage().contains("connection closed")))
+        msg = ExceptionUtils.getMessage(e.getCause());
+        if (msg.contains("This connection has been closed.")
+            || msg.contains("Communications link failure")
+            || msg.contains("Connection is closed")
+            || msg.contains("connection closed"))
         {
             return true;
         }
