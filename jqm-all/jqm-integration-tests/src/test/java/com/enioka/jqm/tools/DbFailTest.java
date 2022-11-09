@@ -80,20 +80,23 @@ public class DbFailTest extends JqmBaseTest
         this.simulateDbFailure(5);
         TestHelpers.waitFor(1, 10000, this.getNewDbSession());
 
+        this.sleep(5);
+
         Assert.assertEquals(1, TestHelpers.getOkCount(this.getNewDbSession()));
         Assert.assertEquals(0, TestHelpers.getNonOkCount(this.getNewDbSession()));
     }
 
     // Job ends KO during db failure.
     @Test
-    @Ignore
     public void testDbFailureWithRunningJobKo() throws Exception
     {
         JqmSimpleTest.create(cnx, "pyl.KillMe").expectOk(0).run(this);
-        this.sleep(2);
+        this.sleep(5);
 
         this.simulateDbFailure(5);
         TestHelpers.waitFor(1, 10000, this.getNewDbSession());
+
+        this.sleep(5);
 
         Assert.assertEquals(0, TestHelpers.getOkCount(this.getNewDbSession()));
         Assert.assertEquals(1, TestHelpers.getNonOkCount(this.getNewDbSession()));
@@ -101,7 +104,6 @@ public class DbFailTest extends JqmBaseTest
 
     // Many jobs starting & running during failure
     @Test
-    @Ignore
     public void testDbFailureUnderLoad() throws Exception
     {
         // Many starting jobs simultaneously

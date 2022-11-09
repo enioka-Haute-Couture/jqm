@@ -329,6 +329,10 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
             jqmlogger.error("a database related operation has failed and cannot be recovered", e);
             throw e;
         }
+        finally
+        {
+            Helpers.closeQuietly(cnx);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
