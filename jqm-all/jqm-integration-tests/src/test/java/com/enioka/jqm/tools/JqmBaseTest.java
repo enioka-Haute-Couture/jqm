@@ -64,17 +64,8 @@ public class JqmBaseTest
             JndiContext.createJndiContext();
 
             // If needed, create an HSQLDB server.
-            InputStream fis = null;
-            Properties p = new Properties();
-            fis = Helpers.class.getClassLoader().getResourceAsStream("jqm.properties");
-            if (fis != null)
-            {
-                p.load(fis);
-                IOUtils.closeQuietly(fis);
-                fis.close();
-            }
-            if (p.isEmpty() || !p.containsKey("com.enioka.jqm.jdbc.datasource") || (p.containsKey("com.enioka.jqm.jdbc.datasource")
-                    && p.getProperty("com.enioka.jqm.jdbc.datasource").contains("hsql")))
+            String dbName = System.getenv("DB");
+            if (dbName == null || "hsqldb".equals(dbName))
             {
                 s = new Server();
                 s.setDatabaseName(0, "testdbengine");

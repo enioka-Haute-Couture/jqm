@@ -103,13 +103,23 @@
                                 <artifactItem>
                                     <groupId>org.postgresql</groupId>
                                     <artifactId>postgresql</artifactId>
-                                    <version>42.2.25.jre6</version>
+                                    <version>${postgresql.client.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>mysql</groupId>
                                     <artifactId>mysql-connector-java</artifactId>
-                                    <version>5.1.41</version>
+                                    <version>${mysql.client.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mariadb.jdbc</groupId>
+                                    <artifactId>mariadb-java-client</artifactId>
+                                    <version>${mariadb.client.version}</version>
+                                </artifactItem>
+                                <dependency>
+                                    <groupId>com.ibm.db2</groupId>
+                                    <artifactId>jcc</artifactId>
+                                    <version>${db2.client.version}</version>
+                                </dependency>
                                 <artifactItem>
                                     <groupId>com.h2database</groupId>
                                     <artifactId>h2</artifactId>
