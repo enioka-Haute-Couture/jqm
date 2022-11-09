@@ -246,6 +246,15 @@ public class Db
                 closeQuietly(fis);
             }
         }
+
+        // Overload the datasource name from environment variable if any (tests only).
+        String dbName = System.getenv("DB");
+        if (dbName != null)
+        {
+            p.put("com.enioka.jqm.jdbc.datasource", "jdbc/" + dbName);
+        }
+
+        // Done
         return p;
     }
 

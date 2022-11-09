@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
 	<resource
-	      name="jdbc/jqm"
+	      name="jdbc/hsqldb"
           auth="Container"
           type="javax.sql.DataSource"
           factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
@@ -28,7 +28,7 @@
           singleton="true"/>
 
      <resource
-	      name="jdbc/pgsql"
+	      name="jdbc/postgresql"
           auth="Container"
           type="javax.sql.DataSource"
           factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
@@ -161,8 +161,8 @@
           logAbandoned="true"
           minEvictableIdleTimeMillis="60000"
           jmxEnabled="true"
-          username="marsu"
-          password="aaaa"
+          username="jqm"
+          password="jqm"
           driverClassName="com.ibm.db2.jcc.DB2Driver"
           url="jdbc:db2://localhost:50000/jqm"
           singleton="true"
