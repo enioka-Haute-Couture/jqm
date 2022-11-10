@@ -11,7 +11,6 @@ import java.util.Properties;
 
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
-import com.enioka.jqm.jdbc.DbHelper;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 

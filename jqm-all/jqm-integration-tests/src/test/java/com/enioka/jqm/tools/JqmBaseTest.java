@@ -15,21 +15,17 @@
  */
 package com.enioka.jqm.tools;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
-import org.apache.commons.io.IOUtils;
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
-import com.enioka.jqm.jdbc.DatabaseUnreachableException;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -43,13 +39,6 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.enioka.jqm.api.JobInstance;
-import com.enioka.jqm.api.JqmClientFactory;
-import com.enioka.jqm.api.Query;
-import com.enioka.jqm.jdbc.Db;
-import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.test.helpers.TestHelpers;
 
 public class JqmBaseTest
 {
@@ -247,18 +236,6 @@ public class JqmBaseTest
         {
             // Nothing to do. Some SGBDR will throw exception because the killing connection was killed.
         }
-    }
-
-    protected boolean waitForPollersArePolling()
-    {
-        int remainingAttempt = 10;
-        while (!this.engines.get("localhost").areAllPollersPolling() && remainingAttempt > 0)
-        {
-            this.sleep(1);
-            --remainingAttempt;
-            jqmlogger.debug("waitFormPollersArePolling countdown : " + remainingAttempt);
-        }
-        return this.engines.get("localhost").areAllPollersPolling();
     }
 
     protected void displayAllHistoryTable()

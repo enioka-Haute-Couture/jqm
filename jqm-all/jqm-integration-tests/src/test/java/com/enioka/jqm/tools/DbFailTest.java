@@ -1,7 +1,6 @@
 package com.enioka.jqm.tools;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.Ignore;
@@ -31,7 +30,7 @@ public class DbFailTest extends JqmBaseTest
         this.sleep(5);
 
         // Once DB connection is restored all pollers restarted
-        Assert.assertTrue(this.waitForPollersArePolling());
+        Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
     }
 
     @Test
@@ -41,7 +40,7 @@ public class DbFailTest extends JqmBaseTest
         this.simulateDbFailure(2);
 
         this.sleep(2);
-        Assert.assertTrue(this.waitForPollersArePolling());
+        Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
 
         // cnx was closed in previous simulateDbFailure()
         cnx = getNewDbSession();
@@ -50,7 +49,7 @@ public class DbFailTest extends JqmBaseTest
 
         this.sleep(2);
 
-        Assert.assertTrue(this.waitForPollersArePolling());
+        Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
     }
 
     @Test
@@ -67,7 +66,7 @@ public class DbFailTest extends JqmBaseTest
 
         this.sleep(5);
 
-        Assert.assertTrue(this.waitForPollersArePolling());
+        Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
     }
 
     // Job ends OK during db failure.
@@ -127,8 +126,6 @@ public class DbFailTest extends JqmBaseTest
         this.sleep(1);
         jqmlogger.info("Stopping db");
         this.simulateDbFailure(2);
-
-        Assert.assertTrue(this.waitForPollersArePolling());
 
         TestHelpers.waitFor(1000, 120000, this.getNewDbSession());
         this.sleep(5);

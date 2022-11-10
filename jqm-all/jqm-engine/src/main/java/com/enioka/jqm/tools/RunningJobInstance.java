@@ -17,7 +17,6 @@ import com.enioka.jqm.api.JobRunnerCallback;
 import com.enioka.jqm.api.JobRunnerException;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.SimpleApiSecurity;
-import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DatabaseUnreachableException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.QueryResult;
