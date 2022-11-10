@@ -85,6 +85,11 @@
         <commons.io.version>2.5</commons.io.version> <!-- Very last Java 6 version -->
         <commons.lang.version>2.6</commons.lang.version>
         <h2.version>1.4.191</h2.version>        <!-- Very last Java 6 version - https://github.com/h2database/h2database/issues/300 -->
+        <mysql.client.version>5.1.41</mysql.client.version>
+        <mariadb.client.version>2.4.0</mariadb.client.version>
+        <postgresql.client.version>42.2.25.jre6</postgresql.client.version>
+        <db2.client.version>11.1.4.4</db2.client.version>
+        <oracle.client.version>18.3.0.0</oracle.client.version>
         <shrinkwrap.resolver.version>2.2.6</shrinkwrap.resolver.version>
 
         <sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>

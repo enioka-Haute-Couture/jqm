@@ -85,7 +85,7 @@
           jdbcInterceptors="com.enioka.jqm.providers.Interceptor"/>
 
 	<resource
-	      name="jdbc/mysql"
+          name="jdbc/mysql"
           auth="Container"
           type="javax.sql.DataSource"
           factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
@@ -107,13 +107,13 @@
           jmxEnabled="true"
           username="jqm"
           password="jqm"
-          driverClassName="com.mysql.cj.jdbc.Driver"
-          url="jdbc:mysql://localhost:3306/jqm?useSSL=false&amp;disableMariaDbDriver&amp;allowPublicKeyRetrieval=true"
+          driverClassName="com.mysql.jdbc.Driver"
+          url="jdbc:mysql://localhost:3306/jqm?useSSL=false&amp;disableMariaDbDriver"
           singleton="true"
-          connectionProperties="connectionAttributes=program_name:jqm;useLegacyDatetimeCode=false;"/>
+          connectionProperties="connectionAttributes=program_name:jqm;useLegacyDatetimeCode=false;serverTimezone=UTC;"/>
 
     <resource
-	      name="jdbc/mariadb"
+          name="jdbc/mariadb"
           auth="Container"
           type="javax.sql.DataSource"
           factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
@@ -138,7 +138,7 @@
           driverClassName="org.mariadb.jdbc.Driver"
           url="jdbc:mariadb://localhost:3306/jqm?useSSL=false"
           singleton="true"
-          connectionProperties="connectionAttributes=program_name:jqm;useLegacyDatetimeCode=false;"/>
+          connectionProperties="connectionAttributes=program_name:jqm;useLegacyDatetimeCode=false;serverTimezone=UTC;"/>
 
     <resource
 	      name="jdbc/db2"
