@@ -37,6 +37,83 @@ jobs:
             - name: Test
               run: mvn -s ./jqm-engine/src/main/resources/META-INF/settings.xml test
 
+    postgres_tests:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                postgres: [9.6, 10]
+        steps:
+            - uses: actions/checkout@v2
+            - name: Set up java
+              uses: actions/setup-java@v1
+              with:
+                  java-version: 11
+            - uses: harmon758/postgresql-action@v1
+              with:
+                  postgresql version: ${{ matrix.postgres }}
+                  postgresql db: "jqm"
+                  postgresql user: "jqm"
+                  postgresql password: "jqm"
+            - name: Build
+              run: mvn install -DskipTests
+            - name: Test
+              run: mvn test
+              env:
+                  DB: postgresql
+                  DB_VERSION: ${{ matrix.postgres }}
+
+    mysql_tests:
+        runs-on: ubuntu-latest
+        services:
+            mysql:
+                image: mysql:5.7
+                env:
+                    MYSQL_ROOT_PASSWORD: password
+                    MYSQL_DATABASE: jqm
+                    MYSQL_USER: jqm
+                    MYSQL_PASSWORD: jqm
+                ports:
+                    - 3306:3306
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+        steps:
+            - uses: actions/checkout@v2
+            - name: Set up java
+              uses: actions/setup-java@v1
+              with:
+                  java-version: 11
+            - name: Build
+              run: mvn install -DskipTests
+            - name: Test
+              run: mvn test
+              env:
+                  DB: mysql
+                  DB_VERSION: 5.7
+    db2_test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: Login to Docker Hub
+              uses: docker/login-action@v1
+              with:
+                  username: ${{ secrets.DOCKER_USERNAME }}
+                  password: ${{ secrets.DOCKER_PASSWORD }}
+            - run: docker run --privileged=true --rm --name db2 --detach -p 50000:50000 -e "LICENSE=accept" -e "DB2INST1_PASSWORD=superpassword" -e "DBNAME=jqm" -e "ARCHIVE_LOGS=false" ibmcom/db2;
+            - run: while true; do if docker logs db2 2>/dev/null | grep -q "Setup has completed"; then break; fi; done
+            - run: docker exec db2 /bin/bash -c 'useradd -G db2iadm1 jqm; echo "jqm:jqm" | chpasswd';
+            - run: docker exec --user db2inst1 db2 /bin/bash -c 'export DB2INSTANCE=db2inst1; printf "connect to jqm\n create schema jqm AUTHORIZATION jqm\n " | /opt/ibm/db2/V11.5/bin/db2 -v -';
+            - name: Set up java
+              uses: actions/setup-java@v1
+              with:
+                  java-version: 11
+            - name: Build
+              run: mvn install -DskipTests
+            - name: Test
+              run: mvn test
+              env:
+                  DB: db2
+                  DB_VERSION: 11.5
+
     publish_docker_image:
         runs-on: ubuntu-latest
         needs:
