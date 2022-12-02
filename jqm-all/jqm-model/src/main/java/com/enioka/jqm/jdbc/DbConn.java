@@ -103,30 +103,6 @@ public class DbConn implements Closeable
         return qp;
     }
 
-    /** For testing purposes only */
-    public void runCommand(String query_key, Object... params)
-    {
-        QueryPreparation qp = adapterPreparation(query_key, false, params);
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepare(qp);
-            ps.execute();
-        }
-        catch (SQLException e)
-        {
-            if (this.parent.getAdapter().testDbUnreachable(e))
-            {
-                throw new DatabaseUnreachableException(e);
-            }
-            jqmlogger.warn(e.getMessage());
-        }
-        finally
-        {
-            DbHelper.closeQuietly(ps);
-        }
-    }
-
     public QueryResult runUpdate(String query_key, Object... params)
     {
         transac_open = true;
@@ -494,7 +470,7 @@ public class DbConn implements Closeable
      * Close utility method.
      *
      * @param ps
-     *               statement to close.
+     *            statement to close.
      */
     public void closeQuietly(Closeable ps)
     {
@@ -505,7 +481,7 @@ public class DbConn implements Closeable
      * Close utility method.
      *
      * @param ps
-     *               statement to close through a result set.
+     *            statement to close through a result set.
      */
     public void closeQuietly(ResultSet ps)
     {
@@ -516,7 +492,7 @@ public class DbConn implements Closeable
      * Close utility method.
      *
      * @param ps
-     *               statement to close.
+     *            statement to close.
      */
     public void closeQuietly(Connection ps)
     {

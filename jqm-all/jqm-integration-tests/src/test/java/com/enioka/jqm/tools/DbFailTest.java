@@ -3,7 +3,6 @@ package com.enioka.jqm.tools;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.Ignore;
 
 import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
@@ -86,9 +85,7 @@ public class DbFailTest extends JqmBaseTest
     }
 
     // Job ends KO during db failure.
-    // TODO : check the test
     @Test
-    @Ignore
     public void testDbFailureWithRunningJobKo() throws Exception
     {
         JqmSimpleTest.create(cnx, "pyl.KillMe").expectOk(0).run(this);

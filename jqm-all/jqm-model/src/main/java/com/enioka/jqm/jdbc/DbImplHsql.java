@@ -3,6 +3,7 @@ package com.enioka.jqm.jdbc;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientException;
 import java.util.List;
@@ -63,7 +64,7 @@ public class DbImplHsql extends DbAdapter
     public boolean testDbUnreachable(Exception e)
     {
         if (ExceptionUtils.indexOfType(e, SQLNonTransientException.class) != -1
-            && ExceptionUtils.getMessage(e).contains("connection exception: closed"))
+                && ExceptionUtils.getMessage(e).contains("connection exception: closed"))
         {
             return true;
         }
@@ -75,8 +76,33 @@ public class DbImplHsql extends DbAdapter
     {
         try
         {
-            PreparedStatement s = cnx.prepareStatement("DISCONNECT");
-            s.execute();
+            // Get current session ID to avoid it.
+            PreparedStatement s1 = cnx.prepareStatement("CALL SESSION_ID()");
+            ResultSet rs1 = s1.executeQuery();
+            if (!rs1.next())
+            {
+                throw new NoResultException("Could not fetch current session ID");
+            }
+            long currentSessionId = rs1.getLong(1);
+            rs1.close();
+
+            PreparedStatement s2 = cnx.prepareStatement("SELECT SESSION_ID FROM INFORMATION_SCHEMA.SYSTEM_SESSIONS");
+
+            ResultSet rs2 = s2.executeQuery();
+            while (rs2.next())
+            {
+                if (currentSessionId == rs2.getLong(1))
+                {
+                    // Do not kill the session killing the others!
+                    continue;
+                }
+
+                // Note: cannot use parameters with ALTER SESSION in HSQLDB.
+                cnx.prepareStatement("ALTER SESSION " + rs2.getLong(1) + " RELEASE").executeUpdate();
+                cnx.prepareStatement("ALTER SESSION " + rs2.getLong(1) + " CLOSE").executeUpdate();
+            }
+
+            rs2.close();
         }
         catch (SQLException e)
         {
