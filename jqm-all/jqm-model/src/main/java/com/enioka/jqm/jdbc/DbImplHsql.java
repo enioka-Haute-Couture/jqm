@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientException;
+import java.sql.SQLTransactionRollbackException;
 import java.util.List;
 import java.util.Properties;
 
@@ -66,6 +67,11 @@ public class DbImplHsql extends DbAdapter
         if (ExceptionUtils.indexOfType(e, SQLNonTransientException.class) != -1
                 && ExceptionUtils.getMessage(e).contains("connection exception: closed"))
         {
+            return true;
+        }
+        if (ExceptionUtils.indexOfType(e, SQLTransactionRollbackException.class) != -1)
+        {
+            // Unexpected rollbacks happen on DBA closing the session in HSQLDB.
             return true;
         }
         return super.testDbUnreachable(e);

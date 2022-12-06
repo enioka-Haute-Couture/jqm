@@ -155,7 +155,7 @@ public class JqmBaseTest
         String dbName = System.getenv("DB");
         if (dbName != null)
         {
-            Assume.assumeFalse( "Test not implement for db2.", dbName.contains("db2"));
+            Assume.assumeFalse("Test not implemented for db2.", dbName.contains("db2"));
         }
     }
 
@@ -164,7 +164,7 @@ public class JqmBaseTest
         String dbName = System.getenv("DB");
         if (dbName != null)
         {
-            Assume.assumeFalse("Test not implement for oracle.", dbName.contains("oracle"));
+            Assume.assumeFalse("Test not implemented for oracle.", dbName.contains("oracle"));
         }
     }
 

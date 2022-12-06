@@ -69,7 +69,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <hibernate.version>4.2.21.Final</hibernate.version>
         <junit.version>4.13.2</junit.version>
-        <hsqldb.version>2.3.4</hsqldb.version> <!-- Very last Java 6 version -->
+        <hsqldb.version>2.3.6</hsqldb.version> <!-- Very last Java 6 version -->
         <jersey-version>2.6</jersey-version> <!-- Very last Java 6 version -->
         <jetty.version>8.1.22.v20160922</jetty.version> <!-- Very last Java 6 version -->
         <!-- 1.7.34/35 are Java 6 compatible but on 1.9 https://bugs.openjdk.java.net/browse/JDK-8193802 -->

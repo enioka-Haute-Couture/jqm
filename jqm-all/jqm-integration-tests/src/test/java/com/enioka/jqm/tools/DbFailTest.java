@@ -88,7 +88,7 @@ public class DbFailTest extends JqmBaseTest
     @Test
     public void testDbFailureWithRunningJobKo() throws Exception
     {
-        JqmSimpleTest.create(cnx, "pyl.KillMe").expectOk(0).run(this);
+        JqmSimpleTest.create(cnx, "pyl.KillMeWithJqmDatasource").expectOk(0).run(this);
         this.sleep(5);
 
         this.simulateDbFailure(5);
