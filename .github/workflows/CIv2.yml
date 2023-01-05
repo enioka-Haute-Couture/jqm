@@ -6,7 +6,7 @@ on:
             - 2.2-maintenance
     pull_request:
         branches:
-          - 2.2-maintenance
+            - 2.2-maintenance
 
 defaults:
     run:
@@ -18,13 +18,13 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                java: [6, 7, 8, 9, 10, 11, 12, 17]
+                java: [6, 7, 8, 11, 12, 17]
         steps:
             - uses: actions/checkout@v2
             - name: Set up java
               uses: actions/setup-java@v2
               with:
-                  distribution: 'zulu'
+                  distribution: "zulu"
                   java-version: ${{ matrix.java }}
             - name: Set up Maven
               uses: stCarolas/setup-maven@v4.2
@@ -89,6 +89,7 @@ jobs:
               env:
                   DB: mysql
                   DB_VERSION: 5.7
+
     db2_test:
         runs-on: ubuntu-latest
         steps:
@@ -114,12 +115,34 @@ jobs:
                   DB: db2
                   DB_VERSION: 11.5
 
+    oracle_test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: Login to Oracle container registry
+              uses: docker/login-action@v2
+              with:
+                  registry: container-registry.oracle.com
+                  password: ${{ secrets.DOCKER_ORACLE_REPO_PASSWORD }}
+                  username: ${{ secrets.DOCKER_ORACLE_REPO_USERNAME }}
+            - run: docker run --detach --rm -p 1521:1521 --name oracle -e "DB_SID=JQM" container-registry.oracle.com/database/enterprise:12.2.0.1-slim;
+            - run: while true; do if docker ps | grep "oracle" | grep -q "(healthy)" ; then break; fi; done
+            - run: docker exec oracle /bin/bash -c ". /home/oracle/.bashrc ; printf 'alter session set \"_ORACLE_SCRIPT\"=true; \n CREATE USER JQM IDENTIFIED BY jqm DEFAULT TABLESPACE SYSAUX QUOTA UNLIMITED ON SYSAUX ACCOUNT UNLOCK;\n GRANT CONNECT, RESOURCE TO JQM;\n ALTER SYSTEM SET OPEN_CURSORS=9999 SCOPE=BOTH;\n ' | sqlplus / as sysdba";
+            - name: Set up java
+              uses: actions/setup-java@v1
+              with:
+                  java-version: 11
+            - name: Build
+              run: mvn install -DskipTests
+            - name: Test
+              run: mvn test
+              env:
+                  DB: oracle
+                  DB_VERSION: 12.2
+
     publish_docker_image:
         runs-on: ubuntu-latest
-        needs:
-            [
-                jdk_tests,
-            ]
+        needs: [jdk_tests]
         # trigger job on merge only
         if: github.event.pull_request.merged == true
         steps:
@@ -136,12 +159,10 @@ jobs:
                   push: true
                   file: docker/linux/Dockerfile
                   tags: enioka/jqm:v2-nightly
+
     publish_snapshot:
         runs-on: ubuntu-latest
-        needs:
-            [
-                jdk_tests,
-            ]
+        needs: [jdk_tests]
         # trigger job on merge only
         if: github.event.pull_request.merged == true
         steps:
