@@ -23,6 +23,15 @@ import java.util.Map;
 import javax.naming.NamingException;
 import javax.naming.spi.NamingManager;
 
+import org.junit.After;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TestName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.api.Query;
@@ -31,16 +40,6 @@ import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.test.helpers.TestHelpers;
 import com.enioka.jqm.test.helpers.db.DbTester;
 import com.enioka.jqm.test.helpers.db.DbTesterManager;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.rules.TestName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JqmBaseTest
 {
@@ -71,15 +70,6 @@ public class JqmBaseTest
 
             // In all cases load the datasource. (the helper itself will load the property file if any).
             db = Helpers.getDb();
-        }
-    }
-
-    @AfterClass
-    public static void afterAllTests()
-    {
-        if (dbTester != null)
-        {
-            dbTester.stop();
         }
     }
 
