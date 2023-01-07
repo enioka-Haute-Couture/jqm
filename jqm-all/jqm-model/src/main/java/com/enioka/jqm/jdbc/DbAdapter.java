@@ -48,7 +48,7 @@ public abstract class DbAdapter
      * Tests if the adapter is compatible with a given database. When in doubt, answer no.
      *
      * @param product
-     *                    the product code (from Connection.getMetaData().getDatabaseProductName()) in lower case.
+     *            the product code (from Connection.getMetaData().getDatabaseProductName()) in lower case.
      * @return true if compatible, false otherwise.
      */
     public abstract boolean compatibleWith(DatabaseMetaData product) throws SQLException;
@@ -58,7 +58,7 @@ public abstract class DbAdapter
      * cached.
      *
      * @param sql
-     *                the SQL query (full text, no terminator).
+     *            the SQL query (full text, no terminator).
      * @return a ready to use query.
      */
     public abstract String adaptSql(String sql);
@@ -85,21 +85,20 @@ public abstract class DbAdapter
      * Hook run before creating a new update Statement.
      *
      * @param cnx
-     *                an open and ready to use connection to the database. Please return it without any open statement/result set.
+     *            an open and ready to use connection to the database. Please return it without any open statement/result set.
      * @param q
-     *                the query which will be run. Can be modified by this method.
+     *            the query which will be run. Can be modified by this method.
      * @return a generated ID or null;
      */
     public void beforeUpdate(Connection cnx, QueryPreparation q)
-    {
-    }
+    {}
 
     /**
      * Called after creating the first connection. The adapter should create its caches and do all initialization it requires. Most
      * importantly, the SQL query cache should be created.
      *
      * @param cnx
-     *                an open ready to use connection to the database.
+     *            an open ready to use connection to the database.
      */
     public void prepare(Properties p, Connection cnx)
     {
@@ -115,7 +114,7 @@ public abstract class DbAdapter
      * Returns a ready to run SQL text for the given key. (adaptSql does not need to be run on the returned string)
      *
      * @param key
-     *                key of the SQL order
+     *            key of the SQL order
      * @return full text to run on the database. Null if key not found.
      */
     public String getSqlText(String key)
@@ -127,9 +126,9 @@ public abstract class DbAdapter
      * Databases all have different issues when settings null parameters.
      *
      * @param position
-     *                     in the statement (sql parameters).
+     *            in the statement (sql parameters).
      * @param s
-     *                     statement being built.
+     *            statement being built.
      */
     public abstract void setNullParameter(int position, PreparedStatement s) throws SQLException;
 
@@ -137,13 +136,13 @@ public abstract class DbAdapter
      * Adds pagination elements to a query.
      *
      * @param sql
-     *                       the full SQL text
+     *            the full SQL text
      * @param start
-     *                       the first included row (start of page). First row is zero, not one.
+     *            the first included row (start of page). First row is zero, not one.
      * @param stopBefore
-     *                       the first excluded row (end of page)
+     *            the first excluded row (end of page)
      * @param prms
-     *                       the bind variables values. Can be modified.
+     *            the bind variables values. Can be modified.
      * @return the ready to use SQL query for this database.
      */
     public abstract String paginateQuery(String sql, int start, int stopBefore, List<Object> prms);
@@ -156,11 +155,11 @@ public abstract class DbAdapter
      * performance waste.
      *
      * @param cnx
-     *                     a session without active TX.
+     *            a session without active TX.
      * @param queue
-     *                     the queue being polled
+     *            the queue being polled
      * @param headSize
-     *                     upper estimate of how many slots are available - i.e. max JI which can be taken from the queue.
+     *            upper estimate of how many slots are available - i.e. max JI which can be taken from the queue.
      * @return a list of JI, or an empty list. Never null.
      */
     public List<JobInstance> poll(DbConn cnx, Queue queue, int headSize)
@@ -169,30 +168,18 @@ public abstract class DbAdapter
     }
 
     /**
-     * Test the exception to determine whether the database is offline.
-     * Errors are specific to each type of database
+     * Test the exception to determine whether the database is offline. Errors are specific to each type of database
      *
-     * @param e exception to test
+     * @param e
+     *            exception to test
      * @return true if the database is closed
      */
     public boolean testDbUnreachable(Exception e)
     {
         Throwable cause = e.getCause();
         return (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1)
-            || (ExceptionUtils.indexOfType(e, SocketException.class) != -1)
-            || (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1)
-            || (cause instanceof SQLException && e.getMessage().equals("Failed to validate a newly established connection."));
+                || (ExceptionUtils.indexOfType(e, SocketException.class) != -1)
+                || (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1)
+                || (cause instanceof SQLException && e.getMessage().equals("Failed to validate a newly established connection."));
     }
-
-    /**
-     * Trigger a connection close from the DB.
-     * Used in tests to simulate a DB failure.
-     *
-     * @param cnx
-     *                an open ready to use connection to the database.
-     */
-    public void simulateDisconnection(Connection cnx)
-    {
-    }
-
 }

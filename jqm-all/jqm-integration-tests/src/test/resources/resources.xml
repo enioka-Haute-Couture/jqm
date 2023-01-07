@@ -65,7 +65,7 @@
           validationQuery="CALL DBMS_APPLICATION_INFO.SET_MODULE('CONNECTION POOL', 'IDLE IN POOL')"
           validationInterval="1000"
           timeBetweenEvictionRunsMillis="30000"
-          maxActive="10"
+          maxActive="50"
           minIdle="1"
           maxIdle="4"
           maxWait="30000"

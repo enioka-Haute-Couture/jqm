@@ -1,18 +1,21 @@
 package com.enioka.jqm.jdbc;
 
+import java.io.EOFException;
+import java.net.SocketException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientException;
 import java.sql.SQLTransactionRollbackException;
+import java.sql.SQLTransientConnectionException;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
-import org.apache.commons.lang.exception.ExceptionUtils;
 
 public class DbImplHsql extends DbAdapter
 {
@@ -64,9 +67,21 @@ public class DbImplHsql extends DbAdapter
     @Override
     public boolean testDbUnreachable(Exception e)
     {
+        // HSQLDB actually hides the inner exception, we need to rely on text content.
         if (ExceptionUtils.indexOfType(e, SQLNonTransientException.class) != -1
                 && ExceptionUtils.getMessage(e).contains("connection exception: closed"))
         {
+            // Nice TCP channel closure
+            return true;
+        }
+        if (ExceptionUtils.indexOfType(e, SQLTransientConnectionException.class) != -1
+                && (ExceptionUtils.indexOfType(e, EOFException.class) != -1 || ExceptionUtils.indexOfType(e, SocketException.class) != -1
+                        || ExceptionUtils.getMessage(e).contains("recv failed")
+                        || ExceptionUtils.getMessage(e).contains("socket write error")
+                        || ExceptionUtils.getMessage(e).contains("java.io.EOFException")
+                        || ExceptionUtils.getMessage(e).contains("java.net.SocketException")))
+        {
+            // Brutal TCP channel closure.
             return true;
         }
         if (ExceptionUtils.indexOfType(e, SQLTransactionRollbackException.class) != -1)
@@ -74,46 +89,7 @@ public class DbImplHsql extends DbAdapter
             // Unexpected rollbacks happen on DBA closing the session in HSQLDB.
             return true;
         }
+
         return super.testDbUnreachable(e);
     }
-
-    @Override
-    public void simulateDisconnection(Connection cnx)
-    {
-        try
-        {
-            // Get current session ID to avoid it.
-            PreparedStatement s1 = cnx.prepareStatement("CALL SESSION_ID()");
-            ResultSet rs1 = s1.executeQuery();
-            if (!rs1.next())
-            {
-                throw new NoResultException("Could not fetch current session ID");
-            }
-            long currentSessionId = rs1.getLong(1);
-            rs1.close();
-
-            PreparedStatement s2 = cnx.prepareStatement("SELECT SESSION_ID FROM INFORMATION_SCHEMA.SYSTEM_SESSIONS");
-
-            ResultSet rs2 = s2.executeQuery();
-            while (rs2.next())
-            {
-                if (currentSessionId == rs2.getLong(1))
-                {
-                    // Do not kill the session killing the others!
-                    continue;
-                }
-
-                // Note: cannot use parameters with ALTER SESSION in HSQLDB.
-                cnx.prepareStatement("ALTER SESSION " + rs2.getLong(1) + " RELEASE").executeUpdate();
-                cnx.prepareStatement("ALTER SESSION " + rs2.getLong(1) + " CLOSE").executeUpdate();
-            }
-
-            rs2.close();
-        }
-        catch (SQLException e)
-        {
-            throw new DatabaseException(e);
-        }
-    }
-
 }

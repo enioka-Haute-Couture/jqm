@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,6 +29,7 @@ import com.enioka.jqm.api.JobInstance;
 import com.enioka.jqm.api.Query;
 import com.enioka.jqm.api.Query.Sort;
 import com.enioka.jqm.test.helpers.TestHelpers;
+import com.enioka.jqm.test.helpers.db.DbTesterManager;
 
 public class FiboTest extends JqmBaseTest
 {
@@ -79,7 +79,7 @@ public class FiboTest extends JqmBaseTest
     @Test
     public void testFiboHib() throws Exception
     {
-        Assume.assumeTrue(JqmBaseTest.s != null);
+        DbTesterManager.assumeSpecificDb("hsqldb");
         JqmSimpleTest.create(cnx, "pyl.StressFiboHib", "jqm-test-pyl-hibapi").addRuntimeParameter("p1", "1").addRuntimeParameter("p2", "2")
                 .addWaitMargin(60000).expectOk(11).run(this);
     }

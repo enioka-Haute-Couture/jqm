@@ -147,7 +147,7 @@ public class DbConn implements Closeable
         }
     }
 
-    void runRawUpdate(String query_sql)
+    public void runRawUpdate(String query_sql)
     {
         transac_open = true;
         Statement s = null;
@@ -655,10 +655,5 @@ public class DbConn implements Closeable
     public List<JobInstance> poll(Queue queue, int nbSlots)
     {
         return this.parent.getAdapter().poll(this, queue, nbSlots);
-    }
-
-    public void simulateDisconnection()
-    {
-        this.parent.getAdapter().simulateDisconnection(_cnx);
     }
 }

@@ -38,21 +38,21 @@ public class DbImplMySql extends DbAdapter
             return "";
         }
         return sql.replace("MEMORY TABLE", "TABLE").replace("JQM_PK.nextval", "?").replace(" DOUBLE", " DOUBLE PRECISION")
-            .replace("UNIX_MILLIS()", "ROUND(UNIX_TIMESTAMP(NOW(4)) * 1000)").replace("IN(UNNEST(?))", "IN(?)")
-            .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(UNIX_TIMESTAMP() - 60)")
-            .replace("CURRENT_TIMESTAMP - ? SECOND", "(NOW() - INTERVAL ? SECOND)").replace("FROM (VALUES(0))", "FROM DUAL")
-            .replace("DNS||':'||PORT", "CONCAT(DNS, ':', PORT)").replace(" TIMESTAMP ", " TIMESTAMP(3) ")
-            .replace("CURRENT_TIMESTAMP", "FFFFFFFFFFFFFFFFF@@@@").replace("FFFFFFFFFFFFFFFFF@@@@", "UTC_TIMESTAMP(3)")
-            .replace("TIMESTAMP(3) NOT NULL", "TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)").replace("__T__", this.tablePrefix);
+                .replace("UNIX_MILLIS()", "ROUND(UNIX_TIMESTAMP(NOW(4)) * 1000)").replace("IN(UNNEST(?))", "IN(?)")
+                .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(UNIX_TIMESTAMP() - 60)")
+                .replace("CURRENT_TIMESTAMP - ? SECOND", "(NOW() - INTERVAL ? SECOND)").replace("FROM (VALUES(0))", "FROM DUAL")
+                .replace("DNS||':'||PORT", "CONCAT(DNS, ':', PORT)").replace(" TIMESTAMP ", " TIMESTAMP(3) ")
+                .replace("CURRENT_TIMESTAMP", "FFFFFFFFFFFFFFFFF@@@@").replace("FFFFFFFFFFFFFFFFF@@@@", "UTC_TIMESTAMP(3)")
+                .replace("TIMESTAMP(3) NOT NULL", "TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)").replace("__T__", this.tablePrefix);
     }
 
     @Override
     public boolean compatibleWith(DatabaseMetaData product) throws SQLException
     {
         return (product.getDatabaseProductName().contains("MySQL")
-            && ((product.getDatabaseMajorVersion() == 5 && product.getDatabaseMinorVersion() >= 6)
-            || product.getDatabaseMajorVersion() > 5))
-            || (product.getDatabaseProductName().contains("MariaDB") && product.getDatabaseMajorVersion() >= 10);
+                && ((product.getDatabaseMajorVersion() == 5 && product.getDatabaseMinorVersion() >= 6)
+                        || product.getDatabaseMajorVersion() > 5))
+                || (product.getDatabaseProductName().contains("MariaDB") && product.getDatabaseMajorVersion() >= 10);
     }
 
     @Override
@@ -178,60 +178,30 @@ public class DbImplMySql extends DbAdapter
     @Override
     public boolean testDbUnreachable(Exception e)
     {
-        if (ExceptionUtils.indexOfType(e,SQLNonTransientConnectionException.class) != -1)
+        if (ExceptionUtils.indexOfType(e, SQLNonTransientConnectionException.class) != -1)
         {
             return true;
         }
         if (e.getClass().getSimpleName().equals("CommunicationsException")
-            || e.getClass().getSimpleName().equals("MySQLQueryInterruptedException"))
+                || e.getClass().getSimpleName().equals("MySQLQueryInterruptedException"))
         {
             return true;
         }
         String msg = ExceptionUtils.getMessage(e);
-        if (e instanceof SQLException
-            && (msg.contains("Failed to validate a newly established connection.")
-            || msg.contains("FATAL: terminating connection due to administrator command")
-            || msg.contains("This connection has been closed")
-            || msg.contains("Communications link failure")
-            || msg.contains("Connection is closed")))
+        if (e instanceof SQLException && (msg.contains("Failed to validate a newly established connection.")
+                || msg.contains("FATAL: terminating connection due to administrator command")
+                || msg.contains("This connection has been closed") || msg.contains("Communications link failure")
+                || msg.contains("Connection is closed")))
         {
             return true;
         }
         msg = ExceptionUtils.getMessage(e.getCause());
-        if (msg.contains("This connection has been closed.")
-            || msg.contains("Communications link failure")
-            || msg.contains("Connection is closed")
-            || msg.contains("connection closed"))
+        if (msg.contains("This connection has been closed.") || msg.contains("Communications link failure")
+                || msg.contains("Connection is closed") || msg.contains("connection closed"))
         {
             return true;
         }
 
         return super.testDbUnreachable(e);
-    }
-
-    @Override
-    public void simulateDisconnection(Connection cnx)
-    {
-        PreparedStatement s = null;
-        try
-        {
-            s = cnx.prepareStatement("SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST WHERE USER = 'jqm'");
-            ResultSet rs = s.executeQuery();
-            if (!rs.next())
-            {
-                throw new NoResultException("The query returned zero rows when one was expected.");
-            }
-            String sql = "KILL CONNECTION " + rs.getInt(1);
-            PreparedStatement ns = cnx.prepareStatement(sql);
-            ns.execute();
-        }
-        catch (SQLException e)
-        {
-            throw new DatabaseException(e);
-        }
-        finally
-        {
-            DbHelper.closeQuietly(s);
-        }
     }
 }

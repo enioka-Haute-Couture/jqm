@@ -29,9 +29,11 @@ import com.enioka.jqm.api.Query;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.test.helpers.TestHelpers;
+import com.enioka.jqm.test.helpers.db.DbTester;
+import com.enioka.jqm.test.helpers.db.DbTesterManager;
 
-import org.hsqldb.Server;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -43,7 +45,7 @@ import org.slf4j.LoggerFactory;
 public class JqmBaseTest
 {
     public static Logger jqmlogger = LoggerFactory.getLogger(JqmBaseTest.class);
-    public static Server s;
+    protected static DbTester dbTester;
     protected static Db db;
     public Map<String, JqmEngineOperations> engines = new HashMap<String, JqmEngineOperations>();
     public List<DbConn> cnxs = new ArrayList<DbConn>();
@@ -61,19 +63,23 @@ public class JqmBaseTest
             JndiContext.createJndiContext();
 
             // If needed, create an HSQLDB server.
-            String dbName = System.getenv("DB");
-            if (dbName == null || "hsqldb".equals(dbName))
+            dbTester = DbTesterManager.getTestDbAdapter();
+            if (dbTester != null)
             {
-                s = new Server();
-                s.setDatabaseName(0, "testdbengine");
-                s.setDatabasePath(0, "mem:testdbengine");
-                s.setLogWriter(null);
-                s.setSilent(true);
-                s.start();
+                dbTester.init();
             }
 
             // In all cases load the datasource. (the helper itself will load the property file if any).
             db = Helpers.getDb();
+        }
+    }
+
+    @AfterClass
+    public static void afterAllTests()
+    {
+        if (dbTester != null)
+        {
+            dbTester.stop();
         }
     }
 
@@ -150,24 +156,6 @@ public class JqmBaseTest
         return System.getProperty("os.name").toLowerCase().startsWith("win");
     }
 
-    protected void assumeNotDb2()
-    {
-        String dbName = System.getenv("DB");
-        if (dbName != null)
-        {
-            Assume.assumeFalse("Test not implemented for db2.", dbName.contains("db2"));
-        }
-    }
-
-    protected void assumeNotOracle()
-    {
-        String dbName = System.getenv("DB");
-        if (dbName != null)
-        {
-            Assume.assumeFalse("Test not implemented for oracle.", dbName.contains("oracle"));
-        }
-    }
-
     protected JqmEngineOperations addAndStartEngine()
     {
         return addAndStartEngine("localhost");
@@ -225,17 +213,13 @@ public class JqmBaseTest
 
     protected void simulateDbFailure(int waitTimeBeforeRestart)
     {
-        try
-        {
-            jqmlogger.info("Send suicide query");
-            cnx.simulateDisconnection();
-            this.sleep(waitTimeBeforeRestart);
-            Helpers.closeQuietly(cnx);
-        }
-        catch (Exception e)
-        {
-            // Nothing to do. Some SGBDR will throw exception because the killing connection was killed.
-        }
+        jqmlogger.info("Send suicide query");
+        JqmBaseTest.dbTester.simulateCrash(this.cnx);
+        jqmlogger.info("Suicide query sent");
+        this.sleep(waitTimeBeforeRestart);
+        JqmBaseTest.dbTester.simulateResumeAfterCrash(this.cnx);
+        jqmlogger.info("Restart should have happened by now");
+        Helpers.closeQuietly(cnx);
     }
 
     protected void displayAllHistoryTable()

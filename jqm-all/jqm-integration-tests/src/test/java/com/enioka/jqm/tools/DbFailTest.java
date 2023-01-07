@@ -8,14 +8,14 @@ import com.enioka.jqm.api.JobRequest;
 import com.enioka.jqm.api.JqmClientFactory;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
+import com.enioka.jqm.test.helpers.db.DbTesterManager;
 
 public class DbFailTest extends JqmBaseTest
 {
     @Before
     public void before()
     {
-        assumeNotDb2();
-        assumeNotOracle();
+        DbTesterManager.assumeCurrentTestDbHasTestAdapter();
     }
 
     @Test
@@ -38,7 +38,7 @@ public class DbFailTest extends JqmBaseTest
         this.addAndStartEngine();
         this.simulateDbFailure(2);
 
-        this.sleep(2);
+        this.sleep(5);
         Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
 
         // cnx was closed in previous simulateDbFailure()
