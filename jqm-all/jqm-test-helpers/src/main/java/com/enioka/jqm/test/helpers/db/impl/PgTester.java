@@ -17,8 +17,9 @@ public class PgTester implements DbTester
     @Override
     public void simulateCrash(DbConn cnx)
     {
-        ResultSet rs = cnx.runRawSelect(
-                "select pg_terminate_backend(pid, 20000) from pg_stat_activity where datname='jqm' AND pid <> pg_backend_pid()");
+        // pg_terminate_backend(integer, integer) only exists in psql 14+, so we need to manually wait.
+        ResultSet rs = cnx
+                .runRawSelect("select pg_terminate_backend(pid) from pg_stat_activity where datname='jqm' AND pid <> pg_backend_pid()");
         try
         {
             rs.close();
@@ -26,6 +27,14 @@ public class PgTester implements DbTester
         catch (SQLException e)
         {
             throw new DatabaseException(e);
+        }
+        try
+        {
+            Thread.sleep(1000); // time for process to die.
+        }
+        catch (InterruptedException e)
+        {
+            Thread.interrupted();
         }
     }
 
