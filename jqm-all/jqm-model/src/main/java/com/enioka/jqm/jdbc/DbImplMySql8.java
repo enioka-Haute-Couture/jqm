@@ -136,7 +136,10 @@ public class DbImplMySql8 extends DbAdapter
     @Override
     public boolean testDbUnreachable(Exception e)
     {
-        if (ExceptionUtils.indexOfType(e, SQLNonTransientConnectionException.class) != -1)
+        if (ExceptionUtils.indexOfType(e, SQLNonTransientConnectionException.class) != -1
+                || e.getClass().getSimpleName().equals("CommunicationsException")
+                || e.getClass().getSimpleName().equals("MySQLQueryInterruptedException") || (ExceptionUtils.getRootCause(e) != null
+                        && ExceptionUtils.getRootCause(e).getClass().getName().contains("CommunicationsException")))
         {
             return true;
         }

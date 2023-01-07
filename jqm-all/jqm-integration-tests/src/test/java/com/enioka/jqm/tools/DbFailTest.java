@@ -46,7 +46,7 @@ public class DbFailTest extends JqmBaseTest
 
         this.simulateDbFailure(2);
 
-        this.sleep(2);
+        this.sleep(5);
 
         Assert.assertTrue(this.engines.get("localhost").areAllPollersPolling());
     }
