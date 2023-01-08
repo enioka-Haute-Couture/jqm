@@ -34,6 +34,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import com.enioka.jqm.jdbc.DatabaseException;
+import com.enioka.jqm.jdbc.DatabaseUnreachableException;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.QueryResult;
@@ -600,8 +601,15 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
             public void run()
             {
                 jqmlogger.warn("The engine will now indefinitely try to restore connection to the database");
-                DbConn cnx = null;
-                boolean back = false;
+
+                waitAndRestart();
+            }
+
+            /***
+             * Main thread sequence. Not in run() for clearer recursion.
+             */
+            private void waitAndRestart()
+            {
                 long timeToWait = 1; // seconds.
 
                 // First thing is to wait - it is useless to immediately retry connecting as we *know* the DB is unreachable....
@@ -615,6 +623,30 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                 }
 
                 // Then, infinite loop trying to reconnect to the DB. We wait 1s more on each loop, max 1 minute.
+                waitReconnectionLoop(timeToWait);
+
+                // Restart
+                try
+                {
+                    restartProcedure();
+                }
+                catch (DatabaseUnreachableException e)
+                {
+                    // This may happen if a pool returns us a previously failed and non-tested connection
+                    // (most pools do not test connections all the time on borrow even if asked to)
+                    // In this case just retry.
+                    waitAndRestart();
+                    return;
+                }
+
+                // Done - let the thread end.
+            }
+
+            private void waitReconnectionLoop(long timeToWait)
+            {
+                DbConn cnx = null;
+                boolean back = false;
+
                 while (!back)
                 {
                     try
@@ -648,6 +680,15 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                         Helpers.closeQuietly(cnx);
                     }
                 }
+            }
+
+            private void restartProcedure()
+            {
+                // Always restart internal poller
+                intPoller.stop();
+                ee.intPoller = new InternalPoller(ee);
+                Thread t = new Thread(ee.intPoller);
+                t.start();
 
                 // Restart pollers
                 QueuePoller qp = qpToRestart.poll();
@@ -655,16 +696,10 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                 {
                     jqmlogger.warn("resetting poller on queue " + qp.getQueue().getName());
                     qp.reset();
-                    Thread t = new Thread(qp);
+                    t = new Thread(qp);
                     t.start();
                     qp = qpToRestart.poll();
                 }
-
-                // Always restart internal poller
-                intPoller.stop();
-                ee.intPoller = new InternalPoller(ee);
-                Thread t = new Thread(ee.intPoller);
-                t.start();
 
                 // Finalize loaders that could not store their result inside the database
                 RunningJobInstance l = loaderToFinalize.poll();
@@ -697,8 +732,6 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                     (new Thread(l)).start();
                     l = loaderToRestart.poll();
                 }
-
-                // Done - let the thread end.
             }
         };
         qpRestarter.start();
