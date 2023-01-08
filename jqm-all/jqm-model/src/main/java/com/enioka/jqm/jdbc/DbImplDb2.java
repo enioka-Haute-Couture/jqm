@@ -138,6 +138,6 @@ public class DbImplDb2 extends DbAdapter
         {
             return true;
         }
-        return false;
+        return super.testDbUnreachable(e);
     }
 }

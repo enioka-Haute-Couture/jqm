@@ -1,20 +1,17 @@
 package com.enioka.jqm.jdbc;
 
+import java.io.IOException;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 
@@ -30,8 +27,6 @@ import com.enioka.jqm.model.Queue;
  */
 public abstract class DbAdapter
 {
-    private static Logger jqmlogger = LoggerFactory.getLogger(DbAdapter.class);
-
     protected String[] IDS = new String[] { "ID" };
 
     /**
@@ -176,10 +171,10 @@ public abstract class DbAdapter
      */
     public boolean testDbUnreachable(Exception e)
     {
-        Throwable cause = e.getCause();
         return (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1)
-                || (ExceptionUtils.indexOfType(e, SocketException.class) != -1)
-                || (ExceptionUtils.indexOfType(e, SocketTimeoutException.class) != -1)
-                || (cause instanceof SQLException && e.getMessage().equals("Failed to validate a newly established connection."));
+                || (ExceptionUtils.indexOfType(e, SocketException.class) != -1) || (ExceptionUtils.indexOfType(e, IOException.class) != -1)
+                || (ExceptionUtils.indexOfType(e, SQLException.class) != -1
+                        && ((SQLException) ExceptionUtils.getThrowableList(e).get(ExceptionUtils.indexOfType(e, SQLException.class)))
+                                .getMessage().equals("Failed to validate a newly established connection."));
     }
 }
