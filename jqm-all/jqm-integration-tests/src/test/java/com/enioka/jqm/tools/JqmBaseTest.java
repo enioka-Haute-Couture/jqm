@@ -76,8 +76,8 @@ public class JqmBaseTest
     @Before
     public void beforeTest()
     {
-        jqmlogger.debug("**********************************************************");
-        jqmlogger.debug("Starting test " + testName.getMethodName());
+        jqmlogger.info("**********************************************************");
+        jqmlogger.info("Starting test " + testName.getMethodName());
 
         try
         {
@@ -97,7 +97,7 @@ public class JqmBaseTest
     @After
     public void afterTest()
     {
-        jqmlogger.debug("*** Cleaning after test " + testName.getMethodName());
+        jqmlogger.info("*** Cleaning after test " + testName.getMethodName());
         for (String k : engines.keySet())
         {
             JqmEngineOperations e = engines.get(k);

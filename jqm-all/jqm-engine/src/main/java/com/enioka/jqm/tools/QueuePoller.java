@@ -347,6 +347,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 // Reset the connection on each loop.
                 if (Thread.interrupted()) // always clear interrupted status before doing DB operations.
                 {
+                    jqmlogger.debug("Poller loop was interrupted during actual polling and will stop normally");
                     run = false;
                 }
                 Helpers.closeQuietly(cnx);
@@ -359,6 +360,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
             }
             catch (InterruptedException e)
             {
+                jqmlogger.debug("Poller loop was interrupted during wait and will stop normally");
                 run = false;
                 break;
             }
@@ -401,7 +403,6 @@ class QueuePoller implements Runnable, QueuePollerMBean
         {
             // else => Abnormal stop (DB failure only). Set booleans to reflect this.
             jqmlogger.error("Poller on queue " + this.queue.getName() + " has ended abnormally");
-            this.run = false;
             this.hasStopped = true;
             // Do not check for engine end - we do not want to shut down the engine on a poller failure.
         }
@@ -564,7 +565,8 @@ class QueuePoller implements Runnable, QueuePollerMBean
     public boolean isActuallyPolling()
     {
         // 1000ms is a rough estimate of the time taken to do the actual poll. If it's more, there is a huge issue elsewhere.
-        return this.lastLoop != null && (Calendar.getInstance().getTimeInMillis() - this.lastLoop.getTimeInMillis()) <= pollingInterval + 1000;
+        return this.lastLoop != null
+                && (Calendar.getInstance().getTimeInMillis() - this.lastLoop.getTimeInMillis()) <= pollingInterval + 1000;
     }
 
     @Override
