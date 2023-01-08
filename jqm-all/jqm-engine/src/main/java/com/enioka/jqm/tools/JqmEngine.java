@@ -639,6 +639,13 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                     return;
                 }
 
+                // A thread may have failed during the restart sequence. (usually also due to lingering dirty connection)
+                if (!qpToRestart.isEmpty())
+                {
+                    waitAndRestart();
+                    return;
+                }
+
                 // Done - let the thread end.
             }
 
