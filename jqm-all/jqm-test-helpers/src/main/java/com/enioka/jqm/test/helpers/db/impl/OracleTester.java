@@ -3,6 +3,7 @@ package com.enioka.jqm.test.helpers.db.impl;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,23 @@ public class OracleTester implements DbTester
         {
             while (rs.next())
             {
-                cnx.runRawUpdate("ALTER SYSTEM DISCONNECT SESSION '" + rs.getInt(1) + "," + rs.getInt(2) + "' IMMEDIATE");
+                try
+                {
+                    cnx.runRawUpdate("ALTER SYSTEM DISCONNECT SESSION '" + rs.getInt(1) + "," + rs.getInt(2) + "' IMMEDIATE");
+                }
+                catch (DatabaseException e2)
+                {
+                    if (ExceptionUtils.getRootCauseMessage(e2).contains("ORA-00031"))
+                    {
+                        // Some sessions cannot be killed at once. This message is the way Oracle tells us it will be async.
+                        // We do not really care.
+                        continue;
+                    }
+                    else
+                    {
+                        throw e2;
+                    }
+                }
             }
             rs.close();
         }

@@ -640,13 +640,14 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                 }
 
                 // A thread may have failed during the restart sequence. (usually also due to lingering dirty connection)
-                if (!qpToRestart.isEmpty())
+                if (!qpToRestart.isEmpty() || !loaderToFinalize.isEmpty() || !loaderToRestart.isEmpty())
                 {
                     waitAndRestart();
                     return;
                 }
 
-                // Done - let the thread end.
+                // Done - let the thread end and remove restarter (this thread) from engine.
+                ee.qpRestarter = null;
             }
 
             private void waitReconnectionLoop(long timeToWait)
@@ -663,7 +664,6 @@ class JqmEngine implements JqmEngineMBean, JqmEngineOperations
                             cnx = Helpers.getNewDbSession();
                             cnx.runSelect("node_select_by_id", 1);
                             back = true;
-                            ee.qpRestarter = null;
                             jqmlogger.warn("connection to database was restored");
                         }
                     }
