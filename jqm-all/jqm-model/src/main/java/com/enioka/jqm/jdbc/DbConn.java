@@ -60,6 +60,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
     }
@@ -74,6 +78,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
     }
@@ -126,6 +134,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(qp.sqlText, e);
         }
         finally
@@ -135,7 +147,7 @@ public class DbConn implements Closeable
         }
     }
 
-    void runRawUpdate(String query_sql)
+    public void runRawUpdate(String query_sql)
     {
         transac_open = true;
         Statement s = null;
@@ -153,6 +165,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(sql, e);
         }
         finally
@@ -196,6 +212,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(q.sqlText, e);
         }
         finally
@@ -225,6 +245,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(qp.sqlText, e);
         }
         finally
@@ -268,6 +292,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
         finally
@@ -335,6 +363,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
         finally
@@ -395,6 +427,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
         finally
@@ -434,7 +470,7 @@ public class DbConn implements Closeable
      * Close utility method.
      *
      * @param ps
-     *               statement to close.
+     *            statement to close.
      */
     public void closeQuietly(Closeable ps)
     {
@@ -445,7 +481,7 @@ public class DbConn implements Closeable
      * Close utility method.
      *
      * @param ps
-     *               statement to close through a result set.
+     *            statement to close through a result set.
      */
     public void closeQuietly(ResultSet ps)
     {
@@ -456,7 +492,7 @@ public class DbConn implements Closeable
      * Close utility method.
      *
      * @param ps
-     *               statement to close.
+     *            statement to close.
      */
     public void closeQuietly(Connection ps)
     {
@@ -499,6 +535,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException(e);
         }
 
@@ -541,7 +581,7 @@ public class DbConn implements Closeable
                 List<?> vv = (List<?>) value;
                 if (vv.size() == 0)
                 {
-                    throw new DatabaseException("Cannot do a query whith an empty list parameter");
+                    throw new DatabaseException("Cannot do a query with an empty list parameter");
                 }
                 if (vv.get(0) instanceof Integer)
                 {
@@ -570,6 +610,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e))
+            {
+                throw new DatabaseUnreachableException(e);
+            }
             throw new DatabaseException("Could not set parameter at position " + position, e);
         }
     }
@@ -600,6 +644,10 @@ public class DbConn implements Closeable
         }
         catch (SQLException e1)
         {
+            if (this.parent.getAdapter().testDbUnreachable(e1))
+            {
+                throw new DatabaseUnreachableException(e1);
+            }
             jqmlogger.warn("Could not fetch database version", e1);
         }
     }

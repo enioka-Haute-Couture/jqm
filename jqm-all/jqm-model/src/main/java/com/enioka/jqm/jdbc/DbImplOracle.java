@@ -1,12 +1,16 @@
 package com.enioka.jqm.jdbc;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLRecoverableException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
@@ -73,7 +77,7 @@ public class DbImplOracle extends DbAdapter
                     List<?> vv = (List<?>) o;
                     if (vv.size() == 0)
                     {
-                        throw new DatabaseException("Cannot do a query whith an empty list parameter");
+                        throw new DatabaseException("Cannot do a query with an empty list parameter");
                     }
 
                     newParams.addAll(vv);
@@ -130,5 +134,15 @@ public class DbImplOracle extends DbAdapter
     public List<JobInstance> poll(DbConn cnx, Queue queue, int headSize)
     {
         return JobInstance.select(cnx, "ji_select_poll", queue.getId(), headSize);
+    }
+
+    @Override
+    public boolean testDbUnreachable(Exception e)
+    {
+        if (ExceptionUtils.indexOfType(e, SQLRecoverableException.class) != -1 || ExceptionUtils.indexOfType(e, IOException.class) != -1)
+        {
+            return true;
+        }
+        return super.testDbUnreachable(e);
     }
 }

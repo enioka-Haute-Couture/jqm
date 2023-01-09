@@ -35,6 +35,7 @@ import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
+import com.enioka.jqm.test.helpers.db.DbTesterManager;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -107,7 +108,7 @@ public class MiscTest extends JqmBaseTest
     public void testJobWithPersistenceUnit() throws Exception
     {
         // The PU test expects an HSQLDB database which does not exist when running the tests on other databases
-        Assume.assumeTrue(JqmBaseTest.s != null);
+        DbTesterManager.assumeSpecificDb("hsqldb");
 
         CreationTools.createDatabaseProp("jdbc/test", "org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdbmarsu", "SA", "", cnx,
                 "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS", null);

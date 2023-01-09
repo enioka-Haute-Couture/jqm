@@ -48,7 +48,10 @@
     "java.test.config": [
         {
             "name": "it",
-            "workingDirectory": "${workspaceFolder}/jqm-all/jqm-integration-tests"
+            "workingDirectory": "${workspaceFolder}/jqm-all/jqm-integration-tests",
+            "env": {
+                "DB": "hsqldb"
+            }
         },
         {
             "name": "web",
@@ -68,4 +71,5 @@
     "javascript.format.placeOpenBraceOnNewLineForFunctions": true,
     "javascript.format.placeOpenBraceOnNewLineForControlBlocks": true,
     "restructuredtext.confPath": "${workspaceFolder}\\jqm-all\\jqm-doc\\src\\site\\sphinx",
+    "java.compile.nullAnalysis.mode": "disabled",
 }

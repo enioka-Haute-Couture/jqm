@@ -1,9 +1,13 @@
 package com.enioka.jqm.jdbc;
 
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLNonTransientConnectionException;
 import java.util.List;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 public class DbImplPg extends DbAdapter
 {
@@ -19,8 +23,7 @@ public class DbImplPg extends DbAdapter
                 .replace(" REAL", " DOUBLE PRECISION").replace("UNIX_MILLIS()", "extract('epoch' from current_timestamp)*1000")
                 .replace("IN(UNNEST(?))", "=ANY(?)").replace("CURRENT_TIMESTAMP - 1 MINUTE", "NOW() - INTERVAL '1 MINUTES'")
                 .replace("CURRENT_TIMESTAMP - ? SECOND", "(NOW() - (? || ' SECONDS')::interval)").replace("FROM (VALUES(0))", "")
-                .replace("__T__", this.tablePrefix)
-                .replace("CURRENT_TIMESTAMP", "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
+                .replace("__T__", this.tablePrefix).replace("CURRENT_TIMESTAMP", "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
     }
 
     @Override
@@ -43,5 +46,24 @@ public class DbImplPg extends DbAdapter
         prms.add(pageSize);
         prms.add(start);
         return sql;
+    }
+
+    @Override
+    public boolean testDbUnreachable(Exception e)
+    {
+        if (ExceptionUtils.indexOfType(e, SQLNonTransientConnectionException.class) != -1)
+        {
+            return true;
+        }
+
+        String msg = ExceptionUtils.getMessage(e);
+        if (msg.contains("Failed to validate a newly established connection.")
+                || msg.contains("FATAL: terminating connection due to administrator command")
+                || msg.contains("This connection has been closed") || msg.contains("Communications link failure")
+                || msg.contains("Connection is closed"))
+        {
+            return true;
+        }
+        return super.testDbUnreachable(e);
     }
 }

@@ -35,6 +35,11 @@ public class KillMe implements Runnable
             catch (InterruptedException e)
             {
                 e.printStackTrace();
+                if (Thread.interrupted())
+                {
+                    System.err.println("KillMe was interrupted and will quit");
+                    return;
+                }
             }
             jm.sendProgress(i);
             i++;

@@ -1,5 +1,6 @@
 package com.enioka.jqm.jdbc;
 
+import java.net.SocketException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -7,6 +8,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 public class DbImplDb2 extends DbAdapter
 {
@@ -20,6 +23,7 @@ public class DbImplDb2 extends DbAdapter
                 "UPDATE __T__JOB_INSTANCE j1 SET NODE=?, STATUS='ATTRIBUTED', DATE_ATTRIBUTION=CURRENT_TIMESTAMP WHERE j1.STATUS='SUBMITTED' AND j1.ID IN "
                         + "(SELECT j2.ID FROM __T__JOB_INSTANCE j2 WHERE j2.STATUS='SUBMITTED' AND j2.QUEUE=? "
                         + "AND (j2.HIGHLANDER=0 OR (j2.HIGHLANDER=1 AND (SELECT COUNT(1) FROM __T__JOB_INSTANCE j3 WHERE j3.STATUS IN('ATTRIBUTED', 'RUNNING') AND j3.JOBDEF=j2.JOBDEF)=0 )) ORDER BY PRIORITY DESC, INTERNAL_POSITION FETCH FIRST ? ROWS ONLY)"));
+        ;
     }
 
     @Override
@@ -68,7 +72,7 @@ public class DbImplDb2 extends DbAdapter
                     List<?> vv = (List<?>) o;
                     if (vv.size() == 0)
                     {
-                        throw new DatabaseException("Cannot do a query whith an empty list parameter");
+                        throw new DatabaseException("Cannot do a query with an empty list parameter");
                     }
 
                     newParams.addAll(vv);
@@ -123,5 +127,17 @@ public class DbImplDb2 extends DbAdapter
         prms.add(stopBefore);
 
         return sql;
+    }
+
+    @Override
+    public boolean testDbUnreachable(Exception e)
+    {
+        if (ExceptionUtils.getMessage(e).contains("08003") || ExceptionUtils.getMessage(e).contains("08001")
+                || ExceptionUtils.indexOfType(e, SocketException.class) != -1
+                        && ExceptionUtils.getMessage(e).contains("connection exception: closed"))
+        {
+            return true;
+        }
+        return super.testDbUnreachable(e);
     }
 }

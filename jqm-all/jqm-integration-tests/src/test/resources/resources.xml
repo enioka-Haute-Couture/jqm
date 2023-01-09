@@ -65,7 +65,7 @@
           validationQuery="CALL DBMS_APPLICATION_INFO.SET_MODULE('CONNECTION POOL', 'IDLE IN POOL')"
           validationInterval="1000"
           timeBetweenEvictionRunsMillis="30000"
-          maxActive="10"
+          maxActive="50"
           minIdle="1"
           maxIdle="4"
           maxWait="30000"
@@ -85,7 +85,7 @@
           jdbcInterceptors="com.enioka.jqm.providers.Interceptor"/>
 
 	<resource
-	      name="jdbc/mysql"
+          name="jdbc/mysql"
           auth="Container"
           type="javax.sql.DataSource"
           factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
@@ -113,7 +113,7 @@
           connectionProperties="connectionAttributes=program_name:jqm;useLegacyDatetimeCode=false;serverTimezone=UTC;"/>
 
     <resource
-	      name="jdbc/mariadb"
+          name="jdbc/mariadb"
           auth="Container"
           type="javax.sql.DataSource"
           factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"

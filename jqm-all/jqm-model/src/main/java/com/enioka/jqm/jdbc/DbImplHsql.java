@@ -1,11 +1,18 @@
 package com.enioka.jqm.jdbc;
 
+import java.io.EOFException;
+import java.net.SocketException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLNonTransientException;
+import java.sql.SQLTransactionRollbackException;
+import java.sql.SQLTransientConnectionException;
 import java.util.List;
 import java.util.Properties;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
@@ -55,5 +62,34 @@ public class DbImplHsql extends DbAdapter
     public List<JobInstance> poll(DbConn cnx, Queue queue, int headSize)
     {
         return JobInstance.select(cnx, "ji_select_poll", queue.getId(), headSize);
+    }
+
+    @Override
+    public boolean testDbUnreachable(Exception e)
+    {
+        // HSQLDB actually hides the inner exception, we need to rely on text content.
+        if (ExceptionUtils.indexOfType(e, SQLNonTransientException.class) != -1
+                && ExceptionUtils.getMessage(e).contains("connection exception: closed"))
+        {
+            // Nice TCP channel closure
+            return true;
+        }
+        if (ExceptionUtils.indexOfType(e, SQLTransientConnectionException.class) != -1
+                && (ExceptionUtils.indexOfType(e, EOFException.class) != -1 || ExceptionUtils.indexOfType(e, SocketException.class) != -1
+                        || ExceptionUtils.getMessage(e).contains("recv failed")
+                        || ExceptionUtils.getMessage(e).contains("socket write error")
+                        || ExceptionUtils.getMessage(e).contains("java.io.EOFException")
+                        || ExceptionUtils.getMessage(e).contains("java.net.SocketException")))
+        {
+            // Brutal TCP channel closure.
+            return true;
+        }
+        if (ExceptionUtils.indexOfType(e, SQLTransactionRollbackException.class) != -1)
+        {
+            // Unexpected rollbacks happen on DBA closing the session in HSQLDB.
+            return true;
+        }
+
+        return super.testDbUnreachable(e);
     }
 }

@@ -1,3 +1,4 @@
+.idea
 .settings
 *.class
 target/
@@ -16,6 +17,7 @@ test.txt
 release.properties
 *Thumbs.db
 **/sphinx/_build
+*.iml
 
 /jqm-all/jqm-engine/compile.sh
 /jqmProject/nbproject/private/
