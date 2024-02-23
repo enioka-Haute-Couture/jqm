@@ -50,6 +50,7 @@ jobs:
               uses: actions/setup-java@v4
               with:
                   java-version: 11
+                  distribution: "zulu"
             - uses: harmon758/postgresql-action@v1
               with:
                   postgresql version: ${{ matrix.postgres }}
@@ -83,6 +84,7 @@ jobs:
               uses: actions/setup-java@v4
               with:
                   java-version: 11
+                  distribution: "zulu"
             - name: Build
               run: mvn install -DskipTests
             - name: Test
@@ -108,6 +110,7 @@ jobs:
               uses: actions/setup-java@v4
               with:
                   java-version: 11
+                  distribution: "zulu"
             - name: Build
               run: mvn install -DskipTests
             - name: Test
@@ -133,6 +136,7 @@ jobs:
               uses: actions/setup-java@v4
               with:
                   java-version: 11
+                  distribution: "zulu"
             - name: Build
               run: mvn install -DskipTests
             - name: Test
