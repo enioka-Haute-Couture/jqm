@@ -20,14 +20,14 @@ jobs:
             matrix:
                 java: [6, 7, 8, 11, 12, 17]
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
             - name: Set up java
-              uses: actions/setup-java@v2
+              uses: actions/setup-java@v4
               with:
                   distribution: "zulu"
                   java-version: ${{ matrix.java }}
             - name: Set up Maven
-              uses: stCarolas/setup-maven@v4.2
+              uses: stCarolas/setup-maven@v5
               with:
                   maven-version: 3.2.5
             - name: Check mvn
@@ -44,11 +44,12 @@ jobs:
             matrix:
                 postgres: [9.6, 10]
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
             - name: Set up java
-              uses: actions/setup-java@v1
+              uses: actions/setup-java@v4
               with:
                   java-version: 11
+                  distribution: "zulu"
             - uses: harmon758/postgresql-action@v1
               with:
                   postgresql version: ${{ matrix.postgres }}
@@ -77,11 +78,12 @@ jobs:
                     - 3306:3306
                 options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
             - name: Set up java
-              uses: actions/setup-java@v1
+              uses: actions/setup-java@v4
               with:
                   java-version: 11
+                  distribution: "zulu"
             - name: Build
               run: mvn install -DskipTests
             - name: Test
@@ -93,9 +95,9 @@ jobs:
     db2_test:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
             - name: Login to Docker Hub
-              uses: docker/login-action@v1
+              uses: docker/login-action@v3
               with:
                   username: ${{ secrets.DOCKER_USERNAME }}
                   password: ${{ secrets.DOCKER_PASSWORD }}
@@ -104,9 +106,10 @@ jobs:
             - run: docker exec db2 /bin/bash -c 'useradd -G db2iadm1 jqm; echo "jqm:jqm" | chpasswd';
             - run: docker exec --user db2inst1 db2 /bin/bash -c 'export DB2INSTANCE=db2inst1; printf "connect to jqm\n create schema jqm AUTHORIZATION jqm\n " | /opt/ibm/db2/V11.5/bin/db2 -v -';
             - name: Set up java
-              uses: actions/setup-java@v1
+              uses: actions/setup-java@v4
               with:
                   java-version: 11
+                  distribution: "zulu"
             - name: Build
               run: mvn install -DskipTests
             - name: Test
@@ -118,9 +121,9 @@ jobs:
     oracle_test:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
             - name: Login to Oracle container registry
-              uses: docker/login-action@v2
+              uses: docker/login-action@v3
               with:
                   registry: container-registry.oracle.com
                   password: ${{ secrets.DOCKER_ORACLE_REPO_PASSWORD }}
@@ -129,9 +132,10 @@ jobs:
             - run: while true; do if docker ps | grep "oracle" | grep -q "(healthy)" ; then break; fi; done
             - run: docker exec oracle /bin/bash -c ". /home/oracle/.bashrc ; printf 'alter session set \"_ORACLE_SCRIPT\"=true; \n CREATE USER JQM IDENTIFIED BY jqm DEFAULT TABLESPACE SYSAUX QUOTA UNLIMITED ON SYSAUX ACCOUNT UNLOCK;\n GRANT CONNECT, RESOURCE TO JQM;\n ALTER SYSTEM SET OPEN_CURSORS=9999 SCOPE=BOTH;\n ' | sqlplus / as sysdba";
             - name: Set up java
-              uses: actions/setup-java@v1
+              uses: actions/setup-java@v4
               with:
                   java-version: 11
+                  distribution: "zulu"
             - name: Build
               run: mvn install -DskipTests
             - name: Test
@@ -146,15 +150,15 @@ jobs:
         # trigger job on merge only
         if: github.event.pull_request.merged == true
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
             - name: Login to Docker Hub
-              uses: docker/login-action@v1
+              uses: docker/login-action@v3
               with:
                   username: ${{ secrets.DOCKER_USERNAME }}
                   password: ${{ secrets.DOCKER_PASSWORD }}
             # Push only for linux
             - name: Build and push docker image
-              uses: docker/build-push-action@v2
+              uses: docker/build-push-action@v5
               with:
                   push: true
                   file: docker/linux/Dockerfile
@@ -166,9 +170,9 @@ jobs:
         # trigger job on merge only
         if: github.event.pull_request.merged == true
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
             - name: Set up Maven Central Repository
-              uses: actions/setup-java@v2
+              uses: actions/setup-java@v4
               with:
                   java-version: 11
                   distribution: "zulu"
