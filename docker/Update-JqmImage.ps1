@@ -20,7 +20,7 @@ param(
 )
 $ErrorActionPreference = "Stop"
 
-mkdir -Force (Join-Path $PSScriptRoot "target") >$null
+New-Item -Force -Path (Join-Path $PSScriptRoot "target") -ItemType Directory >$null
 $LogFile = Join-Path $PSScriptRoot "target/docker.log"
 
 $TargetFile = Join-Path $PSScriptRoot "targets.xml"

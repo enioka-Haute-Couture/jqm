@@ -54,7 +54,7 @@ COPY ./docker/config/selfConfig*.xml C:/jqm/
 ###############################################################################
 ## Actual image, based on minimal JRE.
 ###############################################################################
-FROM buildhelpers:jre-${JAVA_VERSION}-${WINDOWS_TAG}
+FROM buildhelpers:jdk-${JAVA_VERSION}-${WINDOWS_TAG}
 
 # We gave up using ContainerUser - in that case, volume mounts ACLs are respected on the host... which require some icacls on the host. Sigh. Docker is still mostly for root.
 USER ContainerAdministrator

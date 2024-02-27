@@ -24,7 +24,7 @@ RUN  mkdir /TEMP >$null; \
 RUN	Write-Host "Expanding ..."; \
     Expand-Archive /TEMP/ojdkbuild.zip -DestinationPath C:/TEMP/OJDK/; \
     Write-Host "Renaming ..."; \
-    Move-Item "C:/TEMP/OJDK/jav*" $env:JAVA_HOME; \
+    Move-Item "C:/TEMP/OJDK/jdk*" $env:JAVA_HOME; \
     Write-Host "Verifying install ..."; \
     ${env:Path}=\"${env:Path};C:/ojdk/bin\"; \
     Write-Host "  java -version"; java -version; \
