@@ -1,94 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.enioka.jqm</groupId>
-		<artifactId>jqm-all</artifactId>
-		<version>2.2.10-SNAPSHOT</version>
-	</parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.enioka.jqm</groupId>
+        <artifactId>jqm-all</artifactId>
+        <version>2.2.10-SNAPSHOT</version>
+    </parent>
 
-	<artifactId>jqm-tests</artifactId>
-	<packaging>pom</packaging>
+    <artifactId>jqm-tests</artifactId>
+    <packaging>pom</packaging>
 
-	<name>${project.groupId}:${project.artifactId}</name>
-	<url>http://jqm.readthedocs.org</url>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <url>http://jqm.readthedocs.org</url>
 
-	<modules>
-		<module>jqm-test-cl-isolation</module>
-		<module>jqm-test-datetimemaven</module>
-		<module>jqm-test-datetimemavenjarinlib</module>
-		<module>jqm-test-datetimemavennolibdef</module>
-		<module>jqm-test-datetimemavennopom</module>
-		<module>jqm-test-datetimemavennopomlib</module>
-		<module>jqm-test-em</module>
-		<module>jqm-test-jndijms-amq</module>
-		<module>jqm-test-providedapi</module>
-		<module>jqm-test-pyl</module>
-		<module>jqm-test-pyl-hibapi</module>
-		<module>jqm-test-pyl-nodep</module>
-		<module>jqm-test-spring-1</module>
-    <module>jqm-test-spring-2</module>
-  </modules>
+    <modules>
+        <module>jqm-test-cl-isolation</module>
+        <module>jqm-test-datetimemaven</module>
+        <module>jqm-test-datetimemavenjarinlib</module>
+        <module>jqm-test-datetimemavennolibdef</module>
+        <module>jqm-test-datetimemavennopom</module>
+        <module>jqm-test-datetimemavennopomlib</module>
+        <module>jqm-test-em</module>
+        <module>jqm-test-jndijms-amq</module>
+        <module>jqm-test-jpms</module>
+        <module>jqm-test-providedapi</module>
+        <module>jqm-test-pyl</module>
+        <module>jqm-test-pyl-hibapi</module>
+        <module>jqm-test-pyl-nodep</module>
+        <module>jqm-test-spring-1</module>
+        <module>jqm-test-spring-2</module>
+    </modules>
 
-	<properties>
-		<sonar.skip>true</sonar.skip>
-	</properties>
+    <properties>
+        <sonar.skip>true</sonar.skip>
+    </properties>
 
-	<profiles>
-		<!-- Tests should produce a "test.jar" file - not a traditionally-named 
-			jar - to ease their use inside the engine auto tests. The dependency plugin 
-			creates that test.jar (by copying the artifact). (We do not actually rename 
-			the artifacts, as this would be contrary to Maven Central rules.) Renaming 
+    <profiles>
+        <!-- Tests should produce a "test.jar" file - not a traditionally-named
+			jar - to ease their use inside the engine auto tests. The dependency plugin
+			creates that test.jar (by copying the artifact). (We do not actually rename
+			the artifacts, as this would be contrary to Maven Central rules.) Renaming
 			is inside a profile to avoid running it on the parent (pom-packaged) project -->
-		<profile>
-			<activation>
-				<file>
-					<missing>../jqm-tests</missing>
-				</file>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.8</version>
-						<configuration>
-							<skip>false</skip>
-						</configuration>
-						<executions>
-							<execution>
-								<id>copy</id>
-								<phase>package</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>${project.groupId}</groupId>
-											<artifactId>${project.artifactId}</artifactId>
-											<version>${project.version}</version>
-											<type>pom</type>
-											<overWrite>true</overWrite>
-											<destFileName>pom.xml</destFileName>
-										</artifactItem>
-										<artifactItem>
-											<groupId>${project.groupId}</groupId>
-											<artifactId>${project.artifactId}</artifactId>
-											<version>${project.version}</version>
-											<type>jar</type>
-											<overWrite>true</overWrite>
-											<destFileName>test.jar</destFileName>
-										</artifactItem>
-									</artifactItems>
-									<outputDirectory>${project.build.directory}</outputDirectory>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+        <profile>
+            <activation>
+                <file>
+                    <missing>../jqm-tests</missing>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.8</version>
+                        <configuration>
+                            <skip>false</skip>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>copy</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>${project.artifactId}</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>pom</type>
+                                            <overWrite>true</overWrite>
+                                            <destFileName>pom.xml</destFileName>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>${project.artifactId}</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>jar</type>
+                                            <overWrite>true</overWrite>
+                                            <destFileName>test.jar</destFileName>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

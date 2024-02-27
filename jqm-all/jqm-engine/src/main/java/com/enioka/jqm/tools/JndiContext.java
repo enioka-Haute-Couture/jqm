@@ -20,20 +20,25 @@ package com.enioka.jqm.tools;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.lang.module.Configuration;
+import java.lang.module.ModuleDescriptor;
+import java.lang.module.ModuleFinder;
+import java.lang.module.ModuleReference;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.rmi.Remote;
 import java.rmi.registry.Registry;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -54,7 +59,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class implements a basic JNDI context
- * 
+ *
  */
 class JndiContext extends InitialContext implements InitialContextFactoryBuilder, InitialContextFactory, NameParser
 {
@@ -64,13 +69,14 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
     private List<ObjectName> jmxNames = new ArrayList<ObjectName>();
     private Registry r = null;
     private ClassLoader extResources;
+    private ModuleLayer extLayer;
 
     /**
      * Will create a JNDI Context and register it as the initial context factory builder
-     * 
+     *
      * @return the context
      * @throws NamingException
-     *                             on any issue during initial context factory builder registration
+     *             on any issue during initial context factory builder registration
      */
     static JndiContext createJndiContext() throws NamingException
     {
@@ -98,7 +104,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
 
     /**
      * Create a new Context
-     * 
+     *
      * @throws NamingException
      */
     private JndiContext() throws NamingException
@@ -128,18 +134,26 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
 
             // Create classloader
             final URL[] aUrls = urls.toArray(new URL[0]);
+            final Path[] aPaths = new Path[aUrls.length];
             for (URL u : aUrls)
             {
+                aPaths[urls.indexOf(u)] = Path.of(u.getPath());
                 jqmlogger.trace(u.toString());
             }
-            extResources = AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>()
-            {
-                @Override
-                public URLClassLoader run()
-                {
-                    return new URLClassLoader(aUrls, getParentCl());
-                }
-            });
+            // TODO: test if java >=9
+            /*
+             * extResources = AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>() {
+             *
+             * @Override public URLClassLoader run() { return new URLClassLoader(aUrls, getParentCl()); } });
+             */
+
+            ModuleFinder moduleFinder = ModuleFinder.of(aPaths);
+            Set<String> moduleNames = moduleFinder.findAll().stream().map(ModuleReference::descriptor).map(ModuleDescriptor::name)
+                    .collect(Collectors.toUnmodifiableSet());
+            Configuration cf = ModuleLayer.boot().configuration().resolveAndBind(ModuleFinder.of(), moduleFinder, moduleNames);
+            extLayer = ModuleLayer.boot().defineModulesWithOneLoader(cf, getParentCl());
+            extResources = extLayer.modules().isEmpty() ? new URLClassLoader(new URL[0])
+                    : extLayer.modules().iterator().next().getClassLoader();
         }
         else
         {
@@ -356,7 +370,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
 
     /**
      * Will register the given Registry as a provider for the RMI: context. If there is already a registered Registry, the call is ignored.
-     * 
+     *
      * @param r
      */
     void registerRmiContext(Registry r)
@@ -373,6 +387,11 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
     ClassLoader getExtCl()
     {
         return this.extResources;
+    }
+
+    public ModuleLayer getModuleLayer()
+    {
+        return this.extLayer;
     }
 
     @Override

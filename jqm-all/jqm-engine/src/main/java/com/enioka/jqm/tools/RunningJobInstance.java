@@ -426,6 +426,20 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
     }
 
     @Override
+    public ModuleLayer getExtensionModuleLayer()
+    {
+        try
+        {
+            return ((JndiContext) NamingManager.getInitialContext(null)).getModuleLayer();
+        }
+        catch (NamingException e)
+        {
+            jqmlogger.warn("could not find ext directory class loader. It will not be used", e);
+            return null;
+        }
+    }
+
+    @Override
     public ClassLoader getEngineClassloader()
     {
         return this.getClass().getClassLoader();

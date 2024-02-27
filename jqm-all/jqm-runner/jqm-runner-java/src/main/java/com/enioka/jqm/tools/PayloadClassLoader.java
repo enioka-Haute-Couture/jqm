@@ -79,18 +79,19 @@ class PayloadClassLoader extends URLClassLoader
 
     /**
      * Everything here can run without the database.
-     * 
+     *
      * @param job
-     *                       the JI to run.
+     *            the JI to run.
      * @param parameters
-     *                       already resolved runtime parameters
+     *            already resolved runtime parameters
      * @param clm
-     *                       the CLM having created this CL.
+     *            the CLM having created this CL.
      * @param h
-     *                       given as parameter because its constructor needs the database.
+     *            given as parameter because its constructor needs the database.
      * @throws JqmEngineException
      */
-    void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, EngineApiProxy h) throws JobRunnerException
+    void launchJar(JobInstance job, Map<String, String> parameters, ClassloaderManager clm, EngineApiProxy h, ModuleLayer parentModuleLayer)
+            throws JobRunnerException
     {
         // 1 - Create the proxy.
         Object proxy = null;
@@ -116,8 +117,18 @@ class PayloadClassLoader extends URLClassLoader
         Class c = null;
         try
         {
-            // using payload CL, i.e. this very object
-            c = loadClass(classQualifiedName);
+            String[] classModuleSegments = classQualifiedName.split("/");
+            if (classModuleSegments.length > 1)
+            {
+                ModuleManager mm = new ModuleManager();
+                ModuleLayer ml = mm.createModuleLayerIfNeeded(this, parentModuleLayer, job);
+                c = ml.findLoader(classModuleSegments[0]).loadClass(classModuleSegments[1]);
+            }
+            else
+            {
+                // using payload CL, i.e. this very object
+                c = loadClass(classQualifiedName);
+            }
         }
         catch (Exception e)
         {

@@ -104,7 +104,7 @@
                                     <artifactId>jqm-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <dependency>
+                                <!--<dependency>
                                     <groupId>com.sun.mail</groupId>
                                     <artifactId>javax.mail</artifactId>
                                     <version>${mail.version}</version>
@@ -113,7 +113,7 @@
                                     <groupId>com.sun.mail</groupId>
                                     <artifactId>smtp</artifactId>
                                     <version>${mail.version}</version>
-                                </dependency>
+                                </dependency>-->
 
                             </artifactItems>
                             <outputDirectory>${project.basedir}/ext</outputDirectory>
