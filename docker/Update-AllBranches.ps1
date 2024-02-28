@@ -32,8 +32,8 @@ foreach ($BranchTag in $Branches.Keys) {
     $BranchName = $Branches[$BranchTag]
 
     # Work in temp directory
-    $root = "/TEMP/BUILDJQM/${BranchName}/"
-    mkdir -Force $root -WhatIf:$false >$null
+    $root = $IsWindows ? "/TEMP/BUILDJQM/${BranchName}/" : "/tmp/BUILDJQM/${BranchName}/"
+    New-Item -Force -Path $root -ItemType Directory -WhatIf:$false >$null
 
     # Checkout branch in that directory
     cd $PSScriptRoot
