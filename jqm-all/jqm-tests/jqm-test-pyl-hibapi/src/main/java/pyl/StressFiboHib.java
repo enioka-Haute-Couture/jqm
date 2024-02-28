@@ -1,7 +1,10 @@
 package pyl;
 
+import java.util.Properties;
+
 import com.enioka.jqm.api.JobManager;
 import com.enioka.jqm.api.JobRequest;
+import com.enioka.jqm.api.JqmClientFactory;
 
 public class StressFiboHib implements Runnable
 {
@@ -11,6 +14,14 @@ public class StressFiboHib implements Runnable
     public void run()
     {
         System.out.println("PARAMETRE FIBO 2: " + jm.parameters().get("p2"));
+
+        // We use non-standard datasource names during tests
+        Properties p = new Properties();
+        String dbName = System.getenv("DB");
+        dbName = (dbName == null ? "hsqldb" : dbName);
+        p.put("javax.persistence.nonJtaDataSource", "jdbc/" + dbName);
+        JqmClientFactory.setProperties(p);
+        // End of datasource name change
 
         if (Integer.parseInt(jm.parameters().get("p1")) <= 100)
         {

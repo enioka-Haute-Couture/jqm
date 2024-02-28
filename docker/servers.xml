@@ -27,10 +27,10 @@
     </server>
     <server>
         <tag>windows-ltsc2022</tag>
-        <url>JEUX:2375</url>
+        <url>Win10DEV:2375</url>
     </server>
     <server>
         <tag>linux-alpine</tag>
-        <url>dockerubnt:2376</url>
+        <url>192.168.1.79:2376</url>
     </server>
 </servers>

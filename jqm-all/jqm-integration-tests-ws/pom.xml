@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.enioka.jqm</groupId>
@@ -23,7 +24,7 @@
         <profile>
             <id>noTests</id>
             <activation>
-                <jdk>[1.9,20)</jdk>
+                <jdk>[1.9,50)</jdk>
             </activation>
             <build>
                 <plugins>
@@ -103,13 +104,23 @@
                                 <artifactItem>
                                     <groupId>org.postgresql</groupId>
                                     <artifactId>postgresql</artifactId>
-                                    <version>42.2.25.jre6</version>
+                                    <version>${postgresql.client.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>mysql</groupId>
                                     <artifactId>mysql-connector-java</artifactId>
-                                    <version>5.1.41</version>
+                                    <version>${mysql.client.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mariadb.jdbc</groupId>
+                                    <artifactId>mariadb-java-client</artifactId>
+                                    <version>${mariadb.client.version}</version>
+                                </artifactItem>
+                                <dependency>
+                                    <groupId>com.ibm.db2</groupId>
+                                    <artifactId>jcc</artifactId>
+                                    <version>${db2.client.version}</version>
+                                </dependency>
                                 <artifactItem>
                                     <groupId>com.h2database</groupId>
                                     <artifactId>h2</artifactId>

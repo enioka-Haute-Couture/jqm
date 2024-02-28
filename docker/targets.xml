@@ -12,7 +12,6 @@
             </arg>
         </buildArgs>
         <subTargets>
-            <target service="jre" />
             <target service="jdk" />
             <target service="mvn" pull="false" />
         </subTargets>
@@ -28,7 +27,6 @@
             </arg>
         </buildArgs>
         <subTargets>
-            <target service="jre" />
             <target service="jdk" />
             <target service="mvn" pull="false" />
         </subTargets>
@@ -49,7 +47,6 @@
             </arg>
         </buildArgs>
         <subTargets>
-            <target service="jre" />
             <target service="jdk" />
             <target service="mvn" pull="false" />
         </subTargets>
@@ -65,7 +62,6 @@
             </arg>
         </buildArgs>
         <subTargets>
-            <target service="jre" />
             <target service="jdk" />
             <target service="mvn" pull="false" />
         </subTargets>
