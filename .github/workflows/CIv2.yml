@@ -4,10 +4,10 @@ on:
     push:
         branches:
             - 2.2-maintenance
-            - mag/j21
     pull_request:
         branches:
             - 2.2-maintenance
+    workflow_dispatch:
 
 defaults:
     run:
