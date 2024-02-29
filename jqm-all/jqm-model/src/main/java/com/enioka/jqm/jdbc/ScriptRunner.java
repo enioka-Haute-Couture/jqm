@@ -34,6 +34,7 @@ public class ScriptRunner
         InputStreamReader isr = null;
         String line;
         StringBuilder sb = new StringBuilder();
+        jqmlogger.debug("Running SQL script {}", classpath);
         try
         {
             isr = new InputStreamReader(is, "UTF-8");
@@ -48,7 +49,8 @@ public class ScriptRunner
                 if (line.contains(";"))
                 {
                     // End of order - run it.
-                    cnx.runRawUpdate(sb.substring(0, sb.length() - 1 - nl.length()));
+                    jqmlogger.trace("Running update SQL {}", sb.toString());
+                    cnx.runRawUpdate(sb.substring(0, sb.length() - 1 - nl.length()), classpath.contains("_raw.sql"));
                     sb = new StringBuilder();
                 }
 

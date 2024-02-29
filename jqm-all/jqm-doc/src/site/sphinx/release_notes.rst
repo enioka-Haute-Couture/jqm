@@ -1,6 +1,46 @@
 Release notes
 ######################
 
+2.3.0
+*************
+
+Maintenance release adding compatibility with the latest Java versions, including changing the Java version of the Docker images.
+
+Upgrade notes
++++++++++++++++++++
+
+No API breaking changes.
+
+There is one (big) database modification in this release: date types where changed in MySQL. Migration is applied
+when running `jqm(.sh|.ps1) createnode`.
+
+Note that while the changes are only about MySQL, the upgrade process must be applied to all database types as database schema version was updated.
+
+Upgrade procedure for standard installation is therefore:
+
+* Stop all nodes to avoid locks on DB tables (which could prevent schema upgrades)
+* Replace all binaries with new version (keep your resources.xml configuration file!)
+* Run `jqm(.sh|.ps1) createnode` (only once for the whole cluster) - this will not recreate existing nodes, simply upgrade the schema
+* Restart all nodes
+
+For those using the Docker images in a cluster, refer yourself to the Docker-specific documentation - it is likely automatic if you are using the UPDATER mode of the image.
+
+It is also of course possible to drop and recreate the database schema then reimport your job defintions if you do not care about your history.
+
+Major changes
+++++++++++++++++++++++++++++
+
+* Engine: on PosgreSQL and MySQL, the engine now correctly stores UTC times instead of local times. This should fix some issues with time zones and DST. (#488)
+* Build: added support for Java 21.
+
+Minor changes
+++++++++++++++++++++++++++++
+
+* Build: updated supported Windows images.
+* Build: updated GitHub actions to latest versions.
+* Build: all supported database tests are now covered in the automated test suite (#501, #503)
+
+
 2.2.9
 *************
 

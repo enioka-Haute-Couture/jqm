@@ -1,21 +1,15 @@
-FROM maven:3-jdk-8 as installer
+FROM maven:3-eclipse-temurin-21 as installer
 
 ARG MVN_SETTINGS=" "
 ARG SKIP_TESTS=true
 
 WORKDIR /jqm-all
 
-# Hack to keep libraries in a layer to speed up subsequent builds (as long as pom.xml files do not change)
-#COPY ./jqm-all/**/pom.xml ./marsu/
-#RUN find .
-#RUN mvn dependency:go-offline
+RUN apt update && apt install unzip
 
-# Resume normal operations
 COPY ./docker/windows/nexus/settings.xml ./jqm-all ./
 
-RUN apt install unzip
-
-RUN mvn install -DskipTests=${SKIP_TESTS} ${MVN_SETTINGS}
+RUN --mount=type=cache,target=/root/.m2/repository mvn install -DskipTests=${SKIP_TESTS} ${MVN_SETTINGS}
 RUN mkdir /jqm
 RUN unzip ./jqm-service/target/jqm*.zip -d /tmp/
 RUN mv /tmp/jqm*/ /tmp/jqm/
@@ -25,7 +19,7 @@ COPY ./docker/config/selfConfig*.xml /tmp/jqm/
 
 
 
-FROM openjdk:8-jre-alpine
+FROM azul/zulu-openjdk-alpine:21
 
 COPY --from=installer /tmp/jqm/ /jqm/
 RUN apk add curl
@@ -52,7 +46,7 @@ VOLUME /jqm/hotdeploy/ \
 WORKDIR /jqm
 
 # Import initial config
-RUN java -jar jqm.jar -u ; java -jar jqm.jar -c selfConfig.single.xml ; java -jar jqm.jar -importjobdef ./jobs/jqm-demo ; rm -f .\logs\*
+RUN java -jar jqm.jar -u ; java -jar jqm.jar -c selfConfig.single.xml ; java -jar jqm.jar -importjobdef ./jobs/jqm-demo ; rm -f .\logs\* ; chmod 700 /jqm/bin/*.sh ;
 
 # Run node on startup
 ENTRYPOINT /jqm/bin/node.sh

@@ -29,12 +29,12 @@ public class Db
     /**
      * The version of the schema as it described in the current Maven artifact
      */
-    private static final int SCHEMA_VERSION = 2;
+    private static final int SCHEMA_VERSION = 3;
 
     /**
      * The SCHEMA_VERSION version is backward compatible until this version
      */
-    private static final int SCHEMA_COMPATIBLE_VERSION = 2;
+    private static final int SCHEMA_COMPATIBLE_VERSION = 3;
 
     /**
      * The list of different database adapters. We are using reflection for loading them for future extensibility.
@@ -382,7 +382,7 @@ public class Db
             int loop_from = db_schema_version;
             int to = db_schema_version;
             List<String> toApply = new ArrayList<String>();
-            toApply.addAll(adapter.preSchemaCreationScripts());
+            toApply.addAll(adapter.preSchemaCreationScripts(cnx));
 
             while (to != SCHEMA_VERSION)
             {

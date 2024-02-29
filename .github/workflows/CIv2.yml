@@ -7,6 +7,7 @@ on:
     pull_request:
         branches:
             - 2.2-maintenance
+    workflow_dispatch:
 
 defaults:
     run:
@@ -18,7 +19,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                java: [6, 7, 8, 11, 12, 17]
+                java: [6, 7, 8, 11, 17, 21]
         steps:
             - uses: actions/checkout@v4
             - name: Set up java
@@ -48,7 +49,7 @@ jobs:
             - name: Set up java
               uses: actions/setup-java@v4
               with:
-                  java-version: 11
+                  java-version: 21
                   distribution: "zulu"
             - uses: harmon758/postgresql-action@v1
               with:
@@ -82,7 +83,7 @@ jobs:
             - name: Set up java
               uses: actions/setup-java@v4
               with:
-                  java-version: 11
+                  java-version: 21
                   distribution: "zulu"
             - name: Build
               run: mvn install -DskipTests
@@ -108,7 +109,7 @@ jobs:
             - name: Set up java
               uses: actions/setup-java@v4
               with:
-                  java-version: 11
+                  java-version: 21
                   distribution: "zulu"
             - name: Build
               run: mvn install -DskipTests
@@ -134,7 +135,7 @@ jobs:
             - name: Set up java
               uses: actions/setup-java@v4
               with:
-                  java-version: 11
+                  java-version: 21
                   distribution: "zulu"
             - name: Build
               run: mvn install -DskipTests
@@ -174,7 +175,7 @@ jobs:
             - name: Set up Maven Central Repository
               uses: actions/setup-java@v4
               with:
-                  java-version: 11
+                  java-version: 21
                   distribution: "zulu"
                   server-id: sonatype-nexus-snapshots
                   server-username: OSSRH_USERNAME

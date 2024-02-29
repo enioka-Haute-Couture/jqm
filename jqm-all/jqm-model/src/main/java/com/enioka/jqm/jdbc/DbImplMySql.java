@@ -40,10 +40,10 @@ public class DbImplMySql extends DbAdapter
         return sql.replace("MEMORY TABLE", "TABLE").replace("JQM_PK.nextval", "?").replace(" DOUBLE", " DOUBLE PRECISION")
                 .replace("UNIX_MILLIS()", "ROUND(UNIX_TIMESTAMP(NOW(4)) * 1000)").replace("IN(UNNEST(?))", "IN(?)")
                 .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(UNIX_TIMESTAMP() - 60)")
-                .replace("CURRENT_TIMESTAMP - ? SECOND", "(NOW() - INTERVAL ? SECOND)").replace("FROM (VALUES(0))", "FROM DUAL")
-                .replace("DNS||':'||PORT", "CONCAT(DNS, ':', PORT)").replace(" TIMESTAMP ", " TIMESTAMP(3) ")
+                .replace("CURRENT_TIMESTAMP - ? SECOND", "(UTC_TIMESTAMP() - INTERVAL ? SECOND)").replace("FROM (VALUES(0))", "FROM DUAL")
+                .replace("DNS||':'||PORT", "CONCAT(DNS, ':', PORT)").replace(" TIMESTAMP ", " DATETIME(3) ")
                 .replace("CURRENT_TIMESTAMP", "FFFFFFFFFFFFFFFFF@@@@").replace("FFFFFFFFFFFFFFFFF@@@@", "UTC_TIMESTAMP(3)")
-                .replace("TIMESTAMP(3) NOT NULL", "TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)").replace("__T__", this.tablePrefix);
+                .replace("DATETIME(3) NOT NULL", "DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)").replace("__T__", this.tablePrefix);
     }
 
     @Override
@@ -56,10 +56,35 @@ public class DbImplMySql extends DbAdapter
     }
 
     @Override
-    public List<String> preSchemaCreationScripts()
+    public List<String> preSchemaCreationScripts(DbConn cnx)
     {
+        // Sequence management
         List<String> res = new ArrayList<String>();
         res.add("/sql/mysql.sql");
+
+        // Deal with a change in version 2.3.0 where we changed timestamps into datetimes for better TZ support.
+        // This cannot be handled in normal migration scripts as the meaning of scripts version 1 & 2 has changed with the changes in
+        // adaptSql().
+        ResultSet rs = cnx.runRawSelect("select UPPER(DATA_TYPE) FROM __T__INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME=? AND COLUMN_NAME=?",
+                "VERSION", "INSTALL_DATE");
+        try
+        {
+            if (rs.next() && rs.getString(1).equals("TIMESTAMP"))
+            {
+                // Should be DATETIME not TIMESTAMP
+                res.add("/sql/mysql_00002_00003_raw.sql");
+            }
+            // If no result we do not care as it means DB schema is empty, hence the rs.next() condition.
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException("Could not update MySQL existing schema", e);
+        }
+        finally
+        {
+            DbHelper.closeQuietly(rs);
+        }
+
         return res;
     }
 
