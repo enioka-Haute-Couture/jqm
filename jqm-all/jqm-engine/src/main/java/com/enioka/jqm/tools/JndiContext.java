@@ -114,6 +114,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
         // List all jars inside ext directory
         File extDir = new File("ext/");
         List<URL> urls = new ArrayList<URL>();
+        List<Path> paths = new ArrayList<Path>();
         if (extDir.isDirectory())
         {
             for (File f : FileUtils.listFiles(extDir, new String[] { "jar", "war", "bar" }, true))
@@ -125,6 +126,8 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
                 try
                 {
                     urls.add(f.toURI().toURL());
+                    paths.add(f.toPath());
+                    jqmlogger.trace("\tAdded EXT path {}", f.toURI());
                 }
                 catch (MalformedURLException e)
                 {
@@ -134,12 +137,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
 
             // Create classloader
             final URL[] aUrls = urls.toArray(new URL[0]);
-            final Path[] aPaths = new Path[aUrls.length];
-            for (URL u : aUrls)
-            {
-                aPaths[urls.indexOf(u)] = Path.of(u.getPath());
-                jqmlogger.trace(u.toString());
-            }
+
             // TODO: test if java >=9
             /*
              * extResources = AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>() {
@@ -147,7 +145,7 @@ class JndiContext extends InitialContext implements InitialContextFactoryBuilder
              * @Override public URLClassLoader run() { return new URLClassLoader(aUrls, getParentCl()); } });
              */
 
-            ModuleFinder moduleFinder = ModuleFinder.of(aPaths);
+            ModuleFinder moduleFinder = ModuleFinder.of(paths.toArray(new Path[0]));
             Set<String> moduleNames = moduleFinder.findAll().stream().map(ModuleReference::descriptor).map(ModuleDescriptor::name)
                     .collect(Collectors.toUnmodifiableSet());
             Configuration cf = ModuleLayer.boot().configuration().resolveAndBind(ModuleFinder.of(), moduleFinder, moduleNames);
