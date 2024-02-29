@@ -59,6 +59,17 @@ public abstract class DbAdapter
      */
     public abstract String adaptSql(String sql);
 
+     /**
+     * Special version of adaptSql which only replaces the table prefix. This is used for queries which are already formatted for a specific database.
+     * 
+     * @param sql
+     * @return a ready to use query.
+     */
+    public String adaptSqlPrefixOnly(String sql)
+    {
+        return sql.replace("__T__", this.tablePrefix);
+    }
+    
     /**
      * The name of the columns to retrieve for getGeneratedKeys calls. (some dbs want uppercase, other lowercase).
      *
@@ -72,7 +83,7 @@ public abstract class DbAdapter
     /**
      * A list of files to run (from the classpath) before running schema upgrades. Default is empty.
      */
-    public List<String> preSchemaCreationScripts()
+    public List<String> preSchemaCreationScripts(DbConn cnx)
     {
         return new ArrayList<String>();
     }

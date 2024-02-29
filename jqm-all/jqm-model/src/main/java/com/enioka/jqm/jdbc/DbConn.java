@@ -137,12 +137,17 @@ public class DbConn implements Closeable
 
     void runRawUpdate(String query_sql)
     {
+        runRawUpdate(query_sql, false);
+    }
+
+    void runRawUpdate(String query_sql, boolean runReallyRaw)
+    {
         transac_open = true;
         Statement s = null;
         String sql = null;
         try
         {
-            sql = parent.getAdapter().adaptSql(query_sql);
+            sql = runReallyRaw ? parent.getAdapter().adaptSqlPrefixOnly(query_sql) : parent.getAdapter().adaptSql(query_sql);
             if (sql.trim().isEmpty())
             {
                 return;
