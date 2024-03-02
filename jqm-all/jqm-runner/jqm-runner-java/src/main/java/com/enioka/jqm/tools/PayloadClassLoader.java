@@ -250,7 +250,7 @@ class PayloadClassLoader extends URLClassLoader
                         + allowedRunners);
     }
 
-    private Class<?> loadFromParentCL(String name) throws ClassNotFoundException
+    private Class<?> findFromParentCL(String name) throws ClassNotFoundException
     {
         for (Pattern pattern : hiddenJavaClassesPatterns)
         {
@@ -262,11 +262,29 @@ class PayloadClassLoader extends URLClassLoader
                 return super.findClass(name);
             }
         }
-        return loadClass(name, false);
+        return super.findClass(name);
     }
 
     @Override
-    public Class<?> loadClass(String name) throws ClassNotFoundException
+    protected Class<?> findClass(String moduleName, String name)
+    {
+        // We must overlopad this - otherwise default ClassLoader impelmentation is used and null is always returned when moduleName is
+        // non-null.
+        // We can cheat here, as we know there is always a single CL in the module layer.
+        jqmlogger.info("FINDING CLASS: {}/{}", moduleName, name);
+        try
+        {
+            Class<?> res = findClass(name);
+            return res != null && res.getModule().getName().equals(moduleName) ? res : null;
+        }
+        catch (ClassNotFoundException e)
+        {
+            return null; // This is the default behavior of the default implementation.
+        }
+    }
+
+    @Override
+    public Class<?> findClass(String name) throws ClassNotFoundException
     {
         Class<?> c = null;
 
@@ -295,7 +313,7 @@ class PayloadClassLoader extends URLClassLoader
                 if (c == null)
                 {
                     // jqmlogger.trace("found in parent " + name);
-                    c = loadFromParentCL(name);
+                    c = findFromParentCL(name);
                 }
                 else
                 {
@@ -310,7 +328,7 @@ class PayloadClassLoader extends URLClassLoader
         else
         {
             // Default behavior
-            c = loadFromParentCL(name);
+            c = findFromParentCL(name);
         }
 
         return c;

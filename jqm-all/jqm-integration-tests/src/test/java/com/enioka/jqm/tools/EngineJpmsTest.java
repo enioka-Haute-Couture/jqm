@@ -73,4 +73,20 @@ public class EngineJpmsTest extends JqmBaseTest
 
         JqmSimpleTest.create(cnx, "pyl.JndiFile", "jqm-test-pyl-nodep").run(this);
     }
+
+    @Test
+    public void testJpmsModuleStartsWithServiceLoaderCall()
+    {
+        addAndStartEngine();
+
+        CreationTools.createJobDef(null, true, "com.enioka.jqm.tests.jpms/com.enioka.jqm.tests.jpms.JpmsPayloadWithService", null,
+                "jqm-tests/jqm-test-jpms/target/test.jar", TestHelpers.qVip, -1, "SimpleJpmsPayload", null, null, null, null, null, false,
+                cnx, null, false);
+        JobRequest.create("SimpleJpmsPayload", null).submit();
+
+        TestHelpers.waitFor(1, 10000, cnx);
+
+        Assert.assertEquals(1, TestHelpers.getOkCount(cnx));
+        Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
+    }
 }
