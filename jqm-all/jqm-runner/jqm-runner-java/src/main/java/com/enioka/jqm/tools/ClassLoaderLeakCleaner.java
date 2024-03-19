@@ -65,6 +65,9 @@ class ClassLoaderLeakCleaner
             clearSunSoftCache(ObjectStreamClass.class, "localDescs");
             clearSunSoftCache(ObjectStreamClass.class, "reflectors");
         }
+
+        // Runaway threads
+        cleanThreads();
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -118,6 +121,30 @@ class ClassLoaderLeakCleaner
             synchronized (cache)
             {
                 cache.clear();
+            }
+        }
+    }
+
+    private static void cleanThreads()
+    {
+        ThreadGroup tg = Thread.currentThread().getThreadGroup();
+
+        synchronized (tg)
+        {
+            Thread[] threads = new Thread[tg.activeCount()];
+            int tCount = tg.enumerate(threads);
+
+            for (int i = 0; i < tCount; i++)
+            {
+                Thread t = threads[i];
+                if (t == null || t == Thread.currentThread())
+                {
+                    continue;
+                }
+
+                jqmlogger.warn("Runaway thread. Cleaner has interrupted thread {}", t.getName());
+                t.setContextClassLoader(null);
+                t.interrupt();
             }
         }
     }
