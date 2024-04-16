@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.enioka.jqm</groupId>
@@ -14,40 +15,24 @@
     <description>Test suite for the JQM engine + service</description>
 
     <properties>
-        <argLine>-Xms256m -Xmx1024m -XX:MaxMetaspaceSize=512m --add-opens java.naming/javax.naming.spi=ALL-UNNAMED</argLine>
+        <argLine>-Xms256m -Xmx1024m -XX:MaxMetaspaceSize=512m --add-opens
+            java.naming/javax.naming.spi=ALL-UNNAMED</argLine>
     </properties>
-
-
-    <profiles>
-        <!-- Cannot open modules on JDK8 as there are no modules... -->
-        <profile>
-            <id>jdk8</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-
-            <properties>
-                <argLine>-Xms256m -Xmx1024m -XX:MaxMetaspaceSize=512m</argLine>
-            </properties>
-        </profile>
-    </profiles>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${surefire.version}</version>
+                <version>${plugin.surefire.version}</version>
                 <configuration>
                     <trimStackTrace>false</trimStackTrace>
-                    <!--<argLine>-XX:MaxMetaspaceSize=128m -Xms150m -Xmx256m -verbose:class</argLine>-->
                     <systemProperties>
                         <property>
                             <name>mavenVersion</name>
                             <value>${project.version}</value>
                         </property>
                     </systemProperties>
-                    <!-- <classpathDependencyScopeExclude>compile</classpathDependencyScopeExclude>-->
                 </configuration>
             </plugin>
 
@@ -181,8 +166,8 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
-                     <!-- Copy the library version reference from jqm-service -->
-                     <execution>
+                    <!-- Copy the library version reference from jqm-service -->
+                    <execution>
                         <id>copy-version-file</id>
                         <phase>process-test-resources</phase>
                         <goals>
@@ -192,7 +177,8 @@
                             <outputDirectory>${basedir}/target/classes/META-INF/maven</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${basedir}/../jqm-service/target/classes/META-INF/maven/</directory>
+                                    <directory>
+                                        ${basedir}/../jqm-service/target/classes/META-INF/maven/</directory>
                                     <filtering>false</filtering>
                                 </resource>
                             </resources>
@@ -259,7 +245,8 @@
 
     <dependencies>
         <!-- This project mostly tests the service JQM distribution -->
-        <!-- This is actually going to be inside the OSGi classpath, not the test class path, so it is here mostly for Maven build ordering.-->
+        <!-- This is actually going to be inside the OSGi classpath, not the test class path, so it
+        is here mostly for Maven build ordering.-->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jqm-service</artifactId>

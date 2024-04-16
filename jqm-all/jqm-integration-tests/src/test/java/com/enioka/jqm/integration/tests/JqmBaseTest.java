@@ -114,12 +114,12 @@ public class JqmBaseTest
                 // Note that we cannot use the "one bundle" framework extension in PAX-EXAM, hence the many bundles here.
                 systemProperty("org.apache.aries.spifly.auto.consumers").value("jakarta.*"),
                 systemProperty("org.apache.aries.spifly.auto.providers").value("com.sun.*"),
-                mavenBundle("org.apache.aries.spifly", "org.apache.aries.spifly.dynamic.bundle", "1.3.3").startLevel(1),
-                mavenBundle("org.ow2.asm", "asm", "9.1").startLevel(1), //
-                mavenBundle("org.ow2.asm", "asm-commons", "9.1").startLevel(1), //
-                mavenBundle("org.ow2.asm", "asm-util", "9.1").startLevel(1), //
-                mavenBundle("org.ow2.asm", "asm-tree", "9.1").startLevel(1), //
-                mavenBundle("org.ow2.asm", "asm-analysis", "9.1").startLevel(1), //
+                mavenBundle("org.apache.aries.spifly", "org.apache.aries.spifly.dynamic.bundle", "1.3.7").startLevel(1),
+                mavenBundle("org.ow2.asm", "asm", "9.6").startLevel(1), //
+                mavenBundle("org.ow2.asm", "asm-commons", "9.6").startLevel(1), //
+                mavenBundle("org.ow2.asm", "asm-util", "9.6").startLevel(1), //
+                mavenBundle("org.ow2.asm", "asm-tree", "9.6").startLevel(1), //
+                mavenBundle("org.ow2.asm", "asm-analysis", "9.6").startLevel(1), //
                 mavenBundle("org.apache.aries", "org.apache.aries.util", "1.1.3").startLevel(1),
 
                 // OSGi DECLARATIVE SERVICES
