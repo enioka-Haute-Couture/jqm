@@ -36,10 +36,7 @@ public class JavaRunner implements JobRunner
     public void activate()
     {
         // Security manager
-        if (System.getSecurityManager() == null)
-        {
-            System.setSecurityManager(new SecurityManagerPayload());
-        }
+        SecurityManagerPayloadLoader.registerIfPossible();
 
         // Log multicasting
         try (DbConn cnx = DbManager.getDb().getConn())
@@ -74,10 +71,7 @@ public class JavaRunner implements JobRunner
     @Deactivate
     public void deactivate()
     {
-        if (System.getSecurityManager() != null && System.getSecurityManager() instanceof SecurityManagerPayload)
-        {
-            System.setSecurityManager(null);
-        }
+        SecurityManagerPayloadLoader.unregisterIfPossible();
 
         if (oneLogPerLaunch)
         {
