@@ -1,19 +1,5 @@
 version: "3.6"
 services:
-    jre:
-        build:
-            context: ./java
-            dockerfile: DockerFile.jre
-            labels:
-                com.enioka.description: "build helper - OpenJDK JRE for windows nano"
-            args:
-                - OJDK_URL=https://github.com/ojdkbuild/ojdkbuild/releases/download/java-1.8.0-openjdk-1.8.0.232-2.b09/java-1.8.0-openjdk-1.8.0.232-2.b09.ojdkbuild.windows.x86_64.zip
-                - OJDK_SHA256=eccdb4ea463e661b2aae81da29ec9baa669c9a24ad27e2e05d877cec36e00c2c
-                - WINDOWS_TAG=${WINDOWS_TAG}
-        image: buildhelpers:jre-1.8.0-${WINDOWS_TAG:?tag must be given}
-        hostname: jre
-        isolation: hyperv
-
     jdk:
         build:
             context: ./java
@@ -21,10 +7,10 @@ services:
             labels:
                 com.enioka.description: "build helper - OpenJDK JDK for windows nano"
             args:
-                - OJDK_URL=https://github.com/ojdkbuild/ojdkbuild/releases/download/java-1.8.0-openjdk-1.8.0.232-2.b09/java-1.8.0-openjdk-1.8.0.232-2.b09.ojdkbuild.windows.x86_64.zip
-                - OJDK_SHA256=eccdb4ea463e661b2aae81da29ec9baa669c9a24ad27e2e05d877cec36e00c2c
+                - OJDK_URL=https://aka.ms/download-jdk/microsoft-jdk-21.0.2-windows-x64.zip
+                - OJDK_SHA256=c910723abc9e2d9ee98c537278076e2b89489449839be2d16715b7dacd378663
                 - WINDOWS_TAG=${WINDOWS_TAG}
-        image: buildhelpers:jdk-1.8.0-${WINDOWS_TAG:?tag must be given}
+        image: buildhelpers:jdk-21.0.2-${WINDOWS_TAG:?tag must be given}
         hostname: jdk
         isolation: hyperv
 
@@ -35,9 +21,10 @@ services:
             labels:
                 com.enioka.description: "build helper - Maven build for windows nano"
             args:
+                - JAVA_VERSION=21.0.2
                 - WINDOWS_TAG=${WINDOWS_TAG}
-                - MVN_VERSION=3.5.4
-                - MVN_MD5=235db716537989e9e949e5bf23f965c0
+                - MVN_VERSION=3.9.6
+                - MVN_MD5=0eb0432004a91ebf399314ad33e5aaffec3d3b29279f2f143b2f43ade26f4db7bd1c0f08e436e9445ac6dc4a564a2945d13072a160ae54a930e90581284d6461
         image: buildhelpers:maven-3-${WINDOWS_TAG:?tag must be given}
         hostname: maven
         isolation: hyperv
@@ -45,10 +32,11 @@ services:
     jqm:
         build:
             context: ../../
-            dockerfile: ./docker/windows/jqm/Dockerfile
+            dockerfile: ./docker/windows/jqm/DockerFile
             labels:
                 com.enioka.description: "official JQM Docker distribution"
             args:
+                - JAVA_VERSION=21.0.2
                 - WINDOWS_TAG=${WINDOWS_TAG}
         image: ${JQM_IMAGE_NAME}
         isolation: hyperv

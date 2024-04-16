@@ -1,71 +1,83 @@
-version: "3.5"
+version: "3.7"
 services:
-  db:
-    image: postgres:10-alpine
-    deploy:
-      mode: replicated
-      replicas: 1
-      endpoint_mode: vip
-    environment:
-      - POSTGRES_PASSWORD=postgres
+    db:
+        image: postgres:10-alpine
+        deploy:
+            mode: replicated
+            replicas: 1
+            endpoint_mode: vip
+        environment:
+            - POSTGRES_PASSWORD=postgres
+        volumes:
+            - jqmdbdata:/var/lib/postgresql/data
 
+    jqmbootstrap:
+        # Create the database schema on startup and stops.
+        build:
+            context: .
+            args:
+                - JQM_VERSION=${JQM_VERSION:-latest}
+        image: enioka/jqm:pgsql-${JQM_VERSION:-latest}
+        environment:
+            - JQM_INIT_MODE=UPDATER
+            - JQM_POOL_CONNSTR=jdbc:postgresql://db/postgres
+            - JQM_POOL_VALIDATION_QUERY=SELECT version()
+            - JQM_POOL_DRIVER=org.postgresql.Driver
+            - JQM_POOL_USER=postgres
+            - JQM_POOL_PASSWORD=postgres
+        deploy:
+            mode: replicated
+            replicas: 1
+            endpoint_mode: vip
+            restart_policy:
+                condition: none
 
-  jqmbootstrap:
-    # Create the database schema on startup and stops.
-    build:
-      context: .
-    image: test:latest
-    environment:
-      - JQM_INIT_MODE=UPDATER
-      - JQM_POOL_CONNSTR=jdbc:postgresql://db/postgres
-      - JQM_POOL_VALIDATION_QUERY=SELECT version()
-      - JQM_POOL_DRIVER=org.postgresql.Driver
-      - JQM_POOL_USER=postgres
-      - JQM_POOL_PASSWORD=postgres
-    deploy:
-      mode: replicated
-      replicas: 1
-      endpoint_mode: vip
-      restart_policy: 
-        condition: none
+    jqmweb:
+        build:
+            context: .
+            args:
+                - JQM_VERSION=${JQM_VERSION:-latest}
+        image: enioka/jqm:pgsql-${JQM_VERSION:-latest}
+        environment:
+            - JQM_NODE_NAME=_localhost_
+            - JQM_NODE_WS_INTERFACE=_localhost_
+            - JQM_INIT_MODE=CLUSTER
+            - JQM_CREATE_NODE_TEMPLATE=TEMPLATE_WEB
+            - JQM_POOL_CONNSTR=jdbc:postgresql://db/postgres
+            - JQM_POOL_VALIDATION_QUERY=SELECT version()
+            - JQM_POOL_DRIVER=org.postgresql.Driver
+            - JQM_POOL_USER=postgres
+            - JQM_POOL_PASSWORD=postgres
+        ports:
+            - target: 1789
+              published: 1789
+              protocol: tcp
+              mode: ingress
+        deploy:
+            mode: replicated
+            replicas: 1
+            endpoint_mode: vip
 
-  jqmweb:
-    build:
-      context: .
-    image: test:latest
-    environment:
-      - JQM_NODE_NAME=_localhost_
-      - JQM_INIT_MODE=CLUSTER
-      - JQM_CREATE_NODE_TEMPLATE=TEMPLATE_WEB
-      - JQM_POOL_CONNSTR=jdbc:postgresql://db/postgres
-      - JQM_POOL_VALIDATION_QUERY=SELECT version()
-      - JQM_POOL_DRIVER=org.postgresql.Driver
-      - JQM_POOL_USER=postgres
-      - JQM_POOL_PASSWORD=postgres
-    ports:
-      - target: 1789
-        published: 1789
-        protocol: tcp
-        mode: ingress
-    deploy:
-      mode: replicated
-      replicas: 1
-      endpoint_mode: vip
-  
-  jqmworker:
-    build:
-      context: .
-    image: test:latest
-    environment:
-      - JQM_NODE_NAME=_localhost_
-      - JQM_INIT_MODE=CLUSTER
-      - JQM_CREATE_NODE_TEMPLATE=TEMPLATE_DRONE
-      - JQM_POOL_CONNSTR=jdbc:postgresql://db/postgres
-      - JQM_POOL_VALIDATION_QUERY=SELECT version()
-      - JQM_POOL_DRIVER=org.postgresql.Driver
-      - JQM_POOL_USER=postgres
-      - JQM_POOL_PASSWORD=postgres
-    deploy:
-      mode: replicated
-      replicas: 2
-      endpoint_mode: vip
+    jqmworker:
+        build:
+            context: .
+            args:
+                - JQM_VERSION=${JQM_VERSION:-latest}
+        image: enioka/jqm:pgsql-${JQM_VERSION:-latest}
+        environment:
+            - JQM_NODE_NAME=_localhost_
+            - JQM_NODE_WS_INTERFACE=_localhost_
+            - JQM_INIT_MODE=CLUSTER
+            - JQM_CREATE_NODE_TEMPLATE=TEMPLATE_DRONE
+            - JQM_POOL_CONNSTR=jdbc:postgresql://db/postgres
+            - JQM_POOL_VALIDATION_QUERY=SELECT version()
+            - JQM_POOL_DRIVER=org.postgresql.Driver
+            - JQM_POOL_USER=postgres
+            - JQM_POOL_PASSWORD=postgres
+        deploy:
+            mode: replicated
+            replicas: 2
+            endpoint_mode: vip
+
+volumes:
+    jqmdbdata:

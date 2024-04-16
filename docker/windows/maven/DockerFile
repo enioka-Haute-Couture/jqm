@@ -1,7 +1,8 @@
 ARG WINDOWS_TAG
+ARG POSH_WINDOWS_TAG
 ARG JAVA_VERSION=1.8.0
 
-FROM mcr.microsoft.com/powershell:nanoserver-${WINDOWS_TAG} as installer
+FROM mcr.microsoft.com/powershell:nanoserver-${POSH_WINDOWS_TAG:-${WINDOWS_TAG}} as installer
 
 SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
@@ -9,13 +10,13 @@ SHELL ["pwsh.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPrefer
 ARG MVN_VERSION
 ARG MVN_MD5
 
-ENV MVN_URL http://www-us.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.zip
+ENV MVN_URL https://archive.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.zip
 
 RUN Write-Host ('Downloading {0} ...' -f $env:MVN_URL); \
     mkdir /TEMP >$null; \
     Invoke-WebRequest -Uri $env:MVN_URL -OutFile '/TEMP/mvn.zip' -UseBasicParsing ; \
-    Write-Host ('Verifying md5 ({0}) ...' -f $env:MVN_MD5); \
-    if ((Get-FileHash /TEMP/mvn.zip -Algorithm md5).Hash -ne $env:MVN_MD5) { \
+    Write-Host ('Verifying hash ({0}) ...' -f $env:MVN_MD5); \
+    if ((Get-FileHash /TEMP/mvn.zip -Algorithm sha512).Hash -ne $env:MVN_MD5) { \
     Write-Host 'FAILED!'; \
     exit 1; \
     };

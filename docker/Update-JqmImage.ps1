@@ -20,7 +20,7 @@ param(
 )
 $ErrorActionPreference = "Stop"
 
-mkdir -Force (Join-Path $PSScriptRoot "target") >$null
+New-Item -Force -Path (Join-Path $PSScriptRoot "target") -ItemType Directory >$null
 $LogFile = Join-Path $PSScriptRoot "target/docker.log"
 
 $TargetFile = Join-Path $PSScriptRoot "targets.xml"
@@ -42,6 +42,10 @@ foreach (${Target} in ${targets}.targets.target) {
 
     ${env:DOCKER_HOST} = ${servers}.servers.server | ? { $_.tag -eq ${Architecture} } | % { $_.url }
     $LogHost = ${env:DOCKER_HOST}
+    if (-not ${env:DOCKER_HOST}) {
+        Write-Warning "Skipping building images for ${Architecture} as there is no suitable build server defined in server XML file."
+        continue
+    }
     if (${env:DOCKER_HOST} -eq "localhost") {
         Remove-Item env:/DOCKER_HOST
     }
@@ -67,12 +71,12 @@ foreach (${Target} in ${targets}.targets.target) {
                 if ((-not $preBuild) -or (-not $preBuild.service)) { continue }
                 $service = $preBuild.service
 
-                $buildArgsPre = @($buildArgs | % $_)
-                if (($preBuild.pull -eq "true") -or (-not $preBuild.pull)) { $pull += "--pull" }
+                $buildArgsPre = @($buildArgs | % { $_ })
+                if (($preBuild.pull -eq "true") -or (-not $preBuild.pull)) { $buildArgsPre += "--pull" }
 
                 Write-Progress "$Description build on ${LogHost} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building image ${service}"
                 if ($PSCmdlet.ShouldProcess(${service}, 'Compose Build')) {
-                    docker-compose -f $Compose --log-level warning build @buildArgsPre ${service} >>$LogFile
+                    docker compose -f $Compose --log-level warning build @buildArgsPre ${service} >>$LogFile
                     if (-not $?) {
                         throw "Build error"
                     }
@@ -84,7 +88,7 @@ foreach (${Target} in ${targets}.targets.target) {
         Write-Progress "$Description build on ${LogHost} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Building JQM image"
         if ($PSCmdlet.ShouldProcess("JQM", 'Compose Build')) {
             # Note there is no pull here - we rely on the pulls done in the helper images.
-            docker-compose -f $Compose --log-level warning build @buildArgs jqm >>$LogFile
+            docker compose -f $Compose --log-level warning build @buildArgs jqm >>$LogFile
             if (-not $?) {
                 throw "Build error"
             }
@@ -94,7 +98,7 @@ foreach (${Target} in ${targets}.targets.target) {
         if ($Push) {
             Write-Progress "$Description build on ${LogHost} - sub-tag is ${Architecture}" -id 1 -CurrentOperation "Pushing JQM image"
             if ($PSCmdlet.ShouldProcess("JQM", 'Compose Push')) {
-                docker-compose -f $Compose --log-level warning push jqm >>$LogFile
+                docker compose -f $Compose --log-level warning push jqm >>$LogFile
                 if (-not $?) {
                     throw "Push error"
                 }
