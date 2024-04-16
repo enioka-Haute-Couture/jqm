@@ -2,23 +2,7 @@
 <!-- This file is versioned and specific to each branch. It specifies which OS can be built by the branch, and how -->
 <targets>
     <target>
-        <description>Windows Server 1803</description>
-        <tag>windows-1803</tag>
-        <compose>windows/docker-compose.yml</compose>
-        <buildArgs>
-            <arg>
-                <key>WINDOWS_TAG</key>
-                <value>1803</value>
-            </arg>
-        </buildArgs>
-        <subTargets>
-            <target service="jre" />
-            <target service="jdk" />
-            <target service="mvn" pull="false" />
-        </subTargets>
-    </target>
-    <target>
-        <description>Windows Server 1809 / 2019</description>
+        <description>Windows Server 1809 / 2019 - LTS - EoL 01/09/2029</description>
         <tag>windows-1809</tag>
         <compose>windows/docker-compose.yml</compose>
         <buildArgs>
@@ -28,39 +12,56 @@
             </arg>
         </buildArgs>
         <subTargets>
-            <target service="jre" />
             <target service="jdk" />
             <target service="mvn" pull="false" />
         </subTargets>
     </target>
     <target>
-        <description>Windows Server 1903</description>
-        <tag>windows-1903</tag>
+        <description>Windows Server 2004 - SAC - EoL 12/14/2021</description>
+        <tag>windows-2004</tag>
         <compose>windows/docker-compose.yml</compose>
         <buildArgs>
             <arg>
                 <key>WINDOWS_TAG</key>
-                <value>1903</value>
+                <value>2004</value>
             </arg>
         </buildArgs>
         <subTargets>
-            <target service="jre" />
             <target service="jdk" />
             <target service="mvn" pull="false" />
         </subTargets>
     </target>
     <target>
-        <description>Windows Server 1909</description>
-        <tag>windows-1909</tag>
+        <description>Windows Server 20H2 - SAC - EoL 05/10/2022</description>
+        <tag>windows-20H2</tag>
         <compose>windows/docker-compose.yml</compose>
         <buildArgs>
             <arg>
                 <key>WINDOWS_TAG</key>
-                <value>1909</value>
+                <value>20H2</value>
+            </arg>
+            <!-- Botched in this posh release: tag in lowercase... -->
+            <arg>
+                <key>POSH_WINDOWS_TAG</key>
+                <value>20h2</value>
             </arg>
         </buildArgs>
         <subTargets>
-            <target service="jre" />
+            <target service="jdk" />
+            <target service="mvn" pull="false" />
+        </subTargets>
+    </target>
+    <target>
+        <description>Windows Server 2022 - LTS - EoL 10/14/2031</description>
+        <tag>windows-ltsc2022</tag>
+        <compose>windows/docker-compose.yml</compose>
+        <buildArgs>
+            <arg>
+                <key>WINDOWS_TAG</key>
+                <value>ltsc2022</value>
+            </arg>
+        </buildArgs>
+        <subTargets>
             <target service="jdk" />
             <target service="mvn" pull="false" />
         </subTargets>

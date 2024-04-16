@@ -9,7 +9,7 @@ services:
                 com.enioka.description: "build helper - Maven cache"
             args:
                 - WINDOWS_TAG=${WINDOWS_TAG:-1809}
-        image: buildhelpers:nexus
+        image: enioka/buildhelpers:nexus
         hostname: nexus
         volumes:
             - type: volume
