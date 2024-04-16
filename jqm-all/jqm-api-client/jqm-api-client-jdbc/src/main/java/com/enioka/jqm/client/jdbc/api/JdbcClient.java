@@ -268,12 +268,15 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         jqmlogger.trace("Job to enqueue is from JobDef " + jobDef.getId());
 
         // Then check Highlander.
-        Integer existing = highlanderMode(jobDef, cnx);
-        if (existing != null)
+        Object highlanderResult = highlanderMode(jobDef, cnx); // Returns Integer if already exists, a resultset otherwise. The RS thing is
+                                                               // to allow to explicitely close it as required by some pools (against the
+                                                               // spec).
+        if (highlanderResult != null && highlanderResult instanceof Integer)
         {
-            jqmlogger.trace("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + existing);
-            return existing;
+            jqmlogger.trace("JI won't actually be enqueued because a job in highlander mode is currently submitted: " + highlanderResult);
+            return (Integer) highlanderResult;
         }
+        ResultSet highlanderRs = (ResultSet) highlanderResult;
 
         // If here, need to enqueue a new execution request.
         jqmlogger.trace("Not in highlander mode or no currently enqueued instance");
@@ -297,6 +300,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             }
             catch (NoResultException e)
             {
+                cnx.closeQuietly(highlanderRs);
                 throw new JqmInvalidRequestException("Requested queue " + runRequest.getQueueName() + " does not exist", e);
             }
         }
@@ -378,7 +382,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     }
 
     // Helper. Current transaction is committed in some cases.
-    private Integer highlanderMode(JobDef jd, DbConn cnx)
+    private Object highlanderMode(JobDef jd, DbConn cnx)
     {
         if (!jd.isHighlander())
         {
@@ -397,7 +401,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
 
         // Now we need to actually synchronize through the database to avoid double posting
         // TODO: use a dedicated table, not the JobDef one. Will avoid locking the configuration.
-        ResultSet rs = cnx.runSelect(true, "jd_select_by_id", jd.getId());
+        ResultSet rs = cnx.runSelect(true, "jd_select_by_id_lock", jd.getId());
 
         // Now we have a lock, just retry - some other client may have created a job instance recently.
         try
@@ -418,7 +422,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         }
 
         jqmlogger.trace("Highlander mode analysis is done: nor existing JO, must create a new one. Lock is hold.");
-        return null;
+        return rs;
     }
 
     /**
@@ -1288,6 +1292,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
                 rs2.next();
 
                 query.setResultSize(rs2.getInt(1));
+                rs2.close();
             }
 
             ///////////////////////////////////////////////
@@ -1323,7 +1328,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
                     {
                         res.get(msg.getInt(2)).getMessages().add(msg.getString(3));
                     }
-                    run.close();
+                    msg.close();
                 }
             }
 

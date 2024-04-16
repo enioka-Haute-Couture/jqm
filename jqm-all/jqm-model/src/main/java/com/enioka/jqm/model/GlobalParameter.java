@@ -120,9 +120,8 @@ public class GlobalParameter implements Serializable
     public static List<GlobalParameter> select(DbConn cnx, String query_key, Object... args)
     {
         List<GlobalParameter> res = new ArrayList<>();
-        try
+        try (ResultSet rs = cnx.runSelect(query_key, args))
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 GlobalParameter tmp = new GlobalParameter();

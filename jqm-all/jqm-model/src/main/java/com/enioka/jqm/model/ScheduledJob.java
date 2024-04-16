@@ -103,9 +103,8 @@ public class ScheduledJob
         List<Integer> currentIdList = null;
         List<List<Integer>> allIdLists = new ArrayList<>();
         ScheduledJob tmp = null;
-        try
+        try (ResultSet rs = cnx.runSelect(query_key, args))
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 // ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED
@@ -126,13 +125,18 @@ public class ScheduledJob
                 }
                 currentIdList.add(tmp.id);
             }
+        }
+        catch (SQLException e)
+        {
+            throw new DatabaseException(e);
+        }
 
-            // Batch fetch parameters, 500 by 500.
-            int currentSJ = 0;
-            for (List<Integer> ids : allIdLists)
+        // Batch fetch parameters, 500 by 500.
+        int currentSJ = 0;
+        for (List<Integer> ids : allIdLists)
+        {
+            try (ResultSet rs = cnx.runSelect("sjprm_select_for_sj_list", ids);)
             {
-                rs = cnx.runSelect("sjprm_select_for_sj_list", ids);
-
                 while (rs.next())
                 {
                     // ID, KEYNAME, VALUE, JOB_SCHEDULE
@@ -146,11 +150,12 @@ public class ScheduledJob
                     }
                     res.get(currentSJ).parametersCache.put(key, val);
                 }
+
             }
-        }
-        catch (SQLException e)
-        {
-            throw new DatabaseException(e);
+            catch (SQLException e)
+            {
+                throw new DatabaseException(e);
+            }
         }
         return res;
     }

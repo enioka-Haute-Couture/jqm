@@ -172,9 +172,8 @@ public class Deliverable implements Serializable
     public static List<Deliverable> select(DbConn cnx, String query_key, Object... args)
     {
         List<Deliverable> res = new ArrayList<>();
-        try
+        try (ResultSet rs = cnx.runSelect(query_key, args))
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 Deliverable tmp = new Deliverable();

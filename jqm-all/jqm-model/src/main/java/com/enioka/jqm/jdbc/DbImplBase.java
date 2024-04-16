@@ -129,6 +129,7 @@ class DbImplBase
                 + "PATH, CLASS_NAME, JAVA_OPTS, KEYWORD1, KEYWORD2, KEYWORD3, ALERT_AFTER_SECONDS, "
                 + "MODULE, PATH_TYPE, QUEUE, PRIORITY FROM __T__JOB_DEFINITION");
         queries.put("jd_select_by_id", queries.get("jd_select_all") + " WHERE ID=?");
+        queries.put("jd_select_by_id_lock", queries.get("jd_select_all") + " WHERE ID=?"); // same as above. To allow some db (oracle...) to change this.
         queries.put("jd_select_by_key", queries.get("jd_select_all") + " WHERE JD_KEY=?");
         queries.put("jd_select_by_tag_app", queries.get("jd_select_all") + " WHERE APPLICATION=?");
         queries.put("jd_select_by_queue", queries.get("jd_select_all") + " WHERE QUEUE=?");

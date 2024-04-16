@@ -107,16 +107,18 @@ public class DbConn implements Closeable
             qr.generatedKey = qp.preGeneratedKey;
             if (qr.generatedKey == null && query_key.contains("insert") && !query_key.equals("history_insert_with_end_date"))
             {
-                ResultSet gen = ps.getGeneratedKeys();
-                if (gen.next())
+                try (ResultSet gen = ps.getGeneratedKeys())
                 {
-                    try
+                    if (gen.next())
                     {
-                        qr.generatedKey = gen.getInt(1);
-                    }
-                    catch (SQLException e)
-                    {
-                        // nothing to do.
+                        try
+                        {
+                            qr.generatedKey = gen.getInt(1);
+                        }
+                        catch (SQLException e)
+                        {
+                            // nothing to do.
+                        }
                     }
                 }
             }
@@ -406,7 +408,7 @@ public class DbConn implements Closeable
      * Close utility method.
      *
      * @param ps
-     *               statement to close.
+     *            statement to close.
      */
     public void closeQuietly(Closeable ps)
     {
@@ -417,7 +419,7 @@ public class DbConn implements Closeable
      * Close utility method.
      *
      * @param ps
-     *               statement to close through a result set.
+     *            statement to close through a result set.
      */
     public void closeQuietly(ResultSet ps)
     {
@@ -428,7 +430,7 @@ public class DbConn implements Closeable
      * Close utility method.
      *
      * @param ps
-     *               statement to close.
+     *            statement to close.
      */
     public void closeQuietly(Connection ps)
     {
@@ -439,7 +441,7 @@ public class DbConn implements Closeable
      * Close utility method.
      *
      * @param ps
-     *               statement to close.
+     *            statement to close.
      */
     public void closeQuietly(Statement ps)
     {

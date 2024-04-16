@@ -207,9 +207,8 @@ public class DeploymentParameter
     public static List<DeploymentParameter> select(DbConn cnx, String query_key, Object... args)
     {
         List<DeploymentParameter> res = new ArrayList<>();
-        try
+        try (ResultSet rs = cnx.runSelect(query_key, args))
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 DeploymentParameter tmp = new DeploymentParameter();
