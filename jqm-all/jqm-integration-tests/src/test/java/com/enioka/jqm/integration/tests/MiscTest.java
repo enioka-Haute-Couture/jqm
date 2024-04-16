@@ -98,6 +98,7 @@ public class MiscTest extends JqmBaseTest
     @Test
     public void testJobWithSystemExit() throws Exception
     {
+        assumeJavaVersionStrictlyLowerThan(17);
         JqmSimpleTest.create(cnx, "pyl.SecExit", "jqm-test-pyl-nodep").expectOk(0).expectNonOk(1).run(this);
     }
 

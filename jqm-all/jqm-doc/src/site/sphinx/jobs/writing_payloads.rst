@@ -201,6 +201,7 @@ To ease the use of the kill function, all other engine API methods actually call
 Finally, for voluntarily killing a running payload, it is possible to do much of the same: throwing a runtime exception.
 Note that System.exit is forbidden by the Java security manager inside payloads - it would stop the whole JQM engine, which
 would be rather impolite towards other running job instances.
+(this check is enforced only in Java strictly below 17 as security managers are now deprecated)
 
 Full example
 *******************
@@ -298,13 +299,16 @@ Limitations
 
 Nearly all JSE Java code can run inside JQM, with the following limitations:
 
-* no system.exit allowed - calling this will trigger a security exeption.
+* no `System.exit` allowed - calling this will trigger a security exeption (only in Java strictly below 17).
 * ... This list will be updated when limits are discovered. For now this is it!
 
 .. versionchanged:: 1.2.1
     JQM used to use a thread pool for running its job instances before version 1.2.1. This had the consequence of making thread local variables very dangerous
     to use. It does not any more - the performance gain was far too low to justify the impact.
 
+.. versionchanged:: 2.2.9
+    The check for `System.exit` is no longer enforced by JQM in newer Java versions as Java does not allow it anymore. The check stays in place in older Java versions
+    *and* it is still totally forbidden for payloads to use `System.exit`! It will be re-introduced if possible later with new Java APIs currently in discussion.
 
 Staying reasonable
 ***********************
