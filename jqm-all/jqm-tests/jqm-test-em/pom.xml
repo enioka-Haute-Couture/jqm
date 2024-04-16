@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-            <version>3.5.6-Final</version>
+            <version>5.6.15.Final</version>
         </dependency>
         <dependency>
             <groupId>org.hsqldb</groupId>

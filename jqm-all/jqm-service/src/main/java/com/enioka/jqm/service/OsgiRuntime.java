@@ -260,9 +260,8 @@ class OsgiRuntime
             }
             else
             {
-                jqmlogger.error("This bundle is not an OSGi bundle and cannot be installed");
+                jqmlogger.info("This bundle is not an OSGi bundle and will be wrapped before installing");
                 b = ctx.installBundle("wrap:" + path);
-                System.exit(995);
             }
             b.adapt(BundleStartLevel.class).setStartLevel(startLevel);
 
