@@ -480,7 +480,7 @@ public class JobDef implements Serializable
             tmp.keyword1 = rs.getString(12 + colShift);
             tmp.keyword2 = rs.getString(13 + colShift);
             tmp.keyword3 = rs.getString(14 + colShift);
-            tmp.maxTimeRunning = rs.getInt(15 + colShift);
+            tmp.maxTimeRunning = rs.getInt(15 + colShift) == 0 ? null : rs.getInt(15 + colShift);
             tmp.module = rs.getString(16 + colShift);
             tmp.pathType = PathType.valueOf(rs.getString(17 + colShift));
             tmp.queue_id = rs.getInt(18 + colShift);
@@ -496,9 +496,8 @@ public class JobDef implements Serializable
     public static List<JobDef> select(DbConn cnx, String query_key, Object... args)
     {
         List<JobDef> res = new ArrayList<>();
-        try
+        try (ResultSet rs = cnx.runSelect(query_key, args))
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 JobDef tmp = map(rs, 0);

@@ -163,9 +163,8 @@ public class Queue implements Serializable
     public static List<Queue> select(DbConn cnx, String query_key, Object... args)
     {
         List<Queue> res = new ArrayList<>();
-        try
+        try (ResultSet rs = cnx.runSelect(query_key, args))
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 Queue tmp = map(rs, 0);

@@ -59,6 +59,10 @@
             "workingDirectory": "${workspaceFolder}/jqm-all/jqm-integration-tests-ws"
         }
     ],
+    "java.maven.downloadSources": true,
+    "java.import.gradle.enabled": false,
+    "java.import.maven.enabled": true,
+    "java.codeGeneration.useBlocks": true,
     "maven.excludedFolders": [
         "**/.*", // exclude hidden folders
         "**/node_modules", // exclude node modules to speed up

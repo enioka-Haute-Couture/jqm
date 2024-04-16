@@ -37,6 +37,9 @@ public class DbImplOracle extends DbAdapter
         // See poll method for everything which is wrong with Oracle and queues.
         queries.put("ji_select_poll",
                 String.format("SELECT /*+ FIRST_ROWS */ a.* FROM (%s) a WHERE ROWNUM < ?", queries.get("ji_select_poll")));
+
+        // Sad: Oracle needs this inside the SQL text in addition to standard JDBC flags...
+        queries.put("jd_select_by_id_lock", queries.get("jd_select_by_id_lock") + " FOR UPDATE");
     }
 
     @Override
@@ -46,7 +49,8 @@ public class DbImplOracle extends DbAdapter
                 .replace("UNIX_MILLIS()", "JQM_PK.currval").replace("IN(UNNEST(?))", "IN(?)")
                 .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(CURRENT_TIMESTAMP - 1/1440)")
                 .replace("CURRENT_TIMESTAMP - ? SECOND", "(CURRENT_TIMESTAMP - ?/86400)").replace("FROM (VALUES(0))", "FROM DUAL")
-                .replace("BOOLEAN", "NUMBER(1)").replace("true", "1").replace("false", "0").replace("__T__", this.tablePrefix);
+                .replace("BOOLEAN", "NUMBER(1)").replace("true", "1").replace("false", "0").replace("__T__", this.tablePrefix)
+                .replace("CURRENT_TIMESTAMP", "SYS_EXTRACT_UTC(CURRENT_TIMESTAMP)");
     }
 
     @Override

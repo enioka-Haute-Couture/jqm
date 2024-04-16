@@ -107,7 +107,7 @@ public class Cl implements Serializable
 
     /**
      * See {@link #isTrace()}
-     * 
+     *
      * @param trace
      */
     public void setTracingEnabled(boolean trace)
@@ -164,7 +164,7 @@ public class Cl implements Serializable
 
     /**
      * ResultSet is not modified (no rs.next called).
-     * 
+     *
      * @param rs
      * @return
      */
@@ -194,9 +194,8 @@ public class Cl implements Serializable
     public static List<Cl> select(DbConn cnx, String query_key, Object... args)
     {
         List<Cl> res = new ArrayList<>();
-        try
+        try (ResultSet rs = cnx.runSelect(query_key, args))
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 Cl tmp = map(rs, 0);

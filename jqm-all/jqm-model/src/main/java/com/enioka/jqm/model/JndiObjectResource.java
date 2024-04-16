@@ -242,9 +242,8 @@ public class JndiObjectResource implements Serializable
     public static List<JndiObjectResource> select(DbConn cnx, String query_key, Object... args)
     {
         List<JndiObjectResource> res = new ArrayList<>();
-        try
+        try (ResultSet rs = cnx.runSelect(query_key, args))
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 JndiObjectResource tmp = new JndiObjectResource();

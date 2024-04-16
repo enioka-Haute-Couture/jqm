@@ -391,6 +391,8 @@ public class Db
         {
             DatabaseMetaData meta = tmp.getMetaData();
             product = meta.getDatabaseProductName().toLowerCase();
+            jqmlogger.info("Database reports it is " + meta.getDatabaseProductName() + " " + meta.getDatabaseMajorVersion() + "."
+                    + meta.getDatabaseMinorVersion());
 
             if (dbAdaptersProp == null || dbAdaptersProp.isEmpty())
             {
