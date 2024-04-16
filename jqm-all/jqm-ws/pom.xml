@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.enioka.jqm</groupId>
@@ -15,14 +14,15 @@
     <description>JQM web API implementation and administration UI</description>
 
     <properties>
-        <sonar.exclusions>src/main/webapp/dist/**</sonar.exclusions>
+        <sonar.exclusions>src/main/react/build/**</sonar.exclusions>
         <node.dir>${project.basedir}/target/node</node.dir>
-        <jsplugin.version>1.6</jsplugin.version>
+        <jsplugin.version>1.12.0</jsplugin.version>
+        <spa.build.repo>src/main/react/build/</spa.build.repo>
     </properties>
 
 
     <profiles>
-        <!-- Disable webpack prod build when using dev mode -->
+        <!-- Disable yarn prod build when using dev mode -->
         <!-- It is enabled inside the exec:exec goal -->
         <profile>
             <id>dev</id>
@@ -40,7 +40,7 @@
                         <version>${jsplugin.version}</version>
                         <executions>
                             <execution>
-                                <id>webpack build</id>
+                                <id>yarn build</id>
                                 <phase>none</phase>
                             </execution>
                         </executions>
@@ -51,51 +51,7 @@
     </profiles>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/webapp</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/dist/main.bundle*.js</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/webapp</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>**/dist/main.bundle*.js</exclude>
-                </excludes>
-            </resource>
-        </resources>
-
         <plugins>
-            <!-- For OSGi only, copy shiro ini file inside the Shirao-accessible classpath -->
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/classes/org/apache/shiro/jqm</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/webapp/WEB-INF</directory>
-                                    <filtering>true</filtering>
-                                    <includes>
-                                        <include>shiro.ini</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- run mvn jetty:run to test (with hot deployment) the app on a dev
 				computer. localhost:8080 -->
             <plugin>
@@ -146,85 +102,107 @@
                 <version>${jsplugin.version}</version>
 
                 <configuration>
-                    <nodeVersion>v8.11.4</nodeVersion>
+                    <nodeVersion>v16.9.0</nodeVersion>
+                    <yarnVersion>v1.22.10</yarnVersion>
                     <installDirectory>target/</installDirectory>
+                    <workingDirectory>src/main/react</workingDirectory>
                 </configuration>
 
                 <executions>
                     <execution>
-                        <id>install node and npm</id>
+                        <id>install node and yarn</id>
                         <goals>
-                            <goal>install-node-and-npm</goal>
+                            <goal>install-node-and-yarn</goal>
                         </goals>
                         <phase>initialize</phase>
                     </execution>
 
                     <execution>
-                        <id>npm install</id>
+                        <id>yarn install</id>
                         <goals>
-                            <goal>npm</goal>
+                            <goal>yarn</goal>
                         </goals>
-
-                        <phase>generate-resources</phase>
-
                         <configuration>
-                            <arguments>install --no-optional</arguments>
+                            <arguments>install</arguments>
                         </configuration>
+                        <phase>generate-resources</phase>
                     </execution>
 
                     <execution>
-                        <id>webpack build</id>
+                        <id>yarn build</id>
                         <goals>
-                            <goal>webpack</goal>
+                            <goal>yarn</goal>
                         </goals>
-
-                        <phase>generate-resources</phase>
-
                         <configuration>
-                            <arguments>--config webpack.prod.js</arguments>
+                            <arguments>build</arguments>
                         </configuration>
+                        <phase>generate-resources</phase>
                     </execution>
                 </executions>
             </plugin>
 
-            <!-- Used for creating a viable autoreload dev environment. 1) launch
-				the webpack build in background. 2) Create a compound goal exec:exec to run
-				jetty+ webpack. -->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
                 <executions>
+                    <!-- For OSGi: copy shiro ini file inside the Shiro-accessible classpath -->
                     <execution>
-                        <id>startwebpacksrv</id>
+                        <id>copy-resources-osgi</id>
+                        <phase>process-resources</phase>
                         <goals>
-                            <goal>exec</goal>
+                            <goal>copy-resources</goal>
                         </goals>
-
                         <configuration>
-                            <addOutputToClasspath>false</addOutputToClasspath>
-                            <async>true</async>
-                            <asyncDestroyOnShutdown>true</asyncDestroyOnShutdown>
-                            <commandlineArgs>${node.dir}/node_modules/npm/bin/npm-cli.js run watch</commandlineArgs>
-                            <executable>${node.dir}/node</executable>
-                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <outputDirectory>${basedir}/target/classes/org/apache/shiro/jqm</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/webapp/WEB-INF</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>shiro.ini</include>
+                                    </includes>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
-
+                    <!-- For react: copy build into dist folder -->
                     <execution>
-                        <id>default-cli</id>
+                        <id>copy-resources-react</id>
+                        <phase>process-resources</phase>
                         <goals>
-                            <goal>exec</goal>
+                            <goal>copy-resources</goal>
                         </goals>
-
                         <configuration>
-                            <executable>mvn</executable>
-                            <asyncDestroyOnShutdown>true</asyncDestroyOnShutdown>
-                            <arguments>
-                                <argument>exec:exec@startwebpacksrv</argument>
-                                <argument>jetty:run</argument>
-                                <argument>-Pdev</argument>
-                            </arguments>
+                            <outputDirectory>${project.basedir}/target/classes/dist</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${spa.build.repo}</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>**/**</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <!-- For auth (webapp content is not automatically copied in a jar) -->
+                    <execution>
+                        <id>copy-resources-authstatic</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/target/classes/auth</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/src/main/webapp/auth</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>*</include>
+                                    </includes>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
@@ -235,7 +213,8 @@
                 <artifactId>bnd-maven-plugin</artifactId>
                 <version>${plugin.bnd.version}</version>
                 <configuration>
-                    <bnd><![CDATA[
+                    <bnd>
+                        <![CDATA[
                         # Do not actually deploy this as an OSGi WAR but as JAX-RS whiteboard resources
                         # Web-ContextPath: /ws
                         # BND issue with multi version jars. https://github.com/bndtools/bnd/issues/2227
