@@ -19,14 +19,15 @@
 package com.enioka.jqm.integration.tests;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.enioka.jqm.client.api.JobRequest;
-import com.enioka.jqm.client.api.State;
 import com.enioka.jqm.client.api.Query.Sort;
+import com.enioka.jqm.client.api.State;
 import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.test.helpers.CreationTools;
@@ -37,42 +38,59 @@ public class HighlanderTest extends JqmBaseTest
     @Test
     public void testHighlanderMultiNode() throws Exception
     {
-        CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
-                "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+        int enqueueLoops = 1000;
 
-        JobRequest j = jqmClient.newJobRequest("MarsuApplication", "TestUser");
+        HashMap<String, String> parameters = new HashMap<String, String>();
+        parameters.put("delay_ms", "200");
+        CreationTools.createJobDef(null, true, "pyl.Wait", parameters, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication1", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+        CreationTools.createJobDef(null, true, "pyl.WaitRandom", parameters, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
+                "MarsuApplication2", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
+
+        JobRequest j1 = jqmClient.newJobRequest("MarsuApplication1", "TestUser");
+        JobRequest j2 = jqmClient.newJobRequest("MarsuApplication2", "TestUser");
         for (int i = 0; i < 9; i++)
         {
-            j.enqueue();
+            j1.enqueue();
         }
 
+        // Start 3 nodes which actually poll qVip (1ms).
         addAndStartEngine();
         addAndStartEngine("localhost4");
+        addAndStartEngine("localhost5");
 
-        for (int i = 0; i < 99; i++)
+        TestHelpers.waitFor(1, 10000, cnx); // This actually ensures at least one engine actually processes requests, nothing more.
+
+        // Now create a lot of requests! This is a synhronisation stress tests of sorts.
+        for (int i = 0; i < enqueueLoops; i++)
         {
-            j.enqueue();
+            j1.enqueue();
+            j2.enqueue();
         }
-        TestHelpers.waitFor(20, 5000, cnx); // Actually wait.
+        jqmlogger.info("Done creating highlander requests");
+        TestHelpers.waitFor(20, 5000, cnx); // Actually wait. We have no idea how many requests will actually get processed.
 
         Assert.assertEquals(0, TestHelpers.getNonOkCount(cnx));
 
-        List<com.enioka.jqm.client.api.JobInstance> res = jqmClient.newQuery().addSortAsc(Sort.ID).invoke();
+        List<com.enioka.jqm.client.api.JobInstance> res = jqmClient.newQuery().addSortAsc(Sort.ID).setApplicationName("MarsuApplication1")
+                .invoke();
 
-        Assert.assertEquals(State.ENDED, res.get(0).getState());
-        Assert.assertEquals(State.ENDED, res.get(1).getState());
-        Assert.assertEquals(true, res.get(0).isHighlander());
+        Assert.assertTrue(res.size() >= 2); // At least initial request + one is allowed to wait behind it. Likely more.
+        Assert.assertTrue(res.size() < 10 + enqueueLoops - 1); // At least one request must have been squeezed by the highlander mode.
 
         Calendar prevEnd = null;
         for (com.enioka.jqm.client.api.JobInstance h : res)
         {
+            Assert.assertEquals(State.ENDED, h.getState());
+            Assert.assertEquals(true, h.isHighlander());
+
             if (h.getBeganRunningDate().before(prevEnd))
             {
                 Assert.fail("executions were not exclusive");
             }
             prevEnd = h.getEndDate();
         }
-        System.out.println("there were n histories: " + res.size());
+        jqmlogger.info("there were n histories: " + res.size());
     }
 
     @Test
@@ -94,8 +112,7 @@ public class HighlanderTest extends JqmBaseTest
     @Test
     public void testHighlanderEngineRunning() throws Exception
     {
-        // This test launches an infinite loop as Highlander, checks if no other job can
-        // launch. Job is killed at the end - which allows a
+        // This test launches an infinite loop as Highlander, checks if no other job can launch. Job is killed at the end - which allows a
         // second one to run, which also has to be killed.
         CreationTools.createJobDef(null, true, "pyl.KillMe", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42, "kill",
                 null, "Franquin", "ModuleMachin", "other", "other", true, cnx);

@@ -34,7 +34,7 @@ public abstract class ResourceManagerBase
      * Main constructor.
      *
      * @param rm
-     *               the configuration to use to instanciate the RM.
+     *            the configuration to use to instanciate the RM.
      */
     ResourceManagerBase(ResourceManager rm)
     {
@@ -43,7 +43,16 @@ public abstract class ResourceManagerBase
 
     /**
      * The main method of a RM: decide if a job can run. This should try to book the resources. {@link JobInstance} parameters specific to
-     * this RM (if any) should be removed by this method.
+     * this RM (if any) should be removed by this method. Once this method has run, booked resources should not be available to anyone else
+     * until either:
+     * <ul>
+     * <li>released at the end of the run - {@link #releaseResource(JobInstance)} - this is the nominal case</li>
+     * <li>released if the engine later decides not to run the JI for some reason (a different resource manager may refuse for exemple) -
+     * {@link #rollbackResourceBooking(JobInstance, DbConn)}</li>
+     * <li>released if the engine decides to run the job instance, but the Resource Manager wishes to release the resource at once because
+     * they are only useful during polling, with no need to withold them during the job instance run.
+     * {@link #commitResourceBooking(JobInstance, DbConn)}</li>
+     * <ul>
      *
      * @param ji
      * @return
@@ -52,12 +61,31 @@ public abstract class ResourceManagerBase
 
     /**
      * Allow the RM to take operations to cancel any resource reservation and the like. <br>
+     * Called when the JobInstance has finished running.<br>
      * Default implementation does nothing.
      *
      * @param ji
      */
     void releaseResource(JobInstance ji)
+    {}
+
+    /**
+     * Called when the engine has decided to actually run the job instance.<br>
+     * Either this or {@link #rollbackResourceBooking(JobInstance, DbConn)} are called when the engine has made a decision.<br>
+     * Default implementation does nothing. This method should never fail. Risky operations are done in bookResource.
+     */
+    void commitResourceBooking(JobInstance ji, DbConn cnx)
+    {}
+
+    /**
+     * Called when the engine has decided to actually *not* run the job instance.<br>
+     * Either this or {@link #commitResourceBooking(JobInstance, DbConn)} are called when the engine has made a decision.<br>
+     * Default implementation calls {@link #releaseResource(JobInstance)} (which does nothing by default).<br>
+     * This method should never fail. Risky operations are done in bookResource.
+     */
+    void rollbackResourceBooking(JobInstance ji, DbConn cnx)
     {
+        this.releaseResource(ji);
     }
 
     /**
@@ -82,8 +110,7 @@ public abstract class ResourceManagerBase
     }
 
     protected void setDefaultProperties()
-    {
-    }
+    {}
 
     /**
      * Called by the engine when it has decided configuration has changed. Care should be taken to ensure continuity of operation despite
@@ -110,11 +137,11 @@ public abstract class ResourceManagerBase
      * JD > RM > defaults
      *
      * @param key
-     *                the end of the parameter key. getParameterRoot()[.key] is automatically prefixed.
+     *            the end of the parameter key. getParameterRoot()[.key] is automatically prefixed.
      * @param ji
-     *                the analysed job instance
+     *            the analysed job instance
      * @param pop
-     *                if true, parameter will be removed from the JI prm list
+     *            if true, parameter will be removed from the JI prm list
      * @return
      */
     protected String getStringParameter(String key, JobInstance ji, boolean pop)
