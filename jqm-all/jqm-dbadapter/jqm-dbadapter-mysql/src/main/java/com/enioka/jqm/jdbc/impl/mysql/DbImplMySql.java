@@ -44,12 +44,12 @@ public class DbImplMySql extends DbAdapter
             return "";
         }
         return sql.replace("MEMORY TABLE", "TABLE").replace("JQM_PK.nextval", "?").replace(" DOUBLE", " DOUBLE PRECISION")
-                .replace("UNIX_MILLIS()", "ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000)").replace("IN(UNNEST(?))", "IN(?)")
+                .replace("UNIX_MILLIS()", "ROUND(UNIX_TIMESTAMP(NOW(4)) * 1000)").replace("IN(UNNEST(?))", "IN(?)")
                 .replace("CURRENT_TIMESTAMP - 1 MINUTE", "(UNIX_TIMESTAMP() - 60)")
-                .replace("CURRENT_TIMESTAMP - ? SECOND", "(NOW() - INTERVAL ? SECOND)").replace("FROM (VALUES(0))", "FROM DUAL")
-                .replace("DNS||':'||PORT", "CONCAT(DNS, ':', PORT)").replace(" TIMESTAMP ", " TIMESTAMP(3) ")
-                .replace("CURRENT_TIMESTAMP", "FFFFFFFFFFFFFFFFF@@@@").replace("FFFFFFFFFFFFFFFFF@@@@", "CURRENT_TIMESTAMP(3)")
-                .replace("TIMESTAMP(3) NOT NULL", "TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)").replace("__T__", this.tablePrefix);
+                .replace("CURRENT_TIMESTAMP - ? SECOND", "(UTC_TIMESTAMP() - INTERVAL ? SECOND)").replace("FROM (VALUES(0))", "FROM DUAL")
+                .replace("DNS||':'||PORT", "CONCAT(DNS, ':', PORT)").replace(" TIMESTAMP ", " DATETIME(3) ")
+                .replace("CURRENT_TIMESTAMP", "FFFFFFFFFFFFFFFFF@@@@").replace("FFFFFFFFFFFFFFFFF@@@@", "UTC_TIMESTAMP(3)")
+                .replace("DATETIME(3) NOT NULL", "DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)").replace("__T__", this.tablePrefix);
     }
 
     @Override

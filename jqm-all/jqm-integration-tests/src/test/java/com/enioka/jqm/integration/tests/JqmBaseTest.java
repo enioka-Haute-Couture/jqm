@@ -147,7 +147,7 @@ public class JqmBaseTest
                 mavenBundle("com.enioka.jqm", "jqm-osgi-repackaging-cron4j").versionAsInProject(),
 
                 // CLI
-                mavenBundle("com.enioka.jqm", "jqm-osgi-repackaging-jcommander").versionAsInProject(),
+                mavenBundle("org.jcommander", "jcommander").versionAsInProject(),
 
                 // XML & binding through annotations APIs
                 mavenBundle("com.enioka.jqm", "jqm-osgi-repackaging-jdom").versionAsInProject(), //

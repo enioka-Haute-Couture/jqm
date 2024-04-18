@@ -3,6 +3,8 @@ package com.enioka.jqm.cli;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.enioka.admin.MetaService;
@@ -19,6 +21,9 @@ class CommandInstallNodeTemplate extends CommandBase
 
     @Parameter(names = { "-n", "--node" }, description = "Name of the target node (i.e. node to copy to).", required = true)
     private String nodeName;
+
+    @Parameter(names = { "-i", "--interface" }, description = "Network interface to bind to", required = false)
+    private String networkInterface;
 
     @Override
     int doWork()
@@ -66,7 +71,7 @@ class CommandInstallNodeTemplate extends CommandBase
             target.setLoadApiClient(template.getLoadApiClient());
             target.setLoapApiSimple(template.getLoapApiSimple());
             target.setOutputDirectory(template.getOutputDirectory());
-            target.setDns(template.getDns());
+            target.setDns(StringUtils.isNotEmpty(networkInterface) ? networkInterface : template.getDns());
             target.setPort(template.getPort());
             target.setRootLogLevel(template.getRootLogLevel());
             target.setTmpDirectory(template.getTmpDirectory());

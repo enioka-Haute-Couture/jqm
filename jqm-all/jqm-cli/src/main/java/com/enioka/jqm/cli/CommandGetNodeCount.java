@@ -1,7 +1,10 @@
 package com.enioka.jqm.cli;
 
+import java.util.List;
+
 import com.beust.jcommander.Parameters;
 import com.enioka.admin.MetaService;
+import com.enioka.api.admin.NodeDto;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
 
@@ -13,7 +16,12 @@ class CommandGetNodeCount extends CommandBase
     {
         try (DbConn cnx = DbManager.getDb().getConn())
         {
-            jqmlogger.info("Existing nodes: " + MetaService.getNodes(cnx).size());
+            List<NodeDto> nodes = MetaService.getNodes(cnx);
+            for (NodeDto node : nodes)
+            {
+                jqmlogger.info("Already existing: " + node.getName());
+            }
+            jqmlogger.info("Existing nodes: " + nodes.size());
             return 0;
         }
         catch (Exception e)

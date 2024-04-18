@@ -40,6 +40,10 @@ if [ "${JQM_NODE_NAME}" = "_localhost_" ]
 then
     export JQM_NODE_NAME=$(hostname)
 fi
+if [ "${JQM_NODE_WS_INTERFACE}" = "_localhost_" ]
+then
+    export JQM_NODE_WS_INTERFACE=$(hostname)
+fi
 
 if [ "${JQM_INIT_MODE}" = "SINGLE" ]
 then
@@ -60,7 +64,7 @@ then
         if [ ! "${JQM_CREATE_NODE_TEMPLATE}" = "" ]
         then
             echo "#### Applying template ${JQM_CREATE_NODE_TEMPLATE} to new JQM node"
-            java -jar jqm.jar Install-NodeTemplate -t ${JQM_CREATE_NODE_TEMPLATE} -n ${JQM_NODE_NAME}
+            java -jar jqm.jar Install-NodeTemplate -t ${JQM_CREATE_NODE_TEMPLATE} -n ${JQM_NODE_NAME} -i ${JQM_NODE_WS_INTERFACE}
         fi
 
         # Jobs
@@ -94,7 +98,7 @@ then
         if [ ! "${JQM_CREATE_NODE_TEMPLATE}" = "" ]
         then
             echo "#### Applying template ${JQM_CREATE_NODE_TEMPLATE} to new JQM node"
-            java -jar jqm.jar Install-NodeTemplate -t ${JQM_CREATE_NODE_TEMPLATE} -n ${JQM_NODE_NAME}
+            java -jar jqm.jar Install-NodeTemplate -t ${JQM_CREATE_NODE_TEMPLATE} -n ${JQM_NODE_NAME} -i ${JQM_NODE_WS_INTERFACE}
         fi
     fi
 fi
