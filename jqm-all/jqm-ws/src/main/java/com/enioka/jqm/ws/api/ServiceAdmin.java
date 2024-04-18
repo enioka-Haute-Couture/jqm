@@ -17,6 +17,7 @@ package com.enioka.jqm.ws.api;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +33,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.Response.Status;
 
 import com.enioka.admin.MetaService;
@@ -495,44 +499,48 @@ public class ServiceAdmin
     @Path("jd/{id}/xml")
     @Produces(MediaType.APPLICATION_XML)
     @HttpCache
-    public void getJobDefDeploymentDescriptor(@PathParam("id") int id, @Context HttpServletResponse res)
+    public Response getJobDefDeploymentDescriptor(@PathParam("id") int id, @Context HttpServletResponse res)
     {
-        res.setHeader("Content-Disposition", "attachment; filename=jobdef_" + id + ".xml");
-
-        try (DbConn cnx = Helpers.getDbSession())
+        StreamingOutput output = new StreamingOutput()
         {
-            XmlJobDefExporter.export(res.getOutputStream(), JobDef.select(cnx, "jd_select_by_id", id), cnx);
-        }
-        catch (JqmXmlException e)
-        {
-            throw new JqmClientException(e);
-        }
-        catch (IOException e)
-        {
-            throw new JqmClientException(e);
-        }
+            @Override
+            public void write(OutputStream outputStream) throws WebApplicationException
+            {
+                try (var cnx = Helpers.getDbSession())
+                {
+                    XmlJobDefExporter.export(outputStream, JobDef.select(cnx, "jd_select_by_id", id), cnx);
+                }
+                catch (JqmXmlException e)
+                {
+                    throw new JqmClientException(e);
+                }
+            }
+        };
+        return Response.ok(output).header("Content-Disposition", "attachment; filename=jobdef_" + id + ".xml").build();
     }
 
     @GET
     @Path("jd/all/xml")
     @Produces(MediaType.APPLICATION_XML)
     @HttpCache
-    public void getJobDefDeploymentDescriptor(@Context HttpServletResponse res)
+    public Response getJobDefDeploymentDescriptor()
     {
-        res.setHeader("Content-Disposition", "attachment; filename=jobdef.xml");
-
-        try (DbConn cnx = Helpers.getDbSession())
+        StreamingOutput output = new StreamingOutput()
         {
-            XmlJobDefExporter.export(res.getOutputStream(), JobDef.select(cnx, "jd_select_all"), cnx);
-        }
-        catch (JqmXmlException e)
-        {
-            throw new JqmClientException(e);
-        }
-        catch (IOException e)
-        {
-            throw new JqmClientException(e);
-        }
+            @Override
+            public void write(OutputStream outputStream) throws WebApplicationException
+            {
+                try (var cnx = Helpers.getDbSession())
+                {
+                    XmlJobDefExporter.export(outputStream, JobDef.select(cnx, "jd_select_all"), cnx);
+                }
+                catch (JqmXmlException e)
+                {
+                    throw new JqmClientException(e);
+                }
+            }
+        };
+        return Response.ok(output).header("Content-Disposition", "attachment; filename=jobdef.xml").build();
     }
 
     //////////////////////////////////////////////////////////////////////////

@@ -161,6 +161,14 @@ class JettyServer
         // This is a JQM node
         httpServiceProperties.put("servlet.init.jqmnodeid", node.getId().toString());
 
+        // Interface to use (default is all)
+        String interfaceFromProperty = System.getProperty("com.enioka.jqm.interface");
+        if (interfaceFromProperty != null && !interfaceFromProperty.isEmpty())
+        {
+            httpServiceProperties.put("org.apache.felix.http.host", interfaceFromProperty);
+            jqmlogger.info("Jetty will bind on (prop) " + interfaceFromProperty + ":" + node.getPort());
+        }
+
         // Connectors configuration - only start http or https, but not both
         httpServiceProperties.put("org.apache.felix.https.enable", useSsl);
         httpServiceProperties.put("org.apache.felix.http.enable", !useSsl);

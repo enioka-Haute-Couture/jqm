@@ -71,6 +71,11 @@ public class JavaRunner implements JobRunner
     @Deactivate
     public void deactivate()
     {
+        if (classloaderManager != null)
+        {
+            classloaderManager.stop();
+        }
+
         SecurityManagerPayloadLoader.unregisterIfPossible();
 
         if (oneLogPerLaunch)

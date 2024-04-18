@@ -6,6 +6,11 @@
 
 
 # set resource file from env variables
+if [ ! "x${JQM_POOL_INIT_SQL}" = "x" ]
+then
+    export JQM_POOL_INIT_SQL="initSQL=\"${JQM_POOL_INIT_SQL}\""
+fi
+
 echo "<resource
     name='jdbc/jqm'
     auth='Container'
@@ -14,7 +19,9 @@ echo "<resource
     testWhileIdle='true'
     testOnBorrow='false'
     testOnReturn='true'
-    validationQuery='${JQM_POOL_VALIDATION_QUERY}'
+    validationQuery=\"${JQM_POOL_VALIDATION_QUERY}\"
+    ${JQM_POOL_INIT_SQL}
+    logValidationErrors='true'
     validationInterval='1000'
     timeBetweenEvictionRunsMillis='60000'
     maxActive='${JQM_POOL_MAX}'
@@ -61,7 +68,7 @@ then
         echo 1 > /jqm/db/${JQM_NODE_NAME}
 
         # Apply template
-        if [ ! "${JQM_CREATE_NODE_TEMPLATE}" = "" ]
+        if [ ! "x${JQM_CREATE_NODE_TEMPLATE}" = "x" ]
         then
             echo "#### Applying template ${JQM_CREATE_NODE_TEMPLATE} to new JQM node"
             java -jar jqm.jar Install-NodeTemplate -t ${JQM_CREATE_NODE_TEMPLATE} -n ${JQM_NODE_NAME} -i ${JQM_NODE_WS_INTERFACE}
@@ -75,11 +82,23 @@ fi
 
 if [ "${JQM_INIT_MODE}" = "CLUSTER" ]
 then
-    if [ ! -f /jqm/db/${JQM_NODE_NAME} ]
+    echo "### Checking configuration in database for node ${JQM_NODE_NAME} - Cluster mode."
+    java -jar jqm.jar Get-NodeCount >/jqm/tmp/nodes.txt
+    if [ ! $? -eq 0 ]
     then
-        echo "#### Node does not exist (as seen by the container). Cluster mode."
+        echo "cannot check node status, java failure"
+        return 1
+    fi
+
+    cat /jqm/tmp/nodes.txt | grep "Already existing: ${JQM_NODE_NAME}"
+    if [ $? -eq 0 ]
+    then
+        echo "### Node ${JQM_NODE_NAME} already exists inside database configuration, skipping config"
+    else
+        echo "#### Node does not exist (as seen by the database). Cluster mode."
 
         echo "### Waiting for templates import"
+        $(exit 0)
         while [ $? -eq 0 ]
         do
             # no templates yet - wait one second and retry
@@ -95,7 +114,7 @@ then
         echo 1 > /jqm/db/${JQM_NODE_NAME}
 
         # Apply template
-        if [ ! "${JQM_CREATE_NODE_TEMPLATE}" = "" ]
+        if [ ! "x${JQM_CREATE_NODE_TEMPLATE}" = "x" ]
         then
             echo "#### Applying template ${JQM_CREATE_NODE_TEMPLATE} to new JQM node"
             java -jar jqm.jar Install-NodeTemplate -t ${JQM_CREATE_NODE_TEMPLATE} -n ${JQM_NODE_NAME} -i ${JQM_NODE_WS_INTERFACE}
@@ -128,4 +147,4 @@ fi
 
 # Go!
 echo "### Starting JQM node ${JQM_NODE_NAME}"
-java ${JAVA_OPTS} -jar jqm.jar Start-Node -n ${JQM_NODE_NAME}
+java -D"com.enioka.jqm.interface=0.0.0.0" ${JAVA_OPTS} -jar jqm.jar Start-Node -n ${JQM_NODE_NAME}
