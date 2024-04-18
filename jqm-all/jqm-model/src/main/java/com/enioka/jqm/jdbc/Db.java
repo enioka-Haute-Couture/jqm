@@ -33,12 +33,12 @@ public class Db
     /**
      * The version of the schema as it described in the current Maven artifact
      */
-    private static final int SCHEMA_VERSION = 2;
+    private static final int SCHEMA_VERSION = 1;
 
     /**
      * The SCHEMA_VERSION version is backward compatible until this version
      */
-    private static final int SCHEMA_COMPATIBLE_VERSION = 2;
+    private static final int SCHEMA_COMPATIBLE_VERSION = 1;
 
     private DataSource _ds = null;
     private DbAdapter adapter = null;
