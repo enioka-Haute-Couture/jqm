@@ -16,6 +16,7 @@
 package com.enioka.jqm.integration.tests;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 
@@ -312,5 +313,40 @@ public class MiscTest extends JqmBaseTest
         Assert.assertEquals(0, MetaService.getJndiObjectResource(cnx).size());
 
         cnx.commit();
+    }
+
+    @Test
+    public void testGlobalParameterDateStability472()
+    {
+        GlobalParameter.setParameter(cnx, "houba", "hop");
+        cnx.commit();
+
+        List<GlobalParameter> gps = GlobalParameter.select(cnx, "globalprm_select_by_key", "houba");
+        Assert.assertEquals(1, gps.size());
+        Assert.assertEquals("hop", gps.get(0).getValue());
+        Assert.assertNotNull("not null", gps.get(0).getLastModified());
+
+        Calendar first = gps.get(0).getLastModified();
+
+        // Reset it, date should not change as same value
+        GlobalParameter.setParameter(cnx, "houba", "hop");
+        cnx.commit();
+
+        gps = GlobalParameter.select(cnx, "globalprm_select_by_key", "houba");
+        Assert.assertEquals(1, gps.size());
+        Assert.assertEquals("hop", gps.get(0).getValue());
+        Assert.assertNotNull("not null", gps.get(0).getLastModified());
+        Assert.assertEquals(first, gps.get(0).getLastModified());
+
+        // Change the value, date should change
+        sleepms(2);
+        GlobalParameter.setParameter(cnx, "houba", "hop hop hop");
+        cnx.commit();
+
+        gps = GlobalParameter.select(cnx, "globalprm_select_by_key", "houba");
+        Assert.assertEquals(1, gps.size());
+        Assert.assertEquals("hop hop hop", gps.get(0).getValue());
+        Assert.assertNotNull("not null", gps.get(0).getLastModified());
+        Assert.assertNotEquals(first, gps.get(0).getLastModified());
     }
 }

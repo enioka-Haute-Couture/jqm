@@ -15,6 +15,7 @@ test.txt
 *.ear
 release.properties
 *Thumbs.db
+**/sphinx/_build
 
 /jqm-all/jqm-engine/compile.sh
 /jqmProject/nbproject/private/

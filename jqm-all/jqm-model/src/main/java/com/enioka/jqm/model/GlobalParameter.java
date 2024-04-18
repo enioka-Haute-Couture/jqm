@@ -164,8 +164,18 @@ public class GlobalParameter implements Serializable
 
     public static void setParameter(DbConn cnx, String key, String value)
     {
-        QueryResult qr = cnx.runUpdate("globalprm_update_value_by_key", value, key);
-        if (qr.nbUpdated == 0)
+        try
+        {
+            // Get current value, throws NoResultException if parameter not in DB.
+            String res = cnx.runSelectSingle("globalprm_select_by_key", 3, String.class, key);
+
+            // If value has changed, update it in db.
+            if ((res != null && !res.equals(value)) || (res == null && value != null))
+            {
+                cnx.runUpdate("globalprm_update_value_by_key", value, key);
+            }
+        }
+        catch (NoResultException e)
         {
             create(cnx, key, value);
         }

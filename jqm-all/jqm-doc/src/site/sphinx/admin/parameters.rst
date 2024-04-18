@@ -16,7 +16,7 @@ There are three sets of engine parameters:
   of parameters to access the database and start.
 
 .. note:: also of interest in regard to engine configuration is the :doc:`queues configuration<queues>`.
-  
+
 Bootstrap
 +++++++++
 
@@ -30,9 +30,11 @@ available to any node.
 
 A second file exists, named JQM_ROOT/conf/jqm.properties. It is used specifically for database-specific bootstrap parameters, and is only useful in very specific use cases. It can be - and should be - safely deleted otherwise. The parameters are:
 
-* com.enioka.jqm.jdbc.tablePrefix: a prefix to add to all table names (if value is "MARSU_", tables will be named MARSU_HISTORY, MARSU_NODE...). Default is empty.
+* com.enioka.jqm.jdbc.tablePrefix: a prefix to add to all table names (if value is "MARSU\_", tables will be named MARSU_HISTORY, MARSU_NODE...). Default is empty.
 * com.enioka.jqm.jdbc.datasource: JNDI name of the datasource from resource.xml to use as the main JQM database connection. Default is jdbc/jqm.
 * com.enioka.jqm.jdbc.allowSchemaUpdate: should not be used in normal operations.
+
+Finally, it is possible to change the JQM listening interface (for web services and GUI) by adding `-D"com.enioka.jqm.interface=0.0.0.0"` (or any other value) inside the `JAVA_OPTS` environment variable. If not set, the normal interface choice is done (by choosing all interfaces corresponding to the node's DNS parameter). This is mostly useful in container deployments - inside the official images, this parameter is always set to 0.0.0.0.
 
 **Changes to bootstrap files require an engine restart**.
 
@@ -105,14 +107,21 @@ have to be altered directly inside the database with your tool of choice or thro
 +-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
 | pfxPassword             | Password of the private key file (if not using internal PKI).                                       | SuperPassword | No      | Yes          |
 +-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
+| deleteStoppedNodes      | If true, stopped nodes are removed from configuration. Useful when nodes are transient, like in an  | false         | Yes     | Yes          |
+|                         | orchestrator as Kubernetes.                                                                         |               |         |              |
++-------------------------+-----------------------------------------------------------------------------------------------------+---------------+---------+--------------+
 
-Here, nullable means the parameter can be absent from the table.
+Here, nullable means the parameter can be absent from the table. New values are taken into account asynchronously by running engines.
 
 Parameter name is case-sensitive.
 
 .. note:: There must be at least one Maven repository specified.
 	If using Maven central, please specify 'http://repo1.maven.org/maven2/' and not one the numerous other aliases that exist.
 	Maven Central is only used if explicitly specified (which is the default).
+
+.. note:: Some parameters about web service or web interface do not require node reboot. However, as they actually change how the
+    services are exposed (HTTP to HTTPS, certificate root...) they will trigger a very short service interruption of the web
+    services. This should be taken into account especially by script writers.
 
 Also, as a side note, mail notifications use the JNDI resource named mail/default, which is created on node startup if it does not exist.
 See resource documentation to set it up.
