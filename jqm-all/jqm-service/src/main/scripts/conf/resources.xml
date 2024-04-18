@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>	
-	<!-- HSQL configuration. For test environments only. Not suitable for production -->
+	<!-- HSQL configuration. This used a file, which is only suitable for single node deployments -->
 	<resource 
 	      name="jdbc/jqm"
           auth="Container"
           type="javax.sql.DataSource"
           factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
           testWhileIdle="true"
-          testOnBorrow="true"
+          testOnBorrow="false"
           testOnReturn="true"
           validationQuery="SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS"
           initSQL="SET TIME ZONE INTERVAL '0:00' HOUR TO MINUTE"
-          validationInterval="30000"
+          validationInterval="1000"
           timeBetweenEvictionRunsMillis="30000"
           maxActive="100"
           minIdle="10"
@@ -20,7 +20,7 @@
           removeAbandonedTimeout="3600"
           removeAbandoned="true"
           logAbandoned="true"
-          minEvictableIdleTimeMillis="30000"
+          minEvictableIdleTimeMillis="60000"
           jmxEnabled="true"
           username="SA"
           password=""
@@ -40,7 +40,7 @@
           testOnReturn="true"
           validationQuery="CALL DBMS_APPLICATION_INFO.SET_MODULE('CONNECTION POOL', 'IDLE IN POOL')"
           validationInterval="1000"
-          timeBetweenEvictionRunsMillis="60000"
+          timeBetweenEvictionRunsMillis="30000"
           maxActive="100"
           minIdle="2"
           maxWait="30000"
@@ -72,7 +72,7 @@
           testOnReturn="true"
           validationQuery="SELECT version()"
           validationInterval="1000"
-          timeBetweenEvictionRunsMillis="60000"
+          timeBetweenEvictionRunsMillis="30000"
           maxActive="100"
           minIdle="2"
           maxWait="30000"
@@ -115,7 +115,8 @@
           username="jqm"
           password="jqm"
           driverClassName="com.mysql.jdbc.Driver"
-          url="jdbc:mysql://pic:3306/jqm?useSSL=false"
-          singleton="true"/> 
+          url="jdbc:mysql://pic:3306/jqm?useSSL=false&amp;disableMariaDbDriver"
+          singleton="true"
+          connectionProperties="connectionAttributes=program_name:jqm;useLegacyDatetimeCode=false;"/> 
 -->
 </resources>

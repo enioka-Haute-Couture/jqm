@@ -19,8 +19,8 @@
           removeAbandonedTimeout="3600"
           removeAbandoned="true"
           logAbandoned="true"
-          minEvictableIdleTimeMillis="30000"
-          jmxEnabled="false"
+          minEvictableIdleTimeMillis="60000"
+          jmxEnabled="true"
           username="SA"
           password=""
           driverClassName="org.hsqldb.jdbcDriver"
@@ -37,7 +37,7 @@
           testOnReturn="false"
           validationQuery="SELECT 1"
           validationInterval="1000"
-          timeBetweenEvictionRunsMillis="30000"
+          timeBetweenEvictionRunsMillis="1000"
           maxActive="80"
           maxIdle="40"
           minIdle="3"
@@ -46,7 +46,7 @@
           removeAbandonedTimeout="3600"
           removeAbandoned="true"
           logAbandoned="true"
-          minEvictableIdleTimeMillis="30000"
+          minEvictableIdleTimeMillis="60000"
           jmxEnabled="true"
           username="jqm"
           password="jqm"
@@ -63,8 +63,8 @@
           testOnBorrow="true"
           testOnReturn="false"
           validationQuery="CALL DBMS_APPLICATION_INFO.SET_MODULE('CONNECTION POOL', 'IDLE IN POOL')"
-          validationInterval="5000"
-          timeBetweenEvictionRunsMillis="60000"
+          validationInterval="1000"
+          timeBetweenEvictionRunsMillis="30000"
           maxActive="10"
           minIdle="1"
           maxIdle="4"
@@ -73,7 +73,7 @@
           removeAbandonedTimeout="3600"
           removeAbandoned="true"
           logAbandoned="true"
-          minEvictableIdleTimeMillis="30000"
+          minEvictableIdleTimeMillis="60000"
           jmxEnabled="true"
           username="jqm"
           password="jqm"
@@ -84,8 +84,7 @@
           initSQL="CALL DBMS_APPLICATION_INFO.SET_MODULE('CONNECTION POOL', 'IDLE IN POOL')"
           jdbcInterceptors="com.enioka.jqm.providers.Interceptor"/>
 
-    <!-- docker run -it - -rm -e "MYSQL_USER=jqm" -e "MYSQL_PASSWORD=jqm" -e "MYSQL_ROOT_PASSWORD=root" -e "MYSQL_DATABASE=jqm" -p 3306:3306 mysql -->
-	<resource
+    <resource
 	      name="jdbc/mysql"
           auth="Container"
           type="javax.sql.DataSource"

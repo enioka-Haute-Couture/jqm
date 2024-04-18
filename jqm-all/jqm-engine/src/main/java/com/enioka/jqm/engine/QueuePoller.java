@@ -235,6 +235,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
                 {
                     // Fetch the queue head. * 3 because we may reject quite a few JI inside resource managers.
                     List<JobInstance> newInstances = cnx.poll(this.queue, freeRoom > 100000 ? Integer.MAX_VALUE : freeRoom * 3);
+                    jqmlogger.trace("Poller has selected {} JIs to run", newInstances.size());
 
                     jiloop: for (JobInstance ji : newInstances)
                     {
@@ -256,7 +257,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
                                 jqmlogger.trace("Poller has a full RM");
                                 for (ResourceManagerBase reservedRm : alreadyReserved)
                                 {
-                                    reservedRm.releaseResource(ji);
+                                    reservedRm.rollbackResourceBooking(ji, cnx);
                                 }
                                 break jiloop;
                             case FAILED:
@@ -264,27 +265,34 @@ class QueuePoller implements Runnable, QueuePollerMBean
                                 jqmlogger.trace("Head JI asks for unavailable resources, skipping to next one");
                                 for (ResourceManagerBase reservedRm : alreadyReserved)
                                 {
-                                    reservedRm.releaseResource(ji);
+                                    reservedRm.rollbackResourceBooking(ji, cnx);
                                 }
                                 continue jiloop;
                             }
                         }
-
-                        actualNbThread.incrementAndGet();
 
                         // Actually set it for running on this node and report it on the in-memory object.
                         QueryResult qr = cnx.runUpdate("ji_update_status_by_id", this.engine.getNode().getId(), ji.getId());
                         if (qr.nbUpdated != 1)
                         {
                             // Means the JI was taken by another node, so simply continue.
-                            releaseResources(ji);
+                            for (ResourceManagerBase reservedRm : alreadyReserved)
+                            {
+                                reservedRm.rollbackResourceBooking(ji, cnx);
+                            }
                             continue;
                         }
                         ji.setNode(this.engine.getNode());
                         ji.setState(State.ATTRIBUTED);
 
                         // Commit taking possession of the JI (as well as anything whih may have been done inside the RMs)
+                        actualNbThread.incrementAndGet();
+                        jqmlogger.trace("Commit");
                         cnx.commit();
+                        for (ResourceManagerBase reservedRm : alreadyReserved)
+                        {
+                            reservedRm.commitResourceBooking(ji, cnx); // after transaction commit.
+                        }
 
                         // We will run this JI!
                         jqmlogger.trace("JI number {} will be run by this poller this loop (already {}/{} on {})", ji.getId(),

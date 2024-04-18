@@ -92,7 +92,7 @@
 
         <hsqldb.version>2.3.4</hsqldb.version>
         <h2.version>1.4.197</h2.version>
-        <mysql.client.version>8.0.15</mysql.client.version>
+        <mysql.client.version>8.0.33</mysql.client.version>
         <mariadb.client.version>2.4.0</mariadb.client.version>
         <postgresql.client.version>42.2.5</postgresql.client.version>
         <db2.client.version>11.1.4.4</db2.client.version>
