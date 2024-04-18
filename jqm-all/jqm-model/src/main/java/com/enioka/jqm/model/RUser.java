@@ -178,9 +178,8 @@ public class RUser implements Serializable
     public static List<RUser> select(DbConn cnx, String query_key, Object... args)
     {
         List<RUser> res = new ArrayList<>();
-        try
+        try (ResultSet rs = cnx.runSelect(query_key, args))
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 RUser tmp = new RUser();

@@ -53,9 +53,9 @@ public class MetaService
      * No commit performed.
      *
      * @param cnx
-     *                  database session to use. Not committed.
+     *            database session to use. Not committed.
      * @param force
-     *                  set to true if you want to delete metadata even if there is still transactional data depending on it.
+     *            set to true if you want to delete metadata even if there is still transactional data depending on it.
      */
     public static void deleteAllMeta(DbConn cnx, boolean force)
     {
@@ -556,10 +556,9 @@ public class MetaService
 
     public static JobDefDto getJobDef(DbConn cnx, Integer id)
     {
-        ResultSet rs = null;
-        try
+        try (var rs = cnx.runSelect("jd_select_by_id", id))
         {
-            rs = cnx.runSelect("jd_select_by_id", id);
+
             if (!rs.next())
             {
                 throw new JqmAdminApiUserException("no result");
@@ -809,10 +808,8 @@ public class MetaService
 
     public static NodeDto getNode(DbConn cnx, int id)
     {
-        ResultSet rs = null;
-        try
+        try (var rs = cnx.runSelect("node_select_by_id", id))
         {
-            rs = cnx.runSelect("node_select_by_id", id);
             if (!rs.next())
             {
                 throw new JqmAdminApiUserException("no result");
@@ -828,10 +825,8 @@ public class MetaService
 
     public static NodeDto getNode(DbConn cnx, String nodeName)
     {
-        ResultSet rs = null;
-        try
+        try (var rs = cnx.runSelect("node_select_by_key", nodeName))
         {
-            rs = cnx.runSelect("node_select_by_key", nodeName);
             if (!rs.next())
             {
                 throw new JqmAdminApiUserException("no result");
@@ -958,10 +953,8 @@ public class MetaService
 
     public static QueueDto getQueue(DbConn cnx, int id)
     {
-        ResultSet rs = null;
-        try
+        try (var rs = cnx.runSelect("q_select_by_id", id))
         {
-            rs = cnx.runSelect("q_select_by_id", id);
             if (!rs.next())
             {
                 throw new JqmAdminApiUserException("no result");

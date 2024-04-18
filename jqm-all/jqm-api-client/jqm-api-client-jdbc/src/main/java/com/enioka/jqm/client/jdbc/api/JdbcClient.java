@@ -476,6 +476,10 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         {
             throw new JqmClientException("Could not extract History data for launch " + launchId, e);
         }
+        finally
+        {
+            cnx.closeQuietly(rs);
+        }
 
         return jd;
     }
@@ -688,10 +692,8 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     public int restartCrashedJob(int idJob)
     {
         // History and Job ID have the same ID.
-        try (DbConn cnx = getDbSession())
+        try (DbConn cnx = getDbSession(); ResultSet rs = cnx.runSelect("history_select_reenqueue_by_id", idJob);)
         {
-            ResultSet rs = cnx.runSelect("history_select_reenqueue_by_id", idJob);
-
             if (!rs.next())
             {
                 throw new JqmClientException("You cannot restart a job that is not done or which was purged from history");
@@ -1559,9 +1561,8 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     {
         URL url = null;
 
-        try (DbConn cnx = getDbSession())
+        try (DbConn cnx = getDbSession(); ResultSet rs = cnx.runSelect("node_select_connectdata_by_key", nodeName);)
         {
-            ResultSet rs = cnx.runSelect("node_select_connectdata_by_key", nodeName);
             if (!rs.next())
             {
                 throw new NoResultException("no node named " + nodeName);
@@ -1900,10 +1901,8 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     @Override
     public QueueStatus getQueueStatus(com.enioka.jqm.client.api.Queue q)
     {
-        try (DbConn cnx = getDbSession())
+        try (DbConn cnx = getDbSession(); ResultSet rs = cnx.runSelect("dp_select_enabled_for_queue", q.getId());)
         {
-            ResultSet rs = cnx.runSelect("dp_select_enabled_for_queue", q.getId());
-
             int nbEnabled = 0, nbDisabled = 0;
             while (rs.next())
             {
@@ -1943,10 +1942,8 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     public int getQueueEnabledCapacity(com.enioka.jqm.client.api.Queue q)
     {
         int capacity = 0;
-        try (DbConn cnx = getDbSession())
+        try (DbConn cnx = getDbSession(); ResultSet rs = cnx.runSelect("dp_select_sum_queue_capacity", q.getId());)
         {
-            ResultSet rs = cnx.runSelect("dp_select_sum_queue_capacity", q.getId());
-
             while (rs.next())
             {
                 capacity = rs.getInt(1);

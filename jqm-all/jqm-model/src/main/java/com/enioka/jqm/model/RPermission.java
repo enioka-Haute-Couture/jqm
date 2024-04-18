@@ -69,9 +69,8 @@ public class RPermission implements Serializable
     public static List<RPermission> select(DbConn cnx, String query_key, Object... args)
     {
         List<RPermission> res = new ArrayList<>();
-        try
+        try (ResultSet rs = cnx.runSelect(query_key, args))
         {
-            ResultSet rs = cnx.runSelect(query_key, args);
             while (rs.next())
             {
                 RPermission tmp = new RPermission();
