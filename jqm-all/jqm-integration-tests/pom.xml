@@ -19,6 +19,36 @@
             java.naming/javax.naming.spi=ALL-UNNAMED</argLine>
     </properties>
 
+    <profiles>
+        <!-- https://issues.apache.org/jira/browse/MDEP-187 -->
+        <!-- Must disable unpack in M2E -->
+        <!-- it means the external tests cannot run without CLI help -->
+        <profile>
+            <id>dev</id>
+            <activation>
+                <property>
+                    <!-- Also disable this build when inside eclipse or vs code. -->
+                    <name>m2e.version</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+
+                        <executions>
+                            <execution>
+                                <id>unpack-full-server</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <!-- Create ext and lib directories for tests -->
