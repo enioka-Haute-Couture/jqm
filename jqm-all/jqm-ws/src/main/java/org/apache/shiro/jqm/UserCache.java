@@ -11,7 +11,7 @@ import java.util.Set;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.util.CollectionUtils;
-import org.apache.shiro.util.SoftHashMap;
+import org.apache.shiro.lang.util.SoftHashMap;
 
 /**
  * Heavy copy/paste from Shiro's MapCache.

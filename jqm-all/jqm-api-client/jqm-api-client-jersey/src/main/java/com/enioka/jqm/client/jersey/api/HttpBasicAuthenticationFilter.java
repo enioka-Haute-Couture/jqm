@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Base64;
 
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.core.HttpHeaders;
 
 /**
  * Basic preemptive HTTP authentication filter for JAX-RS. For use with {@link HttpBasicAuthenticationFeature} only. Most JAX-RS clients

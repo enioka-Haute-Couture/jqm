@@ -17,7 +17,7 @@ package com.enioka.api.admin;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  * Global parameters are shared between all nodes in the JQM cluster and control various aspects of its behaviour: to use SSL or not, which

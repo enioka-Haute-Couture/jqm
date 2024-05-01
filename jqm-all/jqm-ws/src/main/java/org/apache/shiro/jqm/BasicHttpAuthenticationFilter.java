@@ -17,8 +17,8 @@ package org.apache.shiro.jqm;
 
 import java.security.cert.X509Certificate;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 
 import org.apache.shiro.authc.AuthenticationToken;
 
@@ -27,7 +27,8 @@ public class BasicHttpAuthenticationFilter extends org.apache.shiro.web.filter.a
     @Override
     protected boolean isLoginAttempt(ServletRequest request, ServletResponse response)
     {
-        final X509Certificate[] clientCertificateChain = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+        final X509Certificate[] clientCertificateChain = (X509Certificate[]) request
+                .getAttribute("jakarta.servlet.request.X509Certificate");
         if (clientCertificateChain != null && clientCertificateChain.length > 0)
         {
             return true;
@@ -41,7 +42,8 @@ public class BasicHttpAuthenticationFilter extends org.apache.shiro.web.filter.a
     @Override
     protected AuthenticationToken createToken(ServletRequest request, ServletResponse response)
     {
-        final X509Certificate[] clientCertificateChain = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+        final X509Certificate[] clientCertificateChain = (X509Certificate[]) request
+                .getAttribute("jakarta.servlet.request.X509Certificate");
         if (clientCertificateChain != null && clientCertificateChain.length > 0)
         {
             return new CertificateToken(clientCertificateChain[0]);

@@ -3,21 +3,21 @@ package com.enioka.jqm.ws.plumbing;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.ext.Provider;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsExtension;
+import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsExtension;
 
 /**
  * The provider behind the {@link HttpCache} annotation. It is simply a {@link ContainerResponseFilter} that looks for the aforementioned
  * annotation and adds the <code>Cache-Control</code> header to the HTTP response if found.
  */
 @Provider
-@JaxrsExtension
+@JakartarsExtension
 @Component
 public class HttpCacheImpl implements ContainerResponseFilter
 {

@@ -1,7 +1,7 @@
 package com.enioka.jqm.ws.plumbing;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
 

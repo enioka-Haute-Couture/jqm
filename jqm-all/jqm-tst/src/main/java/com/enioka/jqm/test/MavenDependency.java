@@ -36,7 +36,7 @@ class MavenDependency
 
     private void refreshOsgiDataIfNeeded()
     {
-        if (bundleName != null || this.file == null)
+        if (bundleName != null || this.file == null || !this.file.getName().endsWith(".jar"))
         {
             return;
         }
@@ -90,6 +90,10 @@ class MavenDependency
 
     public String getPaxUrl()
     {
+        if (this.file == null)
+        {
+            return null;
+        }
         // return isOsgiBundle() ? "file:" + this.coordinates.replace(':', '/') : "wrap:file:" + this.coordinates.replace(':', '/');
         return (isOsgiBundle() ? "file:" : "wrap:file:") + this.file.getAbsolutePath();
     }

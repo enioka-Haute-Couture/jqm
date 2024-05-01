@@ -48,7 +48,7 @@ import com.enioka.jqm.model.RUser;
 
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
-import org.apache.shiro.util.ByteSource;
+import org.apache.shiro.lang.util.ByteSource;
 
 /**
  * A set of static methods which help creating test data for automated tests.<br>
@@ -59,8 +59,7 @@ public class CreationTools
     // private static Logger jqmlogger = LoggerFactory.getLogger(CreationTools.class);
 
     private CreationTools()
-    {
-    }
+    {}
 
     // ------------------ JOB DEFINITION ------------------------
 

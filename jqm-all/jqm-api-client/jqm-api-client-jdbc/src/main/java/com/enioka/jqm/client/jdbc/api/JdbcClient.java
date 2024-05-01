@@ -19,16 +19,10 @@
 package com.enioka.jqm.client.jdbc.api;
 
 import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -40,9 +34,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.UUID;
 
-import javax.net.ssl.SSLContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.client.api.JobRequest;
 import com.enioka.jqm.client.api.JqmClient;
@@ -57,9 +51,8 @@ import com.enioka.jqm.client.api.QueueStatus;
 import com.enioka.jqm.client.api.Schedule;
 import com.enioka.jqm.client.shared.JobRequestBaseImpl;
 import com.enioka.jqm.client.shared.JqmClientEnqueueCallback;
-import com.enioka.jqm.client.shared.QueryBaseImpl;
 import com.enioka.jqm.client.shared.JqmClientQuerySubmitCallback;
-import com.enioka.jqm.client.shared.SelfDestructFileStream;
+import com.enioka.jqm.client.shared.QueryBaseImpl;
 import com.enioka.jqm.client.shared.SimpleApiSecurity;
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.Db;
@@ -69,7 +62,6 @@ import com.enioka.jqm.jdbc.NoResultException;
 import com.enioka.jqm.jdbc.NonUniqueResultException;
 import com.enioka.jqm.jdbc.QueryResult;
 import com.enioka.jqm.model.Deliverable;
-import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.History;
 import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobDef;
@@ -81,21 +73,6 @@ import com.enioka.jqm.model.RuntimeParameter;
 import com.enioka.jqm.model.ScheduledJob;
 import com.enioka.jqm.model.State;
 
-import org.apache.http.Header;
-import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContexts;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Main JQM client API entry point.
  */
@@ -104,8 +81,8 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
     private static Logger jqmlogger = LoggerFactory.getLogger(JdbcClient.class);
     private static final int IN_CLAUSE_LIMIT = 500;
 
+    private final SimpleHttpClient httpClient;
     private Db db = null;
-    private String protocol = null;
     Properties p;
 
     // /////////////////////////////////////////////////////////////////////
@@ -121,6 +98,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
             jqmlogger.trace("database context present in properties");
             db = (Db) p.get("com.enioka.jqm.jdbc.contextobject");
         }
+        this.httpClient = new SimpleHttpClient(p);
         // otherwise db is created on first use.
     }
 
@@ -1575,7 +1553,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
                 throw new NonUniqueResultException("configuration issue: multiple nodes named " + nodeName);
             }
 
-            url = new URL(getFileProtocol(cnx) + dns + ":" + port + "/ws/simple/enginelog?latest=" + latest);
+            url = new URL(httpClient.getFileProtocol(cnx) + dns + ":" + port + "/ws/simple/enginelog?latest=" + latest);
             jqmlogger.trace("Will invoke engine log URL: " + url.toString());
         }
         catch (MalformedURLException e)
@@ -1612,149 +1590,12 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
         return getFile(url.toString());
     }
 
-    private String getFileProtocol(DbConn cnx)
-    {
-        if (protocol == null)
-        {
-            protocol = "http://";
-            try
-            {
-                String prm = GlobalParameter.getParameter(cnx, "enableWsApiSsl", "false");
-                if (Boolean.parseBoolean(prm))
-                {
-                    protocol = "https://";
-                }
-            }
-            catch (NoResultException e)
-            {
-                protocol = "http://";
-            }
-        }
-        return protocol;
-    }
-
     private InputStream getFile(String url)
     {
-        File file = null;
-        String nameHint = null;
-
-        File destDir = new File(System.getProperty("java.io.tmpdir"));
-        if (!destDir.isDirectory() && !destDir.mkdir())
+        try (var cnx = getDbSession())
         {
-            throw new JqmClientException("could not create temp directory " + destDir.getAbsolutePath());
+            return httpClient.getFile(cnx, url);
         }
-        jqmlogger.trace("File will be copied into " + destDir);
-
-        try (DbConn cnx = getDbSession())
-        {
-            file = new File(destDir + "/" + UUID.randomUUID().toString());
-
-            CredentialsProvider credsProvider = null;
-            if (SimpleApiSecurity.getId(cnx).usr != null)
-            {
-                credsProvider = new BasicCredentialsProvider();
-                credsProvider.setCredentials(AuthScope.ANY,
-                        new UsernamePasswordCredentials(SimpleApiSecurity.getId(cnx).usr, SimpleApiSecurity.getId(cnx).pass));
-            }
-            SSLContext ctx = null;
-            if (getFileProtocol(cnx).equals("https://"))
-            {
-                try
-                {
-                    if (p != null && p.containsKey("com.enioka.jqm.ws.truststoreFile"))
-                    {
-                        KeyStore trust = null;
-
-                        try
-                        {
-                            trust = KeyStore.getInstance(this.p.getProperty("com.enioka.jqm.ws.truststoreType", "JKS"));
-                        }
-                        catch (KeyStoreException e)
-                        {
-                            throw new JqmInvalidRequestException("Specified trust store type ["
-                                    + this.p.getProperty("com.enioka.jqm.ws.truststoreType", "JKS") + "] is invalid", e);
-                        }
-
-                        try (InputStream trustIs = new FileInputStream(this.p.getProperty("com.enioka.jqm.ws.truststoreFile")))
-                        {
-
-                            String trustp = this.p.getProperty("com.enioka.jqm.ws.truststorePass", null);
-                            trust.load(trustIs, (trustp == null ? null : trustp.toCharArray()));
-                        }
-                        catch (FileNotFoundException e)
-                        {
-                            throw new JqmInvalidRequestException(
-                                    "Trust store file [" + this.p.getProperty("com.enioka.jqm.ws.truststoreFile") + "] cannot be found", e);
-                        }
-                        catch (Exception e)
-                        {
-                            throw new JqmInvalidRequestException("Could not load the trust store file", e);
-                        }
-
-                        ctx = SSLContexts.custom().loadTrustMaterial(trust, null).build();
-                    }
-                    else
-                    {
-                        ctx = SSLContexts.createSystemDefault();
-                    }
-                }
-                catch (Exception e)
-                {
-                    // Cannot happen - not trust store is actually loaded!
-                    jqmlogger.error("An supposedly impossible error has happened. Downloading files through the API may not work.", e);
-                }
-            }
-
-            // CloseableHttpResponse rs = null;
-            try (CloseableHttpClient cl = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setSSLContext(ctx).build())
-            {
-                // Run HTTP request
-                HttpUriRequest rq = new HttpGet(url.toString());
-                try (CloseableHttpResponse rs = cl.execute(rq))
-                {
-                    if (rs.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
-                    {
-                        throw new JqmClientException(
-                                "Could not retrieve file from JQM node. The file may have been purged, or the node may be unreachable. HTTP code was: "
-                                        + rs.getStatusLine().getStatusCode());
-                    }
-
-                    // There may be a filename hint inside the response
-                    Header[] hs = rs.getHeaders("Content-Disposition");
-                    if (hs.length == 1)
-                    {
-                        Header h = hs[0];
-                        if (h.getValue().contains("filename="))
-                        {
-                            nameHint = h.getValue().split("=")[1];
-                        }
-                    }
-
-                    try (FileOutputStream fos = new FileOutputStream(file))
-                    {
-                        // Save the file to a temp local file
-                        rs.getEntity().writeTo(fos);
-                        jqmlogger.trace("File was downloaded to " + file.getAbsolutePath());
-                    }
-                }
-            }
-        }
-        catch (IOException e)
-        {
-            throw new JqmClientException("Could not create a webserver-local copy of the file. The remote node may be down. " + url, e);
-        }
-
-        SelfDestructFileStream res = null;
-        try
-        {
-            res = new SelfDestructFileStream(file);
-        }
-        catch (IOException e)
-        {
-            throw new JqmClientException("File seems not to be present where it should have been downloaded", e);
-        }
-        res.nameHint = nameHint;
-        return res;
     }
 
     @Override
@@ -1795,8 +1636,7 @@ final class JdbcClient implements JqmClient, JqmClientEnqueueCallback, JqmClient
                 throw new JqmInvalidRequestException("cannot retrieve a file from a deleted node");
             }
 
-            protocol = getFileProtocol(cnx);
-            return protocol + host;
+            return httpClient.getFileProtocol(cnx) + host;
         }
         catch (JqmException e)
         {

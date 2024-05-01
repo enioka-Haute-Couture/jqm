@@ -22,7 +22,7 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlTransient;
 
 /**
  * Job execution request. It contains the job application name (the only mandatory piece of data needed to enqueue a request), as well as

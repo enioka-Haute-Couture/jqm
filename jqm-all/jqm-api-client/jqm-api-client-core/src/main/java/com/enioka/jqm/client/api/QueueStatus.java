@@ -1,6 +1,6 @@
 package com.enioka.jqm.client.api;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  * The different status a queue can take.

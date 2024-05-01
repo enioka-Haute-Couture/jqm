@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -32,6 +34,7 @@ import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.BundleWiring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 class OsgiRuntime
 {
@@ -39,7 +42,13 @@ class OsgiRuntime
 
     static CommandLine newFramework()
     {
+        // Logging stuff
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+
+        // Go for framework
         jqmlogger.info("Initializing OSGi framework instance");
+        Set<String> loadedBundles = new HashSet<>();
 
         // System properties
         System.setProperty("java.protocol.handler.pkgs", "org.ops4j.pax.url");
@@ -72,10 +81,9 @@ class OsgiRuntime
         Map<String, String> osgiConfig = new HashMap<>();
         osgiConfig.put(Constants.FRAMEWORK_STORAGE, tmpPath);
         osgiConfig.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA,
-                "com.enioka.jqm.cli.bootstrap;version=1.0.0,org.slf4j;version=1.7.32,org.slf4j.spi;version=1.7.32,org.slf4j.helpers;version=1.7.32,ch.qos.logback.classic;version=1.2.0,ch.qos.logback.classic.spi;version=1.2.0,ch.qos.logback.core;version=1.2.0,ch.qos.logback.core.rolling;version=1.2.0");
+                "com.enioka.jqm.cli.bootstrap;version=1.0.0,org.slf4j;version=1.999.0,org.slf4j.spi;version=1.999.0,org.slf4j.helpers;version=1.999.0,ch.qos.logback.classic;version=1.999.0,ch.qos.logback.classic.spi;version=1.999.0,ch.qos.logback.core;version=1.999.0,ch.qos.logback.core.rolling;version=1.999.0,javax.security.auth.x500;version=1.999.0,org.apache.commons.logging");
         osgiConfig.put("org.osgi.framework.startlevel.beginning", "1"); // 0 is framework, 1 is framework extension, 5 is normal.
         osgiConfig.put("felix.auto.deploy.action", ""); // Disable auto deploy
-        osgiConfig.put("org.apache.aries.jax.rs.whiteboard.default.enabled", "false"); // Do not auto start web server
         osgiConfig.put("org.apache.cxf.osgi.http.transport.disable", "true"); // remove /cxf
         osgiConfig.put("org.apache.felix.http.enable", "false");
         osgiConfig.put("org.apache.felix.https.enable", "false");
@@ -119,10 +127,13 @@ class OsgiRuntime
         for (String file : new File(levelOneLibPath).list())
         {
             String path = new File(levelOneLibPath, file).toURI().toString();
-            Bundle b = tryInstallBundle(ctx, path, 1);
-            if (b != null)
+            if (loadedBundles.add(file))
             {
-                levelBundles.add(b);
+                Bundle b = tryInstallBundle(ctx, path, 1);
+                if (b != null)
+                {
+                    levelBundles.add(b);
+                }
             }
         }
         jqmlogger.debug("Starting level 1 bundles...");
@@ -136,7 +147,10 @@ class OsgiRuntime
         for (String file : new File(libPath).list())
         {
             String path = new File(libPath, file).toURI().toString();
-            tryInstallBundle(ctx, path);
+            if (loadedBundles.add(file))
+            {
+                tryInstallBundle(ctx, path);
+            }
         }
 
         // Start the bundles
@@ -260,7 +274,7 @@ class OsgiRuntime
             }
             else
             {
-                jqmlogger.info("This bundle is not an OSGi bundle and will be wrapped before installing");
+                jqmlogger.debug("This bundle {} is not an OSGi bundle and will be wrapped before installing", path);
                 b = ctx.installBundle("wrap:" + path);
             }
             b.adapt(BundleStartLevel.class).setStartLevel(startLevel);

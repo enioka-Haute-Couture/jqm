@@ -17,10 +17,20 @@ package com.enioka.jqm.integration.tests;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.ops4j.pax.exam.Option;
 
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
@@ -28,19 +38,6 @@ import com.enioka.jqm.pki.JdbcCa;
 import com.enioka.jqm.repository.UserManagementRepository;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.conn.ssl.DefaultHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContexts;
-import org.junit.Assert;
-import org.junit.Test;
-import org.ops4j.pax.exam.Option;
 
 public class JettyTest extends JqmBaseTest
 {
@@ -54,9 +51,7 @@ public class JettyTest extends JqmBaseTest
 
     private void waitStartup()
     {
-        serviceWaiter.waitForService("[com.enioka.jqm.ws.api.ServiceSimple]");
-        serviceWaiter.waitForService("[javax.servlet.Servlet]"); // HTTP whiteboard
-        serviceWaiter.waitForService("[javax.servlet.Servlet]"); // JAX-RS whiteboard
+        this.waitForWsStart();
 
         port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
         jqmlogger.info("Jetty port seen by client is {}", port);
@@ -93,31 +88,28 @@ public class JettyTest extends JqmBaseTest
 
         // HTTPS client - with
         KeyStore trustStore = KeyStore.getInstance("JKS");
-        FileInputStream instream = new FileInputStream(new File("./conf/trusted.jks"));
-        try
+        try (var instream = new FileInputStream(new File("./conf/trusted.jks")))
         {
             trustStore.load(instream, "SuperPassword".toCharArray());
         }
-        finally
-        {
-            instream.close();
-        }
 
-        SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(trustStore, null).build();
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1.2" }, null,
-                new DefaultHostnameVerifier());
+        var tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(trustStore);
+        SSLContext sslcontext = SSLContext.getInstance("TLS");
+        sslcontext.init(null, tmf.getTrustManagers(), null);
 
-        CloseableHttpClient cl = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+        var cl = HttpClient.newBuilder().sslContext(sslcontext).build();
 
         int port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
-        HttpUriRequest rq = new HttpGet("https://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + i);
-        jqmlogger.debug(rq.getURI().toString());
-        CloseableHttpResponse rs = cl.execute(rq);
-        Assert.assertEquals(200, rs.getStatusLine().getStatusCode());
-        jqmlogger.debug(IOUtils.toString(rs.getEntity().getContent(), StandardCharsets.UTF_8));
 
-        rs.close();
-        cl.close();
+        var uri = new URI("https://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + i);
+        HttpRequest rq = HttpRequest.newBuilder(uri).GET().build();
+        jqmlogger.debug("{}", uri);
+
+        var rs = cl.send(rq, BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+        Assert.assertEquals(200, rs.statusCode());
+        jqmlogger.debug(rs.body());
     }
 
     @Test
@@ -163,22 +155,26 @@ public class JettyTest extends JqmBaseTest
             instream.close();
         }
 
-        SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(trustStore, null)
-                .loadKeyMaterial(clientStore, "SuperPassword".toCharArray()).build();
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1.2" }, null,
-                new DefaultHostnameVerifier());
+        // Create client
+        var tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(trustStore);
+        var kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        kmf.init(clientStore, "SuperPassword".toCharArray());
 
-        CloseableHttpClient cl = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+        SSLContext sslcontext = SSLContext.getInstance("TLS");
+        sslcontext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+
+        var cl = HttpClient.newBuilder().sslContext(sslcontext).build();
 
         int port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
-        HttpUriRequest rq = new HttpGet("https://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + i);
-        jqmlogger.debug(rq.getURI().toString());
-        CloseableHttpResponse rs = cl.execute(rq);
-        jqmlogger.debug(IOUtils.toString(rs.getEntity().getContent(), StandardCharsets.UTF_8));
-        Assert.assertEquals(200, rs.getStatusLine().getStatusCode());
 
-        rs.close();
-        cl.close();
+        var uri = new URI("https://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + i);
+        HttpRequest rq = HttpRequest.newBuilder(uri).GET().build();
+        jqmlogger.debug("{}", uri);
 
+        var rs = cl.send(rq, BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+        Assert.assertEquals(200, rs.statusCode());
+        jqmlogger.debug(rs.body());
     }
 }

@@ -2,7 +2,7 @@ package com.enioka.jqm.client.jersey.api;
 
 import java.util.Properties;
 
-import javax.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.ClientBuilder;
 
 import com.enioka.jqm.client.api.JqmClient;
 import com.enioka.jqm.client.shared.BaseJqmClientFactory;

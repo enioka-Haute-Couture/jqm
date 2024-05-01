@@ -18,7 +18,7 @@ package com.enioka.api.admin;
 import java.io.Serializable;
 import java.util.Calendar;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class NodeDto implements Serializable
