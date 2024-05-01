@@ -116,7 +116,8 @@ public class JqmBaseTest
                 systemPackages("org.slf4j;version=1.999.0", "org.slf4j;version=2.999.0", "org.slf4j.spi;version=2.999.0",
                         "org.slf4j.helpers;version=2.999.0", "ch.qos.logback.classic;version=1.999.0",
                         "ch.qos.logback.classic.spi;version=1.999.0", "ch.qos.logback.core;version=1.999.0",
-                        "ch.qos.logback.core.rolling;version=1.999.0", "org.apache.commons.logging", "org.slf4j.bridge"),
+                        "ch.qos.logback.core.rolling;version=1.999.0", "org.apache.commons.logging", "org.apache.commons.logging.impl",
+                        "org.slf4j.bridge"),
 
                 // SPI-Fly is needed in order to load java.util.ServiceLoader services (here needed for JAXB implementations)
                 // Note that we cannot use the "one bundle" framework extension in PAX-EXAM, hence the many bundles here.
@@ -290,15 +291,17 @@ public class JqmBaseTest
                 mavenBundle("jakarta.annotation", "jakarta.annotation-api", "2.1.1"), // additional version for HK2
 
                 // Web security
-                mavenBundle("org.apache.shiro", "shiro-core").classifier("jakarta").versionAsInProject(), //
-                mavenBundle("org.apache.shiro", "shiro-web").classifier("jakarta").versionAsInProject(), //
+                // mavenBundle("org.apache.shiro", "shiro-core").classifier("jakarta").versionAsInProject(), //
+                // mavenBundle("org.apache.shiro", "shiro-web").classifier("jakarta").versionAsInProject(), //
+                url("reference:file:../jqm-osgi-repackaging/jqm-osgi-repackaging-shiro/target/classes/"),
                 mavenBundle("org.apache.shiro", "shiro-cache").versionAsInProject(), //
                 mavenBundle("org.apache.shiro", "shiro-event").versionAsInProject(), //
                 mavenBundle("org.apache.shiro", "shiro-crypto-cipher").versionAsInProject(), //
                 mavenBundle("org.apache.shiro", "shiro-config-core").versionAsInProject(), //
                 mavenBundle("org.apache.shiro", "shiro-config-ogdl").versionAsInProject(), //
                 mavenBundle("org.owasp.encoder", "encoder").versionAsInProject(),
-                // mavenBundle("jakarta.annotation", "jakarta.annotation-api", "1.3.5"), // additional version - javax!!!
+                mavenBundle("org.apache.commons", "commons-configuration2").versionAsInProject(),
+                mavenBundle("org.apache.commons", "commons-text").versionAsInProject(),
 
                 // JAXB implementation
                 mavenBundle("com.sun.xml.bind", "jaxb-osgi").versionAsInProject(),

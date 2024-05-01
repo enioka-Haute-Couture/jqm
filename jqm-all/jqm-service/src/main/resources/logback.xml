@@ -2,7 +2,9 @@
     <!-- A console appender -->
     <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%date{dd/MM HH:mm:ss.SSS}|%-5level|%-70.70thread|%35.35logger{1}|%exception%message%n</pattern>
+            <pattern>
+                %date{dd/MM.HH:mm:ss.SSS}|%-5level|%-70.70thread|%35.35logger{1}|%exception%message%n
+            </pattern>
         </encoder>
     </appender>
 
@@ -18,16 +20,18 @@
         </rollingPolicy>
 
         <encoder>
-            <pattern>%date{dd/MM HH:mm:ss.SSS}|%-5level|%-70.70thread|%30.30logger{1}|%exception%message%n</pattern>
+            <pattern>
+                %date{dd/MM.HH:mm:ss.SSS}|%-5level|%-40.40thread|%30.30logger{1}|%exception%message%n
+            </pattern>
         </encoder>
     </appender>
 
     <logger name="hsqldb" level="warn" />
     <logger name="com.enioka.jqm" level="info" />
+    <logger name="org.apache.commons.beanutils" level="info" />
     <logger name="org.eclipse.jetty" level="warn" />
     <logger name="org.apache.felix" level="info" />
     <logger name="org.apache.aries" level="warn" />
-    <logger name="org.apache.cxf" level="warn" />
     <logger name="org.apache.shiro" level="info" />
 
     <root level="info">

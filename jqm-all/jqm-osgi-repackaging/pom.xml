@@ -16,8 +16,9 @@
     <description>Some libraries are not packaged as OSGi bundles. We should create one module per library under this parent module in order to repackage them.</description>
 
     <modules>
-        <module>jqm-osgi-repackaging-winp</module>
-        <module>jqm-osgi-repackaging-jdom</module>
         <module>jqm-osgi-repackaging-cron4j</module>
+        <module>jqm-osgi-repackaging-jdom</module>
+        <module>jqm-osgi-repackaging-shiro</module>
+        <module>jqm-osgi-repackaging-winp</module>
     </modules>
 </project>
