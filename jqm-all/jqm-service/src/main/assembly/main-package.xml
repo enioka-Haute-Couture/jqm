@@ -1,12 +1,15 @@
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
     <id>main-package</id>
     <formats>
         <format>tar.gz</format>
         <format>zip</format>
+        <format>dir</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
     <baseDirectory>jqm-${project.version}</baseDirectory>
+
     <fileSets>
         <fileSet>
             <directory>${project.basedir}/..</directory>
@@ -100,27 +103,39 @@
             </excludes>
         </fileSet>
     </fileSets>
+
     <files>
         <file>
             <source>${project.build.directory}/${project.artifactId}-${project.version}.jar</source>
             <outputDirectory></outputDirectory>
             <destName>jqm.jar</destName>
         </file>
+        <file>
+            <source>${project.build.directory}/jakarta.annotation-api.old.jar</source>
+            <outputDirectory>bundle</outputDirectory>
+            <destName>jqm.jar</destName>
+        </file>
     </files>
+
     <dependencySets>
+        <!-- Needed for the service code (bootstrap libs) -->
         <dependencySet>
             <outputDirectory>lib</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
             <unpack>false</unpack>
-            <scope>runtime</scope>
+            <scope>compile</scope>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
                 <include>org.apache.felix:org.apache.felix.framework</include>
                 <include>org.slf4j:slf4j-api</include>
+                <include>org.slf4j:jul-to-slf4j</include>
+                <include>org.slf4j:jcl-over-slf4j</include>
                 <include>ch.qos.logback:*</include>
                 <include>com.enioka.jqm:jqm-cli-bootstrap</include>
             </includes>
         </dependencySet>
+
+        <!-- OSGi level 1 = framework extensions -->
         <dependencySet>
             <outputDirectory>bundle/level1</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
@@ -130,10 +145,14 @@
             <excludes>
                 <exclude>org.apache.felix:org.apache.felix.framework</exclude>
                 <exclude>org.slf4j:slf4j-api</exclude>
+                <exclude>org.slf4j:jul-to-slf4j</exclude>
+                <exclude>org.slf4j:jcl-over-slf4j</exclude>
                 <exclude>ch.qos.logback:*</exclude>
                 <exclude>com.enioka.jqm:jqm-cli-bootstrap</exclude>
             </excludes>
         </dependencySet>
+
+        <!-- Normal bundles (JQM itself) -->
         <dependencySet>
             <outputDirectory>bundle</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
@@ -145,19 +164,12 @@
                 <exclude>org.apache.tomcat</exclude>
                 <exclude>com.sun.mail</exclude>
                 <exclude>org.osgi:osgi.*</exclude>                <!-- OSGi APIs are actually provided by the framework -->
-                <exclude>org.osgi:org.osgi.service.c*</exclude>
                 <exclude>junit:junit</exclude>
-                <exclude>org.glassfish.jaxb:jaxb-runtime</exclude>                <!-- WHY OH WHY CXF WHITEBOARD???? -->
                 <exclude>com.enioka.jqm:jqm-providers</exclude>
-                <exclude>org.apache.shiro:shiro-cache</exclude>
-                <exclude>org.apache.shiro:shiro-crypto-cipher</exclude>                <!-- We prefer using the "all in one" bundles coming from jqm-web-->
-                <exclude>org.apache.shiro:shiro-config-core</exclude>
-                <exclude>org.apache.shiro:shiro-config-ogdl</exclude>
-                <exclude>org.apache.shiro:shiro-crypto-hash</exclude>
-                <exclude>org.apache.shiro:shiro-lang</exclude>
-                <exclude>org.apache.shiro:shiro-crypto-core</exclude>
             </excludes>
         </dependencySet>
+
+        <!-- Demos -->
         <dependencySet>
             <outputDirectory>jobs/jqm-demo/${artifact.artifactId}</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
@@ -169,6 +181,8 @@
                 <include>com.enioka.jqm:jqm-test-pyl-nodep:jar</include>
             </includes>
         </dependencySet>
+
+        <!-- Drivers -->
         <dependencySet>
             <outputDirectory>ext</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
@@ -180,9 +194,9 @@
                 <include>org.apache.tomcat:tomcat-juli</include>
                 <include>com.enioka.jqm:jqm-providers</include>
                 <include>com.enioka.jqm:jqm-api</include>
-                <include>com.sun.mail:javax.mail</include>
+                <include>jakarta.mail:jakarta.mail-api</include>
                 <include>com.sun.activation:jakarta.activation</include>
-                <include>com.sun.mail:smtp</include>
+                <include>org.eclipse.angus:angus-mail</include>
             </includes>
         </dependencySet>
     </dependencySets>

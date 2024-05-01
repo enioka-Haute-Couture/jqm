@@ -16,11 +16,21 @@
 package com.enioka.jqm.integration.tests;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.ops4j.pax.exam.Option;
 
 import com.enioka.jqm.client.api.JobInstance;
 import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
@@ -29,21 +39,6 @@ import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.State;
 import com.enioka.jqm.test.helpers.CreationTools;
 import com.enioka.jqm.test.helpers.TestHelpers;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.ops4j.pax.exam.Option;
 
 /**
  * Tests of the simple web API.
@@ -68,9 +63,7 @@ public class ApiSimpleTest extends JqmBaseTest
 
         addAndStartEngine();
 
-        serviceWaiter.waitForService("[com.enioka.jqm.ws.api.ServiceSimple]");
-        serviceWaiter.waitForService("[javax.servlet.Servlet]"); // HTTP whiteboard
-        serviceWaiter.waitForService("[javax.servlet.Servlet]"); // JAX-RS whiteboard
+        this.waitForWsStart();
 
         port = Node.select_single(cnx, "node_select_by_id", TestHelpers.node.getId()).getPort();
         jqmlogger.info("Jetty port seen by client is {}", port);
@@ -82,29 +75,29 @@ public class ApiSimpleTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "pyl.EngineApiSend3Msg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip,
                 42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
-        HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/ji");
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair("applicationname", "Marsu-Application"));
-        nvps.add(new BasicNameValuePair("user", "testuser"));
-        nvps.add(new BasicNameValuePair("module", "testuser"));
-        nvps.add(new BasicNameValuePair("parameterNames", "arg"));
-        nvps.add(new BasicNameValuePair("parameterValues", "overridevalue"));
-        nvps.add(new BasicNameValuePair("parameterNames", "arg2"));
-        nvps.add(new BasicNameValuePair("parameterValues", "newvalue2"));
-        post.setEntity(new UrlEncodedFormEntity(nvps));
+        var url = "http://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/ji";
+        var postData = List.of( // a form encoded body
+                Map.entry("applicationname", "Marsu-Application"), //
+                Map.entry("user", "testuser"), //
+                Map.entry("module", "testuser"), //
+                Map.entry("parameterNames", "arg"), //
+                Map.entry("parameterValues", "overridevalue"), //
+                Map.entry("parameterNames", "arg2"), //
+                Map.entry("parameterValues", "newvalue2")).stream()
+                .map(entry -> Stream.of(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8),
+                        URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8)).collect(Collectors.joining("=")))
+                .collect(Collectors.joining("&"));
 
-        HttpClient client = HttpClients.createDefault();
-        HttpResponse res = client.execute(post);
+        HttpClient client = HttpClient.newHttpClient();
 
-        Assert.assertEquals(200, res.getStatusLine().getStatusCode());
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("Content-Type", "application/x-www-form-urlencoded")
+                .POST(HttpRequest.BodyPublishers.ofString(postData)).build();
 
-        HttpEntity entity = res.getEntity();
-        String result;
-        try (InputStream in = entity.getContent(); StringWriter writer = new StringWriter();)
-        {
-            IOUtils.copy(in, writer, Charset.defaultCharset());
-            result = writer.toString();
-        }
+        var res = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        Assert.assertEquals(200, res.statusCode());
+
+        String result = res.body();
 
         Integer jid = 0;
         try
@@ -132,27 +125,28 @@ public class ApiSimpleTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "pyl.EngineApiSend3Msg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip,
                 42, "Marsu-Application", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
-        HttpPost post = new HttpPost("http://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/ji");
-        List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair("applicationname", "Marsu-Application"));
-        nvps.add(new BasicNameValuePair("user", "testuser"));
-        nvps.add(new BasicNameValuePair("module", "testuser"));
-        nvps.add(new BasicNameValuePair("param_1", "arg"));
-        nvps.add(new BasicNameValuePair("paramvalue_1", "newvalue"));
-        post.setEntity(new UrlEncodedFormEntity(nvps));
+        var url = "http://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/ji";
+        var postData = List.of( // a form encoded body
+                Map.entry("applicationname", "Marsu-Application"), //
+                Map.entry("user", "testuser"), //
+                Map.entry("module", "testuser"), //
+                Map.entry("param_1", "arg"), //
+                Map.entry("paramvalue_1", "newvalue") //
+        ).stream()
+                .map(entry -> Stream.of(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8),
+                        URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8)).collect(Collectors.joining("=")))
+                .collect(Collectors.joining("&"));
 
-        HttpClient client = HttpClients.createDefault();
-        HttpResponse res = client.execute(post);
+        HttpClient client = HttpClient.newHttpClient();
 
-        Assert.assertEquals(200, res.getStatusLine().getStatusCode());
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("Content-Type", "application/x-www-form-urlencoded")
+                .POST(HttpRequest.BodyPublishers.ofString(postData)).build();
 
-        HttpEntity entity = res.getEntity();
-        String result;
-        try (InputStream in = entity.getContent(); StringWriter writer = new StringWriter();)
-        {
-            IOUtils.copy(in, writer, Charset.defaultCharset());
-            result = writer.toString();
-        }
+        var res = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        Assert.assertEquals(200, res.statusCode());
+
+        String result = res.body();
 
         Integer jid = 0;
         try
@@ -166,17 +160,14 @@ public class ApiSimpleTest extends JqmBaseTest
 
         TestHelpers.waitFor(1, 10000, cnx);
 
-        HttpGet rq = new HttpGet("http://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + jid);
-        res = client.execute(rq);
-        Assert.assertEquals(200, res.getStatusLine().getStatusCode());
+        // Now test get status API
+        url = "http://" + TestHelpers.node.getDns() + ":" + port + "/ws/simple/status?id=" + jid;
+        request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
+        res = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        entity = res.getEntity();
-        State currentState;
-        try (InputStream in = entity.getContent(); StringWriter writer = new StringWriter();)
-        {
-            IOUtils.copy(in, writer, Charset.defaultCharset());
-            currentState = State.valueOf(writer.toString());
-        }
+        Assert.assertEquals(200, res.statusCode());
+
+        var currentState = State.valueOf(res.body());
 
         Assert.assertEquals(State.ENDED, currentState);
     }

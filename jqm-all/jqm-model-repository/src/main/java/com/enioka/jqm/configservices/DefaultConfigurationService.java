@@ -96,7 +96,7 @@ public class DefaultConfigurationService
             Map<String, String> prms = new HashMap<>();
             prms.put("smtpServerHost", "smtp.gmail.com");
 
-            JndiObjectResource.create(cnx, "mail/default", "javax.mail.Session", "com.enioka.jqm.providers.MailSessionFactory",
+            JndiObjectResource.create(cnx, "mail/default", "jakarta.mail.Session", "com.enioka.jqm.providers.MailSessionFactory",
                     "default parameters used to send e-mails", true, prms);
         }
 

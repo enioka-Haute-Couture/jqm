@@ -1,6 +1,6 @@
 package org.apache.shiro.jqm;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.shiro.mgt.SessionStorageEvaluator;
 import org.apache.shiro.subject.Subject;

@@ -15,22 +15,22 @@
  */
 package com.enioka.jqm.ws.plumbing;
 
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
 
 import com.enioka.jqm.client.api.JqmInvalidRequestException;
 import com.enioka.jqm.ws.api.ErrorDto;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsExtension;
+import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsExtension;
 
 @Provider
-@JaxrsExtension
+@JakartarsExtension
 @Component
 public class JqmExceptionMapper implements ExceptionMapper<JqmInvalidRequestException>
 {

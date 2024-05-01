@@ -138,15 +138,15 @@ class JettyServer
 
         if (loadApiSimple)
         {
-            activateApiJaxRsService(adminService, "com.enioka.jqm.ws.api.ServiceSimple");
+            activateApiJakartaRsService(adminService, "com.enioka.jqm.ws.api.ServiceSimple");
         }
         if (loadApiClient)
         {
-            activateApiJaxRsService(adminService, "com.enioka.jqm.ws.api.ServiceClient");
+            activateApiJakartaRsService(adminService, "com.enioka.jqm.ws.api.ServiceClient");
         }
         if (loadApiAdmin)
         {
-            activateApiJaxRsService(adminService, "com.enioka.jqm.ws.api.ServiceAdmin");
+            activateApiJakartaRsService(adminService, "com.enioka.jqm.ws.api.ServiceAdmin");
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -195,6 +195,12 @@ class JettyServer
 
             jqmlogger.info("JQM will use TLS for all HTTP communications as parameter enableWsApiSsl is 'true'");
         }
+
+        // Context to use for whiteboard (defined in a jqm-ws component)
+        httpServiceProperties.put("osgi.http.whiteboard.context.select", "(osgi.http.whiteboard.context.name=MAIN_HTTP_CTX)");
+        httpServiceProperties.put("org.apache.felix.http.runtime.init.id", "MAIN_HTTP_WB");
+
+        // Done with HTTP whiteboard
         jqmlogger.debug("Jetty will bind on port {}", node.getPort());
 
         ///////////////////////////////////////////////////////////////////////
@@ -204,7 +210,7 @@ class JettyServer
         Configuration jaxRsServiceConfiguration;
         try
         {
-            jaxRsServiceConfiguration = adminService.getConfiguration("org.apache.aries.jax.rs.whiteboard.default", null);
+            jaxRsServiceConfiguration = adminService.getConfiguration("JakartarsServletWhiteboardRuntimeComponent", null);
         }
         catch (IOException e)
         {
@@ -216,8 +222,8 @@ class JettyServer
             jaxRsServiceProperties = new Hashtable<String, Object>();
         }
 
-        jaxRsServiceProperties.put("enabled", true);
-        jaxRsServiceProperties.put("default.application.base", "/ws");
+        jaxRsServiceProperties.put("jersey.context.path", "/ws");
+        jaxRsServiceProperties.put("osgi.http.whiteboard.target", "(id=MAIN_HTTP_WB)");
         jaxRsServiceProperties.put("osgi.http.whiteboard.context.select", "(osgi.http.whiteboard.context.name=MAIN_HTTP_CTX)");
 
         ///////////////////////////////////////////////////////////////////////
@@ -281,12 +287,12 @@ class JettyServer
         jqmlogger.debug("Jetty has stopped");
     }
 
-    private void activateApiJaxRsService(ConfigurationAdmin adminService, String configPid)
+    private void activateApiJakartaRsService(ConfigurationAdmin adminService, String configPid)
     {
-        Configuration jaxRsServiceConfig;
+        Configuration jakartaRsServiceConfig;
         try
         {
-            jaxRsServiceConfig = adminService.getFactoryConfiguration(configPid, node.getId() + "", null);
+            jakartaRsServiceConfig = adminService.getFactoryConfiguration(configPid, node.getId() + "", null);
             // Final null is important - it means the configuration is attached to the first
             // bundle with a compatible service
         }
@@ -294,23 +300,23 @@ class JettyServer
         {
             throw new JqmInitError("Could not fetch OSGi " + configPid + " configuration factory", e);
         }
-        Dictionary<String, Object> jaxRsServiceProperties = jaxRsServiceConfig.getProperties();
-        if (jaxRsServiceProperties == null)
+        Dictionary<String, Object> jakartaRsServiceProperties = jakartaRsServiceConfig.getProperties();
+        if (jakartaRsServiceProperties == null)
         {
-            jaxRsServiceProperties = new Hashtable<>();
+            jakartaRsServiceProperties = new Hashtable<>();
         }
-        jaxRsServiceProperties.put("jqmnodeid", node.getId());
+        jakartaRsServiceProperties.put("jqmnodeid", node.getId());
 
         try
         {
-            jaxRsServiceConfig.update(jaxRsServiceProperties);
+            jakartaRsServiceConfig.update(jakartaRsServiceProperties);
         }
         catch (IOException e)
         {
             throw new JqmInitError("Could not modify OSGi registry storage", e);
         }
 
-        startedServicesPid.add(jaxRsServiceConfig.getPid());
+        startedServicesPid.add(jakartaRsServiceConfig.getPid());
         jqmlogger.info("Created configuration for service " + configPid);
     }
 

@@ -1,7 +1,7 @@
 package org.apache.shiro.jqm;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextListener;
 //
 import org.apache.shiro.web.env.WebEnvironment;
 import org.osgi.service.component.annotations.Component;
@@ -20,7 +20,7 @@ public class ShiroListener extends org.apache.shiro.web.env.EnvironmentLoaderLis
     public WebEnvironment initEnvironment(ServletContext servletContext) throws IllegalStateException
     {
         ClassLoader l = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(null);
+        Thread.currentThread().setContextClassLoader(ShiroListener.class.getClassLoader());
         WebEnvironment res = super.initEnvironment(servletContext);
         // Thread.currentThread().setContextClassLoader(l);
         return res;

@@ -1,7 +1,7 @@
 package com.enioka.jqm.client.jersey.api;
 
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
+import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.core.FeatureContext;
 
 /**
  * Basic preemptive HTTP authentication feature for JAX-RS. Most JAX-RS client actually have a similar feature, but we want to stay purely

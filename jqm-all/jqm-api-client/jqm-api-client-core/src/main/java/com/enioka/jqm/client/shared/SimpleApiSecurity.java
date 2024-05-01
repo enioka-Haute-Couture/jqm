@@ -20,7 +20,7 @@ import java.util.UUID;
 
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
-import org.apache.shiro.util.ByteSource;
+import org.apache.shiro.lang.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

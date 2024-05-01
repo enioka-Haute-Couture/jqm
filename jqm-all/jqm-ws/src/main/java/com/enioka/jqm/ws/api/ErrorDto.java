@@ -18,8 +18,8 @@ package com.enioka.jqm.ws.api;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import javax.ws.rs.core.Response.Status;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class ErrorDto extends RuntimeException

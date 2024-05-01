@@ -566,7 +566,7 @@ resourceTemplates["jndiMail"] = {
     uiName: "SMTP server",
     name: "mail/newsession",
     auth: "CONTAINER",
-    type: "javax.mail.Session",
+    type: "jakarta.mail.Session",
     factory: "com.enioka.jqm.providers.MailSessionFactory",
     description: "smtp mail session",
     singleton: true,

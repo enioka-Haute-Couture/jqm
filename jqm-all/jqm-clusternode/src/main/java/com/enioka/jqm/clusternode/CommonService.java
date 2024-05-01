@@ -8,7 +8,7 @@ import ch.qos.logback.core.rolling.RollingFileAppender;
 
 final class CommonService
 {
-    private static final Logger jqmlogger = (Logger) LoggerFactory.getLogger(CommonService.class);
+    private static final org.slf4j.Logger jqmlogger = LoggerFactory.getLogger(CommonService.class);
 
     static void setLogFileName(String name)
     {

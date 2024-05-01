@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.enioka.jqm</groupId>
@@ -24,7 +25,8 @@
                 <inherited>false</inherited>
                 <configuration>
                     <archive>
-                        <manifestFile combine.self="override"></manifestFile>                        <!-- Do not inherit "fetch OSGi manifest" config -->
+                        <!-- Do not inherit "fetch OSGi manifest" config -->
+                        <manifestFile combine.self="override"></manifestFile>
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
@@ -90,6 +92,37 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Copy annotations in another version to package -->
+            <!-- Annoying - HK2 needs this, and Maven hates multiple versions of same jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${plugin.dependency.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>jakarta.annotation</groupId>
+                            <artifactId>jakarta.annotation-api</artifactId>
+                            <version>2.1.1</version>
+                            <type>jar</type>
+                            <overWrite>false</overWrite>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <destFileName>jakarta.annotation-api.old.jar</destFileName>
+                        </artifactItem>
+                    </artifactItems>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -119,16 +152,15 @@
         </profile>
     </profiles>
 
+    <!-- runtime  = bundle start level 1  -->
+    <!-- provided = bundle start level 5  -->
     <dependencies>
-        <!-- ===================================== -->
-        <!-- Needed for starting an OSGi framework -->
-        <!-- ===================================== -->
-
         <!-- API exposed to the OSGi host by the OSGi libs -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jqm-cli-bootstrap</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- ================ OSGI framework ================== -->
@@ -136,6 +168,7 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
             <version>${felix.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -154,7 +187,7 @@
             <artifactId>org.apache.felix.http.jetty</artifactId>
             <version>${felix.http.whiteboard.version}</version>
             <scope>provided</scope>
-            <!-- Weirdly this package has a lot of "bad" dependencies such as non-osgi jars -->
+            <!-- This is an uber-jar, no need for dependencies -->
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
@@ -162,30 +195,39 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
-            <groupId>org.apache.aries.jax.rs</groupId>
-            <artifactId>org.apache.aries.jax.rs.whiteboard</artifactId>
-            <version>${felix.jaxrs.whiteboard.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jboss.spec.javax.rmi</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.woodstox</groupId>
-            <artifactId>woodstox-core</artifactId>
-            <version>6.2.6</version>
+            <groupId>org.eclipse.osgi-technology.rest</groupId>
+            <artifactId>org.eclipse.osgitech.rest</artifactId>
+            <version>${jakartars.whiteboard.implem.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.osgi-technology.rest</groupId>
+            <artifactId>org.eclipse.osgitech.rest.servlet.whiteboard</artifactId>
+            <version>${jakartars.whiteboard.implem.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.osgi-technology.rest</groupId>
+            <artifactId>org.eclipse.osgitech.rest.sse</artifactId>
+            <version>${jakartars.whiteboard.implem.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.service.http.whiteboard</artifactId>
             <version>${osgi.http.whiteboard.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.component</artifactId>
+            <version>${osgi.component.service.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- JSON support -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -203,20 +245,8 @@
             <groupId>org.apache.aries.spifly</groupId>
             <artifactId>org.apache.aries.spifly.dynamic.framework.extension</artifactId>
             <version>${aries.spifly.version}</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.util.promise</artifactId>
-            <version>${osgi.promise.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.util.function</artifactId>
-            <version>${osgi.function.version}</version>
-            <scope>provided</scope>
+            <!-- Level 1 compulsory - must be loaded before service providers -->
+            <scope>runtime</scope>
         </dependency>
 
         <!-- Support for wrapping non-osgi libs -->
@@ -224,40 +254,44 @@
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-wrap</artifactId>
             <version>${pax.url.version}</version>
-            <scope>runtime</scope> <!-- level1 -->
+            <!-- level1 - some level 2+ libs are not OSGi -->
+            <scope>runtime</scope>
         </dependency>
 
-        <!-- APIs implemented by CXF/Whiteboard - clean OSGi versions from the official source -->
+        <!-- APIs implemented by CXF/Whiteboard -->
+        <dependency> <!-- All javax/jakarta versions for servlets! -->
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.http.servlet-api</artifactId>
+            <version>3.0.0</version>
+        </dependency>
         <dependency>
             <groupId>jakarta.xml.soap</groupId>
             <artifactId>jakarta.xml.soap-api</artifactId>
-            <version>1.4.2</version>
+            <version>3.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.xml.ws</groupId>
             <artifactId>jakarta.xml.ws-api</artifactId>
-            <version>2.3.3</version>
+            <version>${jakarta.ws-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <version>${jaxrs.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
-            <version>1.3.5</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Other Jakarta APIs repackaged with an OSGi provider -->
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jaxrs_2.1_spec</artifactId>
-            <version>1.1</version>
+            <version>${jakarta.annotation.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.http.servlet-api</artifactId>
-            <version>1.1.2</version>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>${jakarta.xml.bind-api.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -266,13 +300,10 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
+            <!-- Goes to normal libs -->
+            <scope>compile</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.logback</artifactId>
-            <version>1.0.2</version>
-        </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.service.log</artifactId>
@@ -282,7 +313,28 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
             <version>${slf4j.version}</version>
+            <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>2.0.13</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
 
         <!-- ====================================================== -->
         <!-- Everything below are plugins only needed for packaging -->
@@ -292,12 +344,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jqm-cli</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jqm-api-client-jdbc</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -345,6 +391,7 @@
             <version>${project.version}</version>
             <scope>provided</scope>
             <exclusions>
+                <!-- This is an uber-jar (for now) -->
                 <exclusion>
                     <groupId>*</groupId>
                     <artifactId>*</artifactId>
@@ -378,30 +425,17 @@
         </dependency>
 
         <!-- Mail lib for JNDI mail resources -->
-        <!-- TODO: replace this by newer jarkarta libs -->
         <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-            <version>${mail.version}</version>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
+            <version>${mail.api.version}</version>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>smtp</artifactId>
-            <version>${mail.version}</version>
+        <dependency> <!-- reference Jakarta Mail implementation -->
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>angus-mail</artifactId>
+            <version>${mail.implem.version}</version>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- ================ SAMPLES ================== -->

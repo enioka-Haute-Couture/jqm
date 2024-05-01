@@ -18,8 +18,8 @@ package com.enioka.jqm.ws.plumbing;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
 
 import com.enioka.jqm.ws.api.ServiceAdmin;
 import com.enioka.jqm.ws.api.ServiceClient;

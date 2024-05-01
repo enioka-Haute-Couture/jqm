@@ -105,6 +105,12 @@ public class ServiceWaiter implements ServiceListener
             }
             break;
 
+        case ServiceEvent.MODIFIED:
+            jqmlogger.info("Service {} was modified", sKey);
+            s = sources.computeIfAbsent(sKey, key -> new Semaphore(0));
+            s.release();
+            break;
+
         default:
             // ignore other events
             break;

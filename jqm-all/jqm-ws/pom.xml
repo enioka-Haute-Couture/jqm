@@ -217,22 +217,13 @@
                 <configuration>
                     <bnd>
                         <![CDATA[
-                        # Do not actually deploy this as an OSGi WAR but as JAX-RS whiteboard resources
+                        # Do not actually deploy this as an OSGi WAR but as JAX-RS whiteboard resources - JAR, not WAR or WAB
                         # Web-ContextPath: /ws
                         # BND issue with multi version jars. https://github.com/bndtools/bnd/issues/2227
                         -fixupmessages: "Classes found in the wrong directory";is:=warning
-                        # This is WAB, i.e. a WAR with an OSGi descriptor.
-                        #-wab:
-                        # do not put libs inside META-INF/lib inside Bundle-Classpath - we want to use the same bundles as the rest of the application.
-                        #-wablib:
                         -removeheaders: Private-Package
-                        #Import-Package: org.apache.shiro.cache,org.apache.shiro.authz,org.apache.shiro.codec,org.apache.shiro.realm,org.apache.shiro.subject,org.apache.shiro.util,org.apache.shiro.authc,org.apache.shiro.web.filter.authc,\
-                        #    javax.servlet,javax.servlet.http,javax.ws.rs,javax.ws.rs.ext,javax.naming,\
-                        #    java.security.cert,java.lang.annotation,\
-                        #    org.slf4j,\
-                        #    org.glassfish.jersey.servlet,org.eclipse.persistence.jaxb,org.glassfish.jersey.server,org.glassfish.jersey.server.monitoring,\
-                        #    com.enioka.jqm.api.client.core,com.enioka.jqm.pki,com.enioka.admin,com.enioka.jqm.model,com.enioka.jqm.jdbc,com.enioka.jqm.xml
-                        # Export-Package: com.enioka.jqm.ws.api,com.enioka.jqm.ws.webui.shiro
+                        # Import packages: add packages used in shiro.ini file (not parsed by bnd)
+                        Import-Package: *, org.apache.shiro.authc.credential, org.apache.shiro.web.session.mgt, org.apache.shiro.session.mgt
                     ]]>
                     </bnd>
                 </configuration>
@@ -243,22 +234,30 @@
 
     <dependencies>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${jakarta.servlet-api.version}</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
-            <groupId>org.apache.aries.spec</groupId>
-            <artifactId>org.apache.aries.javax.jax.rs-api</artifactId>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
             <version>${jaxrs.api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>${jakarta.xml.bind-api.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.service.http.whiteboard</artifactId>
-            <version>1.1.0</version>
+            <version>${osgi.httpwhiteboard.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -267,28 +266,29 @@
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
             <version>${shiro.version}</version>
+            <classifier>jakarta</classifier>
+            <!-- Exclude all deps - see https://shiro.apache.org/jakarta-ee.html -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.shiro</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <!-- Temp - force version as 1.2.3 is OSGi-compliant, not the 1.2.2 coming with Shiro
-        1.8.0-->
         <dependency>
-            <groupId>org.owasp.encoder</groupId>
-            <artifactId>encoder</artifactId>
-            <version>1.2.3</version>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+            <classifier>jakarta</classifier>
+            <version>${shiro.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-pki</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId> commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <version>1.9.4</version>
         </dependency>
 
         <!-- For the client API -->
-        <!-- This includes HTTPCLIENT, which is used in tests in this project -->
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-api-client-jdbc</artifactId>
@@ -301,36 +301,11 @@
         </dependency>
         <dependency>
             <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-model</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-xml</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${httpclient.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Some log -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jul-to-slf4j</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>${commons.logging.version}</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -343,13 +318,11 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons.io.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>${commons.lang.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Sample DB & DB pool for tests only -->
@@ -357,21 +330,13 @@
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jdbc</artifactId>
             <version>${pool.version}</version>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <version>${hsqldb.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Java 9+ compat -->
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.1</version>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

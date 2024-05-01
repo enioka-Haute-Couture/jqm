@@ -46,7 +46,7 @@ import com.enioka.jqm.model.RRole;
 import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.shiro.util.StringUtils;
+import org.apache.shiro.lang.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -247,11 +247,11 @@ final class Helpers
         try
         {
             Thread.currentThread().setContextClassLoader(extLoader);
-            Class transportZ = extLoader.loadClass("javax.mail.Transport");
-            Class sessionZ = extLoader.loadClass("javax.mail.Session");
-            Class mimeMessageZ = extLoader.loadClass("javax.mail.internet.MimeMessage");
-            Class messageZ = extLoader.loadClass("javax.mail.Message");
-            Class recipientTypeZ = extLoader.loadClass("javax.mail.Message$RecipientType");
+            Class transportZ = extLoader.loadClass("jakarta.mail.Transport");
+            Class sessionZ = extLoader.loadClass("jakarta.mail.Session");
+            Class mimeMessageZ = extLoader.loadClass("jakarta.mail.internet.MimeMessage");
+            Class messageZ = extLoader.loadClass("jakarta.mail.Message");
+            Class recipientTypeZ = extLoader.loadClass("jakarta.mail.Message$RecipientType");
             Object msg = mimeMessageZ.getConstructor(sessionZ).newInstance(mailSession);
 
             mimeMessageZ.getMethod("setRecipients", recipientTypeZ, String.class).invoke(msg, recipientTypeZ.getField("TO").get(null), to);

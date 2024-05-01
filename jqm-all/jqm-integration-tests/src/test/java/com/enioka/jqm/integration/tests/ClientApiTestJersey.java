@@ -3,7 +3,7 @@ package com.enioka.jqm.integration.tests;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.NotAuthorizedException;
 
 import com.enioka.jqm.client.api.JqmClient;
 import com.enioka.jqm.client.api.JqmClientException;

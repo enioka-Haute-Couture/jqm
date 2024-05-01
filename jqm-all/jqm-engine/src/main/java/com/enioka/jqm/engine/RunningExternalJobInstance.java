@@ -74,6 +74,7 @@ class RunningExternalJobInstance implements Runnable
         args.add("Start-Single");
         args.add("--id");
         args.add("" + this.jobId);
+        jqmlogger.trace("Starting JVM arguments are {}", args);
 
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.redirectErrorStream(true);

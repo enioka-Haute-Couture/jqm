@@ -15,7 +15,7 @@
  */
 package org.apache.shiro.jqm;
 
-import javax.servlet.Filter;
+import jakarta.servlet.Filter;
 
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;

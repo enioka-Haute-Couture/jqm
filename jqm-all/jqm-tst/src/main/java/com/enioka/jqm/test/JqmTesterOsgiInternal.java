@@ -24,17 +24,17 @@ class JqmTesterOsgiInternal
     private static Logger jqmlogger = LoggerFactory.getLogger(JqmTesterOsgiInternal.class);
 
     private static Framework framework;
-    private HashSet<String> bundlesToLoad = new HashSet<>(Arrays.asList("jakarta.xml.ws:jakarta.xml.ws-api:2.3.3",
-            "org.apache.felix:org.apache.felix.configadmin:1.9.20", "org.apache.felix:org.apache.felix.scr:2.1.26",
-            "org.osgi:org.osgi.service.cm:1.6.0", "org.osgi:org.osgi.util.promise:1.1.1", "org.osgi:org.osgi.util.function:1.1.0",
-            "com.enioka.jqm:jqm-tst-osgi:" + Common.getMavenVersion()));
+    private HashSet<String> bundlesToLoad = new HashSet<>(Arrays.asList("jakarta.xml.ws:jakarta.xml.ws-api:4.0.1",
+            "org.apache.felix:org.apache.felix.configadmin:1.9.26", "org.apache.felix:org.apache.felix.scr:2.2.10",
+            "org.osgi:org.osgi.service.cm:1.6.1", "org.osgi:org.osgi.util.promise:1.3.0", "org.osgi:org.osgi.util.function:1.2.0",
+            "org.osgi:org.osgi.service.component:1.5.1", "com.enioka.jqm:jqm-tst-osgi:" + Common.getMavenVersion()));
 
     protected Map<String, String> defaultOsgiFrameworkConfiguration()
     {
         // OSGi properties
         Map<String, String> osgiConfig = new HashMap<>();
         osgiConfig.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA,
-                "com.enioka.jqm.tester.api;version=3.999.0,com.enioka.jqm.client.api;version=3.999.0,org.slf4j;version=1.7.32,org.slf4j.spi;version=1.7.32,org.slf4j.helpers;version=1.7.32");
+                "com.enioka.jqm.tester.api;version=3.999.0,com.enioka.jqm.client.api;version=3.999.0,org.slf4j;version=2.999.0,org.slf4j.spi;version=2.999.0,org.slf4j.helpers;version=2.999.0");
         osgiConfig.put(Constants.FRAMEWORK_STORAGE, "./target/osgicachetester");
         osgiConfig.put("org.osgi.framework.storage.clean", "onFirstInit");
         osgiConfig.put("org.osgi.framework.startlevel.beginning", "5"); // 0 is framework, 1 is framework extension, 5 is normal.
@@ -90,6 +90,12 @@ class JqmTesterOsgiInternal
             allDeps.addAll(MavenResolver.getArtifactDependencies(dep));
         }
 
+        jqmlogger.debug("Listing all found dependencies");
+        for (MavenDependency dep : allDeps)
+        {
+            jqmlogger.debug("\t\t* {}", dep);
+        }
+
         // Register them
         BundleContext ctx = framework.getBundleContext();
         for (MavenDependency dep : allDeps)
@@ -104,15 +110,21 @@ class JqmTesterOsgiInternal
             {
                 jqmlogger.debug("\tInstalling bundle {} - it is a {}", dep.getFile(),
                         (dep.isOsgiBundle() ? "normal bundle " + dep.getBundleName() : "simple jar"));
+                var url = dep.getPaxUrl();
+                if (url == null)
+                {
+                    jqmlogger.warn("Could not install bundle {name} at URL {url}", dep.getFile(), url);
+                    continue;
+                }
 
-                Bundle b = ctx.installBundle(dep.getPaxUrl());
+                Bundle b = ctx.installBundle(url);
                 b.adapt(BundleStartLevel.class).setStartLevel(5);
 
                 jqmlogger.debug("\t\t** Bundle installed as {}:{} with start level {}", b.getSymbolicName(), b.getVersion(), 5);
             }
-            catch (BundleException e)
+            catch (Exception e)
             {
-                jqmlogger.error("Cound not install bundle " + dep, e);
+                jqmlogger.error("Cound not install bundle {dep}", e);
             }
         }
 

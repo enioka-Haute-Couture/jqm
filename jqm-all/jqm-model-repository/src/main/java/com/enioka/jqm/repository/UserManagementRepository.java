@@ -9,7 +9,7 @@ import com.enioka.jqm.model.RUser;
 
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
-import org.apache.shiro.util.ByteSource;
+import org.apache.shiro.lang.util.ByteSource;
 
 public class UserManagementRepository
 {
