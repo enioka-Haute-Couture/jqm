@@ -29,6 +29,10 @@ class JqmTesterOsgiInternal
             "org.osgi:org.osgi.service.cm:1.6.1", "org.osgi:org.osgi.util.promise:1.3.0", "org.osgi:org.osgi.util.function:1.2.0",
             "org.osgi:org.osgi.service.component:1.5.1", "com.enioka.jqm:jqm-tst-osgi:" + Common.getMavenVersion()));
 
+    // We need to avoid to get other versions of libs - our Maven resolver can only fetch in local repo, so we restrict ourselves to libs
+    // used by the tester itself (they must be already in the local repo by construction).
+    private String[] transitiveExclusions = { "org.osgi:org.osgi.util.function", "org.osgi:org.osgi.util.promise" };
+
     protected Map<String, String> defaultOsgiFrameworkConfiguration()
     {
         // OSGi properties
@@ -87,7 +91,7 @@ class JqmTesterOsgiInternal
         HashSet<MavenDependency> allDeps = new HashSet<>();
         for (String dep : bundlesToLoad)
         {
-            allDeps.addAll(MavenResolver.getArtifactDependencies(dep));
+            allDeps.addAll(MavenResolver.getArtifactDependencies(dep, transitiveExclusions));
         }
 
         jqmlogger.debug("Listing all found dependencies");

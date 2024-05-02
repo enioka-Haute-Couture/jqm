@@ -13,6 +13,7 @@ import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.resolution.DependencyRequest;
@@ -33,8 +34,14 @@ class MavenResolver
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(MavenResolver.class);
 
-    static HashSet<MavenDependency> getArtifactDependencies(String mavenCoordinates)
+    static HashSet<MavenDependency> getArtifactDependencies(String mavenCoordinates, String... exclusions)
     {
+        var exclusionsSet = new HashSet<Exclusion>();
+        for (var ex : exclusions)
+        {
+            exclusionsSet.add(new Exclusion(ex.split(":")[0], ex.split(":")[1], null, "*"));
+        }
+
         DependencyFilter filter = DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE); // , JavaScopes.PROVIDED);
         CollectRequest cr = new CollectRequest();
         cr.setRoot(new Dependency(new DefaultArtifact(mavenCoordinates), JavaScopes.COMPILE));
@@ -45,7 +52,7 @@ class MavenResolver
         DependencySelector depFilter = new org.eclipse.aether.util.graph.selector.AndDependencySelector(
                 new org.eclipse.aether.util.graph.selector.ScopeDependencySelector("test", "provided", "runtime"),
                 new org.eclipse.aether.util.graph.selector.OptionalDependencySelector(),
-                new org.eclipse.aether.util.graph.selector.ExclusionDependencySelector());
+                new org.eclipse.aether.util.graph.selector.ExclusionDependencySelector(exclusionsSet));
         session.setDependencySelector(depFilter);
 
         LocalRepository localRepo = new LocalRepository(getLocalRepoPath());
