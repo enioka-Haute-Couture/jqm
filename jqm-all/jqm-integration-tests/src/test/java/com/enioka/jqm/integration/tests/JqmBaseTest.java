@@ -166,9 +166,6 @@ public class JqmBaseTest
                 mavenBundle("jakarta.mail", "jakarta.mail-api").versionAsInProject(),
                 mavenBundle("org.eclipse.angus", "angus-mail").versionAsInProject(),
 
-                // Needed on Java8 to kill processes properly (inside shell runner)
-                mavenBundle("com.enioka.jqm", "jqm-osgi-repackaging-winp").versionAsInProject(),
-
                 // Shiro is needed by test helpers & client lib for password generation
                 mavenBundle("org.apache.shiro", "shiro-crypto-core").versionAsInProject(), //
                 mavenBundle("org.apache.shiro", "shiro-crypto-hash").versionAsInProject(), //

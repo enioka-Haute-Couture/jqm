@@ -117,7 +117,6 @@
         <jdom.version>1.1.3</jdom.version>
         <cron4j.version>2.2.5</cron4j.version>
         <jcommander.version>1.83</jcommander.version>
-        <winp.version>1.28</winp.version>
         <joda.version>2.12.7</joda.version>
 
         <osgi.core.version>8.0.0</osgi.core.version>

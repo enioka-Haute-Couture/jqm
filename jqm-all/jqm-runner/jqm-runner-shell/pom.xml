@@ -28,13 +28,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- OS specific libraries, Java 6-8 only -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jqm-osgi-repackaging-winp</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- Helpers -->
         <dependency>
             <groupId>commons-lang</groupId>

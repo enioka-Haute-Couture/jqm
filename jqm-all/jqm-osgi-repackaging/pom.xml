@@ -19,6 +19,5 @@
         <module>jqm-osgi-repackaging-cron4j</module>
         <module>jqm-osgi-repackaging-jdom</module>
         <module>jqm-osgi-repackaging-shiro</module>
-        <module>jqm-osgi-repackaging-winp</module>
     </modules>
 </project>
