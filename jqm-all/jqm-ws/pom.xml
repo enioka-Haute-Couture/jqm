@@ -104,7 +104,7 @@
                 <version>${jsplugin.version}</version>
 
                 <configuration>
-                    <nodeVersion>v20.12.2</nodeVersion>
+                    <nodeVersion>v20.14.0</nodeVersion>
                     <yarnVersion>v1.22.22</yarnVersion>
                     <installDirectory>target/</installDirectory>
                     <workingDirectory>src/main/react</workingDirectory>
