@@ -19,6 +19,7 @@
         "@types/react-router-dom": "^5.1.5",
         "cron-validate": "^1.4.3",
         "date-fns": "^2.19.0",
+        "http-proxy-middleware": "^3.0.0",
         "mui-datatables": "^3.5.0",
         "notistack": "^1.0.1",
         "react": "^16.13.1",
@@ -33,7 +34,6 @@
         "test": "react-scripts test",
         "eject": "react-scripts eject"
     },
-    "proxy": "http://localhost:59977",
     "browserslist": {
         "production": [
             ">0.2%",
