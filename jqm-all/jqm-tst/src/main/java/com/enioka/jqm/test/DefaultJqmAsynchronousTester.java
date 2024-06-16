@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ import com.enioka.jqm.model.DeploymentParameter;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.Queue;
+import com.enioka.jqm.model.updater.api.DbSchemaManager;
 import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 import com.enioka.jqm.test.api.JqmAsynchronousTester;
 import com.enioka.jqm.test.api.TestJobDefinition;
@@ -60,7 +62,16 @@ public class DefaultJqmAsynchronousTester implements JqmAsynchronousTester
         ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
 
         // Db connexion should now work.
-        cnx = DbManager.getDb(Common.dbProperties()).getConn();
+        var db = DbManager.getDb(Common.dbProperties());
+        try (var cnx = db.getDataSource().getConnection())
+        {
+            dbSchemaManager.updateSchema(cnx);
+        }
+        catch (SQLException e)
+        {
+            throw new JqmInitError("Could not create database", e);
+        }
+        cnx = db.getConn();
 
         resetAllData();
     }

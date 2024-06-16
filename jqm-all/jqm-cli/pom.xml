@@ -11,14 +11,13 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <url>http://jqm.readthedocs.org</url>
-    <description>A library containing all the JQM CLI commands</description>
+    <description>A library containing most JQM CLI commands as well as the CLI parser</description>
 
     <dependencies>
-        <!-- CLI parsing -->
         <dependency>
-            <groupId>org.jcommander</groupId>
-            <artifactId>jcommander</artifactId>
-            <version>${jcommander.version}</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-cli-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- JQM libs needed for the CLI commands -->

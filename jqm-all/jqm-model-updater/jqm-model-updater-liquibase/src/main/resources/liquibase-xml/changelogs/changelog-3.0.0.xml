@@ -1,0 +1,784 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="1" author="mag">
+        <createSequence sequenceName="JQM_PK" startValue="1" incrementBy="1" />
+
+        <!-- Deployment infra -->
+        <createTable tableName="NODE">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_NODE" nullable="false" />
+            </column>
+            <column name="NAME" type="VARCHAR(255)">
+                <constraints unique="true" uniqueConstraintName="UK_NODE_1" nullable="false" />
+            </column>
+            <column name="DNS" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="PORT" type="INTEGER">
+                <constraints nullable="false" />
+            </column>
+            <column name="ENABLED" type="BOOLEAN" />
+            <column name="STOP" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="JMX_REGISTRY_PORT" type="INTEGER" />
+            <column name="JMX_SERVER_PORT" type="INTEGER" />
+            <column name="LAST_SEEN_ALIVE" type="TIMESTAMP" />
+            <column name="LOAD_API_ADMIN" type="BOOLEAN" />
+            <column name="LOAD_API_CLIENT" type="BOOLEAN" />
+            <column name="LOAD_API_SIMPLE" type="BOOLEAN" />
+            <column name="ROOT_LOG_LEVEL" type="VARCHAR(10)" />
+            <column name="REPO_JOB_DEF" type="VARCHAR(1024)">
+                <constraints nullable="false" />
+            </column>
+            <column name="REPO_DELIVERABLE" type="VARCHAR(1024)">
+                <constraints nullable="false" />
+            </column>
+            <column name="REPO_TMP" type="VARCHAR(1024)" />
+        </createTable>
+
+        <createTable tableName="QUEUE">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_QUEUE" nullable="false" />
+            </column>
+            <column name="DEFAULT_QUEUE" type="BOOLEAN" />
+            <column name="DESCRIPTION" type="VARCHAR(1000)">
+                <constraints nullable="false" />
+            </column>
+            <column name="NAME" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="UK_QUEUE_1" />
+            </column>
+            <column name="TIME_TO_LIVE" type="INTEGER" />
+        </createTable>
+
+        <createTable tableName="QUEUE_NODE_MAPPING">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_QUEUE_NODE_MAPPING"
+                    nullable="false" />
+            </column>
+            <column name="ENABLED" type="BOOLEAN" />
+            <column name="LAST_MODIFIED" type="TIMESTAMP" />
+            <column name="MAX_THREAD" type="INTEGER">
+                <constraints nullable="false" />
+            </column>
+            <column name="POLLING_INTERVAL" type="INTEGER">
+                <constraints nullable="false" />
+            </column>
+            <column name="NODE" type="INTEGER">
+                <constraints nullable="false" referencedTableName="NODE" referencedColumnNames="ID"
+                    foreignKeyName="FK_QUEUE_NODE_MAPPING_1" unique="true"
+                    uniqueConstraintName="UK_QUEUE_NODE_MAPPING_1" />
+            </column>
+            <column name="QUEUE" type="INTEGER">
+                <constraints nullable="false" referencedTableName="QUEUE" referencedColumnNames="ID"
+                    foreignKeyName="FK_QUEUE_NODE_MAPPING_2" unique="true"
+                    uniqueConstraintName="UK_QUEUE_NODE_MAPPING_1" />
+            </column>
+        </createTable>
+        <createIndex tableName="QUEUE_NODE_MAPPING" indexName="IDX_FK_QUEUE_NODE_MAPPING_1">
+            <column name="NODE"></column>
+        </createIndex>
+        <createIndex tableName="QUEUE_NODE_MAPPING" indexName="IDX_FK_QUEUE_NODE_MAPPING_2">
+            <column name="QUEUE"></column>
+        </createIndex>
+
+        <!-- Execution context -->
+        <createTable tableName="CL">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_CL" nullable="false" />
+            </column>
+            <column name="NAME" type="VARCHAR(255)">
+                <constraints unique="true" uniqueConstraintName="UK_CL_1" nullable="false" />
+            </column>
+            <column name="CHILD_FIRST" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="HIDDEN_CLASSES" type="VARCHAR(1024)" />
+            <column name="TRACING" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="PERSISTENT" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="ALLOWED_RUNNERS" type="VARCHAR(1024)" />
+        </createTable>
+
+        <createTable tableName="CL_HANDLER">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_CL_HANDLER" nullable="false" />
+            </column>
+            <column name="EVENT_TYPE" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="CLASS_NAME" type="VARCHAR(1024)">
+                <constraints nullable="true" />
+            </column>
+            <column name="CL" type="INTEGER">
+                <constraints nullable="false" referencedTableName="CL" referencedColumnNames="ID"
+                    foreignKeyName="FK_CL_HANDLER_1" />
+            </column>
+        </createTable>
+        <createIndex tableName="CL_HANDLER" indexName="IDX_FK_CL_HANDLER_1">
+            <column name="CL"></column>
+        </createIndex>
+
+        <createTable tableName="CL_HANDLER_PARAMETER">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_CL_HANDLER_PARAMETER"
+                    nullable="false" />
+            </column>
+            <column name="KEYNAME" type="VARCHAR(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="VALUE" type="VARCHAR(1000)">
+                <constraints nullable="false" />
+            </column>
+            <column name="CL_HANDLER" type="INTEGER">
+                <constraints nullable="false" referencedTableName="CL_HANDLER"
+                    referencedColumnNames="ID" foreignKeyName="FK_CL_HANDLER_PARAMETER_1" />
+            </column>
+        </createTable>
+        <createIndex tableName="CL_HANDLER_PARAMETER" indexName="IDX_FK_CL_HANDLER_PARAMETER_1">
+            <column name="CL_HANDLER"></column>
+        </createIndex>
+
+        <!-- Job definition -->
+        <createTable tableName="JOB_DEFINITION">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_JOB_DEFINITION" nullable="false" />
+            </column>
+            <column name="JD_KEY" type="VARCHAR(255)">
+                <constraints unique="true" uniqueConstraintName="UK_JOB_DEFINITION_1"
+                    nullable="false" />
+            </column>
+            <column name="DESCRIPTION" type="VARCHAR(1024)">
+                <constraints nullable="true" />
+            </column>
+            <column name="HIGHLANDER" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="PRIORITY" type="INTEGER">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="QUEUE" type="INTEGER">
+                <constraints nullable="false" referencedTableName="QUEUE" referencedColumnNames="ID"
+                    foreignKeyName="FK_JOBDEF_1" />
+            </column>
+
+            <column name="ENABLED" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="RESTARTABLE" type="BOOLEAN">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="PATH" type="VARCHAR(1024)">
+                <constraints nullable="false" />
+            </column>
+            <column name="PATH_TYPE" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="CLASS_NAME" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="EXTERNAL" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="JAVA_OPTS" type="VARCHAR(1024)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="CL" type="INTEGER">
+                <constraints nullable="true" referencedTableName="CL" referencedColumnNames="ID"
+                    foreignKeyName="FK_JOBDEF_2" />
+            </column>
+
+            <column name="ALERT_AFTER_SECONDS" type="INTEGER">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="APPLICATION" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="KEYWORD1" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="KEYWORD2" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="KEYWORD3" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="MODULE" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+        <createIndex tableName="JOB_DEFINITION" indexName="IDX_FK_JOBDEF_1">
+            <column name="QUEUE"></column>
+        </createIndex>
+        <createIndex tableName="JOB_DEFINITION" indexName="IDX_FK_JOBDEF_2">
+            <column name="CL"></column>
+        </createIndex>
+
+        <createTable tableName="JOB_DEFINITION_PARAMETER">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_JOB_DEFINITION_PARAMETER"
+                    nullable="false" />
+            </column>
+            <column name="KEYNAME" type="VARCHAR(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="VALUE" type="VARCHAR(1000)">
+                <constraints nullable="false" />
+            </column>
+            <column name="JOBDEF" type="INTEGER">
+                <constraints nullable="false" referencedTableName="JOB_DEFINITION"
+                    referencedColumnNames="ID" foreignKeyName="FK_JOB_DEFINITION_PARAMETER_1" />
+            </column>
+        </createTable>
+        <createIndex tableName="JOB_DEFINITION_PARAMETER" indexName="IDX_FK_JOB_DEFINITION_PRM_1">
+            <column name="JOBDEF"></column>
+        </createIndex>
+
+        <createTable tableName="JOB_SCHEDULE">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_JOB_SCHEDULE" nullable="false" />
+            </column>
+            <column name="CRON_EXPRESSION" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="JOBDEF" type="INTEGER">
+                <constraints nullable="false" referencedTableName="JOB_DEFINITION"
+                    referencedColumnNames="ID" foreignKeyName="FK_JOB_SCHEDULE_1" />
+            </column>
+            <column name="QUEUE" type="INTEGER">
+                <constraints nullable="true" referencedTableName="QUEUE" referencedColumnNames="ID"
+                    foreignKeyName="FK_JOB_SCHEDULE_2" />
+            </column>
+            <column name="PRIORITY" type="INTEGER">
+                <constraints nullable="true" />
+            </column>
+            <column name="LAST_UPDATED" type="TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <createIndex tableName="JOB_SCHEDULE" indexName="IDX_FK_JOB_SCHEDULE_1">
+            <column name="JOBDEF"></column>
+        </createIndex>
+        <createIndex tableName="JOB_SCHEDULE" indexName="IDX_FK_JOB_SCHEDULE_2">
+            <column name="QUEUE"></column>
+        </createIndex>
+        <createIndex tableName="JOB_SCHEDULE" indexName="IDX_JOB_SCHEDULE_1">
+            <column name="LAST_UPDATED"></column>
+        </createIndex>
+
+        <createTable tableName="JOB_SCHEDULE_PARAMETER">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_JOB_SCHEDULE_PARAMETER"
+                    nullable="false" />
+            </column>
+            <column name="KEYNAME" type="VARCHAR(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="VALUE" type="VARCHAR(1000)">
+                <constraints nullable="false" />
+            </column>
+            <column name="JOB_SCHEDULE" type="INTEGER">
+                <constraints nullable="false" referencedTableName="JOB_SCHEDULE"
+                    referencedColumnNames="ID" foreignKeyName="FK_JOB_SCHEDULE_PARAMETER_1" />
+            </column>
+        </createTable>
+        <createIndex tableName="JOB_SCHEDULE_PARAMETER" indexName="IDX_FK_JOB_SCHEDULE_PARAMETER_1">
+            <column name="JOB_SCHEDULE"></column>
+        </createIndex>
+
+        <!-- Execution and history -->
+        <createTable tableName="JOB_INSTANCE">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_JOB_INSTANCE" nullable="false" />
+            </column>
+            <column name="PARENT" type="INTEGER">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="DATE_ENQUEUE" type="TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column name="DATE_ATTRIBUTION" type="TIMESTAMP">
+                <constraints nullable="true" />
+            </column>
+            <column name="DATE_START" type="TIMESTAMP">
+                <constraints nullable="true" />
+            </column>
+            <column name="DATE_NOT_BEFORE" type="TIMESTAMP">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="INTERNAL_POSITION" type="REAL">
+                <constraints nullable="false" />
+            </column>
+            <column name="PRIORITY" type="INTEGER">
+                <constraints nullable="false" />
+            </column>
+            <column name="STATUS" type="VARCHAR(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="INSTRUCTION" type="VARCHAR(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="HIGHLANDER" type="BOOLEAN">
+                <constraints nullable="true" />
+            </column>
+            <column name="FROM_SCHEDULE" type="BOOLEAN">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="EMAIL" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="APPLICATION" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="KEYWORD1" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="KEYWORD2" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="KEYWORD3" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="MODULE" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="SESSION_KEY" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="USERNAME" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="PROGRESS" type="INTEGER">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="JOBDEF" type="INTEGER">
+                <constraints nullable="false" referencedTableName="JOB_DEFINITION"
+                    referencedColumnNames="ID" foreignKeyName="FK_JOB_INSTANCE_1" />
+            </column>
+            <column name="NODE" type="INTEGER">
+                <constraints nullable="true" referencedTableName="NODE" referencedColumnNames="ID"
+                    foreignKeyName="FK_JOB_INSTANCE_2" />
+            </column>
+            <column name="QUEUE" type="INTEGER">
+                <constraints nullable="false" referencedTableName="QUEUE" referencedColumnNames="ID"
+                    foreignKeyName="FK_JOB_INSTANCE_3" />
+            </column>
+        </createTable>
+        <createIndex tableName="JOB_INSTANCE" indexName="IDX_FK_JOB_INSTANCE_1">
+            <column name="JOBDEF"></column>
+        </createIndex>
+        <createIndex tableName="JOB_INSTANCE" indexName="IDX_FK_JOB_INSTANCE_2">
+            <column name="NODE"></column>
+        </createIndex>
+        <createIndex tableName="JOB_INSTANCE" indexName="IDX_FK_JOB_INSTANCE_3">
+            <column name="QUEUE"></column>
+        </createIndex>
+        <createIndex tableName="JOB_INSTANCE" indexName="IDX_JOB_INSTANCE_1">
+            <column name="QUEUE"></column>
+            <column name="STATUS"></column>
+        </createIndex>
+        <createIndex tableName="JOB_INSTANCE" indexName="IDX_JOB_INSTANCE_2">
+            <column name="JOBDEF"></column>
+            <column name="STATUS"></column>
+        </createIndex>
+
+        <createTable tableName="HISTORY">
+            <column name="ID" type="INTEGER"> <!-- always set from JI ID so no sequence used here -->
+                <constraints primaryKey="true"
+                    primaryKeyName="PK_HISTORY" nullable="false" />
+            </column>
+            <column name="PARENT" type="INTEGER">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="DATE_ENQUEUE" type="TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column name="DATE_ATTRIBUTION" type="TIMESTAMP">
+                <constraints nullable="true" />
+            </column>
+            <column name="DATE_START" type="TIMESTAMP">
+                <constraints nullable="true" />
+            </column>
+            <column name="DATE_NOT_BEFORE" type="TIMESTAMP">
+                <constraints nullable="true" />
+            </column>
+            <column name="DATE_END" type="TIMESTAMP">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="PRIORITY" type="INTEGER">
+                <constraints nullable="false" />
+            </column>
+            <column name="STATUS" type="VARCHAR(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="HIGHLANDER" type="BOOLEAN">
+                <constraints nullable="true" />
+            </column>
+            <column name="FROM_SCHEDULE" type="BOOLEAN">
+                <constraints nullable="true" />
+            </column>
+            <column name="PROGRESS" type="INTEGER">
+                <constraints nullable="true" />
+            </column>
+            <column name="RETURN_CODE" type="INTEGER">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="INSTANCE_APPLICATION" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="INSTANCE_KEYWORD1" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="INSTANCE_KEYWORD2" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="INSTANCE_KEYWORD3" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="INSTANCE_MODULE" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="JD_APPLICATION" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="JD_KEYWORD1" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="JD_KEYWORD2" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="JD_KEYWORD3" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="JD_MODULE" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="EMAIL" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="SESSION_KEY" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="USERNAME" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+
+
+            <column name="JOBDEF" type="INTEGER">
+                <constraints nullable="true" /> <!-- FK created with a cascade below -->
+            </column>
+            <column name="JD_KEY" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="NODE" type="INTEGER">
+                <constraints nullable="true" /> <!-- FK created with a cascade below -->
+            </column>
+            <column name="NODE_NAME" type="VARCHAR(255)">
+                <constraints nullable="true" /> <!-- null when cancelled -->
+            </column>
+            <column name="QUEUE" type="INTEGER">
+                <constraints nullable="true" /> <!-- FK created with a cascade below -->
+            </column>
+            <column name="QUEUE_NAME" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="HISTORY" baseColumnNames="JOBDEF"
+            constraintName="FK_HISTORY_1" referencedTableName="JOB_DEFINITION"
+            referencedColumnNames="ID" onDelete="SET NULL" />
+        <addForeignKeyConstraint baseTableName="HISTORY" baseColumnNames="NODE"
+            constraintName="FK_HISTORY_2" referencedTableName="NODE" referencedColumnNames="ID"
+            onDelete="SET NULL" />
+        <addForeignKeyConstraint baseTableName="HISTORY" baseColumnNames="QUEUE"
+            constraintName="FK_HISTORY_3" referencedTableName="QUEUE" referencedColumnNames="ID"
+            onDelete="SET NULL" />
+        <createIndex tableName="HISTORY" indexName="IDX_FK_HISTORY_1">
+            <column name="JOBDEF"></column>
+        </createIndex>
+        <createIndex tableName="HISTORY" indexName="IDX_FK_HISTORY_2">
+            <column name="NODE"></column>
+        </createIndex>
+        <createIndex tableName="HISTORY" indexName="IDX_FK_HISTORY_3">
+            <column name="QUEUE"></column>
+        </createIndex>
+
+        <createTable tableName="DELIVERABLE">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_DELIVERABLE" nullable="false" />
+            </column>
+            <column name="FILE_FAMILY" type="VARCHAR(100)">
+                <constraints nullable="true" />
+            </column>
+            <column name="PATH" type="VARCHAR(1024)">
+                <constraints nullable="false" />
+            </column>
+            <column name="JOB_INSTANCE" type="INTEGER">
+                <!-- Not an FK, as this is used by both History and JobDef -->
+                <constraints nullable="false" />
+            </column>
+            <column name="ORIGINAL_FILE_NAME" type="VARCHAR(1024)">
+                <constraints nullable="true" />
+            </column>
+            <column name="RANDOM_ID" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="UK_DELIVERABLE" />
+            </column>
+        </createTable>
+        <createIndex tableName="DELIVERABLE" indexName="IDX_FK_DELIVERABLE_1">
+            <column name="JOB_INSTANCE"></column>
+        </createIndex>
+
+        <createTable tableName="JOB_INSTANCE_PARAMETER">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_JOB_INSTANCE_PARAMETER"
+                    nullable="false" />
+            </column>
+            <column name="KEYNAME" type="VARCHAR(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="VALUE" type="VARCHAR(1000)">
+                <constraints nullable="false" />
+            </column>
+            <column name="JOB_INSTANCE" type="INTEGER">
+                <!-- Not an FK, as this is used by both History and JobDef -->
+                 <constraints nullable="false" />
+            </column>
+        </createTable>
+        <createIndex tableName="JOB_INSTANCE_PARAMETER" indexName="IDX_FK_JIP_1">
+            <column name="JOB_INSTANCE"></column>
+        </createIndex>
+
+        <createTable tableName="MESSAGE">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_MESSAGE" nullable="false" />
+            </column>
+            <column name="JOB_INSTANCE" type="INTEGER">
+                <!-- Not an FK, as this is used by both History and JobDef -->
+                <constraints nullable="false" />
+            </column>
+            <column name="TEXT_MESSAGE" type="VARCHAR(1024)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <createIndex tableName="MESSAGE" indexName="IDX_FK_MESSAGE_1">
+            <column name="JOB_INSTANCE"></column>
+        </createIndex>
+
+        <!-- JNDI registry -->
+        <createTable tableName="JNDI_OBJECT_RESOURCE">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_JNDI_OBJECT_RESOURCE"
+                    nullable="false" />
+            </column>
+            <column name="AUTH" type="VARCHAR(20)">
+                <constraints nullable="true" />
+            </column>
+            <column name="DESCRIPTION" type="VARCHAR(1000)">
+                <constraints nullable="true" />
+            </column>
+            <column name="FACTORY" type="VARCHAR(1000)">
+                <constraints nullable="false" />
+            </column>
+            <column name="LAST_MODIFIED" type="TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column name="NAME" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"
+                    uniqueConstraintName="UK_JNDI_OBJECT_RESOURCE" />
+            </column>
+            <column name="SINGLETON" type="BOOLEAN">
+                <constraints nullable="true" />
+            </column>
+            <column name="TEMPLATE" type="VARCHAR(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="TYPE" type="VARCHAR(1000)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <createTable tableName="JNDI_OR_PARAMETER">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_JNDI_OR_PARAMETER"
+                    nullable="false" />
+            </column>
+            <column name="KEYNAME" type="VARCHAR(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="LAST_MODIFIED" type="TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column name="VALUE" type="VARCHAR(1000)">
+                <constraints nullable="false" />
+            </column>
+            <column name="JNDI_OR" type="INTEGER">
+                <constraints nullable="false" referencedTableName="JNDI_OBJECT_RESOURCE"
+                    referencedColumnNames="ID" foreignKeyName="FK_JNDI_OR_PARAMETER_1" />
+            </column>
+        </createTable>
+        <createIndex tableName="JNDI_OR_PARAMETER" indexName="IDX_FK_JNDI_OR_PARAMETER_1">
+            <column name="JNDI_OR"></column>
+        </createIndex>
+
+        <!-- Security -->
+        <createTable tableName="PKI">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_PKI" nullable="false" />
+            </column>
+
+            <column name="PEM_CERT" type="VARCHAR(4000)">
+                <constraints nullable="false" />
+            </column>
+            <column name="PEM_PK" type="VARCHAR(4000)">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="PRETTY_NAME" type="VARCHAR(255)">
+                <constraints unique="true" uniqueConstraintName="UK_PKI_1" nullable="false" />
+            </column>
+        </createTable>
+
+        <createTable tableName="RROLE">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_RROLE" nullable="false" />
+            </column>
+            <column name="DESCRIPTION" type="VARCHAR(1000)">
+                <constraints nullable="false" />
+            </column>
+            <column name="NAME" type="VARCHAR(255)">
+                <constraints unique="true" uniqueConstraintName="UK_RROLE_1" nullable="false" />
+            </column>
+        </createTable>
+
+        <createTable tableName="RPERMISSION">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_RPERMISSION" nullable="false" />
+            </column>
+            <column name="NAME" type="VARCHAR(255)">
+                <constraints unique="true" uniqueConstraintName="UK_RPERMISSION_1" nullable="false" />
+            </column>
+            <column name="ROLE" type="INTEGER">
+                <constraints nullable="false" unique="true" uniqueConstraintName="UK_RPERMISSION_1"
+                    referencedTableName="RROLE" referencedColumnNames="ID"
+                    foreignKeyName="FK_RPERMISSION_1" />
+            </column>
+        </createTable>
+        <createIndex tableName="RPERMISSION" indexName="IDX_FK_RPERMISSION_1">
+            <column name="ROLE"></column>
+        </createIndex>
+
+        <createTable tableName="RUSER">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_RUSER" nullable="false" />
+            </column>
+            <column name="CREATION_DATE" type="TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column name="EMAIL" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="EXPIRATION_DATE" type="TIMESTAMP">
+                <constraints nullable="true" />
+            </column>
+            <column name="FREETEXT" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="HASHSALT" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="INTERNAL" type="BOOLEAN">
+                <constraints nullable="true" />
+            </column>
+            <column name="LAST_MODIFIED" type="TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column name="LOCKED" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="LOGIN" type="VARCHAR(255)">
+                <constraints unique="true" uniqueConstraintName="UK_RUSER_1" nullable="false" />
+            </column>
+            <column name="PASSWORD" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+
+        <createTable tableName="RROLE_RUSER">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_RROLE_RUSER" nullable="false" />
+            </column>
+            <column name="ROLE" type="INTEGER">
+                <constraints nullable="false" referencedTableName="RROLE" referencedColumnNames="ID"
+                    deleteCascade="true" foreignKeyName="FK_RROLE_RUSER_1"
+                    unique="true" uniqueConstraintName="UK_RROLE_RUSER_1" />
+            </column>
+            <column name="ACCOUNT" type="INTEGER">
+                <constraints nullable="false" referencedTableName="RUSER" referencedColumnNames="ID"
+                    deleteCascade="true" foreignKeyName="FK_RROLE_RUSER_2"
+                    unique="true" uniqueConstraintName="UK_RROLE_RUSER_1" />
+            </column>
+        </createTable>
+        <createIndex tableName="RROLE_RUSER" indexName="IDX_FK_RROLE_RUSER_1">
+            <column name="ROLE"></column>
+        </createIndex>
+        <createIndex tableName="RROLE_RUSER" indexName="IDX_FK_RROLE_RUSER_2">
+            <column name="ACCOUNT"></column>
+        </createIndex>
+
+        <!-- Misc -->
+        <createTable tableName="GLOBAL_PARAMETER">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_GLOBAL_PARAMETER"
+                    nullable="false" />
+            </column>
+            <column name="KEYNAME" type="VARCHAR(255)">
+                <constraints unique="true" uniqueConstraintName="UK_GLOBAL_PARAMETER_1"
+                    nullable="false" />
+            </column>
+            <column name="LAST_MODIFIED" type="TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column name="VALUE" type="VARCHAR(1000)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <createTable tableName="WITNESS">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_WITNESS" nullable="false" />
+            </column>
+            <column name="KEYNAME" type="VARCHAR(20)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="UK_WITNESS_1" />
+            </column>
+            <column name="NODE" type="INTEGER">
+                <constraints nullable="true" />
+            </column>
+            <column name="LATEST_CONTACT" type="TIMESTAMP">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

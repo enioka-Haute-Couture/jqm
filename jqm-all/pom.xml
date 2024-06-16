@@ -137,6 +137,7 @@
         <module>jqm-tests</module>
         <module>jqm-model</module>
         <module>jqm-model-repository</module>
+        <module>jqm-model-updater</module>
         <module>jqm-api</module>
         <module>jqm-ws</module>
         <module>jqm-api-client</module>
@@ -150,6 +151,7 @@
         <module>jqm-admin</module>
         <module>jqm-handlers</module>
         <module>jqm-cli</module>
+        <module>jqm-cli-api</module>
         <module>jqm-cli-bootstrap</module>
         <module>jqm-clusternode</module>
         <module>jqm-service</module>

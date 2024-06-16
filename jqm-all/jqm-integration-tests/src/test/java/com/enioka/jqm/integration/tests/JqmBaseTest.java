@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.Properties;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -61,6 +62,9 @@ public class JqmBaseTest
 
     protected static DebugHsqlDbServer s;
 
+    @Inject
+    DbSchemaManager dbSchemaManager;
+
     JqmClient jqmClient;
 
     @Rule
@@ -86,7 +90,7 @@ public class JqmBaseTest
     }
 
     @Before
-    public void beforeEachTest() throws NamingException
+    public void beforeEachTest() throws NamingException, SQLException
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test " + testName.getMethodName());
@@ -97,7 +101,15 @@ public class JqmBaseTest
         if (db == null)
         {
             // In all cases load the datasource. (the helper itself will load the property file if any).
-            db = DbManager.getDb();
+            Properties p = new Properties();
+            p.put("com.enioka.jqm.jdbc.waitForConnectionValid", "false");
+            p.put("com.enioka.jqm.jdbc.waitForSchemaValid", "false");
+            db = DbManager.getDb(p);
+
+            try (var cnx = db.getDataSource().getConnection())
+            {
+                dbSchemaManager.updateSchema(cnx);
+            }
         }
 
         cnx = getNewDbSession();

@@ -2,6 +2,7 @@ package com.enioka.jqm.cli;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.enioka.jqm.cli.api.CommandBase;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.xml.XmlJobDefExporter;
@@ -13,7 +14,7 @@ class CommandExportJobDef extends CommandBase
     private String xmlPath;
 
     @Override
-    int doWork()
+    public int doWork()
     {
         try (DbConn cnx = DbManager.getDb().getConn())
         {
