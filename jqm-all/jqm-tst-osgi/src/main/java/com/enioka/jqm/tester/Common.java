@@ -42,8 +42,9 @@ final class Common
     static Properties dbProperties()
     {
         Properties p = new Properties();
-        p.put("com.enioka.jqm.jdbc.allowSchemaUpdate", "true");
         p.put("com.enioka.jqm.jdbc.datasource", "jdbc/jqm");
+        p.put("com.enioka.jqm.jdbc.waitForConnectionValid", "false");
+        p.put("com.enioka.jqm.jdbc.waitForSchemaValid", "false");
         return p;
     }
 

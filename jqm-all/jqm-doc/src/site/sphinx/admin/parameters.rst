@@ -32,7 +32,6 @@ A second file exists, named JQM_ROOT/conf/jqm.properties. It is used specificall
 
 * com.enioka.jqm.jdbc.tablePrefix: a prefix to add to all table names (if value is "MARSU\_", tables will be named MARSU_HISTORY, MARSU_NODE...). Default is empty.
 * com.enioka.jqm.jdbc.datasource: JNDI name of the datasource from resource.xml to use as the main JQM database connection. Default is jdbc/jqm.
-* com.enioka.jqm.jdbc.allowSchemaUpdate: should not be used in normal operations.
 
 Finally, it is possible to change the JQM listening interface (for web services and GUI) by adding `-D"com.enioka.jqm.interface=0.0.0.0"` (or any other value) inside the `JAVA_OPTS` environment variable. If not set, the normal interface choice is done (by choosing all interfaces corresponding to the node's DNS parameter). This is mostly useful in container deployments - inside the official images, this parameter is always set to 0.0.0.0.
 

@@ -1,11 +1,13 @@
 package com.enioka.jqm.tester;
 
 import java.io.File;
+import java.sql.SQLException;
 
 import javax.naming.InitialContext;
 
 import com.enioka.jqm.client.api.JobInstance;
 import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.engine.api.exceptions.JqmInitError;
 import com.enioka.jqm.engine.api.lifecycle.JqmSingleRunnerOperations;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
@@ -17,6 +19,7 @@ import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.Queue;
 import com.enioka.jqm.model.RuntimeParameter;
 import com.enioka.jqm.model.State;
+import com.enioka.jqm.model.updater.api.DbSchemaManager;
 import com.enioka.jqm.tester.api.JqmSynchronousTester;
 
 import org.osgi.framework.BundleContext;
@@ -48,13 +51,23 @@ public class JqmSynchronousTesterOsgi implements JqmSynchronousTester
     InitialContext jndiInitialContext;
 
     @Activate
-    public JqmSynchronousTesterOsgi(@Reference JqmSingleRunnerOperations runner, BundleContext bundleContext)
+    public JqmSynchronousTesterOsgi(@Reference JqmSingleRunnerOperations runner, @Reference DbSchemaManager dbSchemaManager,
+            BundleContext bundleContext)
     {
         // Main resource is jdbc/jqm and uses a memory url, meaning db is created on first use.
         System.setProperty("com.enioka.jqm.resourceFiles", "resources_internal.xml");
 
         // Db connexion should now work.
-        cnx = DbManager.getDb(Common.dbProperties()).getConn();
+        var db = DbManager.getDb(Common.dbProperties());
+        try (var cnx = db.getDataSource().getConnection())
+        {
+            dbSchemaManager.updateSchema(cnx);
+        }
+        catch (SQLException e)
+        {
+            throw new JqmInitError("Could not create database", e);
+        }
+        cnx = db.getConn();
 
         // Needed parameters
         GlobalParameter.setParameter(cnx, "defaultConnection", "");

@@ -2,6 +2,7 @@ package com.enioka.jqm.cli;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.enioka.jqm.cli.api.CommandBase;
 import com.enioka.jqm.engine.api.exceptions.JqmInitError;
 import com.enioka.jqm.engine.api.lifecycle.JqmSingleRunnerOperations;
 import com.enioka.jqm.model.JobInstance;
@@ -18,7 +19,7 @@ class CommandStartSingle extends CommandBase
     private int id;
 
     @Override
-    int doWork()
+    public int doWork()
     {
         BundleContext bundleContext = FrameworkUtil.getBundle(CommandStartSingle.class).getBundleContext();
         if (bundleContext == null)

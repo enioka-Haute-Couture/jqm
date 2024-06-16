@@ -166,6 +166,8 @@
                 <exclude>org.osgi:osgi.*</exclude>                <!-- OSGi APIs are actually provided by the framework -->
                 <exclude>junit:junit</exclude>
                 <exclude>com.enioka.jqm:jqm-providers</exclude>
+                <exclude>org.slf4j:*</exclude>
+                <exclude>ch.qos.logback:*</exclude>
             </excludes>
         </dependencySet>
 

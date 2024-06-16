@@ -1,14 +1,18 @@
 package com.enioka.jqm.cli;
 
+import java.util.List;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import com.beust.jcommander.JCommander;
-import com.enioka.jqm.cli.bootstrap.CommandLine;
-
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.beust.jcommander.JCommander;
+import com.enioka.jqm.cli.api.CommandBase;
+import com.enioka.jqm.cli.bootstrap.CommandLine;
 
 /**
  * Main entry point of the CLI (which is also the entry point for the daemon).
@@ -18,10 +22,14 @@ public class CliParserService implements CommandLine
 {
     private static final Logger jqmlogger = (Logger) LoggerFactory.getLogger(CliParserService.class);
 
+    /** All commands from the OSGi registry */
+    @Reference
+    private List<CommandBase> additionalCommands;
+
     @Override
     public int runOsgiCommand(String[] args)
     {
-        return CliParserService.runCommand(args);
+        return this.runCommand(args);
     }
 
     @Override
@@ -33,18 +41,23 @@ public class CliParserService implements CommandLine
         }
     }
 
-    public static int runCommand(String[] args)
+    public int runCommand(String[] args)
     {
         // CommonService.setLogFileName("cli");
 
         // Create parser
-        JCommander jc = JCommander.newBuilder().addCommand(new CommandExportJobDef()).addCommand(new CommandExportQueue())
+        var jcBuilder = JCommander.newBuilder().addCommand(new CommandExportJobDef()).addCommand(new CommandExportQueue())
                 .addCommand(new CommandGetEngineVersion()).addCommand(new CommandGetJiStatus()).addCommand(new CommandGetNodeCount())
                 .addCommand(new CommandGetRole()).addCommand(new CommandImportClusterConfiguration()).addCommand(new CommandImportJobDef())
                 .addCommand(new CommandImportQueue()).addCommand(new CommandInstallNodeTemplate()).addCommand(new CommandNewJi())
                 .addCommand(new CommandNewNode()).addCommand(new CommandResetRoot()).addCommand(new CommandResetUser())
-                .addCommand(new CommandSetWebConfiguration()).addCommand(new CommandStartNode()).addCommand(new CommandStartSingle())
-                .addCommand(new CommandUpdateSchema()).build();
+                .addCommand(new CommandSetWebConfiguration()).addCommand(new CommandStartNode()).addCommand(new CommandStartSingle());
+        for (var command : additionalCommands)
+        {
+            jcBuilder.addCommand(command);
+        }
+        var jc = jcBuilder.build();
+
         jc.setColumnSize(160);
         jc.setCaseSensitiveOptions(false);
 
@@ -59,7 +72,7 @@ public class CliParserService implements CommandLine
         jc.parse(args);
         CommandBase command = (CommandBase) jc.getCommands().get(jc.getParsedCommand()).getObjects().get(0);
 
-        if (command.help)
+        if (command.isHelp())
         {
             jc.usage();
             return 0;
@@ -67,12 +80,12 @@ public class CliParserService implements CommandLine
 
         // It is possible to actually switch from one environment to another by setting a different 'settings' file.
         // (and therefore a different datasource)
-        if (command.settingsFile != null)
+        if (command.getSettingsFile() != null)
         {
-            jqmlogger.info("Using alternative settings file {}", command.settingsFile);
+            jqmlogger.info("Using alternative settings file {}", command.getSettingsFile());
             try
             {
-                InitialContext.doLookup("internal://xml/" + command.settingsFile); // Ugly internal hack: side effect on lookup.
+                InitialContext.doLookup("internal://xml/" + command.getSettingsFile()); // Ugly internal hack: side effect on lookup.
             }
             catch (NamingException e)
             {

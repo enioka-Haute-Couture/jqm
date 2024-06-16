@@ -23,10 +23,12 @@ import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.url;
 
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.naming.InitialContext;
@@ -40,6 +42,7 @@ import com.enioka.jqm.engine.api.lifecycle.JqmEngineOperations;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
+import com.enioka.jqm.model.updater.api.DbSchemaManager;
 import com.enioka.jqm.test.helpers.DebugHsqlDbServer;
 import com.enioka.jqm.test.helpers.ServiceWaiter;
 import com.enioka.jqm.test.helpers.TestHelpers;
@@ -87,6 +90,9 @@ public class JqmBaseTest
 
     @Inject
     ServiceWaiter serviceWaiter;
+
+    @Inject
+    DbSchemaManager dbSchemaManager;
 
     JqmClient jqmClient;
 
@@ -180,8 +186,17 @@ public class JqmBaseTest
                 mavenBundle("org.bouncycastle", "bcutil-jdk18on").versionAsInProject(),
                 mavenBundle("com.enioka.jqm", "jqm-pki").versionAsInProject(),
 
+                // Liquibase
+                mavenBundle("org.liquibase", "liquibase-core").versionAsInProject(),
+                mavenBundle("com.opencsv", "opencsv").versionAsInProject(), //
+                mavenBundle("org.yaml", "snakeyaml").versionAsInProject(),
+                mavenBundle("org.apache.commons", "commons-collections4").versionAsInProject(),
+                mavenBundle("org.apache.commons", "commons-lang3").versionAsInProject(),
+                mavenBundle("org.apache.commons", "commons-text").versionAsInProject(),
+
                 // JQM tested libraries
                 url("reference:file:../jqm-cli/target/classes/"), //
+                url("reference:file:../jqm-cli-api/target/classes/"), //
                 url("reference:file:../jqm-cli-bootstrap/target/classes/"), //
                 url("reference:file:../jqm-clusternode/target/classes/"), //
                 url("reference:file:../jqm-api/target/classes/"), //
@@ -189,6 +204,8 @@ public class JqmBaseTest
                 url("reference:file:../jqm-xml/target/classes/"), //
                 url("reference:file:../jqm-admin/target/classes/"), //
                 url("reference:file:../jqm-model/target/classes/"), //
+                url("reference:file:../jqm-model-updater/jqm-model-updater-api/target/classes/"), //
+                url("reference:file:../jqm-model-updater/jqm-model-updater-liquibase/target/classes/"), //
                 url("reference:file:../jqm-model-repository/target/classes/"), //
                 url("reference:file:../jqm-jndi-context/target/classes/"), //
                 url("reference:file:../jqm-engine/target/classes/"), //
@@ -314,7 +331,7 @@ public class JqmBaseTest
     }
 
     @Before
-    public void beforeEachTest() throws NamingException
+    public void beforeEachTest() throws NamingException, SQLException
     {
         jqmlogger.debug("**********************************************************");
         jqmlogger.debug("Starting test " + testName.getMethodName());
@@ -325,7 +342,15 @@ public class JqmBaseTest
         if (db == null)
         {
             // In all cases load the datasource. (the helper itself will load the property file if any).
-            db = DbManager.getDb();
+            Properties p = new Properties();
+            p.put("com.enioka.jqm.jdbc.waitForConnectionValid", "false");
+            p.put("com.enioka.jqm.jdbc.waitForSchemaValid", "false");
+            db = DbManager.getDb(p);
+
+            try (var cnx = db.getDataSource().getConnection())
+            {
+                dbSchemaManager.updateSchema(cnx);
+            }
         }
 
         cnx = getNewDbSession();

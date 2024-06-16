@@ -16,6 +16,7 @@ import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.startlevel.BundleStartLevel;
 import org.osgi.framework.wiring.BundleRevision;
+import org.osgi.framework.wiring.BundleWiring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,7 +139,15 @@ class JqmTesterOsgiInternal
             tryStartBundle(bundle);
         }
 
-        dumpServices();
+        // Debug data
+        if (jqmlogger.isDebugEnabled())
+        {
+            dumpContext(ctx);
+        }
+
+        // Some bundles will use ServiceLoader. We must hide the xml files from them so that they only use the versions modified on the fly
+        // by SPI-fly- therefore we must hide all the current test resources from them. ServiceLoader uses CCL, so just use that.
+        Thread.currentThread().setContextClassLoader(ClassLoader.getPlatformClassLoader());
     }
 
     private static void tryStartBundle(Bundle bundle)
@@ -169,36 +178,55 @@ class JqmTesterOsgiInternal
             jqmlogger.error("Could not start bundle " + bundle.getSymbolicName(), e);
         }
 
+        jqmlogger.debug("Bundle {} in version {} is in state {} (should be 32 - started)", bundle.getSymbolicName(), bundle.getVersion(),
+                bundle.getState());
+    }
+
+    /**
+     * Debug logging, helpful when looking for an OSGi lib conflict
+     *
+     * @param bundle
+     *            bundle to analyze
+     */
+    private static void dumpBundleDebugInfo(Bundle bundle)
+    {
         jqmlogger.debug("Bundle {} in version {} is in state {}", bundle.getSymbolicName(), bundle.getVersion(), bundle.getState());
-        if (bundle.getRegisteredServices() != null)
+        if (bundle.getRegisteredServices() != null && bundle.getRegisteredServices().length > 0)
         {
-            /*
-             * for (ServiceReference<?> sr : bundle.getRegisteredServices()) { jqmlogger.debug("\t\tService: {}",
-             * sr.getProperty("component.name")); }
-             */
-            /*
-             * for (BundleCapability wire : bundle.adapt(BundleWiring.class).getCapabilities(null)) { jqmlogger.debug("\t\tWire: {}",
-             * wire.getNamespace()); }
-             */
+            jqmlogger.debug("\tServices provided:");
+            for (ServiceReference<?> sr : bundle.getRegisteredServices())
+            {
+                jqmlogger.debug("\t\t{} - {} {}", sr.getProperty(org.osgi.framework.Constants.OBJECTCLASS),
+                        sr.getProperty(org.osgi.service.component.ComponentConstants.COMPONENT_NAME),
+                        sr.getProperty("serviceloader.mediator") != null ? "mediator service" : "");
+            }
+        }
+        if (bundle.adapt(BundleWiring.class) != null)
+        {
+            if (bundle.adapt(BundleWiring.class).getCapabilities(BundleRevision.PACKAGE_NAMESPACE).size() > 0)
+            {
+                jqmlogger.debug("\tPackages exposed:");
+                for (var wire : bundle.adapt(BundleWiring.class).getCapabilities(BundleRevision.PACKAGE_NAMESPACE))
+                {
+                    jqmlogger.debug("\t\t{}", wire.toString());
+                }
+            }
+            if (bundle.adapt(BundleWiring.class).getRequiredResourceWires(BundleRevision.PACKAGE_NAMESPACE).size() > 0)
+            {
+                jqmlogger.debug("\tPackages consumed:");
+                for (var wire : bundle.adapt(BundleWiring.class).getRequiredResourceWires(BundleRevision.PACKAGE_NAMESPACE))
+                {
+                    jqmlogger.debug("\t\t{}", wire.toString());
+                }
+            }
         }
     }
 
-    private void dumpServices()
+    private static void dumpContext(BundleContext ctx)
     {
-        for (Bundle bundle : framework.getBundleContext().getBundles())
+        for (var bundle : ctx.getBundles())
         {
-            jqmlogger.debug("Bundle {} in version {} is in state {}", bundle.getSymbolicName(), bundle.getVersion(), bundle.getState());
-            if (bundle.getRegisteredServices() != null)
-            {
-                for (ServiceReference<?> sr : bundle.getRegisteredServices())
-                {
-                    jqmlogger.debug("\t\tService: {}", sr.getProperty("component.name"));
-                }
-                /*
-                 * for (BundleCapability wire : bundle.adapt(BundleWiring.class).getCapabilities(null)) { jqmlogger.debug("\t\tWire: {}",
-                 * wire.getNamespace()); }
-                 */
-            }
+            dumpBundleDebugInfo(bundle);
         }
     }
 

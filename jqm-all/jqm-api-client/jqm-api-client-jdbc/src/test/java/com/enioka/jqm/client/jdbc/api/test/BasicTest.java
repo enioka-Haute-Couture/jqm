@@ -15,10 +15,17 @@
  */
 package com.enioka.jqm.client.jdbc.api.test;
 
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
+import org.hsqldb.jdbc.JDBCDataSource;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.enioka.jqm.client.api.Query;
 import com.enioka.jqm.client.api.Query.Sort;
@@ -26,17 +33,12 @@ import com.enioka.jqm.client.api.State;
 import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.jdbc.DbManager;
 import com.enioka.jqm.model.Instruction;
 import com.enioka.jqm.model.JobDef;
 import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
-
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import com.enioka.jqm.model.updater.liquibase.LiquibaseSchemaManager;
 
 /**
  * Simple tests for checking query syntax (no data). No use of OSGi here, as this lib can be used outside a framework.
@@ -44,11 +46,23 @@ import org.junit.Test;
 public class BasicTest
 {
     private static Logger jqmlogger = Logger.getLogger(BasicTest.class);
+    private static Db db;
 
     @BeforeClass
-    public static void beforeClass()
+    public static void beforeClass() throws SQLException
     {
-        JqmClientFactory.setProperty("com.enioka.jqm.jdbc.allowSchemaUpdate", "true");
+        // THe client has no option to initialise the database schema, so we do it explicitly.
+        JDBCDataSource ds = new JDBCDataSource();
+        ds.setDatabase("jdbc:hsqldb:mem:testdbengine");
+        var liquibaseHelper = new LiquibaseSchemaManager();
+        liquibaseHelper.updateSchema(ds.getConnection());
+
+        // We then reuse the same datasource to initialise the client. This is only needed because we use an in-memory database - we cannot
+        // close an reopen it easily. (it would be GC-ed and our new schema would be destroyed)
+        var props = new Properties();
+        props.put("com.enioka.jqm.jdbc.adapters", "com.enioka.jqm.jdbc.impl.hsql.DbImplHsql");
+        db = new Db(ds, props);
+        JqmClientFactory.setProperty("com.enioka.jqm.jdbc.contextobject", db);
     }
 
     @Test
@@ -206,7 +220,6 @@ public class BasicTest
     @Test
     public void testBug305()
     {
-        Db db = DbManager.getDb();
         try (DbConn cnx = db.getConn())
         {
             int qId = Queue.create(cnx, "q1", "q1 description", true);
