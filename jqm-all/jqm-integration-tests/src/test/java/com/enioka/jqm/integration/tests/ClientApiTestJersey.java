@@ -8,7 +8,8 @@ import jakarta.ws.rs.NotAuthorizedException;
 import com.enioka.jqm.client.api.JqmClient;
 import com.enioka.jqm.client.api.JqmClientException;
 import com.enioka.jqm.client.api.JqmInvalidRequestException;
-import com.enioka.jqm.client.jersey.api.JqmClientFactory;
+import com.enioka.jqm.client.shared.IWsClientFactory;
+import com.enioka.jqm.client.api.JqmClientFactory;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.repository.UserManagementRepository;
@@ -17,7 +18,6 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.ops4j.pax.exam.Option;
 
 /**
  * Run all the client tests, but this time with a WS client.
@@ -26,12 +26,6 @@ public class ClientApiTestJersey extends ClientApiTestJdbc
 {
     private Node n;
     private Properties p;
-
-    @Override
-    protected Option[] moreOsgiconfig()
-    {
-        return webConfig();
-    }
 
     @Before
     public void before() throws IOException
@@ -48,9 +42,7 @@ public class ClientApiTestJersey extends ClientApiTestJdbc
 
         addAndStartEngine("wsnode");
 
-        serviceWaiter.waitForService("[com.enioka.jqm.ws.api.ServiceSimple]");
-        serviceWaiter.waitForService("[javax.servlet.Servlet]"); // HTTP whiteboard
-        serviceWaiter.waitForService("[javax.servlet.Servlet]"); // JAX-RS whiteboard
+        this.waitForWsStart();
 
         n = Node.select_single(cnx, "node_select_by_key", "wsnode");
 
@@ -65,7 +57,7 @@ public class ClientApiTestJersey extends ClientApiTestJdbc
         UserManagementRepository.createUserIfMissing(cnx, "test", "testpassword", "test user for WS Junit tests", "client power user");
         cnx.commit();
 
-        JqmClientFactory.resetClient();
+        JqmClientFactory.reset();
         jqmClient = JqmClientFactory.getClient();
     }
 
@@ -89,7 +81,7 @@ public class ClientApiTestJersey extends ClientApiTestJdbc
         temp.putAll(p);
         temp.put("com.enioka.jqm.ws.password", "testpasswordXXX");
 
-        JqmClient wrongClient = JqmClientFactory.getClient("name", temp, false);
+        JqmClient wrongClient = JqmClientFactory.getClient("name", temp, false, IWsClientFactory.class);
 
         try
         {

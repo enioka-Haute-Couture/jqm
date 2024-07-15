@@ -1,22 +1,22 @@
 package com.enioka.jqm.engine;
 
+import org.kohsuke.MetaInfServices;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.enioka.jqm.client.api.JqmInvalidRequestException;
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.client.api.JqmClientFactory;
+import com.enioka.jqm.client.shared.IDbClientFactory;
 import com.enioka.jqm.engine.api.lifecycle.JqmSingleRunnerOperations;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.JobInstance;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ServiceScope;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * This is a dumbed down version of the JQM engine that, instead of checking jobs from a database, will run at once a specified job
  * instance.
  */
-@Component(service = JqmSingleRunnerOperations.class, scope = ServiceScope.SINGLETON)
+@MetaInfServices(JqmSingleRunnerOperations.class)
 public class JqmSingleRunner implements JqmSingleRunnerOperations
 {
     private final static Logger jqmlogger = LoggerFactory.getLogger(JqmSingleRunner.class);
@@ -84,7 +84,7 @@ public class JqmSingleRunner implements JqmSingleRunnerOperations
                 // The stop order may come from SIGTERM or SIGINT - in which case, the payload is not aware it should stop.
                 try
                 {
-                    JqmClientFactory.getClient().killJob(jobId);
+                    JqmClientFactory.getClient(IDbClientFactory.class).killJob(jobId);
                 }
                 catch (JqmInvalidRequestException e)
                 {
@@ -163,7 +163,6 @@ public class JqmSingleRunner implements JqmSingleRunnerOperations
         Runtime.getRuntime().removeShutdownHook(shutHook);
         cnx.close();
         stopper.interrupt();
-        manager.stop();
 
         // Get result
         return job;

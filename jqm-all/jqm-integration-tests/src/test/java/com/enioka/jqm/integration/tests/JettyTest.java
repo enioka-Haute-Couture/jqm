@@ -30,7 +30,6 @@ import javax.net.ssl.TrustManagerFactory;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.ops4j.pax.exam.Option;
 
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
@@ -42,12 +41,6 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 public class JettyTest extends JqmBaseTest
 {
     private int port;
-
-    @Override
-    protected Option[] moreOsgiconfig()
-    {
-        return webConfig();
-    }
 
     private void waitStartup()
     {

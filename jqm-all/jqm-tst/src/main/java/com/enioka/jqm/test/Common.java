@@ -6,9 +6,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Properties;
 
-import org.hsqldb.Server;
+import com.enioka.jqm.jdbc.DbConn;
+import com.enioka.jqm.model.Cl;
+import com.enioka.jqm.model.JobDef;
 
 final class Common
 {
@@ -40,6 +43,14 @@ final class Common
         return (temp);
     }
 
+    static Properties dbProperties()
+    {
+        Properties p = new Properties();
+        p.put("com.enioka.jqm.jdbc.allowSchemaUpdate", "true");
+        p.put("com.enioka.jqm.jdbc.datasource", "jdbc/jqm");
+        return p;
+    }
+
     /**
      * A small helper which reads a file set by Maven to get the current artifact version. Only way that works reliably both at runtime and
      * in unit tests.
@@ -67,5 +78,16 @@ final class Common
         }
 
         return version;
+    }
+
+    static void createJobDef(DbConn cnx, TestJobDefinitionImpl d, Map<String, Integer> queues)
+    {
+        int clId = Cl.create(cnx, d.getSpecificIsolationContext() == null ? d.getName() : d.getSpecificIsolationContext(),
+                d.isChildFirstClassLoader(), d.getHiddenJavaClasses(), d.isClassLoaderTracing(), false, null);
+
+        JobDef.create(cnx, d.getDescription(), d.getJavaClassName(), d.parameters, d.getPath(),
+                d.getQueueName() != null ? queues.get(d.getQueueName()) : queues.values().iterator().next(), 0, d.getName(),
+                d.getApplication(), d.getModule(), d.getKeyword1(), d.getKeyword2(), d.getKeyword3(), d.isHighlander(), clId,
+                d.getPathType());
     }
 }

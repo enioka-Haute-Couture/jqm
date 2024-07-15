@@ -12,7 +12,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import com.enioka.jqm.api.JobRunnerException;
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.client.api.JqmClientFactory;
+import com.enioka.jqm.client.shared.IDbClientFactory;
 import com.enioka.jqm.client.shared.SimpleApiSecurity;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
@@ -362,7 +363,7 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
     {
         Properties props = new Properties();
         props.put("com.enioka.jqm.jdbc.contextobject", DbManager.getDb());
-        JqmClientFactory.getClient("uncached", props, false).killJob(this.ji.getId());
+        JqmClientFactory.getClient("uncached", props, false, IDbClientFactory.class).killJob(this.ji.getId());
     }
 
     void handleInstruction(Instruction instruction)

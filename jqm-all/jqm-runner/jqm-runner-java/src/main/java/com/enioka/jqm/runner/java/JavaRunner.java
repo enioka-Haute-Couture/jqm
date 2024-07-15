@@ -1,7 +1,10 @@
 package com.enioka.jqm.runner.java;
 
 import java.io.PrintStream;
-import java.util.List;
+import java.util.ServiceLoader;
+
+import org.apache.commons.io.FilenameUtils;
+import org.kohsuke.MetaInfServices;
 
 import com.enioka.jqm.api.JavaJobRunner;
 import com.enioka.jqm.api.JobManager;
@@ -14,27 +17,44 @@ import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.runner.api.JobInstanceTracker;
 import com.enioka.jqm.runner.api.JobRunner;
 import com.enioka.jqm.runner.api.JobRunnerCallback;
-
-import org.apache.commons.io.FilenameUtils;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
+import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 
 /**
  * Being in Java, JQM can have a special relationship with jobs coded in Java. This runner provides the capacity to run classes with
  * advanced CL handling inside the engine process. It itself has multiple plugins allowing it to load different types of classes.
  */
-@Component(property = { "Plugin-Type=JobRunner", "Runner-Type=java" })
+@MetaInfServices(JobRunner.class)
 public class JavaRunner implements JobRunner
 {
     private ClassloaderManager classloaderManager;
     private boolean oneLogPerLaunch = false;
     private PrintStream originalStdOut, originalStdErr;
 
-    @Activate
-    public void activate()
+    @Override
+    public void close()
     {
+        if (classloaderManager != null)
+        {
+            classloaderManager.stop();
+        }
+
+        SecurityManagerPayloadLoader.unregisterIfPossible();
+
+        if (oneLogPerLaunch)
+        {
+            System.setOut(originalStdOut);
+            System.setErr(originalStdErr);
+        }
+    }
+
+    public JavaRunner()
+    {
+        // Get all runners from registry
+        var javaJobRunners = ServiceLoaderHelper.getServices(ServiceLoader.load(JavaJobRunner.class));
+
+        // Init CL manager
+        classloaderManager = new ClassloaderManager(javaJobRunners);
+
         // Security manager
         SecurityManagerPayloadLoader.registerIfPossible();
 
@@ -66,29 +86,6 @@ public class JavaRunner implements JobRunner
                 // ((ConsoleAppender) root.getAppender("consoleAppender")).setTarget("System.out");
             }
         }
-    }
-
-    @Deactivate
-    public void deactivate()
-    {
-        if (classloaderManager != null)
-        {
-            classloaderManager.stop();
-        }
-
-        SecurityManagerPayloadLoader.unregisterIfPossible();
-
-        if (oneLogPerLaunch)
-        {
-            System.setOut(originalStdOut);
-            System.setErr(originalStdErr);
-        }
-    }
-
-    @Activate
-    public JavaRunner(@Reference List<JavaJobRunner> javaJobRunners)
-    {
-        classloaderManager = new ClassloaderManager(javaJobRunners);
     }
 
     @Override

@@ -1,24 +1,29 @@
 package com.enioka.jqm.runner.shell;
 
-import com.enioka.jqm.runner.api.JobInstanceTracker;
+import org.kohsuke.MetaInfServices;
+
 import com.enioka.jqm.api.JobManager;
-import com.enioka.jqm.runner.api.JobRunner;
-import com.enioka.jqm.runner.api.JobRunnerCallback;
-
-import org.osgi.service.component.annotations.Component;
-
 import com.enioka.jqm.model.JobDef.PathType;
 import com.enioka.jqm.model.JobInstance;
+import com.enioka.jqm.runner.api.JobInstanceTracker;
+import com.enioka.jqm.runner.api.JobRunner;
+import com.enioka.jqm.runner.api.JobRunnerCallback;
 
 /**
  * This runner provides the ability to launch CLI processes.
  */
-@Component(property = { "Plugin-Type=JobRunner", "Runner-Type=shell" })
+@MetaInfServices(JobRunner.class)
 public class ShellRunner implements JobRunner
 {
     public ShellRunner()
     {
 
+    }
+
+    @Override
+    public void close() throws Exception
+    {
+        // Nothing to do
     }
 
     @Override

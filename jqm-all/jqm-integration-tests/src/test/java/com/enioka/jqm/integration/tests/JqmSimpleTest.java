@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.client.api.JqmClientFactory;
+import com.enioka.jqm.client.shared.IDbClientFactory;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.model.JobDefParameter;
 import com.enioka.jqm.test.helpers.CreationTools;
@@ -112,8 +113,8 @@ public class JqmSimpleTest
         {
             test.addAndStartEngine(nodeName);
         }
-        Integer i = JqmClientFactory.getClient().newJobRequest("TestJqmApplication", "TestUser").setSessionID(sessionId)
-                .setParameters(runtimePrms).enqueue();
+        Integer i = JqmClientFactory.getClient(IDbClientFactory.class).newJobRequest("TestJqmApplication", "TestUser")
+                .setSessionID(sessionId).setParameters(runtimePrms).enqueue();
         TestHelpers.waitFor(nbExpected, 9000 + waitMarginMs + nbExpected * 2000, cnx);
         if (waitMsMin > 0)
         {

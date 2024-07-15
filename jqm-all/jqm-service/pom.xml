@@ -39,22 +39,6 @@
                 </configuration>
             </plugin>
 
-            <!-- This is not an OSGi bundle! -->
-            <plugin>
-                <groupId>biz.aQute.bnd</groupId>
-                <artifactId>bnd-maven-plugin</artifactId>
-                <version>${plugin.bnd.version}</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>PROCESS_BUNDLES</id>
-                        <phase>none</phase>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- Create package -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -125,32 +109,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <!-- A profile adding a CLI when using debug property. -->
-        <profile>
-            <activation>
-                <property>
-                    <name>debug</name>
-                </property>
-            </activation>
-
-            <dependencies>
-                <!-- DEBUG - a CLI -->
-                <dependency>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>org.apache.felix.gogo.shell</artifactId>
-                    <version>1.1.4</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>org.apache.felix.gogo.command</artifactId>
-                    <version>1.1.2</version>
-                </dependency>
-
-            </dependencies>
-        </profile>
-    </profiles>
 
     <!-- runtime  = bundle start level 1  -->
     <!-- provided = bundle start level 5  -->
@@ -343,15 +301,21 @@
         <!-- Main goal: encapsulate the engine. -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jqm-cli</artifactId>
+            <artifactId>jqm-clusternode</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jqm-api</artifactId>
+            <artifactId>jqm-cli</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jqm-engine-api</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope> <!-- needed in this project to start a node! -->
         </dependency>
 
         <!-- Engine plugins for the base distribution -->
@@ -359,44 +323,37 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>jqm-runner-basic</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jqm-runner-spring</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-providers</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-jndi-context</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jqm-runner-shell</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jqm-runner-java</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <!-- This is an uber-jar (for now) -->
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- The website itself -->
@@ -404,7 +361,7 @@
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-ws</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
 
 

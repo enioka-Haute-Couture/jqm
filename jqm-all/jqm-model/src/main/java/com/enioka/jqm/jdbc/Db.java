@@ -9,18 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ServiceLoader;
 
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.sql.DataSource;
 
-import com.enioka.jqm.loader.Loader;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 
 /**
  * Entry point for all database-related operations, from initialization to schema upgrade, as well as creating sessions for querying the
@@ -383,10 +381,6 @@ public class Db
      */
     private void initAdapter(Properties p)
     {
-        DbAdapter newAdpt = null;
-
-        String dbAdaptersProp = p.getProperty("com.enioka.jqm.jdbc.adapters");
-
         try (Connection tmp = _ds.getConnection())
         {
             DatabaseMetaData meta = tmp.getMetaData();
@@ -394,56 +388,23 @@ public class Db
             jqmlogger.info("Database reports it is " + meta.getDatabaseProductName() + " " + meta.getDatabaseMajorVersion() + "."
                     + meta.getDatabaseMinorVersion());
 
-            if (dbAdaptersProp == null || dbAdaptersProp.isEmpty())
+            // Find the correct db apdater
+            jqmlogger.info("Database adapter search: using METAINF services");
+            try
             {
-                // OSGi case - always fails outside an OSGi framework with class not found exceptions.
-                jqmlogger.info("Database adapter search: using OSGi services");
-                try
+                for (var service : ServiceLoaderHelper.getServices(ServiceLoader.load(DbAdapter.class)))
                 {
-                    BundleContext context = FrameworkUtil.getBundle(getClass()).getBundleContext();
-                    Loader<DbAdapter> loader = new Loader<DbAdapter>(context, DbAdapter.class, "(Adapter-Type=*)");
-                    loader.start();
-
-                    for (ServiceReference<?> ref : loader.references)
+                    jqmlogger.info("\t\tFound DB adapter plugin {}", service.getClass().getCanonicalName());
+                    if (service.compatibleWith(meta))
                     {
-                        jqmlogger.info("\t\tFound DB adapter plugin {}:{}", ref.getBundle().getSymbolicName(),
-                                ref.getBundle().getVersion());
-                        DbAdapter newAdapter = (DbAdapter) context.getService(ref);
-                        if (newAdapter.compatibleWith(meta))
-                        {
-                            adapter = newAdapter;
-                            break;
-                        }
+                        adapter = service;
+                        break;
                     }
-                }
-                catch (Exception e)
-                {
-                    throw new DatabaseException("Issue when loading database adapter", e);
                 }
             }
-            else
+            catch (Exception e)
             {
-                // Standard Java class loading environment.
-                jqmlogger.info("Database adapter search: using initialization property {}", dbAdaptersProp);
-                for (String s : dbAdaptersProp.split(","))
-                {
-                    try
-                    {
-                        // Note this cannot work in an OSGi classloader - it could not see classes outside the current bundle. without
-                        // manifest imports.
-                        Class<? extends DbAdapter> clazz = Db.class.getClassLoader().loadClass(s).asSubclass(DbAdapter.class);
-                        newAdpt = clazz.getConstructor().newInstance();
-                        if (newAdpt.compatibleWith(meta))
-                        {
-                            adapter = newAdpt;
-                            break;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        throw new DatabaseException("Issue when loading database adapter named: " + s, e);
-                    }
-                }
+                throw new DatabaseException("Issue when loading database adapter", e);
             }
         }
         catch (SQLException e1)

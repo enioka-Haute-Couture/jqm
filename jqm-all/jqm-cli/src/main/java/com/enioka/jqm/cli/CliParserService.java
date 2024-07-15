@@ -3,17 +3,17 @@ package com.enioka.jqm.cli;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import com.beust.jcommander.JCommander;
-import com.enioka.jqm.cli.bootstrap.CommandLine;
-
-import org.osgi.service.component.annotations.Component;
+import org.kohsuke.MetaInfServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.beust.jcommander.JCommander;
+import com.enioka.jqm.cli.bootstrap.CommandLine;
 
 /**
  * Main entry point of the CLI (which is also the entry point for the daemon).
  */
-@Component(service = CommandLine.class)
+@MetaInfServices(CommandLine.class)
 public class CliParserService implements CommandLine
 {
     private static final Logger jqmlogger = (Logger) LoggerFactory.getLogger(CliParserService.class);

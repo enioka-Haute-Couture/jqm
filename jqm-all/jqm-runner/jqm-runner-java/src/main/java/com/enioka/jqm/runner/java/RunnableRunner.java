@@ -2,15 +2,15 @@ package com.enioka.jqm.runner.java;
 
 import java.util.Map;
 
+import org.kohsuke.MetaInfServices;
+
 import com.enioka.jqm.api.JavaJobRunner;
 import com.enioka.jqm.api.JobRunnerException;
-
-import org.osgi.service.component.annotations.Component;
 
 /**
  * A runner for classes which implement Runnable with a no-args constructor.
  */
-@Component(service = JavaJobRunner.class, property = { "Plugin-Type=JavaJobRunner", "JavaJobRunner-Type=runnable" })
+@MetaInfServices(JavaJobRunner.class)
 public class RunnableRunner implements JavaJobRunner
 {
     public RunnableRunner()

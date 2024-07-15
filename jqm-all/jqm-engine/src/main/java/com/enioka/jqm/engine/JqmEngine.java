@@ -35,7 +35,10 @@ import javax.management.ObjectName;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import com.enioka.jqm.configservices.OsgiBundleLogger;
+import org.kohsuke.MetaInfServices;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.enioka.jqm.engine.api.exceptions.JqmInitError;
 import com.enioka.jqm.engine.api.exceptions.JqmInitErrorTooSoon;
 import com.enioka.jqm.engine.api.jmx.JqmEngineMBean;
@@ -57,15 +60,10 @@ import com.enioka.jqm.repository.VersionRepository;
 import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
 import com.enioka.jqm.shared.misc.Closer;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ServiceScope;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * The engine itself. Everything starts in this class.
  */
-@Component(service = JqmEngineOperations.class, scope = ServiceScope.PROTOTYPE)
+@MetaInfServices(JqmEngineOperations.class)
 public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
 {
     private static Logger jqmlogger = LoggerFactory.getLogger(JqmEngine.class);
@@ -132,7 +130,6 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
         jqmlogger.info("JQM engine version " + this.getVersion() + " for node " + nodeName + " is starting");
         jqmlogger.info("Java version is " + System.getProperty("java.version") + ". JVM was made by " + System.getProperty("java.vendor")
                 + " as " + System.getProperty("java.vm.name") + " version " + System.getProperty("java.vm.version"));
-        OsgiBundleLogger.logAllBundles();
 
         // Database connection
         try (DbConn cnx = Helpers.getNewDbSession())
@@ -282,8 +279,6 @@ public class JqmEngine implements JqmEngineMBean, JqmEngineOperations
     @Override
     public void stop()
     {
-        runnerManager.stop();
-
         synchronized (killHook)
         {
             jqmlogger.info("JQM engine " + this.node.getName() + " has received a stop order");

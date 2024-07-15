@@ -1,14 +1,13 @@
 package com.enioka.jqm.clusternode;
 
-import com.enioka.jqm.engine.api.exceptions.JqmInitError;
-import com.enioka.jqm.engine.api.lifecycle.JqmEngineOperations;
-import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
+import java.util.ServiceLoader;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.enioka.jqm.engine.api.lifecycle.JqmEngineOperations;
+import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
+import com.enioka.jqm.shared.services.ServiceLoaderHelper;
 
 public class ClusterNode
 {
@@ -23,19 +22,11 @@ public class ClusterNode
 
         try
         {
-            BundleContext bundleContext = FrameworkUtil.getBundle(ClusterNode.class).getBundleContext();
-            if (bundleContext == null)
-            {
-                throw new JqmInitError("Not in an OSGi context, cannot start a cluster node");
-            }
-            ServiceReference<JqmEngineOperations> jqmEngineSR = bundleContext.getServiceReference(JqmEngineOperations.class);
-            if (jqmEngineSR == null)
-            {
-                throw new JqmInitError("No jqm engine service instance available - check jqm-engine bundle is started");
-            }
-            this.jqmEngine = bundleContext.getServiceObjects(jqmEngineSR).getService();
+            // ServiceLoaderHelper.getService(ServiceLoader.load(JqmJndiContextControlService.class)).registerIfNeeded();
 
-            jqmEngine.start(nodeName, new EngineCallback());
+            this.jqmEngine = ServiceLoaderHelper.getService(ServiceLoader.load(JqmEngineOperations.class), false);
+
+            jqmEngine.start(this.nodeName, new EngineCallback());
             jqmEngine.join();
             return 0;
         }

@@ -22,8 +22,9 @@ import java.util.Properties;
 
 import com.enioka.jqm.client.api.Query;
 import com.enioka.jqm.client.api.Query.Sort;
+import com.enioka.jqm.client.shared.IDbClientFactory;
 import com.enioka.jqm.client.api.State;
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.client.api.JqmClientFactory;
 import com.enioka.jqm.jdbc.Db;
 import com.enioka.jqm.jdbc.DbConn;
 import com.enioka.jqm.jdbc.DbManager;
@@ -221,8 +222,8 @@ public class BasicTest
 
             Properties p2 = new Properties();
             p2.put("com.enioka.jqm.jdbc.contextobject", db);
-            List<com.enioka.jqm.client.api.JobInstance> res = JqmClientFactory.getClient("test", p2, false).newQuery()
-                    .setQueryHistoryInstances(false).setQueryLiveInstances(true).addSortDesc(Sort.ID).setPageSize(1)
+            List<com.enioka.jqm.client.api.JobInstance> res = JqmClientFactory.getClient("test", p2, false, IDbClientFactory.class)
+                    .newQuery().setQueryHistoryInstances(false).setQueryLiveInstances(true).addSortDesc(Sort.ID).setPageSize(1)
                     .setApplicationName("appName").invoke();
 
             Assert.assertEquals(1, res.size());

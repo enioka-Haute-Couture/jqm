@@ -46,14 +46,6 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
         </dependency>
-
-        <!-- ================ OSGI APIs only used in this artefact ================== -->
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.cm</artifactId>
-            <version>${osgi.cm.version}</version>
-        </dependency>
-
     </dependencies>
 
 </project>

@@ -155,7 +155,6 @@
 
     <modules>
         <module>jqm-shared</module>
-        <module>jqm-loader</module>
         <module>jqm-dbadapter</module>
         <module>jqm-doc</module>
         <module>jqm-runner</module>
@@ -163,8 +162,7 @@
         <module>jqm-model</module>
         <module>jqm-model-repository</module>
         <module>jqm-api</module>
-        <module>jqm-ws</module>
-        <module>jqm-jackson-osgi-jaxrs-config</module>
+        <!--<module>jqm-ws</module>-->
         <module>jqm-api-client</module>
         <module>jqm-test-helpers</module>
         <module>jqm-jndi-context</module>
@@ -173,7 +171,6 @@
         <module>jqm-providers</module>
         <module>jqm-pki</module>
         <module>jqm-tst</module>
-        <module>jqm-tst-osgi</module>
         <module>jqm-admin</module>
         <module>jqm-handlers</module>
         <module>jqm-cli</module>
@@ -182,7 +179,6 @@
         <module>jqm-service</module>
         <module>jqm-xml</module>
         <module>jqm-integration-tests</module>
-        <module>jqm-osgi-repackaging</module>
     </modules>
 
     <scm>
@@ -354,29 +350,6 @@
             </plugin>
 
             <plugin>
-                <groupId>biz.aQute.bnd</groupId>
-                <artifactId>bnd-maven-plugin</artifactId>
-                <version>${plugin.bnd.version}</version>
-                <executions>
-                    <execution>
-                        <id>PROCESS_BUNDLES</id>
-                        <goals>
-                            <goal>bnd-process</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <bnd><![CDATA[
--noclassforname: true
-Bundle-SymbolicName: com.enioka.jqm.${project.artifactId}
-Import-Package: *, ${additionnalBndImports}
--fixupmessages: "The default package "
-        ]]>
-                    </bnd>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>${plugin.release.version}</version>
@@ -490,61 +463,16 @@ Import-Package: *, ${additionnalBndImports}
 
     <dependencies>
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.core</artifactId>
-            <version>${osgi.core.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.annotation</artifactId>
-            <version>${osgi.annotation.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.component.annotations</artifactId>
-            <version>${osgi.component.annotations.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.component</artifactId>
-            <version>${osgi.component.service.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.jakartars</artifactId>
-            <version>${osgi.jakartars.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.cm</artifactId>
-            <version>${osgi.cm.version}</version>
-            <scope>provided</scope>
+            <groupId>org.kohsuke.metainf-services</groupId>
+            <artifactId>metainf-services</artifactId>
+            <version>1.11</version>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
     <dependencyManagement>
         <!-- Beware of transitive dependencies - some OSGi specs bring older versions of these -->
         <dependencies>
-            <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.util.promise</artifactId>
-                <version>${osgi.promise.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.util.function</artifactId>
-                <version>${osgi.function.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk18on</artifactId>
-                <version>${bc.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 

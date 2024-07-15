@@ -24,7 +24,7 @@ public class DbFailTest extends JqmBaseTest
     {
         this.addAndStartEngine();
         jqmlogger.info("Stopping db");
-        s.stop();
+        s.close();
         this.sleep(2);
         jqmlogger.info("Restarting DB");
         s.start();
@@ -37,13 +37,13 @@ public class DbFailTest extends JqmBaseTest
     {
         this.addAndStartEngine();
         jqmlogger.info("Stopping db");
-        s.stop();
+        s.close();
         this.sleep(2);
         jqmlogger.info("Restarting DB");
         s.start();
         this.sleep(5);
         jqmlogger.info("Stopping db");
-        s.stop();
+        s.close();
         this.sleep(2);
         jqmlogger.info("Restarting DB");
         s.start();
@@ -61,7 +61,7 @@ public class DbFailTest extends JqmBaseTest
         this.sleep(2); // first poller loop
 
         jqmlogger.info("Stopping db");
-        s.stop();
+        s.close();
         jqmlogger.info("Restarting DB (as soon as possible)");
         s.start();
         this.sleep(5);
@@ -75,7 +75,7 @@ public class DbFailTest extends JqmBaseTest
         this.sleep(2);
 
         jqmlogger.info("Stopping db");
-        s.stop();
+        s.close();
         this.sleep(5);
 
         jqmlogger.info("Restarting DB");
@@ -93,7 +93,7 @@ public class DbFailTest extends JqmBaseTest
         this.sleep(2);
 
         jqmlogger.info("Stopping db");
-        s.stop();
+        s.close();
         this.sleep(5);
 
         jqmlogger.info("Restarting DB");

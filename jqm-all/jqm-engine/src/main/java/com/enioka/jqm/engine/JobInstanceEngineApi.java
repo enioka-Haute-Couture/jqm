@@ -15,7 +15,8 @@ import com.enioka.jqm.client.api.JobRequest;
 import com.enioka.jqm.client.api.JqmClient;
 import com.enioka.jqm.client.api.JqmClientException;
 import com.enioka.jqm.client.api.Query;
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.client.api.JqmClientFactory;
+import com.enioka.jqm.client.shared.IDbClientFactory;
 import com.enioka.jqm.runner.api.JqmKillException;
 import com.enioka.jqm.shared.exceptions.JqmRuntimeException;
 import com.enioka.jqm.shared.misc.Closer;
@@ -273,7 +274,7 @@ class JobInstanceEngineApi implements JobManager
 
     private JqmClient getJqmClient()
     {
-        return JqmClientFactory.getClient();
+        return JqmClientFactory.getClient(IDbClientFactory.class);
     }
 
     private void handleInstructions()

@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.kohsuke.MetaInfServices;
+
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbAdapter;
 import com.enioka.jqm.jdbc.QueryPreparation;
 
-import org.osgi.service.component.annotations.Component;
-
-@Component(service = DbAdapter.class, property = { "Adapter-Type:String=db2" })
+@MetaInfServices(DbAdapter.class)
 public class DbImplDb2 extends DbAdapter
 {
     @Override

@@ -1,48 +1,24 @@
 package com.enioka.jqm.test.helpers;
 
-import java.util.Map;
+import java.io.Closeable;
+import java.io.IOException;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.hsqldb.Server;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Modified;
-import org.osgi.service.component.annotations.ServiceScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * An HSQLDB server listening in-memory only.
  */
-@Component(immediate = false, service = DebugHsqlDbServer.class, scope = ServiceScope.SINGLETON, configurationPolicy = ConfigurationPolicy.OPTIONAL, configurationPid = "com.enioka.jqm.test.helpers.DebugHsqlDbServer", property = {
-        "dbName=testdbengine", "dbPath=mem:testdbengine" })
-public class DebugHsqlDbServer
+public class DebugHsqlDbServer implements Closeable
 {
     private Logger jqmlogger = LoggerFactory.getLogger(DebugHsqlDbServer.class);
 
     private Server s;
-    private String dbName, dbPath;
-
-    @Activate
-    public void activate(Map<String, Object> properties)
-    {
-        jqmlogger.debug("HSQLDB configuration initialized to {}", properties);
-        this.dbName = properties.get("dbName").toString();
-        this.dbPath = properties.get("dbPath").toString();
-        this.start();
-    }
-
-    @Modified
-    public void modifiedConfiguration(Map<String, Object> properties)
-    {
-        jqmlogger.debug("HSQLDB configuration modified to {}", properties);
-        stop();
-        start();
-    }
+    private String dbName = "testdbengine", dbPath = "mem:testdbengine";
 
     /**
      * Idempotent. Start or restart the server.
@@ -81,8 +57,8 @@ public class DebugHsqlDbServer
     /**
      * Idempotent. Stops the server.
      */
-    @Deactivate
-    public void stop()
+    @Override
+    public void close()
     {
         if (s != null)
         {

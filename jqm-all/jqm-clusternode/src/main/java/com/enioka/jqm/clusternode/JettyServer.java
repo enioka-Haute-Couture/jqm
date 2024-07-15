@@ -18,24 +18,15 @@ package com.enioka.jqm.clusternode;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.enioka.jqm.engine.api.exceptions.JqmInitError;
 import com.enioka.jqm.jdbc.DbConn;
-import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
-import com.enioka.jqm.pki.JdbcCa;
 import com.enioka.jqm.shared.misc.Closer;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Every engine has an embedded Jetty engine that serves the different web service APIs.
@@ -49,7 +40,7 @@ class JettyServer
 
     void start(Node node, DbConn cnx)
     {
-        ConfigurationAdmin adminService = getConfigurationAdmin();
+        /*ConfigurationAdmin adminService = getConfigurationAdmin();
 
         this.node = node;
         Configuration httpServiceConfiguration;
@@ -239,13 +230,13 @@ class JettyServer
         catch (IOException e)
         {
             throw new JqmInitError("Could not modify OSGi registry storage", e);
-        }
+        }*/
     }
 
     void stop()
     {
         jqmlogger.trace("Jetty will now stop");
-        ConfigurationAdmin adminService = getConfigurationAdmin();
+        /*ConfigurationAdmin adminService = getConfigurationAdmin();
         Configuration configuration;
         try
         {
@@ -284,12 +275,12 @@ class JettyServer
         }
 
         cleanApiJaxRsServices(adminService);
-        jqmlogger.debug("Jetty has stopped");
+        jqmlogger.debug("Jetty has stopped");*/
     }
 
-    private void activateApiJakartaRsService(ConfigurationAdmin adminService, String configPid)
+    private void activateApiJakartaRsService( String configPid)
     {
-        Configuration jakartaRsServiceConfig;
+        /*Configuration jakartaRsServiceConfig;
         try
         {
             jakartaRsServiceConfig = adminService.getFactoryConfiguration(configPid, node.getId() + "", null);
@@ -317,12 +308,12 @@ class JettyServer
         }
 
         startedServicesPid.add(jakartaRsServiceConfig.getPid());
-        jqmlogger.info("Created configuration for service " + configPid);
+        jqmlogger.info("Created configuration for service " + configPid);*/
     }
 
-    private void cleanApiJaxRsServices(ConfigurationAdmin adminService)
+    private void cleanApiJaxRsServices()
     {
-        Configuration config = null;
+       /* Configuration config = null;
         for (String pid : startedServicesPid)
         {
             try
@@ -343,7 +334,7 @@ class JettyServer
             {
                 jqmlogger.warn("Could not remove JAXRS service from configuration", e);
             }
-        }
+        }*/
     }
 
     private int getRandomFreePort()
@@ -364,17 +355,5 @@ class JettyServer
             Closer.closeQuietly(ss);
         }
         return port;
-    }
-
-    /**
-     * Retrieve the configuration service. It is retrieved manually. JQM does not use OSGi everywhere, only on extension points and HTTP
-     * server, so this class is a bridge between the OSGi world (HTTP/JAXRS whiteboard) and normal Java code, and it is not a component
-     * itself so we cannot use injection.
-     **/
-    private ConfigurationAdmin getConfigurationAdmin()
-    {
-        BundleContext bundleContext = FrameworkUtil.getBundle(JettyServer.class).getBundleContext();
-        ServiceReference<ConfigurationAdmin> serviceRef = bundleContext.getServiceReference(ConfigurationAdmin.class);
-        return bundleContext.getService(serviceRef);
-    }
+    }   
 }

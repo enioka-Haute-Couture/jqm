@@ -21,21 +21,6 @@
         </testResources>
 
         <plugins>
-            <!-- This is not an OSGi bundle! -->
-            <plugin>
-                <groupId>biz.aQute.bnd</groupId>
-                <artifactId>bnd-maven-plugin</artifactId>
-                <version>${plugin.bnd.version}</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>PROCESS_BUNDLES</id>
-                        <phase>none</phase>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -52,15 +37,24 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>com.enioka.jqm</groupId>
-            <artifactId>jqm-tst-osgi</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <dependency>            <!-- Test resources must be in test class path of all JQM tester users -->
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-providers</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>            <!-- Test resources must be in test class path of all JQM tester users -->
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-api-client-jdbc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>            <!-- Test resources must be in test class path of all JQM tester users -->
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-engine-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>            <!-- Test resources must be in test class path of all JQM tester users -->
+            <groupId>com.enioka.jqm</groupId>
+            <artifactId>jqm-model-repository</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -70,31 +64,14 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.framework</artifactId>
-            <version>${felix.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.scr</artifactId>
-            <version>${felix.scr.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.configadmin</artifactId>
-            <version>${felix.configadmin.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.ops4j.pax.url</groupId>
-            <artifactId>pax-url-wrap</artifactId>
-            <version>${pax.url.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <version>${hsqldb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
         </dependency>
 
         <!-- TEST -->
@@ -109,14 +86,6 @@
             <groupId>com.enioka.jqm</groupId>
             <artifactId>jqm-api</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- For our internal tests, use logback. But only in test scope. -->
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.logback</artifactId>
-            <version>${felix.logback.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

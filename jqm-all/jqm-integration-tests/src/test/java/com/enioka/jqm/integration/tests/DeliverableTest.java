@@ -20,14 +20,13 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.client.api.JqmClientFactory;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.test.helpers.TestHelpers;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.ops4j.pax.exam.Option;
 
 /**
  * Test deliverable retrieval through the JDBC API + WS call for the file itself. No client configuration needed as temporary passwords are
@@ -35,12 +34,6 @@ import org.ops4j.pax.exam.Option;
  */
 public class DeliverableTest extends JqmBaseTest
 {
-    @Override
-    protected Option[] moreOsgiconfig()
-    {
-        return webConfig();
-    }
-
     /**
      * Retrieve all the files created by a job, with auth, without SSL
      */
@@ -134,7 +127,7 @@ public class DeliverableTest extends JqmBaseTest
         GlobalParameter.setParameter(cnx, "enableWsApiSsl", "true");
         cnx.commit();
 
-        JqmClientFactory.resetClient(null);
+        JqmClientFactory.reset();
         JqmClientFactory.setProperty("com.enioka.jqm.ws.truststoreFile", "./conf/trusted.jks");
         JqmClientFactory.setProperty("com.enioka.jqm.ws.truststorePass", "SuperPassword");
         jqmClient = JqmClientFactory.getClient();

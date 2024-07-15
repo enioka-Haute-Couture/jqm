@@ -5,11 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.kohsuke.MetaInfServices;
+
 import com.enioka.jqm.jdbc.DbAdapter;
 
-import org.osgi.service.component.annotations.Component;
-
-@Component(service = DbAdapter.class, property = { "Adapter-Type:String=postgresql" })
+@MetaInfServices(DbAdapter.class)
 public class DbImplPg extends DbAdapter
 {
     public DbImplPg()

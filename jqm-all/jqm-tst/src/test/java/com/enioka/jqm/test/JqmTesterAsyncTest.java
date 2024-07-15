@@ -1,11 +1,11 @@
 package com.enioka.jqm.test;
 
-import com.enioka.jqm.tester.api.JqmAsynchronousTester;
-
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.enioka.jqm.test.api.JqmAsynchronousTester;
 
 /**
  * Tests as they should be: with a node stared once, closed at the end.
@@ -17,8 +17,8 @@ public class JqmTesterAsyncTest
     @BeforeClass
     public static void beforeClass()
     {
-        tester = JqmAsynchonousTesterJse.create().addNode("node1").addNode("node2").addQueue("queue1").addQueue("queue2").addQueue("queue3")
-                .deployQueueToNode("queue1", 10, 100, "node1").deployQueueToNode("queue2", 10, 100, "node2")
+        tester = JqmAsynchronousTesterImpl.create().addNode("node1").addNode("node2").addQueue("queue1").addQueue("queue2")
+                .addQueue("queue3").deployQueueToNode("queue1", 10, 100, "node1").deployQueueToNode("queue2", 10, 100, "node2")
                 .deployQueueToNode("queue3", 10, 100, "node1", "node2").start();
     }
 

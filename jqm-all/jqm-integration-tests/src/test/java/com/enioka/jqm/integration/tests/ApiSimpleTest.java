@@ -30,10 +30,10 @@ import java.util.stream.Stream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.ops4j.pax.exam.Option;
 
 import com.enioka.jqm.client.api.JobInstance;
-import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
+import com.enioka.jqm.client.api.JqmClientFactory;
+import com.enioka.jqm.client.shared.IDbClientFactory;
 import com.enioka.jqm.model.GlobalParameter;
 import com.enioka.jqm.model.Node;
 import com.enioka.jqm.model.State;
@@ -47,12 +47,6 @@ import com.enioka.jqm.test.helpers.TestHelpers;
 public class ApiSimpleTest extends JqmBaseTest
 {
     private int port;
-
-    @Override
-    protected Option[] moreOsgiconfig()
-    {
-        return webConfig();
-    }
 
     @Before
     public void before() throws IOException
@@ -112,7 +106,7 @@ public class ApiSimpleTest extends JqmBaseTest
         TestHelpers.waitFor(1, 10000, cnx);
 
         // Check run is OK & parameters have been correctly processed
-        JobInstance ji = JqmClientFactory.getClient().getJob(jid);
+        JobInstance ji = JqmClientFactory.getClient(IDbClientFactory.class).getJob(jid);
         Assert.assertEquals(com.enioka.jqm.client.api.State.ENDED, ji.getState());
         Assert.assertEquals(2, ji.getParameters().size());
         Assert.assertEquals("newvalue2", ji.getParameters().get("arg2"));

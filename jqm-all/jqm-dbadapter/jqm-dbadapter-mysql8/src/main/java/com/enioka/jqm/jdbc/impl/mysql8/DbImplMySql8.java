@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.kohsuke.MetaInfServices;
+
 import com.enioka.jqm.jdbc.DatabaseException;
 import com.enioka.jqm.jdbc.DbAdapter;
 import com.enioka.jqm.jdbc.DbConn;
@@ -15,12 +17,10 @@ import com.enioka.jqm.jdbc.QueryPreparation;
 import com.enioka.jqm.model.JobInstance;
 import com.enioka.jqm.model.Queue;
 
-import org.osgi.service.component.annotations.Component;
-
 /**
  * Should work on MySQL 8+ and MariaDB 10.3+. These versions have introduced persistent AUTO_INCREMENT high water mark.
  */
-@Component(service = DbAdapter.class, property = { "Adapter-Type:String=mysql" })
+@MetaInfServices(DbAdapter.class)
 public class DbImplMySql8 extends DbAdapter
 {
     @Override
