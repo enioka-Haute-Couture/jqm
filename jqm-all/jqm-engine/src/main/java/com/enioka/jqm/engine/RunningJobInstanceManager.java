@@ -16,7 +16,7 @@ class RunningJobInstanceManager
     private Logger jqmlogger = LoggerFactory.getLogger(RunningJobInstanceManager.class);
 
     private ConcurrentHashMap<RunningJobInstance, RjiRegistration> instancesByTracker = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Integer, RjiRegistration> instancesById = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long, RjiRegistration> instancesById = new ConcurrentHashMap<>();
 
     void startNewJobInstance(JobInstance ji, QueuePoller qp)
     {

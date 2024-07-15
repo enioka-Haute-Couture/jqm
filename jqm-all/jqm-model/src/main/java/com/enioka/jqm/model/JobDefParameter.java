@@ -166,6 +166,6 @@ public class JobDefParameter implements Serializable
     public static int create(DbConn cnx, String key, String value, int jdId)
     {
         QueryResult qr = cnx.runUpdate("jdprm_insert", key, value, jdId);
-        return qr.getGeneratedId();
+        return qr.getGeneratedId().intValue();
     }
 }

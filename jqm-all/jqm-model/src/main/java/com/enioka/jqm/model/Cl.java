@@ -229,7 +229,7 @@ public class Cl implements Serializable
             String allowedRunners)
     {
         QueryResult r = cnx.runUpdate("cl_insert", name, childFirst, hiddenClasses, tracing, persistent, allowedRunners);
-        int newId = r.getGeneratedId();
+        int newId = r.getGeneratedId().intValue();
 
         return newId;
     }

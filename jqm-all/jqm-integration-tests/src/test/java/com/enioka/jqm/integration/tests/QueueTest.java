@@ -32,11 +32,11 @@ public class QueueTest extends JqmBaseTest
                                 "jqm-test-kill", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
                 cnx.commit();
 
-                int i1 = jqmClient.enqueue("jqm-test-kill", "test");
-                int i2 = jqmClient.enqueue("jqm-test-kill", "test");
-                int i3 = jqmClient.enqueue("jqm-test-kill", "test");
-                int i4 = jqmClient.enqueue("jqm-test-kill", "test");
-                int i5 = jqmClient.enqueue("jqm-test-kill", "test");
+                long i1 = jqmClient.enqueue("jqm-test-kill", "test");
+                long i2 = jqmClient.enqueue("jqm-test-kill", "test");
+                long i3 = jqmClient.enqueue("jqm-test-kill", "test");
+                long i4 = jqmClient.enqueue("jqm-test-kill", "test");
+                long i5 = jqmClient.enqueue("jqm-test-kill", "test");
 
                 addAndStartEngine();
 
@@ -44,8 +44,8 @@ public class QueueTest extends JqmBaseTest
                 TestHelpers.waitForRunning(3, 10000, cnx);
                 Thread.sleep(3000); // Additional wait time to ensure no additional starts
 
-                jqmlogger.debug("COUNT RUNNING " + cnx.runSelectSingle("ji_select_count_running", Integer.class));
-                jqmlogger.debug("COUNT ALL     " + cnx.runSelectSingle("ji_select_count_all", Integer.class));
+                jqmlogger.debug("COUNT RUNNING " + cnx.runSelectSingle("ji_select_count_running", Long.class));
+                jqmlogger.debug("COUNT ALL     " + cnx.runSelectSingle("ji_select_count_all", Long.class));
                 Assert.assertEquals(3, jqmClient.newQuery().setQueryLiveInstances(true).setQueryHistoryInstances(false)
                                 .addStatusFilter(com.enioka.jqm.client.api.State.RUNNING).invoke().size());
                 Assert.assertEquals(2, jqmClient.newQuery().setQueryLiveInstances(true).setQueryHistoryInstances(false)
@@ -138,8 +138,8 @@ public class QueueTest extends JqmBaseTest
                 cnx.commit();
 
                 // Enqueue a low priority first, then a higher priority one. The higher priority should run first.
-                int i1 = jqmClient.newJobRequest("jqm-test-wait", "test").addParameter("ms", "100").setPriority(1).enqueue();
-                int i2 = jqmClient.newJobRequest("jqm-test-wait", "test").addParameter("ms", "100").setPriority(6).enqueue();
+                long i1 = jqmClient.newJobRequest("jqm-test-wait", "test").addParameter("ms", "100").setPriority(1).enqueue();
+                long i2 = jqmClient.newJobRequest("jqm-test-wait", "test").addParameter("ms", "100").setPriority(6).enqueue();
 
                 addAndStartEngine();
 
@@ -184,8 +184,8 @@ public class QueueTest extends JqmBaseTest
                 cnx.commit();
 
                 // No priority = FIFO queue.
-                int i1 = jqmClient.newJobRequest("jqm-test-wait", "test").addParameter("ms", "100").setPriority(null).enqueue();
-                int i2 = jqmClient.newJobRequest("jqm-test-wait", "test").addParameter("ms", "100").setPriority(null).enqueue();
+                long i1 = jqmClient.newJobRequest("jqm-test-wait", "test").addParameter("ms", "100").setPriority(null).enqueue();
+                long i2 = jqmClient.newJobRequest("jqm-test-wait", "test").addParameter("ms", "100").setPriority(null).enqueue();
 
                 addAndStartEngine();
                 displayAllQueueTable();
@@ -220,8 +220,8 @@ public class QueueTest extends JqmBaseTest
                                 "jqm-test-wait-single", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
                 cnx.commit();
 
-                int i1 = jqmClient.newJobRequest("jqm-test-wait-single", "test").setPriority(null).enqueue();
-                int i2 = jqmClient.newJobRequest("jqm-test-wait-dual", "test").setPriority(null).enqueue();
+                long i1 = jqmClient.newJobRequest("jqm-test-wait-single", "test").setPriority(null).enqueue();
+                long i2 = jqmClient.newJobRequest("jqm-test-wait-dual", "test").setPriority(null).enqueue();
 
                 addAndStartEngine();
 
@@ -255,7 +255,7 @@ public class QueueTest extends JqmBaseTest
                                 "jqm-test-kill", null, "Franquin", "ModuleMachin", "other", "other", false, cnx);
                 cnx.commit();
 
-                int i1 = jqmClient.newJobRequest("jqm-test-kill", "test").setPriority(null).enqueue();
+                long i1 = jqmClient.newJobRequest("jqm-test-kill", "test").setPriority(null).enqueue();
 
                 addAndStartEngine();
                 TestHelpers.waitFor(1, 60000, cnx);
@@ -302,7 +302,7 @@ public class QueueTest extends JqmBaseTest
                 Assert.assertEquals(3, TestHelpers.getQueueAllCount(cnx));
 
                 // Kill one, the last JI should start after the kill
-                int toKill = jqmClient.newQuery().setQueryHistoryInstances(false).setQueryLiveInstances(true).addStatusFilter(State.RUNNING)
+                long toKill = jqmClient.newQuery().setQueryHistoryInstances(false).setQueryLiveInstances(true).addStatusFilter(State.RUNNING)
                                 .invoke().get(0).getId();
                 jqmClient.killJob(toKill);
 

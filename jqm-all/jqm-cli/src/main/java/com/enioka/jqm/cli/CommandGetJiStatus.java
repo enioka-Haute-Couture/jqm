@@ -9,7 +9,7 @@ import com.enioka.jqm.client.jdbc.api.JqmClientFactory;
 class CommandGetJiStatus extends CommandBase
 {
     @Parameter(names = { "-i", "--id" }, description = "ID of the job instance to query.", required = true)
-    private Integer id;
+    private Long id;
 
     @Override
     public int doWork()

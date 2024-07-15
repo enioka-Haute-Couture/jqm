@@ -41,7 +41,7 @@ public class Deliverable implements Serializable
 
     protected String fileFamily;
 
-    private Integer jobId;
+    private Long jobId;
 
     private String randomId;
 
@@ -67,7 +67,7 @@ public class Deliverable implements Serializable
      * ID of the {@link JobInstance} which created this {@link Deliverable}. This is also the ID of the {@link History} object once the
      * {@link JobInstance} has finished (and therefore disappeared)
      */
-    public Integer getJobId()
+    public Long getJobId()
     {
         return jobId;
     }
@@ -75,7 +75,7 @@ public class Deliverable implements Serializable
     /**
      * See {@link #getJobId()}
      */
-    public void setJobId(final Integer jobId)
+    public void setJobId(final Long jobId)
     {
 
         this.jobId = jobId;
@@ -181,7 +181,7 @@ public class Deliverable implements Serializable
                 tmp.id = rs.getInt(1);
                 tmp.fileFamily = rs.getString(2);
                 tmp.filePath = rs.getString(3);
-                tmp.jobId = rs.getInt(4);
+                tmp.jobId = rs.getLong(4);
                 tmp.originalFileName = rs.getString(5);
                 tmp.randomId = rs.getString(6);
 

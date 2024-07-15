@@ -44,7 +44,7 @@ public class JqmSynchronousTesterOsgi implements JqmSynchronousTester
     private Node node = null;
     private Integer jd = null;
     private Integer q = null;
-    private Integer ji = null;
+    private Long ji = null;
 
     // Just for dependency.
     @Reference

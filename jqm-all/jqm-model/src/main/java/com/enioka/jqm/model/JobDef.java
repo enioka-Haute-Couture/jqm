@@ -519,7 +519,7 @@ public class JobDef implements Serializable
     {
         QueryResult r = cnx.runUpdate("jd_insert", application, applicationName, classLoaderId, description, true, false, highlander,
                 jarPath, javaClassName, null, keyword1, keyword2, keyword3, maxTimeRunning, module, pathType.toString(), queue_id);
-        int newId = r.getGeneratedId();
+        int newId = r.getGeneratedId().intValue();
 
         if (parameters != null)
         {

@@ -119,7 +119,7 @@ public class SchedulerTest extends JqmBaseTest
         int id = CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar",
                 TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
-        int scheduleId = jqmClient.newJobRequest("MarsuApplication", "test user").setRecurrence("* * * * *").addParameter("key1", "value1")
+        Long scheduleId = jqmClient.newJobRequest("MarsuApplication", "test user").setRecurrence("* * * * *").addParameter("key1", "value1")
                 .enqueue();
 
         JobDef jd_client = jqmClient.getJobDefinition("MarsuApplication");
@@ -176,7 +176,7 @@ public class SchedulerTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
-        int i = jqmClient.newJobRequest("MarsuApplication", "testuser").startHeld().enqueue();
+        Long i = jqmClient.newJobRequest("MarsuApplication", "testuser").startHeld().enqueue();
         addAndStartEngine();
 
         // Should not run.

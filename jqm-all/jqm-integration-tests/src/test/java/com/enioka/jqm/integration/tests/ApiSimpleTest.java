@@ -99,10 +99,10 @@ public class ApiSimpleTest extends JqmBaseTest
 
         String result = res.body();
 
-        Integer jid = 0;
+        Long jid = 0L;
         try
         {
-            jid = Integer.parseInt(result);
+            jid = Long.parseLong(result);
         }
         catch (Exception e)
         {

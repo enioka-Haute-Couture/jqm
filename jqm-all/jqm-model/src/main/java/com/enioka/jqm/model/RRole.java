@@ -102,7 +102,7 @@ public class RRole implements Serializable
     public static void create(DbConn cnx, String roleName, String description, String... permissions)
     {
         QueryResult r = cnx.runUpdate("role_insert", description, roleName);
-        int newId = r.getGeneratedId();
+        int newId = r.getGeneratedId().intValue();
 
         for (String s : permissions)
         {

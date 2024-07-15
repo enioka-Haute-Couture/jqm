@@ -44,7 +44,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    int enqueue(String applicationName, String userName);
+    Long enqueue(String applicationName, String userName);
 
     /**
      * Create a new job instance from another job instance that has successfully ended. This does not change the copied instance. Everything
@@ -58,7 +58,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    int enqueueFromHistory(int jobIdToCopy);
+    Long enqueueFromHistory(Long jobIdToCopy);
 
     /**
      * Entry point of the enqueue API. Creates a new empty JobRequest object, ready to run on this client. The returned JobRequest can
@@ -86,7 +86,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    void cancelJob(int jobId);
+    void cancelJob(Long jobId);
 
     /**
      * Remove an enqueued job from the queue, leaving no trace of it. This is an exceptional event - usually cancelJob would be used <br>
@@ -95,18 +95,18 @@ public interface JqmClient
      *
      * @param jobId
      *            the id of the job to delete
-     * @see #cancelJob(int) the more conventional way of removing job requests.
+     * @see #cancelJob(Long) the more conventional way of removing job requests.
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job already done, job does not exist)
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    void deleteJob(int jobId);
+    void deleteJob(Long jobId);
 
     /**
      * Kill a running job. Kill of a running job is not immediate, and is only possible when a job payload calls some JQM APIs. If none are
      * called, the job cannot be killed.<br>
-     * If the job is still waiting in queue, this is equivalent to calling {@link JqmClient#cancelJob(int)}.
+     * If the job is still waiting in queue, this is equivalent to calling {@link JqmClient#cancelJob(Long)}.
      *
      * @param jobId
      *            the id of the job to kill
@@ -115,7 +115,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    void killJob(int jobId);
+    void killJob(Long jobId);
 
     /**
      * Remove a schedule. Effect is immediate.
@@ -127,7 +127,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    void removeRecurrence(int scheduleId);
+    void removeRecurrence(Long scheduleId);
 
     // /////////////////////////////////////////////////////////////////////
     // Job Pause/restart
@@ -138,32 +138,32 @@ public interface JqmClient
      *
      * @param jobId
      *            id of the job instance to pause
-     * @see #resumeJob(int) resuming the paused request.
+     * @see #resumeJob(Long) resuming the paused request.
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job already running or run, job does not exist)
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    void pauseQueuedJob(int jobId);
+    void pauseQueuedJob(Long jobId);
 
     /**
      * Resume a paused request and allow it to progress in queue once again.
      *
      * @param jobId
      *            id of the job instance to resume
-     * @see #pauseQueuedJob(int) pause a job instance.
+     * @see #pauseQueuedJob(Long) pause a job instance.
      * @throws JqmInvalidRequestException
      *             when input data is invalid (job already run, job does not exist...)
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    void resumeQueuedJob(int jobId);
+    void resumeQueuedJob(Long jobId);
 
     /**
-     * @deprecated use {@link #resumeQueuedJob(int)} instead.
+     * @deprecated use {@link #resumeQueuedJob(Long)} instead.
      * @param jobId
      */
-    void resumeJob(int jobId);
+    void resumeJob(Long jobId);
 
     /**
      * Signal a running job instance that it should pause. The job instance may ignore this signal if it does not call any JobManager APIs.
@@ -176,11 +176,11 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    void pauseRunningJob(int jobId);
+    void pauseRunningJob(Long jobId);
 
     /**
-     * Signal a job instance which was paused during its run with {@link #pauseRunningJob(int)} that it is allowed to resume. This works
-     * even if the pause signal was ignored by the job instance. Can be used only on job instance on which {@link #pauseRunningJob(int)} was
+     * Signal a job instance which was paused during its run with {@link #pauseRunningJob(Long)} that it is allowed to resume. This works
+     * even if the pause signal was ignored by the job instance. Can be used only on job instance on which {@link #pauseRunningJob(Long)} was
      * used.
      *
      * @param jobId
@@ -189,7 +189,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    void resumeRunningJob(int jobId);
+    void resumeRunningJob(Long jobId);
 
     /**
      * Will restart a crashed job. This will remove all trace of the failed execution.
@@ -203,7 +203,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    int restartCrashedJob(int jobId);
+    Long restartCrashedJob(Long jobId);
 
     // /////////////////////////////////////////////////////////////////////
     // Misc.
@@ -221,7 +221,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    void setJobQueue(int jobId, int queueId);
+    void setJobQueue(Long jobId, int queueId);
 
     /**
      * Move a job instance from a queue to another queue
@@ -235,7 +235,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    void setJobQueue(int jobId, Queue queue);
+    void setJobQueue(Long jobId, Queue queue);
 
     /**
      * Change the position of a waiting job instance inside a queue.
@@ -249,7 +249,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    void setJobQueuePosition(int jobId, int newPosition);
+    void setJobQueuePosition(Long jobId, int newPosition);
 
     /**
      * Change the priority of a queued (waiting) or running job instance.
@@ -260,7 +260,7 @@ public interface JqmClient
      *            must be between {@link Thread#MIN_PRIORITY} and {@link Thread#MAX_PRIORITY}. Higher priority is better (runs before the
      *            others, has more CPU share).
      */
-    void setJobPriority(int jobId, int priority);
+    void setJobPriority(Long jobId, int priority);
 
     /**
      * Change the "do not run before" date of a waiting job. Only works on job instances already having a "do not run before" date or
@@ -271,7 +271,7 @@ public interface JqmClient
      * @param whenToRun
      *            the new date
      */
-    void setJobRunAfter(int jobId, Calendar whenToRun);
+    void setJobRunAfter(Long jobId, Calendar whenToRun);
 
     /**
      * Change the cron pattern used by a schedule. It is used on next schedule evaluation.
@@ -281,7 +281,7 @@ public interface JqmClient
      * @param cronExpression
      *            the new expression. Validity is not tested.
      */
-    void setScheduleRecurrence(int scheduleId, String cronExpression);
+    void setScheduleRecurrence(Long scheduleId, String cronExpression);
 
     /**
      * Change the default queue of a scheduled job.
@@ -291,7 +291,7 @@ public interface JqmClient
      * @param queueId
      *            the new queue to use (see {@link #getQueues()}.
      */
-    void setScheduleQueue(int scheduleId, int queueId);
+    void setScheduleQueue(Long scheduleId, int queueId);
 
     /**
      * Change the default priority for job instances created by this schedule.
@@ -302,7 +302,7 @@ public interface JqmClient
      *            must be between {@link Thread#MIN_PRIORITY} and {@link Thread#MAX_PRIORITY}. Higher priority is better (runs before the
      *            others, has more CPU share).
      */
-    void setSchedulePriority(int scheduleId, int priority);
+    void setSchedulePriority(Long scheduleId, int priority);
 
     // /////////////////////////////////////////////////////////////////////
     // Job queries
@@ -320,7 +320,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    JobInstance getJob(int jobId);
+    JobInstance getJob(Long jobId);
 
     /**
      * Administrative method. List all currently running or waiting or finished job instances.
@@ -372,7 +372,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    List<String> getJobMessages(int jobId);
+    List<String> getJobMessages(Long jobId);
 
     /**
      * Get the progress indication that may have been given by a job instance (running or done).
@@ -384,7 +384,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    int getJobProgress(int jobId);
+    int getJobProgress(Long jobId);
 
     // /////////////////////////////////////////////////////////////////////
     // Deliverables retrieval
@@ -399,7 +399,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    List<Deliverable> getJobDeliverables(int jobId);
+    List<Deliverable> getJobDeliverables(Long jobId);
 
     /**
      * Return all files created by a job instance if any. The stream is not open: opening and closing it is the caller's responsibility.<br>
@@ -414,7 +414,7 @@ public interface JqmClient
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      */
-    List<InputStream> getJobDeliverablesContent(int jobId);
+    List<InputStream> getJobDeliverablesContent(Long jobId);
 
     /**
      * Return one file created by a job instance. The stream is not open: opening and closing it is the caller's responsibility.<br>
@@ -423,7 +423,7 @@ public interface JqmClient
      * all implementations, the engine that has run the instance must be up.</strong>
      *
      * @param file
-     *            the file to retrieve (usually obtained through {@link #getJobDeliverables(int)})
+     *            the file to retrieve (usually obtained through {@link #getJobDeliverables(Long)})
      * @return a stream
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
@@ -437,7 +437,7 @@ public interface JqmClient
      * all implementations, the engine that has run the instance must be up.</strong>
      *
      * @param fileId
-     *            the id of the file to retrieve (usually obtained through {@link #getJobDeliverables(int)})
+     *            the id of the file to retrieve (usually obtained through {@link #getJobDeliverables(Long)})
      * @return a stream
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
@@ -453,9 +453,9 @@ public interface JqmClient
      *             when input data is invalid (job instance does not exist)
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
-     * @see #getJobLogStdErr(int)
+     * @see #getJobLogStdErr(Long)
      */
-    InputStream getJobLogStdOut(int jobId);
+    InputStream getJobLogStdOut(Long jobId);
 
     /**
      * Returns the standard error flow of of an ended job instance<br>
@@ -466,9 +466,9 @@ public interface JqmClient
      *             when input data is invalid (job does not exist)
      * @throws JqmClientException
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
-     * @see #getJobLogStdOut(int)
+     * @see #getJobLogStdOut(Long)
      */
-    InputStream getJobLogStdErr(int jobId);
+    InputStream getJobLogStdErr(Long jobId);
 
     // /////////////////////////////////////////////////////////////////////
     // Queue API

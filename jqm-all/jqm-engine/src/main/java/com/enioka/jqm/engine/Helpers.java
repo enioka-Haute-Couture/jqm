@@ -114,10 +114,10 @@ final class Helpers
      * @param cnx
      *            the DbConn to use.
      */
-    static int createDeliverable(String path, String originalFileName, String fileFamily, Integer jobId, DbConn cnx)
+    static int createDeliverable(String path, String originalFileName, String fileFamily, Long jobId, DbConn cnx)
     {
         QueryResult qr = cnx.runUpdate("deliverable_insert", fileFamily, path, jobId, originalFileName, UUID.randomUUID().toString());
-        return qr.getGeneratedId();
+        return qr.getGeneratedId().intValue();
     }
 
     static void checkConfiguration(String nodeName, DbConn cnx)

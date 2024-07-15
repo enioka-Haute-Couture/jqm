@@ -227,7 +227,7 @@ public class JqmAsynchronousTesterOsgi implements JqmAsynchronousTester
     }
 
     @Override
-    public int enqueue(String name)
+    public Long enqueue(String name)
     {
         return JqmClientFactory.getClient().newJobRequest(name, "test").enqueue();
     }

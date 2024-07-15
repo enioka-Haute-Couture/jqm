@@ -82,8 +82,8 @@ public class BasicTest
         q.setInstanceApplication("marsu");
         q.setInstanceKeyword2("pouet");
         q.setInstanceModule("module");
-        q.setParentId(12);
-        q.setJobInstanceId(132);
+        q.setParentId(12L);
+        q.setJobInstanceId(132L);
         q.setQueryLiveInstances(true);
 
         q.setJobDefKeyword2("pouet2");
@@ -98,8 +98,8 @@ public class BasicTest
         q.setInstanceApplication("marsu");
         q.setInstanceKeyword2("pouet");
         q.setInstanceModule("module");
-        q.setParentId(12);
-        q.setJobInstanceId(132);
+        q.setParentId(12L);
+        q.setJobInstanceId(132L);
         q.setQueryLiveInstances(true);
 
         q.setEnqueuedBefore(Calendar.getInstance());
@@ -206,7 +206,7 @@ public class BasicTest
     @Test
     public void testBug159()
     {
-        JqmClientFactory.getClient().newQuery().setJobInstanceId(1234).setQueryLiveInstances(true).setQueryHistoryInstances(false)
+        JqmClientFactory.getClient().newQuery().setJobInstanceId(1234L).setQueryLiveInstances(true).setQueryHistoryInstances(false)
                 .setPageSize(15).setFirstRow(0).invoke();
     }
 

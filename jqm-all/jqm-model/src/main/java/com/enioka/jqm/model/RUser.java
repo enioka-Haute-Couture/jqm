@@ -215,7 +215,7 @@ public class RUser implements Serializable
             String... role_names)
     {
         QueryResult r = cnx.runUpdate("user_insert", null, expiration, null, password_salt, internal, false, login, password_hash);
-        int newId = r.getGeneratedId();
+        int newId = r.getGeneratedId().intValue();
 
         for (String s : role_names)
         {

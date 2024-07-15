@@ -190,7 +190,7 @@ public class DeploymentParameter
     {
         QueryResult r = cnx.runUpdate("dp_insert", enabled, nbThread, pollingInterval, nodeId, qId);
         DeploymentParameter res = new DeploymentParameter();
-        res.id = r.getGeneratedId();
+        res.id = r.getGeneratedId().intValue();
         res.node = nodeId;
         res.nbThread = nbThread;
         res.pollingInterval = pollingInterval;

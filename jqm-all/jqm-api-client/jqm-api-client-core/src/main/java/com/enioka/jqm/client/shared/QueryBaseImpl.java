@@ -40,7 +40,7 @@ import com.enioka.jqm.client.api.State;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class QueryBaseImpl implements Query
 {
-    protected Integer jobInstanceId, parentId;
+    protected Long jobInstanceId, parentId;
     protected List<String> applicationName = new ArrayList<>();
     protected String user, sessionId;
     protected String jobDefKeyword1, jobDefKeyword2, jobDefKeyword3, jobDefModule, jobDefApplication;
@@ -175,25 +175,25 @@ public class QueryBaseImpl implements Query
     // Stupid get/set
     // //////////////////////////////////////////
 
-    public Integer getJobInstanceId()
+    public Long getJobInstanceId()
     {
         return jobInstanceId;
     }
 
     @Override
-    public Query setJobInstanceId(Integer jobInstanceId)
+    public Query setJobInstanceId(Long jobInstanceId)
     {
         this.jobInstanceId = jobInstanceId;
         return this;
     }
 
-    public Integer getParentId()
+    public Long getParentId()
     {
         return parentId;
     }
 
     @Override
-    public Query setParentId(Integer parentId)
+    public Query setParentId(Long parentId)
     {
         this.parentId = parentId;
         return this;

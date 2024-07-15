@@ -230,7 +230,7 @@ public class JndiObjectResource implements Serializable
             Map<String, String> parameters)
     {
         QueryResult r = cnx.runUpdate("jndi_insert", description, factoryClass, jndiAlias, singleton, (String) null, className);
-        int newId = r.getGeneratedId();
+        int newId = r.getGeneratedId().intValue();
 
         for (Map.Entry<String, String> prms : parameters.entrySet())
         {

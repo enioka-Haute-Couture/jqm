@@ -52,7 +52,7 @@ public class DeliverableTest extends JqmBaseTest
         GlobalParameter.setParameter(cnx, "enableWsApiSsl", "false");
         cnx.commit();
 
-        int id = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
+        Long id = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
                 .addDefParameter("fileName", "jqm-test-deliverable1.txt").run(this);
         this.waitForWsStart();
 
@@ -75,7 +75,7 @@ public class DeliverableTest extends JqmBaseTest
         GlobalParameter.setParameter(cnx, "enableWsApiSsl", "false");
         cnx.commit();
 
-        int jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
+        long jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
                 .addDefParameter("fileName", "jqm-test-deliverable2.txt").run(this);
         this.waitForWsStart();
 
@@ -105,7 +105,7 @@ public class DeliverableTest extends JqmBaseTest
         GlobalParameter.setParameter(cnx, "enableWsApiSsl", "false");
         cnx.commit();
 
-        int jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
+        long jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
                 .addDefParameter("fileName", "jqm-test-deliverable3.txt").run(this);
         this.waitForWsStart();
 
@@ -139,7 +139,7 @@ public class DeliverableTest extends JqmBaseTest
         JqmClientFactory.setProperty("com.enioka.jqm.ws.truststorePass", "SuperPassword");
         jqmClient = JqmClientFactory.getClient();
 
-        int jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
+        long jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
                 .addDefParameter("fileName", "jqm-test-deliverable4.txt").run(this);
         this.waitForWsStart();
 
@@ -163,7 +163,7 @@ public class DeliverableTest extends JqmBaseTest
     @Test
     public void testGetAllDeliverables() throws Exception
     {
-        int jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
+        long jobId = JqmSimpleTest.create(cnx, "pyl.EngineApiSendDeliverable").addDefParameter("filepath", TestHelpers.node.getDlRepo())
                 .addDefParameter("fileName", "jqm-test-deliverable5.txt").run(this);
 
         List<com.enioka.jqm.client.api.Deliverable> tmp = jqmClient.getJobDeliverables(jobId);

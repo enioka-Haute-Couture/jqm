@@ -247,7 +247,7 @@
         </createIndex>
 
         <createTable tableName="JOB_SCHEDULE">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_JOB_SCHEDULE" nullable="false" />
             </column>
             <column name="CRON_EXPRESSION" type="VARCHAR(255)">
@@ -289,7 +289,7 @@
             <column name="VALUE" type="VARCHAR(1000)">
                 <constraints nullable="false" />
             </column>
-            <column name="JOB_SCHEDULE" type="INTEGER">
+            <column name="JOB_SCHEDULE" type="BIGINT">
                 <constraints nullable="false" referencedTableName="JOB_SCHEDULE"
                     referencedColumnNames="ID" foreignKeyName="FK_JOB_SCHEDULE_PARAMETER_1" />
             </column>
@@ -300,10 +300,10 @@
 
         <!-- Execution and history -->
         <createTable tableName="JOB_INSTANCE">
-            <column name="ID" type="INTEGER">
+            <column name="ID" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="PK_JOB_INSTANCE" nullable="false" />
             </column>
-            <column name="PARENT" type="INTEGER">
+            <column name="PARENT" type="BIGINT">
                 <constraints nullable="true" />
             </column>
 
@@ -401,11 +401,11 @@
         </createIndex>
 
         <createTable tableName="HISTORY">
-            <column name="ID" type="INTEGER"> <!-- always set from JI ID so no sequence used here -->
+            <column name="ID" type="BIGINT"> <!-- always set from JI ID so no sequence used here -->
                 <constraints primaryKey="true"
                     primaryKeyName="PK_HISTORY" nullable="false" />
             </column>
-            <column name="PARENT" type="INTEGER">
+            <column name="PARENT" type="BIGINT">
                 <constraints nullable="true" />
             </column>
 
@@ -535,7 +535,7 @@
             <column name="PATH" type="VARCHAR(1024)">
                 <constraints nullable="false" />
             </column>
-            <column name="JOB_INSTANCE" type="INTEGER">
+            <column name="JOB_INSTANCE" type="BIGINT">
                 <!-- Not an FK, as this is used by both History and JobDef -->
                 <constraints nullable="false" />
             </column>
@@ -561,7 +561,7 @@
             <column name="VALUE" type="VARCHAR(1000)">
                 <constraints nullable="false" />
             </column>
-            <column name="JOB_INSTANCE" type="INTEGER">
+            <column name="JOB_INSTANCE" type="BIGINT">
                 <!-- Not an FK, as this is used by both History and JobDef -->
                  <constraints nullable="false" />
             </column>
@@ -574,7 +574,7 @@
             <column name="ID" type="INTEGER">
                 <constraints primaryKey="true" primaryKeyName="PK_MESSAGE" nullable="false" />
             </column>
-            <column name="JOB_INSTANCE" type="INTEGER">
+            <column name="JOB_INSTANCE" type="BIGINT">
                 <!-- Not an FK, as this is used by both History and JobDef -->
                 <constraints nullable="false" />
             </column>

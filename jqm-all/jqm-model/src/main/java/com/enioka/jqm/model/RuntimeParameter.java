@@ -41,7 +41,7 @@ public class RuntimeParameter implements Serializable
     private String key;
     private String value;
 
-    private int ji;
+    private Long ji;
 
     /**
      * The name of the parameter.<br>
@@ -93,7 +93,7 @@ public class RuntimeParameter implements Serializable
     /**
      * ID of the History or JoBinstance to which this parameter belongs.
      */
-    public int getJi()
+    public Long getJi()
     {
         return ji;
     }
@@ -101,7 +101,7 @@ public class RuntimeParameter implements Serializable
     /**
      * See {@link #getJi()}
      */
-    public void setJi(int ji)
+    public void setJi(Long ji)
     {
         this.ji = ji;
     }
@@ -123,7 +123,7 @@ public class RuntimeParameter implements Serializable
         return res;
     }
 
-    public static void create(DbConn cnx, int jobInstanceId, String keyName, String value)
+    public static void create(DbConn cnx, Long jobInstanceId, String keyName, String value)
     {
         cnx.runUpdate("jiprm_insert", jobInstanceId, keyName, value);
     }

@@ -111,7 +111,7 @@ public class GlobalParameter implements Serializable
     {
         QueryResult r = cnx.runUpdate("globalprm_insert", key, value);
         GlobalParameter res = new GlobalParameter();
-        res.id = r.getGeneratedId();
+        res.id = r.getGeneratedId().intValue();
         res.key = key;
         res.value = value;
         return res;

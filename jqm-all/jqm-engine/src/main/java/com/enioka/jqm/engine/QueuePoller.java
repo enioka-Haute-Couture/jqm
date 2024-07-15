@@ -67,7 +67,7 @@ class QueuePoller implements Runnable, QueuePollerMBean
     private AtomicInteger actualNbThread = new AtomicInteger(0);
     private boolean hasStopped = true;
     private Calendar lastLoop = null;
-    private Map<Integer, Date> peremption = new ConcurrentHashMap<>();
+    private Map<Long, Date> peremption = new ConcurrentHashMap<>();
 
     private List<ResourceManagerBase> resourceManagers = new ArrayList<>();
     private ResourceManager threadresourceManagerConfiguration;

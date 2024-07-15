@@ -88,7 +88,7 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public Integer enqueue(String applicationName, String user, String mail, String sessionId, String application, String module,
+    public Long enqueue(String applicationName, String user, String mail, String sessionId, String application, String module,
             String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
         JobRequest jr = getJqmClient().newJobRequest(applicationName, user);
@@ -111,16 +111,16 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public Integer enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module,
+    public Long enqueueSync(String applicationName, String user, String mail, String sessionId, String application, String module,
             String keyword1, String keyword2, String keyword3, Map<String, String> parameters)
     {
-        int i = enqueue(applicationName, user, mail, sessionId, application, module, keyword1, keyword2, keyword3, parameters);
+        Long i = enqueue(applicationName, user, mail, sessionId, application, module, keyword1, keyword2, keyword3, parameters);
         waitChild(i);
         return i;
     }
 
     @Override
-    public void waitChild(int id)
+    public void waitChild(Long id)
     {
         JqmClient c = getJqmClient();
         Query q = c.newQuery().setQueryHistoryInstances(false).setQueryLiveInstances(true).setJobInstanceId(id);
@@ -188,7 +188,7 @@ class JobInstanceEngineApi implements JobManager
     @Override
     public File getWorkDir()
     {
-        File f = new File(FilenameUtils.concat(ji.getNode().getTmpDirectory(), Integer.toString(this.ji.getId())));
+        File f = new File(FilenameUtils.concat(ji.getNode().getTmpDirectory(), Long.toString(this.ji.getId())));
         if (!f.isDirectory())
         {
             try
@@ -220,7 +220,7 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public boolean hasEnded(int jobId)
+    public boolean hasEnded(Long jobId)
     {
         try (DbConn cnx = Helpers.getNewDbSession())
         {
@@ -234,7 +234,7 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public Boolean hasSucceeded(int requestId)
+    public Boolean hasSucceeded(Long requestId)
     {
         try (DbConn cnx = Helpers.getNewDbSession())
         {
@@ -248,7 +248,7 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public Boolean hasFailed(int requestId)
+    public Boolean hasFailed(Long requestId)
     {
         Boolean b = hasSucceeded(requestId);
         if (b == null)
@@ -345,13 +345,13 @@ class JobInstanceEngineApi implements JobManager
     }
 
     @Override
-    public Integer parentID()
+    public Long parentID()
     {
         return this.ji.getParentId();
     }
 
     @Override
-    public Integer jobInstanceID()
+    public Long jobInstanceID()
     {
         return this.ji.getId();
     }

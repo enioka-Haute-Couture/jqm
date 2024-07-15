@@ -117,7 +117,7 @@ public class ServiceSimple
     @GET
     @Path("status")
     @Produces(MediaType.TEXT_PLAIN)
-    public String getStatus(@QueryParam("id") int id)
+    public String getStatus(@QueryParam("id") Long id)
     {
         return JqmClientFactory.getClient().getJob(id).getState().toString();
     }
@@ -254,7 +254,7 @@ public class ServiceSimple
     @Produces(MediaType.TEXT_PLAIN)
     public String enqueue(@FormParam("applicationname") String applicationName, @FormParam("module") String module,
             @FormParam("mail") String mail, @FormParam("keyword1") String keyword1, @FormParam("keyword2") String keyword2,
-            @FormParam("keyword3") String keyword3, @FormParam("parentid") Integer parentId, @FormParam("user") String user,
+            @FormParam("keyword3") String keyword3, @FormParam("parentid") Long parentId, @FormParam("user") String user,
             @FormParam("sessionid") String sessionId, @FormParam("parameterNames") List<String> prmNames,
             @FormParam("parameterValues") List<String> prmValues, @Context SecurityContext security)
     {
@@ -289,7 +289,7 @@ public class ServiceSimple
             log.trace("Adding a parameter: " + name + " - " + value);
         }
 
-        Integer i = jd.enqueue();
+        Long i = jd.enqueue();
         return i.toString();
     }
 

@@ -18,7 +18,7 @@ import com.enioka.jqm.jdbc.QueryResult;
  */
 public class ScheduledJob
 {
-    private int id;
+    private Long id;
 
     private Integer jobDefinition;
 
@@ -32,12 +32,12 @@ public class ScheduledJob
 
     private Map<String, String> parametersCache = new HashMap<>();
 
-    public int getId()
+    public Long getId()
     {
         return id;
     }
 
-    public void setId(int id)
+    public void setId(Long id)
     {
         this.id = id;
     }
@@ -100,8 +100,8 @@ public class ScheduledJob
     public static List<ScheduledJob> select(DbConn cnx, String query_key, Object... args)
     {
         List<ScheduledJob> res = new ArrayList<>();
-        List<Integer> currentIdList = null;
-        List<List<Integer>> allIdLists = new ArrayList<>();
+        List<Long> currentIdList = null;
+        List<List<Long>> allIdLists = new ArrayList<>();
         ScheduledJob tmp = null;
         try (ResultSet rs = cnx.runSelect(query_key, args))
         {
@@ -109,7 +109,7 @@ public class ScheduledJob
             {
                 // ID, CRON_EXPRESSION, JOBDEF, QUEUE, LAST_UPDATED
                 tmp = new ScheduledJob();
-                tmp.setId(rs.getInt(1));
+                tmp.setId(rs.getLong(1));
                 tmp.setCronExpression(rs.getString(2));
                 tmp.setJobDefinition(rs.getInt(3));
                 tmp.setQueue(rs.getInt(4) > 0 ? rs.getInt(4) : null);
@@ -133,7 +133,7 @@ public class ScheduledJob
 
         // Batch fetch parameters, 500 by 500.
         int currentSJ = 0;
-        for (List<Integer> ids : allIdLists)
+        for (List<Long> ids : allIdLists)
         {
             try (ResultSet rs = cnx.runSelect("sjprm_select_for_sj_list", ids);)
             {
@@ -170,6 +170,6 @@ public class ScheduledJob
             cnx.runUpdate("sjprm_insert", e.getKey(), e.getValue(), r.generatedKey);
         }
 
-        return r.generatedKey;
+        return r.generatedKey.intValue();
     }
 }

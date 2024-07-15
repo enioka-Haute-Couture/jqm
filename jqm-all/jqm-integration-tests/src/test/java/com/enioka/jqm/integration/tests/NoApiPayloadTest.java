@@ -116,7 +116,7 @@ public class NoApiPayloadTest extends JqmBaseTest
     public void testMainTypeInjectWithFullApi() throws Exception
     {
         // Here, engine API + full API mix.
-        int i = JqmSimpleTest.create(cnx, "pyl.EngineApiInject", "jqm-test-pyl-hibapi").setSessionId("123X").expectOk(3).run(this);
+        long i = JqmSimpleTest.create(cnx, "pyl.EngineApiInject", "jqm-test-pyl-hibapi").setSessionId("123X").expectOk(3).run(this);
 
         Assert.assertEquals(1, jqmClient.getJob(i).getMessages().size()); // 1 message per run created by payload
         Assert.assertEquals(100, (int) jqmClient.getJob(i).getProgress());

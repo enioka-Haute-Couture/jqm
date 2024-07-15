@@ -40,7 +40,7 @@ public interface JobRequest extends Serializable
      *             when an internal API implementation occurs. Usually linked to a configuration issue.
      * @return the ID of the job instance.
      */
-    public Integer enqueue();
+    public Long enqueue();
 
     /**
      * Parameters are <key,value> pairs that are passed at runtime to the job. The amount of required parameters depends on the requested
@@ -173,7 +173,7 @@ public interface JobRequest extends Serializable
      * A job instance can be the child of another job instance. This allows you to set the ID of that parent. It should be left null if
      * there is no parent.
      */
-    public JobRequest setParentID(Integer parentJobId);
+    public JobRequest setParentID(Long parentJobId);
 
     /**
      * <strong>Optional</strong><br>
@@ -190,7 +190,7 @@ public interface JobRequest extends Serializable
      * This request is actually to create an occurrence of the specified recurrence. If specified, the {@link #getApplicationName()} is
      * ignored.
      */
-    public JobRequest setScheduleId(Integer id);
+    public JobRequest setScheduleId(Long id);
 
     /**
      * <strong>Optional</strong><br>
@@ -214,7 +214,7 @@ public interface JobRequest extends Serializable
      * <strong>Optional</strong><br>
      * The default behaviour for a newly submitted JobRequest is to run as soon as possible (i.e. as soon as there is a free slot inside a
      * JQM node). This method allows to change this, and to put the request inside the queue but not run it until the
-     * {@link JqmClient#resumeJob(int)} method is called on the newly created job instance.
+     * {@link JqmClient#resumeJob(Long)} method is called on the newly created job instance.
      */
     public JobRequest startHeld();
 

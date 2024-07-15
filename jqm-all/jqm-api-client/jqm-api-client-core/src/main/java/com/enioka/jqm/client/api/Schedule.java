@@ -18,7 +18,7 @@ public class Schedule implements Serializable
 {
     private static final long serialVersionUID = -8520223502712009225L;
 
-    private int id;
+    private Long id;
     private String cronExpression;
     private Integer priority;
     private Queue queue;
@@ -27,12 +27,12 @@ public class Schedule implements Serializable
     /**
      * The schedule ID. This is the same ID returned by {@link JqmClient#enqueue(JobRequest)}.
      */
-    public int getId()
+    public Long getId()
     {
         return id;
     }
 
-    public void setId(int id)
+    public void setId(Long id)
     {
         this.id = id;
     }

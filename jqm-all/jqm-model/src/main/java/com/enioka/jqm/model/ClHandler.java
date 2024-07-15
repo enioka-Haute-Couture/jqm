@@ -132,7 +132,7 @@ public class ClHandler implements Serializable
     public static int create(DbConn cnx, ClEvent type, String className, int classloaderId, Map<String, String> parameters)
     {
         QueryResult r = cnx.runUpdate("cleh_insert", type, className, classloaderId);
-        int newId = r.getGeneratedId();
+        int newId = r.getGeneratedId().intValue();
 
         for (Map.Entry<String, String> prm : parameters.entrySet())
         {

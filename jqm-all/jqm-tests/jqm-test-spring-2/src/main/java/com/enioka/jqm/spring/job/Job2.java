@@ -99,7 +99,7 @@ public class Job2 implements Runnable
         // Test calling JM methods
         JobManager jm = jmp.getObject();
         System.out.println("Job instance ID is " + jm.jobInstanceID());
-        int instanceId = jm.jobInstanceID();
+        long instanceId = jm.jobInstanceID();
         jm.enqueueSync("Job1", jm.userName(), null, null, null, jm.module(), null, null, null, jm.parameters());
 
         if (instanceId != jmp.getObject().jobInstanceID())

@@ -1443,7 +1443,7 @@ public class MetaService
         {
             QueryResult r = cnx.runUpdate("user_insert", dto.getEmail(), dto.getExpirationDate(), dto.getFreeText(), null,
                     dto.getInternal(), false, dto.getLogin(), null);
-            int newId = r.getGeneratedId();
+            int newId = r.getGeneratedId().intValue();
 
             if (dto.getNewPassword() != null && !dto.getNewPassword().isEmpty())
             {

@@ -104,7 +104,7 @@ public class ServiceClient
             target.startHeld();
         }
 
-        int i = target.enqueue();
+        Long i = target.enqueue();
 
         JobInstance ji = new JobInstance();
         ji.setId(i);
@@ -131,74 +131,74 @@ public class ServiceClient
 
     @Path("ji/{id}")
     @POST
-    public int enqueueFromHistory(@PathParam("id") int jobIdToCopy)
+    public Long enqueueFromHistory(@PathParam("id") Long jobIdToCopy)
     {
         return JqmClientFactory.getClient().enqueueFromHistory(jobIdToCopy);
     }
 
     @Path("ji/cancelled/{jobId}")
     @POST
-    public void cancelJob(@PathParam("jobId") int jobId)
+    public void cancelJob(@PathParam("jobId") Long jobId)
     {
         JqmClientFactory.getClient().cancelJob(jobId);
     }
 
     @Path("ji/waiting/{jobId}")
     @DELETE
-    public void deleteJob(@PathParam("jobId") int jobId)
+    public void deleteJob(@PathParam("jobId") Long jobId)
     {
         JqmClientFactory.getClient().deleteJob(jobId);
     }
 
     @Path("ji/killed/{jobId}")
     @POST
-    public void killJob(@PathParam("jobId") int jobId)
+    public void killJob(@PathParam("jobId") Long jobId)
     {
         JqmClientFactory.getClient().killJob(jobId);
     }
 
     @Path("schedule/{scheduleId}")
     @DELETE
-    public void removeRecurrence(@PathParam("scheduleId") int scheduleId)
+    public void removeRecurrence(@PathParam("scheduleId") Long scheduleId)
     {
         JqmClientFactory.getClient().removeRecurrence(scheduleId);
     }
 
     @Path("ji/paused/{jobId}")
     @POST
-    public void pauseQueuedJob(@PathParam("jobId") int jobId)
+    public void pauseQueuedJob(@PathParam("jobId") Long jobId)
     {
         JqmClientFactory.getClient().pauseQueuedJob(jobId);
     }
 
     @Path("ji/paused/{jobId}")
     @DELETE
-    public void resumeQueuedJob(@PathParam("jobId") int jobId)
+    public void resumeQueuedJob(@PathParam("jobId") Long jobId)
     {
         JqmClientFactory.getClient().resumeQueuedJob(jobId);
     }
 
-    public void resumeJob(@PathParam("jobId") int jobId)
+    public void resumeJob(@PathParam("jobId") Long jobId)
     {
         resumeQueuedJob(jobId);
     }
 
     @Path("ji/running/paused/{jobId}")
     @POST
-    public void pauseRunningJob(@PathParam("jobId") int jobId)
+    public void pauseRunningJob(@PathParam("jobId") Long jobId)
     {
         JqmClientFactory.getClient().pauseRunningJob(jobId);
     }
 
     @Path("ji/running/paused/{jobId}")
     @DELETE
-    public void resumeRunningJob(@PathParam("jobId") int jobId)
+    public void resumeRunningJob(@PathParam("jobId") Long jobId)
     {
         JqmClientFactory.getClient().resumeRunningJob(jobId);
     }
 
     // Not exposed directly - we prefer objects to primitive types
-    public int restartCrashedJob(int jobId)
+    public int restartCrashedJob(Long jobId)
     {
         return 0;
     }
@@ -206,48 +206,48 @@ public class ServiceClient
     @Path("ji/crashed/{jobId}")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @DELETE
-    public JobInstance restartCrashedJobObject(@PathParam("jobId") int jobId)
+    public JobInstance restartCrashedJobObject(@PathParam("jobId") Long jobId)
     {
-        int i = JqmClientFactory.getClient().restartCrashedJob(jobId);
+        Long i = JqmClientFactory.getClient().restartCrashedJob(jobId);
         return getJob(i);
     }
 
     @Path("q/{queueId: [0-9]+}/{jobId: [0-9]+}")
     @POST
-    public void setJobQueue(@PathParam("jobId") int jobId, @PathParam("queueId") int queueId)
+    public void setJobQueue(@PathParam("jobId") Long jobId, @PathParam("queueId") int queueId)
     {
         JqmClientFactory.getClient().setJobQueue(jobId, queueId);
     }
 
     // No need to expose. Client side work.
 
-    public void setJobQueue(int jobId, Queue queue)
+    public void setJobQueue(Long jobId, Queue queue)
     {
         JqmClientFactory.getClient().setJobQueue(jobId, queue);
     }
 
     @POST
     @Path("ji/{jobId}/position/{newPosition}")
-    public void setJobQueuePosition(@PathParam("jobId") int jobId, @PathParam("newPosition") int newPosition)
+    public void setJobQueuePosition(@PathParam("jobId") Long jobId, @PathParam("newPosition") int newPosition)
     {
         JqmClientFactory.getClient().setJobQueuePosition(jobId, newPosition);
     }
 
     @POST
     @Path("ji/{jobId}/priority/{priority}")
-    public void setJobPriority(@PathParam("jobId") int jobId, @PathParam("priority") int priority)
+    public void setJobPriority(@PathParam("jobId") Long jobId, @PathParam("priority") int priority)
     {
         JqmClientFactory.getClient().setJobPriority(jobId, priority);
     }
 
-    public void setJobRunAfter(@PathParam("jobId") int jobId, @PathParam("whenToRun") Calendar whenToRun)
+    public void setJobRunAfter(@PathParam("jobId") Long jobId, @PathParam("whenToRun") Calendar whenToRun)
     {
         JqmClientFactory.getClient().setJobRunAfter(jobId, whenToRun);
     }
 
     @POST
     @Path("ji/{jobId}/delay/{whenToRun}")
-    public void setJobRunAfter(@PathParam("jobId") int jobId, @PathParam("whenToRun") long whenToRun)
+    public void setJobRunAfter(@PathParam("jobId") Long jobId, @PathParam("whenToRun") long whenToRun)
     {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(whenToRun);
@@ -256,21 +256,21 @@ public class ServiceClient
 
     @POST
     @Path("schedule/{scheduleId}/queue/{queueId}")
-    public void setScheduleQueue(@PathParam("scheduleId") int scheduleId, @PathParam("queueId") int queueId)
+    public void setScheduleQueue(@PathParam("scheduleId") Long scheduleId, @PathParam("queueId") int queueId)
     {
         JqmClientFactory.getClient().setScheduleQueue(scheduleId, queueId);
     }
 
     @POST
     @Path("schedule/{scheduleId}/cron/{cronExpression}")
-    public void setScheduleRecurrence(@PathParam("scheduleId") int scheduleId, @PathParam("cronExpression") String cronExpression)
+    public void setScheduleRecurrence(@PathParam("scheduleId") Long scheduleId, @PathParam("cronExpression") String cronExpression)
     {
         JqmClientFactory.getClient().setScheduleRecurrence(scheduleId, cronExpression);
     }
 
     @POST
     @Path("schedule/{scheduleId}/priority/{priority}")
-    public void setSchedulePriority(@PathParam("scheduleId") int scheduleId, @PathParam("priority") int priority)
+    public void setSchedulePriority(@PathParam("scheduleId") Long scheduleId, @PathParam("priority") int priority)
     {
         JqmClientFactory.getClient().setSchedulePriority(scheduleId, priority);
     }
@@ -279,7 +279,7 @@ public class ServiceClient
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Path("ji/{jobId}")
     @HttpCache("public, max-age=60")
-    public JobInstance getJob(@PathParam("jobId") int jobId)
+    public JobInstance getJob(@PathParam("jobId") Long jobId)
     {
         return JqmClientFactory.getClient().getJob(jobId);
     }
@@ -358,7 +358,7 @@ public class ServiceClient
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @HttpCache("public, max-age=60")
-    public List<String> getJobMessages(@PathParam("jobId") int jobId)
+    public List<String> getJobMessages(@PathParam("jobId") Long jobId)
     {
         return JqmClientFactory.getClient().getJobMessages(jobId);
     }
@@ -374,7 +374,7 @@ public class ServiceClient
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @HttpCache("public, max-age=60")
-    public List<Deliverable> getJobDeliverables(@PathParam("jobId") int jobId)
+    public List<Deliverable> getJobDeliverables(@PathParam("jobId") Long jobId)
     {
         return JqmClientFactory.getClient().getJobDeliverables(jobId);
     }
@@ -382,7 +382,7 @@ public class ServiceClient
     // Not exposed. Returning a list of files is a joke anyway... Loop should be
     // client-side.
 
-    public List<InputStream> getJobDeliverablesContent(int jobId)
+    public List<InputStream> getJobDeliverablesContent(Long jobId)
     {
         throw new NotSupportedException();
     }
@@ -411,7 +411,7 @@ public class ServiceClient
     @Path("ji/{jobId}/stderr")
     @Produces("application/octet-stream")
     @GET
-    public InputStream getJobLogStdErr(@PathParam("jobId") int jobId, @Context HttpServletResponse res)
+    public InputStream getJobLogStdErr(@PathParam("jobId") Long jobId, @Context HttpServletResponse res)
     {
         SelfDestructFileStream fs = (SelfDestructFileStream) JqmClientFactory.getClient().getJobLogStdErr(jobId);
         res.setHeader("Content-Disposition", "attachment; filename=" + fs.nameHint);
@@ -421,7 +421,7 @@ public class ServiceClient
     @Path("ji/{jobId}/stdout")
     @Produces("application/octet-stream")
     @GET
-    public InputStream getJobLogStdOut(@PathParam("jobId") int jobId, @Context HttpServletResponse res)
+    public InputStream getJobLogStdOut(@PathParam("jobId") Long jobId, @Context HttpServletResponse res)
     {
         SelfDestructFileStream fs = (SelfDestructFileStream) JqmClientFactory.getClient().getJobLogStdOut(jobId);
         res.setHeader("Content-Disposition", "attachment; filename=" + fs.nameHint);

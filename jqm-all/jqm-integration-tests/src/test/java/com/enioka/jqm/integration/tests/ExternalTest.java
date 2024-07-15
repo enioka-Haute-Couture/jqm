@@ -33,7 +33,7 @@ public class ExternalTest extends JqmBaseTest
         GlobalParameter.setParameter(cnx, "internalPollingPeriodMs", "100");
         cnx.commit();
 
-        int i = JqmSimpleTest.create(cnx, "pyl.KillMeNot").setExternal().expectNonOk(0).expectOk(0).run(this);
+        Long i = JqmSimpleTest.create(cnx, "pyl.KillMeNot").setExternal().expectNonOk(0).expectOk(0).run(this);
         TestHelpers.waitForRunning(1, 20000, cnx);
 
         jqmClient.killJob(i);

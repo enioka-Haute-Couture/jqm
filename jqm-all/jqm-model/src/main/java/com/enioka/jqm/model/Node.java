@@ -335,7 +335,7 @@ public class Node implements Serializable
         QueryResult r = cnx.runUpdate("node_insert", dlRepo, dns, true, 0, 0, false, false, true, nodeName, port, repo, logLevel, false,
                 tmpDir);
         Node res = new Node();
-        res.id = r.getGeneratedId();
+        res.id = r.getGeneratedId().intValue();
         res.name = nodeName;
         res.dns = dns;
         res.port = port;

@@ -280,7 +280,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public int enqueue(JobRequestBaseImpl jd)
+    public Long enqueue(JobRequestBaseImpl jd)
     {
         try
         {
@@ -298,13 +298,13 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public int enqueue(String applicationName, String userName)
+    public Long enqueue(String applicationName, String userName)
     {
         return newJobRequest(applicationName, userName).enqueue();
     }
 
     @Override
-    public int enqueueFromHistory(int jobIdToCopy)
+    public Long enqueueFromHistory(Long jobIdToCopy)
     {
         JobInstance h = getJob(jobIdToCopy);
         JobRequest jd = newJobRequest(h.getApplicationName(), h.getUser());
@@ -332,7 +332,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     ///////////////////////////////////////////////////////////////////////
 
     @Override
-    public void cancelJob(int idJob)
+    public void cancelJob(Long idJob)
     {
         try
         {
@@ -349,7 +349,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public void deleteJob(int idJob)
+    public void deleteJob(Long idJob)
     {
         try
         {
@@ -366,7 +366,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public void killJob(int idJob)
+    public void killJob(Long idJob)
     {
         try
         {
@@ -383,7 +383,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public void removeRecurrence(int scheduleId)
+    public void removeRecurrence(Long scheduleId)
     {
         try
         {
@@ -405,7 +405,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     ///////////////////////////////////////////////////////////////////////
 
     @Override
-    public void pauseQueuedJob(int idJob)
+    public void pauseQueuedJob(Long idJob)
     {
         try
         {
@@ -422,7 +422,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public void resumeQueuedJob(int idJob)
+    public void resumeQueuedJob(Long idJob)
     {
         try
         {
@@ -439,12 +439,12 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public void resumeJob(int jobId)
+    public void resumeJob(Long jobId)
     {
         resumeQueuedJob(jobId);
     }
 
-    public int restartCrashedJob(int idJob)
+    public Long restartCrashedJob(Long idJob)
     {
         try
         {
@@ -461,7 +461,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public void pauseRunningJob(int jobId)
+    public void pauseRunningJob(Long jobId)
     {
         try
         {
@@ -478,7 +478,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public void resumeRunningJob(int jobId)
+    public void resumeRunningJob(Long jobId)
     {
         try
         {
@@ -499,7 +499,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     ///////////////////////////////////////////////////////////////////////
 
     @Override
-    public void setJobQueue(int idJob, int idQueue)
+    public void setJobQueue(Long idJob, int idQueue)
     {
         try
         {
@@ -516,13 +516,13 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public void setJobQueue(int idJob, com.enioka.jqm.client.api.Queue queue)
+    public void setJobQueue(Long idJob, com.enioka.jqm.client.api.Queue queue)
     {
         setJobQueue(idJob, queue.getId());
     }
 
     @Override
-    public void setJobQueuePosition(int idJob, int position)
+    public void setJobQueuePosition(Long idJob, int position)
     {
         try
         {
@@ -539,7 +539,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public void setJobPriority(int jobId, int priority)
+    public void setJobPriority(Long jobId, int priority)
     {
         try
         {
@@ -556,7 +556,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public void setJobRunAfter(int jobId, Calendar whenToRun)
+    public void setJobRunAfter(Long jobId, Calendar whenToRun)
     {
         try
         {
@@ -573,7 +573,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public void setScheduleQueue(int scheduleId, int queueId)
+    public void setScheduleQueue(Long scheduleId, int queueId)
     {
         try
         {
@@ -590,7 +590,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public void setScheduleRecurrence(int scheduleId, String cronExpression)
+    public void setScheduleRecurrence(Long scheduleId, String cronExpression)
     {
         try
         {
@@ -607,7 +607,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public void setSchedulePriority(int scheduleId, int priority)
+    public void setSchedulePriority(Long scheduleId, int priority)
     {
         try
         {
@@ -628,7 +628,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     ///////////////////////////////////////////////////////////////////////
 
     @Override
-    public com.enioka.jqm.client.api.JobInstance getJob(int idJob)
+    public com.enioka.jqm.client.api.JobInstance getJob(Long idJob)
     {
         try
         {
@@ -725,7 +725,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     ///////////////////////////////////////////////////////////////////////
 
     @Override
-    public List<String> getJobMessages(int idJob)
+    public List<String> getJobMessages(Long idJob)
     {
         try
         {
@@ -742,7 +742,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public int getJobProgress(int idJob)
+    public int getJobProgress(Long idJob)
     {
         try
         {
@@ -763,7 +763,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     ///////////////////////////////////////////////////////////////////////
 
     @Override
-    public List<com.enioka.jqm.client.api.Deliverable> getJobDeliverables(int idJob)
+    public List<com.enioka.jqm.client.api.Deliverable> getJobDeliverables(Long idJob)
     {
         try
         {
@@ -782,7 +782,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public List<InputStream> getJobDeliverablesContent(int idJob)
+    public List<InputStream> getJobDeliverablesContent(Long idJob)
     {
         List<InputStream> res = new ArrayList<>();
         for (Deliverable d : getJobDeliverables(idJob))
@@ -827,7 +827,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public InputStream getJobLogStdErr(int jobId)
+    public InputStream getJobLogStdErr(Long jobId)
     {
         try
         {
@@ -844,7 +844,7 @@ final class JerseyClient implements JqmClient, JqmClientQuerySubmitCallback, Jqm
     }
 
     @Override
-    public InputStream getJobLogStdOut(int jobId)
+    public InputStream getJobLogStdOut(Long jobId)
     {
         try
         {

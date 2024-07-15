@@ -54,8 +54,8 @@ public class JobRequestBaseImpl implements JobRequest
     private String keyword3;
     private String email = null;
     private String queueName = null;
-    private Integer parentJobId = null;
-    private Integer scheduleId = null;
+    private Long parentJobId = null;
+    private Long scheduleId = null;
     private State startState = null;
     private Integer priority = 0;
     private Map<String, String> parameters = new HashMap<>();
@@ -76,7 +76,7 @@ public class JobRequestBaseImpl implements JobRequest
     }
 
     @Override
-    public Integer enqueue()
+    public Long enqueue()
     {
         return enqueueCallback.enqueue(this);
     }
@@ -372,7 +372,7 @@ public class JobRequestBaseImpl implements JobRequest
      */
     public JobRequest setParentJobId(String parentJobId)
     {
-        this.parentJobId = Integer.parseInt(parentJobId);
+        this.parentJobId = Long.parseLong(parentJobId);
         return this;
     }
 
@@ -381,7 +381,7 @@ public class JobRequestBaseImpl implements JobRequest
      * A job instance can be the child of another job instance. This allows you to retrieve the ID of that parent. It is null if there is no
      * parent.
      */
-    public Integer getParentID()
+    public Long getParentID()
     {
         return parentJobId;
     }
@@ -391,7 +391,7 @@ public class JobRequestBaseImpl implements JobRequest
      * A job instance can be the child of another job instance. This allows you to set the ID of that parent. It should be left null if
      * there is no parent.
      */
-    public JobRequest setParentID(Integer parentJobId)
+    public JobRequest setParentID(Long parentJobId)
     {
         this.parentJobId = parentJobId;
         return this;
@@ -429,7 +429,7 @@ public class JobRequestBaseImpl implements JobRequest
      * This request is actually to create an occurrence of the specified recurrence. If specified, the {@link #getApplicationName()} is
      * ignored.
      */
-    public Integer getScheduleId()
+    public Long getScheduleId()
     {
         return this.scheduleId;
     }
@@ -439,7 +439,7 @@ public class JobRequestBaseImpl implements JobRequest
      * This request is actually to create an occurrence of the specified recurrence. If specified, the {@link #getApplicationName()} is
      * ignored.
      */
-    public JobRequest setScheduleId(Integer id)
+    public JobRequest setScheduleId(Long id)
     {
         this.scheduleId = id;
         return this;
@@ -493,7 +493,7 @@ public class JobRequestBaseImpl implements JobRequest
      * <strong>Optional</strong><br>
      * The default behaviour for a newly submitted JobRequest is to run as soon as possible (i.e. as soon as there is a free slot inside a
      * JQM node). This method allows to change this, and to put the request inside the queue but not run it until the
-     * {@link JqmClient#resumeJob(int)} method is called on the newly created job instance.
+     * {@link JqmClient#resumeJob(Long)} method is called on the newly created job instance.
      */
     public JobRequest startHeld()
     {

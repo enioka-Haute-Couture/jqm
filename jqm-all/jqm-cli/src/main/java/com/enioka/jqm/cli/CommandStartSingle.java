@@ -16,7 +16,7 @@ import org.osgi.framework.ServiceReference;
 class CommandStartSingle extends CommandBase
 {
     @Parameter(names = { "-i", "--id" }, description = "ID of the job instance to launch.", required = true)
-    private int id;
+    private long id;
 
     @Override
     public int doWork()

@@ -419,7 +419,7 @@ class RunningJobInstance implements Runnable, JobRunnerCallback
     // Helpers
     ///////////////////////////////////////////////////////////////////////////
 
-    int getId()
+    Long getId()
     {
         return this.ji.getId();
     }

@@ -132,7 +132,7 @@ public class Queue implements Serializable
     {
         QueryResult r = cnx.runUpdate("q_insert", defaultQ, description, name);
         Queue res = new Queue();
-        res.id = r.getGeneratedId();
+        res.id = r.getGeneratedId().intValue();
         res.name = name;
         res.description = description;
         res.defaultQueue = defaultQ;

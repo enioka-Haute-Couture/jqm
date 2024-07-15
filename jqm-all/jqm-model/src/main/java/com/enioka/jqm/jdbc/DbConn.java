@@ -113,7 +113,7 @@ public class DbConn implements Closeable
                     {
                         try
                         {
-                            qr.generatedKey = gen.getInt(1);
+                            qr.generatedKey = gen.getLong(1);
                         }
                         catch (SQLException e)
                         {
