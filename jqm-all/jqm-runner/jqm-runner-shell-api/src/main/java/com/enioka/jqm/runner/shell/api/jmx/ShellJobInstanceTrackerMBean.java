@@ -59,5 +59,5 @@ public interface ShellJobInstanceTrackerMBean
     /**
      * The unique ID of the launch. It holds no special meaning.
      */
-    Integer getId();
+    Long getId();
 }

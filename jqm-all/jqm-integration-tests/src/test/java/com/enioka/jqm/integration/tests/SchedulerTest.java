@@ -21,7 +21,7 @@ public class SchedulerTest extends JqmBaseTest
     @Test
     public void createMeta()
     {
-        int i = CreationTools.createJobDef(null, true, "doesnotexist", null, "path", TestHelpers.qVip, -1, "TestJqmApplication",
+        Long i = CreationTools.createJobDef(null, true, "doesnotexist", null, "path", TestHelpers.qVip, -1, "TestJqmApplication",
                 "appFreeName", "TestModule", "kw1", "kw2", "kw3", false, cnx);
 
         JobDefDto dto = MetaService.getJobDef(cnx, i);
@@ -116,14 +116,14 @@ public class SchedulerTest extends JqmBaseTest
     @Test // Commented - waiting for one minute is long.
     public void testSimpleSchedule()
     {
-        int id = CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar",
+        long id = CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar",
                 TestHelpers.qVip, 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
-        int scheduleId = jqmClient.newJobRequest("MarsuApplication", "test user").setRecurrence("* * * * *").addParameter("key1", "value1")
+        long scheduleId = jqmClient.newJobRequest("MarsuApplication", "test user").setRecurrence("* * * * *").addParameter("key1", "value1")
                 .enqueue();
 
         JobDef jd_client = jqmClient.getJobDefinition("MarsuApplication");
-        Assert.assertEquals(id, (int) jd_client.getId());
+        Assert.assertEquals(id, jd_client.getId());
         Assert.assertEquals(1, jd_client.getSchedules().size());
         Assert.assertEquals(scheduleId, jd_client.getSchedules().get(0).getId());
         Assert.assertEquals("* * * * *", jd_client.getSchedules().get(0).getCronExpression());
@@ -176,7 +176,7 @@ public class SchedulerTest extends JqmBaseTest
         CreationTools.createJobDef(null, true, "pyl.EngineApiSendMsg", null, "jqm-tests/jqm-test-pyl/target/test.jar", TestHelpers.qVip, 42,
                 "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
 
-        int i = jqmClient.newJobRequest("MarsuApplication", "testuser").startHeld().enqueue();
+        long i = jqmClient.newJobRequest("MarsuApplication", "testuser").startHeld().enqueue();
         addAndStartEngine();
 
         // Should not run.

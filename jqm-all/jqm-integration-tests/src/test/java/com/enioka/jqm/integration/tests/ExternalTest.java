@@ -14,7 +14,7 @@ public class ExternalTest extends JqmBaseTest
     public void testExternalLaunch() throws Exception
     {
         // A job which simply outputs the date on stdout.
-        int jdId = CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip,
+        long jdId = CreationTools.createJobDef(null, true, "App", null, "jqm-tests/jqm-test-datetimemaven/target/test.jar", TestHelpers.qVip,
                 42, "MarsuApplication", null, "Franquin", "ModuleMachin", "other", "other", true, cnx);
         JobDef.setExternal(cnx, jdId);
         cnx.commit();
@@ -33,7 +33,7 @@ public class ExternalTest extends JqmBaseTest
         GlobalParameter.setParameter(cnx, "internalPollingPeriodMs", "100");
         cnx.commit();
 
-        int i = JqmSimpleTest.create(cnx, "pyl.KillMeNot").setExternal().expectNonOk(0).expectOk(0).run(this);
+        Long i = JqmSimpleTest.create(cnx, "pyl.KillMeNot").setExternal().expectNonOk(0).expectOk(0).run(this);
         TestHelpers.waitForRunning(1, 20000, cnx);
 
         jqmClient.killJob(i);

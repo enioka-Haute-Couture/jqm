@@ -29,7 +29,7 @@ public class RUserDto implements Serializable
 {
     private static final long serialVersionUID = -3226768067729024400L;
 
-    private Integer id;
+    private Long id;
     private String login;
     private String newPassword;
     private String certificateThumbprint;
@@ -40,15 +40,15 @@ public class RUserDto implements Serializable
     private String email;
 
     @XmlElementWrapper(name = "roles")
-    @XmlElement(name = "role", type = Integer.class)
-    private List<Integer> roles = new ArrayList<>();
+    @XmlElement(name = "role", type = Long.class)
+    private List<Long> roles = new ArrayList<>();
 
-    public Integer getId()
+    public Long getId()
     {
         return id;
     }
 
-    public void setId(Integer id)
+    public void setId(Long id)
     {
         this.id = id;
     }
@@ -133,12 +133,12 @@ public class RUserDto implements Serializable
         this.email = email;
     }
 
-    public List<Integer> getRoles()
+    public List<Long> getRoles()
     {
         return roles;
     }
 
-    public void addRole(int roleId)
+    public void addRole(long roleId)
     {
         if (!this.roles.contains(roleId))
         {
@@ -146,7 +146,7 @@ public class RUserDto implements Serializable
         }
     }
 
-    void setRoles(List<Integer> roles)
+    void setRoles(List<Long> roles)
     {
         this.roles = roles;
     }

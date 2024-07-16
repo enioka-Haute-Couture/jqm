@@ -113,7 +113,7 @@ public class DbConn implements Closeable
                     {
                         try
                         {
-                            qr.generatedKey = gen.getInt(1);
+                            qr.generatedKey = gen.getLong(1);
                         }
                         catch (SQLException e)
                         {
@@ -539,6 +539,10 @@ public class DbConn implements Closeable
                 else if (vv.get(0) instanceof String)
                 {
                     a = _cnx.createArrayOf("VARCHAR", ((List<?>) value).toArray(new String[0]));
+                }
+                else if (vv.get(0) instanceof Long)
+                {
+                    a = _cnx.createArrayOf("BIGINT", ((List<?>) value).toArray(new Long[0]));
                 }
                 else
                 {
